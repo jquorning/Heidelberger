@@ -1,8 +1,8 @@
-with Hb_Server;
+with HB_Server;
 
 procedure Heidelberger is
 begin
-   Hb_Server.Start;
-   Hb_Server.Wait;
-   Hb_Server.Shutdown;
+   HB_Server.Start;
+   HB_Server.Wait;
+   HB_Server.Shutdown;
 end Heidelberger;

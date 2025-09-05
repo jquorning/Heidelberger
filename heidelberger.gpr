@@ -12,7 +12,8 @@ project Heidelberger is
    for Main use ("heidelberger.adb");
 
    package Compiler is
-      for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches;
+      for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
+         "-gnatyyM0C");
    end Compiler;
 
    package Binder is

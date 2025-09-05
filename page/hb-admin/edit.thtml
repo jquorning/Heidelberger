@@ -88,8 +88,8 @@ _SERVER ["REQUEST_URI"] := Remove_Query_Arg (array( "locked", "skipped", "update
 <?php $wp_list_table->search_box( $post_type_object->labels->search_items, 'post' ); ?>
  -->
 
-<input type="hidden" name="post_status" class="post_status_page" value="@_VAR(page_edit_post_status)_@" />
-<input type="hidden" name="post_type" class="post_type_page" value="@_VAR(page_edit_post_type)_@>" />
+<input type="hidden" name="post_status" class="post_status_page" value="@_VAR_page_edit_post_status_@" />
+<input type="hidden" name="post_type" class="post_type_page" value="@_VAR_page_edit_post_type_@>" />
 <!--
 <input type="hidden" name="post_status" class="post_status_page" value="<?php echo ! empty( $_REQUEST['post_status'] ) ? esc_attr( $_REQUEST['post_status'] ) : 'all'; ?>" />
 <input type="hidden" name="post_type" class="post_type_page" value="<?php echo $post_type; ?>" />
