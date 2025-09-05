@@ -1,24 +1,40 @@
 
-with Ada.Directories;
+--  with Ada.Directories;
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;
+--  with Ada.Strings.Unbounded;
 with Ada.Text_IO;
-
-with GNAT.Directory_Operations;
 
 with AWS.Config.Set;
 with AWS.Response;
 with AWS.Services.Page_Server;
-with AWS.Services.Directory;
+with AWS.Services.Dispatchers.URI;
+--  with AWS.Services.Directory;
 with AWS.Server;
 with AWS.Status;
 
+with HB_Edit;
+
 package body HB_Server is
 
-   Http_Server : AWS.Server.HTTP;
+   Server_Name : constant String := "Heidelberger";
 
    function Callback (Request : AWS.Status.Data)
                       return AWS.Response.Data;
+   procedure Register_Dispatcher;
+
+   Server     : AWS.Server.HTTP;
+   Dispatcher : AWS.Services.Dispatchers.URI.Handler;
+
+   -------------------------
+   -- Register_Dispatcher --
+   -------------------------
+
+   procedure Register_Dispatcher
+   is
+      use AWS.Services.Dispatchers.URI;
+   begin
+      Register (Dispatcher, "/hb-admin/edit", HB_Edit.Render'Access);
+   end Register_Dispatcher;
 
    --------------
    -- Callback --
@@ -26,12 +42,12 @@ package body HB_Server is
 
    function Callback (Request : AWS.Status.Data) return AWS.Response.Data
    is
-      use Ada.Directories;
-      use Ada.Strings.Unbounded;
-      use GNAT.Directory_Operations;
-      use AWS.Services.Directory;
+--      use Ada.Directories;
+--      use Ada.Strings.Unbounded;
+--      use GNAT.Directory_Operations;
+--      use AWS.Services.Directory;
 
-      Uri : constant String := AWS.Status.URI (D => Request);
+--      Uri : constant String := AWS.Status.URI (D => Request);
    begin
       return AWS.Services.Page_Server.Callback (Request => Request);
    end Callback;
@@ -52,8 +68,10 @@ package body HB_Server is
       Set.Max_Connection (Server_Config, 5);
       Set.Reuse_Address  (Server_Config, True);
 
-      AWS.Server.Start (Web_Server => Http_Server,
-                        Callback   => Callback'Access,
+      Register_Dispatcher;
+
+      AWS.Server.Start (Web_Server => Server,
+                        Dispatcher => Dispatcher,
                         Config     => Server_Config);
 
       Put_Line ("Server was started.");
@@ -73,7 +91,7 @@ package body HB_Server is
       use Ada.Text_IO;
    begin
       Put ("Shutting down server...");
-      AWS.Server.Shutdown (Web_Server => Http_Server);
+      AWS.Server.Shutdown (Web_Server => Server);
    end Shutdown;
 
    ----------

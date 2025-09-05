@@ -1,0 +1,141 @@
+<DOCTYPE html>
+<head>
+  <title>Edit Posts</title>
+</head>
+<body>
+
+
+<div class="wrap">
+<h1 class="wp-heading-inline">
+@_VAR_page_edit_h1_@
+<!--
+<?php
+echo esc_html( $post_type_object->labels->name );
+?>
+-->
+
+</h1>
+
+@_VAR_page_edit_h1_sub_@
+<!--
+<?php
+if Current_User_Can (Post_Type_Object.Cap.Create_Posts) then
+	echo " <a href=""" & Esc_Url (Admin_Url (Post_New_File) ) & """ class=""page-title-action"">" & Esc_Html (Post_Type_Object.Labels.Add_New) & "</a>";
+end if;
+
+if Isset (_REQUEST ["s"] ) and _REQUEST ["s"]'Length /= 0 then
+	echo "<span class=""subtitle"">";
+	Printf (
+		-- translators: %s: Search query.
+		abs "Search results for: %s",
+		"<strong>" & Get_Search_Query & "</strong>" -- ()
+	);
+	echo "</span>";
+end if;
+?>
+-->
+
+<hr class="wp-header-end">
+@_VAR_page_edit_bulk_@
+
+<!--
+<?php
+-- If we have a bulk message to issue:
+Messages := array();
+for ( $bulk_counts as $message => $count ) loop   -- foreach
+	if Isset (Bulk_Messages [Post_Type] [Message]) then
+		Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message], Number_Format_I18n (Count));
+	elsif Isset (Bulk_Messages ["post"] [Message] ) then
+		Messages [] := Sprintf (Bulk_Messages ["post"] [Message ], Number_Format_I18n (Count));
+	end if;
+
+	if "trashed" = Message and then Isset (_REQUEST ["ids"] ) then
+		Ids         := Preg_Replace ("/[^0-9,]/", "", _REQUEST ["ids"]);
+		Messages [] := "<a href=""" & Esc_Url (Hb_Nonce_Url ("""edit?post_type=$post_type&doaction=undo&action=untrash&ids=$ids""", "bulk-posts" )) & """>" & abs "Undo" & "</a>";
+	end if;
+
+	if "untrashed" = Message and then Isset (_REQUEST ["ids"]) then
+		Ids := Explode (",", _REQUEST ["ids"]);
+
+		if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids [0]) then
+			Messages [] := Sprintf (
+				"<a href=""%1$s"">%2$s</a>",
+				Esc_Url  (Get_Edit_Post_Link ( Ids [0])),
+				Esc_Html (Get_Post_Type_Object (Get_Post_Type (Ids [0] )).Labels.Edit_Item)
+			);
+		end if;
+	end if;
+end loop;
+
+if Messages then
+	echo "<div id=""message"" class=""updated notice is-dismissible""><p>" & Implode (" ", Messages) & "</p></div>";
+end if;
+--unset( $messages );
+
+_SERVER ["REQUEST_URI"] := Remove_Query_Arg (array( "locked", "skipped", "updated", "deleted", "trashed", "untrashed" ), _SERVER ["REQUEST_URI"] );
+?>
+-->
+
+@_VAR_page_edit_views_@
+<!--
+<?php $wp_list_table->views(); ?>
+ -->
+
+<form id="posts-filter" method="get">
+
+@_VAR_page_edit_search_box_@
+<!--
+<?php $wp_list_table->search_box( $post_type_object->labels->search_items, 'post' ); ?>
+ -->
+
+<input type="hidden" name="post_status" class="post_status_page" value="@_VAR(page_edit_post_status)_@" />
+<input type="hidden" name="post_type" class="post_type_page" value="@_VAR(page_edit_post_type)_@>" />
+<!--
+<input type="hidden" name="post_status" class="post_status_page" value="<?php echo ! empty( $_REQUEST['post_status'] ) ? esc_attr( $_REQUEST['post_status'] ) : 'all'; ?>" />
+<input type="hidden" name="post_type" class="post_type_page" value="<?php echo $post_type; ?>" />
+-->
+
+@_VAR_page_edit_author_@
+<!--
+<?php if ( ! empty( $_REQUEST['author'] ) ) { ?>
+<input type="hidden" name="author" value="<?php echo esc_attr( $_REQUEST['author'] ); ?>" />
+<?php } ?>
+ -->
+
+@_VAR_page_edit_show_sticky_@
+<!--
+<?php if ( ! empty( $_REQUEST['show_sticky'] ) ) { ?>
+<input type="hidden" name="show_sticky" value="1" />
+<?php } ?>
+-->
+
+@_VAR_page_edit_display_@
+<!--
+<?php $wp_list_table->display(); ?>
+-->
+
+</form>
+
+@_VAR_page_edit_inline_edit_@
+<!--
+<?php
+if ( $wp_list_table->has_items() ) {
+	$wp_list_table->inline_edit();
+}
+?>
+-->
+
+<div id="ajax-response"></div>
+<div class="clear"></div>
+</div>
+
+@@EXTENDS@@ footer.thtml
+@@BLOCK()@@
+@@END_BLOCK@@
+@@END_EXTENDS@@
+<!--
+<?php
+require_once ABSPATH . 'wp-admin/admin-footer.php';
+-->
+
+</body>
