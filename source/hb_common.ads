@@ -41,6 +41,7 @@ is
          Cap       : Cap_Type;
          Post_Type : Unbounded_String;
          Labels    : Lab_Type;
+         Show_In_Menu : Boolean;
       end record;
 
    type List_Table is tagged null record;
@@ -57,7 +58,7 @@ is
 
    function Typenow return String;
 
-   procedure HB_Die (Why : String; Code : Integer := 0);
+   procedure HB_Die (Why : String; Sub : String := ""; Code : Integer := 0);
 
    procedure Check_Admin_Referer (Item : String; Item_2 : String := "");
 
@@ -84,11 +85,6 @@ is
    function HB_Get_Referer return String;
    function Remove_Query_Arg  (List : Array_Type; Item : String) return String;
 
-   function Current_User_Can (Trait : Boolean) return Boolean;
-   function Current_User_Can (Trait : String; Val : Assoc_Type) return Boolean;
-   function Current_User_Can (Trait : String; Val : String) return Boolean;
-   function Current_User_Can (Trait : String; Val : Integer) return Boolean;
-   function Current_User_Can (Trait : String) return Boolean is (True);
    function Admin_URL (Item : String) return String;
 
    function Preg_Replace (Left : String; Right : String) return Integer;
@@ -102,9 +98,6 @@ is
    function Prepare (Db : DB_Type; Sql : String; Arg_1, Arg_2 : String) return Statement_Type;
    function Wpdb return DB_Type;
 
-   function Isset (Item : Array_Type) return Boolean;
-   function Isset (Item : String) return Boolean;
-
    function Explode (Item : String; Table : Array_Type) return Array_Type;
    function Implode (Item : String; Table : Array_Type) return String;
    function Implode (Item : String; Item_2 : Unbounded_String) return String;
@@ -113,11 +106,15 @@ is
 
    procedure HB_Redirect (Item : String);
 
-   function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean;
+   function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
+   function HB_Check_Post_Lock (Post_Id : String)     return Integer is (1);
    function HB_Trash_Post      (Post_Id : Assoc_Type) return Boolean;
+   function HB_Trash_Post      (Post_Id : String)     return Boolean is (True);
 
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
+   function Add_Query_Arg (Item : String; N : String; I : String)
+      return String is ("XXX-120");
    function Add_Query_Arg (Item : String; N : String) return String;
    function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
       return Unbounded_String;
@@ -133,11 +130,15 @@ is
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
 
-   function HB_Untrash_Post (Item : Assoc_Type) return Boolean;
-   function HB_Delete_Attachment (Item : Assoc_Type) return Boolean;
-   function HB_Delete_Post (Item : Assoc_Type) return Boolean;
+   function HB_Delete_Attachment (Item : Assoc_Type;
+                                  V    : Boolean := False) return Boolean is (True);
+   function HB_Delete_Attachment (Id : String;
+                                  V  : Boolean) return Boolean is (True);
+   function HB_Delete_Post (Item : Assoc_Type; V : Boolean := False)
+      return Boolean is (True);
+   function HB_Delete_Post (Item : String; V : Boolean := False)
+      return Boolean is (True);
 
-   function Get_Post (Id : Assoc_Type) return Post_Rec;
    function Bulk_Edit_Posts (Item : Array_Type) return Array_Type;
    function Is_Array (Item : Assoc_List) return Boolean;
 
@@ -199,7 +200,7 @@ is
    function Get_Post_Type_Object (Item : String) return String;
    function Get_Post_Type (Item : Assoc_Type) return Post_Rec;
 
-   function Get_Edit_Post_Link (Id : Assoc_Type) return String;
+   function Get_Edit_Post_Link (Id : Assoc_Type; Item : String := "") return String;
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return Array_Type;
@@ -258,5 +259,97 @@ is
    function Submit_Button (Text : String; V1 : String; V2 : String; X : Boolean)
      return String is ("XX-101");
    function Is_Taxonomy_Hierarchical (Taxonomy : String) return Boolean is (True);
+
+   procedure HB_Reset_Vars (A : Array_Type) is null;
+   OBJECT : Post_Rec;
+   type Hb_post is null record;
+   function HB_Verify_Nonce (V : String; Item : String) return Boolean is (True);
+   function HB_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
+   function Get_Default_Comment_Status (S : String; E : String := "") return String
+     is ("XXX-111");
+   function Str_Replace (A : Array_Type;
+                         S : String;
+                         D : String) return String is ("XXX-112");
+   function Edit_Post  return String is ("XXX-113");
+   function Write_Post return String is ("XXX-114");
+   procedure Redirect_Post (Post_Id : String) is null;
+
+   function Get_Post_Types (A : Array_Type)
+            return Array_Type is (1 .. 0 => <>);
+   function Get_Post_Types (A : Array_Type)
+            return Tax_Rec;
+   type Lock_Type is new Integer;
+   function HB_Set_Post_Lock (Post_Id : String) return Lock_Type is (1);
+
+   function Post_Type_Supports (Post : String; I : String) return Boolean is (True);
+   procedure Enqueue_Comment_Hotkeys_JS is null;
+   function HB_Basename (S : String) return String is ("XXX-106");
+   procedure HB_Update_Attachment_Metadata (Post : String; Newmeta : Array_Type)
+     is null;
+
+
+   X_COOKIE : Array_Type := (1 .. 0 => <>);
+   type Time is null record;
+   procedure Setcookie (N    : String;
+                        Post : String;
+                        Ts   : Time;
+                        Path : String;
+                        Dom  : String;
+                        Ssl  : Boolean) is null;
+   MEDIA_TRASH : Boolean := False;
+   function Post_Preview return String is ("XXX-104");
+   procedure HB_Safe_Redirect (Ref : String) is null;
+   type HB_Post_2 is
+      record
+         Post_Type   : Unbounded_String;
+         ID          : Unbounded_String;
+         Post_Status : Unbounded_String;
+      end record;
+   function "not" (T : HB_Post_2) return Boolean is (False);
+   function "not" (T : Post_Rec)  return Boolean is (False);
+
+   function Get_Post (Id : Assoc_Type) return Post_Rec;
+--   function Get_Post (Id : Integer)    return HB_Post_2;
+   function Get_Post (Id : String)     return HB_Post_2;
+   function Get_Post (Id : String; B : Post_Rec; Ltem : String) return HB_Post_2;
+
+   function Empty (A : String) return Boolean is (True);
+
+   function Apply_Filters (Item : String; S : String; D : HB_Post_2)
+      return Boolean is (True);
+   function Use_Block_Editor_For_Post (Post : HB_Post_2) return Boolean is (True);
+
+   function Isset (Item : Array_Type) return Boolean;
+   function Isset (Item : String) return Boolean;
+   function Isset (Item : Post_Rec) return Boolean is (True);
+
+   procedure Unset (A : String) is null;
+   function HB_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
+     is (1 .. 0 => <>);
+
+   type User_Type is
+      record
+         Display_Name : Unbounded_String;
+      end record;
+
+   function Get_Userdata (Id : Integer) return User_Type;
+
+   function Current_User_Can (Trait : Boolean) return Boolean;
+   function Current_User_Can (Trait : String; Val : Assoc_Type) return Boolean;
+   function Current_User_Can (Trait : String; Val : String) return Boolean;
+   function Current_User_Can (Trait : String; Val : Integer) return Boolean;
+   function Current_User_Can (Trait : String) return Boolean is (True);
+   function Current_User_Can (Trait : String; Val : HB_Post_2) return Boolean
+      is (True);
+
+   function HB_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
+   function HB_Untrash_Post (Item : HB_Post_2)  return Boolean is (True);
+
+   function Get_Current_User_Id return Integer is (1);
+   function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean
+      is (True);
+
+   procedure Update_User_Meta (Id : Integer; Item : String; V : Boolean) is null;
+
 
 end HB_Common;

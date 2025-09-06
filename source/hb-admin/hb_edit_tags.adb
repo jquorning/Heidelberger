@@ -51,7 +51,7 @@ is
          HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                  "<p>" & abs "Sorry, you are not allowed to manage terms in this taxonomy." &
                  "</p>",
-                 403);
+                 Code => 403);
       end if;
 
 --
@@ -111,7 +111,7 @@ is
             if not Current_User_Can (Tax.Cap.Edit_Terms) then
                HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                        "<p>" & abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
-                       403);
+                       Code => 403);
             end if;
 
             declare
@@ -146,7 +146,7 @@ is
                if not Current_User_Can ("delete_term", Tag_ID) then
                   HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                           "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
-                          403);
+                          Code => 403);
                end if;
 
                HB_Delete_Term (Tag_ID, -Taxonomy);
@@ -166,7 +166,7 @@ is
             if not Current_User_Can (Tax.Cap.Delete_Terms) then
                HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                        "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
-                       403);
+                       Code => 403);
             end if;
 
             declare
@@ -212,7 +212,7 @@ is
                if not Current_User_Can ("edit_term", Tag_ID) then
                   HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                           "<p>" & abs "Sorry, you are not allowed to edit this item." & "</p>",
-                          403);
+                          Code => 403);
                end if;
 
                declare
@@ -260,7 +260,10 @@ is
             <<Break_3>>
          end if; -- end case;
 
-         if "" = Location and then not Empty (Get (X_REQUEST, "_wp_http_referer")) then  -- not
+         if
+           "" = Location and then
+           not Empty (String'(Get (X_REQUEST, "_wp_http_referer")))
+         then  -- not
             Location := +Remove_Query_Arg
                 (To_Array (List => (1 => Build ("_wp_http_referer", "_wpnonce"))),
                                      HB_Unslash (Get (X_SERVER, "REQUEST_URI")));

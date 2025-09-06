@@ -25,7 +25,7 @@ is
 
    procedure Post_Type_Object is null;
 
-   procedure HB_Die (Why : String; Code : Integer := 0) is
+   procedure HB_Die (Why : String; Sub : String := ""; Code : Integer := 0) is
    begin
       null;
    end HB_Die;
@@ -100,7 +100,7 @@ is
 
    procedure HB_Redirect (Item : String) is null;
 
-   function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (False);
+--   function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (False);
    function HB_Trash_Post      (Post_Id : Assoc_Type) return Boolean is (False);
 
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
@@ -130,7 +130,7 @@ is
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer) is null;
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer) is null;
 
-   function HB_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
+--   function HB_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
    function HB_Delete_Attachment (Item : Assoc_Type) return Boolean is (True);
    function HB_Delete_Post (Item : Assoc_Type) return Boolean is (True);
 
@@ -216,7 +216,8 @@ is
       return Post;
    end Get_Post_Type;
 
-   function Get_Edit_Post_Link (Id : Assoc_Type) return String is ("XXX-67");
+   function Get_Edit_Post_Link (Id : Assoc_Type; Item : String := "") return String
+    is ("XXX-67");
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return Array_Type
    is
@@ -279,5 +280,34 @@ is
    function HB_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type) return Boolean
       is (True);
    function Is_Plugin_Active (Item : String) return Boolean is (False);
+
+   function Get_Post (Id : String)     return HB_Post_2
+   is
+      P : HB_Post_2;
+   begin
+      return P;
+   end Get_Post;
+
+   function Get_Post (Id : String; B : Post_Rec; Ltem : String) return HB_Post_2
+   is
+      P : HB_Post_2;
+   begin
+      return P;
+   end Get_Post;
+
+   function Get_Userdata (Id : Integer) return User_Type
+   is
+      U : User_Type;
+   begin
+      return U;
+   end Get_Userdata;
+
+   function Get_Post_Types (A : Array_Type)
+            return Tax_Rec
+   is
+      T : Tax_Rec;
+   begin
+      return T;
+   end Get_Post_Types;
 
 end HB_Common;

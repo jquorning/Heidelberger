@@ -71,7 +71,7 @@ package body HB_Edit is
            ("<h1>" & abs "You need a higher level of permission."  & "</h1>" &
             "<p>"  & abs "Sorry, you are not allowed to edit posts in this post type." &
             "</p>",
-            403);
+            Code => 403);
       end if;
 
       declare
@@ -150,7 +150,7 @@ package body HB_Edit is
                            Post_Ids := new Array_Type'(Get (X_REQUEST, "media"));
                         elsif Isset (String'(Get (X_REQUEST, "ids"))) then
                            Post_Ids := new Array_Type'(Explode (",", Get (X_REQUEST, "ids")));
-                        elsif not Empty (Get (X_REQUEST, "post")) then
+                        elsif not Empty (String'(Get (X_REQUEST, "post"))) then
                            Post_Ids := new Array_Type'(Array_Map ("intval", Get (X_REQUEST, "post")));
                         end if;
 
@@ -305,7 +305,7 @@ package body HB_Edit is
                      end;
                   end;
 
-            elsif not Empty (Get (X_REQUEST, "_wp_http_referer")) then
+            elsif not Empty (String'(Get (X_REQUEST, "_wp_http_referer"))) then
                HB_Redirect (Remove_Query_Arg
                              (To_Array (To_List ((+"_wp_http_referer", +"_wpnonce"))),
                               HB_Unslash (Get (X_SERVER, "REQUEST_URI"))));
@@ -588,7 +588,7 @@ package body HB_Edit is
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Insert (Translations,
                                 Assoc ("VAR_page_edit_post_status",
-                                       (if not Empty (Get (X_REQUEST, "post_status"))
+                                       (if not Empty (String'(Get (X_REQUEST, "post_status")))
                                         then ESC_Attr (String'(Get (X_REQUEST, "post_status")))
                                         else "all")));
 
@@ -597,7 +597,7 @@ package body HB_Edit is
                                                      Post_Type));
 
                      elsif Var_Name = "VAR_page_edit_author" then
-                        if not Empty (Get (X_REQUEST, "author")) then
+                        if not Empty (String'(Get (X_REQUEST, "author"))) then
                            declare
                               Author : constant String := ESC_Attrl (Get (X_REQUEST, "author"));
                            begin
@@ -607,7 +607,7 @@ package body HB_Edit is
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_show_sticky" then
-                        if not Empty (Get (X_REQUEST, "show_sticky")) then
+                        if not Empty (String'(Get (X_REQUEST, "show_sticky"))) then
                            Insert (Translations, Assoc ("VAR_page_edit_show_sticky",
                                                         "<input type=""hidden"" name=""show_sticky"" value=""1"" />"));
                         end if;
@@ -704,7 +704,7 @@ package body HB_Edit is
                declare
                   Ids : constant Assoc_List := Explode (",", Get (X_REQUEST, "ids"));
                begin
-                  if 1 = Ids'Length and then Current_User_Can ("edit_post", Ids (0)) then
+                  if 1 = Ids'Length and then Current_User_Can ("edit_post", Ids (Ids'First)) then
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
                      declare
                         Id   : constant Assoc_Type := Ids (Ids'First);
