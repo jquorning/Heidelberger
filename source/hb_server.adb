@@ -1,25 +1,21 @@
 
---  with Ada.Directories;
 with Ada.Strings.Fixed;
---  with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with AWS.Config.Set;
 with AWS.Response;
 with AWS.Services.Page_Server;
 with AWS.Services.Dispatchers.URI;
---  with AWS.Services.Directory;
 with AWS.Server;
 with AWS.Status;
 
 with HB_Edit;
+with HB_Edit_Tags;
 
 package body HB_Server is
 
    Server_Name : constant String := "Heidelberger";
 
-   function Callback (Request : AWS.Status.Data)
-                      return AWS.Response.Data;
    procedure Register_Dispatcher;
 
    Server     : AWS.Server.HTTP;
@@ -33,24 +29,9 @@ package body HB_Server is
    is
       use AWS.Services.Dispatchers.URI;
    begin
-      Register (Dispatcher, "/hb-admin/edit", HB_Edit.Render'Access);
+      Register (Dispatcher, "/hb-admin/edit",      HB_Edit.Render'Access);
+      Register (Dispatcher, "/hb-admin/edit-tags", HB_Edit_Tags.Render'Access);
    end Register_Dispatcher;
-
-   --------------
-   -- Callback --
-   --------------
-
-   function Callback (Request : AWS.Status.Data) return AWS.Response.Data
-   is
---      use Ada.Directories;
---      use Ada.Strings.Unbounded;
---      use GNAT.Directory_Operations;
---      use AWS.Services.Directory;
-
---      Uri : constant String := AWS.Status.URI (D => Request);
-   begin
-      return AWS.Services.Page_Server.Callback (Request => Request);
-   end Callback;
 
    -----------
    -- Start --
@@ -63,7 +44,7 @@ package body HB_Server is
 
       Server_Config : Object := Default_Config;
    begin
-      Set.Server_Name    (Server_Config, "Heidelberger");
+      Set.Server_Name    (Server_Config, Server_Name);
       Set.Server_Port    (Server_Config, 8080);
       Set.Max_Connection (Server_Config, 5);
       Set.Reuse_Address  (Server_Config, True);

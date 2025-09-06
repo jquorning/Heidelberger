@@ -39,11 +39,24 @@ is
    function To_List (List : List_Type) return Assoc_List is ((1 .. 0 => <>));
 
    function To_Array (List : Assoc_List) return Array_Type is ((1 .. 0 => <>));
+   function To_Array (Item : String) return Array_Type is ((1 .. 0 => <>));
 
    function HB_Get_Referer return String is ("XXX 3");
 
    function Remove_Query_Arg  (List : Array_Type; Item : String) return Unbounded_String
    is (Null_Unbounded_String);
+
+   function Remove_Query_Arg  (List : Array_Type; Item : String) return String
+   is ("XXX-104");
+
+   function Apply_Filters (Item : String;
+                           S : String;
+                           D : String := "";
+                           X : String := "")
+      return String is ("XXX-105");
+
+   function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
+      return Array_Type is ((1 .. 0 => <>));
 
    function Current_User_Can (Trait : Boolean) return Boolean is
    begin
@@ -59,7 +72,7 @@ is
 
    function Preg_Replace (Left : String; Right : Array_Type) return Integer is (1);
    function Preg_Replace (Left : String; Mid : String; Right : Array_Type) return Integer is (1);
-   function X_REQUEST (Item : String) return Array_Type is (1 .. 0 => <>);
+
    function Get_Post_Status_Object (N : Integer) return Boolean is (True);
 
    function Get_Col (Db : DB_Type; Statement : Statement_Type) return Array_Type
@@ -85,13 +98,14 @@ is
    function Array_Map (Item : String; Table : Array_Type) return Array_Type is (1 .. 0 => <>);
    function Empty (Table : Array_Type) return Boolean is (True);
 
-   procedure HB_Redirect (Item : Unbounded_String) is null;
+   procedure HB_Redirect (Item : String) is null;
 
    function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (False);
    function HB_Trash_Post      (Post_Id : Assoc_Type) return Boolean is (False);
 
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String is (Null_Unbounded_String);
+   function Add_Query_Arg (Item : String; N : String) return String is ("XXX-78");
    function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
       return Unbounded_String is (Null_Unbounded_String);
 
@@ -112,9 +126,6 @@ is
    begin
       return AL;
    end Array_Filter;
-
-   function X_GET (Item : String) return Array_Type is (1 .. 0 => <>);
-   function X_GET (Item : String) return String is ("XXX 6");
 
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer) is null;
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer) is null;
@@ -157,6 +168,8 @@ is
 
    function Apply_Filters (Item : String; S : Unbounded_String; D : String; X : Assoc_List)
       return Unbounded_String is (Null_Unbounded_String);
+   function Apply_Filters (Item : String; S : String; D : String)
+      return String is ("XXX-77");
    function Apply_Filters (Item : String; S : Assoc_List; D : Assoc_List)
       return Assoc_List
    is
@@ -180,6 +193,7 @@ is
    function ESC_HTML (Item : String) return String is (Item);
    function ESC_URL  (Item : String) return String is (Item);
    function ESC_Attr (AL : Assoc_List) return String is ("XXX-41");
+   function ESC_Attr (AL : String) return String is ("XXX-106");
    function ESC_Attrl (AL : Assoc_List) return String is ("XXX-42");
 
    function Printf (Format : String; Arg_1 : String) return String is (Format & Arg_1);
@@ -204,14 +218,14 @@ is
 
    function Get_Edit_Post_Link (Id : Assoc_Type) return String is ("XXX-67");
 
-   function Get (List : Array_Type; Arg_1 : String; Arg_2 : String) return Array_Type
+   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return Array_Type
    is
       A : constant Array_Type := (1 .. 0 => <>);
    begin
       return A;
    end Get;
 
-   function Get (List : Array_Type; Arg_1 : String; Arg_2 : String) return String is ("XXX-68");
+   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String is ("XXX-68");
 
    function As_Count_Message (List : Array_Type) return Count_Message_Type
    is
@@ -219,5 +233,51 @@ is
    begin
       return C;
    end As_Count_Message;
+
+   procedure Check_Admin_Referer (Item : String; Item_2 : String := "") is null;
+   function Get_Pagination_Arg (List : List_Type; Item : String) return Natural is (1);
+   function Get_Pagination_Arg (List : List_Table; Item : String) return Natural is (1);
+   function Current_User_Can (Trait : String; Val : String) return Boolean is (True);
+   function Current_User_Can (Trait : String; Val : Integer) return Boolean is (True);
+   function Admin_URL (Item : String) return String is ("XXX-71");
+   function Preg_Replace (Left : String; Right : String) return Integer is (1);
+   function Isset (Item : String) return Boolean is (True);
+   function Taxnow return String is ("XXX-72");
+   function Get_Taxonomy (Item : String) return Tax_Rec
+   is
+      T : Tax_Rec;
+   begin
+      return T;
+   end Get_Taxonomy;
+
+   function Get_Taxonomies (list : Array_Type) return Tax_Rec
+   is
+      T : Tax_Rec;
+   begin
+      return T;
+   end Get_Taxonomies;
+
+   function In_Array (Item : String; Tax : Tax_Rec; V : Boolean) return Boolean is (True);
+   function HB_Insert_Term (Item : String; Item2 : String; Arr : Array_Type) return Boolean
+      is (True);
+   -- Get (X_Post, "tag-name"), Taxonomy, X_POST);
+   function Is_HB_Error (Ret : Boolean) return Boolean is (False);
+   procedure HB_Delete_Term (Tag : Integer; Taxonomy : String) is null;
+   procedure HB_Delete_Terms (Tag : Integer; Taxonomy : String) is null;
+
+   function Get_Term (Id : Integer; Tax : String := "") return Term_Type
+   is
+      T : Term_Type;
+   begin
+      return T;
+   end Get_Term;
+
+   function "not" (Term : Term_Type) return Boolean is (False);
+   function Sanitize_URL (Item : String) return String is ("XXX-73");
+   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String) return String
+      is ("XXX-74");
+   function HB_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type) return Boolean
+      is (True);
+   function Is_Plugin_Active (Item : String) return Boolean is (False);
 
 end HB_Common;

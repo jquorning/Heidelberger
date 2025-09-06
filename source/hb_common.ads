@@ -14,18 +14,26 @@ is
       record
          Edit_Posts   : Boolean := True;
          Create_Posts : Boolean := True;
+         Manage_Terms : Boolean := True;
+         Edit_Terms   : Boolean := True;
+         Delete_Terms : Boolean := True;
       end record;
 
    type Lab_Type is
       record
          Name              : Unbounded_String;
          Filter_Items_List : Unbounded_String;
-         Items_List_Navigation : Unbounded_String;
+         Items_List_Navigation  : Unbounded_String;
+         Name_Field_Description : Unbounded_String;
          Items_List   : Unbounded_String;
          Add_New      : Unbounded_String;
+         Add_New_Item : Unbounded_String;
          Search_Items : Unbounded_String;
          Edit_Items   : Unbounded_String;
          Edit_Item    : Unbounded_String;
+         Slug_Field_Description : Unbounded_String;
+         Parent_Field_Description : Unbounded_String;
+         Parent_Item : Unbounded_String;
       end record;
 
    type Post_Rec is
@@ -37,6 +45,7 @@ is
 
    type List_Table is tagged null record;
    function Get_Pagenum (Item : List_Table) return Natural;
+
    procedure Prepare_Items (Table : in out List_Table);
    function Current_Action (Item : List_Table) return String;
    function Views (Item : List_Table) return String;
@@ -48,14 +57,9 @@ is
 
    function Typenow return String;
 
---   procedure Post_Type_Object;
    procedure HB_Die (Why : String; Code : Integer := 0);
 
---   procedure Parent_File;
---   procedure Submenu_File;
---   procedure Post_New_File;
-
-   procedure Check_Admin_Referer (Item : String);
+   procedure Check_Admin_Referer (Item : String; Item_2 : String := "");
 
    type Assoc_Type is
       record
@@ -71,17 +75,24 @@ is
 
    type List_Type is array (Positive range <>) of Unbounded_String;
    function To_List (List : List_Type) return Assoc_List;
+   function Get_Pagination_Arg (List : List_Type; Item : String) return Natural;
+   function Get_Pagination_Arg (List : List_Table; Item : String) return Natural;
+
    function To_Array (List : Assoc_List) return Array_Type;
+   function To_Array (Item : String) return Array_Type;
+
    function HB_Get_Referer return String;
-   function Remove_Query_Arg  (List : Array_Type; Item : String) return Unbounded_String;
+   function Remove_Query_Arg  (List : Array_Type; Item : String) return String;
 
    function Current_User_Can (Trait : Boolean) return Boolean;
    function Current_User_Can (Trait : String; Val : Assoc_Type) return Boolean;
-   function Admin_URL (Item : String) return Unbounded_String;
+   function Current_User_Can (Trait : String; Val : String) return Boolean;
+   function Current_User_Can (Trait : String; Val : Integer) return Boolean;
+   function Current_User_Can (Trait : String) return Boolean is (True);
+   function Admin_URL (Item : String) return String;
 
-   function Preg_Replace (Left : String; Right : Array_Type) return Integer;
+   function Preg_Replace (Left : String; Right : String) return Integer;
    function Preg_Replace (Left : String; Mid : String; Right : Array_Type) return Integer;
-   function X_REQUEST (Item : String) return Array_Type;
    function Get_Post_Status_Object (N : Integer) return Boolean;
 
    type Statement_Type is null record;
@@ -92,19 +103,22 @@ is
    function Wpdb return DB_Type;
 
    function Isset (Item : Array_Type) return Boolean;
+   function Isset (Item : String) return Boolean;
+
    function Explode (Item : String; Table : Array_Type) return Array_Type;
    function Implode (Item : String; Table : Array_Type) return String;
    function Implode (Item : String; Item_2 : Unbounded_String) return String;
    function Array_Map (Item : String; Table : Array_Type) return Array_Type;
    function Empty (Table : Array_Type) return Boolean;
 
-   procedure HB_Redirect (Item : Unbounded_String);
+   procedure HB_Redirect (Item : String);
 
    function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean;
    function HB_Trash_Post      (Post_Id : Assoc_Type) return Boolean;
 
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
+   function Add_Query_Arg (Item : String; N : String) return String;
    function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
       return Unbounded_String;
 
@@ -115,8 +129,6 @@ is
    function Absint (Item : Assoc_List) return String;
 
    function Array_Filter (List : Array_Type) return Assoc_List;
-   function X_GET (Item : String) return Array_Type;
-   function X_GET (Item : String) return String;
 
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
@@ -130,7 +142,6 @@ is
    function Is_Array (Item : Assoc_List) return Boolean;
 
    procedure Set (Arr : in out Array_Type; Key : String; Value : String);
-   function Get (Arr : Array_Type; Key : String) return String;
    function Count (Item : String) return String;
 
    type Screen_Id is new Integer;
@@ -148,11 +159,22 @@ is
 
    function Apply_Filters (Item : String; S : Unbounded_String; D : String; X : Assoc_List)
       return Unbounded_String;
+   function Apply_Filters (Item : String; S : String; D : String := ""; X : String := "")
+      return String;
    function Apply_Filters (Item : String; S : Assoc_List; D : Assoc_List)
       return Assoc_List;
+   function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
+      return Array_Type;
+--   function Apply_Filters ("redirect_term_location", -Location, Tax) return String;
 
    function HB_Unslash (Item : String) return String;
-   X_SERVER : Array_Type := (1 .. 0 => <>); -- (Item : String) return String;
+
+   X_SERVER  : Array_Type := (1 .. 0 => <>); -- (Item : String) return String;
+   X_POST    : Array_Type := (1 .. 0 => <>);
+   X_GET     : Array_Type := (1 .. 0 => <>);
+--   function X_GET (Item : String) return String;
+   X_REQUEST : Array_Type := (1 .. 0 => <>);
+
    procedure Add_Screen_Option (Item : String; List : Array_Type);
 
    function "abs" (List : Array_Type) return String;
@@ -160,6 +182,7 @@ is
    function ESC_HTML (Item : String) return String;
    function ESC_URL  (Item : String) return String;
    function ESC_Attr (AL : Assoc_List) return String;
+   function ESC_Attr (AL : String) return String;
    function ESC_Attrl (AL : Assoc_List) return String;
 
    function Printf (Format : String; Arg_1 : String) return String;
@@ -178,8 +201,8 @@ is
 
    function Get_Edit_Post_Link (Id : Assoc_Type) return String;
 
-   function Get (List : Array_Type; Arg_1 : String; Arg_2 : String) return Array_Type;
-   function Get (List : Array_Type; Arg_1 : String; Arg_2 : String) return String;
+   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
+   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return Array_Type;
 
    type Count_Message_Type is
       record
@@ -188,5 +211,52 @@ is
       end record;
 
    function As_Count_Message (List : Array_Type) return Count_Message_Type;
+
+   type Lab_Record is
+      record
+         Name : Unbounded_String;
+      end record;
+
+   type Tax_Rec is
+      record
+         Labels : Lab_Type;  --  Lab_Record;
+         Name   : Unbounded_String;
+         Cap    : Cap_Type;
+      end record;
+
+   function Taxnow return String;
+   function Get_Taxonomy (Item : String) return Tax_Rec;
+   function Get_Taxonomies (list : Array_Type) return Tax_Rec;
+   function In_Array (Item : String; Tax : Tax_Rec; V : Boolean) return Boolean;
+   function HB_Insert_Term (Item : String; Item2 : String; Arr : Array_Type) return Boolean;
+   -- Get (X_Post, "tag-name"), Taxonomy, X_POST);
+   function Is_HB_Error (Ret : Boolean) return Boolean;
+   procedure HB_Delete_Term (Tag : Integer; Taxonomy : String);
+   procedure HB_Delete_Terms (Tag : Integer; Taxonomy : String);
+
+   type Term_Type is null record;
+   function Get_Term (Id : Integer; Tax : String := "") return Term_Type;
+   function "not" (Term : Term_Type) return Boolean;
+   function Sanitize_URL (Item : String) return String;
+   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String) return String;
+   function HB_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type) return Boolean;
+   function Is_Plugin_Active (Item : String) return Boolean;
+
+   procedure Do_Action_Deprecated (I1 : String;
+                                   A1 : Array_Type;
+                                   V : String;
+                                   I2 : String) is null;
+   procedure Do_Action (Item_1 : String; Item_2 : String := "") is null;
+   procedure HB_Nonce_Field (I1, I2 : String) is null;
+
+   function Get_Cat_Name (Item : String) return String is ("XXX-91");
+   function Get_Option (Item : String) return String is ("XXX-92");
+
+   function HB_Is_Mobile return Boolean is (False);
+   procedure HB_Dropdown_Categories (A : Array_Type) is null;
+
+   function Submit_Button (Text : String; V1 : String; V2 : String; X : Boolean)
+     return String is ("XX-101");
+   function Is_Taxonomy_Hierarchical (Taxonomy : String) return Boolean is (True);
 
 end HB_Common;

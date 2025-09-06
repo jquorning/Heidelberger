@@ -112,18 +112,18 @@ package body HB_Edit is
                Check_Admin_Referer ("bulk-posts");
                   declare
                      Sendback : Unbounded_String
-                       := Remove_Query_Arg (To_Array (List => To_List ((+"trashed", +"untrashed",
-                                                                        +"deleted",
-                                                                        +"locked", +"ids"))),
-                                            HB_Get_Referer);  -- () );
+                       := +Remove_Query_Arg (To_Array (List => To_List ((+"trashed", +"untrashed",
+                                                                         +"deleted",
+                                                                         +"locked", +"ids"))),
+                                             HB_Get_Referer);  -- () );
                   begin
                      if Sendback = "" then   -- not
-                        Sendback := Admin_URL (Parent_File);
+                        Sendback := To_Unbounded_String (Admin_URL (Parent_File));
                      end if;
 
                      Sendback := Add_Query_Arg ("paged", Pagenum, Sendback);
                      if Index (Sendback, "post") /= 0 then
-                        Sendback := Admin_URL (Post_New_File);
+                        Sendback := To_Unbounded_String (Admin_URL (Post_New_File));
                      end if;
 
                      declare
@@ -134,7 +134,7 @@ package body HB_Edit is
                         -- Prepare for deletion of all posts with a specified post status
                         -- (i.e. Empty Trash).
                            Post_Status := Preg_Replace ("/(^a-z0-9_-)+/i', '",
-                                                        X_REQUEST ("post_status"));
+                                                        Get (X_REQUEST, "post_status"));
 
                            -- Validate the post status exists.
                            if Get_Post_Status_Object (Post_Status) then
@@ -146,16 +146,16 @@ package body HB_Edit is
                               Post_Ids := new Array_Type'(Wpdb.Get_Col (Wpdb.Prepare ("SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", Post_Type, Post_Status'Image)));
                            end if;
                            Doaction := "delete";
-                        elsif Isset (X_REQUEST ("media")) then
-                           Post_Ids := new Array_Type'(X_REQUEST ("media"));
-                        elsif Isset (X_REQUEST ("ids")) then
-                           Post_Ids := new Array_Type'(Explode (",", X_REQUEST ("ids")));
-                        elsif not Empty (X_REQUEST ("post")) then
-                           Post_Ids := new Array_Type'(Array_Map ("intval", X_REQUEST ("post")));
+                        elsif Isset (String'(Get (X_REQUEST, "media"))) then
+                           Post_Ids := new Array_Type'(Get (X_REQUEST, "media"));
+                        elsif Isset (String'(Get (X_REQUEST, "ids"))) then
+                           Post_Ids := new Array_Type'(Explode (",", Get (X_REQUEST, "ids")));
+                        elsif not Empty (Get (X_REQUEST, "post")) then
+                           Post_Ids := new Array_Type'(Array_Map ("intval", Get (X_REQUEST, "post")));
                         end if;
 
                         if Empty (Post_Ids.all) then
-                           HB_Redirect (Sendback);
+                           HB_Redirect (-Sendback);
                            return AWS.Response.URL (""); -- exit;  -- redirect
                         end if;
 
@@ -184,7 +184,7 @@ package body HB_Edit is
                               end loop;
 
                               Sendback := Add_Query_Arg (
-                                To_Array ((
+                                To_Array (List => (
                                         Build ("trashed", Trashed'Image),
                                         Build ("ids",     Implode (",", Post_Ids.all)),
                                         Build ("locked",  Locked'Image)
@@ -197,7 +197,10 @@ package body HB_Edit is
                            declare
                               Untrashed : Natural := 0;
                            begin
-                              if Isset (X_GET ("doaction")) and "undo" = X_GET ("doaction") then
+                              if
+                                Isset (String'(Get (X_GET, "doaction"))) and
+                                "undo" = String'(Get (X_GET, "doaction"))
+                              then
                                  Add_Filter ("wp_untrash_post_status",
                                              "wp_untrash_post_set_previous_status",
                                              10, 3);
@@ -250,9 +253,9 @@ package body HB_Edit is
 
                         elsif "edit" = Doaction then
 --              when "edit" =>
-                           if Isset (X_REQUEST ("bulk_edit")) then
+                           if Isset (String'(Get (X_REQUEST, "bulk_edit"))) then
                               declare
-                                 Done : Array_Type := Bulk_Edit_Posts (X_REQUEST (Item => ""));
+                                 Done : Array_Type := Bulk_Edit_Posts (Get (X_REQUEST, ""));
                                  -- (item => ) added
                               begin
                                  if Is_Array (Done) then
@@ -291,18 +294,18 @@ package body HB_Edit is
                            end;
                         end if; --      end case;
 
-                        Sendback := Remove_Query_Arg
+                        Sendback := +Remove_Query_Arg
                            (To_Array (To_List ((+"action", +"action2", +"tags_input",
                                                 +"post_author", +"comment_status", +"ping_status",
                                                 +"_status", +"post", +"bulk_edit", +"post_view"))),
                             -Sendback);
 
-                        HB_Redirect (Sendback);
+                        HB_Redirect (-Sendback);
                         return AWS.Response.URL (""); -- exit;  -- redirect
                      end;
                   end;
 
-            elsif not Empty (X_REQUEST ("_wp_http_referer")) then
+            elsif not Empty (Get (X_REQUEST, "_wp_http_referer")) then
                HB_Redirect (Remove_Query_Arg
                              (To_Array (To_List ((+"_wp_http_referer", +"_wpnonce"))),
                               HB_Unslash (Get (X_SERVER, "REQUEST_URI"))));
@@ -325,7 +328,7 @@ package body HB_Edit is
             begin
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
-                        To_Array ((
+                        To_Array (List => (
                         Build ("id",    "overview"),
                         Build ("title", abs "Overview"),
                         Build ("content",
@@ -333,7 +336,7 @@ package body HB_Edit is
                         )));
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array ((
+                        To_Array (List => (
                         Build ("id",    "screen-content"),
                         Build ("title", abs "Screen Content"),
                         Build ("content",
@@ -347,7 +350,7 @@ package body HB_Edit is
                         )));
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array ((
+                        To_Array (List => (
                          Build ("id",    "action-links"),
                          Build ("title", abs "Available Actions"),
                         Build ("content",
@@ -361,7 +364,7 @@ package body HB_Edit is
                         )));
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array ((
+                        To_Array (List => (
                         Build ("id",    "bulk-actions"),
                         Build ("title", abs "Bulk actions"),
                         Build ("conten",
@@ -377,7 +380,7 @@ package body HB_Edit is
 
                elsif "page" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab (
-                     To_Array ((
+                     To_Array (List => (
                         Build ("id",    "overview"),
                         Build ("title", abs "Overview"),
                         Build ("content",
@@ -385,7 +388,7 @@ package body HB_Edit is
                   )));
 
                   Get_Current_Screen.Add_Help_Tab (
-                     To_Array ((
+                     To_Array (List => (
                         Build ("id",    "managing-pages"),
                         Build ("title", abs "Managing Pages"),
                         Build ("content",
@@ -402,7 +405,7 @@ package body HB_Edit is
             end;
 
             Get_Current_Screen.Set_Screen_Reader_Content (
-               To_Array ((
+               To_Array (List => (
                 Build ("heading_views",      -Post_Type_Object.Labels.Filter_Items_List),
                 Build ("heading_pagination", -Post_Type_Object.Labels.Items_List_Navigation),
                 Build ("heading_list",       -Post_Type_Object.Labels.Items_List)
@@ -410,28 +413,28 @@ package body HB_Edit is
 
             Add_Screen_Option (
                "per_page",
-               To_Array ((
+               To_Array (List => (
                   Build ("default", Natural'(20)'Image),
                   Build ("option",  "edit_" & Post_Type & "_per_page")
             )));
 
             declare
                Bulk_Counts : Array_Type
-                  := To_Array ((
-        Build ("updated",   (if Isset (X_REQUEST ("updated"))
-                             then Absint (X_REQUEST ("updated"))   else "0")),
-        Build ("locked",    (if Isset (X_REQUEST ("locked"))
-                             then Absint (X_REQUEST ("locked"))    else "0")),
-        Build ("deleted",   (if Isset (X_REQUEST ("deleted"))
-                             then Absint (X_REQUEST ("deleted"))   else "0")),
-        Build ("trashed",   (if Isset (X_REQUEST ("trashed"))
-                             then Absint (X_REQUEST ("trashed"))   else "0")),
-        Build ("untrashed", (if Isset (X_REQUEST ("untrashed"))
-                             then Absint (X_REQUEST ("untrashed")) else "0"))
+                  := To_Array (List => (
+        Build ("updated",   (if Isset (String'(Get (X_REQUEST, "updated")))
+                             then Absint (Get (X_REQUEST, "updated"))   else "0")),
+        Build ("locked",    (if Isset (String'(Get (X_REQUEST, "locked")))
+                             then Absint (Get (X_REQUEST, "locked"))    else "0")),
+        Build ("deleted",   (if Isset (String'(Get (X_REQUEST, "deleted")))
+                             then Absint (Get (X_REQUEST, "deleted"))   else "0")),
+        Build ("trashed",   (if Isset (String'(Get (X_REQUEST, "trashed")))
+                             then Absint (Get (X_REQUEST, "trashed"))   else "0")),
+        Build ("untrashed", (if Isset (String'(Get (X_REQUEST, "untrashed")))
+                             then Absint (Get (X_REQUEST, "untrashed")) else "0"))
                ));
                Bulk_Messages    : Array_Type := (1 .. 0 => <>); --          := To_Array; --  ();begin
             begin
-               Set (Bulk_Messages, "post", abs To_Array ((    --  abs added
+               Set (Bulk_Messages, "post", abs To_Array (List => (    --  abs added
         -- translators: %s: Number of posts.
         Build ("updated", Plural ("%s post updated.",
                                      "%s posts updated.", Get (Bulk_Counts, "updated"))),
@@ -455,7 +458,7 @@ package body HB_Edit is
                                     Get (Bulk_Counts, "untrashed")))
                )));
 
-               Set (Bulk_Messages, "page", abs To_Array ((
+               Set (Bulk_Messages, "page", abs To_Array (List => (
         -- translators: %s: Number of pages.
         Build ("updated", Plural ("%s page updated.", "%s pages updated.", Get (Bulk_Counts, "updated"))),
         Build ("locked",  (if "1" = Get (Bulk_Counts, "locked")
@@ -478,7 +481,7 @@ package body HB_Edit is
                                     Get (Bulk_Counts, "untrashed")))
                )));
 
-               Set (Bulk_Messages, "wp_block", abs To_Array ((
+               Set (Bulk_Messages, "wp_block", abs To_Array (List => (
         -- translators: %s: Number of blocks.
         Build ("updated", Plural ("%s block updated.",
                                   "%s blocks updated.",
@@ -539,17 +542,20 @@ package body HB_Edit is
 
                      elsif Var_Name = "VAR_page_edit_h1_sub" then
                         declare
-                           Url  : constant String := ESC_URL  (-Admin_URL (Post_New_File));
-                           Html : constant String := ESC_HTML (-Post_Type_Object.Labels.Add_New);
+                           URL  : constant String := ESC_URL  (Admin_URL (Post_New_File));
+                           HTML : constant String := ESC_HTML (-Post_Type_Object.Labels.Add_New);
                         begin
                            if Current_User_Can (Post_Type_Object.Cap.Create_Posts) then
                               Insert (Translations, Assoc ("VAR_page_edit_h1_sub",
-                                                           " <a href=""" & Url & """ class=""page-title-action"">" & Html & "</a>"));
+                                                           " <a href=""" & URL & """ class=""page-title-action"">" & HTML & "</a>"));
 
                            end if;
                         end;
 
-                        if Isset (X_REQUEST ("s")) and X_REQUEST ("s")'Length /= 0 then
+                        if
+                          Isset (String'(Get (X_REQUEST, "s"))) and then
+                          String'(Get (X_REQUEST, "s"))'Length /= 0
+                        then
                            declare
                               Buffer : constant String
                                  := "<span class=""subtitle"">" &
@@ -580,19 +586,20 @@ package body HB_Edit is
                                                             "post")));
 
                      elsif Var_Name = "VAR_page_edit_post_status" then
-                        Insert (Translations, Assoc ("VAR_page_edit_post_status",
-                                                     (if not Empty (X_REQUEST ("post_status"))
-                                                      then ESC_Attr (X_REQUEST ("post_status"))
-                                                       else "all")));
+                        Insert (Translations,
+                                Assoc ("VAR_page_edit_post_status",
+                                       (if not Empty (Get (X_REQUEST, "post_status"))
+                                        then ESC_Attr (String'(Get (X_REQUEST, "post_status")))
+                                        else "all")));
 
                      elsif Var_Name = "VAR_page_edit_post_type" then
                         Insert (Translations, Assoc ("VAR_page_edit_post_status",
                                                      Post_Type));
 
                      elsif Var_Name = "VAR_page_edit_author" then
-                        if not Empty (X_REQUEST ("author")) then
+                        if not Empty (Get (X_REQUEST, "author")) then
                            declare
-                              Author : constant String := ESC_Attrl (X_REQUEST ("author"));
+                              Author : constant String := ESC_Attrl (Get (X_REQUEST, "author"));
                            begin
                               Insert (Translations, Assoc ("VAR_page_edit_author",
                                                            "<input type=""hidden"" name=""author"" value=""" & Author & """ />"));
@@ -600,7 +607,7 @@ package body HB_Edit is
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_show_sticky" then
-                        if not Empty (X_REQUEST ("show_sticky")) then
+                        if not Empty (Get (X_REQUEST, "show_sticky")) then
                            Insert (Translations, Assoc ("VAR_page_edit_show_sticky",
                                                         "<input type=""hidden"" name=""show_sticky"" value=""1"" />"));
                         end if;
@@ -665,21 +672,22 @@ package body HB_Edit is
             Count   : constant Natural := Natural'Value (-X.Key);   -- Count;
             Message : constant String  := -X.Value; -- Message;
          begin
-            if Isset (Get (Bulk_Messages, Post_Type, Message)) then
+            if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, Post_Type, Message),
                                           Number_Format_I18n (Count)));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
-            elsif Isset (Get (Bulk_Messages, "post", Message)) then
+            elsif Isset (String'(Get (Bulk_Messages, "post", Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, "post", Message),
                                           Number_Format_I18n (Count)));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
             end if;
 
-            if "trashed" = Message and then Isset (X_REQUEST ("ids")) then
+            if "trashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
                declare
-                  Ids   : constant Integer := Preg_Replace ("/[^0-9,]/", "", X_REQUEST ("ids"));
+                  Ids   : constant Integer := Preg_Replace ("/[^0-9,]/", "",
+                                                            Get (X_REQUEST, "ids"));
                   URL_2 : constant String
                      := """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
                         Ids'Image & """";
@@ -692,9 +700,9 @@ package body HB_Edit is
                -- "bulk-posts" )) & """>" & abs "Undo" & "</a>";
             end if;
 
-            if "untrashed" = Message and then Isset (X_REQUEST ("ids")) then
+            if "untrashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
                declare
-                  Ids : constant Assoc_List := Explode (",", X_REQUEST ("ids"));
+                  Ids : constant Assoc_List := Explode (",", Get (X_REQUEST, "ids"));
                begin
                   if 1 = Ids'Length and then Current_User_Can ("edit_post", Ids (0)) then
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
@@ -729,7 +737,7 @@ package body HB_Edit is
       -- unset( $messages );
 
       Set (X_SERVER, "REQUEST_URI",
-           -Remove_Query_Arg (To_Array (To_List ((+"locked", +"skipped",
+           Remove_Query_Arg (To_Array (To_List ((+"locked", +"skipped",
                                          +"updated", +"deleted",
                                          +"trashed", +"untrashed"))),
                               Get (X_SERVER, "REQUEST_URI")));
