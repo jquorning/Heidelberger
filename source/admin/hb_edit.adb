@@ -17,12 +17,17 @@ with Php;
 with HB_Common;
 with Wp_Common;
 
+with Inc_Class_Posts;
+with Inc_Class_Wp_Post_Type;
+with Inc_Posts;
+
 package body HB_Edit
 is
    use Ada.Containers;
    use Ada.Strings.Unbounded;
    use L10n;
    use HB_Common;
+   use Wp_Common;
    use Arrays;
    use Php;
 
@@ -59,20 +64,23 @@ is
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
+      use Inc_Class_Posts;
+      use Inc_Class_Wp_Post_Type;
 --
 --  @global string       $post_type
 --  @global WP_Post_Type $post_type_object
 --
 --  global $post_type, $post_type_object;
 
-      Post_Type        : constant String    := Typenow;
-      Post_Type_Object : constant Post_Rec  := Post_Rec'(Get_Post_Type_Object (Post_Type));
+      Post_Type        : constant String       := Typenow;
+      Post_Type_Object : constant Wp_Post_Type
+         := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin
 --  if Post_Type_Object = 0 then  -- not
 --   Wp_Die (abs  "Invalid post type.");
 --  end if;
 
-      if not Current_User_Can (Post_Type_Object.Cap.Edit_Posts) then
+      if not Current_User_Can (Get (Post_Type_Object.Cap, "edit_posts")) then
          Wp_Die
            ("<h1>" & abs "You need a higher level of permission."  & "</h1>" &
             "<p>"  & abs "Sorry, you are not allowed to edit posts in this post type." &
@@ -135,36 +143,48 @@ is
                      end if;
 
                      declare
-                        Post_Ids    : Array_Type; --  := To_Array; -- ()
-                        Post_Status : Integer;
+                        use Array_Vectors;
+
+                        Post_Ids    : List_Type; --  := To_Array; -- ()
+                        Post_Status : Unbounded_String;
                      begin
                         if "delete_all" = Doaction then
                         -- Prepare for deletion of all posts with a specified post status
                         -- (i.e. Empty Trash).
-                           Post_Status := Preg_Replace ("/(^a-z0-9_-)+/i', '",
-                                                        Get (X_REQUEST, "post_status"));
+                           Post_Status
+                              := +Preg_Replace (Pattern     => "/(^a-z0-9_-)+/i",
+                                                Replacement => "",
+                                                Subject     => Get (X_REQUEST,
+                                                                    "post_status"));
 
                            -- Validate the post status exists.
-                           if Get_Post_Status_Object (Post_Status) then
+                           if
+                             Inc_Posts.Get_Post_Status_Object (-Post_Status)
+                                /= Empty_Array
+                           then
                               --
                               -- @global wpdb $wpdb WordPress database abstraction object.
                               --
                               -- global $wpdb;
-
-                              Post_Ids := Array_Type'(Wpdb.Get_Col (Wpdb.Prepare ("SELECT ID FROM " & Post_Type & " WHERE post_type=%s AND post_status = %s", Post_Type, Post_Status'Image)));
+                              --
+                              Post_Ids := Wpdb.Get_Col (
+                                 Wpdb.Prepare
+                                    ("SELECT ID FROM " & Post_Type &
+                                     " WHERE post_type=%s AND post_status = %s",
+                                     Post_Type, -Post_Status));
                            end if;
                            Doaction := "delete";
 
                         elsif Isset (String'(Get (X_REQUEST, "media"))) then
-                           Post_Ids := Array_Type'(Get (X_REQUEST, "media"));
+                           Post_Ids := Get_List (X_REQUEST, "media");
 
                         elsif Isset (String'(Get (X_REQUEST, "ids"))) then
-                           Post_Ids := Array_Type'(Explode (",", Get (X_REQUEST, "ids")));
+                           Post_Ids := List_Type'(Explode (",", Get_List (X_REQUEST, "ids")));
                         elsif not Empty (String'(Get (X_REQUEST, "post"))) then
-                           Post_Ids := Array_Type'(Array_Map ("intval", Get (X_REQUEST, "post")));
+                           Post_Ids := List_Type'(Array_Map ("intval", Get (X_REQUEST, "post")));
                         end if;
 
-                        if Empty (Post_Ids) then
+                        if Post_Ids.Is_Empty then
                            Wp_Redirect (-Sendback);
                            return AWS.Response.URL (""); -- exit;  -- redirect
                         end if;
@@ -176,16 +196,16 @@ is
                               Locked  : Natural := 0;
                            begin
                               for Post_Id of Post_Ids loop -- foreach (To_Array)
-                                 if not Current_User_Can ("delete_post", Post_Id) then
+                                 if not Current_User_Can ("delete_post", -Post_Id) then
                                     Wp_Die (abs "Sorry, you are not allowed to move this item to the Trash.");
                                  end if;
 
-                                 if Wp_Check_Post_Lock (Post_Id) then
+                                 if 0 /= Wp_Check_Post_Lock (-Post_Id) then
                                     Locked := Locked + 1;
                                     goto Continue;
                                  end if;
 
-                                 if not Wp_Trash_Post (Post_Id) then
+                                 if not Wp_Trash_Post (-Post_Id) then
                                     Wp_Die (abs "Error in moving the item to Trash.");
                                  end if;
 
@@ -196,7 +216,7 @@ is
                               Sendback := Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("trashed", Trashed'Image),
-                                        Build ("ids",     Implode (",", Post_Ids)),
+--                                        Build ("ids",     Implode (",", Post_Ids)),
                                         Build ("locked",  Locked'Image)
                                 )),
                                 Sendback);
@@ -208,8 +228,8 @@ is
                               Untrashed : Natural := 0;
                            begin
                               if
-                                Isset (String'(Get (X_GET, "doaction"))) and
-                                "undo" = String'(Get (X_GET, "doaction"))
+                                Isset (String'(Get (XX_GET, "doaction"))) and
+                                "undo" = String'(Get (XX_GET, "doaction"))
                               then
                                  Add_Filter ("wp_untrash_post_status",
                                              "wp_untrash_post_set_previous_status",
@@ -217,11 +237,11 @@ is
                               end if;
 
                               for Post_Id of Post_Ids loop
-                                 if not Current_User_Can ("delete_post", Post_Id) then
+                                 if not Current_User_Can ("delete_post", -Post_Id) then
                                     Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
                                  end if;
 
-                                 if not Wp_Untrash_Post (Post_Id) then
+                                 if not Wp_Untrash_Post (-Post_Id) then
                                     Wp_Die (abs "Error in restoring the item from Trash.");
                                  end if;
 
@@ -240,18 +260,19 @@ is
                            begin
                               for Post_Id of Post_Ids loop
                                  declare
-                                    Post_Del : constant Post_Rec := Get_Post (Post_Id);
+                                    Post_Del : constant Wp_Post
+                                       := Inc_Posts.Get_Post (Integer'Value (-Post_Id));
                                  begin
-                                    if not Current_User_Can ("delete_post", Post_Id) then
+                                    if not Current_User_Can ("delete_post", -Post_Id) then
                                        Wp_Die (abs "Sorry, you are not allowed to delete this item.");
                                     end if;
 
                                     if "attachment" = Post_Del.Post_Type then
-                                       if not Wp_Delete_Attachment (Post_Id) then
+                                       if not Wp_Delete_Attachment (-Post_Id) then
                                           Wp_Die (abs "Error in deleting the attachment.");
                                        end if;
                                     else
-                                       if not Wp_Delete_Post (Post_Id) then
+                                       if not Wp_Delete_Post (-Post_Id) then
                                           Wp_Die (abs "Error in deleting the item.");
                                        end if;
                                     end if;
@@ -339,7 +360,7 @@ is
 
             declare
                --  Used in the HTML title tag.
-               Title : String := -Post_Type_Object.Labels.Name;
+               Title : String := Wp_Common.Get (Post_Type_Object, "labels.name");
             begin
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
@@ -421,9 +442,12 @@ is
 
             Get_Current_Screen.Set_Screen_Reader_Content (
                To_Array (List => (
-                Build ("heading_views",      -Post_Type_Object.Labels.Filter_Items_List),
-                Build ("heading_pagination", -Post_Type_Object.Labels.Items_List_Navigation),
-                Build ("heading_list",       -Post_Type_Object.Labels.Items_List)
+                Build ("heading_views",
+                       Wp_Common.Get (Post_Type_Object, "labels.filter_items_list")),
+                Build ("heading_pagination",
+                       Wp_Common.Get (Post_Type_Object, "labels.items_list_navigation")),
+                Build ("heading_list",
+                       Wp_Common.Get (Post_Type_Object, "labels.items_list"))
             )));
 
             Add_Screen_Option (
@@ -557,15 +581,23 @@ is
                   is
                   begin
                      if Var_Name = "VAR_page_edit_h1" then
-                        Insert (Translations, Assoc ("VAR_page_edit_h1",
-                                                     ESC_HTML (-Post_Type_Object.Labels.Name)));
+                        Insert (Translations,
+                                Assoc ("VAR_page_edit_h1",
+                                       ESC_HTML (Wp_Common.Get (Post_Type_Object,
+                                                      "labels.name"))));
 
                      elsif Var_Name = "VAR_page_edit_h1_sub" then
                         declare
-                           URL  : constant String := ESC_URL  (Admin_URL (Post_New_File));
-                           HTML : constant String := ESC_HTML (-Post_Type_Object.Labels.Add_New);
+                           URL  : constant String :=
+                              ESC_URL  (Admin_URL (Post_New_File));
+                           HTML : constant String :=
+                              ESC_HTML (String'(Hb_Common.Get (Post_Type_Object,
+                                                     "labels.add_new")));
                         begin
-                           if Current_User_Can (Post_Type_Object.Cap.Create_Posts) then
+                           if
+                             Current_User_Can (Get (Post_Type_Object.Cap,
+                                                    "create_posts"))
+                          then
                               Insert (Translations, Assoc ("VAR_page_edit_h1_sub",
                                                            " <a href=""" & URL & """ class=""page-title-action"">" & HTML & "</a>"));
 
@@ -602,8 +634,10 @@ is
                      elsif Var_Name = "VAR_page_edit_search_box" then
                         Insert (Translations,
                            Assoc ("VAR_page_edit_search_box",
-                                  Wp_List_Table.Search_Box (-Post_Type_Object.Labels.Search_Items,
-                                                            "post")));
+                                  Wp_List_Table.Search_Box
+                                    (String'(Hb_Common.Get (Post_Type_Object,
+                                                  "labels.search_items")),
+                                     "post")));
 
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Insert (Translations,
@@ -722,23 +756,28 @@ is
 
             if "untrashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
                declare
-                  use Array_Vectors;
+                  use List_Vectors;
 
-                  Ids : constant Array_type := Explode (",", Get (X_REQUEST, "ids"));
+                  Ids : constant List_Type :=
+                     Explode (",", Get_List (X_REQUEST, "ids"));
                begin
                   if
                     1 = Length (Ids) and then
-                    Current_User_Can ("edit_post", Ids.First_Element) --  (Ids'First))
+                    Current_User_Can ("edit_post", -Ids.First_Element) --  (Ids'First))
                   then
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
                      declare
-                        Id   : constant Assoc_Type := Ids.First_Element;
-                        URL  : constant String     := ESC_URL (Get_Edit_Post_Link (Id));
-                        Post : constant Post_Rec   := Get_Post_Type (Id);
-                        HTML : constant String
-                          := ESC_HTML (Get_Post_Type_Object (-Post.Labels.Edit_Item));
+                        Id   : constant Integer := Integer'Value (-Ids.First_Element);
+                        URL  : constant String  :=
+                           ESC_URL (Get_Edit_Post_Link (Id));
+                        Post : constant String  := -- Inc_Class_Posts.Wp_Post :=
+                           Inc_Posts.Get_Post_Type (Id);
+                        HTML : constant String := "XXX-251";
+--                        := ESC_HTML (Inc_Posts.Get_Post_Type_Object
+--                                      (Get (A => Post, Key => "labels.edit_item")));
                      begin
-                        Append (Messages, "<a href=""" & URL & "$s"">" & HTML & "$s</a>");
+                        Append (Messages, "<a href=""" & URL & "$s"">" & HTML &
+                                          "$s</a>");
                      end;
                      -- Messages [] := Sprintf (
                      --               "<a href=""%1$s"">%2$s</a>",

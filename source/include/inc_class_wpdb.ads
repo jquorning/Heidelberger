@@ -828,8 +828,8 @@ is
         function Get_Col (Db    : in out Wpdb_Class;
                           Query : String  := "";  -- null;
                           X     : Integer := 0)
-                          return Array_Type
-                          is (Empty_Array);
+                          return List_Type
+                          is (Empty_List);
 
 --
         -- Retrieves the character set for the given table.

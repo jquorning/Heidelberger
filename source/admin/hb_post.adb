@@ -8,6 +8,8 @@ with L10n;
 with Arrays;
 with Php;
 
+with Inc_Class_Wp_Post_Type;
+
 with HB_Common;
 --
 -- Edit post administration panel.
@@ -19,6 +21,8 @@ with HB_Common;
 --
 
 with Inc_Class_Posts;
+with Inc_Class_Wp_Post_Type;
+with Inc_Posts;
 
 -- WordPress Administration Bootstrap
 -- require_once __DIR__ . '/admin.php';
@@ -41,22 +45,22 @@ is
 
       Wp_Reset_Vars (To_Array ("action"));
       declare
-         Post_Id : String := "test"; -- Integer; -- test added
+         Post_Id : Integer; -- String := "test"; -- Integer; -- test added
       begin
          if
-           Isset (String'(Get (X_GET, "post"))) and then
+           Isset (String'(Get (XX_GET, "post"))) and then
            Isset (String'(Get (X_POST, "post_ID"))) and then
-           Integer'Value (String'(Get (X_GET, "post"))) /=
+           Integer'Value (String'(Get (XX_GET, "post"))) /=
            Integer'Value (String'(Get (X_POST, "post_ID")))
          then
             Wp_Die (abs "A post ID mismatch has been detected.",
                     abs "Sorry, you are not allowed to edit this item.", 400);
-         elsif Isset (String'(Get (X_GET, "post"))) then
-            Post_Id := String'(Get (X_GET, "post"));
+         elsif Isset (String'(Get (XX_GET, "post"))) then
+            Post_Id := Get_Integer (XX_GET, "post");
          elsif (Isset (String'(Get (X_POST, "post_ID")))) then
-            Post_Id := String'(Get (X_POST, "post_ID"));
+            Post_Id := Get_Integer (X_POST, "post_ID");
          else
-            Post_Id := "";
+            Post_Id := 0; -- "    ";
          end if;
 --  post_ID := Post_Id;
 
@@ -68,18 +72,18 @@ is
 -- global post_type, post_type_object, post;
       declare
          Post_Type        : String := "";
-         Post_Type_Object : Post_Rec;
+         Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
          Post             : Inc_Class_Posts.Wp_Post;
          Action   : Unbounded_String;
          Sendback : Unbounded_String;
       begin
-         if Post_Id /= "" then
-            Post := Get_Post (Post_Id);
+         if Post_Id /= 0 then  -- "    " then
+            Post := Inc_Posts.Get_Post (Post_Id);
          end if;
 
 --       if Post then
          Post_Type        := -Post.Post_Type;
-         Post_Type_Object := Get_Post_Type_Object (Post_Type);
+         Post_Type_Object := Inc_Posts.Get_Post_Type_Object (Post_Type);
 --       end if;
 
          if
@@ -137,7 +141,9 @@ is
                      Error_Msg := +abs "Unable to submit this form, please refresh and try again.";
                   end if;
 
-                  if not Current_User_Can (Get_Post_Type_Object ("post").Cap.Create_Posts) then
+                  if
+                    not Current_User_Can (Get (Inc_Posts.Get_Post_Type_Object ("post").Cap, "create_posts"))
+                  then
                      goto Bailout; -- return;  -- exit;
                   end if;
 
@@ -145,7 +151,7 @@ is
                     goto Bailout; -- return; -- Wp_Dashboard_Quick_Press (-Error_Msg);
                   end if;
                end;
-               Post := Get_Post (Get (X_REQUEST, "post_ID"));
+               Post := Inc_Posts.Get_Post (Get_Integer (X_REQUEST, "post_ID"));
                Check_Admin_Referer ("add-" & (-Post.Post_Type));
 
                Set (X_POST, "comment_status",
@@ -190,7 +196,7 @@ is
                declare
                   Editing : Boolean := True;
                begin
-                  if Empty (Post_Id) then -- .key added
+                  if Post_Id = 0 then -- .key added
                      Wp_Redirect (Admin_URL ("post.php"));
                      goto Bailout; -- return; -- exit;
                   end if;
@@ -220,12 +226,12 @@ is
                      Wp_Die (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                   end if;
 
-                  if not Empty (String'(Get (X_GET, "get-post-lock"))) then
-                     Check_Admin_Referer ("lock-post_" & Post_Id);
+                  if not Empty (String'(Get (XX_GET, "get-post-lock"))) then
+                     Check_Admin_Referer ("lock-post_" & Post_Id'Image);
                      declare
                         Unused : Lock_Type := Wp_Set_Post_Lock (Post_Id);
                      begin
-                        Wp_Redirect (Get_Edit_Post_Link (Build (Post_Id, "url")));
+                        Wp_Redirect (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
                      end;
                      goto Bailout; -- return; -- exit;
                   end if;
@@ -241,11 +247,11 @@ is
                      Post_New_File := +"media-new.php";
                   else
                      if
-                       Isset (Post_Type_Object) and then
-                       Post_Type_Object.Show_In_Menu and then
-                       True /= Post_Type_Object.Show_In_Menu
+--                       Isset (Post_Type_Object) and then
+--                       Post_Type_Object.Show_In_Menu_Bool and then
+                       True /= Post_Type_Object.Show_In_Menu_Bool
                      then
-                        Parent_File := +(Post_Type_Object.Show_In_Menu'Image);
+                        Parent_File := Post_Type_Object.Show_In_Menu;
                      else
                         Parent_File := +"edit.php?post_type=post_type";
                      end if;
@@ -254,7 +260,7 @@ is
                   end if;
 
                   declare
-                     Title : String := -Post_Type_Object.Labels.Edit_Item;
+                     Title : String := Get (Post_Type_Object, "labels.edit_item");
                   begin
                      null;
                   end;
@@ -286,7 +292,7 @@ is
                      end;
                   end if;
 
-                  Post := Get_Post (Post_Id, OBJECT, "edit");
+                  Post := Inc_Posts.Get_Post (Post_Id, "OBJECT", "edit");
 
                   if Post_Type_Supports (Post_Type, "comments") then
                      Wp_Enqueue_Script ("admin-comments");
@@ -297,7 +303,7 @@ is
                <<Label_1>>
 
             elsif Action = "editattachment" then
-               Check_Admin_Referer ("update-post_" & Post_Id);
+               Check_Admin_Referer ("update-post_" & Post_Id'Image);
 
                -- Don"t let these be changed.
                Unset (Get (X_POST, "guid"));
@@ -305,33 +311,35 @@ is
 
                -- Update the thumbnail filename.
                declare
-                  Newmeta : Array_Type := Wp_Get_Attachment_Metadata (Post_Id, True);
+                  Newmeta : Array_Type :=
+                     Wp_Get_Attachment_Metadata (Post_Id'Image, True);
                begin
                   Set (Newmeta, "thumb", Wp_Basename (Get (X_POST, "thumb")));
 
-                  Wp_Update_Attachment_Metadata (Post_Id, Newmeta);
+                  Wp_Update_Attachment_Metadata (Post_Id'Image, Newmeta);
                end;
                -- Intentional fall-through to trigger the edit_post() call.
 
             elsif Action = "editpost" then
-               Check_Admin_Referer ("update-post_" & Post_Id);
+               Check_Admin_Referer ("update-post_" & Post_Id'Image);
 
-               Post_Id := Edit_Post; --();
+               Post_Id := Integer'Value (Edit_Post); --();
 
                -- Session cookie flag that the post was saved.
                if
                  Isset (String'(Get (X_COOKIE, "wp-saving-post"))) -- and then
                then
-                  Set (X_COOKIE, "wp-saving-post", Post_Id & "-check");
+                  Set (X_COOKIE, "wp-saving-post", Post_Id'Image & "-check");
 --                Setcookie ("wp-saving-post", Post_Id'Image & "-saved", time + DAY_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN, Is_Ssl); -- ssl());
                end if;
 
-               Redirect_Post (Post_Id); -- Send user on their way while we keep working.
+               Redirect_Post (Post_Id'Image);
+               -- Send user on their way while we keep working.
 
                goto Bailout; -- return; -- exit;
 
             elsif Action = "trash" then
-               Check_Admin_Referer ("trash-post_" & Post_Id);
+               Check_Admin_Referer ("trash-post_" & Post_Id'Image);
 
                if not Post then
                   Wp_Die (abs "The item you are trying to move to the Trash no longer exists.");
@@ -346,7 +354,7 @@ is
                end if;
 
                declare
-                  User_Id : constant Integer := Wp_Check_Post_Lock (Post_Id);
+                  User_Id : constant Integer := Wp_Check_Post_Lock (Post_Id'Image);
                begin
                   if User_Id /= 0 then
                      declare
@@ -357,7 +365,7 @@ is
                      end;
                   end if;
 
-                  if not Wp_Trash_Post (Post_Id) then
+                  if not Wp_Trash_Post (Post_Id'Image) then
                      Wp_Die (abs "Error in moving the item to Trash.");
                   end if;
 
@@ -365,7 +373,7 @@ is
                         -Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("trashed", "1"),
-                                        Build ("ids",     Post_Id)
+                                        Build ("ids",     Post_Id'Image)
                                 )),
                                 Sendback
                         )
@@ -374,7 +382,7 @@ is
                goto Bailout; -- return; --  exit;
 
             elsif Action = "untrash" then
-               Check_Admin_Referer ("untrash-post_" & Post_Id);
+               Check_Admin_Referer ("untrash-post_" & Post_Id'Image);
 
                if not Post then
                   Wp_Die (abs "The item you are trying to restore from the Trash no longer exists.");
@@ -395,7 +403,7 @@ is
                Sendback := Add_Query_Arg (
                         To_Array (List => (
                                 Build ("untrashed", "1"),
-                                Build ("ids",       Post_Id)
+                                Build ("ids",       Post_Id'Image)
                         )),
                         Sendback
                );
@@ -403,7 +411,7 @@ is
                goto Bailout; -- return; -- exit;
 
             elsif Action = "delete" then
-               Check_Admin_Referer ("delete-post_" & Post_Id);
+               Check_Admin_Referer ("delete-post_" & Post_Id'Image);
 
                if not Post then
                   Wp_Die (abs "This item has already been deleted.");
@@ -421,12 +429,12 @@ is
                   declare
                      Force : constant Boolean := not MEDIA_TRASH;
                   begin
-                     if not Wp_Delete_Attachment (Post_Id, Force) then
+                     if not Wp_Delete_Attachment (Post_Id'Image, Force) then
                         Wp_Die (abs "Error in deleting the attachment.");
                      end if;
                   end;
                else
-                  if not Wp_Delete_Post (Post_Id, True) then
+                  if not Wp_Delete_Post (Post_Id'Image, True) then
                      Wp_Die (abs "Error in deleting the item.");
                   end if;
                end if;
@@ -435,7 +443,7 @@ is
                goto Bailout; -- return; -- exit;
 
             elsif Action = "preview" then
-               Check_Admin_Referer ("update-post_" & Post_Id);
+               Check_Admin_Referer ("update-post_" & Post_Id'Image);
                declare
                   URL : constant String := Post_Preview; -- ();
                begin
@@ -473,7 +481,7 @@ is
                --
                -- @param int post_id Post ID sent with the request.
                --
-               Do_Action ("post_action_{action}", Post_Id);
+               Do_Action ("post_action_" & (-Action), Post_Id'Image);
 
                Wp_Redirect (Admin_URL ("edit.php"));
                goto Bailout; -- return; -- exit;

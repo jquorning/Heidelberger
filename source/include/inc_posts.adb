@@ -1523,15 +1523,33 @@ is
 -- @param string $post_type The name of a registered post type.
 -- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
 --
--- function get_post_type_object( $post_type ) then
---         global $wp_post_types;
+   Wp_Post_Types : List_Type;
 
---         if ( ! is_scalar( $post_type ) || empty( $wp_post_types[ $post_type ] ) ) then
---                 return null;
---         end;
+   function Get_Post_Type_Object (Post_Type : String)
+                                  return Inc_Class_Wp_Post_Type.Wp_Post_Type
+   is
+      use List_Vectors;
+--        global $wp_post_types;
+      P : Inc_Class_Wp_Post_Type.Wp_Post_Type;
+   begin
+      if
+--        not Is_Scalar (Post_Type) or else
+        "" = Get (Wp_Post_Types, Post_Type)  -- empty
+      then
+         null;
+--         return null;
+      end if;
 
---         return $wp_post_types[ $post_type ];
--- end;
+      return P; -- Get (Wp_Post_Types, Post_Type);
+   end Get_Post_Type_Object;
+
+  function Get_Post_Type_Object (Post_Type : String)
+                                 return Wp_Post
+  is
+     P : Wp_Post;
+  begin
+     return P;
+  end Get_Post_Type_Object;
 
 --
 -- Gets a list of all registered post type objects.

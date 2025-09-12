@@ -1,6 +1,7 @@
 with Arrays;
 
 with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Post_Type;
 with Inc_Class_Posts;
 with Inc_Taxonomys;
 
@@ -40,5 +41,10 @@ is
    function Get_Term_Array (Arry : Inc_Class_Wp_Terms.Wp_Term_Array;
                             Key  : String)
                             return Inc_Class_Wp_Terms.Wp_Term;
+
+   function Get (Post_Type : Inc_Class_Wp_Post_Type.Wp_Post_Type;
+                 Key       : String)
+                 return String
+                 is ("XXX-240");
 
 end Wp_Common;

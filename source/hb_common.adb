@@ -19,11 +19,11 @@ is
 
    function Typenow return String is ("XXX 2");
 
-   function Get_Post_Type_Object (Item : String) return Post_Rec is
-      Rec : Post_Rec;
-   begin
-      return Rec;
-   end Get_Post_Type_Object;
+   -- function Get_Post_Type_Object (Item : String) return Post_Rec is
+   --    Rec : Post_Rec;
+   -- begin
+   --    return Rec;
+   -- end Get_Post_Type_Object;
 
    procedure Post_Type_Object is null;
 
@@ -124,11 +124,11 @@ is
    function Wp_Delete_Attachment (Item : Assoc_Type) return Boolean is (True);
    function Wp_Delete_Post (Item : Assoc_Type) return Boolean is (True);
 
-   function Get_Post (Id : Assoc_Type) return Post_Rec is
-      Pr : Post_Rec;
-   begin
-      return Pr;
-   end Get_Post;
+   -- function Get_Post (Id : Assoc_Type) return Post_Rec is
+   --    Pr : Post_Rec;
+   -- begin
+   --    return Pr;
+   -- end Get_Post;
 
    function Bulk_Edit_Posts (Item : Array_Type) return Array_Type is
       A : constant Array_Type := Empty_Array;
@@ -182,9 +182,9 @@ is
 
    function ESC_HTML (Item : String) return String is (Item);
    function ESC_URL  (Item : String) return String is (Item);
-   function ESC_Attr (AL : Assoc_List) return String is ("XXX-41");
+--   function ESC_Attr (AL : Assoc_List) return String is ("XXX-41");
    function ESC_Attr (AL : String) return String is ("XXX-106");
-   function ESC_Attrl (AL : Assoc_List) return String is ("XXX-42");
+--   function ESC_Attrl (AL : Assoc_List) return String is ("XXX-42");
 
    function Printf (Format : String; Arg_1 : String) return String is (Format & Arg_1);
 
@@ -196,15 +196,15 @@ is
 --   function Wp_Nonce_URL (Url : String; Item : String) return String is ("XXX-64");
    function Count (Al : Assoc_List) return Natural is (1);
 
-   function Get_Post_Type_Object (Item : Post_Rec) return String is ("XXX-65");
-   function Get_Post_Type_Object (Item : String) return String is ("XXX-66");
+--   function Get_Post_Type_Object (Item : Post_Rec) return String is ("XXX-65");
+--   function Get_Post_Type_Object (Item : String) return String is ("XXX-66");
 
-   function Get_Post_Type (Item : Assoc_Type) return Post_Rec
-   is
-      Post : Post_Rec;
-   begin
-      return Post;
-   end Get_Post_Type;
+   -- function Get_Post_Type (Item : Assoc_Type) return Post_Rec
+   -- is
+   --    Post : Post_Rec;
+   -- begin
+   --    return Post;
+   -- end Get_Post_Type;
 
    function Get_Edit_Post_Link (Id : Assoc_Type; Item : String := "") return String
     is ("XXX-67");
@@ -216,14 +216,15 @@ is
       return A;
    end Get;
 
-   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String is ("XXX-68");
+   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
+                 return String is ("XXX-68");
 
-   function As_Count_Message (List : Array_Type) return Count_Message_Type
-   is
-      C : Count_Message_Type;
-   begin
-      return C;
-   end As_Count_Message;
+--   function As_Count_Message (List : Array_Type) return Count_Message_Type
+--   is
+--      C : Count_Message_Type;
+--   begin
+--      return C;
+--   end As_Count_Message;
 
    procedure Check_Admin_Referer (Item : String; Item_2 : String := "") is null;
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural is (1);
@@ -273,19 +274,19 @@ is
 --      is (True);
    function Is_Plugin_Active (Item : String) return Boolean is (False);
 
-   function Get_Post (Id : String)     return Wp_Post
-   is
-      P : Wp_Post;
-   begin
-      return P;
-   end Get_Post;
+   -- function Get_Post (Id : String)     return Wp_Post
+   -- is
+   --    P : Wp_Post;
+   -- begin
+   --    return P;
+   -- end Get_Post;
 
-   function Get_Post (Id : String; B : Post_Rec; Ltem : String) return Wp_Post
-   is
-      P : Wp_Post;
-   begin
-      return P;
-   end Get_Post;
+   -- function Get_Post (Id : String; B : Post_Rec; Ltem : String) return Wp_Post
+   -- is
+   --    P : Wp_Post;
+   -- begin
+   --    return P;
+   -- end Get_Post;
 
    function Get_Userdata (Id : Integer) return User_Type
    is

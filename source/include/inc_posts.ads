@@ -1,11 +1,59 @@
 with Arrays;
 
 with Inc_Class_Posts;
+with Inc_Class_Wp_Post_Type;
 
 package Inc_Posts
 is
    use Arrays;
    use Inc_Class_Posts;
+
+--
+-- Retrieves the post type of the current post or of a given post.
+--
+-- @since 2.1.0
+--
+-- @param int|WP_Post|null $post Optional. Post ID or post object. Default is global $post.
+-- @return string|false          Post type on success, false on failure.
+--
+   function Get_Post_Type (Post : Integer := 0) -- := null )
+                           return String is ("XXX-250");
+   function Get_Post_Type (Post : Wp_Post) -- := null )
+                           return String is ("XXX-251");
+
+--
+-- Retrieves a post type object by name.
+--
+-- @since 3.0.0
+-- @since 4.6.0 Object returned is now an instance of `WP_Post_Type`.
+--
+-- @global array $wp_post_types List of post types.
+--
+-- @see register_post_type()
+--
+-- @param string $post_type The name of a registered post type.
+-- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
+--
+  function Get_Post_Type_Object (Post_Type : String) return Wp_Post;
+  function Get_Post_Type_Object (Post_Type : String)
+                                 return Inc_Class_Wp_Post_Type.Wp_Post_Type;
+
+--
+-- Retrieves a post status object by name.
+--
+-- @since 3.0.0
+--
+-- @global stdClass[] $wp_post_statuses List of post statuses.
+--
+-- @see register_post_status()
+--
+-- @param string $post_status The name of a registered post status.
+-- @return stdClass|null A post status object.
+--
+   function Get_Post_Status_Object (Post_Status : String)
+                                    return Array_Type
+                                    is (Empty_Array);
+
 --
 -- Retrieves post data given a post ID or post object.
 --
