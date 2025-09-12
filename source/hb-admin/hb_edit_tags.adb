@@ -1,31 +1,31 @@
+--
+-- Edit Tags Administration Screen.
+--
+-- @package WordPress
+-- @subpackage Administration
+--
 
 with Ada.Strings.Unbounded;
 
 with Templates_Parser;
 
+with Arrays;
 with L10n;
 
 with HB_Common;
 
+with Inc_Taxonomys;
+with Inc_Class_Wp_Taxonomy;
+with Inc_Class_Wp_Terms;
+with Inc_Options;
+
 package body HB_Edit_Tags
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
    use L10n;
    use HB_Common;
 
-   function Translation
-      return Templates_Parser.Translate_Table;
-
--- <?php
--- /**
--- * Edit Tags Administration Screen.
--- *
--- * @package WordPress
--- * @subpackage Administration
--- */
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data
-   is
 -- /** WordPress Administration Bootstrap */
 -- require_once __DIR__ . '/admin.php';
 
@@ -33,22 +33,32 @@ is
 --      wp_die( __( 'Invalid taxonomy.' ) );
 -- }
 
-      Tax : constant Tax_Rec := Get_Taxonomy (Taxnow);
+   function Translation
+      return Templates_Parser.Translate_Table;
+
+   function Render (Request : in AWS.Status.Data)
+                    return AWS.Response.Data
+   is
+      use Inc_Taxonomys;
+      use Inc_Class_Wp_Taxonomy;
+      use Inc_Class_Wp_Terms;
+
+      Tax : constant Wp_Taxonomy := Get_Taxonomy (Taxnow);
       Taxonomy : constant String := ""; -- jq
    begin
 --      if not Tax then
---         HB_Die (abs "Invalid taxonomy.");
+--         Wp_Die (abs "Invalid taxonomy.");
 --      end if;
 
       if
          not In_Array (-Tax.Name, Get_Taxonomies
                                    (To_Array (List => (1 => Build ("show_ui", "true")))), True)
       then
-         HB_Die (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
+         Wp_Die (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
       end if;
 
-      if not Current_User_Can (Tax.Cap.Manage_Terms) then
-         HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+      if not Current_User_Can (Get (Tax.Cap, "manage_terms")) then
+         Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                  "<p>" & abs "Sorry, you are not allowed to manage terms in this taxonomy." &
                  "</p>",
                  Code => 403);
@@ -63,10 +73,10 @@ is
       Label_1 :
       declare
          Post_Type     : constant String := ""; -- jq
-         HB_List_Table : List_Table := X_Get_List_Table ("WP_Terms_List_Table");
-         Pagenum       : constant Natural    := HB_List_Table.Get_Pagenum;  -- ();
+         Wp_List_Table : List_Table := X_Get_List_Table ("WP_Terms_List_Table");
+         Pagenum       : constant Natural    := Wp_List_Table.Get_Pagenum;  -- ();
 
-         Title : String := -Tax.Labels.Name;
+         Title : String := Get (Tax.Labels, "name");
 
          Parent_File  : String
             := (if "post" /= Post_Type then (if "attachment" = Post_Type
@@ -91,35 +101,39 @@ is
                                                                "_per_page"))));
 
          Get_Current_Screen.Set_Screen_Reader_Content (
-                  To_Array (List => (Build ("heading_pagination", -Tax.Labels.Items_List_Navigation),
-                                     Build ("heading_list",       -Tax.Labels.Items_List))));
+            To_Array (List =>
+               (Build ("heading_pagination", Get (Tax.Labels, "items_list_navigation")),
+                Build ("heading_list",       Get (Tax.Labels, "items_list")))));
 
 --               Location := False;
-         Referer  := +HB_Get_Referer; -- ();
+         Referer  := +Wp_Get_Referer; -- ();
          if Referer = "" then -- For POST requests.  -- not
-            Referer := +HB_Unslash (Get (X_SERVER, "REQUEST_URI"));
+            Referer := +Wp_Unslash (Get (X_SERVER, "REQUEST_URI"));
          end if;
-         Referer := +Remove_Query_Arg (To_Array ((To_List ((+"_wp_http_referer", +"_wpnonce",
-                                                            +"error", +"message", +"paged")))),
+         Referer := +Remove_Query_Arg (To_List ((+"_wp_http_referer",
+                                                 +"_wpnonce",
+                                                 +"error",
+                                                 +"message",
+                                                 +"paged")),
                                        -Referer);
 
 -- case Hb_List_Table.Current_Action then
 
-         if "add-tag" = HB_List_Table.Current_Action then
+         if "add-tag" = Wp_List_Table.Current_Action then
             Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
 
-            if not Current_User_Can (Tax.Cap.Edit_Terms) then
-               HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+            if not Current_User_Can (Get (Tax.Cap, "edit_terms")) then
+               Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                        "<p>" & abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
                        Code => 403);
             end if;
 
             declare
                Taxonomy : Unbounded_String;  --  Added by jq. Not declared anywhere
-               Ret : constant Boolean := HB_Insert_Term (Get (X_POST, "tag-name"),
+               Ret : constant Boolean := Wp_Insert_Term (Get (X_POST, "tag-name"),
                                                          -Taxonomy, X_POST);
             begin
-               if Ret and then not Is_HB_Error (Ret) then
+               if Ret and then not Is_Wp_Error (Ret) then
                   Location := Add_Query_Arg ("message", 1, Referer);
                else
                   Location := Add_Query_Arg (
@@ -132,7 +146,7 @@ is
                end if;
             end;
 
-         elsif "delete" = HB_List_Table.Current_Action then
+         elsif "delete" = Wp_List_Table.Current_Action then
             if not Isset (String'(Get (X_REQUEST, "tag_ID"))) then
                goto  Break;
             end if;
@@ -144,27 +158,28 @@ is
                Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
 
                if not Current_User_Can ("delete_term", Tag_ID) then
-                  HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+                  Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                           "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
                           Code => 403);
                end if;
 
-               HB_Delete_Term (Tag_ID, -Taxonomy);
+               Wp_Delete_Term (Tag_ID, -Taxonomy);
 
                Location := Add_Query_Arg ("message", 2, Referer);
 
                -- When deleting a term, prevent the action from redirecting back to a term
                -- that no longer exists.
-               Location := +Remove_Query_Arg (To_Array (List => (1 => Build ("tag_ID", "action"))),
+               Location := +Remove_Query_Arg (Arrays.To_Array ((1 => Build ("tag_ID",
+                                                                           "action"))),
                                               -Location);
             end;
             <<Break>>
 
-         elsif "bulk-delete" = HB_List_Table.Current_Action then
+         elsif "bulk-delete" = Wp_List_Table.Current_Action then
             Check_Admin_Referer ("bulk-tags");
 
-            if not Current_User_Can (Tax.Cap.Delete_Terms) then
-               HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+            if not Current_User_Can (Get (Tax.Cap, "delete_terms")) then
+               Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                        "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
                        Code => 403);
             end if;
@@ -174,13 +189,13 @@ is
                Tags : constant Array_Type := To_Array (Item => Get (X_REQUEST, "delete_tags"));
             begin
                for Tag_ID of Tags loop
-                  HB_Delete_Term (Integer'Value (-Tag_ID.Key), -Taxonomy);  -- Added .key
+                  Wp_Delete_Term (Integer'Value (-Tag_ID.Key), -Taxonomy);  -- Added .key
                end loop;
 
                Location := Add_Query_Arg ("message", 6, Referer);
             end;
 
-         elsif "edit" =  HB_List_Table.Current_Action then
+         elsif "edit" =  Wp_List_Table.Current_Action then
             if not Isset (String'(Get (X_REQUEST, "tag_ID"))) then
                goto Break_2;
             end if;
@@ -188,21 +203,21 @@ is
             declare
                Taxonomy : Unbounded_String;
                Term_Id  : constant Integer   := Integer'Value (Get (X_REQUEST, "tag_ID"));
-               Term     : Term_Type := Get_Term (Term_Id);
+               Term     : Wp_Term := Get_Term (Term_Id);
             begin
                if False then
---             if Term not in HB_Term then
+--             if Term not in Wp_Term then
 --             if not term instanceof WP_Term then
-                  HB_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                  Wp_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                end if;
 
-               HB_Redirect (Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, Post_Type)));
+               Wp_Redirect (Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, Post_Type)));
             end;
             goto Bailout; -- return; -- exit;
 
          <<Break_2>>
 
-         elsif "editedtag" = HB_List_Table.Current_Action then
+         elsif "editedtag" = Wp_List_Table.Current_Action then
             declare
                Taxonomy : Unbounded_String;
                Tag_ID   : constant Integer := Integer'Value (Get (X_POST, "tag_ID"));
@@ -210,22 +225,22 @@ is
                Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
 
                if not Current_User_Can ("edit_term", Tag_ID) then
-                  HB_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+                  Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                           "<p>" & abs "Sorry, you are not allowed to edit this item." & "</p>",
                           Code => 403);
                end if;
 
                declare
-                  Tag : constant Term_Type := Get_Term (Tag_ID, -Taxonomy);
+                  Tag : constant Wp_Term := Get_Term (Tag_ID, -Taxonomy);
                begin
                   if not Tag then
-                     HB_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                     Wp_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
                   declare
-                     Ret : constant Boolean := HB_Update_Term (Tag_ID, -Taxonomy, X_POST);
+                     Ret : constant Boolean := Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
                   begin
-                     if Ret and then not Is_HB_Error (Ret) then
+                     if Ret and then not Is_Wp_Error (Ret) then
                         Location := Add_Query_Arg ("message", 3, Referer);
                      else
                         Location := Add_Query_Arg (
@@ -241,7 +256,7 @@ is
             end;
 
          else
-            if "" = HB_List_Table.Current_Action or else  -- not
+            if "" = Wp_List_Table.Current_Action or else  -- not
               not Isset (String'(Get (X_REQUEST, "delete_tags")))
             then
                goto Break_3;
@@ -253,8 +268,9 @@ is
                Tags   : constant Array_Type := To_Array (Item => Get (X_REQUEST, "delete_tags"));
             begin
                -- This action is documented in wp-admin/edit.php
-               Location := Apply_Filters ("handle_bulk_actions-thenscreenend;",
-                                          Location, HB_List_Table.Current_Action, Tags);
+               Location := +Apply_Filters ("handle_bulk_actions-thenscreenend;",
+                                           -Location, Wp_List_Table.Current_Action,
+                                           Tags);
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
             end;
             <<Break_3>>
@@ -266,7 +282,7 @@ is
          then  -- not
             Location := +Remove_Query_Arg
                 (To_Array (List => (1 => Build ("_wp_http_referer", "_wpnonce"))),
-                                     HB_Unslash (Get (X_SERVER, "REQUEST_URI")));
+                                     Wp_Unslash (Get (X_SERVER, "REQUEST_URI")));
          end if;
 
          if Location /= "" then
@@ -282,24 +298,24 @@ is
             -- @param string      location The destination URL.
             -- @param WP_Taxonomy tax      The taxonomy object.
             --
-            HB_Redirect (Apply_Filters ("redirect_term_location", -Location, -Tax.Name));  -- .name added
+            Wp_Redirect (Apply_Filters ("redirect_term_location", -Location, -Tax.Name));  -- .name added
             goto Bailout; -- return;  --  exit;
          end if;
 
-         HB_List_Table.Prepare_Items; -- ();
+         Wp_List_Table.Prepare_Items; -- ();
 
          declare
-            Total_Pages : constant Natural := Get_Pagination_Arg (HB_List_Table, "total_pages");
+            Total_Pages : constant Natural := Get_Pagination_Arg (Wp_List_Table, "total_pages");
          begin
             if Pagenum > Total_Pages and Total_Pages > 0 then
-               HB_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
+               Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
                goto Bailout; -- return;  -- exit;
             end if;
          end;
 
-         HB_Enqueue_Script ("admin-tags");
-         if Current_User_Can (Tax.Cap.Edit_Terms) then
-            HB_Enqueue_Script ("inline-edit-tax");
+         Wp_Enqueue_Script ("admin-tags");
+         if Current_User_Can (Get (Tax.Cap, "edit_terms")) then
+            Wp_Enqueue_Script ("inline-edit-tax");
          end if;
 
          Label_2 :
@@ -443,8 +459,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("edit_category_form",
-                           To_Array (List => To_Array (List => (1 => Build ("parent", "0")))),
-                                              "3.0.0", "{taxonomy}_add_form");
+                           Arrays.To_Array ((1 => Build ("parent", "0"))),
+                                              "3.0.0", Taxonomy & "_add_form");
                      elsif "link_category" = Taxonomy then
                         --
                         -- Fires at the end of the Edit Link form.
@@ -455,8 +471,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("edit_link_category_form",
-                         To_Array (List => To_Array (List => (1 => Build ("parent", "0")))),
-                                      "3.0.0", "{taxonomy}_add_form");
+                           Arrays.To_Array ((1 => Build ("parent", "0"))),
+                                      "3.0.0", Taxonomy & "_add_form");
                      else
                         --
                         -- Fires at the end of the Add Tag form.
@@ -489,16 +505,17 @@ is
                      Set ("VAR_edit_tags_add_form", "XXX-81");
 
                   elsif Var_Name = "VAR_edit_tags_add_new_item" then
-                     Set ("VAR_edit_tags_add_new_item", -Tax.Labels.Add_New_Item);
+                     Set ("VAR_edit_tags_add_new_item",
+                          Get (Tax.Labels, "add_new_item"));
 
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
-                     HB_Nonce_Field ("add-tag", "_wpnonce_add-tag");
+                     Wp_Nonce_Field ("add-tag", "_wpnonce_add-tag");
                      Set ("VAR_edit_tags_add_tag", "XXX-82");
 
                   elsif Var_Name = "VAR_edit_tags_can_edit_terms" then
                      declare
                         Can_Edit_Terms : constant Boolean
-                           := Current_User_Can (Tax.Cap.Edit_Terms);
+                           := Current_User_Can (Get (Tax.Cap, "edit_terms"));
                      begin
                         Set ("VAR_edit_tags_can_edit_terms", Can_Edit_Terms);
                      end;
@@ -538,11 +555,14 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_delete_help" then
                      declare
+                        use Inc_Options;
+
                         R : constant String := Printf (
                         -- translators: %s: Default category.
                         abs "Deleting a category does not delete the posts in that category. Instead, posts that were only assigned to the deleted category are set to the default category %s. The default category cannot be deleted.",
                         -- This filter is documented in wp-includes/category-template.php
-                        "<strong>" & Apply_Filters ("the_category", Get_Cat_Name (Get_Option ("default_category")), "", "") & "</strong>");
+                        "<strong>" & Apply_Filters ("the_category",
+                                                    Get_Cat_Name (Get_Option ("default_category")), "", "") & "</strong>");
                      begin
                         Set ("VAR_edit_tags_delete_help", R);
                      end;
@@ -551,7 +571,7 @@ is
                      Set ("VAR_edit_tags_description", E_E ("Description"));
 
                   elsif Var_Name = "VAR_edit_tags_display" then
-                     Set ("VAR_edit_tags_display", HB_List_Table.Display);
+                     Set ("VAR_edit_tags_display", Wp_List_Table.Display);
 
                   elsif Var_Name = "VAR_edit_tags_do_action_deprecated" then
                      if "category" = Taxonomy then
@@ -564,8 +584,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("add_category_form_pre",
-                               To_Array (List => To_Array (List => (1 => Build ("parent", "0")))),
-                               "3.0.0", "{taxonomy}_pre_add_form");
+                               Arrays.To_Array ((1 => Build ("parent", "0"))),
+                               "3.0.0", Taxonomy & "_pre_add_form");
                      elsif "link_category" = Taxonomy then
                         --
                         -- Fires before the link category form.
@@ -576,8 +596,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("add_link_category_form_pre",
-                                  To_Array (List => To_Array (List => (1 => Build ("parent", "0")))),
-                                  "3.0.0", "{taxonomy}_pre_add_form");
+                                  Arrays.To_Array ((1 => Build ("parent", "0"))),
+                                  "3.0.0", Taxonomy & "_pre_add_form");
                      else
                         --
                         -- Fires before the Add Tag form.
@@ -715,7 +735,7 @@ is
                         Set (Dropdown_Args, "aria_describedby", "parent-description");
 --                      Dropdown_Args ("aria_describedby") := "parent-description";
 
-                        HB_Dropdown_Categories (Dropdown_Args);
+                        Wp_Dropdown_Categories (Dropdown_Args);
 
                         Set ("VAR_edit_tags_dropdown", "XXX-87");
                      end;
@@ -732,7 +752,7 @@ is
                            Append (R, Printf (
                               -- translators: %s: Search query.
                               abs "Search results for: %s",
-                              "<strong>" & ESC_HTML (HB_Unslash (Get (X_REQUEST, "s"))) & "</strong>"
+                              "<strong>" & ESC_HTML (Wp_Unslash (Get (X_REQUEST, "s"))) & "</strong>"
                            ));
                            Append (R, "</span>");
                         end if;
@@ -740,7 +760,7 @@ is
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_inline_edit" then
-                     Set ("VAR_edit_tags_inline_edit", HB_List_Table.Inline_Edit);
+                     Set ("VAR_edit_tags_inline_edit", Wp_List_Table.Inline_Edit);
 
                   elsif Var_Name = "VAR_edit_tags_is_tax_hierarchical" then
                      Set ("VAR_edit_tags_is_tax_hierarchical", Is_Taxonomy_Hierarchical (Taxonomy));
@@ -752,10 +772,11 @@ is
                      Set ("VAR_edit_tags_message_set", Message /= "");
 
                   elsif Var_Name = "VAR_edit_tags_name_field_description" then
-                     Set ("VAR_edit_tags_name_field_description", -Tax.Labels.Name_Field_Description);
+                     Set ("VAR_edit_tags_name_field_description",
+                          Get (Tax.Labels, "name_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_not_is_mobile" then
-                     Set ("VAR_edit_tags_not_is_mobile", not HB_Is_Mobile);
+                     Set ("VAR_edit_tags_not_is_mobile", not Wp_Is_Mobile);
 
                   elsif Var_Name = "VAR_edit_tags_post_tag_and_user_can_import" then
                      Set ("VAR_edit_tags_post_tag_and_user_can_import",
@@ -773,23 +794,29 @@ is
                   elsif Var_Name = "VAR_edit_tags_search_box" then
                      declare
                         X : constant String
-                           := Search_Box (HB_List_Table, -Tax.Labels.Search_Items, "tag");
+                           := Search_Box (Wp_List_Table,
+                                          Get (Tax.Labels, "search_items"),
+                                          "tag");
                      begin
                         Set ("VAR_edit_tags_search_box", X);
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_slug_field_description" then
-                     Set ("VAR_edit_tags_slug_field_description", -Tax.Labels.Slug_Field_Description);
+                     Set ("VAR_edit_tags_slug_field_description",
+                          Get (Tax.Labels, "slug_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_submit_button" then
                      Set ("VAR_edit_tags_submit_button",
-                          Submit_Button (-Tax.Labels.Add_New_Item, "primary", "submit", False));
+                          Submit_Button (Get (Tax.Labels, "add_new_item"),
+                                         "primary", "submit", False));
 
                   elsif Var_Name = "VAR_edit_tags_tax_field_description" then
-                     Set ("VAR_edit_tags_tax_field_description", -Tax.Labels.Parent_Field_Description);
+                     Set ("VAR_edit_tags_tax_field_description",
+                          Get (Tax.Labels, "parent_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_tax_parent_item" then
-                     Set ("VAR_edit_tags_tax_parent_item", ESC_HTML (-Tax.Labels.Parent_Item));
+                     Set ("VAR_edit_tags_tax_parent_item",
+                          ESC_HTML (Get (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
                      Set ("VAR_edit_tags_taxonomy", ESC_Attr (Taxonomy));
@@ -798,10 +825,11 @@ is
                      Set ("VAR_edit_tags_term_name", Ex_Ex ("Name", "term name"));
 
                   elsif Var_Name = "VAR_edit_tags_user_can_import" then
-                     Set ("VAR_edit_tags_user_can_import", Current_User_Can ("import"));
+                     Set ("VAR_edit_tags_user_can_import",
+                          Current_User_Can ("import"));
 
                   elsif Var_Name = "VAR_edit_tags_views" then
-                     Set ("VAR_edit_tags_views", HB_List_Table.Views);
+                     Set ("VAR_edit_tags_views", Wp_List_Table.Views);
                   end if;
                end Value;
 

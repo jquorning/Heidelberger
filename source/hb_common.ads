@@ -1,8 +1,19 @@
+
 with Ada.Strings.Unbounded;
+
+with Arrays;
+
+with Inc_Class_Wpdb;
+with Inc_Class_Wp_Terms;
+with Inc_Class_Posts;
+with Inc_Taxonomys;
+-- with Inc_Templates;
+with Inc_Class_Posts;
 
 package HB_Common
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
 
    function "+" (Item : String) return Unbounded_String
       renames To_Unbounded_String;
@@ -17,6 +28,7 @@ is
          Manage_Terms : Boolean := True;
          Edit_Terms   : Boolean := True;
          Delete_Terms : Boolean := True;
+         Assign_Terms : Boolean := True;
       end record;
 
    type Lab_Type is
@@ -58,58 +70,47 @@ is
 
    function Typenow return String;
 
-   procedure HB_Die (Why : String; Sub : String := ""; Code : Integer := 0);
+   procedure Wp_Die (Why : String; Sub : String := ""; Code : Integer := 0) is null;
 
    procedure Check_Admin_Referer (Item : String; Item_2 : String := "");
 
-   type Assoc_Type is
-      record
-         Key   : Unbounded_String;
-         Value : Unbounded_String;
-      end record;
-
-   type Assoc_List is array (Positive range <>) of Assoc_Type;
-
-   subtype Array_Type is Assoc_List;
-
-   type Array_Access is access all Array_Type;
-
-   type List_Type is array (Positive range <>) of Unbounded_String;
-   function To_List (List : List_Type) return Assoc_List;
+--   function To_List (List : List_Type) return Assoc_List;
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural;
    function Get_Pagination_Arg (List : List_Table; Item : String) return Natural;
 
-   function To_Array (List : Assoc_List) return Array_Type;
    function To_Array (Item : String) return Array_Type;
+   function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
+                      S  : String)
+                      return Array_Type is (Empty_Array);
 
-   function HB_Get_Referer return String;
-   function Remove_Query_Arg  (List : Array_Type; Item : String) return String;
+   function Wp_Get_Referer return String is ("XXX-213");
+   function Remove_Query_Arg  (List : List_Type;
+                               Item : String)
+                               return String
+                               is ("XXX-214");
+
+   function Remove_Query_Arg  (Arry : Array_Type;
+                               Item : String)
+                               return String
+                               is ("XXX-221");
 
    function Admin_URL (Item : String) return String;
 
-   function Preg_Replace (Left : String; Right : String) return Integer;
-   function Preg_Replace (Left : String; Mid : String; Right : Array_Type) return Integer;
    function Get_Post_Status_Object (N : Integer) return Boolean;
 
-   type Statement_Type is null record;
-   type DB_Type is tagged null record;
+--   type Statement_Type is null record;
+--   type DB_Type is tagged null record;
 
-   function Get_Col (Db : DB_Type; Statement : Statement_Type) return Array_Type;
-   function Prepare (Db : DB_Type; Sql : String; Arg_1, Arg_2 : String) return Statement_Type;
-   function Wpdb return DB_Type;
+--   function Get_Col (Db : DB_Type; Statement : Statement_Type) return Array_Type;
+--   function Prepare (Db : DB_Type; Sql : String; Arg_1, Arg_2 : String) return Statement_Type;
+   Wpdb : Inc_Class_Wpdb.Wpdb_Class; -- return DB_Type;
 
-   function Explode (Item : String; Table : Array_Type) return Array_Type;
-   function Implode (Item : String; Table : Array_Type) return String;
-   function Implode (Item : String; Item_2 : Unbounded_String) return String;
-   function Array_Map (Item : String; Table : Array_Type) return Array_Type;
-   function Empty (Table : Array_Type) return Boolean;
+   procedure Wp_Redirect (Item : String) is null;
 
-   procedure HB_Redirect (Item : String);
-
-   function HB_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
-   function HB_Check_Post_Lock (Post_Id : String)     return Integer is (1);
-   function HB_Trash_Post      (Post_Id : Assoc_Type) return Boolean;
-   function HB_Trash_Post      (Post_Id : String)     return Boolean is (True);
+   function Wp_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
+   function Wp_Check_Post_Lock (Post_Id : String)     return Integer is (1);
+   function Wp_Trash_Post      (Post_Id : Assoc_Type) return Boolean is (True);
+   function Wp_Trash_Post      (Post_Id : String)     return Boolean is (True);
 
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
@@ -119,30 +120,33 @@ is
    function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
       return Unbounded_String;
 
-   procedure HB_Enqueue_Script (Item : String);
-   procedure HB_Enqueue_Style  (Item : String);
+   procedure Wp_Enqueue_Script (Item : String) is null;
+   procedure Wp_Enqueue_Style  (Item : String) is null;
 
-   function Build (Key : String; Value : String) return Assoc_Type;
    function Absint (Item : Assoc_List) return String;
+   function Absint (Item : String)     return String is ("XXX-213");
 
    function Array_Filter (List : Array_Type) return Assoc_List;
+   function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
 
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
 
-   function HB_Delete_Attachment (Item : Assoc_Type;
+   function Wp_Delete_Attachment (Item : Assoc_Type;
                                   V    : Boolean := False) return Boolean is (True);
-   function HB_Delete_Attachment (Id : String;
+   function Wp_Delete_Attachment (Id : String;
                                   V  : Boolean) return Boolean is (True);
-   function HB_Delete_Post (Item : Assoc_Type; V : Boolean := False)
+   function Wp_Delete_Post (Item : Assoc_Type; V : Boolean := False)
       return Boolean is (True);
-   function HB_Delete_Post (Item : String; V : Boolean := False)
+   function Wp_Delete_Post (Item : String; V : Boolean := False)
       return Boolean is (True);
 
    function Bulk_Edit_Posts (Item : Array_Type) return Array_Type;
-   function Is_Array (Item : Assoc_List) return Boolean;
 
    procedure Set (Arr : in out Array_Type; Key : String; Value : String);
+   procedure Set (Arr : in out Array_Type; Key : String; Value : Array_Type)
+     is null;
+
    function Count (Item : String) return String;
 
    type Screen_Id is new Integer;
@@ -158,23 +162,85 @@ is
 
    procedure Add_Screen_Option;
 
-   function Apply_Filters (Item : String; S : Unbounded_String; D : String; X : Assoc_List)
-      return Unbounded_String;
-   function Apply_Filters (Item : String; S : String; D : String := ""; X : String := "")
-      return String;
-   function Apply_Filters (Item : String; S : Assoc_List; D : Assoc_List)
-      return Assoc_List;
-   function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
-      return Array_Type;
---   function Apply_Filters ("redirect_term_location", -Location, Tax) return String;
+   function Apply_Filters (Item : String;
+                           S : String;
+                           D : String;
+                           X : Assoc_List)
+                           return String
+                           is ("XXX-220");
 
-   function HB_Unslash (Item : String) return String;
+   function Apply_Filters (Item : String;
+                           S    : String;
+                           D    : String := "";
+                           X    : String := "")
+                           return String;
 
-   X_SERVER  : Array_Type := (1 .. 0 => <>); -- (Item : String) return String;
-   X_POST    : Array_Type := (1 .. 0 => <>);
-   X_GET     : Array_Type := (1 .. 0 => <>);
---   function X_GET (Item : String) return String;
-   X_REQUEST : Array_Type := (1 .. 0 => <>);
+   function Apply_Filters (Item : String;
+                           S    : Assoc_List;
+                           D    : Assoc_List)
+                           return Assoc_List;
+
+   function Apply_Filters (Hook_Name : String;
+                           A         : Array_Type;
+                           B         : Array_Type)
+                           return Array_Type
+                           is (Empty_Array);
+
+   function Apply_Filters (Item : String;
+                           A    : Array_Type;
+                           V    : String;
+                           N    : String)
+                           return Array_Type;
+
+   function Apply_Filters (Item  : String;
+                           Left  : Array_Type;
+                           Right : Integer)
+                           return Array_Type is (Empty_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Id        : String;
+                           Taxonomy  : String)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : access Integer;
+                           Arg_2     : Positive;
+                           Arg_3     : String;
+                           Arg_4     : Boolean;
+                           Arg_5     : String)
+                           return Integer is (1);
+
+   function Apply_Filters (Hook_Name : String;
+                           Arg_2     : Array_Type;
+                           Arg_3     : Array_Type;
+                           Arg_4     : Array_Type)
+                           return Array_Type is (Empty_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           A1 : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           A2 : String;
+                           A3 : String;
+                           A4 : Array_Type)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           S         : String;
+                           D         : String;
+                           P         : Array_Type)
+                           return String
+                           is ("XXX-221");
+
+   function Wp_Unslash (Item : String) return String is ("XXX-215");
+
+   X_SERVER  : Array_Type := Empty_Array;
+   X_POST    : Array_Type := Empty_Array;
+   X_GET     : Array_Type := Empty_Array;
+   X_REQUEST : Array_Type := Empty_Array;
+   X_COOKIE  : Array_Type := Empty_Array;
+   GLOBALS   : Array_Type := Empty_Array;
 
    procedure Add_Screen_Option (Item : String; List : Array_Type);
 
@@ -190,9 +256,11 @@ is
 
    function Get_Search_Query return String;
 
-   function Sprintf (Format : String; Arg_1 : String) return String;
+   function Sprintf (Format : String; Arg_1 : String; Arg_2 : String := "")
+      return String is ("XXX-201");
+
    function Number_Format_I18n (N : Integer) return String;
-   function HB_Nonce_URL (Url : String; Item : String) return String;
+   function Wp_Nonce_URL (Url : String; Item : String) return String is ("XXX-216");
    function Count (Al : Assoc_List) return Natural;
 
    function Get_Post_Type_Object (Item : Post_Rec) return String;
@@ -204,6 +272,10 @@ is
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return Array_Type;
+   function Get (List : List_Type;
+                 Key  : String)
+                 return String
+                 is ("XXX-220");
 
    type Count_Message_Type is
       record
@@ -218,29 +290,39 @@ is
          Name : Unbounded_String;
       end record;
 
-   type Tax_Rec is
-      record
-         Labels : Lab_Type;  --  Lab_Record;
-         Name   : Unbounded_String;
-         Cap    : Cap_Type;
-      end record;
+   -- type Tax_Rec is
+   --    record
+   --       Labels : Lab_Type;  --  Lab_Record;
+   --       Name   : Unbounded_String;
+   --       Cap    : Cap_Type;
+   --       Show_In_Quick_Edit : Boolean;
+   --       Hierarchical : Boolean;
+   --    end record;
 
    function Taxnow return String;
-   function Get_Taxonomy (Item : String) return Tax_Rec;
-   function Get_Taxonomies (list : Array_Type) return Tax_Rec;
-   function In_Array (Item : String; Tax : Tax_Rec; V : Boolean) return Boolean;
-   function HB_Insert_Term (Item : String; Item2 : String; Arr : Array_Type) return Boolean;
+--   function Get_Taxonomy (Item : String) return Tax_Rec;
+--   function Get_Taxonomies (list : Array_Type) return Tax_Rec;
+   function Wp_Insert_Term (Item : String; Item2 : String; Arr : Array_Type)
+                            return Boolean
+                            is (True);
    -- Get (X_Post, "tag-name"), Taxonomy, X_POST);
-   function Is_HB_Error (Ret : Boolean) return Boolean;
-   procedure HB_Delete_Term (Tag : Integer; Taxonomy : String);
-   procedure HB_Delete_Terms (Tag : Integer; Taxonomy : String);
+   function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
+   procedure Wp_Delete_Term (Tag : Integer; Taxonomy : String) is null;
+   procedure Wp_Delete_Terms (Tag : Integer; Taxonomy : String) is null;
 
-   type Term_Type is null record;
-   function Get_Term (Id : Integer; Tax : String := "") return Term_Type;
-   function "not" (Term : Term_Type) return Boolean;
+--   type Term_Type is null record;
+--   function Get_Term (Id : Integer; Tax : String := "") return Term_Type;
+   function "not" (Term : Inc_Class_Wp_Terms.Wp_Term)
+                   return Boolean
+                   is (False);
+
    function Sanitize_URL (Item : String) return String;
-   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String) return String;
-   function HB_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type) return Boolean;
+   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String)
+                               return String;
+   function Wp_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type)
+                            return Boolean
+                            is (True);
+
    function Is_Plugin_Active (Item : String) return Boolean;
 
    procedure Do_Action_Deprecated (I1 : String;
@@ -248,47 +330,43 @@ is
                                    V : String;
                                    I2 : String) is null;
    procedure Do_Action (Item_1 : String; Item_2 : String := "") is null;
-   procedure HB_Nonce_Field (I1, I2 : String) is null;
+   procedure Wp_Nonce_Field (I1, I2 : String) is null;
 
    function Get_Cat_Name (Item : String) return String is ("XXX-91");
-   function Get_Option (Item : String) return String is ("XXX-92");
+--   function Get_Option (Item : String) return String is ("XXX-92");
 
-   function HB_Is_Mobile return Boolean is (False);
-   procedure HB_Dropdown_Categories (A : Array_Type) is null;
+   function Wp_Is_Mobile return Boolean is (False);
+   procedure Wp_Dropdown_Categories (A : Array_Type) is null;
 
    function Submit_Button (Text : String; V1 : String; V2 : String; X : Boolean)
      return String is ("XX-101");
    function Is_Taxonomy_Hierarchical (Taxonomy : String) return Boolean is (True);
 
-   procedure HB_Reset_Vars (A : Array_Type) is null;
+   procedure Wp_Reset_Vars (A : Array_Type) is null;
    OBJECT : Post_Rec;
    type Hb_post is null record;
-   function HB_Verify_Nonce (V : String; Item : String) return Boolean is (True);
-   function HB_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
+   function Wp_Verify_Nonce (V : String; Item : String) return Boolean is (True);
+   function Wp_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
    function Get_Default_Comment_Status (S : String; E : String := "") return String
      is ("XXX-111");
-   function Str_Replace (A : Array_Type;
-                         S : String;
-                         D : String) return String is ("XXX-112");
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
    procedure Redirect_Post (Post_Id : String) is null;
 
    function Get_Post_Types (A : Array_Type)
-            return Array_Type is (1 .. 0 => <>);
-   function Get_Post_Types (A : Array_Type)
-            return Tax_Rec;
+            return Array_Type is (Empty_Array);
+--   function Get_Post_Types (A : Array_Type)
+--            return Tax_Rec;
    type Lock_Type is new Integer;
-   function HB_Set_Post_Lock (Post_Id : String) return Lock_Type is (1);
+   function Wp_Set_Post_Lock (Post_Id : String) return Lock_Type is (1);
 
    function Post_Type_Supports (Post : String; I : String) return Boolean is (True);
    procedure Enqueue_Comment_Hotkeys_JS is null;
-   function HB_Basename (S : String) return String is ("XXX-106");
-   procedure HB_Update_Attachment_Metadata (Post : String; Newmeta : Array_Type)
+   function Wp_Basename (S : String) return String is ("XXX-106");
+   procedure Wp_Update_Attachment_Metadata (Post : String; Newmeta : Array_Type)
      is null;
 
 
-   X_COOKIE : Array_Type := (1 .. 0 => <>);
    type Time is null record;
    procedure Setcookie (N    : String;
                         Post : String;
@@ -298,34 +376,61 @@ is
                         Ssl  : Boolean) is null;
    MEDIA_TRASH : Boolean := False;
    function Post_Preview return String is ("XXX-104");
-   procedure HB_Safe_Redirect (Ref : String) is null;
-   type HB_Post_2 is
-      record
-         Post_Type   : Unbounded_String;
-         ID          : Unbounded_String;
-         Post_Status : Unbounded_String;
-      end record;
-   function "not" (T : HB_Post_2) return Boolean is (False);
+   procedure Wp_Safe_Redirect (Ref : String) is null;
+   -- type Wp_Post_2 is
+   --    record
+   --       Post_Type     : Unbounded_String;
+   --       ID            : Unbounded_String;
+   --       Post_Status   : Unbounded_String;
+   --       Post_Title    : Unbounded_String;
+   --       Post_Date     : Unbounded_String;
+   --       Post_Password : Unbounded_String;
+   --       Post_Parent   : Unbounded_String;
+   --       Page_Template : Unbounded_String;
+   --       Menu_Order    : Unbounded_String;
+   --    end record;
+   function "not" (T : Inc_Class_Posts.Wp_Post) return Boolean is (False);
    function "not" (T : Post_Rec)  return Boolean is (False);
 
    function Get_Post (Id : Assoc_Type) return Post_Rec;
---   function Get_Post (Id : Integer)    return HB_Post_2;
-   function Get_Post (Id : String)     return HB_Post_2;
-   function Get_Post (Id : String; B : Post_Rec; Ltem : String) return HB_Post_2;
+--   function Get_Post (Id : Integer)    return Wp_Post_2;
+   function Get_Post (Id : String)     return Inc_Class_Posts.Wp_Post;
+   function Get_Post (Id : String; B : Post_Rec; Ltem : String)
+                      return Inc_Class_Posts.Wp_Post;
+   function Get_Post      return Inc_Class_Posts.Wp_Post; --  is (others => <>);
 
    function Empty (A : String) return Boolean is (True);
+   function Empty (Table : Array_Type) return Boolean;
+   function Empty (Arry : Array_Type; Key : String) return Boolean is (False);
 
-   function Apply_Filters (Item : String; S : String; D : HB_Post_2)
+   function Apply_Filters (Item : String; S : String; D : Inc_Class_Posts.Wp_Post)
       return Boolean is (True);
-   function Use_Block_Editor_For_Post (Post : HB_Post_2) return Boolean is (True);
+   function Apply_Filters (Hook_Name : String;
+                           Arg_2     : Array_Type;
+                           Id        : Inc_Class_Posts.Post_Id)
+                           return Array_Type is (Empty_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           Arg_2     : Array_Type)
+                           return Array_Type is (Empty_Array);
+
+   function Apply_Filters (Hook_Name  : String;
+                           A1         : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           A2, A3, A4 : Array_Type)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+
+   function Use_Block_Editor_For_Post (Post : Inc_Class_Posts.Wp_Post)
+                                       return Boolean is (True);
 
    function Isset (Item : Array_Type) return Boolean;
    function Isset (Item : String) return Boolean;
    function Isset (Item : Post_Rec) return Boolean is (True);
+   function X_Isset (Arry : Array_Type; Value : String) return Boolean is (True);
 
    procedure Unset (A : String) is null;
-   function HB_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
-     is (1 .. 0 => <>);
+   function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
+     is (Empty_Array);
 
    type User_Type is
       record
@@ -339,11 +444,13 @@ is
    function Current_User_Can (Trait : String; Val : String) return Boolean;
    function Current_User_Can (Trait : String; Val : Integer) return Boolean;
    function Current_User_Can (Trait : String) return Boolean is (True);
-   function Current_User_Can (Trait : String; Val : HB_Post_2) return Boolean
+   function Current_User_Can (Trait : String; Val : Inc_Class_Posts.Wp_Post)
+                              return Boolean
       is (True);
 
-   function HB_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
-   function HB_Untrash_Post (Item : HB_Post_2)  return Boolean is (True);
+   function Wp_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
+   function Wp_Untrash_Post (Item : Inc_Class_Posts.Wp_Post)
+                             return Boolean is (True);
 
    function Get_Current_User_Id return Integer is (1);
    function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean
@@ -351,5 +458,13 @@ is
 
    procedure Update_User_Meta (Id : Integer; Item : String; V : Boolean) is null;
 
+   type Walker_Type is access procedure;
+
+   procedure Echo (Item : String) is null;
+
+   function In_Array (Taxonomy   : String;
+                      Taxonomies : Inc_Taxonomys.Taxonomy_Array;
+                      S          : Boolean)
+                      return Boolean is (True);
 
 end HB_Common;

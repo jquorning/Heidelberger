@@ -5,6 +5,8 @@ with Ada.Strings.Fixed;
 --  with Templates_Parser;
 
 with L10n;
+with Arrays;
+with Php;
 
 with HB_Common;
 --
@@ -16,14 +18,18 @@ with HB_Common;
 -- @subpackage Administration
 --
 
+with Inc_Class_Posts;
+
 -- WordPress Administration Bootstrap
 -- require_once __DIR__ . '/admin.php';
 
 package body HB_Post
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
    use L10n;
    use HB_Common;
+   use Php;
 
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
@@ -33,7 +39,7 @@ is
       Post_New_File : Unbounded_String;
    begin
 
-      HB_Reset_Vars (To_Array ("action"));
+      Wp_Reset_Vars (To_Array ("action"));
       declare
          Post_Id : String := "test"; -- Integer; -- test added
       begin
@@ -43,7 +49,7 @@ is
            Integer'Value (String'(Get (X_GET, "post"))) /=
            Integer'Value (String'(Get (X_POST, "post_ID")))
          then
-            HB_Die (abs "A post ID mismatch has been detected.",
+            Wp_Die (abs "A post ID mismatch has been detected.",
                     abs "Sorry, you are not allowed to edit this item.", 400);
          elsif Isset (String'(Get (X_GET, "post"))) then
             Post_Id := String'(Get (X_GET, "post"));
@@ -63,7 +69,7 @@ is
       declare
          Post_Type        : String := "";
          Post_Type_Object : Post_Rec;
-         Post             : HB_Post_2;
+         Post             : Inc_Class_Posts.Wp_Post;
          Action   : Unbounded_String;
          Sendback : Unbounded_String;
       begin
@@ -81,7 +87,7 @@ is
 --         Post and then
            Post_Type /= Get (X_POST, "post_type")
          then
-            HB_Die (abs "A post type mismatch has been detected.",
+            Wp_Die (abs "A post type mismatch has been detected.",
                     abs "Sorry, you are not allowed to edit this item.", 400);
             end if;
 
@@ -94,7 +100,7 @@ is
                Action := +"preview";
             end if;
 
-            Sendback := +HB_Get_Referer;  -- ();
+            Sendback := +Wp_Get_Referer;  -- ();
             if
               Sendback = "" or else
               Ada.Strings.Fixed.Index (-Sendback, "post.php") = 0 or else
@@ -110,10 +116,10 @@ is
                   end if;
                end if;
             else
-               Sendback := +Remove_Query_Arg (To_Array (To_List ((+"trashed",
-                                                                  +"untrashed",
-                                                                  +"deleted",
-                                                                  +"ids"))),
+               Sendback := +Remove_Query_Arg (To_List ((+"trashed",
+                                                        +"untrashed",
+                                                        +"deleted",
+                                                        +"ids")),
                                               -Sendback);
             end if;
 
@@ -127,7 +133,7 @@ is
                   -- For output of the Quick Draft dashboard widget.
 --                require_once ABSPATH . "wp-admin/includes/dashboard.php";
 
-                  if not HB_Verify_Nonce (Nonce, "add-post") then
+                  if not Wp_Verify_Nonce (Nonce, "add-post") then
                      Error_Msg := +abs "Unable to submit this form, please refresh and try again.";
                   end if;
 
@@ -136,7 +142,7 @@ is
                   end if;
 
                   if Error_Msg /= "" then
-                    goto Bailout; -- return; -- HB_Dashboard_Quick_Press (-Error_Msg);
+                    goto Bailout; -- return; -- Wp_Dashboard_Quick_Press (-Error_Msg);
                   end if;
                end;
                Post := Get_Post (Get (X_REQUEST, "post_ID"));
@@ -154,7 +160,9 @@ is
                   Set (X_POST, "content",
                        Sprintf (
                                 "<!-- wp:paragraph -->%s<!-- /wp:paragraph -->",
-                                Str_Replace (To_Array (To_List ((+"\r\n", +"\r", +"\n"))),
+                                Str_Replace (To_List ((+"\r\n",
+                                                       +"\r",
+                                                       +"\n")),
                                              "<br />",
                                               Get (X_POST, "content"))
                         ));
@@ -162,7 +170,7 @@ is
 
                declare
                   Unused_1 : String := Edit_Post;   -- ();
-                  Unused_2 : String := HB_Dashboard_Quick_Press; -- ();
+                  Unused_2 : String := Wp_Dashboard_Quick_Press; -- ();
                begin
                   null;
                end;
@@ -183,41 +191,41 @@ is
                   Editing : Boolean := True;
                begin
                   if Empty (Post_Id) then -- .key added
-                     HB_Redirect (Admin_URL ("post.php"));
+                     Wp_Redirect (Admin_URL ("post.php"));
                      goto Bailout; -- return; -- exit;
                   end if;
 
                   if not Post then
-                     HB_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                     Wp_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
                   if not Post_Type_Object then
-                     HB_Die (abs "Invalid post type.");
+                     Wp_Die (abs "Invalid post type.");
                   end if;
 
                   if
-                    not In_Array (Item => Typenow,
-                                  Tax  => Get_Post_Types
-                                          (To_Array (List => (1 => Build ("show_ui", "true")))),
-                                  V    => True)
+                    not In_Array (Typenow,
+                                  Get_Post_Types
+                                    (To_Array (List => (1 => Build ("show_ui", "true")))),
+                                  True)
                   then
-                     HB_Die (abs "Sorry, you are not allowed to edit posts in this post type.");
+                     Wp_Die (abs "Sorry, you are not allowed to edit posts in this post type.");
                   end if;
 
                   if not Current_User_Can ("edit_post", Post_Id) then
-                     HB_Die (abs "Sorry, you are not allowed to edit this item.");
+                     Wp_Die (abs "Sorry, you are not allowed to edit this item.");
                   end if;
 
                   if "trash" = Post.Post_Status then
-                     HB_Die (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
+                     Wp_Die (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                   end if;
 
                   if not Empty (String'(Get (X_GET, "get-post-lock"))) then
                      Check_Admin_Referer ("lock-post_" & Post_Id);
                      declare
-                        Unused : Lock_Type := HB_Set_Post_Lock (Post_Id);
+                        Unused : Lock_Type := Wp_Set_Post_Lock (Post_Id);
                      begin
-                        HB_Redirect (Get_Edit_Post_Link (Build (Post_Id, "url")));
+                        Wp_Redirect (Get_Edit_Post_Link (Build (Post_Id, "url")));
                      end;
                      goto Bailout; -- return; -- exit;
                   end if;
@@ -268,12 +276,12 @@ is
                     goto Label_1; -- break;
                   end if;
 
-                  if 0 = HB_Check_Post_Lock (-Post.ID) then
+                  if 0 = Wp_Check_Post_Lock (Post.Id'Image) then
                      declare
-                        Active_Post_Lock : Lock_Type := HB_Set_Post_Lock (-Post.ID);
+                        Active_Post_Lock : Lock_Type := Wp_Set_Post_Lock (Post.Id'Image);
                      begin
                         if "attachment" /= Post_Type then
-                           HB_Enqueue_Script ("autosave");
+                           Wp_Enqueue_Script ("autosave");
                         end if;
                      end;
                   end if;
@@ -281,7 +289,7 @@ is
                   Post := Get_Post (Post_Id, OBJECT, "edit");
 
                   if Post_Type_Supports (Post_Type, "comments") then
-                     HB_Enqueue_Script ("admin-comments");
+                     Wp_Enqueue_Script ("admin-comments");
                      Enqueue_Comment_Hotkeys_JS; --();
                   end if;
                end;
@@ -297,11 +305,11 @@ is
 
                -- Update the thumbnail filename.
                declare
-                  Newmeta : Array_Type := HB_Get_Attachment_Metadata (Post_Id, True);
+                  Newmeta : Array_Type := Wp_Get_Attachment_Metadata (Post_Id, True);
                begin
-                  Set (Newmeta, "thumb", HB_Basename (Get (X_POST, "thumb")));
+                  Set (Newmeta, "thumb", Wp_Basename (Get (X_POST, "thumb")));
 
-                  HB_Update_Attachment_Metadata (Post_Id, Newmeta);
+                  Wp_Update_Attachment_Metadata (Post_Id, Newmeta);
                end;
                -- Intentional fall-through to trigger the edit_post() call.
 
@@ -326,34 +334,34 @@ is
                Check_Admin_Referer ("trash-post_" & Post_Id);
 
                if not Post then
-                  HB_Die (abs "The item you are trying to move to the Trash no longer exists.");
+                  Wp_Die (abs "The item you are trying to move to the Trash no longer exists.");
                end if;
 
                if not Post_Type_Object then
-                  HB_Die (abs "Invalid post type.");
+                  Wp_Die (abs "Invalid post type.");
                end if;
 
                if not Current_User_Can ("delete_post", Post_Id) then
-                  HB_Die (abs "Sorry, you are not allowed to move this item to the Trash.");
+                  Wp_Die (abs "Sorry, you are not allowed to move this item to the Trash.");
                end if;
 
                declare
-                  User_Id : constant Integer := HB_Check_Post_Lock (Post_Id);
+                  User_Id : constant Integer := Wp_Check_Post_Lock (Post_Id);
                begin
                   if User_Id /= 0 then
                      declare
                         User : constant User_Type := Get_Userdata (User_Id);
                      begin
                         -- translators: %s: User"s display name.
-                        HB_Die (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", -User.Display_Name));
+                        Wp_Die (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", -User.Display_Name));
                      end;
                   end if;
 
-                  if not HB_Trash_Post (Post_Id) then
-                     HB_Die (abs "Error in moving the item to Trash.");
+                  if not Wp_Trash_Post (Post_Id) then
+                     Wp_Die (abs "Error in moving the item to Trash.");
                   end if;
 
-                  HB_Redirect (
+                  Wp_Redirect (
                         -Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("trashed", "1"),
@@ -369,19 +377,19 @@ is
                Check_Admin_Referer ("untrash-post_" & Post_Id);
 
                if not Post then
-                  HB_Die (abs "The item you are trying to restore from the Trash no longer exists.");
+                  Wp_Die (abs "The item you are trying to restore from the Trash no longer exists.");
                end if;
 
                if not Post_Type_Object then
-                  HB_Die (abs "Invalid post type.");
+                  Wp_Die (abs "Invalid post type.");
                end if;
 
                if not Current_User_Can ("delete_post", Post) then
-                  HB_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
+                  Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
                end if;
 
-               if not HB_Untrash_Post (Post) then
-                  HB_Die (abs "Error in restoring the item from Trash.");
+               if not Wp_Untrash_Post (Post) then
+                  Wp_Die (abs "Error in restoring the item from Trash.");
                end if;
 
                Sendback := Add_Query_Arg (
@@ -391,39 +399,39 @@ is
                         )),
                         Sendback
                );
-               HB_Redirect (-Sendback);
+               Wp_Redirect (-Sendback);
                goto Bailout; -- return; -- exit;
 
             elsif Action = "delete" then
                Check_Admin_Referer ("delete-post_" & Post_Id);
 
                if not Post then
-                  HB_Die (abs "This item has already been deleted.");
+                  Wp_Die (abs "This item has already been deleted.");
                end if;
 
                if not Post_Type_Object then
-                  HB_Die (abs "Invalid post type.");
+                  Wp_Die (abs "Invalid post type.");
                end if;
 
                if not Current_User_Can ("delete_post", Post_Id) then
-                  HB_Die (abs "Sorry, you are not allowed to delete this item.");
+                  Wp_Die (abs "Sorry, you are not allowed to delete this item.");
                end if;
 
                if "attachment" = Post.Post_Type then
                   declare
                      Force : constant Boolean := not MEDIA_TRASH;
                   begin
-                     if not HB_Delete_Attachment (Post_Id, Force) then
-                        HB_Die (abs "Error in deleting the attachment.");
+                     if not Wp_Delete_Attachment (Post_Id, Force) then
+                        Wp_Die (abs "Error in deleting the attachment.");
                      end if;
                   end;
                else
-                  if not HB_Delete_Post (Post_Id, True) then
-                     HB_Die (abs "Error in deleting the item.");
+                  if not Wp_Delete_Post (Post_Id, True) then
+                     Wp_Die (abs "Error in deleting the item.");
                   end if;
                end if;
 
-               HB_Redirect (-Add_Query_Arg ("deleted", 1, Sendback));
+               Wp_Redirect (-Add_Query_Arg ("deleted", 1, Sendback));
                goto Bailout; -- return; -- exit;
 
             elsif Action = "preview" then
@@ -431,7 +439,7 @@ is
                declare
                   URL : constant String := Post_Preview; -- ();
                begin
-                  HB_Redirect (URL);
+                  Wp_Redirect (URL);
                end;
                goto Bailout; -- return; -- exit;
 
@@ -452,7 +460,7 @@ is
                      end;
                   end if;
                end;
-               HB_Safe_Redirect (HB_Get_Referer); -- ()
+               Wp_Safe_Redirect (Wp_Get_Referer); -- ()
                goto Bailout; -- return; -- exit;
 
             else
@@ -467,7 +475,7 @@ is
                --
                Do_Action ("post_action_{action}", Post_Id);
 
-               HB_Redirect (Admin_URL ("edit.php"));
+               Wp_Redirect (Admin_URL ("edit.php"));
                goto Bailout; -- return; -- exit;
             end if; -- End switch.
          end;
