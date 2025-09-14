@@ -9,4 +9,11 @@ is
       return (+Key, +Value);
    end Build;
 
+   function Build (Key : String; Value : Array_Type) return Assoc_Type
+   is
+      A : Assoc_Type;
+   begin
+      return A;
+   end Build;
+
 end Arrays;

@@ -10,12 +10,11 @@ with AWS.Server;
 --  with AWS.Status;
 
 -- with INC_Menu;
--- with INC_Templates;
 with Inc_Class_Posts;
 
 with HB_Edit;
 with HB_Edit_Tags;
--- with HB_Menu;
+with HB_Menu;
 with HB_Post;
 
 package body HB_Server is

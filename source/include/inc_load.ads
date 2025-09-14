@@ -19,6 +19,16 @@ is
    procedure Wp_Load_Translations_Early;
 
 --
+-- If Multisite is enabled.
+--
+-- @since 3.0.0
+--
+-- @return bool True if Multisite is enabled, false otherwise.
+--
+   function Is_Multisite
+            return Boolean;
+
+--
 -- Checks whether the given variable is a WordPress Error.
 --
 -- Returns whether `$thing` is an instance of the `WP_Error` class.

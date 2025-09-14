@@ -108,4 +108,10 @@ is
 
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
+
+   function Urlencode (Item : String) return String is ("XXX-301");
+
+   function Is_Int (A : Integer)   return Boolean is (True);
+   function Is_String (A : String) return Boolean is (True);
+
 end Php;

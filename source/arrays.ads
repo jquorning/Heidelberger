@@ -1,3 +1,4 @@
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
@@ -36,6 +37,7 @@ is
    Empty_Array : Array_Type renames Array_Vectors.Empty_Vector;
 
    function Build (Key : String; Value : String) return Assoc_Type;
+   function Build (Key : String; Value : Array_Type) return Assoc_Type;
 
    type Assoc_List is array (Positive range <>) of Assoc_Type;
    function To_Array (List : Assoc_List) return Array_Type
@@ -47,5 +49,12 @@ is
 
    type Item_List is array (Positive range <>) of Item_Type;
    function To_List (List : Item_List) return List_Type is (Empty_List);
+
+   package String_Vectors is
+      new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                             Element_Type => String);
+
+   subtype String_Array is String_Vectors.Vector;
+   Empty_String_Array : constant String_Array := String_Vectors.Empty_Vector;
 
 end Arrays;

@@ -70,5 +70,65 @@ is
    function Wp_Parse_Args (Args     : Array_Type;
                            Defaults : Array_Type := Empty_Array)
                            return Array_Type;
+--
+-- Returns an array of single-use query variable names that can be removed from a URL.
+--
+-- @since 4.4.0
+--
+-- @return string[] An array of query variable names to remove from the URL.
+--
+   function Wp_Removable_Query_Args
+            return String_Array
+            is (Empty_String_Array);
+
+--
+-- Determines whether a site is the main site of the current network.
+--
+-- @since 3.0.0
+-- @since 4.9.0 The `$network_id` parameter was added.
+--
+-- @param int $site_id    Optional. Site ID to test. Defaults to current site.
+-- @param int $network_id Optional. Network ID of the network to check for.
+--                        Defaults to current network.
+-- @return bool True if $site_id is the main site of the network, or if not
+--              running Multisite.
+--
+   function Is_Main_Site (Site_Id    : Integer := 0; -- = null,
+                          Network_Id : Integer := 0) -- = null
+                          return Boolean is (False);
+
+--
+-- Converts float number to format based on the locale.
+--
+-- @since 2.3.0
+--
+-- @global WP_Locale $wp_locale WordPress date and time locale object.
+--
+-- @param float $number   The number to convert based on locale.
+-- @param int   $decimals Optional. Precision of the number of decimal places. Default 0.
+-- @return string Converted number in string format.
+--
+   function Number_Format_I18n (Number   : Float;
+                                Decimals : Integer := 0)
+                                return String
+                                is ("XXX-302");
+--
+-- Removes an item or items from a query string.
+--
+-- @since 1.5.0
+--
+-- @param string|string[] $key   Query key or keys to remove.
+-- @param false|string    $query Optional. When false uses the current URL. Default false.
+-- @return string New URL query string.
+--
+   function Remove_Query_Arg (Key   : String;
+                              Query : String := "") -- False)
+                              return String
+                              is ("XXX-304");
+   function Remove_Query_Arg (Key   : String_Array;
+                              Query : String := "") -- False)
+                              return String
+                              is ("XXX-305");
+
 
 end Inc_Functions;

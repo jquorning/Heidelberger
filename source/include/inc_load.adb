@@ -1256,24 +1256,28 @@ is
 --         return false;
 -- end;
 
--- --
--- -- If Multisite is enabled.
--- --
--- -- @since 3.0.0
--- --
--- -- @return bool True if Multisite is enabled, false otherwise.
--- --
--- function is_multisite() then
---         if ( defined( "MULTISITE" ) ) then
---                 return MULTISITE;
---         end;
+--
+-- If Multisite is enabled.
+--
+-- @since 3.0.0
+--
+-- @return bool True if Multisite is enabled, false otherwise.
+--
 
---         if ( defined( "SUBDOMAIN_INSTALL" ) || defined( "VHOST" ) || defined( "SUNRISE" ) ) then
---                 return true;
---         end;
+   function Is_Multisite
+            return Boolean
+   is
+   begin
+      -- if Defined ("MULTISITE") then
+      --    return MULTISITE;
+      -- end if;
 
---         return false;
--- end;
+      -- if Defined ("SUBDOMAIN_INSTALL") or else Defined ("VHOST") or else Defined ("SUNRISE") then
+      --    return True;
+      -- end if;
+
+      return False;
+   end Is_Multisite;
 
 -- --
 -- -- Retrieve the current site ID.

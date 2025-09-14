@@ -178,7 +178,7 @@ is
         -- @since 4.6.0
         -- @var int menu_position
         --
-        -- public menu_position = null;
+        Menu_Position : Integer := 0; -- null;
 
         --
         -- The URL or reference to the icon to be used for this menu.
@@ -193,7 +193,7 @@ is
         -- @since 4.6.0
         -- @var string menu_icon
         --
-        -- public menu_icon = null;
+        Menu_Icon : Unbounded_String; --  = null;
 
         --
         -- The string to use to build the read, edit, and delete capabilities.
@@ -205,7 +205,7 @@ is
         -- @since 4.6.0
         -- @var string capability_type
         --
-        -- public capability_type = "post";
+        Capability_Type : Unbounded_String := To_Unbounded_String ("post");
 
         --
         -- Whether to use the internal default meta capability handling.
@@ -215,7 +215,7 @@ is
         -- @since 4.6.0
         -- @var bool map_meta_cap
         --
-        -- public map_meta_cap = false;
+        Map_Meta_Cap : Boolean := False;
 
         --
         -- Provide a callback function that sets up the meta boxes for the edit form.
@@ -268,7 +268,7 @@ is
         -- @since 4.6.0
         -- @var bool can_export
         --
-        -- public can_export = true;
+        Can_Export : Boolean := True;
 
         --
         -- Whether to delete posts of this type when deleting a user.

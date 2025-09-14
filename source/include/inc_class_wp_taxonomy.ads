@@ -88,7 +88,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public show_ui = true;
+        Show_Ui : Boolean := True;
 
         --
         -- Whether to show the taxonomy in the admin menu.
@@ -98,7 +98,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public show_in_menu = true;
+        Show_In_Menu : Boolean := True;
 
         --
         -- Whether the taxonomy is available for selection in navigation menus.
@@ -154,7 +154,7 @@ is
         -- @since 4.7.0
         -- @var string[]
         --
-        -- public object_type = null;
+        Object_Type : String_Array; -- = null;
 
         --
         -- Capabilities for this taxonomy.

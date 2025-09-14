@@ -19,6 +19,7 @@ with Wp_Common;
 
 with Inc_Class_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Functions;
 with Inc_Posts;
 
 package body HB_Edit
@@ -125,13 +126,18 @@ is
             if Doaction = "" then   -- if doaction then
                Check_Admin_Referer ("bulk-posts");
                   declare
+                     use String_Vectors;
+                     use Inc_Functions;
+
+                     Arg : constant String_Array := Empty_String_Array &
+                                                    "trashed"   &
+                                                    "untrashed" &
+                                                    "deleted"   &
+                                                    "locked"    &
+                                                    "ids";
+
                      Sendback : Unbounded_String
-                       := +Remove_Query_Arg (To_List ((+"trashed",
-                                                       +"untrashed",
-                                                       +"deleted",
-                                                       +"locked",
-                                                       +"ids")),
-                                             Wp_Get_Referer);  -- () );
+                       := +Remove_Query_Arg (Arg, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
                         Sendback := To_Unbounded_String (Admin_URL (Parent_File));
@@ -328,23 +334,36 @@ is
                            end;
                         end if; --      end case;
 
-                        Sendback := +Remove_Query_Arg
-                           (To_List ((+"action", +"action2", +"tags_input",
-                                      +"post_author", +"comment_status",
-                                      +"ping_status",
-                                      +"_status", +"post", +"bulk_edit",
-                                      +"post_view")),
-                            -Sendback);
+                        declare
+                           use String_Vectors;
+                           use Inc_Functions;
 
+                           Arg : constant String_Array := Empty_String_Array &
+                                                 "action" & "action2" & "tags_input" &
+                                                 "post_author" & "comment_status"    &
+                                                 "ping_status" & "_status" & "post"  &
+                                                 "bulk_edit"   & "post_view";
+                        begin
+                           Sendback := +Remove_Query_Arg (Arg, -Sendback);
+                        end;
                         Wp_Redirect (-Sendback);
                         return AWS.Response.URL (""); -- exit;  -- redirect
                      end;
                   end;
 
             elsif not Empty (String'(Get (X_REQUEST, "_wp_http_referer"))) then
-               Wp_Redirect (Remove_Query_Arg
-                             (To_List ((+"_wp_http_referer", +"_wpnonce")),
+               declare
+                  use Inc_Functions;
+                  use String_Vectors;
+
+                  Arg : constant String_Array := Empty_String_Array &
+                                                 "_wp_http_referer" &
+                                                 "_wpnonce";
+               begin
+                  Wp_Redirect (Remove_Query_Arg
+                             (Arg,
                               Wp_Unslash (Get (X_SERVER, "REQUEST_URI"))));
+               end;
                return AWS.Response.URL (""); -- exit;  -- redirect
             end if;
 
@@ -800,11 +819,18 @@ is
       end if;
       -- unset( $messages );
 
-      Set (X_SERVER, "REQUEST_URI",
-           Remove_Query_Arg (To_List ((+"locked", +"skipped",
-                                       +"updated", +"deleted",
-                                       +"trashed", +"untrashed")),
-                              Get (X_SERVER, "REQUEST_URI")));
+      declare
+         use Inc_Functions;
+         use String_Vectors;
+
+         Arg : constant String_Array := Empty_String_Array    &
+                                        "locked"  & "skipped" &
+                                        "updated" & "deleted" &
+                                        "trashed" & "untrashed";
+      begin
+         Set (X_SERVER, "REQUEST_URI",
+              Remove_Query_Arg (Arg, Get (X_SERVER, "REQUEST_URI")));
+      end;
       return "XXX-51";
    end Var_Bulk;
 

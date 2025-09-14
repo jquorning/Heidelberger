@@ -14,6 +14,7 @@ with L10n;
 
 with HB_Common;
 
+with Inc_Functions;
 with Inc_Taxonomys;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
@@ -110,12 +111,20 @@ is
          if Referer = "" then -- For POST requests.  -- not
             Referer := +Wp_Unslash (Get (X_SERVER, "REQUEST_URI"));
          end if;
-         Referer := +Remove_Query_Arg (To_List ((+"_wp_http_referer",
-                                                 +"_wpnonce",
-                                                 +"error",
-                                                 +"message",
-                                                 +"paged")),
-                                       -Referer);
+
+         declare
+            use String_Vectors;
+            use Inc_Functions;
+
+            Ww : constant String_Array := Empty_String_Array &
+                                          "_wp_http_referer" &
+                                          "_wpnonce" &
+                                          "error"    &
+                                          "message"  &
+                                          "paged";
+         begin
+            Referer := +Remove_Query_Arg (Ww, -Referer);
+         end;
 
 -- case Hb_List_Table.Current_Action then
 
@@ -167,11 +176,17 @@ is
 
                Location := Add_Query_Arg ("message", 2, Referer);
 
-               -- When deleting a term, prevent the action from redirecting back to a term
-               -- that no longer exists.
-               Location := +Remove_Query_Arg (Arrays.To_Array ((1 => Build ("tag_ID",
-                                                                           "action"))),
-                                              -Location);
+               -- When deleting a term, prevent the action from redirecting back to
+               -- a term that no longer exists.
+               declare
+                  use Inc_Functions;
+                  use String_Vectors;
+
+                  Arg : constant String_Array := Empty_String_Array &
+                                                 "tag_ID" & "action";
+               begin
+                  Location := +Remove_Query_Arg (Arg, -Location);
+               end;
             end;
             <<Break>>
 
@@ -280,9 +295,16 @@ is
            "" = Location and then
            not Empty (String'(Get (X_REQUEST, "_wp_http_referer")))
          then  -- not
-            Location := +Remove_Query_Arg
-                (To_Array (List => (1 => Build ("_wp_http_referer", "_wpnonce"))),
-                                     Wp_Unslash (Get (X_SERVER, "REQUEST_URI")));
+            declare
+               use String_Vectors;
+               use Inc_Functions;
+
+               Arg : constant String_Array := Empty_String_Array &
+                                              "_wp_http_referer" & "_wpnonce";
+            begin
+               Location := +Remove_Query_Arg
+                  (Arg, Wp_Unslash (Get (X_SERVER, "REQUEST_URI")));
+            end;
          end if;
 
          if Location /= "" then
@@ -786,9 +808,16 @@ is
                      Set ("VAR_edit_tags_post_type", ESC_Attr (Post_Type));
 
                   elsif Var_Name = "VAR_edit_tags_remove_message_and_error" then
-                     Set (X_SERVER, "REQUEST_URI",
-                          Remove_Query_Arg (To_Array (List => (1 => Build ("message", "error"))),
-                                                Get (X_SERVER, "REQUEST_URI")));
+                     declare
+                        use Inc_Functions;
+                        use String_Vectors;
+
+                        Arg : constant String_Array := Empty_String_Array &
+                                                       "message" & "error";
+                     begin
+                        Set (X_SERVER, "REQUEST_URI",
+                             Remove_Query_Arg (Arg, Get (X_SERVER, "REQUEST_URI")));
+                     end;
                      Set ("VAR_edit_tags_remove_message_and_error", "XXX-88");
 
                   elsif Var_Name = "VAR_edit_tags_search_box" then

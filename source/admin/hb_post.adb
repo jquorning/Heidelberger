@@ -1,3 +1,11 @@
+--
+-- Edit post administration panel.
+--
+-- Manage Post actions: post, edit, delete, etc.
+--
+-- @package WordPress
+-- @subpackage Administration
+--
 
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
@@ -8,18 +16,10 @@ with L10n;
 with Arrays;
 with Php;
 
-with Inc_Class_Wp_Post_Type;
 
 with HB_Common;
---
--- Edit post administration panel.
---
--- Manage Post actions: post, edit, delete, etc.
---
--- @package WordPress
--- @subpackage Administration
---
 
+with Inc_Functions;
 with Inc_Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Posts;
@@ -120,11 +120,18 @@ is
                   end if;
                end if;
             else
-               Sendback := +Remove_Query_Arg (To_List ((+"trashed",
-                                                        +"untrashed",
-                                                        +"deleted",
-                                                        +"ids")),
-                                              -Sendback);
+               declare
+                  use String_Vectors;
+                  use Inc_Functions;
+
+                  Arg : constant String_Array := Empty_String_Array &
+                                                 "trashed"   &
+                                                 "untrashed" &
+                                                 "deleted"   &
+                                                 "ids";
+               begin
+                  Sendback := +Remove_Query_Arg (Arg, -Sendback);
+               end;
             end if;
 
 -- switch (action) then

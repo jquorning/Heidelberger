@@ -1,13 +1,3 @@
-
-with Ada.Strings.Unbounded;
-with Ada.Strings.Fixed;
-
---  with Templates_Parser;
-
-with L10n;
-
-with HB_Common;
-
 --
 -- Build Administration Menu.
 --
@@ -15,438 +5,721 @@ with HB_Common;
 -- @subpackage Administration
 --
 
---
--- Constructs the admin menu.
---
--- The elements in the array are:
---     0: Menu item name.
---     1: Minimum level or capability required.
---     2: The URL of the item's file.
---     3: Page title.
---     4: Classes.
---     5: ID.
---     6: Icon for top level menu.
---
--- @global array $menu
---
+with Ada.Strings.Unbounded;
+with Ada.Strings.Fixed;
+
+--  with Templates_Parser;
+
+with L10n;
+with Arrays;
+with Php;
+
+with HB_Common;
+
+with Adi_Plugins;
+
+with Inc_Comments;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Load;
+with Inc_Media;
+with Inc_Options;
+with Inc_Plugins;
+with Inc_Posts;
+with Inc_Taxonomys;
+with Inc_Themes;
+with Inc_Updates;
+with Inc_Class_Wp_Post_Type;
 
 package body Hb_Menu
 is
    use Ada.Strings.Unbounded;
    use L10n;
    use HB_Common;
+   use Arrays;
+   use Php;
+   use Inc_Functions;
 
-   function run
+   -------------
+   -- To_Menu --
+   -------------
+
+   function To_Menu (Name    : String;
+                     Cap     : String;
+                     Url     : String;
+                     Title   : String;
+                     Classes : String;
+                     Id      : String := "";
+                     Icon    : String := "")
+                     return Menu_Item
    is
+      Item : Menu_Item := (Name    => +Name,
+                           Cap     => +Cap,
+                           Url     => +Url,
+                           Title   => +Title,
+                           Classes => +Classes,
+                           Id      => +Id,
+                           Icon    => +Icon);
+   begin
+      return Item;
+   end To_Menu;
 
-Menu (2) := To_Array (abs "Dashboard", "read", "index.php", "", "menu-top menu-top-first menu-icon-dashboard", "menu-dashboard", "dashicons-dashboard");
+   type Submenu_Type is null record;
 
-Submenu ("index.php") (0) := To_Array (abs "Home", "read", "index.php");
+   procedure Set (Sub : in out Submenu_Type;
+                  Url : String;
+                  I   : Integer;
+                  A1  : String;
+                  A2  : String;
+                  A3  : String;
+                  A4  : String := "";
+                  A5  : String := "")
+   is
+   begin
+      null;
+   end Set;
 
-if Is_Multisite  then -- ()
-        Submenu ("index.php") (5) := To_Array (abs "My Sites", "read", "my-sites.php");
-end if;
+   ---------
+   -- Run --
+   ---------
 
-if not Is_Multisite or else Current_User_Can ("update_core") then
-        Update_Data := Hb_Get_Update_Data; -- ();
-end if;
+   procedure Run
+   is
+      Submenu : Submenu_Type;
+      Is_Multisite : constant Boolean := Inc_Load.Is_Multisite;
+      Cap          : Unbounded_String;
+      I            : Natural;
+      Update_Data  : Array_Type;
+      Counts_Total : Integer;
+   begin
+      Menu (2) := To_Menu (abs "Dashboard", "read", "index.php", "",
+                           "menu-top menu-top-first menu-icon-dashboard",
+                           "menu-dashboard", "dashicons-dashboard");
 
-if not Is_Multisite then
-        if Current_User_Can ("update_core") then
-                Cap := "update_core";
-        elsif Current_User_Can ("update_plugins")) then
-                Cap := "update_plugins";
-        elsif current_user_can ("update_themes")) then
-                Cap := "update_themes";
-        else
-                Cap := "update_languages";
-        end if;
-        Submenu ("index.php") (10) := To_Array (
-                Sprintf (
+      Set (Submenu, "index.php", 0, abs "Home", "read", "index.php");
+
+      if Is_Multisite  then -- ()
+         Set (Submenu, "index.php", 5, abs "My Sites", "read", "my-sites.php");
+      end if;
+
+      if not Is_Multisite or else Current_User_Can ("update_core") then
+         Update_Data := Inc_Updates.Wp_Get_Update_Data; -- ();
+      end if;
+
+      if not Is_Multisite then
+         if Current_User_Can ("update_core") then
+            Cap := +"update_core";
+         elsif Current_User_Can ("update_plugins") then
+            Cap := +"update_plugins";
+         elsif current_user_can ("update_themes") then
+            Cap := +"update_themes";
+         else
+            Cap := +"update_languages";
+         end if;
+
+         Counts_Total :=
+            Integer'Value (Get_2 (Update_Data, "counts", "total"));
+
+         Set (Submenu, "index.php", 10,
+              Sprintf (
                         -- translators: %s: Number of pending updates.
                         abs "Updates %s",
                         Sprintf (
                                 "<span class=""update-plugins count-%s""><span class=""update-count"">%s</span></span>",
-                                Update_Data ("counts") ("total"),
-                                Number_Format_I18n (Update_Data ("counts") ("total"))
+                                Counts_Total'Image,
+                                -- Update_Data ("counts") ("total"),
+                                Number_Format_I18n (Float (Counts_Total))
+                                -- Update_Data ("counts") ("total"))
                        )
-                ),
-                cap,
-                "update-core.php"
-        );
-        Unset (Cap);
-end if;
+              ),
+              -Cap,
+              "update-core.php"
+            );
+--         Unset (Cap);
+      end if;
 
-Menu (4) := To_Array ("", "read", "separator1", "", "wp-menu-separator");
+      Menu (4) := To_Menu ("", "read", "separator1", "", "wp-menu-separator");
 
--- menu(5) = Posts.
+      -- menu(5) = Posts.
 
-Menu (10) := To_array (abs "Media", "upload_files", "upload.php", "", "menu-top menu-icon-media", "menu-media", "dashicons-admin-media");
-        Submenu ("upload.php") (5) := To_Array (abs "Library", "upload_files", "upload.php");
-        -- translators: Add new file.
-        Submenu ("upload.php") (10) := To_array (X_X ("Add New", "file") , "upload_files", "media-new.php");
-        I : = 15;
-for Tax of Get_Taxonomies_For_Attachments ("objects") loop
-        if not Tax.Show_UI or else not Tax.Show_In_Menu then
-                goto Continue;
-        end if;
+      Menu (10) := To_Menu (abs "Media", "upload_files", "upload.php", "",
+                            "menu-top menu-icon-media", "menu-media",
+                            "dashicons-admin-media");
+      Set (Submenu, "upload.php", 5, abs "Library", "upload_files", "upload.php");
+      -- translators: Add new file.
+      Set (Submenu, "upload.php", 10, X_X ("Add New", "file"), "upload_files",
+                                      "media-new.php");
+      I := 15;
+      for Tax of Inc_Media.Get_Taxonomies_For_Attachments ("objects") loop
+         if not Tax.Show_UI or else not Tax.Show_In_Menu then
+            goto Continue_1;
+         end if;
 
-        Submenu ("upload.php") (I) := To_Array (ESC_Attr (Tax.Labels.Menu_name) , Tax.Cap.Manage_Terms, "edit-tags.php?taxonomy=" . Tax.name & "&amp;post_type=attachment");
-        I := I + 1;
-end loop;
-        Unset (Tax, I);
+         Set (Submenu, "upload.php", I, ESC_Attr (Get (Tax.Labels, "menu_name")),
+              Get (Tax.Cap, "manage_terms"),
+              "edit-tags.php?taxonomy=" & (-Tax.Name) & "&amp;post_type=attachment");
+         I := I + 1;
+         << Continue_1 >>
+      end loop;
+--      Unset (Tax, I);
 
-Menu (15) := To_array (abs "Links", "manage_links", "link-manager.php", "", "menu-top menu-icon-links", "menu-links", "dashicons-admin-links");
-        Submenu ("link-manager.php") (5) := To_array (X_X ("All Links", "admin menu") , "manage_links", "link-manager.php");
-        -- translators: Add new links.
-        Submenu ("link-manager.php") (10) = To_array (X_X ("Add New", "link"), "manage_links", "link-add.php");
-        Submenu ("link-manager.php") (15) = To_array (abs "Link Categories", "manage_categories", "edit-tags.php?taxonomy=link_category");
+      Menu (15) := To_Menu (abs "Links", "manage_links", "link-manager.php", "",
+                            "menu-top menu-icon-links", "menu-links",
+                            "dashicons-admin-links");
+      Set (Submenu, "link-manager.php", 5, X_X ("All Links", "admin menu"),
+           "manage_links", "link-manager.php");
+      -- translators: Add new links.
+      Set (Submenu, "link-manager.php", 10, X_X ("Add New", "link"),
+           "manage_links", "link-add.php");
+      Set (Submenu, "link-manager.php", 15, abs "Link Categories",
+           "manage_categories", "edit-tags.php?taxonomy=link_category");
 
--- menu(20) = Pages.
+      -- menu(20) = Pages.
 
--- Avoid the comment count query for users who cannot edit_posts.
-if Current_User_Can ("edit_posts") then
-        Awaiting_Mod      := Wp_Count_Comments; --();
-        Awaiting_Mod      := Awaiting_Mod.Moderated;
-        awaiting_mod_i18n := Number_Format_I18n (Awaiting_Mod);
-        -- translators: %s: Number of comments
-        Awaiting_Mod_Text = Sprintf (N_N ("%s Comment in moderation", "%s Comments in moderation", awaiting_mod) , awaiting_mod_i18n);
-
-        Menu (25) := To_Array (
+      -- Avoid the comment count query for users who cannot edit_posts.
+      if Current_User_Can ("edit_posts") then
+         declare
+            Comments : constant Inc_Comments.Comment_Counts :=
+               Inc_Comments.Wp_Count_Comments; --();
+            Awaiting_Mod      : constant Integer := Comments.Moderated;
+            Awaiting_Mod_I18n : constant String  :=
+               Number_Format_I18n (Float (Awaiting_Mod));
+            -- translators: %s: Number of comments
+            Awaiting_Mod_Text : constant String :=
+               Sprintf (N_N ("%s Comment in moderation",
+                              "%s Comments in moderation",
+                              Awaiting_Mod),
+                        Awaiting_Mod_I18n);
+         begin
+            Menu (25) := To_Menu (
                 -- translators: %s: Number of comments.
-                sprintf (abs "Comments %s", "<span class=""awaiting-mod count-" & Absint (Awaiting_Mod)  & """><span class=""pending-count"" aria-hidden=""true"">" & Awaiting_Mod_I18n & "</span><span class=""comments-in-moderation-text screen-reader-text"">" & Awaiting_Mod_Text & "</span></span>"),
+                Sprintf (abs "Comments %s",
+                         "<span class=""awaiting-mod count-" &
+                         Awaiting_Mod'Image &
+                         """><span class=""pending-count"" aria-hidden=""true"">" &
+                         Awaiting_Mod_I18n &
+                         "</span><span class=""comments-in-moderation-text " &
+                         "screen-reader-text"">" &
+                         Awaiting_Mod_Text & "</span></span>"),
                 "edit_posts",
                 "edit-comments.php",
                 "",
                 "menu-top menu-icon-comments",
                 "menu-comments",
                 "dashicons-admin-comments"
-       );
-        Unset (Awaiting_Mod);
-end if;
+            );
+         end;
+--         Unset (Awaiting_Mod);
+      end if;
 
-Submenu ("edit-comments.php") (0) = To_Array (abs "All Comments", "edit_posts", "edit-comments.php");
+      Set (Submenu, "edit-comments.php", 0, abs "All Comments",
+           "edit_posts", "edit-comments.php");
 
-X_HP_Last_Object_Menu := 25; -- The index of the last top-level menu in the object menu group.
+      declare
+         X_Wp_Last_Object_Menu : Natural := 25;
+         -- The index of the last top-level menu in the object menu group.
 
-Types   := (array) Get_Post_Types (
-        To_Array ((
-                Build ("show_ui",      True),
-                Build ("_builtin",     False),
-                Build ("show_in_menu", True),
-       ))
-);
-Builtin := To_Array ("post", "page");
-foreach  (array_merge (builtin, types)  as ptype)  then
-        Ptype_Obj := Get_Post_Type_Object (Ptype);
-        -- Check if it should be a submenu.
-        if  True /= Ptype_Obj.Show_In_Menu then
-                goto Continue;
-        end if;
-        Ptype_Menu_Position := (if Is_Int (Ptype_Obj.Menu_Position) then Ptype_Obj.Menu_Position else ++_Wp_Last_Object_Menu);
-        -- If we"re to use _wp_last_object_menu, increment it first.
-        Ptype_For_Id        := Sanitize_Html_Class (Ptype);
+         Types  : Array_Type := Get_Post_Types (  -- (array)
+            Arrays.To_Array ((
+                Build ("show_ui",      "true"),
+                Build ("_builtin",     "false"),
+                Build ("show_in_menu", "true"))));
 
-        Menu_Icon := "dashicons-admin-post";
-        if Is_String (Ptype_Obj.Menu_Icon) then
-                -- Special handling for data:image/svg+xml and Dashicons.
-                if 0 = Strpos (Ptype_Obj.Menu_Icon, "data:image/svg+xml;base64,") or else 0 = Strpos (Ptype_Obj.Menu_Icon, "dashicons-") then
-                        Menu_Icon := Ptype_Obj.Menu_Icon;
-                else
-                        Menu_Icon := ESC_URL (Ptype_Obj.Menu_Icon);
-                end if;
-        elsif In_Array (Ptype, Builtin, True) then
-                Menu_Icon := "dashicons-admin-" & Ptype;
-        end if;
+         Builtin : constant Array_Type :=
+            Arrays.To_Array ((
+               Build ("post", ""),
+               Build ("page", "")));
+      begin
+         for Ptype of Array_Merge (Builtin, Types) loop
+           declare
+               Ptype_Obj : Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+                  Inc_Posts.Get_Post_Type_Object (-Ptype.Key);
+               Ptype_Menu_Position : Integer;
+               Ptype_For_Id        : Unbounded_String;
+               Menu_Icon           : Unbounded_String;
+               Menu_Class          : Unbounded_String;
+               Ptype_File          : Unbounded_String;
+               Post_New_File       : Unbounded_String;
+               Edit_Tags_File      : Unbounded_String;
+               Ptype_Menu_Id       : Unbounded_String;
+            begin
 
-        Menu_Class := "menu-top menu-icon-" & Ptype_For_Id;
-        -- "post" special case.
-        if "post" = ptype then
-                Menu_Class     := Menu_Class & " open-if-no-js";
-                Ptype_File     := "edit.php";
-                Post_New_File  := "post-new.php";
-                Edit_Tags_File := "edit-tags.php?taxonomy=%s";
-        else
-                Ptype_File     := "edit.php?post_type=ptype";
-                Post_New_File  := "post-new.php?post_type=ptype";
-                Edit_Tags_File := "edit-tags.php?taxonomy=%s&amp;post_type=ptype";
-        end if;
+               -- Check if it should be a submenu.
+               if  True /= Ptype_Obj.Show_In_Menu_Bool then
+                  goto Continue_2;
+               end if;
 
-        if in_array (Ptype, Builtin, True) then
-                Ptype_Menu_Id := "menu-" & Ptype_For_Id & "s";
-        else
-                Ptype_Menu_Id := "menu-posts-" & Ptype_For_Id;
-        end if;
-        --
-        -- If ptype_menu_position is already populated or will be populated
-        -- by a hard-coded value below, increment the position.
-        --
-        Core_Menu_Positions := To_array (59, 60, 65, 70, 75, 80, 85, 99);
-        while Isset (Menu (Ptype_Menu_Position)) or else In_Array (ptype_menu_position, Core_Menu_Positions, True) then
-                Ptype_Menu_Position := Ptype_Menu_Position + 1;
-        end loop;
+               if Is_Int (Ptype_Obj.Menu_Position) then
+                  Ptype_Menu_Position := Ptype_Obj.Menu_Position;
+               else
+                  X_Wp_Last_Object_Menu := X_Wp_Last_Object_Menu + 1;
+               end if;
 
-        Menu (Ptype_Menu_Position)  := To_Array (ESC_Attr (Ptype_Obj.Labels.Menu_Name), Ptype_Obj.Cap.Edit_Posts, Ptype_File, "", Menu_Class, Ptype_Menu_Id, Menu_Icon);
-        Submenu (Ptype_File) (5)    := To_Array (Ptype_Obj.Labels.All_Items, Ptype_Obj.Cap.Edit_Posts,   Ptype_File);
-        Submenu (Ptype_File) (10)   := To_Array (Ptype_Obj.Labels.Add_New,   Ptype_Obj.Cap.Create_Posts, Post_New_File);
+               -- If we"re to use _wp_last_object_menu, increment it first.
+               Ptype_For_Id := +Inc_Formatting.Sanitize_Html_Class (-Ptype.Key);
+               Menu_Icon    := +"dashicons-admin-post";
 
-        i := 15;
-        for Tax of Get_Taxonomies (To_array(), "objects") loop
-                if not Tax.Show_UI or else not Tax.Show_In_Menu or else not In_Array (Ptype, (array) Tax.Object_Type, True)) then
-                        goto continue;
-                end if;
+               if Is_String (-Ptype_Obj.Menu_Icon) then
+                  -- Special handling for data:image/svg+xml and Dashicons.
+                  if
+                    0 = Strpos (-Ptype_Obj.Menu_Icon, "data:image/svg+xml;base64,") or else
+                    0 = Strpos (-Ptype_Obj.Menu_Icon, "dashicons-")
+                  then
+                     Menu_Icon := Ptype_Obj.Menu_Icon;
+                  else
+                     Menu_Icon := +ESC_URL (-Ptype_Obj.Menu_Icon);
+                  end if;
+               elsif In_Array (-Ptype.Key, Builtin, True) then
+                  Menu_Icon := "dashicons-admin-" & Ptype.Key;
+               end if;
 
-                Submenu (Ptype_File)  (i++)  := To_Array (ESC_Attr (Tax.Labels.Menu_name) , Tax.Cap.Manage_Terms, sprintf (Edit_Tags_File, Tax.Name));
-        end loop;
-end;
-Unset (ptype, ptype_obj, ptype_for_id, ptype_menu_position, menu_icon, i, tax, post_new_file);
+               Menu_Class := "menu-top menu-icon-" & Ptype_For_Id;
+               -- "post" special case.
+               if "post" = Ptype.Key then
+                  Menu_Class     := Menu_Class & " open-if-no-js";
+                  Ptype_File     := +"edit.php";
+                  Post_New_File  := +"post-new.php";
+                  Edit_Tags_File := +"edit-tags.php?taxonomy=%s";
+               else
+                  Ptype_File     := +"edit.php?post_type=ptype";
+                  Post_New_File  := +"post-new.php?post_type=ptype";
+                  Edit_Tags_File := +"edit-tags.php?taxonomy=%s&amp;post_type=ptype";
+               end if;
 
-Menu (59) := To_array ("", "read", "separator2", "", "wp-menu-separator");
+               if In_Array (-Ptype.Key, Builtin, True) then
+                  Ptype_Menu_Id := "menu-" & Ptype_For_Id & "s";
+               else
+                  Ptype_Menu_Id := "menu-posts-" & Ptype_For_Id;
+               end if;
 
-Appearance_Cap := (if current_user_can ("switch_themes") then "switch_themes" else "edit_theme_options");
+               --
+               -- If ptype_menu_position is already populated or will be populated
+               -- by a hard-coded value below, increment the position.
+               --
+               while
+                 Menu (Ptype_Menu_Position).Name /= "" or else
+                 -- Isset (Menu (Ptype_Menu_Position)) or else
+                 Ptype_Menu_Position in 59 | 60 | 65 | 70 | 75 | 80 | 85 | 99
+--               In_Array (Ptype_Menu_Position, Core_Menu_Positions, True)
+               loop
+                  Ptype_Menu_Position := Ptype_Menu_Position + 1;
+               end loop;
 
-Menu (60) := To_Array (abs "Appearance", Appearance_Cap, "themes.php", "", "menu-top menu-icon-appearance", "menu-appearance", "dashicons-admin-appearance");
+               Menu (Ptype_Menu_Position)  :=
+                  To_Menu (ESC_Attr (Get (Ptype_Obj, "labels.menu_name")),
+                           Get (Ptype_Obj.Cap, "edit_posts"),
+                           -Ptype_File, "", -Menu_Class, -Ptype_Menu_Id, -Menu_Icon);
 
-count := "";
-if not Is_Multisite and then Current_User_Can ("update_themes") then
-        if not Isset (Update_Data)) then
-                Update_Data := Hb_Get_Update_Data;  -- ();
-        end if;
-        Count := Sprintf (
-                "<span class=""update-plugins count-%s""><span class=""theme-count"">%s</span></span>",
-                Update_Data ("counts") ("themes"),
-                Number_Format_I18n (Update_Data ("counts") ("themes"))
-       );
-end if;
+               Set (Submenu, -Ptype_File, 5, Get (Ptype_Obj, "labels.all_items"),
+                    Get (Ptype_Obj.Cap, "edit_posts"), -Ptype_File);
 
-        -- translators: %s: Number of available theme updates.
-        Submenu ("themes.php") (5) := To_array (Sprintf (abs "Themes %s", Count) , Appearance_Cap, "themes.php");
+               Set (Submenu, -Ptype_File, 10, Get (Ptype_Obj, "labels.add_new"),
+                    Get (Ptype_Obj.Cap, "create_posts"), -Post_New_File);
 
-if Hb_Is_Block_Theme then -- ()
-        Submenu ("themes.php") (6) := To_Array (
-                Sprintf (
+               I := 15;
+               for Tax of Inc_Taxonomys.Get_Taxonomies (Empty_Array, "objects") loop
+                  if
+                    not Tax.Show_UI      or else
+                    not Tax.Show_In_Menu or else
+                    not In_Array (-Ptype.Key, Tax.Object_Type, True) -- (array)
+                  then
+                     goto Continue_3;
+                  end if;
+
+                  Set (Submenu, -Ptype_File, I,
+                       ESC_Attr (Get (Tax.Labels, "menu_name")),
+                       Get (Tax.Cap, "manage_terms"),
+                       Sprintf (-Edit_Tags_File, -Tax.Name));
+                  I := I + 1;
+                  << Continue_3 >>
+               end loop;
+            end;
+            << Continue_2 >>
+         end loop;
+
+--      Unset (ptype, ptype_obj, ptype_for_id, ptype_menu_position, menu_icon, i, tax, post_new_file);
+      end;
+
+      Menu (59) := To_Menu ("", "read", "separator2", "", "wp-menu-separator");
+
+      declare
+         Appearance_Cap : String := (if Current_User_Can ("switch_themes")
+                                     then "switch_themes"
+                                     else "edit_theme_options");
+      begin
+         Menu (60) := To_Menu (abs "Appearance", Appearance_Cap, "themes.php", "",
+                               "menu-top menu-icon-appearance", "menu-appearance",
+                               "dashicons-admin-appearance");
+
+         declare
+            Count       : Unbounded_String;
+            Update_Date : Array_Type;
+         begin
+            if not Is_Multisite and then Current_User_Can ("update_themes") then
+               if not Isset (Update_Data) then
+                  Update_Data := Inc_Updates.Wp_Get_Update_Data;  -- ();
+               end if;
+
+               declare
+                  Theme_Count : constant String := Get_2 (Update_Data, "counts",
+                                                                       "themes");
+               begin
+                  Count := +Sprintf (
+                     "<span class=""update-plugins count-%s""><span class=""theme-count"">%s</span></span>",
+                     Theme_Count,
+                     Number_Format_I18n (Float'Value (Theme_Count)));
+               end;
+            end if;
+
+            -- translators: %s: Number of available theme updates.
+            Set (Submenu, "themes.php", 5, Sprintf (abs "Themes %s", -Count),
+                 Appearance_Cap, "themes.php");
+         end;
+
+         if Inc_Themes.Wp_Is_Block_Theme then -- ()
+            Set (Submenu, "themes.php", 6,
+                  Sprintf (
                         -- translators: %s: "beta" label
                         abs "Editor %s",
                         "<span class=""awaiting-mod"">" & abs "beta" & "</span>"
-               ),
-                "edit_theme_options",
-                "site-editor.php"
-       );
-end if;
+                  ),
+                  "edit_theme_options",
+                  "site-editor.php");
+         end if;
 
-if not Hb_Is_Block_Theme and then Current_Theme_Supports ("block-template-parts") then
-        Submenu ("themes.php") (6) := To_Array (
+         if
+           not Inc_Themes.Wp_Is_Block_Theme and then
+           Inc_Themes.Current_Theme_Supports ("block-template-parts")
+         then
+            Set (Submenu, "themes.php", 6,
                 abs "Template Parts",
                 "edit_theme_options",
-                "site-editor.php?postType=wp_template_part"
-       );
-end if;
+                "site-editor.php?postType=wp_template_part");
+         end if;
 
-Customize_Url := Add_Query_Arg ("return", Urlencode (Remove_Query_Arg (Hb_Removable_Query_Args, Hb_Unslash (X_SERVER ("REQUEST_URI")))) , "customize.php");
+         declare
+            use Inc_Functions;
+            use Inc_Plugins;
+            use Inc_Themes;
 
--- Hide Customize link on block themes unless a plugin or theme
--- is using "customize_register" to add a setting.
-if not Hb_Is_Block_Theme or Has_Action ("customize_register") then
-        position :=  (if Hb_Is_Block_Theme or else Current_Theme_Supports ("block-template-parts") then 7 else 6);
+            Customize_Url : constant String :=
+                Add_Query_Arg
+                  ("return",
+                   Urlencode (Remove_Query_Arg (Wp_Removable_Query_Args,
+                                          Wp_Unslash (Get (X_Server, "REQUEST_URI")))),
+                   "customize.php");
+         begin
+            -- Hide Customize link on block themes unless a plugin or theme
+            -- is using "customize_register" to add a setting.
+            if not wp_Is_Block_Theme or Has_Action ("customize_register") then
+               declare
+                  Position : constant Integer :=
+                     (if
+                        wp_Is_Block_Theme or else
+                        Current_Theme_Supports ("block-template-parts")
+                      then 7 else 6);
+         begin
+            Set (Submenu, "themes.php", Position, abs "Customize", "customize",
+                 ESC_URL (Customize_Url), "", "hide-if-no-customize");
+         end;
+      end if;
 
-        Submenu ("themes.php") (Position) := To_Array (abs "Customize", "customize", ESC_URL (Customize_Url), "", "hide-if-no-customize");
-end if;
+      if
+        Current_Theme_Supports ("menus") or else
+        Current_Theme_Supports ("widgets")
+      then
+         Set (Submenu, "themes.php", 10, abs "Menus", "edit_theme_options",
+              "nav-menus.php");
+      end if;
 
-if  Current_Theme_Supports ("menus") or else Current_Theme_Supports ("widgets") then
-        Submenu ("themes.php") (10) := To_array (abs "Menus" , "edit_theme_options", "nav-menus.php");
-end if;
+      if
+        Current_Theme_Supports ("custom-header") and then
+        Current_User_Can ("customize")
+      then
+         declare
+            Array_1 : constant Array_Type := Arrays.To_Array ((1 => Build ("control",
+                                                                    "header_image")));
+            Array_2 : constant Array_Type := Arrays.To_Array ((1 => Build ("autofocus",
+                                                                    Array_1)));
+            Customize_Header_Url : constant String :=
+               -Add_Query_Arg (Array_2, +Customize_Url);
+      begin
+            Set (Submenu, "themes.php", 15, abs "Header", Appearance_Cap,
+                 ESC_URL (Customize_Header_Url), "", "hide-if-no-customize");
+         end;
+      end if;
 
-if Current_Theme_Supports ("custom-header")  and then Current_User_Can ("customize") then
-        Customize_Header_Url        := Add_Query_Arg (Tp_array ("autofocus" => To_array ("control" => "header_image") ), Customize_Url);
-        Submenu ("themes.php") (15) := To_Array (abs "Header", Appearance_Cap, ESC_URL (Customize_Header_Url), "", "hide-if-no-customize");
-end if;
+      if
+        Current_Theme_Supports ("custom-background") and then
+        Current_User_Can ("customize")
+      then
+         declare
+            Array_1 : constant Array_Type := Arrays.To_Array ((1 => Build ("control",
+                                                             "background_image")));
+            Array_2 : constant Array_Type := Arrays.To_Array ((1 => Build ("autofocus",
+                                                                   Array_1)));
+            Customize_Background_Url : constant String :=
+               -Add_Query_Arg (Array_2, +Customize_Url);
+         begin
+            Set (Submenu, "themes.php", 20, abs "Background", Appearance_Cap,
+                 ESC_URL (Customize_Background_Url), "", "hide-if-no-customize");
+         end;
+      end if;
 
-if Current_Theme_Supports ("custom-background") and then Current_User_Can ("customize") then
-        Customize_Background_Url    := Add_Query_Arg (To_Array ("autofocus" => To_Array ("control" => "background_image") ) , Customize_Url);
-        Submenu ("themes.php") (20) := To_Array (abs "Background", Appearance_Cap, ESC_URL (Customize_Background_Url) , "", "hide-if-no-customize");
-end if;
+              Unset (Customize_Url);
+              Unset (Appearance_Cap);
+            end;
+         end;
 
-Unset (Customize_Url);
-Unset (Appearance_Cap);
+         -- Add "Theme File Editor" to the bottom of the Appearance (non-block themes)
+         -- or Tools (block themes) menu.
+         if not Is_Multisite  then
+            -- Must use API on the admin_menu hook, direct modification is only
+            -- possible on/before the _admin_menu hook.
+            Inc_Plugins.Add_Action ("admin_menu", "_add_themes_utility_last", 101);
+         end if;
 
--- Add "Theme File Editor" to the bottom of the Appearance (non-block themes) or Tools (block themes) menu.
-if not Is_Multisite  then
-        -- Must use API on the admin_menu hook, direct modification is only possible on/before the _admin_menu hook.
-        Add_Action ("admin_menu", "_add_themes_utility_last", 101);
-end if;
+         declare
+            --
+            -- Adds the "Theme File Editor" menu item to the bottom of the Appearance (non-block themes)
+            -- or Tools (block themes) menu.
+            --
+            -- @access private
+            -- @since 3.0.0
+            -- @since 5.9.0 Renamed "Theme Editor" to "Theme File Editor".
+            --              Relocates to Tools for block themes.
+            --
+            procedure X_Add_Themes_Utility_Last
+            is
+               use Inc_Themes;
+               use Adi_Plugins;
+            begin
+               Add_Submenu_Page (
+                   (if Wp_Is_Block_Theme then "tools.php" else "themes.php"),
+                   abs "Theme File Editor",
+                   abs "Theme File Editor",
+                   "edit_themes",
+                   "theme-editor.php");
+            end X_Add_Themes_Utility_Last;
 
---
--- Adds the "Theme File Editor" menu item to the bottom of the Appearance (non-block themes)
--- or Tools (block themes) menu.
---
--- @access private
--- @since 3.0.0
--- @since 5.9.0 Renamed "Theme Editor" to "Theme File Editor".
---              Relocates to Tools for block themes.
---
+            --
+            -- Adds the "Plugin File Editor" menu item after the "Themes File Editor" in Tools
+            -- for block themes.
+            --
+            -- @access private
+            -- @since 5.9.0
+            --
+            procedure X_Add_Plugin_File_Editor_To_Tools
+            is
+               use Inc_Themes;
+               use Adi_Plugins;
+            begin
+               if not wp_Is_Block_Theme then
+                  return;
+               end if;
+               Add_Submenu_Page (
+                  "tools.php",
+                  abs "Plugin File Editor",
+                  abs "Plugin File Editor",
+                  "edit_plugins",
+                  "plugin-editor.php");
+            end X_Add_Plugin_File_Editor_To_Tools;
+         begin
+            declare
+               Count        : Unbounded_String;
+               Update_Date  : Array_Type;
+               Plugin_Count : Unbounded_String;
+            begin
+               if not Is_Multisite and then Current_User_Can ("update_plugins") then
+                  if not Isset (Update_Data) then
+                     Update_Data := Inc_Updates.wp_Get_Update_Data; -- ();
+                  end if;
+                  Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
+                  Count := +Sprintf (
+                     "<span class=""update-plugins count-%s""><span class=""plugin-count"">%s</span></span>",
+                     -Plugin_Count,
+                     Number_Format_I18n (Float'Value (-Plugin_Count))
+                  );
+               end if;
 
-procedure X_Add_Themes_Utility_Last is
-begin
-        Add_Submenu_Page (
-                (if Hb_Is_Block_Theme then "tools.php" else "themes.php"),
-                abs "Theme File Editor",
-                abs "Theme File Editor",
-                "edit_themes",
-                "theme-editor.php"
-       );
-end X_Add_Themes_Utility_Last;
+               -- translators: %s: Number of available plugin updates.
+               Menu (65) := To_Menu (Sprintf (abs "Plugins %s", -Count),
+                                  "activate_plugins",
+                                  "plugins.php", "", "menu-top menu-icon-plugins",
+                                  "menu-plugins", "dashicons-admin-plugins");
+            end;
 
---
--- Adds the "Plugin File Editor" menu item after the "Themes File Editor" in Tools
--- for block themes.
---
--- @access private
--- @since 5.9.0
---
-procedure X_Add_Plugin_File_Editor_To_Tools is
-          begin
-        if not Hb_Is_Block_Theme then
-                return;
-        end if;
-        Add_Submenu_Page (
-                "tools.php",
-                abs "Plugin File Editor",
-                abs "Plugin File Editor",
-                "edit_plugins",
-                "plugin-editor.php"
-       );
-end X_Add_Plugin_File_Editor_To_Tools;
+            Set (Submenu, "plugins.php", 5, abs "Installed Plugins",
+                 "activate_plugins", "plugins.php");
 
-Count := "";
-if not Is_Multisite and then Current_User_Can ("update_plugins") then
-        if not Isset (Update_Data) then
-                Update_Data := Hb_Get_Update_Data; -- ();
-        end if;
-        Count := Sprintf (
-                "<span class=""update-plugins count-%s""><span class=""plugin-count"">%s</span></span>",
-                Update_Data ("counts") ("plugins"),
-                Number_Format_I18n (Update_Data ("counts") ("plugins"))
-       );
-end if;
+            if not Is_Multisite then
+               -- translators: Add new plugin.
+               Set (Submenu, "plugins.php", 10, X_X ("Add New", "plugin"),
+                    "install_plugins", "plugin-install.php");
+               if Inc_Themes.Wp_Is_Block_Theme then
+                  -- Place the menu item below the Theme File Editor menu item.
+                  Inc_Plugins.Add_Action ("admin_menu",
+                                          "_add_plugin_file_editor_to_tools", 101);
+               else
+                  Set (Submenu, "plugins.php", 15, abs "Plugin File Editor",
+                       "edit_plugins", "plugin-editor.php");
+            end if;
+         end if;
 
--- translators: %s: Number of available plugin updates.
-Menu (65) := To_array (Sprintf (abs "Plugins %s", Count), "activate_plugins", "plugins.php", "", "menu-top menu-icon-plugins", "menu-plugins", "dashicons-admin-plugins");
+--      Unset (Update_Data);
 
-Submenu ("plugins.php") (5) := To_array (abs "Installed Plugins", "activate_plugins", "plugins.php");
+         if Current_User_Can ("list_users") then
+            Menu (70) := To_Menu (abs "Users", "list_users", "users.php", "",
+                                  "menu-top menu-icon-users", "menu-users",
+                                  "dashicons-admin-users");
+         else
+            Menu (70) := To_Menu (abs "Profile", "read", "profile.php", "",
+                                  "menu-top menu-icon-users", "menu-users",
+                                  "dashicons-admin-users");
+         end if;
 
-if not Is_Multisite then
-        -- translators: Add new plugin.
-        Submenu ("plugins.php") (10) := To_array (X_X ("Add New", "plugin") , "install_plugins", "plugin-install.php");
-        if Hb_Is_Block_Theme then
-                -- Place the menu item below the Theme File Editor menu item.
-                Add_Action ("admin_menu", "_add_plugin_file_editor_to_tools", 101);
-        else
-                Submenu ("plugins.php") (15) := To_Array (abs "Plugin File Editor", "edit_plugins", "plugin-editor.php");
-        end if;
-end if;
+         if Current_User_Can ("list_users") then
+            Set (X_Wp_Real_Parent_File, "profile.php", Value => "users.php");
+            -- Back-compat for plugins adding submenus to profile.php.
 
-Unset (Update_Data);
+            Set (Submenu, "users.php", 5, abs "All Users", "list_users", "users.php");
+            if Current_User_Can ("create_users") then
+               Set (Submenu, "users.php", 10, X_X ("Add New", "user"), "create_users",
+                    "user-new.php");
+            elsif Is_Multisite then
+               Set (Submenu, "users.php", 10, X_X ("Add New", "user"), "promote_users",
+                    "user-new.php");
+            end if;
 
-if Current_User_Can ("list_users") then
-        Menu (70) := To_Array (abs "Users", "list_users", "users.php", "", "menu-top menu-icon-users", "menu-users", "dashicons-admin-users");
-else
-        Menu (70) := To_Array (abs "Profile", "read", "profile.php", "", "menu-top menu-icon-users", "menu-users", "dashicons-admin-users");
-end if;
+            Set (Submenu, "users.php", 15, abs "Profile", "read", "profile.php");
+         else
+            Set (X_Wp_Real_Parent_File, "users.php", Value => "profile.php");
+            Set (Submenu, "profile.php", 5, abs "Profile", "read", "profile.php");
 
-if current_user_can ("list_users") then
-        X_Hb_Real_Parent_File ("profile.php") := "users.php"; -- Back-compat for plugins adding submenus to profile.php.
-        Submenu ("users.php") (5)             := To_array (abs "All Users", "list_users", "users.php");
-        if Current_User_Can ("create_users") then
-                Submenu ("users.php") (10) := To_Array (X_X ("Add New", "user") , "create_users", "user-new.php");
-        elsif Is_Multisite then
-                Submenu ("users.php") (10) := To_Array (X_X ("Add New", "user") , "promote_users", "user-new.php");
-        end if;
+            if Current_User_Can ("create_users") then
+               Set (Submenu, "profile.php", 10, abs "Add New User", "create_users",
+                    "user-new.php");
+            elsif Is_Multisite then
+               Set (Submenu, "profile.php", 10, abs "Add New User", "promote_users",
+                    "user-new.php");
+            end if;
+         end if;
 
-        Submenu ("users.php") (15) := To_array (abs "Profile", "read", "profile.php");
-else
-        X_Hb_Real_Parent_File ("users.php") := "profile.php";
-        Submenu ("profile.php") (5)         := To_array (abs "Profile", "read", "profile.php");
-        if current_user_can ("create_users") then
-                Submenu ("profile.php") (10) := To_Array (abs "Add New User", "create_users", "user-new.php");
-        elsif Is_Multisite then
-                Submenu ("profile.php") (10) := To_Array (abs "Add New User", "promote_users", "user-new.php");
-        end if;
-end if;
+         declare
+            Site_Health_Count : Unbounded_String;
+         begin
+            if not Is_Multisite and then
+              Current_User_Can ("view_site_health_checks")
+            then
+               declare
+                  use Array_Vectors;
 
-Site_Health_Count := "";
-if not Is_Multisite and then Current_User_Can ("view_site_health_checks") then
-        Get_Issues := Get_Transient ("health-check-site-status-result");
+                  Get_Issues   : String :=
+                     Inc_Options.Get_Transient ("health-check-site-status-result");
+                  Issue_Counts : Array_Type := Empty_Array;
+               begin
+                  -- if False /= Get_Issues then
+                  --    Issue_Counts := Json_Decode (Get_Issues, True);
+                  -- end if;
 
-        Issue_Counts := To_Array ();
+                  if
+                    not Is_Array (Issue_Counts) or else
+                    Issue_Counts = Empty_Array
+                  then
+                     Issue_Counts := Arrays.To_Array ((
+                        Build ("good",        "0"),
+                        Build ("recommended", "0"),
+                        Build ("critical",    "0")));
+                  end if;
 
-        if false /= Get_Issues then
-                Issue_Counts := Json_Decode (Get_Issues, True);
-        end if;
+                  declare
+                     Health : String := Get (Issue_Counts, "critical");
+                  begin
+                     Site_Health_Count := +Sprintf (
+                        "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
+                        Health,
+                        Number_Format_I18n (Float'Value (Health)));
+                  end;
+               end;
+            end if;
 
-        if not Is_Array (Issue_Counts) or else not Issue_Counts then
-                Issue_Counts := To_Array ((
-                        Build ("good",        0),
-                        Build ("recommended", 0),
-                        Build ("critical",    0)
-               );
-        end if;
+            Menu (75) := To_Menu (abs "Tools", "edit_posts", "tools.php", "",
+                                  "menu-top menu-icon-tools", "menu-tools",
+                                  "dashicons-admin-tools");
+            Set (Submenu, "tools.php", 5, abs "Available Tools", "edit_posts",
+                 "tools.php");
+            Set (Submenu, "tools.php", 10, abs "Import", "import", "import.php");
+            Set (Submenu, "tools.php", 15, abs "Export", "export", "export.php");
+            -- translators: %s: Number of critical Site Health checks.
+            Set (Submenu, "tools.php", 20, Sprintf (abs "Site Health %s",
+                                                 -Site_Health_Count),
+                 "view_site_health_checks", "site-health.php");
+            Set (Submenu, "tools.php", 25, abs "Export Personal Data",
+                 "export_others_personal_data", "export-personal-data.php");
+            Set (Submenu, "tools.php", 30, abs "Erase Personal Data",
+                 "erase_others_personal_data", "erase-personal-data.php");
+         end;
 
-        Site_Health_Count := Sprintf (
-                "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
-                Issue_Counts ("critical"),
-                Number_Format_I18n (Issue_Counts ("critical"))
-       );
-end if;
+         if Is_Multisite and then not Inc_Functions.Is_Main_Site  then
+            Set (Submenu, "tools.php", 35, abs "Delete Site", "delete_site",
+                 "ms-delete-site.php");
+         end if;
 
-Menu (75) := To_Array (abs "Tools", "edit_posts", "tools.php", "", "menu-top menu-icon-tools", "menu-tools", "dashicons-admin-tools");
-        Submenu ("tools.php")( 5)  := To_array (abs "Available Tools", "edit_posts", "tools.php");
-        Submenu ("tools.php") (10) := To_array (abs "Import", "import", "import.php");
-        Submenu ("tools.php") (15) := To_array (abs "Export", "export", "export.php");
-        -- translators: %s: Number of critical Site Health checks.
-        Submenu ("tools.php") (20) := To_array (sprintf (abs "Site Health %s", Site_Health_Count) , "view_site_health_checks", "site-health.php");
-        Submenu ("tools.php") (25) := To_array (abs "Export Personal Data", "export_others_personal_data", "export-personal-data.php");
-        Submenu ("tools.php") (30) := To_array (abs "Erase Personal Data", "erase_others_personal_data", "erase-personal-data.php");
-if Is_Multisite and then not Is_Main_Site  then
-        Submenu ("tools.php") (35) := To_array (abs "Delete Site", "delete_site", "ms-delete-site.php");
-end if;
-if not Is_Multisite and then defined ("WP_ALLOW_MULTISITE") and then HP_ALLOW_MULTISITE then
-        Submenu ("tools.php") (50) := To_array (abs "Network Setup", "setup_network", "network.php");
-end if;
+         -- if
+         --   not Is_Multisite and then
+         --   defined ("WP_ALLOW_MULTISITE") and then
+         --   WP_ALLOW_MULTISITE
+         -- then
+         --    Set (Submenu, "tools.php", 50, abs "Network Setup", "setup_network",
+         --         "network.php");
+         -- end if;
 
-Menu (80) := To_array (abs "Settings", "manage_options", "options-general.php", "", "menu-top menu-icon-settings", "menu-settings", "dashicons-admin-settings");
-        Submenu ("options-general.php") (10) := To_array (X_X ("General", "settings screen") , "manage_options", "options-general.php");
-        Submenu ("options-general.php") (15) := To_array (abs "Writing", "manage_options", "options-writing.php");
-        Submenu ("options-general.php") (20) := To_array (abs "Reading", "manage_options", "options-reading.php");
-        Submenu ("options-general.php") (25) := To_array (abs "Discussion", "manage_options", "options-discussion.php");
-        Submenu ("options-general.php") (30) := To_array (abs "Media", "manage_options", "options-media.php");
-        Submenu ("options-general.php") (40) := To_array (abs "Permalinks", "manage_options", "options-permalink.php");
-        Submenu ("options-general.php") (45) := To_array (abs("Privacy", "manage_privacy_options", "options-privacy.php");
+         Menu (80) := To_Menu (abs "Settings", "manage_options", "options-general.php",
+                               "", "menu-top menu-icon-settings", "menu-settings",
+                               "dashicons-admin-settings");
+         Set (Submenu, "options-general.php", 10, X_X ("General", "settings screen"),
+              "manage_options", "options-general.php");
+         Set (Submenu, "options-general.php", 15, abs "Writing", "manage_options",
+              "options-writing.php");
+         Set (Submenu, "options-general.php", 20, abs "Reading", "manage_options",
+              "options-reading.php");
+         Set (Submenu, "options-general.php", 25, abs "Discussion", "manage_options",
+              "options-discussion.php");
+         Set (Submenu, "options-general.php", 30, abs "Media", "manage_options",
+              "options-media.php");
+         Set (Submenu, "options-general.php", 40, abs "Permalinks", "manage_options",
+              "options-permalink.php");
+         Set (Submenu, "options-general.php", 45, abs "Privacy",
+              "manage_privacy_options", "options-privacy.php");
 
-X_Hp_Last_Utility_Menu := 80; -- The index of the last top-level menu in the utility menu group.
+--         X_wp_Last_Utility_Menu := 80;
+         -- The index of the last top-level menu in the utility menu group.
 
-Menu (99) := To_array ("", "read", "separator-last", "", "wp-menu-separator");
+         Menu (99) := To_Menu ("", "read", "separator-last", "", "wp-menu-separator");
+      end;
 
--- Back-compat for old top-levels.
-X_Hb_Real_Parent_File ("post.php")       := "edit.php";
-X_Hb_Real_Parent_File ("post-new.php")   := "edit.php";
-X_Hb_Real_Parent_File ("edit-pages.php") := "edit.php?post_type=page";
-X_Hb_Real_Parent_File ("page-new.php")   := "edit.php?post_type=page";
-X_Hb_Real_Parent_File ("wpmu-admin.php") := "tools.php";
-X_Hb_Real_Parent_File ("ms-admin.php")   := "tools.php";
+      -- -- Back-compat for old top-levels.
+      -- X_wp_Real_Parent_File ("post.php")       := "edit.php";
+      -- X_wp_Real_Parent_File ("post-new.php")   := "edit.php";
+      -- X_wp_Real_Parent_File ("edit-pages.php") := "edit.php?post_type=page";
+      -- X_wp_Real_Parent_File ("page-new.php")   := "edit.php?post_type=page";
+      -- X_wp_Real_Parent_File ("wpmu-admin.php") := "tools.php";
+      -- X_wp_Real_Parent_File ("ms-admin.php")   := "tools.php";
 
--- Ensure backward compatibility.
-Compat := To_Array ((
-        Build ("index",           "dashboard"),
-        Build ("edit",            "posts"),
-        Build ("post",            "posts"),
-        Build ("upload",          "media"),
-        Build ("link-manager",    "links"),
-        Build ("edit-pages",      "pages"),
-        Build ("page",            "pages"),
-        Build ("edit-comments",   "comments"),
-        Build ("options-general", "settings"),
-        Build ("themes",          "appearance")
-));
+      -- -- Ensure backward compatibility.
+      -- Compat := To_Array ((
+      --    Build ("index",           "dashboard"),
+      --    Build ("edit",            "posts"),
+      --    Build ("post",            "posts"),
+      --    Build ("upload",          "media"),
+      --    Build ("link-manager",    "links"),
+      --    Build ("edit-pages",      "pages"),
+      --    Build ("page",            "pages"),
+      --    Build ("edit-comments",   "comments"),
+      --    Build ("options-general", "settings"),
+      --    Build ("themes",          "appearance")
+      -- ));
+   end Run;
 
 end HB_Menu;
---require_once ABSPATH . "wp-admin/includes/menu.php";
+-- require_once ABSPATH . "wp-admin/includes/menu.php";

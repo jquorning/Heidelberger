@@ -160,4 +160,15 @@ function Has_Header_Image
                                return Boolean
                                is (True);
 
+--
+-- Returns whether the active theme is a block-based theme or not.
+--
+-- @since 5.9.0
+--
+-- @return boolean Whether the active theme is a block-based theme or not.
+--
+   function Wp_Is_Block_Theme
+            return Boolean
+            is (True);
+
 end Inc_Themes;

@@ -1,4 +1,5 @@
 
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
 
 with Arrays;
@@ -84,15 +85,15 @@ is
                       return Array_Type is (Empty_Array);
 
    function Wp_Get_Referer return String is ("XXX-213");
-   function Remove_Query_Arg  (List : List_Type;
-                               Item : String)
-                               return String
-                               is ("XXX-214");
+   -- function Remove_Query_Arg  (List : List_Type;
+   --                             Item : String)
+   --                             return String
+   --                             is ("XXX-214");
 
-   function Remove_Query_Arg  (Arry : Array_Type;
-                               Item : String)
-                               return String
-                               is ("XXX-221");
+   -- function Remove_Query_Arg  (Arry : Array_Type;
+   --                             Item : String)
+   --                             return String
+   --                             is ("XXX-221");
 
    function Admin_URL (Item : String) return String;
 
@@ -284,6 +285,10 @@ is
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
                  return Array_Type;
+
+   function Get_2 (Arry : Array_Type; Key_1, Key_2 : String)
+                  return String is ("XXX-303");
+
    function Get_List (Arry : Array_Type; Key : String)
                       return List_Type
                       is (Empty_List);
@@ -501,4 +506,8 @@ is
                       S          : Boolean)
                       return Boolean is (True);
 
+   function In_Array (Key  : String;
+                      Arry : String_Array;
+                      S    : Boolean)
+                      return Boolean is (True);
 end HB_Common;
