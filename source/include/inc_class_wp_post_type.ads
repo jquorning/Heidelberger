@@ -411,4 +411,6 @@ is
 
    end record;
 
+   type Wp_Post_Type_Array is array (Positive range <>) of Wp_Post_Type;
+
 end Inc_Class_Wp_Post_Type;

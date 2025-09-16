@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 -- with Hb_Common;
 
-package Inc_Class_Posts
+package Inc_Class_Wp_Posts
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -306,4 +306,4 @@ end record;
         function To_Array (Post : Wp_Post)
                           return Array_Type;
 
-end Inc_Class_Posts;
+end Inc_Class_Wp_Posts;

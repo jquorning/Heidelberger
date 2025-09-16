@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Inc_Functions;
 with Inc_Meta;
 
+with Globals;
 with Hb_Common;
 with Php;
 
@@ -993,7 +994,7 @@ is
    begin
       if
 --         Empty (Post) and then
-        Isset (String'(Get (GLOBALS, "post")))
+        Isset (String'(Get (Globals.GLOBALS, "post")))
       then
          null;
 --          Post_2 := Get (GLOBALS, "post");
@@ -1018,7 +1019,7 @@ is
 --         return null;
 --      end if;
 
-      X_Post := Inc_Class_Posts.Filter (X_Post, Filter);
+      X_Post := Inc_Class_Wp_Posts.Filter (X_Post, Filter);
 
       if "ARRAY_A" = Output then
          return X_Post; -- .To_Array; -- ();
@@ -1050,10 +1051,10 @@ is
 --
 -- function get_post_ancestors( $post ) then
 
-   function Get_Post_Ancestors (Post : Inc_Class_Posts.Wp_Post)
+   function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
    is
-        Post_2 : Inc_Class_Posts.Wp_Post := Get_Post (Post);
+        Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
    begin
       if
 --        not Post or else
@@ -1576,6 +1577,15 @@ is
 
 --         return wp_filter_object_list( $wp_post_types, $args, $operator, $field );
 -- end;
+   function Get_Post_Types (Args     : Array_Type := Empty_Array;
+                            Output   : String     := "names";
+                            Operator : String     := "and")
+                            return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array
+   is
+      P : Inc_Class_Wp_Post_Type.Wp_Post_Type_Array := (1 .. 0 => <>);
+   begin
+      return P;
+   end Get_Post_Types;
 
 --
 -- Registers a post type.
@@ -2545,7 +2555,7 @@ is
 --
 --   function get_post_meta( $post_id, $key = '', $single = false ) then
 
-   function Get_Post_Meta (Post_Id : Inc_Class_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type -- Post_Id_List;
@@ -2760,11 +2770,11 @@ is
 --
 -- function sanitize_post( $post, $context = 'display' )
 
-   function Sanitize_Post (Post    : Inc_Class_Posts.Wp_Post;
+   function Sanitize_Post (Post    : Inc_Class_Wp_Posts.Wp_Post;
                            Context : String := "display")
-                           return Inc_Class_Posts.Wp_Post
+                           return Inc_Class_Wp_Posts.Wp_Post
    is
-      Post_2 : Inc_Class_Posts.Wp_Post := Post;
+      Post_2 : Inc_Class_Wp_Posts.Wp_Post := Post;
    begin
 --      if Is_Object (Post_2) then
          -- Check if post already filtered for this context.
@@ -2821,7 +2831,7 @@ is
 
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
-                                 Post_Id : Inc_Class_Posts.Post_Id;
+                                 Post_Id : Inc_Class_Wp_Posts.Post_Id;
                                  Context : String := "display")
                                  return Array_Type
    is
@@ -3717,6 +3727,15 @@ end Sanitize_Post_Field;
 -- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`.
 -- @return WP_Post|false|null Post data on success, false or null on failure.
 --
+   function Wp_Untrash_Post (Post_Id : Integer := 0)
+                             return Wp_Post
+   is
+      P : Wp_Post;
+   begin
+      return P;
+   end Wp_Untrash_Post;
+
+
 -- function wp_untrash_post( $post_id = 0 ) then
 --         $post = get_post( $post_id );
 

@@ -12,14 +12,17 @@ with Templates_Parser;
 
 with L10n;
 with Arrays;
+with Globals;
 with Php;
 
 with HB_Common;
 with Wp_Common;
 
-with Inc_Class_Posts;
+with Inc_Capabilities;
+with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Functions;
+with Inc_Pluggables;
 with Inc_Posts;
 
 package body HB_Edit
@@ -30,6 +33,7 @@ is
    use HB_Common;
    use Wp_Common;
    use Arrays;
+   use Globals;
    use Php;
 
    function Var_Bulk (Bulk_Messages : Array_Type;
@@ -65,7 +69,8 @@ is
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
-      use Inc_Class_Posts;
+      use Inc_Capabilities;
+      use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;
 --
 --  @global string       $post_type
@@ -82,7 +87,7 @@ is
 --  end if;
 
       if not Current_User_Can (Get (Post_Type_Object.Cap, "edit_posts")) then
-         Wp_Die
+         Inc_Functions.Wp_Die
            ("<h1>" & abs "You need a higher level of permission."  & "</h1>" &
             "<p>"  & abs "Sorry, you are not allowed to edit posts in this post type." &
             "</p>",
@@ -124,7 +129,7 @@ is
          begin
 
             if Doaction = "" then   -- if doaction then
-               Check_Admin_Referer ("bulk-posts");
+               Inc_Pluggables.Check_Admin_Referer ("bulk-posts");
                   declare
                      use String_Vectors;
                      use Inc_Functions;
@@ -203,7 +208,8 @@ is
                            begin
                               for Post_Id of Post_Ids loop -- foreach (To_Array)
                                  if not Current_User_Can ("delete_post", -Post_Id) then
-                                    Wp_Die (abs "Sorry, you are not allowed to move this item to the Trash.");
+                                    Inc_Functions.Wp_Die
+                                      (abs "Sorry, you are not allowed to move this item to the Trash.");
                                  end if;
 
                                  if 0 /= Wp_Check_Post_Lock (-Post_Id) then
@@ -212,7 +218,8 @@ is
                                  end if;
 
                                  if not Wp_Trash_Post (-Post_Id) then
-                                    Wp_Die (abs "Error in moving the item to Trash.");
+                                    Inc_Functions.Wp_Die
+                                      (abs "Error in moving the item to Trash.");
                                  end if;
 
                                  Trashed := Trashed + 1;
@@ -244,11 +251,13 @@ is
 
                               for Post_Id of Post_Ids loop
                                  if not Current_User_Can ("delete_post", -Post_Id) then
-                                    Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
+                                    Inc_Functions.Wp_Die
+                                      (abs "Sorry, you are not allowed to restore this item from the Trash.");
                                  end if;
 
-                                 if not Wp_Untrash_Post (-Post_Id) then
-                                    Wp_Die (abs "Error in restoring the item from Trash.");
+                                 if not Inc_Posts.Wp_Untrash_Post (-Post_Id) then
+                                    Inc_Functions.Wp_Die
+                                      (abs "Error in restoring the item from Trash.");
                                  end if;
 
                                  Untrashed := Untrashed + 1;
@@ -270,16 +279,19 @@ is
                                        := Inc_Posts.Get_Post (Integer'Value (-Post_Id));
                                  begin
                                     if not Current_User_Can ("delete_post", -Post_Id) then
-                                       Wp_Die (abs "Sorry, you are not allowed to delete this item.");
+                                       Inc_Functions.Wp_Die
+                                          (abs "Sorry, you are not allowed to delete this item.");
                                     end if;
 
                                     if "attachment" = Post_Del.Post_Type then
                                        if not Wp_Delete_Attachment (-Post_Id) then
-                                          Wp_Die (abs "Error in deleting the attachment.");
+                                          Inc_Functions.Wp_Die
+                                             (abs "Error in deleting the attachment.");
                                        end if;
                                     else
                                        if not Wp_Delete_Post (-Post_Id) then
-                                          Wp_Die (abs "Error in deleting the item.");
+                                          Inc_Functions.Wp_Die
+                                            (abs "Error in deleting the item.");
                                        end if;
                                     end if;
                                     Deleted := Deleted + 1;
@@ -735,6 +747,8 @@ is
                       Bulk_Counts   : Array_Type;
                       Post_Type     : String) return String
    is
+      use Inc_Capabilities;
+
       Messages : Unbounded_String;
       -- Messages := array();
    begin

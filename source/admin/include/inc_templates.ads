@@ -6,7 +6,7 @@ with Arrays;
 with Hb_Common;
 
 with Inc_Class_Wp_Terms;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 
 package INC_Templates
 is
@@ -75,7 +75,7 @@ is
 
 
 
-   function Get_Media_States (Post : Inc_Class_Posts.Wp_Post) return List_Type;
+   function Get_Media_States (Post : Inc_Class_Wp_Posts.Wp_Post) return List_Type;
 
    -- package Term_Arrays is new
    --    Ada.Containers.Vectors (Index_Type   => Positive,

@@ -101,6 +101,21 @@ is
                            return Integer is (1);
 
 --
+-- Updates theme modification value for the active theme.
+--
+-- @since 2.1.0
+-- @since 5.6.0 A return value was added.
+--
+-- @param string name  Theme modification name.
+-- @param mixed  value Theme modification value.
+-- @return bool True if the value was updated, false otherwise.
+--
+   function Set_Theme_Mod (Name  : String;
+                           Value : Array_Type)
+                           return Boolean
+                           is (False);
+
+--
 -- Checks whether a header image is set or not.
 --
 -- @since 4.2.0

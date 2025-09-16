@@ -4,12 +4,11 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Posts;
 with Inc_Class_Wpdb;
-with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Terms;
 with Inc_Taxonomys;
-with Inc_Class_Posts;
 
 package HB_Common
 is
@@ -21,41 +20,6 @@ is
 
    function "-" (Item : Unbounded_String) return String
       renames To_String;
-
-   -- type Cap_Type is
-   --    record
-   --       Edit_Posts   : Boolean := True;
-   --       Create_Posts : Boolean := True;
-   --       Manage_Terms : Boolean := True;
-   --       Edit_Terms   : Boolean := True;
-   --       Delete_Terms : Boolean := True;
-   --       Assign_Terms : Boolean := True;
-   --    end record;
-
-   -- type Lab_Type is
-   --    record
-   --       Name              : Unbounded_String;
-   --       Filter_Items_List : Unbounded_String;
-   --       Items_List_Navigation  : Unbounded_String;
-   --       Name_Field_Description : Unbounded_String;
-   --       Items_List   : Unbounded_String;
-   --       Add_New      : Unbounded_String;
-   --       Add_New_Item : Unbounded_String;
-   --       Search_Items : Unbounded_String;
-   --       Edit_Items   : Unbounded_String;
-   --       Edit_Item    : Unbounded_String;
-   --       Slug_Field_Description : Unbounded_String;
-   --       Parent_Field_Description : Unbounded_String;
-   --       Parent_Item : Unbounded_String;
-   --    end record;
-
-   -- type Post_Rec is
-   --    record
-   --       Cap       : Cap_Type;
-   --       Post_Type : Unbounded_String;
-   --       Labels    : Lab_Type;
-   --       Show_In_Menu : Boolean;
-   --    end record;
 
    type List_Table is tagged null record;
    function Get_Pagenum (Item : List_Table) return Natural;
@@ -69,13 +33,10 @@ is
    function Has_Items (Item : List_Table) return Boolean;
    function X_Get_List_Table (Item : String) return List_Table;
 
-   function Typenow return String;
+--   procedure Wp_Die (Why : String; Sub : String := ""; Code : Integer := 0) is null;
 
-   procedure Wp_Die (Why : String; Sub : String := ""; Code : Integer := 0) is null;
+--   procedure Check_Admin_Referer (Item : String; Item_2 : String := "");
 
-   procedure Check_Admin_Referer (Item : String; Item_2 : String := "");
-
---   function To_List (List : List_Type) return Assoc_List;
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural;
    function Get_Pagination_Arg (List : List_Table; Item : String) return Natural;
 
@@ -85,26 +46,10 @@ is
                       return Array_Type is (Empty_Array);
 
    function Wp_Get_Referer return String is ("XXX-213");
-   -- function Remove_Query_Arg  (List : List_Type;
-   --                             Item : String)
-   --                             return String
-   --                             is ("XXX-214");
-
-   -- function Remove_Query_Arg  (Arry : Array_Type;
-   --                             Item : String)
-   --                             return String
-   --                             is ("XXX-221");
 
    function Admin_URL (Item : String) return String;
 
---   function Get_Post_Status_Object (N : Integer) return Boolean;
-
---   type Statement_Type is null record;
---   type DB_Type is tagged null record;
-
---   function Get_Col (Db : DB_Type; Statement : Statement_Type) return Array_Type;
---   function Prepare (Db : DB_Type; Sql : String; Arg_1, Arg_2 : String) return Statement_Type;
-   Wpdb : Inc_Class_Wpdb.Wpdb_Class; -- return DB_Type;
+   Wpdb : Inc_Class_Wpdb.Wpdb_Class;
 
    procedure Wp_Redirect (Item : String) is null;
 
@@ -243,22 +188,13 @@ is
 
    function Wp_Unslash (Item : String) return String is ("XXX-215");
 
-   X_SERVER  : Array_Type := Empty_Array;
-   X_POST    : Array_Type := Empty_Array;
-   XX_GET    : Array_Type := Empty_Array;
-   X_REQUEST : Array_Type := Empty_Array;
-   X_COOKIE  : Array_Type := Empty_Array;
-   GLOBALS   : Array_Type := Empty_Array;
-
    procedure Add_Screen_Option (Item : String; List : Array_Type);
 
    function "abs" (List : Array_Type) return String;
 
    function ESC_HTML (Item : String) return String;
    function ESC_URL  (Item : String) return String;
---   function ESC_Attr (AL : Assoc_List) return String;
    function ESC_Attr (AL : String) return String;
---   function ESC_Attrl (AL : Assoc_List) return String;
 
    function Printf (Format : String; Arg_1 : String) return String;
 
@@ -270,11 +206,6 @@ is
    function Number_Format_I18n (N : Integer) return String;
    function Wp_Nonce_URL (Url : String; Item : String) return String is ("XXX-216");
    function Count (Al : Assoc_List) return Natural;
-
---   function Get_Post_Type_Object (Item : Post_Rec) return String;
---   function Get_Post_Type_Object (Item : String) return Post_Rec;
---   function Get_Post_Type_Object (Item : String) return String;
---   function Get_Post_Type (Item : Assoc_Type) return Post_Rec;
 
    function Get_Edit_Post_Link (Id : Assoc_Type; Item : String := "") return String;
    function Get_Edit_Post_Link (Id   : Integer;
@@ -312,41 +243,16 @@ is
                  Key  : String)
                  return String is ("XXX-250");
 
-   -- type Count_Message_Type is
-   --    record
-   --       Count   : Natural;
-   --       Message : Unbounded_String;
-   --    end record;
-
---   function As_Count_Message (List : Array_Type) return Count_Message_Type;
-
---   type Lab_Record is
---      record
---         Name : Unbounded_String;
---      end record;
-
-   -- type Tax_Rec is
-   --    record
-   --       Labels : Lab_Type;  --  Lab_Record;
-   --       Name   : Unbounded_String;
-   --       Cap    : Cap_Type;
-   --       Show_In_Quick_Edit : Boolean;
-   --       Hierarchical : Boolean;
-   --    end record;
-
    function Taxnow return String;
---   function Get_Taxonomy (Item : String) return Tax_Rec;
---   function Get_Taxonomies (list : Array_Type) return Tax_Rec;
+
    function Wp_Insert_Term (Item : String; Item2 : String; Arr : Array_Type)
                             return Boolean
                             is (True);
-   -- Get (X_Post, "tag-name"), Taxonomy, X_POST);
+
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
    procedure Wp_Delete_Term (Tag : Integer; Taxonomy : String) is null;
    procedure Wp_Delete_Terms (Tag : Integer; Taxonomy : String) is null;
 
---   type Term_Type is null record;
---   function Get_Term (Id : Integer; Tax : String := "") return Term_Type;
    function "not" (Term : Inc_Class_Wp_Terms.Wp_Term)
                    return Boolean
                    is (False);
@@ -368,7 +274,6 @@ is
    procedure Wp_Nonce_Field (I1, I2 : String) is null;
 
    function Get_Cat_Name (Item : String) return String is ("XXX-91");
---   function Get_Option (Item : String) return String is ("XXX-92");
 
    function Wp_Is_Mobile return Boolean is (False);
    procedure Wp_Dropdown_Categories (A : Array_Type) is null;
@@ -378,8 +283,8 @@ is
    function Is_Taxonomy_Hierarchical (Taxonomy : String) return Boolean is (True);
 
    procedure Wp_Reset_Vars (A : Array_Type) is null;
---   OBJECT : Post_Rec;
-   type Hb_post is null record;
+
+--   type Hb_post is null record;
    function Wp_Verify_Nonce (V : String; Item : String) return Boolean is (True);
    function Wp_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
    function Get_Default_Comment_Status (S : String; E : String := "") return String
@@ -388,10 +293,6 @@ is
    function Write_Post return String is ("XXX-114");
    procedure Redirect_Post (Post_Id : String) is null;
 
-   function Get_Post_Types (A : Array_Type)
-            return Array_Type is (Empty_Array);
---   function Get_Post_Types (A : Array_Type)
---            return Tax_Rec;
    type Lock_Type is new Integer;
    function Wp_Set_Post_Lock (Post_Id : String)  return Lock_Type is (1);
    function Wp_Set_Post_Lock (Post_Id : Integer) return Lock_Type is (1);
@@ -401,7 +302,6 @@ is
    function Wp_Basename (S : String) return String is ("XXX-106");
    procedure Wp_Update_Attachment_Metadata (Post : String; Newmeta : Array_Type)
      is null;
-
 
    type Time is null record;
    procedure Setcookie (N    : String;
@@ -413,39 +313,21 @@ is
    MEDIA_TRASH : Boolean := False;
    function Post_Preview return String is ("XXX-104");
    procedure Wp_Safe_Redirect (Ref : String) is null;
-   -- type Wp_Post_2 is
-   --    record
-   --       Post_Type     : Unbounded_String;
-   --       ID            : Unbounded_String;
-   --       Post_Status   : Unbounded_String;
-   --       Post_Title    : Unbounded_String;
-   --       Post_Date     : Unbounded_String;
-   --       Post_Password : Unbounded_String;
-   --       Post_Parent   : Unbounded_String;
-   --       Page_Template : Unbounded_String;
-   --       Menu_Order    : Unbounded_String;
-   --    end record;
-   function "not" (T : Inc_Class_Posts.Wp_Post) return Boolean is (False);
+
+   function "not" (T : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (False);
    function "not" (T : Inc_Class_Wp_Post_type.Wp_Post_Type)
                    return Boolean
                    is (False);
---   function "not" (T : Post_Rec)  return Boolean is (False);
-
---   function Get_Post (Id : Assoc_Type) return Post_Rec;
---   function Get_Post (Id : String)     return Inc_Class_Posts.Wp_Post;
---   function Get_Post (Id : String; B : Post_Rec; Ltem : String)
---                      return Inc_Class_Posts.Wp_Post;
---   function Get_Post      return Inc_Class_Posts.Wp_Post; --  is (others => <>);
 
    function Empty (A : String) return Boolean is (True);
    function Empty (Table : Array_Type) return Boolean;
    function Empty (Arry : Array_Type; Key : String) return Boolean is (False);
 
-   function Apply_Filters (Item : String; S : String; D : Inc_Class_Posts.Wp_Post)
+   function Apply_Filters (Item : String; S : String; D : Inc_Class_Wp_Posts.Wp_Post)
       return Boolean is (True);
    function Apply_Filters (Hook_Name : String;
                            Arg_2     : Array_Type;
-                           Id        : Inc_Class_Posts.Post_Id)
+                           Id        : Inc_Class_Wp_Posts.Post_Id)
                            return Array_Type is (Empty_Array);
 
    function Apply_Filters (Hook_Name : String;
@@ -458,12 +340,12 @@ is
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
-   function Use_Block_Editor_For_Post (Post : Inc_Class_Posts.Wp_Post)
+   function Use_Block_Editor_For_Post (Post : Inc_Class_Wp_Posts.Wp_Post)
                                        return Boolean is (True);
 
    function Isset (Item : Array_Type) return Boolean;
    function Isset (Item : String) return Boolean;
---   function Isset (Item : Post_Rec) return Boolean is (True);
+
    function X_Isset (Arry : Array_Type; Value : String) return Boolean is (True);
 
    procedure Unset (A : String) is null;
@@ -476,20 +358,6 @@ is
       end record;
 
    function Get_Userdata (Id : Integer) return User_Type;
-
-   function Current_User_Can (Trait : Boolean) return Boolean;
-   function Current_User_Can (Trait : String; Val : Assoc_Type) return Boolean;
-   function Current_User_Can (Trait : String; Val : String) return Boolean;
-   function Current_User_Can (Trait : String; Val : Integer) return Boolean;
-   function Current_User_Can (Trait : String) return Boolean is (True);
-   function Current_User_Can (Trait : String; Val : Inc_Class_Posts.Wp_Post)
-                              return Boolean
-      is (True);
-
-   function Wp_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
-   function Wp_Untrash_Post (Item : String) return Boolean is (True);
-   function Wp_Untrash_Post (Item : Inc_Class_Posts.Wp_Post)
-                             return Boolean is (True);
 
    function Get_Current_User_Id return Integer is (1);
    function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean
@@ -510,4 +378,10 @@ is
                       Arry : String_Array;
                       S    : Boolean)
                       return Boolean is (True);
+
+   function Isset (Arry : Array_Type;
+                   Key  : String)
+                   return Boolean
+                   is (True);
+
 end HB_Common;

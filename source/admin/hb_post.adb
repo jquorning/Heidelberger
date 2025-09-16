@@ -14,14 +14,15 @@ with Ada.Strings.Fixed;
 
 with L10n;
 with Arrays;
+with Globals;
 with Php;
-
-
 with HB_Common;
 
+with Inc_Capabilities;
 with Inc_Functions;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Pluggables;
 with Inc_Posts;
 
 -- WordPress Administration Bootstrap
@@ -34,10 +35,13 @@ is
    use L10n;
    use HB_Common;
    use Php;
+   use Globals;
 
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
+      use Inc_Capabilities;
+
       Parent_File   : Unbounded_String := +"edit.php";
       Submenu_File  : Unbounded_String := +"edit.php";
       Post_New_File : Unbounded_String;
@@ -53,8 +57,9 @@ is
            Integer'Value (String'(Get (XX_GET, "post"))) /=
            Integer'Value (String'(Get (X_POST, "post_ID")))
          then
-            Wp_Die (abs "A post ID mismatch has been detected.",
-                    abs "Sorry, you are not allowed to edit this item.", 400);
+            Inc_Functions.Wp_Die
+               (abs "A post ID mismatch has been detected.",
+                abs "Sorry, you are not allowed to edit this item.", 400);
          elsif Isset (String'(Get (XX_GET, "post"))) then
             Post_Id := Get_Integer (XX_GET, "post");
          elsif (Isset (String'(Get (X_POST, "post_ID")))) then
@@ -73,7 +78,7 @@ is
       declare
          Post_Type        : String := "";
          Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
-         Post             : Inc_Class_Posts.Wp_Post;
+         Post             : Inc_Class_Wp_Posts.Wp_Post;
          Action   : Unbounded_String;
          Sendback : Unbounded_String;
       begin
@@ -91,8 +96,9 @@ is
 --         Post and then
            Post_Type /= Get (X_POST, "post_type")
          then
-            Wp_Die (abs "A post type mismatch has been detected.",
-                    abs "Sorry, you are not allowed to edit this item.", 400);
+            Inc_Functions.Wp_Die
+               (abs "A post type mismatch has been detected.",
+                abs "Sorry, you are not allowed to edit this item.", 400);
             end if;
 
             if Isset (String'(Get (X_POST, "deletepost"))) then
@@ -159,7 +165,7 @@ is
                   end if;
                end;
                Post := Inc_Posts.Get_Post (Get_Integer (X_REQUEST, "post_ID"));
-               Check_Admin_Referer ("add-" & (-Post.Post_Type));
+               Inc_Pluggables.Check_Admin_Referer ("add-" & (-Post.Post_Type));
 
                Set (X_POST, "comment_status",
                     Get_Default_Comment_Status (-Post.Post_Type));
@@ -190,7 +196,7 @@ is
                goto Bailout; -- return;  -- exit;
 
             elsif Action = "post" or Action = "postajaxpost" then
-               Check_Admin_Referer ("add-" & Post_Type);
+               Inc_Pluggables.Check_Admin_Referer ("add-" & Post_Type);
                declare
                   Post_Id : String := (if "postajaxpost" = Action
                                        then Edit_Post else Write_Post);
@@ -209,32 +215,36 @@ is
                   end if;
 
                   if not Post then
-                     Wp_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                     Inc_Functions.Wp_Die
+                       (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
                   if not Post_Type_Object then
-                     Wp_Die (abs "Invalid post type.");
+                     Inc_Functions.Wp_Die (abs "Invalid post type.");
                   end if;
 
                   if
-                    not In_Array (Typenow,
-                                  Get_Post_Types
+                    not In_Array (Globals.Typenow,
+                                  Inc_Posts.Get_Post_Types
                                     (To_Array (List => (1 => Build ("show_ui", "true")))),
                                   True)
                   then
-                     Wp_Die (abs "Sorry, you are not allowed to edit posts in this post type.");
+                     Inc_Functions.Wp_Die
+                       (abs "Sorry, you are not allowed to edit posts in this post type.");
                   end if;
 
                   if not Current_User_Can ("edit_post", Post_Id) then
-                     Wp_Die (abs "Sorry, you are not allowed to edit this item.");
+                     Inc_Functions.Wp_Die
+                       (abs "Sorry, you are not allowed to edit this item.");
                   end if;
 
                   if "trash" = Post.Post_Status then
-                     Wp_Die (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
+                     Inc_Functions.Wp_Die
+                        (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                   end if;
 
                   if not Empty (String'(Get (XX_GET, "get-post-lock"))) then
-                     Check_Admin_Referer ("lock-post_" & Post_Id'Image);
+                     Inc_Pluggables.Check_Admin_Referer ("lock-post_" & Post_Id'Image);
                      declare
                         Unused : Lock_Type := Wp_Set_Post_Lock (Post_Id);
                      begin
@@ -310,7 +320,7 @@ is
                <<Label_1>>
 
             elsif Action = "editattachment" then
-               Check_Admin_Referer ("update-post_" & Post_Id'Image);
+               Inc_Pluggables.Check_Admin_Referer ("update-post_" & Post_Id'Image);
 
                -- Don"t let these be changed.
                Unset (Get (X_POST, "guid"));
@@ -328,7 +338,7 @@ is
                -- Intentional fall-through to trigger the edit_post() call.
 
             elsif Action = "editpost" then
-               Check_Admin_Referer ("update-post_" & Post_Id'Image);
+               Inc_Pluggables.Check_Admin_Referer ("update-post_" & Post_Id'Image);
 
                Post_Id := Integer'Value (Edit_Post); --();
 
@@ -346,18 +356,20 @@ is
                goto Bailout; -- return; -- exit;
 
             elsif Action = "trash" then
-               Check_Admin_Referer ("trash-post_" & Post_Id'Image);
+               Inc_Pluggables.Check_Admin_Referer ("trash-post_" & Post_Id'Image);
 
                if not Post then
-                  Wp_Die (abs "The item you are trying to move to the Trash no longer exists.");
+                  Inc_Functions.Wp_Die
+                     (abs "The item you are trying to move to the Trash no longer exists.");
                end if;
 
                if not Post_Type_Object then
-                  Wp_Die (abs "Invalid post type.");
+                  Inc_Functions.Wp_Die (abs "Invalid post type.");
                end if;
 
                if not Current_User_Can ("delete_post", Post_Id) then
-                  Wp_Die (abs "Sorry, you are not allowed to move this item to the Trash.");
+                  Inc_Functions.Wp_Die
+                    (abs "Sorry, you are not allowed to move this item to the Trash.");
                end if;
 
                declare
@@ -368,12 +380,13 @@ is
                         User : constant User_Type := Get_Userdata (User_Id);
                      begin
                         -- translators: %s: User"s display name.
-                        Wp_Die (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", -User.Display_Name));
+                        Inc_Functions.Wp_Die
+                           (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", -User.Display_Name));
                      end;
                   end if;
 
                   if not Wp_Trash_Post (Post_Id'Image) then
-                     Wp_Die (abs "Error in moving the item to Trash.");
+                     Inc_Functions.Wp_Die (abs "Error in moving the item to Trash.");
                   end if;
 
                   Wp_Redirect (
@@ -389,22 +402,23 @@ is
                goto Bailout; -- return; --  exit;
 
             elsif Action = "untrash" then
-               Check_Admin_Referer ("untrash-post_" & Post_Id'Image);
+               Inc_Pluggables.Check_Admin_Referer ("untrash-post_" & Post_Id'Image);
 
                if not Post then
-                  Wp_Die (abs "The item you are trying to restore from the Trash no longer exists.");
+                  Inc_Functions.Wp_Die
+                    (abs "The item you are trying to restore from the Trash no longer exists.");
                end if;
 
                if not Post_Type_Object then
-                  Wp_Die (abs "Invalid post type.");
+                  Inc_Functions.Wp_Die (abs "Invalid post type.");
                end if;
 
                if not Current_User_Can ("delete_post", Post) then
-                  Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
+                  Inc_Functions.Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
                end if;
 
-               if not Wp_Untrash_Post (Post) then
-                  Wp_Die (abs "Error in restoring the item from Trash.");
+               if not Inc_Posts.Wp_Untrash_Post (Post) then
+                  Inc_Functions.Wp_Die (abs "Error in restoring the item from Trash.");
                end if;
 
                Sendback := Add_Query_Arg (
@@ -418,18 +432,18 @@ is
                goto Bailout; -- return; -- exit;
 
             elsif Action = "delete" then
-               Check_Admin_Referer ("delete-post_" & Post_Id'Image);
+               Inc_Pluggables.Check_Admin_Referer ("delete-post_" & Post_Id'Image);
 
                if not Post then
-                  Wp_Die (abs "This item has already been deleted.");
+                  Inc_Functions.Wp_Die (abs "This item has already been deleted.");
                end if;
 
                if not Post_Type_Object then
-                  Wp_Die (abs "Invalid post type.");
+                  Inc_Functions.Wp_Die (abs "Invalid post type.");
                end if;
 
                if not Current_User_Can ("delete_post", Post_Id) then
-                  Wp_Die (abs "Sorry, you are not allowed to delete this item.");
+                  Inc_Functions.Wp_Die (abs "Sorry, you are not allowed to delete this item.");
                end if;
 
                if "attachment" = Post.Post_Type then
@@ -437,12 +451,12 @@ is
                      Force : constant Boolean := not MEDIA_TRASH;
                   begin
                      if not Wp_Delete_Attachment (Post_Id'Image, Force) then
-                        Wp_Die (abs "Error in deleting the attachment.");
+                        Inc_Functions.Wp_Die (abs "Error in deleting the attachment.");
                      end if;
                   end;
                else
                   if not Wp_Delete_Post (Post_Id'Image, True) then
-                     Wp_Die (abs "Error in deleting the item.");
+                     Inc_Functions.Wp_Die (abs "Error in deleting the item.");
                   end if;
                end if;
 
@@ -450,7 +464,7 @@ is
                goto Bailout; -- return; -- exit;
 
             elsif Action = "preview" then
-               Check_Admin_Referer ("update-post_" & Post_Id'Image);
+               Inc_Pluggables.Check_Admin_Referer ("update-post_" & Post_Id'Image);
                declare
                   URL : constant String := Post_Preview; -- ();
                begin
@@ -459,8 +473,8 @@ is
                goto Bailout; -- return; -- exit;
 
             elsif Action = "toggle-custom-fields" then
-               Check_Admin_Referer ("toggle-custom-fields",
-                                    "toggle-custom-fields-nonce");
+               Inc_Pluggables.Check_Admin_Referer ("toggle-custom-fields",
+                                                   "toggle-custom-fields-nonce");
                declare
                   Current_User_Id : constant Integer := Get_Current_User_Id; -- ();
                begin

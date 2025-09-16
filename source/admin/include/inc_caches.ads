@@ -1,6 +1,6 @@
 with Arrays;
 
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 
 package Inc_Caches
 is
@@ -22,7 +22,7 @@ is
 -- @return bool True on success, false if cache key and group already exist.
 --
    procedure Wp_Cache_Add (Key    : String;
-                           Data   : Inc_Class_Posts.Wp_Post;  --- String;
+                           Data   : Inc_Class_Wp_Posts.Wp_Post;  --- String;
                            Group  : String  := "";
                            Expire : Integer := 0);
 
@@ -48,7 +48,7 @@ is
 --
    procedure Wp_Cache_Get (Key   : String;
                            Group : String  := "";
-                           Post  : Inc_Class_Posts.Wp_Post;
+                           Post  : Inc_Class_Wp_Posts.Wp_Post;
                            Force : Boolean := False;
 --                         found : out Boolean
                            Success : out Boolean);

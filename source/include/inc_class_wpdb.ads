@@ -3,7 +3,7 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 
 package Inc_Class_Wpdb
 is
@@ -806,7 +806,7 @@ is
         -- @return array|object|null|void Database query result in format specified by $output or null on failure.
         --
         procedure Get_Row (Db      : in out Wpdb_Class;
-                           Post    : Inc_Class_Posts.Wp_Post;
+                           Post    : Inc_Class_Wp_Posts.Wp_Post;
                            Query   : String  := ""; -- = null,
                            Output  : String  := ""; -- = OBJECT,
                            Y       : Natural := 0;

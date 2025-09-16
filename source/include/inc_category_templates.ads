@@ -1,5 +1,5 @@
 with Inc_Class_Wp_Terms;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 with Inc_Taxonomys;
 
 package Inc_Category_Templates
@@ -16,7 +16,7 @@ is
 -- @return WP_Term[]|false|WP_Error Array of WP_Term objects on success, false if there are no terms
 --                                  or the post does not exist, WP_Error on failure.
 --
-   function Get_The_Terms (Post     : Inc_Class_Posts.Wp_Post;
+   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Wp_Post;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array;
                             -- Inc_Class_Posts.Wp_Post;

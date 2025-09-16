@@ -1,8 +1,8 @@
 with Arrays;
 
 with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
-with Inc_Class_Posts;
 with Inc_Taxonomys;
 
 package Wp_Common
@@ -23,7 +23,7 @@ is
 
    function Apply_Filters (A : String;
                            B : String;
-                           C : Inc_Class_Posts.Wp_Post)
+                           C : Inc_Class_Wp_Posts.Wp_Post)
                            return List_Type
                            is (Empty_List);
 

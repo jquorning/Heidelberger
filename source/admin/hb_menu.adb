@@ -13,11 +13,12 @@ with Ada.Strings.Fixed;
 with L10n;
 with Arrays;
 with Php;
-
+with Globals;
 with HB_Common;
 
 with Adi_Plugins;
 
+with Inc_Capabilities;
 with Inc_Comments;
 with Inc_Formatting;
 with Inc_Functions;
@@ -38,6 +39,7 @@ is
    use HB_Common;
    use Arrays;
    use Php;
+   use Globals;
    use Inc_Functions;
 
    -------------
@@ -53,18 +55,20 @@ is
                      Icon    : String := "")
                      return Menu_Item
    is
-      Item : Menu_Item := (Name    => +Name,
-                           Cap     => +Cap,
-                           Url     => +Url,
-                           Title   => +Title,
-                           Classes => +Classes,
-                           Id      => +Id,
-                           Icon    => +Icon);
+      Item : Menu_Item := (Menu_Title => +Name,
+                           Capability => +Cap,
+                           Menu_Slug  => +Url,
+                           Page_Title => +Title,
+                           Classes    => +Classes,
+                           hookname   => +Id,
+                           Icon_Url   => +Icon);
    begin
       return Item;
    end To_Menu;
 
-   type Submenu_Type is null record;
+   ---------
+   -- Set --
+   ---------
 
    procedure Set (Sub : in out Submenu_Type;
                   Url : String;
@@ -85,7 +89,9 @@ is
 
    procedure Run
    is
-      Submenu : Submenu_Type;
+      use Inc_Capabilities;
+
+--      Submenu : Submenu_Type;
       Is_Multisite : constant Boolean := Inc_Load.Is_Multisite;
       Cap          : Unbounded_String;
       I            : Natural;
@@ -216,24 +222,27 @@ is
            "edit_posts", "edit-comments.php");
 
       declare
+         use Inc_Class_Wp_Post_Type;
+         use Inc_Posts;
+
          X_Wp_Last_Object_Menu : Natural := 25;
          -- The index of the last top-level menu in the object menu group.
 
-         Types  : Array_Type := Get_Post_Types (  -- (array)
+         Types  : String_Array := Get_Post_Types (  -- (array)
             Arrays.To_Array ((
                 Build ("show_ui",      "true"),
                 Build ("_builtin",     "false"),
                 Build ("show_in_menu", "true"))));
 
-         Builtin : constant Array_Type :=
-            Arrays.To_Array ((
-               Build ("post", ""),
-               Build ("page", "")));
+--         Builtin : constant String_Array := String_Array'(1 => "post", 2 => "page");
+--            Arrays.To_Array ((
+--               Build ("post", ""),
+--               Build ("page", "")));
       begin
-         for Ptype of Array_Merge (Builtin, Types) loop
+         for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
            declare
                Ptype_Obj : Inc_Class_Wp_Post_Type.Wp_Post_Type :=
-                  Inc_Posts.Get_Post_Type_Object (-Ptype.Key);
+                  Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Integer;
                Ptype_For_Id        : Unbounded_String;
                Menu_Icon           : Unbounded_String;
@@ -256,7 +265,7 @@ is
                end if;
 
                -- If we"re to use _wp_last_object_menu, increment it first.
-               Ptype_For_Id := +Inc_Formatting.Sanitize_Html_Class (-Ptype.Key);
+               Ptype_For_Id := +Inc_Formatting.Sanitize_Html_Class (Ptype);
                Menu_Icon    := +"dashicons-admin-post";
 
                if Is_String (-Ptype_Obj.Menu_Icon) then
@@ -269,13 +278,13 @@ is
                   else
                      Menu_Icon := +ESC_URL (-Ptype_Obj.Menu_Icon);
                   end if;
-               elsif In_Array (-Ptype.Key, Builtin, True) then
-                  Menu_Icon := "dashicons-admin-" & Ptype.Key;
+--               elsif In_Array (Ptype, Builtin, True) then
+--                  Menu_Icon := "dashicons-admin-" & Ptype;
                end if;
 
                Menu_Class := "menu-top menu-icon-" & Ptype_For_Id;
                -- "post" special case.
-               if "post" = Ptype.Key then
+               if "post" = Ptype then
                   Menu_Class     := Menu_Class & " open-if-no-js";
                   Ptype_File     := +"edit.php";
                   Post_New_File  := +"post-new.php";
@@ -286,18 +295,18 @@ is
                   Edit_Tags_File := +"edit-tags.php?taxonomy=%s&amp;post_type=ptype";
                end if;
 
-               if In_Array (-Ptype.Key, Builtin, True) then
-                  Ptype_Menu_Id := "menu-" & Ptype_For_Id & "s";
-               else
+--               if In_Array (Ptype, Builtin, True) then
+--                  Ptype_Menu_Id := "menu-" & Ptype_For_Id & "s";
+--               else
                   Ptype_Menu_Id := "menu-posts-" & Ptype_For_Id;
-               end if;
+--               end if;
 
                --
                -- If ptype_menu_position is already populated or will be populated
                -- by a hard-coded value below, increment the position.
                --
                while
-                 Menu (Ptype_Menu_Position).Name /= "" or else
+                 Menu (Ptype_Menu_Position).Menu_Title /= "" or else
                  -- Isset (Menu (Ptype_Menu_Position)) or else
                  Ptype_Menu_Position in 59 | 60 | 65 | 70 | 75 | 80 | 85 | 99
 --               In_Array (Ptype_Menu_Position, Core_Menu_Positions, True)
@@ -321,7 +330,7 @@ is
                   if
                     not Tax.Show_UI      or else
                     not Tax.Show_In_Menu or else
-                    not In_Array (-Ptype.Key, Tax.Object_Type, True) -- (array)
+                    not In_Array (Ptype, Tax.Object_Type, True) -- (array)
                   then
                      goto Continue_3;
                   end if;
@@ -406,7 +415,7 @@ is
                 Add_Query_Arg
                   ("return",
                    Urlencode (Remove_Query_Arg (Wp_Removable_Query_Args,
-                                          Wp_Unslash (Get (X_Server, "REQUEST_URI")))),
+                                          Wp_Unslash (Get (X_SERVER, "REQUEST_URI")))),
                    "customize.php");
          begin
             -- Hide Customize link on block themes unless a plugin or theme
@@ -720,6 +729,54 @@ is
       --    Build ("themes",          "appearance")
       -- ));
    end Run;
+
+   ------------------
+   -- Find_Submenu --
+   ------------------
+
+   function Find_Submenu (Submenu : Submenu_Type;
+                          Slug    : String)
+                          return Submenu_Extended_Index
+   is
+   begin
+      for S in Submenu.First_Index .. Submenu.Last_Index loop
+         if Submenu (S).Menu_Slug = Slug then
+            return S;
+         end if;
+      end loop;
+      return No_Submenu;
+   end Find_Submenu;
+
+   ---------------------
+   -- Get_Sub_Submenu --
+   ---------------------
+
+   function Get_Sub_Submenu (Submenu   : Submenu_Type;
+                             Menu_Slug : String)
+                             return Submenu_Type
+   is
+      use Submenu_Vectors;
+
+      Result : Submenu_Type;
+   begin
+      for Sub of Submenu loop
+         if Sub.Menu_Slug = Menu_Slug then
+            Append (Result, Sub);
+         end if;
+      end loop;
+      return Result;
+   end Get_Sub_Submenu;
+
+   ---------------------
+   -- Filter_And_Sort --
+   ---------------------
+
+   function Filter_And_Sort (Submenu : Submenu_Type)
+                             return Submenu_Type
+   is
+   begin
+      return Submenu;
+   end Filter_And_Sort;
 
 end HB_Menu;
 -- require_once ABSPATH . "wp-admin/includes/menu.php";

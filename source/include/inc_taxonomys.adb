@@ -2356,7 +2356,7 @@ is
                Object_Ids_3 : constant String := Implode (",", Object_Ids_2);
                Taxonomies_3 : constant String
                   := """" &
-                     Implode (", ", Array_Map ("esc_sql", Taxonomies_2)) &
+                     Implode (", ", Array_Type'(Array_Map ("esc_sql", Taxonomies_2))) &
                      """";
             begin
                --

@@ -11,20 +11,23 @@ with Templates_Parser;
 
 with Arrays;
 with L10n;
-
+with Globals;
 with HB_Common;
 
+with Inc_Capabilities;
 with Inc_Functions;
 with Inc_Taxonomys;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Options;
+with Inc_Pluggables;
 
 package body HB_Edit_Tags
 is
    use Ada.Strings.Unbounded;
    use Arrays;
    use L10n;
+   use Globals;
    use HB_Common;
 
 -- /** WordPress Administration Bootstrap */
@@ -40,6 +43,7 @@ is
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
+      use Inc_Capabilities;
       use Inc_Taxonomys;
       use Inc_Class_Wp_Taxonomy;
       use Inc_Class_Wp_Terms;
@@ -55,14 +59,16 @@ is
          not In_Array (-Tax.Name, Get_Taxonomies
                                    (To_Array (List => (1 => Build ("show_ui", "true")))), True)
       then
-         Wp_Die (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
+         Inc_Functions.Wp_Die
+           (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
       end if;
 
       if not Current_User_Can (Get (Tax.Cap, "manage_terms")) then
-         Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                 "<p>" & abs "Sorry, you are not allowed to manage terms in this taxonomy." &
-                 "</p>",
-                 Code => 403);
+         Inc_Functions.Wp_Die
+            ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+             "<p>" & abs "Sorry, you are not allowed to manage terms in this taxonomy." &
+             "</p>",
+             Code => 403);
       end if;
 
 --
@@ -129,12 +135,13 @@ is
 -- case Hb_List_Table.Current_Action then
 
          if "add-tag" = Wp_List_Table.Current_Action then
-            Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
+            Inc_Pluggables.Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
 
             if not Current_User_Can (Get (Tax.Cap, "edit_terms")) then
-               Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                       "<p>" & abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
-                       Code => 403);
+               Inc_Functions.Wp_Die
+                  ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+                   "<p>" & abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
+                   Code => 403);
             end if;
 
             declare
@@ -164,12 +171,13 @@ is
                Taxonomy : Unbounded_String;  -- Added by jq
                Tag_ID   : constant Integer := Integer'Value (Get (X_REQUEST, "tag_ID"));
             begin
-               Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
+               Inc_Pluggables.Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
 
                if not Current_User_Can ("delete_term", Tag_ID) then
-                  Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                          "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
-                          Code => 403);
+                  Inc_Functions.Wp_Die
+                     ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+                      "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
+                      Code => 403);
                end if;
 
                Wp_Delete_Term (Tag_ID, -Taxonomy);
@@ -191,12 +199,13 @@ is
             <<Break>>
 
          elsif "bulk-delete" = Wp_List_Table.Current_Action then
-            Check_Admin_Referer ("bulk-tags");
+            Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
             if not Current_User_Can (Get (Tax.Cap, "delete_terms")) then
-               Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                       "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
-                       Code => 403);
+               Inc_Functions.Wp_Die
+                  ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+                   "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
+                   Code => 403);
             end if;
 
             declare
@@ -223,7 +232,8 @@ is
                if False then
 --             if Term not in Wp_Term then
 --             if not term instanceof WP_Term then
-                  Wp_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                  Inc_Functions.Wp_Die
+                    (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                end if;
 
                Wp_Redirect (Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, Post_Type)));
@@ -237,10 +247,11 @@ is
                Taxonomy : Unbounded_String;
                Tag_ID   : constant Integer := Integer'Value (Get (X_POST, "tag_ID"));
             begin
-               Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
+               Inc_Pluggables.Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
 
                if not Current_User_Can ("edit_term", Tag_ID) then
-                  Wp_Die ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
+                  Inc_Functions.Wp_Die
+                    ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                           "<p>" & abs "Sorry, you are not allowed to edit this item." & "</p>",
                           Code => 403);
                end if;
@@ -249,7 +260,8 @@ is
                   Tag : constant Wp_Term := Get_Term (Tag_ID, -Taxonomy);
                begin
                   if not Tag then
-                     Wp_Die (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                     Inc_Functions.Wp_Die
+                        (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
                   declare
@@ -276,7 +288,7 @@ is
             then
                goto Break_3;
             end if;
-            Check_Admin_Referer ("bulk-tags");
+            Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
             declare
                Screen : Screen_Id  := Get_Current_Screen.Id;

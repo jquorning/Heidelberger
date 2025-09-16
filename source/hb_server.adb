@@ -9,8 +9,12 @@ with AWS.Services.Dispatchers.URI;
 with AWS.Server;
 --  with AWS.Status;
 
+with Adm_Menu_Header;
+
 -- with INC_Menu;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
+-- with Adi_Nav_Menus;
+-- with Adm_Nav_Menus;
 
 with HB_Edit;
 with HB_Edit_Tags;

@@ -1328,7 +1328,7 @@ is
 --
 -- function get_the_terms( $post, $taxonomy ) then
 
-   function Get_The_Terms (Post     : Inc_Class_Posts.Wp_Post;
+   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Wp_Post;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            -- Inc_Class_Posts.Wp_Post
@@ -1339,7 +1339,7 @@ is
       use Inc_Load;
       use Inc_Functions;
 
-      Post_2 : constant Inc_Class_Posts.Wp_Post := Inc_Posts.Get_Post (Post);
+      Post_2 : constant Inc_Class_Wp_Posts.Wp_Post := Inc_Posts.Get_Post (Post);
    begin
 --        if ( ! $post ) then
 --                return false;

@@ -17,6 +17,7 @@ with Hb_Common;
 with Wp_Common;
 with Php;
 
+with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Functions;
 with Inc_Options;
@@ -151,10 +152,11 @@ is
       end if;
 
       declare
-         use Inc_Class_Wp_Terms;
+         use Inc_Capabilities;
          use Inc_Class_Wp_Taxonomy;
-         use Inc_Taxonomys;
+         use Inc_Class_Wp_Terms;
          use Inc_Class_Wp_Terms.Term_Vectors;
+         use Inc_Taxonomys;
 
          Taxonomy             : constant String  := Get (Parsed_Args, "taxonomy");
          Descendants_And_Self : constant Integer
@@ -2615,7 +2617,7 @@ is
 --
    Header_Images : Array_Type; -- Unbounded_String;  -- static
 
-   function Get_Media_States (Post : Inc_Class_Posts.Wp_Post)
+   function Get_Media_States (Post : Inc_Class_Wp_Posts.Wp_Post)
                               return List_Type
    is
 --    static (Header_Images);
@@ -2623,14 +2625,14 @@ is
       use Inc_Themes;
       use Inc_Posts;
       use Array_Vectors;
-      use Inc_Class_Posts;
+      use Inc_Class_Wp_Posts;
 
       Media_States : Unbounded_String; -- Array_Type := Empty_Array;
       Stylesheet   : constant Array_Type := Inc_Options.Get_Option ("stylesheet");
    begin
       if Current_Theme_Supports ("custom-header") then
          declare
-            use Inc_Class_Posts;
+            use Inc_Class_Wp_Posts;
 
             Meta_Header : constant Array_Type
                := Get_Post_Meta (Post.ID, "_wp_attachment_is_custom_header", True);
@@ -2678,7 +2680,7 @@ is
            Has_Header_Video
          then
             declare
-               use Inc_Class_Posts;
+               use Inc_Class_Wp_Posts;
 
                Mods : constant Array_Type := Get_Theme_Mods;  -- ();
             begin

@@ -1,7 +1,7 @@
 
 package body HB_Common
 is
-   use Inc_Class_Posts;
+   use Inc_Class_Wp_Posts;
 
    function Get_Pagenum (Item : List_Table) return Natural is (99);
 
@@ -303,7 +303,7 @@ is
 --      return T;
 --   end Get_Post_Types;
 
-   function Get_Post      return Inc_Class_Posts.Wp_Post
+   function Get_Post      return Inc_Class_Wp_Posts.Wp_Post
    is
       P : Wp_Post;
    begin

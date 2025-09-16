@@ -11,7 +11,7 @@ with Inc_Meta;
 with Inc_Posts;
 with Inc_Taxonomys;
 
-package body Inc_Class_Posts
+package body Inc_Class_Wp_Posts
 is
    function "-" (Item : Unbounded_String) return String
       renames To_String;
@@ -252,4 +252,4 @@ is
       return Post_2;
    end To_Array;
 
-end Inc_Class_Posts;
+end Inc_Class_Wp_Posts;

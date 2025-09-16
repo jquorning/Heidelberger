@@ -1,12 +1,12 @@
 with Arrays;
 
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 
 package Inc_Posts
 is
    use Arrays;
-   use Inc_Class_Posts;
+   use Inc_Class_Wp_Posts;
 
 --
 -- Retrieves the post type of the current post or of a given post.
@@ -20,6 +20,24 @@ is
                            return String is ("XXX-250");
    function Get_Post_Type (Post : Wp_Post) -- := null )
                            return String is ("XXX-251");
+
+--
+-- Determines whether a post type is registered.
+--
+-- For more information on this and similar theme functions, check out
+-- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tagsend; article in the Theme Developer Handbook.
+--
+-- @since 3.0.0
+--
+-- @see get_post_type_object()
+--
+-- @param string $post_type Post type name.
+-- @return bool Whether post type is registered.
+--
+   function Post_Type_Exists (Post_Type : String)
+                              return Boolean
+                              is (True);
 
 --
 -- Retrieves a post type object by name.
@@ -37,6 +55,36 @@ is
   function Get_Post_Type_Object (Post_Type : String) return Wp_Post;
   function Get_Post_Type_Object (Post_Type : String)
                                  return Inc_Class_Wp_Post_Type.Wp_Post_Type;
+  function Get_Post_Type_Object (Post_Type : String)
+                                 return Boolean
+                                 is (True);
+--
+-- Gets a list of all registered post type objects.
+--
+-- @since 2.9.0
+--
+-- @global array $wp_post_types List of post types.
+--
+-- @see register_post_type() for accepted arguments.
+--
+-- @param array|string $args     Optional. An array of key => value arguments to match against
+--                               the post type objects. Default empty array.
+-- @param string       $output   Optional. The type of output to return. Accepts post type 'names'
+--                               or 'objects'. Default 'names'.
+-- @param string       $operator Optional. The logical operation to perform. 'or' means only one
+--                               element from the array needs to match; 'and' means all elements
+--                               must match; 'not' means no elements may match. Default 'and'.
+-- @return string[]|WP_Post_Type[] An array of post type names or objects.
+--
+   function Get_Post_Types (Args     : Array_Type := Empty_Array;
+                            Output   : String     := "names";
+                            Operator : String     := "and")
+                            return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array;
+   function Get_Post_Types (Args     : Array_Type := Empty_Array;
+                            Output   : String     := "names";
+                            Operator : String     := "and")
+                            return String_Array
+                            is (Empty_String_Array);
 
 --
 -- Retrieves a post status object by name.
@@ -84,7 +132,30 @@ is
                       Filter : String := "raw")
                       return Wp_Post;
 
-   --
+--
+-- Updates a post with new post data.
+--
+-- The date does not have to be set for drafts. You can set the date and it will
+-- not be overridden.
+--
+-- @since 1.0.0
+-- @since 3.5.0 Added the `$wp_error` parameter to allow a WP_Error to be returned on failure.
+-- @since 5.6.0 Added the `$fire_after_hooks` parameter.
+--
+-- @param array|object $postarr          Optional. Post data. Arrays are expected to be escaped,
+--                                       objects are not. See wp_insert_post() for accepted arguments.
+--                                       Default array.
+-- @param bool         $wp_error         Optional. Whether to return a WP_Error on failure. Default false.
+-- @param bool         $fire_after_hooks Optional. Whether to fire the after insert hooks. Default true.
+-- @return int|WP_Error The post ID on success. The value 0 or WP_Error on failure.
+--
+   function Wp_Update_Post (Postarr          : Array_Type := Empty_Array;
+                            wp_error         : Boolean    := False;
+                            Fire_After_Hooks : Boolean    := True)
+                            return Integer
+                            is (1);
+
+--
    -- Sanitizes every post field.
    --
    -- If the context is 'raw', then the post object or array will get minimal
@@ -101,9 +172,9 @@ is
    -- @return object|WP_Post|array The now sanitized post object or array (will be the
    --                              same type as `$post`).
    --
-   function Sanitize_Post (Post    : Inc_Class_Posts.Wp_Post;
+   function Sanitize_Post (Post    : Inc_Class_Wp_Posts.Wp_Post;
                            Context : String := "display")
-                           return Inc_Class_Posts.Wp_Post;
+                           return Inc_Class_Wp_Posts.Wp_Post;
 --   function Sanitize_Post (Key    : String;
 --                           Post   : Array_Type;
 --                           Id     : Integer; -- Inc_Class_Posts.Post_Id;
@@ -129,9 +200,26 @@ is
 --
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
-                                 Post_Id : Inc_Class_Posts.Post_Id;
+                                 Post_Id : Inc_Class_Wp_Posts.Post_Id;
                                  Context : String := "display")
                                  return Array_Type;
+--
+-- Restores a post from the Trash.
+--
+-- @since 2.9.0
+-- @since 5.6.0 An untrashed post is now returned to 'draft' status by default, except for
+--              attachments which are returned to their original 'inherit' status.
+--
+-- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`.
+-- @return WP_Post|false|null Post data on success, false or null on failure.
+--
+   function Wp_Untrash_Post (Post_Id : Integer := 0)
+                             return Wp_Post;
+   function Wp_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
+   function Wp_Untrash_Post (Item : String) return Boolean is (True);
+   function Wp_Untrash_Post (Item : Inc_Class_Wp_Posts.Wp_Post)
+                             return Boolean is (True);
+
 --
 -- Retrieves the IDs of the ancestors of a post.
 --
@@ -142,7 +230,7 @@ is
 --
    -- type Post_Id_List is array (Positive range <>) of Inc_Class_Posts.Post_Id;
 
-   function Get_Post_Ancestors (Post : Inc_Class_Posts.Wp_Post)
+   function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type;  -- return Post_Id_List;
 
 --
@@ -161,10 +249,39 @@ is
 --               False for an invalid `$post_id` (non-numeric, zero, or negative value).
 --               An empty string if a valid but non-existing post ID is passed.
 --
-   function Get_Post_Meta (Post_Id : Inc_Class_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type; -- Post_Id_List;
+
+--
+-- Updates a post meta field based on the given post ID.
+--
+-- Use the `$prev_value` parameter to differentiate between meta fields with the
+-- same key and post ID.
+--
+-- If the meta field for the post does not exist, it will be added and its ID returned.
+--
+-- Can be used in place of add_post_meta().
+--
+-- @since 1.5.0
+--
+-- @param int    $post_id    Post ID.
+-- @param string $meta_key   Metadata key.
+-- @param mixed  $meta_value Metadata value. Must be serializable if non-scalar.
+-- @param mixed  $prev_value Optional. Previous value to check before updating.
+--                           If specified, only update existing metadata entries with
+--                           this value. Otherwise, update all entries. Default empty.
+-- @return int|bool Meta ID if the key didn't exist, true on successful update,
+--                  false on failure or if the value passed to the function
+--                  is the same as the one that is already in the database.
+--
+   function Update_Post_Meta (Post_Id    : Integer;
+                              Meta_Key   : String;
+                              Meta_Value : Array_Type;
+                              Prev_Value : Array_Type := Empty_Array) -- = '' )
+                              return Integer
+                              is (1);
 
 --
 -- Retrieves the URL for an attachment.

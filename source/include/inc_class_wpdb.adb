@@ -2193,7 +2193,7 @@ begin
 --        public function get_row(query = null, output = OBJECT, y = 0)
 
    function Get_Row (Db      : in out Wpdb_Class;
-                     Post    : Inc_Class_Posts.Wp_Post;
+                     Post    : Inc_Class_Wp_Posts.Wp_Post;
                      Query   : String  := ""; -- = null,
                      Output  : String  := ""; -- = OBJECT,
                      Y       : Natural := 0;

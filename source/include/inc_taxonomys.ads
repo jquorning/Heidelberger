@@ -288,4 +288,16 @@ is
    function Taxonomy_Exists (Taxonomy : String)
                              return Boolean is (True);
 
+--
+-- Enables or disables term counting.
+--
+-- @since 2.5.0
+--
+-- @param bool defer Optional. Enable if true, disable if false.
+-- @return bool Whether term counting is enabled or disabled.
+--
+   function wp_defer_term_counting (defer : Boolean := False) -- = null
+                                    return Boolean
+                                    is (False);
+
 end Inc_Taxonomys;

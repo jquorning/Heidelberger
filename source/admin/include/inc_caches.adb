@@ -35,7 +35,7 @@ is
 ------------------
 
 procedure Wp_Cache_Add (Key    : String;
-                        Data   : Inc_Class_Posts.Wp_Post;  --- String;
+                        Data   : Inc_Class_Wp_Posts.Wp_Post;  --- String;
                         Group  : String  := "";
                         Expire : Integer := 0)
 is
@@ -149,7 +149,7 @@ end Wp_Cache_Add;
 --                        return String
 procedure Wp_Cache_Get (Key   : String;
                         Group : String  := "";
-                        Post  : Inc_Class_Posts.Wp_Post;
+                        Post  : Inc_Class_Wp_Posts.Wp_Post;
                         Force : Boolean := False;
 --                        found : out Boolean
                         Success : out Boolean)

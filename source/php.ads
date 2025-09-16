@@ -1,12 +1,12 @@
 with Arrays;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
 
 package Php
 is
    use Arrays;
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type;
-   function Get_Object_Vars (Object : Inc_Class_Posts.Wp_Post)
+   function Get_Object_Vars (Object : Inc_Class_Wp_Posts.Wp_Post)
                              return Array_Type is (Empty_Array);
 
    function Strpos (Item : String; Pattern : String) return Natural
@@ -52,7 +52,7 @@ is
    function Vsprintf (Format : String;
                       Arg    : Array_Type) return String is (Format);
 
-   function Is_Object (Post : Inc_Class_Posts.Wp_Post) return Boolean is (True);
+   function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (True);
    function Is_Object (Arry : Array_Type) return Boolean is (False);
    function Is_Array  (Arry : Array_Type) return Boolean is (True);
 
@@ -106,6 +106,10 @@ is
                      Arry      : String)
                      return String is ("XXX-206");
 
+   function Implode (Separator : String;
+                     List      : List_Type)
+                     return String is ("XXX-307");
+
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
 
@@ -114,4 +118,25 @@ is
    function Is_Int (A : Integer)   return Boolean is (True);
    function Is_String (A : String) return Boolean is (True);
 
+   function Array_Values (Arry : Array_Type)
+                          return List_Type
+                          is (Empty_List);
+
+   function File_Exists (Filename : String)
+                         return Boolean
+                         is (True);
+
+   function Is_Dir (Filename : String)
+                    return Boolean
+                    is (False);
+
+   function Substr (Str    : String;
+                    Offset : Integer;
+                    Length : Integer := 0)
+                    return String
+                    is ("XXX-309");
+
+   function Stripslashes (Item : String)
+                          return String
+                          is (Item);
 end Php;

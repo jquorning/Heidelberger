@@ -36,7 +36,8 @@ is
    Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
    Empty_Array : Array_Type renames Array_Vectors.Empty_Vector;
 
-   function Build (Key : String; Value : String) return Assoc_Type;
+   function Build (Key : String; Value : String)     return Assoc_Type;
+   function Build (Key : String; Value : Integer)    return Assoc_Type;
    function Build (Key : String; Value : Array_Type) return Assoc_Type;
 
    type Assoc_List is array (Positive range <>) of Assoc_Type;
