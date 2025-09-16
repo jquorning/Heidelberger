@@ -18,10 +18,15 @@ with Php;
 with HB_Common;
 with Wp_Common;
 
+with Adi_Posts;
+
 with Inc_Capabilities;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Formatting;
 with Inc_Functions;
+with Inc_Function_Wp_Scripts;
+with Inc_Function_Wp_Styles;
 with Inc_Pluggables;
 with Inc_Posts;
 
@@ -72,6 +77,9 @@ is
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;
+      use Inc_Function_Wp_Scripts;
+      use Inc_Function_Wp_Styles;
+      use Inc_Posts;
 --
 --  @global string       $post_type
 --  @global WP_Post_Type $post_type_object
@@ -196,13 +204,15 @@ is
                         end if;
 
                         if Post_Ids.Is_Empty then
-                           Wp_Redirect (-Sendback);
+                           Inc_Pluggables.Wp_Redirect (-Sendback);
                            return AWS.Response.URL (""); -- exit;  -- redirect
                         end if;
 
                         if "trash" = Doaction then
 --              when "trash" =>
                            declare
+                              use Adi_Posts;
+
                               Trashed : Natural := 0;
                               Locked  : Natural := 0;
                            begin
@@ -358,13 +368,14 @@ is
                         begin
                            Sendback := +Remove_Query_Arg (Arg, -Sendback);
                         end;
-                        Wp_Redirect (-Sendback);
+                        Inc_Pluggables.Wp_Redirect (-Sendback);
                         return AWS.Response.URL (""); -- exit;  -- redirect
                      end;
                   end;
 
             elsif not Empty (String'(Get (X_REQUEST, "_wp_http_referer"))) then
                declare
+                  use Inc_Formatting;
                   use Inc_Functions;
                   use String_Vectors;
 
@@ -372,7 +383,8 @@ is
                                                  "_wp_http_referer" &
                                                  "_wpnonce";
                begin
-                  Wp_Redirect (Remove_Query_Arg
+                  Inc_Pluggables.Wp_Redirect
+                            (Remove_Query_Arg
                              (Arg,
                               Wp_Unslash (Get (X_SERVER, "REQUEST_URI"))));
                end;
@@ -610,6 +622,7 @@ is
                                    Var_Name     : in     String;
                                    Translations : in out Translate_Set)
                   is
+                     use Inc_Formatting;
                   begin
                      if Var_Name = "VAR_page_edit_h1" then
                         Insert (Translations,
@@ -773,6 +786,8 @@ is
 
             if "trashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
                declare
+                  use Inc_Formatting;
+
                   Ids   : constant Integer := Preg_Replace ("/[^0-9,]/", "",
                                                             Get (X_REQUEST, "ids"));
                   URL_2 : constant String
@@ -800,6 +815,8 @@ is
                   then
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
                      declare
+                        use Inc_Formatting;
+
                         Id   : constant Integer := Integer'Value (-Ids.First_Element);
                         URL  : constant String  :=
                            ESC_URL (Get_Edit_Post_Link (Id));

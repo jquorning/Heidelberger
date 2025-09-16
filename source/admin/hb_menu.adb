@@ -90,6 +90,7 @@ is
    procedure Run
    is
       use Inc_Capabilities;
+      use Inc_Formatting;
 
 --      Submenu : Submenu_Type;
       Is_Multisite : constant Boolean := Inc_Load.Is_Multisite;
@@ -241,6 +242,8 @@ is
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
            declare
+               use Inc_Formatting;
+
                Ptype_Obj : Inc_Class_Wp_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Integer;
@@ -407,6 +410,7 @@ is
          end if;
 
          declare
+            use Inc_Formatting;
             use Inc_Functions;
             use Inc_Plugins;
             use Inc_Themes;

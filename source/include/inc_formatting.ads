@@ -67,4 +67,86 @@ is
                                  return String
                                  is ("XXX-304");
 
+--
+-- Sanitizes a URL for database or redirect usage.
+--
+-- @since 2.3.1
+-- @since 2.8.0 Deprecated in favor of esc_url_raw().
+-- @since 5.9.0 Restored (un-deprecated).
+--
+-- @see esc_url()
+--
+-- @param string   url       The URL to be cleaned.
+-- @param string[] protocols Optional. An array of acceptable protocols.
+--                            Defaults to return value of wp_allowed_protocols().
+-- @return string The cleaned URL after esc_url() is run with the "db" context.
+--
+-- function sanitize_url( url, protocols = null ) then
+   function Sanitize_URL (Url : String)
+                          return String
+                          is ("XXX-322");
+
+--
+-- Checks and cleans a URL.
+--
+-- A number of characters are removed from the URL. If the URL is for displaying
+-- (the default behaviour) ampersands are also replaced. The then@see "clean_url"end; filter
+-- is applied to the returned cleaned URL.
+--
+-- @since 2.8.0
+--
+-- @param string   url       The URL to be cleaned.
+-- @param string[] protocols Optional. An array of acceptable protocols.
+--                            Defaults to return value of wp_allowed_protocols().
+-- @param string   _context  Private. Use sanitize_url() for database usage.
+-- @return string The cleaned URL after the then@see "clean_url"end; filter is applied.
+--                An empty string is returned if `url` specifies a protocol other than
+--                those in `protocols`, or if `url` contains an empty string.
+--
+-- function esc_url( url, protocols = null, _context = "display" ) then
+   function ESC_URL (Item : String)
+                    return String
+                    is ("XXX-324");
+
+--
+-- Escaping for HTML blocks.
+--
+-- @since 2.8.0
+--
+-- @param string text
+-- @return string
+--
+-- function esc_html( text ) then
+   function ESC_HTML (Item : String)
+                      return String
+                      is ("XXX-323");
+
+--
+-- Escaping for HTML attributes.
+--
+-- @since 2.8.0
+--
+-- @param string text
+-- @return string
+--
+-- function esc_attr( text ) then
+   function ESC_Attr (Item : String)
+                      return String
+                      is ("XXX-325");
+--
+-- Removes slashes from a string or recursively removes slashes from strings within an array.
+--
+-- This should be used to remove slashes from data passed to core API that
+-- expects data to be unslashed.
+--
+-- @since 3.6.0
+--
+-- @param string|array value String or array of data to unslash.
+-- @return string|array Unslashed `value`, in the same type as supplied.
+--
+-- function wp_unslash( value ) then
+   function Wp_Unslash (Item : String)
+                        return String
+                        is ("XXX-215");
+
 end Inc_Formatting;

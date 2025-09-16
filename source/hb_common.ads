@@ -33,10 +33,6 @@ is
    function Has_Items (Item : List_Table) return Boolean;
    function X_Get_List_Table (Item : String) return List_Table;
 
---   procedure Wp_Die (Why : String; Sub : String := ""; Code : Integer := 0) is null;
-
---   procedure Check_Admin_Referer (Item : String; Item_2 : String := "");
-
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural;
    function Get_Pagination_Arg (List : List_Table; Item : String) return Natural;
 
@@ -49,15 +45,6 @@ is
 
    function Admin_URL (Item : String) return String;
 
-   Wpdb : Inc_Class_Wpdb.Wpdb_Class;
-
-   procedure Wp_Redirect (Item : String) is null;
-
-   function Wp_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
-   function Wp_Check_Post_Lock (Post_Id : String)     return Integer is (1);
-   function Wp_Trash_Post      (Post_Id : Assoc_Type) return Boolean is (True);
-   function Wp_Trash_Post      (Post_Id : String)     return Boolean is (True);
-
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
    function Add_Query_Arg (Item : String; N : String; I : String)
@@ -65,9 +52,6 @@ is
    function Add_Query_Arg (Item : String; N : String) return String;
    function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
       return Unbounded_String;
-
-   procedure Wp_Enqueue_Script (Item : String) is null;
-   procedure Wp_Enqueue_Style  (Item : String) is null;
 
    function Absint (Item : Assoc_List) return String;
    function Absint (Item : String)     return String is ("XXX-213");
@@ -186,15 +170,9 @@ is
                            return String
                            is ("XXX-230");
 
-   function Wp_Unslash (Item : String) return String is ("XXX-215");
-
    procedure Add_Screen_Option (Item : String; List : Array_Type);
 
    function "abs" (List : Array_Type) return String;
-
-   function ESC_HTML (Item : String) return String;
-   function ESC_URL  (Item : String) return String;
-   function ESC_Attr (AL : String) return String;
 
    function Printf (Format : String; Arg_1 : String) return String;
 
@@ -243,21 +221,12 @@ is
                  Key  : String)
                  return String is ("XXX-250");
 
-   function Taxnow return String;
-
-   function Wp_Insert_Term (Item : String; Item2 : String; Arr : Array_Type)
-                            return Boolean
-                            is (True);
-
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
-   procedure Wp_Delete_Term (Tag : Integer; Taxonomy : String) is null;
-   procedure Wp_Delete_Terms (Tag : Integer; Taxonomy : String) is null;
 
    function "not" (Term : Inc_Class_Wp_Terms.Wp_Term)
                    return Boolean
                    is (False);
 
-   function Sanitize_URL (Item : String) return String;
    function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String)
                                return String;
    function Wp_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type)

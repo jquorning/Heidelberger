@@ -15,7 +15,9 @@ with Globals;
 with HB_Common;
 
 with Inc_Capabilities;
+with Inc_Formatting;
 with Inc_Functions;
+with Inc_Function_Wp_Scripts;
 with Inc_Taxonomys;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
@@ -44,6 +46,8 @@ is
                     return AWS.Response.Data
    is
       use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Function_Wp_Scripts;
       use Inc_Taxonomys;
       use Inc_Class_Wp_Taxonomy;
       use Inc_Class_Wp_Terms;
@@ -225,6 +229,8 @@ is
             end if;
 
             declare
+               use Inc_Formatting;
+
                Taxonomy : Unbounded_String;
                Term_Id  : constant Integer   := Integer'Value (Get (X_REQUEST, "tag_ID"));
                Term     : Wp_Term := Get_Term (Term_Id);
@@ -236,7 +242,8 @@ is
                     (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                end if;
 
-               Wp_Redirect (Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, Post_Type)));
+               Inc_Pluggables.Wp_Redirect
+                  (Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, Post_Type)));
             end;
             goto Bailout; -- return; -- exit;
 
@@ -332,7 +339,8 @@ is
             -- @param string      location The destination URL.
             -- @param WP_Taxonomy tax      The taxonomy object.
             --
-            Wp_Redirect (Apply_Filters ("redirect_term_location", -Location, -Tax.Name));  -- .name added
+            Inc_Pluggables.Wp_Redirect
+               (Apply_Filters ("redirect_term_location", -Location, -Tax.Name));  -- .name added
             goto Bailout; -- return;  --  exit;
          end if;
 
@@ -342,7 +350,7 @@ is
             Total_Pages : constant Natural := Get_Pagination_Arg (Wp_List_Table, "total_pages");
          begin
             if Pagenum > Total_Pages and Total_Pages > 0 then
-               Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
+               Inc_Pluggables.Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
                goto Bailout; -- return;  -- exit;
             end if;
          end;
@@ -466,6 +474,8 @@ is
                                 Var_Name     : in     String;
                                 Translations : in out Translate_Set)
                is
+                  use Inc_Formatting;
+
                   procedure Set (Var : String; Value : String);
                   procedure Set (Var : String; Value : Boolean);
 
@@ -776,6 +786,8 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_h1_sub" then
                      declare
+                        use Inc_Formatting;
+
                         R : Unbounded_String;
                      begin
                         if
@@ -857,7 +869,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_tax_parent_item" then
                      Set ("VAR_edit_tags_tax_parent_item",
-                          ESC_HTML (Get (Tax.Labels, "parent_item")));
+                          Inc_Formatting.ESC_HTML (Get (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
                      Set ("VAR_edit_tags_taxonomy", ESC_Attr (Taxonomy));

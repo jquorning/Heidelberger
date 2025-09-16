@@ -83,6 +83,7 @@ is
                                Submenu_As_Parent : Boolean := True)
    is
       use Inc_Capabilities;
+      use Inc_Formatting;
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
       First : Boolean := True;
@@ -143,6 +144,7 @@ is
 
             declare
                 use Ada.Containers;
+                use Inc_Formatting;
                 use List_Vectors;
 
                 Class_2 : String :=

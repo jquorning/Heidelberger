@@ -204,6 +204,23 @@ is
                                  Context : String := "display")
                                  return Array_Type;
 --
+-- Moves a post or page to the Trash
+--
+-- If Trash is disabled, the post or page is permanently deleted.
+--
+-- @since 2.9.0
+--
+-- @see wp_delete_post()
+--
+-- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`
+--                     if `EMPTY_TRASH_DAYS` equals true.
+-- @return WP_Post|false|null Post data on success, false or null on failure.
+--
+-- function wp_trash_post( $post_id = 0 ) then
+   function Wp_Trash_Post (Post_Id : Assoc_Type) return Boolean is (True);
+   function Wp_Trash_Post (Post_Id : String)     return Boolean is (True);
+
+--
 -- Restores a post from the Trash.
 --
 -- @since 2.9.0

@@ -18,8 +18,10 @@ with Globals;
 with Php;
 with HB_Common;
 
+with Adi_Posts;
 with Inc_Capabilities;
 with Inc_Functions;
+with Inc_Function_Wp_Scripts;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Pluggables;
@@ -40,7 +42,10 @@ is
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
+      use Adi_Posts;
       use Inc_Capabilities;
+      use Inc_Function_Wp_Scripts;
+      use Inc_Posts;
 
       Parent_File   : Unbounded_String := +"edit.php";
       Submenu_File  : Unbounded_String := +"edit.php";
@@ -210,7 +215,7 @@ is
                   Editing : Boolean := True;
                begin
                   if Post_Id = 0 then -- .key added
-                     Wp_Redirect (Admin_URL ("post.php"));
+                     Inc_Pluggables.Wp_Redirect (Admin_URL ("post.php"));
                      goto Bailout; -- return; -- exit;
                   end if;
 
@@ -248,7 +253,8 @@ is
                      declare
                         Unused : Lock_Type := Wp_Set_Post_Lock (Post_Id);
                      begin
-                        Wp_Redirect (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
+                        Inc_Pluggables.Wp_Redirect
+                           (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
                      end;
                      goto Bailout; -- return; -- exit;
                   end if;
@@ -389,7 +395,7 @@ is
                      Inc_Functions.Wp_Die (abs "Error in moving the item to Trash.");
                   end if;
 
-                  Wp_Redirect (
+                  Inc_Pluggables.Wp_Redirect (
                         -Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("trashed", "1"),
@@ -428,7 +434,7 @@ is
                         )),
                         Sendback
                );
-               Wp_Redirect (-Sendback);
+               Inc_Pluggables.Wp_Redirect (-Sendback);
                goto Bailout; -- return; -- exit;
 
             elsif Action = "delete" then
@@ -460,7 +466,7 @@ is
                   end if;
                end if;
 
-               Wp_Redirect (-Add_Query_Arg ("deleted", 1, Sendback));
+               Inc_Pluggables.Wp_Redirect (-Add_Query_Arg ("deleted", 1, Sendback));
                goto Bailout; -- return; -- exit;
 
             elsif Action = "preview" then
@@ -468,7 +474,7 @@ is
                declare
                   URL : constant String := Post_Preview; -- ();
                begin
-                  Wp_Redirect (URL);
+                  Inc_Pluggables.Wp_Redirect (URL);
                end;
                goto Bailout; -- return; -- exit;
 
@@ -504,7 +510,7 @@ is
                --
                Do_Action ("post_action_" & (-Action), Post_Id'Image);
 
-               Wp_Redirect (Admin_URL ("edit.php"));
+               Inc_Pluggables.Wp_Redirect (Admin_URL ("edit.php"));
                goto Bailout; -- return; -- exit;
             end if; -- End switch.
          end;

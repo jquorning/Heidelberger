@@ -1,5 +1,6 @@
 with Php;
 
+with Globals;
 with Hb_Common;
 
 with Inc_Caches;
@@ -40,6 +41,8 @@ is
 
       if not Success then
          declare
+            use Globals;
+
             Statement : constant String
               := wpdb.Prepare
                 ("SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
