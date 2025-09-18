@@ -19,6 +19,25 @@ is
    procedure Wp_Load_Translations_Early;
 
 --
+-- Determines whether the current request is for an administrative interface page.
+--
+-- Does not check if the user is an administrator; use current_user_can()
+-- for checking roles and capabilities.
+--
+-- For more information on this and similar theme functions, check out
+-- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tagsend; article in the Theme Developer Handbook.
+--
+-- @since 1.5.1
+--
+-- @global WP_Screen current_screen WordPress current screen object.
+--
+-- @return bool True if inside WordPress administration interface, false otherwise.
+--
+   function Is_Admin
+            return Boolean;
+
+--
 -- If Multisite is enabled.
 --
 -- @since 3.0.0

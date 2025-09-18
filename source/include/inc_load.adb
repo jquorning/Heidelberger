@@ -1171,6 +1171,9 @@ is
 -- --
 -- -- @return bool True if inside WordPress administration interface, false otherwise.
 -- --
+   function Is_Admin
+            return Boolean is (True);
+
 -- function is_admin() then
 --         if ( isset( GLOBALS("current_screen") ) ) then
 --                 return GLOBALS("current_screen")->in_admin();

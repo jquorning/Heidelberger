@@ -6,9 +6,19 @@
 -- @package WordPress
 -- @subpackage Dependencies
 --
+
+with Inc_Class_Wp_Dependencies;
+with Inc_Class_Wp_Styles;
+with Inc_Functions_Wp_Scripts;
+
+with Hb_Common;
+with Php;
+
 package body Inc_Function_Wp_Styles
 is
-   procedure Dummy is null;
+   use Inc_Class_Wp_Styles;
+   use Hb_Common;
+   use Php;
 -- --
 -- -- Initialize wp_styles if it has not been set.
 -- --
@@ -148,41 +158,40 @@ is
 --         wp_styles().remove( handle );
 -- end;
 
--- --
--- -- Enqueue a CSS stylesheet.
--- --
--- -- Registers the style if source provided (does NOT overwrite) and enqueues.
--- --
--- -- @see WP_Dependencies::add()
--- -- @see WP_Dependencies::enqueue()
--- -- @link https://www.w3.org/TR/CSS2/media.html#media-types List of CSS media types.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string           handle Name of the stylesheet. Should be unique.
--- -- @param string           src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
--- --                                 Default empty.
--- -- @param string[]         deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
--- -- @param string|bool|null ver    Optional. String specifying stylesheet version number, if it has one, which is added to the URL
--- --                                 as a query string for cache busting purposes. If version is set to false, a version
--- --                                 number is automatically added equal to current installed WordPress version.
--- --                                 If set to null, no version is added.
--- -- @param string           media  Optional. The media for which this stylesheet has been defined.
--- --                                 Default 'all'. Accepts media types like 'all', 'print' and 'screen', or media queries like
--- --                                 '(orientation: portrait)' and '(max-width: 640px)'.
--- --
+   ----------------------
+   -- Wp_Enqueue_Style --
+   ----------------------
+
 -- function wp_enqueue_style( handle, src = '', deps = array(), ver = false, media = 'all' ) then
---         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__, handle );
+   procedure Wp_Enqueue_Style (Handle : String;
+                               Src    : String       := "";
+                               Deps   : String_Array := Empty_String_Array;
+                               Ver    : String       := ""; -- Boolean      := False;
+                               Media  : String       := "all")
+   is
+      use Inc_Class_Wp_Dependencies;
+      use Inc_Functions_Wp_Scripts;
+      use String_Vectors;
+   begin
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
+      declare
+         Styles : Wp_Styles := X_Construct;
+         Unused : Boolean;
+      begin
+         if Src /= "" then
+            declare
+                X_Handle : constant List_Type := Explode ("?", Handle);
+            begin
+                Unused := Inc_Class_Wp_dependencies.Add
+                  (Wp_Dependencies (Styles),
+                   -(X_Handle.First_Element), Src, Deps, Ver, Media);
+            end;
+         end if;
 
---         wp_styles = wp_styles();
-
---         if ( src ) then
---                 _handle = explode( '?', handle );
---                 wp_styles.add( _handle[0], src, deps, ver, media );
---         end;
-
---         wp_styles.enqueue( handle );
--- end;
+         Styles.Enqueue (To_Vector (New_Item => Handle,
+                                    Length   => 1));
+      end;
+   end Wp_Enqueue_Style;
 
 -- --
 -- -- Remove a previously enqueued CSS stylesheet.

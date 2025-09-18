@@ -7,6 +7,7 @@ is
    use Arrays;
 
    ABSPATH       : constant String := "";
+   WPINC         : constant String := "";
    WP_PLUGIN_DIR : constant String := "";
 
    function Typenow return String;

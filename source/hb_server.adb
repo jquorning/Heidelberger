@@ -9,6 +9,9 @@ with AWS.Services.Dispatchers.URI;
 with AWS.Server;
 --  with AWS.Status;
 
+with Inc_Class_Wp_Scripts;
+-- with Inc_Class_Wp_Dependencies;
+
 with Adm_Menu_Header;
 
 -- with INC_Menu;

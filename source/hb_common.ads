@@ -170,15 +170,29 @@ is
                            return String
                            is ("XXX-230");
 
+   function Apply_Filters (Hook_Name : String;
+                           List      : List_Type)
+                           return List_Type
+                           is (Empty_List);
+
    procedure Add_Screen_Option (Item : String; List : Array_Type);
 
    function "abs" (List : Array_Type) return String;
 
-   function Printf (Format : String; Arg_1 : String) return String;
+   function Printf (Format : String;
+                    Arg_1  : String;
+                    Arg_2  : String := "";
+                    Arg_3  : String := "";
+                    Arg_4  : String := "")
+                    return String
+                    is ("XXX-310");
 
    function Get_Search_Query return String;
 
-   function Sprintf (Format : String; Arg_1 : String; Arg_2 : String := "")
+   function Sprintf (Format : String;
+                     Arg_1 : String;
+                     Arg_2 : String := "";
+                     Arg_3 : String := "")
       return String is ("XXX-201");
 
    function Number_Format_I18n (N : Integer) return String;

@@ -55,7 +55,8 @@ is
                      Icon    : String := "")
                      return Menu_Item
    is
-      Item : Menu_Item := (Menu_Title => +Name,
+      Item : constant Menu_Item :=
+                          (Menu_Title => +Name,
                            Capability => +Cap,
                            Menu_Slug  => +Url,
                            Page_Title => +Title,
@@ -229,7 +230,7 @@ is
          X_Wp_Last_Object_Menu : Natural := 25;
          -- The index of the last top-level menu in the object menu group.
 
-         Types  : String_Array := Get_Post_Types (  -- (array)
+         Types  : constant String_Array := Get_Post_Types (  -- (array)
             Arrays.To_Array ((
                 Build ("show_ui",      "true"),
                 Build ("_builtin",     "false"),
@@ -244,7 +245,7 @@ is
            declare
                use Inc_Formatting;
 
-               Ptype_Obj : Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+               Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Integer;
                Ptype_For_Id        : Unbounded_String;
@@ -646,7 +647,7 @@ is
                   end if;
 
                   declare
-                     Health : String := Get (Issue_Counts, "critical");
+                     Health : constant String := Get (Issue_Counts, "critical");
                   begin
                      Site_Health_Count := +Sprintf (
                         "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",

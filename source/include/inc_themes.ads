@@ -65,7 +65,8 @@ is
 -- @return bool True if the active theme supports the feature, false otherwise.
 --
 -- function current_theme_supports( feature, ...args ) then
-   function Current_Theme_Supports (Feature : String)
+   function Current_Theme_Supports (Feature : String;
+                                    Arg_2   : String := "")
 --                                   , ...args )
                                     return Boolean
                                     is (True);

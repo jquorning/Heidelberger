@@ -11,4 +11,9 @@ package L10n is
    function Esc_Attr_E (Item : String) return String is (Item & "XXX-309");
    function Esc_Attr_X (Item : String) return String is (Item & "XXX-310");
 
+   function Load_Script_Textdomain (Handle : String;
+                                    Domain : String;
+                                    Path   : String)
+                                    return String
+                                    is ("XXX-311");
 end L10n;

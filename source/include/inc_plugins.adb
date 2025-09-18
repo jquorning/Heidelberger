@@ -1,25 +1,9 @@
-
---
--- The plugin API is located in this file, which allows for creating actions
--- and filters and hooking functions, and methods. The functions or methods will
--- then be run when the action or filter is called.
---
--- The API callback examples reference functions, but can be methods of classes.
--- To hook methods, you'll need to pass an array one of two ways.
---
--- Any of the syntaxes explained in the PHP documentation for the
--- then@link https:--www.php.net/manual/en/language.pseudo-types.php#language.types.callback 'callback'end;
--- type are valid.
---
--- Also see the then@link https:--developer.wordpress.org/plugins/ Plugin APIend; for
--- more information and examples on how to use a lot of these functions.
---
--- This file should have no external dependencies.
 --
 -- @package WordPress
 -- @subpackage Plugin
 -- @since 1.5.0
 --
+
 package body Inc_Plugins
 is
    procedure Dummy is null;

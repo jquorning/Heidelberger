@@ -58,6 +58,12 @@ is
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);
+   function Array_Diff (Left, Right : Array_Type) return Array_Type
+      is (Left);
+
+   function Array_Diff (Left  : List_Type;
+                        Right : String) return List_Type
+      is (Left);
 
    function Strtoupper (Item : String) return String is (Item);
    function Strtolower (Item : String) return String is (Item);
@@ -77,13 +83,15 @@ is
 
    function In_Array (Needle   : String;
                       Haystack : Array_Type;
-                      Strict   : Boolean)
+                      Strict   : Boolean := False)
                       return Boolean is (True);
    function In_Array (Needle   : String;
                       Haystack : List_Type;
-                      Strict   : Boolean)
+                      Strict   : Boolean := False)
                       return Boolean is (False);
    function Ltrim (Item : String; Xx : String) return String is (Item);
+
+   function Trim (Item : String; Xx : String) return String is (Item);
 
    function Explode (Item  : String;
                      Table : Array_Type)
@@ -92,6 +100,11 @@ is
 
    function Explode (Item : String;
                      List : List_Type)
+                     return List_Type
+                     is (Empty_List);
+
+   function Explode (Separator : String;
+                     Item      : String)
                      return List_Type
                      is (Empty_List);
 
@@ -139,4 +152,51 @@ is
    function Stripslashes (Item : String)
                           return String
                           is (Item);
+
+   type Flag_Type is (Ent_Quotes, Ent_Substitute, Ent_Html404);
+   function Html_Entity_Decode (Item : String;
+                                Flags : Flag_Type;
+                                Encoding : String := "")
+                                return String
+                                is ("XXX-312");
+
+   function Array_Key_Exists (Key  : String;
+                              Arry : Array_Type)
+                              return Boolean
+                              is (False);
+
+   function Array_Key_Exists (Key  : String;
+                              Arry : List_Type)
+                              return Boolean
+                              is (False);
+
+   function Array_Search (Needle   : String;
+                          Haystack : Array_Type;
+                          Strict   : Boolean := False)
+                          return String
+                          is ("XXX-315");
+
+   function Array_Fill_Keys (Keys  : Array_Type;
+                             Value : Boolean)
+                             return Array_Type
+                             is (Empty_Array);
+
+   function Array_Pop (Arry : Array_Type)
+                       return Integer
+                       is (1);
+
+   function Array_Pop (Arry : List_Type)
+                       return String
+                       is ("XXX-332");
+
+   function Array_Push (Arry  : Array_Type;
+                        Value : Integer)
+                        return Integer
+                        is (1);
+
+   function Array_Push (Arry  : List_Type;
+                        Value : String_Array) -- Integer)
+                        return Integer
+                        is (1);
+
 end Php;

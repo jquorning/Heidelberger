@@ -9,7 +9,6 @@ with Ada.Containers;
 
 with Globals;
 with Hb_Common;
-with Hb_Menu;
 with L10n;
 with Php;
 
@@ -105,7 +104,7 @@ is
             Submenu_Index   : constant Hb_Menu.Submenu_Index :=
                Find_Submenu (Submenu, -Item.Menu_Slug);
 
-            Submenu_Items   : Submenu_Type :=
+            Submenu_Items   : constant Submenu_Type :=
                Get_Sub_Submenu (Submenu, Menu_Slug => -Item.Menu_Slug);
             --  Record renames Submenu (Submenu_Index);
          begin
@@ -208,21 +207,21 @@ is
                      Echo ("<div class=""separator""></div>");
                   elsif Submenu_As_Parent and then Submenu_Index /= No_Submenu  then
                      declare
-                        Submenu_Items_2 : Submenu_Type :=
+                        Submenu_Items_2 : constant Submenu_Type :=
                            Filter_And_Sort (Submenu);  -- Re-index.
 
                         -- Submenu_Items_2 : List_Type :=
                         --    Array_Values (Submenu_Items);  -- Re-index.
 
-                        Menu_File     : String  :=
+                        Menu_File : String  :=
                            -Submenu_Items_2.First_Element.Menu_Slug; -- (0)(2)
 --                      Menu_File     : String  := Submenu_Items_2 (0) (2);
 
-                        Menu_Hook     : String :=
+                        Menu_Hook : constant String :=
                            Adi_Plugins.Get_Plugin_Page_Hook (Menu_File,
                                                              -Item.Menu_Slug);
 
-                        Pos           : Integer := Strpos (Menu_File, "?");
+                        Pos : constant Integer := Strpos (Menu_File, "?");
                      begin
                         if 0 /= Pos then
                            Menu_File := Substr (Menu_File, 0, Pos);
@@ -245,11 +244,11 @@ is
                     Current_User_Can (-Item.Capability)
                   then
                      declare
-                        Menu_Hook : String :=
+                        Menu_Hook : constant String :=
                            Adi_Plugins.Get_Plugin_Page_Hook (-Item.Menu_Slug,
                                                              "admin.php");
                         Menu_File : String  := -Item.Menu_Slug;
-                        Pos       : Integer := Strpos (Menu_File, "?");
+                        Pos       : constant Integer := Strpos (Menu_File, "?");
                      begin
                         if 0 /= Pos then
                            Menu_File := Substr (Menu_File, 0, Pos);
@@ -282,7 +281,7 @@ is
                      declare
 --                        Sub_Key         : String := -S.Key;
 --                        Sub_Item        : String := -S.Value;
-                        Sub_Item        : Hb_Menu.Submenu_Record := Sub;
+                        Sub_Item        : constant Hb_Menu.Submenu_Record := Sub;
                         Class           : List_Type := Empty_List;
                         Aria_Attributes : List_Type := Empty_List; --  ;  String := "";
                      begin
@@ -297,7 +296,7 @@ is
 
                         declare
                            Menu_File : String  := -Item.Menu_Slug;
-                           Pos       : Integer := Strpos (Menu_File, "?");
+                           Pos       : constant Integer := Strpos (Menu_File, "?");
 
                            -- Handle current for post_type=post|page|foo pages,
                            -- which won't match self.
@@ -343,12 +342,12 @@ is
                                   then " class=""" & Implode (" ", Class) & """"
                                   else "");
 
-                              Menu_Hook : String :=
+                              Menu_Hook : constant String :=
                                  Adi_Plugins.Get_Plugin_Page_Hook (-Sub_Item.Menu_Slug,
                                                                    -Item.Menu_Slug);
 
                               Sub_File  : String  := -Sub_Item.Menu_Slug;
-                              Pos       : Integer := Strpos (Sub_File, "?");
+                              Pos       : constant Integer := Strpos (Sub_File, "?");
                            begin
                               if 0 /= Pos then
                                  Sub_File := Substr (Sub_File, 0, Pos);

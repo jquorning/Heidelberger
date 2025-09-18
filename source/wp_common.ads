@@ -1,5 +1,6 @@
 with Arrays;
 
+with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
@@ -46,5 +47,29 @@ is
                  Key       : String)
                  return String
                  is ("XXX-240");
+
+   function Array_Keys (Arry : Inc_Class_Wp_Dependency.Dependency_Map)
+                        return List_Type
+                        is (Empty_List);
+
+   function Array_Diff (Arry  : String_Array;
+                        Arrys : List_Type)
+                        return Boolean
+                        is (False);
+
+   function Array_Search (Needle   : String;
+                          Haystack : List_Type;
+                          Strict   : Boolean := False)
+                          return String
+                          is ("XXX-330");
+
+   function Array_Fill_Keys (Keys  : String_Array;
+                             Value : Boolean)
+                             return Array_Type
+                             is (Empty_Array);
+
+   function To_List (List : String_Array)
+                     return List_Type
+                     is (Empty_List);
 
 end Wp_Common;

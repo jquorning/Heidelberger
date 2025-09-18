@@ -1,6 +1,17 @@
+--
+-- Dependencies API: Scripts functions
+--
+-- @since 2.6.0
+--
+-- @package WordPress
+-- @subpackage Dependencies
+--
+
+with Arrays;
+
 package Inc_Function_Wp_Scripts
 is
-   procedure Dummy;
+   use Arrays;
 --
 -- Enqueue a script.
 --
@@ -24,6 +35,10 @@ is
 --                                    Default 'false'.
 --
 -- function wp_enqueue_script( handle, src = '', deps = array(), ver = false, in_footer = false ) then
-   procedure Wp_Enqueue_Script (Item : String) is null;
+   procedure Wp_Enqueue_Script (Handle    : String;
+                                Src       : String       := "";
+                                Deps      : String_Array := Empty_String_Array;
+                                Ver       : String       := ""; -- Boolean   := False;
+                                In_Footer : Boolean      := False);
 
 end Inc_Function_Wp_Scripts;

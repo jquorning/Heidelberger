@@ -1,6 +1,17 @@
+--
+-- Dependencies API: Styles functions
+--
+-- @since 2.6.0
+--
+-- @package WordPress
+-- @subpackage Dependencies
+--
+
+with Arrays;
+
 package Inc_Function_Wp_Styles
 is
-   procedure Dummy;
+   use Arrays;
 --
 -- Enqueue a CSS stylesheet.
 --
@@ -25,6 +36,10 @@ is
 --                                 '(orientation: portrait)' and '(max-width: 640px)'.
 --
 -- function wp_enqueue_style( handle, src = '', deps = array(), ver = false, media = 'all' ) then
-   procedure Wp_Enqueue_Style (Item : String) is null;
+   procedure Wp_Enqueue_Style (Handle : String;
+                               Src    : String       := "";
+                               Deps   : String_Array := Empty_String_Array;
+                               Ver    : String       := ""; -- Boolean      := False;
+                               Media  : String       := "all");
 
 end Inc_Function_Wp_Styles;

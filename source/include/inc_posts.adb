@@ -1582,7 +1582,7 @@ is
                             Operator : String     := "and")
                             return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array
    is
-      P : Inc_Class_Wp_Post_Type.Wp_Post_Type_Array := (1 .. 0 => <>);
+      P : constant Inc_Class_Wp_Post_Type.Wp_Post_Type_Array := (1 .. 0 => <>);
    begin
       return P;
    end Get_Post_Types;
