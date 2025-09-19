@@ -172,9 +172,9 @@ function Has_Header_Image
 --
 -- function get_theme_support( feature, ...args ) then
    function Get_Theme_Support (Feature : String;
-                               T       : String)
-                               return Boolean
-                               is (True);
+                               T       : String := "")
+                               return String_Array
+                               is (Empty_String_Array);
 
 --
 -- Returns whether the active theme is a block-based theme or not.

@@ -87,6 +87,30 @@ is
                           is ("XXX-322");
 
 --
+-- Sanitizes a string into a slug, which can be used in URLs or HTML attributes.
+--
+-- By default, converts accent characters to ASCII characters and further
+-- limits the output to alphanumeric characters, underscore (_) and dash (-)
+-- through the then@see "sanitize_title"end; filter.
+--
+-- If `title` is empty and `fallback_title` is set, the latter will be used.
+--
+-- @since 1.0.0
+--
+-- @param string title          The string to be sanitized.
+-- @param string fallback_title Optional. A title to use if title is empty. Default empty.
+-- @param string context        Optional. The operation for which the string is sanitized.
+--                               When set to "save", the string runs through remove_accents().
+--                               Default "save".
+-- @return string The sanitized string.
+--
+   function Sanitize_Title (Title          : String;
+                            Fallback_Title : String := "";
+                            Context        : String := "save")
+                            return String
+                            is ("XXX-341");
+
+--
 -- Checks and cleans a URL.
 --
 -- A number of characters are removed from the URL. If the URL is for displaying
@@ -107,6 +131,22 @@ is
    function ESC_URL (Item : String)
                     return String
                     is ("XXX-324");
+
+--
+-- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
+--
+-- Escapes text strings for echoing in JS. It is intended to be used for inline JS
+-- (in a tag attribute, for example `onclick="..."`). Note that the strings have to
+-- be in single quotes. The then@see "js_escape"end; filter is also applied here.
+--
+-- @since 2.8.0
+--
+-- @param string text The text to be escaped.
+-- @return string Escaped text.
+--
+   function Esc_Js (Text : String)
+                    return String
+                    is ("XXX-341");
 
 --
 -- Escaping for HTML blocks.
@@ -133,6 +173,25 @@ is
    function ESC_Attr (Item : String)
                       return String
                       is ("XXX-325");
+
+--
+-- Appends a trailing slash.
+--
+-- Will remove trailing forward and backslashes if it exists already before adding
+-- a trailing forward slash. This prevents double slashing a string or path.
+--
+-- The primary use of this is for paths and thus should be used for paths. It is
+-- not restricted to paths and offers no specific path support.
+--
+-- @since 1.2.0
+--
+-- @param string string What to add the trailing slash to.
+-- @return string String with trailing slash added.
+--
+   function Trailingslashit (Item : String)
+                             return String
+                             is ("XXX-335");
+
 --
 -- Removes slashes from a string or recursively removes slashes from strings within an array.
 --

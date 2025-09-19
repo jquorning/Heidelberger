@@ -6,10 +6,14 @@
 -- @subpackage Users
 --
 
+with Arrays;
+
 with Inc_Class_Wp_Users;
 
 package Inc_Users
 is
+   use Arrays;
+
    procedure Dummy;
 --
 -- Retrieves user option that can be either per Site or per Network.
@@ -35,6 +39,36 @@ is
                              Deprecated : String := "")
                              return Boolean
                              is (True);
+
+--
+-- Gets the current user"s ID.
+--
+-- @since MU (3.0.0)
+--
+-- @return int The current user"s ID, or 0 if no user is logged in.
+--
+   function Get_Current_User_Id
+            return Integer
+            is (1);
+
+--
+-- Gets the sites a user belongs to.
+--
+-- @since 3.0.0
+-- @since 4.7.0 Converted to use `get_sites()`.
+--
+-- @global wpdb wpdb WordPress database abstraction object.
+--
+-- @param int  user_id User ID
+-- @param bool all     Whether to retrieve all sites, or only sites that are not
+--                      marked as deleted, archived, or spam.
+-- @return object[] A list of the user"s sites. An empty array if the user doesn"t exist
+--                  or belongs to no sites.
+--
+   function Get_Blogs_Of_User (User_Id   : Integer;
+                               All_Sites : Boolean := False)
+                               return String_Array
+                               is (Empty_String_Array);
 
 --
 -- Retrieves the current user object.

@@ -25,8 +25,8 @@ with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Formatting;
 with Inc_Functions;
-with Inc_Function_Wp_Scripts;
-with Inc_Function_Wp_Styles;
+with Inc_Functions_Wp_Scripts;
+with Inc_Functions_Wp_Styles;
 with Inc_Pluggables;
 with Inc_Posts;
 
@@ -77,8 +77,8 @@ is
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;
-      use Inc_Function_Wp_Scripts;
-      use Inc_Function_Wp_Styles;
+      use Inc_Functions_Wp_Scripts;
+      use Inc_Functions_Wp_Styles;
       use Inc_Posts;
 --
 --  @global string       $post_type

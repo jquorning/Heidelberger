@@ -2676,7 +2676,7 @@ is
             end if;
          end;
          if
-           Get_Theme_Support ("custom-header", "video") and then
+           not Get_Theme_Support ("custom-header", "video").Is_Empty and then
            Has_Header_Video
          then
             declare

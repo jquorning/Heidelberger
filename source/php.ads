@@ -91,7 +91,8 @@ is
                       return Boolean is (False);
    function Ltrim (Item : String; Xx : String) return String is (Item);
 
-   function Trim (Item : String; Xx : String) return String is (Item);
+   function Trim (Item : String; Characters : String := "")
+                  return String is (Item);
 
    function Explode (Item  : String;
                      Table : Array_Type)
@@ -199,4 +200,7 @@ is
                         return Integer
                         is (1);
 
+   function Is_Numeric (Value : String)
+                        return Boolean
+                        is (False);
 end Php;

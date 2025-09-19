@@ -11,6 +11,7 @@ with AWS.Server;
 
 with Inc_Class_Wp_Scripts;
 -- with Inc_Class_Wp_Dependencies;
+with Inc_Class_Wp_Admin_Bar;
 
 with Adm_Menu_Header;
 

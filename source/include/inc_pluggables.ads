@@ -80,4 +80,19 @@ is
                                        Query_Arg : String := "_wpnonce")
                                        is null;
 
+        --
+        -- Determines whether the current visitor is a logged in user.
+        --
+        -- For more information on this and similar theme functions, check out
+        -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+        -- Conditional Tagsend; article in the Theme Developer Handbook.
+        --
+        -- @since 2.0.0
+        --
+        -- @return bool True if user is logged in, false if not logged in.
+        --
+        function Is_User_Logged_In
+           return Boolean
+           is (True);
+
 end Inc_Pluggables;

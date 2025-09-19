@@ -14,7 +14,7 @@ with Inc_Functions_Wp_Scripts;
 with Hb_Common;
 with Php;
 
-package body Inc_Function_Wp_Styles
+package body Inc_Functions_Wp_Styles
 is
    use Inc_Class_Wp_Styles;
    use Hb_Common;
@@ -254,4 +254,4 @@ is
 --         return wp_styles().add_data( handle, key, value );
 -- end;
 
-end Inc_Function_Wp_Styles;
+end Inc_Functions_Wp_Styles;

@@ -342,7 +342,7 @@ is
 
    function Get_Userdata (Id : Integer) return User_Type;
 
-   function Get_Current_User_Id return Integer is (1);
+--   function Get_Current_User_Id return Integer is (1);
    function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean
       is (True);
 

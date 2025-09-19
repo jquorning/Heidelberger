@@ -9,7 +9,7 @@
 
 with Arrays;
 
-package Inc_Function_Wp_Styles
+package Inc_Functions_Wp_Styles
 is
    use Arrays;
 --
@@ -42,4 +42,4 @@ is
                                Ver    : String       := ""; -- Boolean      := False;
                                Media  : String       := "all");
 
-end Inc_Function_Wp_Styles;
+end Inc_Functions_Wp_Styles;

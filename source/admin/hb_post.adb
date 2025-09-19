@@ -21,11 +21,12 @@ with HB_Common;
 with Adi_Posts;
 with Inc_Capabilities;
 with Inc_Functions;
-with Inc_Function_Wp_Scripts;
+with Inc_Functions_Wp_Scripts;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Pluggables;
 with Inc_Posts;
+with Inc_Users;
 
 -- WordPress Administration Bootstrap
 -- require_once __DIR__ . '/admin.php';
@@ -44,7 +45,7 @@ is
    is
       use Adi_Posts;
       use Inc_Capabilities;
-      use Inc_Function_Wp_Scripts;
+      use Inc_Functions_Wp_Scripts;
       use Inc_Posts;
 
       Parent_File   : Unbounded_String := +"edit.php";
@@ -482,6 +483,8 @@ is
                Inc_Pluggables.Check_Admin_Referer ("toggle-custom-fields",
                                                    "toggle-custom-fields-nonce");
                declare
+                  use Inc_Users;
+
                   Current_User_Id : constant Integer := Get_Current_User_Id; -- ();
                begin
                   if 0 /= Current_User_Id then

@@ -19,6 +19,18 @@ is
    procedure Wp_Load_Translations_Early;
 
 --
+-- Determines if SSL is used.
+--
+-- @since 2.6.0
+-- @since 4.6.0 Moved from functions.php to load.php.
+--
+-- @return bool True if SSL, otherwise false.
+--
+function Is_Ssl
+         return Boolean
+         is (False);
+
+--
 -- Determines whether the current request is for an administrative interface page.
 --
 -- Does not check if the user is an administrator; use current_user_can()
@@ -38,6 +50,45 @@ is
             return Boolean;
 
 --
+-- Determines whether the current request is for the network administrative interface.
+--
+-- e.g. `/wp-admin/network/`
+--
+-- Does not check if the user is an administrator; use current_user_can()
+-- for checking roles and capabilities.
+--
+-- Does not check if the site is a Multisite network; use is_multisite()
+-- for checking if Multisite is enabled.
+--
+-- @since 3.1.0
+--
+-- @global WP_Screen current_screen WordPress current screen object.
+--
+-- @return bool True if inside WordPress network administration pages.
+--
+   function Is_Network_Admin
+            return Boolean
+            is (True);
+
+--
+-- Determines whether the current request is for a user admin screen.
+--
+-- e.g. `/wp-admin/user/`
+--
+-- Does not check if the user is an administrator; use current_user_can()
+-- for checking roles and capabilities.
+--
+-- @since 3.1.0
+--
+-- @global WP_Screen current_screen WordPress current screen object.
+--
+-- @return bool True if inside WordPress user administration pages.
+--
+   function Is_User_Admin
+            return Boolean
+            is (True);
+
+--
 -- If Multisite is enabled.
 --
 -- @since 3.0.0
@@ -46,6 +97,19 @@ is
 --
    function Is_Multisite
             return Boolean;
+
+--
+-- Retrieve the current site ID.
+--
+-- @since 3.1.0
+--
+-- @global int blog_id
+--
+-- @return int Site ID.
+--
+   function Get_Current_Blog_Id
+            return Integer
+            is (1);
 
 --
 -- Checks whether the given variable is a WordPress Error.

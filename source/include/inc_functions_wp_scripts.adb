@@ -7,9 +7,17 @@
 -- @subpackage Dependencies
 --
 
+with Hb_Common;
+with Php;
+
+with Inc_Class_Wp_Dependencies;
+with Inc_Class_Wp_Dependency;
+with Inc_Class_Wp_Scripts;
+
 package body Inc_Functions_Wp_Scripts
 is
-
+   use Hb_Common;
+   use Php;
 -- --
 -- -- Initialize wp_scripts if it has not been set.
 -- --
@@ -350,6 +358,51 @@ is
 -- -- @param bool             in_footer Optional. Whether to enqueue the script before `</body>` instead of in the `<head>`.
 -- --                                    Default "false".
 -- --
+
+   -----------------------
+   -- Wp_Enqueue_Script --
+   -----------------------
+
+-- function wp_enqueue_script( handle, src = '', deps = array(), ver = false, in_footer = false ) then
+   procedure Wp_Enqueue_Script (Handle    : String;
+                                Src       : String       := "";
+                                Deps      : String_Array := Empty_String_Array;
+                                Ver       : String       := ""; -- Boolean    := False;
+                                In_Footer : Boolean      := False)
+   is
+      use Inc_Class_Wp_Scripts;
+      use Inc_Class_Wp_Dependencies;
+      use Inc_Class_Wp_Dependency;
+      use Inc_Functions_Wp_Scripts;
+      use String_Vectors;
+   begin
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
+      declare
+         Scripts : Wp_Scripts := X_Construct; -- wp_scripts();
+      begin
+         if Src /= "" or else In_Footer then
+            declare
+               X_Handle : constant List_Type := Explode ("?", Handle);
+               Unused   : Boolean;
+            begin
+               if Src /= "" then
+                  Unused := Inc_Class_Wp_Dependencies.Add
+                    (Wp_Dependencies (Scripts),
+                     -(X_Handle.First_Element), Src, Deps, Ver); -- (0)
+               end if;
+
+               if In_Footer then
+                  Unused := Inc_Class_Wp_Dependencies.Add_Data
+                    (Wp_Dependencies (Scripts),
+                     -(X_Handle.First_Element), "group", "1"); -- (0), 1 -> "1"
+               end if;
+            end;
+         end if;
+         Scripts.Enqueue (To_Vector (New_Item => Handle,
+                                     Length   => 1));
+      end;
+   end Wp_Enqueue_Script;
+
 -- function wp_enqueue_script( handle, src = "", deps = array(), ver = false, in_footer = false ) then
 --         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__, handle );
 
