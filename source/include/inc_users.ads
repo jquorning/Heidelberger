@@ -9,6 +9,7 @@
 with Arrays;
 
 with Inc_Class_Wp_Users;
+with Inc_Class_Wp_Admin_Bar;
 
 package Inc_Users
 is
@@ -41,6 +42,22 @@ is
                              is (True);
 
 --
+-- Finds out whether a user is a member of a given blog.
+--
+-- @since MU (3.0.0)
+--
+-- @global wpdb wpdb WordPress database abstraction object.
+--
+-- @param int user_id Optional. The unique ID of the user. Defaults to the current user.
+-- @param int blog_id Optional. ID of the blog to check. Defaults to the current site.
+-- @return bool
+--
+   function Is_User_Member_Of_Blog (User_Id : Integer := 0;
+                                    Blog_Id : Integer := 0)
+                                    return Boolean
+                                    is (True);
+
+--
 -- Gets the current user"s ID.
 --
 -- @since MU (3.0.0)
@@ -67,8 +84,8 @@ is
 --
    function Get_Blogs_Of_User (User_Id   : Integer;
                                All_Sites : Boolean := False)
-                               return String_Array
-                               is (Empty_String_Array);
+                               return Inc_Class_Wp_Admin_Bar.Blog_List -- String_Array
+                               is (Inc_Class_Wp_Admin_Bar.Empty_Blog_List); -- (Empty_String_Array);
 
 --
 -- Retrieves the current user object.

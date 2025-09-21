@@ -9,16 +9,22 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
--- with Hb_Common;
 
 package Inc_Class_Wp_Posts
 is
    use Ada.Strings.Unbounded;
    use Arrays;
- --  use Hb_Common;
 
    function To_Us (Item : String) return Unbounded_String
       renames To_Unbounded_String;
+
+   type Property_Type is
+      record
+         Taxonomy : Unbounded_String;
+         Term_Id  : Integer;
+      end record;
+
+   Null_Property_Type : constant Property_Type := (Null_Unbounded_String, 0);
 --
 -- Core class used to implement the WP_Post object.
 --
@@ -233,7 +239,11 @@ type Wp_Post is tagged
         -- @var string
         --
         Filter : Unbounded_String;
-end record;
+
+         -- Added by jq
+         Dyn : Property_Type;
+
+      end record;
 
         --
         -- Retrieve WP_Post instance.
@@ -305,5 +315,9 @@ end record;
         --
         function To_Array (Post : Wp_Post)
                           return Array_Type;
+
+   Null_Post : constant Wp_Post :=
+     (Id => 0, Post_Parent => 0, Menu_Order => 0, Dyn => Null_Property_Type,
+      others => Null_Unbounded_String);
 
 end Inc_Class_Wp_Posts;

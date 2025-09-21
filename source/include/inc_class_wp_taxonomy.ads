@@ -40,7 +40,7 @@ is
         -- @since 4.7.0
         -- @var stdClass
         --
-        Labels : List_Type;
+        Labels : Array_Type; -- List_Type;
 
         --
         -- Default labels.
@@ -64,7 +64,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public -- public = true;
+        Public : Boolean := True;
 
         --
         -- Whether the taxonomy is -- publicly queryable.
@@ -72,7 +72,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public -- publicly_queryable = true;
+        Publicly_Queryable : Boolean := True;
 
         --
         -- Whether the taxonomy is hierarchical.
@@ -106,7 +106,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public show_in_nav_menus = true;
+        Show_In_Nav_Menus : Boolean := True;
 
         --
         -- Whether to list the taxonomy in the tag cloud widget controls.
@@ -114,7 +114,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public show_tagcloud = true;
+        Show_Tagcloud : Boolean := True;
 
         --
         -- Whether to show the taxonomy in the quick/bulk edit panel.
@@ -122,7 +122,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public show_in_quick_edit = true;
+        Show_In_Quick_Edit : Boolean := True;
 
         --
         -- Whether to display a column for the taxonomy on its post type listing screens.
@@ -130,7 +130,7 @@ is
         -- @since 4.7.0
         -- @var bool
         --
-        -- public show_admin_column = false;
+        Show_Admin_Column : Boolean := False;
 
         --
         -- The callback function for the meta box display.
@@ -198,7 +198,7 @@ is
         -- @since 4.7.4
         -- @var bool show_in_rest
         --
-        -- public show_in_rest;
+        Show_In_Rest : Boolean;
 
         --
         -- The base path for this taxonomy's REST API endpoints.
@@ -272,6 +272,23 @@ is
         -- public _builtin;
 
    end record;
+
+   Null_Taxonomy : constant Wp_Taxonomy :=
+      (Labels             => Empty_Array, -- Empty_List,
+       Show_Admin_Column  => False,
+       Show_In_Quick_Edit => False,
+       Show_Tagcloud      => False,
+       Show_In_Nav_Menus  => False,
+       Show_In_Menu       => False,
+       Show_Ui            => False,
+       Hierarchical       => False,
+       Publicly_Queryable => False,
+       Public             => False,
+       Cap                => Empty_Array,
+       Object_Type        => Empty_String_Array,
+       Show_In_Rest       => False,
+       Args               => Empty_Array,
+       others             => Null_Unbounded_String);
 
    procedure Dummy;
 

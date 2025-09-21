@@ -1,4 +1,8 @@
-package L10n is
+with Arrays;
+
+package L10n
+is
+   use Arrays;
 
    function "abs" (Item : String) return String;
    function Plural (Single : String; Plural : String; Argument : String) return String;
@@ -16,4 +20,9 @@ package L10n is
                                     Path   : String)
                                     return String
                                     is ("XXX-311");
+
+   function N_N_Noop (Arg_1, Arg_2 : String)
+                      return Array_type
+                      is (Empty_Array);
+
 end L10n;

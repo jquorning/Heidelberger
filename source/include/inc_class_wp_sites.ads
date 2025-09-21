@@ -47,7 +47,7 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Blog_Id : Unbounded_String;
+        Blog_Id : Integer; -- Unbounded_String;
 
         --
         -- Domain of the site.
@@ -159,6 +159,6 @@ is
 
       end record;
 
-   Null_Site : constant Wp_Site := (others => Null_Unbounded_String);
+   Null_Site : constant Wp_Site := (Blog_Id => 0, others => Null_Unbounded_String);
 
 end Inc_Class_Wp_Sites;

@@ -19,9 +19,22 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
 
+   type Blog_Type is
+      record
+         Userblog_Id : Integer;
+         Blogname    : Unbounded_String;
+      end record;
+
+   package Blog_Vectors is new
+      Ada.Containers.Vectors (Index_Type   => Positive,
+                              Element_Type => Blog_Type);
+
+   subtype Blog_List is Blog_Vectors.Vector;
+   Empty_Blog_List : constant Blog_List := Blog_Vectors.Empty_Vector;
+
    type User_Type is
       record
-         Blogs          : String_Array;
+         Blogs          : Blog_List; -- Blog_Vectors.Vector; -- String_Array;
          Active_Blog    : Inc_Class_Wp_Sites.Wp_Site;
          Domain         : Unbounded_String;
          Account_Domain : Unbounded_String;

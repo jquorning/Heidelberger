@@ -6,9 +6,12 @@
 -- @since 4.6.0
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+
+-- with Inc_Posts; -- circular
 
 package Inc_Class_Wp_Post_Type
 is
@@ -54,7 +57,7 @@ is
         -- @since 4.6.0
         -- @var stdClass labels
         --
-        -- public labels;
+        Labels : Array_Type;
 
         --
         -- Default labels.
@@ -72,7 +75,7 @@ is
         -- @since 4.6.0
         -- @var string description
         --
-        -- public description = "";
+        Description : Unbounded_String;
 
         --
         -- Whether a post type is intended for use -- publicly either via the admin interface or by front-end users.
@@ -85,7 +88,7 @@ is
         -- @since 4.6.0
         -- @var bool -- public
         --
-        -- public -- public = false;
+        Public : Boolean := False;
 
         --
         -- Whether the post type is hierarchical (e.g. page).
@@ -95,7 +98,7 @@ is
         -- @since 4.6.0
         -- @var bool hierarchical
         --
-        -- public hierarchical = false;
+        Hierarchical : Boolean := False;
 
         --
         -- Whether to exclude posts with this post type from front end search
@@ -106,10 +109,11 @@ is
         -- @since 4.6.0
         -- @var bool exclude_from_search
         --
-        -- public exclude_from_search = null;
+        Exclude_From_Search : Boolean := False; --  = null;
 
         --
-        -- Whether queries can be performed on the front end for the post type as part of `parse_request()`.
+        -- Whether queries can be performed on the front end for the post type as
+        --  part of `parse_request()`.
         --
         -- Endpoints would include:
         --
@@ -122,7 +126,7 @@ is
         -- @since 4.6.0
         -- @var bool -- publicly_queryable
         --
-        -- public -- publicly_queryable = null;
+        Publicly_Queryable : Boolean := False; --  = null;
 
         --
         -- Whether to generate and allow a UI for managing this post type in the admin.
@@ -132,13 +136,15 @@ is
         -- @since 4.6.0
         -- @var bool show_ui
         --
-        -- public show_ui = null;
+        Show_Ui : Boolean := False; --  = null;
 
         --
         -- Where to show the post type in the admin menu.
         --
-        -- To work, show_ui must be true. If true, the post type is shown in its own top level menu. If false, no menu is
-        -- shown. If a string of an existing top level menu ("tools.php" or "edit.php?post_type=page", for example), the
+        -- To work, show_ui must be true. If true, the post type is shown in its own
+        -- top level menu. If false, no menu is
+        -- shown. If a string of an existing top level menu ("tools.php" or
+        -- "edit.php?post_type=page", for example), the
         -- post type will be placed as a sub-menu of that.
         --
         -- Default is the value of show_ui.
@@ -158,7 +164,7 @@ is
         -- @since 4.6.0
         -- @var bool show_in_nav_menus
         --
-        -- public show_in_nav_menus = null;
+        Show_In_Nav_Menus : Boolean := False; --  = null;
 
         --
         -- Makes this post type available via the admin bar.
@@ -168,7 +174,7 @@ is
         -- @since 4.6.0
         -- @var bool show_in_admin_bar
         --
-        -- public show_in_admin_bar = null;
+        Show_In_Admin_Bar : Boolean := False; -- = null;
 
         --
         -- The position in the menu order the post type should appear.
@@ -183,9 +189,12 @@ is
         --
         -- The URL or reference to the icon to be used for this menu.
         --
-        -- Pass a base64-encoded SVG using a data URI, which will be colored to match the color scheme.
-        -- This should begin with "data:image/svg+xml;base64,". Pass the name of a Dashicons helper class
-        -- to use a font icon, e.g. "dashicons-chart-pie". Pass "none" to leave div.wp-menu-image empty
+        -- Pass a base64-encoded SVG using a data URI, which will be colored to match
+        -- the color scheme.
+        -- This should begin with "data:image/svg+xml;base64,". Pass the name of a
+        -- Dashicons helper class
+        -- to use a font icon, e.g. "dashicons-chart-pie". Pass "none" to leave
+        -- div.wp-menu-image empty
         -- so an icon can be added via CSS.
         --
         -- Defaults to use the posts icon.
@@ -283,7 +292,7 @@ is
         -- @since 4.6.0
         -- @var bool delete_with_user
         --
-        -- public delete_with_user = null;
+        Delete_With_User : Boolean := False; -- = null;
 
         --
         -- Array of blocks to use as the default initial state for an editor session.
@@ -371,7 +380,7 @@ is
         -- @since 4.7.4
         -- @var bool show_in_rest
         --
-        -- public show_in_rest;
+        Show_In_Rest : Boolean;
 
         --
         -- The base path for this post type"s REST API endpoints.
@@ -409,8 +418,96 @@ is
         --
         -- public rest_controller;
 
-   end record;
+      end record;
 
-   type Wp_Post_Type_Array is array (Positive range <>) of Wp_Post_Type;
+        --
+        -- Constructor.
+        --
+        -- See the register_post_type() function for accepted arguments for `args`.
+        --
+        -- Will populate object properties from the provided arguments and assign other
+        -- default properties based on that information.
+        --
+        -- @since 4.6.0
+        --
+        -- @see register_post_type()
+        --
+        -- @param string       post_type Post type key.
+        -- @param array|string args      Optional. Array or string of arguments for registering a post type.
+        --                                Default empty array.
+        --
+--        function X_Construct (Post_Type : String;
+--                              Args      : Inc_Posts.Args_Type) -- = array() )
+--                              return Wp_Post_Type;
+
+        --
+        -- Sets the features support for the post type.
+        --
+        -- @since 4.6.0
+        --
+        procedure Add_Supports (This : in out Wp_Post_Type) is null;
+
+        --
+        -- Adds the necessary rewrite rules for the post type.
+        --
+        -- @since 4.6.0
+        --
+        -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+        -- @global WP         wp         Current WordPress environment instance.
+        --
+        procedure Add_Rewrite_Rules (This : in out Wp_Post_Type) is null;
+
+        --
+        -- Registers the post type meta box if a custom callback was specified.
+        --
+        -- @since 4.6.0
+        --
+        procedure Register_Meta_Boxes (This : in out Wp_Post_Type) is null;
+
+        --
+        -- Adds the future post hook action for the post type.
+        --
+        -- @since 4.6.0
+        --
+        procedure Add_Hooks (This : in out Wp_Post_Type) is null;
+
+        --
+        -- Registers the taxonomies for the post type.
+        --
+        -- @since 4.6.0
+        --
+        procedure Register_Taxonomies (This : in out Wp_Post_Type) is null;
+
+   Null_Post_Type : constant Wp_Post_Type :=
+     (Labels              => Empty_Array,
+      Show_Ui             => False, --  = null;
+      Publicly_Queryable  => False, --  = null;
+      Exclude_From_Search => False, --  = null;
+      Hierarchical      => False,
+      Public            => False,
+      Menu_Position     => 0, -- null;
+      Show_In_Admin_Bar => False, -- = null;
+      Show_In_Nav_Menus => False, --  = null;
+      Show_In_Menu_Bool => False,
+      Show_In_Rest      => False,
+      Cap               => Empty_Array,
+      Delete_With_User  => False, -- = null;
+      Can_Export        => False,
+      Map_Meta_Cap      => False,
+      others            => Null_Unbounded_String);
+
+   package Post_Type_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Wp_Post_Type);
+   subtype Wp_Post_Type_Array is Post_Type_maps.Map;
+
+-- type Wp_Post_Type_Array is array (Positive range <>) of Wp_Post_Type;
+        --
+        -- Resets the cache for the default labels.
+        --
+        -- @since 6.0.0
+        --
+        -- public static
+   procedure Reset_Default_Labels is null;
 
 end Inc_Class_Wp_Post_Type;

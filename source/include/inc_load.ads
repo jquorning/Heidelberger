@@ -89,6 +89,24 @@ function Is_Ssl
             is (True);
 
 --
+-- Determines whether the current request is for a site"s administrative interface.
+--
+-- e.g. `/wp-admin/`
+--
+-- Does not check if the user is an administrator; use current_user_can()
+-- for checking roles and capabilities.
+--
+-- @since 3.1.0
+--
+-- @global WP_Screen current_screen WordPress current screen object.
+--
+-- @return bool True if inside WordPress site administration pages.
+--
+   function Is_Blog_Admin
+            return Boolean
+            is (True);
+
+--
 -- If Multisite is enabled.
 --
 -- @since 3.0.0
@@ -112,6 +130,19 @@ function Is_Ssl
             is (1);
 
 --
+-- Is WordPress in Recovery Mode.
+--
+-- In this mode, plugins or themes that cause WSODs will be paused.
+--
+-- @since 5.2.0
+--
+-- @return bool
+--
+   function Wp_Is_Recovery_Mode
+            return Boolean
+            is (False);
+
+--
 -- Checks whether the given variable is a WordPress Error.
 --
 -- Returns whether `$thing` is an instance of the `WP_Error` class.
@@ -123,5 +154,15 @@ function Is_Ssl
 --
    function Is_Wp_Error (Thing : String)
                          return Boolean is (False);
+
+--
+-- @since 5.0.0
+--
+-- @return bool True if `Accepts` or `Content-Type` headers contain `application/json`.
+--              False otherwise.
+--
+   function Wp_Is_Json_Request
+            return Boolean
+            is (False);
 
 end Inc_Load;

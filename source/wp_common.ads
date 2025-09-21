@@ -1,5 +1,6 @@
 with Arrays;
 
+with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
@@ -71,5 +72,9 @@ is
    function To_List (List : String_Array)
                      return List_Type
                      is (Empty_List);
+
+   function Is_Object (Admin_Bar : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
+                      return Boolean
+                      is (True);
 
 end Wp_Common;

@@ -83,8 +83,7 @@ is
               +(if This.User.Active_Blog = Null_Site
                 then User_Admin_Url
                 else Trailingslashit (
-                        Get_Home_Url (Integer'Value
-                                       (-This.User.Active_Blog.Blog_Id))));
+                        Get_Home_Url (-This.User.Active_Blog.Blog_Id)));
 
             This.User.Account_Domain := this.user.Domain;
          else

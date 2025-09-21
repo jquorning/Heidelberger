@@ -14,13 +14,17 @@ with L10n;
 with Globals;
 with HB_Common;
 
+with Adi_Class_Wp_Screens;
+with Adi_Screens;
+
 with Inc_Capabilities;
+with Inc_Class_Wp_Taxonomy;
+with Inc_Class_Wp_Terms;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_Taxonomys;
-with Inc_Class_Wp_Taxonomy;
-with Inc_Class_Wp_Terms;
+with Inc_Link_Templates;
 with Inc_Options;
 with Inc_Pluggables;
 
@@ -45,6 +49,7 @@ is
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
+      use Adi_Screens;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions_Wp_Scripts;
@@ -112,9 +117,12 @@ is
                                                                "_per_page"))));
 
          Get_Current_Screen.Set_Screen_Reader_Content (
-            To_Array (List =>
-               (Build ("heading_pagination", Get (Tax.Labels, "items_list_navigation")),
-                Build ("heading_list",       Get (Tax.Labels, "items_list")))));
+            Arrays.To_Array ((
+               Build ("heading_pagination",
+                      String'(Get (Tax.Labels, "items_list_navigation"))),
+               Build ("heading_list",
+                      String'(Get (Tax.Labels, "items_list")))
+            )));
 
 --               Location := False;
          Referer  := +Wp_Get_Referer; -- ();
@@ -230,6 +238,7 @@ is
 
             declare
                use Inc_Formatting;
+               use Inc_Link_Templates;
 
                Taxonomy : Unbounded_String;
                Term_Id  : constant Integer   := Integer'Value (Get (X_REQUEST, "tag_ID"));
@@ -298,7 +307,7 @@ is
             Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
             declare
-               Screen : Screen_Id  := Get_Current_Screen.Id;
+               Screen : String := -Get_Current_Screen.Id;
                Tags   : constant Array_Type := To_Array (Item => Get (X_REQUEST, "delete_tags"));
             begin
                -- This action is documented in wp-admin/edit.php
@@ -449,6 +458,8 @@ is
          -- Also used by the Edit Tag form.
          -- require_once ABSPATH . "wp-admin/includes/edit-tag-messages.php";
          declare
+            use Inc_Link_Templates;
+
             Class : String :=  (if Isset (String'(Get (X_REQUEST, "error")))
                                 then "error" else "updated");
             Import_Link : Unbounded_String;
@@ -595,7 +606,8 @@ is
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_current_screen_id" then
-                     Set ("VAR_edit_tags_current_screen_id", ESC_Attr (Get_Current_Screen.Id'Image));
+                     Set ("VAR_edit_tags_current_screen_id",
+                          ESC_Attr (-Get_Current_Screen.Id));
 
                   elsif Var_Name = "VAR_edit_tags_delete_help" then
                      declare

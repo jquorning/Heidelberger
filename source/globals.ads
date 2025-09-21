@@ -22,4 +22,8 @@ is
 
     Wpdb : Inc_Class_Wpdb.Wpdb_Class;
 
+    XMLRPC_REQUEST : Boolean := True;
+    DOING_AJAX     : Boolean := True;
+    IFRAME_REQUEST : Boolean := True;
+
 end Globals;

@@ -92,12 +92,13 @@ is
    is
       use Inc_Capabilities;
       use Inc_Formatting;
+      use Inc_Updates;
 
 --      Submenu : Submenu_Type;
       Is_Multisite : constant Boolean := Inc_Load.Is_Multisite;
       Cap          : Unbounded_String;
       I            : Natural;
-      Update_Data  : Array_Type;
+      Update_Data  : Update_Counts; -- Array_Type;
       Counts_Total : Integer;
    begin
       Menu (2) := To_Menu (abs "Dashboard", "read", "index.php", "",
@@ -125,8 +126,8 @@ is
             Cap := +"update_languages";
          end if;
 
-         Counts_Total :=
-            Integer'Value (Get_2 (Update_Data, "counts", "total"));
+         Counts_Total := Update_Data.Total;
+--          Integer'Value (Get_2 (Update_Data, "counts", "total"));
 
          Set (Submenu, "index.php", 10,
               Sprintf (
@@ -366,16 +367,17 @@ is
 
          declare
             Count       : Unbounded_String;
-            Update_Date : Array_Type;
+            Update_Date : Update_Counts; -- Array_Type;
          begin
             if not Is_Multisite and then Current_User_Can ("update_themes") then
-               if not Isset (Update_Data) then
+               if True then -- not Isset (Update_Data) then
                   Update_Data := Inc_Updates.Wp_Get_Update_Data;  -- ();
                end if;
 
                declare
-                  Theme_Count : constant String := Get_2 (Update_Data, "counts",
-                                                                       "themes");
+                  Theme_Count : constant String := Natural'Image (Update_Data.Themes);
+--                Theme_Count : constant String := Get_2 (Update_Data, "counts",
+--                                                                     "themes");
                begin
                   Count := +Sprintf (
                      "<span class=""update-plugins count-%s""><span class=""theme-count"">%s</span></span>",
@@ -541,14 +543,15 @@ is
          begin
             declare
                Count        : Unbounded_String;
-               Update_Date  : Array_Type;
+               Update_Date  : Update_Counts; -- Array_Type;
                Plugin_Count : Unbounded_String;
             begin
                if not Is_Multisite and then Current_User_Can ("update_plugins") then
-                  if not Isset (Update_Data) then
+                  if True then -- not Isset (Update_Data) then
                      Update_Data := Inc_Updates.wp_Get_Update_Data; -- ();
                   end if;
-                  Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
+                  Plugin_Count := +Natural'Image (Update_Data.Plugins);
+--                Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
                   Count := +Sprintf (
                      "<span class=""update-plugins count-%s""><span class=""plugin-count"">%s</span></span>",
                      -Plugin_Count,

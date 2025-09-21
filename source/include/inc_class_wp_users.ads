@@ -7,9 +7,20 @@
 -- @since 4.4.0
 --
 
+with Ada.Strings.Unbounded;
+
 package Inc_Class_Wp_Users
 is
+   use Ada.Strings.Unbounded;
+
    procedure Dummy;
+
+   -- By jq
+   type Property_Type is
+      record
+         Display_Name : Unbounded_String;
+         User_Login   : Unbounded_String;
+      end record;
 --
 -- Core class used to implement the WP_User object.
 --
@@ -114,6 +125,20 @@ is
         --
 --        private static back_compat_keys;
 
+         -- Added by jq
+         Dyn : Property_Type;
+
       end record;
+
+        --
+        -- Determines whether the user exists in the database.
+        --
+        -- @since 3.4.0
+        --
+        -- @return bool True if user exists in the database, false if not.
+        --
+        function Exists (This : Wp_User)
+                         return Boolean
+                         is (True);
 
 end Inc_Class_Wp_Users;

@@ -24,6 +24,8 @@ with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Users;
+with Inc_Link_Templates;
 with Inc_Pluggables;
 with Inc_Posts;
 with Inc_Users;
@@ -82,6 +84,8 @@ is
 --
 -- global post_type, post_type_object, post;
       declare
+         use Inc_Link_Templates;
+
          Post_Type        : String := "";
          Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
          Post             : Inc_Class_Wp_Posts.Wp_Post;
@@ -380,15 +384,19 @@ is
                end if;
 
                declare
+                  use Inc_Pluggables;
+
                   User_Id : constant Integer := Wp_Check_Post_Lock (Post_Id'Image);
                begin
                   if User_Id /= 0 then
                      declare
-                        User : constant User_Type := Get_Userdata (User_Id);
+                        use Inc_Class_Wp_Users;
+
+                        User : constant Wp_User := Get_Userdata (User_Id);
                      begin
                         -- translators: %s: User"s display name.
                         Inc_Functions.Wp_Die
-                           (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", -User.Display_Name));
+                           (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", "XXX-362")); -- -User.Display_Name));
                      end;
                   end if;
 

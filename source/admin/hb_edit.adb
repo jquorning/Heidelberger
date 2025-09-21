@@ -19,6 +19,8 @@ with HB_Common;
 with Wp_Common;
 
 with Adi_Posts;
+with Adi_Class_Wp_Screens;
+with Adi_Screens;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Posts;
@@ -27,6 +29,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_Functions_Wp_Styles;
+with Inc_Link_Templates;
 with Inc_Pluggables;
 with Inc_Posts;
 
@@ -79,6 +82,7 @@ is
       use Inc_Class_Wp_Post_Type;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
+      use Inc_Link_Templates;
       use Inc_Posts;
 --
 --  @global string       $post_type
@@ -330,7 +334,10 @@ is
                         else
 --              when others =>
                            declare
-                              Screen : constant Screen_Id := Get_Current_Screen.Id;
+                              use Adi_Screens;
+
+                              Screen : constant String := -Get_Current_Screen.Id;
+--                              Screen : constant Screen_Id := -Get_Current_Screen.Id;
                            begin
 --
 -- Fires when a custom bulk action should be handled.
@@ -348,7 +355,7 @@ is
 --                            comments, terms, links, plugins, attachments, or users.
 --
                               Sendback := +Apply_Filters
-                                 (Hook_Name => "handle_bulk_actions-" & Screen'Image,
+                                 (Hook_Name => "handle_bulk_actions-" & Screen,
                                   S         => -Sendback,
                                   D         => Doaction,
                                   P         => Post_Ids);
@@ -402,12 +409,14 @@ is
             end if;
 
             declare
+               use Adi_Screens;
+
                --  Used in the HTML title tag.
                Title : String := Wp_Common.Get (Post_Type_Object, "labels.name");
             begin
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
-                        To_Array (List => (
+                        Arrays.To_Array (List => (
                         Build ("id",    "overview"),
                         Build ("title", abs "Overview"),
                         Build ("content",
@@ -481,7 +490,6 @@ is
                 "<p>" & abs "<a href=""https://wordpress.org/support/"">Support</a>" & "</p>"
                   );
                end if;
-            end;
 
             Get_Current_Screen.Set_Screen_Reader_Content (
                To_Array (List => (
@@ -492,6 +500,7 @@ is
                 Build ("heading_list",
                        Wp_Common.Get (Post_Type_Object, "labels.items_list"))
             )));
+            end;
 
             Add_Screen_Option (
                "per_page",

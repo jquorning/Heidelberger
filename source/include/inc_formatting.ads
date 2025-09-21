@@ -193,6 +193,41 @@ is
                              is ("XXX-335");
 
 --
+-- Safely extracts not more than the first count characters from HTML string.
+--
+-- UTF-8, tags and entities safe prefix extraction. Entities inside will--NOT*
+-- be counted as one character. For example &amp; will be counted as 4, &lt; as
+-- 3, etc.
+--
+-- @since 2.5.0
+--
+-- @param string str   String to get the excerpt from.
+-- @param int    count Maximum number of characters to take.
+-- @param string more  Optional. What to append if str needs to be trimmed. Defaults to empty string.
+-- @return string The excerpt.
+--
+   function Wp_Html_Excerpt (Str   : String;
+                             Count : Integer;
+                             More  : String := "") -- = null
+                             return String
+                             is ("XXX-353");
+
+--
+-- Sanitizes a string key.
+--
+-- Keys are used as internal identifiers. Lowercase alphanumeric characters,
+-- dashes, and underscores are allowed.
+--
+-- @since 3.0.0
+--
+-- @param string key String key.
+-- @return string Sanitized key.
+--
+   function Sanitize_Key (Key : String)
+                          return String
+                          is ("XXX-402");
+
+--
 -- Removes slashes from a string or recursively removes slashes from strings within an array.
 --
 -- This should be used to remove slashes from data passed to core API that

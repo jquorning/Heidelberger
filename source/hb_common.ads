@@ -43,7 +43,7 @@ is
 
    function Wp_Get_Referer return String is ("XXX-213");
 
-   function Admin_URL (Item : String) return String;
+--   function Admin_URL (Item : String) return String;
 
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
@@ -84,10 +84,10 @@ is
       record
          Id : Screen_Id;
       end record;
-   type Screen_Access is access all Screen_Type;
-   function Get_Current_Screen return Screen_Access;
-   procedure Add_Help_Tab (Screen : in out Screen_Type; List : Array_Type);
-   procedure Set_Help_Sidebar (Screen : in out Screen_Type; Item : String);
+--   type Screen_Access is access all Screen_Type;
+--   function Get_Current_Screen return Screen_Access;
+--   procedure Add_Help_Tab (Screen : in out Screen_Type; List : Array_Type);
+--   procedure Set_Help_Sidebar (Screen : in out Screen_Type; Item : String);
    procedure Set_Screen_Reader_Content (Screen : in out Screen_Type; List : Array_Type);
 
    procedure Add_Screen_Option;
@@ -175,6 +175,11 @@ is
                            return List_Type
                            is (Empty_List);
 
+   function Apply_Filters (Hook_Name : String;
+                           Arg       : Boolean)
+                           return Boolean
+                           is (True);
+
    procedure Add_Screen_Option (Item : String; List : Array_Type);
 
    function "abs" (List : Array_Type) return String;
@@ -241,8 +246,8 @@ is
                    return Boolean
                    is (False);
 
-   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String)
-                               return String;
+--   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String)
+--                               return String;
    function Wp_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type)
                             return Boolean
                             is (True);
@@ -335,12 +340,12 @@ is
    function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
      is (Empty_Array);
 
-   type User_Type is
-      record
-         Display_Name : Unbounded_String;
-      end record;
+--   type User_Type is
+--      record
+--         Display_Name : Unbounded_String;
+--      end record;
 
-   function Get_Userdata (Id : Integer) return User_Type;
+--   function Get_Userdata (Id : Integer) return User_Type;
 
 --   function Get_Current_User_Id return Integer is (1);
    function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean

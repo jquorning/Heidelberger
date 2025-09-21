@@ -1,0 +1,1836 @@
+--
+-- Toolbar API: Top-level Toolbar functionality
+--
+-- @package WordPress
+-- @subpackage Toolbar
+-- @since 3.1.0
+--
+
+with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Strings.Unbounded;
+
+with Arrays;
+with Globals;
+with Hb_Common;
+with L10n;
+with Php;
+with Wp_Common;
+
+with Adi_Class_Wp_Screens;
+with Adi_Screens;
+
+with Inc_Author_Templates;
+with Inc_Class_Wp_Posts;
+with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Recovery_Mode;
+with Inc_Class_Wp_Sites;
+with Inc_Class_Wp_Taxonomy;
+with Inc_Class_Wp_Users;
+with Inc_Comments;
+with Inc_Capabilities;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_General_Templates;
+with Inc_Link_Templates;
+with Inc_Load;
+with Inc_Media;
+with Inc_Ms_Blogs;
+with Inc_Ms_Networks;
+with Inc_Options;
+with Inc_Pluggables;
+with Inc_Plugins;
+with Inc_Posts;
+with Inc_Taxonomys;
+with Inc_Themes;
+with Inc_Updates;
+with Inc_Users;
+
+package body Inc_Admin_Bar
+is
+   use Ada.Strings.Unbounded;
+   use Arrays;
+   use Hb_Common;
+   use L10n;
+   use Wp_Common;
+   use Php;
+   use Inc_Capabilities;
+
+        -- static
+        Rendered : Boolean := False;
+
+--
+-- Instantiates the admin bar object and set it up as a global for access elsewhere.
+--
+-- UNHOOKING THIS FUNCTION WILL NOT PROPERLY REMOVE THE ADMIN BAR.
+-- For that, use show_admin_bar(false) or the then@see "show_admin_bar"end; filter.
+--
+-- @since 3.1.0
+-- @access private
+--
+-- @global WP_Admin_Bar wp_admin_bar
+--
+-- @return bool Whether the admin bar was successfully initialized.
+--
+function X_Wp_Admin_Bar_Init
+         return Boolean
+is
+--        global wp_admin_bar;
+begin
+        if not Is_Admin_Bar_Showing then
+                return False;
+        end if;
+
+        -- Load the admin bar class code ready for instantiation
+--        require_once ABSPATH . WPINC . "/class-wp-admin-bar.php";
+
+        -- Instantiate the admin bar
+
+        --
+        -- Filters the admin bar class to instantiate.
+        --
+        -- @since 3.1.0
+        --
+        -- @param string wp_admin_bar_class Admin bar class to use. Default "WP_Admin_Bar".
+        --
+
+        -- admin_bar_class = apply_filters( "wp_admin_bar_class", "WP_Admin_Bar" );
+        -- if ( class_exists( admin_bar_class ) ) then
+        --         wp_admin_bar = new admin_bar_class;
+        -- end; else then
+        --         return false;
+        -- end;
+
+        X_Wp_Admin_Bar.Initialize;
+        X_Wp_Admin_Bar.Add_Menus;
+
+        return True;
+end X_Wp_Admin_Bar_Init;
+
+--
+-- Renders the admin bar to the page based on the wp_admin_bar.menu member var.
+--
+-- This is called very early on the {@see "wp_body_open"} action so that it will render
+-- before anything else being added to the page body.
+--
+-- For backward compatibility with themes not using the "wp_body_open" action,
+-- the function is also called late on then@see "wp_footer"end;.
+--
+-- It includes the then@see "admin_bar_menu"end; action which should be used to hook in and
+-- add new menus to the admin bar. That way you can be sure that you are adding at most
+-- optimal point, right before the admin bar is rendered. This also gives you access to
+-- the `post` global, among others.
+--
+-- @since 3.1.0
+-- @since 5.4.0 Called on "wp_body_open" action first, with "wp_footer" as a fallback.
+--
+-- @global WP_Admin_Bar wp_admin_bar
+--
+procedure Wp_Admin_Bar_Render
+is
+          use Inc_Plugins;
+--        global wp_admin_bar;
+begin
+        if Rendered then
+                return;
+        end if;
+
+        if not Is_Admin_Bar_Showing or else not Is_Object (X_Wp_Admin_Bar) then
+                return;
+        end if;
+
+        --
+        -- Loads all necessary admin bar items.
+        --
+        -- This is the hook used to add, remove, or manipulate admin bar items.
+        --
+        -- @since 3.1.0
+        --
+        -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance, passed by reference.
+        --
+        Do_Action_Ref_Array ("admin_bar_menu", X_Wp_Admin_Bar); -- &
+
+        --
+        -- Fires before the admin bar is rendered.
+        --
+        -- @since 3.1.0
+        --
+        Do_Action ("wp_before_admin_bar_render");
+
+        X_Wp_Admin_Bar.Render;
+
+        --
+        -- Fires after the admin bar is rendered.
+        --
+        -- @since 3.1.0
+        --
+        Do_Action ("wp_after_admin_bar_render");
+
+        Rendered := True;
+end Wp_Admin_Bar_Render;
+
+--
+-- Adds the WordPress logo menu.
+--
+-- @since 3.3.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Wp_Menu (Admin_Bar : in out Wp_Admin_Bar)
+is
+          use Inc_Load;
+          use Inc_Link_Templates;
+          use Inc_Users;
+
+         About_Url : Unbounded_String;
+begin
+        if Current_User_Can ("read") then
+                about_url := +Self_Admin_Url ("about.php");
+        elsif Is_Multisite then
+                about_url := +Get_Dashboard_Url (get_current_user_id, "about.php");
+        else
+                about_url := +""; -- false;
+        end if;
+
+declare
+        Wp_Logo_Menu_Args : Node_Args; --  := X_Construct;
+       --  Wp_Logo_Menu_Args : Array_Type := Arrays.To_Array ((
+       --          Build ("id",    "wp-logo"),
+       --          Build ("title", "<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "About WordPress" & "</span>"),
+       --          Build ("href",  -About_Url)
+       -- ));
+begin
+       Wp_Logo_Menu_Args.Id    := +"wp-logo";
+       Wp_Logo_Menu_Args.Title := +"<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "About WordPress" & "</span>";
+       Wp_Logo_Menu_Args.Href  := About_Url;
+
+        -- Set tabindex="0" to make sub menus accessible when no URL is available.
+        if About_Url /= "" then
+                Wp_Logo_Menu_Args.meta := arrays.To_Array ((
+                   1 => Build ("tabindex", 0)
+                ));
+        end if;
+
+        Admin_Bar.Add_Node (Wp_Logo_Menu_Args);
+end;
+
+        if About_Url /= "" then
+                -- Add "About WordPress" link.
+             declare
+                Node : Node_Args; -- :=  X_Construct;
+             begin
+                Node.Parent := +"wp-logo";
+                Node.Id     := +"about";
+                Node.Title  := +abs "About WordPress";
+                Node.Href   := About_Url;
+
+                Admin_Bar.Add_Node (Node);
+               --          To_Array ((
+               --                  Build ("parent", "wp-logo"),
+               --                  Build ("id",     "about"),
+               --                  Build ("title",  abs "About WordPress"),
+               --                  Build ("href",   About_Url)
+               --         ))
+               -- );
+             end;
+        end if;
+
+        -- Add WordPress.org link.
+        declare
+           Node : Node_Args;
+        begin
+           Node.Parent := +"wp-logo-external";
+           Node.Id     := +"wporg";
+           Node.Title  := +abs "WordPress.org";
+           Node.Href   := +abs "https://wordpress.org/";
+
+           admin_bar.Add_Node (Node);
+        end;
+
+        -- Add documentation link.
+        declare
+           Node : Node_Args;
+        begin
+           Node.Parent := +"wp-logo-external";
+           Node.Id     := +"documentation";
+           Node.Title  := +abs "Documentation";
+           Node.Href   := +abs "https://wordpress.org/support/";
+
+           admin_bar.Add_Node (Node);
+        end;
+
+        -- Add forums link.
+        declare
+           Node : Node_Args;
+        begin
+           Node.Parent := +"wp-logo-external";
+           Node.Id     := +"support-forums";
+           Node.Title  := +abs "Support";
+           Node.Href   := +abs "https://wordpress.org/support/forums/";
+
+           admin_bar.Add_Node (Node);
+        end;
+
+        -- Add feedback link.
+        declare
+           Node : Node_Args;
+        begin
+           Node.Parent := +"wp-logo-external";
+           Node.Id     := +"feedback";
+           Node.Title  := +abs "Feedback";
+           Node.Href   := +abs "https://wordpress.org/support/forum/requests-and-feedback";
+           admin_bar.Add_Node (Node);
+        end;
+end Wp_Admin_Bar_Wp_Menu;
+
+--
+-- Adds the sidebar toggle button.
+--
+-- @since 3.8.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Sidebar_Toggle (Admin_Bar : in out Wp_Admin_Bar)
+is
+          use Inc_Load;
+begin
+        if Is_Admin then
+           declare
+              Node : Node_Args;
+           begin
+              Node.Id     := +"menu-toggle";
+              Node.Title  := +"<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "Menu" & "</span>";
+              Node.Href   := +"#";
+
+              admin_bar.Add_Node (Node);
+           end;
+        end if;
+end Wp_Admin_Bar_Sidebar_Toggle;
+
+--
+-- Adds the "My Account" item.
+--
+-- @since 3.3.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_My_Account_Item (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Class_Wp_Users;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Pluggables;
+      use Inc_Users;
+
+      User_Id      : Integer := Get_Current_User_Id;
+      Current_User : Wp_User := Wp_Get_Current_User;
+      Profile_Url  : Unbounded_String;
+   begin
+      if User_Id = 0 then
+         return;
+      end if;
+
+      if Current_User_Can ("read") then
+         Profile_Url := +Get_Edit_Profile_Url (User_Id);
+      elsif Is_Multisite then
+         Profile_Url := +Get_Dashboard_Url (User_Id, "profile.php");
+      else
+         Profile_Url := +""; -- false;
+      end if;
+
+      declare
+         Avatar : String := Get_Avatar (User_Id, 26);
+
+         -- translators: %s: Current user"s display name.
+         Howdy : String :=
+            Sprintf (abs "Howdy, %s",
+                     "<span class=""display-name"">"  &
+                     (-Current_User.Dyn.Display_Name) &
+                     "</span>");
+
+         Class : String := (if Empty (Avatar) then "" else "with-avatar");
+         Node  : Node_Args;
+      begin
+         Node.Id     := +"my-account";
+         Node.Parent := +"top-secondary";
+         Node.Title  := +Howdy & Avatar;
+         Node.Href   := Profile_Url;
+         Node.Meta   := Arrays.To_Array ((1 => Build ("class", Class)));
+
+         Admin_Bar.Add_Node (Node);
+      end;
+   end Wp_Admin_Bar_My_Account_Item;
+
+--
+-- Adds the "My Account" submenu items.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_My_Account_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Class_Wp_Users;
+      use Inc_General_Templates;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Pluggables;
+      use Inc_Users;
+
+      User_Id      : Integer := Get_Current_User_Id;
+      Current_User : Wp_User := Wp_Get_Current_User;
+      Profile_Url  : Unbounded_String;
+      User_Info    : Unbounded_String;
+   begin
+      if User_Id = 0 then
+         return;
+      end if;
+
+      if Current_User_Can ("read") then
+         Profile_Url := +Get_Edit_Profile_Url (User_Id);
+      elsif Is_Multisite then
+         Profile_Url := +Get_Dashboard_Url (User_Id, "profile.php");
+      else
+         Profile_Url := +""; -- false;
+      end if;
+
+      declare
+         Node : Node_Args;
+      begin
+         Node.Parent := +"my-account";
+         Node.Id     := +"user-actions";
+
+         Admin_Bar.Add_Group (Node);
+      end;
+
+      User_Info := +Get_Avatar (User_Id, 64);
+      User_Info := User_Info & "<span class=""display-name"">" &
+                               Current_User.Dyn.Display_Name & "</span>";
+
+      if Current_User.Dyn.Display_Name /= Current_User.Dyn.User_Login then
+         User_Info := User_Info & "<span class=""username"">" &
+                      Current_User.Dyn.User_Login & "</span>";
+      end if;
+
+      declare
+         Node : Node_Args;
+      begin
+         Node.Parent := +"user-actions";
+         Node.Id     := +"user-info";
+         Node.Title  := User_Info;
+         Node.Href   := Profile_Url;
+         Node.Meta   := Arrays.To_Array ((1 => Build ("tabindex", -1)));
+
+         Admin_Bar.Add_Node (Node);
+      end;
+
+      if "" /= Profile_Url then
+         declare
+            Node : Node_Args;
+         begin
+            Node.Parent := +"user-actions";
+            Node.Id     := +"edit-profile";
+            Node.Title  := +abs "Edit Profile";
+            Node.Href   := Profile_Url;
+
+            Admin_Bar.Add_Node (Node);
+         end;
+      end if;
+
+      declare
+         Node : Node_Args;
+      begin
+         Node.Parent := +"user-actions";
+         Node.Id     := +"logout";
+         Node.Title  := +abs "Log Out";
+         Node.Href   := +Wp_Logout_Url;
+
+         Admin_Bar.Add_Node (Node);
+      end;
+   end Wp_Admin_Bar_My_Account_Menu;
+
+--
+-- Adds the "Site Name" menu.
+--
+-- @since 3.3.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
+is
+   use Inc_Formatting;
+   use Inc_General_Templates;
+          use Inc_Link_Templates;
+          use Inc_Load;
+          use Inc_Pluggables;
+          use Inc_Users;
+          use Inc_Ms_Networks;
+
+          Blogname : Unbounded_String;
+begin
+        -- Don"t show for logged out users.
+        if not Is_User_Logged_In then
+                return;
+        end if;
+
+        -- Show only when the user is a member of this site, or they"re a super admin.
+        if not Is_User_Member_Of_Blog and then not Current_User_Can ("manage_network") then
+                return;
+        end if;
+
+        Blogname := +Get_Bloginfo ("name");
+
+        if Blogname = "" then
+                Blogname := +Preg_Replace ("#^(https?://)?(www.)?#", "", Get_Home_Url);
+        end if;
+
+        if Is_Network_Admin then
+                -- translators: %s: Site title.
+                blogname := +Sprintf (abs "Network Admin: %s",
+                                      Esc_Html (-Get_Network.Site_Name));
+        elsif Is_User_Admin then
+                -- translators: %s: Site title.
+                blogname := +Sprintf (abs "User Dashboard: %s",
+                                      Esc_Html (-Get_Network.Site_Name));
+        end if;
+
+declare
+        Title : String := Wp_Html_Excerpt (-Blogname, 40, "&hellip;");
+        Node  : Node_Args;
+begin
+        Node.Id    := +"site-name";
+        Node.Title := +Title;
+        Node.Href  := +(if is_admin or else not Current_User_Can ("read")
+                        then Home_Url ("/") else Admin_Url);
+
+        Admin_Bar.Add_Node (Node);
+end;
+        -- Create submenu items.
+
+        if Is_Admin then
+                -- Add an option to visit the site.
+                declare
+                   Node : Node_Args;
+                begin
+                   Node.Parent := +"site-name";
+                   Node.Id     := +"view-site";
+                   Node.Title  := +abs "Visit Site";
+                   Node.Href   := +Home_Url ("/");
+
+                   admin_bar.Add_Node (Node);
+                end;
+
+                if
+                  Is_Blog_Admin and then
+                  Is_Multisite and then
+                  Current_User_Can ("manage_sites")
+                then
+                   declare
+                      Node : Node_Args;
+                   begin
+                      Node.Parent := +"site-name";
+                      Node.Id     := +"edit-site";
+                      Node.Title  := +abs "Edit Site";
+                      Node.Href   := +Network_Admin_Url
+                                        ("site-info.php?id=" &
+                                         Integer'Image (Get_Current_Blog_Id));
+                      admin_bar.Add_Node (Node);
+                   end;
+                end if;
+
+        elsif Current_User_Can ("read") then
+                -- We"re on the front end, link to the Dashboard.
+                declare
+                   Node : Node_Args;
+                begin
+                   Node.Parent := +"site-name";
+                   Node.Id     := +"dashboard";
+                   Node.Title  := +abs "Dashboard";
+                   Node.Href   := +Admin_Url;
+
+                   admin_bar.Add_Node (Node);
+                end;
+
+                -- Add the appearance submenu items.
+                Wp_Admin_Bar_Appearance_Menu (X_wp_admin_bar);
+        end if;
+end Wp_Admin_Bar_Site_Menu;
+
+--
+-- Adds the "Edit site" link to the Toolbar.
+--
+-- @since 5.9.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Edit_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
+is
+          use Inc_Link_Templates;
+          use Inc_Load;
+          use Inc_Themes;
+begin
+        -- Don"t show if a block theme is not activated.
+        if not Wp_Is_Block_Theme then
+                return;
+        end if;
+
+        -- Don"t show for users who can"t edit theme options or when in the admin.
+        if not Current_User_Can ("edit_theme_options") or else Is_Admin then
+                return;
+        end if;
+
+        declare
+           Node : Node_Args;
+        begin
+           Node.Id    := +"site-editor";
+           Node.Title := +abs "Edit site";
+           Node.Href  := +Admin_Url ("site-editor.php");
+
+           Admin_Bar.Add_Node (Node);
+        end;
+end Wp_Admin_Bar_Edit_Site_Menu;
+
+--
+-- Adds the "Customize" link to the Toolbar.
+--
+-- @since 4.3.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+-- @global WP_Customize_Manager wp_customize
+--
+procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar)
+is
+        use Inc_Functions;
+        use Inc_Load;
+        use Inc_Pluggables;
+        use Inc_Plugins;
+        use Inc_Posts;
+        use Inc_Themes;
+        use Globals;
+
+--        global wp_customize;
+        Current_Url   : Unbounded_String;
+        Customize_Url : Unbounded_String;
+begin
+        -- Don't show if a block theme is activated and no plugins use the customizer.
+        if Wp_Is_Block_Theme and then not Has_Action ("customize_register") then
+                return;
+        end if;
+
+        -- Don't show for users who can"t access the customizer or when in the admin.
+        if not Current_User_Can ("customize") or else Is_Admin then
+                return;
+        end if;
+
+        -- Don't show if the user cannot edit a given customize_changeset post currently being previewed.
+        if
+          Is_Customize_Preview and then
+          Wp_Customize.Changeset_Post_Id /= 0 and then
+          not Current_User_Can (Get (Get_Post_Type_Object ("customize_changeset").Cap,
+                                     "edit_post"), wp_customize.Changeset_Post_Id)
+        then
+                return;
+        end if;
+
+        Current_Url := +(if Is_Ssl then "https://" else "http://") &
+                       Get (X_SERVER, "HTTP_HOST") &
+                       Get (X_SERVER, "REQUEST_URI");
+
+        if
+          Is_Customize_Preview and then
+          Wp_Customize.Changeset_Uuid /= ""
+        then
+                Current_Url := +Remove_Query_Arg ("customize_changeset_uuid", -Current_Url);
+        end if;
+
+        Customize_Url := +Add_Query_Arg ("url", Urlencode (-Current_Url),
+                                        Wp_Customize_Url);
+        if Is_Customize_Preview then
+                Customize_Url :=
+                   Add_Query_Arg (Arrays.To_Array
+                     ((1 => Build ("changeset_uuid", -wp_customize.changeset_uuid))),
+                                  Customize_Url);
+        end if;
+
+        declare
+           Node : Node_Args;
+        begin
+           Node.Id    := +"customize";
+           Node.Title := +abs "Customize";
+           Node.Href  := Customize_Url;
+           Node.Meta  := Arrays.To_Array
+              ((1 => Build ("class", "hide-if-no-customize")));
+
+           admin_bar.Add_Node (Node);
+        end;
+
+        Add_Action ("wp_before_admin_bar_render", "wp_customize_support_script");
+end Wp_Admin_Bar_Customize_Menu;
+
+--
+-- Adds the "My Sites/[Site Name]" menu and all submenus.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_My_Sites_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Ada.Containers;
+      use Inc_Class_Wp_Sites;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Pluggables;
+      use Inc_Posts;
+      use Blog_Vectors;
+--      use String_Vectors;
+
+      My_Sites_Url : Unbounded_String;
+      Unused       : Boolean;
+   begin
+      -- Don"t show for logged out users or single site mode.
+      if not Is_User_Logged_In or else not Is_Multisite then
+         return;
+      end if;
+
+      -- Show only when the user has at least one site, or they"re a super admin.
+      if
+        Length (Admin_Bar.User.Blogs) < 1 and then
+        not Current_User_Can ("manage_network")
+      then
+         return;
+      end if;
+
+      if Admin_Bar.User.Active_Blog /= Null_Site then -- "" then
+         My_Sites_Url := +Get_Admin_Url (Admin_Bar.user.active_blog.Blog_Id,
+                                         "my-sites.php");
+      else
+         My_Sites_Url := +Admin_Url ("my-sites.php");
+      end if;
+
+      declare
+         Node : Node_Args;
+      begin
+         Node.Id    := +"my-sites";
+         Node.Title := +abs "My Sites";
+         Node.Href  := My_Sites_Url;
+
+         admin_bar.Add_Node (Node);
+      end;
+
+      if Current_User_Can ("manage_network") then
+         declare
+            Node : Node_Args;
+         begin
+            Node.Parent := +"my-sites";
+            Node.Id     := +"my-sites-super-admin";
+
+            admin_bar.Add_Group (Node);
+         end;
+
+         declare
+            Node : Node_Args;
+         begin
+            Node.parent := +"my-sites-super-admin";
+            Node.id     := +"network-admin";
+            Node.title  := +abs "Network Admin";
+            Node.Href   := +Network_Admin_Url;
+
+            Admin_Bar.Add_Node (Node);
+         end;
+
+         declare
+            Node : Node_Args;
+         begin
+            Node.Parent := +"network-admin";
+            Node.Id     := +"network-admin-d";
+            Node.Title  := +abs "Dashboard";
+            Node.Href   := +Network_Admin_Url;
+
+            Admin_Bar.Add_Node (Node);
+         end;
+
+         if Current_User_Can ("manage_sites") then
+            declare
+               Node : Node_Args;
+            begin
+               Node.Parent := +"network-admin";
+               Node.Id     := +"network-admin-s";
+               Node.Title  := +abs "Sites";
+               Node.Href   := +Network_Admin_Url ("sites.php");
+
+               Admin_Bar.Add_Node (Node);
+            end;
+         end if;
+
+         if Current_User_Can ("manage_network_users") then
+            declare
+               Node : Node_Args;
+            begin
+               Node.Parent := +"network-admin";
+               Node.Id     := +"network-admin-u";
+               Node.Title  := +abs "Users";
+               Node.Href   := +Network_Admin_Url ("users.php");
+
+               Admin_Bar.Add_Node (Node);
+            end;
+         end if;
+
+         if Current_User_Can ("manage_network_themes") then
+            declare
+               Node : Node_Args;
+            begin
+               Node.Parent := +"network-admin";
+               Node.Id     := +"network-admin-t";
+               Node.Title  := +abs "Themes";
+               Node.Href   := +Network_Admin_Url ("themes.php");
+
+               admin_bar.Add_Node (Node);
+            end;
+         end if;
+
+         if Current_User_Can ("manage_network_plugins") then
+            declare
+               Node : Node_Args;
+            begin
+               Node.Parent := +"network-admin";
+               Node.Id     := +"network-admin-p";
+               Node.Title  := +abs "Plugins";
+               Node.Href   := +Network_Admin_Url ("plugins.php");
+
+               Admin_Bar.Add_Node (Node);
+            end;
+         end if;
+
+         if Current_User_Can ("manage_network_options") then
+            declare
+               Node : Node_Args;
+            begin
+               Node.Parent := +"network-admin";
+               Node.Id     := +"network-admin-o";
+               Node.Title  := +abs "Settings";
+               Node.Href   := +Network_Admin_Url ("settings.php");
+
+               Admin_Bar.Add_Node (Node);
+            end;
+         end if;
+      end if;
+
+      -- Add site links.
+      declare
+         Node : Node_Args;
+      begin
+         Node.Parent := +"my-sites";
+         Node.Id     := +"my-sites-list";
+         Node.Meta   :=
+            Arrays.To_Array ((1 => Build ("class",
+                                          (if Current_User_Can ("manage_network")
+                                           then "ab-sub-secondary" else ""))));
+         Admin_Bar.Add_Group (Node);
+      end;
+
+      --
+      -- Filters whether to show the site icons in toolbar.
+      --
+      -- Returning false to this hook is the recommended way to hide site icons in the toolbar.
+      -- A truthy return may have negative performance impact on large multisites.
+      --
+      -- @since 6.0.0
+      --
+      -- @param bool show_site_icons Whether site icons should be shown in the toolbar. Default true.
+      --
+      declare
+         use Inc_Formatting;
+
+         Show_Site_Icons : Boolean :=
+            Apply_Filters ("wp_admin_bar_show_site_icons", True);
+      begin
+
+         for Blog of Admin_Bar.User.Blogs loop -- (array)
+            declare
+               use Inc_General_Templates;
+               use Inc_Media;
+               use Inc_Ms_Blogs;
+
+               Blavatar : Unbounded_String;
+               Blogname : Unbounded_String;
+               Unused   : Boolean;
+            begin
+               Unused := Switch_To_Blog (Blog.Userblog_Id);
+
+               if True = Show_Site_Icons and then Has_Site_Icon then
+                  blavatar := +Sprintf (
+                                "<img class=""blavatar"" src=""%s"" srcset=""%s 2x"" alt="""" width=""16"" height=""16""%s />",
+                                Esc_Url (Get_Site_Icon_Url (16)),
+                                Esc_Url (Get_Site_Icon_Url (32)),
+                                (if Wp_Lazy_Loading_Enabled ("img", "site_icon_in_toolbar") then " loading=""lazy""" else "")
+                       );
+               else
+                  blavatar := +"<div class=""blavatar""></div>";
+               end if;
+
+               Blogname := Blog.Blogname;
+
+               if Blogname = "" then
+                  Blogname := +Preg_Replace ("#^(https?:--)?(www.)?#", "",
+                                             Get_Home_Url);
+               end if;
+
+               declare
+                  Menu_Id : String := "blog-" & Integer'Image (Blog.Userblog_Id);
+               begin
+                  if Current_User_Can ("read") then
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.Parent := +"my-sites-list";
+                        Node.Id     := +Menu_Id;
+                        Node.Title  := blavatar & Blogname;
+                        Node.Href   := +Admin_Url;
+
+                        admin_bar.Add_Node (Node);
+                     end;
+
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.Parent := +Menu_Id;
+                        Node.Id     := +Menu_Id & "-d";
+                        Node.Title  := +abs "Dashboard";
+                        Node.Href   := +Admin_Url;
+
+                        Admin_Bar.Add_Node (Node);
+                     end;
+                  else
+                      declare
+                         Node : Node_Args;
+                      begin
+                         Node.Parent := +"my-sites-list";
+                         Node.Id     := +Menu_Id;
+                         Node.Title  := Blavatar & Blogname;
+                         Node.Href   := +Home_Url;
+
+                         Admin_Bar.Add_Node (Node);
+                     end;
+                  end if;
+
+               if
+                 Current_User_Can (Get (Get_Post_Type_Object ("post").Cap,
+                                        "create_posts"))
+               then
+                  declare
+                     Node : Node_Args;
+                  begin
+                      Node.Parent := +Menu_Id;
+                      Node.Id     := +menu_id & "-n";
+                      Node.Title  := +Get (Get_Post_Type_Object ("post").Labels,
+                                           "new_item");
+                      Node.Href   := +Admin_Url ("post-new.php");
+
+                      Admin_Bar.Add_Node (Node);
+                  end;
+               end if;
+
+               if Current_User_Can ("edit_posts") then
+                  declare
+                     Node : Node_Args;
+                  begin
+                     Node.Parent := +Menu_Id;
+                     Node.Id     := +menu_id & "-c";
+                     Node.Title  := +abs "Manage Comments";
+                     Node.Href   := +Admin_Url ("edit-comments.php");
+
+                     Admin_Bar.Add_Node (Node);
+                  end;
+               end if;
+
+               declare
+                  Node : Node_Args;
+               begin
+                  Node.Parent := +Menu_Id;
+                  Node.Id     := +Menu_Id & "-v";
+                  Node.Title  := +abs "Visit Site";
+                  Node.Href   := +Home_Url ("/");
+
+                  admin_bar.Add_Node (Node);
+               end;
+            end;
+         end;
+
+         declare
+            use Inc_Ms_Blogs;
+
+            Unused : Boolean;
+         begin
+            Unused := Restore_Current_Blog;
+         end;
+         end loop;
+      end;
+   end Wp_Admin_Bar_My_Sites_Menu;
+
+--
+-- Provides a shortlink.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Shortlink_Menu (Admin_Bar : in out Wp_Admin_Bar)
+is
+        use Inc_Formatting;
+        use Inc_Link_Templates;
+
+        short : String := Wp_Get_Shortlink (0, "query");
+        id    : String := "get-shortlink";
+        Html  : Unbounded_String;
+begin
+        if Empty (short) then
+                return;
+        end if;
+
+        html := +"<input class=""shortlink-input"" type=""text"" readonly=""readonly"" value=""" & Esc_Attr (short) & """ aria-label=""" & abs "Shortlink" & """ />";
+
+        declare
+           Node : Node_Args;
+        begin
+           Node.Id    := +Id;
+           Node.Title := +abs "Shortlink";
+           Node.Href  := +Short;
+           Node.Meta  := Arrays.To_Array ((1 => Build ("html", -Html)));
+
+           Admin_Bar.Add_Node (Node);
+        end;
+   end Wp_Admin_Bar_Shortlink_Menu;
+
+--
+-- Provides an edit link for posts and terms.
+--
+-- @since 3.1.0
+-- @since 5.5.0 Added a "View Post" link on Comments screen for a single post.
+--
+-- @global WP_Term  tag
+-- @global WP_Query wp_the_query WordPress Query object.
+-- @global int      user_id      The ID of the user being edited. Not to be confused with the
+--                                global user_ID, which contains the ID of the current user.
+-- @global int      post_id      The ID of the post when editing comments for a single post.
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_Edit_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Adi_Class_Wp_Screens;
+      use Inc_Class_Wp_Terms;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Posts;
+      use Inc_Taxonomys;
+
+--        global tag, wp_the_query, user_id, post_id;
+   begin
+      if Is_Admin then
+         declare
+            use Adi_Screens;
+            use Adi_Class_Wp_Screens;
+            use Inc_Class_Wp_Posts;
+            use Inc_Class_Wp_Post_type;
+            use Inc_Options;
+
+            Current_Screen   : Wp_Screen := Get_Current_Screen;
+            Post             : Wp_Post   := Get_Post;
+            Post_Type_Object : Wp_Post_Type; -- = null;
+         begin
+            if "post" = Current_Screen.Base then
+               Post_Type_Object := Get_Post_Type_Object (-Post.Post_Type);
+            elsif "edit" = current_screen.base then
+               Post_Type_Object := Get_Post_Type_Object (-Current_Screen.Post_Type);
+            elsif "edit-comments" = current_screen.base and then Post_Id /= 0 then
+               Post := Get_Post (Post_Id);
+               if Post = Null_Post then
+                  Post_Type_Object := Get_Post_Type_Object (-Post.Post_Type);
+               end if;
+            end if;
+
+            if ("post" = current_screen.base or else
+                "edit-comments" = Current_Screen.Base)
+                  or else "add" /= current_screen.action
+                  or else (Post_Type_Object /= Null_Post_Type)
+                  or else Current_User_Can ("read_post", Integer (Post.Id))
+                  or else (Post_Type_Object.Public)
+                  or else (Post_Type_Object.Show_In_Admin_Bar)
+            then
+               if "draft" = post.Post_Status then
+                  declare
+                     use Inc_Formatting;
+
+                     Preview_Link : String := Get_Preview_Post_Link (Post);
+                     Node : Node_Args;
+                  begin
+                     Node.Id    := +"preview";
+                     Node.Title := +Get (Post_Type_Object.Labels, "view_item");
+                     Node.Href  := +Esc_Url (Preview_Link);
+                     Node.Meta  :=
+                        Arrays.To_Array ((1 =>
+                           Build ("target",
+                                  "wp-preview-" & "XXX-451"))); --"Post_Id'Image (Post.Id))));
+
+                     admin_bar.Add_Node (Node);
+                  end;
+               else
+                  declare
+                     Node : Node_Args;
+                  begin
+                     Node.Id    := +"view";
+                     Node.Title := +Get (Post_Type_Object.Labels, "view_item");
+                     Node.Href  := +Get_Permalink (Integer (Post.Id));
+
+                     Admin_Bar.Add_Node (Node);
+                  end;
+               end if;
+            elsif
+              "edit" = current_screen.base
+              or else (Post_Type_Object /= Null_Post_Type)
+              or else (post_type_object.Public)
+              or else (post_type_object.Show_In_Admin_Bar)
+              or else (Get_Post_Type_Archive_Link (-Post_Type_Object.Name) /= "")
+              or else not ("post" = Post_Type_Object.name or else
+                           "posts" = Get_Option ("show_on_front"))
+            then
+               declare
+                  Node : Node_Args;
+               begin
+                  Node.id    := +"archive";
+                  Node.title := +Get (post_type_object.Labels, "view_items");
+                  Node.Href  :=
+                    +Get_Post_Type_Archive_Link (-Current_Screen.Post_Type);
+
+                  admin_bar.Add_Node (Node);
+               end;
+
+            elsif
+               "term" = current_screen.base or else
+               Tag /= Null_Term -- or else
+--             Is_Object (Tag) or else
+--             not Is_Wp_Error (Tag)
+            then
+               declare
+                  use Inc_Class_Wp_Taxonomy;
+
+                  Tax : Wp_Taxonomy := Get_Taxonomy (-Tag.Taxonomy);
+               begin
+                  if Is_Term_Publicly_Viewable (tag) then
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.id    := +"view";
+                        Node.Title := +Get (Tax.Labels, "view_item");
+                        Node.Href  := +Get_Term_Link (Tag);
+
+                        Admin_Bar.Add_Node (Node);
+                     end;
+                  end if;
+               end;
+
+            elsif "user-edit" = current_screen.base or else User_Id /= 0 then
+               declare
+                  use Inc_Author_Templates;
+                  use Inc_Class_Wp_Users;
+                  use Inc_Pluggables;
+
+                  User_Object : Wp_User := Get_Userdata (User_Id);
+                  View_Link   : String  := Get_Author_Posts_Url (User_Object.ID);
+               begin
+                  if User_Object.Exists or else View_Link /= "" then
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.id    := +"view";
+                        Node.title := +abs "View User";
+                        Node.Href  := +View_Link;
+
+                        Admin_Bar.Add_Node (Node);
+                     end;
+                  end if;
+               end;
+            end if;
+         end;
+      else
+         declare
+            use Inc_Class_Wp_Posts;
+
+            Current_Object : Wp_Post := Wp_The_Query.Get_Queried_Object;
+         begin
+            if Current_Object = Null_Post then
+--          if Empty (Current_Object) then
+               return;
+            end if;
+
+            if not Empty (-current_object.Post_Type) then
+               declare
+                  use Inc_Class_Wp_Post_Type;
+
+                  Post_Type_Object : Wp_Post_Type :=
+                     Get_Post_Type_Object (-Current_Object.Post_Type);
+
+                  Edit_Post_Link : String :=
+                     Get_Edit_Post_Link (Integer (Current_Object.Id));
+               begin
+                  if Post_Type_Object /= Null_Post_Type
+                    or else Edit_Post_Link /= ""
+                    or else Current_User_Can ("edit_post", Integer (Current_Object.Id))
+                    or else post_type_object.Show_In_Admin_Bar
+                  then
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.id    := +"edit";
+                        Node.title := +Get (post_type_object.Labels, "edit_item");
+                        Node.Href  := +Edit_Post_Link;
+
+                        admin_bar.Add_Node (Node);
+                     end;
+                  end if;
+               end;
+
+            elsif Current_Object.Dyn.Taxonomy /= "" then
+               declare
+                  use Inc_Class_Wp_Taxonomy;
+
+                  Tax : Wp_Taxonomy :=
+                     Get_Taxonomy (-Current_Object.Dyn.Taxonomy);
+
+                  Edit_Term_Link : String :=
+                     Get_Edit_Term_Link (Current_Object.Dyn.Term_Id,
+                                         -Current_Object.Dyn.Taxonomy);
+               begin
+                  if
+                    Tax /= Null_Taxonomy or else
+                    Edit_Term_Link /= "" or else
+                    Current_User_Can ("edit_term", Current_Object.Dyn.Term_Id)
+                  then
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.Id    := +"edit";
+                        Node.Title := +Get (Tax.Labels, "edit_item");
+                        Node.Href  := +Edit_Term_Link;
+
+                        Admin_Bar.Add_Node (Node);
+                     end;
+                  end if;
+               end;
+            elsif
+--            Is_A (Current_Object, "WP_User") or else
+              Current_User_Can ("edit_user", Integer (Current_Object.Id))
+            then
+               declare
+                  use Inc_Link_Templates;
+
+                  Edit_User_Link : String :=
+                     Get_Edit_User_Link (Integer (current_object.Id));
+               begin
+                  if Edit_User_Link /= "" then
+                     declare
+                        Node : Node_Args;
+                     begin
+                        Node.id    := +"edit";
+                        Node.title := +abs "Edit User";
+                        Node.Href  := +Edit_User_Link;
+
+                        Admin_Bar.Add_Node (Node);
+                     end;
+                  end if;
+               end;
+            end if;
+         end;
+      end if;
+   end Wp_Admin_Bar_Edit_Menu;
+
+--
+-- Adds "Add New" menu.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_New_Content_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Class_Wp_Post_Type.Post_Type_Maps;
+
+      package Action_Maps is new
+         Ada.Containers.Indefinite_Ordered_Maps
+           (Key_Type     => String,
+            Element_Type => Array_Type,
+            "="          => Arrays.Array_Vectors."=");
+
+      function Array_Keys (Map : Action_Maps.Map)
+                           return List_Type
+      is
+         Result : List_Type;
+      begin
+         for A in Map.Iterate loop
+            Result.Append (+Action_Maps.Key (A));
+         end loop;
+         return Result;
+      end Array_Keys;
+
+      Actions : Action_Maps.Map; -- Array_Type;
+      Cpts    : Wp_Post_Type_Array :=
+         Get_Post_Types (Arrays.To_Array ((1 => Build ("show_in_admin_bar", "true"))),
+                         "objects"); -- (array)
+   begin
+      if
+        Cpts.Find ("post") /= No_Element or else
+--      Isset (cpts ("post")) or else
+        Current_User_Can (Get (cpts ("post").Cap, "create_posts"))
+      then
+         Actions ("post-new.php") :=
+            Arrays.To_Array ((1 =>
+               Build (Get (Cpts ("post").Labels, "name_admin_bar"), "new-post")));
+      end if;
+
+      if
+        Cpts.Find ("attachment") /= No_Element or else
+        Current_User_Can ("upload_files")
+      then
+         Actions ("media-new.php") :=
+            Arrays.To_Array ((1 =>
+               Build (Get (Cpts ("attachment").Labels, "name_admin_bar"),
+                      "new-media")));
+      end if;
+
+      if Current_User_Can ("manage_links") then
+         Actions ("link-add.php") :=
+            Arrays.To_Array ((1 =>
+               Build (X_X ("Link", "add new from admin bar"), "new-link")));
+      end if;
+
+      if
+        Cpts.Find ("page") /= No_Element or else
+        Current_User_Can (Get (Cpts ("page").Cap, "create_posts"))
+      then
+         actions ("post-new.php?post_type=page") :=
+            Arrays.To_Array ((1 =>
+               Build (Get (Cpts ("page").Labels, "name_admin_bar"), "new-page")));
+      end if;
+
+      Cpts.Delete ("post");
+      Cpts.Delete ("page");
+      Cpts.Delete ("attachment");
+      -- Unset (cpts ("post"));
+      -- Unset (cpts ("page"));
+      -- Unset (cpts ("attachment"));
+
+      -- Add any additional custom post types.
+      for Cpt of cpts loop
+         if not Current_User_Can (Get (Cpt.Cap, "create_posts")) then
+            goto Continue;
+          end if;
+
+          declare
+             Key : String := "post-new.php?post_type=" & (-Cpt.Name);
+          begin
+             Actions (Key) :=
+                Arrays.To_Array ((1 =>
+                   Build (Get (Cpt.Labels, "name_admin_bar"), "new-" & (-Cpt.Name))));
+          end;
+          << Continue >>
+      end loop;
+
+
+      -- Avoid clash with parent node and a "content" post type.
+--      if Isset (actions ("post-new.php?post_type=content")) then
+--         actions ("post-new.php?post_type=content") (1) := "add-new-content";
+--      end if;
+
+      if
+        Current_User_Can ("create_users") or else
+        Is_Multisite or else
+        Current_User_Can ("promote_users")
+      then
+         actions ("user-new.php") :=
+            Arrays.To_Array ((1 => Build (X_X ("User", "add new from admin bar"),
+                                          "new-user")));
+      end if;
+
+      if Actions.Is_Empty then
+         return;
+      end if;
+
+      declare
+         Title : String :=
+            "<span class=""ab-icon"" aria-hidden=""true""></span><span class=""ab-label"">" & X_X ("New", "admin bar menu group label") & "</span>";
+
+         Node  : Node_Args;
+         Arry  : Array_Type := Action_Maps.Element (Actions.Find ("user-new.php"));
+         Value : String     := -Arry.First_Element.Key;
+      begin
+         Node.Id    := +"new-content";
+         Node.Title := +Title;
+         Node.Href  := +Admin_Url (Value);
+--       Node.Href  := +Admin_Url (Current (Array_Keys (Actions)));
+
+         Admin_Bar.Add_Node (Node);
+
+         for A in Actions.Iterate loop
+            declare
+               Link   : String     := Action_Maps.Key (A);
+               Action : Array_Type := Action_Maps.Element (A);
+               Title  : String     := -Action.First_Element.Key; -- Title; -- list()
+               Id     : String     := -Action.First_Element.Value; -- Id;
+
+               Node : Node_Args;
+            begin
+               Node.Parent := +"new-content";
+               Node.Id     := +Id;
+               Node.Title  := +Title;
+               Node.Href   := +Admin_Url (Link);
+
+               Admin_Bar.Add_Node (Node);
+            end;
+         end loop;
+      end;
+   end Wp_Admin_Bar_New_Content_Menu;
+
+--
+-- Adds edit comments link with awaiting moderation count bubble.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_Comments_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Comments;
+      use Inc_Link_Templates;
+
+      Counts        : Comment_Counts := Wp_Count_Comments;
+      Awaiting_Mod  : Natural := Counts.Moderated;
+      Awaiting_Text : String  :=
+         Sprintf (
+                  -- translators: %s: Number of comments.
+                  N_N ("%s Comment in moderation",
+                       "%s Comments in moderation", Awaiting_Mod),
+                  Number_Format_I18n (Awaiting_Mod));
+      Icon  : Unbounded_String;
+      Title : Unbounded_String;
+      Node  : Node_Args;
+   begin
+      if not Current_User_Can ("edit_posts") then
+         return;
+      end if;
+
+      Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
+      Title := +"<span class=""ab-label awaiting-mod pending-count count-" &
+                Natural'Image (Awaiting_Mod) & """ aria-hidden=""true"">" &
+                Number_Format_I18n (Awaiting_Mod) & "</span>";
+      Title := Title &
+               "<span class=""screen-reader-text comments-in-moderation-text"">" &
+               Awaiting_Text & "</span>";
+
+      Node.Id    := +"comments";
+      Node.Title := Icon & Title;
+      Node.Href  := +Admin_Url ("edit-comments.php");
+
+      Admin_Bar.Add_Node (Node);
+   end Wp_Admin_Bar_Comments_Menu;
+
+--
+-- Adds appearance submenu items to the "Site Name" menu.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_Appearance_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Link_Templates;
+      use Inc_Themes;
+   begin
+      declare
+         Node : Node_Args;
+      begin
+         Node.Parent := +"site-name";
+         Node.Id     := +"appearance";
+
+         Admin_Bar.Add_Group (Node);
+      end;
+
+      if Current_User_Can ("switch_themes") then
+         declare
+            Node : Node_Args;
+         begin
+            Node.Parent := +"appearance";
+            Node.id     := +"themes";
+            Node.title  := +abs "Themes";
+            Node.Href   := +Admin_Url ("themes.php");
+
+            Admin_Bar.Add_Node (Node);
+         end;
+      end if;
+
+      if not Current_User_Can ("edit_theme_options") then
+         return;
+      end if;
+
+      if Current_Theme_Supports ("widgets") then
+         declare
+            Node : Node_Args;
+         begin
+            Node.parent := +"appearance";
+            Node.id     := +"widgets";
+            Node.title  := +abs "Widgets";
+            Node.href   := +Admin_Url ("widgets.php");
+
+            Admin_Bar.Add_Node (Node);
+         end;
+      end if;
+
+      if
+        Current_Theme_Supports ("menus") or else
+        Current_Theme_Supports ("widgets")
+      then
+         declare
+            Node : Node_Args;
+         begin
+            Node.Parent := +"appearance";
+            Node.id     := +"menus";
+            Node.title  := +abs "Menus";
+            Node.href   := +Admin_Url ("nav-menus.php");
+
+            Admin_Bar.Add_Node (Node);
+         end;
+      end if;
+
+      if Current_Theme_Supports ("custom-background") then
+         declare
+            Node : Node_Args;
+         begin
+            Node.Parent := +"appearance";
+            Node.id     := +"background";
+            Node.title  := +abs "Background";
+            Node.href   := +Admin_Url ("themes.php?page=custom-background");
+            Node.meta   :=
+               Arrays.To_Array ((1 => Build ("class", "hide-if-customize")));
+
+            Admin_Bar.Add_Node (Node);
+         end;
+      end if;
+
+      if Current_Theme_Supports ("custom-header") then
+         declare
+            Node : Node_Args;
+         begin
+            Node.parent := +"appearance";
+            Node.id     := +"header";
+            Node.title  := +abs "Header";
+            Node.href   := +Admin_Url ("themes.php?page=custom-header");
+            Node.Meta   :=
+               Arrays.To_Array ((1 => Build ("class", "hide-if-customize")));
+
+            Admin_Bar.Add_Node (Node);
+         end;
+      end if;
+   end Wp_Admin_Bar_Appearance_Menu;
+
+--
+-- Provides an update link if theme/plugin/core updates are available.
+--
+-- @since 3.1.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_Updates_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Link_Templates;
+      use Inc_Updates;
+
+      Update_Data  : Update_Counts := Wp_Get_Update_Data;
+      Counts_Total : Integer       := Update_Data.Total; -- ("counts") ("total");
+      Updates_Text : Unbounded_String;
+      Icon         : Unbounded_String;
+      Title        : Unbounded_String;
+   begin
+      if Counts_Total = 0 then -- not update_data ("counts") ("total")
+         return;
+      end if;
+
+      Updates_Text := +Sprintf (
+                -- translators: %s: Total number of updates available.
+                N_N ("%s update available", "%s updates available",
+                     Counts_Total),
+                Number_Format_I18n (Counts_Total));
+
+      Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
+      Title := +"<span class=""ab-label"" aria-hidden=""true"">" &
+               Number_Format_I18n (Counts_Total) & "</span>";
+      Title := Title &
+               "<span class=""screen-reader-text updates-available-text"">" &
+               Updates_Text & "</span>";
+
+      declare
+         Node : Node_Args;
+      begin
+         Node.id    := +"updates";
+         Node.Title := Icon & Title;
+         Node.href  := +Network_Admin_Url ("update-core.php");
+
+         Admin_Bar.Add_Node (Node);
+      end;
+   end Wp_Admin_Bar_Updates_Menu;
+
+--
+-- Adds search form.
+--
+-- @since 3.3.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Search_Menu (Admin_Bar : in out Wp_Admin_Bar)
+is
+          use Inc_Formatting;
+          use Inc_Link_Templates;
+          use Inc_Load;
+
+         Form : Unbounded_String;
+begin
+        if Is_Admin then
+                return;
+        end if;
+
+        form := +"<form action=""" & Esc_Url (Home_Url ("/")) & """ method=""get"" id=""adminbarsearch"">";
+        form := Form & "<input class=""adminbar-input"" name=""s"" id=""adminbar-search"" type=""text"" value="""" maxlength=""150"" />";
+        form := Form & "<label for=""adminbar-search"" class=""screen-reader-text"">" & abs "Search" & "</label>";
+        form := Form & "<input type=""submit"" class=""adminbar-button"" value=""" & abs "Search" & """ />";
+        form := Form & "</form>";
+
+        declare
+           Node : Node_Args;
+        begin
+           Node.Parent := +"top-secondary";
+           Node.id     := +"search";
+           Node.title  := Form;
+           Node.meta   := Arrays.To_Array ((
+                                Build ("class",    "admin-bar-search"),
+                                Build ("tabindex", -1)));
+
+           admin_bar.Add_Node (Node);
+        end;
+end Wp_Admin_Bar_Search_Menu;
+
+--
+-- Adds a link to exit recovery mode when Recovery Mode is active.
+--
+-- @since 5.2.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+   procedure Wp_Admin_Bar_Recovery_Mode_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   is
+      use Inc_Class_Wp_Recovery_Mode;
+      use Inc_General_Templates;
+      use Inc_Load;
+
+      Url : Unbounded_String;
+   begin
+      if not Wp_Is_Recovery_Mode then
+         return;
+      end if;
+
+      Url := +Wp_Login_Url;
+      Url := +Add_Query_Arg ("action", EXIT_ACTION, -Url); -- ::
+      Url := +Wp_Nonce_Url (-Url, EXIT_ACTION); -- ::
+
+      declare
+         Node : Node_Args;
+      begin
+         Node.Parent := +"top-secondary";
+         Node.id     := +"recovery-mode";
+         Node.title  := +abs "Exit Recovery Mode";
+         Node.href   := Url;
+
+         Admin_Bar.Add_Node (Node);
+      end;
+   end Wp_Admin_Bar_Recovery_Mode_Menu;
+
+--
+-- Adds secondary menus.
+--
+-- @since 3.3.0
+--
+-- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
+--
+procedure Wp_Admin_Bar_Add_Secondary_Groups (Admin_Bar : in out Wp_Admin_Bar)
+is
+begin
+        declare
+           Node : Node_Args;
+        begin
+           Node.id   := +"top-secondary";
+           Node.Meta := Arrays.To_Array ((1 => Build ("class", "ab-top-secondary")));
+
+           admin_bar.Add_Group (Node);
+        end;
+
+        declare
+           Node : Node_Args;
+        begin
+           Node.Parent := +"wp-logo";
+           Node.id     := +"wp-logo-external";
+           Node.meta   := Arrays.To_Array ((1 => Build ("class", "ab-sub-secondary")));
+
+           admin_bar.Add_Group (Node);
+        end;
+end Wp_Admin_Bar_Add_Secondary_Groups;
+
+--
+-- Prints style and scripts for the admin bar.
+--
+-- @since 3.1.0
+--
+   procedure Wp_Admin_Bar_Header
+   is
+      use Inc_Themes;
+
+      Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
+                             then "" else " type=""text/css""");
+   begin
+      null;
+--        ?>
+-- <style<?php echo type_attr; ?> media="print">#wpadminbar { display:none; }</style>
+--        <?php
+   end Wp_Admin_Bar_Header;
+
+--
+-- Prints default admin bar callback.
+--
+-- @since 3.1.0
+--
+   procedure X_Admin_Bar_Bump_Cb
+   is
+      use Inc_Themes;
+
+      Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
+                            then "" else " type=""text/css""");
+   begin
+      null;
+--        ?>
+-- <style<?php echo type_attr; ?> media="screen">
+--        html then margin-top: 32px !important; end;
+--        @media screen and (max-width: 782px) then
+--                html then margin-top: 46px !important; end;
+--        end;
+-- </style>
+--        <?php
+   end X_Admin_Bar_Bump_Cb;
+
+--
+-- Sets the display status of the admin bar.
+--
+-- This can be called immediately upon plugin load. It does not need to be called
+-- from a function hooked to the then@see "init"end; action.
+--
+-- @since 3.1.0
+--
+-- @global bool show_admin_bar
+--
+-- @param bool show Whether to allow the admin bar to show.
+--
+procedure Show_Admin_Bar (Show : Boolean)
+is
+--        global show_admin_bar;
+begin
+        X_Show_Admin_Bar := Show; -- (bool)
+end Show_Admin_Bar;
+
+--
+-- Determines whether the admin bar should be showing.
+--
+-- For more information on this and similar theme functions, check out
+-- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tagsend; article in the Theme Developer Handbook.
+--
+-- @since 3.1.0
+--
+-- @global bool   show_admin_bar
+-- @global string pagenow        The filename of the current screen.
+--
+-- @return bool Whether the admin bar should be showing.
+--
+   function Is_Admin_Bar_Showing
+            return Boolean
+   is
+      use Globals;
+      use Inc_Load;
+      use Inc_Pluggables;
+--        global show_admin_bar, pagenow;
+   begin
+      -- For all these types of requests, we never want an admin bar.
+      if
+        XMLRPC_REQUEST or else DOING_AJAX or else
+        IFRAME_REQUEST or else Wp_Is_Json_Request
+      then
+         return False;
+      end if;
+
+--        if Is_Embed then
+--                return False;
+--        end if;
+
+      -- Integrated into the admin.
+      if Is_Admin then
+         return True;
+      end if;
+
+      if True then -- not Isset (X_Show_Admin_Bar) then
+         if not Is_User_Logged_In or else "wp-login.php" = Pagenow then
+            X_Show_Admin_Bar := False;
+         else
+            X_Show_Admin_Bar := X_Get_Admin_Bar_Pref;
+         end if;
+      end if;
+
+      --
+      -- Filters whether to show the admin bar.
+      --
+      -- Returning false to this hook is the recommended way to hide the admin bar.
+      -- The user"s display preference is used for logged in users.
+      --
+      -- @since 3.1.0
+      --
+      -- @param bool show_admin_bar Whether the admin bar should be shown. Default false.
+      --
+      X_Show_Admin_Bar := Apply_Filters ("show_admin_bar", X_Show_Admin_Bar);
+
+      return X_show_admin_bar;
+   end Is_Admin_Bar_Showing;
+
+--
+-- Retrieves the admin bar display preference of a user.
+--
+-- @since 3.1.0
+-- @access private
+--
+-- @param string context Context of this preference check. Defaults to "front". The "admin"
+--                        preference is no longer used.
+-- @param int    user    Optional. ID of the user to check, defaults to 0 for current user.
+-- @return bool Whether the admin bar should be showing for this user.
+--
+   function X_Get_Admin_Bar_Pref (Context : String  := "front";
+                                  User    : Integer := 0)
+                                  return Boolean
+   is
+      use Inc_Users;
+
+      Pref : Boolean := Get_User_Option ("show_admin_bar_{context}", User);
+   begin
+      if not Pref then -- False = Pref then
+         return True;
+      end if;
+
+      return Pref;
+   end X_Get_Admin_Bar_Pref;
+
+end Inc_Admin_Bar;

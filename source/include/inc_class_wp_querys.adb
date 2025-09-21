@@ -8,6 +8,8 @@
 
 package body Inc_Class_Wp_Querys
 is
+   procedure Dummy is null;
+
 --         --
 --         -- Resets query flags to false.
 --         --

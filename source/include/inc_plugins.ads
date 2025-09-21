@@ -23,6 +23,7 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Styles;
 
 package Inc_Plugins
@@ -70,6 +71,9 @@ is
                                   Args      : Array_type) is null;
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Inc_Class_Wp_Styles.Wp_Styles)
+                                  is null;
+   procedure Do_Action_Ref_Array (Hook_Name : String;
+                                  Args      : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
                                   is null;
 
 --

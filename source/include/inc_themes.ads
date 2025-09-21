@@ -177,6 +177,32 @@ function Has_Header_Image
                                is (Empty_String_Array);
 
 --
+-- Whether the site is being previewed in the Customizer.
+--
+-- @since 4.0.0
+--
+-- @global WP_Customize_Manager wp_customize Customizer instance.
+--
+-- @return bool True if the site is being previewed in the Customizer, false otherwise.
+--
+   function Is_Customize_Preview
+            return Boolean
+            is (True);
+
+--
+-- Returns a URL to load the Customizer.
+--
+-- @since 3.4.0
+--
+-- @param string stylesheet Optional. Theme to customize. Defaults to active theme.
+--                           The theme"s stylesheet will be urlencoded if necessary.
+-- @return string
+--
+   function Wp_Customize_Url (Stylesheet : String := "")
+                              return String
+                              is ("XXX-353");
+
+--
 -- Returns whether the active theme is a block-based theme or not.
 --
 -- @since 5.9.0

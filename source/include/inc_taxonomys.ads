@@ -385,4 +385,34 @@ is
                             return Boolean
                             is (True);
 
+--
+-- Generates a permalink for a taxonomy term archive.
+--
+-- @since 2.5.0
+--
+-- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+--
+-- @param WP_Term|int|string term     The term object, ID, or slug whose link will be retrieved.
+-- @param string             taxonomy Optional. Taxonomy. Default empty.
+-- @return string|WP_Error URL of the taxonomy term archive on success, WP_Error if term does not exist.
+--
+   function Get_Term_Link (Term     : Inc_Class_Wp_Terms.Wp_Term;
+                           Taxonomy : String := "")
+                           return String
+                           is ("XXX-361");
+
+--
+-- Determines whether a term is publicly viewable.
+--
+-- A term is considered publicly viewable if its taxonomy is viewable.
+--
+-- @since 6.1.0
+--
+-- @param int|WP_Term term Term ID or term object.
+-- @return bool Whether the term is publicly viewable.
+--
+   function Is_Term_Publicly_Viewable (Term : Inc_Class_Wp_Terms.Wp_Term)
+                                       return Boolean
+                                       is (True);
+
 end Inc_Taxonomys;

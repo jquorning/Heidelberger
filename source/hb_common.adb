@@ -142,12 +142,12 @@ is
    function Get (Arr : Array_Type; Key : String) return String is ("XXX 7");
    function Count (Item : String) return String is ("XXX 8");
 
-   Screen : aliased Screen_Type;
+--   Screen : aliased Screen_Type;
 
-   function Get_Current_Screen return Screen_Access is
-   begin
-      return Screen'Access;
-   end Get_Current_Screen;
+--   function Get_Current_Screen return Screen_Access is
+--   begin
+--      return Screen'Access;
+--   end Get_Current_Screen;
 
    procedure Add_Help_Tab (Screen : in out Screen_Type; List : Array_Type) is null;
    procedure Set_Help_Sidebar (Screen : in out Screen_Type; Item : String) is null;
@@ -288,12 +288,12 @@ is
    --    return P;
    -- end Get_Post;
 
-   function Get_Userdata (Id : Integer) return User_Type
-   is
-      U : User_Type;
-   begin
-      return U;
-   end Get_Userdata;
+--   function Get_Userdata (Id : Integer) return User_Type
+--   is
+--      U : User_Type;
+--   begin
+--      return U;
+--   end Get_Userdata;
 
 --   function Get_Post_Types (A : Array_Type)
 --                            return Tax_Rec

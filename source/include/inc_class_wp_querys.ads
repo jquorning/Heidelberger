@@ -10,13 +10,15 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
--- with Inc_Class_Wp_Posts;
-with Inc_Class_Posts;
+with Inc_Class_Wp_Posts;
+-- with Inc_Class_Posts;
 
 package Inc_Class_Wp_Querys
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+
+   procedure Dummy;
 --
 -- The WordPress Query class.
 --
@@ -487,7 +489,8 @@ end record;
         -- @return bool True if posts are available, false if end of the loop.
         --
         function Have_Posts (This : in out Wp_Query)
-                             return Boolean;
+                             return Boolean
+                             is (True);
 
         --
         -- Set up the next post and iterate current post index.
@@ -497,6 +500,21 @@ end record;
         -- @return WP_Post Next post.
         --
         function Next_Post (This : Wp_Query)
-                            return Inc_Class_Posts.Wp_Post; -- Inc_Class_Wp_Posts
+                            return Inc_Class_Wp_Posts.Wp_Post -- Inc_Class_Wp_Posts
+                            is (Inc_Class_Wp_Posts.Null_Post);
+        --
+        -- Retrieves the currently queried object.
+        --
+        -- If queried object is not set, then the queried object will be set from
+        -- the category, tag, taxonomy, posts page, single post, page, or author
+        -- query variable. After it is set up, it will be returned.
+        --
+        -- @since 1.5.0
+        --
+        -- @return WP_Term|WP_Post_Type|WP_Post|WP_User|null The queried object.
+        --
+        function Get_Queried_Object (This : Wp_Query)
+                                     return Inc_Class_Wp_Posts.Wp_Post
+                                     is (Inc_Class_Wp_Posts.Null_Post);
 
 end Inc_Class_Wp_Querys;
