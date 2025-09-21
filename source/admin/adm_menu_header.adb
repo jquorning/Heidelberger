@@ -77,9 +77,10 @@ is
    -- X_Wp_Menu_Output --
    ----------------------
 
-   procedure X_Wp_Menu_Output (Menu              : Hb_Menu.Menu_Array; -- Array_Type;
-                               Submenu           : Hb_Menu.Submenu_Type; -- Array_Type;
-                               Submenu_As_Parent : Boolean := True)
+   procedure X_Wp_Menu_Output
+     (Menu              : Adm_Menu.Menu_Array; -- Array_Type;
+      Submenu           : Adm_Menu.Submenu_Type; -- Array_Type;
+      Submenu_As_Parent : Boolean := True)
    is
       use Inc_Capabilities;
       use Inc_Formatting;
@@ -92,7 +93,7 @@ is
       for Item of Menu loop
          declare
             use List_Vectors;
-            use Hb_Menu;
+            use Adm_Menu;
 --            Key             : String     := -M.Key;
 --            Item            : String     := -M.Value;
             Admin_Is_Parent : Boolean    := False;
@@ -101,7 +102,7 @@ is
             Aria_Hidden     : Unbounded_String;
             Is_Separator    : Boolean    := False;
 
-            Submenu_Index   : constant Hb_Menu.Submenu_Index :=
+            Submenu_Index   : constant Adm_Menu.Submenu_Index :=
                Find_Submenu (Submenu, -Item.Menu_Slug);
 
             Submenu_Items   : constant Submenu_Type :=
@@ -281,7 +282,7 @@ is
                      declare
 --                        Sub_Key         : String := -S.Key;
 --                        Sub_Item        : String := -S.Value;
-                        Sub_Item        : constant Hb_Menu.Submenu_Record := Sub;
+                        Sub_Item        : constant Adm_Menu.Submenu_Record := Sub;
                         Class           : List_Type := Empty_List;
                         Aria_Attributes : List_Type := Empty_List; --  ;  String := "";
                      begin
@@ -419,7 +420,7 @@ is
 
    procedure Bottom
    is
-      use Hb_Menu;
+      use Adm_Menu;
    begin
 -- ?>
       Echo

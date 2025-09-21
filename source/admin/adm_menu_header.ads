@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Hb_Menu;
+with Adm_Menu;
 
 package Adm_Menu_Header
 is
@@ -39,9 +39,10 @@ is
    -- @param bool  submenu_as_parent
    --
 
-   procedure X_Wp_Menu_Output (Menu              : Hb_Menu.Menu_Array; -- Array_Type;
-                               Submenu           : Hb_Menu.Submenu_Type; -- Array_Type;
-                               Submenu_As_Parent : Boolean := True);
+   procedure X_Wp_Menu_Output
+     (Menu              : Adm_Menu.Menu_Array; -- Array_Type;
+      Submenu           : Adm_Menu.Submenu_Type; -- Array_Type;
+      Submenu_As_Parent : Boolean := True);
 
    procedure Top;
    procedure Bottom;

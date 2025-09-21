@@ -32,7 +32,7 @@ with Inc_Themes;
 with Inc_Updates;
 with Inc_Class_Wp_Post_Type;
 
-package body Hb_Menu
+package body Adm_Menu
 is
    use Ada.Strings.Unbounded;
    use L10n;
@@ -786,5 +786,5 @@ is
       return Submenu;
    end Filter_And_Sort;
 
-end HB_Menu;
+end Adm_Menu;
 -- require_once ABSPATH . "wp-admin/includes/menu.php";

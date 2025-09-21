@@ -3,7 +3,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Hb_Menu
+package Adm_Menu
 is
    use Ada.Strings.Unbounded;
 
@@ -88,4 +88,4 @@ is
    function Filter_And_Sort (Submenu : Submenu_Type)
                              return Submenu_Type;
 
-end Hb_Menu;
+end Adm_Menu;

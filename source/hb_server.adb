@@ -26,7 +26,7 @@ with Inc_Class_Wp_Posts;
 
 with Adm_Edit;
 with Adm_Edit_Tags;
-with HB_Menu;
+with Adm_Menu;
 with Adm_Post;
 
 package body HB_Server is
