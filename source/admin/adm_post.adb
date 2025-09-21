@@ -84,6 +84,8 @@ is
 --
 -- global post_type, post_type_object, post;
       declare
+         use Inc_Class_Wp_Posts;
+         use Inc_Class_Wp_Post_Type;
          use Inc_Link_Templates;
 
          Post_Type        : String := "";
@@ -224,12 +226,12 @@ is
                      goto Bailout; -- return; -- exit;
                   end if;
 
-                  if not Post then
+                  if Post = Null_Post then
                      Inc_Functions.Wp_Die
                        (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
-                  if not Post_Type_Object then
+                  if Post_Type_Object = Null_Post_Type then
                      Inc_Functions.Wp_Die (abs "Invalid post type.");
                   end if;
 
@@ -369,12 +371,12 @@ is
             elsif Action = "trash" then
                Inc_Pluggables.Check_Admin_Referer ("trash-post_" & Post_Id'Image);
 
-               if not Post then
+               if Post = Null_Post then
                   Inc_Functions.Wp_Die
                      (abs "The item you are trying to move to the Trash no longer exists.");
                end if;
 
-               if not Post_Type_Object then
+               if Post_Type_Object = Null_Post_Type then
                   Inc_Functions.Wp_Die (abs "Invalid post type.");
                end if;
 
@@ -419,12 +421,12 @@ is
             elsif Action = "untrash" then
                Inc_Pluggables.Check_Admin_Referer ("untrash-post_" & Post_Id'Image);
 
-               if not Post then
+               if Post = Null_Post then
                   Inc_Functions.Wp_Die
                     (abs "The item you are trying to restore from the Trash no longer exists.");
                end if;
 
-               if not Post_Type_Object then
+               if Post_Type_Object = Null_Post_Type then
                   Inc_Functions.Wp_Die (abs "Invalid post type.");
                end if;
 
@@ -449,11 +451,11 @@ is
             elsif Action = "delete" then
                Inc_Pluggables.Check_Admin_Referer ("delete-post_" & Post_Id'Image);
 
-               if not Post then
+               if Post = Null_Post then
                   Inc_Functions.Wp_Die (abs "This item has already been deleted.");
                end if;
 
-               if not Post_Type_Object then
+               if Post_Type_Object = Null_Post_Type then
                   Inc_Functions.Wp_Die (abs "Invalid post type.");
                end if;
 
@@ -465,7 +467,7 @@ is
                   declare
                      Force : constant Boolean := not MEDIA_TRASH;
                   begin
-                     if not Wp_Delete_Attachment (Post_Id'Image, Force) then
+                     if Wp_Delete_Attachment (Post_Id, Force) = Null_Post then
                         Inc_Functions.Wp_Die (abs "Error in deleting the attachment.");
                      end if;
                   end;

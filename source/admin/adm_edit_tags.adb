@@ -275,7 +275,7 @@ is
                declare
                   Tag : constant Wp_Term := Get_Term (Tag_ID, -Taxonomy);
                begin
-                  if not Tag then
+                  if Tag = Null_Term then
                      Inc_Functions.Wp_Die
                         (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;

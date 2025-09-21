@@ -298,7 +298,7 @@ is
                                     end if;
 
                                     if "attachment" = Post_Del.Post_Type then
-                                       if not Wp_Delete_Attachment (-Post_Id) then
+                                       if Wp_Delete_Attachment (Integer'Value (-Post_Id)) = Null_Post then
                                           Inc_Functions.Wp_Die
                                              (abs "Error in deleting the attachment.");
                                        end if;

@@ -759,6 +759,30 @@ is
                       return Wp_Post;
 
 --
+-- Trashes or deletes an attachment.
+--
+-- When an attachment is permanently deleted, the file will also be removed.
+-- Deletion removes all post meta fields, taxonomy, comments, etc. associated
+-- with the attachment (except the main post).
+--
+-- The attachment is moved to the Trash instead of permanently deleted unless Trash
+-- for media is disabled, item is already in the Trash, or force_delete is True.
+--
+-- @since 2.0.0
+--
+-- @global wpdb wpdb WordPress database abstraction object.
+--
+-- @param int  post_id      Attachment ID.
+-- @param bool force_delete Optional. Whether to bypass Trash and force deletion.
+--                           Default False.
+-- @return WP_Post|False|null Post data on success, False or null on failure.
+--
+   function Wp_Delete_Attachment (Post_Id      : Integer;
+                                  Force_Delete : Boolean := False)
+                                  return Inc_Class_Wp_Posts.Wp_Post
+                                  is (Inc_Class_Wp_Posts.Null_Post);
+
+--
 -- Updates a post with new post data.
 --
 -- The date does not have to be set for drafts. You can set the date and it will

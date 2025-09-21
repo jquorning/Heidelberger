@@ -43,8 +43,6 @@ is
 
    function Wp_Get_Referer return String is ("XXX-213");
 
---   function Admin_URL (Item : String) return String;
-
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
    function Add_Query_Arg (Item : String; N : String; I : String)
@@ -62,10 +60,6 @@ is
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
 
-   function Wp_Delete_Attachment (Item : Assoc_Type;
-                                  V    : Boolean := False) return Boolean is (True);
-   function Wp_Delete_Attachment (Id : String;
-                                  V  : Boolean := False) return Boolean is (True);
    function Wp_Delete_Post (Item : Assoc_Type; V : Boolean := False)
       return Boolean is (True);
    function Wp_Delete_Post (Item : String; V : Boolean := False)
@@ -78,17 +72,6 @@ is
      is null;
 
    function Count (Item : String) return String;
-
-   type Screen_Id is new Integer;
-   type Screen_Type is tagged
-      record
-         Id : Screen_Id;
-      end record;
---   type Screen_Access is access all Screen_Type;
---   function Get_Current_Screen return Screen_Access;
---   procedure Add_Help_Tab (Screen : in out Screen_Type; List : Array_Type);
---   procedure Set_Help_Sidebar (Screen : in out Screen_Type; Item : String);
-   procedure Set_Screen_Reader_Content (Screen : in out Screen_Type; List : Array_Type);
 
    procedure Add_Screen_Option;
 
@@ -242,12 +225,6 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   function "not" (Term : Inc_Class_Wp_Terms.Wp_Term)
-                   return Boolean
-                   is (False);
-
---   function Get_Edit_Term_Link (Id : Integer; Taxonomy : String; Post_Type : String)
---                               return String;
    function Wp_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type)
                             return Boolean
                             is (True);
@@ -272,7 +249,6 @@ is
 
    procedure Wp_Reset_Vars (A : Array_Type) is null;
 
---   type Hb_post is null record;
    function Wp_Verify_Nonce (V : String; Item : String) return Boolean is (True);
    function Wp_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
    function Get_Default_Comment_Status (S : String; E : String := "") return String
@@ -302,10 +278,6 @@ is
    function Post_Preview return String is ("XXX-104");
    procedure Wp_Safe_Redirect (Ref : String) is null;
 
-   function "not" (T : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (False);
-   function "not" (T : Inc_Class_Wp_Post_type.Wp_Post_Type)
-                   return Boolean
-                   is (False);
 
    function Empty (A : String) return Boolean is (True);
    function Empty (Table : Array_Type) return Boolean;
@@ -340,14 +312,6 @@ is
    function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
      is (Empty_Array);
 
---   type User_Type is
---      record
---         Display_Name : Unbounded_String;
---      end record;
-
---   function Get_Userdata (Id : Integer) return User_Type;
-
---   function Get_Current_User_Id return Integer is (1);
    function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean
       is (True);
 
