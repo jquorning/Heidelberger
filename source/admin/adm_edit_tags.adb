@@ -15,6 +15,7 @@ with Globals;
 with HB_Common;
 
 with Adi_Class_Wp_Screens;
+with Adi_Plugins;
 with Adi_Screens;
 
 with Inc_Capabilities;
@@ -461,6 +462,7 @@ is
          -- Also used by the Edit Tag form.
          -- require_once ABSPATH . "wp-admin/includes/edit-tag-messages.php";
          declare
+            use Adi_Plugins;
             use Inc_Link_Templates;
 
             Class : String :=  (if Isset (String'(Get (X_REQUEST, "error")))
