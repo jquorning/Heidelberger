@@ -29,6 +29,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_Functions_Wp_Styles;
+with Inc_General_Templates;
 with Inc_Link_Templates;
 with Inc_Pluggables;
 with Inc_Posts;
@@ -663,6 +664,8 @@ is
                           String'(Get (X_REQUEST, "s"))'Length /= 0
                         then
                            declare
+                              use Inc_General_Templates;
+
                               Buffer : constant String
                                  := "<span class=""subtitle"">" &
                                     Printf (

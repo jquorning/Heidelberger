@@ -102,6 +102,22 @@ is
                            is ("XXX-351");
 
 --
+-- Retrieves the contents of the search WordPress query variable.
+--
+-- The search query string is passed through esc_attr() to ensure that it is safe
+-- for placing in an HTML attribute.
+--
+-- @since 2.3.0
+--
+-- @param bool escaped Whether the result is escaped. Default true.
+--                      Only use when you are later escaping it. Do not use unescaped.
+-- @return string
+--
+   function Get_Search_Query (Escaped : Boolean := True)
+                              return String
+                              is ("XXX-445");
+
+--
 -- Returns the Site Icon URL.
 --
 -- @since 4.3.0

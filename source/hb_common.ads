@@ -161,8 +161,6 @@ is
                     return String
                     is ("XXX-310");
 
-   function Get_Search_Query return String;
-
    function Sprintf (Format : String;
                      Arg_1 : String;
                      Arg_2 : String := "";
