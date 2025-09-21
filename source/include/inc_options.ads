@@ -86,6 +86,36 @@ is
                         is ("XXX-222");
 
 --
+-- Updates the value of an option that was already added.
+--
+-- You do not need to serialize values. If the value needs to be serialized,
+-- then it will be serialized before it is inserted into the database.
+-- Remember, resources cannot be serialized or added as an option.
+--
+-- If the option does not exist, it will be created.
+
+-- This function is designed to work with or without a logged-in user. In terms of security,
+-- plugin developers should check the current user"s capabilities before updating any options.
+--
+-- @since 1.0.0
+-- @since 4.2.0 The `autoload` parameter was added.
+--
+-- @global wpdb wpdb WordPress database abstraction object.
+--
+-- @param string      option   Name of the option to update. Expected to not be SQL-escaped.
+-- @param mixed       value    Option value. Must be serializable if non-scalar. Expected to not be SQL-escaped.
+-- @param string|bool autoload Optional. Whether to load the option when WordPress starts up. For existing options,
+--                              `autoload` can only be updated using `update_option()` if `value` is also changed.
+--                              Accepts "yes"|true to enable or "no"|false to disable. For non-existent options,
+--                              the default value is "yes". Default null.
+-- @return bool True if the value was updated, false otherwise.
+--
+   function Update_Option (Option   : String;
+                           Value    : Boolean;
+                           Autoload : Boolean := False) -- = null
+                           return Boolean
+                           is (False);
+--
 -- Retrieves the value of a transient.
 --
 -- If the transient does not exist, does not have a value, or has expired,

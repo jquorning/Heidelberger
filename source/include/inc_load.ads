@@ -156,6 +156,17 @@ function Is_Ssl
                          return Boolean is (False);
 
 --
+-- Determines whether the current request is a WordPress Ajax request.
+--
+-- @since 4.7.0
+--
+-- @return bool True if it"s a WordPress Ajax request, false otherwise.
+--
+   function Wp_Doing_Ajax
+            return Boolean
+            is (True);
+
+--
 -- @since 5.0.0
 --
 -- @return bool True if `Accepts` or `Content-Type` headers contain `application/json`.

@@ -9,6 +9,8 @@ with AWS.Services.Dispatchers.URI;
 with AWS.Server;
 --  with AWS.Status;
 
+with Adm_Admin;
+
 with Inc_Posts;
 with Inc_Admin_Bar;
 with Inc_Class_Wp_Scripts;

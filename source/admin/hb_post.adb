@@ -234,7 +234,7 @@ is
                   end if;
 
                   if
-                    not In_Array (Globals.Typenow,
+                    not In_Array (-Globals.Typenow,
                                   Inc_Posts.Get_Post_Types
                                     (To_Array (List => (1 => Build ("show_ui", "true")))),
                                   True)

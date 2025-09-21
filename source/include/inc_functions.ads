@@ -57,6 +57,18 @@ is
                                     Replacement : String := "")
                                     is null;
 
+--
+-- Sets the headers to prevent caching for the different browsers.
+--
+-- Different browsers support different nocache headers, so several
+-- headers must be sent so that all of them get the point that no
+-- caching should occur.
+--
+-- @since 2.0.0
+--
+-- @see wp_get_nocache_headers()
+--
+   procedure Nocache_Headers is null;
 
 --
 -- Marks a function argument as deprecated and inform when it has been used.
@@ -187,6 +199,26 @@ is
                               is ("XXX-305");
 
 --
+-- Validates a file name and path against an allowed set of rules.
+--
+-- A return value of `1` means the file path contains directory traversal.
+--
+-- A return value of `2` means the file path contains a Windows drive path.
+--
+-- A return value of `3` means the file is not in the allowed files list.
+--
+-- @since 1.2.0
+--
+-- @param string   $file          File path.
+-- @param string[] $allowed_files Optional. Array of allowed files.
+-- @return int 0 means nothing is wrong, greater than 0 means something was wrong.
+--
+   function Validate_File (File          : String;
+                           Allowed_Files : Array_Type := Empty_array)
+                           return Integer
+                           is (0);
+
+--
 -- Kills WordPress execution and displays HTML page with an error message.
 --
 -- This function complements the `die()` PHP function. The difference is that
@@ -238,6 +270,24 @@ is
                      Title   : String  := "";
                      Code    : Integer := 0) -- , $args = array() ) then
                      is null;
+
+--
+-- Attempts to raise the PHP memory limit for memory intensive processes.
+--
+-- Only allows raising the existing limit and prevents lowering it.
+--
+-- @since 4.6.0
+--
+-- @param string $context Optional. Context in which the function is called. Accepts either 'admin',
+--                        'image', or an arbitrary other context. If an arbitrary context is passed,
+--                        the similarly arbitrary then@see '$context_memory_limit'end; filter will be
+--                        invoked. Default 'admin'.
+-- @return int|string|false The limit that was set or false on failure.
+--
+   function Wp_Raise_Memory_Limit (Context : String := "admin")
+                                   return Integer
+                                   is (0);
+
 --
 -- Encodes a variable into JSON, with some sanity checks.
 --

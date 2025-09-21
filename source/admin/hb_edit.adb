@@ -90,7 +90,7 @@ is
 --
 --  global $post_type, $post_type_object;
 
-      Post_Type        : constant String       := Typenow;
+      Post_Type        : constant String       := -Typenow;
       Post_Type_Object : constant Wp_Post_Type
          := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin

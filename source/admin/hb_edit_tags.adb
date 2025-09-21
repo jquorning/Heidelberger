@@ -57,7 +57,7 @@ is
       use Inc_Class_Wp_Taxonomy;
       use Inc_Class_Wp_Terms;
 
-      Tax : constant Wp_Taxonomy := Get_Taxonomy (Taxnow);
+      Tax : constant Wp_Taxonomy := Get_Taxonomy (-Taxnow);
       Taxonomy : constant String := ""; -- jq
    begin
 --      if not Tax then

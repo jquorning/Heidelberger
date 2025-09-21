@@ -18,9 +18,9 @@ is
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
    Self         : Unbounded_String;
-   Parent_File  : Unbounded_String;
-   Submenu_File : Unbounded_String;
-   Plugin_Page  : Unbounded_String;
+--   Parent_File  : Unbounded_String;
+--   Submenu_File : Unbounded_String;
+--   Plugin_Page  : Unbounded_String;
 
    --
    -- Display menu.

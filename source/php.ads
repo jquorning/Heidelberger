@@ -155,11 +155,20 @@ is
                           is (Item);
 
    type Flag_Type is (Ent_Quotes, Ent_Substitute, Ent_Html404);
-   function Html_Entity_Decode (Item : String;
-                                Flags : Flag_Type;
+   -- Shold be or'ed together instead
+
+   function Html_Entity_Decode (Item     : String;
+                                Flags    : Flag_Type;
                                 Encoding : String := "")
                                 return String
                                 is ("XXX-312");
+
+   function Htmlentities (Item          : String;
+                          Flags         : Flag_Type := Ent_Quotes;
+                          Encoding      : String  := "";
+                          Double_Encode : Boolean := True)
+                          return String
+                          is ("XXX-462");
 
    function Array_Key_Exists (Key  : String;
                               Arry : Array_Type)
@@ -203,5 +212,9 @@ is
    function Is_Numeric (Value : String)
                         return Boolean
                         is (False);
+
+   function Is_File (Filename : String)
+                     return Boolean
+                     is (False);
 
 end Php;

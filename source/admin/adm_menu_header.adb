@@ -120,7 +120,7 @@ is
 
             if
               (Parent_File /= "" and then Item.Menu_Slug = Parent_File) or else
-              (Empty (Typenow) and then Self = Item.Menu_Slug)
+              (Empty (-Typenow) and then Self = Item.Menu_Slug)
             then
                if Submenu_Index /= No_Submenu then
 --             if not Empty (Submenu_Items) then
@@ -301,8 +301,8 @@ is
                            -- Handle current for post_type=post|page|foo pages,
                            -- which won't match self.
                            Self_Type : String :=
-                              (if not Empty (Typenow)
-                               then (-Self) & "?post_type=" & Typenow
+                              (if not Empty (-Typenow)
+                               then (-Self) & "?post_type=" & (-Typenow)
                                else "nothing");
                         begin
                            if 0 /= Pos then

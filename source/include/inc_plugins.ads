@@ -77,6 +77,22 @@ is
                                   is null;
 
 --
+-- Gets the basename of a plugin.
+--
+-- This method extracts the name of a plugin from its filename.
+--
+-- @since 1.5.0
+--
+-- @global array wp_plugin_paths
+--
+-- @param string file The filename of plugin.
+-- @return string The name of a plugin.
+--
+   function Plugin_Basename (File : String)
+                             return String
+                             is ("XXX-461");
+
+--
 -- Adds a callback function to an action hook.
 --
 -- Actions are the hooks that the WordPress core launches at specific points
