@@ -318,7 +318,8 @@ is
 --              when "edit" =>
                            if Isset (String'(Get (X_REQUEST, "bulk_edit"))) then
                               declare
-                                 Done : Array_Type := Bulk_Edit_Posts (Get (X_REQUEST, ""));
+                                 Done : Array_Type :=
+                                    Adi_Posts.Bulk_Edit_Posts (Get (X_REQUEST, ""));
                                  -- (item => ) added
                               begin
                                  if Is_Array (Done) then

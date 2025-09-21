@@ -60,8 +60,6 @@ is
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
 
-   function Bulk_Edit_Posts (Item : Array_Type) return Array_Type;
-
    procedure Set (Arr : in out Array_Type; Key : String; Value : String);
    procedure Set (Arr : in out Array_Type; Key : String; Value : Array_Type)
      is null;
