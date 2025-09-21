@@ -33,7 +33,7 @@ with Inc_Users;
 -- WordPress Administration Bootstrap
 -- require_once __DIR__ . '/admin.php';
 
-package body HB_Post
+package body Adm_Post
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -535,4 +535,4 @@ is
 
    end Render;
 
-end HB_Post;
+end Adm_Post;

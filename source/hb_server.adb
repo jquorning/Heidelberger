@@ -27,7 +27,7 @@ with Inc_Class_Wp_Posts;
 with Adm_Edit;
 with Adm_Edit_Tags;
 with HB_Menu;
-with HB_Post;
+with Adm_Post;
 
 package body HB_Server is
 
@@ -48,7 +48,7 @@ package body HB_Server is
    begin
       Register (Dispatcher, "/hb-admin/edit",      Adm_Edit.Render'Access);
       Register (Dispatcher, "/hb-admin/edit-tags", Adm_Edit_Tags.Render'Access);
-      Register (Dispatcher, "/hb-admin/post",      HB_Post.Render'Access);
+      Register (Dispatcher, "/hb-admin/post",      Adm_Post.Render'Access);
    end Register_Dispatcher;
 
    -----------
