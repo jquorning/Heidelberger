@@ -123,6 +123,24 @@ is
                                is ("XXX-351");
 
 --
+-- Retrieves the edit post link for post.
+--
+-- Can be used within the WordPress loop or outside of it. Can be used with
+-- pages, posts, attachments, and revisions.
+--
+-- @since 2.3.0
+--
+-- @param int|WP_Post post    Optional. Post ID or post object. Default is the global `post`.
+-- @param string      context Optional. How to output the "&" character. Default "&amp;".
+-- @return string|null The edit post link for the given post. Null if the post type does not exist
+--                     or does not allow an editing UI.
+--
+   function Get_Edit_Post_Link (Post    : Integer := 0;
+                                Context : String  := "display")
+                                return String
+                                is ("XXX-444");
+
+--
 -- Retrieves the URL to the admin area for either the current site or the network depending on context.
 --
 -- @since 3.1.0

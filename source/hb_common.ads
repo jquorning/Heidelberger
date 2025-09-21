@@ -173,12 +173,6 @@ is
 
    function Count (Al : Assoc_List) return Natural;
 
-   function Get_Edit_Post_Link (Id : Assoc_Type; Item : String := "") return String;
-   function Get_Edit_Post_Link (Id   : Integer;
-                                Item : String := "")
-                                return String
-                                is ("XXX-250");
-
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
                  return Array_Type;

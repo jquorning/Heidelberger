@@ -827,6 +827,7 @@ is
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
                      declare
                         use Inc_Formatting;
+                        use Inc_Link_Templates;
 
                         Id   : constant Integer := Integer'Value (-Ids.First_Element);
                         URL  : constant String  :=

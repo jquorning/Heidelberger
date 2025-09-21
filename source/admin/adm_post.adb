@@ -261,7 +261,8 @@ is
                         Unused : Array_Type := Wp_Set_Post_Lock (Post_Id);
                      begin
                         Inc_Pluggables.Wp_Redirect
-                           (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
+                           (Get_Edit_Post_Link (Post_Id, "url"));
+--                         (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
                      end;
                      goto Bailout; -- return; -- exit;
                   end if;
