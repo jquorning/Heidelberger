@@ -31,6 +31,24 @@ is
                              is (Empty_Array);
 
 --
+-- Marks the post as currently being edited by the current user.
+--
+-- @since 2.5.0
+--
+-- @param int|WP_Post $post ID or object of the post being edited.
+-- @return array|false then
+--     Array of the lock time and user ID. False if the post does not exist, or there
+--     is no current user.
+--
+--     @type int $0 The current time as a Unix timestamp.
+--     @type int $1 The ID of the current user.
+-- end;
+--
+   function Wp_Set_Post_Lock (Post : Integer)
+                              return Array_Type
+                              is (Empty_Array);
+
+--
 -- Determines whether the post is currently being edited by another user.
 --
 -- @since 2.5.0

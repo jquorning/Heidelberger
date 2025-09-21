@@ -33,7 +33,6 @@ is
    function Has_Items (Item : List_Table) return Boolean;
    function X_Get_List_Table (Item : String) return List_Table;
 
-   function Get_Pagination_Arg (List : List_Type; Item : String) return Natural;
    function Get_Pagination_Arg (List : List_Table; Item : String) return Natural;
 
    function To_Array (Item : String) return Array_Type;
@@ -247,10 +246,6 @@ is
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
    procedure Redirect_Post (Post_Id : String) is null;
-
-   type Lock_Type is new Integer;
-   function Wp_Set_Post_Lock (Post_Id : String)  return Lock_Type is (1);
-   function Wp_Set_Post_Lock (Post_Id : Integer) return Lock_Type is (1);
 
    function Post_Type_Supports (Post : String; I : String) return Boolean is (True);
    procedure Enqueue_Comment_Hotkeys_JS is null;

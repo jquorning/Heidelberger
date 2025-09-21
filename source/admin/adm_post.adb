@@ -258,7 +258,7 @@ is
                   if not Empty (String'(Get (XX_GET, "get-post-lock"))) then
                      Inc_Pluggables.Check_Admin_Referer ("lock-post_" & Post_Id'Image);
                      declare
-                        Unused : Lock_Type := Wp_Set_Post_Lock (Post_Id);
+                        Unused : Array_Type := Wp_Set_Post_Lock (Post_Id);
                      begin
                         Inc_Pluggables.Wp_Redirect
                            (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
@@ -314,7 +314,8 @@ is
 
                   if 0 = Wp_Check_Post_Lock (Post.Id'Image) then
                      declare
-                        Active_Post_Lock : Lock_Type := Wp_Set_Post_Lock (Post.Id'Image);
+                        Active_Post_Lock : array_Type :=
+                           Wp_Set_Post_Lock (Integer (Post.Id));
                      begin
                         if "attachment" /= Post_Type then
                            Wp_Enqueue_Script ("autosave");
