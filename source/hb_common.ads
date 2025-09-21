@@ -167,8 +167,6 @@ is
                      Arg_3 : String := "")
       return String is ("XXX-201");
 
-   function Number_Format_I18n (N : Integer) return String;
-
    function Count (Al : Assoc_List) return Natural;
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;

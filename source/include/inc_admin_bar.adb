@@ -1404,6 +1404,7 @@ begin
    procedure Wp_Admin_Bar_Comments_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Comments;
+      use Inc_Functions;
       use Inc_Link_Templates;
 
       Counts        : Comment_Counts := Wp_Count_Comments;
@@ -1413,7 +1414,7 @@ begin
                   -- translators: %s: Number of comments.
                   N_N ("%s Comment in moderation",
                        "%s Comments in moderation", Awaiting_Mod),
-                  Number_Format_I18n (Awaiting_Mod));
+                  Number_Format_I18n (Float (Awaiting_Mod)));
       Icon  : Unbounded_String;
       Title : Unbounded_String;
       Node  : Node_Args;
@@ -1425,7 +1426,7 @@ begin
       Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
       Title := +"<span class=""ab-label awaiting-mod pending-count count-" &
                 Natural'Image (Awaiting_Mod) & """ aria-hidden=""true"">" &
-                Number_Format_I18n (Awaiting_Mod) & "</span>";
+                Number_Format_I18n (Float (Awaiting_Mod)) & "</span>";
       Title := Title &
                "<span class=""screen-reader-text comments-in-moderation-text"">" &
                Awaiting_Text & "</span>";
@@ -1544,6 +1545,7 @@ begin
 --
    procedure Wp_Admin_Bar_Updates_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Updates;
 
@@ -1561,11 +1563,11 @@ begin
                 -- translators: %s: Total number of updates available.
                 N_N ("%s update available", "%s updates available",
                      Counts_Total),
-                Number_Format_I18n (Counts_Total));
+                Number_Format_I18n (Float (Counts_Total)));
 
       Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
       Title := +"<span class=""ab-label"" aria-hidden=""true"">" &
-               Number_Format_I18n (Counts_Total) & "</span>";
+               Number_Format_I18n (Float (Counts_Total)) & "</span>";
       Title := Title &
                "<span class=""screen-reader-text updates-available-text"">" &
                Updates_Text & "</span>";

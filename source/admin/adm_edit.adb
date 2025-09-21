@@ -782,17 +782,19 @@ is
       for X of Bulk_Counts loop   -- foreach
 --            for (Message, Count) of Bulk_Counts loop   -- foreach
          declare
+            use Inc_Functions;
+
             Count   : constant Natural := Natural'Value (-X.Key);   -- Count;
             Message : constant String  := -X.Value; -- Message;
          begin
             if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, Post_Type, Message),
-                                          Number_Format_I18n (Count)));
+                                          Number_Format_I18n (Float (Count))));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
             elsif Isset (String'(Get (Bulk_Messages, "post", Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, "post", Message),
-                                          Number_Format_I18n (Count)));
+                                          Number_Format_I18n (Float (Count))));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
             end if;
