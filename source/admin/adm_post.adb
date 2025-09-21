@@ -494,8 +494,10 @@ is
                Inc_Pluggables.Check_Admin_Referer ("toggle-custom-fields",
                                                    "toggle-custom-fields-nonce");
                declare
+                  use Inc_Pluggables;
                   use Inc_Users;
 
+                  Unused : Boolean;
                   Current_User_Id : constant Integer := Get_Current_User_Id; -- ();
                begin
                   if 0 /= Current_User_Id then
@@ -508,8 +510,8 @@ is
                                           not Enable_Custom_Fields);
                      end;
                   end if;
+                  Unused := Wp_Safe_Redirect (Inc_Functions.Wp_Get_Referer); -- ()
                end;
-               Wp_Safe_Redirect (Inc_Functions.Wp_Get_Referer); -- ()
                goto Bailout; -- return; -- exit;
 
             else

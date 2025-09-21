@@ -250,8 +250,6 @@ is
                         Ssl  : Boolean) is null;
    MEDIA_TRASH : Boolean := False;
    function Post_Preview return String is ("XXX-104");
-   procedure Wp_Safe_Redirect (Ref : String) is null;
-
 
    function Empty (A : String) return Boolean is (True);
    function Empty (Table : Array_Type) return Boolean;
