@@ -303,7 +303,7 @@ is
                                              (abs "Error in deleting the attachment.");
                                        end if;
                                     else
-                                       if not Wp_Delete_Post (-Post_Id) then
+                                       if Wp_Delete_Post (Integer'Value (-Post_Id)) = Null_Post then
                                           Inc_Functions.Wp_Die
                                             (abs "Error in deleting the item.");
                                        end if;

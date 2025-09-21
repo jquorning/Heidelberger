@@ -472,7 +472,7 @@ is
                      end if;
                   end;
                else
-                  if not Wp_Delete_Post (Post_Id'Image, True) then
+                  if Wp_Delete_Post (Post_Id, True) = Null_Post then
                      Inc_Functions.Wp_Die (abs "Error in deleting the item.");
                   end if;
                end if;
