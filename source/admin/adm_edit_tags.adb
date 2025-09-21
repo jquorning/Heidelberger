@@ -28,7 +28,7 @@ with Inc_Link_Templates;
 with Inc_Options;
 with Inc_Pluggables;
 
-package body HB_Edit_Tags
+package body Adm_Edit_Tags
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -927,4 +927,4 @@ is
       return Table;
    end Translation;
 
-end HB_Edit_Tags;
+end Adm_Edit_Tags;
