@@ -8,8 +8,8 @@
 with Ada.Containers;
 
 with Adi_Caches;
+with Adi_Templates;
 
-with Inc_Templates;
 with Inc_Functions;
 
 with Hb_Common;
@@ -2226,8 +2226,8 @@ is
                                  Args       : Array_Type := Empty_Array)
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Adi_Templates;
       use Inc_Class_Wp_Terms;
-      use Inc_Templates;
       use Array_Vectors;
       use Integer_Vectors;
 

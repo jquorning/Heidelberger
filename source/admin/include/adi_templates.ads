@@ -1,57 +1,89 @@
 
---
--- Template WordPress Administration API.
---
--- A Big Mess. Also some neat functions that are nicely written.
---
--- @package WordPress
--- @subpackage Administration
---
+with Ada.Containers.Vectors;
 
 with Arrays;
 
+with Hb_Common;
+
+with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Posts;
+
 package Adi_Templates
 is
+   use Hb_Common;
    use Arrays;
---
--- Adds a meta box to one or more screens.
---
--- @since 2.5.0
--- @since 4.4.0 The `screen` parameter now accepts an array of screen IDs.
---
--- @global array wp_meta_boxes
---
--- @param string                 id            Meta box ID (used in the "id" attribute for the meta box).
--- @param string                 title         Title of the meta box.
--- @param callable               callback      Function that fills the box with the desired content.
---                                              The function should echo its output.
--- @param string|array|WP_Screen screen        Optional. The screen or screens on which to show the box
---                                              (such as a post type, "link", or "comment"). Accepts a single
---                                              screen ID, WP_Screen object, or array of screen IDs. Default
---                                              is the current screen.  If you have used add_menu_page() or
---                                              add_submenu_page() to create a new screen (and hence screen_id),
---                                              make sure your menu slug conforms to the limits of sanitize_key()
---                                              otherwise the "screen" menu may not correctly render on your page.
--- @param string                 context       Optional. The context within the screen where the box
---                                              should display. Available contexts vary from screen to
---                                              screen. Post edit screen contexts include "normal", "side",
---                                              and "advanced". Comments screen contexts include "normal"
---                                              and "side". Menus meta boxes (accordion sections) all use
---                                              the "side" context. Global default is "advanced".
--- @param string                 priority      Optional. The priority within the context where the box should show.
---                                              Accepts "high", "core", "default", or "low". Default "default".
--- @param array                  callback_args Optional. Data that should be set as the args property
---                                              of the box array (which is the second parameter passed
---                                              to your callback). Default null.
---
-   type Callable is null record;
 
-   procedure Add_Meta_Box (Id            : String;
-                           Title         : String;
-                           Callback      : Callable;
-                           Screen        : String     := ""; -- = null,
-                           Context       : String     := "advanced";
-                           Priority      : String     := "default";
-                           Callback_Args : Array_Type := Empty_Array);-- null )
+--
+-- Category Checklists.
+--
+
+--
+-- Outputs an unordered list of checkbox input elements labeled with category names.
+--
+-- @since 2.5.1
+--
+-- @see wp_terms_checklist()
+--
+-- @param int         $post_id              Optional. Post to generate a categories checklist for. Default 0.
+--                                          $selected_cats must not be an array. Default 0.
+-- @param int         $descendants_and_self Optional. ID of the category to output along with its descendants.
+--                                          Default 0.
+-- @param int[]|false $selected_cats        Optional. Array of category IDs to mark as checked. Default false.
+-- @param int[]|false $popular_cats         Optional. Array of category IDs to receive the "popular-category" class.
+--                                          Default false.
+-- @param Walker      $walker               Optional. Walker object to use to build the output.
+--                                          Default is a Walker_Category_Checklist instance.
+-- @param bool        $checked_ontop        Optional. Whether to move checked items out of the hierarchy and to
+--                                          the top of the list. Default true.
+--
+   procedure Wp_Category_Checklist (Post_Id              : Integer     := 0;
+                                    Descendants_And_Self : Integer     := 0;
+                                    Selected_Cats        : Array_Type  := Empty_Array;
+                                    Popular_Cats         : Array_type  := Empty_Array;
+                                    Walker               : Walker_Type := null;
+                                    Checked_Ontop        : Boolean     := True);
+
+--
+-- Outputs an unordered list of checkbox input elements labelled with term names.
+--
+-- Taxonomy-independent version of wp_category_checklist().
+--
+-- @since 3.0.0
+-- @since 4.4.0 Introduced the `echo` argument.
+--
+-- @param int          post_id Optional. Post ID. Default 0.
+-- @param array|string args then
+--     Optional. Array or string of arguments for generating a terms checklist. Default empty array.
+--
+--     @type int    descendants_and_self ID of the category to output along with its descendants.
+--                                        Default 0.
+--     @type int[]  selected_cats        Array of category IDs to mark as checked. Default false.
+--     @type int[]  popular_cats         Array of category IDs to receive the "popular-category" class.
+--                                        Default false.
+--     @type Walker walker               Walker object to use to build the output. Default empty which
+--                                        results in a Walker_Category_Checklist instance being used.
+--     @type string taxonomy             Taxonomy to generate the checklist for. Default "category".
+--     @type bool   checked_ontop        Whether to move checked items out of the hierarchy and to
+--                                        the top of the list. Default true.
+--     @type bool   echo                 Whether to echo the generated markup. False to return the markup instead
+--                                        of echoing it. Default true.
+-- end;
+-- @return string HTML list of input elements.
+--
+   function Wp_Terms_Checklist (Post_Id : Integer := 0;
+                                Args    : Array_Type) return String;
+
+
+
+   function Get_Media_States (Post : Inc_Class_Wp_Posts.Wp_Post) return List_Type;
+
+   -- package Term_Arrays is new
+   --    Ada.Containers.Vectors (Index_Type   => Positive,
+   --                            Element_Type => Inc_Class_Wp_Terms.Wp_Term,
+   --                            "="          => Inc_Class_Wp_Terms."=");
+
+   -- subtype Wp_Term_Array is Term_Arrays.Vector;
+
+   -- Empty_Term_Array : constant Wp_Term_Array := Term_Arrays.Empty_Vector;
 
 end Adi_Templates;
