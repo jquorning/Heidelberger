@@ -227,8 +227,6 @@ is
    function Post_Type_Supports (Post : String; I : String) return Boolean is (True);
    procedure Enqueue_Comment_Hotkeys_JS is null;
    function Wp_Basename (S : String) return String is ("XXX-106");
-   procedure Wp_Update_Attachment_Metadata (Post : String; Newmeta : Array_Type)
-     is null;
 
    type Time is null record;
    procedure Setcookie (N    : String;

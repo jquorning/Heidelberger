@@ -343,12 +343,13 @@ is
 
                -- Update the thumbnail filename.
                declare
+                  Unused  : Integer;
                   Newmeta : Array_Type :=
                      Wp_Get_Attachment_Metadata (Post_Id'Image, True);
                begin
                   Set (Newmeta, "thumb", Wp_Basename (Get (X_POST, "thumb")));
 
-                  Wp_Update_Attachment_Metadata (Post_Id'Image, Newmeta);
+                  Unused := Wp_Update_Attachment_Metadata (Post_Id, Newmeta);
                end;
                -- Intentional fall-through to trigger the edit_post() call.
 

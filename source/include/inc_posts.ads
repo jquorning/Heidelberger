@@ -832,6 +832,20 @@ is
                             is (1);
 
 --
+-- Updates metadata for an attachment.
+--
+-- @since 2.1.0
+--
+-- @param int   attachment_id Attachment post ID.
+-- @param array data          Attachment meta data.
+-- @return int|False False if post is invalid.
+--
+   function Wp_Update_Attachment_Metadata (Attachment_Id : Integer;
+                                           Data          : Array_Type)
+                                           return Integer
+                                           is (1);
+
+   --
    -- Sanitizes every post field.
    --
    -- If the context is 'raw', then the post object or array will get minimal
