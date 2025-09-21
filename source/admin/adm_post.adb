@@ -122,7 +122,7 @@ is
                Action := +"preview";
             end if;
 
-            Sendback := +Wp_Get_Referer;  -- ();
+            Sendback := +Inc_Functions.Wp_Get_Referer;  -- ();
             if
               Sendback = "" or else
               Ada.Strings.Fixed.Index (-Sendback, "post.php") = 0 or else
@@ -508,7 +508,7 @@ is
                      end;
                   end if;
                end;
-               Wp_Safe_Redirect (Wp_Get_Referer); -- ()
+               Wp_Safe_Redirect (Inc_Functions.Wp_Get_Referer); -- ()
                goto Bailout; -- return; -- exit;
 
             else

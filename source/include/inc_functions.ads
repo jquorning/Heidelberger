@@ -102,6 +102,19 @@ is
                                     is null;
 
 --
+-- Retrieves referer from '_wp_http_referer' or HTTP referer.
+--
+-- If it's the same as the current request URL, will return false.
+--
+-- @since 2.0.4
+--
+-- @return string|false Referer URL on success, false on failure.
+--
+   function Wp_Get_Referer
+            return String
+            is ("XXX-465");
+
+--
 -- Marks something as being incorrectly called.
 --
 -- There is a hook then@see 'doing_it_wrong_run'end; that will be called that can be used

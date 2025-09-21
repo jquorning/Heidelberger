@@ -41,8 +41,6 @@ is
                       S  : String)
                       return Array_Type is (Empty_Array);
 
-   function Wp_Get_Referer return String is ("XXX-213");
-
    function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
       return Unbounded_String;
    function Add_Query_Arg (Item : String; N : String; I : String)

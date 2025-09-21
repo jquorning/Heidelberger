@@ -125,7 +125,7 @@ is
             )));
 
 --               Location := False;
-         Referer  := +Wp_Get_Referer; -- ();
+         Referer  := +Inc_Functions.Wp_Get_Referer; -- ();
          if Referer = "" then -- For POST requests.  -- not
             Referer := +Wp_Unslash (Get (X_SERVER, "REQUEST_URI"));
          end if;
