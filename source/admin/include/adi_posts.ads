@@ -49,6 +49,15 @@ is
                               is (Empty_Array);
 
 --
+-- Redirects to previous page.
+--
+-- @since 2.7.0
+--
+-- @param int $post_id Optional. Post ID.
+--
+   procedure Redirect_Post (Post_Id : Integer := 0) is null;
+
+--
 -- Determines whether the post is currently being edited by another user.
 --
 -- @since 2.5.0

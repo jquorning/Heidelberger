@@ -233,7 +233,6 @@ is
      is ("XXX-111");
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
-   procedure Redirect_Post (Post_Id : String) is null;
 
    function Post_Type_Supports (Post : String; I : String) return Boolean is (True);
    procedure Enqueue_Comment_Hotkeys_JS is null;

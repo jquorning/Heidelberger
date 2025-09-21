@@ -213,7 +213,7 @@ is
                   Post_Id : String := (if "postajaxpost" = Action
                                        then Edit_Post else Write_Post);
                begin
-                  Redirect_Post (Post_Id);
+                  Redirect_Post (Integer'Value (Post_Id));
                end;
                goto Bailout; -- return; -- exit;
 
@@ -364,7 +364,7 @@ is
 --                Setcookie ("wp-saving-post", Post_Id'Image & "-saved", time + DAY_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN, Is_Ssl); -- ssl());
                end if;
 
-               Redirect_Post (Post_Id'Image);
+               Redirect_Post (Post_Id);
                -- Send user on their way while we keep working.
 
                goto Bailout; -- return; -- exit;
