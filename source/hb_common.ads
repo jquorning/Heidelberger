@@ -215,10 +215,6 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   function Wp_Update_Term (Id : Natural; Taxonomy : String; Arr : Array_Type)
-                            return Boolean
-                            is (True);
-
    function Is_Plugin_Active (Item : String) return Boolean;
 
    procedure Do_Action_Deprecated (I1 : String;

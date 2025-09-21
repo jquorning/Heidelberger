@@ -281,9 +281,12 @@ is
                   end if;
 
                   declare
-                     Ret : constant Boolean := Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
+                     use Array_Vectors;
+
+                     Ret : constant Array_Type :=
+                        Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
                   begin
-                     if Ret and then not Is_Wp_Error (Ret) then
+                     if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
                         Location := Add_Query_Arg ("message", 3, Referer);
                      else
                         Location := Add_Query_Arg (
