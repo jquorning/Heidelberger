@@ -24,7 +24,7 @@ with Inc_Class_Wp_Posts;
 -- with Adi_Nav_Menus;
 -- with Adm_Nav_Menus;
 
-with HB_Edit;
+with Adm_Edit;
 with HB_Edit_Tags;
 with HB_Menu;
 with HB_Post;
@@ -46,7 +46,7 @@ package body HB_Server is
    is
       use AWS.Services.Dispatchers.URI;
    begin
-      Register (Dispatcher, "/hb-admin/edit",      HB_Edit.Render'Access);
+      Register (Dispatcher, "/hb-admin/edit",      Adm_Edit.Render'Access);
       Register (Dispatcher, "/hb-admin/edit-tags", HB_Edit_Tags.Render'Access);
       Register (Dispatcher, "/hb-admin/post",      HB_Post.Render'Access);
    end Register_Dispatcher;

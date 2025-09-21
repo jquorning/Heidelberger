@@ -33,7 +33,7 @@ with Inc_Link_Templates;
 with Inc_Pluggables;
 with Inc_Posts;
 
-package body HB_Edit
+package body Adm_Edit
 is
    use Ada.Containers;
    use Ada.Strings.Unbounded;
@@ -877,4 +877,4 @@ is
 --  require_once ABSPATH . 'wp-admin/admin-header.php';
 -- ?>
 
-end HB_Edit;
+end Adm_Edit;
