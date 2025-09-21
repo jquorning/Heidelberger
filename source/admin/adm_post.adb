@@ -20,6 +20,7 @@ with HB_Common;
 
 with Adi_Posts;
 with Inc_Capabilities;
+with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_Class_Wp_Posts;
@@ -343,6 +344,8 @@ is
 
                -- Update the thumbnail filename.
                declare
+                  use Inc_Formatting;
+
                   Unused  : Integer;
                   Newmeta : Array_Type :=
                      Wp_Get_Attachment_Metadata (Post_Id'Image, True);

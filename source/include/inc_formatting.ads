@@ -228,6 +228,20 @@ is
                           is ("XXX-402");
 
 --
+-- i18n-friendly version of basename().
+--
+-- @since 3.1.0
+--
+-- @param string path   A path.
+-- @param string suffix If the filename ends in suffix this will also be cut off.
+-- @return string
+--
+   function Wp_Basename (Path   : String;
+                         Suffix : String := "")
+                         return String
+                         is ("XXX-446");
+
+--
 -- Removes slashes from a string or recursively removes slashes from strings within an array.
 --
 -- This should be used to remove slashes from data passed to core API that
