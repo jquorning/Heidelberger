@@ -10,8 +10,8 @@
 --
 
 with Hb_Common;
--- with Arrays;
-with Inc_Caches;
+
+with Adi_Caches;
 
 package body Inc_Meta
 is
@@ -772,7 +772,7 @@ is
       end;
 
       declare
-         use Inc_Caches;
+         use Adi_Caches;
 
          Hit        : Boolean;
          Meta_Cache : Array_Type;

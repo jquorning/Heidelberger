@@ -10,7 +10,8 @@ with Ada.Containers;
 
 with Arrays;
 
-with Inc_Caches;
+with Adi_Caches;
+
 with Inc_Class_Wp_Terms;
 with Inc_Functions;
 with Inc_Load;
@@ -1333,7 +1334,7 @@ is
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            -- Inc_Class_Posts.Wp_Post
    is
-      use Inc_Caches;
+      use Adi_Caches;
       use Inc_Class_Wp_Terms;
       use Inc_Taxonomys;
       use Inc_Load;

@@ -3,7 +3,8 @@ with Php;
 with Globals;
 with Hb_Common;
 
-with Inc_Caches;
+with Adi_Caches;
+
 with Inc_Category_Templates;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wpdb;
@@ -17,7 +18,7 @@ is
    function "-" (Item : Unbounded_String) return String
       renames To_String;
 
-   use Inc_Caches;
+   use Adi_Caches;
 
    procedure Get_Instance (Id      : Post_Id;
                            Post    : out Wp_Post;

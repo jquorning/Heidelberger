@@ -8,7 +8,7 @@
 -- @subpackage Cache
 --
 
-package body Inc_Caches
+package body Adi_Caches
 is
 
 
@@ -435,4 +435,4 @@ end Wp_Cache_Get;
 --         $wp_object_cache->reset();
 -- end;
 
-end Inc_Caches;
+end Adi_Caches;

@@ -2,7 +2,7 @@ with Arrays;
 
 with Inc_Class_Wp_Posts;
 
-package Inc_Caches
+package Adi_Caches
 is
    use Arrays;
 --
@@ -59,4 +59,4 @@ is
                            Result : out Array_Type;
                            Hit    : out Boolean) is null;
 
-end Inc_Caches;
+end Adi_Caches;

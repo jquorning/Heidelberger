@@ -7,8 +7,8 @@
 
 with Ada.Containers;
 
-with Inc_Caches;
--- with Inc_Class_Wp_Taxonomy;
+with Adi_Caches;
+
 with Inc_Templates;
 with Inc_Functions;
 
@@ -3771,7 +3771,7 @@ is
                                    Taxonomy : String)
                                    return Inc_Class_Wp_Terms.Wp_Term_Array
    is
-      use Inc_Caches;
+      use Adi_Caches;
       use Inc_Class_Wp_Terms;
       use Array_Vectors;
 
