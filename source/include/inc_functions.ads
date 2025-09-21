@@ -71,6 +71,55 @@ is
    procedure Nocache_Headers is null;
 
 --
+-- Retrieves URL with nonce added to URL query.
+--
+-- @since 2.0.4
+--
+-- @param string     $actionurl URL to add nonce action.
+-- @param int|string $action    Optional. Nonce action name. Default -1.
+-- @param string     $name      Optional. Nonce name. Default '_wpnonce'.
+-- @return string Escaped URL with nonce action added.
+--
+   function Wp_Nonce_Url (Actionurl : String;
+                          Action    : String := "-1";
+                          Name      : String := "_wpnonce")
+                          return String
+                          is ("XXX-466");
+
+--
+-- Retrieves or display nonce hidden field for forms.
+--
+-- The nonce field is used to validate that the contents of the form came from
+-- the location on the current site and not somewhere else. The nonce does not
+-- offer absolute protection, but should protect against most cases. It is very
+-- important to use nonce field in forms.
+--
+-- The $action and $name are optional, but if you want to have better security,
+-- it is strongly suggested to set those two parameters. It is easier to just
+-- call the function without any parameters, because validation of the nonce
+-- doesn't require any parameters, but since crackers know what the default is
+-- it won't be difficult for them to find a way around your nonce and cause
+-- damage.
+--
+-- The input name will be whatever $name value you gave. The input value will be
+-- the nonce creation value.
+--
+-- @since 2.0.4
+--
+-- @param int|string $action  Optional. Action name. Default -1.
+-- @param string     $name    Optional. Nonce name. Default '_wpnonce'.
+-- @param bool       $referer Optional. Whether to set the referer field for validation. Default true.
+-- @param bool       $echo    Optional. Whether to display or return hidden form field. Default true.
+-- @return string Nonce field HTML markup.
+--
+   function Wp_Nonce_Field (Action  : String  := "-1"; -- = -1
+                            Name    : String  := "_wpnonce";
+                            Referer : Boolean := True;
+                            Echo    : Boolean := True)
+                            return String
+                            is ("XXX-466");
+
+--
 -- Marks a function argument as deprecated and inform when it has been used.
 --
 -- This function is to be used whenever a deprecated function argument is used.

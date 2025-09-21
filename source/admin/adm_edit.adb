@@ -797,6 +797,7 @@ is
             if "trashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
                declare
                   use Inc_Formatting;
+                  use Inc_Functions;
 
                   Ids   : constant Integer := Preg_Replace ("/[^0-9,]/", "",
                                                             Get (X_REQUEST, "ids"));

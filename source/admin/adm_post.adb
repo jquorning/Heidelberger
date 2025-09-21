@@ -162,7 +162,7 @@ is
                   -- For output of the Quick Draft dashboard widget.
 --                require_once ABSPATH . "wp-admin/includes/dashboard.php";
 
-                  if not Wp_Verify_Nonce (Nonce, "add-post") then
+                  if Inc_Pluggables.Wp_Verify_Nonce (Nonce, "add-post") = 0 then
                      Error_Msg := +abs "Unable to submit this form, please refresh and try again.";
                   end if;
 

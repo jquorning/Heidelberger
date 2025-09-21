@@ -1630,6 +1630,7 @@ end Wp_Admin_Bar_Search_Menu;
    procedure Wp_Admin_Bar_Recovery_Mode_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Class_Wp_Recovery_Mode;
+      use Inc_Functions;
       use Inc_General_Templates;
       use Inc_Load;
 

@@ -564,8 +564,13 @@ is
                           Get (Tax.Labels, "add_new_item"));
 
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
-                     Wp_Nonce_Field ("add-tag", "_wpnonce_add-tag");
-                     Set ("VAR_edit_tags_add_tag", "XXX-82");
+                     declare
+                        Unused : String :=
+                           Inc_Functions.Wp_Nonce_Field ("add-tag",
+                                                         "_wpnonce_add-tag");
+                     begin
+                        Set ("VAR_edit_tags_add_tag", "XXX-82");
+                     end;
 
                   elsif Var_Name = "VAR_edit_tags_can_edit_terms" then
                      declare

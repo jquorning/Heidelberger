@@ -174,7 +174,7 @@ is
       return String is ("XXX-201");
 
    function Number_Format_I18n (N : Integer) return String;
-   function Wp_Nonce_URL (Url : String; Item : String) return String is ("XXX-216");
+
    function Count (Al : Assoc_List) return Natural;
 
    function Get_Edit_Post_Link (Id : Assoc_Type; Item : String := "") return String;
@@ -226,7 +226,6 @@ is
                                    V : String;
                                    I2 : String) is null;
    procedure Do_Action (Item_1 : String; Item_2 : String := "") is null;
-   procedure Wp_Nonce_Field (I1, I2 : String) is null;
 
    function Get_Cat_Name (Item : String) return String is ("XXX-91");
 
@@ -239,7 +238,6 @@ is
 
    procedure Wp_Reset_Vars (A : Array_Type) is null;
 
-   function Wp_Verify_Nonce (V : String; Item : String) return Boolean is (True);
    function Wp_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
    function Get_Default_Comment_Status (S : String; E : String := "") return String
      is ("XXX-111");
