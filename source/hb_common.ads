@@ -63,8 +63,6 @@ is
 
    function Count (Item : String) return String;
 
-   procedure Add_Screen_Option;
-
    function Apply_Filters (Item : String;
                            S : String;
                            D : String;
@@ -152,8 +150,6 @@ is
                            Arg       : Boolean)
                            return Boolean
                            is (True);
-
-   procedure Add_Screen_Option (Item : String; List : Array_Type);
 
    function "abs" (List : Array_Type) return String;
 

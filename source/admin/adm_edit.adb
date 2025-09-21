@@ -492,23 +492,23 @@ is
                   );
                end if;
 
-            Get_Current_Screen.Set_Screen_Reader_Content (
-               To_Array (List => (
-                Build ("heading_views",
-                       Wp_Common.Get (Post_Type_Object, "labels.filter_items_list")),
-                Build ("heading_pagination",
-                       Wp_Common.Get (Post_Type_Object, "labels.items_list_navigation")),
-                Build ("heading_list",
-                       Wp_Common.Get (Post_Type_Object, "labels.items_list"))
-            )));
-            end;
+               Get_Current_Screen.Set_Screen_Reader_Content (
+                  To_Array (List => (
+                   Build ("heading_views",
+                          Wp_Common.Get (Post_Type_Object, "labels.filter_items_list")),
+                   Build ("heading_pagination",
+                          Wp_Common.Get (Post_Type_Object, "labels.items_list_navigation")),
+                   Build ("heading_list",
+                          Wp_Common.Get (Post_Type_Object, "labels.items_list"))
+               )));
 
-            Add_Screen_Option (
-               "per_page",
-               To_Array (List => (
-                  Build ("default", Natural'(20)'Image),
-                  Build ("option",  "edit_" & Post_Type & "_per_page")
-            )));
+               Add_Screen_Option (
+                  "per_page",
+                  To_Array (List => (
+                     Build ("default", Natural'(20)'Image),
+                     Build ("option",  "edit_" & Post_Type & "_per_page")
+               )));
+            end;
 
             declare
                Bulk_Counts : Array_Type

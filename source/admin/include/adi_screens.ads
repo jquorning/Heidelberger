@@ -5,10 +5,24 @@
 -- @subpackage Administration
 --
 
+with Arrays;
+
 with Adi_Class_Wp_Screens;
 
 package Adi_Screens
 is
+   use Arrays;
+--
+-- Register and configure an admin screen option
+--
+-- @since 3.1.0
+--
+-- @param string option An option name.
+-- @param mixed  args   Option-dependent arguments.
+--
+   procedure Add_Screen_Option (Option : String;
+                                Args   : Array_Type := Empty_Array)
+                                is null;
 
 --
 -- Get the current screen object
