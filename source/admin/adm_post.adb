@@ -18,6 +18,7 @@ with Globals;
 with Php;
 with HB_Common;
 
+with Adi_Comments;
 with Adi_Dashboard;
 with Adi_Misc;
 with Adi_Posts;
@@ -338,7 +339,7 @@ is
 
                   if Post_Type_Supports (Post_Type, "comments") then
                      Wp_Enqueue_Script ("admin-comments");
-                     Enqueue_Comment_Hotkeys_JS; --();
+                     Adi_Comments.Enqueue_Comment_Hotkeys_JS;
                   end if;
                end;
 --                require ABSPATH . "wp-admin/edit-form-advanced.php";

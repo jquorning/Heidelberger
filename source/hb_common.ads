@@ -210,8 +210,6 @@ is
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
 
-   procedure Enqueue_Comment_Hotkeys_JS is null;
-
    type Time is null record;
    procedure Setcookie (N    : String;
                         Post : String;
