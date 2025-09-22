@@ -18,6 +18,7 @@ with Globals;
 with Php;
 with HB_Common;
 
+with Adi_Misc;
 with Adi_Posts;
 
 with Inc_Capabilities;
@@ -59,7 +60,7 @@ is
       Post_New_File : Unbounded_String;
    begin
 
-      Wp_Reset_Vars (To_Array ("action"));
+      Adi_Misc.Wp_Reset_Vars (To_Array ("action"));
       declare
          Post_Id : Integer; -- String := "test"; -- Integer; -- test added
       begin
