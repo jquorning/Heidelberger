@@ -224,7 +224,6 @@ is
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
 
-   function Post_Type_Supports (Post : String; I : String) return Boolean is (True);
    procedure Enqueue_Comment_Hotkeys_JS is null;
 
    type Time is null record;
