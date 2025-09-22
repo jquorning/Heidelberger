@@ -18,6 +18,7 @@ with Globals;
 with Php;
 with HB_Common;
 
+with Adi_Dashboard;
 with Adi_Misc;
 with Adi_Posts;
 
@@ -207,11 +208,13 @@ is
                end if;
 
                declare
-                  Unused_1 : String := Edit_Post;   -- ();
-                  Unused_2 : String := Wp_Dashboard_Quick_Press; -- ();
+                  use Adi_Dashboard;
+
+                  Unused : String := Edit_Post;   -- ();
                begin
-                  null;
+                  Wp_Dashboard_Quick_Press; -- ();
                end;
+
                goto Bailout; -- return;  -- exit;
 
             elsif Action = "post" or Action = "postajaxpost" then

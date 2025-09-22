@@ -207,8 +207,6 @@ is
    function Wp_Is_Mobile return Boolean is (False);
    procedure Wp_Dropdown_Categories (A : Array_Type) is null;
 
-   function Wp_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
-
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
 
