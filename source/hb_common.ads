@@ -214,7 +214,6 @@ is
 
    function Submit_Button (Text : String; V1 : String; V2 : String; X : Boolean)
      return String is ("XX-101");
-   function Is_Taxonomy_Hierarchical (Taxonomy : String) return Boolean is (True);
 
    procedure Wp_Reset_Vars (A : Array_Type) is null;
 
