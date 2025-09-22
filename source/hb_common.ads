@@ -227,9 +227,6 @@ is
    function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
      is (Empty_Array);
 
-   function Get_User_Meta (Id : Integer; Item : String; V : Boolean) return Boolean
-      is (True);
-
    procedure Update_User_Meta (Id : Integer; Item : String; V : Boolean) is null;
 
    type Walker_Type is access procedure;
