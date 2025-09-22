@@ -211,7 +211,7 @@ is
                declare
                   use Adi_Dashboard;
 
-                  Unused : String := Edit_Post;   -- ();
+                  Unused : Integer := Edit_Post;   -- ();
                begin
                   Wp_Dashboard_Quick_Press; -- ();
                end;
@@ -221,10 +221,10 @@ is
             elsif Action = "post" or Action = "postajaxpost" then
                Inc_Pluggables.Check_Admin_Referer ("add-" & Post_Type);
                declare
-                  Post_Id : String := (if "postajaxpost" = Action
+                  Post_Id : Integer := (if "postajaxpost" = Action
                                        then Edit_Post else Write_Post);
                begin
-                  Redirect_Post (Integer'Value (Post_Id));
+                  Redirect_Post (Post_Id);
                end;
                goto Bailout; -- return; -- exit;
 
@@ -369,7 +369,7 @@ is
             elsif Action = "editpost" then
                Inc_Pluggables.Check_Admin_Referer ("update-post_" & Post_Id'Image);
 
-               Post_Id := Integer'Value (Edit_Post); --();
+               Post_Id := Edit_Post; --();
 
                -- Session cookie flag that the post was saved.
                if

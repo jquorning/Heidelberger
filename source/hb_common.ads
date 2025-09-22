@@ -190,10 +190,6 @@ is
 
    function Wp_Is_Mobile return Boolean is (False);
 
-   function Edit_Post  return String is ("XXX-113");
-   function Write_Post return String is ("XXX-114");
-   function Post_Preview return String is ("XXX-104");
-
    function Empty (A : String) return Boolean is (True);
    function Empty (Table : Array_Type) return Boolean;
    function Empty (Arry : Array_Type; Key : String) return Boolean is (False);

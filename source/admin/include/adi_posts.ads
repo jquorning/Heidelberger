@@ -30,6 +30,37 @@ is
                              return Array_Type
                              is (Empty_Array);
 
+   --
+   -- Updates an existing post with values provided in `$_POST`.
+   --
+   -- If post data is passed as an argument, it is treated as an array of data
+   -- keyed appropriately for turning into a post object.
+   --
+   -- If post data is not passed, the `$_POST` global variable is used instead.
+   --
+   -- @since 1.5.0
+   --
+   -- @global wpdb $wpdb WordPress database abstraction object.
+   --
+   -- @param array|null $post_data Optional. The array of post data to process.
+   --                              Defaults to the `$_POST` superglobal.
+   -- @return int Post ID.
+   --
+   function Edit_Post (Post_Data : Array_Type := Empty_Array) -- = null
+                       return Integer
+                       is (1);
+
+   --
+   -- Calls wp_write_post() and handles the errors.
+   --
+   -- @since 2.0.0
+   --
+   -- @return int|void Post ID on success, void on failure.
+   --
+   function Write_Post
+            return Integer
+            is (1);
+
 --
 -- Marks the post as currently being edited by the current user.
 --
@@ -71,5 +102,15 @@ is
    function Wp_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
    function Wp_Check_Post_Lock (Post_Id : String)     return Integer is (1);
 
+   --
+   -- Saves a draft or manually autosaves for the purpose of showing a post preview.
+   --
+   -- @since 2.7.0
+   --
+   -- @return string URL to redirect to show the preview.
+   --
+   function Post_Preview
+            return String
+            is ("XXX-501");
 
 end Adi_Posts;
