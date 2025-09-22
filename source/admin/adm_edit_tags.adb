@@ -19,8 +19,9 @@ with Adi_Plugins;
 with Adi_Screens;
 with Adi_Templates;
 
-with Inc_Category_Templates;
 with Inc_Capabilities;
+with Inc_Categories;
+with Inc_Category_Templates;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Formatting;
@@ -625,6 +626,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_delete_help" then
                      declare
+                        use Inc_Categories;
                         use Inc_Options;
 
                         R : constant String := Printf (

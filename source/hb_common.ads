@@ -202,8 +202,6 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   function Get_Cat_Name (Item : String) return String is ("XXX-91");
-
    function Wp_Is_Mobile return Boolean is (False);
 
    function Edit_Post  return String is ("XXX-113");
