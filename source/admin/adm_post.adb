@@ -512,7 +512,8 @@ is
                   use Inc_Pluggables;
                   use Inc_Users;
 
-                  Unused : Boolean;
+                  Unused   : Boolean;
+                  Unused_2 : Integer;
                   Current_User_Id : constant Integer := Get_Current_User_Id; -- ();
                begin
                   if 0 /= Current_User_Id then
@@ -521,8 +522,9 @@ is
                            := Get_User_Meta (Current_User_Id,
                                              "enable_custom_fields", True);
                      begin
-                        Update_User_Meta (Current_User_Id, "enable_custom_fields",
-                                          not Enable_Custom_Fields);
+                        Unused_2 := Update_User_Meta (Current_User_Id,
+                                                      "enable_custom_fields",
+                                                      not Enable_Custom_Fields);
                      end;
                   end if;
                   Unused := Wp_Safe_Redirect (Inc_Functions.Wp_Get_Referer); -- ()

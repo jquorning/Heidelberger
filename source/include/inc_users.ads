@@ -65,6 +65,35 @@ is
                            return Boolean
                            is (True);
 
+   --
+   -- Updates user meta field based on user ID.
+   --
+   -- Use the prev_value parameter to differentiate between meta fields with the
+   -- same key and user ID.
+   --
+   -- If the meta field for the user does not exist, it will be added.
+   --
+   -- @since 3.0.0
+   --
+   -- @link https://developer.wordpress.org/reference/functions/update_user_meta/
+   --
+   -- @param int    user_id    User ID.
+   -- @param string meta_key   Metadata key.
+   -- @param mixed  meta_value Metadata value. Must be serializable if non-scalar.
+   -- @param mixed  prev_value Optional. Previous value to check before updating.
+   --                           If specified, only update existing metadata entries with
+   --                           this value. Otherwise, update all entries. Default empty.
+   -- @return int|bool Meta ID if the key didn"t exist, true on successful update,
+   --                  false on failure or if the value passed to the function
+   --                  is the same as the one that is already in the database.
+   --
+   function Update_User_Meta (User_Id    : Integer;
+                              Meta_Key   : String;
+                              Meta_Value : Boolean;
+                              prev_value : String := "")
+                              return Integer
+                              is (0);
+
 --
 -- Finds out whether a user is a member of a given blog.
 --
