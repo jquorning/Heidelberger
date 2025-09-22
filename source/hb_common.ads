@@ -209,15 +209,6 @@ is
 
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
-
-   type Time is null record;
-   procedure Setcookie (N    : String;
-                        Post : String;
-                        Ts   : Time;
-                        Path : String;
-                        Dom  : String;
-                        Ssl  : Boolean) is null;
-   MEDIA_TRASH : Boolean := False;
    function Post_Preview return String is ("XXX-104");
 
    function Empty (A : String) return Boolean is (True);

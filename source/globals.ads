@@ -29,6 +29,8 @@ is
    DOING_AJAX     : Boolean := True;
    IFRAME_REQUEST : Boolean := True;
 
+   MEDIA_TRASH : Boolean := False;
+
    WP_ADMIN          : Boolean;
    WP_NETWORK_ADMIN  : Boolean;
    WP_USER_ADMIN     : Boolean;
