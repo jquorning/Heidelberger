@@ -201,10 +201,6 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   procedure Do_Action_Deprecated (I1 : String;
-                                   A1 : Array_Type;
-                                   V : String;
-                                   I2 : String) is null;
    procedure Do_Action (Item_1 : String; Item_2 : String := "") is null;
 
    function Get_Cat_Name (Item : String) return String is ("XXX-91");

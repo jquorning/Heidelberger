@@ -27,6 +27,7 @@ with Inc_Functions_Wp_Scripts;
 with Inc_Taxonomys;
 with Inc_Link_Templates;
 with Inc_Options;
+with Inc_Plugins;
 with Inc_Pluggables;
 
 package body Adm_Edit_Tags
@@ -491,6 +492,7 @@ is
                                 Translations : in out Translate_Set)
                is
                   use Inc_Formatting;
+                  use Inc_Plugins;
 
                   procedure Set (Var : String; Value : String);
                   procedure Set (Var : String; Value : Boolean);
