@@ -10,6 +10,20 @@ package Inc_Comments
 is
 
 --
+-- Gets the default comment status for a post type.
+--
+-- @since 4.3.0
+--
+-- @param string post_type    Optional. Post type. Default "post".
+-- @param string comment_type Optional. Comment type. Default "comment".
+-- @return string Expected return value is "open" or "closed".
+--
+   function Get_Default_Comment_Status (Post_Type    : String := "post";
+                                        Comment_Type : String := "comment")
+                                        return String
+                                        is ("XXX-447");
+
+--
 -- Retrieves the total comment counts for the whole site or a single post.
 --
 -- The comment stats are cached and then retrieved, if they already exist in the

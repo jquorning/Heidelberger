@@ -19,7 +19,9 @@ with Php;
 with HB_Common;
 
 with Adi_Posts;
+
 with Inc_Capabilities;
+with Inc_Comments;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -88,6 +90,7 @@ is
       declare
          use Inc_Class_Wp_Posts;
          use Inc_Class_Wp_Post_Type;
+         use Inc_Comments;
          use Inc_Link_Templates;
          use Inc_Plugins;
 

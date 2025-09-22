@@ -210,8 +210,7 @@ is
    procedure Wp_Reset_Vars (A : Array_Type) is null;
 
    function Wp_Dashboard_Quick_Press (I : String := "") return String is ("XXX-110");
-   function Get_Default_Comment_Status (S : String; E : String := "") return String
-     is ("XXX-111");
+
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");
 
