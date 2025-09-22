@@ -19,6 +19,7 @@ with Php;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
+with Inc_Formatting;
 with Inc_Functions;
 with Inc_Options;
 with Inc_Posts;
@@ -2803,139 +2804,110 @@ is
 --         -- <?php
 -- end Compression_Test;
 
--- --
--- -- Echoes a submit button, with provided text and appropriate class(es).
--- --
--- -- @since 3.1.0
--- --
--- -- @see get_submit_button()
--- --
--- -- @param string       text             The text of the button (defaults to "Save Changes")
--- -- @param string       type             Optional. The type and CSS class(es) of the button. Core values
--- --                                       include "primary", "small", and "large". Default "primary".
--- -- @param string       name             The HTML name of the submit button. Defaults to "submit". If no
--- --                                       id attribute is given in other_attributes below, name will be
--- --                                       used as the Button's id.
--- -- @param bool         wrap             True if the output button should be wrapped in a paragraph tag,
--- --                                       false otherwise. Defaults to true.
--- -- @param array|string other_attributes Other attributes that should be output with the button, mapping
--- --                                       attributes to their values, such as setting tabindex to 1, etc.
--- --                                       These key/value attribute pairs will be output as attribute="value",
--- --                                       where attribute is the key. Other attributes can also be provided
--- --                                       as a string such as "tabindex="1"", though the array format is
--- --                                       preferred. Default null.
--- --
--- procedure Submit_Button (Text : String := null;
---                          Typ  : String := "primary";
---                          Name : string := "submit";
---                          Wrap : Boolean := True;
---                          Other_Attributes : Array_Type := Empty_Array)
--- is
--- begin
---         echo (Get_Submit_Button (Text, Typ, Name, Wrap, Other_Attributes));
--- end Submit_Button;
+   -------------------
+   -- Submit_Button --
+   -------------------
 
--- --
--- -- Returns a submit button, with provided text and appropriate class.
--- --
--- -- @since 3.1.0
--- --
--- -- @param string       text             Optional. The text of the button. Default "Save Changes".
--- -- @param string       type             Optional. The type and CSS class(es) of the button. Core values
--- --                                       include "primary", "small", and "large". Default "primary large".
--- -- @param string       name             Optional. The HTML name of the submit button. Defaults to "submit".
--- --                                       If no id attribute is given in other_attributes below, `name` will
--- --                                       be used as the Button's id. Default "submit".
--- -- @param bool         wrap             Optional. True if the output button should be wrapped in a paragraph
--- --                                       tag, false otherwise. Default true.
--- -- @param array|string other_attributes Optional. Other attributes that should be output with the button,
--- --                                       mapping attributes to their values, such as `array ("tabindex" => "1")`.
--- --                                       These attributes will be output as `attribute="value"`, such as
--- --                                       `tabindex="1"`. Other attributes can also be provided as a string such
--- --                                       as `tabindex="1"`, though the array format is typically cleaner.
--- --                                       Default empty.
--- -- @return string Submit button HTML.
--- --
---    function Get_Submit_Button (Text             : String  := "";
---                                Typ              : String  := "primary large";
---                                Name             : String  := "submit";
---                                Wrap             : Boolean := True;
---                                Other_Attributes : String  := "") return String
---    is
---       Typ_2 : List_Type;
---       Button_Shorthand : List_Type := To_array ("primary", "small", "large");
---       Classes          : List_Type := To_array ("button");
---    begin
---       if not Is_Array (Typ) then
---          Typ_2 := Explode (" ", Typ);
---       end if;
+   procedure Submit_Button (Text             : String     := ""; -- null;
+                            Typ              : String     := "primary";
+                            Name             : String     := "submit";
+                            Wrap             : Boolean    := True;
+                            Other_Attributes : Array_Type := Empty_Array)
+   is
+   begin
+      Echo (Get_Submit_Button (Text, Typ, Name, Wrap, Other_Attributes));
+   end Submit_Button;
 
---       for T of Typ_2 loop
---          if "secondary" = T or else "button-secondary" = T then
---             goto Continue_3;
---          end if;
+   -----------------------
+   -- Get_Submit_Button --
+   -----------------------
 
---          Classes := (if In_Array (-T, Button_Shorthand, True)
---                      then "button-" & T else T); -- ()
---          <<Continue_3>>
---       end loop;
+   function Get_Submit_Button (Text             : String     := "";
+                               Typ              : String     := "primary large";
+                               Name             : String     := "submit";
+                               Wrap             : Boolean    := True;
+                               Other_Attributes : Array_Type := Empty_Array)
+                                return String
+   is
+      use Inc_Formatting;
 
---       declare
---          -- Remove empty items, remove duplicate items, and finally build a string.
---          Class  : String := Implode (" ", Array_Unique (Array_Filter (Classes)));
---          Text_2 : String := (if Text then Text else abs "Save Changes");
---          -- Default the id attribute to name unless an id was specifically
---          -- provided in other_attributes.
---          Id : String := Name;
---       begin
---          if Is_Array (Other_Attributes) and then Isset (Other_Attributes ("id")) then
---             Id := Other_Attributes ("id");
---             Unset (Other_Attributes ("id"));
---          end if;
+      Typ_2            : List_Type;
+      Button_Shorthand : List_Type := To_List ((+"primary", +"small", +"large"));
+      Classes          : List_Type := To_List ((1 => +"button"));
+   begin
+--      if not Is_Array (Typ) then
+         Typ_2 := Explode (" ", Typ);
+--      end if;
 
---          declare
---             Attributes : Unbounded_String;
---          begin
---             if Is_Array (Other_Attributes) then
---                for A of Other_Attributes loop
---                   declare
---                      Attribute : Key_Type   := A.Key;
---                      Value     : Value_Type := A.Value;
---                   begin
---                      Attributes := Attributes & Attribute & "=""" &
---                                    Esc_Attr (-Value) & """ ";
---                      -- Trailing space is important.
---                   end;
---                end loop;
---             elsif not Empty (Other_Attributes) then -- Attributes provided as a string.
---                Attributes := +Other_Attributes;
---             end if;
+      for T of Typ_2 loop
+         if "secondary" = T or else "button-secondary" = T then
+            goto Continue_3;
+         end if;
 
---             declare
---                -- Don't output empty name and id attributes.
---                Name_Attr : String := (if Name /= ""
---                                       then " name=""" & Esc_Attr (Name) & """"
---                                       else """");
---                Id_Attr   : String := (if Id /= ""
---                                       then " id="""   & Esc_Attr (Id)   & """"
---                                       else """");
+         Classes.Append ((if In_Array (-T, Button_Shorthand, True)
+                          then "button-" & T else T)); -- ()
+         <<Continue_3>>
+      end loop;
 
---                Button : Unbounded_String;
---             begin
---                Append (Button, "<input type=""submit""" & Name_Attr & Id_Attr &
---                                " class=""" & Esc_Attr (Class));
---                Append (Button, """ value=""" & Esc_Attr (Text_2) & """ " & Attributes &
---                                " />");
+      declare
+         -- Remove empty items, remove duplicate items, and finally build a string.
+         Class  : String :=
+            Implode (" ", List_Type'(Array_Unique (Array_Filter (Classes))));
 
---                if Wrap then
---                   Button := To_Unbounded_String ("<p class=""submit"">" & (-Button) &
---                                                  "</p>");
---                end if;
---                return -Button;
---             end;
---          end;
---       end;
---    end Get_Submit_Button;
+         Text_2 : String := (if Text /= "" then Text else abs "Save Changes");
+         -- Default the id attribute to name unless an id was specifically
+         -- provided in other_attributes.
+         Id : String := Name;
+      begin
+         if Is_Array (Other_Attributes) and then Isset (Other_Attributes, "id") then
+            Id := Get (Other_Attributes, "id");
+--          Other_Attributes.Delete (Other_Attributes.Find (Item => "id"));
+--          Unset (Other_Attributes ("id"));
+         end if;
+
+         declare
+            Attributes : Unbounded_String;
+         begin
+            if Is_Array (Other_Attributes) then
+               for A of Other_Attributes loop
+                  declare
+                     Attribute : Key_Type   := A.Key;
+                     Value     : Value_Type := A.Value;
+                  begin
+                     Attributes := Attributes & Attribute & "=""" &
+                                   Esc_Attr (-Value) & """ ";
+                     -- Trailing space is important.
+                  end;
+               end loop;
+--          elsif not Empty (Other_Attributes) then -- Attributes provided as a string.
+--             Attributes := +Other_Attributes;
+            end if;
+
+            declare
+               -- Don't output empty name and id attributes.
+               Name_Attr : String := (if Name /= ""
+                                      then " name=""" & Esc_Attr (Name) & """"
+                                      else """");
+               Id_Attr   : String := (if Id /= ""
+                                      then " id="""   & Esc_Attr (Id)   & """"
+                                      else """");
+
+               Button : Unbounded_String;
+            begin
+               Append (Button, "<input type=""submit""" & Name_Attr & Id_Attr &
+                               " class=""" & Esc_Attr (Class));
+               Append (Button, """ value=""" & Esc_Attr (Text_2) & """ " & Attributes &
+                               " />");
+
+               if Wrap then
+                  Button := To_Unbounded_String ("<p class=""submit"">" & (-Button) &
+                                                 "</p>");
+               end if;
+               return -Button;
+            end;
+         end;
+      end;
+   end Get_Submit_Button;
 
 -- --
 -- -- Prints out the beginning of the admin HTML header.

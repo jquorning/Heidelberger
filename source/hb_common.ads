@@ -53,6 +53,7 @@ is
 
    function Array_Filter (List : Array_Type) return Assoc_List;
    function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
+   function Array_Filter (List : List_Type) return List_Type is (Empty_List);
 
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
@@ -205,9 +206,6 @@ is
 
    function Wp_Is_Mobile return Boolean is (False);
    procedure Wp_Dropdown_Categories (A : Array_Type) is null;
-
-   function Submit_Button (Text : String; V1 : String; V2 : String; X : Boolean)
-     return String is ("XX-101");
 
    procedure Wp_Reset_Vars (A : Array_Type) is null;
 

@@ -17,6 +17,7 @@ with HB_Common;
 with Adi_Class_Wp_Screens;
 with Adi_Plugins;
 with Adi_Screens;
+with Adi_Templates;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
@@ -883,9 +884,9 @@ is
                           Get (Tax.Labels, "slug_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_submit_button" then
-                     Set ("VAR_edit_tags_submit_button",
-                          Submit_Button (Get (Tax.Labels, "add_new_item"),
-                                         "primary", "submit", False));
+                      Adi_Templates.Submit_Button (Get (Tax.Labels, "add_new_item"),
+                                     "primary", "submit", False);
+                     Set ("VAR_edit_tags_submit_button", "XXX-447");
 
                   elsif Var_Name = "VAR_edit_tags_tax_field_description" then
                      Set ("VAR_edit_tags_tax_field_description",

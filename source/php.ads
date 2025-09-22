@@ -217,4 +217,16 @@ is
                      return Boolean
                      is (False);
 
+   type Unique_Flags is (Sort_String);
+
+   function Array_Unique (Arry  : Array_Type;
+                          Flags : Unique_Flags := Sort_String)
+                          return Array_Type
+                          is (Empty_Array);
+
+   function Array_Unique (Arry  : List_Type;
+                          Flags : Unique_Flags := Sort_String)
+                          return List_Type
+                          is (Empty_List);
+
 end Php;
