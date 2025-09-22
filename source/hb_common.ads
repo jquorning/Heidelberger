@@ -205,7 +205,6 @@ is
    function Get_Cat_Name (Item : String) return String is ("XXX-91");
 
    function Wp_Is_Mobile return Boolean is (False);
-   procedure Wp_Dropdown_Categories (A : Array_Type) is null;
 
    function Edit_Post  return String is ("XXX-113");
    function Write_Post return String is ("XXX-114");

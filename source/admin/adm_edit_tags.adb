@@ -19,6 +19,7 @@ with Adi_Plugins;
 with Adi_Screens;
 with Adi_Templates;
 
+with Inc_Category_Templates;
 with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
@@ -766,6 +767,8 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_dropdown" then
                      declare
+                        use Inc_Category_Templates;
+
                         Dropdown_Args : Array_Type := To_Array (List => (
                                       Build ("hide_empty",       "0"),
                                       Build ("hide_if_empty",    "false"),
@@ -797,6 +800,7 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         -- @param string context  Filter context. Accepts "new" or "edit".
                         --
+                        Unused : Unbounded_String;
                      begin
                         Dropdown_Args := Apply_Filters ("taxonomy_parent_dropdown_args",
                                                         Dropdown_Args, Taxonomy, "new");
@@ -804,7 +808,7 @@ is
                         Set (Dropdown_Args, "aria_describedby", "parent-description");
 --                      Dropdown_Args ("aria_describedby") := "parent-description";
 
-                        Wp_Dropdown_Categories (Dropdown_Args);
+                        Unused := +Wp_Dropdown_Categories (Dropdown_Args);
 
                         Set ("VAR_edit_tags_dropdown", "XXX-87");
                      end;
