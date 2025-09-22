@@ -201,8 +201,6 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   procedure Do_Action (Item_1 : String; Item_2 : String := "") is null;
-
    function Get_Cat_Name (Item : String) return String is ("XXX-91");
 
    function Wp_Is_Mobile return Boolean is (False);

@@ -28,6 +28,7 @@ with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Users;
 with Inc_Link_Templates;
 with Inc_Pluggables;
+with Inc_Plugins;
 with Inc_Posts;
 with Inc_Users;
 
@@ -88,6 +89,7 @@ is
          use Inc_Class_Wp_Posts;
          use Inc_Class_Wp_Post_Type;
          use Inc_Link_Templates;
+         use Inc_Plugins;
 
          Post_Type        : String := "";
          Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;

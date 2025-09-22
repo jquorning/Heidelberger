@@ -49,6 +49,7 @@ is
    is
       use Globals;
       use Adi_Plugins;
+      use Inc_Plugins;
 
       Unused : Boolean;
    begin

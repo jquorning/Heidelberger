@@ -15,6 +15,7 @@ with Php;
 with Adi_Plugins;
 with Inc_Capabilities;
 with Inc_Formatting;
+with Inc_Plugins;
 
 package body Adm_Menu_Header
 is
@@ -421,6 +422,7 @@ is
    procedure Bottom
    is
       use Adm_Menu;
+      use Inc_Plugins;
    begin
 -- ?>
       Echo
