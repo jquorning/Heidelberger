@@ -18,8 +18,11 @@ with Php;
 with HB_Common;
 with Wp_Common;
 
-with Adi_Posts;
+with Adi_Class_Wp_List_Tables;
+with Adi_Class_Wp_Posts_List_Tables;
 with Adi_Class_Wp_Screens;
+with Adi_List_Tables;
+with Adi_Posts;
 with Adi_Screens;
 
 with Inc_Capabilities;
@@ -108,8 +111,13 @@ is
       end if;
 
       declare
-         Wp_List_Table : List_Table       := X_Get_List_Table ("Wp_Posts_List_Table");
-         Pagenum       : constant Natural := Wp_List_Table.Get_Pagenum; -- ();
+         use Adi_Class_Wp_Posts_List_Tables;
+         use Adi_List_Tables;
+
+         X_Wp_List_Table : Wp_Posts_List_Table :=
+            Wp_Posts_List_Table (X_Get_List_Table ("Wp_Posts_List_Table"));
+
+         Pagenum         : constant Natural := X_Wp_List_Table.Get_Pagenum; -- ();
       begin
 -- // Back-compat for viewing comments of an entry.
 -- foreach ( array( 'p', 'attachment_id', 'page_id' ) as $_redirect ) {
@@ -138,7 +146,7 @@ is
 --    Submenu_File  := "edit";
 --    Post_New_File := "post-new";
 -- end if;
-            Doaction : String := Wp_List_Table.Current_Action; -- ();
+            Doaction : String := X_Wp_List_Table.Current_Action; -- ();
          begin
 
             if Doaction = "" then   -- if doaction then
@@ -400,7 +408,7 @@ is
                return AWS.Response.URL (""); -- exit;  -- redirect
             end if;
 
-            Wp_List_Table.Prepare_Items; -- ();
+            X_Wp_List_Table.Prepare_Items; -- ();
 
             Wp_Enqueue_Script ("inline-edit-post");
             Wp_Enqueue_Script ("Heartbeat");
@@ -685,16 +693,17 @@ is
                                                                Post_Type)));
 
                      elsif Var_Name = "VAR_page_edit_views" then
+                        X_Wp_List_Table.Views; -- ()
                         Insert (Translations, Assoc ("VAR_page_edit_views",
-                                                     Wp_List_Table.Views)); -- ()
+                                                     "XX-449")); -- ()
 
                      elsif Var_Name = "VAR_page_edit_search_box" then
+                        X_Wp_List_Table.Search_Box
+                          (String'(Hb_Common.Get (Post_Type_Object,
+                                                 "labels.search_items")),
+                           "post");
                         Insert (Translations,
-                           Assoc ("VAR_page_edit_search_box",
-                                  Wp_List_Table.Search_Box
-                                    (String'(Hb_Common.Get (Post_Type_Object,
-                                                  "labels.search_items")),
-                                     "post")));
+                           Assoc ("VAR_page_edit_search_box", "XXX-454"));
 
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Insert (Translations,
@@ -724,13 +733,16 @@ is
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_display" then
+                        X_Wp_List_Table.Display;  -- ()
                         Insert (Translations, Assoc ("VAR_page_edit_display",
-                                                     Wp_List_Table.Display));  -- ()
+                                                     "XXX-450"));
 
                      elsif Var_Name = "VAR_page_edit_inline_edit" then
-                        if Wp_List_Table.Has_Items then -- ()
+                        if X_Wp_List_Table.Has_Items then -- ()
+                           X_Wp_List_Table.Inline_Edit;  -- ();
                            Insert (Translations, Assoc ("VAR_page_edit_inline_edit",
-                                                        Wp_List_Table.Inline_Edit));  -- ();
+                                                        "XXX-462"));
+
                         end if;
                      end if;
                   end Value;

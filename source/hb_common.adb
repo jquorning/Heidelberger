@@ -3,19 +3,19 @@ package body HB_Common
 is
    use Inc_Class_Wp_Posts;
 
-   function Get_Pagenum (Item : List_Table) return Natural is (99);
+--   function Get_Pagenum (Item : List_Table) return Natural is (99);
 
-   procedure Prepare_Items (Table : in out List_Table) is
-   begin
-      null;
-   end Prepare_Items;
+--   procedure Prepare_Items (Table : in out List_Table) is
+--   begin
+--      null;
+--   end Prepare_Items;
 
-   function Current_Action (Item : List_Table) return String is ("XXX 1");
-   function X_Get_List_Table (Item : String) return List_Table is
-      List : List_Table;
-   begin
-      return List;
-   end X_Get_List_Table;
+--   function Current_Action (Item : List_Table) return String is ("XXX 1");
+--   function X_Get_List_Table (Item : String) return List_Table is
+--      List : List_Table;
+--   begin
+--      return List;
+--   end X_Get_List_Table;
 
    procedure Post_Type_Object is null;
 
@@ -126,15 +126,15 @@ is
 
    function "abs" (List : Array_Type) return String is ("XXX 12");
 
-   function Views (Item : List_Table) return String is ("XXX-31");
-   function Search_Box (Item : List_Table; L : String; R : String) return String is ("XXX-32");
-   function Display (Item : List_Table) return String is ("XXX-33");
-   function Inline_Edit (Item : List_Table) return String is ("XXX-34");
-   function Has_Items (Item : List_Table) return Boolean is (False);
+--   function Views (Item : List_Table) return String is ("XXX-31");
+--   function Search_Box (Item : List_Table; L : String; R : String) return String is ("XXX-32");
+--   function Display (Item : List_Table) return String is ("XXX-33");
+--   function Inline_Edit (Item : List_Table) return String is ("XXX-34");
+--   function Has_Items (Item : List_Table) return Boolean is (False);
 
-   function ESC_HTML (Item : String) return String is (Item);
-   function ESC_URL  (Item : String) return String is (Item);
-   function ESC_Attr (AL : String) return String is ("XXX-106");
+--   function ESC_HTML (Item : String) return String is (Item);
+--   function ESC_URL  (Item : String) return String is (Item);
+--   function ESC_Attr (AL : String) return String is ("XXX-106");
 
    function Printf (Format : String; Arg_1 : String) return String is (Format & Arg_1);
 
@@ -160,7 +160,7 @@ is
 
    procedure Check_Admin_Referer (Item : String; Item_2 : String := "") is null;
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural is (1);
-   function Get_Pagination_Arg (List : List_Table; Item : String) return Natural is (1);
+--   function Get_Pagination_Arg (List : List_Table; Item : String) return Natural is (1);
    function Current_User_Can (Trait : String; Val : String) return Boolean is (True);
    function Current_User_Can (Trait : String; Val : Integer) return Boolean is (True);
    function Admin_URL (Item : String) return String is ("XXX-71");

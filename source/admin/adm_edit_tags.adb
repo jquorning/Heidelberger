@@ -15,6 +15,9 @@ with Globals;
 with HB_Common;
 
 with Adi_Class_Wp_Screens;
+with Adi_Class_Wp_List_Tables;
+with Adi_Class_Wp_Terms_List_Tables;
+with Adi_List_Tables;
 with Adi_Plugins;
 with Adi_Screens;
 with Adi_Templates;
@@ -93,9 +96,13 @@ is
 --  global $post_type;
       Label_1 :
       declare
+         use Adi_Class_Wp_Terms_List_Tables;
+         use Adi_List_Tables;
+
          Post_Type     : constant String := ""; -- jq
-         Wp_List_Table : List_Table := X_Get_List_Table ("WP_Terms_List_Table");
-         Pagenum       : constant Natural    := Wp_List_Table.Get_Pagenum;  -- ();
+         X_Wp_List_Table : Wp_Terms_List_Table :=
+            Wp_Terms_List_Table (X_Get_List_Table ("WP_Terms_List_Table"));
+         Pagenum       : constant Natural    := X_Wp_List_Table.Get_Pagenum;  -- ();
 
          Title : String := Get (Tax.Labels, "name");
 
@@ -151,7 +158,7 @@ is
 
 -- case Hb_List_Table.Current_Action then
 
-         if "add-tag" = Wp_List_Table.Current_Action then
+         if "add-tag" = X_Wp_List_Table.Current_Action then
             Inc_Pluggables.Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
 
             if not Current_User_Can (Get (Tax.Cap, "edit_terms")) then
@@ -179,7 +186,7 @@ is
                end if;
             end;
 
-         elsif "delete" = Wp_List_Table.Current_Action then
+         elsif "delete" = X_Wp_List_Table.Current_Action then
             if not Isset (String'(Get (X_REQUEST, "tag_ID"))) then
                goto  Break;
             end if;
@@ -215,7 +222,7 @@ is
             end;
             <<Break>>
 
-         elsif "bulk-delete" = Wp_List_Table.Current_Action then
+         elsif "bulk-delete" = X_Wp_List_Table.Current_Action then
             Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
             if not Current_User_Can (Get (Tax.Cap, "delete_terms")) then
@@ -236,7 +243,7 @@ is
                Location := Add_Query_Arg ("message", 6, Referer);
             end;
 
-         elsif "edit" =  Wp_List_Table.Current_Action then
+         elsif "edit" =  X_Wp_List_Table.Current_Action then
             if not Isset (String'(Get (X_REQUEST, "tag_ID"))) then
                goto Break_2;
             end if;
@@ -263,7 +270,7 @@ is
 
          <<Break_2>>
 
-         elsif "editedtag" = Wp_List_Table.Current_Action then
+         elsif "editedtag" = X_Wp_List_Table.Current_Action then
             declare
                Taxonomy : Unbounded_String;
                Tag_ID   : constant Integer := Integer'Value (Get (X_POST, "tag_ID"));
@@ -307,7 +314,7 @@ is
             end;
 
          else
-            if "" = Wp_List_Table.Current_Action or else  -- not
+            if "" = X_Wp_List_Table.Current_Action or else  -- not
               not Isset (String'(Get (X_REQUEST, "delete_tags")))
             then
                goto Break_3;
@@ -320,7 +327,7 @@ is
             begin
                -- This action is documented in wp-admin/edit.php
                Location := +Apply_Filters ("handle_bulk_actions-thenscreenend;",
-                                           -Location, Wp_List_Table.Current_Action,
+                                           -Location, X_Wp_List_Table.Current_Action,
                                            Tags);
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
             end;
@@ -361,10 +368,12 @@ is
             goto Bailout; -- return;  --  exit;
          end if;
 
-         Wp_List_Table.Prepare_Items; -- ();
+         X_Wp_List_Table.Prepare_Items; -- ();
 
          declare
-            Total_Pages : constant Natural := Get_Pagination_Arg (Wp_List_Table, "total_pages");
+            use Adi_Class_Wp_List_Tables;
+
+            Total_Pages : constant Natural := Get_Pagination_Arg (X_Wp_List_Table, "total_pages");
          begin
             if Pagenum > Total_Pages and Total_Pages > 0 then
                Inc_Pluggables.Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
@@ -643,7 +652,8 @@ is
                      Set ("VAR_edit_tags_description", E_E ("Description"));
 
                   elsif Var_Name = "VAR_edit_tags_display" then
-                     Set ("VAR_edit_tags_display", Wp_List_Table.Display);
+                     X_Wp_List_Table.Display;
+                     Set ("VAR_edit_tags_display", "XXX-451");
 
                   elsif Var_Name = "VAR_edit_tags_do_action_deprecated" then
                      if "category" = Taxonomy then
@@ -837,7 +847,8 @@ is
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_inline_edit" then
-                     Set ("VAR_edit_tags_inline_edit", Wp_List_Table.Inline_Edit);
+                     X_Wp_List_Table.Inline_Edit;
+                     Set ("VAR_edit_tags_inline_edit", "XXX-463");
 
                   elsif Var_Name = "VAR_edit_tags_is_tax_hierarchical" then
                      Set ("VAR_edit_tags_is_tax_hierarchical", Is_Taxonomy_Hierarchical (Taxonomy));
@@ -876,14 +887,10 @@ is
                      Set ("VAR_edit_tags_remove_message_and_error", "XXX-88");
 
                   elsif Var_Name = "VAR_edit_tags_search_box" then
-                     declare
-                        X : constant String
-                           := Search_Box (Wp_List_Table,
-                                          Get (Tax.Labels, "search_items"),
-                                          "tag");
-                     begin
-                        Set ("VAR_edit_tags_search_box", X);
-                     end;
+                     Search_Box (X_Wp_List_Table,
+                                 Get (Tax.Labels, "search_items"),
+                                 "tag");
+                     Set ("VAR_edit_tags_search_box", "XXX-452");
 
                   elsif Var_Name = "VAR_edit_tags_slug_field_description" then
                      Set ("VAR_edit_tags_slug_field_description",
@@ -913,7 +920,8 @@ is
                           Current_User_Can ("import"));
 
                   elsif Var_Name = "VAR_edit_tags_views" then
-                     Set ("VAR_edit_tags_views", Wp_List_Table.Views);
+                     X_Wp_List_Table.Views;
+                     Set ("VAR_edit_tags_views", "XXX-452");
                   end if;
                end Value;
 

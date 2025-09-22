@@ -21,20 +21,6 @@ is
    function "-" (Item : Unbounded_String) return String
       renames To_String;
 
-   type List_Table is tagged null record;
-   function Get_Pagenum (Item : List_Table) return Natural;
-
-   procedure Prepare_Items (Table : in out List_Table);
-   function Current_Action (Item : List_Table) return String;
-   function Views (Item : List_Table) return String;
-   function Search_Box (Item : List_Table; L : String; R : String) return String;
-   function Display (Item : List_Table) return String;
-   function Inline_Edit (Item : List_Table) return String;
-   function Has_Items (Item : List_Table) return Boolean;
-   function X_Get_List_Table (Item : String) return List_Table;
-
-   function Get_Pagination_Arg (List : List_Table; Item : String) return Natural;
-
    function To_Array (Item : String) return Array_Type;
    function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
                       S  : String)
