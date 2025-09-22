@@ -215,9 +215,6 @@ is
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
-   function Use_Block_Editor_For_Post (Post : Inc_Class_Wp_Posts.Wp_Post)
-                                       return Boolean is (True);
-
    function Isset (Item : Array_Type) return Boolean;
    function Isset (Item : String) return Boolean;
 
