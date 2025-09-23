@@ -34,7 +34,7 @@ is
    function Wptexturize (Text  : String;
                          Reset : Boolean := False)
                          return String
-                         is ("XXX-310");
+                         is ("XXX-513");
 
 --
 -- Parses a string into variables to be stored in an array.
@@ -148,18 +148,16 @@ is
                     return String
                     is ("XXX-341");
 
---
--- Escaping for HTML blocks.
---
--- @since 2.8.0
---
--- @param string text
--- @return string
---
--- function esc_html( text ) then
+   --
+   -- Escaping for HTML blocks.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string text
+   -- @return string
+   --
    function ESC_HTML (Item : String)
-                      return String
-                      is (Item & "XXX-514");
+                      return String;
 
 --
 -- Escaping for HTML attributes.
