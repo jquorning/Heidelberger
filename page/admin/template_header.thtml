@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html class="<?php echo admin_html_class; ?>"
+<!-- From int_templates.x_hb_admin_html_begin -->
+
+<head>
+<meta http-equiv="Content-Type" content="<?php bloginfo ("html_type"); ?>; charset=<?php echo get_option ("blog_charset"); ?>" />
+<!-- From int_templates.x_hb_admin_html_begin -->
+
+<!-- From Ifame_Header -->
+<title><?php bloginfo ("name"); ?> &rsaquo; <?php echo title; ?> &#8212; <?php _e ("WordPress"); ?></title>
+
+<script type="text/javascript">
+addLoadEvent = function(func){if(typeof jQuery!=="undefined")jQuery(function(){func();});else if(typeof wpOnload!=="function"){wpOnload=func};else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};
+function tb_close(){var win=window.dialogArguments||opener||parent||top;win.tb_remove();}
+var ajaxurl = "<?php echo esc_js (admin_url ("admin-ajax.php", "relative")); ?>",
+        pagenow = "<?php echo esc_js (current_screen->id); ?>",
+        typenow = "<?php echo esc_js (current_screen->post_type); ?>",
+        adminpage = "<?php echo esc_js (admin_body_class); ?>",
+        thousandsSeparator = "<?php echo esc_js (wp_locale->number_format["thousands_sep")); ?>",
+        decimalPoint = "<?php echo esc_js (wp_locale->number_format["decimal_point")); ?>",
+        isRtl = <?php echo (int) is_rtl(); ?>;
+</script>
+
+</head>
+<body <?php echo admin_body_id; ?>class="wp-admin wp-core-ui no-js iframe <?php echo admin_body_classes; ?>">
+<script type="text/javascript">
+(function(){
+var c = document.body.className;
+c = c.replace(/no-js/, "js");
+document.body.className = c;
+})();
+</script>

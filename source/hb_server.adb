@@ -1,45 +1,64 @@
 
-with Ada.Directories;
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
-with GNAT.Directory_Operations;
-
 with AWS.Config.Set;
-with AWS.Response;
-with AWS.Services.Page_Server;
-with AWS.Services.Directory;
+--  with AWS.Response;
+--  with AWS.Services.Page_Server;
+with AWS.Services.Dispatchers.URI;
 with AWS.Server;
-with AWS.Status;
+--  with AWS.Status;
+
+with Binder;
+
+with Adm_Credits;
+with Adm_Admin;
+
+with Inc_Posts;
+with Inc_Admin_Bar;
+with Inc_Class_Wp_Scripts;
+-- with Inc_Class_Wp_Dependencies;
+with Inc_Class_Wp_Admin_Bar;
+
+with Adm_Menu_Header;
+
+-- with Adi_Menu;
+with Inc_Class_Wp_Posts;
+-- with Adi_Nav_Menus;
+-- with Adm_Nav_Menus;
+
+with Adm_Edit;
+with Adm_Edit_Tags;
+with Adm_Menu;
+with Adm_Post;
 
 package body HB_Server is
 
-   Http_Server : AWS.Server.HTTP;
+   Server_Name : constant String := "Heidelberger";
 
-   function Callback (Request : AWS.Status.Data)
-                      return AWS.Response.Data;
+   procedure Register_Dispatcher;
 
-   --------------
-   -- Callback --
-   --------------
+   Server     : AWS.Server.HTTP;
+   Dispatcher : AWS.Services.Dispatchers.URI.Handler;
 
-   function Callback (Request : AWS.Status.Data) return AWS.Response.Data
+   -------------------------
+   -- Register_Dispatcher --
+   -------------------------
+
+   procedure Register_Dispatcher
    is
-      use Ada.Directories;
-      use Ada.Strings.Unbounded;
-      use GNAT.Directory_Operations;
-      use AWS.Services.Directory;
-
-      Uri : constant String := AWS.Status.URI (D => Request);
+      use AWS.Services.Dispatchers.URI;
    begin
-      return AWS.Services.Page_Server.Callback (Request => Request);
-   end Callback;
+      Register (Dispatcher, "/wp-admin/edit",      Adm_Edit.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit-tags", Adm_Edit_Tags.Render'Access);
+      Register (Dispatcher, "/wp-admin/post",      Adm_Post.Render'Access);
+      Register (Dispatcher, "/wp-admin/credits.php", Binder.Render'Access);
+   end Register_Dispatcher;
 
    -----------
    -- Start --
    -----------
-
+Program_Termination : exception;
    procedure Start
    is
       use Ada.Text_IO;
@@ -47,13 +66,15 @@ package body HB_Server is
 
       Server_Config : Object := Default_Config;
    begin
-      Set.Server_Name    (Server_Config, "Heidelberger");
+      Set.Server_Name    (Server_Config, Server_Name);
       Set.Server_Port    (Server_Config, 8080);
       Set.Max_Connection (Server_Config, 5);
       Set.Reuse_Address  (Server_Config, True);
 
-      AWS.Server.Start (Web_Server => Http_Server,
-                        Callback   => Callback'Access,
+      Register_Dispatcher;
+
+      AWS.Server.Start (Web_Server => Server,
+                        Dispatcher => Dispatcher,
                         Config     => Server_Config);
 
       Put_Line ("Server was started.");
@@ -73,7 +94,7 @@ package body HB_Server is
       use Ada.Text_IO;
    begin
       Put ("Shutting down server...");
-      AWS.Server.Shutdown (Web_Server => Http_Server);
+      AWS.Server.Shutdown (Web_Server => Server);
    end Shutdown;
 
    ----------

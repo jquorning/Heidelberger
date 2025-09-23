@@ -1,0 +1,377 @@
+--
+-- Dependencies API: WP_Styles class
+--
+-- @since 2.6.0
+--
+-- @package WordPress
+-- @subpackage Dependencies
+--
+
+with Hb_Common;
+
+with Inc_Themes;
+with Inc_Load;
+with Inc_Plugins;
+
+package body Inc_Class_Wp_Styles
+is
+   use Hb_Common;
+
+        --
+        -- Constructor.
+        --
+        -- @since 2.6.0
+        --
+        function X_Construct
+           return Wp_Styles
+        is
+           This : Wp_Styles;
+        begin
+                if
+--                    function_exists( "is_admin" ) and then
+                      not Inc_Load.Is_Admin and then
+--                    function_exists( "current_theme_supports" ) and then
+                      not Inc_Themes.Current_Theme_Supports ("html5", "style")
+                then
+                        this.type_attr := +" type=""text/css""";
+                end if;
+
+                --
+                -- Fires when the WP_Styles instance is initialized.
+                --
+                -- @since 2.6.0
+                --
+                -- @param WP_Styles wp_styles WP_Styles instance (passed by reference).
+                --
+                Inc_Plugins.Do_Action_Ref_Array ("wp_default_styles", This);
+                return This;
+        end X_Construct;
+
+--         --
+--         -- Processes a style dependency.
+--         --
+--         -- @since 2.6.0
+--         -- @since 5.5.0 Added the `group` parameter.
+--         --
+--         -- @see WP_Dependencies::do_item()
+--         --
+--         -- @param string    handle The style"s registered handle.
+--         -- @param int|false group  Optional. Group level: level (int), no groups (false).
+--         --                          Default false.
+--         -- @return bool True on success, false on failure.
+--         --
+--         public function do_item( handle, group = false ) then
+--                 if ( not parent::do_item( handle ) ) then
+--                         return false;
+--                 end;
+
+--                 obj = this.registered[ handle ];
+
+--                 if ( null === obj.ver ) then
+--                         ver = "";
+--                 end; else then
+--                         ver = obj.ver ? obj.ver : this.default_version;
+--                 end;
+
+--                 if ( isset( this.args[ handle ] ) ) then
+--                         ver = ver ? ver . "&amp;" . this.args[ handle ] : this.args[ handle ];
+--                 end;
+
+--                 src         = obj.src;
+--                 cond_before = "";
+--                 cond_after  = "";
+--                 conditional = isset( obj.extra["conditional"] ) ? obj.extra["conditional"] : "";
+
+--                 if ( conditional ) then
+--                         cond_before = "<!--[if thenconditionalend;]>\n";
+--                         cond_after  = "<![endif]-.\n";
+--                 end;
+
+--                 inline_style = this.print_inline_style( handle, false );
+
+--                 if ( inline_style ) then
+--                         inline_style_tag = sprintf(
+--                                 "<style id="%s-inline-css"%s>\n%s\n</style>\n",
+--                                 esc_attr( handle ),
+--                                 this.type_attr,
+--                                 inline_style
+--                         );
+--                 end; else then
+--                         inline_style_tag = "";
+--                 end;
+
+--                 if ( this.do_concat ) then
+--                         if ( this.in_default_dir( src ) and then not conditional and then not isset( obj.extra["alt"] ) ) then
+--                                 this.concat         .= "handle,";
+--                                 this.concat_version .= "handlever";
+
+--                                 this.print_code .= inline_style;
+
+--                                 return true;
+--                         end;
+--                 end;
+
+--                 if ( isset( obj.args ) ) then
+--                         media = esc_attr( obj.args );
+--                 end; else then
+--                         media = "all";
+--                 end;
+
+--                 // A single item may alias a set of items, by having dependencies, but no source.
+--                 if ( not src ) then
+--                         if ( inline_style_tag ) then
+--                                 if ( this.do_concat ) then
+--                                         this.print_html .= inline_style_tag;
+--                                 end; else then
+--                                         echo inline_style_tag;
+--                                 end;
+--                         end;
+
+--                         return true;
+--                 end;
+
+--                 href = this._css_href( src, ver, handle );
+--                 if ( not href ) then
+--                         return true;
+--                 end;
+
+--                 rel   = isset( obj.extra["alt"] ) and then obj.extra["alt"] ? "alternate stylesheet" : "stylesheet";
+--                 title = isset( obj.extra["title"] ) ? sprintf( " title="%s"", esc_attr( obj.extra["title"] ) ) : "";
+
+--                 tag = sprintf(
+--                         "<link rel="%s" id="%s-css"%s href="%s"%s media="%s" />\n",
+--                         rel,
+--                         handle,
+--                         title,
+--                         href,
+--                         this.type_attr,
+--                         media
+--                 );
+
+--                 --
+--                 -- Filters the HTML link tag of an enqueued style.
+--                 --
+--                 -- @since 2.6.0
+--                 -- @since 4.3.0 Introduced the `href` parameter.
+--                 -- @since 4.5.0 Introduced the `media` parameter.
+--                 --
+--                 -- @param string tag    The link tag for the enqueued style.
+--                 -- @param string handle The style"s registered handle.
+--                 -- @param string href   The stylesheet"s source URL.
+--                 -- @param string media  The stylesheet"s media attribute.
+--                 --
+--                 tag = apply_filters( "style_loader_tag", tag, handle, href, media );
+
+--                 if ( "rtl" === this.text_direction and then isset( obj.extra["rtl"] ) and then obj.extra["rtl"] ) then
+--                         if ( is_bool( obj.extra["rtl"] ) || "replace" === obj.extra["rtl"] ) then
+--                                 suffix   = isset( obj.extra["suffix"] ) ? obj.extra["suffix"] : "";
+--                                 rtl_href = str_replace( "thensuffixend;.css", "-rtlthensuffixend;.css", this._css_href( src, ver, "handle-rtl" ) );
+--                         end; else then
+--                                 rtl_href = this._css_href( obj.extra["rtl"], ver, "handle-rtl" );
+--                         end;
+
+--                         rtl_tag = sprintf(
+--                                 "<link rel="%s" id="%s-rtl-css"%s href="%s"%s media="%s" />\n",
+--                                 rel,
+--                                 handle,
+--                                 title,
+--                                 rtl_href,
+--                                 this.type_attr,
+--                                 media
+--                         );
+
+--                         -- This filter is documented in wp-includes/class-wp-styles.php--
+--                         rtl_tag = apply_filters( "style_loader_tag", rtl_tag, handle, rtl_href, media );
+
+--                         if ( "replace" === obj.extra["rtl"] ) then
+--                                 tag = rtl_tag;
+--                         end; else then
+--                                 tag .= rtl_tag;
+--                         end;
+--                 end;
+
+--                 if ( this.do_concat ) then
+--                         this.print_html .= cond_before;
+--                         this.print_html .= tag;
+--                         if ( inline_style_tag ) then
+--                                 this.print_html .= inline_style_tag;
+--                         end;
+--                         this.print_html .= cond_after;
+--                 end; else then
+--                         echo cond_before;
+--                         echo tag;
+--                         this.print_inline_style( handle );
+--                         echo cond_after;
+--                 end;
+
+--                 return true;
+--         end;
+
+--         --
+--         -- Adds extra CSS styles to a registered stylesheet.
+--         --
+--         -- @since 3.3.0
+--         --
+--         -- @param string handle The style"s registered handle.
+--         -- @param string code   String containing the CSS styles to be added.
+--         -- @return bool True on success, false on failure.
+--         --
+--         public function add_inline_style( handle, code ) then
+--                 if ( not code ) then
+--                         return false;
+--                 end;
+
+--                 after = this.get_data( handle, "after" );
+--                 if ( not after ) then
+--                         after = array();
+--                 end;
+
+--                 after[] = code;
+
+--                 return this.add_data( handle, "after", after );
+--         end;
+
+--         --
+--         -- Prints extra CSS styles of a registered stylesheet.
+--         --
+--         -- @since 3.3.0
+--         --
+--         -- @param string handle  The style"s registered handle.
+--         -- @param bool   display Optional. Whether to print the inline style
+--         --                        instead of just returning it. Default true.
+--         -- @return string|bool False if no data exists, inline styles if `display` is true,
+--         --                     true otherwise.
+--         --
+--         public function print_inline_style( handle, display = true ) then
+--                 output = this.get_data( handle, "after" );
+
+--                 if ( empty( output ) ) then
+--                         return false;
+--                 end;
+
+--                 output = implode( "\n", output );
+
+--                 if ( not display ) then
+--                         return output;
+--                 end;
+
+--                 printf(
+--                         "<style id="%s-inline-css"%s>\n%s\n</style>\n",
+--                         esc_attr( handle ),
+--                         this.type_attr,
+--                         output
+--                 );
+
+--                 return true;
+--         end;
+
+--         --
+--         -- Determines style dependencies.
+--         --
+--         -- @since 2.6.0
+--         --
+--         -- @see WP_Dependencies::all_deps()
+--         --
+--         -- @param string|string[] handles   Item handle (string) or item handles (array of strings).
+--         -- @param bool            recursion Optional. Internal flag that function is calling itself.
+--         --                                   Default false.
+--         -- @param int|false       group     Optional. Group level: level (int), no groups (false).
+--         --                                   Default false.
+--         -- @return bool True on success, false on failure.
+--         --
+--         public function all_deps( handles, recursion = false, group = false ) then
+--                 r = parent::all_deps( handles, recursion, group );
+--                 if ( not recursion ) then
+--                         --
+--                         -- Filters the array of enqueued styles before processing for output.
+--                         --
+--                         -- @since 2.6.0
+--                         --
+--                         -- @param string[] to_do The list of enqueued style handles about to be processed.
+--                         --
+--                         this.to_do = apply_filters( "print_styles_array", this.to_do );
+--                 end;
+--                 return r;
+--         end;
+
+--         --
+--         -- Generates an enqueued style"s fully-qualified URL.
+--         --
+--         -- @since 2.6.0
+--         --
+--         -- @param string src    The source of the enqueued style.
+--         -- @param string ver    The version of the enqueued style.
+--         -- @param string handle The style"s registered handle.
+--         -- @return string Style"s fully-qualified URL.
+--         --
+--         public function _css_href( src, ver, handle ) then
+--                 if ( not is_bool( src ) and then not preg_match( "|^(https?:)?//|", src ) and then not ( this.content_url and then 0 === strpos( src, this.content_url ) ) ) then
+--                         src = this.base_url . src;
+--                 end;
+
+--                 if ( not empty( ver ) ) then
+--                         src = add_query_arg( "ver", ver, src );
+--                 end;
+
+--                 --
+--                 -- Filters an enqueued style"s fully-qualified URL.
+--                 --
+--                 -- @since 2.6.0
+--                 --
+--                 -- @param string src    The source URL of the enqueued style.
+--                 -- @param string handle The style"s registered handle.
+--                 --
+--                 src = apply_filters( "style_loader_src", src, handle );
+--                 return esc_url( src );
+--         end;
+
+--         --
+--         -- Whether a handle"s source is in a default directory.
+--         --
+--         -- @since 2.8.0
+--         --
+--         -- @param string src The source of the enqueued style.
+--         -- @return bool True if found, false if not.
+--         --
+--         public function in_default_dir( src ) then
+--                 if ( not this.default_dirs ) then
+--                         return true;
+--                 end;
+
+--                 foreach ( (array) this.default_dirs as test ) then
+--                         if ( 0 === strpos( src, test ) ) then
+--                                 return true;
+--                         end;
+--                 end;
+--                 return false;
+--         end;
+
+--         --
+--         -- Processes items and dependencies for the footer group.
+--         --
+--         -- HTML 5 allows styles in the body, grab late enqueued items and output them in the footer.
+--         --
+--         -- @since 3.3.0
+--         --
+--         -- @see WP_Dependencies::do_items()
+--         --
+--         -- @return string[] Handles of items that have been processed.
+--         --
+--         public function do_footer_items() then
+--                 this.do_items( false, 1 );
+--                 return this.done;
+--         end;
+
+--         --
+--         -- Resets class properties.
+--         --
+--         -- @since 3.3.0
+--         --
+--         public function reset() then
+--                 this.do_concat      = false;
+--                 this.concat         = "";
+--                 this.concat_version = "";
+--                 this.print_html     = "";
+--         end;
+
+end Inc_Class_Wp_Styles;

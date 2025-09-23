@@ -1,0 +1,841 @@
+--
+-- Toolbar API: WP_Admin_Bar class
+--
+-- @package WordPress
+-- @subpackage Toolbar
+-- @since 3.1.0
+--
+
+with Hb_Common;
+with Php;
+
+with Inc_Ms_Functions;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Functions_Wp_Styles;
+with Inc_Functions_Wp_Scripts;
+with Inc_L10n;
+with Inc_Link_Templates;
+with Inc_Load;
+with Inc_Pluggables;
+with Inc_Plugins;
+with Inc_Themes;
+with Inc_Users;
+
+package body Inc_Class_Wp_Admin_Bar
+is
+   use Hb_Common;
+   use Inc_L10n;
+   use Php;
+
+   -----------
+   -- X_Get --
+   -----------
+
+   function X_Get (This : Wp_Admin_Bar;
+                   Name : String)
+                   return String
+   is
+      use Inc_Functions;
+      use Inc_Load;
+   begin
+      if Name = "proto" then
+         return (if Is_Ssl
+                 then "https://"
+                 else "http://");
+
+      elsif Name = "menu" then
+         X_Deprecated_Argument
+           ("WP_Admin_Bar", "3.3.0",
+            "Modify admin bar nodes with WP_Admin_Bar::get_node(), WP_Admin_Bar::add_node(), and WP_Admin_Bar::remove_node(), not the <code>menu</code> property.");
+         return "";  -- array(); -- Sorry, folks.
+      end if;
+      return "";
+   end X_Get;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize (This : in out Wp_Admin_Bar)
+   is
+      use Inc_Class_Wp_Sites;
+      use Inc_Ms_Functions;
+      use Inc_Formatting;
+      use Inc_Functions_Wp_Styles;
+      use Inc_Functions_Wp_Scripts;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Pluggables;
+      use Inc_Plugins;
+      use Inc_Themes;
+      use Inc_Users;
+   begin
+ --     this.User := new stdClass;
+
+      if Is_User_Logged_In then
+         -- Populate settings we need for the menu based on the current user.
+         This.User.Blogs := Get_Blogs_Of_User (Get_Current_User_Id);
+         if Is_Multisite then
+            This.User.Active_Blog    := Get_Active_Blog_For_User (Get_Current_User_Id);
+
+            This.User.Domain         :=
+              +(if This.User.Active_Blog = Null_Site
+                then User_Admin_Url
+                else Trailingslashit (
+                        Get_Home_Url (-This.User.Active_Blog.Blog_Id)));
+
+            This.User.Account_Domain := this.user.Domain;
+         else
+--          this.user.Active_Blog    := This.User.Blogs (Get_Current_Blog_Id);
+            This.User.Domain         := +Trailingslashit (Home_Url);
+            This.User.Account_Domain := This.User.Domain;
+         end if;
+      end if;
+
+      Add_Action ("wp_head", "wp_admin_bar_header");
+
+      Add_Action ("admin_head", "wp_admin_bar_header");
+
+      declare
+         Admin_Bar_Args  : String_Array; -- Array_Type;
+         Header_Callback : Unbounded_String;
+      begin
+         if Current_Theme_Supports ("admin-bar") then
+            --
+            -- To remove the default padding styles from WordPress for the Toolbar,
+            -- use the following code:
+            -- add_theme_support( "admin-bar", array( "callback" => "__return_false"));
+            --
+            Admin_Bar_Args  := Get_Theme_Support ("admin-bar");
+            Header_Callback := +Get (Admin_Bar_Args.First_Element, "callback");
+         end if;
+
+         if Header_Callback = "" then
+            Header_Callback := +"_admin_bar_bump_cb";
+         end if;
+
+         Add_Action ("wp_head", -Header_Callback);
+      end;
+
+      Wp_Enqueue_Script ("admin-bar");
+      Wp_Enqueue_Style  ("admin-bar");
+
+      --
+      -- Fires after WP_Admin_Bar is initialized.
+      --
+      -- @since 3.1.0
+      --
+      Do_Action ("admin_bar_init");
+   end Initialize;
+
+   --------------
+   -- Add_Menu --
+   --------------
+
+   procedure Add_Menu (This : in out Wp_Admin_Bar;
+                       Node : Node_Args) -- Array_Type)
+   is
+   begin
+      this.Add_Node (Node);
+   end Add_Menu;
+
+   -----------------
+   -- Remove_Menu --
+   -----------------
+
+   procedure Remove_Menu (This : in out Wp_Admin_Bar;
+                          Id   : String)
+   is
+   begin
+      this.Remove_Node (Id);
+   end Remove_Menu;
+
+   --------------
+   -- Add_Node --
+   --------------
+
+   procedure Add_Node (This : in out Wp_Admin_Bar;
+                       Args : Node_Args) -- Array_Type)
+   is
+      use Inc_Formatting;
+      use Inc_Functions;
+
+      Args_2 : Node_Args := Args;
+
+      Defaults : Node_Args := -- Array_Type := To_Array ((
+        (Id       => +"",   --              Build ("id",     "false"),
+         Title    => +"",   --              Build ("title",  "false"),
+         Parent   => +"",   --              Build ("parent", "false"),
+         Href     => +"",   --              Build ("href",   "false"),
+         Group    => False, --              Build ("group",  "false"),
+         Meta     => Empty_Array, --        Build ("meta",   Empty_Array)
+         Typ      => Typ_Item,
+         Children => null);
+
+   begin
+      -- Shim for old method signature: add_node( parent_id, menu_obj, args).
+      -- if Func_Num_Args >= 3 and then Is_String (Args) then
+      --         args = array_merge( array( "parent" => args), func_get_arg( 2));
+      -- end if;
+
+      -- if Is_Object (Args)  then
+      --         args = get_object_vars( args);
+      -- end if;
+
+      -- Ensure we have a valid title.
+      if Args_2.Id = "" then -- Empty (Args ("id")) then
+         if Args_2.Title = "" then -- Empty (Args ("title")) then
+            return;
+         end if;
+
+         X_Doing_It_Wrong ("__METHOD__",
+                           abs "The menu ID should not be empty.", "3.3.0");
+         -- Deprecated: Generate an ID from the title.
+         Args_2.Id := +Esc_Attr (Sanitize_Title (Trim (-Args_2.Title)));
+      end if;
+
+      -- If the node already exists, keep any data that isn"t provided.
+      declare
+         Maybe_Defaults : constant Node_Args := This.Get_Node (-Args_2.Id);
+      begin
+         if Maybe_Defaults /= Null_Node_Args then
+            Defaults := Maybe_Defaults; -- Get_Object_Vars (Maybe_Defaults);
+         end if;
+      end;
+
+      -- Do the same for "meta" items.
+      if Defaults.Meta.Is_Empty and then Args_2.Meta.Is_Empty then
+         Args_2.Meta := Wp_Parse_Args (Args_2.Meta, Defaults.Meta);
+      end if;
+
+      Args_2 := Node_Args'
+        (Id       => (if Args_2.Id = Defaults.Id       then Defaults.Id    else Args_2.Id),
+         Title    => (if Args_2.Title = Defaults.Title then Defaults.Title else Args_2.Title),
+         Parent   => Defaults.Parent,   -- same here
+         Href     => Defaults.Href,     --    "
+         Group    => Defaults.Group,    --    "
+         Meta     => Defaults.Meta,     --    "
+         Typ      => Defaults.Typ,      --    "
+         Children => Defaults.Children);
+
+--    Args_2 := Wp_Parse_Args (Args_2, Defaults);
+
+      declare
+         Back_Compat_Parents : constant Array_Type := Arrays.To_Array ((
+            Build ("my-account-with-avatar",
+                   Arrays.To_Array ((1 => Build ("my-account", "3.3")))),
+            Build ("my-blogs",
+                   Arrays.To_Array ((1 => Build ("my-sites",   "3.3"))))
+        ));
+        New_Parent : Unbounded_String;
+        Version    : Unbounded_String;
+      begin
+         if Isset (Back_Compat_Parents, -Args_2.Parent) then
+--          New_Parent := Back_Compat_Parents (-Args_2.Parent) (New_Parent);
+--          Version    := Back_Compat_Parents (-Args_2.Parent) (Version);
+
+            X_Deprecated_Argument ("__METHOD__", -Version,
+                                   Sprintf ("Use <code>%s</code> as the parent for the <code>%s</code> admin bar node instead of <code>%s</code>.",
+                                            -New_Parent, -Args_2.Id, -Args_2.parent));
+            Args_2.Parent := New_Parent;
+         end if;
+      end;
+      This.X_Set_Node (Args_2);
+   end Add_Node;
+
+   ----------------
+   -- X_Set_Node --
+   ----------------
+
+   procedure X_Set_Node (This : in out Wp_Admin_Bar;
+                         Args : Node_Args) -- Array_Type)
+   is
+   begin
+      This.Nodes (Integer'Value (-Args.Id)) := Args; -- (object)
+   end X_Set_Node;
+
+   --------------
+   -- Get_Node --
+   --------------
+
+   function Get_Node (This : Wp_Admin_Bar;
+                      Id   : String)
+                      return Node_Args -- Array_Type
+   is
+      Node : constant Node_Args := this.X_Get_Node (Id);
+   begin
+      if Node /= Null_Node_Args then
+         return Node; -- clone
+      end if;
+      return Null_Node_Args;
+   end Get_Node;
+
+   ----------------
+   -- X_Get_Node --
+   ----------------
+
+   function X_Get_Node (This : Wp_Admin_Bar;
+                        Id   : String)
+                        return Node_Args -- String
+   is
+      use Node_Maps;
+
+      Id_2 : Unbounded_String := +Id;
+   begin
+      if This.Bound then
+         return Null_Node_Args;
+      end if;
+
+      if Id_2 = "" then
+         Id_2 := +"root";
+      end if;
+
+      for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
+         if Id_2 = -This.Nodes (A).Id then
+            return This.Nodes (A);
+         end if;
+      end loop;
+
+      return Null_Node_Args;
+   end X_Get_Node;
+
+   ---------------
+   -- Get_Nodes --
+   ---------------
+
+   function Get_Nodes (This : Wp_Admin_Bar)
+                       return Node_Array_Access -- Array_Type
+   is
+      Nodes : constant Node_Array_Access := This.X_Get_Nodes;
+   begin
+      if Nodes.Is_Empty then
+         return null; -- Empty_Node_Map; -- Empty_Array;
+      end if;
+
+      for Node of Nodes.all loop --  &node
+         Node := Node;  -- clone
+      end loop;
+      return Nodes;
+   end Get_Nodes;
+
+   -----------------
+   -- X_Get_Nodes --
+   -----------------
+
+   function X_Get_Nodes (This : Wp_Admin_Bar)
+                         return Node_Array_Access -- Array_Type
+   is
+   begin
+      if This.Bound then
+         return null; -- Empty_Node_Map; -- Empty_Array;
+      end if;
+
+      return This.Nodes;
+   end X_Get_Nodes;
+
+   ---------------
+   -- Add_Group --
+   ---------------
+
+   procedure Add_Group (This : in out Wp_Admin_Bar;
+                        Args : Node_Args) -- Array_Type)
+   is
+      Args_2 : Node_Args := Args;
+   begin
+      Args_2.Group := True;
+
+      This.Add_Node (Args_2);
+   end Add_Group;
+
+   -----------------
+   -- Remove_Node --
+   -----------------
+
+   procedure Remove_Node (This : in out Wp_Admin_Bar;
+                          Id   : String)
+   is
+   begin
+      This.X_Unset_Node (Id);
+   end Remove_Node;
+
+   ------------------
+   -- X_Unset_Node --
+   ------------------
+
+   procedure X_Unset_Node (This : in out Wp_Admin_Bar;
+                           Id   : String)
+   is
+   begin
+      for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
+         if Id = -This.Nodes (A).Id then
+            This.Nodes.Delete (A);
+            return;
+         end if;
+      end loop;
+--    This.Nodes.Delete (Id);
+--    Unset (this.Nodes (id));
+   end X_Unset_Node;
+
+   ------------
+   -- Render --
+   ------------
+
+   procedure Render (This : in out Wp_Admin_Bar)
+   is
+      Root : constant Node_Args := This.X_Bind;
+   begin
+      if Root /= Null_Node_Args then
+         This.X_Render (Root);
+      end if;
+   end Render;
+
+   ------------
+   -- X_Bind --
+   ------------
+
+   function X_Bind (This : in out Wp_Admin_Bar)
+            return Node_Args -- Array_Type
+   is
+      Parent : Node_Args;
+   begin
+      if This.Bound then
+         return Null_Node_Args;
+      end if;
+
+      -- Add the root node.
+      -- Clear it first, just in case. Don"t mess with The Root.
+      This.Remove_Node ("root");
+      declare
+         N : Node_Args := Null_Node_Args;
+      begin
+         N.Id    := +"root";
+         N.Group := False;
+
+         This.Add_Node (N);
+      end;
+      -- This.Add_Node (
+      --    To_Array ((
+      --       Build ("id",    "root"),
+      --       Build ("group", "false")
+      --    ))
+      -- );
+
+      -- Normalize nodes: define internal "children" and "type" properties.
+      for Node of This.X_Get_Nodes.all loop
+         Node.Children := null;
+         Node.Typ      := (if Node.Group then Typ_Group else Typ_Item);
+--       Unset (Node.Group);
+
+         -- The Root wants your orphans. No lonely items allowed.
+         if Node.Parent = "" then
+            Node.Parent := +"root";
+         end if;
+      end loop;
+
+      for Node of This.X_Get_Nodes.all loop
+         if "root" = node.id then
+            goto Continue;
+         end if;
+
+         -- Fetch the parent node. If it isn"t registered, ignore the node.
+         Parent := This.X_Get_Node (-Node.Parent);
+         if Parent = Null_Node_Args then
+            goto Continue;
+         end if;
+
+         -- Generate the group class (we distinguish between top level and other
+         -- level groups).
+         declare
+            Group_Class : String := (if "root" = Node.Parent
+                                     then "ab-top-menu" else "ab-submenu");
+         begin
+            if Typ_Group = Node.Typ then
+               if Empty (Node.Meta, "class") then
+                  Set (node.Meta, "class", Group_Class);
+               else
+                  Set (Node.Meta, "class",
+                       Get (Node.Meta, "class") & " " & Group_Class);
+               end if;
+            end if;
+
+            -- Items in items aren"t allowed. Wrap nested items in "default" groups.
+            if Typ_Item = Parent.Typ and then Typ_Item = Node.Typ then
+               declare
+                  Default_Id : constant String    := -(Parent.Id & "-default");
+                  Default    : Node_Args := This.X_Get_Node (Default_Id);
+               begin
+                  -- The default group is added here to allow groups that are
+                  -- added before standard menu items to render first.
+                  if Default = Null_Node_Args then
+                     -- Use _set_node because add_node can be overloaded.
+                     -- Make sure to specify default settings for all properties.
+                     This.X_Set_Node (
+                        Node_Args'(
+                           Id       =>  +Default_Id,
+                           Parent   =>  Parent.Id,
+                           Typ      =>  Typ_Group,
+                           Children =>  null,
+                           Meta     =>  Arrays.To_Array ((
+                                 1 => Build ("class", Group_Class)
+                              )),
+                           Title    => +"",
+                           Href     => +"",
+                           Group    => False
+                        ));
+                        -- To_Array ((
+                        --    Build ("id",       Default_Id),
+                        --    Build ("parent",   parent.Id),
+                        --    Build ("type",     "group"),
+                        --    Build ("children", Empty_Array),
+                        --    Build ("meta",     To_Array ((
+                        --          1 => Build ("class", Group_Class))
+                        --       )),
+                        --    Build ("title",    "false"),
+                        --    Build ("href",     "false")
+                        -- ))
+
+                     Default         := This.X_Get_Node (Default_Id);
+                     Parent.Children.Append (Default); -- ()
+                  end if;
+                  Parent := Default;
+               end;
+
+            -- Groups in groups aren"t allowed. Add a special "container" node.
+            -- The container will invisibly wrap both groups.
+            elsif Typ_Group = Parent.Typ and then Typ_Group = Node.Typ then
+               declare
+                  Container_Id : constant String := -Parent.Id & "-container";
+                  Container    : Node_Args := This.X_Get_Node (Container_Id);
+               begin
+                  -- We need to create a container for this group, life is sad.
+                  if Container = Null_Node_Args then
+                     -- Use _set_node because add_node can be overloaded.
+                     -- Make sure to specify default settings for all properties.
+                     declare
+                        V : constant Node_Array := To_Vector (Parent, Length => 1);
+                     begin
+                        This.X_Set_Node (
+                           Node_Args'(
+                              Id       =>  +Container_Id,
+                              Typ      =>  Typ_Container,
+                              Children =>  new Node_Array'(V),
+--                            Children =>  To_Array (Parent),
+                              Parent   =>  +"",
+                              Title    =>  +"",
+                              Href     =>  +"",
+                              Meta     =>  Empty_Array,
+                              Group    =>  False
+                           ));
+                     end;
+                     Container := This.X_Get_Node (Container_Id);
+
+                     -- Link the container node if a grandparent node exists.
+                     declare
+                        Grandparent : constant Node_Args :=
+                           this.X_Get_Node (-Parent.Parent);
+
+                        Index : Integer := 0;
+                     begin
+                        if Grandparent /= Null_Node_Args then
+                           Container.Parent := Grandparent.Id;
+
+                           for
+                             A in Grandparent.Children.First_Index ..
+                                  Grandparent.Children.Last_Index
+                           loop
+                              if Parent.Id = Grandparent.Children (A).Id then
+                                 Index := A;
+                                 exit;
+                              end if;
+                           end loop;
+
+                           if Index = 0 then
+                              Grandparent.Children.Append (Container); -- ()
+                           else
+                              Grandparent.Children.Replace_Element (Index, Container);
+                           end if;
+                           -- Index := Array_Search (Parent,
+                           --                        Grandparent.Children, True);
+                           -- if Index = 0 then
+                           --    Grandparent.Children.Append (Container); -- ()
+                           -- else
+                           --    Array_Splice (Grandparent.Children, Index, 1,
+                           --                  To_Array (Container));
+                           -- end if;
+                     end if;
+                     end;
+
+                     parent.parent := container.id;
+                  end if;
+                  parent := container;
+               end;
+            end if;
+
+            -- Update the parent ID (it might have changed).
+            Node.Parent := Parent.Id;
+
+            -- Add the node to the tree.
+            Parent.Children.Append (Node); -- ()
+         end;
+         << Continue >>
+      end loop;
+
+      This.Bound := True;
+      return This.X_Get_Node ("root");
+   end X_Bind;
+
+   --------------
+   -- X_Render --
+   --------------
+
+   procedure X_Render (This : Wp_Admin_Bar;
+                       Root : Node_Args) -- Array_Type)
+   is
+      Class : Unbounded_String := +"nojq nojs";
+   begin
+      -- Add browser classes.
+      -- We have to do this here since admin bar shows on the front end.
+      if Wp_Is_Mobile then
+         Class := Class & " mobile";
+      end if;
+
+                -- ?>
+                -- <div id="wpadminbar" class="<?php echo class; ?>">
+                --         <?php if (! is_admin() && ! did_action("wp_body_open")) then ?>
+                --                 <a class="screen-reader-shortcut" href="#wp-toolbar" tabindex="1"><?php _e("Skip to toolbar"); ?></a>
+                --         <?php end; ?>
+                --         <div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="<?php esc_attr_e("Toolbar"); ?>">
+                --                 <?php
+                                 for Group of Root.Children.all loop
+                                    This.X_Render_Group (Group);
+                                 end loop;
+                --                 ?>
+                --         </div>
+                --         <?php if (is_user_logged_in()) : ?>
+                --         <a class="screen-reader-shortcut" href="<?php echo esc_url(wp_logout_url()); ?>"><?php _e("Log Out"); ?></a>
+                --         <?php endif; ?>
+                -- </div>
+
+                -- <?php
+   end X_Render;
+
+   ------------------------
+   -- X_Render_Container --
+   ------------------------
+
+   procedure X_Render_Container (This : Wp_Admin_Bar;
+                                 Node : Node_Args) -- Array_Type)
+   is
+      use Inc_Formatting;
+   begin
+      if Typ_container /= node.typ or else node.Children = null then
+         return;
+      end if;
+
+      echo ("<div id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) &
+            """ class=""ab-group-container"">");
+
+      for Group of Node.Children.all loop
+         This.X_Render_Group (group);
+      end loop;
+
+      echo ("</div>");
+   end X_Render_Container;
+
+   --------------------
+   -- X_Render_Group --
+   --------------------
+
+   procedure X_Render_Group (This : Wp_Admin_Bar;
+                             Node : Node_Args) -- Array_Type)
+   is
+      use Inc_Formatting;
+
+      Class : Unbounded_String;
+   begin
+      if Typ_Container = Node.Typ then
+         this.X_Render_Container (node);
+         return;
+      end if;
+
+      if Typ_Group /= node.typ or else Node.Children = null then
+         return;
+      end if;
+
+      if not Empty (node.Meta, "class") then
+         class := +" class=""" & Esc_Attr (Trim (Get (Node.Meta, "class"))) & """";
+      else
+         class := +"";
+      end if;
+
+      echo ("<ul id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) & """class>");
+      for Item of Node.Children.all loop
+          This.X_Render_Item (Item);
+      end loop;
+      echo ("</ul>");
+   end X_Render_Group;
+
+   -------------------
+   -- X_Render_Item --
+   -------------------
+
+   procedure X_Render_Item (This : Wp_Admin_Bar;
+                            Node : Node_Args) -- Array_Type)
+   is
+      use Inc_Formatting;
+
+      Is_Parent             : constant Boolean := Node.Children /= null;
+      Has_Link              : constant Boolean := Node.Href /= "";
+      Is_Root_Top_Item      : constant Boolean := "root-default"  = node.parent;
+      Is_Top_Secondary_Item : constant Boolean := "top-secondary" = node.parent;
+
+      -- Allow only numeric values, then casted to integers, and allow a tabindex
+      -- value of `0` for a11y.
+      Tabindex : constant Integer := (if
+                               Isset (Node.Meta, "tabindex") and then
+                               Is_Numeric (Get (node.Meta, "tabindex"))
+                             then Integer'Value (Get (Node.Meta, "tabindex")) else 0);
+
+      Aria_Attributes : Unbounded_String :=
+         +(if 0 /= Tabindex
+           then " tabindex=""" & Tabindex'Image & """" else "");
+
+      Menuclass : Unbounded_String;
+      Arrow     : Unbounded_String;
+
+      Attributes : List_Type;
+   begin
+      if Typ_Item /= Node.Typ then
+         return;
+      end if;
+
+      if Is_Parent then
+          Menuclass        := +"menupop ";
+          Aria_Attributes  := Aria_Attributes & " aria-haspopup=""true""";
+      end if;
+
+      if not Empty (node.Meta, "class") then
+         Menuclass := Menuclass & Get (Node.Meta, "class");
+      end if;
+
+      -- Print the arrow icon for the menu children with children.
+      if
+        not is_root_top_item and then
+        not is_top_secondary_item and then
+        Is_Parent
+      then
+         arrow := +"<span class=""wp-admin-bar-arrow"" aria-hidden=""true""></span>";
+      end if;
+
+      if Menuclass /= "" then
+         Menuclass := +" class=""" & Esc_Attr (Trim (-Menuclass)) & """";
+      end if;
+
+      echo ("<li id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) & """menuclass>");
+
+      if Has_Link then
+         Attributes := To_List ((+"onclick", +"target", +"title",
+                                 +"rel", +"lang", +"dir"));
+         echo ("<a class=""ab-item""aria_attributes href=""" & Esc_Url (-Node.Href) &
+               """");
+      else
+         Attributes := To_List ((+"onclick", +"target", +"title",
+                                 +"rel", +"lang", +"dir"));
+         echo ("<div class=""ab-item ab-empty-item""" & (-Aria_Attributes));
+      end if;
+
+      for Attribute of Attributes loop
+         if Empty (Node.Meta, -Attribute) then
+            goto Continue_2;
+         end if;
+
+         if "onclick" = Attribute then
+            echo (" attribute=""" & Esc_Js (Get (Node.Meta, -Attribute)) & """");
+         else
+            echo (" attribute=""" & Esc_Attr (Get (Node.Meta, -Attribute)) & """");
+         end if;
+         << Continue_2 >>
+      end loop;
+
+      echo (">" & (-Arrow) & (-Node.Title));
+
+      if has_link then
+         echo ("</a>");
+      else
+         echo ("</div>");
+      end if;
+
+      if Is_Parent then
+         echo ("<div class=""ab-sub-wrapper"">");
+         for Group of Node.Children.all loop
+            This.X_Render_Group (Group);
+         end loop;
+         echo ("</div>");
+      end if;
+
+      if not Empty (Node.Meta, "html") then
+         Echo (Get (node.Meta, "html"));
+      end if;
+
+      echo ("</li>");
+   end X_Render_Item;
+
+   ----------------------
+   -- Recursive_Render --
+   ----------------------
+
+   procedure Recursive_Render (This : Wp_Admin_Bar;
+                               Id   : String;
+                               Node : Node_Args) -- Array_Type)
+   is
+      use Inc_Functions;
+   begin
+      X_Deprecated_Function
+        ("__METHOD__", "3.3.0",
+         "WP_Admin_bar::render(), WP_Admin_Bar::_render_item()");
+      This.X_Render_Item (node);
+   end Recursive_Render;
+
+   ---------------
+   -- Add_Menus --
+   ---------------
+
+   procedure Add_Menus (This : Wp_Admin_Bar)
+   is
+      use Inc_Load;
+      use Inc_Plugins;
+   begin
+      -- User-related, aligned right.
+      Add_Action ("admin_bar_menu", "wp_admin_bar_my_account_menu", 0);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_search_menu", 4);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_my_account_item", 7);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_recovery_mode_menu", 8);
+
+      -- Site-related.
+      Add_Action ("admin_bar_menu", "wp_admin_bar_sidebar_toggle", 0);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_wp_menu", 10);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_my_sites_menu", 20);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_site_menu", 30);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_edit_site_menu", 40);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_customize_menu", 40);
+      Add_Action ("admin_bar_menu", "wp_admin_bar_updates_menu", 50);
+
+      -- Content-related.
+      if not Is_Network_Admin and then not Is_User_Admin then
+         Add_Action ("admin_bar_menu", "wp_admin_bar_comments_menu", 60);
+         Add_Action ("admin_bar_menu", "wp_admin_bar_new_content_menu", 70);
+      end if;
+      Add_Action ("admin_bar_menu", "wp_admin_bar_edit_menu", 80);
+
+      Add_Action ("admin_bar_menu", "wp_admin_bar_add_secondary_groups", 200);
+
+      --
+      -- Fires after menus are added to the menu bar.
+      --
+      -- @since 3.1.0
+      --
+      Do_Action ("add_admin_bar_menus");
+   end Add_Menus;
+
+end Inc_Class_Wp_Admin_Bar;

@@ -4,7 +4,9 @@ project Heidelberger is
 
    for Source_Dirs use (
       "source/",
-      "source/hb-admin/",
+      "source/include/",
+      "source/admin/",
+      "source/admin/include/",
       "config/");
    for Object_Dir use "obj/" & Heidelberger_Config.Build_Profile;
    for Create_Missing_Dirs use "True";
@@ -12,7 +14,11 @@ project Heidelberger is
    for Main use ("heidelberger.adb");
 
    package Compiler is
-      for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches;
+      for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
+         "-gnatwA",
+         "-gnatef",
+         "-gnatf",
+         "-gnatyyM0C-l0rs");
    end Compiler;
 
    package Binder is
