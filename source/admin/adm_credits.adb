@@ -74,7 +74,7 @@ is
             use Adi_Credits;
          begin
             if Var_Name = "VAR_credits_contributors" then
-               Set ("VAR_credits_contributors", E_E ("Contributors"));
+               Set ("VAR_credits_contributors", X_E ("Contributors"));
 
             elsif Var_Name = "VAR_credits_header" then
                Clear_Echo;
@@ -85,16 +85,16 @@ is
                Set ("VAR_credits_header", Get_Echo);
 
             elsif Var_Name = "VAR_credits_about" then
-               Set ("VAR_credits_about", E_E ("What&#8217;s New"));
+               Set ("VAR_credits_about", X_E ("What&#8217;s New"));
 
             elsif Var_Name = "VAR_credits_credits" then
-               Set ("VAR_credits_credits", E_E ("Credits"));
+               Set ("VAR_credits_credits", X_E ("Credits"));
 
             elsif Var_Name = "VAR_credits_freedoms" then
-               Set ("VAR_credits_freedoms", E_E ("Freedoms"));
+               Set ("VAR_credits_freedoms", X_E ("Freedoms"));
 
             elsif Var_Name = "VAR_credits_privacy" then
-               Set ("VAR_credits_privacy", E_E ("Privacy"));
+               Set ("VAR_credits_privacy", X_E ("Privacy"));
 
             elsif Var_Name = "VAR_credits_not_credits" then
                Set ("VAR_credits_not_credits", Credits.Is_Empty);
@@ -109,7 +109,7 @@ is
 
             elsif Var_Name = "VAR_credits_see_your_name" then
                Set ("VAR_credits_see_your_name",
-                    E_E ("Want to see your name in lights on this page?"));
+                    X_E ("Want to see your name in lights on this page?"));
 
             elsif Var_Name = "VAR_credits_core_developers" then
                Clear_Echo;

@@ -195,7 +195,7 @@ is
                Number_Format_I18n (Float (Awaiting_Mod));
             -- translators: %s: Number of comments
             Awaiting_Mod_Text : constant String :=
-               Sprintf (N_N ("%s Comment in moderation",
+               Sprintf (X_N ("%s Comment in moderation",
                               "%s Comments in moderation",
                               Awaiting_Mod),
                         Awaiting_Mod_I18n);

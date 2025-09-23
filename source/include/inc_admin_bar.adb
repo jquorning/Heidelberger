@@ -1412,7 +1412,7 @@ begin
       Awaiting_Text : String  :=
          Sprintf (
                   -- translators: %s: Number of comments.
-                  N_N ("%s Comment in moderation",
+                  X_N ("%s Comment in moderation",
                        "%s Comments in moderation", Awaiting_Mod),
                   Number_Format_I18n (Float (Awaiting_Mod)));
       Icon  : Unbounded_String;
@@ -1561,7 +1561,7 @@ begin
 
       Updates_Text := +Sprintf (
                 -- translators: %s: Total number of updates available.
-                N_N ("%s update available", "%s updates available",
+                X_N ("%s update available", "%s updates available",
                      Counts_Total),
                 Number_Format_I18n (Float (Counts_Total)));
 

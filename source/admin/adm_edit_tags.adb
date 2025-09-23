@@ -601,7 +601,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_category_help" then
                      Set ("VAR_edit_tags_category_help",
-                          E_E ("Categories, unlike tags, can have a hierarchy. You might have a Jazz category, and under that have children categories for Bebop and Big Band. Totally optional."));
+                          X_E ("Categories, unlike tags, can have a hierarchy. You might have a Jazz category, and under that have children categories for Bebop and Big Band. Totally optional."));
 
                   elsif Var_Name = "VAR_edit_tags_category_is_taxonomy" then
                      Set ("VAR_edit_tags_category_is_taxonomy", "category" = Taxonomy);
@@ -649,7 +649,7 @@ is
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_description" then
-                     Set ("VAR_edit_tags_description", E_E ("Description"));
+                     Set ("VAR_edit_tags_description", X_E ("Description"));
 
                   elsif Var_Name = "VAR_edit_tags_display" then
                      X_Wp_List_Table.Display;
@@ -913,7 +913,7 @@ is
                      Set ("VAR_edit_tags_taxonomy", ESC_Attr (Taxonomy));
 
                   elsif Var_Name = "VAR_edit_tags_term_name" then
-                     Set ("VAR_edit_tags_term_name", Ex_Ex ("Name", "term name"));
+                     Set ("VAR_edit_tags_term_name", X_Ex ("Name", "term name"));
 
                   elsif Var_Name = "VAR_edit_tags_user_can_import" then
                      Set ("VAR_edit_tags_user_can_import",

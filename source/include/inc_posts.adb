@@ -1053,7 +1053,7 @@ is
                         public      => True,
                         x_builtin   => True, -- internal use only.
                         -- translators: %s: Number of published posts.
-                        label_count => N_N_Noop (
+                        label_count => X_N_Noop (
                                 "Published <span class=""count"">(%s)</span>",
                                 "Published <span class=""count"">(%s)</span>"
                         ),
@@ -1077,7 +1077,7 @@ is
                         Protect     => True,
                         x_builtin   => True, -- internal use only.
                         -- translators: %s: Number of scheduled posts.
-                        label_count => n_N_Noop (
+                        label_count => X_N_Noop (
                                 "Scheduled <span class=""count"">(%s)</span>",
                                 "Scheduled <span class=""count"">(%s)</span>"
                         ),
@@ -1102,7 +1102,7 @@ is
                         Protect       => True,
                         x_builtin     => True, -- internal use only.
                         -- translators: %s: Number of draft posts.
-                        label_count   => n_N_Noop (
+                        label_count   => X_N_Noop (
                                 "Draft <span class=""count"">(%s)</span>",
                                 "Drafts <span class=""count"">(%s)</span>"
                         ),
@@ -1128,7 +1128,7 @@ is
                         Protect       => True,
                         x_builtin     => True, -- internal use only.
                         -- translators: %s: Number of pending posts.
-                        label_count   => N_N_Noop (
+                        label_count   => X_N_Noop (
                                 "Pending <span class=""count"">(%s)</span>",
                                 "Pending <span class=""count"">(%s)</span>"
                         ),
@@ -1154,7 +1154,7 @@ is
                         Privat      => True,
                         x_builtin   => True, -- internal use only.
                         -- translators: %s: Number of private posts.
-                        label_count => n_N_Noop (
+                        label_count => X_N_Noop (
                                 "Private <span class=""count"">(%s)</span>",
                                 "Private <span class=""count"">(%s)</span>"
                         ),
@@ -1179,7 +1179,7 @@ is
                         internal                  => True,
                         x_builtin                 => True, -- internal use only.
                         -- translators: %s: Number of trashed posts.
-                        label_count               => n_N_Noop (
+                        label_count               => X_N_Noop (
                                 "Trash <span class=""count"">(%s)</span>",
                                 "Trash <span class=""count"">(%s)</span>"
                         ),
@@ -1249,7 +1249,7 @@ is
                         internal            => True,
                         x_builtin           => True, -- internal use only.
                         -- translators: %s: Number of pending requests.
-                        label_count         => n_N_Noop (
+                        label_count         => X_N_Noop (
                                 "Pending <span class=""count"">(%s)</span>",
                                 "Pending <span class=""count"">(%s)</span>"
                         ),
@@ -1275,7 +1275,7 @@ is
                         internal            => True,
                         x_builtin           => True, -- internal use only.
                         -- translators: %s: Number of confirmed requests.
-                        label_count         => n_N_Noop (
+                        label_count         => X_N_Noop (
                                 "Confirmed <span class=""count"">(%s)</span>",
                                 "Confirmed <span class=""count"">(%s)</span>"
                         ),
@@ -1301,7 +1301,7 @@ is
                         internal            => True,
                         x_builtin           => True, -- internal use only.
                         -- translators: %s: Number of failed requests.
-                        label_count         => n_N_Noop (
+                        label_count         => X_N_Noop (
                                 "Failed <span class=""count"">(%s)</span>",
                                 "Failed <span class=""count"">(%s)</span>"
                         ),
@@ -1327,7 +1327,7 @@ is
                         internal            => True,
                         x_builtin           => True, -- internal use only.
                         -- translators: %s: Number of completed requests.
-                        label_count         => n_N_Noop (
+                        label_count         => X_N_Noop (
                                 "Completed <span class=""count"">(%s)</span>",
                                 "Completed <span class=""count"">(%s)</span>"
                         ),
