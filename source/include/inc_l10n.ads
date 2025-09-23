@@ -1,6 +1,6 @@
 with Arrays;
 
-package L10n
+package Inc_L10n
 is
    use Arrays;
 
@@ -34,4 +34,4 @@ is
                        Domain : String := "default")
                        return String
                        is (Text);
-end L10n;
+end Inc_L10n;

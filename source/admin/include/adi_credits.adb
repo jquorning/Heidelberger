@@ -12,12 +12,12 @@ with Ada.Text_Io;
 with Arrays;
 with Globals;
 with Hb_Common;
-with L10n;
 with Php;
 
 with Inc_Formatting;
 with Inc_Options;
 with Inc_Versions;
+with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Http;
 
@@ -27,7 +27,7 @@ is
    use Ada.Text_Io;
    use Arrays;
    use Hb_Common;
-   use L10n;
+   use Inc_L10n;
    use Php;
 
 --   procedure Print_Them (Name  : Utf8_String;

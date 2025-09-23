@@ -10,7 +10,6 @@ with Ada.Strings.Unbounded;
 with Templates_Parser;
 
 with Arrays;
-with L10n;
 with Globals;
 with HB_Common;
 
@@ -30,6 +29,7 @@ with Inc_Class_Wp_Terms;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
+with Inc_L10n;
 with Inc_Taxonomys;
 with Inc_Link_Templates;
 with Inc_Options;
@@ -40,7 +40,7 @@ package body Adm_Edit_Tags
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use L10n;
+   use Inc_L10n;
    use Globals;
    use HB_Common;
 

@@ -11,11 +11,11 @@
 -- with Ada.Strings.Unbounded;
 
 with Php;
-with L10n;
 
 with Hb_Common;
 
 with Inc_Functions;
+with Inc_L10n;
 with Inc_Load;
 
 package body Inc_Class_Wpdb
@@ -23,7 +23,7 @@ is
 --   use Ada.Strings.Unbounded;
    use Php;
    use Hb_Common;
-   use L10n;
+   use Inc_L10n;
 --
 -- @since 0.71
 --

@@ -1,4 +1,4 @@
-package body L10n is
+package body Inc_L10n is
 
    function "abs" (Item : String) return String is (Item);
 
@@ -10,4 +10,4 @@ package body L10n is
 
    function Gettext (Item : String) return String is (Item);
 
-end L10n;
+end Inc_L10n;

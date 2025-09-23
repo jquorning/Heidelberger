@@ -6,7 +6,6 @@ with Ada.Text_Io;
 with Arrays;
 with Globals;
 with Hb_Common;
-with L10n;
 with Php;
 
 with Gnatcoll.Json;
@@ -14,6 +13,7 @@ with Templates_Parser;
 
 with Adi_Credits;
 with Inc_General_Templates;
+with Inc_L10n;
 
 package body Adm_Credits
 is
@@ -21,7 +21,7 @@ is
    use Ada.Text_Io;
    use Arrays;
    use Hb_Common;
-   use L10n;
+   use Inc_L10n;
    use Php;
 
    subtype Json_Value is Gnatcoll.Json.Json_Value;

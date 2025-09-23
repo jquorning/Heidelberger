@@ -7,7 +7,6 @@
 --
 
 with Hb_Common;
-with L10n;
 with Php;
 
 with Inc_Ms_Functions;
@@ -15,6 +14,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_Functions_Wp_Scripts;
+with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_Pluggables;
@@ -25,7 +25,7 @@ with Inc_Users;
 package body Inc_Class_Wp_Admin_Bar
 is
    use Hb_Common;
-   use L10n;
+   use Inc_L10n;
    use Php;
 
    -----------

@@ -11,12 +11,12 @@ with Ada.Containers;
 
 with Globals;
 with Hb_Common;
-with L10n;
 with Php;
 
 with Inc_Class_Wp_Dependency;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_L10n;
 with Inc_Load;
 with Inc_Plugins;
 with Inc_Script_Loader;
@@ -25,7 +25,7 @@ with Inc_Themes;
 package body Inc_Class_Wp_Scripts
 is
    use Hb_Common;
-   use L10n;
+   use Inc_L10n;
    use Php;
 
         -----------------

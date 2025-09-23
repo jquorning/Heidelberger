@@ -10,7 +10,6 @@ with Ada.Strings.Unbounded;
 
 with Templates_Parser;
 
-with L10n;
 with Arrays;
 with Globals;
 with Php;
@@ -33,6 +32,7 @@ with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
+with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Pluggables;
 with Inc_Posts;
@@ -41,7 +41,7 @@ package body Adm_Edit
 is
    use Ada.Containers;
    use Ada.Strings.Unbounded;
-   use L10n;
+   use Inc_L10n;
    use HB_Common;
    use Wp_Common;
    use Arrays;

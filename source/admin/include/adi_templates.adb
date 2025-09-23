@@ -10,8 +10,6 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with L10n;
-
 with Arrays;
 with Hb_Common;
 with Wp_Common;
@@ -21,6 +19,7 @@ with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_L10n;
 with Inc_Options;
 with Inc_Posts;
 with Inc_Taxonomys;
@@ -30,7 +29,7 @@ package body Adi_Templates
 is
    use Ada.Containers;
    use Ada.Strings.Unbounded;
-   use L10n;
+   use Inc_L10n;
    use Php;
    use Wp_Common;
 -- -- Walker_Category_Checklist class

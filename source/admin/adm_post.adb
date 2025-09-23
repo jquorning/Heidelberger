@@ -12,7 +12,6 @@ with Ada.Strings.Fixed;
 
 --  with Templates_Parser;
 
-with L10n;
 with Arrays;
 with Globals;
 with Php;
@@ -31,6 +30,7 @@ with Inc_Functions_Wp_Scripts;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Users;
+with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Pluggables;
 with Inc_Plugins;
@@ -44,7 +44,7 @@ package body Adm_Post
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use L10n;
+   use Inc_L10n;
    use HB_Common;
    use Php;
    use Globals;

@@ -12,7 +12,6 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Globals;
 with Hb_Common;
-with L10n;
 with Php;
 with Wp_Common;
 
@@ -31,6 +30,7 @@ with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
+with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_Media;
@@ -50,7 +50,7 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
    use Hb_Common;
-   use L10n;
+   use Inc_L10n;
    use Wp_Common;
    use Php;
    use Inc_Capabilities;

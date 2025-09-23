@@ -10,7 +10,6 @@ with Ada.Strings.Fixed;
 
 --  with Templates_Parser;
 
-with L10n;
 with Arrays;
 with Php;
 with Globals;
@@ -22,6 +21,7 @@ with Inc_Capabilities;
 with Inc_Comments;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_L10n;
 with Inc_Load;
 with Inc_Media;
 with Inc_Options;
@@ -35,7 +35,7 @@ with Inc_Class_Wp_Post_Type;
 package body Adm_Menu
 is
    use Ada.Strings.Unbounded;
-   use L10n;
+   use Inc_L10n;
    use HB_Common;
    use Arrays;
    use Php;
