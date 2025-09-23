@@ -12,7 +12,6 @@ with AWS.Server;
 with Binder;
 
 with Adm_Credits;
--- with Adi_Credits;
 with Adm_Admin;
 
 with Inc_Posts;
@@ -23,7 +22,7 @@ with Inc_Class_Wp_Admin_Bar;
 
 with Adm_Menu_Header;
 
--- with INC_Menu;
+-- with Adi_Menu;
 with Inc_Class_Wp_Posts;
 -- with Adi_Nav_Menus;
 -- with Adm_Nav_Menus;
