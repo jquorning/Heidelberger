@@ -1,6 +1,7 @@
 
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
+with Ada.Characters.Latin_1;
 
 with Arrays;
 
@@ -20,6 +21,10 @@ is
 
    function "-" (Item : Unbounded_String) return String
       renames To_String;
+
+   Nl     : constant String := "" & Ada.Characters.Latin_1.Lf;
+   Tab    : constant String := "" & Ada.Characters.Latin_1.Ht;
+   nl_Tab : constant String := Nl & Tab;
 
    function To_Array (Item : String) return Array_Type;
    function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
@@ -152,7 +157,7 @@ is
                      Arg_1 : String;
                      Arg_2 : String := "";
                      Arg_3 : String := "")
-      return String is ("XXX-201");
+      return String is (Format & "XXX-201");
 
    function Count (Al : Assoc_List) return Natural;
 
@@ -221,8 +226,6 @@ is
      is (Empty_Array);
 
    type Walker_Type is access procedure;
-
-   procedure Echo (Item : String) is null;
 
    function In_Array (Taxonomy   : String;
                       Taxonomies : Inc_Taxonomys.Taxonomy_Array;

@@ -25,4 +25,11 @@ is
                       return Array_type
                       is (Empty_Array);
 
+   function Get_User_Locale (User : Integer := 0)
+                             return String
+                             is ("da_DK");
+   function Translate (Text   : String;
+                       Domain : String := "default")
+                       return String
+                       is (Text);
 end L10n;

@@ -130,7 +130,7 @@ is
 -- function esc_url( url, protocols = null, _context = "display" ) then
    function ESC_URL (Item : String)
                     return String
-                    is ("XXX-324");
+                    is (Item & "XXX-513");
 
 --
 -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
@@ -159,7 +159,7 @@ is
 -- function esc_html( text ) then
    function ESC_HTML (Item : String)
                       return String
-                      is ("XXX-323");
+                      is (Item & "XXX-514");
 
 --
 -- Escaping for HTML attributes.
@@ -240,6 +240,26 @@ is
                          Suffix : String := "")
                          return String
                          is ("XXX-446");
+
+   --
+   -- WordPress implementation of PHP sprintf() with filters.
+   --
+   -- @since 2.5.0
+   -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
+   --              by adding it to the function signature.
+   --
+   -- @link https://www.php.net/sprintf
+   --
+   -- @param string pattern The string which formatted args are inserted.
+   -- @param mixed  ...args Arguments to be formatted into the pattern string.
+   -- @return string The formatted string.
+   --
+   -- function wp_sprintf( pattern, ...args ) then
+   function Wp_Sprintf (Pattern : String;
+                        Arg_1   : String)
+                        -- , ...args )
+                        return String
+                        is (Pattern);
 
 --
 -- Removes slashes from a string or recursively removes slashes from strings within an array.

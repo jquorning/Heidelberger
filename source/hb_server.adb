@@ -9,6 +9,10 @@ with AWS.Services.Dispatchers.URI;
 with AWS.Server;
 --  with AWS.Status;
 
+with Binder;
+
+with Adm_Credits;
+-- with Adi_Credits;
 with Adm_Admin;
 
 with Inc_Posts;
@@ -46,15 +50,16 @@ package body HB_Server is
    is
       use AWS.Services.Dispatchers.URI;
    begin
-      Register (Dispatcher, "/hb-admin/edit",      Adm_Edit.Render'Access);
-      Register (Dispatcher, "/hb-admin/edit-tags", Adm_Edit_Tags.Render'Access);
-      Register (Dispatcher, "/hb-admin/post",      Adm_Post.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit",      Adm_Edit.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit-tags", Adm_Edit_Tags.Render'Access);
+      Register (Dispatcher, "/wp-admin/post",      Adm_Post.Render'Access);
+      Register (Dispatcher, "/wp-admin/credits.php", Binder.Render'Access);
    end Register_Dispatcher;
 
    -----------
    -- Start --
    -----------
-
+Program_Termination : exception;
    procedure Start
    is
       use Ada.Text_IO;
@@ -79,6 +84,11 @@ package body HB_Server is
                                         Side => Ada.Strings.Left) &
                 "/index.html");
       Put_Line ("Press ""Q"" for quit.");
+
+      Adm_Credits.Render;
+      exception
+      when others =>
+      raise Program_Termination;
    end Start;
 
    --------------

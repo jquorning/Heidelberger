@@ -229,4 +229,17 @@ is
                           return List_Type
                           is (Empty_List);
 
+   -------------------
+   -- Echo handling --
+   -------------------
+
+   procedure Echo (Item : String);
+
+   procedure Printf (Format : String;
+                     Arg_1  : String);
+
+   procedure Clear_Echo;
+   function Get_Echo
+            return String;
+
 end Php;
