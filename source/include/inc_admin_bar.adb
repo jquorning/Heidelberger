@@ -1266,6 +1266,9 @@ begin
             "="          => Arrays.Array_Vectors."=");
 
       function Array_Keys (Map : Action_Maps.Map)
+                           return List_Type;
+
+      function Array_Keys (Map : Action_Maps.Map)
                            return List_Type
       is
          Result : List_Type;

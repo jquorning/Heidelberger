@@ -263,6 +263,9 @@ is
             Classes : String  := "wp-people-group " & (if compact then "compact" else "");
 
             procedure Print_Them (Name  : Utf8_String;
+                                  Value : Json_Value);
+
+            procedure Print_Them (Name  : Utf8_String;
                                   Value : Json_Value)
             is
                Person_Data : Json_Array := Get (Value);

@@ -3,20 +3,6 @@ package body HB_Common
 is
    use Inc_Class_Wp_Posts;
 
---   function Get_Pagenum (Item : List_Table) return Natural is (99);
-
---   procedure Prepare_Items (Table : in out List_Table) is
---   begin
---      null;
---   end Prepare_Items;
-
---   function Current_Action (Item : List_Table) return String is ("XXX 1");
---   function X_Get_List_Table (Item : String) return List_Table is
---      List : List_Table;
---   begin
---      return List;
---   end X_Get_List_Table;
-
    procedure Post_Type_Object is null;
 
    procedure Parent_File is null;
@@ -42,16 +28,6 @@ is
    function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
       return Array_Type is (Empty_Array);
 
-   function Current_User_Can (Trait : Boolean) return Boolean is
-   begin
-      return True;
-   end Current_User_Can;
-
-   function Current_User_Can (Trait : String; Val : Assoc_Type) return Boolean is
-   begin
-      return True;
-   end Current_User_Can;
-
    function Preg_Replace (Left : String; Right : Array_Type) return Integer is (1);
    function Preg_Replace (Left : String; Mid : String; Right : Array_Type) return Integer is (1);
 
@@ -75,12 +51,6 @@ is
    procedure Hb_Enqueue_Script (Item : String) is null;
    procedure Hb_Enqueue_Style  (Item : String) is null;
 
-   function Build (Key : String; Value : String) return Assoc_Type is
-      A : Assoc_Type;
-   begin
-      return A;
-   end Build;
-
    function Absint (Item : Assoc_List) return String is ("1");
    procedure Bulk_Messages is null;
 
@@ -95,12 +65,6 @@ is
 
    function Wp_Delete_Attachment (Item : Assoc_Type) return Boolean is (True);
    function Wp_Delete_Post (Item : Assoc_Type) return Boolean is (True);
-
-   function Bulk_Edit_Posts (Item : Array_Type) return Array_Type is
-      A : constant Array_Type := Empty_Array;
-   begin
-      return A;
-   end Bulk_Edit_Posts;
 
    function Is_Array (Item : Assoc_List) return Boolean is (True);
 
@@ -126,16 +90,6 @@ is
 
    function "abs" (List : Array_Type) return String is ("XXX 12");
 
---   function Views (Item : List_Table) return String is ("XXX-31");
---   function Search_Box (Item : List_Table; L : String; R : String) return String is ("XXX-32");
---   function Display (Item : List_Table) return String is ("XXX-33");
---   function Inline_Edit (Item : List_Table) return String is ("XXX-34");
---   function Has_Items (Item : List_Table) return Boolean is (False);
-
---   function ESC_HTML (Item : String) return String is (Item);
---   function ESC_URL  (Item : String) return String is (Item);
---   function ESC_Attr (AL : String) return String is ("XXX-106");
-
    function Printf (Format : String; Arg_1 : String) return String is (Format & Arg_1);
 
    function Get_Search_Query return String is ("XXX-43");
@@ -160,7 +114,7 @@ is
 
    procedure Check_Admin_Referer (Item : String; Item_2 : String := "") is null;
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural is (1);
---   function Get_Pagination_Arg (List : List_Table; Item : String) return Natural is (1);
+
    function Current_User_Can (Trait : String; Val : String) return Boolean is (True);
    function Current_User_Can (Trait : String; Val : Integer) return Boolean is (True);
    function Admin_URL (Item : String) return String is ("XXX-71");
@@ -173,12 +127,5 @@ is
       is ("XXX-74");
 
    function Is_Plugin_Active (Item : String) return Boolean is (False);
-
-   function Get_Post      return Inc_Class_Wp_Posts.Wp_Post
-   is
-      P : Wp_Post;
-   begin
-      return P;
-   end Get_Post;
 
 end HB_Common;

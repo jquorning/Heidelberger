@@ -2177,14 +2177,6 @@ is
       return P; -- Get (Wp_Post_Types, Post_Type);
    end Get_Post_Type_Object;
 
-  function Get_Post_Type_Object (Post_Type : String)
-                                 return Wp_Post
-  is
-     P : Wp_Post;
-  begin
-     return P;
-  end Get_Post_Type_Object;
-
 --
 -- Gets a list of all registered post type objects.
 --
@@ -2384,6 +2376,10 @@ is
    is
       use Inc_Class_Wp_Post_Type;
       use Inc_Formatting;
+
+      function Construct (Post_Type : String;
+                          Args      : Args_Type)
+                          return Wp_Post_Type;
 
       function Construct (Post_Type : String;
                           Args      : Args_Type)

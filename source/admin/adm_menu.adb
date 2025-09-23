@@ -42,6 +42,24 @@ is
    use Globals;
    use Inc_Functions;
 
+   function To_Menu (Name    : String;
+                     Cap     : String;
+                     Url     : String;
+                     Title   : String;
+                     Classes : String;
+                     Id      : String := "";
+                     Icon    : String := "")
+                     return Menu_Item;
+
+   procedure Set (Sub : in out Submenu_Type;
+                  Url : String;
+                  I   : Integer;
+                  A1  : String;
+                  A2  : String;
+                  A3  : String;
+                  A4  : String := "";
+                  A5  : String := "");
+
    -------------
    -- To_Menu --
    -------------
@@ -496,6 +514,9 @@ is
          end if;
 
          declare
+            procedure X_Add_Themes_Utility_Last;
+            procedure X_Add_Plugin_File_Editor_To_Tools;
+
             --
             -- Adds the "Theme File Editor" menu item to the bottom of the Appearance (non-block themes)
             -- or Tools (block themes) menu.
@@ -505,6 +526,7 @@ is
             -- @since 5.9.0 Renamed "Theme Editor" to "Theme File Editor".
             --              Relocates to Tools for block themes.
             --
+
             procedure X_Add_Themes_Utility_Last
             is
                use Inc_Themes;
