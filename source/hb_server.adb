@@ -84,11 +84,6 @@ Program_Termination : exception;
                                         Side => Ada.Strings.Left) &
                 "/index.html");
       Put_Line ("Press ""Q"" for quit.");
-
-      Adm_Credits.Render;
-      exception
-      when others =>
-      raise Program_Termination;
    end Start;
 
    --------------

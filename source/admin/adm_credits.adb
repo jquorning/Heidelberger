@@ -90,6 +90,43 @@ is
                   Wp_Credits_Section_List  (Credits, "contributing-developers");
                end;
                Set ("VAR_credits_core_developers", Get_Echo);
+
+            elsif Var_Name = "VAR_credits_props" then
+               Clear_Echo;
+
+               declare
+                  Groups : Json_Value := Credits.Get ("groups");
+                  Props  : Json_Value := Groups. Get ("props");
+               begin
+                  Wp_Credits_Section_Title (Props);
+                  Wp_Credits_Section_List  (Credits, "props");
+               end;
+               Set ("VAR_credits_props", Get_Echo);
+
+            elsif Var_Name = "VAR_credits_validators" then
+               Clear_Echo;
+
+               declare
+                  Groups     : Json_Value := Credits.Get ("groups");
+                  Validators : Json_Value := Groups. Get ("validators");
+               begin
+                  Wp_Credits_Section_Title (Validators);
+                  Wp_Credits_Section_List  (Credits, "validators");
+                  Wp_Credits_Section_List  (Credits, "translators");
+               end;
+               Set ("VAR_credits_validators", Get_Echo);
+
+            elsif Var_Name = "VAR_credits_libraries" then
+               Clear_Echo;
+
+               declare
+                  Groups    : Json_Value := Credits.Get ("groups");
+                  Libraries : Json_Value := Groups. Get ("libraries");
+               begin
+                  Wp_Credits_Section_Title (Libraries);
+                  Wp_Credits_Section_List  (Credits, "libraries");
+               end;
+               Set ("VAR_credits_validators", Get_Echo);
             end if;
          end Value;
 
