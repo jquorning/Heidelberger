@@ -1,3 +1,6 @@
+
+with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Multiway_Trees;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
@@ -36,11 +39,23 @@ is
          Icon_Url   : Unbounded_String; -- Icon
       end record;
 
-   type Menu_Array is array (0 .. 99) of Menu_Item;
+   type Menu_Index is range 0 .. 99;
+--   subtype Menu_Key is String;
+
+--   package Menu_Maps is new
+--      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => Menu_Key,
+--                                              Element_Type => Menu_Item);
+   package Menu_Vectors is new
+      Ada.Containers.vectors (Index_Type   => Menu_Index,
+                              Element_Type => Menu_Item);
+
+-- type Menu_Array is array (Menu_Index) of Menu_Item;
+--   subtype Menu_Map is Menu_Maps.Map;
+   subtype Menu_Vector is Menu_Vectors.Vector;
 
    -- 0 := menu_title, 1 := capability, 2 := menu_slug,
    -- 3 := page_title, 4 := classes.
-   type Submenu_Record is
+   type Submenu_Item is
       record
          Menu_Title : Unbounded_String;
          Capability : Unbounded_String;
@@ -49,19 +64,22 @@ is
          Classes    : Unbounded_String;
       end record;
 
-   type Submenu_Extended_Index is new Natural;
-   subtype Submenu_Index is Submenu_Extended_Index
-     range 1 .. Submenu_Extended_Index'Last;
+   type Submenu_Index is new Natural;
 
-   No_Submenu : constant Submenu_Extended_Index := 0;
+--   No_Submenu : constant Submenu_Index := 0;
+
+   -- package Submenu_Trees  is new
+   --    Ada.Containers.Multiway_Trees (Element_Type => Submenu_Item);
+
+   -- subtype Submenu_Type is Submenu_Trees.Tree;
 
    package Submenu_Vectors is new
       Ada.Containers.Vectors (Index_Type   => Submenu_Index,
-                              Element_Type => Submenu_Record);
+                              Element_Type => Submenu_Item);
 
    subtype Submenu_Type is Submenu_Vectors.Vector;
 
-   Menu    : Menu_Array;
+   Menu    : Menu_Vector;  -- Menu_Map;
    Submenu : Submenu_Type;
 
    --
@@ -72,9 +90,10 @@ is
    --
    --
    --
-   function Find_Submenu (Submenu : Submenu_Type;
-                          Slug    : String)
-                          return Submenu_Extended_Index;
+   procedure Find_Submenu (Submenu : Submenu_Type;
+                           Slug    : String;
+                           Found   : out Boolean;
+                           Index   : out Submenu_Index);
 
    --
    --

@@ -79,7 +79,7 @@ is
    ----------------------
 
    procedure X_Wp_Menu_Output
-     (Menu              : Adm_Menu.Menu_Array; -- Array_Type;
+     (Menu              : Adm_Menu.Menu_Vector; -- _Map; -- _Array; -- Array_Type;
       Submenu           : Adm_Menu.Submenu_Type; -- Array_Type;
       Submenu_As_Parent : Boolean := True)
    is
@@ -102,13 +102,14 @@ is
             Aria_Hidden     : Unbounded_String;
             Is_Separator    : Boolean    := False;
 
-            Submenu_Index   : constant Adm_Menu.Submenu_Index :=
-               Find_Submenu (Submenu, -Item.Menu_Slug);
+            Submenu_Index : Adm_Menu.Submenu_Index;
+            Submenu_Found : Boolean;
 
-            Submenu_Items   : constant Submenu_Type :=
+            Submenu_Items : constant Submenu_Type :=
                Get_Sub_Submenu (Submenu, Menu_Slug => -Item.Menu_Slug);
-            --  Record renames Submenu (Submenu_Index);
          begin
+            Find_Submenu (Submenu, -Item.Menu_Slug, Submenu_Found, Submenu_Index);
+
             if First then
                Append (Class, +"wp-first-item");  -- ()
                First   := False;
@@ -123,7 +124,7 @@ is
               (Parent_File /= "" and then Item.Menu_Slug = Parent_File) or else
               (Empty (-Typenow) and then Self = Item.Menu_Slug)
             then
-               if Submenu_Index /= No_Submenu then
+               if not Submenu_Found then
 --             if not Empty (Submenu_Items) then
                   Append (Class, +"wp-has-current-submenu wp-menu-open");
                else
@@ -132,7 +133,7 @@ is
                end if;
             else
                Append (Class, +"wp-not-current-submenu");  -- ()
-               if Submenu_Index /= No_Submenu then
+               if Submenu_Found then
 --               if not Empty (Submenu_Items) then
                   Append (Aria_Attributes, +"aria-haspopup=""true""");
                end if;
@@ -204,7 +205,7 @@ is
 
                   if Is_Separator then
                      Echo ("<div class=""separator""></div>");
-                  elsif Submenu_As_Parent and then Submenu_Index /= No_Submenu  then
+                  elsif Submenu_As_Parent and then not Submenu_Found then
                      declare
                         Submenu_Items_2 : constant Submenu_Type :=
                            Filter_And_Sort (Submenu);  -- Re-index.
@@ -278,7 +279,7 @@ is
                      -- 3 := page_title, 4 := classes.
                      for Sub of Submenu_Items loop
                         declare
-                           Sub_Item        : constant Adm_Menu.Submenu_Record := Sub;
+                           Sub_Item        : constant Adm_Menu.Submenu_Item := Sub;
                            Class           : List_Type := Empty_List;
                            Aria_Attributes : List_Type := Empty_List;
                         begin

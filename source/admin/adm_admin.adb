@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Globals;
-with Hb_Common;
+with HB_Common;
 with Php;
 
 with Adi_Plugins;
@@ -38,7 +38,7 @@ package body Adm_Admin
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use HB_Common;
    use Inc_L10n;
 
    ---------
@@ -102,7 +102,7 @@ is
       then
 
          if not Inc_Load.Is_Multisite then
-            Inc_Pluggables.wp_Redirect
+            Inc_Pluggables.Wp_Redirect
                (Inc_Link_Templates.Admin_Url
                  ("upgrade.php?_wp_http_referer=" &
                   Php.Urlencode (Inc_Formatting.Wp_Unslash
@@ -430,7 +430,7 @@ is
 
                if Inc_Functions.Validate_File (Importer) /= 0 then
                   Inc_Pluggables.Wp_Redirect
-                     (Inc_Link_Templates.Admin_Url ("import.php?invalid=" & importer));
+                     (Inc_Link_Templates.Admin_Url ("import.php?invalid=" & Importer));
                   return; -- exit;
                end if;
 
@@ -534,7 +534,7 @@ is
                if "category" = Taxnow then
                   Do_Action ("load-categories.php");
                   -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-               elsif "link_category" = taxnow then
+               elsif "link_category" = Taxnow then
                   Do_Action ("load-edit-link-categories.php");
                   -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
                end if;

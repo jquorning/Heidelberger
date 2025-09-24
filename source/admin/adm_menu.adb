@@ -39,65 +39,23 @@ is
    use Globals;
    use Inc_Functions;
 
-   function To_Menu (Name    : String;
-                     Cap     : String;
-                     Url     : String;
-                     Title   : String;
-                     Classes : String;
-                     Id      : String := "";
-                     Icon    : String := "")
+   function To_Menu (Menu_Title : String;
+                     Capability : String;
+                     Menu_slug  : String;
+                     Page_Title : String;
+                     Classes    : String;
+                     Hookname   : String := "";
+                     Icon_Url   : String := "")
                      return Menu_Item;
 
-   procedure Set (Sub : in out Submenu_Type;
-                  Url : String;
-                  I   : Integer;
-                  A1  : String;
-                  A2  : String;
-                  A3  : String;
-                  A4  : String := "";
-                  A5  : String := "");
-
-   -------------
-   -- To_Menu --
-   -------------
-
-   function To_Menu (Name    : String;
-                     Cap     : String;
-                     Url     : String;
-                     Title   : String;
-                     Classes : String;
-                     Id      : String := "";
-                     Icon    : String := "")
-                     return Menu_Item
-   is
-      Item : constant Menu_Item :=
-                          (Menu_Title => +Name,
-                           Capability => +Cap,
-                           Menu_Slug  => +Url,
-                           Page_Title => +Title,
-                           Classes    => +Classes,
-                           hookname   => +Id,
-                           Icon_Url   => +Icon);
-   begin
-      return Item;
-   end To_Menu;
-
-   ---------
-   -- Set --
-   ---------
-
-   procedure Set (Sub : in out Submenu_Type;
-                  Url : String;
-                  I   : Integer;
-                  A1  : String;
-                  A2  : String;
-                  A3  : String;
-                  A4  : String := "";
-                  A5  : String := "")
-   is
-   begin
-      null;
-   end Set;
+   procedure Set (Submenu    : in out Submenu_Type;
+                  Menu_Slug  : String;
+                  Position   : Adm_Menu.Submenu_Index;
+                  Menu_Title : String;  -- Localized
+                  Capability : String;
+                  Page_Title : String;
+                  Unknown    : String := "";
+                  Classes    : String := "");
 
    ---------
    -- Run --
@@ -109,10 +67,9 @@ is
       use Inc_Formatting;
       use Inc_Updates;
 
---      Submenu : Submenu_Type;
       Is_Multisite : constant Boolean := Inc_Load.Is_Multisite;
       Cap          : Unbounded_String;
-      I            : Natural;
+      I            : Adm_Menu.Submenu_Index; -- Natural;
       Update_Data  : Update_Counts; -- Array_Type;
       Counts_Total : Integer;
    begin
@@ -120,7 +77,11 @@ is
                            "menu-top menu-top-first menu-icon-dashboard",
                            "menu-dashboard", "dashicons-dashboard");
 
-      Set (Submenu, "index.php", 0, abs "Home", "read", "index.php");
+      Set (Submenu, Menu_Slug  => "index.php",
+                    Position   => 0,
+                    Menu_Title => abs "Home",
+                    Capability => "read",
+                    Page_Title => "index.php");
 
       if Is_Multisite  then -- ()
          Set (Submenu, "index.php", 5, abs "My Sites", "read", "my-sites.php");
@@ -142,24 +103,22 @@ is
          end if;
 
          Counts_Total := Update_Data.Total;
---          Integer'Value (Get_2 (Update_Data, "counts", "total"));
+--       Integer'Value (Get_2 (Update_Data, "counts", "total"));
 
          Set (Submenu, "index.php", 10,
               Sprintf (
-                        -- translators: %s: Number of pending updates.
-                        abs "Updates %s",
-                        Sprintf (
-                                "<span class=""update-plugins count-%s""><span class=""update-count"">%s</span></span>",
-                                Counts_Total'Image,
-                                -- Update_Data ("counts") ("total"),
-                                Number_Format_I18n (Float (Counts_Total))
-                                -- Update_Data ("counts") ("total"))
-                       )
-              ),
+                 -- translators: %s: Number of pending updates.
+                 abs "Updates %s",
+                 Sprintf (
+                    "<span class=""update-plugins count-%s""><span class=""update-count"">%s</span></span>",
+                    Counts_Total'Image,
+                     -- Update_Data ("counts") ("total"),
+                     Number_Format_I18n (Float (Counts_Total)))),
+                     -- Update_Data ("counts") ("total"))
               -Cap,
-              "update-core.php"
-            );
---         Unset (Cap);
+              "update-core.php");
+
+--       Unset (Cap);
       end if;
 
       Menu (4) := To_Menu ("", "read", "separator1", "", "wp-menu-separator");
@@ -170,9 +129,10 @@ is
                             "menu-top menu-icon-media", "menu-media",
                             "dashicons-admin-media");
       Set (Submenu, "upload.php", 5, abs "Library", "upload_files", "upload.php");
-      -- translators: Add new file.
-      Set (Submenu, "upload.php", 10, X_X ("Add New", "file"), "upload_files",
-                                      "media-new.php");
+      Set (Submenu, "upload.php", 10,
+           -- translators: Add new file.
+           X_X ("Add New", "file"), "upload_files", "media-new.php");
+
       I := 15;
       for Tax of Inc_Media.Get_Taxonomies_For_Attachments ("objects") loop
          if not Tax.Show_UI or else not Tax.Show_In_Menu then
@@ -261,7 +221,7 @@ is
             declare
                Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
-               Ptype_Menu_Position : Integer;
+               Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : Unbounded_String;
                Menu_Icon           : Unbounded_String;
                Menu_Class          : Unbounded_String;
@@ -277,7 +237,7 @@ is
                end if;
 
                if Is_Int (Ptype_Obj.Menu_Position) then
-                  Ptype_Menu_Position := Ptype_Obj.Menu_Position;
+                  Ptype_Menu_Position := Menu_Index (Ptype_Obj.Menu_Position);
                else
                   X_Wp_Last_Object_Menu := X_Wp_Last_Object_Menu + 1;
                end if;
@@ -439,12 +399,14 @@ is
             -- Hide Customize link on block themes unless a plugin or theme
             -- is using "customize_register" to add a setting.
             if not wp_Is_Block_Theme or Has_Action ("customize_register") then
+
                declare
-                  Position : constant Integer :=
-                     (if
-                        wp_Is_Block_Theme or else
-                        Current_Theme_Supports ("block-template-parts")
-                      then 7 else 6);
+                  Block_Theme : constant Boolean :=
+                     wp_Is_Block_Theme or else
+                     Current_Theme_Supports ("block-template-parts");
+
+                  Position : constant Adm_Menu.Submenu_Index :=
+                     (if Block_Theme then 7 else 6);
                begin
                   Set (Submenu, "themes.php", Position, abs "Customize", "customize",
                        ESC_URL (Customize_Url), "", "hide-if-no-customize");
@@ -763,17 +725,22 @@ is
    -- Find_Submenu --
    ------------------
 
-   function Find_Submenu (Submenu : Submenu_Type;
-                          Slug    : String)
-                          return Submenu_Extended_Index
+   procedure Find_Submenu (Submenu : Submenu_Type;
+                           Slug    : String;
+                           Found   : out Boolean;
+                           Index   : out Submenu_Index)
    is
    begin
       for S in Submenu.First_Index .. Submenu.Last_Index loop
          if Submenu (S).Menu_Slug = Slug then
-            return S;
+            Index := S;
+            Found := True;
+            return;
          end if;
       end loop;
-      return No_Submenu;
+
+      Found := False;
+      Index := Submenu_Index'First;
    end Find_Submenu;
 
    ---------------------
@@ -806,6 +773,54 @@ is
    begin
       return Submenu;
    end Filter_And_Sort;
+
+   -------------
+   -- To_Menu --
+   -------------
+
+   function To_Menu (Menu_Title : String;
+                     Capability : String;
+                     Menu_slug  : String;
+                     Page_Title : String;
+                     Classes    : String;
+                     Hookname   : String := "";
+                     Icon_Url   : String := "")
+                     return Menu_Item
+   is
+      Item : constant Menu_Item :=
+                          (Menu_Title => +Menu_Title,
+                           Capability => +Capability,
+                           Menu_Slug  => +Menu_Slug,
+                           Page_Title => +Page_Title,
+                           Classes    => +Classes,
+                           Hookname   => +Hookname,
+                           Icon_Url   => +Icon_Url);
+   begin
+      return Item;
+   end To_Menu;
+
+   ---------
+   -- Set --
+   ---------
+
+   procedure Set (Submenu    : in out Submenu_Type;
+                  Menu_Slug  : String;
+                  Position   : Adm_Menu.Submenu_Index;
+                  Menu_Title : String;  -- Localized
+                  Capability : String;
+                  Page_Title : String;
+                  Unknown    : String := "";
+                  Classes    : String := "")
+   is
+      Item : constant Submenu_Item :=
+        (Menu_Title => +Menu_Title,
+         Capability => +Capability,
+         Menu_Slug  => +Menu_Slug,
+         Page_Title => +Page_Title,      -- Page_Title,
+         Classes    => +Classes);
+   begin
+      Adm_Menu.Submenu (Position) := Item;
+   end Set;
 
 end Adm_Menu;
 -- require_once ABSPATH . "wp-admin/includes/menu.php";

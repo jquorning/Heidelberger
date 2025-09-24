@@ -166,12 +166,12 @@ is
                        := +Remove_Query_Arg (Arg, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
-                        Sendback := To_Unbounded_String (Admin_URL (Parent_File));
+                        Sendback := To_Unbounded_String (Admin_Url (Parent_File));
                      end if;
 
                      Sendback := Add_Query_Arg ("paged", Pagenum, Sendback);
                      if Index (Sendback, "post") /= 0 then
-                        Sendback := To_Unbounded_String (Admin_URL (Post_New_File));
+                        Sendback := To_Unbounded_String (Admin_Url (Post_New_File));
                      end if;
 
                      declare
@@ -649,9 +649,9 @@ is
                      elsif Var_Name = "VAR_page_edit_h1_sub" then
                         declare
                            URL  : constant String :=
-                              ESC_URL  (Admin_URL (Post_New_File));
+                              ESC_URL  (Admin_Url (Post_New_File));
                            HTML : constant String :=
-                              ESC_HTML (String'(Hb_Common.Get (Post_Type_Object,
+                              ESC_HTML (String'(HB_Common.Get (Post_Type_Object,
                                                      "labels.add_new")));
                         begin
                            if
@@ -696,7 +696,7 @@ is
 
                      elsif Var_Name = "VAR_page_edit_search_box" then
                         X_Wp_List_Table.Search_Box
-                          (String'(Hb_Common.Get (Post_Type_Object,
+                          (String'(HB_Common.Get (Post_Type_Object,
                                                  "labels.search_items")),
                            "post");
                         Insert (Translations,
@@ -817,7 +817,7 @@ is
                   URL_2 : constant String
                      := """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
                         Ids'Image & """";
-                  URL   : constant String  := ESC_URL (Wp_Nonce_URL (URL_2, "bulk-posts"));
+                  URL   : constant String  := ESC_URL (Wp_Nonce_Url (URL_2, "bulk-posts"));
                begin
                   Append (Messages, "<a href=""" & URL & """>" & abs "Undo" & "</a>");
                end;

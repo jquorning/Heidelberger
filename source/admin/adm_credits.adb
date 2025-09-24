@@ -1,14 +1,14 @@
 
 with Ada.Exceptions;
 with Ada.Strings.Unbounded;
-with Ada.Text_Io;
+with Ada.Text_IO;
 
 with Arrays;
 with Globals;
-with Hb_Common;
+with HB_Common;
 with Php;
 
-with Gnatcoll.Json;
+with GNATCOLL.JSON;
 with Templates_Parser;
 
 with Adi_Credits;
@@ -18,13 +18,13 @@ with Inc_L10n;
 package body Adm_Credits
 is
    use Ada.Strings.Unbounded;
-   use Ada.Text_Io;
+   use Ada.Text_IO;
    use Arrays;
-   use Hb_Common;
+   use HB_Common;
    use Inc_L10n;
    use Php;
 
-   subtype Json_Value is Gnatcoll.Json.Json_Value;
+   subtype Json_Value is GNATCOLL.JSON.JSON_Value;
 
    function Translation
       return Templates_Parser.Translate_Table;

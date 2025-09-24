@@ -229,6 +229,17 @@ is
                           return List_Type
                           is (Empty_List);
 
+   function Basename (Path : String;
+                      Suffix : String := "")
+                      return String
+                      is ("XXX-521");
+
+   function Stristr (Haystack      : String;
+                     Needle        : String;
+                     Before_Needle : Boolean := False)
+                     return Boolean  -- string|false
+                     is (False);
+
    -------------------
    -- Echo handling --
    -------------------

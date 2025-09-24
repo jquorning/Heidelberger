@@ -22,7 +22,7 @@ with Inc_Class_Wp_Admin_Bar;
 
 with Adm_Menu_Header;
 
--- with Adi_Menu;
+with Adi_Menu;
 with Inc_Class_Wp_Posts;
 -- with Adi_Nav_Menus;
 -- with Adm_Nav_Menus;
