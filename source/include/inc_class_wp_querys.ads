@@ -479,42 +479,43 @@ is
 --        private $compat_methods = array( 'init_query_flags', 'parse_tax_query' );
       end record;
 
-        --
-        -- Determines whether there are more posts available in the loop.
-        --
-        -- Calls the {@see 'loop_end'} action when the loop is complete.
-        --
-        -- @since 1.5.0
-        --
-        -- @return bool True if posts are available, false if end of the loop.
-        --
-        function Have_Posts (This : in out Wp_Query)
-                             return Boolean
-                             is (True);
+   --
+   -- Determines whether there are more posts available in the loop.
+   --
+   -- Calls the {@see 'loop_end'} action when the loop is complete.
+   --
+   -- @since 1.5.0
+   --
+   -- @return bool True if posts are available, false if end of the loop.
+   --
+   function Have_Posts (This : in out Wp_Query)
+                        return Boolean
+                        is (True);
 
-        --
-        -- Set up the next post and iterate current post index.
-        --
-        -- @since 1.5.0
-        --
-        -- @return WP_Post Next post.
-        --
-        function Next_Post (This : Wp_Query)
-                            return Inc_Class_Wp_Posts.Wp_Post -- Inc_Class_Wp_Posts
-                            is (Inc_Class_Wp_Posts.Null_Post);
-        --
-        -- Retrieves the currently queried object.
-        --
-        -- If queried object is not set, then the queried object will be set from
-        -- the category, tag, taxonomy, posts page, single post, page, or author
-        -- query variable. After it is set up, it will be returned.
-        --
-        -- @since 1.5.0
-        --
-        -- @return WP_Term|WP_Post_Type|WP_Post|WP_User|null The queried object.
-        --
-        function Get_Queried_Object (This : Wp_Query)
-                                     return Inc_Class_Wp_Posts.Wp_Post
-                                     is (Inc_Class_Wp_Posts.Null_Post);
+   --
+   -- Set up the next post and iterate current post index.
+   --
+   -- @since 1.5.0
+   --
+   -- @return WP_Post Next post.
+   --
+   function Next_Post (This : Wp_Query)
+                       return Inc_Class_Wp_Posts.Wp_Post -- Inc_Class_Wp_Posts
+                       is (Inc_Class_Wp_Posts.Null_Post);
+
+   --
+   -- Retrieves the currently queried object.
+   --
+   -- If queried object is not set, then the queried object will be set from
+   -- the category, tag, taxonomy, posts page, single post, page, or author
+   -- query variable. After it is set up, it will be returned.
+   --
+   -- @since 1.5.0
+   --
+   -- @return WP_Term|WP_Post_Type|WP_Post|WP_User|null The queried object.
+   --
+   function Get_Queried_Object (This : Wp_Query)
+                                return Inc_Class_Wp_Posts.Wp_Post
+                                is (Inc_Class_Wp_Posts.Null_Post);
 
 end Inc_Class_Wp_Querys;

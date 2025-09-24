@@ -4808,18 +4808,18 @@ is
 
       Parsed_Args : Array_Type;
    begin
-        if Is_Object (Args) then
-                Parsed_Args := Get_Object_Vars (Args);
-        elsif Is_Array (Args) then
-                Array_Vectors.Append (Parsed_Args, Args);
-        else
-                Wp_Parse_Str ("Args", Parsed_Args); -- args ???
-        end if;
+      if Is_Object (Args) then
+         Parsed_Args := Get_Object_Vars (Args);
+      elsif Is_Array (Args) then
+         Array_Vectors.Append (Parsed_Args, Args);
+      else
+         Wp_Parse_Str ("Args", Parsed_Args); -- args ???
+      end if;
 
-        if Is_Array (Defaults) and then not Defaults.Is_Empty then
-                return Array_Merge (Defaults, Parsed_Args);
-        end if;
-        return Parsed_Args;
+      if Is_Array (Defaults) and then not Defaults.Is_Empty then
+         return Array_Merge (Defaults, Parsed_Args);
+      end if;
+      return Parsed_Args;
    end Wp_Parse_Args;
 
 --

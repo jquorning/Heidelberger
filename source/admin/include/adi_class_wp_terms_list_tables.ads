@@ -24,7 +24,7 @@ is
 
 --        public callback_args;
 
- --       private
+--       private
          Level : Integer;  -- ?
 
       end record;

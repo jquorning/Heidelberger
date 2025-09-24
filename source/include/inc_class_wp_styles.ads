@@ -124,12 +124,12 @@ is
 
       end record;
 
-        --
-        -- Constructor.
-        --
-        -- @since 2.6.0
-        --
-        function X_Construct
-           return Wp_Styles;
+   --
+   -- Constructor.
+   --
+   -- @since 2.6.0
+   --
+   function X_Construct
+            return Wp_Styles;
 
 end Inc_Class_Wp_Styles;

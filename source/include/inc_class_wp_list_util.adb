@@ -7,26 +7,26 @@
 
 package body Inc_Class_Wp_List_Util
 is
-        --
-        -- Constructor.
-        --
-        -- Sets the input array.
-        --
-        -- @since 4.7.0
-        --
-        -- @param array input Array to perform operations on.
-        --
-        -- public function __construct( input ) then
+   --
+   -- Constructor.
+   --
+   -- Sets the input array.
+   --
+   -- @since 4.7.0
+   --
+   -- @param array input Array to perform operations on.
+   --
+   -- public function __construct( input ) then
 
-        function X_Construct (Input : Array_Type)
-                              return Wp_List_Util
-        is
-           This : Wp_List_Util;
-        begin
-           This.Output := Input;
-           This.Input  := Input;
-           return This;
-        end X_Construct;
+   function X_Construct (Input : Array_Type)
+                         return Wp_List_Util
+   is
+      This : Wp_List_Util;
+   begin
+      This.Output := Input;
+      This.Input  := Input;
+      return This;
+   end X_Construct;
 
 --         --
 --         -- Returns the original input array.

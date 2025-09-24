@@ -245,8 +245,8 @@ is
                   end if;
                end loop;
             end;
-                -- Put checked categories on top.
---                Append (Output, Walker.Walk (Checked_Categories, 0, Args_2));
+            -- Put checked categories on top.
+--          Append (Output, Walker.Walk (Checked_Categories, 0, Args_2));
          end if;
          -- Then the rest of them.
 --       Append (Output, Walker.Walk (Categories, 0, Args_2));

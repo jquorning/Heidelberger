@@ -17,35 +17,35 @@ package body Inc_Class_Wp_Styles
 is
    use Hb_Common;
 
-        --
-        -- Constructor.
-        --
-        -- @since 2.6.0
-        --
-        function X_Construct
-           return Wp_Styles
-        is
-           This : Wp_Styles;
-        begin
-                if
---                    function_exists( "is_admin" ) and then
-                      not Inc_Load.Is_Admin and then
---                    function_exists( "current_theme_supports" ) and then
-                      not Inc_Themes.Current_Theme_Supports ("html5", "style")
-                then
-                        this.type_attr := +" type=""text/css""";
-                end if;
+   --
+   -- Constructor.
+   --
+   -- @since 2.6.0
+   --
+   function X_Construct
+      return Wp_Styles
+   is
+      This : Wp_Styles;
+   begin
+      if
+--      function_exists( "is_admin" ) and then
+        not Inc_Load.Is_Admin and then
+--      function_exists( "current_theme_supports" ) and then
+        not Inc_Themes.Current_Theme_Supports ("html5", "style")
+      then
+         this.type_attr := +" type=""text/css""";
+      end if;
 
-                --
-                -- Fires when the WP_Styles instance is initialized.
-                --
-                -- @since 2.6.0
-                --
-                -- @param WP_Styles wp_styles WP_Styles instance (passed by reference).
-                --
-                Inc_Plugins.Do_Action_Ref_Array ("wp_default_styles", This);
-                return This;
-        end X_Construct;
+      --
+      -- Fires when the WP_Styles instance is initialized.
+      --
+      -- @since 2.6.0
+      --
+      -- @param WP_Styles wp_styles WP_Styles instance (passed by reference).
+      --
+      Inc_Plugins.Do_Action_Ref_Array ("wp_default_styles", This);
+      return This;
+   end X_Construct;
 
 --         --
 --         -- Processes a style dependency.

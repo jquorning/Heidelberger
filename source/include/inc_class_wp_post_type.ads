@@ -440,43 +440,43 @@ is
 --                              Args      : Inc_Posts.Args_Type) -- = array() )
 --                              return Wp_Post_Type;
 
-        --
-        -- Sets the features support for the post type.
-        --
-        -- @since 4.6.0
-        --
-        procedure Add_Supports (This : in out Wp_Post_Type) is null;
+   --
+   -- Sets the features support for the post type.
+   --
+   -- @since 4.6.0
+   --
+   procedure Add_Supports (This : in out Wp_Post_Type) is null;
 
-        --
-        -- Adds the necessary rewrite rules for the post type.
-        --
-        -- @since 4.6.0
-        --
-        -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
-        -- @global WP         wp         Current WordPress environment instance.
-        --
-        procedure Add_Rewrite_Rules (This : in out Wp_Post_Type) is null;
+   --
+   -- Adds the necessary rewrite rules for the post type.
+   --
+   -- @since 4.6.0
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   -- @global WP         wp         Current WordPress environment instance.
+   --
+   procedure Add_Rewrite_Rules (This : in out Wp_Post_Type) is null;
 
-        --
-        -- Registers the post type meta box if a custom callback was specified.
-        --
-        -- @since 4.6.0
-        --
-        procedure Register_Meta_Boxes (This : in out Wp_Post_Type) is null;
+   --
+   -- Registers the post type meta box if a custom callback was specified.
+   --
+   -- @since 4.6.0
+   --
+   procedure Register_Meta_Boxes (This : in out Wp_Post_Type) is null;
 
-        --
-        -- Adds the future post hook action for the post type.
-        --
-        -- @since 4.6.0
-        --
-        procedure Add_Hooks (This : in out Wp_Post_Type) is null;
+   --
+   -- Adds the future post hook action for the post type.
+   --
+   -- @since 4.6.0
+   --
+   procedure Add_Hooks (This : in out Wp_Post_Type) is null;
 
-        --
-        -- Registers the taxonomies for the post type.
-        --
-        -- @since 4.6.0
-        --
-        procedure Register_Taxonomies (This : in out Wp_Post_Type) is null;
+   --
+   -- Registers the taxonomies for the post type.
+   --
+   -- @since 4.6.0
+   --
+   procedure Register_Taxonomies (This : in out Wp_Post_Type) is null;
 
    Null_Post_Type : constant Wp_Post_Type :=
      (Labels              => Empty_Array,
@@ -501,13 +501,12 @@ is
                                               Element_Type => Wp_Post_Type);
    subtype Wp_Post_Type_Array is Post_Type_maps.Map;
 
--- type Wp_Post_Type_Array is array (Positive range <>) of Wp_Post_Type;
-        --
-        -- Resets the cache for the default labels.
-        --
-        -- @since 6.0.0
-        --
-        -- public static
+   --
+   -- Resets the cache for the default labels.
+   --
+   -- @since 6.0.0
+   --
+   -- public static
    procedure Reset_Default_Labels is null;
 
 end Inc_Class_Wp_Post_Type;

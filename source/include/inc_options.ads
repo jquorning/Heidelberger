@@ -2,7 +2,8 @@ with Arrays;
 
 package Inc_Options
 is
-        use Arrays;
+   use Arrays;
+
 --
 -- Retrieves an option value based on an option name.
 --

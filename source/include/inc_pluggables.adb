@@ -81,14 +81,14 @@ is
 --         -- @param int user_id User ID
 --         -- @return WP_User|false WP_User object on success, false on failure.
 --         --
-        function Get_Userdata (User_Id : Integer)
-                               return Inc_Class_Wp_Users.Wp_User
-        is
-           U : Inc_Class_Wp_Users.Wp_User;
-        begin
-           return U;
---           return Get_User_By ("id", User_Id);
-        end Get_Userdata;
+   function Get_Userdata (User_Id : Integer)
+                          return Inc_Class_Wp_Users.Wp_User
+   is
+      U : Inc_Class_Wp_Users.Wp_User;
+   begin
+      return U;
+--    return Get_User_By ("id", User_Id);
+   end Get_Userdata;
 -- endif;
 
 -- if ( ! function_exists( 'get_user_by' ) ) :

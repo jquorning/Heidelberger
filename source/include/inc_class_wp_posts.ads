@@ -245,76 +245,76 @@ is
 
       end record;
 
-        --
-        -- Retrieve WP_Post instance.
-        --
-        -- @since 3.5.0
-        --
-        -- @global wpdb $wpdb WordPress database abstraction object.
-        --
-        -- @param int $post_id Post ID.
-        -- @return WP_Post|false Post object, false otherwise.
-        --
-        procedure Get_Instance (Id      : Post_Id;
-                                Post    : out Wp_Post;
-                                Success : out Boolean);
+   --
+   -- Retrieve WP_Post instance.
+   --
+   -- @since 3.5.0
+   --
+   -- @global wpdb $wpdb WordPress database abstraction object.
+   --
+   -- @param int $post_id Post ID.
+   -- @return WP_Post|false Post object, false otherwise.
+   --
+   procedure Get_Instance (Id      : Post_Id;
+                           Post    : out Wp_Post;
+                           Success : out Boolean);
 --        function Get_Instance (Id : Post_Id) return Wp_Post;
 
-        --
-        -- Constructor.
-        --
-        -- @since 3.5.0
-        --
-        -- @param WP_Post|object post Post object.
-        --
+   --
+   -- Constructor.
+   --
+   -- @since 3.5.0
+   --
+   -- @param WP_Post|object post Post object.
+   --
 --        public function __construct( post )
-        function X_Construct (Post : Wp_Post) return Wp_Post;
+   function X_Construct (Post : Wp_Post) return Wp_Post;
 
-        --
-        -- Isset-er.
-        --
-        -- @since 3.5.0
-        --
-        -- @param string $key Property to check if set.
-        -- @return bool
-        --
-        function X_Isset (Post : Wp_Post;
-                          Key  : String)
-                          return Boolean;
+   --
+   -- Isset-er.
+   --
+   -- @since 3.5.0
+   --
+   -- @param string $key Property to check if set.
+   -- @return bool
+   --
+   function X_Isset (Post : Wp_Post;
+                     Key  : String)
+                     return Boolean;
 
-        --
-        -- Getter.
-        --
-        -- @since 3.5.0
-        --
-        -- @param string $key Key to get.
-        -- @return mixed
-        --
-        function X_Get (Post : Wp_post;
-                        Key  : String)
-                        return Array_Type;
+   --
+   -- Getter.
+   --
+   -- @since 3.5.0
+   --
+   -- @param string $key Key to get.
+   -- @return mixed
+   --
+   function X_Get (Post : Wp_post;
+                   Key  : String)
+                   return Array_Type;
 
-        --
-        -- {@Missing Summary}
-        --
-        -- @since 3.5.0
-        --
-        -- @param string $filter Filter.
-        -- @return WP_Post
-        --
-        function Filter (Post   : Wp_Post;
-                         Filter : String)
-                         return Wp_Post;
+   --
+   -- {@Missing Summary}
+   --
+   -- @since 3.5.0
+   --
+   -- @param string $filter Filter.
+   -- @return WP_Post
+   --
+   function Filter (Post   : Wp_Post;
+                    Filter : String)
+                    return Wp_Post;
 
-        --
-        -- Convert object to array.
-        --
-        -- @since 3.5.0
-        --
-        -- @return array Object as array.
-        --
-        function To_Array (Post : Wp_Post)
-                          return Array_Type;
+   --
+   -- Convert object to array.
+   --
+   -- @since 3.5.0
+   --
+   -- @return array Object as array.
+   --
+   function To_Array (Post : Wp_Post)
+                      return Array_Type;
 
    Null_Post : constant Wp_Post :=
      (Id => 0, Post_Parent => 0, Menu_Order => 0, Dyn => Null_Property_Type,

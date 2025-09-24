@@ -11,7 +11,8 @@
 
 package body Inc_Author_Templates
 is
-        procedure Dummy is null;
+   procedure Dummy is null;
+
 -- --
 -- -- Retrieves the author of the current post.
 -- --

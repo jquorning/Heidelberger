@@ -47,16 +47,27 @@ is
 
    type Node_Args is
       record
-         Id     : Unbounded_String;  --  ID of the item.
-         Title  : Unbounded_String;  --  Title of the node.
-         Parent : Unbounded_String;  --  Optional. ID of the parent node.
-         Href   : Unbounded_String;  --  Optional. Link for the item.
-         Group  : Boolean;           --  Optional. Whether or not the node is a group.
-                                     --  Default false.
-         Meta   : Array_Type;        --  Meta data including the following keys:
-                                     --  "html", "class", "rel", "lang", "dir",
-                                     --  "onclick", "target", "title", "tabindex".
-                                     --   Default empty.
+         Id     : Unbounded_String;
+         --  ID of the item.
+
+         Title  : Unbounded_String;
+         --  Title of the node.
+
+         Parent : Unbounded_String;
+         --  Optional. ID of the parent node.
+
+         Href   : Unbounded_String;
+         --  Optional. Link for the item.
+
+         Group  : Boolean;
+         --  Optional. Whether or not the node is a group.
+         --  Default false.
+
+         Meta   : Array_Type;
+         --  Meta data including the following keys:
+         --  "html", "class", "rel", "lang", "dir",
+         --  "onclick", "target", "title", "tabindex".
+         --   Default empty.
          Typ      : Typ_Type;
          Children : Node_Array_Access;
       end record;

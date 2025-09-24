@@ -28,77 +28,77 @@ is
    use Inc_L10n;
    use Php;
 
-        -----------------
-        -- X_Construct --
-        -----------------
+   -----------------
+   -- X_Construct --
+   -----------------
 
-        function X_Construct
-                 return Wp_Scripts
-        is
-           use Inc_Plugins;
+   function X_Construct
+            return Wp_Scripts
+   is
+      use Inc_Plugins;
 
-           This : Wp_Scripts;
-        begin
-           This.Init;
---           Add_Action ("init", To_Array (This, "init"), 0);
-           return This;
-        end X_Construct;
+      This : Wp_Scripts;
+   begin
+      This.Init;
+--    Add_Action ("init", To_Array (This, "init"), 0);
+      return This;
+   end X_Construct;
 
-        ----------
-        -- Init --
-        ----------
+   ----------
+   -- Init --
+   ----------
 
-        procedure Init (This : in out Wp_Scripts)
-        is
-           use Inc_Plugins;
-        begin
-           if
---              Function_Exists ("is_admin") and then
-              not Inc_Load.Is_Admin and then
---              Function_Exists ("current_theme_supports") and then
-              not Inc_Themes.Current_Theme_Supports ("html5", "script")
-           then
-              This.Type_Attr := +" type=""text/javascript""";
-           end if;
+   procedure Init (This : in out Wp_Scripts)
+   is
+      use Inc_Plugins;
+   begin
+      if
+--      Function_Exists ("is_admin") and then
+        not Inc_Load.Is_Admin and then
+--      Function_Exists ("current_theme_supports") and then
+        not Inc_Themes.Current_Theme_Supports ("html5", "script")
+      then
+         This.Type_Attr := +" type=""text/javascript""";
+      end if;
 
-            --
-            -- Fires when the WP_Scripts instance is initialized.
-            --
-            -- @since 2.6.0
-            --
-            -- @param WP_Scripts wp_scripts WP_Scripts instance (passed by reference).
-            --
---            Do_Action_Ref_Array ("wp_default_scripts", This); -- to_array (&this)
-        end Init;
+      --
+      -- Fires when the WP_Scripts instance is initialized.
+      --
+      -- @since 2.6.0
+      --
+      -- @param WP_Scripts wp_scripts WP_Scripts instance (passed by reference).
+      --
+--    Do_Action_Ref_Array ("wp_default_scripts", This); -- to_array (&this)
+   end Init;
 
-        -------------------
-        -- Print_Scripts --
-        -------------------
+   -------------------
+   -- Print_Scripts --
+   -------------------
 
-        function Print_Scripts (This    : in out Wp_Scripts;
-                                Handles : List_Type := Empty_List;
-                                Group   : Integer      := 0) -- False)
-                                return String_Array
-        is
-        begin
-           return This.Do_Items (Handles, Group);
-        end Print_Scripts;
+   function Print_Scripts (This    : in out Wp_Scripts;
+                           Handles : List_Type := Empty_List;
+                           Group   : Integer      := 0) -- False)
+                           return String_Array
+   is
+   begin
+      return This.Do_Items (Handles, Group);
+   end Print_Scripts;
 
-        -----------------------
-        -- Print_Script_L10n --
-        -----------------------
+   -----------------------
+   -- Print_Script_L10n --
+   -----------------------
 
-        function Print_Scripts_L10n (This    : Wp_Scripts;
-                                     Handle  : String;
-                                     Display : Boolean := True)
-                                     return String
-        is
-           use Inc_Functions;
-        begin
-           X_Deprecated_Function ("__FUNCTION__", "3.3.0",
-                                  "WP_Scripts::print_extra_script()");
-           return This.Print_Extra_Script (Handle, Display);
-        end Print_Scripts_L10n;
+   function Print_Scripts_L10n (This    : Wp_Scripts;
+                                Handle  : String;
+                                Display : Boolean := True)
+                                return String
+   is
+      use Inc_Functions;
+   begin
+      X_Deprecated_Function ("__FUNCTION__", "3.3.0",
+                             "WP_Scripts::print_extra_script()");
+      return This.Print_Extra_Script (Handle, Display);
+   end Print_Scripts_L10n;
 
    ------------------------
    -- Print_Extra_Script --

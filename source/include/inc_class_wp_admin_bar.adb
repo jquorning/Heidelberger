@@ -71,7 +71,7 @@ is
       use Inc_Themes;
       use Inc_Users;
    begin
- --     this.User := new stdClass;
+--    this.User := new stdClass;
 
       if Is_User_Logged_In then
          -- Populate settings we need for the menu based on the current user.
@@ -227,9 +227,9 @@ is
                    Arrays.To_Array ((1 => Build ("my-account", "3.3")))),
             Build ("my-blogs",
                    Arrays.To_Array ((1 => Build ("my-sites",   "3.3"))))
-        ));
-        New_Parent : Unbounded_String;
-        Version    : Unbounded_String;
+         ));
+         New_Parent : Unbounded_String;
+         Version    : Unbounded_String;
       begin
          if Isset (Back_Compat_Parents, -Args_2.Parent) then
 --          New_Parent := Back_Compat_Parents (-Args_2.Parent) (New_Parent);
@@ -599,25 +599,23 @@ is
       if Wp_Is_Mobile then
          Class := Class & " mobile";
       end if;
-
-                -- ?>
-                -- <div id="wpadminbar" class="<?php echo class; ?>">
-                --         <?php if (! is_admin() && ! did_action("wp_body_open")) then ?>
-                --                 <a class="screen-reader-shortcut" href="#wp-toolbar" tabindex="1"><?php _e("Skip to toolbar"); ?></a>
-                --         <?php end; ?>
-                --         <div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="<?php esc_attr_e("Toolbar"); ?>">
-                --                 <?php
-                                 for Group of Root.Children.all loop
-                                    This.X_Render_Group (Group);
-                                 end loop;
-                --                 ?>
-                --         </div>
-                --         <?php if (is_user_logged_in()) : ?>
-                --         <a class="screen-reader-shortcut" href="<?php echo esc_url(wp_logout_url()); ?>"><?php _e("Log Out"); ?></a>
-                --         <?php endif; ?>
-                -- </div>
-
-                -- <?php
+           -- ?>
+           -- <div id="wpadminbar" class="<?php echo class; ?>">
+           --         <?php if (! is_admin() && ! did_action("wp_body_open")) then ?>
+           --                 <a class="screen-reader-shortcut" href="#wp-toolbar" tabindex="1"><?php _e("Skip to toolbar"); ?></a>
+           --         <?php end; ?>
+           --         <div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="<?php esc_attr_e("Toolbar"); ?>">
+           --                 <?php
+         for Group of Root.Children.all loop
+            This.X_Render_Group (Group);
+         end loop;
+           --                 ?>
+           --         </div>
+           --         <?php if (is_user_logged_in()) : ?>
+           --         <a class="screen-reader-shortcut" href="<?php echo esc_url(wp_logout_url()); ?>"><?php _e("Log Out"); ?></a>
+           --         <?php endif; ?>
+           -- </div>
+           -- <?php
    end X_Render;
 
    ------------------------
@@ -671,7 +669,7 @@ is
 
       echo ("<ul id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) & """class>");
       for Item of Node.Children.all loop
-          This.X_Render_Item (Item);
+         This.X_Render_Item (Item);
       end loop;
       echo ("</ul>");
    end X_Render_Group;
@@ -711,8 +709,8 @@ is
       end if;
 
       if Is_Parent then
-          Menuclass        := +"menupop ";
-          Aria_Attributes  := Aria_Attributes & " aria-haspopup=""true""";
+         Menuclass        := +"menupop ";
+         Aria_Attributes  := Aria_Attributes & " aria-haspopup=""true""";
       end if;
 
       if not Empty (node.Meta, "class") then

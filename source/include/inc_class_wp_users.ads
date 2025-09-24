@@ -117,7 +117,7 @@ is
         -- @since 4.9.0
         -- @var int
         --
- --       private site_id = 0;
+--      private site_id = 0;
 
         --
         -- @since 3.3.0
@@ -130,15 +130,15 @@ is
 
       end record;
 
-        --
-        -- Determines whether the user exists in the database.
-        --
-        -- @since 3.4.0
-        --
-        -- @return bool True if user exists in the database, false if not.
-        --
-        function Exists (This : Wp_User)
-                         return Boolean
-                         is (True);
+   --
+   -- Determines whether the user exists in the database.
+   --
+   -- @since 3.4.0
+   --
+   -- @return bool True if user exists in the database, false if not.
+   --
+   function Exists (This : Wp_User)
+                    return Boolean
+                    is (True);
 
 end Inc_Class_Wp_Users;

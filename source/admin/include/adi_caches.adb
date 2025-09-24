@@ -155,10 +155,10 @@ is
                            Success : out Boolean)
 --                         return String
    is
---        global $wp_object_cache;
+--    global $wp_object_cache;
    begin
-          null;
---        return $wp_object_cache->get( $key, $group, $force, $found );
+      null;
+--    return $wp_object_cache->get( $key, $group, $force, $found );
    end Wp_Cache_Get;
 
 --

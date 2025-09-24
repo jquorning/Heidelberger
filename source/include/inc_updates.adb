@@ -8,7 +8,8 @@
 
 package body Inc_Updates
 is
-        procedure Dummy is null;
+   procedure Dummy is null;
+
 -- --
 -- -- Checks WordPress version against the newest version.
 -- --

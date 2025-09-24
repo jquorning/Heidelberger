@@ -144,23 +144,23 @@ is
             end if;
 
             declare
-                use Ada.Containers;
-                use Inc_Formatting;
-                use List_Vectors;
+               use Ada.Containers;
+               use Inc_Formatting;
+               use List_Vectors;
 
-                Class_2 : String :=
+               Class_2 : String :=
                   (if Length (Class) = 0
                    then " class=""" & Implode (" ", Class) & """" else "");
 
-                Id : String :=
+               Id : String :=
                   (if Item.Hookname /= ""
                    then " id=""" & Preg_Replace ("|(^a-zA-Z0-9_:.)|", "-",
                                                  -Item.Hookname) & """"
                    else "");
 
-                Img       : Unbounded_String;
-                Img_Style : Unbounded_String;
-                Img_Class : Unbounded_String := +" dashicons-before";
+               Img       : Unbounded_String;
+               Img_Style : Unbounded_String;
+               Img_Class : Unbounded_String := +" dashicons-before";
             begin
                if 0 /= Strpos (Class_2, "wp-menu-separator") then
                   Is_Separator := True;

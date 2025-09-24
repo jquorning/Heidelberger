@@ -208,67 +208,74 @@ is
 
       end record;
 
-        --
-        -- Adds a help tab to the contextual help for the screen.
-        --
-        -- Call this on the `load-$pagenow` hook for the relevant screen,
-        -- or fetch the `$current_screen` object, or use get_current_screen()
-        -- and then call the method from the object.
-        --
-        -- You may need to filter `$current_screen` using an if or switch statement
-        -- to prevent new help tabs from being added to ALL admin screens.
-        --
-        -- @since 3.3.0
-        -- @since 4.4.0 The `$priority` argument was added.
-        --
-        -- @param array $args {
-        --     Array of arguments used to display the help tab.
-        --
-        --     @type string   $title    Title for the tab. Default false.
-        --     @type string   $id       Tab ID. Must be HTML-safe and should be unique for this menu.
-        --                              It is NOT allowed to contain any empty spaces. Default false.
-        --     @type string   $content  Optional. Help tab content in plain text or HTML. Default empty string.
-        --     @type callable $callback Optional. A callback to generate the tab content. Default false.
-        --     @type int      $priority Optional. The priority of the tab, used for ordering. Default 10.
-        -- }
-        --
-        procedure Add_Help_Tab (This : Wp_Screen;
-                                Args : Array_Type)
-                                is null;
+   --
+   -- Adds a help tab to the contextual help for the screen.
+   --
+   -- Call this on the `load-$pagenow` hook for the relevant screen,
+   -- or fetch the `$current_screen` object, or use get_current_screen()
+   -- and then call the method from the object.
+   --
+   -- You may need to filter `$current_screen` using an if or switch statement
+   -- to prevent new help tabs from being added to ALL admin screens.
+   --
+   -- @since 3.3.0
+   -- @since 4.4.0 The `$priority` argument was added.
+   --
+   -- @param array $args {
+   --     Array of arguments used to display the help tab.
+   --
+   --     @type string   $title    Title for the tab. Default false.
+   --     @type string   $id       Tab ID. Must be HTML-safe and should be unique
+   --                              for this menu.
+   --                              It is NOT allowed to contain any empty spaces.
+   --                              Default false.
+   --     @type string   $content  Optional. Help tab content in plain text or HTML.
+   --                              Default empty string.
+   --     @type callable $callback Optional. A callback to generate the tab content.
+   --                              Default false.
+   --     @type int      $priority Optional. The priority of the tab, used for
+   --                              ordering. Default 10.
+   -- }
+   --
+   procedure Add_Help_Tab (This : Wp_Screen;
+                           Args : Array_Type)
+                           is null;
 
-        --
-        -- Adds a sidebar to the contextual help for the screen.
-        --
-        -- Call this in template files after admin.php is loaded and before admin-header.php is loaded
-        -- to add a sidebar to the contextual help.
-        --
-        -- @since 3.3.0
-        --
-        -- @param string $content Sidebar content in plain text or HTML.
-        --
-        procedure Set_Help_Sidebar (This    : Wp_Screen;
-                                    Content : String)
-                                    is null;
+   --
+   -- Adds a sidebar to the contextual help for the screen.
+   --
+   -- Call this in template files after admin.php is loaded and before
+   -- admin-header.php is loaded to add a sidebar to the contextual help.
+   --
+   -- @since 3.3.0
+   --
+   -- @param string $content Sidebar content in plain text or HTML.
+   --
+   procedure Set_Help_Sidebar (This    : Wp_Screen;
+                               Content : String)
+                               is null;
 
-        --
-        -- Adds accessible hidden headings and text for the screen.
-        --
-        -- @since 4.4.0
-        --
-        -- @param array $content then
-        --     An associative array of screen reader text strings.
-        --
-        --     @type string $heading_views      Screen reader text for the filter links heading.
-        --                                      Default "Filter items list".
-        --     @type string $heading_pagination Screen reader text for the pagination heading.
-        --                                      Default "Items list navigation".
-        --     @type string $heading_list       Screen reader text for the items list heading.
-        --                                      Default "Items list".
-        -- end;
-        --
-        procedure Set_Screen_Reader_Content (This    : Wp_Screen;
-                                             Content : Array_type)
-                                             is null;
-
+   --
+   -- Adds accessible hidden headings and text for the screen.
+   --
+   -- @since 4.4.0
+   --
+   -- @param array $content then
+   --     An associative array of screen reader text strings.
+   --
+   --     @type string $heading_views      Screen reader text for the filter links
+   --                                      heading.
+   --                                      Default "Filter items list".
+   --     @type string $heading_pagination Screen reader text for the pagination
+   --                                      heading.
+   --                                      Default "Items list navigation".
+   --     @type string $heading_list       Screen reader text for the items list
+   --                                      heading.
+   --                                      Default "Items list".
+   -- end;
+   --
+   procedure Set_Screen_Reader_Content (This    : Wp_Screen;
+                                        Content : Array_type)
+                                        is null;
 
 end Adi_Class_Wp_Screens;

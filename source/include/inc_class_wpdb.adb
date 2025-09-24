@@ -2235,11 +2235,11 @@ is
       --    return (if Db.Last_Result (Y) /= ""
       --            then Array_Values (Get_Object_Vars (Db.Last_Result (Y))) else "");
       elsif "OBJECT" = Strtoupper (Output) then
-          -- Back compat for OBJECT being previously case-insensitive.
+         -- Back compat for OBJECT being previously case-insensitive.
          return (if Db.Last_Result (Y) /= ""
                  then Db.Last_Result (Y) else "");
       else
-          Db.Print_Error (" db.get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
+         Db.Print_Error (" db.get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
       end if;
       return "";
    end Get_Row;

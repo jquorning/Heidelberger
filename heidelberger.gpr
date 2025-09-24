@@ -20,7 +20,7 @@ project Heidelberger is
          "-gnatwA",
          "-gnatef",
          "-gnatf",
-         "-gnatyyM0C-0r");
+         "-gnatyyM0C-r");
    end Compiler;
 
    package Binder is

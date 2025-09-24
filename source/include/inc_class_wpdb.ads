@@ -657,206 +657,222 @@ is
         --
 --        public $error = null;
 
-   end record;
-
-        --
-        -- Checks if a string is ASCII.
-        --
-        -- The negative regex is faster for non-ASCII strings, as it allows
-        -- the search to finish as soon as it encounters a non-ASCII character.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string string String to check.
-        -- @return bool True if ASCII, false if not.
-        --
-        -- protected function check_ascii(string) then
-
-        function Check_Ascii (This : Wpdb_Class;
-                              Item : String)
-                              return Boolean is (False);
-        --
-        -- Checks if the query is accessing a collation considered safe on the current version of MySQL.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string $query The query to check.
-        -- @return bool True if the collation is safe, false if it isn't.
-        --
-        -- protected function check_safe_collation( $query ) then
-        function Check_Safe_Collation (This  : in out Wpdb_Class;
-                                       Query : String)
-                                       return Boolean;
-        --
-        -- Performs a database query, using current database connection.
-        --
-        -- More information can be found on the documentation page.
-        --
-        -- @since 0.71
-        --
-        -- @link https://developer.wordpress.org/reference/classes/wpdb/
-        --
-        -- @param string $query Database query.
-        -- @return int|bool Boolean true for CREATE, ALTER, TRUNCATE and DROP queries. Number of rows
-        --                  affected/selected for all other queries. Boolean false on error.
-        --
-        function Query (Db    : Wpdb_Class;
-                        Query : String)
-                        return Integer is (0);
-
-        --
-        -- Adds a placeholder escape string, to escape anything that resembles a printf() placeholder.
-        --
-        -- @since 4.8.3
-        --
-        -- @param string $query The query to escape.
-        -- @return string The query with the placeholder escape string inserted where necessary.
-        --
-        function Add_Placeholder_Escape (Db    : Wpdb_Class;
-                                         Query : String)
-                                         return String is ("XXX-206");
-
-        -- Prepares a SQL query for safe execution.
-        --
-        -- Uses sprintf()-like syntax. The following placeholders can be used in the query string:
-        --
-        -- - %d (integer)
-        -- - %f (float)
-        -- - %s (string)
-        --
-        -- All placeholders MUST be left unquoted in the query string. A corresponding argument
-        -- MUST be passed for each placeholder.
-        --
-        -- Note: There is one exception to the above: for compatibility with old behavior,
-        -- numbered or formatted string placeholders (eg, `%1$s`, `%5s`) will not have quotes
-        -- added by this function, so should be passed with appropriate quotes around them.
-        --
-        -- Literal percentage signs (`%`) in the query string must be written as `%%`. Percentage wildcards
-        -- (for example, to use in LIKE syntax) must be passed via a substitution argument containing
-        -- the complete LIKE string, these cannot be inserted directly in the query string.
-        -- Also see wpdb::esc_like().
-        --
-        -- Arguments may be passed as individual arguments to the method, or as a single array
-        -- containing all arguments. A combination of the two is not supported.
-        --
-        -- Examples:
-        --
-        --     $wpdb->prepare(
-        --         "SELECT-- FROM `table` WHERE `column` = %s AND `field` = %d OR `other_field` LIKE %s",
-        --         array( 'foo', 1337, '%bar' )
-        --     );
-        --
-        --     $wpdb->prepare(
-        --         "SELECT DATE_FORMAT(`field`, '%%c') FROM `table` WHERE `column` = %s",
-        --         'foo'
-        --     );
-        --
-        -- @since 2.3.0
-        -- @since 5.3.0 Formalized the existing and already documented `...$args` parameter
-        --              by updating the function signature. The second parameter was changed
-        --              from `$args` to `...$args`.
-        --
-        -- @link https://www.php.net/sprintf Description of syntax.
-        --
-        -- @param string      $query   Query statement with sprintf()-like placeholders.
-        -- @param array|mixed $args    The array of variables to substitute into the query's placeholders
-        --                             if being called with an array of arguments, or the first variable
-        --                             to substitute into the query's placeholders if being called with
-        --                             individual arguments.
-        -- @param mixed       ...$args Further variables to substitute into the query's placeholders
-        --                             if being called with individual arguments.
-        -- @return string|void Sanitized query string, if there is a query to prepare.
-        --
-        function Prepare (Db    : Wpdb_Class;
-                          Query : String;
-                          Args  : Array_Type) --, ...$args )
-                          return String;
-        function Prepare (Db    : Wpdb_Class;
-                          Query : String;
-                          Arg_1 : String;
-                          Arg_2 : String) --, ...$args )
-                          return String
-                          is ("XXX-212");
-
-        --
-        -- Prints SQL/DB error.
-        --
-        -- @since 0.71
-        --
-        -- @global array $EZSQL_ERROR Stores error information of query and error string.
-        --
-        -- @param string $str The error to display.
-        -- @return void|false Void if the showing of errors is enabled, false if disabled.
-        --
-        procedure Print_Error (Db  : Wpdb_Class;
-                               Str : String := "") is null;
-
---
-        -- Retrieves one row from the database.
-        --
-        -- Executes a SQL query and returns the row from the SQL result.
-        --
-        -- @since 0.71
-        --
-        -- @param string|null $query  SQL query.
-        -- @param string      $output Optional. The required return type. One of OBJECT, ARRAY_A, or ARRAY_N, which
-        --                            correspond to an stdClass object, an associative array, or a numeric array,
-        --                            respectively. Default OBJECT.
-        -- @param int         $y      Optional. Row to return. Indexed from 0.
-        -- @return array|object|null|void Database query result in format specified by $output or null on failure.
-        --
-        procedure Get_Row (Db      : in out Wpdb_Class;
-                           Post    : Inc_Class_Wp_Posts.Wp_Post;
-                           Query   : String  := ""; -- = null,
-                           Output  : String  := ""; -- = OBJECT,
-                           Y       : Natural := 0;
-                           Success : out Boolean) is null;
-                           -- return Array_Type;
-        --
-        -- Retrieves one column from the database.
-        --
-        -- Executes a SQL query and returns the column from the SQL result.
-        -- If the SQL result contains more than one column, the column specified is returned.
-        -- If query is null, the specified column from the previous SQL result is returned.
-        --
-        -- @since 0.71
-        --
-        -- @param string|null query Optional. SQL query. Defaults to previous query.
-        -- @param int         x     Optional. Column to return. Indexed from 0.
-        -- @return array Database query result. Array indexed from 0 by SQL result row number.
-        --
-        function Get_Col (Db    : in out Wpdb_Class;
-                          Query : String  := "";  -- null;
-                          X     : Integer := 0)
-                          return List_Type
-                          is (Empty_List);
-
---
-        -- Retrieves the character set for the given table.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string table Table name.
-        -- @return string|WP_Error Table character set, WP_Error object if it couldn"t be found.
-        --
-        -- protected function get_table_charset(table) then
-
-        function Get_Table_Charset (This  : Wpdb_Class;
-                                    Table : String)
-                                    return String is ("XXX-205");
+      end record;
 
    --
-        -- Finds the first table name referenced in a query.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string query The query to search.
-        -- @return string|false The table name found, or false if a table couldn"t be found.
-        --
-        -- protected function get_table_from_query(query) then
+   -- Checks if a string is ASCII.
+   --
+   -- The negative regex is faster for non-ASCII strings, as it allows
+   -- the search to finish as soon as it encounters a non-ASCII character.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string string String to check.
+   -- @return bool True if ASCII, false if not.
+   --
+   -- protected function check_ascii(string) then
+   function Check_Ascii (This : Wpdb_Class;
+                         Item : String)
+                         return Boolean is (False);
+   --
+   -- Checks if the query is accessing a collation considered safe on the current
+   -- version of MySQL.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string $query The query to check.
+   -- @return bool True if the collation is safe, false if it isn't.
+   --
+   -- protected function check_safe_collation( $query ) then
+   function Check_Safe_Collation (This  : in out Wpdb_Class;
+                                  Query : String)
+                                  return Boolean;
+   --
+   -- Performs a database query, using current database connection.
+   --
+   -- More information can be found on the documentation page.
+   --
+   -- @since 0.71
+   --
+   -- @link https://developer.wordpress.org/reference/classes/wpdb/
+   --
+   -- @param string $query Database query.
+   -- @return int|bool Boolean true for CREATE, ALTER, TRUNCATE and DROP queries.
+   --                          Number of rows affected/selected for all other
+   --                          queries. Boolean false on error.
+   --
+   function Query (Db    : Wpdb_Class;
+                   Query : String)
+                   return Integer
+                   is (0);
 
-        function Get_Table_From_Query (This  : Wpdb_Class;
-                                       Query : String)
-                                       return String is ("XXX-203");
+   --
+   -- Adds a placeholder escape string, to escape anything that resembles a printf()
+   -- placeholder.
+   --
+   -- @since 4.8.3
+   --
+   -- @param string $query The query to escape.
+   -- @return string The query with the placeholder escape string inserted where
+   --                necessary.
+   --
+   function Add_Placeholder_Escape (Db    : Wpdb_Class;
+                                    Query : String)
+                                    return String is ("XXX-206");
+
+   --
+   -- Prepares a SQL query for safe execution.
+   --
+   -- Uses sprintf()-like syntax. The following placeholders can be used in the
+   -- query string:
+   --
+   -- - %d (integer)
+   -- - %f (float)
+   -- - %s (string)
+   --
+   -- All placeholders MUST be left unquoted in the query string. A corresponding
+   -- argument MUST be passed for each placeholder.
+   --
+   -- Note: There is one exception to the above: for compatibility with old behavior,
+   -- numbered or formatted string placeholders (eg, `%1$s`, `%5s`) will not have
+   -- quotes added by this function, so should be passed with appropriate quotes
+   -- around them.
+   --
+   -- Literal percentage signs (`%`) in the query string must be written as `%%`.
+   -- Percentage wildcards (for example, to use in LIKE syntax) must be passed via
+   -- a substitution argument containing the complete LIKE string, these cannot be
+   -- inserted directly in the query string. Also see wpdb::esc_like().
+   --
+   -- Arguments may be passed as individual arguments to the method, or as a single
+   -- array containing all arguments. A combination of the two is not supported.
+   --
+   -- Examples:
+   --
+   --     $wpdb->prepare(
+   --         "SELECT-- FROM `table` WHERE `column` = %s AND `field` = %d OR `other_field` LIKE %s",
+   --         array( 'foo', 1337, '%bar' )
+   --     );
+   --
+   --     $wpdb->prepare(
+   --         "SELECT DATE_FORMAT(`field`, '%%c') FROM `table` WHERE `column` = %s",
+   --         'foo'
+   --     );
+   --
+   -- @since 2.3.0
+   -- @since 5.3.0 Formalized the existing and already documented `...$args` parameter
+   --              by updating the function signature. The second parameter was changed
+   --              from `$args` to `...$args`.
+   --
+   -- @link https://www.php.net/sprintf Description of syntax.
+   --
+   -- @param string      $query   Query statement with sprintf()-like placeholders.
+   -- @param array|mixed $args    The array of variables to substitute into the
+   --                             query's placeholders
+   --                             if being called with an array of arguments, or the
+   --                             first variable to substitute into the query's
+   --                             placeholders if being called with individual
+   --                             arguments.
+   -- @param mixed       ...$args Further variables to substitute into the query's
+   --                             placeholders
+   --                             if being called with individual arguments.
+   -- @return string|void Sanitized query string, if there is a query to prepare.
+   --
+   function Prepare (Db    : Wpdb_Class;
+                     Query : String;
+                     Args  : Array_Type) --, ...$args )
+                     return String;
+   function Prepare (Db    : Wpdb_Class;
+                     Query : String;
+                     Arg_1 : String;
+                     Arg_2 : String) --, ...$args )
+                     return String
+                     is ("XXX-212");
+
+   --
+   -- Prints SQL/DB error.
+   --
+   -- @since 0.71
+   --
+   -- @global array $EZSQL_ERROR Stores error information of query and error string.
+   --
+   -- @param string $str The error to display.
+   -- @return void|false Void if the showing of errors is enabled, false if disabled.
+   --
+   procedure Print_Error (Db  : Wpdb_Class;
+                          Str : String := "") is null;
+
+   --
+   -- Retrieves one row from the database.
+   --
+   -- Executes a SQL query and returns the row from the SQL result.
+   --
+   -- @since 0.71
+   --
+   -- @param string|null $query  SQL query.
+   -- @param string      $output Optional. The required return type. One of OBJECT,
+   --                            ARRAY_A, or ARRAY_N, which
+   --                            correspond to an stdClass object, an associative
+   --                            array, or a numeric array,
+   --                            respectively. Default OBJECT.
+   -- @param int         $y      Optional. Row to return. Indexed from 0.
+   -- @return array|object|null|void Database query result in format specified by
+   --                                $output or null on failure.
+   --
+   procedure Get_Row (Db      : in out Wpdb_Class;
+                      Post    : Inc_Class_Wp_Posts.Wp_Post;
+                      Query   : String  := ""; -- = null,
+                      Output  : String  := ""; -- = OBJECT,
+                      Y       : Natural := 0;
+                      Success : out Boolean) is null;
+                      -- return Array_Type;
+   --
+   -- Retrieves one column from the database.
+   --
+   -- Executes a SQL query and returns the column from the SQL result.
+   -- If the SQL result contains more than one column, the column specified is
+   -- returned.
+   -- If query is null, the specified column from the previous SQL result is returned.
+   --
+   -- @since 0.71
+   --
+   -- @param string|null query Optional. SQL query. Defaults to previous query.
+   -- @param int         x     Optional. Column to return. Indexed from 0.
+   -- @return array Database query result. Array indexed from 0 by SQL result row
+   --               number.
+   --
+   function Get_Col (Db    : in out Wpdb_Class;
+                     Query : String  := "";  -- null;
+                     X     : Integer := 0)
+                     return List_Type
+                     is (Empty_List);
+
+   --
+   -- Retrieves the character set for the given table.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string table Table name.
+   -- @return string|WP_Error Table character set, WP_Error object if it couldn't
+   --                         be found.
+   --
+   -- protected function get_table_charset(table) then
+   function Get_Table_Charset (This  : Wpdb_Class;
+                               Table : String)
+                               return String
+                               is ("XXX-205");
+
+   --
+   -- Finds the first table name referenced in a query.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string query The query to search.
+   -- @return string|false The table name found, or false if a table couldn"t be found.
+   --
+   -- protected function get_table_from_query(query) then
+   function Get_Table_From_Query (This  : Wpdb_Class;
+                                  Query : String)
+                                  return String
+                                  is ("XXX-203");
 
 end Inc_Class_Wpdb;

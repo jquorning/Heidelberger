@@ -7,7 +7,8 @@
 
 package body Adi_Posts
 is
-        procedure Dummy is null;
+   procedure Dummy is null;
+
 -- --
 -- -- Renames `$_POST` data from form names to DB post columns.
 -- --

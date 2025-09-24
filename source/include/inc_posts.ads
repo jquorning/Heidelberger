@@ -193,43 +193,46 @@ is
    procedure Register_Post_Status (Post_Status : String;
                                    Args        : Status_Type); --  = to_array ()
 
---
--- Retrieves a post type object by name.
---
--- @since 3.0.0
--- @since 4.6.0 Object returned is now an instance of `WP_Post_Type`.
---
--- @global array $wp_post_types List of post types.
---
--- @see register_post_type()
---
--- @param string $post_type The name of a registered post type.
--- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
---
---  function Get_Post_Type_Object (Post_Type : String) return Wp_Post;
-  function Get_Post_Type_Object (Post_Type : String)
-                                 return Inc_Class_Wp_Post_Type.Wp_Post_Type;
-  function Get_Post_Type_Object (Post_Type : String)
-                                 return Boolean
-                                 is (True);
---
--- Gets a list of all registered post type objects.
---
--- @since 2.9.0
---
--- @global array $wp_post_types List of post types.
---
--- @see register_post_type() for accepted arguments.
---
--- @param array|string $args     Optional. An array of key => value arguments to match against
---                               the post type objects. Default empty array.
--- @param string       $output   Optional. The type of output to return. Accepts post type 'names'
---                               or 'objects'. Default 'names'.
--- @param string       $operator Optional. The logical operation to perform. 'or' means only one
---                               element from the array needs to match; 'and' means all elements
---                               must match; 'not' means no elements may match. Default 'and'.
--- @return string[]|WP_Post_Type[] An array of post type names or objects.
---
+   --
+   -- Retrieves a post type object by name.
+   --
+   -- @since 3.0.0
+   -- @since 4.6.0 Object returned is now an instance of `WP_Post_Type`.
+   --
+   -- @global array $wp_post_types List of post types.
+   --
+   -- @see register_post_type()
+   --
+   -- @param string $post_type The name of a registered post type.
+   -- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
+   --
+   --  function Get_Post_Type_Object (Post_Type : String) return Wp_Post;
+   function Get_Post_Type_Object (Post_Type : String)
+                                  return Inc_Class_Wp_Post_Type.Wp_Post_Type;
+   function Get_Post_Type_Object (Post_Type : String)
+                                  return Boolean
+                                  is (True);
+   --
+   -- Gets a list of all registered post type objects.
+   --
+   -- @since 2.9.0
+   --
+   -- @global array $wp_post_types List of post types.
+   --
+   -- @see register_post_type() for accepted arguments.
+   --
+   -- @param array|string $args     Optional. An array of key => value arguments to
+   --                               match against the post type objects. Default
+   --                               empty array.
+   -- @param string       $output   Optional. The type of output to return. Accepts
+   --                               post type 'names'
+   --                               or 'objects'. Default 'names'.
+   -- @param string       $operator Optional. The logical operation to perform. 'or'
+   --                               means only one element from the array needs to
+   --                               match; 'and' means all elements must match; 'not'
+   --                               means no elements may match. Default 'and'.
+   -- @return string[]|WP_Post_Type[] An array of post type names or objects.
+   --
    function Get_Post_Types (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
                             Operator : String     := "and")
@@ -243,9 +246,9 @@ is
 --     @type bool|array   rewrite               {
    type Rewrite_Rec is
       record
-         -- Triggers the handling of rewrites for this post type. To prevent rewrite, set to false.
-         -- Defaults to true, using post_type as slug. To specify rewrite rules, an array can be
-         -- passed with any of these keys:
+         -- Triggers the handling of rewrites for this post type. To prevent rewrite,
+         -- set to false. Defaults to true, using post_type as slug. To specify
+         -- rewrite rules, an array can be passed with any of these keys:
 
 --         @type string
            Slug : Unbounded_String;

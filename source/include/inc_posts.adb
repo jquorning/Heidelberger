@@ -50,9 +50,9 @@ is
    is
       use String_Vectors;
    begin
-        Inc_Class_Wp_Post_Type.Reset_Default_Labels; -- :: ();
+      Inc_Class_Wp_Post_Type.Reset_Default_Labels; -- :: ();
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "post",
                 Args_Type'(
                         Labels                =>
@@ -101,7 +101,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "page",
                 Args_Type'(
                         labels                =>
@@ -151,7 +151,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "attachment",
                 Args_Type'(
                         labels                => Arrays.to_array ((
@@ -209,10 +209,10 @@ is
 --                        Capability_Type      => Null_Unbounded_String
                 )
         );
-        Add_Post_Type_Support ("attachment:audio", "thumbnail");
-        Add_Post_Type_Support ("attachment:video", "thumbnail");
+      Add_Post_Type_Support ("attachment:audio", "thumbnail");
+      Add_Post_Type_Support ("attachment:video", "thumbnail");
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "revision",
                 Args_Type'(
                         labels           => Arrays.to_array ((
@@ -263,7 +263,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "nav_menu_item",
                 Args_Type'(
                         labels                => Arrays.to_array ((
@@ -336,7 +336,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "custom_css",
                 Args_Type'(
                         labels           => Arrays.to_array ((
@@ -402,7 +402,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "customize_changeset",
                 Args_Type'(
                         labels           => Arrays.to_array ((
@@ -483,7 +483,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "oembed_cache",
                 Args_Type'(
                         labels           => Arrays.to_array ((
@@ -536,7 +536,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "user_request",
                 Args_Type'(
                         labels           => Arrays.to_array ((
@@ -589,7 +589,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "wp_block",
                 Args_Type'(
                         labels                => Arrays.to_array ((
@@ -680,7 +680,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "wp_template",
                 Args_Type'(
                         labels                => Arrays.to_array ((
@@ -779,7 +779,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "wp_template_part",
                 Args_Type'(
                         labels                => Arrays.to_array ((
@@ -876,7 +876,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "wp_global_styles",
                 Args_Type'(
                         label        => +x_x ("Global Styles", "post type general name"),
@@ -943,7 +943,7 @@ is
                 )
         );
 
-        Register_Post_Type (
+      Register_Post_Type (
                 "wp_navigation",
                 Args_Type'(
                         labels                => Arrays.to_array ((
@@ -1046,7 +1046,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "publish",
                 Status_Type'(
                         label       => +x_x ("Published", "post status"),
@@ -1070,7 +1070,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "future",
                 Status_Type'(
                         label       => +x_x ("Scheduled", "post status"),
@@ -1095,7 +1095,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "draft",
                 Status_Type'(
                         label         => +x_x ("Draft", "post status"),
@@ -1121,7 +1121,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "pending",
                 Status_Type'(
                         label         => +x_x ("Pending", "post status"),
@@ -1147,7 +1147,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "private",
                 Status_Type'(
                         label       => +x_x ("Private", "post status"),
@@ -1172,7 +1172,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "trash",
                 Status_Type'(
                         label                     => +x_x ("Trash", "post status"),
@@ -1198,7 +1198,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "auto-draft",
                 Status_Type'(
                         label         => +"auto-draft",
@@ -1220,7 +1220,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "inherit",
                 Status_Type'(
                         label               => +"inherit",
@@ -1242,7 +1242,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "request-pending",
                 Status_Type'(
                         label               => +x_x ("Pending", "request status"),
@@ -1268,7 +1268,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "request-confirmed",
                 Status_Type'(
                         label               => +x_x ("Confirmed", "request status"),
@@ -1294,7 +1294,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "request-failed",
                 Status_Type'(
                         label               => +x_x ("Failed", "request status"),
@@ -1320,7 +1320,7 @@ is
                 )
         );
 
-        Register_Post_Status (
+      Register_Post_Status (
                 "request-completed",
                 Status_Type'(
                         label               => +x_x ("Completed", "request status"),
@@ -1620,9 +1620,9 @@ is
                       Filter : String := "raw")
                       return Wp_Post
    is
-       Post_2 : constant Wp_Post := Post;
-       X_Post : Wp_Post;
-       Unused_Success : Boolean;
+      Post_2 : constant Wp_Post := Post;
+      X_Post : Wp_Post;
+      Unused_Success : Boolean;
    begin
       if
 --         Empty (Post) and then
@@ -1686,7 +1686,7 @@ is
    function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
    is
-        Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
+      Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
    begin
       if
 --        not Post or else
@@ -2037,9 +2037,9 @@ is
         --         args.label_count = _n_noop( args.label, args.label );
         -- end;
 
-        Wp_Post_Statuses (Post_Status) := Args;
+      Wp_Post_Statuses (Post_Status) := Args;
 
---        return args;
+--    return args;
    end Register_Post_Status;
 
 --
@@ -2398,7 +2398,7 @@ is
 --                 wp_post_types = to_array ();
 --         end;
 
-        -- Sanitize post type name.
+         -- Sanitize post type name.
       declare
          Post_Type_2 : String := Sanitize_Key (Post_Type);
 
@@ -3214,7 +3214,7 @@ is
                            return Array_Type -- Post_Id_List;
    is
    begin
-        return Inc_Meta.Get_Metadata ("post", Integer (Post_Id), Key, Single);
+      return Inc_Meta.Get_Metadata ("post", Integer (Post_Id), Key, Single);
    end Get_Post_Meta;
 
 --
@@ -3565,83 +3565,83 @@ is
                 --         Value_2 := Esc_Attr (Value_2);
                 -- end if;
          elsif "db" = Context then
-                if Prefixed then
+            if Prefixed then
 
-                        --
-                        -- Filters the value of a specific post field before saving.
-                        --
-                        -- The dynamic portion of the hook name, `field`, refers to the post
-                        -- field name.
-                        --
-                        -- @since 2.3.0
-                        --
-                        -- @param mixed value Value of the post field.
-                        --
-                        Value_2 := Apply_Filters ("pre_" & Field, Value_2);
+               --
+               -- Filters the value of a specific post field before saving.
+               --
+               -- The dynamic portion of the hook name, `field`, refers to the post
+               -- field name.
+               --
+               -- @since 2.3.0
+               --
+               -- @param mixed value Value of the post field.
+               --
+               Value_2 := Apply_Filters ("pre_" & Field, Value_2);
 
-                        --
-                        -- Filters the value of a specific field before saving.
-                        --
-                        -- The dynamic portion of the hook name, `field_no_prefix`, refers
-                        -- to the post field name.
-                        --
-                        -- @since 2.3.0
-                        --
-                        -- @param mixed value Value of the post field.
-                        --
-                        Value_2 := Apply_Filters (-Field_No_Prefix & "_save_pre",
-                                                  Value_2);
-                else
-                        Value_2 := Apply_Filters ("pre_post_" & Field, Value_2);
+               --
+               -- Filters the value of a specific field before saving.
+               --
+               -- The dynamic portion of the hook name, `field_no_prefix`, refers
+               -- to the post field name.
+               --
+               -- @since 2.3.0
+               --
+               -- @param mixed value Value of the post field.
+               --
+               Value_2 := Apply_Filters (-Field_No_Prefix & "_save_pre",
+                                         Value_2);
+            else
+               Value_2 := Apply_Filters ("pre_post_" & Field, Value_2);
 
-                        --
-                        -- Filters the value of a specific post field before saving.
-                        --
-                        -- The dynamic portion of the hook name, `field`, refers to the post
-                        -- field name.
-                        --
-                        -- @since 2.3.0
-                        --
-                        -- @param mixed value Value of the post field.
-                        --
-                        Value_2 := Apply_Filters (Field & "_pre", Value_2);
-                end if;
+               --
+               -- Filters the value of a specific post field before saving.
+               --
+               -- The dynamic portion of the hook name, `field`, refers to the post
+               -- field name.
+               --
+               -- @since 2.3.0
+               --
+               -- @param mixed value Value of the post field.
+               --
+               Value_2 := Apply_Filters (Field & "_pre", Value_2);
+            end if;
          else
-                -- Use display filters by default.
-                if Prefixed then
+            -- Use display filters by default.
+            if Prefixed then
 
-                        --
-                        -- Filters the value of a specific post field for display.
-                        --
-                        -- The dynamic portion of the hook name, `field`, refers to the post
-                        -- field name.
-                        --
-                        -- @since 2.3.0
-                        --
-                        -- @param mixed  value   Value of the prefixed post field.
-                        -- @param int    post_id Post ID.
-                        -- @param string context Context for how to sanitize the field.
-                        --                        Accepts "raw", "edit", "db", "display",
-                        --                        "attribute", or "js". Default "display".
-                        --
-                        Value_2 := Apply_Filters (Field, Value_2, Post_Id'Image,
-                                                  Context);
-                else
-                        Value_2 := Apply_Filters ("post_" & Field, Value_2,
-                                                  Post_Id'Image, Context);
-                end if;
+               --
+               -- Filters the value of a specific post field for display.
+               --
+               -- The dynamic portion of the hook name, `field`, refers to the post
+               -- field name.
+               --
+               -- @since 2.3.0
+               --
+               -- @param mixed  value   Value of the prefixed post field.
+               -- @param int    post_id Post ID.
+               -- @param string context Context for how to sanitize the field.
+               --                        Accepts "raw", "edit", "db", "display",
+               --                        "attribute", or "js". Default "display".
+               --
+               Value_2 := Apply_Filters (Field, Value_2, Post_Id'Image,
+                                         Context);
+            else
+               Value_2 := Apply_Filters ("post_" & Field, Value_2,
+                                         Post_Id'Image, Context);
+            end if;
 
-                -- if "attribute" = Context then
-                --         Value_2 := Esc_Attr (Value_2);
-                -- elsif "js" = Context then
-                --         Value_2 := Esc_Js (Value_2);
-                -- end if;
+            -- if "attribute" = Context then
+            --         Value_2 := Esc_Attr (Value_2);
+            -- elsif "js" = Context then
+            --         Value_2 := Esc_Js (Value_2);
+            -- end if;
          end if;
 
-        -- Restore the type for integer fields after esc_attr().
---        if In_Array (Field, Int_Fields, True) then
---                Value_2 := Integer (Value_2);
---        end if;
+         -- Restore the type for integer fields after esc_attr().
+--       if In_Array (Field, Int_Fields, True) then
+--          Value_2 := Integer (Value_2);
+--       end if;
       end;
       return Value_2;
    end Sanitize_Post_Field;

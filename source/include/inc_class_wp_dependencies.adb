@@ -229,7 +229,7 @@ is
                       Handle : String;
                       Key    : String;
                       Value  : String) -- Array_Type)
- --                   Value  : Array_Type)
+--                    Value  : Array_Type)
                       return Boolean
    is
       use Inc_Class_Wp_Dependency.Dependency_Maps;
@@ -367,9 +367,9 @@ is
 --             Unset (This.Args (Handle_2 (Handle_2.First_Index)));
 
             elsif Array_Key_Exists (First, This.Queued_Before_Register) then
-                Position_1 := This.Queued_Before_Register.Find (+First);
-                This.Queued_Before_Register.Delete (Position_1);
---              Unset (This.Queued_Before_Register (Handle_2 (Handle_2.First_Index)));
+               Position_1 := This.Queued_Before_Register.Find (+First);
+               This.Queued_Before_Register.Delete (Position_1);
+--             Unset (This.Queued_Before_Register (Handle_2 (Handle_2.First_Index)));
             end if;
          end;
       end loop;
@@ -431,8 +431,8 @@ is
 
          This.All_Queued_Deps := All_Deps;
 
-          return This.All_Queued_Deps.Find (+Handle) /= List_Vectors.No_Element;
---        return Isset (This.All_Queued_Deps (Handle));
+         return This.All_Queued_Deps.Find (+Handle) /= List_Vectors.No_Element;
+--       return Isset (This.All_Queued_Deps (Handle));
       end;
    end Recurse_Deps;
 

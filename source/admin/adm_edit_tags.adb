@@ -469,7 +469,7 @@ is
             end if;  -- ???
          end Label_2;
 
-    <<Bailout>>
+         <<Bailout>>
          -- require_once ABSPATH . "wp-admin/admin-header.php";
 
          -- Also used by the Edit Tag form.
@@ -900,7 +900,7 @@ is
                           Get (Tax.Labels, "slug_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_submit_button" then
-                      Adi_Templates.Submit_Button (Get (Tax.Labels, "add_new_item"),
+                     Adi_Templates.Submit_Button (Get (Tax.Labels, "add_new_item"),
                                      "primary", "submit", False);
                      Set ("VAR_edit_tags_submit_button", "XXX-447");
 

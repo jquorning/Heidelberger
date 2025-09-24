@@ -180,11 +180,11 @@ is
       begin
          if Src /= "" then
             declare
-                X_Handle : constant List_Type := Explode ("?", Handle);
+               X_Handle : constant List_Type := Explode ("?", Handle);
             begin
-                Unused := Inc_Class_Wp_dependencies.Add
-                  (Wp_Dependencies (Styles),
-                   -(X_Handle.First_Element), Src, Deps, Ver, Media);
+               Unused := Inc_Class_Wp_dependencies.Add
+                 (Wp_Dependencies (Styles),
+                  -(X_Handle.First_Element), Src, Deps, Ver, Media);
             end;
          end if;
 

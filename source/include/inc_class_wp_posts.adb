@@ -84,9 +84,9 @@ is
    is
    begin
       return Post;
-        --                foreach ( get_object_vars( post ) as key => value ) then
---                        this.key = value;
---                end;
+--       foreach ( get_object_vars( post ) as key => value ) then
+--          this.key = value;
+--       end;
    end X_Construct;
 
         --

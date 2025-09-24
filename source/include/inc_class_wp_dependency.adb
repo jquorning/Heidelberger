@@ -26,7 +26,7 @@ is
    is
       This : X_Wp_Dependency;
    begin
-        -- list ()
+      -- list ()
       this.Handle := +Handle;
       this.Src    := +Src;
       this.Deps   := Deps;

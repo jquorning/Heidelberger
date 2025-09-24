@@ -55,8 +55,8 @@ is
    use Php;
    use Inc_Capabilities;
 
-        -- static
-        Rendered : Boolean := False;
+   -- static
+   Rendered : Boolean := False;
 
    -------------------------
    -- X_Wp_Admin_Bar_Init --
@@ -167,7 +167,7 @@ is
       end if;
 
       declare
-          Wp_Logo_Menu_Args : Node_Args; --  := X_Construct;
+         Wp_Logo_Menu_Args : Node_Args; --  := X_Construct;
        -- Wp_Logo_Menu_Args : Array_Type := Arrays.To_Array ((
        --          Build ("id",    "wp-logo"),
        --          Build ("title", "<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "About WordPress" & "</span>"),
@@ -870,13 +870,13 @@ is
                      declare
                         Node : Node_Args;
                      begin
-                         Node.Parent := +Menu_Id;
-                         Node.Id     := +menu_id & "-n";
-                         Node.Title  := +Get (Get_Post_Type_Object ("post").Labels,
-                                              "new_item");
-                         Node.Href   := +Admin_Url ("post-new.php");
+                        Node.Parent := +Menu_Id;
+                        Node.Id     := +menu_id & "-n";
+                        Node.Title  := +Get (Get_Post_Type_Object ("post").Labels,
+                                             "new_item");
+                        Node.Href   := +Admin_Url ("post-new.php");
 
-                         Admin_Bar.Add_Node (Node);
+                        Admin_Bar.Add_Node (Node);
                      end;
                   end if;
 

@@ -71,9 +71,9 @@ is
    -- }
    -- @return string HTML dropdown list of categories.
    --
-  function Wp_Dropdown_Categories (Args : Array_Type := Empty_Array) -- := "")
-                                   return String
-                                   is ("XXX-447");
+   function Wp_Dropdown_Categories (Args : Array_Type := Empty_Array) -- := "")
+                                    return String
+                                    is ("XXX-447");
 
    --
    -- Retrieves the terms of the taxonomy that are attached to the post.
@@ -82,12 +82,13 @@ is
    --
    -- @param int|WP_Post $post     Post ID or object.
    -- @param string      $taxonomy Taxonomy name.
-   -- @return WP_Term[]|false|WP_Error Array of WP_Term objects on success, false if there are no terms
-   --                                  or the post does not exist, WP_Error on failure.
+   -- @return WP_Term[]|false|WP_Error Array of WP_Term objects on success, false if
+   --                                  there are no terms or the post does not exist,
+   --                                  WP_Error on failure.
    --
    function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Wp_Post;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array;
-                            -- Inc_Class_Posts.Wp_Post;
+                           -- Inc_Class_Posts.Wp_Post;
 
 end Inc_Category_Templates;
