@@ -9,7 +9,6 @@
 with Ada.Strings.Unbounded;
 with Ada.Text_Io;
 
-with Arrays;
 with Globals;
 with Hb_Common;
 with Php;
@@ -25,7 +24,6 @@ package body Adi_Credits
 is
    use Ada.Strings.Unbounded;
    use Ada.Text_Io;
-   use Arrays;
    use Hb_Common;
    use Inc_L10n;
    use Php;
@@ -211,7 +209,6 @@ is
                                       -- Array_Type := Empty_Array;
                                       Slug    : String     := "")
    is
-      use Gnatcoll.Json;
       use Inc_Formatting;
 
       Group : constant Json_Value := Get (Credits, "groups");
@@ -349,8 +346,6 @@ is
    function Get_File (Filename : String)
                       return Unbounded_String
    is
-      use Ada.Text_Io;
-
       File   : File_Type;
       Buffer : Unbounded_String;
    begin

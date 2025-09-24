@@ -169,8 +169,6 @@ is
       end if;
 
       declare
-         use Inc_Class_Wp_Dependency;
-
          Obj : X_Wp_Dependency := This.Registered (Handle);
          Ver : Unbounded_String;
       begin
@@ -187,10 +185,7 @@ is
 
          Label_2 :
          declare
-            use Inc_Class_Wp_Dependency;
-            use Inc_Class_Wp_Dependency.String_Maps;
-
-            Src         : Unbounded_String := Obj.Src;
+            Src : Unbounded_String := Obj.Src;
 
             Conditional : constant Boolean :=
                Boolean'Value ((if Obj.Extra.Find ("conditional") /=

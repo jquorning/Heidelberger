@@ -10,8 +10,6 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Arrays;
-with Hb_Common;
 with Wp_Common;
 with Php;
 
@@ -211,8 +209,6 @@ is
                        ))
             );
             declare
-               use Inc_Class_Wp_Terms;
-
                Self : constant Wp_Term := Get_Term (Descendants_And_Self, Taxonomy);
             begin
                Array_Unshift (Categories, Self);
@@ -2632,8 +2628,6 @@ is
    begin
       if Current_Theme_Supports ("custom-header") then
          declare
-            use Inc_Class_Wp_Posts;
-
             Meta_Header : constant Array_Type
                := Get_Post_Meta (Post.ID, "_wp_attachment_is_custom_header", True);
          begin
@@ -2680,8 +2674,6 @@ is
            Has_Header_Video
          then
             declare
-               use Inc_Class_Wp_Posts;
-
                Mods : constant Array_Type := Get_Theme_Mods;  -- ();
             begin
                if

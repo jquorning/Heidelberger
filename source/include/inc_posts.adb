@@ -5,9 +5,6 @@
 -- @subpackage Post
 --
 
-with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
-
 with Globals;
 with Hb_Common;
 with Php;
@@ -19,7 +16,6 @@ with Inc_Meta;
 
 package body Inc_Posts
 is
-   use Ada.Strings.Unbounded;
    use Hb_Common;
    use Php;
    use Inc_L10n;

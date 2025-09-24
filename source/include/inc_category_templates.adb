@@ -8,15 +8,11 @@
 
 with Ada.Containers;
 
-with Arrays;
-
 with Adi_Caches;
 
-with Inc_Class_Wp_Terms;
 with Inc_Functions;
 with Inc_Load;
 with Inc_Posts;
--- with Inc_Taxonomys;
 
 with Hb_Common;
 
@@ -24,8 +20,6 @@ package body Inc_Category_Templates
 is
    use Ada.Containers;
    use Hb_Common;
-   use Arrays;
-
 
 --
 -- Retrieves category link URL.

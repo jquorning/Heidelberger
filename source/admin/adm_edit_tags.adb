@@ -251,7 +251,6 @@ is
             end if;
 
             declare
-               use Inc_Formatting;
                use Inc_Link_Templates;
 
                Taxonomy : Unbounded_String;
@@ -505,7 +504,6 @@ is
                                 Var_Name     : in     String;
                                 Translations : in out Translate_Set)
                is
-                  use Inc_Formatting;
                   use Inc_Plugins;
 
                   procedure Set (Var : String; Value : String);
@@ -832,8 +830,6 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_h1_sub" then
                      declare
-                        use Inc_Formatting;
-
                         R : Unbounded_String;
                      begin
                         if

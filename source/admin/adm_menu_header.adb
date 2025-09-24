@@ -95,8 +95,7 @@ is
          declare
             use List_Vectors;
             use Adm_Menu;
---            Key             : String     := -M.Key;
---            Item            : String     := -M.Value;
+
             Admin_Is_Parent : Boolean    := False;
             Class           : List_Type  := Empty_List;
             Aria_Attributes : List_Type  := Empty_List; -- String     := "";
@@ -145,8 +144,6 @@ is
 
             declare
                use Ada.Containers;
-               use Inc_Formatting;
-               use List_Vectors;
 
                Class_2 : String :=
                   (if Length (Class) = 0

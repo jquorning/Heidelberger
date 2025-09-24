@@ -5,12 +5,10 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
 --  with Templates_Parser;
 
-with Arrays;
 with Php;
 with Globals;
 with HB_Common;
@@ -34,7 +32,6 @@ with Inc_Class_Wp_Post_Type;
 
 package body Adm_Menu
 is
-   use Ada.Strings.Unbounded;
    use Inc_L10n;
    use HB_Common;
    use Arrays;
@@ -262,8 +259,6 @@ is
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
-               use Inc_Formatting;
-
                Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Integer;
@@ -431,8 +426,6 @@ is
          end if;
 
          declare
-            use Inc_Formatting;
-            use Inc_Functions;
             use Inc_Plugins;
             use Inc_Themes;
 

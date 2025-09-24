@@ -7,7 +7,6 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with Globals;
@@ -47,7 +46,6 @@ with Inc_Users;
 
 package body Inc_Admin_Bar
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Hb_Common;
    use Inc_L10n;
@@ -968,7 +966,6 @@ is
       if Is_Admin then
          declare
             use Adi_Screens;
-            use Adi_Class_Wp_Screens;
             use Inc_Class_Wp_Posts;
             use Inc_Class_Wp_Post_type;
             use Inc_Options;
@@ -1163,8 +1160,6 @@ is
               Current_User_Can ("edit_user", Integer (Current_Object.Id))
             then
                declare
-                  use Inc_Link_Templates;
-
                   Edit_User_Link : constant String :=
                      Get_Edit_User_Link (Integer (current_object.Id));
                begin

@@ -3808,7 +3808,6 @@ is
       X_Prime_Term_Caches (Term_Ids);
 
       declare
-         use Inc_Class_Wp_Terms;
          use Inc_Taxonomys;
 
          Terms : Wp_Term_Array;

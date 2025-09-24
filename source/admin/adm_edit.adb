@@ -374,9 +374,6 @@ is
                         end if; --      end case;
 
                         declare
-                           use String_Vectors;
-                           use Inc_Functions;
-
                            Arg : constant String_Array := Empty_String_Array &
                                                  "action" & "action2" & "tags_input" &
                                                  "post_author" & "comment_status"    &
@@ -814,7 +811,6 @@ is
             if "trashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
                declare
                   use Inc_Formatting;
-                  use Inc_Functions;
 
                   Ids   : constant Integer := Preg_Replace ("/[^0-9,]/", "",
                                                             Get (X_REQUEST, "ids"));
