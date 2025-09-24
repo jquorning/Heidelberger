@@ -114,7 +114,7 @@ is
          use Adi_Class_Wp_Posts_List_Tables;
          use Adi_List_Tables;
 
-         X_Wp_List_Table : Wp_Posts_List_Table :=
+         X_Wp_List_Table : constant Wp_Posts_List_Table :=
             Wp_Posts_List_Table (X_Get_List_Table ("Wp_Posts_List_Table"));
 
          Pagenum         : constant Natural := X_Wp_List_Table.Get_Pagenum; -- ();

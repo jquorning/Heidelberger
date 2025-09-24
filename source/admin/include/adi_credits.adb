@@ -76,11 +76,11 @@ is
 --                 Strpos (-Version_2, Results ("data") ("version")) /= 0)
       then
          declare
-            Url : Unbounded_String :=
+            Url : constant Unbounded_String :=
                +"http://api.wordpress.org/core/credits/1.1/?version=" &
                (-Version_2) & "&locale=" & (-Locale_2) & """";
 
-            Options : Array_Type :=
+            Options : constant Array_Type :=
                Arrays.To_Array ((1 => Build ("user-agent", "WordPress/" &
                           (-Version_2) & "; " & Inc_Link_Templates.Home_Url ("/"))));
 
@@ -214,15 +214,15 @@ is
       use Gnatcoll.Json;
       use Inc_Formatting;
 
-      Group : Json_Value := Get (Credits, "groups");
-      Slugs : Json_Value := Get (Group,   Slug);
+      Group : constant Json_Value := Get (Credits, "groups");
+      Slugs : constant Json_Value := Get (Group,   Slug);
 
-      Group_Data   : Json_Value := Slugs;
-      Credits_Data : Json_Value := Get (Slugs, "data");
+      Group_Data   : constant Json_Value := Slugs;
+      Credits_Data : constant Json_Value := Get (Slugs, "data");
       -- Group_Data : Array_type := (if Isset (Credits ("groups") (Slug))
       --                             then Credits ("groups") (Slug) else Empty_Array);
       -- Credits_Data : String := Credits ("data");
-      Typ  : Json_Value := Get (Slugs, "type");
+      Typ  : constant Json_Value := Get (Slugs, "type");
    begin
 --      if 0 = Count (Group_Data) then
 --         return;
@@ -244,7 +244,7 @@ is
          end;
       elsif "libraries" = String'(Typ.Get) then
          declare
-            Data : Json_Array := Get (Group_Data, "data");
+            Data : constant Json_Array := Get (Group_Data, "data");
          begin
             for A of Data loop
 --               Echo (X_Wp_Credits_Build_Object_Link (A));
@@ -257,8 +257,11 @@ is
 
       else
          declare
-            Compact : Boolean := "compact" = String'(Get (Group_Data, "type").Get);
-            Classes : String  := "wp-people-group " & (if compact then "compact" else "");
+            Compact : constant Boolean :=
+               "compact" = String'(Get (Group_Data, "type").Get);
+
+            Classes : constant String :=
+               "wp-people-group " & (if compact then "compact" else "");
 
             procedure Print_Them (Name  : Utf8_String;
                                   Value : Json_Value);
@@ -266,7 +269,7 @@ is
             procedure Print_Them (Name  : Utf8_String;
                                   Value : Json_Value)
             is
-               Person_Data : Json_Array := Get (Value);
+               Person_Data : constant Json_Array := Get (Value);
             begin
                Echo ("<li class=""wp-person"" id=""wp-person-" &
                      Esc_Attr (Get (Person_Data, 3).Get) & """>" & Nl_Tab); -- (2)
@@ -278,8 +281,15 @@ is
                   use Inc_Link_Templates;
 
                   Size   : constant Integer := (if Compact then 80 else 160);
-                  Data   : Array_Type := Get_Avatar_Data (Get (Person_Data, 2).Get & "@md5.gravatar.com", Arrays.To_Array ((1 => Build ("size", Size))));     -- (1)
-                  Data2x : Array_Type := Get_Avatar_Data (Get (Person_Data, 2).Get & "@md5.gravatar.com", Arrays.To_Array ((1 => Build ("size", Size * 2)))); -- (1)
+                  Data   : constant Array_Type :=
+                     Get_Avatar_Data (Get (Person_Data, 2).Get & "@md5.gravatar.com",
+                                      Arrays.To_Array ((1 =>
+                                         Build ("size", Size))));     -- (1)
+
+                  Data2x : constant Array_Type :=
+                     Get_Avatar_Data (Get (Person_Data, 2).Get & "@md5.gravatar.com",
+                                      Arrays.To_Array ((1 =>
+                                         Build ("size", Size * 2)))); -- (1)
                begin
                   Echo ("<span class=""wp-person-avatar""><img src=""" &
                         Esc_Url (Get (Data,   "url")) & """ srcset=""" &

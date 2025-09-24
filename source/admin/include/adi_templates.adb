@@ -2831,7 +2831,10 @@ is
       use Inc_Formatting;
 
       Typ_2            : List_Type;
-      Button_Shorthand : List_Type := To_List ((+"primary", +"small", +"large"));
+
+      Button_Shorthand : constant List_Type :=
+         To_List ((+"primary", +"small", +"large"));
+
       Classes          : List_Type := To_List ((1 => +"button"));
    begin
 --      if not Is_Array (Typ) then
@@ -2850,7 +2853,7 @@ is
 
       declare
          -- Remove empty items, remove duplicate items, and finally build a string.
-         Class  : String :=
+         Class  : constant String :=
             Implode (" ", List_Type'(Array_Unique (Array_Filter (Classes))));
 
          Text_2 : String := (if Text /= "" then Text else abs "Save Changes");
@@ -2870,8 +2873,8 @@ is
             if Is_Array (Other_Attributes) then
                for A of Other_Attributes loop
                   declare
-                     Attribute : Key_Type   := A.Key;
-                     Value     : Value_Type := A.Value;
+                     Attribute : constant Key_Type   := A.Key;
+                     Value     : constant Value_Type := A.Value;
                   begin
                      Attributes := Attributes & Attribute & "=""" &
                                    Esc_Attr (-Value) & """ ";

@@ -282,8 +282,8 @@ is
       use Inc_Pluggables;
       use Inc_Users;
 
-      User_Id      : Integer := Get_Current_User_Id;
-      Current_User : Wp_User := Wp_Get_Current_User;
+      User_Id      : constant Integer := Get_Current_User_Id;
+      Current_User : constant Wp_User := Wp_Get_Current_User;
       Profile_Url  : Unbounded_String;
    begin
       if User_Id = 0 then
@@ -299,10 +299,10 @@ is
       end if;
 
       declare
-         Avatar : String := Get_Avatar (User_Id, 26);
+         Avatar : constant String := Get_Avatar (User_Id, 26);
 
          -- translators: %s: Current user"s display name.
-         Howdy : String :=
+         Howdy : constant String :=
             Sprintf (abs "Howdy, %s",
                      "<span class=""display-name"">"  &
                      (-Current_User.Dyn.Display_Name) &
@@ -334,8 +334,8 @@ is
       use Inc_Pluggables;
       use Inc_Users;
 
-      User_Id      : Integer := Get_Current_User_Id;
-      Current_User : Wp_User := Wp_Get_Current_User;
+      User_Id      : constant Integer := Get_Current_User_Id;
+      Current_User : constant Wp_User := Wp_Get_Current_User;
       Profile_Url  : Unbounded_String;
       User_Info    : Unbounded_String;
    begin
@@ -452,7 +452,7 @@ is
       end if;
 
       declare
-         Title : String := Wp_Html_Excerpt (-Blogname, 40, "&hellip;");
+         Title : constant String := Wp_Html_Excerpt (-Blogname, 40, "&hellip;");
          Node  : Node_Args;
       begin
          Node.Id    := +"site-name";
@@ -791,7 +791,7 @@ is
       declare
          use Inc_Formatting;
 
-         Show_Site_Icons : Boolean :=
+         Show_Site_Icons : constant Boolean :=
             Apply_Filters ("wp_admin_bar_show_site_icons", True);
       begin
 
@@ -826,7 +826,8 @@ is
                end if;
 
                declare
-                  Menu_Id : String := "blog-" & Integer'Image (Blog.Userblog_Id);
+                  Menu_Id : constant String :=
+                     "blog-" & Integer'Image (Blog.Userblog_Id);
                begin
                   if Current_User_Can ("read") then
                      declare
@@ -926,8 +927,8 @@ is
       use Inc_Formatting;
       use Inc_Link_Templates;
 
-      Short : String := Wp_Get_Shortlink (0, "query");
-      Id    : String := "get-shortlink";
+      Short : constant String := Wp_Get_Shortlink (0, "query");
+      Id    : constant String := "get-shortlink";
       Html  : Unbounded_String;
    begin
       if Empty (short) then
@@ -972,7 +973,7 @@ is
             use Inc_Class_Wp_Post_type;
             use Inc_Options;
 
-            Current_Screen   : Wp_Screen := Get_Current_Screen;
+            Current_Screen   : constant Wp_Screen := Get_Current_Screen;
             Post             : Wp_Post   := Get_Post;
             Post_Type_Object : Wp_Post_Type; -- = null;
          begin
@@ -999,7 +1000,7 @@ is
                   declare
                      use Inc_Formatting;
 
-                     Preview_Link : String := Get_Preview_Post_Link (Post);
+                     Preview_Link : constant String := Get_Preview_Post_Link (Post);
                      Node : Node_Args;
                   begin
                      Node.Id    := +"preview";
@@ -1052,7 +1053,7 @@ is
                declare
                   use Inc_Class_Wp_Taxonomy;
 
-                  Tax : Wp_Taxonomy := Get_Taxonomy (-Tag.Taxonomy);
+                  Tax : constant Wp_Taxonomy := Get_Taxonomy (-Tag.Taxonomy);
                begin
                   if Is_Term_Publicly_Viewable (tag) then
                      declare
@@ -1073,8 +1074,10 @@ is
                   use Inc_Class_Wp_Users;
                   use Inc_Pluggables;
 
-                  User_Object : Wp_User := Get_Userdata (User_Id);
-                  View_Link   : String  := Get_Author_Posts_Url (User_Object.ID);
+                  User_Object : constant Wp_User := Get_Userdata (User_Id);
+
+                  View_Link   : constant String :=
+                     Get_Author_Posts_Url (User_Object.ID);
                begin
                   if User_Object.Exists or else View_Link /= "" then
                      declare
@@ -1094,7 +1097,7 @@ is
          declare
             use Inc_Class_Wp_Posts;
 
-            Current_Object : Wp_Post := Wp_The_Query.Get_Queried_Object;
+            Current_Object : constant Wp_Post := Wp_The_Query.Get_Queried_Object;
          begin
             if Current_Object = Null_Post then
 --          if Empty (Current_Object) then
@@ -1105,10 +1108,10 @@ is
                declare
                   use Inc_Class_Wp_Post_Type;
 
-                  Post_Type_Object : Wp_Post_Type :=
+                  Post_Type_Object : constant Wp_Post_Type :=
                      Get_Post_Type_Object (-Current_Object.Post_Type);
 
-                  Edit_Post_Link : String :=
+                  Edit_Post_Link : constant String :=
                      Get_Edit_Post_Link (Integer (Current_Object.Id));
                begin
                   if Post_Type_Object /= Null_Post_Type
@@ -1132,10 +1135,10 @@ is
                declare
                   use Inc_Class_Wp_Taxonomy;
 
-                  Tax : Wp_Taxonomy :=
+                  Tax : constant Wp_Taxonomy :=
                      Get_Taxonomy (-Current_Object.Dyn.Taxonomy);
 
-                  Edit_Term_Link : String :=
+                  Edit_Term_Link : constant String :=
                      Get_Edit_Term_Link (Current_Object.Dyn.Term_Id,
                                          -Current_Object.Dyn.Taxonomy);
                begin
@@ -1162,7 +1165,7 @@ is
                declare
                   use Inc_Link_Templates;
 
-                  Edit_User_Link : String :=
+                  Edit_User_Link : constant String :=
                      Get_Edit_User_Link (Integer (current_object.Id));
                begin
                   if Edit_User_Link /= "" then
@@ -1268,7 +1271,7 @@ is
          end if;
 
          declare
-            Key : String := "post-new.php?post_type=" & (-Cpt.Name);
+            Key : constant String := "post-new.php?post_type=" & (-Cpt.Name);
          begin
             Actions (Key) :=
                Arrays.To_Array ((1 =>
@@ -1298,12 +1301,15 @@ is
       end if;
 
       declare
-         Title : String :=
+         Title : constant String :=
             "<span class=""ab-icon"" aria-hidden=""true""></span><span class=""ab-label"">" & X_X ("New", "admin bar menu group label") & "</span>";
 
          Node  : Node_Args;
-         Arry  : Array_Type := Action_Maps.Element (Actions.Find ("user-new.php"));
-         Value : String     := -Arry.First_Element.Key;
+
+         Arry  : constant Array_Type :=
+            Action_Maps.Element (Actions.Find ("user-new.php"));
+
+         Value : constant String := -Arry.First_Element.Key;
       begin
          Node.Id    := +"new-content";
          Node.Title := +Title;
@@ -1314,10 +1320,11 @@ is
 
          for A in Actions.Iterate loop
             declare
-               Link   : String     := Action_Maps.Key (A);
-               Action : Array_Type := Action_Maps.Element (A);
-               Title  : String     := -Action.First_Element.Key; -- Title; -- list()
-               Id     : String     := -Action.First_Element.Value; -- Id;
+               Link   : constant String     := Action_Maps.Key (A);
+               Action : constant Array_Type := Action_Maps.Element (A);
+               Title  : constant String     := -Action.First_Element.Key;
+               -- Title; -- list()
+               Id     : constant String     := -Action.First_Element.Value; -- Id;
 
                Node : Node_Args;
             begin
@@ -1342,9 +1349,9 @@ is
       use Inc_Functions;
       use Inc_Link_Templates;
 
-      Counts        : Comment_Counts := Wp_Count_Comments;
-      Awaiting_Mod  : Natural := Counts.Moderated;
-      Awaiting_Text : String  :=
+      Counts        : constant Comment_Counts := Wp_Count_Comments;
+      Awaiting_Mod  : constant Natural := Counts.Moderated;
+      Awaiting_Text : constant String  :=
          Sprintf (
                   -- translators: %s: Number of comments.
                   X_N ("%s Comment in moderation",
@@ -1478,8 +1485,9 @@ is
       use Inc_Link_Templates;
       use Inc_Updates;
 
-      Update_Data  : Update_Counts := Wp_Get_Update_Data;
-      Counts_Total : Integer       := Update_Data.Total; -- ("counts") ("total");
+      Update_Data  : constant Update_Counts := Wp_Get_Update_Data;
+      Counts_Total : constant Integer       := Update_Data.Total;
+      -- ("counts") ("total");
       Updates_Text : Unbounded_String;
       Icon         : Unbounded_String;
       Title        : Unbounded_String;
@@ -1720,7 +1728,7 @@ is
    is
       use Inc_Users;
 
-      Pref : Boolean := Get_User_Option ("show_admin_bar_{context}", User);
+      Pref : constant Boolean := Get_User_Option ("show_admin_bar_{context}", User);
    begin
       if not Pref then -- False = Pref then
          return True;

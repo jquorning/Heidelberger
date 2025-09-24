@@ -99,10 +99,12 @@ is
          use Adi_Class_Wp_Terms_List_Tables;
          use Adi_List_Tables;
 
-         Post_Type     : constant String := ""; -- jq
-         X_Wp_List_Table : Wp_Terms_List_Table :=
+         Post_Type : constant String := ""; -- jq
+
+         X_Wp_List_Table : constant Wp_Terms_List_Table :=
             Wp_Terms_List_Table (X_Get_List_Table ("WP_Terms_List_Table"));
-         Pagenum       : constant Natural    := X_Wp_List_Table.Get_Pagenum;  -- ();
+
+         Pagenum : constant Natural := X_Wp_List_Table.Get_Pagenum;  -- ();
 
          Title : String := Get (Tax.Labels, "name");
 

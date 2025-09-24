@@ -221,8 +221,8 @@ is
                elsif Action = "post" or Action = "postajaxpost" then
                   Inc_Pluggables.Check_Admin_Referer ("add-" & Post_Type);
                   declare
-                     Post_Id : Integer := (if "postajaxpost" = Action
-                                          then Edit_Post else Write_Post);
+                     Post_Id : constant Integer := (if "postajaxpost" = Action
+                                                    then Edit_Post else Write_Post);
                   begin
                      Redirect_Post (Post_Id);
                   end;

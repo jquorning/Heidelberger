@@ -129,7 +129,7 @@ is
             declare
                use Inc_Ms_Functions;
 
-               C : Natural := Get_Blog_Count;
+               C : constant Natural := Get_Blog_Count;
                type Site_Count is range 1 .. 1000;
 
                package Site_Random is new
@@ -421,7 +421,7 @@ is
 
          elsif Isset (XX_GET, "import") then
             declare
-               Importer : String := Get (XX_GET, "import");
+               Importer : constant String := Get (XX_GET, "import");
             begin
                if not Inc_Capabilities.Current_User_Can ("import") then
                   Inc_Functions.Wp_Die

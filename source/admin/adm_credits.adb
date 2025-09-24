@@ -115,8 +115,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups    : Json_Value := Credits.Get ("groups");
-                  Core_Devs : Json_Value := Groups. Get ("core-developers");
+                  Groups    : constant Json_Value := Credits.Get ("groups");
+                  Core_Devs : constant Json_Value := Groups. Get ("core-developers");
                begin
                   Wp_Credits_Section_Title (Core_Devs);
                   Wp_Credits_Section_List  (Credits, "core-developers");
@@ -128,8 +128,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups : Json_Value := Credits.Get ("groups");
-                  Props  : Json_Value := Groups. Get ("props");
+                  Groups : constant Json_Value := Credits.Get ("groups");
+                  Props  : constant Json_Value := Groups. Get ("props");
                begin
                   Wp_Credits_Section_Title (Props);
                   Wp_Credits_Section_List  (Credits, "props");
@@ -140,8 +140,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups     : Json_Value := Credits.Get ("groups");
-                  Validators : Json_Value := Groups. Get ("validators");
+                  Groups     : constant Json_Value := Credits.Get ("groups");
+                  Validators : constant Json_Value := Groups. Get ("validators");
                begin
                   Wp_Credits_Section_Title (Validators);
                   Wp_Credits_Section_List  (Credits, "validators");
@@ -153,8 +153,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups    : Json_Value := Credits.Get ("groups");
-                  Libraries : Json_Value := Groups. Get ("libraries");
+                  Groups    : constant Json_Value := Credits.Get ("groups");
+                  Libraries : constant Json_Value := Groups. Get ("libraries");
                begin
                   Wp_Credits_Section_Title (Libraries);
                   Wp_Credits_Section_List  (Credits, "libraries");
