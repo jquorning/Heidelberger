@@ -261,7 +261,7 @@ is
 --               Build ("page", "")));
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
-           declare
+            declare
                use Inc_Formatting;
 
                Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
@@ -452,58 +452,60 @@ is
                         wp_Is_Block_Theme or else
                         Current_Theme_Supports ("block-template-parts")
                       then 7 else 6);
-         begin
-            Set (Submenu, "themes.php", Position, abs "Customize", "customize",
-                 ESC_URL (Customize_Url), "", "hide-if-no-customize");
-         end;
-      end if;
+               begin
+                  Set (Submenu, "themes.php", Position, abs "Customize", "customize",
+                       ESC_URL (Customize_Url), "", "hide-if-no-customize");
+               end;
+            end if;
 
-      if
-        Current_Theme_Supports ("menus") or else
-        Current_Theme_Supports ("widgets")
-      then
-         Set (Submenu, "themes.php", 10, abs "Menus", "edit_theme_options",
-              "nav-menus.php");
-      end if;
+            if
+              Current_Theme_Supports ("menus") or else
+              Current_Theme_Supports ("widgets")
+            then
+               Set (Submenu, "themes.php", 10, abs "Menus", "edit_theme_options",
+                    "nav-menus.php");
+            end if;
 
-      if
-        Current_Theme_Supports ("custom-header") and then
-        Current_User_Can ("customize")
-      then
-         declare
-            Array_1 : constant Array_Type := Arrays.To_Array ((1 => Build ("control",
-                                                                    "header_image")));
-            Array_2 : constant Array_Type := Arrays.To_Array ((1 => Build ("autofocus",
-                                                                    Array_1)));
-            Customize_Header_Url : constant String :=
-               -Add_Query_Arg (Array_2, +Customize_Url);
-      begin
-            Set (Submenu, "themes.php", 15, abs "Header", Appearance_Cap,
-                 ESC_URL (Customize_Header_Url), "", "hide-if-no-customize");
-         end;
-      end if;
+            if
+              Current_Theme_Supports ("custom-header") and then
+              Current_User_Can ("customize")
+            then
+               declare
+                  Array_1 : constant Array_Type := Arrays.To_Array ((1 =>
+                                                   Build ("control", "header_image")));
+                  Array_2 : constant Array_Type := Arrays.To_Array ((1 =>
+                                                   Build ("autofocus", Array_1)));
+                  Customize_Header_Url : constant String :=
+                     -Add_Query_Arg (Array_2, +Customize_Url);
+               begin
+                  Set (Submenu, "themes.php", 15, abs "Header", Appearance_Cap,
+                       ESC_URL (Customize_Header_Url), "", "hide-if-no-customize");
+               end;
+            end if;
 
-      if
-        Current_Theme_Supports ("custom-background") and then
-        Current_User_Can ("customize")
-      then
-         declare
-            Array_1 : constant Array_Type := Arrays.To_Array ((1 => Build ("control",
-                                                             "background_image")));
-            Array_2 : constant Array_Type := Arrays.To_Array ((1 => Build ("autofocus",
-                                                                   Array_1)));
-            Customize_Background_Url : constant String :=
-               -Add_Query_Arg (Array_2, +Customize_Url);
-         begin
-            Set (Submenu, "themes.php", 20, abs "Background", Appearance_Cap,
-                 ESC_URL (Customize_Background_Url), "", "hide-if-no-customize");
-         end;
-      end if;
+            if
+              Current_Theme_Supports ("custom-background") and then
+              Current_User_Can ("customize")
+            then
+               declare
+                  Array_1 : constant Array_Type :=
+                     Arrays.To_Array ((1 => Build ("control", "background_image")));
 
-              Unset (Customize_Url);
-              Unset (Appearance_Cap);
-            end;
+                  Array_2 : constant Array_Type :=
+                     Arrays.To_Array ((1 => Build ("autofocus", Array_1)));
+
+                  Customize_Background_Url : constant String :=
+                     -Add_Query_Arg (Array_2, +Customize_Url);
+               begin
+                  Set (Submenu, "themes.php", 20, abs "Background", Appearance_Cap,
+                       ESC_URL (Customize_Background_Url), "", "hide-if-no-customize");
+               end;
+            end if;
+
+            Unset (Customize_Url);
+            Unset (Appearance_Cap);
          end;
+      end;
 
          -- Add "Theme File Editor" to the bottom of the Appearance (non-block themes)
          -- or Tools (block themes) menu.
@@ -602,140 +604,144 @@ is
                else
                   Set (Submenu, "plugins.php", 15, abs "Plugin File Editor",
                        "edit_plugins", "plugin-editor.php");
-            end if;
-         end if;
-
---      Unset (Update_Data);
-
-         if Current_User_Can ("list_users") then
-            Menu (70) := To_Menu (abs "Users", "list_users", "users.php", "",
-                                  "menu-top menu-icon-users", "menu-users",
-                                  "dashicons-admin-users");
-         else
-            Menu (70) := To_Menu (abs "Profile", "read", "profile.php", "",
-                                  "menu-top menu-icon-users", "menu-users",
-                                  "dashicons-admin-users");
-         end if;
-
-         if Current_User_Can ("list_users") then
-            Set (X_Wp_Real_Parent_File, "profile.php", Value => "users.php");
-            -- Back-compat for plugins adding submenus to profile.php.
-
-            Set (Submenu, "users.php", 5, abs "All Users", "list_users", "users.php");
-            if Current_User_Can ("create_users") then
-               Set (Submenu, "users.php", 10, X_X ("Add New", "user"), "create_users",
-                    "user-new.php");
-            elsif Is_Multisite then
-               Set (Submenu, "users.php", 10, X_X ("Add New", "user"), "promote_users",
-                    "user-new.php");
+               end if;
             end if;
 
-            Set (Submenu, "users.php", 15, abs "Profile", "read", "profile.php");
-         else
-            Set (X_Wp_Real_Parent_File, "users.php", Value => "profile.php");
-            Set (Submenu, "profile.php", 5, abs "Profile", "read", "profile.php");
+--          Unset (Update_Data);
 
-            if Current_User_Can ("create_users") then
-               Set (Submenu, "profile.php", 10, abs "Add New User", "create_users",
-                    "user-new.php");
-            elsif Is_Multisite then
-               Set (Submenu, "profile.php", 10, abs "Add New User", "promote_users",
-                    "user-new.php");
+            if Current_User_Can ("list_users") then
+               Menu (70) := To_Menu (abs "Users", "list_users", "users.php", "",
+                                     "menu-top menu-icon-users", "menu-users",
+                                     "dashicons-admin-users");
+            else
+               Menu (70) := To_Menu (abs "Profile", "read", "profile.php", "",
+                                     "menu-top menu-icon-users", "menu-users",
+                                     "dashicons-admin-users");
             end if;
-         end if;
 
-         declare
-            Site_Health_Count : Unbounded_String;
-         begin
-            if not Is_Multisite and then
-              Current_User_Can ("view_site_health_checks")
-            then
-               declare
-                  use Array_Vectors;
+            if Current_User_Can ("list_users") then
+               Set (X_Wp_Real_Parent_File, "profile.php", Value => "users.php");
+               -- Back-compat for plugins adding submenus to profile.php.
 
-                  Get_Issues   : String :=
-                     Inc_Options.Get_Transient ("health-check-site-status-result");
-                  Issue_Counts : Array_Type := Empty_Array;
-               begin
-                  -- if False /= Get_Issues then
-                  --    Issue_Counts := Json_Decode (Get_Issues, True);
-                  -- end if;
+               Set (Submenu, "users.php", 5, abs "All Users", "list_users",
+                    "users.php");
+               if Current_User_Can ("create_users") then
+                  Set (Submenu, "users.php", 10, X_X ("Add New", "user"),
+                       "create_users", "user-new.php");
+               elsif Is_Multisite then
+                  Set (Submenu, "users.php", 10, X_X ("Add New", "user"),
+                       "promote_users", "user-new.php");
+               end if;
 
-                  if
-                    not Is_Array (Issue_Counts) or else
-                    Issue_Counts = Empty_Array
-                  then
-                     Issue_Counts := Arrays.To_Array ((
-                        Build ("good",        "0"),
+               Set (Submenu, "users.php", 15, abs "Profile", "read", "profile.php");
+            else
+               Set (X_Wp_Real_Parent_File, "users.php", Value => "profile.php");
+               Set (Submenu, "profile.php", 5, abs "Profile", "read", "profile.php");
+
+               if Current_User_Can ("create_users") then
+                  Set (Submenu, "profile.php", 10, abs "Add New User", "create_users",
+                       "user-new.php");
+               elsif Is_Multisite then
+                  Set (Submenu, "profile.php", 10, abs "Add New User", "promote_users",
+                       "user-new.php");
+               end if;
+            end if;
+
+            declare
+               Site_Health_Count : Unbounded_String;
+            begin
+               if not Is_Multisite and then
+                  Current_User_Can ("view_site_health_checks")
+               then
+                  declare
+                     use Array_Vectors;
+
+                     Get_Issues   : String :=
+                        Inc_Options.Get_Transient ("health-check-site-status-result");
+                     Issue_Counts : Array_Type := Empty_Array;
+                  begin
+                     -- if False /= Get_Issues then
+                     --    Issue_Counts := Json_Decode (Get_Issues, True);
+                     -- end if;
+
+                     if
+                       not Is_Array (Issue_Counts) or else
+                       Issue_Counts = Empty_Array
+                     then
+                        Issue_Counts := Arrays.To_Array ((
+                           Build ("good",        "0"),
                         Build ("recommended", "0"),
                         Build ("critical",    "0")));
-                  end if;
+                     end if;
 
-                  declare
-                     Health : constant String := Get (Issue_Counts, "critical");
-                  begin
-                     Site_Health_Count := +Sprintf (
-                        "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
-                        Health,
-                        Number_Format_I18n (Float'Value (Health)));
+                     declare
+                        Health : constant String := Get (Issue_Counts, "critical");
+                     begin
+                        Site_Health_Count := +Sprintf (
+                           "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
+                           Health,
+                           Number_Format_I18n (Float'Value (Health)));
+                     end;
                   end;
-               end;
+               end if;
+
+               Menu (75) := To_Menu (abs "Tools", "edit_posts", "tools.php", "",
+                                     "menu-top menu-icon-tools", "menu-tools",
+                                     "dashicons-admin-tools");
+               Set (Submenu, "tools.php", 5, abs "Available Tools", "edit_posts",
+                    "tools.php");
+               Set (Submenu, "tools.php", 10, abs "Import", "import", "import.php");
+               Set (Submenu, "tools.php", 15, abs "Export", "export", "export.php");
+               -- translators: %s: Number of critical Site Health checks.
+               Set (Submenu, "tools.php", 20, Sprintf (abs "Site Health %s",
+                                                    -Site_Health_Count),
+                    "view_site_health_checks", "site-health.php");
+               Set (Submenu, "tools.php", 25, abs "Export Personal Data",
+                    "export_others_personal_data", "export-personal-data.php");
+               Set (Submenu, "tools.php", 30, abs "Erase Personal Data",
+                    "erase_others_personal_data", "erase-personal-data.php");
+            end;
+
+            if Is_Multisite and then not Inc_Functions.Is_Main_Site  then
+               Set (Submenu, "tools.php", 35, abs "Delete Site", "delete_site",
+                    "ms-delete-site.php");
             end if;
 
-            Menu (75) := To_Menu (abs "Tools", "edit_posts", "tools.php", "",
-                                  "menu-top menu-icon-tools", "menu-tools",
-                                  "dashicons-admin-tools");
-            Set (Submenu, "tools.php", 5, abs "Available Tools", "edit_posts",
-                 "tools.php");
-            Set (Submenu, "tools.php", 10, abs "Import", "import", "import.php");
-            Set (Submenu, "tools.php", 15, abs "Export", "export", "export.php");
-            -- translators: %s: Number of critical Site Health checks.
-            Set (Submenu, "tools.php", 20, Sprintf (abs "Site Health %s",
-                                                 -Site_Health_Count),
-                 "view_site_health_checks", "site-health.php");
-            Set (Submenu, "tools.php", 25, abs "Export Personal Data",
-                 "export_others_personal_data", "export-personal-data.php");
-            Set (Submenu, "tools.php", 30, abs "Erase Personal Data",
-                 "erase_others_personal_data", "erase-personal-data.php");
+            -- if
+            --   not Is_Multisite and then
+            --   defined ("WP_ALLOW_MULTISITE") and then
+            --   WP_ALLOW_MULTISITE
+            -- then
+            --    Set (Submenu, "tools.php", 50, abs "Network Setup", "setup_network",
+            --         "network.php");
+            -- end if;
+
+            Menu (80) := To_Menu (abs "Settings", "manage_options",
+                                  "options-general.php",
+                                  "", "menu-top menu-icon-settings", "menu-settings",
+                                  "dashicons-admin-settings");
+            Set (Submenu, "options-general.php", 10,
+                 X_X ("General", "settings screen"),
+                 "manage_options", "options-general.php");
+            Set (Submenu, "options-general.php", 15, abs "Writing", "manage_options",
+                 "options-writing.php");
+            Set (Submenu, "options-general.php", 20, abs "Reading", "manage_options",
+                 "options-reading.php");
+            Set (Submenu, "options-general.php", 25, abs "Discussion",
+                 "manage_options", "options-discussion.php");
+            Set (Submenu, "options-general.php", 30, abs "Media", "manage_options",
+                 "options-media.php");
+            Set (Submenu, "options-general.php", 40, abs "Permalinks",
+                 "manage_options", "options-permalink.php");
+            Set (Submenu, "options-general.php", 45, abs "Privacy",
+                 "manage_privacy_options", "options-privacy.php");
+
+--          X_wp_Last_Utility_Menu := 80;
+            -- The index of the last top-level menu in the utility menu group.
+
+            Menu (99) := To_Menu ("", "read", "separator-last", "",
+                                  "wp-menu-separator");
          end;
-
-         if Is_Multisite and then not Inc_Functions.Is_Main_Site  then
-            Set (Submenu, "tools.php", 35, abs "Delete Site", "delete_site",
-                 "ms-delete-site.php");
-         end if;
-
-         -- if
-         --   not Is_Multisite and then
-         --   defined ("WP_ALLOW_MULTISITE") and then
-         --   WP_ALLOW_MULTISITE
-         -- then
-         --    Set (Submenu, "tools.php", 50, abs "Network Setup", "setup_network",
-         --         "network.php");
-         -- end if;
-
-         Menu (80) := To_Menu (abs "Settings", "manage_options", "options-general.php",
-                               "", "menu-top menu-icon-settings", "menu-settings",
-                               "dashicons-admin-settings");
-         Set (Submenu, "options-general.php", 10, X_X ("General", "settings screen"),
-              "manage_options", "options-general.php");
-         Set (Submenu, "options-general.php", 15, abs "Writing", "manage_options",
-              "options-writing.php");
-         Set (Submenu, "options-general.php", 20, abs "Reading", "manage_options",
-              "options-reading.php");
-         Set (Submenu, "options-general.php", 25, abs "Discussion", "manage_options",
-              "options-discussion.php");
-         Set (Submenu, "options-general.php", 30, abs "Media", "manage_options",
-              "options-media.php");
-         Set (Submenu, "options-general.php", 40, abs "Permalinks", "manage_options",
-              "options-permalink.php");
-         Set (Submenu, "options-general.php", 45, abs "Privacy",
-              "manage_privacy_options", "options-privacy.php");
-
---         X_wp_Last_Utility_Menu := 80;
-         -- The index of the last top-level menu in the utility menu group.
-
-         Menu (99) := To_Menu ("", "read", "separator-last", "", "wp-menu-separator");
-      end;
 
       -- -- Back-compat for old top-levels.
       -- X_wp_Real_Parent_File ("post.php")       := "edit.php";

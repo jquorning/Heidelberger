@@ -179,7 +179,7 @@ is
          Name         : constant Json_Value := Get (Group_Data, "name");
          Placeholders : constant Json_Value := Get (Group_Data, "placeholders");
       begin
-          if Name.Kind = Json_String_Type then
+         if Name.Kind = Json_String_Type then
             if "Translators" = String'(Name.Get) then
                -- Considered a special slug in the API response. (Also, will never be
                -- returned for en_US.)
@@ -211,8 +211,6 @@ is
                                       -- Array_Type := Empty_Array;
                                       Slug    : String     := "")
    is
-   begin
-   declare
       use Gnatcoll.Json;
       use Inc_Formatting;
 
@@ -332,7 +330,6 @@ is
          echo ("</ul>" & Nl);
 
       end if;
-      end;
    end Wp_Credits_Section_List;
 
    --------------

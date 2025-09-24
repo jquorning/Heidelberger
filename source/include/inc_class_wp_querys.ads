@@ -477,7 +477,7 @@ is
 --        private $compat_fields = array( 'query_vars_hash', 'query_vars_changed' );
 
 --        private $compat_methods = array( 'init_query_flags', 'parse_tax_query' );
-end record;
+      end record;
 
         --
         -- Determines whether there are more posts available in the loop.

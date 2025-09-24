@@ -59,7 +59,7 @@ is
                                      --   Default empty.
          Typ      : Typ_Type;
          Children : Node_Array_Access;
-       end record;
+      end record;
 
    Null_Node_Args : constant Node_Args :=
      (Group => False, Meta => Empty_Array, Typ => Typ_Item, Children => null,

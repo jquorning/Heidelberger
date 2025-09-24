@@ -147,6 +147,6 @@ is
                                 is (Empty_Array);
 
 
-procedure Dummy;
+   procedure Dummy;
 
 end Inc_Options;

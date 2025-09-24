@@ -269,150 +269,149 @@ is
                      end;
                   end if;
 
-               if Submenu_Items.Length /= 0 then
---             if not Empty (Submenu_Items) then
-                  Echo ("\n\t<ul class=""wp-submenu wp-submenu-wrap"">");
-                  Echo ("<li class=""wp-submenu-head"" aria-hidden=""true"">" &
-                        (-Item.Menu_Title) & "</li>");
+                  if Submenu_Items.Length /= 0 then
+--                if not Empty (Submenu_Items) then
+                     Echo ("\n\t<ul class=""wp-submenu wp-submenu-wrap"">");
+                     Echo ("<li class=""wp-submenu-head"" aria-hidden=""true"">" &
+                           (-Item.Menu_Title) & "</li>");
 
-                  First := True;
+                     First := True;
 
-                  -- 0 := menu_title, 1 := capability, 2 := menu_slug,
-                  -- 3 := page_title, 4 := classes.
-                  for Sub of Submenu_Items loop
-                     declare
---                        Sub_Key         : String := -S.Key;
---                        Sub_Item        : String := -S.Value;
-                        Sub_Item        : constant Adm_Menu.Submenu_Record := Sub;
-                        Class           : List_Type := Empty_List;
-                        Aria_Attributes : List_Type := Empty_List; --  ;  String := "";
-                     begin
-                        if Current_User_Can (-Sub_Item.Capability) then
-                           goto Continue_1;
-                        end if;
-
-                        if First then
-                           Append (Class, +"wp-first-item");  -- ()
-                           First := False;
-                        end if;
-
+                     -- 0 := menu_title, 1 := capability, 2 := menu_slug,
+                     -- 3 := page_title, 4 := classes.
+                     for Sub of Submenu_Items loop
                         declare
-                           Menu_File : String  := -Item.Menu_Slug;
-                           Pos       : constant Integer := Strpos (Menu_File, "?");
-
-                           -- Handle current for post_type=post|page|foo pages,
-                           -- which won't match self.
-                           Self_Type : String :=
-                              (if not Empty (-Typenow)
-                               then (-Self) & "?post_type=" & (-Typenow)
-                               else "nothing");
+                           Sub_Item        : constant Adm_Menu.Submenu_Record := Sub;
+                           Class           : List_Type := Empty_List;
+                           Aria_Attributes : List_Type := Empty_List;
                         begin
-                           if 0 /= Pos then
-                              Menu_File := Substr (Menu_File, 0, Pos);
+                           if Current_User_Can (-Sub_Item.Capability) then
+                              goto Continue_1;
                            end if;
 
-                           if Submenu_File /= "" then
-                              if Submenu_File = Sub_Item.Menu_Slug then
-                                 Append (Class,           +"current");  -- ()
-                                 Append (Aria_Attributes, +" aria-current=""page""");
-                              end if;
-                              -- If plugin_page is set the parent must either match
-                              -- the current page or not physically exist.
-                              -- This allows plugin pages with the same hook to exist
-                              -- under different parents.
-                           elsif
-                             (Plugin_Page /= "" and then
-                              Self = Sub_Item.Menu_Slug)
-                             or else
-                              (Plugin_Page /= ""               and then
-                               Plugin_Page = Sub_Item.Menu_Slug and then
-                               (Item.Menu_Slug = Self_Type or else
-                                Item.Menu_Slug = Self      or else
-                                File_Exists (Menu_File) = False))
-                           then
-                              Append (Class,           +"current");  -- ()
-                              Append (Aria_Attributes, +" aria-current=""page""");
-                           end if;
-
-                           if Sub_Item.Classes /= "" then
-                              Append (Class, +Esc_Attr (-Sub_Item.Classes));
+                           if First then
+                              Append (Class, +"wp-first-item");  -- ()
+                              First := False;
                            end if;
 
                            declare
-                              Class_2 : String :=
-                                 (if Length (Class) /= 0
-                                  then " class=""" & Implode (" ", Class) & """"
-                                  else "");
+                              Menu_File : String  := -Item.Menu_Slug;
+                              Pos       : constant Integer := Strpos (Menu_File, "?");
 
-                              Menu_Hook : constant String :=
-                                 Adi_Plugins.Get_Plugin_Page_Hook (-Sub_Item.Menu_Slug,
-                                                                   -Item.Menu_Slug);
-
-                              Sub_File  : String  := -Sub_Item.Menu_Slug;
-                              Pos       : constant Integer := Strpos (Sub_File, "?");
+                              -- Handle current for post_type=post|page|foo pages,
+                              -- which won't match self.
+                              Self_Type : String :=
+                                 (if not Empty (-Typenow)
+                                  then (-Self) & "?post_type=" & (-Typenow)
+                                  else "nothing");
                            begin
                               if 0 /= Pos then
-                                 Sub_File := Substr (Sub_File, 0, Pos);
+                                 Menu_File := Substr (Menu_File, 0, Pos);
                               end if;
 
-                              Title :=
-                                 +Inc_Formatting.Wptexturize (-Sub_Item.Menu_Title);
-
-                              if
-                                 Menu_Hook /= "" or else
-                                 (("index.php" /= Sub_Item.Menu_Slug)       and then
-                                  File_Exists (WP_PLUGIN_DIR & "/sub_file") and then
-                                  not File_Exists (ABSPATH & "/wp-admin/sub_file"))
-                              then
-                                 declare
-                                    Sub_Item_Url : Unbounded_String;
-                                 begin
-                                 -- If admin.php is the current page or if the parent
-                                 -- exists as a file in the plugins or admin directory.
-                                 if
-                                   (not Admin_Is_Parent and then
-                                    File_Exists (WP_PLUGIN_DIR & "/menu_file") and then
-                                    not Is_Dir (WP_PLUGIN_DIR & "/" &
-                                                (-Item.Menu_Slug))) or else
-                                    File_Exists (Menu_File)
-                                 then
-                                    Sub_Item_Url := Add_Query_Arg (
-                                       Arrays.To_Array ((1 => Build ("page",
-                                                              -Sub_Item.Menu_Slug))),
-                                                  Item.Menu_Slug);
-                                 else
-                                    Sub_Item_Url := Add_Query_Arg (
-                                       Arrays.To_Array ((1 => Build ("page",
-                                                              -Sub_Item.Menu_Slug))),
-                                                  +"admin.php");
+                              if Submenu_File /= "" then
+                                 if Submenu_File = Sub_Item.Menu_Slug then
+                                    Append (Class,           +"current");  -- ()
+                                    Append (Aria_Attributes, +" aria-current=""page""");
                                  end if;
-                                 Sub_Item_Url := +Esc_Url (-Sub_Item_Url);
-                                 Echo ("<liclass><a href=""" & (-Sub_Item_Url) &
-                                       """classaria_attributes>title</a></li>");
-                                 end;
-                              else
-                                 Echo ("<liclass><a href=""" & (-Sub_Item.Menu_Slug) &
-                                       """classaria_attributes>title</a></li>");
+                                 -- If plugin_page is set the parent must either match
+                                 -- the current page or not physically exist.
+                                 -- This allows plugin pages with the same hook to exist
+                                 -- under different parents.
+                              elsif
+                                (Plugin_Page /= "" and then
+                                 Self = Sub_Item.Menu_Slug)
+                                or else
+                                 (Plugin_Page /= ""               and then
+                                  Plugin_Page = Sub_Item.Menu_Slug and then
+                                  (Item.Menu_Slug = Self_Type or else
+                                   Item.Menu_Slug = Self      or else
+                                   File_Exists (Menu_File) = False))
+                              then
+                                 Append (Class,           +"current");  -- ()
+                                 Append (Aria_Attributes, +" aria-current=""page""");
                               end if;
+
+                              if Sub_Item.Classes /= "" then
+                                 Append (Class, +Esc_Attr (-Sub_Item.Classes));
+                              end if;
+
+                              declare
+                                 Class_2 : String :=
+                                    (if Length (Class) /= 0
+                                     then " class=""" & Implode (" ", Class) & """"
+                                     else "");
+
+                                 Menu_Hook : constant String :=
+                                    Adi_Plugins.Get_Plugin_Page_Hook
+                                       (-Sub_Item.Menu_Slug, -Item.Menu_Slug);
+
+                                 Sub_File : String  := -Sub_Item.Menu_Slug;
+                                 Pos      : constant Integer := Strpos (Sub_File, "?");
+                              begin
+                                 if 0 /= Pos then
+                                    Sub_File := Substr (Sub_File, 0, Pos);
+                                 end if;
+
+                                 Title :=
+                                    +Inc_Formatting.Wptexturize (-Sub_Item.Menu_Title);
+
+                                 if
+                                    Menu_Hook /= "" or else
+                                    (("index.php" /= Sub_Item.Menu_Slug)       and then
+                                     File_Exists (WP_PLUGIN_DIR & "/sub_file") and then
+                                     not File_Exists (ABSPATH & "/wp-admin/sub_file"))
+                                 then
+                                    declare
+                                       Sub_Item_Url : Unbounded_String;
+                                    begin
+                                       -- If admin.php is the current page or if the
+                                       -- parent exists as a file in the plugins or
+                                       -- admin directory.
+                                       if
+                                         (not Admin_Is_Parent and then
+                                          File_Exists (WP_PLUGIN_DIR & "/menu_file") and then
+                                          not Is_Dir (WP_PLUGIN_DIR & "/" &
+                                                      (-Item.Menu_Slug))) or else
+                                          File_Exists (Menu_File)
+                                       then
+                                          Sub_Item_Url := Add_Query_Arg (
+                                             Arrays.To_Array ((1 =>
+                                                Build ("page", -Sub_Item.Menu_Slug))),
+                                                        Item.Menu_Slug);
+                                       else
+                                          Sub_Item_Url := Add_Query_Arg (
+                                             Arrays.To_Array ((1 =>
+                                                Build ("page", -Sub_Item.Menu_Slug))),
+                                                        +"admin.php");
+                                       end if;
+                                       Sub_Item_Url := +Esc_Url (-Sub_Item_Url);
+                                       Echo ("<liclass><a href=""" & (-Sub_Item_Url) &
+                                             """classaria_attributes>title</a></li>");
+                                    end;
+                                 else
+                                    Echo ("<liclass><a href=""" & (-Sub_Item.Menu_Slug) &
+                                          """classaria_attributes>title</a></li>");
+                                 end if;
+                              end;
                            end;
                         end;
-                     end;
-                     << Continue_1 >>
-                  end loop;
-                  echo ("</ul>");
-               end if;
-               echo ("</li>");
+                        << Continue_1 >>
+                     end loop;
+                     echo ("</ul>");
+                  end if;
+                  echo ("</li>");
+               end;
             end;
          end;
-      end;
-   end loop;
+      end loop;
 
-       Echo ("<li id=""collapse-menu"" class=""hide-if-no-js"">" &
-             "<button type=""button"" id=""collapse-button"" aria-label=""" &
-             Esc_Attr_X ("Collapse Main menu") & """ aria-expanded=""true"">" &
-             "<span class=""collapse-button-icon"" aria-hidden=""true""></span>" &
-             "<span class=""collapse-button-label"">"" " & abs "Collapse menu" &
-             "</span></button></li>");
+      Echo ("<li id=""collapse-menu"" class=""hide-if-no-js"">" &
+            "<button type=""button"" id=""collapse-button"" aria-label=""" &
+            Esc_Attr_X ("Collapse Main menu") & """ aria-expanded=""true"">" &
+            "<span class=""collapse-button-icon"" aria-hidden=""true""></span>" &
+            "<span class=""collapse-button-label"">"" " & abs "Collapse menu" &
+            "</span></button></li>");
    end X_Wp_Menu_Output;
 
    ------------

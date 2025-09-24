@@ -110,6 +110,6 @@ is
                                   return String
                                   is ("XXX-308");
 
-procedure Dummy;
+   procedure Dummy;
 
 end Adi_Plugins;

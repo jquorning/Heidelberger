@@ -125,9 +125,9 @@ is
 --
 -- @return bool Whether a header image is set or not.
 --
-function Has_Header_Image
-         return Boolean
-         is (True);
+   function Has_Header_Image
+            return Boolean
+            is (True);
 
 --
 -- Retrieves header image for custom header.

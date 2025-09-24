@@ -168,18 +168,10 @@ is
             Templates_Parser.Parse ("page/admin/credits.thtml",
                                     Translation,
                                     Lazy_Tag => Lazy'Unchecked_Access);
-         begin
-            null;
---            Printf (-Payload);
-            Clear_Echo;
-            Echo (-Payload);
---            return AWS.Response.Build ("text/html", Payload);
-         end;
---   exception
---      when Occurrence : others =>
---         Put_Line (Ada.Exceptions.Exception_Information (Occurrence));
---         raise;
-
+      begin
+         Clear_Echo;
+         Echo (-Payload);
+      end;
    end Render;
 
    ------------------

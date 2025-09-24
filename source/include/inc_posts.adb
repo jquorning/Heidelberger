@@ -3550,10 +3550,10 @@ is
                         --
                         Value_2 := Apply_Filters (-Field_No_Prefix & "_edit_pre",
                                                   Value_2, Post_Id);
-                else
+            else
                         Value_2 := Apply_Filters ("edit_post_" & Field,
                                                   Value_2, Post_Id);
-                end if;
+            end if;
 
                 -- if In_Array (Field, Format_To_Edit, True) then
                 --         if "post_content" = Field then
@@ -3564,7 +3564,7 @@ is
                 -- else
                 --         Value_2 := Esc_Attr (Value_2);
                 -- end if;
-        elsif "db" = Context then
+         elsif "db" = Context then
                 if Prefixed then
 
                         --
@@ -3606,7 +3606,7 @@ is
                         --
                         Value_2 := Apply_Filters (Field & "_pre", Value_2);
                 end if;
-        else
+         else
                 -- Use display filters by default.
                 if Prefixed then
 
@@ -3636,15 +3636,15 @@ is
                 -- elsif "js" = Context then
                 --         Value_2 := Esc_Js (Value_2);
                 -- end if;
-        end if;
+         end if;
 
         -- Restore the type for integer fields after esc_attr().
 --        if In_Array (Field, Int_Fields, True) then
 --                Value_2 := Integer (Value_2);
 --        end if;
-end;
-        return Value_2;
-end Sanitize_Post_Field;
+      end;
+      return Value_2;
+   end Sanitize_Post_Field;
 
 --
 -- Makes a post sticky.

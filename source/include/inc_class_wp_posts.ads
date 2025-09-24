@@ -38,10 +38,10 @@ is
 --
 -- #[AllowDynamicProperties]
 -- final class WP_Post {
-type Post_Id is new Natural;
+   type Post_Id is new Natural;
 
-type Wp_Post is tagged
-     record
+   type Wp_Post is tagged
+      record
         --
         -- Post ID.
         --

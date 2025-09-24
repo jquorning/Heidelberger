@@ -107,7 +107,7 @@ is
         --
         Filter : Unbounded_String := To_Unbounded_String ("raw");
 
-        end record;
+      end record;
 
    Null_Term : constant Wp_Term := (Term_Id => 0, Term_Group => 0,
                                     Term_Taxonomy_Id => 0, Parent => 0,
@@ -120,5 +120,6 @@ is
    subtype Wp_Term_Array is Term_Vectors.Vector;
    Empty_Term_Array : constant Wp_Term_Array := Term_Vectors.Empty_Vector;
 
-procedure Dummy;
+   procedure Dummy;
+
 end Inc_Class_Wp_Terms;

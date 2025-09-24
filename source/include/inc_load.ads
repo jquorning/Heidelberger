@@ -26,9 +26,9 @@ is
 --
 -- @return bool True if SSL, otherwise false.
 --
-function Is_Ssl
-         return Boolean
-         is (False);
+   function Is_Ssl
+            return Boolean
+            is (False);
 
 --
 -- Determines whether the current request is for an administrative interface page.

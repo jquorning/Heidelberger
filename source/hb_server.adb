@@ -58,7 +58,7 @@ package body HB_Server is
    -----------
    -- Start --
    -----------
-Program_Termination : exception;
+
    procedure Start
    is
       use Ada.Text_IO;

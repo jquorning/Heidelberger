@@ -14,18 +14,13 @@ project Heidelberger is
    for Exec_Dir use "bin";
    for Main use ("heidelberger.adb");
 
-   package Builder is
-      for Default_Switches ("Ada") use (
-         "-j1");
-   end Builder;
-
    package Compiler is
       for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
 --         "-gnatwa",
          "-gnatwA",
          "-gnatef",
          "-gnatf",
-         "-gnatyyM0C-l0r");
+         "-gnatyyM0C-0r");
    end Compiler;
 
    package Binder is

@@ -25,10 +25,10 @@ is
    --------------
 
 --        public function do_items( $handles = false, $group = false ) then
-        function Do_Items (This    : in out Wp_Dependencies;
-                           Handles : List_type := Empty_List; -- = false,
-                           Group   : Integer   := 0) --  = false
-                           return String_Array
+   function Do_Items (This    : in out Wp_Dependencies;
+                      Handles : List_type := Empty_List; -- = false,
+                      Group   : Integer   := 0) --  = false
+                      return String_Array
    is
       use List_Vectors;
                 --
@@ -433,8 +433,8 @@ is
 
           return This.All_Queued_Deps.Find (+Handle) /= List_Vectors.No_Element;
 --        return Isset (This.All_Queued_Deps (Handle));
-       end;
-    end Recurse_Deps;
+      end;
+   end Recurse_Deps;
 
    -----------
    -- Query --

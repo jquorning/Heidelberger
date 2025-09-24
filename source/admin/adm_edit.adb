@@ -660,7 +660,7 @@ is
                            if
                              Current_User_Can (Get (Post_Type_Object.Cap,
                                                     "create_posts"))
-                          then
+                           then
                               Insert (Translations, Assoc ("VAR_page_edit_h1_sub",
                                                            " <a href=""" & URL & """ class=""page-title-action"">" & HTML & "</a>"));
 

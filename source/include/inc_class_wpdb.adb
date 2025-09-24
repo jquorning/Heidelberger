@@ -827,9 +827,9 @@ is
       end if;
 
       -- If args were passed as an array (as in vsprintf), move them up.
-declare
-      Passed_As_Array : constant Boolean := False;
-begin
+      declare
+         Passed_As_Array : constant Boolean := False;
+      begin
 --                if (isset(args[0]) && is_array(args[0]) && 1 === count(args)) then
 --                        passed_as_array = true;
 --                        args            = args[0];
@@ -859,106 +859,107 @@ begin
       -- - Alignment specifier, e.g. %05-s
       -- - Precision specifier, e.g. %.2f
       --
-      declare
-         Allowed_Format : String
-            := "(?:[1-9][0-9]*[])?[-+0-9]*(?: |0|\'.)?[-+0-9]*(?:\.[0-9]+)?";
-         Query_2 : Unbounded_String;
-      begin
-         --
-         -- If a %s placeholder already has quotes around it, removing the existing quotes
-         -- and re-inserting them ensures the quotes are consistent.
-         --
-         -- For backward compatibility, this is only applied to %s, and not to placeholders like %1s,
-         -- which are frequently used in the middle of longer strings, or as table name placeholders.
-         --
-         Query_2 := +Str_Replace ("'%s'", "%s", Query);
-         -- Strip any existing single quotes.
+         declare
+            Allowed_Format : String :=
+               "(?:[1-9][0-9]*[])?[-+0-9]*(?: |0|\'.)?[-+0-9]*(?:\.[0-9]+)?";
+            Query_2 : Unbounded_String;
+         begin
+            --
+            -- If a %s placeholder already has quotes around it, removing the
+            -- existing quotes and re-inserting them ensures the quotes are consistent.
+            --
+            -- For backward compatibility, this is only applied to %s, and not to
+            -- placeholders like %1s, which are frequently used in the middle of
+            -- longer strings, or as table name placeholders.
+            --
+            Query_2 := +Str_Replace ("'%s'", "%s", Query);
+            -- Strip any existing single quotes.
 
-         Query_2 := +Str_Replace ("""%s""", "%s", -Query_2);
-         -- Strip any existing double quotes.
+            Query_2 := +Str_Replace ("""%s""", "%s", -Query_2);
+            -- Strip any existing double quotes.
 
-         Query_2 := +Preg_Replace ("/(?<!%)%s/", "'%s'", -Query_2);
-         -- Quote the strings, avoiding escaped strings like %%s.
+            Query_2 := +Preg_Replace ("/(?<!%)%s/", "'%s'", -Query_2);
+            -- Quote the strings, avoiding escaped strings like %%s.
 
-         Query_2 := +Preg_Replace ("/(?<!%)(%(allowed_format)?f)/", "%\\2F",
-                                   -Query_2);
-         -- Force floats to be locale-unaware.
+            Query_2 := +Preg_Replace ("/(?<!%)(%(allowed_format)?f)/", "%\\2F",
+                                      -Query_2);
+            -- Force floats to be locale-unaware.
 
-         Query_2 := +Preg_Replace ("/%(?:%||(?!(allowed_format)?[sdF]))/", "%%\\1",
-                                   -Query_2);
-         -- Escape any unescaped percents.
-declare
-         -- Count the number of valid placeholders in the query.
-         Matches : Array_Type;
-         Placeholders : constant Integer
-            := Preg_Match_All ("/(^|[^%]|(%%)+)%(allowed_format)?[sdF]/",
-                               -Query_2, Matches);
-         Args_Count : constant Integer := Count (Args);
-begin
-         if Args_Count /= Placeholders then
-            if 1 = placeholders and then Passed_As_Array then
-               -- If the passed query only expected one argument, but the wrong
-               -- number of arguments were sent as an array, bail.
-               Inc_Load.Wp_Load_Translations_Early; -- ();
-               X_Doing_It_Wrong
-                  ("wpdb::prepare",
-                   abs "The query only expected one placeholder, but an array of multiple placeholders was sent.",
-                   "4.9.0");
+            Query_2 := +Preg_Replace ("/%(?:%||(?!(allowed_format)?[sdF]))/",
+                                      "%%\\1", -Query_2);
+            -- Escape any unescaped percents.
+            declare
+               -- Count the number of valid placeholders in the query.
+               Matches : Array_Type;
+               Placeholders : constant Integer :=
+                  Preg_Match_All ("/(^|[^%]|(%%)+)%(allowed_format)?[sdF]/",
+                                  -Query_2, Matches);
+               Args_Count : constant Integer := Count (Args);
+            begin
+               if Args_Count /= Placeholders then
+                  if 1 = placeholders and then Passed_As_Array then
+                     -- If the passed query only expected one argument, but the wrong
+                     -- number of arguments were sent as an array, bail.
+                     Inc_Load.Wp_Load_Translations_Early; -- ();
+                     X_Doing_It_Wrong (
+                        "wpdb::prepare",
+                        abs "The query only expected one placeholder, but an array of multiple placeholders was sent.",
+                        "4.9.0");
 
-               return "";
-            else
-               --
-               -- If we don"t have the right number of placeholders,
-               -- but they were passed as individual arguments,
-               -- or we were expecting multiple arguments in an array, throw a warning.
-               --
-               Inc_Load.Wp_Load_Translations_Early; -- ();
-               X_Doing_It_Wrong
-                  ("wpdb::prepare",
-                   Sprintf (
-                      -- translators: 1: Number of placeholders, 2: Number of
-                      -- arguments passed.
-                      abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
-                      Placeholders'Image,
-                      Args_Count'Image
-                    ),
-                   "4.8.3");
+                     return "";
+                  else
+                     --
+                     -- If we don"t have the right number of placeholders,
+                     -- but they were passed as individual arguments,
+                     -- or we were expecting multiple arguments in an array, throw
+                     -- a warning.
+                     --
+                     Inc_Load.Wp_Load_Translations_Early; -- ();
+                     X_Doing_It_Wrong (
+                        "wpdb::prepare",
+                        Sprintf (
+                           -- translators: 1: Number of placeholders, 2: Number of
+                           -- arguments passed.
+                           abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
+                           Placeholders'Image,
+                           Args_Count'Image),
+                        "4.8.3");
 
-               --
-               -- If we don"t have enough arguments to match the placeholders,
-               -- return an empty string to avoid a fatal error on PHP 8.
-               --
-               if Args_Count < Placeholders then
-                  declare
-                     use Array_Vectors;
+                     --
+                     -- If we don"t have enough arguments to match the placeholders,
+                     -- return an empty string to avoid a fatal error on PHP 8.
+                     --
+                     if Args_Count < Placeholders then
+                        declare
+                           use Array_Vectors;
 
-                     Max_Numbered_Placeholder : constant Integer
-                        := (if Element (Matches, 3) /= (+"", +"") -- not in 0  -- not empty
-                            then Max (Array_Map
+                           Max_Numbered_Placeholder : constant Integer :=
+                             (if Element (Matches, 3) /= (+"", +"") -- not in 0  -- not empty
+                              then Max (Array_Map
                                        ("intval",
                                         Empty_Array & Matches (3)))
 --              Table => To_Array (List => (1 => Build (Element (Matches, 3)))))
-                            else 0);
-                  begin
-                     if
-                       Max_Numbered_Placeholder = 0 or else -- not
-                       Args_Count < Max_Numbered_Placeholder
-                     then
-                        return "";
+                              else 0);
+                        begin
+                           if
+                             Max_Numbered_Placeholder = 0 or else -- not
+                             Args_Count < Max_Numbered_Placeholder
+                           then
+                              return "";
+                           end if;
+                        end;
                      end if;
-                  end;
+                  end if;
                end if;
-            end if;
-         end if;
 
---         Array_Walk (Args, Func"Access);
-         -- To_Array (Db, "escape_by_ref"));
+--             Array_Walk (Args, Func"Access);
+--             To_Array (Db, "escape_by_ref"));
 
-         Query_2 := +Vsprintf (-Query_2, Args);
+               Query_2 := +Vsprintf (-Query_2, Args);
 
-         return Db.Add_Placeholder_Escape (-Query_2);
-      end;
-      end;
+               return Db.Add_Placeholder_Escape (-Query_2);
+            end;
+         end;
       end;
    end Prepare;
 
@@ -2650,7 +2651,7 @@ begin
       if
         0 /= Preg_Match ("/^(?:SHOW|DESCRIBE|DESC|EXPLAIN|CREATE)\s/i",
                          Query_2, Unused_Matches)
-       then
+      then
          return True;
       end if;
 

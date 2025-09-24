@@ -563,7 +563,7 @@ is
                            --    Array_Splice (Grandparent.Children, Index, 1,
                            --                  To_Array (Container));
                            -- end if;
-                     end if;
+                        end if;
                      end;
 
                      parent.parent := container.id;

@@ -57,9 +57,9 @@ is
               not Inc_Load.Is_Admin and then
 --              Function_Exists ("current_theme_supports") and then
               not Inc_Themes.Current_Theme_Supports ("html5", "script")
-            then
-               This.Type_Attr := +" type=""text/javascript""";
-            end if;
+           then
+              This.Type_Attr := +" type=""text/javascript""";
+           end if;
 
             --
             -- Fires when the WP_Scripts instance is initialized.
@@ -212,85 +212,85 @@ is
             Unused_Matches : Array_Type;
          begin
 
-               if Before_Handle /= "" then
-                  Before_Handle :=
-                     +Sprintf ("<script%s id=""%s-js-before"">\n%s\n</script>\n",
-                               -This.Type_Attr, Esc_Attr (Handle), -Before_Handle);
+            if Before_Handle /= "" then
+               Before_Handle :=
+                  +Sprintf ("<script%s id=""%s-js-before"">\n%s\n</script>\n",
+                            -This.Type_Attr, Esc_Attr (Handle), -Before_Handle);
+            end if;
+
+            if After_Handle /= "" then
+               After_Handle :=
+                  +Sprintf ("<script%s id=""%s-js-after"">\n%s\n</script>\n",
+                            -This.Type_Attr, Esc_Attr (Handle), -After_Handle);
+            end if;
+
+            declare
+               Inline_Script_Tag : Unbounded_String;
+            begin
+               if Before_Handle /= "" or else After_Handle /= "" then
+                  Inline_Script_Tag :=
+                     Cond_Before & Before_Handle & After_Handle & Cond_After;
+               else
+                  Inline_Script_Tag := +"";
                end if;
 
-               if After_Handle /= "" then
-                  After_Handle :=
-                     +Sprintf ("<script%s id=""%s-js-after"">\n%s\n</script>\n",
-                               -This.Type_Attr, Esc_Attr (Handle), -After_Handle);
-               end if;
-
+               --
+               -- Prevent concatenation of scripts if the text domain is defined
+               -- to ensure the dependency order is respected.
+               --
+               Label_1 :
                declare
-                  Inline_Script_Tag : Unbounded_String;
+                  Translations_Stop_Concat : constant Boolean :=
+                     Obj.Textdomain /= "";
+
+                  Translations : Unbounded_String :=
+                     +This.Print_Translations (Handle, False);
                begin
-                  if Before_Handle /= "" or else After_Handle /= "" then
-                     Inline_Script_Tag :=
-                        Cond_Before & Before_Handle & After_Handle & Cond_After;
-                  else
-                     Inline_Script_Tag := +"";
+                  if Translations /= "" then
+                     Translations := +Sprintf (
+                        "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
+                        -this.Type_attr, Esc_Attr (Handle), -Translations);
                   end if;
 
-                  --
-                  -- Prevent concatenation of scripts if the text domain is defined
-                  -- to ensure the dependency order is respected.
-                  --
-                  Label_1 :
-                  declare
-                     Translations_Stop_Concat : constant Boolean :=
-                        Obj.Textdomain /= "";
+                  if This.Do_Concat then
+                     --
+                     -- Filters the script loader source.
+                     --
+                     -- @since 2.2.0
+                     --
+                     -- @param string src    Script loader source path.
+                     -- @param string handle Script handle.
+                     --
+                     declare
+                        Srce : constant String :=
+                           Apply_Filters ("script_loader_src", -Src, Handle);
+                     begin
+                        if
+                          This.In_Default_Dir (Srce) and then
+                          (Before_Handle /= "" or else After_Handle /= "" or else
+                          Translations_Stop_Concat)
+                        then
+                           This.Do_Concat := False;
 
-                     Translations : Unbounded_String :=
-                        +This.Print_Translations (Handle, False);
-                  begin
-                     if Translations /= "" then
-                        Translations := +Sprintf (
-                           "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                           -this.Type_attr, Esc_Attr (Handle), -Translations);
-                     end if;
-
-                     if This.Do_Concat then
-                        --
-                        -- Filters the script loader source.
-                        --
-                        -- @since 2.2.0
-                        --
-                        -- @param string src    Script loader source path.
-                        -- @param string handle Script handle.
-                        --
-                        declare
-                           Srce : constant String :=
-                              Apply_Filters ("script_loader_src", -Src, Handle);
-                        begin
-                           if
-                             This.In_Default_Dir (Srce) and then
-                             (Before_Handle /= "" or else After_Handle /= "" or else
-                             Translations_Stop_Concat)
-                           then
-                              This.Do_Concat := False;
-
-                              -- Have to print the so-far concatenated scripts right
-                              -- away to maintain the right order.
-                              Inc_Script_Loader.X_Print_Scripts; -- ();
-                              This.Reset; -- ();
-                           elsif
-                             This.In_Default_Dir (Srce) and then
-                             Conditional
-                           then
-                              Append (This.Print_Code,
-                                      This.Print_Extra_Script (Handle, False));
-                              Append (This.Concat,         "handle,");
-                              Append (This.Concat_Version, "handlever");
-                              return True;
-                           else
-                              Append (This.Ext_Handles, "handle,");
-                              Append (This.Ext_Version, "handlever");
-                           end if;
-                        end;
-                     end if;
+                           -- Have to print the so-far concatenated scripts right
+                           -- away to maintain the right order.
+                           Inc_Script_Loader.X_Print_Scripts; -- ();
+                           This.Reset; -- ();
+                        elsif
+                          This.In_Default_Dir (Srce) and then
+                          Conditional
+                        then
+                           Append (This.Print_Code,
+                                   This.Print_Extra_Script (Handle, False));
+                           Append (This.Concat,         "handle,");
+                           Append (This.Concat_Version, "handlever");
+                           return True;
+                        else
+                           Append (This.Ext_Handles, "handle,");
+                           Append (This.Ext_Version, "handlever");
+                        end if;
+                     end;
+                  end if;
 
                   declare
                      Unused : Unbounded_String;
@@ -321,58 +321,62 @@ is
                      end if;
                      return True;
                   end if;
---               end;
 
-            if
-              0 /= Preg_Match ("|^(https?:)?//|", -Src, Unused_Matches) and then
-              not (This.Content_Url /= "" and then
-                   0 = Strpos (-Src, -This.Content_Url))
-            then
-               Src := This.Base_Url & Src;
-            end if;
+                  if
+                    0 /= Preg_Match ("|^(https?:)?//|", -Src, Unused_Matches)
+                    and then not (This.Content_Url /= "" and then
+                    0 = Strpos (-Src, -This.Content_Url))
+                  then
+                     Src := This.Base_Url & Src;
+                  end if;
 
-            if not Empty (-Ver) then
-               Src := +Add_Query_Arg ("ver", -Ver, -Src);
-            end if;
+                  if not Empty (-Ver) then
+                     Src := +Add_Query_Arg ("ver", -Ver, -Src);
+                  end if;
 
-            -- This filter is documented in wp-includes/class-wp-scripts.php--
-            Src := +Esc_Url (Apply_Filters ("script_loader_src", -Src, Handle));
+                  -- This filter is documented in wp-includes/class-wp-scripts.php
+                  Src := +Esc_Url (Apply_Filters ("script_loader_src", -Src,
+                                                  Handle));
 
-            if Src = "" then
-               return True;
-            end if;
+                  if Src = "" then
+                     return True;
+                  end if;
 
-            declare
-               Tag : Unbounded_String := Translations & Cond_Before & Before_Handle;
-            begin
-               Append (Tag, Sprintf ("<script%s src=""%s"" id=""%s-js""></script>\n",
-                                     -This.Type_Attr, -Src, Esc_Attr (Handle)));
-               Append (Tag, After_Handle & Cond_After);
+                  declare
+                     Tag : Unbounded_String :=
+                        Translations & Cond_Before & Before_Handle;
+                  begin
+                     Append (Tag,
+                        Sprintf ("<script%s src=""%s"" id=""%s-js""></script>\n",
+                                 -This.Type_Attr, -Src, Esc_Attr (Handle)));
+                     Append (Tag, After_Handle & Cond_After);
 
-               --
-               -- Filters the HTML script tag of an enqueued script.
-               --
-               -- @since 4.1.0
-               --
-               -- @param string tag    The `<script>` tag for the enqueued script.
-               -- @param string handle The script"s registered handle.
-               -- @param string src    The script"s source URL.
-               --
-               Tag := +Apply_Filters ("script_loader_tag", -Tag, Handle, -Src);
+                     --
+                     -- Filters the HTML script tag of an enqueued script.
+                     --
+                     -- @since 4.1.0
+                     --
+                     -- @param string tag    The `<script>` tag for the enqueued
+                     --                      script.
+                     -- @param string handle The script"s registered handle.
+                     -- @param string src    The script"s source URL.
+                     --
+                     Tag := +Apply_Filters
+                        ("script_loader_tag", -Tag, Handle, -Src);
 
-               if This.Do_Concat then
-                  Append (This.Print_Html, Tag);
-               else
-                  Echo (-Tag);
-               end if;
+                     if This.Do_Concat then
+                        Append (This.Print_Html, Tag);
+                     else
+                        Echo (-Tag);
+                     end if;
+                  end;
+               end Label_1;
             end;
-            end Label_1;
-         end;
-      end Label_2;
+         end Label_2;
 
          return True;
-       end;
-    end Do_Item;
+      end;
+   end Do_Item;
 
    -----------------------
    -- Add_Inline_Script --

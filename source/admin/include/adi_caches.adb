@@ -34,17 +34,17 @@ is
 -- wp_cache_add --
 ------------------
 
-procedure Wp_Cache_Add (Key    : String;
-                        Data   : Inc_Class_Wp_Posts.Wp_Post;  --- String;
-                        Group  : String  := "";
-                        Expire : Integer := 0)
-is
+   procedure Wp_Cache_Add (Key    : String;
+                           Data   : Inc_Class_Wp_Posts.Wp_Post;  --- String;
+                           Group  : String  := "";
+                           Expire : Integer := 0)
+   is
 --        global $wp_object_cache;
-begin
-   null;
+   begin
+      null;
 
 --        return $wp_object_cache->add( $key, $data, $group, (int) $expire );
-end Wp_Cache_Add;
+   end Wp_Cache_Add;
 
 --
 -- Adds multiple values to the cache in one call.
@@ -147,19 +147,19 @@ end Wp_Cache_Add;
 --                        Force : Boolean := False;
 --                        found : out Boolean)
 --                        return String
-procedure Wp_Cache_Get (Key   : String;
-                        Group : String  := "";
-                        Post  : Inc_Class_Wp_Posts.Wp_Post;
-                        Force : Boolean := False;
---                        found : out Boolean
-                        Success : out Boolean)
---                        return String
-is
+   procedure Wp_Cache_Get (Key   : String;
+                           Group : String  := "";
+                           Post  : Inc_Class_Wp_Posts.Wp_Post;
+                           Force : Boolean := False;
+--                         found : out Boolean
+                           Success : out Boolean)
+--                         return String
+   is
 --        global $wp_object_cache;
-begin
+   begin
           null;
 --        return $wp_object_cache->get( $key, $group, $force, $found );
-end Wp_Cache_Get;
+   end Wp_Cache_Get;
 
 --
 -- Retrieves multiple values from the cache in one call.
