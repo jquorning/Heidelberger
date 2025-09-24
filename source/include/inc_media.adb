@@ -40,7 +40,7 @@ is
 -- -- than the supported will result in the content_width size or 500 if that is
 -- -- not set.
 -- --
--- -- Finally, there is a filter named then@see "editor_max_image_size"end;, that will be
+-- -- Finally, there is a filter named {@see "editor_max_image_size"}, that will be
 -- -- called on the calculated array for width and height, respectively.
 -- --
 -- -- @since 2.5.0
@@ -173,7 +173,7 @@ is
 -- -- function won"t create a new resized copy, it will just return an already
 -- -- resized one if it exists.
 -- --
--- -- A plugin may use the then@see "image_downsize"end; filter to hook into and offer image
+-- -- A plugin may use the {@see "image_downsize"} filter to hook into and offer image
 -- -- resizing services for images. The hook must return an array with the same
 -- -- elements that are normally returned from the function.
 -- --
@@ -354,12 +354,12 @@ is
 -- --
 -- -- Gets an img tag for an image attachment, scaling it down if requested.
 -- --
--- -- The then@see "get_image_tag_class"end; filter allows for changing the class name for the
+-- -- The {@see "get_image_tag_class"} filter allows for changing the class name for the
 -- -- image without having to use regular expressions on the HTML content. The
 -- -- parameters are: what WordPress will use for the class, the Attachment ID,
 -- -- image align value, and the size the image should be.
 -- --
--- -- The second filter, then@see "get_image_tag"end;, has the HTML content, which can then be
+-- -- The second filter, {@see "get_image_tag"}, has the HTML content, which can then be
 -- -- further manipulated by a plugin to change all attribute values and even HTML
 -- -- content.
 -- --
@@ -664,7 +664,7 @@ is
 -- -- Resizes an image to make a thumbnail or intermediate size.
 -- --
 -- -- The returned array has the file size, the image width, and image height. The
--- -- then@see "image_make_intermediate_size"end; filter can be used to hook in and change the
+-- -- {@see "image_make_intermediate_size"} filter can be used to hook in and change the
 -- -- values of the returned array. The only parameter is the resized file path.
 -- --
 -- -- @since 2.5.0
@@ -1954,7 +1954,7 @@ is
 -- -- main thread (`sync`) or as determined by the browser (`auto`).
 -- --
 -- -- By default WordPress adds `decoding="async"` to images but developers
--- -- can use the then@see "wp_img_tag_add_decoding_attr"end; filter to modify this
+-- -- can use the {@see "wp_img_tag_add_decoding_attr"} filter to modify this
 -- -- to remove the attribute or set it to another accepted value.
 -- --
 -- -- @since 6.1.0
@@ -2127,7 +2127,7 @@ is
 -- --
 -- -- Adds a "wp-post-image" class to post thumbnails. Internal use only.
 -- --
--- -- Uses the then@see "begin_fetch_post_thumbnail_html"end; and then@see "end_fetch_post_thumbnail_html"end;
+-- -- Uses the {@see "begin_fetch_post_thumbnail_html"} and {@see "end_fetch_post_thumbnail_html"}
 -- -- action hooks to dynamically add/remove itself so as to only filter post thumbnails.
 -- --
 -- -- @ignore
@@ -2174,7 +2174,7 @@ is
 -- -- Builds the Caption shortcode output.
 -- --
 -- -- Allows a plugin to replace the content that would otherwise be returned. The
--- -- filter is then@see "img_caption_shortcode"end; and passes an empty string, the attr
+-- -- filter is {@see "img_caption_shortcode"} and passes an empty string, the attr
 -- -- parameter and the content parameter values.
 -- --
 -- -- The supported attributes for the shortcode are "id", "caption_id", "align",
@@ -5446,10 +5446,10 @@ is
 -- -- omitted on the element. The purpose of this refinement is to avoid lazy-loading elements that are within the initial
 -- -- viewport, which can have a negative performance impact.
 -- --
--- -- Under the hood, the function uses then@see wp_increase_content_media_count()end; every time it is called for an element
+-- -- Under the hood, the function uses {@see wp_increase_content_media_count()} every time it is called for an element
 -- -- within the main content. If the element is the very first content element, the `loading` attribute will be omitted.
 -- -- This default threshold of 1 content element to omit the `loading` attribute for can be customized using the
--- -- then@see "wp_omit_loading_attr_threshold"end; filter.
+-- -- {@see "wp_omit_loading_attr_threshold"} filter.
 -- --
 -- -- @since 5.9.0
 -- --
@@ -5483,7 +5483,7 @@ is
 -- --
 -- -- Gets the threshold for how many of the first content media elements to not lazy-load.
 -- --
--- -- This function runs the then@see "wp_omit_loading_attr_threshold"end; filter, which uses a default threshold value of 1.
+-- -- This function runs the {@see "wp_omit_loading_attr_threshold"} filter, which uses a default threshold value of 1.
 -- -- The filter is only run once per page load, unless the `force` parameter is used.
 -- --
 -- -- @since 5.9.0

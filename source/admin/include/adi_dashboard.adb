@@ -1607,11 +1607,11 @@ is
 -- --
 -- -- Displays file upload quota on dashboard.
 -- --
--- -- Runs on the then@see "activity_box_end"end; hook in wp_dashboard_right_now().
+-- -- Runs on the {@see "activity_box_end"} hook in wp_dashboard_right_now().
 -- --
 -- -- @since 3.0.0
 -- --
--- -- @return true|void True if not multisite, user can"t upload files, or the space check option is disabled.
+-- -- @return true|void True if not multisite, user can't upload files, or the space check option is disabled.
 -- --
 -- function wp_dashboard_quota() then
 --         if ( ! is_multisite() || ! current_user_can( "upload_files" )

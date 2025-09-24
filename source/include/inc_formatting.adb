@@ -2115,7 +2115,7 @@ is
 -- -- Removes tags, octets, entities, and if strict is enabled, will only keep
 -- -- alphanumeric, _, space, ., -, @. After sanitizing, it passes the username,
 -- -- raw username (the username in the parameter), and the value of strict as
--- -- parameters for the then@see "sanitize_user"end; filter.
+-- -- parameters for the {@see "sanitize_user"} filter.
 -- --
 -- -- @since 2.0.0
 -- --
@@ -2189,7 +2189,7 @@ is
 -- --
 -- -- By default, converts accent characters to ASCII characters and further
 -- -- limits the output to alphanumeric characters, underscore (_) and dash (-)
--- -- through the then@see "sanitize_title"end; filter.
+-- -- through the {@see "sanitize_title"} filter.
 -- --
 -- -- If `title` is empty and `fallback_title` is set, the latter will be used.
 -- --
@@ -2715,7 +2715,7 @@ is
 -- --
 -- -- The content is run through esc_textarea(), which uses htmlspecialchars()
 -- -- to convert special characters to HTML entities. If `richedit` is set to true,
--- -- it is simply a holder for the then@see "format_to_edit"end; filter.
+-- -- it is simply a holder for the {@see "format_to_edit"} filter.
 -- --
 -- -- @since 0.71
 -- -- @since 4.4.0 The `richedit` parameter was renamed to `rich_text` for clarity.
@@ -3888,8 +3888,8 @@ is
 -- --
 -- -- Returns a maximum of 55 words with an ellipsis appended if necessary.
 -- --
--- -- The 55 word limit can be modified by plugins/themes using the then@see "excerpt_length"end; filter
--- -- The " [&hellip;]" string can be modified by plugins/themes using the then@see "excerpt_more"end; filter
+-- -- The 55 word limit can be modified by plugins/themes using the {@see "excerpt_length"} filter
+-- -- The " [&hellip;]" string can be modified by plugins/themes using the {@see "excerpt_more"} filter
 -- --
 -- -- @since 1.5.0
 -- -- @since 5.2.0 Added the `post` parameter.
@@ -4298,7 +4298,7 @@ is
 -- -- Generally the browsers treat everything inside a textarea as text, but
 -- -- it is still a good idea to HTML entity encode `<`, `>` and `&` in the content.
 -- --
--- -- The filter then@see "format_for_editor"end; is applied here. If `text` is empty the
+-- -- The filter {@see "format_for_editor"} is applied here. If `text` is empty the
 -- -- filter will be applied to an empty string.
 -- --
 -- -- @since 4.3.0
@@ -4381,7 +4381,7 @@ is
 -- -- Checks and cleans a URL.
 -- --
 -- -- A number of characters are removed from the URL. If the URL is for displaying
--- -- (the default behaviour) ampersands are also replaced. The then@see "clean_url"end; filter
+-- -- (the default behaviour) ampersands are also replaced. The {@see "clean_url"} filter
 -- -- is applied to the returned cleaned URL.
 -- --
 -- -- @since 2.8.0
@@ -4390,7 +4390,7 @@ is
 -- -- @param string[] protocols Optional. An array of acceptable protocols.
 -- --                            Defaults to return value of wp_allowed_protocols().
 -- -- @param string   _context  Private. Use sanitize_url() for database usage.
--- -- @return string The cleaned URL after the then@see "clean_url"end; filter is applied.
+-- -- @return string The cleaned URL after the {@see "clean_url"} filter is applied.
 -- --                An empty string is returned if `url` specifies a protocol other than
 -- --                those in `protocols`, or if `url` contains an empty string.
 -- --
@@ -4550,7 +4550,7 @@ is
 -- --
 -- -- Escapes text strings for echoing in JS. It is intended to be used for inline JS
 -- -- (in a tag attribute, for example `onclick="..."`). Note that the strings have to
--- -- be in single quotes. The then@see "js_escape"end; filter is also applied here.
+-- -- be in single quotes. The {@see "js_escape"} filter is also applied here.
 -- --
 -- -- @since 2.8.0
 -- --
@@ -5989,7 +5989,7 @@ is
 --         -- We can only transform the emoji into images if it"s a `text/html` email.
 --         -- To do that, here"s a cut down version of the same process that happens
 --         -- in wp_mail() - get the `Content-Type` from the headers, if there is one,
---         -- then pass it through the then@see "wp_mail_content_type"end; filter, in case
+--         -- then pass it through the {@see "wp_mail_content_type"} filter, in case
 --         -- a plugin is handling changing the `Content-Type`.
 --         --
 --         headers = array();

@@ -83,7 +83,7 @@ is
 --                         -- Filters the number of terms displayed per page for the Tags list table.
 --                         --
 --                         -- @since 2.7.0
---                         -- @deprecated 2.8.0 Use then@see "edit_tags_per_page"end; instead.
+--                         -- @deprecated 2.8.0 Use {@see "edit_tags_per_page"} instead.
 --                         --
 --                         -- @param int tags_per_page Number of tags to be displayed. Default 20.
 --                         --
@@ -498,7 +498,7 @@ is
 --                 -- Filters the action links displayed for each term in the Tags list table.
 --                 --
 --                 -- @since 2.8.0
---                 -- @since 3.0.0 Deprecated in favor of then@see "thentaxonomyend;_row_actions"end; filter.
+--                 -- @since 3.0.0 Deprecated in favor of {@see "{taxonomy}_row_actions"} filter.
 --                 -- @since 5.4.2 Restored (un-deprecated).
 --                 --
 --                 -- @param string[] actions An array of action links to be displayed. Default

@@ -52,7 +52,7 @@ is
         --     exit;
         --
         -- Exiting can also be selectively manipulated by using wp_redirect() as a conditional
-        -- in conjunction with the then@see 'wp_redirect'end; and then@see 'wp_redirect_location'end; filters:
+        -- in conjunction with the {@see 'wp_redirect'} and {@see 'wp_redirect_location'} filters:
         --
         --     if ( wp_redirect( url ) ) then
         --         exit;
@@ -140,7 +140,7 @@ is
         --     exit;
         --
         -- Exiting can also be selectively manipulated by using wp_safe_redirect() as a conditional
-        -- in conjunction with the then@see 'wp_redirect'end; and then@see 'wp_redirect_location'end; filters:
+        -- in conjunction with the {@see 'wp_redirect'} and {@see 'wp_redirect_location'} filters:
         --
         --     if ( wp_safe_redirect( url ) ) then
         --         exit;

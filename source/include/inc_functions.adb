@@ -3334,7 +3334,7 @@ is
 --         -- Filters the list of mime types and file extensions.
 --         --
 --         -- This filter should be used to add, not remove, mime types. To remove
---         -- mime types, use the then@see 'upload_mimes'end; filter.
+--         -- mime types, use the {@see 'upload_mimes'} filter.
 --         --
 --         -- @since 3.5.0
 --         --
@@ -3726,7 +3726,7 @@ is
 -- Kills WordPress execution and displays HTML page with an error message.
 --
 -- This is the default handler for wp_die(). If you want a custom one,
--- you can override this using the then@see 'wp_die_handler'end; filter in wp_die().
+-- you can override this using the {@see 'wp_die_handler'} filter in wp_die().
 --
 -- @since 3.0.0
 -- @access private
@@ -5363,7 +5363,7 @@ is
 --
 -- Marks a function as deprecated and inform when it has been used.
 --
--- There is a hook then@see 'deprecated_function_run'end; that will be called that can be used
+-- There is a hook {@see 'deprecated_function_run'} that will be called that can be used
 -- to get the backtrace up to what file and function called the deprecated
 -- function.
 --
@@ -5548,7 +5548,7 @@ is
 --
 -- Marks a file as deprecated and inform when it has been used.
 --
--- There is a hook then@see 'deprecated_file_included'end; that will be called that can be used
+-- There is a hook {@see 'deprecated_file_included'} that will be called that can be used
 -- to get the backtrace up to what file and function included the deprecated
 -- file.
 --
@@ -5736,7 +5736,7 @@ is
 --
 -- Marks a deprecated action or filter hook as deprecated and throws a notice.
 --
--- Use the then@see 'deprecated_hook_run'end; action to get the backtrace describing where
+-- Use the {@see 'deprecated_hook_run'} action to get the backtrace describing where
 -- the deprecated hook was called.
 --
 -- Default behavior is to trigger a user error if `WP_DEBUG` is true.
@@ -5805,7 +5805,7 @@ is
 --
 -- Marks something as being incorrectly called.
 --
--- There is a hook then@see 'doing_it_wrong_run'end; that will be called that can be used
+-- There is a hook {@see 'doing_it_wrong_run'} that will be called that can be used
 -- to get the backtrace up to what file and function called the deprecated
 -- function.
 --
@@ -6649,7 +6649,7 @@ is
 --
 -- @param string $file            Absolute path to the file.
 -- @param array  $default_headers List of headers, in the format `array( 'HeaderKey' => 'Header Name' )`.
--- @param string $context         Optional. If specified adds filter hook then@see 'extra_$context_headers'end;.
+-- @param string $context         Optional. If specified adds filter hook {@see 'extra_$context_headers'}.
 --                                Default empty.
 -- @return string[] Array of file header values keyed by header name.
 --
@@ -7100,7 +7100,7 @@ is
 -- Can be disabled with remove_action( 'admin_enqueue_scripts', 'wp_auth_check_load' );
 --
 -- This is disabled for certain screens where a login screen could cause an
--- inconvenient interruption. A filter called then@see 'wp_auth_check_load'end; can be used
+-- inconvenient interruption. A filter called {@see 'wp_auth_check_load'} can be used
 -- for fine-grained control.
 --
 -- @since 3.6.0
@@ -7461,7 +7461,7 @@ is
 --
 -- @param string $context Optional. Context in which the function is called. Accepts either 'admin',
 --                        'image', or an arbitrary other context. If an arbitrary context is passed,
---                        the similarly arbitrary then@see '$context_memory_limit'end; filter will be
+--                        the similarly arbitrary {@see '$context_memory_limit'} filter will be
 --                        invoked. Default 'admin'.
 -- @return int|string|false The limit that was set or false on failure.
 --
@@ -7976,7 +7976,7 @@ is
 -- Gets the URL to learn more about updating the PHP version the site is running on.
 --
 -- This URL can be overridden by specifying an environment variable `WP_UPDATE_PHP_URL` or by using the
--- then@see 'wp_update_php_url'end; filter. Providing an empty string is not allowed and will result in the
+-- {@see 'wp_update_php_url'} filter. Providing an empty string is not allowed and will result in the
 -- default URL being used. Furthermore the page the URL links to should preferably be localized in the
 -- site language.
 --
@@ -8014,7 +8014,7 @@ is
 --
 -- Gets the default URL to learn more about updating the PHP version the site is running on.
 --
--- Do not use this function to retrieve this URL. Instead, use then@see wp_get_update_php_url()end; when relying on the URL.
+-- Do not use this function to retrieve this URL. Instead, use {@see wp_get_update_php_url()} when relying on the URL.
 -- This function does not allow modifying the returned URL, and is only used to compare the actually used URL with the
 -- default one.
 --
@@ -8030,7 +8030,7 @@ is
 --
 -- Prints the default annotation for the web host altering the "Update PHP" page URL.
 --
--- This function is to be used after then@see wp_get_update_php_url()end; to display a consistent
+-- This function is to be used after {@see wp_get_update_php_url()} to display a consistent
 -- annotation if the web host has altered the default "Update PHP" page URL.
 --
 -- @since 5.1.0
@@ -8050,7 +8050,7 @@ is
 --
 -- Returns the default annotation for the web hosting altering the "Update PHP" page URL.
 --
--- This function is to be used after then@see wp_get_update_php_url()end; to return a consistent
+-- This function is to be used after {@see wp_get_update_php_url()} to return a consistent
 -- annotation if the web host has altered the default "Update PHP" page URL.
 --
 -- @since 5.2.0
@@ -8078,7 +8078,7 @@ is
 -- Gets the URL for directly updating the PHP version the site is running on.
 --
 -- A URL will only be returned if the `WP_DIRECT_UPDATE_PHP_URL` environment variable is specified or
--- by using the then@see 'wp_direct_php_update_url'end; filter. This allows hosts to send users directly to
+-- by using the {@see 'wp_direct_php_update_url'} filter. This allows hosts to send users directly to
 -- the page where they can update PHP to a newer version.
 --
 -- @since 5.1.1
@@ -8135,7 +8135,7 @@ is
 -- Gets the URL to learn more about updating the site to use HTTPS.
 --
 -- This URL can be overridden by specifying an environment variable `WP_UPDATE_HTTPS_URL` or by using the
--- then@see 'wp_update_https_url'end; filter. Providing an empty string is not allowed and will result in the
+-- {@see 'wp_update_https_url'} filter. Providing an empty string is not allowed and will result in the
 -- default URL being used. Furthermore the page the URL links to should preferably be localized in the
 -- site language.
 --
@@ -8172,7 +8172,7 @@ is
 --
 -- Gets the default URL to learn more about updating the site to use HTTPS.
 --
--- Do not use this function to retrieve this URL. Instead, use then@see wp_get_update_https_url()end; when relying on the URL.
+-- Do not use this function to retrieve this URL. Instead, use {@see wp_get_update_https_url()} when relying on the URL.
 -- This function does not allow modifying the returned URL, and is only used to compare the actually used URL with the
 -- default one.
 --
@@ -8190,7 +8190,7 @@ is
 -- Gets the URL for directly updating the site to use HTTPS.
 --
 -- A URL will only be returned if the `WP_DIRECT_UPDATE_HTTPS_URL` environment variable is specified or
--- by using the then@see 'wp_direct_update_https_url'end; filter. This allows hosts to send users directly to
+-- by using the {@see 'wp_direct_update_https_url'} filter. This allows hosts to send users directly to
 -- the page where they can update their site to use HTTPS.
 --
 -- @since 5.7.0

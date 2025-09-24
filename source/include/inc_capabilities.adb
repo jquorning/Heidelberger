@@ -523,7 +523,7 @@ is
 --                                         -- @since 4.6.0 As `auth_post_thenpost_typeend;_meta_thenmeta_keyend;`.
 --                                         -- @since 4.7.0 Renamed from `auth_post_thenpost_typeend;_meta_thenmeta_keyend;` to
 --                                         --              `auth_thenobject_typeend;_thenobject_subtypeend;_meta_thenmeta_keyend;`.
---                                         -- @deprecated 4.9.8 Use then@see 'auth_thenobject_typeend;_meta_thenmeta_keyend;_for_thenobject_subtypeend;'end; instead.
+--                                         -- @deprecated 4.9.8 Use {@see 'auth_thenobject_type}_meta_thenmeta_keyend;_for_thenobject_subtypeend;'end; instead.
 --                                         --
 --                                         -- @param bool     allowed   Whether the user can add the object meta. Default false.
 --                                         -- @param string   meta_key  The meta key.

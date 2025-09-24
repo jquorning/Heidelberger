@@ -33,7 +33,7 @@ is
 -- - "charset" - The "Encoding for pages and feeds"  (set in Settings > Reading)
 -- - "version" - The current WordPress version
 -- - "html_type" - The content-type (default: "text/html"). Themes and plugins
---   can override the default value using the then@see "pre_option_html_type"end; filter
+--   can override the default value using the {@see "pre_option_html_type"} filter
 -- - "text_direction" - The text direction determined by the site"s language. is_rtl()
 --   should be used instead
 -- - "language" - Language code for the current site

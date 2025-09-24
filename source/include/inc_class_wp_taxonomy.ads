@@ -229,7 +229,7 @@ is
         --
         -- The controller instance for this taxonomy's REST API endpoints.
         --
-        -- Lazily computed. Should be accessed using then@see WP_Taxonomy::get_rest_controller()end;.
+        -- Lazily computed. Should be accessed using {@see WP_Taxonomy::get_rest_controller()}.
         --
         -- @since 5.5.0
         -- @var WP_REST_Controller rest_controller

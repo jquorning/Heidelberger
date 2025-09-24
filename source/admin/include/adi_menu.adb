@@ -298,7 +298,7 @@ is
       --
       -- Filters whether to enable custom ordering of the administration menu.
       --
-      -- See the then@see "menu_order"end; filter for reordering menu items.
+      -- See the {@see "menu_order"} filter for reordering menu items.
       --
       -- @since 2.8.0
       --

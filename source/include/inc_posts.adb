@@ -2675,7 +2675,7 @@ is
 -- Above, the first default value is for non-hierarchical post types (like posts)
 -- and the second one is for hierarchical post types (like pages).
 --
--- Note: To set labels used in post type admin notices, see the then@see "post_updated_messages"end; filter.
+-- Note: To set labels used in post type admin notices, see the {@see "post_updated_messages"} filter.
 --
 -- @since 3.0.0
 -- @since 4.3.0 Added the `featured_image`, `set_featured_image`, `remove_featured_image`,
@@ -3270,7 +3270,7 @@ is
 --                          to register the meta key across all existing post types.
 -- @param string meta_key  The meta key to register.
 -- @param array  args      Data used to describe the meta key when registered. See
---                          then@see register_meta()end; for a list of supported arguments.
+--                          {@see register_meta()} for a list of supported arguments.
 -- @return bool True if the meta key was successfully registered, False if not.
 --
 -- function register_post_meta( post_type, meta_key, array args ) then
@@ -6088,8 +6088,8 @@ is
 -- When a post is saved, the post status is "transitioned" from one status to another,
 -- though this does not always mean the status has actually changed before and after
 -- the save. This function fires a number of action hooks related to that transition:
--- the generic then@see "transition_post_status"end; action, as well as the dynamic hooks
--- then@see "old_status_to_new_status"end; and then@see "new_status_post.post_type"end;. Note
+-- the generic {@see "transition_post_status"} action, as well as the dynamic hooks
+-- {@see "old_status_to_new_status"} and {@see "new_status_post.post_type"}. Note
 -- that the function does not transition the post object in the database.
 --
 -- For instance: When publishing a post for the first time, the post status may transition
@@ -6162,7 +6162,7 @@ is
 --         -- subsequent post updates (old and new status are both the same).
 --         --
 --         -- Therefore, if you are looking to only fire a callback when a post is first
---         -- transitioned to a status, use the then@see "transition_post_status"end; hook instead.
+--         -- transitioned to a status, use the {@see "transition_post_status"} hook instead.
 --         --
 --         -- @since 2.3.0
 --         -- @since 5.9.0 Added `old_status` parameter.
@@ -8367,7 +8367,7 @@ is
 --                 -- Fires when a post"s status is transitioned from private to published.
 --                 --
 --                 -- @since 1.5.0
---                 -- @deprecated 2.3.0 Use then@see "private_to_publish"end; instead.
+--                 -- @deprecated 2.3.0 Use {@see "private_to_publish"} instead.
 --                 --
 --                 -- @param int post_id Post ID.
 --                 --
@@ -8475,7 +8475,7 @@ is
 -- Checks the given subset of the post hierarchy for hierarchy loops.
 --
 -- Prevents loops from forming and breaks those that it finds. Attached
--- to the then@see "wp_insert_post_parent"end; filter.
+-- to the {@see "wp_insert_post_parent"} filter.
 --
 -- @since 3.1.0
 --

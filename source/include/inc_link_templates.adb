@@ -34,7 +34,7 @@ is
 -- --
 -- -- Conditionally adds a trailing slash if the permalink structure has a trailing
 -- -- slash, strips the trailing slash if not. The string is passed through the
--- -- then@see "user_trailingslashit"end; filter. Will remove trailing slash from string, if
+-- -- {@see "user_trailingslashit"} filter. Will remove trailing slash from string, if
 -- -- site is not set to have them.
 -- --
 -- -- @since 2.2.0
@@ -4016,7 +4016,7 @@ is
 -- -- This function exists to provide a shortlink tag that all themes and plugins can target.
 -- -- A plugin must hook in to provide the actual shortlinks. Default shortlink support is
 -- -- limited to providing ?p= style links for posts. Plugins can short-circuit this function
--- -- via the then@see "pre_get_shortlink"end; filter or filter the output via the then@see "get_shortlink"end;
+-- -- via the {@see "pre_get_shortlink"} filter or filter the output via the {@see "get_shortlink"}
 -- -- filter.
 -- --
 -- -- @since 3.0.0
@@ -4090,7 +4090,7 @@ is
 -- --
 -- -- Injects rel=shortlink into the head if a shortlink is defined for the current page.
 -- --
--- -- Attached to the then@see "wp_head"end; action.
+-- -- Attached to the {@see "wp_head"} action.
 -- --
 -- -- @since 3.0.0
 -- --
@@ -4107,7 +4107,7 @@ is
 -- --
 -- -- Sends a Link: rel=shortlink header if a shortlink is defined for the current page.
 -- --
--- -- Attached to the then@see "wp"end; action.
+-- -- Attached to the {@see "wp"} action.
 -- --
 -- -- @since 3.0.0
 -- --
@@ -4331,7 +4331,7 @@ is
 --         --
 --         -- Passing a non-null value in the "url" member of the return array will
 --         -- effectively short circuit get_avatar_data(), passing the value through
---         -- the then@see "get_avatar_data"end; filter and returning early.
+--         -- the {@see "get_avatar_data"} filter and returning early.
 --         --
 --         -- @since 4.2.0
 --         --

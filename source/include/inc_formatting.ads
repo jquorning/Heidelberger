@@ -91,7 +91,7 @@ is
 --
 -- By default, converts accent characters to ASCII characters and further
 -- limits the output to alphanumeric characters, underscore (_) and dash (-)
--- through the then@see "sanitize_title"end; filter.
+-- through the {@see "sanitize_title"} filter.
 --
 -- If `title` is empty and `fallback_title` is set, the latter will be used.
 --
@@ -114,7 +114,7 @@ is
 -- Checks and cleans a URL.
 --
 -- A number of characters are removed from the URL. If the URL is for displaying
--- (the default behaviour) ampersands are also replaced. The then@see "clean_url"end; filter
+-- (the default behaviour) ampersands are also replaced. The {@see "clean_url"} filter
 -- is applied to the returned cleaned URL.
 --
 -- @since 2.8.0
@@ -123,7 +123,7 @@ is
 -- @param string[] protocols Optional. An array of acceptable protocols.
 --                            Defaults to return value of wp_allowed_protocols().
 -- @param string   _context  Private. Use sanitize_url() for database usage.
--- @return string The cleaned URL after the then@see "clean_url"end; filter is applied.
+-- @return string The cleaned URL after the {@see "clean_url"} filter is applied.
 --                An empty string is returned if `url` specifies a protocol other than
 --                those in `protocols`, or if `url` contains an empty string.
 --
@@ -137,7 +137,7 @@ is
 --
 -- Escapes text strings for echoing in JS. It is intended to be used for inline JS
 -- (in a tag attribute, for example `onclick="..."`). Note that the strings have to
--- be in single quotes. The then@see "js_escape"end; filter is also applied here.
+-- be in single quotes. The {@see "js_escape"} filter is also applied here.
 --
 -- @since 2.8.0
 --

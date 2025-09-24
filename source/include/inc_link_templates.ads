@@ -255,7 +255,7 @@ is
 -- This function exists to provide a shortlink tag that all themes and plugins can target.
 -- A plugin must hook in to provide the actual shortlinks. Default shortlink support is
 -- limited to providing ?p= style links for posts. Plugins can short-circuit this function
--- via the then@see "pre_get_shortlink"end; filter or filter the output via the then@see "get_shortlink"end;
+-- via the {@see "pre_get_shortlink"} filter or filter the output via the {@see "get_shortlink"}
 -- filter.
 --
 -- @since 3.0.0

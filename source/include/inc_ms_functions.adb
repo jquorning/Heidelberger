@@ -141,7 +141,7 @@ is
 -- --
 -- -- Adds a user to a blog, along with specifying the user"s role.
 -- --
--- -- Use the then@see "add_user_to_blog"end; action to fire an event when users are added to a blog.
+-- -- Use the {@see "add_user_to_blog"} action to fire an event when users are added to a blog.
 -- --
 -- -- @since MU (3.0.0)
 -- --
@@ -214,7 +214,7 @@ is
 -- --
 -- -- Removes a user from a blog.
 -- --
--- -- Use the then@see "remove_user_from_blog"end; action to fire an event when
+-- -- Use the {@see "remove_user_from_blog"} action to fire an event when
 -- -- users are removed from a blog.
 -- --
 -- -- Accepts an optional `reassign` parameter, if you want to
@@ -433,9 +433,9 @@ is
 -- -- and checks email addresses against allowed and disallowed domains provided by
 -- -- administrators.
 -- --
--- -- The then@see "wpmu_validate_user_signup"end; hook provides an easy way to modify the sign-up
+-- -- The {@see "wpmu_validate_user_signup"} hook provides an easy way to modify the sign-up
 -- -- process. The value result, which is passed to the hook, contains both the user-provided
--- -- info and the error messages created by the function. then@see "wpmu_validate_user_signup"end;
+-- -- info and the error messages created by the function. {@see "wpmu_validate_user_signup"}
 -- -- allows you to process the data in any way you"d like, and unset the relevant errors if
 -- -- necessary.
 -- --
@@ -597,7 +597,7 @@ is
 -- -- user parameter to the function, where user is the other user, is
 -- -- effectively an override of this limitation.
 -- --
--- -- Filter then@see "wpmu_validate_blog_signup"end; if you want to modify
+-- -- Filter {@see "wpmu_validate_blog_signup"} if you want to modify
 -- -- the way that WordPress validates new site signups.
 -- --
 -- -- @since MU (3.0.0)
@@ -921,11 +921,11 @@ is
 -- -- This is the notification function used when site registration
 -- -- is enabled.
 -- --
--- -- Filter then@see "wpmu_signup_blog_notification"end; to bypass this function or
+-- -- Filter {@see "wpmu_signup_blog_notification"} to bypass this function or
 -- -- replace it with your own notification behavior.
 -- --
--- -- Filter then@see "wpmu_signup_blog_notification_email"end; and
--- -- then@see "wpmu_signup_blog_notification_subject"end; to change the content
+-- -- Filter {@see "wpmu_signup_blog_notification_email"} and
+-- -- {@see "wpmu_signup_blog_notification_subject"} to change the content
 -- -- and subject line of the email sent to newly registered users.
 -- --
 -- -- @since MU (3.0.0)
@@ -1060,11 +1060,11 @@ is
 -- -- This is the notification function used when no new site has
 -- -- been requested.
 -- --
--- -- Filter then@see "wpmu_signup_user_notification"end; to bypass this function or
+-- -- Filter {@see "wpmu_signup_user_notification"} to bypass this function or
 -- -- replace it with your own notification behavior.
 -- --
--- -- Filter then@see "wpmu_signup_user_notification_email"end; and
--- -- then@see "wpmu_signup_user_notification_subject"end; to change the content
+-- -- Filter {@see "wpmu_signup_user_notification_email"} and
+-- -- {@see "wpmu_signup_user_notification_subject"} to change the content
 -- -- and subject line of the email sent to newly registered users.
 -- --
 -- -- @since MU (3.0.0)
@@ -1166,7 +1166,7 @@ is
 -- --
 -- -- Activates a signup.
 -- --
--- -- Hook to then@see "wpmu_activate_user"end; or then@see "wpmu_activate_blog"end; for events
+-- -- Hook to {@see "wpmu_activate_user"} or {@see "wpmu_activate_blog"} for events
 -- -- that should happen only when users or sites are self-created (since
 -- -- those actions are not called when users and sites are created
 -- -- by a Super Admin).
@@ -1350,9 +1350,9 @@ is
 -- -- Creates a user.
 -- --
 -- -- This function runs when a user self-registers as well as when
--- -- a Super Admin creates a new user. Hook to then@see "wpmu_new_user"end; for events
+-- -- a Super Admin creates a new user. Hook to {@see "wpmu_new_user"} for events
 -- -- that should affect all new users, but only on Multisite (otherwise
--- -- use then@see "user_register"end;).
+-- -- use {@see "user_register"}).
 -- --
 -- -- @since MU (3.0.0)
 -- --
@@ -1389,7 +1389,7 @@ is
 -- -- Creates a site.
 -- --
 -- -- This function runs when a user self-registers a new site as well
--- -- as when a Super Admin creates a new site. Hook to then@see "wpmu_new_blog"end;
+-- -- as when a Super Admin creates a new site. Hook to {@see "wpmu_new_blog"}
 -- -- for events that should affect all new sites.
 -- --
 -- -- On subdirectory installations, domain is the same as the main site"s
@@ -1461,11 +1461,11 @@ is
 -- --
 -- -- Notifies the network admin that a new site has been activated.
 -- --
--- -- Filter then@see "newblog_notify_siteadmin"end; to change the content of
+-- -- Filter {@see "newblog_notify_siteadmin"} to change the content of
 -- -- the notification email.
 -- --
 -- -- @since MU (3.0.0)
--- -- @since 5.1.0 blog_id now supports input from the then@see "wp_initialize_site"end; action.
+-- -- @since 5.1.0 blog_id now supports input from the {@see "wp_initialize_site"} action.
 -- --
 -- -- @param WP_Site|int blog_id    The new site"s object or ID.
 -- -- @param string      deprecated Not used.
@@ -1528,7 +1528,7 @@ is
 -- --
 -- -- Notifies the network admin that a new user has been activated.
 -- --
--- -- Filter then@see "newuser_notify_siteadmin"end; to change the content of
+-- -- Filter {@see "newuser_notify_siteadmin"} to change the content of
 -- -- the notification email.
 -- --
 -- -- @since MU (3.0.0)
@@ -1629,9 +1629,9 @@ is
 -- --
 -- -- Notifies the site administrator that their site activation was successful.
 -- --
--- -- Filter then@see "wpmu_welcome_notification"end; to disable or bypass.
+-- -- Filter {@see "wpmu_welcome_notification"} to disable or bypass.
 -- --
--- -- Filter then@see "update_welcome_email"end; and then@see "update_welcome_subject"end; to
+-- -- Filter {@see "update_welcome_email"} and {@see "update_welcome_subject"} to
 -- -- modify the content and subject line of the notification email.
 -- --
 -- -- @since MU (3.0.0)
@@ -1750,9 +1750,9 @@ is
 -- --
 -- -- Notifies the Multisite network administrator that a new site was created.
 -- --
--- -- Filter then@see "send_new_site_email"end; to disable or bypass.
+-- -- Filter {@see "send_new_site_email"} to disable or bypass.
 -- --
--- -- Filter then@see "new_site_email"end; to filter the contents.
+-- -- Filter {@see "new_site_email"} to filter the contents.
 -- --
 -- -- @since 5.6.0
 -- --
@@ -1864,9 +1864,9 @@ is
 -- --
 -- -- Notifies a user that their account activation has been successful.
 -- --
--- -- Filter then@see "wpmu_welcome_user_notification"end; to disable or bypass.
+-- -- Filter {@see "wpmu_welcome_user_notification"} to disable or bypass.
 -- --
--- -- Filter then@see "update_welcome_user_email"end; and then@see "update_welcome_user_subject"end; to
+-- -- Filter {@see "update_welcome_user_email"} and {@see "update_welcome_user_subject"} to
 -- -- modify the content and subject line of the notification email.
 -- --
 -- -- @since MU (3.0.0)
@@ -2074,7 +2074,7 @@ is
 -- -- Logs the user email, IP, and registration date of a new site.
 -- --
 -- -- @since MU (3.0.0)
--- -- @since 5.1.0 Parameters now support input from the then@see "wp_initialize_site"end; action.
+-- -- @since 5.1.0 Parameters now support input from the {@see "wp_initialize_site"} action.
 -- --
 -- -- @global wpdb wpdb WordPress database abstraction object.
 -- --
@@ -2292,7 +2292,7 @@ is
 -- -- Adds a newly created user to the appropriate blog
 -- --
 -- -- To add a user in general, use add_user_to_blog(). This function
--- -- is specifically hooked into the then@see "wpmu_activate_user"end; action.
+-- -- is specifically hooked into the {@see "wpmu_activate_user"} action.
 -- --
 -- -- @since MU (3.0.0)
 -- --
@@ -2479,7 +2479,7 @@ is
 -- --
 -- -- Updates the count of sites for the current network.
 -- --
--- -- If enabled through the then@see "enable_live_network_counts"end; filter, update the sites count
+-- -- If enabled through the {@see "enable_live_network_counts"} filter, update the sites count
 -- -- on a network when a site is created or its status is updated.
 -- --
 -- -- @since 3.7.0
@@ -2510,7 +2510,7 @@ is
 -- --
 -- -- Updates the network-wide users count.
 -- --
--- -- If enabled through the then@see "enable_live_network_counts"end; filter, update the users count
+-- -- If enabled through the {@see "enable_live_network_counts"} filter, update the users count
 -- -- on a network when a user is created or its status is updated.
 -- --
 -- -- @since 3.7.0
@@ -2686,7 +2686,7 @@ is
 -- -- Determines whether or not we have a large network.
 -- --
 -- -- The default criteria for a large network is either more than 10,000 users or more than 10,000 sites.
--- -- Plugins can alter this criteria using the then@see "wp_is_large_network"end; filter.
+-- -- Plugins can alter this criteria using the {@see "wp_is_large_network"} filter.
 -- --
 -- -- @since 3.3.0
 -- -- @since 4.8.0 The `network_id` parameter has been added.

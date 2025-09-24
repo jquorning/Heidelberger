@@ -615,7 +615,7 @@ is
 -- --
 -- -- Mark allowed redirect hosts safe for HTTP requests as well.
 -- --
--- -- Attached to the then@see "http_request_host_is_external"end; filter.
+-- -- Attached to the {@see "http_request_host_is_external"} filter.
 -- --
 -- -- @since 3.6.0
 -- --
@@ -634,7 +634,7 @@ is
 -- -- Adds any domain in a multisite installation for safe HTTP requests to the
 -- -- allowed list.
 -- --
--- -- Attached to the then@see "http_request_host_is_external"end; filter.
+-- -- Attached to the {@see "http_request_host_is_external"} filter.
 -- --
 -- -- @since 3.6.0
 -- --

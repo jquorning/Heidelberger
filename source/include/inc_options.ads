@@ -28,8 +28,8 @@ is
 --
 -- 1. When the option has not been saved in the database, the `default` value
 --    is returned if provided. If not, boolean `false` is returned.
--- 2. When one of the Options API filters is used: then@see "pre_option_option"end;,
---    then@see "default_option_option"end;, or then@see "option_option"end;, the returned
+-- 2. When one of the Options API filters is used: {@see "pre_option_option"},
+--    {@see "default_option_option"}, or {@see "option_option"}, the returned
 --    value may not match the expected type.
 -- 3. When the option has just been saved in the database, and get_option()
 --    is used right after, non-string scalar and null values are not converted to

@@ -36,7 +36,7 @@ is
 --
 -- Marks a function as deprecated and inform when it has been used.
 --
--- There is a hook then@see 'deprecated_function_run'end; that will be called that can be used
+-- There is a hook {@see 'deprecated_function_run'} that will be called that can be used
 -- to get the backtrace up to what file and function called the deprecated
 -- function.
 --
@@ -166,7 +166,7 @@ is
 --
 -- Marks something as being incorrectly called.
 --
--- There is a hook then@see 'doing_it_wrong_run'end; that will be called that can be used
+-- There is a hook {@see 'doing_it_wrong_run'} that will be called that can be used
 -- to get the backtrace up to what file and function called the deprecated
 -- function.
 --
@@ -342,7 +342,7 @@ is
 --
 -- @param string $context Optional. Context in which the function is called. Accepts either 'admin',
 --                        'image', or an arbitrary other context. If an arbitrary context is passed,
---                        the similarly arbitrary then@see '$context_memory_limit'end; filter will be
+--                        the similarly arbitrary {@see '$context_memory_limit'} filter will be
 --                        invoked. Default 'admin'.
 -- @return int|string|false The limit that was set or false on failure.
 --

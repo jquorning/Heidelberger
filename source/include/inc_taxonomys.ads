@@ -68,11 +68,11 @@ is
 -- term object, and the taxonomy name as parameters. Both hooks are expected to
 -- return a term object.
 --
--- then@see "get_term"end; hook - Takes two parameters the term Object and the taxonomy name.
+-- {@see "get_term"} hook - Takes two parameters the term Object and the taxonomy name.
 -- Must return term object. Used in get_term() as a catch-all filter for every
 -- term.
 --
--- then@see "get_taxonomy"end; hook - Takes two parameters the term Object and the taxonomy
+-- {@see "get_taxonomy"} hook - Takes two parameters the term Object and the taxonomy
 -- name. Must return term object. taxonomy will be the taxonomy name, so for
 -- example, if "category", it would be "get_category" as the filter name. Useful
 -- for custom taxonomies or plugging into default taxonomies.
@@ -188,15 +188,15 @@ is
 -- WP_Term_Query::get_terms() for details. In all cases, a `WP_Error` object will
 -- be returned if an invalid taxonomy is requested.
 --
--- The then@see "get_terms"end; filter will be called when the cache has the term and will
+-- The {@see "get_terms"} filter will be called when the cache has the term and will
 -- pass the found term along with the array of taxonomies and array of args.
 -- This filter is also called before the array of terms is passed and will pass
 -- the array of terms, along with the taxonomies and args.
 --
--- The then@see "list_terms_exclusions"end; filter passes the compiled exclusions along with
+-- The {@see "list_terms_exclusions"} filter passes the compiled exclusions along with
 -- the args.
 --
--- The then@see "get_terms_orderby"end; filter passes the `ORDER BY` clause for the query
+-- The {@see "get_terms_orderby"} filter passes the `ORDER BY` clause for the query
 -- along with the args array.
 --
 -- Prior to 4.5.0, the first parameter of `get_terms()` was a taxonomy or list of taxonomies:

@@ -56,7 +56,7 @@ is
 --         --
 --         -- Checks whether recovery mode is active.
 --         --
---         -- This will not change after recovery mode has been initialized. then@see WP_Recovery_Mode::run()end;.
+--         -- This will not change after recovery mode has been initialized. {@see WP_Recovery_Mode::run()}.
 --         --
 --         -- @since 5.2.0
 --         --

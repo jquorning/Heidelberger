@@ -112,7 +112,7 @@ is
 --                 --
 --                 -- This allows Core components to be excluded from being instantiated by
 --                 -- filtering them out of the array. Note that this filter generally runs
---                 -- during the then@see "plugins_loaded"end; action, so it cannot be added
+--                 -- during the {@see "plugins_loaded"} action, so it cannot be added
 --                 -- in a theme.
 --                 --
 --                 -- @since 4.4.0
@@ -2009,9 +2009,9 @@ is
 --         -- @since 3.4.0
 --         -- @deprecated 4.7.0
 --         --
---         -- @param callable|null callback Optional. Value passed through for then@see "wp_die_handler"end; filter.
+--         -- @param callable|null callback Optional. Value passed through for {@see "wp_die_handler"} filter.
 --         --                                Default null.
---         -- @return callable|null Value passed through for then@see "wp_die_handler"end; filter.
+--         -- @return callable|null Value passed through for {@see "wp_die_handler"} filter.
 --         --
 --         public function remove_preview_signature( callback = null ) then
 --                 _deprecated_function( __METHOD__, "4.7.0" );
@@ -2532,7 +2532,7 @@ is
 --                 --
 --                 -- Fires before save validation happens.
 --                 --
---                 -- Plugins can add just-in-time then@see "customize_validate_thenthis->IDend;"end; filters
+--                 -- Plugins can add just-in-time {@see "customize_validate_{this->ID}"} filters
 --                 -- at this point to catch any settings registered after `customize_register`.
 --                 -- The dynamic portion of the hook name, `this->ID` refers to the setting ID.
 --                 --
@@ -2772,7 +2772,7 @@ is
 --         --
 --         -- Preserves the initial JSON post_content passed to save into the post.
 --         --
---         -- This is needed to prevent KSES and other then@see "content_save_pre"end; filters
+--         -- This is needed to prevent KSES and other {@see "content_save_pre"} filters
 --         -- from corrupting JSON data.
 --         --
 --         -- Note that WP_Customize_Manager::validate_setting_values() have already

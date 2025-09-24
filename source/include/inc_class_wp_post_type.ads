@@ -411,7 +411,7 @@ is
         --
         -- The controller instance for this post type"s REST API endpoints.
         --
-        -- Lazily computed. Should be accessed using then@see WP_Post_Type::get_rest_controller()end;.
+        -- Lazily computed. Should be accessed using {@see WP_Post_Type::get_rest_controller()}.
         --
         -- @since 5.3.0
         -- @var WP_REST_Controller rest_controller

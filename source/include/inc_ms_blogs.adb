@@ -259,7 +259,7 @@ is
 --         -- Filters a blog"s details.
 --         --
 --         -- @since MU (3.0.0)
---         -- @deprecated 4.7.0 Use then@see "site_details"end; instead.
+--         -- @deprecated 4.7.0 Use {@see "site_details"} instead.
 --         --
 --         -- @param WP_Site details The blog details.
 --         --

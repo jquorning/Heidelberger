@@ -21,22 +21,22 @@ package body Inc_L10n is
 -- --
 -- -- Retrieves the current locale.
 -- --
--- -- If the locale is set, then it will filter the locale in the then@see "locale"end;
+-- -- If the locale is set, then it will filter the locale in the {@see "locale"}
 -- -- filter hook and return the value.
 -- --
 -- -- If the locale is not set already, then the WPLANG constant is used if it is
--- -- defined. Then it is filtered through the then@see "locale"end; filter hook and
+-- -- defined. Then it is filtered through the {@see "locale"} filter hook and
 -- -- the value for the locale global set and the locale is returned.
 -- --
 -- -- The process to get the locale should only be done once, but the locale will
--- -- always be filtered using the then@see "locale"end; hook.
+-- -- always be filtered using the {@see "locale"} hook.
 -- --
 -- -- @since 1.5.0
 -- --
 -- -- @global string locale           The current locale.
 -- -- @global string wp_local_package Locale code of the package.
 -- --
--- -- @return string The locale of the blog or from the then@see "locale"end; hook.
+-- -- @return string The locale of the blog or from the {@see "locale"} hook.
 -- --
 -- function get_locale() then
 --         global locale, wp_local_package;
@@ -1368,7 +1368,7 @@ package body Inc_L10n is
 -- -- The default directory is WP_LANG_DIR.
 -- --
 -- -- @since 3.0.0
--- -- @since 4.7.0 The results are now filterable with the then@see "get_available_languages"end; filter.
+-- -- @since 4.7.0 The results are now filterable with the {@see "get_available_languages"} filter.
 -- --
 -- -- @param string dir A directory to search for language files.
 -- --                    Default WP_LANG_DIR.

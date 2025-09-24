@@ -1307,7 +1307,7 @@ is
 --         -- Fires before the comment is tested for disallowed characters or words.
 --         --
 --         -- @since 1.5.0
---         -- @deprecated 5.5.0 Use then@see "wp_check_comment_disallowed_list"end; instead.
+--         -- @deprecated 5.5.0 Use {@see "wp_check_comment_disallowed_list"} instead.
 --         --
 --         -- @param string author     Comment author.
 --         -- @param string email      Comment author"s email.
@@ -1761,12 +1761,12 @@ is
 -- --
 -- -- Calls hooks for comment status transitions. If the new comment status is not the same
 -- -- as the previous comment status, then two hooks will be ran, the first is
--- -- then@see "transition_comment_status"end; with new status, old status, and comment data.
--- -- The next action called is then@see "comment_old_status_to_new_status"end;. It has
+-- -- {@see "transition_comment_status"} with new status, old status, and comment data.
+-- -- The next action called is {@see "comment_old_status_to_new_status"}. It has
 -- -- the comment data.
 -- --
 -- -- The final action will run whether or not the comment statuses are the same.
--- -- The action is named then@see "comment_new_status_comment->comment_type"end;.
+-- -- The action is named {@see "comment_new_status_comment->comment_type"}.
 -- --
 -- -- @since 2.7.0
 -- --
@@ -2173,8 +2173,8 @@ is
 -- -- Adds a new comment to the database.
 -- --
 -- -- Filters new comment to ensure that the fields are sanitized and valid before
--- -- inserting comment into database. Calls then@see "comment_post"end; action with comment ID
--- -- and whether comment is approved by WordPress. Also has then@see "preprocess_comment"end;
+-- -- inserting comment into database. Calls {@see "comment_post"} action with comment ID
+-- -- and whether comment is approved by WordPress. Also has {@see "preprocess_comment"}
 -- -- filter for processing the comment data before the function handles it.
 -- --
 -- -- We use `REMOTE_ADDR` here directly. If you are behind a proxy, you should ensure
@@ -2360,7 +2360,7 @@ is
 -- --
 -- -- @since 4.4.0
 -- --
--- -- Uses the then@see "notify_post_author"end; filter to determine whether the post author
+-- -- Uses the {@see "notify_post_author"} filter to determine whether the post author
 -- -- should be notified when a new comment is added, overriding site setting.
 -- --
 -- -- @param int comment_ID Comment ID.
@@ -2401,7 +2401,7 @@ is
 -- --
 -- -- Sets the status of a comment.
 -- --
--- -- The then@see "wp_set_comment_status"end; action is called after the comment is handled.
+-- -- The {@see "wp_set_comment_status"} action is called after the comment is handled.
 -- -- If the comment status is not in the list, then false is returned.
 -- --
 -- -- @since 1.0.0

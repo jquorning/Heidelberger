@@ -21,7 +21,7 @@ is
 -- -- true.
 -- --
 -- -- Note: wp_signon() doesn't handle setting the current user. This means that if the
--- -- function is called before the then@see "init"end; hook is fired, is_user_logged_in() will
+-- -- function is called before the {@see "init"} hook is fired, is_user_logged_in() will
 -- -- evaluate as false until that point. If is_user_logged_in() is needed in conjunction
 -- -- with wp_signon(), wp_set_current_user() should be called explicitly.
 -- --
@@ -518,7 +518,7 @@ is
 -- -- Checks the logged-in cookie if the previous auth cookie could not be
 -- -- validated and parsed.
 -- --
--- -- This is a callback for the then@see "determine_current_user"end; filter, rather than API.
+-- -- This is a callback for the {@see "determine_current_user"} filter, rather than API.
 -- --
 -- -- @since 3.9.0
 -- --
@@ -2366,7 +2366,7 @@ is
 --         --
 --         -- Does not include contact methods. These are added using `wp_get_user_contact_methods( user )`.
 --         --
---         -- For custom meta fields, see the then@see "insert_custom_user_meta"end; filter.
+--         -- For custom meta fields, see the {@see "insert_custom_user_meta"} filter.
 --         --
 --         -- @since 4.4.0
 --         -- @since 5.8.0 The `userdata` parameter was added.
@@ -2403,7 +2403,7 @@ is
 --         -- Filters a user"s custom meta values and keys immediately after the user is created or updated
 --         -- and before any user meta is inserted or updated.
 --         --
---         -- For non-custom meta fields, see the then@see "insert_user_meta"end; filter.
+--         -- For non-custom meta fields, see the {@see "insert_user_meta"} filter.
 --         --
 --         -- @since 5.9.0
 --         --
@@ -2853,10 +2853,10 @@ is
 --         --
 --         -- Fires before a new password is retrieved.
 --         --
---         -- Use the then@see "retrieve_password"end; hook instead.
+--         -- Use the {@see "retrieve_password"} hook instead.
 --         --
 --         -- @since 1.5.0
---         -- @deprecated 1.5.1 Misspelled. Use then@see "retrieve_password"end; hook instead.
+--         -- @deprecated 1.5.1 Misspelled. Use {@see "retrieve_password"} hook instead.
 --         --
 --         -- @param string user_login The user login name.
 --         --
@@ -4128,9 +4128,9 @@ is
 --         -- ###SITEURL###     The URL to the site.
 --         --
 --         -- @since 4.9.6
---         -- @deprecated 5.8.0 Use then@see "user_request_confirmed_email_content"end; instead.
+--         -- @deprecated 5.8.0 Use {@see "user_request_confirmed_email_content"} instead.
 --         --                   For user erasure fulfillment email content
---         --                   use then@see "user_erasure_fulfillment_email_content"end; instead.
+--         --                   use {@see "user_erasure_fulfillment_email_content"} instead.
 --         --
 --         -- @param string content    The email content.
 --         -- @param array  email_data then
@@ -4284,7 +4284,7 @@ is
 --         -- Filters the subject of the email sent when an erasure request is completed.
 --         --
 --         -- @since 4.9.8
---         -- @deprecated 5.8.0 Use then@see "user_erasure_fulfillment_email_subject"end; instead.
+--         -- @deprecated 5.8.0 Use {@see "user_erasure_fulfillment_email_subject"} instead.
 --         --
 --         -- @param string subject    The email subject.
 --         -- @param string sitename   The name of the site.
@@ -4371,9 +4371,9 @@ is
 --         -- ###SITEURL###            The URL to the site.
 --         --
 --         -- @since 4.9.6
---         -- @deprecated 5.8.0 Use then@see "user_erasure_fulfillment_email_content"end; instead.
+--         -- @deprecated 5.8.0 Use {@see "user_erasure_fulfillment_email_content"} instead.
 --         --                   For user request confirmation email content
---         --                   use then@see "user_request_confirmed_email_content"end; instead.
+--         --                   use {@see "user_request_confirmed_email_content"} instead.
 --         --
 --         -- @param string content The email content.
 --         -- @param array  email_data then
@@ -4439,7 +4439,7 @@ is
 --         -- Filters the headers of the data erasure fulfillment notification.
 --         --
 --         -- @since 5.4.0
---         -- @deprecated 5.8.0 Use then@see "user_erasure_fulfillment_email_headers"end; instead.
+--         -- @deprecated 5.8.0 Use {@see "user_erasure_fulfillment_email_headers"} instead.
 --         --
 --         -- @param string|array headers    The email headers.
 --         -- @param string       subject    The email subject.
@@ -4903,7 +4903,7 @@ is
 -- -- Checks if Application Passwords is supported.
 -- --
 -- -- Application Passwords is supported only by sites using SSL or local environments
--- -- but may be made available using the then@see "wp_is_application_passwords_available"end; filter.
+-- -- but may be made available using the {@see "wp_is_application_passwords_available"} filter.
 -- --
 -- -- @since 5.9.0
 -- --
@@ -4917,7 +4917,7 @@ is
 -- -- Checks if Application Passwords is globally available.
 -- --
 -- -- By default, Application Passwords is available to all sites using SSL or to local environments.
--- -- Use the then@see "wp_is_application_passwords_available"end; filter to adjust its availability.
+-- -- Use the {@see "wp_is_application_passwords_available"} filter to adjust its availability.
 -- --
 -- -- @since 5.6.0
 -- --
@@ -4937,7 +4937,7 @@ is
 -- --
 -- -- Checks if Application Passwords is available for a specific user.
 -- --
--- -- By default all users can use Application Passwords. Use then@see "wp_is_application_passwords_available_for_user"end;
+-- -- By default all users can use Application Passwords. Use {@see "wp_is_application_passwords_available_for_user"}
 -- -- to restrict availability to certain users.
 -- --
 -- -- @since 5.6.0

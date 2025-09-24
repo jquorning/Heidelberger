@@ -242,7 +242,7 @@ is
 -- --
 -- -- @since 3.6.0
 -- -- @since 5.8.0 Added 'path' as an official value for key.
--- --              See then@see wp_maybe_inline_styles()end;.
+-- --              See {@see wp_maybe_inline_styles()}.
 -- --
 -- -- @param string handle Name of the stylesheet.
 -- -- @param string key    Name of data point for which we're storing a value.

@@ -28,8 +28,8 @@ is
 -- Creates the initial taxonomies.
 --
 -- This function fires twice: in wp-settings.php before plugins are loaded (for
--- backward compatibility reasons), and again on the then@see "init"end; action. We must
--- avoid registering rewrite rules before the then@see "init"end; action.
+-- backward compatibility reasons), and again on the {@see "init"} action. We must
+-- avoid registering rewrite rules before the {@see "init"} action.
 --
 -- @since 2.8.0
 -- @since 5.9.0 Added `"wp_template_part_area"` taxonomy.
@@ -392,7 +392,7 @@ is
 --
 -- Creates or modifies a taxonomy object.
 --
--- Note: Do not use before the then@see "init"end; hook.
+-- Note: Do not use before the {@see "init"} hook.
 --
 -- A simple function for creating or modifying a taxonomy object based on
 -- the parameters given. If modifying an existing taxonomy object, note
@@ -918,11 +918,11 @@ is
 -- term object, and the taxonomy name as parameters. Both hooks are expected to
 -- return a term object.
 --
--- then@see "get_term"end; hook - Takes two parameters the term Object and the taxonomy name.
+-- {@see "get_term"} hook - Takes two parameters the term Object and the taxonomy name.
 -- Must return term object. Used in get_term() as a catch-all filter for every
 -- term.
 --
--- then@see "get_taxonomy"end; hook - Takes two parameters the term Object and the taxonomy
+-- {@see "get_taxonomy"} hook - Takes two parameters the term Object and the taxonomy
 -- name. Must return term object. taxonomy will be the taxonomy name, so for
 -- example, if "category", it would be "get_category" as the filter name. Useful
 -- for custom taxonomies or plugging into default taxonomies.
@@ -994,7 +994,7 @@ is
 --         --
 --         -- Filters a taxonomy term object.
 --         --
---         -- The then@see "get_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "get_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 2.3.0
@@ -1254,15 +1254,15 @@ is
 -- WP_Term_Query::get_terms() for details. In all cases, a `WP_Error` object will
 -- be returned if an invalid taxonomy is requested.
 --
--- The then@see "get_terms"end; filter will be called when the cache has the term and will
+-- The {@see "get_terms"} filter will be called when the cache has the term and will
 -- pass the found term along with the array of taxonomies and array of args.
 -- This filter is also called before the array of terms is passed and will pass
 -- the array of terms, along with the taxonomies and args.
 --
--- The then@see "list_terms_exclusions"end; filter passes the compiled exclusions along with
+-- The {@see "list_terms_exclusions"} filter passes the compiled exclusions along with
 -- the args.
 --
--- The then@see "get_terms_orderby"end; filter passes the `ORDER BY` clause for the query
+-- The {@see "get_terms_orderby"} filter passes the `ORDER BY` clause for the query
 -- along with the args array.
 --
 -- Prior to 4.5.0, the first parameter of `get_terms()` was a taxonomy or list of taxonomies:
@@ -1495,7 +1495,7 @@ is
 --                         to register the meta key across all existing taxonomies.
 -- @param string meta_key The meta key to register.
 -- @param array  args     Data used to describe the meta key when registered. See
---                         then@see register_meta()end; for a list of supported arguments.
+--                         {@see register_meta()} for a list of supported arguments.
 -- @return bool True if the meta key was successfully registered, false if not.
 --
 -- function register_term_meta (taxonomy, meta_key, array args) then
@@ -1802,7 +1802,7 @@ is
 --                         --
 --                         -- Filters the category nicename before it is sanitized.
 --                         --
---                         -- Use the then@see "pre_taxonomy_field"end; hook instead.
+--                         -- Use the {@see "pre_taxonomy_field"} hook instead.
 --                         --
 --                         -- @since 2.0.3
 --                         --
@@ -2150,7 +2150,7 @@ is
 --         --
 --         -- Fires after a term is deleted from the database and the cache is cleaned.
 --         --
---         -- The then@see "delete_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "delete_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 2.5.0
@@ -2270,7 +2270,7 @@ is
          -- @since 4.9.0
          --
          -- @param array    args       An array of arguments for retrieving terms for the given object(s).
-         --                             See then@see wp_get_object_terms()end; for details.
+         --                             See {@see wp_get_object_terms()} for details.
          -- @param int()    object_ids Array of object IDs.
          -- @param string() taxonomies Array of taxonomy names to retrieve terms from.
          --
@@ -2363,7 +2363,7 @@ is
                -- Filters the terms for a given object or objects.
                --
                -- The `taxonomies` parameter passed to this filter is formatted as a SQL fragment. The
-               -- then@see "get_object_terms"end; filter is recommended as an alternative.
+               -- {@see "get_object_terms"} filter is recommended as an alternative.
                --
                -- @since 2.8.0
                --
@@ -2664,7 +2664,7 @@ is
 --         --
 --         -- Fires immediately after a new term is created, before the term cache is cleaned.
 --         --
---         -- The then@see "create_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "create_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 2.3.0
@@ -2714,7 +2714,7 @@ is
 --         --
 --         -- Fires after a new term is created, and after the term cache has been cleaned.
 --         --
---         -- The then@see "created_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "created_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 2.3.0
@@ -2750,7 +2750,7 @@ is
 --         --
 --         -- Fires after a term has been saved, and the term cache has been cleared.
 --         --
---         -- The then@see "saved_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "saved_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 5.5.0
@@ -3413,7 +3413,7 @@ is
 --         --
 --         -- Fires after a term has been updated, but before the term cache has been cleaned.
 --         --
---         -- The then@see "edit_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "edit_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 2.3.0
@@ -3454,7 +3454,7 @@ is
 --         --
 --         -- Fires after a term has been updated, and the term cache has been cleaned.
 --         --
---         -- The then@see "edited_taxonomy"end; hook is also available for targeting a specific
+--         -- The {@see "edited_taxonomy"} hook is also available for targeting a specific
 --         -- taxonomy.
 --         --
 --         -- @since 2.3.0
@@ -4747,7 +4747,7 @@ is
 --                 -- Filters the tag link.
 --                 --
 --                 -- @since 2.3.0
---                 -- @since 2.5.0 Deprecated in favor of then@see "term_link"end; filter.
+--                 -- @since 2.5.0 Deprecated in favor of {@see "term_link"} filter.
 --                 -- @since 5.4.1 Restored (un-deprecated).
 --                 --
 --                 -- @param string termlink Tag link URL.
@@ -4760,7 +4760,7 @@ is
 --                 -- Filters the category link.
 --                 --
 --                 -- @since 1.5.0
---                 -- @since 2.5.0 Deprecated in favor of then@see "term_link"end; filter.
+--                 -- @since 2.5.0 Deprecated in favor of {@see "term_link"} filter.
 --                 -- @since 5.4.1 Restored (un-deprecated).
 --                 --
 --                 -- @param string termlink Category link URL.
@@ -5072,7 +5072,7 @@ is
 -- Checks the given subset of the term hierarchy for hierarchy loops.
 -- Prevents loops from forming and breaks those that it finds.
 --
--- Attached to the then@see "wp_update_term_parent"end; filter.
+-- Attached to the {@see "wp_update_term_parent"} filter.
 --
 -- @since 3.1.0
 --

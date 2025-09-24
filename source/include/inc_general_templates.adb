@@ -214,13 +214,13 @@ is
 -- -- the parent, then load it. If it doesn"t exist, then the default search form
 -- -- will be displayed. The default search form is HTML, which will be displayed.
 -- -- There is a filter applied to the search form HTML in order to edit or replace
--- -- it. The filter is then@see "get_search_form"end;.
+-- -- it. The filter is {@see "get_search_form"}.
 -- --
 -- -- This function is primarily used by themes which want to hardcode the search
 -- -- form into the sidebar and also by the search widget in WordPress.
 -- --
 -- -- There is also an action that is called whenever the function is run called,
--- -- then@see "pre_get_search_form"end;. This can be useful for outputting JavaScript that the
+-- -- {@see "pre_get_search_form"}. This can be useful for outputting JavaScript that the
 -- -- search relies on or various formatting that applies to the beginning of the
 -- -- search. To give a few examples of what it can be used for.
 -- --
@@ -715,7 +715,7 @@ is
 -- --
 -- -- Theme container function for the "wp_meta" action.
 -- --
--- -- The then@see "wp_meta"end; action can have several purposes, depending on how you use it,
+-- -- The {@see "wp_meta"} action can have several purposes, depending on how you use it,
 -- -- but one purpose might have been to allow for theme switching.
 -- --
 -- -- @since 1.5.0
@@ -757,7 +757,7 @@ is
 -- -- - "charset" - The "Encoding for pages and feeds"  (set in Settings > Reading)
 -- -- - "version" - The current WordPress version
 -- -- - "html_type" - The content-type (default: "text/html"). Themes and plugins
--- --   can override the default value using the then@see "pre_option_html_type"end; filter
+-- --   can override the default value using the {@see "pre_option_html_type"} filter
 -- -- - "text_direction" - The text direction determined by the site"s language. is_rtl()
 -- --   should be used instead
 -- -- - "language" - Language code for the current site
@@ -2551,7 +2551,7 @@ is
 -- -- Retrieves the date on which the post was written.
 -- --
 -- -- Unlike the_date() this function will always return the date.
--- -- Modify output with the then@see "get_the_date"end; filter.
+-- -- Modify output with the {@see "get_the_date"} filter.
 -- --
 -- -- @since 3.0.0
 -- --
@@ -3031,7 +3031,7 @@ is
 -- --
 -- -- Fires the wp_head action.
 -- --
--- -- See then@see "wp_head"end;.
+-- -- See {@see "wp_head"}.
 -- --
 -- -- @since 1.2.0
 -- --
@@ -3047,7 +3047,7 @@ is
 -- --
 -- -- Fires the wp_footer action.
 -- --
--- -- See then@see "wp_footer"end;.
+-- -- See {@see "wp_footer"}.
 -- --
 -- -- @since 1.5.1
 -- --
@@ -3063,7 +3063,7 @@ is
 -- --
 -- -- Fires the wp_body_open action.
 -- --
--- -- See then@see "wp_body_open"end;.
+-- -- See {@see "wp_body_open"}.
 -- --
 -- -- @since 5.2.0
 -- --
@@ -3172,14 +3172,14 @@ is
 --                 -- Filters whether to display the post comments feed link.
 --                 --
 --                 -- This filter allows to enable or disable the feed link for a singular post
---                 -- in a way that is independent of then@see "feed_links_show_comments_feed"end;
+--                 -- in a way that is independent of {@see "feed_links_show_comments_feed"}
 --                 -- (which controls the global comments feed). The result of that filter
 --                 -- is accepted as a parameter.
 --                 --
 --                 -- @since 6.1.0
 --                 --
 --                 -- @param bool show_comments_feed Whether to display the post comments feed link. Defaults to
---                 --                                 the then@see "feed_links_show_comments_feed"end; filter result.
+--                 --                                 the {@see "feed_links_show_comments_feed"} filter result.
 --                 --
 --                 show_post_comments_feed = apply_filters( "feed_links_extra_show_post_comments_feed", show_comments_feed );
 
@@ -3386,7 +3386,7 @@ is
 -- -- Outputs a referrer `strict-origin-when-cross-origin` meta tag that tells the browser not to send
 -- -- the full URL as a referrer to other sites when cross-origin assets are loaded.
 -- --
--- -- Typical usage is as a then@see "wp_head"end; callback:
+-- -- Typical usage is as a {@see "wp_head"} callback:
 -- --
 -- --     add_action( "wp_head", "wp_strict_cross_origin_referrer" );
 -- --
@@ -4817,7 +4817,7 @@ is
 -- --
 -- -- Displays the URL of a WordPress admin CSS file.
 -- --
--- -- @see WP_Styles::_css_href() and its then@see "style_loader_src"end; filter.
+-- -- @see WP_Styles::_css_href() and its {@see "style_loader_src"} filter.
 -- --
 -- -- @since 2.3.0
 -- --
@@ -4847,8 +4847,8 @@ is
 -- -- Enqueues or directly prints a stylesheet link to the specified CSS file.
 -- --
 -- -- "Intelligently" decides to enqueue or to print the CSS file. If the
--- -- then@see "wp_print_styles"end; action has--not* yet been called, the CSS file will be
--- -- enqueued. If the then@see "wp_print_styles"end; action has been called, the CSS link will
+-- -- {@see "wp_print_styles"} action has--not* yet been called, the CSS file will be
+-- -- enqueued. If the {@see "wp_print_styles"} action has been called, the CSS link will
 -- -- be printed. Printing may be forced by passing true as the force_echo
 -- -- (second) parameter.
 -- --
@@ -4928,7 +4928,7 @@ is
 -- --
 -- -- Displays the XHTML generator that is generated on the wp_head hook.
 -- --
--- -- See then@see "wp_head"end;.
+-- -- See {@see "wp_head"}.
 -- --
 -- -- @since 2.5.0
 -- --
@@ -4947,7 +4947,7 @@ is
 -- -- Displays the generator XML or Comment for RSS, ATOM, etc.
 -- --
 -- -- Returns the correct generator type for the requested output format. Allows
--- -- for a plugin to filter generators overall the then@see "the_generator"end; filter.
+-- -- for a plugin to filter generators overall the {@see "the_generator"} filter.
 -- --
 -- -- @since 2.5.0
 -- --
@@ -4971,7 +4971,7 @@ is
 -- --
 -- -- Returns the correct generator type for the requested output format. Allows
 -- -- for a plugin to filter generators on an individual basis using the
--- -- then@see "get_the_generator_type"end; filter.
+-- -- {@see "get_the_generator_type"} filter.
 -- --
 -- -- @since 2.5.0
 -- --

@@ -472,7 +472,7 @@ end;
 --
 -- The "post_tag" taxonomy is a special
 -- case; the class has the "tag-" prefix instead of "post_tag-". All class names are
--- passed through the filter, then@see "post_class"end;, with the list of class names, followed by
+-- passed through the filter, {@see "post_class"}, with the list of class names, followed by
 -- class parameter value, with the post ID as the last parameter.
 --
 -- @since 2.7.0

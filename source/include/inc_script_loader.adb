@@ -2696,14 +2696,14 @@ is
 -- -- Sanitizes an attributes array into an attributes string to be placed inside a `<script>` tag.
 -- --
 -- -- Automatically injects type attribute if needed.
--- -- Used by then@see wp_get_script_tag()end; and then@see wp_get_inline_script_tag()end;.
+-- -- Used by {@see wp_get_script_tag()} and {@see wp_get_inline_script_tag()}.
 -- --
 -- -- @since 5.7.0
 -- --
 -- -- @param array attributes Key-value pairs representing `<script>` tag attributes.
 -- -- @return string String made of sanitized `<script>` tag attributes.
 -- --
--- function wp_sanitize_script_attributes( attributes ) then
+-- function wp_sanitize_script_attributes( attributes ) {
 --         html5_script_support = ! is_admin() && ! current_theme_supports( "html5", "script" );
 --         attributes_string    = "";
 
@@ -2713,7 +2713,7 @@ is
 --                 if ( is_bool( attribute_value ) ) then
 --                         if ( attribute_value ) then
 --                                 attributes_string .= html5_script_support ? sprintf( " %1s="%2s"", esc_attr( attribute_name ), esc_attr( attribute_name ) ) : " " . esc_attr( attribute_name );
---                         end;
+--                         }
 --                 end; else then
 --                         attributes_string .= sprintf( " %1s="%2s"", esc_attr( attribute_name ), esc_attr( attribute_value ) );
 --                 end;
@@ -2725,7 +2725,7 @@ is
 -- --
 -- -- Formats `<script>` loader tags.
 -- --
--- -- It is possible to inject attributes in the `<script>` tag via the then@see "wp_script_attributes"end; filter.
+-- -- It is possible to inject attributes in the `<script>` tag via the {@see "wp_script_attributes"} filter.
 -- -- Automatically injects type attribute if needed.
 -- --
 -- -- @since 5.7.0
@@ -2754,7 +2754,7 @@ is
 -- --
 -- -- Prints formatted `<script>` loader tag.
 -- --
--- -- It is possible to inject attributes in the `<script>` tag via the  then@see "wp_script_attributes"end;  filter.
+-- -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
 -- -- Automatically injects type attribute if needed.
 -- --
 -- -- @since 5.7.0
@@ -2768,7 +2768,7 @@ is
 -- --
 -- -- Wraps inline JavaScript in `<script>` tag.
 -- --
--- -- It is possible to inject attributes in the `<script>` tag via the  then@see "wp_script_attributes"end;  filter.
+-- -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
 -- -- Automatically injects type attribute if needed.
 -- --
 -- -- @since 5.7.0
@@ -2801,7 +2801,7 @@ is
 -- --
 -- -- Prints inline JavaScript wrapped in `<script>` tag.
 -- --
--- -- It is possible to inject attributes in the `<script>` tag via the  then@see "wp_script_attributes"end;  filter.
+-- -- It is possible to inject attributes in the `<script>` tag via the  {@see "wp_script_attributes"}  filter.
 -- -- Automatically injects type attribute if needed.
 -- --
 -- -- @since 5.7.0

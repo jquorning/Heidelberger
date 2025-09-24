@@ -159,10 +159,10 @@ is
 --         --
 --         -- The default content type is `text/plain` which does not allow using HTML.
 --         -- However, you can set the content type of the email by using the
---         -- then@see 'wp_mail_content_type'end; filter.
+--         -- {@see 'wp_mail_content_type'} filter.
 --         --
 --         -- The default charset is based on the charset used on the blog. The charset can
---         -- be set using the then@see 'wp_mail_charset'end; filter.
+--         -- be set using the {@see 'wp_mail_charset'} filter.
 --         --
 --         -- @since 1.2.1
 --         -- @since 5.5.0 is_email() is used for email validation,
@@ -200,7 +200,7 @@ is
 --                 --
 --                 -- Filters whether to preempt sending an email.
 --                 --
---                 -- Returning a non-null value will short-circuit then@see wp_mail()end;, returning
+--                 -- Returning a non-null value will short-circuit {@see wp_mail()}, returning
 --                 -- that value instead. A boolean return value should be used to indicate whether
 --                 -- the email was successfully sent.
 --                 --
@@ -1352,7 +1352,7 @@ is
 --         --     exit;
 --         --
 --         -- Exiting can also be selectively manipulated by using wp_redirect() as a conditional
---         -- in conjunction with the then@see 'wp_redirect'end; and then@see 'wp_redirect_location'end; filters:
+--         -- in conjunction with the {@see 'wp_redirect'} and {@see 'wp_redirect_location'} filters:
 --         --
 --         --     if ( wp_redirect( url ) ) then
 --         --         exit;
@@ -1498,7 +1498,7 @@ is
 --         --     exit;
 --         --
 --         -- Exiting can also be selectively manipulated by using wp_safe_redirect() as a conditional
---         -- in conjunction with the then@see 'wp_redirect'end; and then@see 'wp_redirect_location'end; filters:
+--         -- in conjunction with the {@see 'wp_redirect'} and {@see 'wp_redirect_location'} filters:
 --         --
 --         --     if ( wp_safe_redirect( url ) ) then
 --         --         exit;
@@ -1851,7 +1851,7 @@ is
 --         --
 --         -- @global wpdb wpdb WordPress database abstraction object.
 --         --
---         -- Uses the then@see 'notify_moderator'end; filter to determine whether the site moderator
+--         -- Uses the {@see 'notify_moderator'} filter to determine whether the site moderator
 --         -- should be notified, overriding the site setting.
 --         --
 --         -- @param int comment_id Comment ID.
@@ -2829,7 +2829,7 @@ is
 --                 -- Allows the HTML for a user's avatar to be returned early.
 --                 --
 --                 -- Returning a non-null value will effectively short-circuit get_avatar(), passing
---                 -- the value through the then@see 'get_avatar'end; filter and returning early.
+--                 -- the value through the {@see 'get_avatar'} filter and returning early.
 --                 --
 --                 -- @since 4.2.0
 --                 --

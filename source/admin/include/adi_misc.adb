@@ -22,7 +22,7 @@ is
 --         -- Filters whether Apache and mod_rewrite are present.
 --         --
 --         -- This filter was previously used to force URL rewriting for other servers,
---         -- like nginx. Use the then@see "got_url_rewrite"end; filter in got_url_rewrite() instead.
+--         -- like nginx. Use the {@see "got_url_rewrite"} filter in got_url_rewrite() instead.
 --         --
 --         -- @since 2.5.0
 --         --
@@ -1100,7 +1100,7 @@ is
 -- --
 -- -- Adds viewport meta for mobile in Customizer.
 -- --
--- -- Hooked to the then@see "admin_viewport_meta"end; filter.
+-- -- Hooked to the {@see "admin_viewport_meta"} filter.
 -- --
 -- -- @since 5.5.0
 -- --
@@ -1557,7 +1557,7 @@ is
 -- -- Checks if the user needs to update PHP.
 -- --
 -- -- @since 5.1.0
--- -- @since 5.1.1 Added the then@see "wp_is_php_version_acceptable"end; filter.
+-- -- @since 5.1.1 Added the {@see "wp_is_php_version_acceptable"} filter.
 -- --
 -- -- @return array|false Array of PHP version data. False on failure.
 -- --

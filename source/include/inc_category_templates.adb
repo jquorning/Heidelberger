@@ -857,12 +857,12 @@ is
 --                                                Default 'flat'.
 --     @type string   $separator                  HTML or text to separate the tags. Default "\n" (newline).
 --     @type string   $orderby                    Value to order tags by. Accepts 'name' or 'count'.
---                                                Default 'name'. The then@see 'tag_cloud_sort'end; filter
+--                                                Default 'name'. The {@see 'tag_cloud_sort'} filter
 --                                                can also affect how tags are sorted.
 --     @type string   $order                      How to order the tags. Accepts 'ASC' (ascending),
 --                                                'DESC' (descending), or 'RAND' (random). Default 'ASC'.
 --     @type int|bool $filter                     Whether to enable filtering of the final output
---                                                via then@see 'wp_generate_tag_cloud'end;. Default 1.
+--                                                via {@see 'wp_generate_tag_cloud'}. Default 1.
 --     @type array    $topic_count_text           Nooped plural text from _n_noop() to supply to
 --                                                tag counts. Default null.
 --     @type callable $topic_count_text_callback  Callback used to generate nooped plural text for

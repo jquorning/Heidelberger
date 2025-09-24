@@ -264,7 +264,7 @@ is
 -- -- stylesheet will be checked for existence, for example "ltr.css".
 -- --
 -- -- The theme may change the location of the stylesheet directory by either using
--- -- the then@see "stylesheet_directory_uri"end; or then@see "locale_stylesheet_uri"end; filters.
+-- -- the {@see "stylesheet_directory_uri"} or {@see "locale_stylesheet_uri"} filters.
 -- --
 -- -- If you want to change the location of the stylesheet files for the entire
 -- -- WordPress workflow, then change the former. If you just have the locale in a
@@ -841,7 +841,7 @@ is
 -- -- But if it doesn"t exist, it"ll fall back to the latest core default theme that does exist.
 -- -- Will switch theme to the fallback theme if active theme does not validate.
 -- --
--- -- You can use the then@see "validate_current_theme"end; filter to return false to disable
+-- -- You can use the {@see "validate_current_theme"} filter to return false to disable
 -- -- this functionality.
 -- --
 -- -- @since 1.5.0
@@ -2526,8 +2526,8 @@ is
 -- -- Registers theme support for a given feature.
 -- --
 -- -- Must be called in the theme"s functions.php file to work.
--- -- If attached to a hook, it must be then@see "after_setup_theme"end;.
--- -- The then@see "init"end; hook may be too late for some features.
+-- -- If attached to a hook, it must be {@see "after_setup_theme"}.
+-- -- The {@see "init"} hook may be too late for some features.
 -- --
 -- -- Example usage:
 -- --
@@ -3363,7 +3363,7 @@ is
 -- --
 -- -- Checks if a theme has been changed and runs "after_switch_theme" hook on the next WP load.
 -- --
--- -- See then@see "after_switch_theme"end;.
+-- -- See {@see "after_switch_theme"}.
 -- --
 -- -- @since 3.3.0
 -- --
@@ -3818,7 +3818,7 @@ is
 -- --
 -- -- Creates the initial theme features when the "setup_theme" action is fired.
 -- --
--- -- See then@see "setup_theme"end;.
+-- -- See {@see "setup_theme"}.
 -- --
 -- -- @since 5.5.0
 -- -- @since 6.0.1 The `block-templates` feature was added.
@@ -4237,7 +4237,7 @@ is
 -- --
 -- -- Adds default theme supports for block themes when the "setup_theme" action fires.
 -- --
--- -- See then@see "setup_theme"end;.
+-- -- See {@see "setup_theme"}.
 -- --
 -- -- @since 5.9.0
 -- -- @access private

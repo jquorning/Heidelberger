@@ -34,7 +34,7 @@ is
    -- Instantiates the admin bar object and set it up as a global for access elsewhere.
    --
    -- UNHOOKING THIS FUNCTION WILL NOT PROPERLY REMOVE THE ADMIN BAR.
-   -- For that, use show_admin_bar(false) or the then@see "show_admin_bar"end; filter.
+   -- For that, use show_admin_bar(false) or the {@see "show_admin_bar"} filter.
    --
    -- @since 3.1.0
    -- @access private
@@ -55,7 +55,7 @@ is
    -- For backward compatibility with themes not using the "wp_body_open" action,
    -- the function is also called late on {@see "wp_footer"}.
    --
-   -- It includes the then@see "admin_bar_menu"end; action which should be used to
+   -- It includes the {@see "admin_bar_menu"} action which should be used to
    -- hook in and add new menus to the admin bar. That way you can be sure that you
    -- are adding at most optimal point, right before the admin bar is rendered. This
    -- also gives you access to the `post` global, among others.
@@ -249,7 +249,7 @@ is
    -- Sets the display status of the admin bar.
    --
    -- This can be called immediately upon plugin load. It does not need to be called
-   -- from a function hooked to the then@see "init"end; action.
+   -- from a function hooked to the {@see "init"} action.
    --
    -- @since 3.1.0
    --
