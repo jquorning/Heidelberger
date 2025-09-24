@@ -58,23 +58,14 @@ is
         -- static
         Rendered : Boolean := False;
 
-   --
-   -- Instantiates the admin bar object and set it up as a global for access elsewhere.
-   --
-   -- UNHOOKING THIS FUNCTION WILL NOT PROPERLY REMOVE THE ADMIN BAR.
-   -- For that, use show_admin_bar(false) or the then@see "show_admin_bar"end; filter.
-   --
-   -- @since 3.1.0
-   -- @access private
-   --
-   -- @global WP_Admin_Bar wp_admin_bar
-   --
-   -- @return bool Whether the admin bar was successfully initialized.
-   --
+   -------------------------
+   -- X_Wp_Admin_Bar_Init --
+   -------------------------
+
    function X_Wp_Admin_Bar_Init
             return Boolean
    is
---        global wp_admin_bar;
+--    global wp_admin_bar;
    begin
       if not Is_Admin_Bar_Showing then
          return False;
@@ -107,26 +98,10 @@ is
       return True;
    end X_Wp_Admin_Bar_Init;
 
-   --
-   -- Renders the admin bar to the page based on the wp_admin_bar.menu member var.
-   --
-   -- This is called very early on the {@see "wp_body_open"} action so that it will
-   -- render before anything else being added to the page body.
-   --
-   -- For backward compatibility with themes not using the "wp_body_open" action,
-   -- the function is also called late on {@see "wp_footer"}.
-   --
-   -- It includes the {@see "admin_bar_menu"} action which should be used to
-   -- hook in and add new menus to the admin bar. That way you can be sure that you
-   -- are adding at most optimal point, right before the admin bar is rendered. This
-   -- also gives you access to the `post` global, among others.
-   --
-   -- @since 3.1.0
-   -- @since 5.4.0 Called on "wp_body_open" action first, with "wp_footer" as a
-   --              fallback.
-   --
-   -- @global WP_Admin_Bar wp_admin_bar
-   --
+   -------------------------
+   -- Wp_Admin_Bar_Render --
+   -------------------------
+
    procedure Wp_Admin_Bar_Render
    is
       use Inc_Plugins;
@@ -171,13 +146,10 @@ is
       Rendered := True;
    end Wp_Admin_Bar_Render;
 
-   --
-   -- Adds the WordPress logo menu.
-   --
-   -- @since 3.3.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   --------------------------
+   -- Wp_Admin_Bar_Wp_Menu --
+   --------------------------
+
    procedure Wp_Admin_Bar_Wp_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Load;
@@ -277,13 +249,10 @@ is
       end;
    end Wp_Admin_Bar_Wp_Menu;
 
-   --
-   -- Adds the sidebar toggle button.
-   --
-   -- @since 3.8.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ---------------------------------
+   -- Wp_Admin_Bar_Sidebar_Toggle --
+   ---------------------------------
+
    procedure Wp_Admin_Bar_Sidebar_Toggle (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Load;
@@ -301,13 +270,10 @@ is
       end if;
    end Wp_Admin_Bar_Sidebar_Toggle;
 
-   --
-   -- Adds the "My Account" item.
-   --
-   -- @since 3.3.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ----------------------------------
+   -- Wp_Admin_Bar_My_Account_Item --
+   ----------------------------------
+
    procedure Wp_Admin_Bar_My_Account_Item (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Class_Wp_Users;
@@ -355,13 +321,10 @@ is
       end;
    end Wp_Admin_Bar_My_Account_Item;
 
-   --
-   -- Adds the "My Account" submenu items.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ----------------------------------
+   -- Wp_Admin_Bar_My_Account_Menu --
+   ----------------------------------
+
    procedure Wp_Admin_Bar_My_Account_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Class_Wp_Users;
@@ -443,13 +406,10 @@ is
       end;
    end Wp_Admin_Bar_My_Account_Menu;
 
-   --
-   -- Adds the "Site Name" menu.
-   --
-   -- @since 3.3.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ----------------------------
+   -- Wp_Admin_Bar_Site_Menu --
+   ----------------------------
+
    procedure Wp_Admin_Bar_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Formatting;
@@ -553,13 +513,10 @@ is
       end if;
    end Wp_Admin_Bar_Site_Menu;
 
-   --
-   -- Adds the "Edit site" link to the Toolbar.
-   --
-   -- @since 5.9.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ---------------------------------
+   -- Wp_Admin_Bar_Edit_Site_Menu --
+   ---------------------------------
+
    procedure Wp_Admin_Bar_Edit_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Link_Templates;
@@ -587,14 +544,10 @@ is
       end;
    end Wp_Admin_Bar_Edit_Site_Menu;
 
-   --
-   -- Adds the "Customize" link to the Toolbar.
-   --
-   -- @since 4.3.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   -- @global WP_Customize_Manager wp_customize
-   --
+   ---------------------------------
+   -- Wp_Admin_Bar_Customize_Menu --
+   ---------------------------------
+
    procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Functions;
@@ -665,13 +618,10 @@ is
       Add_Action ("wp_before_admin_bar_render", "wp_customize_support_script");
    end Wp_Admin_Bar_Customize_Menu;
 
-   --
-   -- Adds the "My Sites/[Site Name]" menu and all submenus.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   --------------------------------
+   -- Wp_Admin_Bar_My_Sites_Menu --
+   --------------------------------
+
    procedure Wp_Admin_Bar_My_Sites_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Ada.Containers;
@@ -967,13 +917,10 @@ is
       end;
    end Wp_Admin_Bar_My_Sites_Menu;
 
-   --
-   -- Provides a shortlink.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ---------------------------------
+   -- Wp_Admin_Bar_Shortlink_Menu --
+   ---------------------------------
+
    procedure Wp_Admin_Bar_Shortlink_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Formatting;
@@ -1002,22 +949,10 @@ is
       end;
    end Wp_Admin_Bar_Shortlink_Menu;
 
-   --
-   -- Provides an edit link for posts and terms.
-   --
-   -- @since 3.1.0
-   -- @since 5.5.0 Added a "View Post" link on Comments screen for a single post.
-   --
-   -- @global WP_Term  tag
-   -- @global WP_Query wp_the_query WordPress Query object.
-   -- @global int      user_id      The ID of the user being edited. Not to be
-   --                               confused with the global user_ID, which contains
-   --                               the ID of the current user.
-   -- @global int      post_id      The ID of the post when editing comments for a
-   --                               single post.
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ----------------------------
+   -- Wp_Admin_Bar_Edit_Menu --
+   ----------------------------
+
    procedure Wp_Admin_Bar_Edit_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Adi_Class_Wp_Screens;
@@ -1247,13 +1182,10 @@ is
       end if;
    end Wp_Admin_Bar_Edit_Menu;
 
-   --
-   -- Adds "Add New" menu.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   -----------------------------------
+   -- Wp_Admin_Bar_New_Content_Menu --
+   -----------------------------------
+
    procedure Wp_Admin_Bar_New_Content_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Link_Templates;
@@ -1400,13 +1332,10 @@ is
       end;
    end Wp_Admin_Bar_New_Content_Menu;
 
-   --
-   -- Adds edit comments link with awaiting moderation count bubble.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   --------------------------------
+   -- Wp_Admin_Bar_Comments_Menu --
+   --------------------------------
+
    procedure Wp_Admin_Bar_Comments_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Comments;
@@ -1444,13 +1373,10 @@ is
       Admin_Bar.Add_Node (Node);
    end Wp_Admin_Bar_Comments_Menu;
 
-   --
-   -- Adds appearance submenu items to the "Site Name" menu.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ----------------------------------
+   -- Wp_Admin_Bar_Appearance_Menu --
+   ----------------------------------
+
    procedure Wp_Admin_Bar_Appearance_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Link_Templates;
@@ -1542,13 +1468,10 @@ is
       end if;
    end Wp_Admin_Bar_Appearance_Menu;
 
-   --
-   -- Provides an update link if theme/plugin/core updates are available.
-   --
-   -- @since 3.1.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   -------------------------------
+   -- Wp_Admin_Bar_Updates_Menu --
+   -------------------------------
+
    procedure Wp_Admin_Bar_Updates_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Functions;
@@ -1589,13 +1512,10 @@ is
       end;
    end Wp_Admin_Bar_Updates_Menu;
 
-   --
-   -- Adds search form.
-   --
-   -- @since 3.3.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ------------------------------
+   -- Wp_Admin_Bar_Search_Menu --
+   ------------------------------
+
    procedure Wp_Admin_Bar_Search_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Formatting;
@@ -1628,13 +1548,10 @@ is
       end;
    end Wp_Admin_Bar_Search_Menu;
 
-   --
-   -- Adds a link to exit recovery mode when Recovery Mode is active.
-   --
-   -- @since 5.2.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   -------------------------------------
+   -- Wp_Admin_Bar_Recovery_Mode_Menu --
+   -------------------------------------
+
    procedure Wp_Admin_Bar_Recovery_Mode_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Inc_Class_Wp_Recovery_Mode;
@@ -1664,13 +1581,10 @@ is
       end;
    end Wp_Admin_Bar_Recovery_Mode_Menu;
 
-   --
-   -- Adds secondary menus.
-   --
-   -- @since 3.3.0
-   --
-   -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
-   --
+   ---------------------------------------
+   -- Wp_Admin_Bar_Add_Secondary_Groups --
+   ---------------------------------------
+
    procedure Wp_Admin_Bar_Add_Secondary_Groups (Admin_Bar : in out Wp_Admin_Bar)
    is
    begin
@@ -1694,11 +1608,10 @@ is
       end;
    end Wp_Admin_Bar_Add_Secondary_Groups;
 
-   --
-   -- Prints style and scripts for the admin bar.
-   --
-   -- @since 3.1.0
-   --
+   -------------------------
+   -- Wp_Admin_Bar_Header --
+   -------------------------
+
    procedure Wp_Admin_Bar_Header
    is
       use Inc_Themes;
@@ -1712,11 +1625,10 @@ is
 --        <?php
    end Wp_Admin_Bar_Header;
 
-   --
-   -- Prints default admin bar callback.
-   --
-   -- @since 3.1.0
-   --
+   -------------------------
+   -- X_Admin_Bar_Bump_Cb --
+   -------------------------
+
    procedure X_Admin_Bar_Bump_Cb
    is
       use Inc_Themes;
@@ -1735,18 +1647,10 @@ is
 --        <?php
    end X_Admin_Bar_Bump_Cb;
 
-   --
-   -- Sets the display status of the admin bar.
-   --
-   -- This can be called immediately upon plugin load. It does not need to be called
-   -- from a function hooked to the then@see "init"end; action.
-   --
-   -- @since 3.1.0
-   --
-   -- @global bool show_admin_bar
-   --
-   -- @param bool show Whether to allow the admin bar to show.
-   --
+   --------------------
+   -- Show_Admin_Bar --
+   --------------------
+
    procedure Show_Admin_Bar (Show : Boolean)
    is
 --    global show_admin_bar;
@@ -1754,20 +1658,10 @@ is
       X_Show_Admin_Bar := Show; -- (bool)
    end Show_Admin_Bar;
 
-   --
-   -- Determines whether the admin bar should be showing.
-   --
-   -- For more information on this and similar theme functions, check out
-   -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
-   -- Conditional Tagsend; article in the Theme Developer Handbook.
-   --
-   -- @since 3.1.0
-   --
-   -- @global bool   show_admin_bar
-   -- @global string pagenow        The filename of the current screen.
-   --
-   -- @return bool Whether the admin bar should be showing.
-   --
+   --------------------------
+   -- Is_Admin_Bar_Showing --
+   --------------------------
+
    function Is_Admin_Bar_Showing
             return Boolean
    is
@@ -1816,18 +1710,10 @@ is
       return X_show_admin_bar;
    end Is_Admin_Bar_Showing;
 
-   --
-   -- Retrieves the admin bar display preference of a user.
-   --
-   -- @since 3.1.0
-   -- @access private
-   --
-   -- @param string context Context of this preference check. Defaults to "front".
-   --                       The "admin" preference is no longer used.
-   -- @param int    user    Optional. ID of the user to check, defaults to 0 for
-   --                       current user.
-   -- @return bool Whether the admin bar should be showing for this user.
-   --
+   --------------------------
+   -- X_Get_Admin_Bar_Pref --
+   --------------------------
+
    function X_Get_Admin_Bar_Pref (Context : String  := "front";
                                   User    : Integer := 0)
                                   return Boolean
