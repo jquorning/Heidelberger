@@ -6,13 +6,10 @@
 -- @package WordPress
 --
 
-with Arrays;
-
 with Inc_Class_Wp_Users;
 
 package Inc_Pluggables
 is
-   use Arrays;
 
    --
    -- Retrieves the current user object.

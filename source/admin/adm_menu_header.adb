@@ -7,8 +7,9 @@
 
 with Ada.Containers;
 
+with Arrays;
 with Globals;
-with Hb_Common;
+with HB_Common;
 with Php;
 
 with Adi_Plugins;
@@ -19,10 +20,11 @@ with Inc_Plugins;
 
 package body Adm_Menu_Header
 is
+   use Arrays;
    use Globals;
    use Php;
    use Inc_L10n;
-   use Hb_Common;
+   use HB_Common;
 
 --
 -- The current page.
@@ -95,6 +97,8 @@ is
          declare
             use List_Vectors;
             use Adm_Menu;
+            use type Adm_Menu.Submenu_Maps.Map;
+            use type Adm_Menu.Inner_Maps.Map;
 
             Admin_Is_Parent : Boolean    := False;
             Class           : List_Type  := Empty_List;
@@ -102,29 +106,24 @@ is
             Aria_Hidden     : Unbounded_String;
             Is_Separator    : Boolean    := False;
 
-            Submenu_Index : Adm_Menu.Submenu_Index;
-            Submenu_Found : Boolean;
-
-            Submenu_Items : constant Submenu_Type :=
-               Get_Sub_Submenu (Submenu, Menu_Slug => -Item.Menu_Slug);
+            Submenu_Items : Adm_Menu.Inner_Maps.Map;
          begin
-            Find_Submenu (Submenu, -Item.Menu_Slug, Submenu_Found, Submenu_Index);
 
             if First then
                Append (Class, +"wp-first-item");  -- ()
-               First   := False;
+               First := False;
             end if;
 
             if Item.Menu_Slug /= "" then
                Append (Class, +"wp-has-submenu"); -- ()
---               Submenu_Items := Hb_Menu.Find_Submenu (Submenu, Item.Menu_Slug);
+               Submenu_Items := Submenu (-Item.Menu_Slug);
             end if;
 
             if
               (Parent_File /= "" and then Item.Menu_Slug = Parent_File) or else
               (Empty (-Typenow) and then Self = Item.Menu_Slug)
             then
-               if not Submenu_Found then
+               if Submenu_Items = Inner_Maps.Empty_Map then
 --             if not Empty (Submenu_Items) then
                   Append (Class, +"wp-has-current-submenu wp-menu-open");
                else
@@ -133,14 +132,14 @@ is
                end if;
             else
                Append (Class, +"wp-not-current-submenu");  -- ()
-               if Submenu_Found then
+               if Submenu_Items = Inner_Maps.Empty_Map then
 --               if not Empty (Submenu_Items) then
                   Append (Aria_Attributes, +"aria-haspopup=""true""");
                end if;
             end if;
 
             if Item.Classes /= "" then
-               Append (Class, +Esc_Attr (-Item.Classes));
+               Append (Class, +ESC_Attr (-Item.Classes));
             end if;
 
             declare
@@ -172,7 +171,7 @@ is
                -- as special cases.
                --
                if Item.Icon_Url /= "" then
-                  Img := +"<img src=""" & Esc_Url (-Item.Icon_Url) & """ alt="" />";
+                  Img := +"<img src=""" & ESC_URL (-Item.Icon_Url) & """ alt="" />";
 
                   if "none" = Item.Icon_Url or else "div" = Item.Icon_Url then
                      Img := +"<br />";
@@ -181,7 +180,7 @@ is
                      -- The value is base64-encoded data, so esc_attr() is used here
                      -- instead of esc_url().
                      Img_Style := +" style=""background-image:url(\""" &
-                                   Esc_Attr (-Item.Icon_Url) & "\"")""";
+                                   ESC_Attr (-Item.Icon_Url) & "\"")""";
                      Img_Class := +" svg";
                   elsif 0 = Strpos (-Item.Icon_Url, "dashicons-") then
                      Img       := +"<br />";
@@ -205,17 +204,22 @@ is
 
                   if Is_Separator then
                      Echo ("<div class=""separator""></div>");
-                  elsif Submenu_As_Parent and then not Submenu_Found then
+                  elsif
+                    Submenu_As_Parent and then
+                    Submenu_Items /= Inner_Maps.Empty_Map
+                  then
                      declare
                         Submenu_Items_2 : constant Submenu_Type :=
                            Filter_And_Sort (Submenu);  -- Re-index.
 
-                        -- Submenu_Items_2 : List_Type :=
-                        --    Array_Values (Submenu_Items);  -- Re-index.
+                        -- Re-index.
+                        Submenu_Map : constant Inner_Maps.Map :=
+                           Submenu_Items_2.First_Element;
 
-                        Menu_File : String  :=
-                           -Submenu_Items_2.First_Element.Menu_Slug; -- (0)(2)
---                      Menu_File     : String  := Submenu_Items_2 (0) (2);
+                        Elem        : constant Submenu_Item :=
+                           Submenu_Map.First_Element;
+
+                        Menu_File   : String := -Elem.Menu_Slug;
 
                         Menu_Hook : constant String :=
                            Adi_Plugins.Get_Plugin_Page_Hook (Menu_File,
@@ -331,7 +335,7 @@ is
                               end if;
 
                               if Sub_Item.Classes /= "" then
-                                 Append (Class, +Esc_Attr (-Sub_Item.Classes));
+                                 Append (Class, +ESC_Attr (-Sub_Item.Classes));
                               end if;
 
                               declare
@@ -383,7 +387,7 @@ is
                                                 Build ("page", -Sub_Item.Menu_Slug))),
                                                         +"admin.php");
                                        end if;
-                                       Sub_Item_Url := +Esc_Url (-Sub_Item_Url);
+                                       Sub_Item_Url := +ESC_URL (-Sub_Item_Url);
                                        Echo ("<liclass><a href=""" & (-Sub_Item_Url) &
                                              """classaria_attributes>title</a></li>");
                                     end;
@@ -396,9 +400,9 @@ is
                         end;
                         << Continue_1 >>
                      end loop;
-                     echo ("</ul>");
+                     Echo ("</ul>");
                   end if;
-                  echo ("</li>");
+                  Echo ("</li>");
                end;
             end;
          end;

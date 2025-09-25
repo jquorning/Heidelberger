@@ -6,12 +6,8 @@
 -- @since 2.3.0
 --
 
-with Arrays;
-
 package Inc_Updates
 is
-   use Arrays;
-
    type Update_Counts is
       record
          Plugins      : Natural := 0;

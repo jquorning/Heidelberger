@@ -7,14 +7,11 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
-
 with Adm_Menu;
 
 package Adm_Menu_Header
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
    Self         : Unbounded_String;

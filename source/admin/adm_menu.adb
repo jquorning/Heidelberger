@@ -5,10 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Fixed;
-
---  with Templates_Parser;
-
 with Php;
 with Globals;
 with HB_Common;
@@ -41,7 +37,7 @@ is
 
    function To_Menu (Menu_Title : String;
                      Capability : String;
-                     Menu_slug  : String;
+                     Menu_Slug  : String;
                      Page_Title : String;
                      Classes    : String;
                      Hookname   : String := "";
@@ -96,7 +92,7 @@ is
             Cap := +"update_core";
          elsif Current_User_Can ("update_plugins") then
             Cap := +"update_plugins";
-         elsif current_user_can ("update_themes") then
+         elsif Current_User_Can ("update_themes") then
             Cap := +"update_themes";
          else
             Cap := +"update_languages";
@@ -135,7 +131,7 @@ is
 
       I := 15;
       for Tax of Inc_Media.Get_Taxonomies_For_Attachments ("objects") loop
-         if not Tax.Show_UI or else not Tax.Show_In_Menu then
+         if not Tax.Show_Ui or else not Tax.Show_In_Menu then
             goto Continue_1;
          end if;
 
@@ -306,7 +302,7 @@ is
                I := 15;
                for Tax of Inc_Taxonomys.Get_Taxonomies (Empty_Array, "objects") loop
                   if
-                    not Tax.Show_UI      or else
+                    not Tax.Show_Ui      or else
                     not Tax.Show_In_Menu or else
                     not In_Array (Ptype, Tax.Object_Type, True) -- (array)
                   then
@@ -398,11 +394,11 @@ is
          begin
             -- Hide Customize link on block themes unless a plugin or theme
             -- is using "customize_register" to add a setting.
-            if not wp_Is_Block_Theme or Has_Action ("customize_register") then
+            if not Wp_Is_Block_Theme or Has_Action ("customize_register") then
 
                declare
                   Block_Theme : constant Boolean :=
-                     wp_Is_Block_Theme or else
+                     Wp_Is_Block_Theme or else
                      Current_Theme_Supports ("block-template-parts");
 
                   Position : constant Adm_Menu.Submenu_Index :=
@@ -509,7 +505,7 @@ is
                use Inc_Themes;
                use Adi_Plugins;
             begin
-               if not wp_Is_Block_Theme then
+               if not Wp_Is_Block_Theme then
                   return;
                end if;
                Add_Submenu_Page (
@@ -527,7 +523,7 @@ is
             begin
                if not Is_Multisite and then Current_User_Can ("update_plugins") then
                   if True then -- not Isset (Update_Data) then
-                     Update_Data := Inc_Updates.wp_Get_Update_Data; -- ();
+                     Update_Data := Inc_Updates.Wp_Get_Update_Data; -- ();
                   end if;
                   Plugin_Count := +Natural'Image (Update_Data.Plugins);
 --                Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
@@ -721,48 +717,6 @@ is
       -- ));
    end Run;
 
-   ------------------
-   -- Find_Submenu --
-   ------------------
-
-   procedure Find_Submenu (Submenu : Submenu_Type;
-                           Slug    : String;
-                           Found   : out Boolean;
-                           Index   : out Submenu_Index)
-   is
-   begin
-      for S in Submenu.First_Index .. Submenu.Last_Index loop
-         if Submenu (S).Menu_Slug = Slug then
-            Index := S;
-            Found := True;
-            return;
-         end if;
-      end loop;
-
-      Found := False;
-      Index := Submenu_Index'First;
-   end Find_Submenu;
-
-   ---------------------
-   -- Get_Sub_Submenu --
-   ---------------------
-
-   function Get_Sub_Submenu (Submenu   : Submenu_Type;
-                             Menu_Slug : String)
-                             return Submenu_Type
-   is
-      use Submenu_Vectors;
-
-      Result : Submenu_Type;
-   begin
-      for Sub of Submenu loop
-         if Sub.Menu_Slug = Menu_Slug then
-            Append (Result, Sub);
-         end if;
-      end loop;
-      return Result;
-   end Get_Sub_Submenu;
-
    ---------------------
    -- Filter_And_Sort --
    ---------------------
@@ -780,7 +734,7 @@ is
 
    function To_Menu (Menu_Title : String;
                      Capability : String;
-                     Menu_slug  : String;
+                     Menu_Slug  : String;
                      Page_Title : String;
                      Classes    : String;
                      Hookname   : String := "";
@@ -788,13 +742,13 @@ is
                      return Menu_Item
    is
       Item : constant Menu_Item :=
-                          (Menu_Title => +Menu_Title,
-                           Capability => +Capability,
-                           Menu_Slug  => +Menu_Slug,
-                           Page_Title => +Page_Title,
-                           Classes    => +Classes,
-                           Hookname   => +Hookname,
-                           Icon_Url   => +Icon_Url);
+         (Menu_Title  =>  +Menu_Title,
+          Capability  =>  +Capability,
+          Menu_Slug   =>  +Menu_Slug,
+          Page_Title  =>  +Page_Title,
+          Classes     =>  +Classes,
+          Hookname    =>  +Hookname,
+          Icon_Url    =>  +Icon_Url);
    begin
       return Item;
    end To_Menu;
@@ -812,14 +766,41 @@ is
                   Unknown    : String := "";
                   Classes    : String := "")
    is
-      Item : constant Submenu_Item :=
-        (Menu_Title => +Menu_Title,
-         Capability => +Capability,
-         Menu_Slug  => +Menu_Slug,
-         Page_Title => +Page_Title,      -- Page_Title,
-         Classes    => +Classes);
+      -- Submenu (position : int) (menu_slug : map) of submenu_item
+
+      Sub_Item : constant Submenu_Item :=
+        (Menu_Title  =>  +Menu_Title,
+         Capability  =>  +Capability,
+         Menu_Slug   =>  +Menu_Slug,
+         Page_Title  =>  +Page_Title,
+         Classes     =>  +Classes);
+
+      use Submenu_Maps;
+      use Inner_Maps;
+
+      A : Inner_Maps.Map := Submenu (Menu_Slug);
    begin
-      Adm_Menu.Submenu (Position) := Item;
+      if A = Inner_Maps.Empty_Map then
+         declare
+            Map : Inner_Maps.Map;
+         begin
+            Map.Include (Key => Position, New_Item => Sub_Item);
+            Submenu.Include (Key => Menu_Slug, New_Item => Map);
+         end;
+      else
+         declare
+--          M : Submenu_Maps.Map;
+            E : constant Inner_Maps.Cursor := A.Find (Key => Position);
+         begin
+            if E = Inner_Maps.No_Element then
+               A.Include (Key => Position, New_Item => Sub_Item);
+            else
+               A.Include (Key => Position, New_Item => Sub_Item);
+            end if;
+
+         end;
+      end if;
+--    Adm_Menu.Submenu (Position) := Item;
    end Set;
 
 end Adm_Menu;

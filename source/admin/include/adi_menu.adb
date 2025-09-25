@@ -5,9 +5,8 @@
 -- @subpackage Administration
 --
 
-with Ada.Containers.Generic_Array_Sort;
-with Ada.Containers.Generic_Constrained_Array_Sort;
-with Ada.Strings.Unbounded;
+with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded.Less_Case_Insensitive;
 
 with Arrays;
@@ -30,12 +29,6 @@ is
    use Arrays;
    use HB_Common;
    use Php;
-
-   -- Dummy
-   function Apply_Filters (Hookname : String;
-                           Menu     : Adm_Menu.Menu_Vector)
-                           return Adm_Menu.Menu_Vector
-                           is (Menu);
 
    --
    -- Adds a CSS class to a string.
@@ -60,10 +53,31 @@ is
    -- @param array menu The array of administration menu items.
    -- @return array The array of administration menu items with the CSS classes added.
    --
-   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector); -- Array_Type)
---                              return Adm_Menu.Menu_Vector;  -- Array_Type
---   function Add_Menu_Classes (Menu : Array_Type)
---                              return Array_Type;
+   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector);
+
+   package Boolean_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Boolean);
+
+   package Slug_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Boolean_Maps.Map,
+                                              "="          => Boolean_Maps."=");
+
+   package Slug_Vectors is new
+      Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                         Element_Type => String);
+
+   -- Dummys
+   function Apply_Filters (Hookname : String;
+                           Menu     : Slug_Vectors.Vector)
+                           return Slug_Vectors.Vector
+                           is (Menu);
+
+   function Apply_Filters (Hookname : String;
+                           Menu     : Adm_Menu.Menu_Vector)
+                           return Adm_Menu.Menu_Vector
+                           is (Menu);
 
    ---------
    -- Run --
@@ -129,14 +143,16 @@ is
                Hook_Name := +Substr (-Menu_Page.Menu_Slug, 0, Pos); -- (2)
                declare
                   Hook_Args : String := Substr (-Menu_Page.Menu_Slug, Pos + 1); -- (2)
+                  pragma Unreferenced (Hook_Args);
                begin
-                  Inc_Formatting.Wp_Parse_Str (Hook_Args, Hook_Args);
-                  -- Set the hook name to be the post type.
-                  if Isset (Hook_Args ("post_type")) then
-                     Hook_Name := +Hook_Args ("post_type");
-                  else
-                     Hook_Name := +Basename (-Hook_Name, ".php");
-                  end if;
+                  null;
+--                Inc_Formatting.Wp_Parse_Str (Hook_Args, Hook_Args);
+--                -- Set the hook name to be the post type.
+--                if Isset (Hook_Args ("post_type")) then
+--                   Hook_Name := +Hook_Args ("post_type");
+--                else
+--                   Hook_Name := +Basename (-Hook_Name, ".php");
+--                end if;
 --                Unset (Hook_Args);
                end;
             else
@@ -159,28 +175,27 @@ is
 --    Unset (Compat);
 
       declare
-         X_Wp_Submenu_Nopriv : Array_Type;
+         X_Wp_Submenu_Nopriv : Slug_Maps.Map;
          X_Wp_Menu_Nopriv    : List_Type;
       begin
          -- Loop over submenus and remove pages for which the user does not have privs.
-         for A in Submenu.First_Index .. Submenu.Last_Index loop
+         for A in Submenu.Iterate loop
             declare
                use Adm_Menu;
 
---             Parent : String := -A.Key;
---             Sub    : String := -A.Value;
-               Parent : Submenu_Index := A;
-               Sub    : Submenu_Item renames Submenu (A);
+               Parent : constant String := Submenu_Maps.Key (A);
+               Sub    : Inner_Maps.Map renames Submenu (Parent);
             begin
-               for B of Sub loop
+               for B in Sub.Iterate loop
                   declare
-                     Index : constant String := -B.Key;
-                     Data  : constant String := -B.Value;
+                     Index : constant Submenu_Index := Inner_Maps.Key (B);
+                     Data  : Submenu_Item renames Submenu (Parent) (Index);
                   begin
                      if not Inc_Capabilities.Current_User_Can (-Data.Capability) then
 --                   if not Inc_Capabilities.Current_User_Can (Data (1)) then
-                        Unset (Submenu (Parent) (Index));
-                        X_Wp_Submenu_Nopriv (Parent) (-Data.Menu_Slug) := True;
+                        Submenu (Parent).Delete (Index);
+--                      Unset (Submenu (Parent) (Index));
+                        X_Wp_Submenu_Nopriv (Parent).Include (-Data.Menu_Slug, True);
 --                      X_wp_Submenu_Nopriv (Parent) (Data (2)) := True;
                      end if;
                   end;
@@ -188,7 +203,7 @@ is
 --             Unset (Index);
 --             Unset (Data);
 
-               if Submenu.Contains (Sub) then
+               if Submenu.Contains (Parent) then
 --             if Empty (Submenu (Parent)) then
                   Submenu.Delete (Parent);
 --                Unset (Submenu (Parent));
@@ -205,13 +220,11 @@ is
          -- privileges will have the next submenu in line be assigned as the new menu
          -- parent.
          --
-         for M in Menu.First_Index .. Menu.Last_Index loop
+         for M in Menu.Iterate loop
             declare
                use Adm_Menu;
 
---             Id   : constant String := -M.Key;
---             Data : constant String := -M.Value;
-               Id   : constant Menu_Index := M;
+               Id   : constant Menu_Index := Menu_Vectors.To_Index (M);
                Data : Menu_Item renames Menu (Id);
             begin
                if not Submenu.Contains (-Data.Menu_Slug) then -- (2)
@@ -220,10 +233,12 @@ is
                end if;
 
                declare
-                  Subs       : String  := Submenu (-Data.Menu_Slug); -- (2)
-                  First_Sub  : Integer := Reset (Subs);       -- (2)
-                  Old_Parent : String  := -Data.Menu_Slug;           -- (2)
-                  New_Parent : String  := -First_Sub.Menu_Slug;      -- (2)
+                  use Inner_Maps;
+
+                  Subs       : constant Map    := Submenu (-Data.Menu_Slug);
+                  First_Sub  : constant Cursor := Subs.First;
+                  Old_Parent : constant String := -Data.Menu_Slug;
+                  New_Parent : constant String := -Element (First_Sub).Menu_Slug;
                begin
                   --
                   -- If the first submenu is not the same as the assigned parent,
@@ -255,22 +270,27 @@ is
                         end if;
                      end;
 --                   X_Wp_Real_Parent_File (Old_Parent) := New_Parent;
-                     Menu (Id) (2)                      := New_Parent;
+                     Menu (Id).Menu_Slug                := +New_Parent; -- (2)
+--                   Menu (Id) (2)                      := New_Parent;
 
-                     for S of Submenu (Old_Parent) loop
+                     for Sub in Submenu (Old_Parent).Iterate loop
                         declare
-                           Index : constant String := -S.Key;
-                           Data  : constant String := -S.Value;
+                           Index : constant Submenu_Index := Key (Sub);
+--                         Index : constant Submenu_Maps.Cursor := Key (Sub);
+--                         Data  : constant String := -Sub.Value;
                         begin
                            Submenu (New_Parent) (Index) :=
                               Submenu (Old_Parent) (Index);
-                           Unset (Submenu (Old_Parent) (Index));
+                           Submenu (Old_Parent).Delete (Index);
+--                         Unset (Submenu (Old_Parent) (Index));
                         end;
                      end loop;
-                     Unset (Submenu (Old_Parent));
+                     Submenu.Delete (Old_Parent);
+--                   Unset (Submenu (Old_Parent));
 --                   Unset (Index);
 
-                     if Isset (X_Wp_Submenu_Nopriv (old_parent)) then
+                     if X_Wp_Submenu_Nopriv.Contains (Old_Parent) then
+--                   if Isset (X_Wp_Submenu_Nopriv (Old_Parent)) then
                         X_Wp_Submenu_Nopriv (New_Parent) :=
                            X_Wp_Submenu_Nopriv (Old_Parent);
                      end if;
@@ -324,9 +344,11 @@ is
          for M in Menu.First_Index .. Menu.Last_Index loop
             declare
                use Adm_Menu;
+               use type Ada.Containers.Count_Type;
 
-               Id   : Menu_Index := M; -- constant String := -M.Key;
-               Data : Menu_Item  renames Menu (Id); -- constant String := -M.Value;
+               Id   : constant Menu_Index := M;
+               Data : Menu_Item  renames Menu (Id);
+               Slug : constant String := -Data.Menu_Slug;
             begin
                if not Inc_Capabilities.Current_User_Can (-Data.Capability) then -- (1)
                   X_Wp_Menu_Nopriv.Append (Data.Menu_Slug); -- := True; -- (2)
@@ -337,21 +359,24 @@ is
                -- parent, remove the submenu.
                --
                if
-                 not Submenu (Data.Menu_Slug).Is_Empty and then -- (2)
-                 1 = Length (Submenu (Data.Menu_Slug)) -- (2)
+                 not Submenu (Slug).Is_Empty and then -- (2)
+                 1 = Submenu (Slug).Length -- (2)
                then
                   declare
-                     Subs      : Integer := Submenu (Data.Menu_Slug); -- (2)
-                     First_Sub : Integer := Reset (Subs);
+                     use Inner_Maps;
+
+                     Subs      : constant Map    := Submenu (Slug); -- (2)
+                     First_Sub : constant Cursor := Subs.First; -- Reset (Subs);
                   begin
-                     if Data.Menu_Slug = First_Sub.Menu_Slug then -- 2x(2)
-                        Unset (Submenu (Data.Menu_Slug));   -- (2)
+                     if Data.Menu_Slug = Element (First_Sub).Menu_Slug then -- 2x(2)
+                        Submenu.Delete (Slug);   -- (2)
+--                      Unset (Submenu (Data.Menu_Slug));   -- (2)
                      end if;
                   end;
                end if;
 
                -- If submenu is empty...
-               if Empty (Submenu (Data.Menu_Slug)) then  -- (2)
+               if Submenu (Slug).Is_Empty then  -- (2)
                   -- And user Doesn't have privs, remove menu.
                   if X_Wp_Menu_Nopriv.Contains (Data.Menu_Slug) then  -- (2)
 --                if Isset (X_Wp_Menu_Nopriv (Data.Menu_Slug)) then  -- (2)
@@ -399,11 +424,11 @@ is
       --
       if Apply_Filters ("custom_menu_order", False) then
          declare
-            Menu_Order         : List_Type;
-            Default_Menu_Order : List_Type;
+            Menu_Order         : Slug_Vectors.Vector;
+            Default_Menu_Order : Slug_Vectors.Vector;
          begin
             for Menu_Item of Menu loop
-               List_Vectors.Append (Menu_Order, Menu_Item.Menu_Slug); -- () & (2)
+               Menu_Order.Append (-Menu_Item.Menu_Slug); -- () & (2)
             end loop;
 --            Unset (Menu_Item);
             Default_Menu_Order := Menu_Order;
@@ -444,14 +469,12 @@ is
                function Less_Than (Left, Right : Adm_Menu.Menu_Item)
                                   return Boolean
                is
-                  use List_Vectors;
-
 --                global Menu_Order, Default_Menu_Order;
                   A : constant String := -Left. Menu_Slug; --  (2)
                   B : constant String := -Right.Menu_Slug; --  (2)
 
-                  Contains_A : constant Boolean := Contains (Menu_Order, +A);
-                  Contains_B : constant Boolean := Contains (Menu_Order, +B);
+                  Contains_A : constant Boolean := Menu_Order.Contains (A);
+                  Contains_B : constant Boolean := Menu_Order.Contains (B);
                begin
                   if Contains_A and not Contains_B then
                      return True;
@@ -461,10 +484,12 @@ is
 
                   elsif Contains_A and Contains_B then
                      return
-                        Menu_Order (A) < Menu_Order (B);
+                        Slug_Vectors.Element (Menu_Order.Find (A)) <
+                        Slug_Vectors.Element (Menu_Order.Find (B));
                   else
                      return
-                        Default_Menu_Order (A) < Default_Menu_Order (B);
+                        Slug_Vectors.Element (Default_Menu_Order.Find (A)) <
+                        Slug_Vectors.Element (Default_Menu_Order.Find (B));
                   end if;
                end Less_Than;
 
@@ -587,25 +612,25 @@ is
    -- @param array menu The array of administration menu items.
    -- @return array The array of administration menu items with the CSS classes added.
    --
-   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector) -- Array_Type)
---                              return Adm_Menu.Menu_Vector  -- Array_Type
+   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector)
    is
       use Adm_Menu;
 
       First_Item       : Boolean    := False;
       Last_Order       : Boolean    := False;
       Last_Order_Index : Menu_Index := 0;
-      Items_Count      : Menu_Index := Menu.Last_Index; -- Count (Menu);
---    I           : Natural := 0;
+--    Items_Count      : Menu_Index := Menu.Last_Index; -- Count (Menu);
+--    I                : Natural := 0;
    begin
       for Order in Menu.First_Index .. Menu.Last_Index loop
          declare
 --            Order : constant String := -M.Key;
-            Top   : Menu_Item renames Menu (Order); -- constant String := -M.Value;
+            Top   : Menu_Item renames Menu (Order);
          begin
 --          I := I + 1;
 
-            if 0 = Order then -- Dashboard is always shown/single.
+            -- Dashboard is always shown/single.
+            if 0 = Order then
                Menu (0).Classes :=
                   +Add_Cssclass ("menu-top-first", -Top.Classes); -- 2x(4)
 
@@ -650,7 +675,7 @@ is
 
             Last_Order_Index := Order;
             Last_Order       := True;
---          Last_Order := Order;
+--          Last_Order       := Order;
          end;
          << Continue_2 >>
       end loop;

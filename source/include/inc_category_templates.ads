@@ -10,7 +10,6 @@ with Arrays;
 
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
-with Inc_Taxonomys;
 
 package Inc_Category_Templates
 is

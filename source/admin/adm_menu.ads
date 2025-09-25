@@ -1,6 +1,12 @@
+--
+-- Build Administration Menu.
+--
+-- @package WordPress
+-- @subpackage Administration
+--
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Containers.Multiway_Trees;
+with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
@@ -30,27 +36,21 @@ is
       -- 3 := page_title, 4 := classes, 5 := hookname, 6 := icon_url.
    type Menu_Item is
       record
-         Menu_Title : Unbounded_String; -- Name
-         Capability : Unbounded_String; -- Cap
-         Menu_Slug  : Unbounded_String; -- Url
-         Page_Title : Unbounded_String; -- Title
+         Menu_Title : Unbounded_String;
+         Capability : Unbounded_String;
+         Menu_Slug  : Unbounded_String;
+         Page_Title : Unbounded_String;
          Classes    : Unbounded_String;
-         Hookname   : Unbounded_String; -- Id
-         Icon_Url   : Unbounded_String; -- Icon
+         Hookname   : Unbounded_String;
+         Icon_Url   : Unbounded_String;
       end record;
 
    type Menu_Index is range 0 .. 99;
---   subtype Menu_Key is String;
 
---   package Menu_Maps is new
---      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => Menu_Key,
---                                              Element_Type => Menu_Item);
    package Menu_Vectors is new
       Ada.Containers.vectors (Index_Type   => Menu_Index,
                               Element_Type => Menu_Item);
 
--- type Menu_Array is array (Menu_Index) of Menu_Item;
---   subtype Menu_Map is Menu_Maps.Map;
    subtype Menu_Vector is Menu_Vectors.Vector;
 
    -- 0 := menu_title, 1 := capability, 2 := menu_slug,
@@ -66,43 +66,27 @@ is
 
    type Submenu_Index is new Natural;
 
---   No_Submenu : constant Submenu_Index := 0;
+   package Inner_Maps is new
+      Ada.Containers.Ordered_Maps (Key_Type     => Submenu_Index,
+                                   Element_Type => Submenu_Item);
 
-   -- package Submenu_Trees  is new
-   --    Ada.Containers.Multiway_Trees (Element_Type => Submenu_Item);
+   package Submenu_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Inner_Maps.Map,
+                                              "="          => Inner_Maps."=");
 
-   -- subtype Submenu_Type is Submenu_Trees.Tree;
+   subtype Submenu_Type is Submenu_Maps.Map;
 
-   package Submenu_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Submenu_Index,
-                              Element_Type => Submenu_Item);
-
-   subtype Submenu_Type is Submenu_Vectors.Vector;
-
-   Menu    : Menu_Vector;  -- Menu_Map;
+   Menu    : Menu_Vector;
    Submenu : Submenu_Type;
 
    --
-   --
+   -- Run
    --
    procedure Run;
 
    --
-   --
-   --
-   procedure Find_Submenu (Submenu : Submenu_Type;
-                           Slug    : String;
-                           Found   : out Boolean;
-                           Index   : out Submenu_Index);
-
-   --
-   --
-   --
-   function Get_Sub_Submenu (Submenu   : Submenu_Type;
-                             Menu_Slug : String)
-                             return Submenu_Type;
-   --
-   --
+   -- Filter_And_Sort
    --
    function Filter_And_Sort (Submenu : Submenu_Type)
                              return Submenu_Type;

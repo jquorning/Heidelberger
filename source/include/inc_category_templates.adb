@@ -13,6 +13,7 @@ with Adi_Caches;
 with Inc_Functions;
 with Inc_Load;
 with Inc_Posts;
+with Inc_Taxonomys;
 
 with Hb_Common;
 

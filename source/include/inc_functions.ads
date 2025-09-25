@@ -1,7 +1,6 @@
 with Arrays;
 
 with Inc_Class_Wp_Terms;
-with Inc_Taxonomys;
 
 package Inc_Functions
 is
