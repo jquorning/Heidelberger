@@ -33,14 +33,18 @@ is
 --
    procedure Top
    is
-      Self   : Unbounded_String;  -- Where does this come from? jq
+      use Adm_Menu;
+
+      Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
       Unused : Unbounded_String;
+      Self_2 : constant String := Get (X_SERVER, "PHP_SELF");
+      Self_3 : constant String := Preg_Replace ("|^.*/wp-admin/network/|i",
+                                                "", Self_2);
+      Self_4 : constant String := Preg_Replace ("|^.*/wp-admin/|i", "",   Self_3);
+      Self_5 : constant String := Preg_Replace ("|^.*/plugins/|i", "",    Self_4);
+      Self_6 : constant String := Preg_Replace ("|^.*/mu-plugins/|i", "", Self_5);
    begin
-      Self := +Get (X_SERVER, "PHP_SELF");
-      Self := +Preg_Replace ("|^.*/wp-admin/network/|i", "", -Self);
-      Self := +Preg_Replace ("|^.*/wp-admin/|i", "",   -Self);
-      Self := +Preg_Replace ("|^.*/plugins/|i", "",    -Self);
-      Self := +Preg_Replace ("|^.*/mu-plugins/|i", "", -Self);
+      Self := +Adm_Menu.Slug_Type (Self_6);
 
       --
       -- For when admin-header is included from within a function.
@@ -81,8 +85,8 @@ is
    ----------------------
 
    procedure X_Wp_Menu_Output
-     (Menu              : Adm_Menu.Menu_Vector; -- _Map; -- _Array; -- Array_Type;
-      Submenu           : Adm_Menu.Submenu_Type; -- Array_Type;
+     (Menu              : Adm_Menu.Menu_Vector;
+      Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True)
    is
       use Inc_Capabilities;
@@ -102,7 +106,7 @@ is
 
             Admin_Is_Parent : Boolean    := False;
             Class           : List_Type  := Empty_List;
-            Aria_Attributes : List_Type  := Empty_List; -- String     := "";
+            Aria_Attributes : List_Type  := Empty_List;
             Aria_Hidden     : Unbounded_String;
             Is_Separator    : Boolean    := False;
 
@@ -219,16 +223,17 @@ is
                         Elem        : constant Submenu_Item :=
                            Submenu_Map.First_Element;
 
-                        Menu_File   : String := -Elem.Menu_Slug;
+                        Menu_File   : Slug_Type := -Elem.Menu_Slug;
 
                         Menu_Hook : constant String :=
-                           Adi_Plugins.Get_Plugin_Page_Hook (Menu_File,
-                                                             -Item.Menu_Slug);
+                           Adi_Plugins.Get_Plugin_Page_Hook (String (Menu_File),
+                                                             String (-Item.Menu_Slug));
 
-                        Pos : constant Integer := Strpos (Menu_File, "?");
+                        Pos : constant Integer := Strpos (String (Menu_File), "?");
                      begin
                         if 0 /= Pos then
-                           Menu_File := Substr (Menu_File, 0, Pos);
+                           Menu_File :=
+                             Slug_Type (Substr (String (Menu_File), 0, Pos));
                         end if;
 
                         if not Empty (Menu_Hook)
@@ -237,9 +242,9 @@ is
                                         and then not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
-                           Echo ("<a href=""admin.php?page=" & Menu_File & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">title</div></a>");
+                           Echo ("<a href=""admin.php?page=" & String (Menu_File) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">title</div></a>");
                         else
-                           Echo ("\n\t<a href=""" & Menu_File & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">title</div></a>");
+                           Echo ("\n\t<a href=""" & String (Menu_File) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">title</div></a>");
                         end if;
                      end;
 
@@ -249,13 +254,14 @@ is
                   then
                      declare
                         Menu_Hook : constant String :=
-                           Adi_Plugins.Get_Plugin_Page_Hook (-Item.Menu_Slug,
+                           Adi_Plugins.Get_Plugin_Page_Hook (String (-Item.Menu_Slug),
                                                              "admin.php");
-                        Menu_File : String  := -Item.Menu_Slug;
-                        Pos       : constant Integer := Strpos (Menu_File, "?");
+                        Menu_File : Slug_Type := -Item.Menu_Slug;
+                        Pos : constant Integer := Strpos (String (Menu_File), "?");
                      begin
                         if 0 /= Pos then
-                           Menu_File := Substr (Menu_File, 0, Pos);
+                           Menu_File :=
+                             Slug_Type (Substr (String (Menu_File), 0, Pos));
                         end if;
 
                         if not Empty (Menu_Hook)
@@ -264,9 +270,9 @@ is
                                         and then not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
-                           Echo ("\n\t<a href=""admin.php?page=" & (-Item.Menu_Slug) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">" & (-Item.Menu_Title) & "</div></a>");
+                           Echo ("\n\t<a href=""admin.php?page=" & String (-Item.Menu_Slug) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">" & (-Item.Menu_Title) & "</div></a>");
                         else
-                           Echo ("\n\t<a href=""" & (-Item.Menu_Slug) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">" & (-Item.Menu_Title) & "</div></a>");
+                           Echo ("\n\t<a href=""" & String (-Item.Menu_Slug) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">" & (-Item.Menu_Title) & "</div></a>");
                         end if;
                      end;
                   end if;
@@ -297,18 +303,20 @@ is
                            end if;
 
                            declare
-                              Menu_File : String  := -Item.Menu_Slug;
-                              Pos       : constant Integer := Strpos (Menu_File, "?");
+                              Menu_File : Slug_Type        := -Item.Menu_Slug;
+                              Pos       : constant Integer :=
+                                Strpos (String (Menu_File), "?");
 
                               -- Handle current for post_type=post|page|foo pages,
                               -- which won't match self.
                               Self_Type : String :=
                                  (if not Empty (-Typenow)
-                                  then (-Self) & "?post_type=" & (-Typenow)
+                                  then String (-Self) & "?post_type=" & (-Typenow)
                                   else "nothing");
                            begin
                               if 0 /= Pos then
-                                 Menu_File := Substr (Menu_File, 0, Pos);
+                                 Menu_File :=
+                                   Slug_Type (Substr (String (Menu_File), 0, Pos));
                               end if;
 
                               if Submenu_File /= "" then
@@ -328,7 +336,7 @@ is
                                   Plugin_Page = Sub_Item.Menu_Slug and then
                                   (Item.Menu_Slug = Self_Type or else
                                    Item.Menu_Slug = Self      or else
-                                   File_Exists (Menu_File) = False))
+                                   not File_Exists (String (Menu_File))))
                               then
                                  Append (Class,           +"current");  -- ()
                                  Append (Aria_Attributes, +" aria-current=""page""");
@@ -346,13 +354,17 @@ is
 
                                  Menu_Hook : constant String :=
                                     Adi_Plugins.Get_Plugin_Page_Hook
-                                       (-Sub_Item.Menu_Slug, -Item.Menu_Slug);
+                                       (String (-Sub_Item.Menu_Slug),
+                                        String (-Item.Menu_Slug));
 
-                                 Sub_File : String  := -Sub_Item.Menu_Slug;
-                                 Pos      : constant Integer := Strpos (Sub_File, "?");
+                                 Sub_File : Slug_Type := -Sub_Item.Menu_Slug;
+
+                                 Pos : constant Integer :=
+                                   Strpos (String (Sub_File), "?");
                               begin
                                  if 0 /= Pos then
-                                    Sub_File := Substr (Sub_File, 0, Pos);
+                                    Sub_File :=
+                                      Slug_Type (Substr (String (Sub_File), 0, Pos));
                                  end if;
 
                                  Title :=
@@ -374,17 +386,17 @@ is
                                          (not Admin_Is_Parent and then
                                           File_Exists (WP_PLUGIN_DIR & "/menu_file") and then
                                           not Is_Dir (WP_PLUGIN_DIR & "/" &
-                                                      (-Item.Menu_Slug))) or else
-                                          File_Exists (Menu_File)
+                                                      String (-Item.Menu_Slug))) or else
+                                          File_Exists (String (Menu_File))
                                        then
                                           Sub_Item_Url := Add_Query_Arg (
                                              Arrays.To_Array ((1 =>
-                                                Build ("page", -Sub_Item.Menu_Slug))),
-                                                        Item.Menu_Slug);
+                                                Build ("page", String (-Sub_Item.Menu_Slug)))),
+                                                        Unbounded_String (Item.Menu_Slug));
                                        else
                                           Sub_Item_Url := Add_Query_Arg (
                                              Arrays.To_Array ((1 =>
-                                                Build ("page", -Sub_Item.Menu_Slug))),
+                                                Build ("page", String (-Sub_Item.Menu_Slug)))),
                                                         +"admin.php");
                                        end if;
                                        Sub_Item_Url := +ESC_URL (-Sub_Item_Url);
@@ -392,7 +404,8 @@ is
                                              """classaria_attributes>title</a></li>");
                                     end;
                                  else
-                                    Echo ("<liclass><a href=""" & (-Sub_Item.Menu_Slug) &
+                                    Echo ("<liclass><a href=""" &
+                                          String (-Sub_Item.Menu_Slug) &
                                           """classaria_attributes>title</a></li>");
                                  end if;
                               end;

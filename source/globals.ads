@@ -3,6 +3,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 
 with Inc_Class_Wpdb;
+with Adm_Menu;
 
 package Globals
 is
@@ -43,11 +44,10 @@ is
    Taxnow      : Unbounded_String;
    Pagenow     : Unbounded_String;
    Hook_Suffix : Unbounded_String;
-   Plugin_Page : Unbounded_String;
-   -- typenow, taxnow;
+   Plugin_Page : Adm_Menu.Unbounded_Slug;
 
    Title        : Unbounded_String;
-   Parent_File  : Unbounded_String;
-   Submenu_File : Unbounded_String;
+   Parent_File  : Adm_Menu.Unbounded_Slug;
+   Submenu_File : Adm_Menu.Unbounded_Slug;
 
 end Globals;

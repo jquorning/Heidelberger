@@ -18,6 +18,8 @@ is
 
    X_Wp_Real_Parent_File : Arrays.Array_Type;
 
+   type Unbounded_Slug is new Unbounded_String;
+
    --
    -- Constructs the admin menu.
    --
@@ -38,7 +40,7 @@ is
       record
          Menu_Title : Unbounded_String;
          Capability : Unbounded_String;
-         Menu_Slug  : Unbounded_String;
+         Menu_Slug  : Unbounded_Slug;
          Page_Title : Unbounded_String;
          Classes    : Unbounded_String;
          Hookname   : Unbounded_String;
@@ -59,23 +61,32 @@ is
       record
          Menu_Title : Unbounded_String;
          Capability : Unbounded_String;
-         Menu_Slug  : Unbounded_String;
+         Menu_Slug  : Unbounded_Slug;
          Page_Title : Unbounded_String;
          Classes    : Unbounded_String;
       end record;
 
    type Submenu_Index is new Natural;
+   type Slug_Type     is new String;
 
    package Inner_Maps is new
       Ada.Containers.Ordered_Maps (Key_Type     => Submenu_Index,
                                    Element_Type => Submenu_Item);
 
    package Submenu_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => Slug_Type,
                                               Element_Type => Inner_Maps.Map,
                                               "="          => Inner_Maps."=");
 
    subtype Submenu_Type is Submenu_Maps.Map;
+
+   function "-" (Item : Unbounded_Slug) return Slug_Type
+     is (Slug_Type (To_String (Unbounded_String (Item))));
+
+   function "+" (Item : Slug_Type) return Unbounded_Slug
+     is (Unbounded_Slug (Ada.Strings.Unbounded.To_Unbounded_String (String (Item))));
+
+   function "<" (Left, Right : Slug_Type) return Boolean is (True);
 
    Menu    : Menu_Vector;
    Submenu : Submenu_Type;

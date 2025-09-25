@@ -14,7 +14,7 @@ is
    use Ada.Strings.Unbounded;
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
-   Self         : Unbounded_String;
+   Self         : Adm_Menu.Unbounded_Slug;
 --   Parent_File  : Unbounded_String;
 --   Submenu_File : Unbounded_String;
 --   Plugin_Page  : Unbounded_String;

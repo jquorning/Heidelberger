@@ -56,17 +56,22 @@ is
    procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector);
 
    package Boolean_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => Boolean);
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => Adm_Menu.Slug_Type, -- String,
+         Element_Type => Boolean,
+         "<"          => Adm_Menu."<");
 
    package Slug_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => Boolean_Maps.Map,
-                                              "="          => Boolean_Maps."=");
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => Adm_Menu.Slug_Type, -- String,
+         Element_Type => Boolean_Maps.Map,
+         "="          => Boolean_Maps."=",
+         "<"          => Adm_Menu."<");
 
    package Slug_Vectors is new
       Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
-                                         Element_Type => String);
+                                         Element_Type => Adm_Menu.Slug_Type,
+                                         "="          => Adm_Menu."=");
 
    -- Dummys
    function Apply_Filters (Hookname : String;
@@ -135,14 +140,19 @@ is
       -- Create list of page plugin hook names.
       for Menu_Page of Menu loop
          declare
-            Pos : constant Integer := Strpos (-Menu_Page.Menu_Slug, "?"); -- (2)
+            use Adm_Menu;
+
+            Pos : constant Integer :=
+              Strpos (String (-Menu_Page.Menu_Slug), "?"); -- (2)
+
             Hook_Name : Unbounded_String;
          begin
             if 0 /= Pos then
                -- Handle post_type=post|page|foo pages.
-               Hook_Name := +Substr (-Menu_Page.Menu_Slug, 0, Pos); -- (2)
+               Hook_Name := +Substr (String (-Menu_Page.Menu_Slug), 0, Pos); -- (2)
                declare
-                  Hook_Args : String := Substr (-Menu_Page.Menu_Slug, Pos + 1); -- (2)
+                  Hook_Args : String :=
+                    Substr (String (-Menu_Page.Menu_Slug), Pos + 1); -- (2)
                   pragma Unreferenced (Hook_Args);
                begin
                   null;
@@ -156,7 +166,7 @@ is
 --                Unset (Hook_Args);
                end;
             else
-               Hook_Name := +Basename (-Menu_Page.Menu_Slug, ".php"); -- (2)
+               Hook_Name := +Basename (String (-Menu_Page.Menu_Slug), ".php"); -- (2)
             end if;
             Hook_Name := +Inc_Formatting.Sanitize_Title (-Hook_Name);
 
@@ -183,7 +193,7 @@ is
             declare
                use Adm_Menu;
 
-               Parent : constant String := Submenu_Maps.Key (A);
+               Parent : constant Slug_Type := Submenu_Maps.Key (A);
                Sub    : Inner_Maps.Map renames Submenu (Parent);
             begin
                for B in Sub.Iterate loop
@@ -235,10 +245,10 @@ is
                declare
                   use Inner_Maps;
 
-                  Subs       : constant Map    := Submenu (-Data.Menu_Slug);
-                  First_Sub  : constant Cursor := Subs.First;
-                  Old_Parent : constant String := -Data.Menu_Slug;
-                  New_Parent : constant String := -Element (First_Sub).Menu_Slug;
+                  Subs       : constant Map       := Submenu (-Data.Menu_Slug);
+                  First_Sub  : constant Cursor    := Subs.First;
+                  Old_Parent : constant Slug_Type := -Data.Menu_Slug;
+                  New_Parent : constant Slug_Type := -Element (First_Sub).Menu_Slug;
                begin
                   --
                   -- If the first submenu is not the same as the assigned parent,
@@ -254,7 +264,9 @@ is
                            E in X_Wp_Real_Parent_File.First_Index
                              .. X_Wp_Real_Parent_File.Last_Index
                         loop
-                           if X_Wp_Real_Parent_File (E).Key = Old_Parent then
+                           if
+                             Slug_Type (-X_Wp_Real_Parent_File (E).Key) = Old_Parent
+                           then
                               Pos   := E;
                               Found := True;
                               exit;
@@ -263,10 +275,10 @@ is
 
                         if Found then
                            X_Wp_Real_Parent_File.Replace_Element
-                              (Pos, (+Old_Parent, +New_Parent));
+                              (Pos, (+String (Old_Parent), +String (New_Parent)));
                         else
                            X_Wp_Real_Parent_File.Append
-                              ((+Old_Parent, +New_Parent));
+                              ((+String (Old_Parent), +String (New_Parent)));
                         end if;
                      end;
 --                   X_Wp_Real_Parent_File (Old_Parent) := New_Parent;
@@ -348,10 +360,10 @@ is
 
                Id   : constant Menu_Index := M;
                Data : Menu_Item  renames Menu (Id);
-               Slug : constant String := -Data.Menu_Slug;
+               Slug : constant Slug_Type := -Data.Menu_Slug;
             begin
                if not Inc_Capabilities.Current_User_Can (-Data.Capability) then -- (1)
-                  X_Wp_Menu_Nopriv.Append (Data.Menu_Slug); -- := True; -- (2)
+                  X_Wp_Menu_Nopriv.Append (Unbounded_String (Data.Menu_Slug)); -- := True; -- (2)
                end if;
 
                --
@@ -378,7 +390,7 @@ is
                -- If submenu is empty...
                if Submenu (Slug).Is_Empty then  -- (2)
                   -- And user Doesn't have privs, remove menu.
-                  if X_Wp_Menu_Nopriv.Contains (Data.Menu_Slug) then  -- (2)
+                  if X_Wp_Menu_Nopriv.Contains (Unbounded_String (Data.Menu_Slug)) then  -- (2)
 --                if Isset (X_Wp_Menu_Nopriv (Data.Menu_Slug)) then  -- (2)
                      Menu.Delete (Id);
 --                   Unset (Menu (Id));
@@ -424,6 +436,8 @@ is
       --
       if Apply_Filters ("custom_menu_order", False) then
          declare
+            use Adm_Menu;
+
             Menu_Order         : Slug_Vectors.Vector;
             Default_Menu_Order : Slug_Vectors.Vector;
          begin
@@ -470,8 +484,8 @@ is
                                   return Boolean
                is
 --                global Menu_Order, Default_Menu_Order;
-                  A : constant String := -Left. Menu_Slug; --  (2)
-                  B : constant String := -Right.Menu_Slug; --  (2)
+                  A : constant Slug_Type := -Left. Menu_Slug; --  (2)
+                  B : constant Slug_Type := -Right.Menu_Slug; --  (2)
 
                   Contains_A : constant Boolean := Menu_Order.Contains (A);
                   Contains_B : constant Boolean := Menu_Order.Contains (B);
@@ -640,7 +654,7 @@ is
 
             -- If separator.
             if
-              0 = Strpos (-Top.Menu_Slug, "separator") and then      -- (2)
+              0 = Strpos (String (-Top.Menu_Slug), "separator") and then      -- (2)
               Last_Order
             then
                First_Item := True;

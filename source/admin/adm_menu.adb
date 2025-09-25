@@ -37,7 +37,7 @@ is
 
    function To_Menu (Menu_Title : String;
                      Capability : String;
-                     Menu_Slug  : String;
+                     Menu_Slug  : Adm_Menu.Slug_Type;
                      Page_Title : String;
                      Classes    : String;
                      Hookname   : String := "";
@@ -45,7 +45,7 @@ is
                      return Menu_Item;
 
    procedure Set (Submenu    : in out Submenu_Type;
-                  Menu_Slug  : String;
+                  Menu_Slug  : Adm_Menu.Slug_Type;
                   Position   : Adm_Menu.Submenu_Index;
                   Menu_Title : String;  -- Localized
                   Capability : String;
@@ -215,13 +215,13 @@ is
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
-               Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+               Ptype_Obj : constant Inc_Class_Wp_Post_Type.WP_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : Unbounded_String;
                Menu_Icon           : Unbounded_String;
                Menu_Class          : Unbounded_String;
-               Ptype_File          : Unbounded_String;
+               Ptype_File          : Unbounded_Slug;
                Post_New_File       : Unbounded_String;
                Edit_Tags_File      : Unbounded_String;
                Ptype_Menu_Id       : Unbounded_String;
@@ -294,7 +294,7 @@ is
                            -Ptype_File, "", -Menu_Class, -Ptype_Menu_Id, -Menu_Icon);
 
                Set (Submenu, -Ptype_File, 5, Get (Ptype_Obj, "labels.all_items"),
-                    Get (Ptype_Obj.Cap, "edit_posts"), -Ptype_File);
+                    Get (Ptype_Obj.Cap, "edit_posts"), String (-Ptype_File));
 
                Set (Submenu, -Ptype_File, 10, Get (Ptype_Obj, "labels.add_new"),
                     Get (Ptype_Obj.Cap, "create_posts"), -Post_New_File);
@@ -734,7 +734,7 @@ is
 
    function To_Menu (Menu_Title : String;
                      Capability : String;
-                     Menu_Slug  : String;
+                     Menu_Slug  : Adm_Menu.Slug_Type;
                      Page_Title : String;
                      Classes    : String;
                      Hookname   : String := "";
@@ -758,7 +758,7 @@ is
    ---------
 
    procedure Set (Submenu    : in out Submenu_Type;
-                  Menu_Slug  : String;
+                  Menu_Slug  : Adm_Menu.Slug_Type;
                   Position   : Adm_Menu.Submenu_Index;
                   Menu_Title : String;  -- Localized
                   Capability : String;
