@@ -6,11 +6,13 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-with Ada.Text_Io;
 
+with Ada.Strings.Unbounded;
+with Ada.Text_IO;
+
+with Arrays;
 with Globals;
-with Hb_Common;
+with HB_Common;
 with Php;
 
 with Inc_Formatting;
@@ -23,13 +25,12 @@ with Inc_Http;
 package body Adi_Credits
 is
    use Ada.Strings.Unbounded;
-   use Ada.Text_Io;
-   use Hb_Common;
+   use Ada.Text_IO;
+   use Arrays;
+   use HB_Common;
    use Inc_L10n;
    use Php;
 
---   procedure Print_Them (Name  : Utf8_String;
---                         Value : Json_Value);
    function Get_File (Filename : String)
                       return Unbounded_String;
 
@@ -45,9 +46,8 @@ is
    --
    function Wp_Credits (Version : String := "";
                         Locale  : String := "")
-                        return Json_Value -- Array_Type
+                        return JSON_Value
    is
-      use Inc_Formatting;
       use Inc_Options;
 
       Version_2 : Unbounded_String := +Version;
@@ -58,7 +58,7 @@ is
          -- Include an unmodified wp_version.
 --         require ABSPATH . WPINC . "/version.php";
 
-         Version_2 := +Inc_Versions.Wp_Version;
+         Version_2 := +Inc_Versions.wp_version;
       end if;
 
       if Locale = "" then
@@ -82,8 +82,8 @@ is
                Arrays.To_Array ((1 => Build ("user-agent", "WordPress/" &
                           (-Version_2) & "; " & Inc_Link_Templates.Home_Url ("/"))));
 
-            Response : Array_Type; -- Unbounded_String;
-            Json     : Json_Value;
+            Response : Array_Type;
+            Json     : JSON_Value;
          begin
 --            if Wp_Http_Supports (To_Array ("ssl")) then
 --               url := Set_Url_Scheme (Url, "https");
@@ -113,7 +113,7 @@ is
          end;
       end if;
 
-      return Json_Null; -- Results;
+      return JSON_Null; -- Results;
    end Wp_Credits;
 
    --
@@ -132,8 +132,8 @@ is
    is
       use Inc_Formatting;
    begin
-      Display_Name := "<a href=""" & Esc_Url (Sprintf (Profiles, Username)) &
-                      """>" & Esc_Html (Display_Name) & "</a>";
+      Display_Name := "<a href=""" & ESC_URL (Sprintf (Profiles, Username)) &
+                      """>" & ESC_HTML (Display_Name) & "</a>";
    end X_Wp_Credits_Add_Profile_Link;
 
    --
@@ -144,7 +144,7 @@ is
    --
    -- @param string data External library data (passed by reference).
    --
-   function X_Wp_Credits_Build_Object_Link (Data : Json_Array) -- in out String)
+   function X_Wp_Credits_Build_Object_Link (Data : JSON_Array)
                                             return String
 --   procedure X_Wp_Credits_Build_Object_Link (Data : in out String)
    is
@@ -152,8 +152,8 @@ is
 
       Url  : constant String := Get (Data, 2).Get; -- Data (1);
       Name : constant String := Get (Data, 1).Get; -- Data (0);
-      Href : constant String := Esc_Url (Url);
-      Link : constant String := Esc_Html (Name);
+      Href : constant String := ESC_URL (Url);
+      Link : constant String := ESC_HTML (Name);
    begin
       return "<a href=""" & Href & """>" & Link & "</a>";
    end X_Wp_Credits_Build_Object_Link;
@@ -165,7 +165,7 @@ is
    --
    -- @param array group_data The current contributor group.
    --
-   procedure Wp_Credits_Section_Title (Group_Data : Json_Value)
+   procedure Wp_Credits_Section_Title (Group_Data : JSON_Value)
    is
       use Inc_Formatting;
    begin
@@ -174,16 +174,16 @@ is
 --      end if;
 
       declare
-         Name         : constant Json_Value := Get (Group_Data, "name");
-         Placeholders : constant Json_Value := Get (Group_Data, "placeholders");
+         Name         : constant JSON_Value := Get (Group_Data, "name");
+         Placeholders : constant JSON_Value := Get (Group_Data, "placeholders");
       begin
-         if Name.Kind = Json_String_Type then
+         if Name.Kind = JSON_String_Type then
             if "Translators" = String'(Name.Get) then
                -- Considered a special slug in the API response. (Also, will never be
                -- returned for en_US.)
                Globals.Title := +X_X ("Translators",
                                       "Translate this to be the equivalent of English Translators in your language for the credits page Translators section");
-            elsif Placeholders.Kind = Json_Array_Type then  -- Isset
+            elsif Placeholders.Kind = JSON_Array_Type then  -- Isset
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
                Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_Array); -- Placeholders.Get);
             else
@@ -191,7 +191,7 @@ is
                Globals.Title := +Translate (Name.Get);
             end if;
 
-            Echo ("<h2 class=""wp-people-group-title"">" & Esc_Html (-Globals.Title) &
+            Echo ("<h2 class=""wp-people-group-title"">" & ESC_HTML (-Globals.Title) &
                   "</h2>" & Nl);
          end if;
       end;
@@ -205,21 +205,20 @@ is
    -- @param array  credits The credits groups returned from the API.
    -- @param string slug    The current group to display.
    --
-   procedure Wp_Credits_Section_List (Credits : Json_Value;
-                                      -- Array_Type := Empty_Array;
+   procedure Wp_Credits_Section_List (Credits : JSON_Value;
                                       Slug    : String     := "")
    is
       use Inc_Formatting;
 
-      Group : constant Json_Value := Get (Credits, "groups");
-      Slugs : constant Json_Value := Get (Group,   Slug);
+      Group : constant JSON_Value := Get (Credits, "groups");
+      Slugs : constant JSON_Value := Get (Group,   Slug);
 
-      Group_Data   : constant Json_Value := Slugs;
-      Credits_Data : constant Json_Value := Get (Slugs, "data");
+      Group_Data   : constant JSON_Value := Slugs;
+      Credits_Data : constant JSON_Value := Get (Slugs, "data");
       -- Group_Data : Array_type := (if Isset (Credits ("groups") (Slug))
       --                             then Credits ("groups") (Slug) else Empty_Array);
       -- Credits_Data : String := Credits ("data");
-      Typ  : constant Json_Value := Get (Slugs, "type");
+      Typ  : constant JSON_Value := Get (Slugs, "type");
    begin
 --      if 0 = Count (Group_Data) then
 --         return;
@@ -231,7 +230,7 @@ is
 
       if "list" = String'(Typ.Get) then
          declare
-            Data : Json_Value := Get (Group_Data, "data");
+            Data : JSON_Value := Get (Group_Data, "data");
          begin
 --         Array_Walk (Group_Data ("data"), "_wp_credits_add_profile_link", Credits_Data ("profiles"));
 --         echo ("<p class=""wp-credits-list"">" & Wp_Sprintf ("%l.", Data) &
@@ -241,7 +240,7 @@ is
          end;
       elsif "libraries" = String'(Typ.Get) then
          declare
-            Data : constant Json_Array := Get (Group_Data, "data");
+            Data : constant JSON_Array := Get (Group_Data, "data");
          begin
             for A of Data loop
 --               Echo (X_Wp_Credits_Build_Object_Link (A));
@@ -258,20 +257,20 @@ is
                "compact" = String'(Get (Group_Data, "type").Get);
 
             Classes : constant String :=
-               "wp-people-group " & (if compact then "compact" else "");
+               "wp-people-group " & (if Compact then "compact" else "");
 
-            procedure Print_Them (Name  : Utf8_String;
-                                  Value : Json_Value);
+            procedure Print_Them (Name  : UTF8_String;
+                                  Value : JSON_Value);
 
-            procedure Print_Them (Name  : Utf8_String;
-                                  Value : Json_Value)
+            procedure Print_Them (Name  : UTF8_String;
+                                  Value : JSON_Value)
             is
-               Person_Data : constant Json_Array := Get (Value);
+               Person_Data : constant JSON_Array := Get (Value);
             begin
                Echo ("<li class=""wp-person"" id=""wp-person-" &
-                     Esc_Attr (Get (Person_Data, 3).Get) & """>" & Nl_Tab); -- (2)
+                     ESC_Attr (Get (Person_Data, 3).Get) & """>" & NL_TAB); -- (2)
                Echo ("<a href=""" &
-                     Esc_Url (Sprintf ("%s", -- Get (Credits_Data, "profiles").Get,
+                     ESC_URL (Sprintf ("%s", -- Get (Credits_Data, "profiles").Get,
                                        Get (Person_Data, 2).Get)) &
                      """ class=""web"">");
                declare
@@ -289,29 +288,30 @@ is
                                          Build ("size", Size * 2)))); -- (1)
                begin
                   Echo ("<span class=""wp-person-avatar""><img src=""" &
-                        Esc_Url (Get (Data,   "url")) & """ srcset=""" &
-                        Esc_Url (Get (Data2x, "url")) &
-                        " 2x"" class=""gravatar"" alt="""" /></span>" & Nl);
-                  Echo (Esc_Html (Get (Person_Data, 1).Get) & "</a>" & Nl_Tab); -- (0)
+                        ESC_URL (Get (Data,   "url")) & """ srcset=""" &
+                        ESC_URL (Get (Data2x, "url")) &
+                        " 2x"" class=""gravatar"" alt="""" /></span>" & NL);
+                  Echo (ESC_HTML (Get (Person_Data, 1).Get) & "</a>" & NL_TAB); -- (0)
                end;
 
                if not Compact and then String'(Get (Person_Data, 4).Get) /= "" then
                   -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
                   Echo ("<span class=""title"">" & Translate (Get (Person_Data, 4).Get) & "</span>" & Nl); -- (3)
                end if;
-               echo ("</li>" & Nl);
+               Echo ("</li>" & NL);
 
             end Print_Them;
 
          begin
-            Echo ("<ul class=""" & Classes & """ id=""wp-people-group-" & Slug & """>" & Nl);
+            Echo ("<ul class=""" & Classes & """ id=""wp-people-group-" &
+                  Slug & """>" & NL);
 
-            Map_Json_Object (Get (Group_Data, "data"), Cb => Print_Them'Access);
+            Map_JSON_Object (Get (Group_Data, "data"), CB => Print_Them'Access);
 
 --             for Person_Data of Get (Group_Data, "data") loop
 -- --               Echo ("<li class=""wp-person"" id=""wp-person-" &
 -- --                     Esc_Attr (String'(Get (Person_Data, 3))) & """>" & "\n\t"); -- (2)
--- --               Echo ("<a href=""" & Esc_Url (Sprintf (Credits_Data ("profiles"), Person_Data (2))) & """ class=""web"">");
+-- --               Echo ("<a href=""" & ESC_URL (Sprintf (Credits_Data ("profiles"), Person_Data (2))) & """ class=""web"">");
 
 --                declare
 --                   use Inc_Link_Templates;
@@ -321,10 +321,10 @@ is
 --                   Data2x : Array_Type; -- := Get_Avatar_Data (Person_Data (1) & "@md5.gravatar.com", To_Array ((1 => Build ("size", Size * 2))));
 --                begin
 --                   Echo ("<span class=""wp-person-avatar""><img src=""" &
---                         Esc_Url (Get (Data,   "url")) & """ srcset=""" &
---                         Esc_Url (Get (Data2x, "url")) &
+--                         ESC_URL (Get (Data,   "url")) & """ srcset=""" &
+--                         ESC_URL (Get (Data2x, "url")) &
 --                         " 2x"" class=""gravatar"" alt="""" /></span>" & "\n");
--- --                  Echo (Esc_Html (Person_Data (0)) & "</a>\n\t");
+-- --                  Echo (ESC_HTML (Person_Data (0)) & "</a>\n\t");
 --                end;
 
 -- --               if not Compact and then not Empty (Person_Data (3)) then
@@ -334,7 +334,7 @@ is
 --                echo ("</li>\n");
 --             end loop;
          end;
-         echo ("</ul>" & Nl);
+         Echo ("</ul>" & NL);
 
       end if;
    end Wp_Credits_Section_List;

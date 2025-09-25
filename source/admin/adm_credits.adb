@@ -1,7 +1,11 @@
+--
+-- Credits administration panel.
+--
+-- @package WordPress
+-- @subpackage Administration
+--
 
-with Ada.Exceptions;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
 
 with Arrays;
 with Globals;
@@ -18,7 +22,6 @@ with Inc_L10n;
 package body Adm_Credits
 is
    use Ada.Strings.Unbounded;
-   use Ada.Text_IO;
    use Arrays;
    use HB_Common;
    use Inc_L10n;

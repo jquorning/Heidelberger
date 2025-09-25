@@ -6,14 +6,11 @@
 -- @since 4.4.0
 --
 
-with Gnatcoll.Json;
-
-with Arrays;
+with GNATCOLL.JSON;
 
 package Adi_Credits
 is
-   use Gnatcoll.Json;
-   use Arrays;
+   use GNATCOLL.JSON;
 
    --
    -- Retrieve the contributor credits.
@@ -27,7 +24,7 @@ is
    --
    function Wp_Credits (Version : String := "";
                         Locale  : String := "")
-                        return Json_Value; -- Array_Type;
+                        return JSON_Value; -- Array_Type;
 
    --
    -- Retrieve the link to a contributor's WordPress.org profile page.
@@ -52,7 +49,7 @@ is
    -- @param string data External library data (passed by reference).
    --
 --   procedure X_Wp_Credits_Build_Object_Link (Data : in out String);
-   function X_Wp_Credits_Build_Object_Link (Data : Json_Array)
+   function X_Wp_Credits_Build_Object_Link (Data : JSON_Array)
                                             return String;
 
    --
@@ -62,7 +59,7 @@ is
    --
    -- @param array group_data The current contributor group.
    --
-   procedure Wp_Credits_Section_Title (Group_Data : Json_Value); -- Array_Type := Empty_array);
+   procedure Wp_Credits_Section_Title (Group_Data : JSON_Value);
 
    --
    -- Displays a list of contributors for a given group.
@@ -72,7 +69,7 @@ is
    -- @param array  credits The credits groups returned from the API.
    -- @param string slug    The current group to display.
    --
-   procedure Wp_Credits_Section_List (Credits : Json_Value; -- Array_Type := Empty_Array;
+   procedure Wp_Credits_Section_List (Credits : JSON_Value;
                                       Slug    : String     := "");
 
 
