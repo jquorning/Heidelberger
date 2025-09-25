@@ -147,7 +147,6 @@ is
                                 return Array_Type
                                 is (Empty_Array);
 
-
    procedure Dummy;
 
 end Inc_Options;

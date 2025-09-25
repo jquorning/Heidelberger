@@ -275,7 +275,7 @@ is
 -- @return int 0 means nothing is wrong, greater than 0 means something was wrong.
 --
    function Validate_File (File          : String;
-                           Allowed_Files : Array_Type := Empty_array)
+                           Allowed_Files : Array_Type := Empty_Array)
                            return Integer
                            is (0);
 

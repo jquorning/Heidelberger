@@ -18,7 +18,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
-with Inc_Plugins;
+-- with Inc_Plugins;
 with Inc_Script_Loader;
 with Inc_Themes;
 
@@ -35,7 +35,7 @@ is
    function X_Construct
             return Wp_Scripts
    is
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       This : Wp_Scripts;
    begin
@@ -50,7 +50,7 @@ is
 
    procedure Init (This : in out Wp_Scripts)
    is
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       if
 --      Function_Exists ("is_admin") and then
@@ -111,7 +111,7 @@ is
    is
       use Inc_Formatting;
 
-      Output : constant Unbounded_String := +this.Get_Data (Handle, "data");
+      Output : constant Unbounded_String := +This.Get_Data (Handle, "data");
       Unused : Unbounded_String;
    begin
       if Output = "" then
@@ -123,7 +123,7 @@ is
       end if;
 
       Unused := +Printf ("<script%s id=""%s-js-extra"">\n", -This.Type_Attr,
-                         Esc_Attr (Handle));
+                         ESC_Attr (Handle));
 
       -- CDATA is not needed for HTML 5.
       if This.Type_Attr /= "" then
@@ -133,7 +133,7 @@ is
       Echo ("output\n");
 
       if This.Type_Attr /= "" then
-         echo ("/* ]]>--\n");
+         Echo ("/* ]]>--\n");
       end if;
 
       Echo ("</script>\n");
@@ -210,13 +210,13 @@ is
             if Before_Handle /= "" then
                Before_Handle :=
                   +Sprintf ("<script%s id=""%s-js-before"">\n%s\n</script>\n",
-                            -This.Type_Attr, Esc_Attr (Handle), -Before_Handle);
+                            -This.Type_Attr, ESC_Attr (Handle), -Before_Handle);
             end if;
 
             if After_Handle /= "" then
                After_Handle :=
                   +Sprintf ("<script%s id=""%s-js-after"">\n%s\n</script>\n",
-                            -This.Type_Attr, Esc_Attr (Handle), -After_Handle);
+                            -This.Type_Attr, ESC_Attr (Handle), -After_Handle);
             end if;
 
             declare
@@ -244,7 +244,7 @@ is
                   if Translations /= "" then
                      Translations := +Sprintf (
                         "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                        -this.Type_attr, Esc_Attr (Handle), -Translations);
+                        -This.Type_Attr, ESC_Attr (Handle), -Translations);
                   end if;
 
                   if This.Do_Concat then
@@ -309,9 +309,9 @@ is
                   if Src = "" then
                      if Inline_Script_Tag /= "" then
                         if This.Do_Concat then
-                           Append (this.Print_Html, Inline_Script_Tag);
+                           Append (This.Print_Html, Inline_Script_Tag);
                         else
-                           echo (-Inline_Script_Tag);
+                           Echo (-Inline_Script_Tag);
                         end if;
                      end if;
                      return True;
@@ -330,7 +330,7 @@ is
                   end if;
 
                   -- This filter is documented in wp-includes/class-wp-scripts.php
-                  Src := +Esc_Url (Apply_Filters ("script_loader_src", -Src,
+                  Src := +ESC_URL (Apply_Filters ("script_loader_src", -Src,
                                                   Handle));
 
                   if Src = "" then
@@ -343,7 +343,7 @@ is
                   begin
                      Append (Tag,
                         Sprintf ("<script%s src=""%s"" id=""%s-js""></script>\n",
-                                 -This.Type_Attr, -Src, Esc_Attr (Handle)));
+                                 -This.Type_Attr, -Src, ESC_Attr (Handle)));
                      Append (Tag, After_Handle & Cond_After);
 
                      --
@@ -427,7 +427,7 @@ is
 
       if Display then
          Unused := +Printf ("<script%s id=""%s-js-%s"">\n%s\n</script>\n",
-                 -This.Type_Attr, Esc_Attr (Handle), Esc_Attr (Position), -Output);
+                 -This.Type_Attr, ESC_Attr (Handle), ESC_Attr (Position), -Output);
       end if;
 
       return -Output;
@@ -490,7 +490,7 @@ is
 --                  goto Continue_1;
 --               end if;
 
-               Set (L10n_2, Key, Html_Entity_Decode (Value, ENT_QUOTES, "UTF-8"));
+               Set (L10n_2, Key, Html_Entity_Decode (Value, Ent_Quotes, "UTF-8"));
             end;
 --            << Continue_1 >>
          end loop;
@@ -591,7 +591,7 @@ is
       use Inc_Class_Wp_Dependency.Dependency_Maps;
    begin
       if
-        This.Registered.find (Handle) /= No_Element or else
+        This.Registered.Find (Handle) /= No_Element or else
         This.Registered (Handle).Textdomain = ""
       then
          return ""; -- False;
@@ -624,7 +624,7 @@ is
 
          if Display then
             Unused := +Printf ("<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                              -This.Type_Attr, Esc_Attr (Handle), -Output);
+                              -This.Type_Attr, ESC_Attr (Handle), -Output);
          end if;
 
          return -Output;

@@ -51,7 +51,7 @@ is
 -- @property string use_ssl
 --
 --#[AllowDynamicProperties]
-   type WP_User is tagged
+   type Wp_User is tagged
       record
         --
         -- User data container.

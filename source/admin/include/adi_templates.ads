@@ -1,6 +1,4 @@
 
-with Ada.Containers.Vectors;
-
 with Arrays;
 
 with Hb_Common;
@@ -39,7 +37,7 @@ is
    procedure Wp_Category_Checklist (Post_Id              : Integer     := 0;
                                     Descendants_And_Self : Integer     := 0;
                                     Selected_Cats        : Array_Type  := Empty_Array;
-                                    Popular_Cats         : Array_type  := Empty_Array;
+                                    Popular_Cats         : Array_Type  := Empty_Array;
                                     Walker               : Walker_Type := null;
                                     Checked_Ontop        : Boolean     := True);
 
@@ -72,8 +70,6 @@ is
 --
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String;
-
-
 
    function Get_Media_States (Post : Inc_Class_Wp_Posts.Wp_Post) return List_Type;
 

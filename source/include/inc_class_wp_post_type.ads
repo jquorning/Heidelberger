@@ -28,7 +28,7 @@ is
 -- @see register_post_type()
 --
 --#[AllowDynamicProperties]
-   type WP_Post_Type is tagged
+   type Wp_Post_Type is tagged
       record
         --
         -- Post type key.
@@ -499,7 +499,7 @@ is
    package Post_Type_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                               Element_Type => Wp_Post_Type);
-   subtype Wp_Post_Type_Array is Post_Type_maps.Map;
+   subtype Wp_Post_Type_Array is Post_Type_Maps.Map;
 
    --
    -- Resets the cache for the default labels.

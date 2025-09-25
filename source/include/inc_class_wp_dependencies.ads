@@ -30,7 +30,7 @@ is
    -- @see _WP_Dependency
    --
    -- #[AllowDynamicProperties]
-   type WP_Dependencies is tagged
+   type Wp_Dependencies is tagged
       record
         --
         -- An array of all registered dependencies keyed by handle.
@@ -141,7 +141,7 @@ is
    -- @return string[] Array of handles of items that have been processed.
    --
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_type := Empty_List; -- = false,
+                      Handles : List_Type := Empty_List; -- = false,
                       -- Handles : String_Array := Empty_String_Array; -- = false,
                       Group   : Integer      := 0) --  = false
                       return String_Array;

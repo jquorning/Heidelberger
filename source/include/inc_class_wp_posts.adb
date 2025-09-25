@@ -45,7 +45,7 @@ is
             use Globals;
 
             Statement : constant String
-              := wpdb.Prepare
+              := Wpdb.Prepare
                 ("SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
                  (To_Array (Id'Image)));
          begin
@@ -97,7 +97,7 @@ is
         -- @param string key Property to check if set.
         -- @return bool
         --
-   function X_isset (Post : Wp_Post;
+   function X_Isset (Post : Wp_Post;
                      Key  : String)
                      return Boolean
    is
@@ -138,9 +138,9 @@ is
       use Inc_Functions;
       use Inc_Taxonomys;
    begin
-      if "page_template" = Key and then Post.X_Isset (key) then
+      if "page_template" = Key and then Post.X_Isset (Key) then
          return Inc_Posts.Get_Post_Meta
-                  (Post.ID, "_wp_page_template", True);
+                  (Post.Id, "_wp_page_template", True);
       end if;
 
       if "post_category" = Key then
@@ -189,7 +189,7 @@ is
          Value_2 : Array_Type -- Post_Id_List
             := (if "ancestors" = Key
                 then Get_Post_Ancestors (Post)
-                else Get_Post_Meta (Post.ID, Key, Single => True));
+                else Get_Post_Meta (Post.Id, Key, Single => True));
 
          Value : Array_Type  -- Post_Id_List
             := (if Post.Filter /= ""
@@ -208,7 +208,7 @@ is
         -- @param string filter Filter.
         -- @return WP_Post
         --
-   function Filter (Post   : Wp_post;
+   function Filter (Post   : Wp_Post;
                     Filter : String)
                     return Wp_Post
    is
@@ -242,7 +242,7 @@ is
    is
       use Hb_Common;
 
-      Post_2 : Array_Type := PHP.Get_Object_Vars (Post);
+      Post_2 : Array_Type := Php.Get_Object_Vars (Post);
    begin
       for
         Key of To_List ((+"ancestors", +"page_template",

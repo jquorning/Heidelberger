@@ -372,8 +372,6 @@ is
    is
       use Inc_Class_Wp_Scripts;
       use Inc_Class_Wp_Dependencies;
-      use Inc_Class_Wp_Dependency;
-      use Inc_Functions_Wp_Scripts;
       use String_Vectors;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);

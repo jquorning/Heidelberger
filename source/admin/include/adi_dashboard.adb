@@ -480,7 +480,6 @@ is
 
 --         <p class="youhave"><?php echo sentence; ?></p>
 
-
 --         <?php
 --                 --
 --                 -- Fires in the Network Admin "Right Now" dashboard widget
@@ -1276,7 +1275,6 @@ is
 
 --         wp_widget_rss_form( widget_options[ widget_id ], form_inputs );
 -- end;
-
 
 -- --
 -- -- Renders the Events and News dashboard widget.

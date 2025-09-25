@@ -32,7 +32,7 @@ is
    -- @since 2.6.0
    --
    -- #[AllowDynamicProperties]
-   type X_WP_Dependency is tagged
+   type X_Wp_Dependency is tagged
       record
         --
         -- The handle name.

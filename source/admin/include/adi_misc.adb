@@ -566,7 +566,6 @@ is
 --         end;
 -- end;
 
-
 -- --
 -- -- Resets global variables based on _GET and _POST.
 -- --

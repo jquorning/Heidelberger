@@ -85,7 +85,7 @@ is
                 else Trailingslashit (
                         Get_Home_Url (-This.User.Active_Blog.Blog_Id)));
 
-            This.User.Account_Domain := this.user.Domain;
+            This.User.Account_Domain := This.User.Domain;
          else
 --          this.user.Active_Blog    := This.User.Blogs (Get_Current_Blog_Id);
             This.User.Domain         := +Trailingslashit (Home_Url);
@@ -137,7 +137,7 @@ is
                        Node : Node_Args) -- Array_Type)
    is
    begin
-      this.Add_Node (Node);
+      This.Add_Node (Node);
    end Add_Menu;
 
    -----------------
@@ -148,7 +148,7 @@ is
                           Id   : String)
    is
    begin
-      this.Remove_Node (Id);
+      This.Remove_Node (Id);
    end Remove_Menu;
 
    --------------
@@ -192,7 +192,7 @@ is
          X_Doing_It_Wrong ("__METHOD__",
                            abs "The menu ID should not be empty.", "3.3.0");
          -- Deprecated: Generate an ID from the title.
-         Args_2.Id := +Esc_Attr (Sanitize_Title (Trim (-Args_2.Title)));
+         Args_2.Id := +ESC_Attr (Sanitize_Title (Trim (-Args_2.Title)));
       end if;
 
       -- If the node already exists, keep any data that isn"t provided.
@@ -237,7 +237,7 @@ is
 
             X_Deprecated_Argument ("__METHOD__", -Version,
                                    Sprintf ("Use <code>%s</code> as the parent for the <code>%s</code> admin bar node instead of <code>%s</code>.",
-                                            -New_Parent, -Args_2.Id, -Args_2.parent));
+                                            -New_Parent, -Args_2.Id, -Args_2.Parent));
             Args_2.Parent := New_Parent;
          end if;
       end;
@@ -263,7 +263,7 @@ is
                       Id   : String)
                       return Node_Args -- Array_Type
    is
-      Node : constant Node_Args := this.X_Get_Node (Id);
+      Node : constant Node_Args := This.X_Get_Node (Id);
    begin
       if Node /= Null_Node_Args then
          return Node; -- clone
@@ -434,7 +434,7 @@ is
       end loop;
 
       for Node of This.X_Get_Nodes.all loop
-         if "root" = node.id then
+         if "root" = Node.Id then
             goto Continue;
          end if;
 
@@ -452,7 +452,7 @@ is
          begin
             if Typ_Group = Node.Typ then
                if Empty (Node.Meta, "class") then
-                  Set (node.Meta, "class", Group_Class);
+                  Set (Node.Meta, "class", Group_Class);
                else
                   Set (Node.Meta, "class",
                        Get (Node.Meta, "class") & " " & Group_Class);
@@ -533,7 +533,7 @@ is
                      -- Link the container node if a grandparent node exists.
                      declare
                         Grandparent : constant Node_Args :=
-                           this.X_Get_Node (-Parent.Parent);
+                           This.X_Get_Node (-Parent.Parent);
 
                         Index : Integer := 0;
                      begin
@@ -566,9 +566,9 @@ is
                         end if;
                      end;
 
-                     parent.parent := container.id;
+                     Parent.Parent := Container.Id;
                   end if;
-                  parent := container;
+                  Parent := Container;
                end;
             end if;
 
@@ -627,18 +627,18 @@ is
    is
       use Inc_Formatting;
    begin
-      if Typ_container /= node.typ or else node.Children = null then
+      if Typ_Container /= Node.Typ or else Node.Children = null then
          return;
       end if;
 
-      echo ("<div id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) &
+      Echo ("<div id=""" & ESC_Attr ("wp-admin-bar-" & (-Node.Id)) &
             """ class=""ab-group-container"">");
 
       for Group of Node.Children.all loop
-         This.X_Render_Group (group);
+         This.X_Render_Group (Group);
       end loop;
 
-      echo ("</div>");
+      Echo ("</div>");
    end X_Render_Container;
 
    --------------------
@@ -653,25 +653,25 @@ is
       Class : Unbounded_String;
    begin
       if Typ_Container = Node.Typ then
-         this.X_Render_Container (node);
+         This.X_Render_Container (Node);
          return;
       end if;
 
-      if Typ_Group /= node.typ or else Node.Children = null then
+      if Typ_Group /= Node.Typ or else Node.Children = null then
          return;
       end if;
 
-      if not Empty (node.Meta, "class") then
-         class := +" class=""" & Esc_Attr (Trim (Get (Node.Meta, "class"))) & """";
+      if not Empty (Node.Meta, "class") then
+         Class := +" class=""" & ESC_Attr (Trim (Get (Node.Meta, "class"))) & """";
       else
-         class := +"";
+         Class := +"";
       end if;
 
-      echo ("<ul id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) & """class>");
+      Echo ("<ul id=""" & ESC_Attr ("wp-admin-bar-" & (-Node.Id)) & """class>");
       for Item of Node.Children.all loop
          This.X_Render_Item (Item);
       end loop;
-      echo ("</ul>");
+      Echo ("</ul>");
    end X_Render_Group;
 
    -------------------
@@ -685,14 +685,14 @@ is
 
       Is_Parent             : constant Boolean := Node.Children /= null;
       Has_Link              : constant Boolean := Node.Href /= "";
-      Is_Root_Top_Item      : constant Boolean := "root-default"  = node.parent;
-      Is_Top_Secondary_Item : constant Boolean := "top-secondary" = node.parent;
+      Is_Root_Top_Item      : constant Boolean := "root-default"  = Node.Parent;
+      Is_Top_Secondary_Item : constant Boolean := "top-secondary" = Node.Parent;
 
       -- Allow only numeric values, then casted to integers, and allow a tabindex
       -- value of `0` for a11y.
       Tabindex : constant Integer := (if
                                Isset (Node.Meta, "tabindex") and then
-                               Is_Numeric (Get (node.Meta, "tabindex"))
+                               Is_Numeric (Get (Node.Meta, "tabindex"))
                              then Integer'Value (Get (Node.Meta, "tabindex")) else 0);
 
       Aria_Attributes : Unbounded_String :=
@@ -713,34 +713,34 @@ is
          Aria_Attributes  := Aria_Attributes & " aria-haspopup=""true""";
       end if;
 
-      if not Empty (node.Meta, "class") then
+      if not Empty (Node.Meta, "class") then
          Menuclass := Menuclass & Get (Node.Meta, "class");
       end if;
 
       -- Print the arrow icon for the menu children with children.
       if
-        not is_root_top_item and then
-        not is_top_secondary_item and then
+        not Is_Root_Top_Item and then
+        not Is_Top_Secondary_Item and then
         Is_Parent
       then
-         arrow := +"<span class=""wp-admin-bar-arrow"" aria-hidden=""true""></span>";
+         Arrow := +"<span class=""wp-admin-bar-arrow"" aria-hidden=""true""></span>";
       end if;
 
       if Menuclass /= "" then
-         Menuclass := +" class=""" & Esc_Attr (Trim (-Menuclass)) & """";
+         Menuclass := +" class=""" & ESC_Attr (Trim (-Menuclass)) & """";
       end if;
 
-      echo ("<li id=""" & Esc_Attr ("wp-admin-bar-" & (-Node.Id)) & """menuclass>");
+      Echo ("<li id=""" & ESC_Attr ("wp-admin-bar-" & (-Node.Id)) & """menuclass>");
 
       if Has_Link then
          Attributes := To_List ((+"onclick", +"target", +"title",
                                  +"rel", +"lang", +"dir"));
-         echo ("<a class=""ab-item""aria_attributes href=""" & Esc_Url (-Node.Href) &
+         Echo ("<a class=""ab-item""aria_attributes href=""" & ESC_URL (-Node.Href) &
                """");
       else
          Attributes := To_List ((+"onclick", +"target", +"title",
                                  +"rel", +"lang", +"dir"));
-         echo ("<div class=""ab-item ab-empty-item""" & (-Aria_Attributes));
+         Echo ("<div class=""ab-item ab-empty-item""" & (-Aria_Attributes));
       end if;
 
       for Attribute of Attributes loop
@@ -749,34 +749,34 @@ is
          end if;
 
          if "onclick" = Attribute then
-            echo (" attribute=""" & Esc_Js (Get (Node.Meta, -Attribute)) & """");
+            Echo (" attribute=""" & ESC_JS (Get (Node.Meta, -Attribute)) & """");
          else
-            echo (" attribute=""" & Esc_Attr (Get (Node.Meta, -Attribute)) & """");
+            Echo (" attribute=""" & ESC_Attr (Get (Node.Meta, -Attribute)) & """");
          end if;
          << Continue_2 >>
       end loop;
 
-      echo (">" & (-Arrow) & (-Node.Title));
+      Echo (">" & (-Arrow) & (-Node.Title));
 
-      if has_link then
-         echo ("</a>");
+      if Has_Link then
+         Echo ("</a>");
       else
-         echo ("</div>");
+         Echo ("</div>");
       end if;
 
       if Is_Parent then
-         echo ("<div class=""ab-sub-wrapper"">");
+         Echo ("<div class=""ab-sub-wrapper"">");
          for Group of Node.Children.all loop
             This.X_Render_Group (Group);
          end loop;
-         echo ("</div>");
+         Echo ("</div>");
       end if;
 
       if not Empty (Node.Meta, "html") then
-         Echo (Get (node.Meta, "html"));
+         Echo (Get (Node.Meta, "html"));
       end if;
 
-      echo ("</li>");
+      Echo ("</li>");
    end X_Render_Item;
 
    ----------------------
@@ -792,7 +792,7 @@ is
       X_Deprecated_Function
         ("__METHOD__", "3.3.0",
          "WP_Admin_bar::render(), WP_Admin_Bar::_render_item()");
-      This.X_Render_Item (node);
+      This.X_Render_Item (Node);
    end Recursive_Render;
 
    ---------------

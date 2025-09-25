@@ -1,9 +1,26 @@
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
-with Adm_Credits;
 with Php;
 with Hb_Common;
+
+with Adm_Credits;
+with Adm_Edit;
+with Adm_Edit_Tags;
+with Adm_Post;
+-- with Adm_Nav_Menus;
+-- with Adm_Menu_Header;
+-- with Adm_Admin;
+with Adm_Menu;
+
+-- with Adi_Nav_Menus;
+-- with Adi_Menu;
+
+-- with Inc_Admin_Bar;
+-- with Inc_Class_Wp_Admin_Bar;
+-- with Inc_Class_Wp_Scripts;
+-- with Inc_Class_Wp_Posts;
+-- with Inc_Posts;
 
 package body Binder
 is
@@ -15,16 +32,25 @@ is
    is
       use Ada.Strings.Fixed;
 
-      Url     : constant String := Aws.Status.Url (Request);
+      URL     : constant String := AWS.Status.URL (Request);
       Payload : Unbounded_String;
    begin
-      if Index (Url, "/wp-admin/credits.php") /= 0 then
+      if Index (URL, "/wp-admin/credits.php") /= 0 then
          Adm_Credits.Render;
-         Payload := +Php.Get_Echo;
-         return AWS.Response.Build ("text/html", Payload);
+
+      elsif Index (URL, "/wp-admin/edit.php") /= 0 then
+         Adm_Edit.Render;
+
+      elsif Index (URL, "/wp-admin/edit_tags.php") /= 0 then
+         Adm_Edit_Tags.Render;
+
+      elsif Index (URL, "/wp-admin/posts.php") /= 0 then
+         Adm_Post.Render;
+
       end if;
 
-      return AWS.Response.Build ("text/html", "Not avaliable");
+      Payload := +Php.Get_Echo;
+      return AWS.Response.Build ("text/html", Payload);
    end Render;
 
 end Binder;

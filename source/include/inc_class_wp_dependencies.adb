@@ -26,7 +26,7 @@ is
 
 --        public function do_items( $handles = false, $group = false ) then
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_type := Empty_List; -- = false,
+                      Handles : List_Type := Empty_List; -- = false,
                       Group   : Integer   := 0) --  = false
                       return String_Array
    is
@@ -476,7 +476,7 @@ is
 --                        case "done":
 --                        case "printed": -- Back compat.
       elsif Status in "done" | "printed" then
-         return (In_Array (Handle, This.done, True), Null_Deps);
+         return (In_Array (Handle, This.Done, True), Null_Deps);
       end if;
 
       return (False, Null_Deps);

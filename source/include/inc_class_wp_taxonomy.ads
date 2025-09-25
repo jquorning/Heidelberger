@@ -11,7 +11,7 @@ is
 -- @since 4.7.0
 --
 -- #[AllowDynamicProperties]
-   type WP_Taxonomy is tagged
+   type Wp_Taxonomy is tagged
       record
         --
         -- Taxonomy key.

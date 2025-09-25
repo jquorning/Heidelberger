@@ -103,7 +103,7 @@ is
    --
    --#[AllowDynamicProperties]
 
-   type WP_Admin_Bar is tagged
+   type Wp_Admin_Bar is tagged
       record
          -- private
          Nodes : Node_Array_Access;
@@ -113,7 +113,6 @@ is
 
          User : User_Type;
       end record;
-
 
    --
    -- @since 3.3.0

@@ -32,7 +32,7 @@ is
                                     is ("XXX-311");
 
    function X_N_Noop (Arg_1, Arg_2 : String)
-                      return Array_type
+                      return Array_Type
                       is (Empty_Array);
 
    function Get_User_Locale (User : Integer := 0)

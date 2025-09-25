@@ -72,5 +72,4 @@ is
    procedure Wp_Credits_Section_List (Credits : JSON_Value;
                                       Slug    : String     := "");
 
-
 end Adi_Credits;

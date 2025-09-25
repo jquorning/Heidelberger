@@ -255,7 +255,7 @@ is
            -- Customize the permastruct slug. Defaults to post_type key.
 
 --         @type bool
-           with_front : Boolean;
+           With_Front : Boolean;
            -- Whether the permastruct should be prepended with WP_Rewrite::front.
            -- Default true.
 
@@ -269,7 +269,7 @@ is
            -- Whether the permastruct should provide for pagination. Default true.
 
 --         @type int
-           Ep_Mask : Integer;
+           EP_Mask : Integer;
            -- Endpoint mask to assign. If not specified and permalink_epmask is set,
            -- inherits from permalink_epmask. If not specified and permalink_epmask
            -- is not set, defaults to EP_PERMALINK.
@@ -280,7 +280,7 @@ is
       With_Front => False,
       Feeds      => False,
       Pages      => False,
-      Ep_Mask    => 0
+      EP_Mask    => 0
      );
 
    type Callable is null record;
@@ -308,7 +308,7 @@ is
        -- Default empty.
 
 --     @type bool
-       public : Boolean;
+       Public : Boolean;
        -- Whether a post type is intended for use publicly either via
        -- the admin interface or by front-end users. While the default
        -- settings of exclude_from_search, publicly_queryable, show_ui,
@@ -317,7 +317,7 @@ is
        -- Default false.
 
 --     @type bool
-       hierarchical : Boolean;
+       Hierarchical : Boolean;
        -- Whether the post type is hierarchical (e.g. page). Default false.
 
 --     @type bool
@@ -335,7 +335,7 @@ is
        -- If not set, the default is inherited from public.
 
 --     @type bool
-       Show_Ui : Boolean;
+       Show_UI : Boolean;
        -- Whether to generate and allow a UI for managing this post type in the
        -- admin. Default is value of public.
 
@@ -360,20 +360,20 @@ is
        -- of show_in_menu.
 
 --     @type bool
-       Show_In_Rest : Boolean;
+       Show_In_REST : Boolean;
        -- Whether to include the post type in the REST API. Set this to true
        -- for the post type to be available in the block editor.
 
 --     @type string
-       Rest_Base : Unbounded_String;
+       REST_Base : Unbounded_String;
        -- To change the base URL of REST API route. Default is post_type.
 
 --     @type string
-       Rest_Namespace : Unbounded_String;
+       REST_Namespace : Unbounded_String;
        -- To change the namespace URL of REST API route. Default is wp/v2.
 
 --     @type string
-       Rest_Controller_Class : Unbounded_String;
+       REST_Controller_Class : Unbounded_String;
        -- REST API controller class name. Default is "WP_REST_Posts_Controller".
 
 --     @type int
@@ -424,7 +424,7 @@ is
        -- Default is an array containing "title" and "editor".
 
 --     @type callable
-       Register_Meta_Box_Cb : Callable;
+       Register_Meta_Box_CB : Callable;
        -- Provide a callback function that sets up the meta boxes for the
        -- edit form. Do remove_meta_box() and add_meta_box() calls in the
        -- callback. Default null.
@@ -511,8 +511,6 @@ is
        -- FOR INTERNAL USE ONLY! URL segment to use for edit link of
        -- this post type. Default "post.php?post=%d".
       end record;
-
-
 
 --
 -- Registers a post type.
@@ -1034,7 +1032,6 @@ is
    function Use_Block_Editor_For_Post (Post : Wp_Post)
                                        return Boolean
                                        is (True);
-
 
 -- By jq
    function Get (Post  : Wp_Post;

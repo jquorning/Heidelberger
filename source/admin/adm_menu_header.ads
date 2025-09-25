@@ -15,9 +15,6 @@ is
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
    Self         : Adm_Menu.Unbounded_Slug;
---   Parent_File  : Unbounded_String;
---   Submenu_File : Unbounded_String;
---   Plugin_Page  : Unbounded_String;
 
    --
    -- Display menu.
@@ -37,7 +34,7 @@ is
    --
 
    procedure X_Wp_Menu_Output
-     (Menu              : Adm_Menu.Menu_Vector; -- Menu_Map;
+     (Menu              : Adm_Menu.Menu_Vector;
       Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True);
 

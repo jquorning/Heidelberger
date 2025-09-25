@@ -1829,6 +1829,4 @@ is
 --         return apply_filters( "get_object_subtype_then$object_typeend;", $object_subtype, $object_id );
 -- end;
 
-
-
 end Inc_Meta;

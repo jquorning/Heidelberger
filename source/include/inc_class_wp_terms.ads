@@ -22,7 +22,7 @@ is
 --
 -- #[AllowDynamicProperties]
 
-   type WP_Term is tagged
+   type Wp_Term is tagged
       record
 
         --

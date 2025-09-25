@@ -71,7 +71,6 @@ is
                                     return Boolean
                                     is (True);
 
-
 --
 -- Retrieves all theme modifications.
 --

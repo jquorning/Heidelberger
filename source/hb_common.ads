@@ -1,5 +1,4 @@
 
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
 with Ada.Characters.Latin_1;
 
@@ -11,7 +10,7 @@ with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Terms;
 with Inc_Taxonomys;
 
-package HB_Common
+package Hb_Common
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -22,9 +21,9 @@ is
    function "-" (Item : Unbounded_String) return String
       renames To_String;
 
-   Nl     : constant String := "" & Ada.Characters.Latin_1.Lf;
-   Tab    : constant String := "" & Ada.Characters.Latin_1.Ht;
-   nl_Tab : constant String := Nl & Tab;
+   NL     : constant String := "" & Ada.Characters.Latin_1.LF;
+   TAB    : constant String := "" & Ada.Characters.Latin_1.HT;
+   NL_TAB : constant String := NL & TAB;
 
    function To_Array (Item : String) return Array_Type;
    function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
@@ -242,4 +241,4 @@ is
                    return Boolean
                    is (True);
 
-end HB_Common;
+end Hb_Common;

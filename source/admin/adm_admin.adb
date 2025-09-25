@@ -104,7 +104,7 @@ is
 
          if not Inc_Load.Is_Multisite then
             Inc_Pluggables.Wp_Redirect
-               (Inc_Link_Templates.Admin_Url
+               (Inc_Link_Templates.Admin_URL
                  ("upgrade.php?_wp_http_referer=" &
                   Php.Urlencode (Inc_Formatting.Wp_Unslash
                                   (Get (X_SERVER, "REQUEST_URI")))));
@@ -157,7 +157,7 @@ is
                      Response : Array_Type;
                   begin
                      Response := Inc_Http.Wp_Remote_Get (
-                        Inc_Link_Templates.Admin_Url ("upgrade.php?step=1"),
+                        Inc_Link_Templates.Admin_URL ("upgrade.php?step=1"),
                            Arrays.To_Array ((
                               Build ("timeout",     120),
                               Build ("httpversion", "1.1")
@@ -308,7 +308,7 @@ is
                            Query_String := "page=" & Unbounded_String (Plugin_Page);
                         end if;
                         Inc_Pluggables.Wp_Redirect
-                           (Inc_Link_Templates.Admin_Url
+                           (Inc_Link_Templates.Admin_URL
                               ("tools.php?" & (-Query_String)));
                      end;
                      return; -- exit;
@@ -438,7 +438,7 @@ is
 
                if Inc_Functions.Validate_File (Importer) /= 0 then
                   Inc_Pluggables.Wp_Redirect
-                     (Inc_Link_Templates.Admin_Url ("import.php?invalid=" & Importer));
+                     (Inc_Link_Templates.Admin_URL ("import.php?invalid=" & Importer));
                   return; -- exit;
                end if;
 
@@ -447,7 +447,7 @@ is
 --               not Is_Callable (Wp_Importers (Importer) (2))
                then
                   Inc_Pluggables.Wp_Redirect
-                     (Inc_Link_Templates.Admin_Url ("import.php?invalid=" & Importer));
+                     (Inc_Link_Templates.Admin_URL ("import.php?invalid=" & Importer));
                   return; -- exit;
                end if;
 

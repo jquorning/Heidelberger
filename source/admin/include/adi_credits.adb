@@ -6,13 +6,12 @@
 -- @since 4.4.0
 --
 
-
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Arrays;
 with Globals;
-with HB_Common;
+with Hb_Common;
 with Php;
 
 with Inc_Formatting;
@@ -27,7 +26,7 @@ is
    use Ada.Strings.Unbounded;
    use Ada.Text_IO;
    use Arrays;
-   use HB_Common;
+   use Hb_Common;
    use Inc_L10n;
    use Php;
 
@@ -192,7 +191,7 @@ is
             end if;
 
             Echo ("<h2 class=""wp-people-group-title"">" & ESC_HTML (-Globals.Title) &
-                  "</h2>" & Nl);
+                  "</h2>" & NL);
          end if;
       end;
    end Wp_Credits_Section_Title;
@@ -296,7 +295,7 @@ is
 
                if not Compact and then String'(Get (Person_Data, 4).Get) /= "" then
                   -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
-                  Echo ("<span class=""title"">" & Translate (Get (Person_Data, 4).Get) & "</span>" & Nl); -- (3)
+                  Echo ("<span class=""title"">" & Translate (Get (Person_Data, 4).Get) & "</span>" & NL); -- (3)
                end if;
                Echo ("</li>" & NL);
 

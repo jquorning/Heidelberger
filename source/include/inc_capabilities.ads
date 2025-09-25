@@ -65,5 +65,4 @@ is
                               return Boolean
                               is (True);
 
-
 end Inc_Capabilities;

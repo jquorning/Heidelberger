@@ -1,9 +1,12 @@
-with AWS.Response;
-with AWS.Status;
+--
+-- Edit Tags Administration Screen.
+--
+-- @package WordPress
+-- @subpackage Administration
+--
 
 package Adm_Edit_Tags is
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data;
+   procedure Render;
 
 end Adm_Edit_Tags;

@@ -33,7 +33,7 @@ is
 --      function_exists( "current_theme_supports" ) and then
         not Inc_Themes.Current_Theme_Supports ("html5", "style")
       then
-         this.type_attr := +" type=""text/css""";
+         This.Type_Attr := +" type=""text/css""";
       end if;
 
       --

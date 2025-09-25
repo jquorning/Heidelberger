@@ -1,7 +1,7 @@
 
-package body HB_Common
+package body Hb_Common
 is
-   use Inc_Class_Wp_Posts;
+-- use Inc_Class_Wp_Posts;
 
    procedure Post_Type_Object is null;
 
@@ -128,4 +128,4 @@ is
 
    function Is_Plugin_Active (Item : String) return Boolean is (False);
 
-end HB_Common;
+end Hb_Common;

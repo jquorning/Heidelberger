@@ -22,7 +22,7 @@ is
 -- @since 3.3.0
 --
 --#[AllowDynamicProperties]
-   type WP_Screen is tagged
+   type Wp_Screen is tagged
       record
         --
         -- Any action associated with the screen.
@@ -275,7 +275,7 @@ is
    -- end;
    --
    procedure Set_Screen_Reader_Content (This    : Wp_Screen;
-                                        Content : Array_type)
+                                        Content : Array_Type)
                                         is null;
 
 end Adi_Class_Wp_Screens;

@@ -16,10 +16,10 @@ project Heidelberger is
 
    package Compiler is
       for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
-         "-gnatwaCFUMV",
+         "-gnatwaCFMUV", -- U must be removed eventually
          "-gnatef",
 --         "-gnatf",
-         "-gnatyyM0C-r");
+         "-gnatyyduxCM0S"); -- 0-r
    end Compiler;
 
    package Binder is

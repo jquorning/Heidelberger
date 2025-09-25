@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Globals;
-with HB_Common;
+with Hb_Common;
 with Php;
 
 with GNATCOLL.JSON;
@@ -23,7 +23,7 @@ package body Adm_Credits
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use HB_Common;
+   use Hb_Common;
    use Inc_L10n;
    use Php;
 
@@ -156,8 +156,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups    : constant Json_Value := Credits.Get ("groups");
-                  Libraries : constant Json_Value := Groups. Get ("libraries");
+                  Group     : constant Json_Value := Credits.Get ("groups");
+                  Libraries : constant Json_Value := Group.Get ("libraries");
                begin
                   Wp_Credits_Section_Title (Libraries);
                   Wp_Credits_Section_List  (Credits, "libraries");

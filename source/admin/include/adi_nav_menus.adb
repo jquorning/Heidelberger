@@ -15,20 +15,20 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Arrays;
-with Hb_Common;
-with L10n;
+with HB_Common;
+with Globals;
 with Php;
 
 with Adi_Templates;
 
-with Inc_Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Querys;
+with Inc_Formatting;
 with Inc_Functions;
+with Inc_L10n;
 with Inc_Nav_Menus;
 with Inc_Nav_Menu_Templates;
 with Inc_Pluggables;
@@ -40,10 +40,11 @@ with Inc_Users;
 package body Adi_Nav_Menus
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
-   use Hb_Common;
-   use L10n;
+   use Globals;
+   use HB_Common;
+   use Inc_L10n;
    use Php;
+   use Inc_Class_Wp_Posts;
 
    ---------------------------------
    -- X_Wp_Ajax_Menu_Quick_Search --
@@ -82,14 +83,14 @@ is
          if Inc_Posts.Post_Type_Exists (Object_Type) then
             if Isset (Request, "ID") then
                declare
-                  Object_Id : Integer := Get_Integer (Request, "ID");
+                  Object_Id : constant Integer := Get_Integer (Request, "ID");
                begin
                   if "markup" = Response_Format then
                      null;
 --                                        echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item",
 --                                              To_array (Get_Post (Object_Id))), 0, Args)); -- (object)
                   elsif "json" = Response_Format then
-                     echo (Inc_Functions.Wp_Json_Encode (
+                     Echo (Inc_Functions.Wp_Json_Encode (
                         Arrays.To_Array ((
                            Build ("ID",         Object_Id),
                            Build ("post_title",
@@ -98,14 +99,15 @@ is
                                   Inc_Posts.Get_Post_Type (Object_Id))
                            ))
                         ));
-                        echo ("\n");
+                        Echo ("\n");
                   end if;
                end;
             end if;
+
          elsif Inc_Taxonomys.Taxonomy_Exists (Object_Type) then
             if Isset (Request, "ID") then
                declare
-                  Object_Id : Integer := Get_Integer (Request, "ID");
+                  Object_Id : constant Integer := Get_Integer (Request, "ID");
                begin
                   if "markup" = Response_Format then
                      null;
@@ -116,7 +118,8 @@ is
                         use Inc_Class_Wp_Terms;
                         use Inc_Taxonomys;
 
-                        Post_Obj : Wp_Term := Get_Term (Object_Id, Object_Type);
+                        Post_Obj : constant Wp_Term :=
+                          Get_Term (Object_Id, Object_Type);
                      begin
                         Echo (Inc_Functions.Wp_Json_Encode (
                            Arrays.To_Array ((
@@ -125,7 +128,7 @@ is
                               Build ("post_type",  Object_Type)
                            ))
                         ));
-                        echo ("\n");
+                        Echo ("\n");
                      end;
                   end if;
                end;
@@ -180,22 +183,22 @@ is
                            declare
                               use Inc_Nav_Menu_Templates;
 
-                              Var_By_Ref : Post_Id := Post.ID;
+                              Var_By_Ref : Post_Id := Post.Id;
                            begin
                               Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item",
                                  To_Array (Inc_Posts.Get_Post (Integer (Var_By_Ref)))), 0, Args_2)); -- (object)
                            end;
                         elsif "json" = Response_Format then
-                           echo (Inc_Functions.Wp_Json_Encode (
+                           Echo (Inc_Functions.Wp_Json_Encode (
                               Arrays.To_Array ((
                                  Build ("ID",         Integer (Post.Id)),
                                  Build ("post_title",
                                         Inc_Post_Templates.Get_The_Title
-                                           (Integer (Post.ID))),
+                                           (Integer (Post.Id))),
                                  Build ("post_type",  -Matches (2).Key)
                               ))
                            ));
-                           echo ("\n");
+                           Echo ("\n");
                         end if;
                      end;
                   end loop;
@@ -223,9 +226,9 @@ is
                end if;
 
                for Term of Terms loop -- To_Array (Terms) loop
-                  if "markup" = response_format then
+                  if "markup" = Response_Format then
                      Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item",
-                           Arrays.To_array ((1 => Build (Term, "")))), 0, Args)); -- (object)
+                           Arrays.To_Array ((1 => Build (Term, "")))), 0, Args)); -- (object)
 
                   elsif "json" = Response_Format then
                      Echo (Inc_Functions.Wp_Json_Encode (
@@ -294,7 +297,7 @@ is
    begin
       if
         Inc_Users.Get_User_Option ("metaboxhidden_nav-menus") /= False or else
-        not Is_Array (Wp_Meta_boxes)
+        not Is_Array (Wp_Meta_Boxes)
       then
          return;
       end if;
@@ -322,6 +325,7 @@ is
          declare
             use Inc_Class_Wp_Users;
             use Inc_Pluggables;
+            use Inc_Users;
 
             User : Wp_User := Wp_Get_Current_User; -- ();
          begin
@@ -342,7 +346,7 @@ is
       use Ada.Containers;
 
       Post_Types : Wp_Post_Type_Array :=
-         Get_Post_Types (arrays.To_array ((1 => Build ("show_in_nav_menus", "true"))),
+         Get_Post_Types (Arrays.To_Array ((1 => Build ("show_in_nav_menus", "true"))),
                          "object");
    begin
       if Post_Types'Length = 0 then -- not Post_Types then
@@ -398,7 +402,7 @@ is
       use Taxonomy_Vectors;
 
       Taxonomies : Taxonomy_Array :=
-         Get_Taxonomies (Arrays.To_array ((1 => Build ("show_in_nav_menus", "true"))),
+         Get_Taxonomies (Arrays.To_Array ((1 => Build ("show_in_nav_menus", "true"))),
                          "object");
    begin
       if Length (Taxonomies) = 0 then -- not Taxonomies then
@@ -445,12 +449,12 @@ is
    -- Wp_Nav_Menu_Item_Link_Meta_Box --
    ------------------------------------
 
-procedure Wp_Nav_Menu_Item_Link_Meta_Box
-is
+   procedure Wp_Nav_Menu_Item_Link_Meta_Box
+   is
 --        global (x_nav_menu_placeholder, Nav_Menu_Selected_Id);
-begin
-        X_Nav_Menu_Placeholder := (if 0 > X_Nav_Menu_Placeholder
-                                   then X_Nav_Menu_Placeholder - 1 else -1);
+   begin
+      X_Nav_Menu_Placeholder := (if 0 > X_Nav_Menu_Placeholder
+                                 then X_Nav_Menu_Placeholder - 1 else -1);
 
         -- ?>
         -- <div class="customlinkdiv" id="customlinkdiv">
@@ -474,398 +478,413 @@ begin
 
         -- </div><!-- /.customlinkdiv -->
         -- <?php
-end Wp_Nav_Menu_Item_Link_Meta_Box;
+   end Wp_Nav_Menu_Item_Link_Meta_Box;
 
    -----------------------------------------
    -- Wp_Nav_Menu_Item_Post_Type_Meta_Box --
    -----------------------------------------
 
-function Wp_Nav_Menu_Item_Post_Type_Meta_Box (Data_Object : String;
-                                              Box         : Array_Type)
-                                              return Array_Type
-is
+   function Wp_Nav_Menu_Item_Post_Type_Meta_Box (Data_Object : String;
+                                                 Box         : Array_Type)
+                                                 return Array_Type
+   is
 --        global (x_nav_menu_placeholder, Nav_Menu_Selected_Id);
-        use Inc_Class_Wp_Post_Type;
-        use Inc_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Formatting;
+      use Inc_Posts;
 
-        Post_Type_Name : String       := -Get (Box, "args").Name;
-        Post_Type      : Wp_Post_Type := Get_Post_Type_Object (Post_Type_Name);
-        Tab_Name       : String       := Post_Type_Name & "-tab";
+      Post_Type_Name : String       := -Get (Box, "args").Name;
+      Post_Type      : Wp_Post_Type := Get_Post_Type_Object (Post_Type_Name);
+      Tab_Name       : String       := Post_Type_Name & "-tab";
 
-        -- Paginate browsing for large numbers of post objects.
-        Per_Page : constant Natural := 50;
+      -- Paginate browsing for large numbers of post objects.
+      Per_Page : constant Natural := 50;
 
-        Pagenum  : constant Natural :=
-          (if
-             Isset (X_REQUEST, Tab_Name) and then
-             Isset (X_REQUEST, "paged")
-           then absint (Get (X_REQUEST, "paged")) else 1);
+      Pagenum  : constant Natural :=
+        (if
+           Isset (X_REQUEST, Tab_Name) and then
+           Isset (X_REQUEST, "paged")
+         then Absint (Get (X_REQUEST, "paged")) else "1");
 
-        Offset   : constant Natural := (if 0 < Pagenum
-                                        then Per_Page * (Pagenum - 1) else 0);
+      Offset : constant Natural := (if 0 < Pagenum
+                                    then Per_Page * (Pagenum - 1) else 0);
 
-        Args : Array_Type := Arrays.To_Array ((
-                Build ("offset",                 Offset),
-                Build ("order",                  "ASC"),
-                Build ("orderby",                "title"),
-                Build ("posts_per_page",         Per_Page),
-                Build ("post_type",              Post_Type_Name),
-                Build ("suppress_filters",       "true"),
-                Build ("update_post_term_cache", "false"),
-                Build ("update_post_meta_cache", "false")
-       ));
+      Args : Array_Type := Arrays.To_Array ((
+              Build ("offset",                 Offset),
+              Build ("order",                  "ASC"),
+              Build ("orderby",                "title"),
+              Build ("posts_per_page",         Per_Page),
+              Build ("post_type",              Post_Type_Name),
+              Build ("suppress_filters",       "true"),
+              Build ("update_post_term_cache", "false"),
+              Build ("update_post_meta_cache", "false")
+      ));
 
-        --
-        -- If we"re dealing with pages, let"s prioritize the Front Page,
-        -- Posts Page and Privacy Policy Page at the top of the list.
-        --
-       Important_Pages : List_Type := List_Array;
-begin
-        if Isset (Box ("args").X_Default_Query) then
-                Args := Array_Merge (Args, To_Array (Box ("args").X_Default_Query));
-        end if;
+      --
+      -- If we"re dealing with pages, let"s prioritize the Front Page,
+      -- Posts Page and Privacy Policy Page at the top of the list.
+      --
+      Important_Pages : List_Type := List_Array;
+   begin
+      if Isset (Box ("args").X_Default_Query) then
+         Args := Array_Merge (Args, To_Array (Box ("args").X_Default_Query));
+      end if;
 
 --        Important_Pages := Empty_Array;
-        if "page" = Post_Type_Name then
-                Suppress_Page_Ids := Empty_Array;
+      if "page" = Post_Type_Name then
+         Suppress_Page_Ids := Empty_Array;
 
-                -- Insert Front Page or custom Home link.
-                Front_Page := (if "page" = Get_Option ("show_on_front") then Get_Option ("page_on_front") else 0); -- (int)
+         -- Insert Front Page or custom Home link.
+         Front_Page := (if "page" = Get_Option ("show_on_front")
+                        then Get_Option ("page_on_front") else "0"); -- (int)
 
-                Front_Page_Obj := null;
-                if not empty (Front_Page) then
-                        Front_Page_Obj               := Get_Post (Front_Page);
-                        Front_Page_Obj.Front_Or_Home := True;
+         Front_Page_Obj := null;
 
-                        Set (Important_Pages,   Front_Page_Obj);    -- ()
-                        Set (Suppress_Page_Ids, Front_Page_Obj.ID); -- ()
-                else
-                        x_nav_menu_placeholder :=  (if 0 > x_nav_menu_placeholder then X_Nav_Menu_Placeholder - 1 else -1); -- (int)
-                        Front_Page_Obj         := To_Array ((  -- (object)
-                                Build ("front_or_home", "true"),
-                                Build ("ID",            "0"),
-                                Build ("object_id",     X_Nav_Menu_Placeholder),
-                                Build ("post_content",  ""),
-                                Build ("post_excerpt",  ""),
-                                Build ("post_parent",   ""),
-                                Build ("post_title",    x_x ("Home", "nav menu home label")),
-                                Build ("post_type",     "nav_menu_item"),
-                                Build ("type",          "custom"),
-                                Build ("url",           Home_Url ("/"))
-                       ));
+         if not Empty (Front_Page) then
+            Front_Page_Obj               := Get_Post (Front_Page);
+            Front_Page_Obj.Front_Or_Home := True;
 
-                        Set (Important_Pages, Front_Page_Obj);  -- ()
-                end if;
+            Set (Important_Pages,   Front_Page_Obj);    -- ()
+            Set (Suppress_Page_Ids, Front_Page_Obj.ID); -- ()
+         else
+            X_Nav_Menu_Placeholder :=  (if 0 > X_Nav_Menu_Placeholder
+                                        then X_Nav_Menu_Placeholder - 1 else -1); -- (int)
+            Front_Page_Obj := To_Array ((  -- (object)
+               Build ("front_or_home", "true"),
+               Build ("ID",            "0"),
+               Build ("object_id",     X_Nav_Menu_Placeholder),
+               Build ("post_content",  ""),
+               Build ("post_excerpt",  ""),
+               Build ("post_parent",   ""),
+               Build ("post_title",    x_x ("Home", "nav menu home label")),
+               Build ("post_type",     "nav_menu_item"),
+               Build ("type",          "custom"),
+               Build ("url",           Home_Url ("/"))
+            ));
 
-                -- Insert Posts Page.
-                Posts_Page := (if "page" = Get_Option ("show_on_front") then Get_Option ("page_for_posts") else 0);  -- (int)
+            Set (Important_Pages, Front_Page_Obj);  -- ()
+         end if;
 
-                if not Empty (Posts_Page) then
-                        Posts_Page_Obj            := Get_Post (Posts_Page);
-                        Posts_Page_Obj.Posts_Page := True;
+         -- Insert Posts Page.
+         Posts_Page := (if "page" = Get_Option ("show_on_front")
+                        then Get_Option ("page_for_posts") else 0);  -- (int)
 
-                        Set (Important_Pages,  Posts_Page_Obj);    -- ()
-                        Set (Suppress_Page_Id, Posts_Page_Obj.Id); -- ()
-                end if;
+         if not Empty (Posts_Page) then
+            Posts_Page_Obj            := Get_Post (Posts_Page);
+            Posts_Page_Obj.Posts_Page := True;
 
-                -- Insert Privacy Policy Page.
-                Privacy_Policy_Page_Id := Get_Option ("wp_page_for_privacy_policy"); -- (int)
+            Set (Important_Pages,  Posts_Page_Obj);    -- ()
+            Set (Suppress_Page_Id, Posts_Page_Obj.Id); -- ()
+         end if;
 
-                if not empty (Privacy_Policy_Page_Id) then
-                        Privacy_Policy_Page := Get_Post (Privacy_Policy_Page_Id);
-                        if Privacy_Policy_Page in WP_Post and then "publish" = Privacy_Policy_Page.Post_Status then -- instanceof
-                                Privacy_Policy_Page.Privacy_Policy_Page := True;
+         -- Insert Privacy Policy Page.
+         Privacy_Policy_Page_Id := Get_Option ("wp_page_for_privacy_policy"); -- (int)
 
-                                Set (Important_Pages,   Privacy_Policy_Page);    -- ()
-                                Set (Suppress_Page_Ids, Privacy_Policy_Page.Id); -- ()
-                        end if;
-                end if;
+         if not Empty (Privacy_Policy_Page_Id) then
+            Privacy_Policy_Page := Get_Post (Privacy_Policy_Page_Id);
+            if
+              Privacy_Policy_Page in Wp_Post and then    -- instanceof
+              "publish" = Privacy_Policy_Page.Post_Status
+            then
+               Privacy_Policy_Page.Privacy_Policy_Page := True;
 
-                -- Add suppression array to arguments for WP_Query.
-                if not Empty (Suppress_Page_Ids) then
-                        Args ("post__not_in") := Suppress_Page_Ids;
-                end if;
-        end if;
+               Set (Important_Pages,   Privacy_Policy_Page);    -- ()
+               Set (Suppress_Page_Ids, Privacy_Policy_Page.Id); -- ()
+            end if;
+         end if;
 
-        -- @todo Transient caching of these results with proper invalidation on updating of a post of this type.
-        Get_Posts := new WP_Query;
-        Posts     := Get_Posts.Query (Args);
+         -- Add suppression array to arguments for WP_Query.
+         if not Empty (Suppress_Page_Ids) then
+            Args ("post__not_in") := Suppress_Page_Ids;
+         end if;
+      end if;
 
-        -- Only suppress and insert when more than just suppression pages available.
-        if not Get_Posts.Post_Count then
-                if not Empty (Suppress_Page_Ids) then
-                        unset (Args ("post__not_in"));
-                        Get_Posts := new WP_Query;
-                        Posts     := Get_Posts.Query (Args);
-                else
-                        Echo ("<p>" & abs "No items." & "</p>");
-                        return;
-                end if;
-        elsif not Empty (Important_Pages) then
-                Posts := Array_Merge (Important_Pages, Posts);
-        end if;
+      -- @todo Transient caching of these results with proper invalidation on
+      -- updating of a post of this type.
+      Get_Posts := new WP_Query;
+      Posts     := Get_Posts.Query (Args);
 
-        Num_Pages := Get_Posts.Max_Num_Pages;
+      -- Only suppress and insert when more than just suppression pages available.
+      if not Get_Posts.Post_Count then
+         if not Empty (Suppress_Page_Ids) then
+            Unset (Args ("post__not_in"));
+            Get_Posts := new WP_Query;
+            Posts     := Get_Posts.Query (Args);
+         else
+            Echo ("<p>" & abs "No items." & "</p>");
+            return;
+         end if;
 
-        Page_Links := Paginate_Links (
-                To_Array ((
-                        Build ("base",               Add_Query_Arg (
-                                To_Array ((
-                                        Build (Tab_Name,     "all"),
-                                        Build ("paged",       "%#%"),
-                                        Build ("item-type",   "post_type"),
-                                        Build ("item-object", Post_Type_Name)
-                               ))
-                       )),
-                        Build ("format",             ""),
-                        Build ("prev_text",          "<span aria-label=""" & esc_attr_x ("Previous page") & """>" & abs "&laquo;" & "</span>"),
-                        Build ("next_text",          "<span aria-label=""" & esc_attr_x ("Next page") & """>" & abs "&raquo;" & "</span>"),
-                        Build ("before_page_number", "<span class=""screen-reader-text"">" & abs "Page" & "</span> "),
-                        Build ("total",              Num_Pages),
-                        Build ("current",            Pagenum)
-               ))
-       );
+      elsif not Empty (Important_Pages) then
+         Posts := Array_Merge (Important_Pages, Posts);
+      end if;
 
-        Db_Fields := false;
-        if Is_Post_Type_Hierarchical (Post_Type_Name) then
-                Db_Fields := To_Array ((
-                        Build ("parent", "post_parent"),
-                        Build ("id",     "ID")
-               ));
-        end if;
+      Num_Pages := Get_Posts.Max_Num_Pages;
 
-        Walker := new Walker_Nav_Menu_Checklist (Db_Fields);
+      Page_Links := Paginate_Links (
+         To_Array ((
+            Build ("base", Add_Query_Arg (To_Array ((
+                              Build (Tab_Name,     "all"),
+                              Build ("paged",       "%#%"),
+                              Build ("item-type",   "post_type"),
+                              Build ("item-object", Post_Type_Name))))),
+            Build ("format",             ""),
+            Build ("prev_text",          "<span aria-label=""" & esc_attr_x ("Previous page") & """>" & abs "&laquo;" & "</span>"),
+            Build ("next_text",          "<span aria-label=""" & esc_attr_x ("Next page") & """>" & abs "&raquo;" & "</span>"),
+            Build ("before_page_number", "<span class=""screen-reader-text"">" & abs "Page" & "</span> "),
+            Build ("total",              Num_Pages),
+            Build ("current",            Pagenum))));
 
-        Current_Tab := "most-recent";
+      Db_Fields := false;
+      if Is_Post_Type_Hierarchical (Post_Type_Name) then
+         Db_Fields := To_Array ((
+            Build ("parent", "post_parent"),
+            Build ("id",     "ID")));
+      end if;
 
-        if  isset (X_REQUEST (tab_name)) and then In_Array (X_REQUEST (Tab_Name), To_array ("all", "search"), true) then
-                Current_Tab := X_REQUEST (tab_name);
-        end if;
+      Walker := new Walker_Nav_Menu_Checklist (Db_Fields);
 
-        if not Empty (X_REQUEST ("quick-search-posttype-" & Post_Type_Name)) then
-                Current_Tab := "search";
-        end if;
+      Current_Tab := "most-recent";
 
-        Removed_Args := To_Array ((
+      if
+        Isset (X_REQUEST (Tab_Name)) and then
+        In_Array (X_REQUEST (Tab_Name), To_array ("all", "search"), true)
+      then
+         Current_Tab := X_REQUEST (Tab_Name);
+      end if;
+
+      if not Empty (X_REQUEST ("quick-search-posttype-" & Post_Type_Name)) then
+         Current_Tab := "search";
+      end if;
+
+      Removed_Args := To_Array ((
                 "action",
                 "customlink-tab",
                 "edit-menu-item",
                 "menu-item",
                 "page-tab",
                 "_wpnonce"
-       ));
+      ));
 
-        Most_Recent_Url := "";
-        View_All_Url    := "";
-        Search_Url      := "";
-        if Nav_Menu_Selected_Id then
-                Most_Recent_Url := Esc_Url (Add_Query_Arg (Tab_Name, "most-recent", Remove_Query_Arg (Removed_Args)));
-                View_All_Url    := Esc_Url (Add_Query_Arg (Tab_Name, "all",         Remove_Query_Arg (Removed_Args)));
-                Search_Url      := Esc_Url (Add_Query_Arg (Tab_Name, "search",      Remove_Query_Arg (Removed_Args)));
-        end if;
-        -- ?>
-        -- <div id="posttype-<?php echo post_type_name; ?>" class="posttypediv">
-        --         <ul id="posttype-<?php echo post_type_name; ?>-tabs" class="posttype-tabs add-menu-item-tabs">
-        --                 <li <?php echo  ("most-recent" === current_tab ? " class="tabs"" : ""); ?>>
-        --                         <a class="nav-tab-link" data-type="tabs-panel-posttype-<?php echo esc_attr (post_type_name); ?>-most-recent" href="<?php echo most_recent_url; ?>#tabs-panel-posttype-<?php echo post_type_name; ?>-most-recent">
-        --                                 <?php _e ("Most Recent"); ?>
-        --                         </a>
-        --                 </li>
-        --                 <li <?php echo  ("all" === current_tab ? " class="tabs"" : ""); ?>>
-        --                         <a class="nav-tab-link" data-type="<?php echo esc_attr (post_type_name); ?>-all" href="<?php echo view_all_url; ?>#<?php echo post_type_name; ?>-all">
-        --                                 <?php _e ("View All"); ?>
-        --                         </a>
-        --                 </li>
-        --                 <li <?php echo  ("search" === current_tab ? " class="tabs"" : ""); ?>>
-        --                         <a class="nav-tab-link" data-type="tabs-panel-posttype-<?php echo esc_attr (post_type_name); ?>-search" href="<?php echo search_url; ?>#tabs-panel-posttype-<?php echo post_type_name; ?>-search">
-        --                                 <?php _e ("Search"); ?>
-        --                         </a>
-        --                 </li>
-        --         </ul><!-- .posttype-tabs -->
+      Most_Recent_Url := "";
+      View_All_Url    := "";
+      Search_Url      := "";
 
-        --         <div id="tabs-panel-posttype-<?php echo post_type_name; ?>-most-recent" class="tabs-panel <?php echo  ("most-recent" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php _e ("Most Recent"); ?>" tabindex="0">
-        --                 <ul id="<?php echo post_type_name; ?>checklist-most-recent" class="categorychecklist form-no-clear">
-        --                         <?php
-                                Recent_Args    := Array_Merge (
-                                        Args,
-                                        To_Array ((
-                                                Build ("orderby",        "post_date"),
-                                                Build ("order",          "DESC"),
-                                                Build ("posts_per_page", "15")
-                                       ))
-                               );
-                                Most_Recent     := Get_Posts.Query (Recent_Args);
-                                Args ("walker") := Walker;
+      if Nav_Menu_Selected_Id then
+         Most_Recent_Url := ESC_URL (Add_Query_Arg (Tab_Name, "most-recent", Remove_Query_Arg (Removed_Args)));
+         View_All_Url    := ESC_URL (Add_Query_Arg (Tab_Name, "all",         Remove_Query_Arg (Removed_Args)));
+         Search_Url      := ESC_URL (Add_Query_Arg (Tab_Name, "search",      Remove_Query_Arg (Removed_Args)));
+      end if;
+      -- ?>
+      -- <div id="posttype-<?php echo post_type_name; ?>" class="posttypediv">
+      --         <ul id="posttype-<?php echo post_type_name; ?>-tabs" class="posttype-tabs add-menu-item-tabs">
+      --                 <li <?php echo  ("most-recent" === current_tab ? " class="tabs"" : ""); ?>>
+      --                         <a class="nav-tab-link" data-type="tabs-panel-posttype-<?php echo esc_attr (post_type_name); ?>-most-recent" href="<?php echo most_recent_url; ?>#tabs-panel-posttype-<?php echo post_type_name; ?>-most-recent">
+      --                                 <?php _e ("Most Recent"); ?>
+      --                         </a>
+      --                 </li>
+      --                 <li <?php echo  ("all" === current_tab ? " class="tabs"" : ""); ?>>
+      --                         <a class="nav-tab-link" data-type="<?php echo esc_attr (post_type_name); ?>-all" href="<?php echo view_all_url; ?>#<?php echo post_type_name; ?>-all">
+      --                                 <?php _e ("View All"); ?>
+      --                         </a>
+      --                 </li>
+      --                 <li <?php echo  ("search" === current_tab ? " class="tabs"" : ""); ?>>
+      --                         <a class="nav-tab-link" data-type="tabs-panel-posttype-<?php echo esc_attr (post_type_name); ?>-search" href="<?php echo search_url; ?>#tabs-panel-posttype-<?php echo post_type_name; ?>-search">
+      --                                 <?php _e ("Search"); ?>
+      --                         </a>
+      --                 </li>
+      --         </ul><!-- .posttype-tabs -->
 
-                                --
-                                -- Filters the posts displayed in the "Most Recent" tab of the current
-                                -- post type"s menu items meta box.
-                                --
-                                -- The dynamic portion of the hook name, `post_type_name`, refers to the post type name.
-                                --
-                                -- Possible hook names include:
-                                --
-                                --  - `nav_menu_items_post_recent`
-                                --  - `nav_menu_items_page_recent`
-                                --
-                                -- @since 4.3.0
-                                -- @since 4.9.0 Added the `recent_args` parameter.
-                                --
-                                -- @param WP_Post() most_recent An array of post objects being listed.
-                                -- @param array     args        An array of `WP_Query` arguments for the meta box.
-                                -- @param array     box         Arguments passed to `wp_nav_menu_item_post_type_meta_box()`.
-                                -- @param array     recent_args An array of `WP_Query` arguments for "Most Recent" tab.
-                                --
-                                Most_Recent := Apply_Filters ("nav_menu_items_" & Post_Type_Name & "_recent", Most_Recent, Args, Box, Recent_Args);
+      --         <div id="tabs-panel-posttype-<?php echo post_type_name; ?>-most-recent" class="tabs-panel <?php echo  ("most-recent" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php _e ("Most Recent"); ?>" tabindex="0">
+      --                 <ul id="<?php echo post_type_name; ?>checklist-most-recent" class="categorychecklist form-no-clear">
+      --                         <?php
+      Recent_Args    := Array_Merge (
+         Args,
+         To_Array ((
+            Build ("orderby",        "post_date"),
+            Build ("order",          "DESC"),
+            Build ("posts_per_page", "15")
+         ))
+      );
+      Most_Recent     := Get_Posts.Query (Recent_Args);
+      Args ("walker") := Walker;
 
-                                Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Most_Recent), 0, Args));  -- (object)
-                --                 ?>
-                --         </ul>
-                -- </div><!-- /.tabs-panel -->
+      --
+      -- Filters the posts displayed in the "Most Recent" tab of the current
+      -- post type"s menu items meta box.
+      --
+      -- The dynamic portion of the hook name, `post_type_name`, refers to the post type name.
+      --
+      -- Possible hook names include:
+      --
+      --  - `nav_menu_items_post_recent`
+      --  - `nav_menu_items_page_recent`
+      --
+      -- @since 4.3.0
+      -- @since 4.9.0 Added the `recent_args` parameter.
+      --
+      -- @param WP_Post() most_recent An array of post objects being listed.
+      -- @param array     args        An array of `WP_Query` arguments for the meta box.
+      -- @param array     box         Arguments passed to `wp_nav_menu_item_post_type_meta_box()`.
+      -- @param array     recent_args An array of `WP_Query` arguments for "Most Recent" tab.
+      --
+      Most_Recent := Apply_Filters ("nav_menu_items_" & Post_Type_Name & "_recent",
+                                    Most_Recent, Args, Box, Recent_Args);
 
-                -- <div class="tabs-panel <?php echo  ("search" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" id="tabs-panel-posttype-<?php echo post_type_name; ?>-search" role="region" aria-label="<?php echo post_type->labels->search_items; ?>" tabindex="0">
-                --         <?php
-                        if isset (X_REQUEST ("quick-search-posttype-" & Post_Type_Name)) then
-                                Searched       := Esc_Attr (X_REQUEST ("quick-search-posttype-" & Post_Type_Name));
-                                Search_Results := Get_Posts (
-                                        To_Array ((
-                                                Build ("s",         Searched),
-                                                Build ("post_type", Post_Type_Name),
-                                                Build ("fields",    "all"),
-                                                Build ("order",     "DESC")
-                                       ))
-                               );
-                        else
-                                Searched       := "";
-                                Search_Results := Empty_Array;
-                        end if;
-                --         ?>
-                --         <p class="quick-search-wrap">
-                --                 <label for="quick-search-posttype-<?php echo post_type_name; ?>" class="screen-reader-text"><?php _e ("Search"); ?></label>
-                --                 <input type="search"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> class="quick-search" value="<?php echo searched; ?>" name="quick-search-posttype-<?php echo post_type_name; ?>" id="quick-search-posttype-<?php echo post_type_name; ?>" />
-                --                 <span class="spinner"></span>
-                --                 <?php submit_button (__ ("Search"), "small quick-search-submit hide-if-js", "submit", false, array ("id" => "submit-quick-search-posttype-" . post_type_name)); ?>
-                --         </p>
+      Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Most_Recent),
+                                0, Args));  -- (object)
+      --                 ?>
+      --         </ul>
+      -- </div><!-- /.tabs-panel -->
 
-                --         <ul id="<?php echo post_type_name; ?>-search-checklist" data-wp-lists="list:<?php echo post_type_name; ?>" class="categorychecklist form-no-clear">
-                --         <?php if  (! empty (search_results) && ! is_wp_error (search_results)) : ?>
-                --                 <?php
-                --                 args("walker") = walker;
-                --                 echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", search_results), 0, (object) args);
-                --                 ?>
-                --         <?php elseif  (is_wp_error (search_results)) : ?>
-                --                 <li><?php echo search_results->get_error_message(); ?></li>
-                --         <?php elseif  (! empty (searched)) : ?>
-                --                 <li><?php _e ("No results found."); ?></li>
-                --         <?php endif; ?>
-                --         </ul>
-                -- </div><!-- /.tabs-panel -->
+      -- <div class="tabs-panel <?php echo  ("search" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" id="tabs-panel-posttype-<?php echo post_type_name; ?>-search" role="region" aria-label="<?php echo post_type->labels->search_items; ?>" tabindex="0">
+      --         <?php
+      if Isset (X_REQUEST ("quick-search-posttype-" & Post_Type_Name)) then
+         Searched       := ESC_Attr (X_REQUEST ("quick-search-posttype-" & Post_Type_Name));
+         Search_Results := Get_Posts (
+            To_Array ((
+               Build ("s",         Searched),
+               Build ("post_type", Post_Type_Name),
+               Build ("fields",    "all"),
+               Build ("order",     "DESC")
+            ))
+         );
+      else
+         Searched       := "";
+         Search_Results := Empty_Array;
+      end if;
+      --         ?>
+      --         <p class="quick-search-wrap">
+      --                 <label for="quick-search-posttype-<?php echo post_type_name; ?>" class="screen-reader-text"><?php _e ("Search"); ?></label>
+      --                 <input type="search"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> class="quick-search" value="<?php echo searched; ?>" name="quick-search-posttype-<?php echo post_type_name; ?>" id="quick-search-posttype-<?php echo post_type_name; ?>" />
+      --                 <span class="spinner"></span>
+      --                 <?php submit_button (__ ("Search"), "small quick-search-submit hide-if-js", "submit", false, array ("id" => "submit-quick-search-posttype-" . post_type_name)); ?>
+      --         </p>
 
-                -- <div id="<?php echo post_type_name; ?>-all" class="tabs-panel tabs-panel-view-all <?php echo  ("all" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php echo post_type->labels->all_items; ?>" tabindex="0">
-                --         <?php if  (! empty (page_links)) : ?>
-                --                 <div class="add-menu-item-pagelinks">
-                --                         <?php echo page_links; ?>
-                --                 </div>
-                --         <?php endif; ?>
-                --         <ul id="<?php echo post_type_name; ?>checklist" data-wp-lists="list:<?php echo post_type_name; ?>" class="categorychecklist form-no-clear">
-                --                 <?php
-                                Args ("walker") := Walker;
+      --         <ul id="<?php echo post_type_name; ?>-search-checklist" data-wp-lists="list:<?php echo post_type_name; ?>" class="categorychecklist form-no-clear">
+      --         <?php if  (! empty (search_results) && ! is_wp_error (search_results)) : ?>
+      --                 <?php
+      --                 args("walker") = walker;
+      --                 echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", search_results), 0, (object) args);
+      --                 ?>
+      --         <?php elseif  (is_wp_error (search_results)) : ?>
+      --                 <li><?php echo search_results->get_error_message(); ?></li>
+      --         <?php elseif  (! empty (searched)) : ?>
+      --                 <li><?php _e ("No results found."); ?></li>
+      --         <?php endif; ?>
+      --         </ul>
+      -- </div><!-- /.tabs-panel -->
 
-                                if Post_Type.Has_Archive then
-                                        X_Nav_Menu_Placeholder :=  (if 0 > X_Nav_Menu_Placeholder then X_Nav_Menu_Placeholder - 1 else -1); -- (int)
-                                        Array_Unshift (
-                                                Posts,
-                                                To_Array (( -- (object)
-                                                        Build ("ID",           "0"),
-                                                        Build ("object_id",    X_Nav_Menu_Placeholder),
-                                                        Build ("object",       Post_Type_Name),
-                                                        Build ("post_content", ""),
-                                                        Build ("post_excerpt", ""),
-                                                        Build ("post_title",   Post_Type.Labels.Archives),
-                                                        Build ("post_type",    "nav_menu_item"),
-                                                        Build ("type",         "post_type_archive"),
-                                                        Build ("url",          Get_Post_Type_Archive_Link (Post_Type_Name))
-                                               ))
-                                       );
-                                end if;
+      -- <div id="<?php echo post_type_name; ?>-all" class="tabs-panel tabs-panel-view-all <?php echo  ("all" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php echo post_type->labels->all_items; ?>" tabindex="0">
+      --         <?php if  (! empty (page_links)) : ?>
+      --                 <div class="add-menu-item-pagelinks">
+      --                         <?php echo page_links; ?>
+      --                 </div>
+      --         <?php endif; ?>
+      --         <ul id="<?php echo post_type_name; ?>checklist" data-wp-lists="list:<?php echo post_type_name; ?>" class="categorychecklist form-no-clear">
+      --                 <?php
+      Args ("walker") := Walker;
 
-                                --
-                                -- Filters the posts displayed in the "View All" tab of the current
-                                -- post type"s menu items meta box.
-                                --
-                                -- The dynamic portion of the hook name, `post_type_name`, refers
-                                -- to the slug of the current post type.
-                                --
-                                -- Possible hook names include:
-                                --
-                                --  - `nav_menu_items_post`
-                                --  - `nav_menu_items_page`
-                                --
-                                -- @since 3.2.0
-                                -- @since 4.6.0 Converted the `post_type` parameter to accept a WP_Post_Type object.
-                                --
-                                -- @see WP_Query::query()
-                                --
-                                -- @param object()     posts     The posts for the current post type. Mostly `WP_Post` objects, but
-                                --                                can also contain "fake" post objects to represent other menu items.
-                                -- @param array        args      An array of `WP_Query` arguments.
-                                -- @param WP_Post_Type post_type The current post type object for this menu item meta box.
-                                --
-                                Posts := Apply_Filters ("nav_menu_items_" & Post_Type_Name, Posts, Args, Post_Type);
+      if Post_Type.Has_Archive then
+         X_Nav_Menu_Placeholder :=  (if 0 > X_Nav_Menu_Placeholder
+                                     then X_Nav_Menu_Placeholder - 1 else -1); -- (int)
+         Array_Unshift (
+            Posts,
+            To_Array (( -- (object)
+               Build ("ID",           "0"),
+               Build ("object_id",    X_Nav_Menu_Placeholder),
+               Build ("object",       Post_Type_Name),
+               Build ("post_content", ""),
+               Build ("post_excerpt", ""),
+               Build ("post_title",   Post_Type.Labels.Archives),
+               Build ("post_type",    "nav_menu_item"),
+               Build ("type",         "post_type_archive"),
+               Build ("url",          Get_Post_Type_Archive_Link (Post_Type_Name))
+            ))
+         );
+      end if;
 
-                                Checkbox_Items := Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Posts), 0, Args); -- (object)
+      --
+      -- Filters the posts displayed in the "View All" tab of the current
+      -- post type"s menu items meta box.
+      --
+      -- The dynamic portion of the hook name, `post_type_name`, refers
+      -- to the slug of the current post type.
+      --
+      -- Possible hook names include:
+      --
+      --  - `nav_menu_items_post`
+      --  - `nav_menu_items_page`
+      --
+      -- @since 3.2.0
+      -- @since 4.6.0 Converted the `post_type` parameter to accept a WP_Post_Type object.
+      --
+      -- @see WP_Query::query()
+      --
+      -- @param object()     posts     The posts for the current post type. Mostly `WP_Post` objects, but
+      --                                can also contain "fake" post objects to represent other menu items.
+      -- @param array        args      An array of `WP_Query` arguments.
+      -- @param WP_Post_Type post_type The current post type object for this menu item meta box.
+      --
+      Posts := Apply_Filters ("nav_menu_items_" & Post_Type_Name,
+                              Posts, Args, Post_Type);
 
-                                Echo (Checkbox_Items);
-        --                         ?>
-        --                 </ul>
-        --                 <?php if  (! empty (page_links)) : ?>
-        --                         <div class="add-menu-item-pagelinks">
-        --                                 <?php echo page_links; ?>
-        --                         </div>
-        --                 <?php endif; ?>
-        --         </div><!-- /.tabs-panel -->
+      Checkbox_Items := Walk_Nav_Menu_Tree
+        (Array_Map ("wp_setup_nav_menu_item", Posts), 0, Args); -- (object)
 
-        --         <p class="button-controls wp-clearfix" data-items-type="posttype-<?php echo esc_attr (post_type_name); ?>">
-        --                 <span class="list-controls hide-if-no-js">
-        --                         <input type="checkbox"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> id="<?php echo esc_attr (tab_name); ?>" class="select-all" />
-        --                         <label for="<?php echo esc_attr (tab_name); ?>"><?php _e ("Select All"); ?></label>
-        --                 </span>
+      Echo (Checkbox_Items);
+      --                         ?>
+      --                 </ul>
+      --                 <?php if  (! empty (page_links)) : ?>
+      --                         <div class="add-menu-item-pagelinks">
+      --                                 <?php echo page_links; ?>
+      --                         </div>
+      --                 <?php endif; ?>
+      --         </div><!-- /.tabs-panel -->
 
-        --                 <span class="add-to-menu">
-        --                         <input type="submit"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> class="button submit-add-to-menu right" value="<?php esc_attr_e ("Add to Menu"); ?>" name="add-post-type-menu-item" id="<?php echo esc_attr ("submit-posttype-" . post_type_name); ?>" />
-        --                         <span class="spinner"></span>
-        --                 </span>
-        --         </p>
+      --         <p class="button-controls wp-clearfix" data-items-type="posttype-<?php echo esc_attr (post_type_name); ?>">
+      --                 <span class="list-controls hide-if-no-js">
+      --                         <input type="checkbox"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> id="<?php echo esc_attr (tab_name); ?>" class="select-all" />
+      --                         <label for="<?php echo esc_attr (tab_name); ?>"><?php _e ("Select All"); ?></label>
+      --                 </span>
 
-        -- </div><!-- /.posttypediv -->
-        -- <?php
-end Wp_Nav_Menu_Item_Post_Type_Meta_Box;
+      --                 <span class="add-to-menu">
+      --                         <input type="submit"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> class="button submit-add-to-menu right" value="<?php esc_attr_e ("Add to Menu"); ?>" name="add-post-type-menu-item" id="<?php echo esc_attr ("submit-posttype-" . post_type_name); ?>" />
+      --                         <span class="spinner"></span>
+      --                 </span>
+      --         </p>
+
+      -- </div><!-- /.posttypediv -->
+      -- <?php
+   end Wp_Nav_Menu_Item_Post_Type_Meta_Box;
 
    ----------------------------------------
    -- Wp_Nav_Menu_Item_Taxonomy_Meta_Box --
    ----------------------------------------
 
-procedure Wp_Nav_Menu_Item_Taxonomy_Meta_Box (Data_Object : String;
-                                              Box         : Array_Type)
-is
+   procedure Wp_Nav_Menu_Item_Taxonomy_Meta_Box (Data_Object : String;
+                                                 Box         : Array_Type)
+   is
+      use Inc_Formatting;
+
 --        global nav_menu_selected_id;
 
-        Taxonomy_Name : String      := Box ("args").Name;
-        Taxonomy      : Wp_Taxonomy := Get_Taxonomy (Taxonomy_Name);
-        Tab_Name      : String      := Taxonomy_Name & "-tab";
+      Taxonomy_Name : String      := Box ("args").Name;
+      Taxonomy      : Wp_Taxonomy := Get_Taxonomy (Taxonomy_Name);
+      Tab_Name      : String      := Taxonomy_Name & "-tab";
 
-        -- Paginate browsing for large numbers of objects.
-        Per_Page : constant Natural := 50;
-        Pagenum  : constant Natural :=
-          (if
-             Isset (X_REQUEST (tab_name)) and then
-             Isset (X_REQUEST ("paged"))
-           then Absint (X_REQUEST ("paged")) else 1);
+      -- Paginate browsing for large numbers of objects.
+      Per_Page : constant Natural := 50;
+      Pagenum  : constant Natural :=
+         (if
+            Isset (X_REQUEST (Tab_Name)) and then
+            Isset (X_REQUEST ("paged"))
+          then Absint (X_REQUEST ("paged")) else 1);
 
-        Offset   : constant Natural :=
-          (if 0 < pagenum then Per_Page * (pagenum - 1) else 0);
+      Offset   : constant Natural :=
+        (if 0 < Pagenum then Per_Page * (Pagenum - 1) else 0);
 
-        Args : Array_Type := To_Array ((
+      Args : Array_Type := To_Array ((
                 Build ("taxonomy",     Taxonomy_Name),
                 Build ("child_of",     "0"),
                 Build ("exclude",      ""),
@@ -877,28 +896,28 @@ is
                 Build ("order",        "ASC"),
                 Build ("orderby",      "name"),
                 Build ("pad_counts",   "false")
-       ));
+      ));
 
-        Terms : Wp_Term := Get_Terms (Args);
-begin
-        if not terms or else Is_Wp_Error (Terms) then
-                Echo ("<p>" & abs "No items." & "</p>");
-                return;
-        end if;
+      Terms : Wp_Term := Get_Terms (Args);
+   begin
+      if not Terms or else Is_Wp_Error (Terms) then
+         Echo ("<p>" & abs "No items." & "</p>");
+         return;
+      end if;
 
-        Num_Pages := Ceil (
+      Num_Pages := Ceil (
                 Wp_Count_Terms (
                         Array_Merge (
-                                args,
+                                Args,
                                 To_Array ((
                                         Build ("number", ""),
                                         Build ("offset", "")
                                ))
                        )
                ) / Per_Page
-       );
+      );
 
-        Page_Links := Paginate_Links (
+      Page_Links := Paginate_Links (
                 To_Array ((
                         Build ("base",               Add_Query_Arg (
                                 To_Array ((
@@ -915,227 +934,263 @@ begin
                         Build ("total",              Num_Pages),
                         Build ("current",            Pagenum)
                ))
-       );
+      );
 
-        Db_Fields := False;
-        if Is_Taxonomy_Hierarchical (Taxonomy_Name) then
-                Db_Fields := To_Array ((
+      Db_Fields := False;
+      if Is_Taxonomy_Hierarchical (Taxonomy_Name) then
+         Db_Fields := To_Array ((
                         Build ("parent", "parent"),
                         Build ("id",     "term_id")
-               ));
-        end if;
+         ));
+      end if;
 
-        Walker := new Walker_Nav_Menu_Checklist (db_fields);
+      Walker := new Walker_Nav_Menu_Checklist (db_fields);
 
-        Current_Tab := "most-used";
+      Current_Tab := "most-used";
 
-        if Isset (X_REQUEST (tab_name)) and then In_Array (X_REQUEST (Tab_Name), To_array ("all", "most-used", "search"), true) then
-                Current_Tab := X_REQUEST (Tab_Name);
-        end if;
+      if
+        Isset (X_REQUEST (Tab_Name)) and then
+        In_Array (X_REQUEST (Tab_Name), To_array ("all", "most-used", "search"), true)
+      then
+         Current_Tab := X_REQUEST (Tab_Name);
+      end if;
 
-        if not empty (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name)) then
-                Current_Tab := "search";
-        end if;
+      if not Empty (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name)) then
+         Current_Tab := "search";
+      end if;
 
-        Removed_Args := To_Array (
+      Removed_Args := To_Array (
                 "action",
                 "customlink-tab",
                 "edit-menu-item",
                 "menu-item",
                 "page-tab",
                 "_wpnonce"
-       );
+      );
 
-        Most_Used_Url := "";
-        View_All_Url  := "";
-        Search_Url    := "";
-        if Nav_Menu_Selected_Id then
-                Most_Used_Url := Esc_Url (Add_Query_Arg (Tab_Name, "most-used", Remove_Query_Arg (Removed_Args)));
-                View_All_Url  := Esc_Url (Add_Query_Arg (Tab_Name, "all",       Remove_Query_Arg (Removed_Args)));
-                Search_Url    := Esc_Url (Add_Query_Arg (Tab_Name, "search",    Remove_Query_Arg (Removed_Args)));
-        end if;
-        -- ?>
-        -- <div id="taxonomy-<?php echo taxonomy_name; ?>" class="taxonomydiv">
-        --         <ul id="taxonomy-<?php echo taxonomy_name; ?>-tabs" class="taxonomy-tabs add-menu-item-tabs">
-        --                 <li <?php echo  ("most-used" === current_tab ? " class="tabs"" : ""); ?>>
-        --                         <a class="nav-tab-link" data-type="tabs-panel-<?php echo esc_attr (taxonomy_name); ?>-pop" href="<?php echo most_used_url; ?>#tabs-panel-<?php echo taxonomy_name; ?>-pop">
-        --                                 <?php echo esc_html (taxonomy->labels->most_used); ?>
-        --                         </a>
-        --                 </li>
-        --                 <li <?php echo  ("all" === current_tab ? " class="tabs"" : ""); ?>>
-        --                         <a class="nav-tab-link" data-type="tabs-panel-<?php echo esc_attr (taxonomy_name); ?>-all" href="<?php echo view_all_url; ?>#tabs-panel-<?php echo taxonomy_name; ?>-all">
-        --                                 <?php _e ("View All"); ?>
-        --                         </a>
-        --                 </li>
-        --                 <li <?php echo  ("search" === current_tab ? " class="tabs"" : ""); ?>>
-        --                         <a class="nav-tab-link" data-type="tabs-panel-search-taxonomy-<?php echo esc_attr (taxonomy_name); ?>" href="<?php echo search_url; ?>#tabs-panel-search-taxonomy-<?php echo taxonomy_name; ?>">
-        --                                 <?php _e ("Search"); ?>
-        --                         </a>
-        --                 </li>
-        --         </ul><!-- .taxonomy-tabs -->
+      Most_Used_Url := "";
+      View_All_Url  := "";
+      Search_Url    := "";
 
-        --         <div id="tabs-panel-<?php echo taxonomy_name; ?>-pop" class="tabs-panel <?php echo  ("most-used" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php echo taxonomy->labels->most_used; ?>" tabindex="0">
-        --                 <ul id="<?php echo taxonomy_name; ?>checklist-pop" class="categorychecklist form-no-clear" >
-        --                         <?php
-                                Popular_Terms := Get_Terms (
-                                        To_Array ((
-                                                Build ("taxonomy",     Taxonomy_Name),
-                                                Build ("orderby",      "count"),
-                                                Build ("order",        "DESC"),
-                                                Build ("number",       "10"),
-                                                Build ("hierarchical", "false")
-                                       ))
-                               );
-                                Args ("walker") := Walker;
-                                echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Popular_Terms), 0, Args));  -- (object)
-                --                 ?>
-                --         </ul>
-                -- </div><!-- /.tabs-panel -->
+      if Nav_Menu_Selected_Id then
+         Most_Used_Url := ESC_URL (Add_Query_Arg (Tab_Name, "most-used", Remove_Query_Arg (Removed_Args)));
+         View_All_Url  := ESC_URL (Add_Query_Arg (Tab_Name, "all",       Remove_Query_Arg (Removed_Args)));
+         Search_Url    := ESC_URL (Add_Query_Arg (Tab_Name, "search",    Remove_Query_Arg (Removed_Args)));
+      end if;
 
-                -- <div id="tabs-panel-<?php echo taxonomy_name; ?>-all" class="tabs-panel tabs-panel-view-all <?php echo  ("all" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php echo taxonomy->labels->all_items; ?>" tabindex="0">
-                --         <?php if  (! empty (page_links)) : ?>
-                --                 <div class="add-menu-item-pagelinks">
-                --                         <?php echo page_links; ?>
-                --                 </div>
-                --         <?php endif; ?>
-                --         <ul id="<?php echo taxonomy_name; ?>checklist" data-wp-lists="list:<?php echo taxonomy_name; ?>" class="categorychecklist form-no-clear">
-                --                 <?php
-                --                 args("walker") = walker;
-                --                 echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", terms), 0, (object) args);
-                --                 ?>
-                --         </ul>
-                --         <?php if  (! empty (page_links)) : ?>
-                --                 <div class="add-menu-item-pagelinks">
-                --                         <?php echo page_links; ?>
-                --                 </div>
-                --         <?php endif; ?>
-                -- </div><!-- /.tabs-panel -->
+      -- ?>
+      -- <div id="taxonomy-<?php echo taxonomy_name; ?>" class="taxonomydiv">
+      --         <ul id="taxonomy-<?php echo taxonomy_name; ?>-tabs" class="taxonomy-tabs add-menu-item-tabs">
+      --                 <li <?php echo  ("most-used" === current_tab ? " class="tabs"" : ""); ?>>
+      --                         <a class="nav-tab-link" data-type="tabs-panel-<?php echo esc_attr (taxonomy_name); ?>-pop" href="<?php echo most_used_url; ?>#tabs-panel-<?php echo taxonomy_name; ?>-pop">
+      --                                 <?php echo esc_html (taxonomy->labels->most_used); ?>
+      --                         </a>
+      --                 </li>
+      --                 <li <?php echo  ("all" === current_tab ? " class="tabs"" : ""); ?>>
+      --                         <a class="nav-tab-link" data-type="tabs-panel-<?php echo esc_attr (taxonomy_name); ?>-all" href="<?php echo view_all_url; ?>#tabs-panel-<?php echo taxonomy_name; ?>-all">
+      --                                 <?php _e ("View All"); ?>
+      --                         </a>
+      --                 </li>
+      --                 <li <?php echo  ("search" === current_tab ? " class="tabs"" : ""); ?>>
+      --                         <a class="nav-tab-link" data-type="tabs-panel-search-taxonomy-<?php echo esc_attr (taxonomy_name); ?>" href="<?php echo search_url; ?>#tabs-panel-search-taxonomy-<?php echo taxonomy_name; ?>">
+      --                                 <?php _e ("Search"); ?>
+      --                         </a>
+      --                 </li>
+      --         </ul><!-- .taxonomy-tabs -->
 
-                -- <div class="tabs-panel <?php echo  ("search" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" id="tabs-panel-search-taxonomy-<?php echo taxonomy_name; ?>" role="region" aria-label="<?php echo taxonomy->labels->search_items; ?>" tabindex="0">
-                --         <?php
-                        if Isset (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name)) then
-                                Searched       := Esc_Attr (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name));
-                                Search_Results := Get_Terms (
-                                        To_Array ((
-                                                Build ("taxonomy",     Taxonomy_Name),
-                                                Build ("name__like",   Searched),
-                                                Build ("fields",       "all"),
-                                                Build ("orderby",      "count"),
-                                                Build ("order",        "DESC"),
-                                                Build ("hierarchical", "false")
-                                       ))
-                               );
-                        else
-                                Searched       := "";
-                                Search_Results := Emptt_Array;
-                        end if;
-        --                 ?>
-        --                 <p class="quick-search-wrap">
-        --                         <label for="quick-search-taxonomy-<?php echo taxonomy_name; ?>" class="screen-reader-text"><?php _e ("Search"); ?></label>
-        --                         <input type="search" class="quick-search" value="<?php echo searched; ?>" name="quick-search-taxonomy-<?php echo taxonomy_name; ?>" id="quick-search-taxonomy-<?php echo taxonomy_name; ?>" />
-        --                         <span class="spinner"></span>
-        --                         <?php submit_button (__ ("Search"), "small quick-search-submit hide-if-js", "submit", false, array ("id" => "submit-quick-search-taxonomy-" . taxonomy_name)); ?>
-        --                 </p>
+      --         <div id="tabs-panel-<?php echo taxonomy_name; ?>-pop" class="tabs-panel <?php echo  ("most-used" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php echo taxonomy->labels->most_used; ?>" tabindex="0">
+      --                 <ul id="<?php echo taxonomy_name; ?>checklist-pop" class="categorychecklist form-no-clear" >
+      --                         <?php
+      Popular_Terms := Get_Terms (
+                         To_Array ((
+                            Build ("taxonomy",     Taxonomy_Name),
+                            Build ("orderby",      "count"),
+                            Build ("order",        "DESC"),
+                            Build ("number",       "10"),
+                            Build ("hierarchical", "false")
+                         ))
+                      );
+      Args ("walker") := Walker;
+      Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Popular_Terms),
+            0, Args));  -- (object)
 
-        --                 <ul id="<?php echo taxonomy_name; ?>-search-checklist" data-wp-lists="list:<?php echo taxonomy_name; ?>" class="categorychecklist form-no-clear">
-        --                 <?php if  (! empty (search_results) && ! is_wp_error (search_results)) : ?>
-        --                         <?php
-        --                         args("walker") = walker;
-        --                         echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", search_results), 0, (object) args);
-        --                         ?>
-        --                 <?php elseif  (is_wp_error (search_results)) : ?>
-        --                         <li><?php echo search_results->get_error_message(); ?></li>
-        --                 <?php elseif  (! empty (searched)) : ?>
-        --                         <li><?php _e ("No results found."); ?></li>
-        --                 <?php endif; ?>
-        --                 </ul>
-        --         </div><!-- /.tabs-panel -->
+      --                 ?>
+      --         </ul>
+      -- </div><!-- /.tabs-panel -->
 
-        --         <p class="button-controls wp-clearfix" data-items-type="taxonomy-<?php echo esc_attr (taxonomy_name); ?>">
-        --                 <span class="list-controls hide-if-no-js">
-        --                         <input type="checkbox"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> id="<?php echo esc_attr (tab_name); ?>" class="select-all" />
-        --                         <label for="<?php echo esc_attr (tab_name); ?>"><?php _e ("Select All"); ?></label>
-        --                 </span>
+      -- <div id="tabs-panel-<?php echo taxonomy_name; ?>-all" class="tabs-panel tabs-panel-view-all <?php echo  ("all" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" role="region" aria-label="<?php echo taxonomy->labels->all_items; ?>" tabindex="0">
+      --         <?php if  (! empty (page_links)) : ?>
+      --                 <div class="add-menu-item-pagelinks">
+      --                         <?php echo page_links; ?>
+      --                 </div>
+      --         <?php endif; ?>
+      --         <ul id="<?php echo taxonomy_name; ?>checklist" data-wp-lists="list:<?php echo taxonomy_name; ?>" class="categorychecklist form-no-clear">
+      --                 <?php
+      --                 args("walker") = walker;
+      --                 echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", terms), 0, (object) args);
+      --                 ?>
+      --         </ul>
+      --         <?php if  (! empty (page_links)) : ?>
+      --                 <div class="add-menu-item-pagelinks">
+      --                         <?php echo page_links; ?>
+      --                 </div>
+      --         <?php endif; ?>
+      -- </div><!-- /.tabs-panel -->
 
-        --                 <span class="add-to-menu">
-        --                         <input type="submit"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> class="button submit-add-to-menu right" value="<?php esc_attr_e ("Add to Menu"); ?>" name="add-taxonomy-menu-item" id="<?php echo esc_attr ("submit-taxonomy-" . taxonomy_name); ?>" />
-        --                         <span class="spinner"></span>
-        --                 </span>
-        --         </p>
+      -- <div class="tabs-panel <?php echo  ("search" === current_tab ? "tabs-panel-active" : "tabs-panel-inactive"); ?>" id="tabs-panel-search-taxonomy-<?php echo taxonomy_name; ?>" role="region" aria-label="<?php echo taxonomy->labels->search_items; ?>" tabindex="0">
+      --         <?php
+      if Isset (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name)) then
+         Searched := Esc_Attr (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name));
 
-        -- </div><!-- /.taxonomydiv -->
-        -- <?php
-end Wp_Nav_Menu_Item_Taxonomy_Meta_Box;
+         Search_Results := Get_Terms (
+                              To_Array ((
+                                 Build ("taxonomy",     Taxonomy_Name),
+                                 Build ("name__like",   Searched),
+                                 Build ("fields",       "all"),
+                                 Build ("orderby",      "count"),
+                                 Build ("order",        "DESC"),
+                                 Build ("hierarchical", "false")
+                              ))
+                           );
+      else
+         Searched       := "";
+         Search_Results := Emptt_Array;
+      end if;
+      --                 ?>
+      --                 <p class="quick-search-wrap">
+      --                         <label for="quick-search-taxonomy-<?php echo taxonomy_name; ?>" class="screen-reader-text"><?php _e ("Search"); ?></label>
+      --                         <input type="search" class="quick-search" value="<?php echo searched; ?>" name="quick-search-taxonomy-<?php echo taxonomy_name; ?>" id="quick-search-taxonomy-<?php echo taxonomy_name; ?>" />
+      --                         <span class="spinner"></span>
+      --                         <?php submit_button (__ ("Search"), "small quick-search-submit hide-if-js", "submit", false, array ("id" => "submit-quick-search-taxonomy-" . taxonomy_name)); ?>
+      --                 </p>
+      --                 <ul id="<?php echo taxonomy_name; ?>-search-checklist" data-wp-lists="list:<?php echo taxonomy_name; ?>" class="categorychecklist form-no-clear">
+      --                 <?php if  (! empty (search_results) && ! is_wp_error (search_results)) : ?>
+      --                         <?php
+      --                         args("walker") = walker;
+      --                         echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", search_results), 0, (object) args);
+      --                         ?>
+      --                 <?php elseif  (is_wp_error (search_results)) : ?>
+      --                         <li><?php echo search_results->get_error_message(); ?></li>
+      --                 <?php elseif  (! empty (searched)) : ?>
+      --                         <li><?php _e ("No results found."); ?></li>
+      --                 <?php endif; ?>
+      --                 </ul>
+      --         </div><!-- /.tabs-panel -->
+
+      --         <p class="button-controls wp-clearfix" data-items-type="taxonomy-<?php echo esc_attr (taxonomy_name); ?>">
+      --                 <span class="list-controls hide-if-no-js">
+      --                         <input type="checkbox"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> id="<?php echo esc_attr (tab_name); ?>" class="select-all" />
+      --                         <label for="<?php echo esc_attr (tab_name); ?>"><?php _e ("Select All"); ?></label>
+      --                 </span>
+
+      --                 <span class="add-to-menu">
+      --                         <input type="submit"<?php wp_nav_menu_disabled_check (nav_menu_selected_id); ?> class="button submit-add-to-menu right" value="<?php esc_attr_e ("Add to Menu"); ?>" name="add-taxonomy-menu-item" id="<?php echo esc_attr ("submit-taxonomy-" . taxonomy_name); ?>" />
+      --                         <span class="spinner"></span>
+      --                 </span>
+      --         </p>
+
+      -- </div><!-- /.taxonomydiv -->
+      -- <?php
+   end Wp_Nav_Menu_Item_Taxonomy_Meta_Box;
 
    ----------------------------
    -- Wp_Save_Nav_Menu_Items --
    ----------------------------
 
-function Wp_Save_Nav_Menu_Items (Menu_Id   : Integer    := 0;
-                                 Menu_Data : Array_Type := Empty_Array)
-                                 return Integer -- (_Array)
-is
---        Menu_Id     := (int) menu_id;
-        Items_Saved : Array_Type := Empty_Array;
-begin
-        if 0 = Menu_Id or else Is_Nav_Menu (Menu_Id) then
+   function Wp_Save_Nav_Menu_Items (Menu_Id   : Integer    := 0;
+                                    Menu_Data : Array_Type := Empty_Array)
+                                    return Integer -- (_Array)
+   is
+--    Menu_Id     := (int) menu_id;
+      Items_Saved : Array_Type := Empty_Array;
+   begin
+      if 0 = Menu_Id or else Is_Nav_Menu (Menu_Id) then
 
-                -- Loop through all the menu items" POST values.
-                for A of Menu_Data loop -- (array)
-                     X_Possible_Db_Id := A.Key;
-                     X_Item_Object_Data := A.Value;
-                        if
-                                -- Checkbox is not checked.
-                                empty (X_Item_Object_Data ("menu-item-object-id")) and then
-                                (
-                                        -- And item type either isn"t set.
-                                        not isset (X_Item_Object_Data ("menu-item-type")) or else
-                                        -- Or URL is the default.
-                                        In_Array (X_Item_Object_Data ("menu-item-url"), To_array ("https://", "http://", ""), true) or else
-                                        -- Or it"s not a custom menu item (but not the custom home page).
-                                        (not "custom" = X_Item_Object_Data ("menu-item-type") and then not isset (X_Item_Object_Data ("menu-item-db-id"))) or else
-                                        -- Or it--is* a custom menu item that already exists.
-                                        not Empty (X_Item_Object_Data ("menu-item-db-id"))
-                               )
-                        then
-                                -- Then this potential menu item is not getting added to this menu.
-                                goto Continue_1;
-                        end if;
+         -- Loop through all the menu items" POST values.
+         for A of Menu_Data loop -- (array)
+            X_Possible_Db_Id := A.Key;
+            X_Item_Object_Data := A.Value;
 
-                        -- If this possible menu item doesn"t actually have a menu database ID yet.
-                        if
-                                Empty (X_Item_Object_Data ("menu-item-db-id")) or else
-                                 0 > X_Possible_Db_Id or else
-                                X_Possible_Db_Id /= X_Item_Object_Data ("menu-item-db-id")
-                        then
-                                X_Actual_Db_Id := 0;
-                        else
-                                X_Actual_Db_Id := X_Item_Object_Data ("menu-item-db-id"); -- (int)
-                        end if;
+            if
+              -- Checkbox is not checked.
+              empty (X_Item_Object_Data ("menu-item-object-id")) and then
+              (
+               -- And item type either isn"t set.
+               not isset (X_Item_Object_Data ("menu-item-type")) or else
+               -- Or URL is the default.
+               In_Array (X_Item_Object_Data ("menu-item-url"), To_array ("https://", "http://", ""), true) or else
+               -- Or it"s not a custom menu item (but not the custom home page).
+               (not "custom" = X_Item_Object_Data ("menu-item-type") and then not isset (X_Item_Object_Data ("menu-item-db-id"))) or else
+                -- Or it--is* a custom menu item that already exists.
+                not Empty (X_Item_Object_Data ("menu-item-db-id"))
+               )
+            then
+               -- Then this potential menu item is not getting added to this menu.
+               goto Continue_1;
+            end if;
 
-                        Args := To_Array ((
-                                Build ("menu-item-db-id",        (if isset (X_Item_Object_Data ("menu-item-db-id"))       then X_Item_Object_Data ("menu-item-db-id") else "")),
-                                Build ("menu-item-object-id",    (if isset (X_Item_Object_Data ("menu-item-object-id"))   then X_Item_Object_Data ("menu-item-object-id") else "")),
-                                Build ("menu-item-object",       (if isset (X_Item_Object_Data ("menu-item-object"))      then X_Item_Object_Data ("menu-item-object") else "")),
-                                Build ("menu-item-parent-id",    (if isset (X_Item_Object_Data ("menu-item-parent-id"))   then X_Item_Object_Data ("menu-item-parent-id") else "")),
-                                Build ("menu-item-position",     (if isset (X_Item_Object_Data ("menu-item-position"))    then X_Item_Object_Data ("menu-item-position") else "")),
-                                Build ("menu-item-type",         (if isset (X_Item_Object_Data ("menu-item-type"))        then X_Item_Object_Data ("menu-item-type") else "")),
-                                Build ("menu-item-title",        (if isset (X_Item_Object_Data ("menu-item-title"))       then X_Item_Object_Data ("menu-item-title") else "")),
-                                Build ("menu-item-url",          (if isset (X_Item_Object_Data ("menu-item-url"))         then X_Item_Object_Data ("menu-item-url") else "")),
-                                Build ("menu-item-description",  (if isset (X_Item_Object_Data ("menu-item-description")) then X_Item_Object_Data ("menu-item-description") else "")),
-                                Build ("menu-item-attr-title",   (if isset (X_Item_Object_Data ("menu-item-attr-title"))  then X_Item_Object_Data ("menu-item-attr-title") else "")),
-                                Build ("menu-item-target",       (if isset (X_Item_Object_Data ("menu-item-target"))      then X_Item_Object_Data ("menu-item-target") else "")),
-                                Build ("menu-item-classes",      (if isset (X_Item_Object_Data ("menu-item-classes"))     then X_Item_Object_Data ("menu-item-classes") else "")),
-                                Build ("menu-item-xfn",          (if isset (X_Item_Object_Data ("menu-item-xfn"))         then X_Item_Object_Data ("menu-item-xfn") else ""))
-                       ));
+            -- If this possible menu item doesn"t actually have a menu database ID yet.
+            if
+              Empty (X_Item_Object_Data ("menu-item-db-id")) or else
+              0 > X_Possible_Db_Id or else
+              X_Possible_Db_Id /= X_Item_Object_Data ("menu-item-db-id")
+            then
+               X_Actual_Db_Id := 0;
+            else
+               X_Actual_Db_Id := X_Item_Object_Data ("menu-item-db-id"); -- (int)
+            end if;
 
-                        Set (Items_Saved,       -- ()
-                             Wp_Update_Nav_Menu_Item (Menu_Id, X_Actual_Db_Id, Args));
+            Args := To_Array ((
+               Build ("menu-item-db-id",
+                      (if isset (X_Item_Object_Data ("menu-item-db-id"))
+                       then X_Item_Object_Data ("menu-item-db-id") else "")),
 
-                end loop;
-        end if;
-        return Items_Saved;
-end Wp_Save_Nav_Menu_Items;
+               Build ("menu-item-object-id",
+                      (if isset (X_Item_Object_Data ("menu-item-object-id"))
+                      then X_Item_Object_Data ("menu-item-object-id") else "")),
+
+               Build ("menu-item-object",
+                      (if isset (X_Item_Object_Data ("menu-item-object"))
+                       then X_Item_Object_Data ("menu-item-object") else "")),
+               Build ("menu-item-parent-id",
+                      (if isset (X_Item_Object_Data ("menu-item-parent-id"))
+                       then X_Item_Object_Data ("menu-item-parent-id") else "")),
+               Build ("menu-item-position",
+                      (if isset (X_Item_Object_Data ("menu-item-position"))
+                       then X_Item_Object_Data ("menu-item-position") else "")),
+               Build ("menu-item-type",
+                      (if isset (X_Item_Object_Data ("menu-item-type"))
+                       then X_Item_Object_Data ("menu-item-type") else "")),
+               Build ("menu-item-title",
+                      (if isset (X_Item_Object_Data ("menu-item-title"))
+                       then X_Item_Object_Data ("menu-item-title") else "")),
+               Build ("menu-item-url",
+                      (if isset (X_Item_Object_Data ("menu-item-url"))
+                       then X_Item_Object_Data ("menu-item-url") else "")),
+               Build ("menu-item-description",
+                      (if isset (X_Item_Object_Data ("menu-item-description"))
+                       then X_Item_Object_Data ("menu-item-description") else "")),
+               Build ("menu-item-attr-title",
+                      (if isset (X_Item_Object_Data ("menu-item-attr-title"))
+                       then X_Item_Object_Data ("menu-item-attr-title") else "")),
+               Build ("menu-item-target",
+                      (if isset (X_Item_Object_Data ("menu-item-target"))
+                       then X_Item_Object_Data ("menu-item-target") else "")),
+               Build ("menu-item-classes",
+                      (if isset (X_Item_Object_Data ("menu-item-classes"))
+                       then X_Item_Object_Data ("menu-item-classes") else "")),
+               Build ("menu-item-xfn",
+                      (if isset (X_Item_Object_Data ("menu-item-xfn"))
+                       then X_Item_Object_Data ("menu-item-xfn") else ""))
+            ));
+
+            Set (Items_Saved,       -- ()
+            Wp_Update_Nav_Menu_Item (Menu_Id, X_Actual_Db_Id, Args));
+
+         end loop;
+      end if;
+      return Items_Saved;
+   end Wp_Save_Nav_Menu_Items;
 
    -----------------------------------
    -- X_Wp_Nav_Menu_Meta_Box_Object --
@@ -1145,146 +1200,167 @@ end Wp_Save_Nav_Menu_Items;
                                            return Array_Type
    is
    begin
-        if Isset (Data_Object.Name) then
+      if Isset (Data_Object.Name) then
 
-                if "page" = Data_Object.Name then
-                        Data_Object.X_Default_Query := To_Array ((
-                                Build ("orderby",     "menu_order title"),
-                                Build ("post_status", "publish")
-                       ));
+         if "page" = Data_Object.Name then
+            Data_Object.X_Default_Query := To_Array ((
+               Build ("orderby",     "menu_order title"),
+               Build ("post_status", "publish")
+            ));
 
-                        -- Posts should show only published items.
-                elsif "post" = Data_Object.Name then
-                        Data_Object.X_Default_Query := To_Array ((
-                                Build ("post_status", "publish")
-                       ));
+            -- Posts should show only published items.
+         elsif "post" = Data_Object.Name then
+            Data_Object.X_Default_Query := To_Array ((
+               Build ("post_status", "publish")
+            ));
 
-                        -- Categories should be in reverse chronological order.
-                elsif "category" = Data_Object.Name then
-                        Data_Object.X_Default_Query := To_Array ((
-                                Build ("orderby", "id"),
-                                Build ("order",   "DESC")
-                       ));
+         -- Categories should be in reverse chronological order.
+         elsif "category" = Data_Object.Name then
+            Data_Object.X_Default_Query := To_Array ((
+               Build ("orderby", "id"),
+               Build ("order",   "DESC")
+            ));
 
-                        -- Custom post types should show only published items.
-                else
-                        Data_Object.X_Default_Query := To_Array ((
-                                Build ("post_status", "publish")
-                       ));
-                end if;
-        end if;
+         -- Custom post types should show only published items.
+         else
+            Data_Object.X_Default_Query := To_Array ((
+               Build ("post_status", "publish")
+            ));
+         end if;
+      end if;
 
-        return Data_Object;
-end X_Wp_Nav_Menu_Meta_Box_Object;
+      return Data_Object;
+   end X_Wp_Nav_Menu_Meta_Box_Object;
 
    -----------------------------
    -- Wp_Get_Nav_Menu_To_Edit --
    -----------------------------
 
-function Wp_Get_Nav_Menu_To_Edit (Menu_Id : Integer := 0)
-                                  return String
-is
-        Menu : Integer := Wp_Get_Nav_Menu_Object (Menu_Id);
-begin
-        -- If the menu exists, get its items.
-        if Is_Nav_Menu (Menu) then
-                Menu_Items := Wp_Get_Nav_Menu_Items (Menu.Term_Id, To_array ((Build ("post_status", "any"))));
-                Result     := "<div id=""menu-instructions"" class=""post-body-plain""";
-                Append (Result, (if not Empty (Menu_Items) then " menu-instructions-inactive"">" else """>"));
-                Append (Result, "<p>" & abs "Add menu items from the column on the left." & "</p>");
-                Append (Result, "</div>");
+   function Wp_Get_Nav_Menu_To_Edit (Menu_Id : Integer := 0)
+                                     return String
+   is
+      Menu : Integer := Wp_Get_Nav_Menu_Object (Menu_Id);
+   begin
+      -- If the menu exists, get its items.
+      if Is_Nav_Menu (Menu) then
+         Menu_Items := Wp_Get_Nav_Menu_Items (Menu.Term_Id, To_array ((
+                          Build ("post_status", "any"))));
 
-                if Empty (Menu_Items) then
-                        return result & " <ul class=""menu"" id=""menu-to-edit""> </ul>";
-                end if;
+         Result := "<div id=""menu-instructions"" class=""post-body-plain""";
 
-                --
-                -- Filters the Walker class used when adding nav menu items.
-                --
-                -- @since 3.0.0
-                --
-                -- @param string class   The walker class to use. Default "Walker_Nav_Menu_Edit".
-                -- @param int    menu_id ID of the menu being rendered.
-                --
-                Walker_Class_Name := Apply_Filters ("wp_edit_nav_menu_walker", "Walker_Nav_Menu_Edit", Menu_Id);
+         Append (Result, (if not Empty (Menu_Items)
+                          then " menu-instructions-inactive"">" else """>"));
+         Append (Result, "<p>" & abs "Add menu items from the column on the left." &
+                         "</p>");
+         Append (Result, "</div>");
 
-                if Class_Exists (Walker_Class_Name) then
-                        Walker := new Walker_Class_Name;
-                else
-                        return new Wp_Error (
-                                "menu_walker_not_exist",
-                                Sprintf (
-                                        -- translators: %s: Walker class name.
-                                        abs "The Walker class named %s does not exist.",
-                                        "<strong>" & Walker_Class_Name & "</strong>"
-                               )
-                       );
-                end if;
+         if Empty (Menu_Items) then
+            return result & " <ul class=""menu"" id=""menu-to-edit""> </ul>";
+         end if;
 
-                Some_Pending_Menu_Items := False;
-                Some_Invalid_Menu_Items := False;
-                for Menu_Item of Menu_Items loop
-                        if Isset (Menu_Item.Post_Status) and then "draft" = Menu_Item.Post_Status then
-                                Some_Pending_Menu_Items := True;
-                        end if;
-                        if not Empty (Menu_Item.X_Invalid) then
-                                Some_Invalid_Menu_Items := True;
-                        end if;
-                end loop;
+         --
+         -- Filters the Walker class used when adding nav menu items.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string class   The walker class to use. Default
+         --                       "Walker_Nav_Menu_Edit".
+         -- @param int    menu_id ID of the menu being rendered.
+         --
+         Walker_Class_Name := Apply_Filters ("wp_edit_nav_menu_walker",
+                                             "Walker_Nav_Menu_Edit", Menu_Id);
 
-                if Some_Pending_Menu_Items then
-                        Append (Result, "<div class=""notice notice-info notice-alt inline""><p>" & abs "Click Save Menu to make pending menu items public." & "</p></div>");
-                end if;
+         if Class_Exists (Walker_Class_Name) then
+            Walker := new Walker_Class_Name;
+         else
+            return new Wp_Error (
+               "menu_walker_not_exist",
+                Sprintf (
+                   -- translators: %s: Walker class name.
+                   abs "The Walker class named %s does not exist.",
+                   "<strong>" & Walker_Class_Name & "</strong>"
+                ));
+         end if;
 
-                if Some_Invalid_Menu_Items then
-                        Append (Result, "<div class=""notice notice-error notice-alt inline""><p>" & abs "There are some invalid menu items. Please check or delete them." & "</p></div>");
-                end if;
+         Some_Pending_Menu_Items := False;
+         Some_Invalid_Menu_Items := False;
 
-                Append (Result, "<ul class=""menu"" id=""menu-to-edit""> ");
-                Append (Result, Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Menu_Items), 0, To_array ((Build ("walker", Walker))))); -- (object)
-                Append (Result, " </ul> ");
-                return Result;
-        elsif Is_Wp_Error (menu) then
-                return Menu;
-        end if;
+         for Menu_Item of Menu_Items loop
+            if
+              Isset (Menu_Item.Post_Status) and then
+              "draft" = Menu_Item.Post_Status
+            then
+               Some_Pending_Menu_Items := True;
+            end if;
 
-end Wp_Get_Nav_Menu_To_Edit;
+            if not Empty (Menu_Item.X_Invalid) then
+               Some_Invalid_Menu_Items := True;
+            end if;
+         end loop;
+
+         if Some_Pending_Menu_Items then
+            Append (Result,
+                    "<div class=""notice notice-info notice-alt inline""><p>" &
+                    abs "Click Save Menu to make pending menu items public." &
+                    "</p></div>");
+         end if;
+
+         if Some_Invalid_Menu_Items then
+            Append
+              (Result,
+               "<div class=""notice notice-error notice-alt inline""><p>" &
+               abs "There are some invalid menu items. Please check or delete them." &
+               "</p></div>");
+         end if;
+
+         Append (Result, "<ul class=""menu"" id=""menu-to-edit""> ");
+         Append (Result, Walk_Nav_Menu_Tree (
+                            Array_Map ("wp_setup_nav_menu_item", Menu_Items),
+                                       0, To_array ((Build ("walker", Walker))))); -- (object)
+         Append (Result, " </ul> ");
+         return Result;
+
+      elsif Is_Wp_Error (menu) then
+         return Menu;
+      end if;
+   end Wp_Get_Nav_Menu_To_Edit;
 
    --------------------------------
    -- Wp_Nav_Menu_Manage_Columns --
    --------------------------------
 
-function Wp_Nav_Menu_Manage_Columns
-         return Array_Type
-is
-begin
-        return To_Array ((
-                Build ("_title",          abs "Show advanced menu properties"),
-                Build ("cb",              "<input type=""checkbox"" />"),
-                Build ("link-target",     abs "Link Target"),
-                Build ("title-attribute", abs "Title Attribute"),
-                Build ("css-classes",     abs "CSS Classes"),
-                Build ("xfn",             abs "Link Relationship (XFN)"),
-                Build ("description",     abs "Description")
-       ));
-end Wp_Nav_Menu_Manage_Columns;
+   function Wp_Nav_Menu_Manage_Columns
+            return Array_Type
+   is
+   begin
+      return To_Array ((
+         Build ("_title",          abs "Show advanced menu properties"),
+         Build ("cb",              "<input type=""checkbox"" />"),
+         Build ("link-target",     abs "Link Target"),
+         Build ("title-attribute", abs "Title Attribute"),
+         Build ("css-classes",     abs "CSS Classes"),
+         Build ("xfn",             abs "Link Relationship (XFN)"),
+         Build ("description",     abs "Description")
+      ));
+   end Wp_Nav_Menu_Manage_Columns;
 
    -------------------------------------------
    -- X_Wp_Delete_Orphaned_Draft_Menu_Items --
    -------------------------------------------
 
-procedure X_Wp_Delete_Orphaned_Draft_Menu_Items
-is
+   procedure X_Wp_Delete_Orphaned_Draft_Menu_Items
+   is
 --        global wpdb;
-        Delete_Timestamp : Time := time - (DAY_IN_SECONDS * EMPTY_TRASH_DAYS); -- ()
-begin
+      Delete_Timestamp : Time := time - (DAY_IN_SECONDS * EMPTY_TRASH_DAYS); -- ()
+   begin
         -- Delete orphaned draft menu items.
-        Menu_Items_To_Delete := Wpdb.Get_Col (Wpdb.Prepare ("SELECT ID FROM wpdb->posts AS p LEFT JOIN wpdb->postmeta AS m ON p.ID = m.post_id WHERE post_type = ""nav_menu_item"" AND post_status = ""draft"" AND meta_key = ""_menu_item_orphaned"" AND meta_value < %d", Delete_Timestamp));
+      Menu_Items_To_Delete := Wpdb.Get_Col (Wpdb.Prepare
+        ("SELECT ID FROM wpdb->posts AS p LEFT JOIN wpdb->postmeta AS m ON p.ID = m.post_id WHERE post_type = ""nav_menu_item"" AND post_status = ""draft"" AND meta_key = ""_menu_item_orphaned"" AND meta_value < %d", Delete_Timestamp));
 
-        for Menu_Item_Id of Menu_Items_To_Delete loop
-                Wp_Delete_Post (Menu_Item_Id, True);
-        end loop;
-end X_Wp_Delete_Orphaned_Draft_Menu_Items;
+      for Menu_Item_Id of Menu_Items_To_Delete loop
+          Wp_Delete_Post (Menu_Item_Id, True);
+      end loop;
+   end X_Wp_Delete_Orphaned_Draft_Menu_Items;
 
    -----------------------------------
    -- Wp_Nav_Menu_Update_Menu_Items --

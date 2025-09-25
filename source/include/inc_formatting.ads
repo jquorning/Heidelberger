@@ -45,7 +45,7 @@ is
 -- @param array  $array  Variables will be stored in this array.
 --
    procedure Wp_Parse_Str (Str  :     String;
-                           Arry : out Array_type);
+                           Arry : out Array_Type);
 
 --
 -- Sanitizes an HTML classname to ensure it only contains valid characters.
@@ -144,7 +144,7 @@ is
 -- @param string text The text to be escaped.
 -- @return string Escaped text.
 --
-   function Esc_Js (Text : String)
+   function ESC_JS (Text : String)
                     return String
                     is ("XXX-341");
 

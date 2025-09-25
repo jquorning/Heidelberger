@@ -897,7 +897,7 @@ is
                Args_Count : constant Integer := Count (Args);
             begin
                if Args_Count /= Placeholders then
-                  if 1 = placeholders and then Passed_As_Array then
+                  if 1 = Placeholders and then Passed_As_Array then
                      -- If the passed query only expected one argument, but the wrong
                      -- number of arguments were sent as an array, bail.
                      Inc_Load.Wp_Load_Translations_Early; -- ();

@@ -59,11 +59,11 @@ is
 -- @param bool        $checked_ontop        Optional. Whether to move checked items out of the hierarchy and to
 --                                          the top of the list. Default true.
 --
-   procedure wp_Category_Checklist (Post_Id              : Integer     := 0;
+   procedure Wp_Category_Checklist (Post_Id              : Integer     := 0;
                                     Descendants_And_Self : Integer     := 0;
                                     Selected_Cats        : Array_Type  := Empty_Array;
-                                    Popular_Cats         : Array_type  := Empty_Array;
-                                    Walker               : Walker_type := null;
+                                    Popular_Cats         : Array_Type  := Empty_Array;
+                                    Walker               : Walker_Type := null;
                                     Checked_Ontop        : Boolean     := True)
    is
       Unused : String := Wp_Terms_Checklist (
@@ -161,7 +161,7 @@ is
             := Integer'Value (Get (Parsed_Args, "descendants_and_self"));
          Args_2 : Array_Type := To_Array (List => (1 =>
                                    Build ("taxonomy", Taxonomy)));
-         Tax        : constant Wp_taxonomy := Inc_Taxonomys.Get_Taxonomy (Taxonomy);
+         Tax        : constant Wp_Taxonomy := Inc_Taxonomys.Get_Taxonomy (Taxonomy);
          Categories : Wp_Term_Array;  -- Array_Type;
       begin
          Set (Args_2, "disabled",
@@ -1286,7 +1286,6 @@ is
 --                 Build ("args",     Callback_Args)
 --        ));
 -- end Add_Meta_Box;
-
 
 -- --
 -- -- Renders a "fake" meta box with an information message,
@@ -2629,7 +2628,7 @@ is
       if Current_Theme_Supports ("custom-header") then
          declare
             Meta_Header : constant Array_Type
-               := Get_Post_Meta (Post.ID, "_wp_attachment_is_custom_header", True);
+               := Get_Post_Meta (Post.Id, "_wp_attachment_is_custom_header", True);
          begin
             if Is_Random_Header_Image then  -- ()
                if Length (Header_Images) = 0 then -- isset
@@ -2653,7 +2652,7 @@ is
                   if
                     not Empty (Meta_Header) and then
                     Meta_Header = Stylesheet and then
-                    wp_Get_Attachment_Url (Integer (Post.Id)) /= Header_Image
+                    Wp_Get_Attachment_Url (Integer (Post.Id)) /= Header_Image
                   then
                      Media_States := +abs "Header Image";
                   end if;
@@ -2689,7 +2688,7 @@ is
       if Current_Theme_Supports ("custom-background") then
          declare
             Meta_Background : constant Array_Type
-               := Get_Post_Meta (Post.ID, "_wp_attachment_is_custom_background", True);
+               := Get_Post_Meta (Post.Id, "_wp_attachment_is_custom_background", True);
          begin
             if not Empty (Meta_Background) and then Meta_Background = Stylesheet then
                Media_States := +abs "Background Image";
@@ -2869,7 +2868,7 @@ is
                      Value     : constant Value_Type := A.Value;
                   begin
                      Attributes := Attributes & Attribute & "=""" &
-                                   Esc_Attr (-Value) & """ ";
+                                   ESC_Attr (-Value) & """ ";
                      -- Trailing space is important.
                   end;
                end loop;
@@ -2880,17 +2879,17 @@ is
             declare
                -- Don't output empty name and id attributes.
                Name_Attr : String := (if Name /= ""
-                                      then " name=""" & Esc_Attr (Name) & """"
+                                      then " name=""" & ESC_Attr (Name) & """"
                                       else """");
                Id_Attr   : String := (if Id /= ""
-                                      then " id="""   & Esc_Attr (Id)   & """"
+                                      then " id="""   & ESC_Attr (Id)   & """"
                                       else """");
 
                Button : Unbounded_String;
             begin
                Append (Button, "<input type=""submit""" & Name_Attr & Id_Attr &
-                               " class=""" & Esc_Attr (Class));
-               Append (Button, """ value=""" & Esc_Attr (Text_2) & """ " & Attributes &
+                               " class=""" & ESC_Attr (Class));
+               Append (Button, """ value=""" & ESC_Attr (Text_2) & """ " & Attributes &
                                " />");
 
                if Wrap then

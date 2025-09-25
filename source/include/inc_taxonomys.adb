@@ -2311,7 +2311,7 @@ is
             else
                T := Get_Taxonomy (-Taxonomies_2 (1).Key);    -- 0
                if Isset (T.Args) and then Is_Array (T.Args) then
-                  Args_2 := Array_Merge (Args, T.args);
+                  Args_2 := Array_Merge (Args, T.Args);
                end if;
             end if;
 

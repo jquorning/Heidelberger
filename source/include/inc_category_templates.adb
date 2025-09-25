@@ -1345,7 +1345,7 @@ is
          use Integer_Vectors;
 
          Terms : Wp_Term_Array
-            := Get_Object_Term_Cache (Integer (Post_2.ID), Taxonomy);
+            := Get_Object_Term_Cache (Integer (Post_2.Id), Taxonomy);
       begin
          if Length (Terms) = 0 then  -- false =
             Terms := Wp_Get_Object_Terms (Empty_Integer_Array & Integer (Post_2.Id),
@@ -1624,6 +1624,5 @@ is
 
 --         return $r;
 -- end;
-
 
 end Inc_Category_Templates;

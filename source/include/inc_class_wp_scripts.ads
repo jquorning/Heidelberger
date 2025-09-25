@@ -25,7 +25,7 @@ is
    --
    -- @see WP_Dependencies
    --
-   type WP_Scripts is new Inc_Class_Wp_Dependencies.WP_Dependencies
+   type Wp_Scripts is new Inc_Class_Wp_Dependencies.Wp_Dependencies
       with record
         --
         -- Base URL for scripts.

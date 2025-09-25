@@ -11,10 +11,12 @@ with Templates_Parser;
 
 with Arrays;
 with Globals;
-with HB_Common;
+with Hb_Common;
+with Php;
+
+with Adm_Menu;
 
 with Adi_Class_Wp_Screens;
-with Adi_Class_Wp_List_Tables;
 with Adi_Class_Wp_Terms_List_Tables;
 with Adi_List_Tables;
 with Adi_Plugins;
@@ -42,7 +44,8 @@ is
    use Arrays;
    use Inc_L10n;
    use Globals;
-   use HB_Common;
+   use Hb_Common;
+   use Php;
 
 -- /** WordPress Administration Bootstrap */
 -- require_once __DIR__ . '/admin.php';
@@ -54,8 +57,11 @@ is
    function Translation
       return Templates_Parser.Translate_Table;
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data
+   ------------
+   -- Render --
+   ------------
+
+   procedure Render
    is
       use Adi_Screens;
       use Inc_Capabilities;
@@ -98,6 +104,7 @@ is
       declare
          use Adi_Class_Wp_Terms_List_Tables;
          use Adi_List_Tables;
+         use Adm_Menu;
 
          Post_Type : constant String := ""; -- jq
 
@@ -106,23 +113,27 @@ is
 
          Pagenum : constant Natural := X_Wp_List_Table.Get_Pagenum;  -- ();
 
-         Title : String := Get (Tax.Labels, "name");
-
-         Parent_File  : String
-            := (if "post" /= Post_Type then (if "attachment" = Post_Type
-                                             then "upload.php"
-                                             else "edit.php?post_type=post_type")
-                elsif "link_category" = Tax.Name then "link-manager.php"
-                else                                  "edit.php");
-
-         Submenu_File : String
-            := (if "post" /= Post_Type
-                then "edit-tags.php?taxonomy=taxonomy&amp;post_type=post_type"
-                elsif "link_category" = Tax.Name then "edit-tags.php?taxonomy=link_category"
-                else                                  "edit-tags.php?taxonomy=taxonomy");
          Location : Unbounded_String;  -- jq
          Referer  : Unbounded_String;  -- jq
       begin
+         Globals.Parent_File :=
+            +Slug_Type ((if "post" /= Post_Type then (if "attachment" = Post_Type
+                                          then Slug_Type'("upload.php")
+                                          else "edit.php?post_type=post_type")
+             elsif "link_category" = Tax.Name then Slug_Type'("link-manager.php")
+             else                                  "edit.php"));
+
+         Globals.Submenu_File :=
+            +Slug_Type ((if "post" /= Post_Type
+             then Slug_Type'("edit-tags.php?taxonomy=taxonomy&amp;post_type=post_type")
+             elsif "link_category" = Tax.Name
+             then
+               Slug_Type'("edit-tags.php?taxonomy=link_category")
+             else
+               Slug_Type'("edit-tags.php?taxonomy=taxonomy")));
+
+         Globals.Title := +Get (Tax.Labels, "name");
+
 --         null;
 --      end;
          Add_Screen_Option ("per_page",
@@ -372,9 +383,8 @@ is
          X_Wp_List_Table.Prepare_Items; -- ();
 
          declare
-            use Adi_Class_Wp_List_Tables;
-
-            Total_Pages : constant Natural := Get_Pagination_Arg (X_Wp_List_Table, "total_pages");
+            Total_Pages : constant Natural :=
+              Get_Pagination_Arg (X_Wp_List_Table, "total_pages");
          begin
             if Pagenum > Total_Pages and Total_Pages > 0 then
                Inc_Pluggables.Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
@@ -932,7 +942,8 @@ is
                                              Translation,
                                              Lazy_Tag => Lazy'Unchecked_Access);
             begin
-               return AWS.Response.Build ("text/html", Payload);
+               Clear_Echo;
+               Echo (-Payload);
             end;
          end;
       end Label_1;

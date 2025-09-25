@@ -68,7 +68,7 @@ is
 -- @param array  args      The arguments supplied to the functions hooked to `hook_name`.
 --
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Array_type) is null;
+                                  Args      : Array_Type) is null;
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Inc_Class_Wp_Styles.Wp_Styles)
                                   is null;

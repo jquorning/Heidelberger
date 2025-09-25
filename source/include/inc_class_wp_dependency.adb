@@ -27,10 +27,10 @@ is
       This : X_Wp_Dependency;
    begin
       -- list ()
-      this.Handle := +Handle;
-      this.Src    := +Src;
-      this.Deps   := Deps;
-      this.Ver    := +Ver;
+      This.Handle := +Handle;
+      This.Src    := +Src;
+      This.Deps   := Deps;
+      This.Ver    := +Ver;
 --      this.Args   := Args;
 --      if not Is_Array (This.Deps) then
 --         This.Deps := Empty_Array;
@@ -47,7 +47,7 @@ is
                       Data : String)
                       return Boolean
    is
-      use Array_Vectors;
+--    use Array_Vectors;
    begin
 --      if not Is_Scalar (Name) then
 --         return False;
@@ -69,8 +69,8 @@ is
 --      if not Is_String (Domain) then
 --         return False;
 --      end if;
-      this.textdomain        := +domain;
-      this.translations_path := +path;
+      This.Textdomain        := +Domain;
+      This.Translations_Path := +Path;
       return True;
    end Set_Translations;
 

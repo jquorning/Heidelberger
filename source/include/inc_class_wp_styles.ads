@@ -24,7 +24,7 @@ is
    --
    -- @see WP_Dependencies
    --
-   type WP_Styles is new Inc_Class_Wp_Dependencies.WP_Dependencies
+   type Wp_Styles is new Inc_Class_Wp_Dependencies.Wp_Dependencies
       with record
         --
         -- Base URL for styles.

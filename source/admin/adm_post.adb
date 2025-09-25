@@ -15,7 +15,7 @@ with Ada.Strings.Fixed;
 with Arrays;
 with Globals;
 with Php;
-with HB_Common;
+with Hb_Common;
 
 with Adi_Comments;
 with Adi_Dashboard;
@@ -45,12 +45,15 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
    use Inc_L10n;
-   use HB_Common;
+   use Hb_Common;
    use Php;
    use Globals;
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data
+   ------------
+   -- Render --
+   ------------
+
+   procedure Render
    is
       use Adi_Posts;
       use Inc_Capabilities;
@@ -77,7 +80,7 @@ is
                 abs "Sorry, you are not allowed to edit this item.", 400);
          elsif Isset (String'(Get (XX_GET, "post"))) then
             Post_Id := Get_Integer (XX_GET, "post");
-         elsif (Isset (String'(Get (X_POST, "post_ID")))) then
+         elsif Isset (String'(Get (X_POST, "post_ID"))) then
             Post_Id := Get_Integer (X_POST, "post_ID");
          else
             Post_Id := 0; -- "    ";
@@ -301,11 +304,7 @@ is
                         Post_New_File := +"post-new.php?post_type=post_type";
                      end if;
 
-                     declare
-                        Title : String := Get (Post_Type_Object, "labels.edit_item");
-                     begin
-                        null;
-                     end;
+                     Globals.Title := +Get (Post_Type_Object, "labels.edit_item");
 
                      --
                      -- Allows replacement of the editor.
@@ -327,7 +326,7 @@ is
 
                      if 0 = Wp_Check_Post_Lock (Post.Id'Image) then
                         declare
-                           Active_Post_Lock : array_Type :=
+                           Active_Post_Lock : Array_Type :=
                               Wp_Set_Post_Lock (Integer (Post.Id));
                         begin
                            if "attachment" /= Post_Type then
@@ -340,7 +339,7 @@ is
 
                      if Post_Type_Supports (Post_Type, "comments") then
                         Wp_Enqueue_Script ("admin-comments");
-                        Adi_Comments.Enqueue_Comment_Hotkeys_JS;
+                        Adi_Comments.Enqueue_Comment_Hotkeys_Js;
                      end if;
                   end;
 --                require ABSPATH . "wp-admin/edit-form-advanced.php";
@@ -556,7 +555,7 @@ is
 
       <<Bailout>>
 
-      return AWS.Response.Build ("text/html", "");
+      Clear_Echo;
 
    end Render;
 

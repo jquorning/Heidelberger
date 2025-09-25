@@ -19,7 +19,7 @@ is
    --
    -- @see WP_List_Table
    --
-   type WP_Posts_List_Table is new Adi_Class_Wp_List_Tables.WP_List_Table with
+   type Wp_Posts_List_Table is new Adi_Class_Wp_List_Tables.Wp_List_Table with
       record
 
 --         --

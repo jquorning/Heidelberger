@@ -7,7 +7,7 @@
 
 with Php;
 with Globals;
-with HB_Common;
+with Hb_Common;
 
 with Adi_Plugins;
 
@@ -29,7 +29,7 @@ with Inc_Class_Wp_Post_Type;
 package body Adm_Menu
 is
    use Inc_L10n;
-   use HB_Common;
+   use Hb_Common;
    use Arrays;
    use Php;
    use Globals;
@@ -215,7 +215,7 @@ is
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
-               Ptype_Obj : constant Inc_Class_Wp_Post_Type.WP_Post_Type :=
+               Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : Unbounded_String;

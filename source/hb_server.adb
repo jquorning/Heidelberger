@@ -3,34 +3,10 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
 with AWS.Config.Set;
---  with AWS.Response;
---  with AWS.Services.Page_Server;
 with AWS.Services.Dispatchers.URI;
 with AWS.Server;
---  with AWS.Status;
 
 with Binder;
-
-with Adm_Credits;
-with Adm_Admin;
-
-with Inc_Posts;
-with Inc_Admin_Bar;
-with Inc_Class_Wp_Scripts;
--- with Inc_Class_Wp_Dependencies;
-with Inc_Class_Wp_Admin_Bar;
-
-with Adm_Menu_Header;
-
-with Adi_Menu;
-with Inc_Class_Wp_Posts;
--- with Adi_Nav_Menus;
--- with Adm_Nav_Menus;
-
-with Adm_Edit;
-with Adm_Edit_Tags;
-with Adm_Menu;
-with Adm_Post;
 
 package body HB_Server is
 
@@ -49,9 +25,9 @@ package body HB_Server is
    is
       use AWS.Services.Dispatchers.URI;
    begin
-      Register (Dispatcher, "/wp-admin/edit",      Adm_Edit.Render'Access);
-      Register (Dispatcher, "/wp-admin/edit-tags", Adm_Edit_Tags.Render'Access);
-      Register (Dispatcher, "/wp-admin/post",      Adm_Post.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit",        Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/edit-tags",   Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/post",        Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/credits.php", Binder.Render'Access);
    end Register_Dispatcher;
 

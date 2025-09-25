@@ -11,14 +11,15 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Hb_Common;
-with L10n;
+with HB_Common;
 with Php;
 with Globals;
 
 with Adi_Nav_Menus;
+
 with Inc_Capabilities;
 with Inc_Functions;
+with Inc_L10n;
 with Inc_Nav_Menus;
 with Inc_Pluggables;
 with Inc_Posts;
@@ -29,8 +30,8 @@ package body Adm_Nav_Menus
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
-   use L10n;
+   use HB_Common;
+   use Inc_L10n;
    use Php;
    use Globals;
 -- -- Load WordPress Administration Bootstrap
@@ -50,8 +51,8 @@ is
         not Current_Theme_Supports ("menus") and then
         not Current_Theme_Supports ("widgets")
       then
-        Inc_Functions.Wp_Die
-          (abs "Your theme does not support navigation menus or widgets.");
+         Inc_Functions.Wp_Die
+           (abs "Your theme does not support navigation menus or widgets.");
       end if;
 
       -- Permissions check.
@@ -80,7 +81,7 @@ is
          -- The menu id of the current menu being edited.
          Nav_Menu_Selected_Id : Integer :=
             (if Isset (X_REQUEST, "menu")
-             then Integer'Value (Get (X_Request, "menu"))
+             then Integer'Value (Get (X_REQUEST, "menu"))
              else 0);
 
          -- Get existing menu locations assignments.
@@ -109,8 +110,8 @@ is
                                                "menu-settings-column-nonce");
 
             if Isset (X_REQUEST, "nav-menu-locations") then
-              Unused_2 := Set_Theme_Mod ("nav_menu_locations",
-                            Array_Map ("absint", Get (X_REQUEST, "menu-locations")));
+               Unused_2 := Set_Theme_Mod ("nav_menu_locations",
+                             Array_Map ("absint", Get (X_REQUEST, "menu-locations")));
 
             elsif Isset (X_REQUEST, "menu-item") then
                Unused := Adi_Nav_Menus.Wp_Save_Nav_Menu_Items

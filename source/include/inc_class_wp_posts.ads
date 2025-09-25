@@ -290,7 +290,7 @@ is
    -- @param string $key Key to get.
    -- @return mixed
    --
-   function X_Get (Post : Wp_post;
+   function X_Get (Post : Wp_Post;
                    Key  : String)
                    return Array_Type;
 

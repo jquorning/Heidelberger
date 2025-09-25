@@ -11,7 +11,7 @@ is
 -- @since 4.7.0
 --
 -- #[AllowDynamicProperties]
-   type WP_List_Util is tagged
+   type Wp_List_Util is tagged
       record
         --
         -- The input array.

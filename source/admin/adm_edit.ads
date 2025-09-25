@@ -1,9 +1,12 @@
-with AWS.Response;
-with AWS.Status;
+--
+--  Edit Posts Administration Screen.
+--
+--  @package Heidelberger
+--  @subpackage Administration
+--
 
 package Adm_Edit is
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data;
+   procedure Render;
 
 end Adm_Edit;

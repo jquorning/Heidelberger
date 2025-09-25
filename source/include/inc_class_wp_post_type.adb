@@ -9,7 +9,6 @@
 package body Inc_Class_Wp_Post_Type
 is
 
-
 --         --
 --         -- Constructor.
 --         --

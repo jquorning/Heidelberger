@@ -20,7 +20,7 @@ is
    -- @since 3.1.0
    --
 -- #[AllowDynamicProperties]
-   type WP_List_Table is tagged
+   type Wp_List_Table is tagged
       record
 
 --         --

@@ -164,7 +164,7 @@ is
 --                       "http" or "https" can be passed to force those schemes.
 -- @return string Admin URL link with optional path appended.
 --
-   function Admin_Url (Path   : String := "";
+   function Admin_URL (Path   : String := "";
                        Scheme : String := "admin")
                        return String
                        is ("XXX-353");

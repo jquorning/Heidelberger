@@ -11,7 +11,6 @@
 package body Adi_Caches
 is
 
-
 -- WP_Object_Cache class
 -- require_once ABSPATH . WPINC . '/class-wp-object-cache.php';
 

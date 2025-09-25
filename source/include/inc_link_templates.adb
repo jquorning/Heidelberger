@@ -4170,7 +4170,6 @@ is
 --         end;
 -- end;
 
-
 -- --
 -- -- Retrieves the avatar URL.
 -- --
@@ -4203,7 +4202,6 @@ is
 --         return args["url"];
 -- end;
 
-
 -- --
 -- -- Check if this comment type allows avatars to be retrieved.
 -- --
@@ -4224,7 +4222,6 @@ is
 
 --         return in_array( comment_type, (array) allowed_comment_types, true );
 -- end;
-
 
 -- --
 -- -- Retrieves default data about the avatar.

@@ -10,7 +10,6 @@ with Hb_Common;
 with Php;
 
 with Inc_Formatting;
-with Inc_Functions;
 with Inc_L10n;
 with Inc_Meta;
 
@@ -30,7 +29,6 @@ is
 
    Wp_Post_Types : Post_Type_Map; -- List_Type;
 
-
 --
 -- Post Type registration.
 --
@@ -44,7 +42,7 @@ is
 --
    procedure Create_Initial_Post_Types
    is
-      use String_Vectors;
+--    use String_Vectors;
    begin
       Inc_Class_Wp_Post_Type.Reset_Default_Labels; -- :: ();
 
@@ -54,39 +52,39 @@ is
                         Labels                =>
                            Arrays.To_Array ((
                               1 => Build ("name_admin_bar",
-                                          x_x ("Post", "add new from admin bar")))),
-                        public                => True,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.
-                        x_edit_link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.
+                                          X_X ("Post", "add new from admin bar")))),
+                        Public                => True,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.
+                        X_Edit_Link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.
                         Capability_Type_String => +"post",
                         Capability_Type_Array  => Empty_Array,
-                        map_meta_cap          => True,
-                        menu_position         => 5,
-                        menu_icon             => +"dashicons-admin-post",
-                        hierarchical          => False,
+                        Map_Meta_Cap          => True,
+                        Menu_Position         => 5,
+                        Menu_Icon             => +"dashicons-admin-post",
+                        Hierarchical          => False,
                         Rewrite_Bool          => False,
-                        rewrite               => Empty_Rewrite,
-                        Query_Var_bool        => False,
-                        query_var             => Null_Unbounded_String,
-                        delete_with_user      => True,
-                        supports              => To_List ((+"title", +"editor", +"author", +"thumbnail", +"excerpt", +"trackbacks", +"custom-fields", +"comments", +"revisions", +"post-formats")),
-                        show_in_rest          => True,
-                        rest_base             => +"posts",
-                        rest_controller_class => +"WP_REST_Posts_Controller",
+                        Rewrite               => Empty_Rewrite,
+                        Query_Var_Bool        => False,
+                        Query_Var             => Null_Unbounded_String,
+                        Delete_With_User      => True,
+                        Supports              => To_List ((+"title", +"editor", +"author", +"thumbnail", +"excerpt", +"trackbacks", +"custom-fields", +"comments", +"revisions", +"post-formats")),
+                        Show_In_REST          => True,
+                        REST_Base             => +"posts",
+                        REST_Controller_Class => +"WP_REST_Posts_Controller",
 
                         -- Added
                         Label                => Null_Unbounded_String,
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
                         Capabilities         => Empty_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -100,41 +98,41 @@ is
       Register_Post_Type (
                 "page",
                 Args_Type'(
-                        labels                =>
+                        Labels                =>
                            Arrays.To_Array ((
                              1 => Build ("name_admin_bar",
-                                         x_x ("Page", "add new from admin bar")))),
-                        public                => True,
-                        publicly_queryable    => False,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        x_edit_link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.--
+                                         X_X ("Page", "add new from admin bar")))),
+                        Public                => True,
+                        Publicly_Queryable    => False,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
+                        X_Edit_Link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.--
                         Capability_Type_String => +"page",
                         Capability_Type_Array  => Empty_Array,
-                        map_meta_cap          => True,
-                        menu_position         => 20,
-                        menu_icon             => +"dashicons-admin-page",
-                        hierarchical          => True,
-                        rewrite               => Empty_Rewrite,
-                        query_var             => Null_Unbounded_String,
-                        delete_with_user      => True,
-                        supports              => to_list ((+"title", +"editor", +"author", +"thumbnail", +"page-attributes", +"custom-fields", +"comments", +"revisions")),
-                        show_in_rest          => True,
-                        rest_base             => +"pages",
-                        rest_controller_class => +"WP_REST_Posts_Controller",
+                        Map_Meta_Cap          => True,
+                        Menu_Position         => 20,
+                        Menu_Icon             => +"dashicons-admin-page",
+                        Hierarchical          => True,
+                        Rewrite               => Empty_Rewrite,
+                        Query_Var             => Null_Unbounded_String,
+                        Delete_With_User      => True,
+                        Supports              => To_List ((+"title", +"editor", +"author", +"thumbnail", +"page-attributes", +"custom-fields", +"comments", +"revisions")),
+                        Show_In_REST          => True,
+                        REST_Base             => +"pages",
+                        REST_Controller_Class => +"WP_REST_Posts_Controller",
 
                         -- Added
                         Label                => Null_Unbounded_String,
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
 --                      Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
                         Capabilities         => Empty_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -150,34 +148,34 @@ is
       Register_Post_Type (
                 "attachment",
                 Args_Type'(
-                        labels                => Arrays.to_array ((
-                                Build ("name",           x_x ("Media", "post type general name")),
-                                Build ("name_admin_bar", x_x ("Media", "add new from admin bar")),
-                                Build ("add_new",        x_x ("Add New", "file")),
+                        Labels                => Arrays.To_Array ((
+                                Build ("name",           X_X ("Media", "post type general name")),
+                                Build ("name_admin_bar", X_X ("Media", "add new from admin bar")),
+                                Build ("add_new",        X_X ("Add New", "file")),
                                 Build ("edit_item",      abs "Edit Media"),
                                 Build ("view_item",      abs "View Attachment Page"),
                                 Build ("attributes",     abs "Attachment Attributes")
                         )),
-                        public                => True,
-                        show_ui               => True,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.
-                        x_edit_link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.
+                        Public                => True,
+                        Show_UI               => True,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.
+                        X_Edit_Link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.
                         Capability_Type_String => +"post",
                         Capability_Type_Array  => Empty_Array,
-                        capabilities          =>
+                        Capabilities          =>
                            Arrays.To_Array ((
                               1 => Build ("create_posts", "upload_files"))),
-                        map_meta_cap          => True,
-                        menu_icon             => +"dashicons-admin-media",
-                        hierarchical          => False,
-                        rewrite               => Empty_Rewrite,
-                        query_var             => Null_Unbounded_String,
-                        show_in_nav_menus     => False,
-                        delete_with_user      => True,
-                        supports              => To_List ((+"title", +"author", +"comments")),
-                        show_in_rest          => True,
-                        rest_base             => +"media",
-                        rest_controller_class => +"WP_REST_Attachments_Controller",
+                        Map_Meta_Cap          => True,
+                        Menu_Icon             => +"dashicons-admin-media",
+                        Hierarchical          => False,
+                        Rewrite               => Empty_Rewrite,
+                        Query_Var             => Null_Unbounded_String,
+                        Show_In_Nav_Menus     => False,
+                        Delete_With_User      => True,
+                        Supports              => To_List ((+"title", +"author", +"comments")),
+                        Show_In_REST          => True,
+                        REST_Base             => +"media",
+                        REST_Controller_Class => +"WP_REST_Attachments_Controller",
 
                         -- Added
                         Label                => Null_Unbounded_String,
@@ -189,9 +187,9 @@ is
                         Show_In_Menu         => Null_Unbounded_String,
 --                        Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -211,40 +209,40 @@ is
       Register_Post_Type (
                 "revision",
                 Args_Type'(
-                        labels           => Arrays.to_array ((
+                        Labels           => Arrays.To_Array ((
                                 Build ("name",          abs "Revisions"),
                                 Build ("singular_name", abs "Revision")
                         )),
-                        public           => False,
-                        x_builtin         => True, -- internal use only. don"t use this when registering your own post type.--
-                        x_edit_link       => +"revision.php?revision=%d", -- internal use only. don"t use this when registering your own post type.--
+                        Public           => False,
+                        X_Builtin         => True, -- internal use only. don"t use this when registering your own post type.--
+                        X_Edit_Link       => +"revision.php?revision=%d", -- internal use only. don"t use this when registering your own post type.--
                         Capability_Type_String => +"post",
                         Capability_Type_Array  => Empty_Array,
-                        map_meta_cap     => True,
-                        hierarchical     => False,
-                        rewrite          => Empty_Rewrite,
-                        query_var        => Null_Unbounded_String,
-                        can_export       => False,
-                        delete_with_user => True,
-                        supports         => to_list ((1 => +"author")),
+                        Map_Meta_Cap     => True,
+                        Hierarchical     => False,
+                        Rewrite          => Empty_Rewrite,
+                        Query_Var        => Null_Unbounded_String,
+                        Can_Export       => False,
+                        Delete_With_User => True,
+                        Supports         => To_List ((1 => +"author")),
 
                         -- Added
                         Label                => Null_Unbounded_String,
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
-                        Rest_Base            => Null_Unbounded_String,
-                        Rest_Controller_Class => Null_Unbounded_String,
+                        Show_In_REST         => False,
+                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Base            => Null_Unbounded_String,
+                        REST_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
                         Capabilities         => Empty_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -262,22 +260,22 @@ is
       Register_Post_Type (
                 "nav_menu_item",
                 Args_Type'(
-                        labels                => Arrays.to_array ((
+                        Labels                => Arrays.To_Array ((
                                 Build ("name",          abs "Navigation Menu Items"),
                                 Build ("singular_name", abs "Navigation Menu Item")
                         )),
-                        public                => False,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        hierarchical          => False,
-                        rewrite               => Empty_Rewrite,
-                        delete_with_user      => False,
-                        query_var             => Null_Unbounded_String,
-                        map_meta_cap          => True,
+                        Public                => False,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
+                        Hierarchical          => False,
+                        Rewrite               => Empty_Rewrite,
+                        Delete_With_User      => False,
+                        Query_Var             => Null_Unbounded_String,
+                        Map_Meta_Cap          => True,
                         Capability_Type_String => Null_Unbounded_String,
                         Capability_Type_Array  =>
                            Arrays.To_Array ((1 => Build ("edit_theme_options",
                                                          "edit_theme_options"))),
-                        capabilities          => Arrays.To_Array ((
+                        Capabilities          => Arrays.To_Array ((
                                 -- Meta Capabilities.
                                 Build ("edit_post",              "edit_post"),
                                 Build ("read_post",              "read_post"),
@@ -295,9 +293,9 @@ is
                                 Build ("edit_private_posts",     "edit_theme_options"),
                                 Build ("edit_published_posts",   "edit_theme_options")
                         )),
-                        show_in_rest          => True,
-                        rest_base             => +"menu-items",
-                        rest_controller_class => +"WP_REST_Menu_Items_Controller",
+                        Show_In_REST          => True,
+                        REST_Base             => +"menu-items",
+                        REST_Controller_Class => +"WP_REST_Menu_Items_Controller",
 
                         -- Added
                         Supports             => Empty_List,
@@ -305,18 +303,18 @@ is
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
 --                        Rest_Base            => Null_Unbounded_String,
 --                        Rest_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -335,19 +333,19 @@ is
       Register_Post_Type (
                 "custom_css",
                 Args_Type'(
-                        labels           => Arrays.to_array ((
+                        Labels           => Arrays.To_Array ((
                                 Build ("name",          abs "Custom CSS"),
                                 Build ("singular_name", abs "Custom CSS")
                         )),
-                        public           => False,
-                        hierarchical     => False,
-                        rewrite          => Empty_Rewrite,
-                        query_var        => Null_Unbounded_String,
-                        delete_with_user => False,
-                        can_export       => True,
-                        x_builtin        => True, -- internal use only. don"t use this when registering your own post type.--
-                        supports         => to_list ((+"title", +"revisions")),
-                        capabilities     => Arrays.to_array ((
+                        Public           => False,
+                        Hierarchical     => False,
+                        Rewrite          => Empty_Rewrite,
+                        Query_Var        => Null_Unbounded_String,
+                        Delete_With_User => False,
+                        Can_Export       => True,
+                        X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
+                        Supports         => To_List ((+"title", +"revisions")),
+                        Capabilities     => Arrays.To_Array ((
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_post",            "edit_theme_options"),
                                 Build ("delete_published_posts", "edit_theme_options"),
@@ -371,18 +369,18 @@ is
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
-                        Rest_Base            => Null_Unbounded_String,
-                        Rest_Controller_Class => Null_Unbounded_String,
+                        Show_In_REST         => False,
+                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Base            => Null_Unbounded_String,
+                        REST_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -401,10 +399,10 @@ is
       Register_Post_Type (
                 "customize_changeset",
                 Args_Type'(
-                        labels           => Arrays.to_array ((
-                                Build ("name",               x_x ("Changesets", "post type general name")),
-                                Build ("singular_name",      x_x ("Changeset", "post type singular name")),
-                                Build ("add_new",            x_x ("Add New", "Customize Changeset")),
+                        Labels           => Arrays.To_Array ((
+                                Build ("name",               X_X ("Changesets", "post type general name")),
+                                Build ("singular_name",      X_X ("Changeset", "post type singular name")),
+                                Build ("add_new",            X_X ("Add New", "Customize Changeset")),
                                 Build ("add_new_item",       abs "Add New Changeset"),
                                 Build ("new_item",           abs "New Changeset"),
                                 Build ("edit_item",          abs "Edit Changeset"),
@@ -414,18 +412,18 @@ is
                                 Build ("not_found",          abs "No changesets found."),
                                 Build ("not_found_in_trash", abs "No changesets found in Trash.")
                         )),
-                        public           => False,
-                        x_builtin        => True, -- internal use only. don"t use this when registering your own post type.--
-                        map_meta_cap     => True,
-                        hierarchical     => False,
-                        rewrite          => Empty_Rewrite,
-                        query_var        => Null_Unbounded_String,
-                        can_export       => False,
-                        delete_with_user => False,
-                        supports         => To_List ((+"title", +"author")),
+                        Public           => False,
+                        X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
+                        Map_Meta_Cap     => True,
+                        Hierarchical     => False,
+                        Rewrite          => Empty_Rewrite,
+                        Query_Var        => Null_Unbounded_String,
+                        Can_Export       => False,
+                        Delete_With_User => False,
+                        Supports         => To_List ((+"title", +"author")),
                         Capability_Type_String => +"customize_changeset",
                         Capability_Type_Array  => Empty_Array,
-                        capabilities     => Arrays.to_array ((
+                        Capabilities     => Arrays.To_Array ((
                                 Build ("create_posts",           "customize"),
                                 Build ("delete_others_posts",    "customize"),
                                 Build ("delete_post",            "customize"),
@@ -452,18 +450,18 @@ is
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
-                        Rest_Base            => Null_Unbounded_String,
-                        Rest_Controller_Class => Null_Unbounded_String,
+                        Show_In_REST         => False,
+                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Base            => Null_Unbounded_String,
+                        REST_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -482,18 +480,18 @@ is
       Register_Post_Type (
                 "oembed_cache",
                 Args_Type'(
-                        labels           => Arrays.to_array ((
+                        Labels           => Arrays.To_Array ((
                                 Build ("name",          abs "oEmbed Responses"),
                                 Build ("singular_name", abs "oEmbed Response")
                         )),
-                        public           => False,
-                        hierarchical     => False,
-                        rewrite          => Empty_Rewrite,
-                        query_var        => Null_Unbounded_String,
-                        delete_with_user => False,
-                        can_export       => False,
-                        x_builtin        => True, -- internal use only. don"t use this when registering your own post type.--
-                        supports         => Empty_List,
+                        Public           => False,
+                        Hierarchical     => False,
+                        Rewrite          => Empty_Rewrite,
+                        Query_Var        => Null_Unbounded_String,
+                        Delete_With_User => False,
+                        Can_Export       => False,
+                        X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
+                        Supports         => Empty_List,
 
                         -- Added
                         Map_Meta_Cap           => False,
@@ -505,18 +503,18 @@ is
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
-                        Rest_Base            => Null_Unbounded_String,
-                        Rest_Controller_Class => Null_Unbounded_String,
+                        Show_In_REST         => False,
+                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Base            => Null_Unbounded_String,
+                        REST_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -535,18 +533,18 @@ is
       Register_Post_Type (
                 "user_request",
                 Args_Type'(
-                        labels           => Arrays.to_array ((
+                        Labels           => Arrays.To_Array ((
                                 Build ("name",          abs "User Requests"),
                                 Build ("singular_name", abs "User Request")
                         )),
-                        public           => False,
-                        x_builtin        => True, -- internal use only. don"t use this when registering your own post type.--
-                        hierarchical     => False,
-                        rewrite          => Empty_Rewrite,
-                        query_var        => Null_Unbounded_String,
-                        can_export       => False,
-                        delete_with_user => False,
-                        supports         => Empty_List,
+                        Public           => False,
+                        X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
+                        Hierarchical     => False,
+                        Rewrite          => Empty_Rewrite,
+                        Query_Var        => Null_Unbounded_String,
+                        Can_Export       => False,
+                        Delete_With_User => False,
+                        Supports         => Empty_List,
 
                         -- Added
                         Map_Meta_Cap           => False,
@@ -558,18 +556,18 @@ is
                         Description          => Null_Unbounded_String,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
-                        Show_Ui              => False,
+                        Show_UI              => False,
                         Show_In_Menu_Bool    => False,
                         Show_In_Menu         => Null_Unbounded_String,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
-                        Rest_Base            => Null_Unbounded_String,
-                        Rest_Controller_Class => Null_Unbounded_String,
+                        Show_In_REST         => False,
+                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Base            => Null_Unbounded_String,
+                        REST_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -588,10 +586,10 @@ is
       Register_Post_Type (
                 "wp_block",
                 Args_Type'(
-                        labels                => Arrays.to_array ((
-                                Build ("name",                     x_x ("Reusable blocks", "post type general name")),
-                                Build ("singular_name",            x_x ("Reusable block", "post type singular name")),
-                                Build ("add_new",                  x_x ("Add New", "Reusable block")),
+                        Labels                => Arrays.To_Array ((
+                                Build ("name",                     X_X ("Reusable blocks", "post type general name")),
+                                Build ("singular_name",            X_X ("Reusable block", "post type singular name")),
+                                Build ("add_new",                  X_X ("Add New", "Reusable block")),
                                 Build ("add_new_item",             abs "Add new Reusable block"),
                                 Build ("new_item",                 abs "New Reusable block"),
                                 Build ("edit_item",                abs "Edit Reusable block"),
@@ -609,16 +607,16 @@ is
                                 Build ("item_scheduled",           abs "Reusable block scheduled."),
                                 Build ("item_updated",             abs "Reusable block updated.")
                         )),
-                        public                => False,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        show_ui               => True,
-                        show_in_menu          => Null_Unbounded_String,
-                        rewrite               => Empty_Rewrite,
-                        show_in_rest          => True,
-                        rest_base              => +"blocks",
-                        rest_controller_class  => +"WP_REST_Blocks_Controller",
+                        Public                => False,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
+                        Show_UI               => True,
+                        Show_In_Menu          => Null_Unbounded_String,
+                        Rewrite               => Empty_Rewrite,
+                        Show_In_REST          => True,
+                        REST_Base              => +"blocks",
+                        REST_Controller_Class  => +"WP_REST_Blocks_Controller",
                         Capability_Type_String => +"block",
-                        capabilities           => Arrays.to_array ((
+                        Capabilities           => Arrays.To_Array ((
                                 -- You need to be able to edit posts, in order to read blocks in their raw form.
                                 Build ("read",                   "edit_posts"),
                                 -- You need to be able to publish posts, in order to create blocks.
@@ -629,8 +627,8 @@ is
                                 Build ("edit_others_posts",      "edit_others_posts"),
                                 Build ("delete_others_posts",    "delete_others_posts")
                         )),
-                        map_meta_cap          => True,
-                        supports              => To_List ((
+                        Map_Meta_Cap          => True,
+                        Supports              => To_List ((
                                 +"title",
                                 +"editor",
                                 +"revisions"
@@ -654,12 +652,12 @@ is
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
 --                        Rest_Base            => Null_Unbounded_String,
 --                        Rest_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -679,10 +677,10 @@ is
       Register_Post_Type (
                 "wp_template",
                 Args_Type'(
-                        labels                => Arrays.to_array ((
-                                Build ("name",                  x_x ("Templates", "post type general name")),
-                                Build ("singular_name",         x_x ("Template", "post type singular name")),
-                                Build ("add_new",               x_x ("Add New", "Template")),
+                        Labels                => Arrays.To_Array ((
+                                Build ("name",                  X_X ("Templates", "post type general name")),
+                                Build ("singular_name",         X_X ("Template", "post type singular name")),
+                                Build ("add_new",               X_X ("Add New", "Template")),
                                 Build ("add_new_item",          abs "Add New Template"),
                                 Build ("new_item",              abs "New Template"),
                                 Build ("edit_item",             abs "Edit Template"),
@@ -699,19 +697,19 @@ is
                                 Build ("items_list_navigation", abs "Templates list navigation"),
                                 Build ("items_list",            abs "Templates list")
                         )),
-                        description           => +abs "Templates to include in your theme.",
-                        public                => False,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        has_archive           => Null_Unbounded_String,
-                        show_ui               => False,
-                        show_in_menu          => Null_Unbounded_String,
-                        show_in_rest          => True,
-                        rewrite               => Empty_Rewrite,
-                        rest_base             => +"templates",
-                        rest_controller_class => +"WP_REST_Templates_Controller",
+                        Description           => +abs "Templates to include in your theme.",
+                        Public                => False,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
+                        Has_Archive           => Null_Unbounded_String,
+                        Show_UI               => False,
+                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_REST          => True,
+                        Rewrite               => Empty_Rewrite,
+                        REST_Base             => +"templates",
+                        REST_Controller_Class => +"WP_REST_Templates_Controller",
                         Capability_Type_String => Null_Unbounded_String,
-                        Capability_Type_Array  => Arrays.to_array ((1 =>  Build ("template", "templates"))),
-                        capabilities          => Arrays.to_array ((
+                        Capability_Type_Array  => Arrays.To_Array ((1 =>  Build ("template", "templates"))),
+                        Capabilities          => Arrays.To_Array ((
                                 Build ("create_posts",           "edit_theme_options"),
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_others_posts",    "edit_theme_options"),
@@ -725,8 +723,8 @@ is
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("read_private_posts",     "edit_theme_options")
                         )),
-                        map_meta_cap          => True,
-                        supports              => to_list ((
+                        Map_Meta_Cap          => True,
+                        Supports              => To_List ((
                                 +"title",
                                 +"slug",
                                 +"excerpt",
@@ -753,12 +751,12 @@ is
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
 --                        Rest_Base            => Null_Unbounded_String,
 --                        Rest_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
 --                        Has_Archive          => Null_Unbounded_String,
@@ -778,10 +776,10 @@ is
       Register_Post_Type (
                 "wp_template_part",
                 Args_Type'(
-                        labels                => Arrays.to_array ((
-                                Build ("name",                  x_x ("Template Parts", "post type general name")),
-                                Build ("singular_name",         x_x ("Template Part", "post type singular name")),
-                                Build ("add_new",               x_x ("Add New", "Template Part")),
+                        Labels                => Arrays.To_Array ((
+                                Build ("name",                  X_X ("Template Parts", "post type general name")),
+                                Build ("singular_name",         X_X ("Template Part", "post type singular name")),
+                                Build ("add_new",               X_X ("Add New", "Template Part")),
                                 Build ("add_new_item",          abs "Add New Template Part"),
                                 Build ("new_item",              abs "New Template Part"),
                                 Build ("edit_item",             abs "Edit Template Part"),
@@ -798,18 +796,18 @@ is
                                 Build ("items_list_navigation", abs "Template parts list navigation"),
                                 Build ("items_list",            abs "Template parts list")
                         )),
-                        description           => +abs "Template parts to include in your templates.",
-                        public                => False,
-                        x_builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        has_archive           => Null_Unbounded_String,
-                        show_ui               => False,
-                        show_in_menu          => Null_Unbounded_String,
-                        show_in_rest          => True,
-                        rewrite               => Empty_Rewrite,
-                        rest_base             => +"template-parts",
-                        rest_controller_class => +"WP_REST_Templates_Controller",
-                        map_meta_cap          => True,
-                        capabilities          => Arrays.to_array ((
+                        Description           => +abs "Template parts to include in your templates.",
+                        Public                => False,
+                        X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
+                        Has_Archive           => Null_Unbounded_String,
+                        Show_UI               => False,
+                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_REST          => True,
+                        Rewrite               => Empty_Rewrite,
+                        REST_Base             => +"template-parts",
+                        REST_Controller_Class => +"WP_REST_Templates_Controller",
+                        Map_Meta_Cap          => True,
+                        Capabilities          => Arrays.To_Array ((
                                 Build ("create_posts",           "edit_theme_options"),
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_others_posts",    "edit_theme_options"),
@@ -823,7 +821,7 @@ is
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("read_private_posts",     "edit_theme_options")
                         )),
-                        supports              => To_List ((
+                        Supports              => To_List ((
                                 +"title",
                                 +"slug",
                                 +"excerpt",
@@ -850,12 +848,12 @@ is
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
 --                        Rest_Base            => Null_Unbounded_String,
 --                        Rest_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
 --                        Has_Archive          => Null_Unbounded_String,
@@ -875,14 +873,14 @@ is
       Register_Post_Type (
                 "wp_global_styles",
                 Args_Type'(
-                        label        => +x_x ("Global Styles", "post type general name"),
-                        description  => +abs "Global styles to include in themes.",
-                        public       => False,
-                        x_builtin    => True, -- internal use only. don't use this when registering your own post type.
-                        show_ui      => False,
-                        show_in_rest => False,
-                        rewrite      => Empty_Rewrite,
-                        capabilities => Arrays.to_array ((
+                        Label        => +X_X ("Global Styles", "post type general name"),
+                        Description  => +abs "Global styles to include in themes.",
+                        Public       => False,
+                        X_Builtin    => True, -- internal use only. don't use this when registering your own post type.
+                        Show_UI      => False,
+                        Show_In_REST => False,
+                        Rewrite      => Empty_Rewrite,
+                        Capabilities => Arrays.To_Array ((
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("create_posts",           "edit_theme_options"),
                                 Build ("edit_posts",             "edit_theme_options"),
@@ -891,8 +889,8 @@ is
                                 Build ("edit_others_posts",      "edit_theme_options"),
                                 Build ("delete_others_posts",    "edit_theme_options")
                         )),
-                        map_meta_cap => True,
-                        supports     => To_List ((
+                        Map_Meta_Cap => True,
+                        Supports     => To_List ((
                                 +"title",
                                 +"editor",
                                 +"revisions"
@@ -917,12 +915,12 @@ is
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
-                        Rest_Base            => Null_Unbounded_String,
-                        Rest_Controller_Class => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Base            => Null_Unbounded_String,
+                        REST_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
@@ -942,10 +940,10 @@ is
       Register_Post_Type (
                 "wp_navigation",
                 Args_Type'(
-                        labels                => Arrays.to_array ((
-                                Build ("name",                  x_x ("Navigation Menus", "post type general name")),
-                                Build ("singular_name",         x_x ("Navigation Menu", "post type singular name")),
-                                Build ("add_new",               x_x ("Add New", "Navigation Menu")),
+                        Labels                => Arrays.To_Array ((
+                                Build ("name",                  X_X ("Navigation Menus", "post type general name")),
+                                Build ("singular_name",         X_X ("Navigation Menu", "post type singular name")),
+                                Build ("add_new",               X_X ("Add New", "Navigation Menu")),
                                 Build ("add_new_item",          abs "Add New Navigation Menu"),
                                 Build ("new_item",              abs "New Navigation Menu"),
                                 Build ("edit_item",             abs "Edit Navigation Menu"),
@@ -962,17 +960,17 @@ is
                                 Build ("items_list_navigation", abs "Navigation Menus list navigation"),
                                 Build ("items_list",            abs "Navigation Menus list")
                         )),
-                        description           => +abs "Navigation menus that can be inserted into your site.",
-                        public                => False,
-                        x_builtin             => True, -- internal use only. don't use this when registering your own post type.
-                        has_archive           => Null_Unbounded_String,
-                        show_ui               => True,
-                        show_in_menu          => Null_Unbounded_String,
-                        show_in_admin_bar     => False,
-                        show_in_rest          => True,
-                        rewrite               => Empty_Rewrite,
-                        map_meta_cap          => True,
-                        capabilities          => Arrays.to_array ((
+                        Description           => +abs "Navigation menus that can be inserted into your site.",
+                        Public                => False,
+                        X_Builtin             => True, -- internal use only. don't use this when registering your own post type.
+                        Has_Archive           => Null_Unbounded_String,
+                        Show_UI               => True,
+                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_Admin_Bar     => False,
+                        Show_In_REST          => True,
+                        Rewrite               => Empty_Rewrite,
+                        Map_Meta_Cap          => True,
+                        Capabilities          => Arrays.To_Array ((
                                 Build ("edit_others_posts",      "edit_theme_options"),
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("publish_posts",          "edit_theme_options"),
@@ -985,9 +983,9 @@ is
                                 Build ("edit_published_posts",   "edit_theme_options"),
                                 Build ("edit_posts",             "edit_theme_options")
                         )),
-                        rest_base             => +"navigation",
-                        rest_controller_class => +"WP_REST_Posts_Controller",
-                        supports              => to_list ((
+                        REST_Base             => +"navigation",
+                        REST_Controller_Class => +"WP_REST_Posts_Controller",
+                        Supports              => To_List ((
                                 +"title",
                                 +"editor",
                                 +"revisions"
@@ -1020,12 +1018,12 @@ is
 --                        Show_In_Admin_Status_List => False,
 --                        Date_Floating             => False,
 --                        Show_In_Rest         => False,
-                        Rest_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_Unbounded_String,
 --                        Rest_Base            => Null_Unbounded_String,
 --                        Rest_Controller_Class => Null_Unbounded_String,
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
-                        Register_Meta_Box_Cb => Null_Callable,
+                        Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_String_Array,
                         Has_Archive_Bool     => False,
 --                        Has_Archive          => Null_Unbounded_String,
@@ -1045,11 +1043,11 @@ is
       Register_Post_Status (
                 "publish",
                 Status_Type'(
-                        label       => +x_x ("Published", "post status"),
-                        public      => True,
-                        x_builtin   => True, -- internal use only.
+                        Label       => +X_X ("Published", "post status"),
+                        Public      => True,
+                        X_Builtin   => True, -- internal use only.
                         -- translators: %s: Number of published posts.
-                        label_count => X_N_Noop (
+                        Label_Count => X_N_Noop (
                                 "Published <span class=""count"">(%s)</span>",
                                 "Published <span class=""count"">(%s)</span>"
                         ),
@@ -1069,11 +1067,11 @@ is
       Register_Post_Status (
                 "future",
                 Status_Type'(
-                        label       => +x_x ("Scheduled", "post status"),
+                        Label       => +X_X ("Scheduled", "post status"),
                         Protect     => True,
-                        x_builtin   => True, -- internal use only.
+                        X_Builtin   => True, -- internal use only.
                         -- translators: %s: Number of scheduled posts.
-                        label_count => X_N_Noop (
+                        Label_Count => X_N_Noop (
                                 "Scheduled <span class=""count"">(%s)</span>",
                                 "Scheduled <span class=""count"">(%s)</span>"
                         ),
@@ -1094,15 +1092,15 @@ is
       Register_Post_Status (
                 "draft",
                 Status_Type'(
-                        label         => +x_x ("Draft", "post status"),
+                        Label         => +X_X ("Draft", "post status"),
                         Protect       => True,
-                        x_builtin     => True, -- internal use only.
+                        X_Builtin     => True, -- internal use only.
                         -- translators: %s: Number of draft posts.
-                        label_count   => X_N_Noop (
+                        Label_Count   => X_N_Noop (
                                 "Draft <span class=""count"">(%s)</span>",
                                 "Drafts <span class=""count"">(%s)</span>"
                         ),
-                        date_floating => True,
+                        Date_Floating => True,
 
                         -- Added
                         Exclude_From_Search       => False,
@@ -1120,15 +1118,15 @@ is
       Register_Post_Status (
                 "pending",
                 Status_Type'(
-                        label         => +x_x ("Pending", "post status"),
+                        Label         => +X_X ("Pending", "post status"),
                         Protect       => True,
-                        x_builtin     => True, -- internal use only.
+                        X_Builtin     => True, -- internal use only.
                         -- translators: %s: Number of pending posts.
-                        label_count   => X_N_Noop (
+                        Label_Count   => X_N_Noop (
                                 "Pending <span class=""count"">(%s)</span>",
                                 "Pending <span class=""count"">(%s)</span>"
                         ),
-                        date_floating => True,
+                        Date_Floating => True,
 
                         -- Added
                         Exclude_From_Search       => False,
@@ -1146,11 +1144,11 @@ is
       Register_Post_Status (
                 "private",
                 Status_Type'(
-                        label       => +x_x ("Private", "post status"),
+                        Label       => +X_X ("Private", "post status"),
                         Privat      => True,
-                        x_builtin   => True, -- internal use only.
+                        X_Builtin   => True, -- internal use only.
                         -- translators: %s: Number of private posts.
-                        label_count => X_N_Noop (
+                        Label_Count => X_N_Noop (
                                 "Private <span class=""count"">(%s)</span>",
                                 "Private <span class=""count"">(%s)</span>"
                         ),
@@ -1171,15 +1169,15 @@ is
       Register_Post_Status (
                 "trash",
                 Status_Type'(
-                        label                     => +x_x ("Trash", "post status"),
-                        internal                  => True,
-                        x_builtin                 => True, -- internal use only.
+                        Label                     => +X_X ("Trash", "post status"),
+                        Internal                  => True,
+                        X_Builtin                 => True, -- internal use only.
                         -- translators: %s: Number of trashed posts.
-                        label_count               => X_N_Noop (
+                        Label_Count               => X_N_Noop (
                                 "Trash <span class=""count"">(%s)</span>",
                                 "Trash <span class=""count"">(%s)</span>"
                         ),
-                        show_in_admin_status_list => True,
+                        Show_In_Admin_Status_List => True,
 
                         -- Added
                         Exclude_From_Search       => False,
@@ -1197,10 +1195,10 @@ is
       Register_Post_Status (
                 "auto-draft",
                 Status_Type'(
-                        label         => +"auto-draft",
-                        internal      => True,
-                        x_builtin     => True, -- internal use only.
-                        date_floating => True,
+                        Label         => +"auto-draft",
+                        Internal      => True,
+                        X_Builtin     => True, -- internal use only.
+                        Date_Floating => True,
 
                         -- Added
                         Label_Count               => Empty_Array,
@@ -1219,10 +1217,10 @@ is
       Register_Post_Status (
                 "inherit",
                 Status_Type'(
-                        label               => +"inherit",
-                        internal            => True,
-                        x_builtin           => True, -- internal use only.
-                        exclude_from_search => False,
+                        Label               => +"inherit",
+                        Internal            => True,
+                        X_Builtin           => True, -- internal use only.
+                        Exclude_From_Search => False,
 
                         -- Added
                         Label_Count               => Empty_Array,
@@ -1241,15 +1239,15 @@ is
       Register_Post_Status (
                 "request-pending",
                 Status_Type'(
-                        label               => +x_x ("Pending", "request status"),
-                        internal            => True,
-                        x_builtin           => True, -- internal use only.
+                        Label               => +X_X ("Pending", "request status"),
+                        Internal            => True,
+                        X_Builtin           => True, -- internal use only.
                         -- translators: %s: Number of pending requests.
-                        label_count         => X_N_Noop (
+                        Label_Count         => X_N_Noop (
                                 "Pending <span class=""count"">(%s)</span>",
                                 "Pending <span class=""count"">(%s)</span>"
                         ),
-                        exclude_from_search => False,
+                        Exclude_From_Search => False,
 
                         -- Added
 --                        Exclude_From_Search       => False,
@@ -1267,15 +1265,15 @@ is
       Register_Post_Status (
                 "request-confirmed",
                 Status_Type'(
-                        label               => +x_x ("Confirmed", "request status"),
-                        internal            => True,
-                        x_builtin           => True, -- internal use only.
+                        Label               => +X_X ("Confirmed", "request status"),
+                        Internal            => True,
+                        X_Builtin           => True, -- internal use only.
                         -- translators: %s: Number of confirmed requests.
-                        label_count         => X_N_Noop (
+                        Label_Count         => X_N_Noop (
                                 "Confirmed <span class=""count"">(%s)</span>",
                                 "Confirmed <span class=""count"">(%s)</span>"
                         ),
-                        exclude_from_search => False,
+                        Exclude_From_Search => False,
 
                         -- Added
 --                        Exclude_From_Search       => False,
@@ -1293,15 +1291,15 @@ is
       Register_Post_Status (
                 "request-failed",
                 Status_Type'(
-                        label               => +x_x ("Failed", "request status"),
-                        internal            => True,
-                        x_builtin           => True, -- internal use only.
+                        Label               => +X_X ("Failed", "request status"),
+                        Internal            => True,
+                        X_Builtin           => True, -- internal use only.
                         -- translators: %s: Number of failed requests.
-                        label_count         => X_N_Noop (
+                        Label_Count         => X_N_Noop (
                                 "Failed <span class=""count"">(%s)</span>",
                                 "Failed <span class=""count"">(%s)</span>"
                         ),
-                        exclude_from_search => False,
+                        Exclude_From_Search => False,
 
                         -- Added
 --                        Exclude_From_Search       => False,
@@ -1319,15 +1317,15 @@ is
       Register_Post_Status (
                 "request-completed",
                 Status_Type'(
-                        label               => +x_x ("Completed", "request status"),
-                        internal            => True,
-                        x_builtin           => True, -- internal use only.
+                        Label               => +X_X ("Completed", "request status"),
+                        Internal            => True,
+                        X_Builtin           => True, -- internal use only.
                         -- translators: %s: Number of completed requests.
-                        label_count         => X_N_Noop (
+                        Label_Count         => X_N_Noop (
                                 "Completed <span class=""count"">(%s)</span>",
                                 "Completed <span class=""count"">(%s)</span>"
                         ),
-                        exclude_from_search => False,
+                        Exclude_From_Search => False,
 
                         -- Added
 --                        Exclude_From_Search       => False,
@@ -1628,7 +1626,7 @@ is
 --          Post_2 := Get (GLOBALS, "post");
       end if;
 
-      if Post in WP_Post then -- instanceof
+      if Post in Wp_Post then -- instanceof
          X_Post := Post_2;
       elsif Is_Object (Post_2) then
          if Post_2.Filter = "" then -- empty
@@ -1668,16 +1666,15 @@ is
       return P;
    end Get_Post;
 
-
---
--- Retrieves the IDs of the ancestors of a post.
---
--- @since 2.5.0
---
--- @param int|WP_Post post Post ID or post object.
--- @return int[] Array of ancestor IDs or empty array if there are none.
---
--- function get_post_ancestors( post ) then
+   --
+   -- Retrieves the IDs of the ancestors of a post.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int|WP_Post post Post ID or post object.
+   -- @return int[] Array of ancestor IDs or empty array if there are none.
+   --
+   -- function get_post_ancestors( post ) then
 
    function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
@@ -1702,7 +1699,7 @@ is
          Ancestor  : Wp_Post;
       begin
          Arrays.Array_Vectors.Append (Ancestors, New_Item => (+Id'Image, +""));
-         Ancestor := Inc_posts.Get_Post (Id);
+         Ancestor := Inc_Posts.Get_Post (Id);
          loop -- while Ancestor loop
             -- Loop detection: If the ancestor has been seen before, break.
             if
@@ -3431,13 +3428,13 @@ is
             return Post_2;
          end if;
          if Post_2.Id = 0 then
-            Post_2.ID := 0;
+            Post_2.Id := 0;
          end if;
          for Field of Array_Keys (Get_Object_Vars (Post_2)) loop
             -- field selecting jq
             Set (Post_2, -Field,
                  Sanitize_Post_Field (-Field, Get (Post_2, -Field),
-                                      Post_2.ID, Context));
+                                      Post_2.Id, Context));
          end loop;
          Set (Post_2, "filter", Context);
 
@@ -4383,7 +4380,6 @@ is
    begin
       return P;
    end Wp_Untrash_Post;
-
 
 -- function wp_untrash_post( post_id = 0 ) then
 --         post = get_post( post_id );
@@ -8917,8 +8913,5 @@ is
 --         --
 --         return apply_filters( "use_block_editor_for_post_type", True, post_type );
 -- end;
-
-
-
 
 end Inc_Posts;

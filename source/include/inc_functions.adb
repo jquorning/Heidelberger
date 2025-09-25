@@ -13,7 +13,6 @@ package body Inc_Functions
 is
    use Php;
 
-
 -- require ABSPATH . WPINC . '/option.php';
 
 --
@@ -4651,7 +4650,6 @@ is
 
 --         return $mce_init;
 -- end;
-
 
 --
 -- Converts smiley code to the icon graphic file equivalent.

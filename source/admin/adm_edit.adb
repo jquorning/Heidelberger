@@ -14,10 +14,9 @@ with Arrays;
 with Globals;
 with Php;
 
-with HB_Common;
+with Hb_Common;
 with Wp_Common;
 
-with Adi_Class_Wp_List_Tables;
 with Adi_Class_Wp_Posts_List_Tables;
 with Adi_Class_Wp_Screens;
 with Adi_List_Tables;
@@ -42,8 +41,7 @@ is
    use Ada.Containers;
    use Ada.Strings.Unbounded;
    use Inc_L10n;
-   use HB_Common;
-   use Wp_Common;
+   use Hb_Common;
    use Arrays;
    use Globals;
    use Php;
@@ -54,7 +52,6 @@ is
 
    function Translation
       return Templates_Parser.Translate_Table;
-
 
 --  /** WordPress Administration Bootstrap */
 --  require_once __DIR__ . '/admin.php';
@@ -78,8 +75,7 @@ is
 --      }
 --  }
 
-   function Render (Request : in AWS.Status.Data)
-                    return AWS.Response.Data
+   procedure Render
    is
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
@@ -166,12 +162,12 @@ is
                        := +Remove_Query_Arg (Arg, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
-                        Sendback := To_Unbounded_String (Admin_Url (Parent_File));
+                        Sendback := To_Unbounded_String (Admin_URL (Parent_File));
                      end if;
 
                      Sendback := Add_Query_Arg ("paged", Pagenum, Sendback);
                      if Index (Sendback, "post") /= 0 then
-                        Sendback := To_Unbounded_String (Admin_Url (Post_New_File));
+                        Sendback := To_Unbounded_String (Admin_URL (Post_New_File));
                      end if;
 
                      declare
@@ -218,7 +214,7 @@ is
 
                         if Post_Ids.Is_Empty then
                            Inc_Pluggables.Wp_Redirect (-Sendback);
-                           return AWS.Response.URL (""); -- exit;  -- redirect
+                           return; -- exit;  -- redirect
                         end if;
 
                         if "trash" = Doaction then
@@ -383,7 +379,7 @@ is
                            Sendback := +Remove_Query_Arg (Arg, -Sendback);
                         end;
                         Inc_Pluggables.Wp_Redirect (-Sendback);
-                        return AWS.Response.URL (""); -- exit;  -- redirect
+                        return; -- exit;  -- redirect
                      end;
                   end;
 
@@ -402,7 +398,7 @@ is
                              (Arg,
                               Wp_Unslash (Get (X_SERVER, "REQUEST_URI"))));
                end;
-               return AWS.Response.URL (""); -- exit;  -- redirect
+               return; -- exit;  -- redirect
             end if;
 
             X_Wp_List_Table.Prepare_Items; -- ();
@@ -417,10 +413,10 @@ is
 
             declare
                use Adi_Screens;
-
-               --  Used in the HTML title tag.
-               Title : String := Wp_Common.Get (Post_Type_Object, "labels.name");
             begin
+               --  Used in the HTML title tag.
+               Title := +Wp_Common.Get (Post_Type_Object, "labels.name");
+
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
                         Arrays.To_Array (List => (
@@ -638,6 +634,14 @@ is
                                    Var_Name     : in     String;
                                    Translations : in out Translate_Set)
                   is
+
+                     procedure Set (Var : String; Value : String);
+
+                     procedure Set (Var : String; Value : String) is
+                     begin
+                        Insert (Translations, Assoc (Var, Value));
+                     end Set;
+
                      use Inc_Formatting;
                   begin
                      if Var_Name = "VAR_page_edit_h1" then
@@ -649,18 +653,19 @@ is
                      elsif Var_Name = "VAR_page_edit_h1_sub" then
                         declare
                            URL  : constant String :=
-                              ESC_URL  (Admin_Url (Post_New_File));
+                              ESC_URL  (Admin_URL (Post_New_File));
                            HTML : constant String :=
-                              ESC_HTML (String'(HB_Common.Get (Post_Type_Object,
+                              ESC_HTML (String'(Hb_Common.Get (Post_Type_Object,
                                                      "labels.add_new")));
                         begin
                            if
                              Current_User_Can (Get (Post_Type_Object.Cap,
                                                     "create_posts"))
                            then
-                              Insert (Translations, Assoc ("VAR_page_edit_h1_sub",
-                                                           " <a href=""" & URL & """ class=""page-title-action"">" & HTML & "</a>"));
-
+                              Set ("VAR_page_edit_h1_sub",
+                                   " <a href=""" & URL &
+                                   """ class=""page-title-action"">" & HTML &
+                                   "</a>");
                            end if;
                         end;
 
@@ -674,71 +679,66 @@ is
                               Buffer : constant String
                                  := "<span class=""subtitle"">" &
                                     Printf (
-                                            -- translators: %s: Search query.
-                                            abs "Search results for: %s",
-                                            "<strong>" & Get_Search_Query & "</strong>") & -- ()
-                                    "</span>";
+                                      -- translators: %s: Search query.
+                                      abs "Search results for: %s",
+                                      "<strong>" & Get_Search_Query & "</strong>") &
+                                      "</span>";
                            begin
-                              Insert (Translations, Assoc ("VAR_page_edit_h1_sub", Buffer));
+                              Set ("VAR_page_edit_h1_sub", Buffer);
                            end;
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_bulk" then
-                        Insert (Translations, Assoc ("VAR_page_edit_bulk",
-                                                     Var_Bulk (Bulk_Messages,
-                                                               Bulk_Counts,
-                                                               Post_Type)));
+                        Set ("VAR_page_edit_bulk",
+                             Var_Bulk (Bulk_Messages, Bulk_Counts, Post_Type));
 
                      elsif Var_Name = "VAR_page_edit_views" then
                         X_Wp_List_Table.Views; -- ()
-                        Insert (Translations, Assoc ("VAR_page_edit_views",
-                                                     "XX-449")); -- ()
+                        Set ("VAR_page_edit_views", "XX-449");
 
                      elsif Var_Name = "VAR_page_edit_search_box" then
                         X_Wp_List_Table.Search_Box
-                          (String'(HB_Common.Get (Post_Type_Object,
+                          (String'(Hb_Common.Get (Post_Type_Object,
                                                  "labels.search_items")),
                            "post");
-                        Insert (Translations,
-                           Assoc ("VAR_page_edit_search_box", "XXX-454"));
+                        Set ("VAR_page_edit_search_box", "XXX-454");
 
                      elsif Var_Name = "VAR_page_edit_post_status" then
-                        Insert (Translations,
-                                Assoc ("VAR_page_edit_post_status",
-                                       (if not Empty (String'(Get (X_REQUEST, "post_status")))
-                                        then ESC_Attr (String'(Get (X_REQUEST, "post_status")))
-                                        else "all")));
+                        Set ("VAR_page_edit_post_status",
+                            (if not Empty  (String'(Get (X_REQUEST, "post_status")))
+                             then ESC_Attr (String'(Get (X_REQUEST, "post_status")))
+                             else "all"));
 
                      elsif Var_Name = "VAR_page_edit_post_type" then
-                        Insert (Translations, Assoc ("VAR_page_edit_post_status",
-                                                     Post_Type));
+                        Set ("VAR_page_edit_post_status", Post_Type);
 
                      elsif Var_Name = "VAR_page_edit_author" then
                         if not Empty (String'(Get (X_REQUEST, "author"))) then
                            declare
-                              Author : constant String := ESC_Attr (Get (X_REQUEST, "author"));
+                              Author : constant String :=
+                                ESC_Attr (Get (X_REQUEST, "author"));
                            begin
-                              Insert (Translations, Assoc ("VAR_page_edit_author",
-                                                           "<input type=""hidden"" name=""author"" value=""" & Author & """ />"));
+                              Set
+                                ("VAR_page_edit_author",
+                                 "<input type=""hidden"" name=""author"" value=""" &
+                                 Author & """ />");
                            end;
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_show_sticky" then
                         if not Empty (String'(Get (X_REQUEST, "show_sticky"))) then
-                           Insert (Translations, Assoc ("VAR_page_edit_show_sticky",
-                                                        "<input type=""hidden"" name=""show_sticky"" value=""1"" />"));
+                           Set ("VAR_page_edit_show_sticky",
+                                "<input type=""hidden"" name=""show_sticky"" value=""1"" />");
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_display" then
                         X_Wp_List_Table.Display;  -- ()
-                        Insert (Translations, Assoc ("VAR_page_edit_display",
-                                                     "XXX-450"));
+                        Set ("VAR_page_edit_display", "XXX-450");
 
                      elsif Var_Name = "VAR_page_edit_inline_edit" then
                         if X_Wp_List_Table.Has_Items then -- ()
                            X_Wp_List_Table.Inline_Edit;  -- ();
-                           Insert (Translations, Assoc ("VAR_page_edit_inline_edit",
-                                                        "XXX-462"));
+                           Set ("VAR_page_edit_inline_edit", "XXX-462");
 
                         end if;
                      end if;
@@ -750,7 +750,8 @@ is
                                                 Translation,
                                                 Lazy_Tag => Lazy'Unchecked_Access);
                begin
-                  return AWS.Response.Build ("text/html", Payload); -- JQ
+                  Clear_Echo;
+                  Echo (-Payload);
                end;
             end;
          end;

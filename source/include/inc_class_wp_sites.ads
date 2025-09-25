@@ -34,7 +34,7 @@ is
 --
 -- #[AllowDynamicProperties]
 
-   type WP_Site is tagged
+   type Wp_Site is tagged
       record
 
         --
