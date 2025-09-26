@@ -5720,7 +5720,6 @@ is
 --                 wp_send_json_success( themes );
 --         end;
 
-
 --         --
 --         -- Callback for validating the header_textcolor value.
 --         --

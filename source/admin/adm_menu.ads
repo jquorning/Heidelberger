@@ -53,7 +53,7 @@ is
       Ada.Containers.vectors (Index_Type   => Menu_Index,
                               Element_Type => Menu_Item);
 
-   subtype Menu_Vector is Menu_Vectors.Vector;
+   subtype Menu_Type is Menu_Vectors.Vector;
 
    -- 0 := menu_title, 1 := capability, 2 := menu_slug,
    -- 3 := page_title, 4 := classes.
@@ -88,7 +88,7 @@ is
 
    function "<" (Left, Right : Slug_Type) return Boolean is (True);
 
-   Menu    : Menu_Vector;
+   Menu    : Menu_Type;
    Submenu : Submenu_Type;
 
    --

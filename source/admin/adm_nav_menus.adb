@@ -11,14 +11,16 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with HB_Common;
+with Hb_Common;
 with Php;
 with Globals;
 
 with Adi_Nav_Menus;
 
 with Inc_Capabilities;
+with Inc_Class_Wp_Posts;
 with Inc_Functions;
+with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
 with Inc_Nav_Menus;
 with Inc_Pluggables;
@@ -30,7 +32,7 @@ package body Adm_Nav_Menus
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use HB_Common;
+   use Hb_Common;
    use Inc_L10n;
    use Php;
    use Globals;
@@ -57,18 +59,18 @@ is
 
       -- Permissions check.
       if not Current_User_Can ("edit_theme_options") then
-        Inc_Functions.Wp_Die
-          ("<h1>" & abs "You need a higher level of permission." & "</h1>" & "<p>" &
-           abs "Sorry, you are not allowed to edit theme options on this site." &
-           "</p>",
-           Code => 403
-        );
+         Inc_Functions.Wp_Die
+           ("<h1>" & abs "You need a higher level of permission." & "</h1>" & "<p>" &
+            abs "Sorry, you are not allowed to edit theme options on this site." &
+            "</p>",
+            Code => 403
+           );
       end if;
 
-      Wp_Enqueue_Script ("nav-menu");
+      Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("nav-menu");
 
       if Wp_Is_Mobile then
-         Wp_Enqueue_Script ("jquery-touch-punch");
+         Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("jquery-touch-punch");
       end if;
 
       declare
@@ -132,19 +134,23 @@ is
                   declare
                      Menus : Array_Type :=
                        (if Isset (X_REQUEST, "menu")
-                        then Arrays.To_Array (Get_Integer (X_REQUEST, "menu"))
+                        then Arrays.To_Array ((1 => Build (X_REQUEST, "menu")))
                         else Inc_Taxonomys.Wp_Get_Object_Terms (Menu_Item_Id,
                                                                 "nav_menu",
                                 To_Array ((1 => Build ("fields", "ids")))));
                   begin
-                     if not Is_Wp_Error (Menus) and then not Empty (Menus (0)) then
+                     if
+--                     not Is_Wp_Error (Menus) and then
+                       Menus.First_Element.Value /= "" --  (0)
+                     then
                         declare
-                           Menu_Id            : Integer := Integer (Menus (0));
+                           Menu_Id : String :=
+                             -Menus.First_Element.Value; -- (0)
 
                            Ordered_Menu_Items : Array_Type :=
                               Wp_Get_Nav_Menu_Items (Menu_Id);
 
-                           Menu_Item_Data     : Array_Type :=  -- (array)
+                           Menu_Item_Data : Array_Type :=  -- (array)
                               Wp_Setup_Nav_Menu_Item
                                  (Inc_Posts.Get_Post (Menu_Item_Id));
 
@@ -172,7 +178,7 @@ is
                            -- Get next in order.
                            if
                              Isset (Orders_To_Dbids
-                               (Dbids_To_Orders (menu_item_id) + 1))
+                               (Dbids_To_Orders (Menu_Item_Id) + 1))
                            then
                               declare
                                  use Inc_Posts;
@@ -186,10 +192,14 @@ is
                               begin
                                  -- If not siblings of same parent, bubble menu item
                                  -- up but keep order.
-                                 if not Empty (Menu_Item_Data ("menu_item_parent"))
-                                    and then (Empty (Next_Item_Data ("menu_item_parent"))
-                                      or else Next_Item_Data ("menu_item_parent")  -- (int)
-                                           /= Menu_Item_Data ("menu_item_parent")) -- (int)
+                                 if not Empty (Get_Integer (Menu_Item_Data,
+                                                    "menu_item_parent"))
+                                    and then (Empty (String'(Get (Next_Item_Data,
+                                                                  "menu_item_parent")))
+                                      or else Get_Integer (Next_Item_Data,
+                                                           "menu_item_parent")  -- (int)
+                                           /= Get_Integer (Menu_Item_Data,
+                                                           "menu_item_parent")) -- (int)
                                  then
                                     declare
                                        use Inc_Class_Wp_Posts;
@@ -198,47 +208,50 @@ is
                                           (if In_Array (Menu_Item_Data
                                                           ("menu_item_parent"),
                                                         Orders_To_Dbids, True)
-                                           then Menu_Item_Data ("menu_item_parent")
+                                           then Get_Integer (Menu_Item_Data, "menu_item_parent")
                                            else 0);
 
                                        Parent_Object : Wp_Post :=
                                           Wp_Setup_Nav_Menu_Item (Get_Post
                                                                     (Parent_Db_Id));
                                     begin
-                                       if not Is_Wp_Error (Parent_Object) then
+                                       if True then
+--                                     if not Is_Wp_Error (Parent_Object) then
                                           declare
                                              Unused : Integer;
-                                             Parent_Data : Array_type := Parent_Object;
+                                             Parent_Data : Array_Type := Parent_Object;
                                           begin
                                              Set (Menu_Item_Data, "menu_item_parent",
-                                                Get (Parent_Data, "menu_item_parent"));
+                                                String'(Get (Parent_Data,
+                                                             "menu_item_parent")));
 
                                              Unused := Update_Post_Meta
-                                                (Menu_Item_Data ("ID"),
+                                                (Get_Integer (Menu_Item_Data, "ID"),
                                                  "_menu_item_menu_item_parent",
-                                                 Menu_Item_Data ("menu_item_parent"));
+                                                 String'(Get (Menu_Item_Data,
+                                                              "menu_item_parent")));
                                           end;
                                        end if;
                                     end;
 
                                  -- Make menu item a child of its next sibling.
                                  else
-                                    Next_Item_Data ("menu_order") :=
-                                       Next_Item_Data ("menu_order") - 1;
+                                    Set_Integer (Next_Item_Data, "menu_order",
+                                       Get_Integer (Next_Item_Data, "menu_order") - 1);
 
-                                    Menu_Item_Data ("menu_order") :=
-                                       Menu_Item_Data ("menu_order") + 1;
+                                    Set_Integer (Menu_Item_Data, "menu_order",
+                                       Get_Integer (Menu_Item_Data, "menu_order") + 1);
 
-                                    Menu_Item_Data ("menu_item_parent") :=
-                                       Next_Item_Data ("ID");
+                                    Set (Menu_Item_Data, "menu_item_parent",
+                                       String'(Get (Next_Item_Data, "ID")));
 
                                     declare
                                        Unused : Integer;
                                     begin
                                        Unused :=
-                                          Update_Post_Meta (Menu_Item_Data ("ID"),
+                                          Update_Post_Meta (Get (Menu_Item_Data, "ID"),
                                               "_menu_item_menu_item_parent",
-                                              Menu_Item_Data ("menu_item_parent"));
+                                              Get (Menu_Item_Data, "menu_item_parent"));
                                        Unused :=
                                           Inc_Posts.Wp_Update_Post (Menu_Item_Data);
                                        Unused :=
@@ -249,22 +262,25 @@ is
 
                            -- The item is last but still has a parent, so bubble up.
                            elsif
-                             not Empty (Menu_Item_Data ("menu_item_parent"))
-                             and then In_Array (Menu_Item_Data ("menu_item_parent"), -- (int)
+                             not Empty (String'(Get (Menu_Item_Data,
+                                                     "menu_item_parent")))
+                             and then In_Array (Get (Menu_Item_Data,
+                                                     "menu_item_parent"), -- (int)
                                                 Orders_To_Dbids, True)
                            then
-                              Menu_Item_Data ("menu_item_parent") :=
+                              Set (Menu_Item_Data, "menu_item_parent",
                                  Inc_Posts.Get_Post_Meta
-                                    (Menu_Item_Data ("menu_item_parent"),
+                                    (Inc_Class_Wp_Posts.Post_Id (Get_Integer (Menu_Item_Data,
+                                                           "menu_item_parent")),
                                                      "_menu_item_menu_item_parent",
-                                                     True);
+                                                     True));
                               declare
                                  Unused : Integer;
                               begin
                                  Unused :=
-                                    Inc_Posts.Update_Post_Meta (Menu_Item_Data ("ID"),
+                                    Inc_Posts.Update_Post_Meta (Get_Integer (Menu_Item_Data, "ID"),
                                                 "_menu_item_menu_item_parent",
-                                                Menu_Item_Data ("menu_item_parent")); -- (int)
+                                                Get (Menu_Item_Data, "menu_item_parent")); -- (int)
                               end;
                            end if;
                         end;

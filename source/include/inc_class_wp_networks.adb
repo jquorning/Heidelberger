@@ -398,4 +398,4 @@ is
 --         end;
 -- end;
 
-end inc_class_wp_networks;
+end Inc_Class_Wp_Networks;

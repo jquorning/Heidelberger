@@ -34,7 +34,7 @@ is
    --
 
    procedure X_Wp_Menu_Output
-     (Menu              : Adm_Menu.Menu_Vector;
+     (Menu              : Adm_Menu.Menu_Type;
       Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True);
 

@@ -11,7 +11,6 @@ is
 
    EXIT_ACTION : constant String := "exit_recovery_mode";
 
-
 --
 -- Core class used to implement Recovery Mode.
 --

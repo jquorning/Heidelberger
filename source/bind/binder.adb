@@ -9,18 +9,18 @@ with Adm_Edit;
 with Adm_Edit_Tags;
 with Adm_Post;
 -- with Adm_Nav_Menus;
--- with Adm_Menu_Header;
--- with Adm_Admin;
+with Adm_Menu_Header;
+with Adm_Admin;
 with Adm_Menu;
 
 -- with Adi_Nav_Menus;
--- with Adi_Menu;
+with Adi_Menu;
 
--- with Inc_Admin_Bar;
--- with Inc_Class_Wp_Admin_Bar;
--- with Inc_Class_Wp_Scripts;
--- with Inc_Class_Wp_Posts;
--- with Inc_Posts;
+with Inc_Admin_Bar;
+with Inc_Class_Wp_Admin_Bar;
+with Inc_Class_Wp_Scripts;
+with Inc_Class_Wp_Posts;
+with Inc_Posts;
 
 package body Binder
 is
@@ -44,7 +44,7 @@ is
       elsif Index (URL, "/wp-admin/edit_tags.php") /= 0 then
          Adm_Edit_Tags.Render;
 
-      elsif Index (URL, "/wp-admin/posts.php") /= 0 then
+      elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;
 
       end if;

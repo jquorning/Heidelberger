@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Globals;
-with HB_Common;
+with Hb_Common;
 with Php;
 
 with Adi_Plugins;
@@ -39,7 +39,7 @@ package body Adm_Admin
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use HB_Common;
+   use Hb_Common;
    use Inc_L10n;
 
    ---------

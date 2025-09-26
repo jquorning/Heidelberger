@@ -28,7 +28,7 @@ is
 -- @property int $site_id
 --
 --#[AllowDynamicProperties]
-   type WP_Network is
+   type Wp_Network is
       record
         --
         -- Network ID.
@@ -96,4 +96,4 @@ is
      (Id     => 0,
       others => Null_Unbounded_String);
 
-end inc_class_wp_networks;
+end Inc_Class_Wp_Networks;

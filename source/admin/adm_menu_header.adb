@@ -9,7 +9,7 @@ with Ada.Containers;
 
 with Arrays;
 with Globals;
-with HB_Common;
+with Hb_Common;
 with Php;
 
 with Adi_Plugins;
@@ -24,7 +24,7 @@ is
    use Globals;
    use Php;
    use Inc_L10n;
-   use HB_Common;
+   use Hb_Common;
 
 --
 -- The current page.
@@ -85,7 +85,7 @@ is
    ----------------------
 
    procedure X_Wp_Menu_Output
-     (Menu              : Adm_Menu.Menu_Vector;
+     (Menu              : Adm_Menu.Menu_Type;
       Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True)
    is

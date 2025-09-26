@@ -28,7 +28,7 @@ is
 -- @since 4.5.0 Removed the `$comments_popup` property.
 --
 -- #[AllowDynamicProperties]
-   type WP_Query is tagged
+   type Wp_Query is tagged
       record
 
         --

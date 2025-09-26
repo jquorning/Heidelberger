@@ -356,7 +356,6 @@ is
 --         return base;
 -- end;
 
-
 -- --
 -- -- Resolves numeric slugs that collide with date permalinks.
 -- --

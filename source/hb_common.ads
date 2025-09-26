@@ -51,6 +51,10 @@ is
    procedure Set (Arr : in out Array_Type; Key : String; Value : String);
    procedure Set (Arr : in out Array_Type; Key : String; Value : Array_Type)
      is null;
+   procedure Set_Integer (Arr   : in out Array_Type;
+                          Key   : String;
+                          Value : Integer)
+                          is null;
 
    function Count (Item : String) return String;
 

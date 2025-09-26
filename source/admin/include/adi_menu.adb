@@ -10,7 +10,7 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded.Less_Case_Insensitive;
 
 with Arrays;
-with HB_Common;
+with Hb_Common;
 with Php;
 
 with Adm_Menu;
@@ -27,7 +27,7 @@ package body Adi_Menu
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use HB_Common;
+   use Hb_Common;
    use Php;
 
    --
@@ -53,7 +53,7 @@ is
    -- @param array menu The array of administration menu items.
    -- @return array The array of administration menu items with the CSS classes added.
    --
-   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector);
+   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Type);
 
    package Boolean_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
@@ -80,8 +80,8 @@ is
                            is (Menu);
 
    function Apply_Filters (Hookname : String;
-                           Menu     : Adm_Menu.Menu_Vector)
-                           return Adm_Menu.Menu_Vector
+                           Menu     : Adm_Menu.Menu_Type)
+                           return Adm_Menu.Menu_Type
                            is (Menu);
 
    ---------
@@ -92,7 +92,7 @@ is
    is
       use Inc_Plugins;
 
-      Menu : Adm_Menu.Menu_Vector -- _Map -- _Array
+      Menu : Adm_Menu.Menu_Type
          renames Adm_Menu.Menu;
 
       Submenu : Adm_Menu.Submenu_Type
@@ -626,7 +626,7 @@ is
    -- @param array menu The array of administration menu items.
    -- @return array The array of administration menu items with the CSS classes added.
    --
-   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Vector)
+   procedure Add_Menu_Classes (Menu : in out Adm_Menu.Menu_Type)
    is
       use Adm_Menu;
 
