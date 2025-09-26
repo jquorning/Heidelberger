@@ -14,6 +14,7 @@ with Ada.Text_IO;
 --  with Templates_Parser;
 
 with Arrays;
+with Binder;
 with Globals;
 with Php;
 with Hb_Common;
@@ -59,6 +60,7 @@ is
 
    procedure Render
    is
+      use Binder;
       use Adm_Menu;
       use Adi_Posts;
       use Inc_Capabilities;

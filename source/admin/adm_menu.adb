@@ -5,9 +5,10 @@
 -- @subpackage Administration
 --
 
-with Php;
+with Binder;
 with Globals;
 with Hb_Common;
+with Php;
 
 with Adi_Plugins;
 
@@ -59,6 +60,7 @@ is
 
    procedure Run
    is
+      use Binder;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Updates;

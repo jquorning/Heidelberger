@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 with Templates_Parser;
 
 with Arrays;
+with Binder;
 with Globals;
 with Php;
 
@@ -84,6 +85,7 @@ is
       use Inc_Functions_Wp_Styles;
       use Inc_Link_Templates;
       use Inc_Posts;
+      use Binder;
 --
 --  @global string       $post_type
 --  @global WP_Post_Type $post_type_object
@@ -783,6 +785,7 @@ is
                       Bulk_Counts   : Array_Type;
                       Post_Type     : String) return String
    is
+      use Binder;
       use Inc_Capabilities;
 
       Messages : Unbounded_String;

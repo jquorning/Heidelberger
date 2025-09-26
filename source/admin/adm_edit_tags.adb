@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Templates_Parser;
 
 with Arrays;
+with Binder;
 with Globals;
 with Hb_Common;
 with Php;
@@ -63,6 +64,7 @@ is
 
    procedure Render
    is
+      use Binder;
       use Adi_Screens;
       use Inc_Capabilities;
       use Inc_Formatting;

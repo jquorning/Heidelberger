@@ -9,6 +9,7 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Arrays;
+with Binder;
 with Globals;
 with Hb_Common;
 with Php;
@@ -548,6 +549,7 @@ is
 
    procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use Binder;
       use Inc_Functions;
       use Inc_Load;
       use Inc_Pluggables;

@@ -8,6 +8,7 @@
 with Ada.Containers;
 
 with Arrays;
+with Binder;
 with Globals;
 with Hb_Common;
 with Php;
@@ -26,13 +27,14 @@ is
    use Inc_L10n;
    use Hb_Common;
 
---
--- The current page.
---
--- @global string self
---
+   --
+   -- The current page.
+   --
+   -- @global string self
+   --
    procedure Top
    is
+      use Binder;
       use Adm_Menu;
 
       Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq

@@ -10,6 +10,7 @@ with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Binder;
 with Globals;
 with Hb_Common;
 with Php;
@@ -48,6 +49,7 @@ is
 
    procedure Run
    is
+      use Binder;
       use Globals;
       use Adi_Plugins;
       use Inc_Plugins;
