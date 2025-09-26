@@ -290,6 +290,7 @@ is
       use String_Vectors;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use List_Vectors;
    begin
       for Handle of Handles loop -- (array)
          declare
@@ -302,7 +303,7 @@ is
          begin
             if
               not In_Array (First, This.Queue, True) and then
-              Dependency_Maps.No_Element /= This.Registered.Find (First)
+              Has_Element (This.Registered.Find (First))
             then
                This.Queue.Append (+First); -- Handle_2 (Handle_2.First_Index)); -- ()
 
@@ -310,23 +311,27 @@ is
                -- recurse_deps().
                This.All_Queued_Deps.Clear; --  := null;
 
-               if "" /= Second then -- Isset (Handle_2 (Handle_2.First_Index + 1)) then
-                  This.Args (First) := -- Handle_2 (Handle_2.First_Index)) :=
-                     Second; -- Handle_2 (Handle_2.First_Index + 1);
+               if "" /= Second then
+                  This.Args (First) :=  Second;
                end if;
---          elsif not Isset (This.Registered (Handle_2 (Handle_2.First_Index))) then
-            elsif Dependency_Maps.No_Element = This.Registered.Find (First) then
+
+            elsif not Has_Element (This.Registered.Find (First)) then
                Position := This.Queued_Before_Register.Find (+First);
 
-               This.Queued_Before_Register.Delete (Position);
---                (This.Queued_Before_Register.Find (+First)); --  := null; -- args
+               if Has_Element (Position) then
+                  This.Queued_Before_Register.Delete (Position);
+               end if;
 
---               if Isset (Handle_2 (Handle_2.First_Index + 1))  then
-               if "" /= Second then
+               if Second /= "" then
                   Position := This.Queued_Before_Register.Find (+First);
 
-                  This.Queued_Before_Register.Replace_Element
-                    (Position, New_Item => +Second);
+                  if Has_Element (Position) then
+                     This.Queued_Before_Register.Replace_Element
+                       (Position, New_Item => +Second);
+                  else
+                     This.Queued_Before_Register.Append
+                       (New_Item => +Second);
+                  end if;
                end if;
             end if;
          end;

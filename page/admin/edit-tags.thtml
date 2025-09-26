@@ -26,11 +26,11 @@ end;
 -->
 
 <hr class="wp-header-end">
-@@IF@@@ VAR_edit_tags_message_set
+@@IF@@ @_VAR_edit_tags_message_set_@
 
 <div id="message" class="@_VAR_edit_tags_class_@ notice is-dismissible"><p>@_VAR_edit_tags_message_@</p></div>
         @_VAR_edit_tags_remove_message_and_error_@
-@@END_if@@
+@@END_IF@@
 <!--
 <?php if  (message) : ?>
 
@@ -54,7 +54,7 @@ endif;
 <?php wp_list_table.search_box (tax.labels.search_items, "tag"); ?>
 -->
 </form>
-@@IF@@@ VAR_edit_tags_can_edit_terms
+@@IF@@ @_VAR_edit_tags_can_edit_terms_@
 <!--
 <?php
 can_edit_terms := current_user_can (tax.cap.edit_terms);
@@ -172,7 +172,7 @@ if  (can_edit_terms) then
         <p id="slug-description"><?php echo tax.labels.slug_field_description; ?></p>
 -->
 </div>
-@@IF@@ VAR_edit_tags_is_tax_hierarchical
+@@IF@@ @_VAR_edit_tags_is_tax_hierarchical_@
 <!--
     <?php if  (is_taxonomy_hierarchical (taxonomy)) : ?>
 -->
@@ -222,7 +222,7 @@ if  (can_edit_terms) then
                 wp_dropdown_categories (dropdown_args);
                 ?>
 -->
-                @@IF@@ VAR_edit_tags_category_is_taxonomy
+        @@IF@@ @_VAR_edit_tags_category_is_taxonomy_@
 <!--
                 <?php if  ("category" === taxonomy) : ?>
 -->
@@ -231,7 +231,7 @@ if  (can_edit_terms) then
                 <p id="parent-description">@_VAR_edit_tags_tax_field_description_@</p>
         @@END_IF@@
 </div>
-        @@END_IF@@ <!-- is_taxonomy_hierarchical() -->
+@@END_IF@@ <!-- is_taxonomy_hierarchical() -->
 <!--
                 <p id="parent-description"><?php _e ("Categories, unlike tags, can have a hierarchy. You might have a Jazz category, and under that have children categories for Bebop and Big Band. Totally optional."); ?></p>
         <?php else : ?>
@@ -359,7 +359,7 @@ if  (can_edit_terms) then
 <?php wp_list_table.display(); ?>
 -->
 </form>
-@@IF@@ VAR_edit_tags_category_is_taxonomy
+@@IF@@ @_VAR_edit_tags_category_is_taxonomy_@
 <!--
 <?php if  ("category" === taxonomy) : ?>
 -->
@@ -377,7 +377,7 @@ if  (can_edit_terms) then
         ?>
 -->
 </p>
-        @@IF@@@ VAR_edit_tags_user_can_import
+        @@IF@@ @_VAR_edit_tags_user_can_import_@
 <!--        <?php if  (current_user_can ("import")) : ?>  -->
         <p>
                 @_VAR_edit_tags_converter_help_@
@@ -394,7 +394,7 @@ if  (can_edit_terms) then
         @@END_IF@@
 <!--        <?php endif; ?>  -->
 </div>
-@@ELSIF@@@ VAR_edit_tags_post_tag_and_user_can_import
+@@ELSIF@@ @_VAR_edit_tags_post_tag_and_user_can_import_@
 <!--
 <?php elseif  ("post_tag" === taxonomy && current_user_can ("import")) : ?>
 -->
@@ -414,7 +414,7 @@ if  (can_edit_terms) then
 </div>
 @@END_IF@@
 @_VAR_edit_tags_do_after_table_@
-@@IF@@ VAR_edit_tags_can_edit_terms
+@@IF@@ @_VAR_edit_tags_can_edit_terms_@
 <!--
         <?php
 endif;
@@ -447,7 +447,7 @@ if  (can_edit_terms) then
 
 </div><!--jq<!-- /wrap -.  jq-->
 
-@@IF@@ VAR_edit_tags_not_is_mobile
+@@IF@@ @_VAR_edit_tags_not_is_mobile_@
 <!--  <?php if  (! wp_is_mobile()) : ?>  -->
 <script type="text/javascript">
 try{document.forms.addtag("tag-name").focus();}catch(e){};

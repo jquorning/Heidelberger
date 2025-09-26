@@ -1614,7 +1614,7 @@ is
                       Filter : String := "raw")
                       return Wp_Post
    is
-      Post_2 : constant Wp_Post := Post;
+      Post_2 : Wp_Post := Post;
       X_Post : Wp_Post;
       Unused_Success : Boolean;
    begin
@@ -1623,7 +1623,7 @@ is
         Isset (String'(Get (Globals.GLOBALS, "post")))
       then
          null;
---          Post_2 := Get (GLOBALS, "post");
+--       Post_2 := Get (Globals.GLOBALS, "post");
       end if;
 
       if Post in Wp_Post then -- instanceof

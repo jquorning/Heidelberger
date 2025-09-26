@@ -32,9 +32,9 @@ is
       P : Adi_Class_Wp_Posts_List_Tables.Wp_Posts_List_Table;
       T : Adi_Class_Wp_Terms_List_Tables.Wp_Terms_List_Table;
    begin
-      if Class_Name = "WP_Posts_List_Table" then
+      if Class_Name = "Wp_Posts_List_Table" then
          return P;
-      elsif Class_Name = "WP_Terms_List_Table" then
+      elsif Class_Name = "Wp_Terms_List_Table" then
          return T;
       end if;
       raise Program_Error;

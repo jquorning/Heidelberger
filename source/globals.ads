@@ -4,6 +4,8 @@ with Arrays;
 
 with Inc_Class_Wpdb;
 with Adm_Menu;
+with Inc_Class_Wp_Posts;
+with Inc_Class_Wp_Post_Type;
 
 package Globals
 is
@@ -49,5 +51,9 @@ is
    Title        : Unbounded_String;
    Parent_File  : Adm_Menu.Unbounded_Slug;
    Submenu_File : Adm_Menu.Unbounded_Slug;
+
+   Post_Type        : Unbounded_String;
+   Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
+   Post             : Inc_Class_Wp_Posts.Wp_Post;
 
 end Globals;

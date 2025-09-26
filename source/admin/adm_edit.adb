@@ -746,7 +746,7 @@ is
 
                   Lazy    : aliased My_Lazy;
                   Payload : constant Unbounded_String
-                     := Templates_Parser.Parse ("page/hb-admin/edit.thtml",
+                     := Templates_Parser.Parse ("page/admin/edit.thtml",
                                                 Translation,
                                                 Lazy_Tag => Lazy'Unchecked_Access);
                begin

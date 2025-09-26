@@ -109,7 +109,7 @@ is
          Post_Type : constant String := ""; -- jq
 
          X_Wp_List_Table : constant Wp_Terms_List_Table :=
-            Wp_Terms_List_Table (X_Get_List_Table ("WP_Terms_List_Table"));
+            Wp_Terms_List_Table (X_Get_List_Table ("Wp_Terms_List_Table"));
 
          Pagenum : constant Natural := X_Wp_List_Table.Get_Pagenum;  -- ();
 
@@ -938,7 +938,7 @@ is
 
                Lazy    : aliased My_Lazy;
                Payload : constant Unbounded_String
-                 := Templates_Parser.Parse ("page/hb-admin/edit.thtml",
+                 := Templates_Parser.Parse ("page/admin/edit-tags.thtml",
                                              Translation,
                                              Lazy_Tag => Lazy'Unchecked_Access);
             begin

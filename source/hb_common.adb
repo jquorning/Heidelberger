@@ -33,7 +33,6 @@ is
 
    function Get_Post_Status_Object (N : Integer) return Boolean is (True);
 
-   function Isset (Item : Array_Type) return Boolean is (True);
    function Explode (Item : String; Table : Array_Type) return Array_Type
    is (Empty_Array);
    function Implode (Item : String; Table : Array_Type) return String is ("XXX 5");
@@ -110,7 +109,7 @@ is
    end Get;
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
-                 return String is ("XXX-68");
+                 return String is (Key & " XXX-68");
 
    procedure Check_Admin_Referer (Item : String; Item_2 : String := "") is null;
    function Get_Pagination_Arg (List : List_Type; Item : String) return Natural is (1);
@@ -119,7 +118,6 @@ is
    function Current_User_Can (Trait : String; Val : Integer) return Boolean is (True);
    function Admin_URL (Item : String) return String is ("XXX-71");
    function Preg_Replace (Left : String; Right : String) return Integer is (1);
-   function Isset (Item : String) return Boolean is (True);
    function Taxnow return String is ("XXX-72");
 
    function Sanitize_URL (Item : String) return String is ("XXX-73");
@@ -127,5 +125,31 @@ is
       is ("XXX-74");
 
    function Is_Plugin_Active (Item : String) return Boolean is (False);
+
+   -----------
+   -- Isset --
+   -----------
+
+   function Isset (Item : Array_Type)
+                   return Boolean
+                   is (True);
+
+   function Isset (Item : String)
+                   return Boolean
+                   is (True);
+
+   function Isset (Arry : Array_Type;
+                   Key  : String)
+                   return Boolean
+   is
+   begin
+      for A of Arry loop
+         if A.Key = Key then
+            return True;
+         end if;
+      end loop;
+
+      return False;
+   end Isset;
 
 end Hb_Common;

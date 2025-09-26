@@ -2850,10 +2850,10 @@ is
          Text_2 : String := (if Text /= "" then Text else abs "Save Changes");
          -- Default the id attribute to name unless an id was specifically
          -- provided in other_attributes.
-         Id : String := Name;
+         Id : Unbounded_String := +Name;
       begin
          if Is_Array (Other_Attributes) and then Isset (Other_Attributes, "id") then
-            Id := Get (Other_Attributes, "id");
+            Id := +Get (Other_Attributes, "id");
 --          Other_Attributes.Delete (Other_Attributes.Find (Item => "id"));
 --          Unset (Other_Attributes ("id"));
          end if;
@@ -2882,7 +2882,7 @@ is
                                       then " name=""" & ESC_Attr (Name) & """"
                                       else """");
                Id_Attr   : String := (if Id /= ""
-                                      then " id="""   & ESC_Attr (Id)   & """"
+                                      then " id="""   & ESC_Attr (-Id)   & """"
                                       else """");
 
                Button : Unbounded_String;

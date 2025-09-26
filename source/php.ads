@@ -84,11 +84,13 @@ is
    function In_Array (Needle   : String;
                       Haystack : Array_Type;
                       Strict   : Boolean := False)
-                      return Boolean is (True);
+                      return Boolean is (False);
+
    function In_Array (Needle   : String;
                       Haystack : List_Type;
                       Strict   : Boolean := False)
                       return Boolean is (False);
+
    function Ltrim (Item : String; Xx : String) return String is (Item);
 
    function Trim (Item : String; Characters : String := "")
@@ -106,11 +108,7 @@ is
 
    function Explode (Separator : String;
                      Item      : String)
-                     return List_Type
-                     is (Empty_List);
-
---   function Implode (Item : String; Table : Array_Type) return String;
---   function Implode (Item : String; Item_2 : Unbounded_String) return String;
+                     return List_Type;
 
    function Implode (Separator : String;
                      Arry      : Array_Type)

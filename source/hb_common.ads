@@ -219,11 +219,6 @@ is
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
-   function Isset (Item : Array_Type) return Boolean;
-   function Isset (Item : String) return Boolean;
-
-   function X_Isset (Arry : Array_Type; Value : String) return Boolean is (True);
-
    procedure Unset (A : String) is null;
    function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
      is (Empty_Array);
@@ -240,9 +235,13 @@ is
                       S    : Boolean)
                       return Boolean is (True);
 
+   function Isset (Item : Array_Type) return Boolean;
+   function Isset (Item : String) return Boolean;
+
+   function X_Isset (Arry : Array_Type; Value : String) return Boolean is (True);
+
    function Isset (Arry : Array_Type;
                    Key  : String)
-                   return Boolean
-                   is (True);
+                   return Boolean;
 
 end Hb_Common;
