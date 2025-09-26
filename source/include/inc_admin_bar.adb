@@ -154,14 +154,14 @@ is
       use Inc_Link_Templates;
       use Inc_Users;
 
-      About_Url : Unbounded_String;
+      About_URL : Unbounded_String;
    begin
       if Current_User_Can ("read") then
-         about_url := +Self_Admin_Url ("about.php");
+         About_URL := +Self_Admin_Url ("about.php");
       elsif Is_Multisite then
-         about_url := +Get_Dashboard_Url (get_current_user_id, "about.php");
+         About_URL := +Get_Dashboard_Url (Get_Current_User_Id, "about.php");
       else
-         about_url := +""; -- false;
+         About_URL := +""; -- false;
       end if;
 
       declare
@@ -174,18 +174,18 @@ is
       begin
          Wp_Logo_Menu_Args.Id    := +"wp-logo";
          Wp_Logo_Menu_Args.Title := +"<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "About WordPress" & "</span>";
-         Wp_Logo_Menu_Args.Href  := About_Url;
+         Wp_Logo_Menu_Args.Href  := About_URL;
 
          -- Set tabindex="0" to make sub menus accessible when no URL is available.
-         if About_Url /= "" then
-            Wp_Logo_Menu_Args.meta := Arrays.To_Array ((1 =>
+         if About_URL /= "" then
+            Wp_Logo_Menu_Args.Meta := Arrays.To_Array ((1 =>
                                          Build ("tabindex", 0)));
          end if;
 
          Admin_Bar.Add_Node (Wp_Logo_Menu_Args);
       end;
 
-      if About_Url /= "" then
+      if About_URL /= "" then
          -- Add "About WordPress" link.
          declare
             Node : Node_Args; -- :=  X_Construct;
@@ -193,7 +193,7 @@ is
             Node.Parent := +"wp-logo";
             Node.Id     := +"about";
             Node.Title  := +abs "About WordPress";
-            Node.Href   := About_Url;
+            Node.Href   := About_URL;
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -441,12 +441,12 @@ is
 
       if Is_Network_Admin then
          -- translators: %s: Site title.
-         blogname := +Sprintf (abs "Network Admin: %s",
-                               Esc_Html (-Get_Network.Site_Name));
+         Blogname := +Sprintf (abs "Network Admin: %s",
+                               ESC_HTML (-Get_Network.Site_Name));
       elsif Is_User_Admin then
          -- translators: %s: Site title.
-         blogname := +Sprintf (abs "User Dashboard: %s",
-                               Esc_Html (-Get_Network.Site_Name));
+         Blogname := +Sprintf (abs "User Dashboard: %s",
+                               ESC_HTML (-Get_Network.Site_Name));
       end if;
 
       declare
@@ -455,8 +455,8 @@ is
       begin
          Node.Id    := +"site-name";
          Node.Title := +Title;
-         Node.Href  := +(if is_admin or else not Current_User_Can ("read")
-                         then Home_Url ("/") else Admin_Url);
+         Node.Href  := +(if Is_Admin or else not Current_User_Can ("read")
+                         then Home_Url ("/") else Admin_URL);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -472,7 +472,7 @@ is
             Node.Title  := +abs "Visit Site";
             Node.Href   := +Home_Url ("/");
 
-            admin_bar.Add_Node (Node);
+            Admin_Bar.Add_Node (Node);
          end;
 
          if
@@ -489,7 +489,7 @@ is
                Node.Href   := +Network_Admin_Url
                                  ("site-info.php?id=" &
                                   Integer'Image (Get_Current_Blog_Id));
-               admin_bar.Add_Node (Node);
+               Admin_Bar.Add_Node (Node);
             end;
          end if;
 
@@ -501,13 +501,13 @@ is
             Node.Parent := +"site-name";
             Node.Id     := +"dashboard";
             Node.Title  := +abs "Dashboard";
-            Node.Href   := +Admin_Url;
+            Node.Href   := +Admin_URL;
 
             Admin_Bar.Add_Node (Node);
          end;
 
          -- Add the appearance submenu items.
-         Wp_Admin_Bar_Appearance_Menu (X_wp_admin_bar);
+         Wp_Admin_Bar_Appearance_Menu (X_Wp_Admin_Bar);
       end if;
    end Wp_Admin_Bar_Site_Menu;
 
@@ -536,7 +536,7 @@ is
       begin
          Node.Id    := +"site-editor";
          Node.Title := +abs "Edit site";
-         Node.Href  := +Admin_Url ("site-editor.php");
+         Node.Href  := +Admin_URL ("site-editor.php");
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -576,7 +576,7 @@ is
         Is_Customize_Preview and then
         Wp_Customize.Changeset_Post_Id /= 0 and then
         not Current_User_Can (Get (Get_Post_Type_Object ("customize_changeset").Cap,
-                                   "edit_post"), wp_customize.Changeset_Post_Id)
+                                   "edit_post"), Wp_Customize.Changeset_Post_Id)
       then
          return;
       end if;
@@ -597,7 +597,7 @@ is
       if Is_Customize_Preview then
          Customize_Url :=
             Add_Query_Arg (Arrays.To_Array ((1 =>
-               Build ("changeset_uuid", -wp_customize.changeset_uuid))),
+               Build ("changeset_uuid", -Wp_Customize.Changeset_Uuid))),
                            Customize_Url);
       end if;
 
@@ -647,10 +647,10 @@ is
       end if;
 
       if Admin_Bar.User.Active_Blog /= Null_Site then -- "" then
-         My_Sites_Url := +Get_Admin_Url (Admin_Bar.user.active_blog.Blog_Id,
+         My_Sites_Url := +Get_Admin_Url (Admin_Bar.User.Active_Blog.Blog_Id,
                                          "my-sites.php");
       else
-         My_Sites_Url := +Admin_Url ("my-sites.php");
+         My_Sites_Url := +Admin_URL ("my-sites.php");
       end if;
 
       declare
@@ -660,7 +660,7 @@ is
          Node.Title := +abs "My Sites";
          Node.Href  := My_Sites_Url;
 
-         admin_bar.Add_Node (Node);
+         Admin_Bar.Add_Node (Node);
       end;
 
       if Current_User_Can ("manage_network") then
@@ -670,15 +670,15 @@ is
             Node.Parent := +"my-sites";
             Node.Id     := +"my-sites-super-admin";
 
-            admin_bar.Add_Group (Node);
+            Admin_Bar.Add_Group (Node);
          end;
 
          declare
             Node : Node_Args;
          begin
-            Node.parent := +"my-sites-super-admin";
-            Node.id     := +"network-admin";
-            Node.title  := +abs "Network Admin";
+            Node.Parent := +"my-sites-super-admin";
+            Node.Id     := +"network-admin";
+            Node.Title  := +abs "Network Admin";
             Node.Href   := +Network_Admin_Url;
 
             Admin_Bar.Add_Node (Node);
@@ -730,7 +730,7 @@ is
                Node.Title  := +abs "Themes";
                Node.Href   := +Network_Admin_Url ("themes.php");
 
-               admin_bar.Add_Node (Node);
+               Admin_Bar.Add_Node (Node);
             end;
          end if;
 
@@ -806,14 +806,14 @@ is
                Unused := Switch_To_Blog (Blog.Userblog_Id);
 
                if True = Show_Site_Icons and then Has_Site_Icon then
-                  blavatar := +Sprintf (
+                  Blavatar := +Sprintf (
                                 "<img class=""blavatar"" src=""%s"" srcset=""%s 2x"" alt="""" width=""16"" height=""16""%s />",
-                                Esc_Url (Get_Site_Icon_Url (16)),
-                                Esc_Url (Get_Site_Icon_Url (32)),
+                                ESC_URL (Get_Site_Icon_Url (16)),
+                                ESC_URL (Get_Site_Icon_Url (32)),
                                 (if Wp_Lazy_Loading_Enabled ("img", "site_icon_in_toolbar") then " loading=""lazy""" else "")
                        );
                else
-                  blavatar := +"<div class=""blavatar""></div>";
+                  Blavatar := +"<div class=""blavatar""></div>";
                end if;
 
                Blogname := Blog.Blogname;
@@ -833,10 +833,10 @@ is
                      begin
                         Node.Parent := +"my-sites-list";
                         Node.Id     := +Menu_Id;
-                        Node.Title  := blavatar & Blogname;
-                        Node.Href   := +Admin_Url;
+                        Node.Title  := Blavatar & Blogname;
+                        Node.Href   := +Admin_URL;
 
-                        admin_bar.Add_Node (Node);
+                        Admin_Bar.Add_Node (Node);
                      end;
 
                      declare
@@ -845,7 +845,7 @@ is
                         Node.Parent := +Menu_Id;
                         Node.Id     := +Menu_Id & "-d";
                         Node.Title  := +abs "Dashboard";
-                        Node.Href   := +Admin_Url;
+                        Node.Href   := +Admin_URL;
 
                         Admin_Bar.Add_Node (Node);
                      end;
@@ -870,10 +870,10 @@ is
                         Node : Node_Args;
                      begin
                         Node.Parent := +Menu_Id;
-                        Node.Id     := +menu_id & "-n";
+                        Node.Id     := +Menu_Id & "-n";
                         Node.Title  := +Get (Get_Post_Type_Object ("post").Labels,
                                              "new_item");
-                        Node.Href   := +Admin_Url ("post-new.php");
+                        Node.Href   := +Admin_URL ("post-new.php");
 
                         Admin_Bar.Add_Node (Node);
                      end;
@@ -884,9 +884,9 @@ is
                         Node : Node_Args;
                      begin
                         Node.Parent := +Menu_Id;
-                        Node.Id     := +menu_id & "-c";
+                        Node.Id     := +Menu_Id & "-c";
                         Node.Title  := +abs "Manage Comments";
-                        Node.Href   := +Admin_Url ("edit-comments.php");
+                        Node.Href   := +Admin_URL ("edit-comments.php");
 
                         Admin_Bar.Add_Node (Node);
                      end;
@@ -929,12 +929,12 @@ is
       Id    : constant String := "get-shortlink";
       Html  : Unbounded_String;
    begin
-      if Empty (short) then
+      if Empty (Short) then
          return;
       end if;
 
       Html :=
-         +"<input class=""shortlink-input"" type=""text"" readonly=""readonly"" value=""" & Esc_Attr (short) & """ aria-label=""" & abs "Shortlink" & """ />";
+         +"<input class=""shortlink-input"" type=""text"" readonly=""readonly"" value=""" & ESC_Attr (Short) & """ aria-label=""" & abs "Shortlink" & """ />";
 
       declare
          Node : Node_Args;
@@ -967,7 +967,7 @@ is
          declare
             use Adi_Screens;
             use Inc_Class_Wp_Posts;
-            use Inc_Class_Wp_Post_type;
+            use Inc_Class_Wp_Post_Type;
             use Inc_Options;
 
             Current_Screen   : constant Wp_Screen := Get_Current_Screen;
@@ -976,24 +976,24 @@ is
          begin
             if "post" = Current_Screen.Base then
                Post_Type_Object := Get_Post_Type_Object (-Post.Post_Type);
-            elsif "edit" = current_screen.base then
+            elsif "edit" = Current_Screen.Base then
                Post_Type_Object := Get_Post_Type_Object (-Current_Screen.Post_Type);
-            elsif "edit-comments" = current_screen.base and then Post_Id /= 0 then
+            elsif "edit-comments" = Current_Screen.Base and then Post_Id /= 0 then
                Post := Get_Post (Post_Id);
                if Post = Null_Post then
                   Post_Type_Object := Get_Post_Type_Object (-Post.Post_Type);
                end if;
             end if;
 
-            if ("post" = current_screen.base or else
+            if ("post" = Current_Screen.Base or else
                 "edit-comments" = Current_Screen.Base)
-                  or else "add" /= current_screen.action
+                  or else "add" /= Current_Screen.Action
                   or else (Post_Type_Object /= Null_Post_Type)
                   or else Current_User_Can ("read_post", Integer (Post.Id))
                   or else (Post_Type_Object.Public)
-                  or else (Post_Type_Object.Show_In_Admin_Bar)
+                  or else Post_Type_Object.Show_In_Admin_Bar
             then
-               if "draft" = post.Post_Status then
+               if "draft" = Post.Post_Status then
                   declare
                      use Inc_Formatting;
 
@@ -1002,13 +1002,13 @@ is
                   begin
                      Node.Id    := +"preview";
                      Node.Title := +Get (Post_Type_Object.Labels, "view_item");
-                     Node.Href  := +Esc_Url (Preview_Link);
+                     Node.Href  := +ESC_URL (Preview_Link);
                      Node.Meta  :=
                         Arrays.To_Array ((1 =>
                            Build ("target",
                                   "wp-preview-" & "XXX-451"))); --"Post_Id'Image (Post.Id))));
 
-                     admin_bar.Add_Node (Node);
+                     Admin_Bar.Add_Node (Node);
                   end;
                else
                   declare
@@ -1022,27 +1022,27 @@ is
                   end;
                end if;
             elsif
-              "edit" = current_screen.base
+              "edit" = Current_Screen.Base
               or else (Post_Type_Object /= Null_Post_Type)
-              or else (post_type_object.Public)
-              or else (post_type_object.Show_In_Admin_Bar)
+              or else (Post_Type_Object.Public)
+              or else (Post_Type_Object.Show_In_Admin_Bar)
               or else (Get_Post_Type_Archive_Link (-Post_Type_Object.Name) /= "")
-              or else not ("post" = Post_Type_Object.name or else
+              or else not ("post" = Post_Type_Object.Name or else
                            "posts" = Get_Option ("show_on_front"))
             then
                declare
                   Node : Node_Args;
                begin
-                  Node.id    := +"archive";
-                  Node.title := +Get (post_type_object.Labels, "view_items");
+                  Node.Id    := +"archive";
+                  Node.Title := +Get (Post_Type_Object.Labels, "view_items");
                   Node.Href  :=
                     +Get_Post_Type_Archive_Link (-Current_Screen.Post_Type);
 
-                  admin_bar.Add_Node (Node);
+                  Admin_Bar.Add_Node (Node);
                end;
 
             elsif
-               "term" = current_screen.base or else
+               "term" = Current_Screen.Base or else
                Tag /= Null_Term -- or else
 --             Is_Object (Tag) or else
 --             not Is_Wp_Error (Tag)
@@ -1052,11 +1052,11 @@ is
 
                   Tax : constant Wp_Taxonomy := Get_Taxonomy (-Tag.Taxonomy);
                begin
-                  if Is_Term_Publicly_Viewable (tag) then
+                  if Is_Term_Publicly_Viewable (Tag) then
                      declare
                         Node : Node_Args;
                      begin
-                        Node.id    := +"view";
+                        Node.Id    := +"view";
                         Node.Title := +Get (Tax.Labels, "view_item");
                         Node.Href  := +Get_Term_Link (Tag);
 
@@ -1065,7 +1065,7 @@ is
                   end if;
                end;
 
-            elsif "user-edit" = current_screen.base or else User_Id /= 0 then
+            elsif "user-edit" = Current_Screen.Base or else User_Id /= 0 then
                declare
                   use Inc_Author_Templates;
                   use Inc_Class_Wp_Users;
@@ -1080,8 +1080,8 @@ is
                      declare
                         Node : Node_Args;
                      begin
-                        Node.id    := +"view";
-                        Node.title := +abs "View User";
+                        Node.Id    := +"view";
+                        Node.Title := +abs "View User";
                         Node.Href  := +View_Link;
 
                         Admin_Bar.Add_Node (Node);
@@ -1101,7 +1101,7 @@ is
                return;
             end if;
 
-            if not Empty (-current_object.Post_Type) then
+            if not Empty (-Current_Object.Post_Type) then
                declare
                   use Inc_Class_Wp_Post_Type;
 
@@ -1114,16 +1114,16 @@ is
                   if Post_Type_Object /= Null_Post_Type
                     or else Edit_Post_Link /= ""
                     or else Current_User_Can ("edit_post", Integer (Current_Object.Id))
-                    or else post_type_object.Show_In_Admin_Bar
+                    or else Post_Type_Object.Show_In_Admin_Bar
                   then
                      declare
                         Node : Node_Args;
                      begin
-                        Node.id    := +"edit";
-                        Node.title := +Get (post_type_object.Labels, "edit_item");
+                        Node.Id    := +"edit";
+                        Node.Title := +Get (Post_Type_Object.Labels, "edit_item");
                         Node.Href  := +Edit_Post_Link;
 
-                        admin_bar.Add_Node (Node);
+                        Admin_Bar.Add_Node (Node);
                      end;
                   end if;
                end;
@@ -1161,14 +1161,14 @@ is
             then
                declare
                   Edit_User_Link : constant String :=
-                     Get_Edit_User_Link (Integer (current_object.Id));
+                     Get_Edit_User_Link (Integer (Current_Object.Id));
                begin
                   if Edit_User_Link /= "" then
                      declare
                         Node : Node_Args;
                      begin
-                        Node.id    := +"edit";
-                        Node.title := +abs "Edit User";
+                        Node.Id    := +"edit";
+                        Node.Title := +abs "Edit User";
                         Node.Href  := +Edit_User_Link;
 
                         Admin_Bar.Add_Node (Node);
@@ -1220,7 +1220,7 @@ is
       if
         Cpts.Find ("post") /= No_Element or else
 --      Isset (cpts ("post")) or else
-        Current_User_Can (Get (cpts ("post").Cap, "create_posts"))
+        Current_User_Can (Get (Cpts ("post").Cap, "create_posts"))
       then
          Actions ("post-new.php") :=
             Arrays.To_Array ((1 =>
@@ -1247,7 +1247,7 @@ is
         Cpts.Find ("page") /= No_Element or else
         Current_User_Can (Get (Cpts ("page").Cap, "create_posts"))
       then
-         actions ("post-new.php?post_type=page") :=
+         Actions ("post-new.php?post_type=page") :=
             Arrays.To_Array ((1 =>
                Build (Get (Cpts ("page").Labels, "name_admin_bar"), "new-page")));
       end if;
@@ -1260,7 +1260,7 @@ is
       -- Unset (cpts ("attachment"));
 
       -- Add any additional custom post types.
-      for Cpt of cpts loop
+      for Cpt of Cpts loop
          if not Current_User_Can (Get (Cpt.Cap, "create_posts")) then
             goto Continue;
          end if;
@@ -1275,7 +1275,6 @@ is
          << Continue >>
       end loop;
 
-
       -- Avoid clash with parent node and a "content" post type.
 --      if Isset (actions ("post-new.php?post_type=content")) then
 --         actions ("post-new.php?post_type=content") (1) := "add-new-content";
@@ -1286,7 +1285,7 @@ is
         Is_Multisite or else
         Current_User_Can ("promote_users")
       then
-         actions ("user-new.php") :=
+         Actions ("user-new.php") :=
             Arrays.To_Array ((1 => Build (X_X ("User", "add new from admin bar"),
                                           "new-user")));
       end if;
@@ -1308,7 +1307,7 @@ is
       begin
          Node.Id    := +"new-content";
          Node.Title := +Title;
-         Node.Href  := +Admin_Url (Value);
+         Node.Href  := +Admin_URL (Value);
 --       Node.Href  := +Admin_Url (Current (Array_Keys (Actions)));
 
          Admin_Bar.Add_Node (Node);
@@ -1326,7 +1325,7 @@ is
                Node.Parent := +"new-content";
                Node.Id     := +Id;
                Node.Title  := +Title;
-               Node.Href   := +Admin_Url (Link);
+               Node.Href   := +Admin_URL (Link);
 
                Admin_Bar.Add_Node (Node);
             end;
@@ -1370,7 +1369,7 @@ is
 
       Node.Id    := +"comments";
       Node.Title := Icon & Title;
-      Node.Href  := +Admin_Url ("edit-comments.php");
+      Node.Href  := +Admin_URL ("edit-comments.php");
 
       Admin_Bar.Add_Node (Node);
    end Wp_Admin_Bar_Comments_Menu;
@@ -1398,9 +1397,9 @@ is
             Node : Node_Args;
          begin
             Node.Parent := +"appearance";
-            Node.id     := +"themes";
-            Node.title  := +abs "Themes";
-            Node.Href   := +Admin_Url ("themes.php");
+            Node.Id     := +"themes";
+            Node.Title  := +abs "Themes";
+            Node.Href   := +Admin_URL ("themes.php");
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -1414,10 +1413,10 @@ is
          declare
             Node : Node_Args;
          begin
-            Node.parent := +"appearance";
-            Node.id     := +"widgets";
-            Node.title  := +abs "Widgets";
-            Node.href   := +Admin_Url ("widgets.php");
+            Node.Parent := +"appearance";
+            Node.Id     := +"widgets";
+            Node.Title  := +abs "Widgets";
+            Node.Href   := +Admin_URL ("widgets.php");
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -1431,9 +1430,9 @@ is
             Node : Node_Args;
          begin
             Node.Parent := +"appearance";
-            Node.id     := +"menus";
-            Node.title  := +abs "Menus";
-            Node.href   := +Admin_Url ("nav-menus.php");
+            Node.Id     := +"menus";
+            Node.Title  := +abs "Menus";
+            Node.Href   := +Admin_URL ("nav-menus.php");
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -1444,10 +1443,10 @@ is
             Node : Node_Args;
          begin
             Node.Parent := +"appearance";
-            Node.id     := +"background";
-            Node.title  := +abs "Background";
-            Node.href   := +Admin_Url ("themes.php?page=custom-background");
-            Node.meta   :=
+            Node.Id     := +"background";
+            Node.Title  := +abs "Background";
+            Node.Href   := +Admin_URL ("themes.php?page=custom-background");
+            Node.Meta   :=
                Arrays.To_Array ((1 => Build ("class", "hide-if-customize")));
 
             Admin_Bar.Add_Node (Node);
@@ -1458,10 +1457,10 @@ is
          declare
             Node : Node_Args;
          begin
-            Node.parent := +"appearance";
-            Node.id     := +"header";
-            Node.title  := +abs "Header";
-            Node.href   := +Admin_Url ("themes.php?page=custom-header");
+            Node.Parent := +"appearance";
+            Node.Id     := +"header";
+            Node.Title  := +abs "Header";
+            Node.Href   := +Admin_URL ("themes.php?page=custom-header");
             Node.Meta   :=
                Arrays.To_Array ((1 => Build ("class", "hide-if-customize")));
 
@@ -1507,9 +1506,9 @@ is
       declare
          Node : Node_Args;
       begin
-         Node.id    := +"updates";
+         Node.Id    := +"updates";
          Node.Title := Icon & Title;
-         Node.href  := +Network_Admin_Url ("update-core.php");
+         Node.Href  := +Network_Admin_Url ("update-core.php");
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1531,7 +1530,7 @@ is
          return;
       end if;
 
-      Form := +"<form action=""" & Esc_Url (Home_Url ("/")) & """ method=""get"" id=""adminbarsearch"">";
+      Form := +"<form action=""" & ESC_URL (Home_Url ("/")) & """ method=""get"" id=""adminbarsearch"">";
       Form := Form & "<input class=""adminbar-input"" name=""s"" id=""adminbar-search"" type=""text"" value="""" maxlength=""150"" />";
       Form := Form & "<label for=""adminbar-search"" class=""screen-reader-text"">" & abs "Search" & "</label>";
       Form := Form & "<input type=""submit"" class=""adminbar-button"" value=""" & abs "Search" & """ />";
@@ -1541,9 +1540,9 @@ is
          Node : Node_Args;
       begin
          Node.Parent := +"top-secondary";
-         Node.id     := +"search";
-         Node.title  := Form;
-         Node.meta   := Arrays.To_Array ((
+         Node.Id     := +"search";
+         Node.Title  := Form;
+         Node.Meta   := Arrays.To_Array ((
                            Build ("class",    "admin-bar-search"),
                            Build ("tabindex", -1)));
 
@@ -1562,23 +1561,23 @@ is
       use Inc_General_Templates;
       use Inc_Load;
 
-      Url : Unbounded_String;
+      URL : Unbounded_String;
    begin
       if not Wp_Is_Recovery_Mode then
          return;
       end if;
 
-      Url := +Wp_Login_Url;
-      Url := +Add_Query_Arg ("action", EXIT_ACTION, -Url); -- ::
-      Url := +Wp_Nonce_Url (-Url, EXIT_ACTION); -- ::
+      URL := +Wp_Login_Url;
+      URL := +Add_Query_Arg ("action", EXIT_ACTION, -URL); -- ::
+      URL := +Wp_Nonce_Url (-URL, EXIT_ACTION); -- ::
 
       declare
          Node : Node_Args;
       begin
          Node.Parent := +"top-secondary";
-         Node.id     := +"recovery-mode";
-         Node.title  := +abs "Exit Recovery Mode";
-         Node.href   := Url;
+         Node.Id     := +"recovery-mode";
+         Node.Title  := +abs "Exit Recovery Mode";
+         Node.Href   := URL;
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1594,7 +1593,7 @@ is
       declare
          Node : Node_Args;
       begin
-         Node.id   := +"top-secondary";
+         Node.Id   := +"top-secondary";
          Node.Meta := Arrays.To_Array ((1 => Build ("class", "ab-top-secondary")));
 
          Admin_Bar.Add_Group (Node);
@@ -1604,7 +1603,7 @@ is
          Node : Node_Args;
       begin
          Node.Parent := +"wp-logo";
-         Node.id     := +"wp-logo-external";
+         Node.Id     := +"wp-logo-external";
          Node.Meta   := Arrays.To_Array ((1 => Build ("class", "ab-sub-secondary")));
 
          Admin_Bar.Add_Group (Node);
@@ -1710,7 +1709,7 @@ is
       --
       X_Show_Admin_Bar := Apply_Filters ("show_admin_bar", X_Show_Admin_Bar);
 
-      return X_show_admin_bar;
+      return X_Show_Admin_Bar;
    end Is_Admin_Bar_Showing;
 
    --------------------------

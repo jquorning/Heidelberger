@@ -27,7 +27,7 @@ is
 -- @since 3.4.0
 --
 -- #[AllowDynamicProperties]
-   type WP_Customize_Manager is tagged
+   type Wp_Customize_Manager is tagged
       record
         --
         -- An instance of the theme being previewed.
