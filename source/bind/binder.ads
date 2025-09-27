@@ -7,6 +7,10 @@ package Binder
 is
    use Arrays;
 
+   procedure Web_Server_To_PHP;
+
+   procedure PHP_To_Web_Server;
+
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data;
 

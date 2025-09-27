@@ -14,7 +14,7 @@ with Adm_Menu;
 
 -- with Adi_Nav_Menus;
 -- with Adm_Nav_Menus;
-
+with Adm_Admin_Header;
 with Adi_Menu;
 
 with Inc_Admin_Bar;
@@ -28,6 +28,24 @@ is
    use Ada.Strings.Unbounded;
    use Hb_Common;
 
+   -----------------------
+   -- Web_Server_To_PHP --
+   -----------------------
+
+   procedure Web_Server_To_PHP
+   is separate;
+
+   -----------------------
+   -- PHH_To_Web_Server --
+   -----------------------
+
+   procedure PHP_To_Web_Server
+   is separate;
+
+   ------------
+   -- Render --
+   ------------
+
    function Render (Request : in AWS.Status.Data)
                     return AWS.Response.Data
    is
@@ -36,6 +54,8 @@ is
       URL     : constant String := AWS.Status.URL (Request);
       Payload : Unbounded_String;
    begin
+      Web_Server_To_PHP;
+
       if Index (URL, "/wp-admin/credits.php") /= 0 then
          Adm_Credits.Render;
 
@@ -49,6 +69,8 @@ is
          Adm_Post.Render;
 
       end if;
+
+      PHP_To_Web_Server;
 
       Payload := +Php.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);
