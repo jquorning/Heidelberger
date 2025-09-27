@@ -4,9 +4,17 @@
 -- @package WordPress
 -- @subpackage Template
 --
+
+with Ada.Strings.Unbounded;
+
+with Hb_Common;
+
+with Inc_Options;
+with Inc_Versions;
+
 package body Inc_General_Templates
 is
-   procedure Dummy is null;
+
 -- --
 -- -- Loads header template.
 -- --
@@ -791,7 +799,15 @@ is
 -- -- @param string filter Optional. How to filter what is retrieved. Default "raw".
 -- -- @return string Mostly string values, might be empty.
 -- --
--- function get_bloginfo( show = "", filter = "raw" ) then
+   function Get_Bloginfo (Show   : String := "";
+                          Filter : String := "raw")
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+
+      Output : Unbounded_String;
+   begin
 --         switch ( show ) then
 --                 case "home":    // Deprecated.
 --                 case "siteurl": // Deprecated.
@@ -856,9 +872,13 @@ is
 --                                 output = "UTF-8";
 --                         end;
 --                         break;
+      if Show = "html_type" then
+         Output := +Inc_Options.Get_Option ("html_type");
 --                 case "html_type":
 --                         output = get_option( "html_type" );
 --                         break;
+      elsif Show = "version" then
+         Output := +Inc_Versions.Wp_Version;
 --                 case "version":
 --                         global wp_version;
 --                         output = wp_version;
@@ -897,6 +917,7 @@ is
 --                 default:
 --                         output = get_option( "blogname" );
 --                         break;
+      end if;
 --         end;
 
 --         url = true;
@@ -930,8 +951,8 @@ is
 --                 end;
 --         end;
 
---         return output;
--- end;
+      return -Output;
+   end Get_Bloginfo;
 
 -- --
 -- -- Returns the Site Icon URL.

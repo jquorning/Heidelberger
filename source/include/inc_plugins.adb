@@ -4,6 +4,8 @@
 -- @since 1.5.0
 --
 
+with Ada.Text_IO;
+
 package body Inc_Plugins
 is
    procedure Dummy is null;
@@ -467,6 +469,13 @@ is
 -- --                          functions hooked to the action. Default empty.
 -- --
 -- function do_action( hook_name, ...arg ) then
+   procedure Do_Action (Hook_Name : String;
+                        Arg_2     : String := "")
+   is
+      use Ada.Text_IO;
+   begin
+      Put_Line ("Do_Action " & Hook_Name & " arg: " & Arg_2);
+   end Do_Action;
 --         global wp_filter, wp_actions, wp_current_filter;
 
 --         if ( ! isset( wp_actions[ hook_name ] ) ) then

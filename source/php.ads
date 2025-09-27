@@ -12,6 +12,9 @@ is
    function Strpos (Item : String; Pattern : String) return Natural
       is (1);
 
+   function Stripos (Heystack : String; Needle : String) return Natural
+      is (1);
+
    function Str_Replace (Search  : String;
                          replace : String;
                          Item    : String) return String is ("XXX-112");
@@ -91,7 +94,9 @@ is
                       Strict   : Boolean := False)
                       return Boolean is (False);
 
-   function Ltrim (Item : String; Xx : String) return String is (Item);
+   function Ltrim (Item       : String;
+                   Characters : String := "")
+                   return String is (Item);
 
    function Trim (Item : String; Characters : String := "")
                   return String is (Item);
@@ -237,6 +242,24 @@ is
                      Before_Needle : Boolean := False)
                      return Boolean  -- string|false
                      is (False);
+
+   procedure Header (Header        : String;
+                     Replace       : Boolean := True;
+                     Response_Code : Integer := 0)
+                     is null;
+
+   function Error_Get_Last
+            return Array_Type
+            is (Empty_Array);
+
+   function Strip_Tags (Item :        String;
+                        Allowed_Tags : Array_Type := Empty_Array)
+                        return String
+                        is ("XXX-600");
+
+   function Ini_Get (Option : String)
+                     return String
+                     is ("XXX-602");
 
    -------------------
    -- Echo handling --

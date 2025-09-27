@@ -18,6 +18,9 @@ with Php;
 with Hb_Common;
 with Wp_Common;
 
+with Adm_Admin_Header;
+with Adm_Menu;
+
 with Adi_Class_Wp_Posts_List_Tables;
 with Adi_Class_Wp_Screens;
 with Adi_List_Tables;
@@ -44,7 +47,7 @@ is
    use Inc_L10n;
    use Hb_Common;
    use Arrays;
-   use Globals;
+--   use Globals;
    use Php;
 
    function Var_Bulk (Bulk_Messages : Array_Type;
@@ -76,6 +79,10 @@ is
 --      }
 --  }
 
+   ------------
+   -- Render --
+   ------------
+
    procedure Render
    is
       use Inc_Capabilities;
@@ -92,10 +99,12 @@ is
 --
 --  global $post_type, $post_type_object;
 
-      Post_Type        : constant String       := -Typenow;
-      Post_Type_Object : constant Wp_Post_Type
-         := Inc_Posts.Get_Post_Type_Object (Post_Type);
+      Post_Type        : Unbounded_String renames Globals.Post_Type;
+      Post_Type_Object : Wp_Post_Type     renames Globals.Post_Type_Object;
+--         := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin
+      Post_Type        := Globals.Typenow;
+      Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Post_Type);
 --  if Post_Type_Object = 0 then  -- not
 --   Wp_Die (abs  "Invalid post type.");
 --  end if;
@@ -129,23 +138,20 @@ is
 -- unset( $_redirect );
 
          declare
-            Parent_File   : String := (if "post" = Post_Type then "edit"
-                                       else "edit?post_type=" & Post_Type);
-            Submenu_File  : String := (if "post" = Post_Type then "edit"
-                                       else "edit?post_type=" & Post_Type);
-            Post_New_File : String := (if "post" = Post_Type then "post-new"
-                                       else "post-new?post_type=" & Post_Type);
--- if "post" /= Post_Type then
---    Parent_File   := "edit?post_type=" & Post_Type;
---    Submenu_File  := "edit?post_type=" & Post_Type;
---    Post_New_File := "post-new?post_type=" & Post_Type;
--- else
---    Parent_File   := "edit";
---    Submenu_File  := "edit";
---    Post_New_File := "post-new";
--- end if;
+            use Adm_Menu;
+
             Doaction : String := X_Wp_List_Table.Current_Action; -- ();
          begin
+            Globals.Parent_File   :=
+              +Slug_Type (if "post" = Post_Type then Slug_Type'("edit")
+                          else "edit?post_type=" & (-Post_Type));
+
+            Globals.Submenu_File  :=
+              +Slug_Type (if "post" = Post_Type then Slug_Type'("edit")
+                          else "edit?post_type=" & (-Post_Type));
+
+            Globals.Post_New_File := +(if "post" = Post_Type then "post-new"
+                                       else "post-new?post_type=" & (-Post_Type));
 
             if Doaction = "" then   -- if doaction then
                Inc_Pluggables.Check_Admin_Referer ("bulk-posts");
@@ -164,12 +170,12 @@ is
                        := +Remove_Query_Arg (Arg, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
-                        Sendback := To_Unbounded_String (Admin_URL (Parent_File));
+                        Sendback := +Admin_URL (String (-Globals.Parent_File));
                      end if;
 
                      Sendback := Add_Query_Arg ("paged", Pagenum, Sendback);
                      if Index (Sendback, "post") /= 0 then
-                        Sendback := To_Unbounded_String (Admin_URL (Post_New_File));
+                        Sendback := +Admin_URL (-Globals.Post_New_File);
                      end if;
 
                      declare
@@ -197,11 +203,11 @@ is
                               --
                               -- global $wpdb;
                               --
-                              Post_Ids := Wpdb.Get_Col (
-                                 Wpdb.Prepare
-                                    ("SELECT ID FROM " & Post_Type &
+                              Post_Ids := Globals.Wpdb.Get_Col (
+                                 Globals.Wpdb.Prepare
+                                    ("SELECT ID FROM " & (-Post_Type) &
                                      " WHERE post_type=%s AND post_status = %s",
-                                     Post_Type, -Post_Status));
+                                     -Post_Type, -Post_Status));
                            end if;
                            Doaction := "delete";
 
@@ -417,7 +423,7 @@ is
                use Adi_Screens;
             begin
                --  Used in the HTML title tag.
-               Title := +Wp_Common.Get (Post_Type_Object, "labels.name");
+               Globals.Title := +Wp_Common.Get (Post_Type_Object, "labels.name");
 
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
@@ -510,7 +516,7 @@ is
                   "per_page",
                   To_Array (List => (
                      Build ("default", Natural'(20)'Image),
-                     Build ("option",  "edit_" & Post_Type & "_per_page")
+                     Build ("option",  "edit_" & (-Post_Type) & "_per_page")
                )));
             end;
 
@@ -655,7 +661,7 @@ is
                      elsif Var_Name = "VAR_page_edit_h1_sub" then
                         declare
                            URL  : constant String :=
-                              ESC_URL  (Admin_URL (Post_New_File));
+                              ESC_URL  (Admin_URL (-Globals.Post_New_File));
                            HTML : constant String :=
                               ESC_HTML (String'(Hb_Common.Get (Post_Type_Object,
                                                      "labels.add_new")));
@@ -692,7 +698,7 @@ is
 
                      elsif Var_Name = "VAR_page_edit_bulk" then
                         Set ("VAR_page_edit_bulk",
-                             Var_Bulk (Bulk_Messages, Bulk_Counts, Post_Type));
+                             Var_Bulk (Bulk_Messages, Bulk_Counts, -Post_Type));
 
                      elsif Var_Name = "VAR_page_edit_views" then
                         X_Wp_List_Table.Views; -- ()
@@ -712,7 +718,7 @@ is
                              else "all"));
 
                      elsif Var_Name = "VAR_page_edit_post_type" then
-                        Set ("VAR_page_edit_post_status", Post_Type);
+                        Set ("VAR_page_edit_post_status", -Post_Type);
 
                      elsif Var_Name = "VAR_page_edit_author" then
                         if not Empty (String'(Get (X_REQUEST, "author"))) then
@@ -753,6 +759,10 @@ is
                                                 Lazy_Tag => Lazy'Unchecked_Access);
                begin
                   Clear_Echo;
+
+                  Adm_Admin_Header.Run;
+--  require_once ABSPATH . 'wp-admin/admin-header.php';
+
                   Echo (-Payload);
                end;
             end;
@@ -893,8 +903,5 @@ is
       end;
       return "XXX-51";
    end Var_Bulk;
-
---  require_once ABSPATH . 'wp-admin/admin-header.php';
--- ?>
 
 end Adm_Edit;

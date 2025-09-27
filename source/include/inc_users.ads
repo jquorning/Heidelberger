@@ -40,6 +40,11 @@ is
                              Deprecated : String := "")
                              return Boolean
                              is (True);
+   function Get_User_Option (Option     : String;
+                             User       : Integer := 0;
+                             Deprecated : String := "")
+                             return String
+                             is ("XXX-601");
 
    --
    -- Retrieves user meta field for a user.

@@ -80,6 +80,17 @@ is
 -- --               boolean `false` is returned.
 -- --
 -- function get_option( option, default = false ) then
+   function Get_Option (Option : String)
+                        return String
+   is
+   begin
+      if Option = "html_type" then
+         return "text/html";
+      elsif Option = "blog_charset" then
+         return "UTF-8";
+      else
+         return "XXX-222";
+      end if;
 --         global wpdb;
 
 --         if ( is_scalar( option ) ) then
@@ -255,7 +266,7 @@ is
 --         -- @param string option Option name.
 --         --
 --         return apply_filters( "option_thenoptionend;", maybe_unserialize( value ), option );
--- end;
+   end Get_Option;
 
 -- --
 -- -- Protects WordPress special option from being modified.

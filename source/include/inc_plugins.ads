@@ -130,8 +130,7 @@ is
 --                          functions hooked to the action. Default empty.
 --
    procedure Do_Action (Hook_Name : String;
-                        Arg_2     : String := "")
-                        is null;
+                        Arg_2     : String := "");
    --                  , ...arg )
 
 --

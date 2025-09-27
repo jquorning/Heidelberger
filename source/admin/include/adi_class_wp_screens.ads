@@ -208,6 +208,33 @@ is
 
       end record;
 
+      --
+      -- Sets the parent information for the screen.
+      --
+      -- This is called in admin-header.php after the menu parent for the screen
+      --  has been determined.
+      --
+      -- @since 3.3.0
+      --
+      -- @param string $parent_file The parent file of the screen. Typically the
+      --                            parent_file global.
+      --
+      procedure Set_Parentage (This        : Wp_Screen;
+                               Parent_File : String)
+                               is null;
+
+      --
+      -- Renders the screen"s help section.
+      --
+      -- This will trigger the deprecated filters for backward compatibility.
+      --
+      -- @since 3.3.0
+      --
+      -- @global string $screen_layout_columns
+      --
+      procedure Render_Screen_Meta (This : Wp_Screen)
+                                    is null;
+
    --
    -- Adds a help tab to the contextual help for the screen.
    --

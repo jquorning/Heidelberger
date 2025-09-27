@@ -138,4 +138,11 @@ is
                                Other_Attributes : Array_Type := Empty_Array)
                                return String;
 
+   --
+   -- Prints out the beginning of the admin HTML header.
+   --
+   -- @global bool is_IE
+   --
+   procedure X_Wp_Admin_Html_Begin;
+
 end Adi_Templates;

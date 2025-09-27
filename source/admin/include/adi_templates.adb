@@ -13,15 +13,19 @@ with Ada.Strings.Unbounded;
 with Wp_Common;
 with Php;
 
+with Inc_Admin_Bar;
 with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_General_Templates;
 with Inc_L10n;
 with Inc_Options;
+with Inc_Plugins;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
+with Inc_Vars;
 
 package body Adi_Templates
 is
@@ -2902,40 +2906,41 @@ is
       end;
    end Get_Submit_Button;
 
--- --
--- -- Prints out the beginning of the admin HTML header.
--- --
--- -- @global bool is_IE
--- --
--- procedure X_hb_Admin_Html_Begin
--- is
--- begin
---         global (Is_Ie);
+   ---------------------------
+   -- X_Wp_Admin_Html_Begin --
+   ---------------------------
 
---         Admin_Html_Class :=  (if Is_Admin_Bar_Showing then "wp-toolbar" else "");
+   procedure X_Wp_Admin_Html_Begin
+   is
+      use Inc_Options;
 
---         if Is_IE then
---                 Header ("X-UA-Compatible: IE=edge");
---         end if;
+      Admin_Html_Class : constant String :=
+        (if Inc_Admin_Bar.Is_Admin_Bar_Showing then "wp-toolbar" else "");
+   begin
+      if Inc_Vars.Is_IE then
+         Header ("X-UA-Compatible: IE=edge");
+      end if;
 
--- --         ?>
--- -- <!DOCTYPE html>
--- -- <html class="<?php echo admin_html_class; ?>"
--- --         <?php
---         --
---         -- Fires inside the HTML tag in the admin header.
---         --
---         -- @since 2.2.0
---         --/
---         Do_Action ("admin_xml_ns");
+--         ?>
+      Echo ("<!DOCTYPE html>" & NL);
+      Echo ("<html class=""" & Admin_Html_Class & """" & NL);
+--         <?php
+      --
+      -- Fires inside the HTML tag in the admin header.
+      --
+      -- @since 2.2.0
+      --
+      Inc_Plugins.Do_Action ("admin_xml_ns" & NL);
 
---         Language_Attributes; -- ()
--- --         ?>
--- -- >
--- -- <head>
--- -- <meta http-equiv="Content-Type" content="<?php bloginfo ("html_type"); ?>; charset=<?php echo get_option ("blog_charset"); ?>" />
--- --         <?php
--- end X_Hb_Admin_Html_Begin;
+      Inc_General_Templates.Language_Attributes; -- ()
+--         ?>
+      Echo (">" & NL);
+      Echo ("<head>" & NL);
+      Echo ("<meta http-equiv=""Content-Type"" content=""" &
+            Inc_General_Templates.Get_Bloginfo ("html_type") & "; charset=" &
+            Get_Option ("blog_charset") & """ />" & NL);
+--         <?php
+   end X_Wp_Admin_Html_Begin;
 
 -- --
 -- -- Converts a screen string to a screen object.

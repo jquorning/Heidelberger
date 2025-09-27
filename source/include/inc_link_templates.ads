@@ -153,7 +153,7 @@ is
    function Self_Admin_Url (Path   : String := "";
                             Scheme : String := "admin")
                             return String
-                            is ("XXX-352");
+                            is ("XXX-605");
 --
 -- Retrieves the URL to the admin area for the current site.
 --
