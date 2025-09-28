@@ -7,6 +7,8 @@
 package body Inc_Load
 is
 
+   X_Wp_Using_Ext_Object_Cache : Boolean := False;
+
 -- --
 -- -- Return the HTTP protocol sent by the server.
 -- --
@@ -646,14 +648,17 @@ is
 -- -- @param bool using Whether external object cache is being used.
 -- -- @return bool The current "using" setting.
 -- --
--- function wp_using_ext_object_cache( using = null ) then
---         global _wp_using_ext_object_cache;
---         current_using = _wp_using_ext_object_cache;
---         if ( null !== using ) then
---                 _wp_using_ext_object_cache = using;
---         end;
---         return current_using;
--- end;
+   function Wp_Using_Ext_Object_Cache (Using : Boolean := False) -- = null
+                                       return Boolean
+   is
+--    global _wp_using_ext_object_cache;
+      Current_Using : Boolean := X_Wp_Using_Ext_Object_Cache;
+   begin
+      if Using then
+         X_Wp_Using_Ext_Object_Cache := Using;
+      end if;
+      return Current_Using;
+   end Wp_Using_Ext_Object_Cache;
 
 -- --
 -- -- Start the WordPress object cache.

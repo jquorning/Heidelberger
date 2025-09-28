@@ -1,6 +1,7 @@
 
-with Ada.Strings.Unbounded;
 with Ada.Characters.Latin_1;
+with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Strings.Unbounded;
 
 with Arrays;
 
@@ -235,6 +236,12 @@ is
                       S    : Boolean)
                       return Boolean is (True);
 
+   -- function In_Array (Needle   : String;
+   --                    Haystack : List_Type;
+   --                    Strict   : Boolean := False)
+   --                    return Boolean
+   --                    is (True);
+
    function Isset (Item : Array_Type) return Boolean;
    function Isset (Item : String) return Boolean;
 
@@ -248,5 +255,9 @@ is
                    Key  : Integer)
                    return Boolean
                    is (True);
+
+   package String_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => String);
 
 end Hb_Common;

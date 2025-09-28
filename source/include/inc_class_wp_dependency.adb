@@ -19,7 +19,7 @@ is
 
    function X_Construct (Handle : String;
                          Src    : String;
-                         Deps   : String_Array;
+                         Deps   : List_Type; -- String_Array;
                          Ver    : String;
                          Args   : String) -- Array_Type) --  ...args )
                          return X_Wp_Dependency

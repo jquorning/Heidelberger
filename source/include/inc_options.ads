@@ -1,4 +1,5 @@
 with Arrays;
+with Hb_Common;
 
 package Inc_Options
 is
@@ -65,13 +66,15 @@ is
    --
    -- @global wpdb wpdb WordPress database abstraction object.
    --
-   -- @param string option  Name of the option to retrieve. Expected to not be SQL-escaped.
-   -- @param mixed  default Optional. Default value to return if the option does not exist.
+   -- @param string option  Name of the option to retrieve. Expected to not be
+   --                       SQL-escaped.
+   -- @param mixed  default Optional. Default value to return if the option does not
+   --                       exist.
    -- @return mixed Value of the option. A value of any type may be returned, including
    --               scalar (string, boolean, float, integer), null, array, object.
-   --               Scalar and null values will be returned as strings as long as they originate
-   --               from a database stored option value. If there is no option in the database,
-   --               boolean `false` is returned.
+   --               Scalar and null values will be returned as strings as long as
+   --               they originate from a database stored option value. If there is
+   --               no option in the database, boolean `false` is returned.
    --
 --   function get_option( option, default = false ) then
    function Get_Option (Option : String)
@@ -96,6 +99,51 @@ is
    --
    procedure Wp_User_Settings
              is null;
+
+   --
+   -- Retrieve an option value for the current network based on name of option.
+   --
+   -- @since 2.8.0
+   -- @since 4.4.0 The `use_cache` parameter was deprecated.
+   -- @since 4.4.0 Modified into wrapper for get_network_option()
+   --
+   -- @see get_network_option()
+   --
+   -- @param string option     Name of the option to retrieve. Expected to not be
+   --                          SQL-escaped.
+   -- @param mixed  default    Optional. Value to return if the option doesn't exist.
+   --                          Default false.
+   -- @param bool   deprecated Whether to use cache. Multisite only. Always set to
+   --                          true.
+   -- @return mixed Value set for the option.
+   --
+   function Get_Site_Option (Option     : String;
+                             Default    : Boolean := False;
+                             Deprecated : Boolean := True)
+                             return String;
+
+   --
+   -- Retrieves a network"s option value based on the option name.
+   --
+   -- @since 4.4.0
+   --
+   -- @see get_option()
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param int    network_id ID of the network. Can be null to default to the
+   --                          current network ID.
+   -- @param string option     Name of the option to retrieve. Expected to not be
+   --                          SQL-escaped.
+   -- @param mixed  default    Optional. Value to return if the option doesn"t exist.
+   --                          Default false.
+   -- @return mixed Value set for the option.
+   --
+   function Get_Network_Option (Network_Id : Integer;
+                                Option     : String;
+                                Default    : Boolean := False)
+                                return String
+                                is ("XXX-667");
 
    --
    -- Updates the value of an option that was already added.
@@ -143,25 +191,27 @@ is
    -- @since 2.7.0
    --
    -- @param string       name    The name of the setting.
-   -- @param string|false default Optional. Default value to return when name is not set. Default false.
-   -- @return mixed The last saved user setting or the default value/false if it doesn"t exist.
+   -- @param string|false default Optional. Default value to return when name is not
+   --                             set. Default false.
+   -- @return mixed The last saved user setting or the default value/false if it
+   --               doesn't exist.
    --
    function Get_User_Setting (Name    : String;
                               Default : Boolean := False)
                               return String
                               is ("XXX-601");
 
---
--- Retrieves the value of a transient.
---
--- If the transient does not exist, does not have a value, or has expired,
--- then the return value will be false.
---
--- @since 2.8.0
---
--- @param string transient Transient name. Expected to not be SQL-escaped.
--- @return mixed Value of transient.
---
+   --
+   -- Retrieves the value of a transient.
+   --
+   -- If the transient does not exist, does not have a value, or has expired,
+   -- then the return value will be false.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string transient Transient name. Expected to not be SQL-escaped.
+   -- @return mixed Value of transient.
+   --
    function Get_Transient (Transient : String)
                            return String is ("XXX-302");
 
@@ -179,8 +229,7 @@ is
    -- @return mixed Value of transient.
    --
    function Get_Site_Transient (Transient : String)
-                                return Array_Type
-                                is (Empty_Array);
+                                return Hb_Common.String_Maps.Map;
 
    procedure Dummy;
 

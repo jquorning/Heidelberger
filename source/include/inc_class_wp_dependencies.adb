@@ -132,13 +132,15 @@ is
                if This.Registered.Find (Handle_2) = Dependency_Maps.No_Element then
                   Keep_Going := False; -- Item doesn't exist.
                elsif
-                 This.Registered (Handle_2).Deps /= Empty_String_Array and then
-                 Array_Diff (This.Registered (Handle_2).Deps,
-                             Array_Keys (This.Registered))
+                 not This.Registered (Handle_2).Deps.Is_Empty and then
+--               This.Registered (Handle_2).Deps /= Empty_String_Array and then
+                 Empty_List = Array_Diff (This.Registered (Handle_2).Deps,
+                                          Array_Keys (This.Registered))
                then
                   Keep_Going := False; -- Item requires dependencies that don't exist.
                elsif
-                 This.Registered (Handle_2).Deps /= Empty_String_Array and then
+                 not This.Registered (Handle_2).Deps.Is_Empty and then
+--               This.Registered (Handle_2).Deps /= Empty_String_Array and then
                  not This.All_Deps (This.Registered (Handle_2).Deps,
                                     Recursion => True,
                                     Group     => New_Group)
@@ -181,7 +183,8 @@ is
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
-                 Deps   : String_Array := Empty_String_Array;
+                 Deps   : List_Type := Empty_List;
+                 -- String_Array := Empty_String_Array;
                  Ver    : String       := ""; -- Boolean      := False;
                  Args   : String       := "") -- = null
 --               Args   : Array_Type   := Empty_Array) -- = null
@@ -356,7 +359,7 @@ is
                Array_Search (First, This.Queue, True);
 
             Position_1 : List_Vectors.Cursor;
-            Position_2 : String_Maps.Cursor;
+            Position_2 : Inc_Class_Wp_Dependency.String_Maps.Cursor;
          begin
             if "" /= Key then
                -- Reset all dependencies so they must be recalculated in
@@ -417,11 +420,14 @@ is
 --               Isset (This.Registered (Queued))
                then
                   declare
-                     Deps   : constant String_Array := This.Registered (-Queued).Deps;
+                     Deps   : constant List_Type := This.Registered (-Queued).Deps;
+--                   Deps   : constant String_Array := This.Registered (-Queued).Deps;
                      Unused : Integer;
                   begin
-                     if Deps /= Empty_String_Array then
-                        All_Deps.Append (To_List (Deps));
+                     if not Deps.Is_Empty then
+--                   if Deps /= Empty_String_Array then
+                        All_Deps.Append (Deps);
+--                      All_Deps.Append (To_List (Deps));
 --                      All_Deps.Append (Array_Fill_Keys (Deps, True));
                         Unused := Array_Push (Queues, Deps);
                      end if;

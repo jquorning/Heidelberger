@@ -189,7 +189,7 @@ is
 
             Conditional : constant Boolean :=
                Boolean'Value ((if Obj.Extra.Find ("conditional") /=
-                                  String_Maps.No_Element
+                                  Inc_Class_Wp_Dependency.String_Maps.No_Element
                                then Obj.Extra ("conditional") else "false"));
 
             Cond_Before : constant String :=
@@ -571,7 +571,7 @@ is
          Obj : X_Wp_Dependency := This.Registered (Handle);
       begin
          if not In_Array ("wp-i18n", Obj.Deps, True) then
-            Obj.Deps.Append ("wp-i18n");  -- ()
+            Obj.Deps.Append (+"wp-i18n");  -- ()
          end if;
 
          return Obj.Set_Translations (Domain, Path);

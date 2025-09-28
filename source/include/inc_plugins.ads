@@ -197,33 +197,11 @@ is
                          Accepted_Args : Integer := 1)
                          is null;
 
-   --
-   -- Adds a callback function to an action hook.
-   --
-   -- Actions are the hooks that the WordPress core launches at specific points
-   -- during execution, or when specific events occur. Plugins can specify that
-   -- one or more of its PHP functions are executed at these points, using the
-   -- Action API.
-   --
-   -- @since 1.2.0
-   --
-   -- @param string   hook_name       The name of the action to add the callback to.
-   -- @param callable callback        The callback to be run when the action is called.
-   -- @param int      priority        Optional. Used to specify the order in which
-   --                                 the functions associated with a particular
-   --                                 action are executed. Lower numbers correspond
-   --                                 with earlier execution, and functions with the
-   --                                 same priority are executed in the order in
-   --                                 which they were added to the action. Default 10.
-   -- @param int      accepted_args   Optional. The number of arguments the function
-   --                                 accepts. Default 1.
-   -- @return true Always returns true.
-   --
-   function Add_Action (Hook_Name     : String;
-                        Callback      : Callable;
-                        Priority      : Integer := 10;
-                        Accepted_Args : Integer := 1)
-                        return Boolean;
+   procedure Add_Filter (Hook_Name     : String;
+                         Callback      : String;
+                         Priority      : Integer := 10;
+                         Accepted_Args : Integer := 1)
+                         is null;
 
    --
    -- Calls the callback functions that have been added to an action hook.
@@ -293,33 +271,41 @@ is
                                    Message     : String := "")
                                    is null;
 
---
--- Adds a callback function to an action hook.
---
--- Actions are the hooks that the WordPress core launches at specific points
--- during execution, or when specific events occur. Plugins can specify that
--- one or more of its PHP functions are executed at these points, using the
--- Action API.
---
--- @since 1.2.0
---
--- @param string   hook_name       The name of the action to add the callback to.
--- @param callable callback        The callback to be run when the action is called.
--- @param int      priority        Optional. Used to specify the order in which the functions
---                                  associated with a particular action are executed.
---                                  Lower numbers correspond with earlier execution,
---                                  and functions with the same priority are executed
---                                  in the order in which they were added to the action. Default 10.
--- @param int      accepted_args   Optional. The number of arguments the function accepts. Default 1.
--- @return true Always returns true.
---
---   type Callable is null record;
+   --
+   -- Adds a callback function to an action hook.
+   --
+   -- Actions are the hooks that the WordPress core launches at specific points
+   -- during execution, or when specific events occur. Plugins can specify that
+   -- one or more of its PHP functions are executed at these points, using the
+   -- Action API.
+   --
+   -- @since 1.2.0
+   --
+   -- @param string   hook_name       The name of the action to add the callback to.
+   -- @param callable callback        The callback to be run when the action is called.
+   -- @param int      priority        Optional. Used to specify the order in which the
+   --                                 functions associated with a particular action
+   --                                 are executed. Lower numbers correspond with
+   --                                 earlier execution, and functions with the same
+   --                                 priority are executed in the order in which they
+   --                                 were added to the action. Default 10.
+   -- @param int      accepted_args   Optional. The number of arguments the function
+   --                                 accepts. Default 1.
+   -- @return true Always returns true.
+   --
+   type Callable_4 is access procedure;
 
    procedure Add_Action (Hook_Name     : String;
-                         Callback      : String; -- Callable;
+                         Callback      : Callable; -- _4;
                          Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1)
-                         is null;
+                         Accepted_Args : Integer := 1);
+--                       is null;
+
+   procedure Add_Action (Hook_Name     : String;
+                         Callback      : String;
+                         Priority      : Integer := 10;
+                         Accepted_Args : Integer := 1);
+--                       is null;
 
    procedure Dummy;
 

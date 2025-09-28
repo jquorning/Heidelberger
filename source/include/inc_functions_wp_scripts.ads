@@ -50,9 +50,10 @@ is
 --
 -- function wp_enqueue_script( handle, src = '', deps = array(), ver = false, in_footer = false ) then
    procedure Wp_Enqueue_Script (Handle    : String;
-                                Src       : String       := "";
-                                Deps      : String_Array := Empty_String_Array;
-                                Ver       : String       := ""; -- Boolean   := False;
-                                In_Footer : Boolean      := False);
+                                Src       : String    := "";
+                                Deps      : List_Type := Empty_List;
+                                -- String_Array := Empty_String_Array;
+                                Ver       : String    := ""; -- Boolean   := False;
+                                In_Footer : Boolean   := False);
 
 end Inc_Functions_Wp_Scripts;

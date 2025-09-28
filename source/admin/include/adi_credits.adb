@@ -51,7 +51,7 @@ is
 
       Version_2 : Unbounded_String := +Version;
       Locale_2  : Unbounded_String := +Locale;
-      Results   : Array_Type;
+      Results   : Hb_Common.String_Maps.Map; -- Array_Type;
    begin
       if Version = "" then
          -- Include an unmodified wp_version.

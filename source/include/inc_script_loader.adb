@@ -1,4 +1,3 @@
-
 --
 -- WordPress scripts and styles default loader.
 --
@@ -15,8 +14,20 @@
 --
 -- @package WordPress
 --
+
+with Arrays;
+with Hb_Common;
+with Globals;
+with Php;
+
+with Inc_Class_Wp_Theme_Json_Resolver;
+with Inc_Functions_Wp_Styles;
+with Inc_Versions;
+
 package body Inc_Script_Loader
 is
+   use Arrays;
+
    procedure Dummy is null;
 
 -- -- WordPress Dependency Class
@@ -635,6 +646,8 @@ is
 --         end;
 -- end;
 
+   Suffixes : Array_Type;
+
 -- --
 -- -- Returns the suffix that can be used for the scripts.
 -- --
@@ -646,32 +659,44 @@ is
 -- -- @return string The script suffix.
 -- --
 -- function wp_scripts_get_suffix( type = "" ) then
+   function Wp_Scripts_Get_Suffix (Typ : String := "")
+                                   return String
+   is
+      use Globals;
+      use Hb_Common;
+      use Inc_Versions;
 --         static suffixes;
+   begin
+      if Suffixes.Is_Empty then --  = Empty_Array then -- null =
+         declare
+            -- Include an unmodified wp_version.
+--          require ABSPATH . WPINC . "/version.php";
 
---         if ( null === suffixes ) then
---                 -- Include an unmodified wp_version.
---                 require ABSPATH . WPINC . "/version.php";
+            Develop_Src : constant Boolean := 0 /= Php.Strpos (Wp_Version, "-src");
+         begin
+--          if ( ! defined( "SCRIPT_DEBUG" ) ) then
+               SCRIPT_DEBUG := Develop_Src;
+--             Define ("SCRIPT_DEBUG", Develop_Src);
+--          end if;
 
---                 develop_src = false !== strpos( wp_version, "-src" );
+            declare
+               Suffix     : constant String := (if SCRIPT_DEBUG then "" else ".min");
+               Dev_Suffix : constant String := (if Develop_Src  then "" else ".min");
+            begin
+               Suffixes := Arrays.To_Array ((
+                  Build ("suffix",     Suffix),
+                  Build ("dev_suffix", Dev_Suffix)
+               ));
+            end;
+         end;
+      end if;
 
---                 if ( ! defined( "SCRIPT_DEBUG" ) ) then
---                         define( "SCRIPT_DEBUG", develop_src );
---                 end;
---                 suffix     = SCRIPT_DEBUG ? "" : ".min";
---                 dev_suffix = develop_src ? "" : ".min";
+      if "dev" = Typ then
+         return Get (Suffixes, "dev_suffix");
+      end if;
 
---                 suffixes = array(
---                         "suffix"     => suffix,
---                         "dev_suffix" => dev_suffix,
---                 );
---         end;
-
---         if ( "dev" === type ) then
---                 return suffixes["dev_suffix"];
---         end;
-
---         return suffixes["suffix"];
--- end;
+      return Get (Suffixes, "suffix");
+   end Wp_Scripts_Get_Suffix;
 
 -- --
 -- -- Registers all WordPress scripts.
@@ -3668,12 +3693,27 @@ is
 -- -- @since 6.1.0
 -- --
 -- function wp_enqueue_classic_theme_styles() then
---         if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) then
---                 suffix = wp_scripts_get_suffix();
---                 wp_register_style( "classic-theme-styles", "/" . WPINC . "/css/classic-themessuffix.css", array(), true );
---                 wp_enqueue_style( "classic-theme-styles" );
---         end;
--- end;
+   procedure Wp_Enqueue_Classic_Theme_Styles
+   is
+      use Globals;
+      use Inc_Class_Wp_Theme_Json_Resolver;
+      use Inc_Functions_Wp_Styles;
+   begin
+      if not Static.Theme_Has_Support then -- Wp_Theme_Json_Resolver::
+         declare
+            Suffix : constant String := Wp_Scripts_Get_Suffix;
+            Unused : Boolean;
+         begin
+            Unused :=
+              Wp_Register_Style
+                ("classic-theme-styles",
+                 "/" & WPINC & "/css/classic-themes" & Suffix & ".css",
+                 Empty_List, Ver => "true"); -- Ver => True
+
+            Wp_Enqueue_Style ("classic-theme-styles");
+         end;
+      end if;
+   end Wp_Enqueue_Classic_Theme_Styles;
 
 -- --
 -- -- Loads classic theme styles on classic themes in the editor.

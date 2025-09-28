@@ -45,7 +45,7 @@ is
       is (Empty_Array);
 
    function Exists (Arry : Array_Type; Key : String) return Boolean is (True);
-   function Array_Keys (Arry : Array_Type) return List_Type is (Empty_List);
+--   function Array_Keys (Arry : Array_Type) return List_Type is (Empty_List);
    function Count (Arry : Array_Type) return Natural is (1);
 
    type Item_List is array (Positive range <>) of Item_Type;

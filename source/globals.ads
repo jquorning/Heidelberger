@@ -24,12 +24,14 @@ is
    WPINC           : constant String := "";
    WP_PLUGIN_DIR   : constant String := "";
    WPMU_PLUGIN_DIR : constant String := "";
+   WP_CONTENT_DIR  : constant String := "";
 
    Wpdb : Inc_Class_Wpdb.Wpdb_Class;
 
    XMLRPC_REQUEST : Boolean := False;
    DOING_AJAX     : Boolean := False;
    IFRAME_REQUEST : Boolean := False;
+   DOING_CRON     : Boolean := False;
 
    MEDIA_TRASH : Boolean := False;
 
@@ -41,6 +43,7 @@ is
 
    WP_DEBUG         : Boolean;
    WP_DEBUG_DISPLAY : Boolean;
+   SCRIPT_DEBUG     : Boolean := False;
 
    Wp_Importers : Array_Type;
 

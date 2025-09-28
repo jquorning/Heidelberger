@@ -5,9 +5,18 @@
 -- @subpackage Theme
 --
 
+with Ada.Containers;
+with Ada.Strings.Unbounded;
+
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Options;
+
 package body Inc_Themes
 is
-   procedure Dummy is null;
+
 -- --
 -- -- Returns an array of WP_Theme objects based on the arguments.
 -- --
@@ -160,52 +169,51 @@ is
 --         return ( TEMPLATEPATH !== STYLESHEETPATH );
 -- end;
 
--- --
--- -- Retrieves name of the current stylesheet.
--- --
--- -- The theme name that is currently set as the front end theme.
--- --
--- -- For all intents and purposes, the template name and the stylesheet name
--- -- are going to be the same for most cases.
--- --
--- -- @since 1.5.0
--- --
--- -- @return string Stylesheet name.
--- --
--- function get_stylesheet() then
---         --
---         -- Filters the name of current stylesheet.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string stylesheet Name of the current stylesheet.
---         --
---         return apply_filters( "stylesheet", get_option( "stylesheet" ) );
--- end;
+   --------------------
+   -- Get_Stylesheet --
+   --------------------
 
--- --
--- -- Retrieves stylesheet directory path for the active theme.
--- --
--- -- @since 1.5.0
--- --
--- -- @return string Path to active theme"s stylesheet directory.
--- --
--- function get_stylesheet_directory() then
---         stylesheet     = get_stylesheet();
---         theme_root     = get_theme_root( stylesheet );
---         stylesheet_dir = "theme_root/stylesheet";
+   function Get_Stylesheet
+            return String
+   is
+      use Hb_Common;
+      use Inc_Options;
+   begin
+      --
+      -- Filters the name of current stylesheet.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string stylesheet Name of the current stylesheet.
+      --
+      return Apply_Filters ("stylesheet", Get_Option ("stylesheet"));
+   end Get_Stylesheet;
 
---         --
---         -- Filters the stylesheet directory path for the active theme.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string stylesheet_dir Absolute path to the active theme.
---         -- @param string stylesheet     Directory name of the active theme.
---         -- @param string theme_root     Absolute path to themes directory.
---         --
---         return apply_filters( "stylesheet_directory", stylesheet_dir, stylesheet, theme_root );
--- end;
+   ------------------------------
+   -- Get_Stylesheet_Directory --
+   ------------------------------
+
+   function Get_Stylesheet_Directory
+            return String
+   is
+      use Hb_Common;
+
+      Stylesheet     : constant String := Get_Stylesheet; -- ();
+      Theme_Root     : constant String := Get_Theme_Root (Stylesheet);
+      Stylesheet_Dir : constant String := "theme_root/stylesheet";
+   begin
+      --
+      -- Filters the stylesheet directory path for the active theme.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string stylesheet_dir Absolute path to the active theme.
+      -- @param string stylesheet     Directory name of the active theme.
+      -- @param string theme_root     Absolute path to themes directory.
+      --
+      return Apply_Filters ("stylesheet_directory", Stylesheet_Dir, Stylesheet,
+                            Theme_Root);
+   end Get_Stylesheet_Directory;
 
 -- --
 -- -- Retrieves stylesheet directory URI for the active theme.
@@ -299,47 +307,51 @@ is
 --         return apply_filters( "locale_stylesheet_uri", stylesheet_uri, stylesheet_dir_uri );
 -- end;
 
--- --
--- -- Retrieves name of the active theme.
--- --
--- -- @since 1.5.0
--- --
--- -- @return string Template name.
--- --
--- function get_template() then
---         --
---         -- Filters the name of the active theme.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string template active theme"s directory name.
---         --
---         return apply_filters( "template", get_option( "template" ) );
--- end;
+   ------------------
+   -- Get_Template --
+   ------------------
 
--- --
--- -- Retrieves template directory path for the active theme.
--- --
--- -- @since 1.5.0
--- --
--- -- @return string Path to active theme"s template directory.
--- --
--- function get_template_directory() then
---         template     = get_template();
---         theme_root   = get_theme_root( template );
---         template_dir = "theme_root/template";
+   function Get_Template
+            return String
+   is
+      use Hb_Common;
+      use Inc_Options;
+   begin
+      --
+      -- Filters the name of the active theme.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string template active theme"s directory name.
+      --
+      return Apply_Filters ("template", Get_Option ("template"));
+   end Get_Template;
 
---         --
---         -- Filters the active theme directory path.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string template_dir The path of the active theme directory.
---         -- @param string template     Directory name of the active theme.
---         -- @param string theme_root   Absolute path to the themes directory.
---         --
---         return apply_filters( "template_directory", template_dir, template, theme_root );
--- end;
+   ----------------------------
+   -- Get_Template_Directory --
+   ----------------------------
+
+   function Get_Template_Directory
+            return String
+   is
+      use Hb_Common;
+
+      Template     : constant String := Get_Template; -- ();
+      Theme_Root   : constant String := Get_Theme_Root (Template);
+      Template_Dir : constant String := "theme_root/template";
+   begin
+      --
+      -- Filters the active theme directory path.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string template_dir The path of the active theme directory.
+      -- @param string template     Directory name of the active theme.
+      -- @param string theme_root   Absolute path to the themes directory.
+      --
+      return Apply_Filters ("template_directory", Template_Dir, Template,
+                            Theme_Root);
+   end Get_Template_Directory;
 
 -- --
 -- -- Retrieves template directory URI for the active theme.
@@ -376,19 +388,38 @@ is
 -- --                      or a single theme root if all themes have the same root.
 -- --
 -- function get_theme_roots() then
+   function Get_Theme_Roots
+            return Hb_Common.String_Maps.Map
+   is
+      use Ada.Containers;
+      use Php;
+      use Inc_Options;
+
 --         global wp_theme_directories;
+      Theme_Roots : Hb_Common.String_Maps.Map;
+      Unused      : Array_Type;
+   begin
+      if
+        not Is_Array (Wp_Theme_Directories) or else
+        Wp_Theme_Directories.Length <= 1
+      then
+         declare
+            M : Hb_Common.String_Maps.Map;
+         begin
+            M.Include ("/themes", "/themes");
+            return M; -- "/themes";
+         end;
+      end if;
 
---         if ( ! is_array( wp_theme_directories ) || count( wp_theme_directories ) <= 1 ) then
---                 return "/themes";
---         end;
-
---         theme_roots = get_site_transient( "theme_roots" );
---         if ( false === theme_roots ) then
---                 search_theme_directories( true ); // Regenerate the transient.
---                 theme_roots = get_site_transient( "theme_roots" );
---         end;
---         return theme_roots;
--- end;
+      Theme_Roots := Get_Site_Transient ("theme_roots");
+      if Theme_Roots.Is_Empty then
+--    if ( false === theme_roots ) then
+         Unused := Search_Theme_Directories (Force => True);
+         -- Regenerate the transient.
+         Theme_Roots := Get_Site_Transient ("theme_roots");
+      end if;
+      return Theme_Roots;
+   end Get_Theme_Roots;
 
 -- --
 -- -- Registers a directory that contains themes.
@@ -568,48 +599,47 @@ is
 --         return found_themes;
 -- end;
 
--- --
--- -- Retrieves path to themes directory.
--- --
--- -- Does not have trailing slash.
--- --
--- -- @since 1.5.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @param string stylesheet_or_template Optional. The stylesheet or template name of the theme.
--- --                                       Default is to leverage the main theme root.
--- -- @return string Themes directory path.
--- --
--- function get_theme_root( stylesheet_or_template = "" ) then
---         global wp_theme_directories;
+   --------------------
+   -- Get_Theme_Root --
+   --------------------
 
---         theme_root = "";
+   function Get_Theme_Root (Stylesheet_Or_Template : String := "")
+                            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Globals;
+      use Hb_Common;
+      use Php;
 
---         if ( stylesheet_or_template ) then
---                 theme_root = get_raw_theme_root( stylesheet_or_template );
---                 if ( theme_root ) then
---                         // Always prepend WP_CONTENT_DIR unless the root currently registered as a theme directory.
---                         // This gives relative theme roots the benefit of the doubt when things go haywire.
---                         if ( ! in_array( theme_root, (array) wp_theme_directories, true ) ) then
---                                 theme_root = WP_CONTENT_DIR . theme_root;
---                         end;
---                 end;
---         end;
+--      global wp_theme_directories;
 
---         if ( ! theme_root ) then
---                 theme_root = WP_CONTENT_DIR . "/themes";
---         end;
+      Theme_Root : Unbounded_String; --  = "";
+   begin
+      if Stylesheet_Or_Template /= "" then
+         Theme_Root := +Get_Raw_Theme_Root (Stylesheet_Or_Template);
+         if Theme_Root /= "" then
+            -- Always prepend WP_CONTENT_DIR unless the root currently registered as
+            -- a theme directory. This gives relative theme roots the benefit of the
+            -- doubt when things go haywire.
+            if not In_Array (-Theme_Root, Wp_Theme_Directories, True) then -- (array)
+               Theme_Root := WP_CONTENT_DIR & Theme_Root;
+            end if;
+         end if;
+      end if;
 
---         --
---         -- Filters the absolute path to the themes directory.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string theme_root Absolute path to themes directory.
---         --
---         return apply_filters( "theme_root", theme_root );
--- end;
+      if Theme_Root /= "" then
+         Theme_Root := +WP_CONTENT_DIR & "/themes";
+      end if;
+
+      --
+      -- Filters the absolute path to the themes directory.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string theme_root Absolute path to themes directory.
+      --
+      return Apply_Filters ("theme_root", -Theme_Root);
+   end Get_Theme_Root;
 
 -- --
 -- -- Retrieves URI for themes directory.
@@ -677,32 +707,51 @@ is
 -- -- @return string Theme root.
 -- --
 -- function get_raw_theme_root( stylesheet_or_template, skip_cache = false ) then
---         global wp_theme_directories;
+   function Get_Raw_Theme_Root (Stylesheet_Or_Template : String;
+                                Skip_Cache             : Boolean := False)
+                                return String
+   is
+      use Ada.Containers;
+      use Ada.Strings.Unbounded;
+      use Inc_Options;
+      use Hb_Common;
+      use Php;
 
---         if ( ! is_array( wp_theme_directories ) || count( wp_theme_directories ) <= 1 ) then
---                 return "/themes";
---         end;
+--    global wp_theme_directories;
+      Theme_Root : Unbounded_String;
+   begin
+      if
+        not Is_Array (Wp_Theme_Directories) or else
+        Wp_Theme_Directories.Length <= 1
+--      Count (Wp_Theme_Directories) <= 1
+      then
+         return "/themes";
+      end if;
 
---         theme_root = false;
+--    theme_root = false;
 
---         // If requesting the root for the active theme, consult options to avoid calling get_theme_roots().
---         if ( ! skip_cache ) then
---                 if ( get_option( "stylesheet" ) == stylesheet_or_template ) then
---                         theme_root = get_option( "stylesheet_root" );
---                 end; elseif ( get_option( "template" ) == stylesheet_or_template ) then
---                         theme_root = get_option( "template_root" );
---                 end;
---         end;
+      -- If requesting the root for the active theme, consult options to avoid
+      -- calling get_theme_roots().
+      if not Skip_Cache then
+         if Get_Option ("stylesheet") = Stylesheet_Or_Template then
+            Theme_Root := +Get_Option ("stylesheet_root");
+         elsif Get_Option ("template") = Stylesheet_Or_Template then
+            Theme_Root := +Get_Option ("template_root");
+         end if;
+      end if;
 
---         if ( empty( theme_root ) ) then
---                 theme_roots = get_theme_roots();
---                 if ( ! empty( theme_roots[ stylesheet_or_template ] ) ) then
---                         theme_root = theme_roots[ stylesheet_or_template ];
---                 end;
---         end;
+      if Empty (-Theme_Root) then
+         declare
+            Theme_Roots : constant String_Maps.Map := Get_Theme_Roots; -- ()
+         begin
+            if not Empty (Theme_Roots (Stylesheet_Or_Template)) then
+               Theme_Root := +Theme_Roots (Stylesheet_Or_Template);
+            end if;
+         end;
+      end if;
 
---         return theme_root;
--- end;
+      return -Theme_Root;
+   end Get_Raw_Theme_Root;
 
 -- --
 -- -- Displays localized stylesheet link element.

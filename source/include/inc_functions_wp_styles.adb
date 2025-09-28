@@ -7,6 +7,8 @@
 -- @subpackage Dependencies
 --
 
+with Adm_Load_Styles;
+
 with Inc_Class_Wp_Dependencies;
 with Inc_Class_Wp_Styles;
 with Inc_Functions_Wp_Scripts;
@@ -19,6 +21,7 @@ is
    use Inc_Class_Wp_Styles;
    use Hb_Common;
    use Php;
+
 -- --
 -- -- Initialize wp_styles if it has not been set.
 -- --
@@ -28,15 +31,21 @@ is
 -- --
 -- -- @return WP_Styles WP_Styles instance.
 -- --
--- function wp_styles() then
---         global wp_styles;
 
---         if ( ! ( wp_styles instanceof WP_Styles ) ) then
---                 wp_styles = new WP_Styles();
---         end;
+   function Wp_Styles_X
+            return Wp_Styles;
 
---         return wp_styles;
--- end;
+   function Wp_Styles_X
+            return Wp_Styles
+   is
+--    global wp_styles;
+   begin
+      -- if ( ! ( wp_styles instanceof WP_Styles ) ) then
+      --         wp_styles = new WP_Styles();
+      -- end if;
+
+      return Adm_Load_Styles.Styles; -- Wp_styles
+   end Wp_Styles_X;
 
 -- --
 -- -- Display styles that are in the handles queue.
@@ -138,10 +147,22 @@ is
 -- -- @return bool Whether the style has been registered. True on success, false on failure.
 -- --
 -- function wp_register_style( handle, src, deps = array(), ver = false, media = 'all' ) then
---         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__, handle );
+   function Wp_Register_Style (Handle : String;
+                               Src    : String;
+                               Deps   : List_Type := Empty_List;
+                               -- Array_Type := Empty_Array;
+                               Ver    : String    := ""; -- Boolean   := False;
+                               Media  : String    := "all")
+                               return Boolean
+   is
+      use Adm_Load_Styles;
+      use Inc_Functions_Wp_Scripts;
+   begin
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 
---         return wp_styles().add( handle, src, deps, ver, media );
--- end;
+      return Styles.Add (Handle, Src, Deps, Ver, Media);
+--    return Wp_Styles_X.Add (Handle, Src, Deps, Ver, Media);
+   end Wp_Register_Style;
 
 -- --
 -- -- Remove a registered stylesheet.
@@ -164,10 +185,11 @@ is
 
 -- function wp_enqueue_style( handle, src = '', deps = array(), ver = false, media = 'all' ) then
    procedure Wp_Enqueue_Style (Handle : String;
-                               Src    : String       := "";
-                               Deps   : String_Array := Empty_String_Array;
-                               Ver    : String       := ""; -- Boolean      := False;
-                               Media  : String       := "all")
+                               Src    : String    := "";
+                               Deps   : List_Type := Empty_List;
+                               -- String_Array := Empty_String_Array;
+                               Ver    : String    := ""; -- Boolean      := False;
+                               Media  : String    := "all")
    is
       use Inc_Class_Wp_Dependencies;
       use Inc_Functions_Wp_Scripts;

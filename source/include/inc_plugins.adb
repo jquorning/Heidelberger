@@ -362,14 +362,25 @@ is
    -- Add_Action --
    ----------------
 
-   function Add_Action (Hook_Name     : String;
-                        Callback      : Callable;
-                        Priority      : Integer := 10;
-                        Accepted_Args : Integer := 1)
-                        return Boolean
+   procedure Add_Action (Hook_Name     : String;
+                         Callback      : Callable;
+                         Priority      : Integer := 10;
+                         Accepted_Args : Integer := 1)
+--                        return Boolean
    is
+      Unused : Boolean;
    begin
-         return Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
+      Unused := Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
+   end Add_Action;
+
+   procedure Add_Action (Hook_Name     : String;
+                         Callback      : String;
+                         Priority      : Integer := 10;
+                         Accepted_Args : Integer := 1)
+   is
+      use Ada.Text_IO;
+   begin
+      Put (Hook_Name & ", ");
    end Add_Action;
 
 -- --

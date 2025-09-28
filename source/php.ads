@@ -58,6 +58,7 @@ is
    function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (True);
    function Is_Object (Arry : Array_Type) return Boolean is (False);
    function Is_Array  (Arry : Array_Type) return Boolean is (True);
+   function Is_Array  (List : List_Type) return Boolean is (True);
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);
@@ -66,6 +67,9 @@ is
       is (Left);
 
    function Array_Diff (Left, Right : Array_Type) return Array_Type
+      is (Left);
+
+   function Array_Diff (Left, Right : List_Type) return List_Type
       is (Left);
 
    function Array_Diff (Left  : List_Type;
@@ -177,6 +181,10 @@ is
                           return String
                           is ("XXX-462");
 
+   function Array_Keys (Arry : Array_Type)
+                        return List_Type
+                        is (Empty_List);
+
    function Array_Key_Exists (Key  : String;
                               Arry : Array_Type)
                               return Boolean
@@ -216,6 +224,11 @@ is
                         return Integer
                         is (1);
 
+   function Array_Push (Arry  : List_Type;
+                        Value : List_Type) -- Integer)
+                        return Integer
+                        is (1);
+
    function Is_Numeric (Value : String)
                         return Boolean
                         is (False);
@@ -250,6 +263,10 @@ is
                       Suffix : String := "")
                       return String
                       is ("XXX-521");
+
+   function Is_Readable (Filename : String)
+                         return Boolean
+                         is (True);
 
    function Stristr (Haystack      : String;
                      Needle        : String;

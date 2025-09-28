@@ -56,7 +56,7 @@ is
         -- @since 2.6.0
         -- @var string[]
         --
-        Deps : String_Array; --  = array();
+        Deps : List_Type; -- String_Array; --  = array();
 
         --
         -- The handle version.
@@ -113,7 +113,7 @@ is
    --
    function X_Construct (Handle : String;
                          Src    : String;
-                         Deps   : String_Array;
+                         Deps   : List_Type; -- String_Array;
                          Ver    : String;
                          Args   : String) -- Array_Type) --  ...args )
                          return X_Wp_Dependency;

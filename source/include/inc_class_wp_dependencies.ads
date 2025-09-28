@@ -231,9 +231,10 @@ is
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
-                 Deps   : String_Array := Empty_String_Array;
-                 Ver    : String       := ""; -- Boolean      := False;
-                 Args   : String       := "") -- = null
+                 Deps   : List_Type := Empty_List;
+                 -- String_Array := Empty_String_Array;
+                 Ver    : String    := ""; -- Boolean      := False;
+                 Args   : String    := "") -- = null
                  return Boolean;
 
    --

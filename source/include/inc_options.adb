@@ -6,6 +6,13 @@
 -- @subpackage Option
 --
 
+with Ada.Strings.Unbounded;
+-- with Hb_Common;
+with Php;
+
+with Inc_Caches;
+with Inc_Load;
+
 package body Inc_Options
 is
    procedure Dummy is null;
@@ -1345,8 +1352,15 @@ is
 -- -- @return mixed Value set for the option.
 -- --
 -- function get_site_option( option, default = false, deprecated = true ) then
---         return get_network_option( null, option, default );
--- end;
+   function Get_Site_Option (Option     : String;
+                             Default    : Boolean := False;
+                             Deprecated : Boolean := True)
+                             return String
+   is
+   begin
+      return Get_Network_Option (0, -- null,
+                                 Option, Default);
+   end Get_Site_Option;
 
 -- --
 -- -- Adds a new option for the current network.
@@ -1943,63 +1957,99 @@ is
 -- -- @return mixed Value of transient.
 -- --
 -- function get_site_transient( transient ) then
+   function Get_Site_Transient (Transient : String)
+                                return Hb_Common.String_Maps.Map
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Caches;
+      use Inc_Load;
 
---         --
---         -- Filters the value of an existing site transient before it is retrieved.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- Returning a value other than boolean false will short-circuit retrieval and
---         -- return that value instead.
---         --
---         -- @since 2.9.0
---         -- @since 4.4.0 The `transient` parameter was added.
---         --
---         -- @param mixed  pre_site_transient The default value to return if the site transient does not exist.
---         --                                   Any value other than false will short-circuit the retrieval
---         --                                   of the transient, and return that value.
---         -- @param string transient          Transient name.
---         --
---         pre = apply_filters( "pre_site_transient_thentransientend;", false, transient );
+      Found : Boolean;
+      Value : Unbounded_String; -- Array_Type;
+   begin
+      --
+      -- Filters the value of an existing site transient before it is retrieved.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      --  name.
+      --
+      -- Returning a value other than boolean false will short-circuit retrieval and
+      -- return that value instead.
+      --
+      -- @since 2.9.0
+      -- @since 4.4.0 The `transient` parameter was added.
+      --
+      -- @param mixed  pre_site_transient The default value to return if the site
+      --                                  transient does not exist. Any value other
+      --                                  than false will short-circuit the retrieval
+      --                                  of the transient, and return that value.
+      -- @param string transient          Transient name.
+      --
+--    Pre := Apply_Filters ("pre_site_transient_" & Transient, False, Transient);
 
---         if ( false !== pre ) then
---                 return pre;
---         end;
+      -- -- if False /= Pre then
+      -- --    return Pre;
+      -- -- end if;
 
---         if ( wp_using_ext_object_cache() || wp_installing() ) then
---                 value = wp_cache_get( transient, "site-transient" );
---         end; else then
---                 // Core transients that do not have a timeout. Listed here so querying timeouts can be avoided.
---                 no_timeout       = array( "update_core", "update_plugins", "update_themes" );
---                 transient_option = "_site_transient_" . transient;
---                 if ( ! in_array( transient, no_timeout, true ) ) then
---                         transient_timeout = "_site_transient_timeout_" . transient;
---                         timeout           = get_site_option( transient_timeout );
---                         if ( false !== timeout && timeout < time() ) then
---                                 delete_site_option( transient_option );
---                                 delete_site_option( transient_timeout );
---                                 value = false;
---                         end;
---                 end;
+      if
+        Wp_Using_Ext_Object_Cache -- or else
+--      Wp_Installing
+      then
+         Value := +Wp_Cache_Get (Transient, "site-transient", Found => Found);
+      else
+         -- Core transients that do not have a timeout. Listed here so querying
+         -- timeouts can be avoided.
+         declare
+            No_Timeout : constant List_Type := To_List ((+"update_core",
+                                                         +"update_plugins",
+                                                         +"update_themes"));
+            Transient_Option : constant String := "_site_transient_" & Transient;
+         begin
+            if not In_Array (Transient, No_Timeout, True) then
+               declare
+                  Transient_Timeout : String :=
+                    "_site_transient_timeout_" & Transient;
 
---                 if ( ! isset( value ) ) then
---                         value = get_site_option( transient_option );
---                 end;
---         end;
+--                Timeout := Get_Site_Option (Transient_Timeout);
+               begin
+                  null;
+                  -- if false /= timeout and then Timeout < Time() ) then
+                  --    Delete_Site_Option (Transient_Option);
+                  --    Delete_Site_Option (Transient_Timeout);
+                  --    Value := False;
+                  -- end if;
+               end;
+            end if;
 
---         --
---         -- Filters the value of an existing site transient.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 2.9.0
---         -- @since 4.4.0 The `transient` parameter was added.
---         --
---         -- @param mixed  value     Value of site transient.
---         -- @param string transient Transient name.
---         --
---         return apply_filters( "site_transient_thentransientend;", value, transient );
--- end;
+            if not Isset (-Value) then
+               Value := +Get_Site_Option (Transient_Option);
+            end if;
+         end;
+      end if;
+
+      --
+      -- Filters the value of an existing site transient.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      --  name.
+      --
+      -- @since 2.9.0
+      -- @since 4.4.0 The `transient` parameter was added.
+      --
+      -- @param mixed  value     Value of site transient.
+      -- @param string transient Transient name.
+      --
+      declare
+         M : Hb_Common.String_Maps.Map;
+         R : constant String :=
+           Apply_Filters ("site_transient_" & Transient, -Value, Transient);
+      begin
+         M.Include (R, R);
+         return M;
+      end;
+   end Get_Site_Transient;
 
 -- --
 -- -- Sets/updates the value of a site transient.
