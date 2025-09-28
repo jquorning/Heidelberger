@@ -254,10 +254,16 @@ is
                               Query : String := "") -- False)
                               return String
                               is ("XXX-304");
+
    function Remove_Query_Arg (Key   : String_Array;
                               Query : String := "") -- False)
                               return String
                               is ("XXX-305");
+
+   function Remove_Query_Arg (Key   : List_Type;
+                              Query : String := "")
+                              return String
+                              is ("XXX-615");
 
 --
 -- Validates a file name and path against an allowed set of rules.

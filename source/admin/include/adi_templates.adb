@@ -1083,7 +1083,7 @@ is
 --    --
 --    -- @param string selected Slug for the role that should be already selected.
 --    --
---    procedure HB_Dropdown_Roles (Selected : String := "")
+--    procedure Wp_Dropdown_Roles (Selected : String := "")
 --    is
 --       R : Unbounded_String;
 

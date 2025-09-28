@@ -43,81 +43,32 @@ is
 --         wp_current_filter = array();
 -- end;
 
--- --
--- -- Adds a callback function to a filter hook.
--- --
--- -- WordPress offers filter hooks to allow plugins to modify
--- -- various types of internal data at runtime.
--- --
--- -- A plugin can modify data by binding a callback to a filter hook. When the filter
--- -- is later applied, each bound callback is run in order of priority, and given
--- -- the opportunity to modify a value by returning a new value.
--- --
--- -- The following example shows how a callback function is bound to a filter hook.
--- --
--- -- Note that `example` is passed to the callback, (maybe) modified, then returned:
--- --
--- --     function example_callback( example ) then
--- --         -- Maybe modify example in some way.
--- --         return example;
--- --     end;
--- --     add_filter( 'example_filter', 'example_callback' );
--- --
--- -- Bound callbacks can accept from none to the total number of arguments passed as parameters
--- -- in the corresponding apply_filters() call.
--- --
--- -- In other words, if an apply_filters() call passes four total arguments, callbacks bound to
--- -- it can accept none (the same as 1) of the arguments or up to four. The important part is that
--- -- the `accepted_args` value must reflect the number of arguments the bound callback--actually*
--- -- opted to accept. If no arguments were accepted by the callback that is considered to be the
--- -- same as accepting 1 argument. For example:
--- --
--- --     -- Filter call.
--- --     value = apply_filters( 'hook', value, arg2, arg3 );
--- --
--- --     -- Accepting zero/one arguments.
--- --     function example_callback() then
--- --         ...
--- --         return 'some value';
--- --     end;
--- --     add_filter( 'hook', 'example_callback' ); -- Where priority is default 10, accepted_args is default 1.
--- --
--- --     -- Accepting two arguments (three possible).
--- --     function example_callback( value, arg2 ) then
--- --         ...
--- --         return maybe_modified_value;
--- --     end;
--- --     add_filter( 'hook', 'example_callback', 10, 2 ); -- Where priority is 10, accepted_args is 2.
--- --
--- ----Note:* The function will return true whether or not the callback is valid.
--- -- It is up to you to take care. This is done for optimization purposes, so
--- -- everything is as quick as possible.
--- --
--- -- @since 0.71
--- --
--- -- @global WP_Hook[] wp_filter A multidimensional array of all hooks and the callbacks hooked to them.
--- --
--- -- @param string   hook_name     The name of the filter to add the callback to.
--- -- @param callable callback      The callback to be run when the filter is applied.
--- -- @param int      priority      Optional. Used to specify the order in which the functions
--- --                                associated with a particular filter are executed.
--- --                                Lower numbers correspond with earlier execution,
--- --                                and functions with the same priority are executed
--- --                                in the order in which they were added to the filter. Default 10.
--- -- @param int      accepted_args Optional. The number of arguments the function accepts. Default 1.
--- -- @return true Always returns true.
--- --
--- function add_filter( hook_name, callback, priority = 10, accepted_args = 1 ) then
---         global wp_filter;
+   ----------------
+   -- Add_Filter --
+   ----------------
 
---         if ( ! isset( wp_filter[ hook_name ] ) ) then
---                 wp_filter[ hook_name ] = new WP_Hook();
---         end;
+   function Add_Filter (Hook_Name     : String;
+                        Callback      : Callable;
+                        Priority      : Integer := 10;
+                        Accepted_Args : Integer := 1)
+                        return Boolean
+   is
+      use Hook_Maps;
+      use Inc_Class_Wp_Hooks;
 
---         wp_filter[ hook_name ]->add_filter( hook_name, callback, priority, accepted_args );
+      Hook : Wp_Hook;
+   begin
+      if not Has_Element (Wp_Filter.Find (Hook_Name)) then
+--    if not Isset (Wp_Filter (Hook_Name)) then
+         Wp_Filter.Include (Hook_Name, Hook);
+--       Wp_Filter (Hook_Name) := new WP_Hook();
+      end if;
 
---         return true;
--- end;
+      Wp_Filter (Hook_Name).Add_Filter (Hook_Name, Callback, Priority,
+                                        Accepted_Args);
+
+      return True;
+   end Add_Filter;
 
 -- --
 -- -- Calls the callback functions that have been added to a filter hook.
@@ -407,29 +358,19 @@ is
 --         return wp_filters[ hook_name ];
 -- end;
 
--- --
--- -- Adds a callback function to an action hook.
--- --
--- -- Actions are the hooks that the WordPress core launches at specific points
--- -- during execution, or when specific events occur. Plugins can specify that
--- -- one or more of its PHP functions are executed at these points, using the
--- -- Action API.
--- --
--- -- @since 1.2.0
--- --
--- -- @param string   hook_name       The name of the action to add the callback to.
--- -- @param callable callback        The callback to be run when the action is called.
--- -- @param int      priority        Optional. Used to specify the order in which the functions
--- --                                  associated with a particular action are executed.
--- --                                  Lower numbers correspond with earlier execution,
--- --                                  and functions with the same priority are executed
--- --                                  in the order in which they were added to the action. Default 10.
--- -- @param int      accepted_args   Optional. The number of arguments the function accepts. Default 1.
--- -- @return true Always returns true.
--- --
--- function add_action( hook_name, callback, priority = 10, accepted_args = 1 ) then
---         return add_filter( hook_name, callback, priority, accepted_args );
--- end;
+   ----------------
+   -- Add_Action --
+   ----------------
+
+   function Add_Action (Hook_Name     : String;
+                        Callback      : Callable;
+                        Priority      : Integer := 10;
+                        Accepted_Args : Integer := 1)
+                        return Boolean
+   is
+   begin
+         return Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
+   end Add_Action;
 
 -- --
 -- -- Calls the callback functions that have been added to an action hook.
@@ -993,24 +934,31 @@ is
 -- -- @return string Unique function ID for usage as array key.
 -- --
 -- function _wp_filter_build_unique_id( hook_name, callback, priority ) then
---         if ( is_string( callback ) ) then
---                 return callback;
---         end;
+   function X_Wp_Filter_Build_Unique_Id (Hook_Name : String;
+                                         Callback  : Callable;
+                                         Priority  : Integer)
+                                         return String
+   is
+   begin
+--        if ( is_string( callback ) ) then
+--                return callback;
+--        end if;
 
---         if ( is_object( callback ) ) then
---                 -- Closures are currently implemented as objects.
---                 callback = array( callback, '' );
---         end; else then
---                 callback = (array) callback;
---         end;
+        -- if Is_Object (callback) then
+        --         Closures are currently implemented as objects.
+        --         callback = array( callback, '' );
+        -- else
+        --         callback = (array) callback;
+        -- end if;
 
---         if ( is_object( callback[0] ) ) then
---                 -- Object class calling.
---                 return spl_object_hash( callback[0] ) . callback[1];
---         end; elseif ( is_string( callback[0] ) ) then
---                 -- Static calling.
---                 return callback[0] . '::' . callback[1];
---         end;
--- end;
+        -- if is_object( callback[0] ) then
+        --         Object class calling.
+        --         return spl_object_hash( callback[0] ) . callback[1];
+        -- elsif is_string( callback[0] ) then
+        --         Static calling.
+        --         return callback[0] . '::' . callback[1];
+        -- end if;
+      return "XXX-610";
+   end X_Wp_Filter_Build_Unique_Id;
 
 end Inc_Plugins;

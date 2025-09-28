@@ -314,7 +314,7 @@ is
       end if;
 
       for Node of Nodes.all loop --  &node
-         Node := Node;  -- clone
+         null; -- Node := Node;  -- clone
       end loop;
       return Nodes;
    end Get_Nodes;

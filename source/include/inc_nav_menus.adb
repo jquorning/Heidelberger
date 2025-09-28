@@ -8,7 +8,7 @@
 
 package body Inc_Nav_Menus
 is
-        procedure Dummy is null;
+   procedure Dummy is null;
 -- --
 -- -- Returns a navigation menu object.
 -- --

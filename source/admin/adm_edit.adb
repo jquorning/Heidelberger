@@ -37,6 +37,7 @@ with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
 with Inc_L10n;
 with Inc_Link_Templates;
+with Inc_Plugins;
 with Inc_Pluggables;
 with Inc_Posts;
 
@@ -265,15 +266,18 @@ is
                         elsif "untrash" = Doaction then
 --              when "untrash" =>
                            declare
+                              use Inc_Plugins;
+
                               Untrashed : Natural := 0;
                            begin
                               if
                                 Isset (String'(Get (XX_GET, "doaction"))) and
                                 "undo" = String'(Get (XX_GET, "doaction"))
                               then
-                                 Add_Filter ("wp_untrash_post_status",
-                                             "wp_untrash_post_set_previous_status",
-                                             10, 3);
+                                 Add_Filter
+                                   ("wp_untrash_post_status",
+                                    Inc_Posts.Wp_Untrash_Post_Set_Previous_Status'Access,
+                                    10, 3);
                               end if;
 
                               for Post_Id of Post_Ids loop

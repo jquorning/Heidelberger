@@ -259,18 +259,34 @@ is
                         return String
                         is (Pattern);
 
---
--- Removes slashes from a string or recursively removes slashes from strings within an array.
---
--- This should be used to remove slashes from data passed to core API that
--- expects data to be unslashed.
---
--- @since 3.6.0
---
--- @param string|array value String or array of data to unslash.
--- @return string|array Unslashed `value`, in the same type as supplied.
---
--- function wp_unslash( value ) then
+   --
+   -- Adds slashes to a string or recursively adds slashes to strings within an array.
+   --
+   -- This should be used when preparing data for core API that expects slashed data.
+   -- This should not be used to escape data going directly into an SQL query.
+   --
+   -- @since 3.6.0
+   -- @since 5.5.0 Non-string values are left untouched.
+   --
+   -- @param string|array value String or array of data to slash.
+   -- @return string|array Slashed `value`, in the same type as supplied.
+   --
+   function Wp_Slash (Value : String)
+                      return String
+                      is ("XXX-626");
+
+   --
+   -- Removes slashes from a string or recursively removes slashes from strings
+   --  within an array.
+   --
+   -- This should be used to remove slashes from data passed to core API that
+   -- expects data to be unslashed.
+   --
+   -- @since 3.6.0
+   --
+   -- @param string|array value String or array of data to unslash.
+   -- @return string|array Unslashed `value`, in the same type as supplied.
+   --
    function Wp_Unslash (Item : String)
                         return String
                         is ("XXX-215");

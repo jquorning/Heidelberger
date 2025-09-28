@@ -6,11 +6,44 @@
 -- @since 3.0.0
 --
 
+with Ada.Strings.Unbounded;
+
 with Arrays;
+
+with Inc_Class_Wp_Terms;
 
 package Inc_Nav_Menus
 is
+   use Ada.Strings.Unbounded;
    use Arrays;
+
+   --
+   -- Returns a navigation menu object.
+   --
+   -- @since 3.0.0
+   --
+   -- @param int|string|WP_Term $menu Menu ID, slug, name, or object.
+   -- @return WP_Term|false Menu object on success, false if $menu param isn't
+   --                       supplied or term does not exist.
+   --
+   function Wp_Get_Nav_Menu_Object (Menu : Integer)
+                                    return Integer
+                                    is (1);
+
+   --
+   -- Determines whether the given ID is a navigation menu.
+   --
+   -- Returns true if it is; false otherwise.
+   --
+   -- @since 3.0.0
+   --
+   -- @param int|string|WP_Term $menu Menu ID, slug, name, or object of menu to check.
+   -- @return bool Whether the menu exists.
+   --
+   function Is_Nav_Menu (Menu : Integer)
+                        return Boolean
+                        is (True);
+
 --
 -- Determines whether the given ID is a nav menu item.
 --
@@ -54,6 +87,10 @@ is
                                     return Array_Type
                                     is (Empty_Array);
 
+   -- function Wp_Setup_Nav_Menu_Item (Menu_Item : Array_Type)
+   --                                  return Array_Type
+   --                                  is (Empty_Array);
+
 --
 -- Retrieves all registered navigation menu locations in a theme.
 --
@@ -67,6 +104,21 @@ is
    function Get_Registered_Nav_Menus
             return String_Array
             is (Empty_String_Array);
+
+   --
+   -- Returns all navigation menu objects.
+   --
+   -- @since 3.0.0
+   -- @since 4.1.0 Default value of the "orderby" argument was changed from "none"
+   --              to "name".
+   --
+   -- @param array $args Optional. Array of arguments passed on to get_terms().
+   --                    Default empty array.
+   -- @return WP_Term[] An array of menu objects.
+   --
+   function Wp_Get_Nav_Menus (Args : Array_Type := Empty_Array)
+                              return Inc_Class_Wp_Terms.Wp_Term_Array
+                              is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
 --
 -- Retrieves all registered navigation menu locations and the menus assigned to them.
@@ -109,10 +161,21 @@ is
 -- }
 -- @return array|false Array of menu items, otherwise false.
 --
+
+   -- Added nby jq
+   type Menu_Item is
+      record
+         Post_Status : Unbounded_String;
+         X_Invalid   : Boolean;
+         DB_Id       : Unbounded_String;
+      end record;
+
+   type Menu_Item_Array is array (Positive range <>) of Menu_Item;
+
    function Wp_Get_Nav_Menu_Items (Menu : String;
                                    Args : Array_Type := Empty_Array)
-                                   return Array_Type
-                                   is (Empty_Array);
+                                   return Menu_Item_Array -- Array_Type
+                                   is (1 .. 0 => <>);     -- is (Empty_Array);
 
    procedure Dummy;
 

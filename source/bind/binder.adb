@@ -13,7 +13,7 @@ with Adm_Admin;
 with Adm_Menu;
 
 -- with Adi_Nav_Menus;
--- with Adm_Nav_Menus;
+with Adm_Nav_Menus;
 with Adm_Admin_Header;
 with Adi_Menu;
 

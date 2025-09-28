@@ -99,6 +99,12 @@ is
                               return Integer
                               is (0);
 
+   procedure Update_User_Meta (User_Id    : Integer;
+                               Meta_Key   : String;
+                               Meta_Value : Array_Type; -- Boolean;
+                               prev_value : String := "")
+                               is null;
+
 --
 -- Finds out whether a user is a member of a given blog.
 --

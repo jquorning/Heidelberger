@@ -320,4 +320,8 @@ is
      (Id => 0, Post_Parent => 0, Menu_Order => 0, Dyn => Null_Property_Type,
       others => Null_Unbounded_String);
 
+   type Wp_Post_Array is array (Positive range <>) of Wp_Post;
+
+   Empty_Wp_Post_Array : constant Wp_Post_Array := (1 .. 0 => Null_Post);
+
 end Inc_Class_Wp_Posts;

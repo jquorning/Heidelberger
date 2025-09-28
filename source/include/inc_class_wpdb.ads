@@ -784,7 +784,7 @@ is
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
                      Arg_1 : String;
-                     Arg_2 : String) --, ...$args )
+                     Arg_2 : String := "") --, ...$args )
                      return String
                      is ("XXX-212");
 

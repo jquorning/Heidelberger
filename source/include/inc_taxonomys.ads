@@ -178,6 +178,34 @@ is
    function Get_Object_Term_Cache (Id       : Integer;
                                    Taxonomy : String)
                                    return Inc_Class_Wp_Terms.Wp_Term_Array;
+   --
+   -- Counts how many terms are in taxonomy.
+   --
+   -- Default args is "hide_empty" which can be "hide_empty=true" or
+   -- array("hide_empty" => true).
+   --
+   -- @since 2.3.0
+   -- @since 5.6.0 Changed the function signature so that the `args` array can be
+   --              provided as the first parameter.
+   --
+   -- @internal The `deprecated` parameter is parsed for backward compatibility only.
+   --
+   -- @param array|string args       Optional. Array or string of arguments. See
+   --                                WP_Term_Query::__construct() for information on
+   --                                accepted arguments. Default empty array.
+   -- @param array|string deprecated Optional. Argument array, when using the legacy
+   --                                function parameter format. If present, this
+   --                                parameter will be interpreted as `args`, and the
+   --                                first function parameter will be parsed as a
+   --                                taxonomy or array of taxonomies. Default empty.
+   -- @return string|WP_Error Numeric string containing the number of terms in that
+   --                         taxonomy or WP_Error if the taxonomy does not exist.
+   --
+   function Wp_Count_Terms (Args       : Array_Type := Empty_Array;
+                            Deprecated : Array_Type := Empty_Array) -- = "")
+                            return Natural
+                            is (1);
+
 --
 -- Retrieves the terms in a given taxonomy or list of taxonomies.
 --
@@ -240,23 +268,37 @@ is
                        return Inc_Class_Wp_Terms.Wp_Term_Array
                        is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
---
--- Retrieves the terms associated with the given object(s), in the supplied taxonomies.
---
--- @since 2.3.0
--- @since 4.2.0 Added support for 'taxonomy', 'parent', and 'term_taxonomy_id' values of `$orderby`.
---              Introduced `$parent` argument.
--- @since 4.4.0 Introduced `$meta_query` and `$update_term_meta_cache` arguments. When `$fields` is 'all' or
---              'all_with_object_id', an array of `WP_Term` objects will be returned.
--- @since 4.7.0 Refactored to use WP_Term_Query, and to support any WP_Term_Query arguments.
---
--- @param int|int[]       $object_ids The ID(s) of the object(s) to retrieve.
--- @param string|string[] $taxonomies The taxonomy names to retrieve terms from.
--- @param array|string    $args       See WP_Term_Query::__construct() for supported arguments.
--- @return WP_Term[]|int[]|string[]|string|WP_Error Array of terms, a count thereof as a numeric string,
---                                                  or WP_Error if any of the taxonomies do not exist.
---                                                  See WP_Term_Query::get_terms() for more information.
---
+   --
+   -- Retrieves the terms associated with the given object(s), in the supplied
+   -- taxonomies.
+   --
+   -- @since 2.3.0
+   -- @since 4.2.0 Added support for 'taxonomy', 'parent', and 'term_taxonomy_id'
+   --              values of `$orderby`. Introduced `$parent` argument.
+   -- @since 4.4.0 Introduced `$meta_query` and `$update_term_meta_cache` arguments.
+   --              When `$fields` is 'all' or 'all_with_object_id', an array of
+   --              `WP_Term` objects will be returned.
+   -- @since 4.7.0 Refactored to use WP_Term_Query, and to support any WP_Term_Query
+   --              arguments.
+   --
+   -- @param int|int[]       $object_ids The ID(s) of the object(s) to retrieve.
+   -- @param string|string[] $taxonomies The taxonomy names to retrieve terms from.
+   -- @param array|string    $args       See WP_Term_Query::__construct() for
+   --                                    supported arguments.
+   -- @return WP_Term[]|int[]|string[]|string|WP_Error Array of terms, a count
+   --                                                  thereof as a numeric string,
+   --                                                  or WP_Error if any of the
+   --                                                  taxonomies do not exist.
+   --                                                  See WP_Term_Query::get_terms()
+   --                                                  for more information.
+   --
+   function Wp_Get_Object_Terms (Object_Ids : Integer;
+                                 Taxonomies : String;
+                                 Args       : Array_Type := Empty_Array)
+                                 return Array_Type
+                                 -- Inc_Class_Wp_Terms.Wp_Term_Array;
+                                 is (Empty_Array);
+
    function Wp_Get_Object_Terms (Object_Ids : Integer_Array;
                                  Taxonomies : Array_Type; -- String_Array;
                                  Args       : Array_Type := Empty_Array)

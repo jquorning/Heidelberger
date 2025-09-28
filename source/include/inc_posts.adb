@@ -1614,7 +1614,7 @@ is
                       Filter : String := "raw")
                       return Wp_Post
    is
-      Post_2 : Wp_Post := Post;
+      Post_2 : constant Wp_Post := Post;
       X_Post : Wp_Post;
       Unused_Success : Boolean;
    begin

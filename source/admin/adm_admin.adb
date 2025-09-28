@@ -101,7 +101,7 @@ is
          Do_Action ("after_db_upgrade");
 
       elsif not Inc_Load.Wp_Doing_Ajax and then Empty (X_POST)
-        and then Inc_Options.Get_Option ("db_version") /= Inc_Versions.wp_db_version
+        and then Inc_Options.Get_Option ("db_version") /= Inc_Versions.Wp_DB_Version
       then
 
          if not Inc_Load.Is_Multisite then

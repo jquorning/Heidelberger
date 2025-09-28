@@ -16,7 +16,7 @@ is
    --
    -- @global string wp_version
    --
-   wp_version : constant String := "6.1.6";
+   Wp_Version : constant String := "6.1.6";
 
    --
    -- Holds the WordPress DB revision, increments when changes are made to the
@@ -24,27 +24,27 @@ is
    --
    -- @global int wp_db_version
    --
-   wp_db_version : constant := 53496;
+   Wp_DB_Version : constant := 53496;
 
    --
    -- Holds the TinyMCE version.
    --
    -- @global string tinymce_version
    --
-   tinymce_version : constant String := "49110-20201110";
+   Tinymce_Version : constant String := "49110-20201110";
 
    --
    -- Holds the required PHP version.
    --
    -- @global string required_php_version
    --
-   required_php_version : constant String := "5.6.20";
+   Required_PHP_Version : constant String := "5.6.20";
 
    --
    -- Holds the required MySQL version.
    --
    -- @global string required_mysql_version
    --
-   required_mysql_version : constant String := "5.0";
+   Required_MySQL_Version : constant String := "5.0";
 
 end Inc_Versions;

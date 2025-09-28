@@ -672,6 +672,22 @@ is
                                  Args      : Args_Type); -- Array_Type := Empty_Array)
    --                            return incWp_Post_Type.Wp_Post_Type;
 
+   --
+   -- Determines whether the post type is hierarchical.
+   --
+   -- A False return value might also mean that the post type does not exist.
+   --
+   -- @since 3.0.0
+   --
+   -- @see get_post_type_object()
+   --
+   -- @param string post_type Post type name
+   -- @return bool Whether post type is hierarchical.
+   --
+   function Is_Post_Type_Hierarchical (Post_Type : String)
+                                       return Boolean
+                                       is (False);
+
 --
 -- Registers support of certain features for a post type.
 --
@@ -795,10 +811,17 @@ is
                       Output : String := "OBJECT"; --  = OBJECT,
                       Filter : String := "raw")
                       return Wp_Post;
+
    function Get_Post (Post   : Integer := 0;
                       Output : String  := "OBJECT"; --  = OBJECT,
                       Filter : String  := "raw")
                       return Wp_Post;
+
+   function Get_Post (Post   : Integer := 0;
+                      Output : String  := "OBJECT";
+                      Filter : String  := "raw")
+                      return Array_Type
+                      is (Empty_Array);
 
 --
 -- Trashes or deletes an attachment.
@@ -1033,7 +1056,26 @@ is
                                        return Boolean
                                        is (True);
 
--- By jq
+   --
+   -- Filters callback which sets the status of an untrashed post to its previous
+   -- status.
+   --
+   -- This can be used as a callback on the `wp_untrash_post_status` filter.
+   --
+   -- @since 5.6.0
+   --
+   -- @param string new_status      The new status of the post being restored.
+   -- @param int    post_id         The ID of the post being restored.
+   -- @param string previous_status The status of the post at the point where it was trashed.
+   -- @return string The new status of the post.
+   --
+   function Wp_Untrash_Post_Set_Previous_Status (New_Status      : String;
+                                                 Post_Id         : Integer;
+                                                 Previous_Status : String)
+                                                 return String
+                                                 is ("XXX-611");
+
+   -- By jq
    function Get (Post  : Wp_Post;
                  Field : String)
                  return Array_Type is (Empty_Array);

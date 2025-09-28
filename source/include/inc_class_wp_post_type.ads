@@ -256,7 +256,7 @@ is
         -- @since 4.6.0
         -- @var bool|string has_archive
         --
-        -- public has_archive = false;
+        Has_Archive : Boolean := False;
 
         --
         -- Sets the query_var key for this post type.
@@ -494,6 +494,7 @@ is
       Delete_With_User  => False, -- = null;
       Can_Export        => False,
       Map_Meta_Cap      => False,
+      Has_Archive       => False,
       others            => Null_Unbounded_String);
 
    package Post_Type_Maps is new

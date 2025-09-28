@@ -518,4 +518,18 @@ is
                                 return Inc_Class_Wp_Posts.Wp_Post
                                 is (Inc_Class_Wp_Posts.Null_Post);
 
+   --
+   -- Sets up the WordPress query by parsing query string.
+   --
+   -- @since 1.5.0
+   --
+   -- @see WP_Query::parse_query() for all available arguments.
+   --
+   -- @param string|array $query URL query string or array of query arguments.
+   -- @return WP_Post[]|int[] Array of post objects or post IDs.
+   --
+   function Query (Query : Array_Type)
+                   return Inc_Class_Wp_Posts.Wp_Post_Array
+                   is (Inc_Class_Wp_Posts.Empty_Wp_Post_Array);
+
 end Inc_Class_Wp_Querys;

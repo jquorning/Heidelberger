@@ -45,7 +45,7 @@ is
    function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
    function Array_Filter (List : List_Type) return List_Type is (Empty_List);
 
-   procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
+-- procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer);
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer);
 
    procedure Set (Arr : in out Array_Type; Key : String; Value : String);
@@ -243,5 +243,10 @@ is
    function Isset (Arry : Array_Type;
                    Key  : String)
                    return Boolean;
+
+   function Isset (Arry : Array_Type;
+                   Key  : Integer)
+                   return Boolean
+                   is (True);
 
 end Hb_Common;

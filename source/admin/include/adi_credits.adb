@@ -57,7 +57,7 @@ is
          -- Include an unmodified wp_version.
 --         require ABSPATH . WPINC . "/version.php";
 
-         Version_2 := +Inc_Versions.wp_version;
+         Version_2 := +Inc_Versions.Wp_Version;
       end if;
 
       if Locale = "" then

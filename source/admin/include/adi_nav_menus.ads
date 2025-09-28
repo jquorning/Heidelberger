@@ -6,18 +6,37 @@
 -- @since 3.0.0
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Ordered_Maps;
+
 with Arrays;
 
 with Inc_Class_Wp_Posts;
+with Inc_Class_Wp_Post_Type;
 
 package Adi_Nav_Menus
 is
    use Arrays;
 
-   Wp_Meta_Boxes               : Array_Type;
+   -- Wp_Meta_Boxes ("nav-menus") (Context) (Priority)
+
+   package Priority_Maps is new
+      Ada.Containers.Ordered_Maps (Key_Type     => Integer,
+                                   Element_Type => Array_Type,
+                                   "="          => Array_Vectors."=");
+   package Context_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Priority_Maps.Map,
+                                              "="          => Priority_Maps."=");
+   package Meta_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Context_Maps.Map,
+                                              "="          => Context_Maps."=");
+
+   Wp_Meta_Boxes               : Meta_Maps.Map; -- Array_Type;
    One_Theme_Location_No_Menus : Boolean;
-   X_Nav_Menu_Placeholder : Integer;
-   Nav_Menu_Selected_Id   : Integer;
+   X_Nav_Menu_Placeholder      : Integer;
+   Nav_Menu_Selected_Id        : Boolean;
    --
    -- Prints the appropriate response to a menu quick search.
    --
@@ -130,7 +149,8 @@ is
    --
    -- @since 3.0.0
    --
-   -- @param int     menu_id   The menu ID for which to save this item. Value of 0 makes a draft, orphaned menu item. Default 0.
+   -- @param int     menu_id   The menu ID for which to save this item. Value of 0
+   --                          makes a draft, orphaned menu item. Default 0.
    -- @param array() menu_data The unsanitized POSTed menu item data.
    -- @return int() The database IDs of the items saved
    --
@@ -150,8 +170,15 @@ is
    --
    function X_Wp_Nav_Menu_Meta_Box_Object (Data_Object : Array_Type) -- := null)
                                            return Array_Type;
+
    function X_Wp_Nav_Menu_Meta_Box_Object (Data_Object : Inc_Class_Wp_Posts.Wp_Post)
-                                           return Array_Type;
+                                           return Array_Type
+                                           is (Empty_Array);
+
+   function X_Wp_Nav_Menu_Meta_Box_Object
+     (Data_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+      return Inc_Class_Wp_Posts.Wp_Post
+      is (Inc_Class_Wp_Posts.Null_Post);
 
    --
    -- Returns the menu formatted to edit.

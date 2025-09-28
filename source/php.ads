@@ -61,6 +61,10 @@ is
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);
+
+   function Array_Merge (Left, Right : List_Type) return List_Type
+      is (Left);
+
    function Array_Diff (Left, Right : Array_Type) return Array_Type
       is (Left);
 
@@ -232,6 +236,16 @@ is
                           return List_Type
                           is (Empty_List);
 
+   function Array_Intersect (Arry    : Array_Type;
+                             Array_2 : Array_Type)
+                             return Array_Type
+                             is (Empty_Array);
+
+   function Array_Replace_Recursive (Arry    : Array_Type;
+                                     Array_2 : Array_Type)
+                                     return Array_Type
+                                     is (Empty_Array);
+
    function Basename (Path : String;
                       Suffix : String := "")
                       return String
@@ -260,6 +274,10 @@ is
    function Ini_Get (Option : String)
                      return String
                      is ("XXX-602");
+
+   function JSON_Decode (JSON : String)
+                         return Array_Type
+                         is (Empty_Array);
 
    -------------------
    -- Echo handling --
