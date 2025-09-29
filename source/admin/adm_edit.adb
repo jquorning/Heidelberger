@@ -544,7 +544,7 @@ is
                ));
                Bulk_Messages    : Array_Type := Empty_Array; --          := To_Array; --  ();begin
             begin
-               Set (Bulk_Messages, "post", abs To_Array (List => (    --  abs added
+               Set (Bulk_Messages, "post", To_Array (List => (    --  abs added
         -- translators: %s: Number of posts.
         Build ("updated", Plural ("%s post updated.",
                                      "%s posts updated.", Get (Bulk_Counts, "updated"))),
@@ -568,7 +568,7 @@ is
                                     Get (Bulk_Counts, "untrashed")))
                )));
 
-               Set (Bulk_Messages, "page", abs To_Array (List => (
+               Set (Bulk_Messages, "page", To_Array (List => (
         -- translators: %s: Number of pages.
         Build ("updated", Plural ("%s page updated.", "%s pages updated.", Get (Bulk_Counts, "updated"))),
         Build ("locked",  (if "1" = Get (Bulk_Counts, "locked")
@@ -591,7 +591,7 @@ is
                                     Get (Bulk_Counts, "untrashed")))
                )));
 
-               Set (Bulk_Messages, "wp_block", abs To_Array (List => (
+               Set (Bulk_Messages, "wp_block", To_Array (List => (
         -- translators: %s: Number of blocks.
         Build ("updated", Plural ("%s block updated.",
                                   "%s blocks updated.",

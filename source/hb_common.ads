@@ -136,8 +136,6 @@ is
                            return Boolean
                            is (True);
 
-   function "abs" (List : Array_Type) return String;
-
    function Printf (Format : String;
                     Arg_1  : String;
                     Arg_2  : String := "";
