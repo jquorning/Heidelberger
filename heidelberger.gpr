@@ -5,6 +5,7 @@ project Heidelberger is
    for Source_Dirs use (
       "source/",
       "source/include/",
+      "source/include/pomo/",
       "source/admin/",
       "source/admin/include/",
       "source/bind/",

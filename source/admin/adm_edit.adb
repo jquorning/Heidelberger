@@ -18,6 +18,7 @@ with Php;
 with Hb_Common;
 with Wp_Common;
 
+with Adm_Admin;
 with Adm_Admin_Header;
 with Adm_Menu;
 
@@ -58,28 +59,6 @@ is
    function Translation
       return Templates_Parser.Translate_Table;
 
---  /** WordPress Administration Bootstrap */
---  require_once __DIR__ . '/admin.php';
-
---  /**
---  * @global string $typenow The post type of the current screen.
---  */
---  global $typenow;
-
---  if ( ! $typenow ) {
---      wp_die( __( 'Invalid post type.' ) );
---  }
-
---  if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ), true ) ) {
---      wp_die( __( 'Sorry, you are not allowed to edit posts in this post type.' ) );
---  }
-
---  if ( 'attachment' === $typenow ) {
---      if ( wp_redirect( admin_url( 'upload.php' ) ) ) {
---              exit;
---      }
---  }
-
    ------------
    -- Render --
    ------------
@@ -104,6 +83,29 @@ is
       Post_Type_Object : Wp_Post_Type     renames Globals.Post_Type_Object;
 --         := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin
+      Adm_Admin.Run;
+-- WordPress Administration Bootstrap
+--  require_once __DIR__ . '/admin.php';
+
+--
+-- @global string $typenow The post type of the current screen.
+--
+--  global $typenow;
+
+--  if ( ! $typenow ) {
+--      wp_die( __( 'Invalid post type.' ) );
+--  }
+
+--  if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ), true ) ) {
+--      wp_die( __( 'Sorry, you are not allowed to edit posts in this post type.' ) );
+--  }
+
+--  if ( 'attachment' === $typenow ) {
+--      if ( wp_redirect( admin_url( 'upload.php' ) ) ) {
+--              exit;
+--      }
+--  }
+
       Post_Type        := Globals.Typenow;
       Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Post_Type);
 --  if Post_Type_Object = 0 then  -- not

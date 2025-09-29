@@ -25,6 +25,12 @@ is
    WP_PLUGIN_DIR   : constant String := "";
    WPMU_PLUGIN_DIR : constant String := "";
    WP_CONTENT_DIR  : constant String := "";
+   WP_SITEURL      : constant String := "";
+   WP_LANG_DIR     : constant String := "";
+
+   WPLANG : constant String := "da_DK";
+
+   WP_SETUP_CONFIG : constant Boolean := False;
 
    Wpdb : Inc_Class_Wpdb.Wpdb_Class;
 
@@ -44,6 +50,10 @@ is
    WP_DEBUG         : Boolean;
    WP_DEBUG_DISPLAY : Boolean;
    SCRIPT_DEBUG     : Boolean := False;
+
+   WP_INSTALLING         : Boolean := False;
+   WP_REPAIRING          : Boolean := False;
+   WP_INSTALLING_NETWORK : Boolean := False;
 
    Wp_Importers : Array_Type;
 

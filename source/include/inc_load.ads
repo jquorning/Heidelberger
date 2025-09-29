@@ -1,5 +1,32 @@
+with Ada.Calendar;
+
 package Inc_Load
 is
+
+   --
+   -- Fix `_SERVER` variables for various setups.
+   --
+   -- @since 3.0.0
+   -- @access private
+   --
+   -- @global string PHP_SELF The filename of the currently executing script,
+   --                          relative to the document root.
+   --
+   procedure Wp_Fix_Server_Vars;
+
+   --
+   -- Check for the required PHP version, and the MySQL extension or
+   -- a database drop-in.
+   --
+   -- Dies if requirements are not met.
+   --
+   -- @since 3.0.0
+   -- @access private
+   --
+   -- @global string required_php_version The required PHP version string.
+   -- @global string wp_version           The WordPress version string.
+   --
+   procedure Wp_Check_Php_Mysql_Versions;
 
    --
    -- Attempt an early load of translations.
@@ -31,6 +58,87 @@ is
    function Is_Ssl
             return Boolean
             is (False);
+
+   --
+   -- Die with a maintenance message when conditions are met.
+   --
+   -- The default message can be replaced by using a drop-in (maintenance.php in
+   -- the wp-content directory).
+   --
+   -- @since 3.0.0
+   -- @access private
+   --
+   procedure Wp_Maintenance;
+
+   --
+   -- Check if maintenance mode is enabled.
+   --
+   -- Checks for a file in the WordPress root directory named ".maintenance".
+   -- This file will contain the variable upgrading, set to the time the file
+   -- was created. If the file was created less than 10 minutes ago, WordPress
+   -- is in maintenance mode.
+   --
+   -- @since 5.5.0
+   --
+   -- @global int upgrading The Unix timestamp marking when upgrading WordPress began.
+   --
+   -- @return bool True if maintenance mode is enabled, false otherwise.
+   --
+   function Wp_Is_Maintenance_Mode
+            return Boolean;
+
+   Timestart : Ada.Calendar.Time;
+
+   --
+   -- Start the WordPress micro-timer.
+   --
+   -- @since 0.71
+   -- @access private
+   --
+   -- @global float timestart Unix timestamp set at the beginning of the page load.
+   -- @see timer_stop()
+   --
+   -- @return bool Always returns true.
+   --
+   procedure Timer_Start;
+
+   --
+   -- Set the location of the language directory.
+   --
+   -- To set directory manually, define the `WP_LANG_DIR` constant
+   -- in wp-config.php.
+   --
+   -- If the language directory exists within `WP_CONTENT_DIR`, it
+   -- is used. Otherwise the language directory is assumed to live
+   -- in `WPINC`.
+   --
+   -- @since 3.0.0
+   -- @access private
+   --
+   procedure Wp_Set_Lang_Dir;
+
+   --
+   -- Load the database class file and instantiate the `wpdb` global.
+   --
+   -- @since 2.5.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Require_Wp_DB;
+
+   --
+   -- Set the database table prefix and the format specifiers for database
+   -- table columns.
+   --
+   -- Columns not listed here default to `%s`.
+   --
+   -- @since 3.0.0
+   -- @access private
+   --
+   -- @global wpdb   wpdb         WordPress database abstraction object.
+   -- @global string table_prefix The database table prefix.
+   --
+   procedure Wp_Set_Wpdb_Vars;
 
    --
    -- Determines whether the current request is for an administrative interface page.

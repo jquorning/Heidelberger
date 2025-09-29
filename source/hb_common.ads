@@ -219,6 +219,19 @@ is
                            A2, A3, A4 : Array_Type)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
+   function Apply_Filters (Hook_Name : String;
+                           A         : Boolean;
+                           B         : String;
+                           D         : String)
+                           return String
+                           is ("XXX-701");
+
+   function Apply_Filters (Hook_Name : String;
+                           A         : Boolean;
+                           B         : String;
+                           D         : Boolean)
+                           return Boolean
+                           is (False);
 
    procedure Unset (A : String) is null;
    function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type

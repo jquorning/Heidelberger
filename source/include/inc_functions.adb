@@ -4,13 +4,18 @@
 -- @package WordPress
 --
 
+with Ada.Strings.Unbounded;
+
 with Inc_Class_Wp_List_Util;
 with Inc_Formatting;
 
+with Globals;
+with Hb_Common;
 with Php;
 
 package body Inc_Functions
 is
+   use Ada.Strings.Unbounded;
    use Php;
 
 -- require ABSPATH . WPINC . '/option.php';
@@ -6055,20 +6060,23 @@ is
 --         return $forced;
 -- end;
 
---
--- Guesses the URL for the site.
---
--- Will remove wp-admin links to retrieve only return URLs not in the wp-admin
--- directory.
---
--- @since 2.6.0
---
--- @return string The guessed URL.
---
--- function wp_guess_url() then
---         if ( defined( 'WP_SITEURL' ) && '' !== WP_SITEURL ) then
---                 $url = WP_SITEURL;
---         end; else then
+   ------------------
+   -- Wp_Guess_URL --
+   ------------------
+
+   function Wp_Guess_URL
+            return String
+   is
+      use Hb_Common;
+
+      URL : Unbounded_String;
+   begin
+      if -- defined( 'WP_SITEURL' ) and then
+        "" /= Globals.WP_SITEURL
+      then
+         URL := +Globals.WP_SITEURL;
+      else
+         null;
 --                 $abspath_fix         = str_replace( '\\', '/', ABSPATH );
 --                 $script_filename_dir = dirname( $_SERVER['SCRIPT_FILENAME'] );
 
@@ -6099,10 +6107,10 @@ is
 
 --                 $schema = is_ssl() ? 'https://' : 'http://'; // set_url_scheme() is not defined yet.
 --                 $url    = $schema . $_SERVER['HTTP_HOST'] . $path;
---         end;
+      end if;
 
---         return rtrim( $url, '/' );
--- end;
+      return Rtrim (-URL, "/");
+   end Wp_Guess_URL;
 
 --
 -- Temporarily suspends cache additions.

@@ -1,8 +1,23 @@
--- --
--- -- These functions are needed to load WordPress.
--- --
--- -- @package WordPress
--- --
+--
+-- These functions are needed to load WordPress.
+--
+-- @package WordPress
+--
+
+with Ada.Strings.Unbounded;
+
+with Arrays;
+with Globals;
+with Hb_Common;
+with Php;
+
+with Wp_Config;
+
+with Inc_Class_Wpdb;
+with Inc_Functions;
+with Inc_L10n;
+with Inc_Versions;
+with Inc_Class_Wp_Textdomain_Registry;
 
 package body Inc_Load
 is
@@ -24,18 +39,15 @@ is
 --         return protocol;
 -- end;
 
--- --
--- -- Fix `_SERVER` variables for various setups.
--- --
--- -- @since 3.0.0
--- -- @access private
--- --
--- -- @global string PHP_SELF The filename of the currently executing script,
--- --                          relative to the document root.
--- --
--- function wp_fix_server_vars() then
---         global PHP_SELF;
+   ------------------------
+   -- Wp_Fix_Server_Vars --
+   ------------------------
 
+   procedure Wp_Fix_Server_Vars
+   is
+--         global PHP_SELF;
+   begin
+      null;
 --         default_server_values = array(
 --                 "SERVER_SOFTWARE" => "",
 --                 "REQUEST_URI"     => "",
@@ -92,7 +104,7 @@ is
 --         end;
 
 --         wp_populate_basic_auth_from_authorization_header();
--- end;
+   end Wp_Fix_Server_Vars;
 
 -- --
 -- -- Populates the Basic Auth server details from the Authorization header.
@@ -146,9 +158,17 @@ is
 -- -- @global string wp_version           The WordPress version string.
 -- --
 -- function wp_check_php_mysql_versions() then
+
+   ---------------------------------
+   -- Wp_Check_Php_Mysql_Versions --
+   ---------------------------------
+
+   procedure Wp_Check_Php_Mysql_Versions
+   is
 --         global required_php_version, wp_version;
 --         php_version = PHP_VERSION;
-
+   begin
+      null;
 --         if ( version_compare( required_php_version, php_version, ">" ) ) then
 --                 protocol = wp_get_server_protocol();
 --                 header( sprintf( "%s 500 Internal Server Error", protocol ), true, 500 );
@@ -175,7 +195,7 @@ is
 --                 );
 --                 exit( 1 );
 --         end;
--- end;
+   end Wp_Check_Php_Mysql_Versions;
 
 -- --
 -- -- Retrieves the current environment type.
@@ -258,84 +278,80 @@ is
 --         end;
 -- end;
 
--- --
--- -- Die with a maintenance message when conditions are met.
--- --
--- -- The default message can be replaced by using a drop-in (maintenance.php in
--- -- the wp-content directory).
--- --
--- -- @since 3.0.0
--- -- @access private
--- --
--- function wp_maintenance() then
---         // Return if maintenance mode is disabled.
---         if ( ! wp_is_maintenance_mode() ) then
---                 return;
---         end;
+   --------------------
+   -- Wp_Maintenance --
+   --------------------
 
---         if ( file_exists( WP_CONTENT_DIR . "/maintenance.php" ) ) then
---                 require_once WP_CONTENT_DIR . "/maintenance.php";
---                 die();
---         end;
+   procedure Wp_Maintenance
+   is
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      -- Return if maintenance mode is disabled.
+      if not Wp_Is_Maintenance_Mode then
+         return;
+      end if;
 
---         require_once ABSPATH . WPINC . "/functions.php";
---         wp_load_translations_early();
+      if Php.File_Exists (Globals.WP_CONTENT_DIR & "/maintenance.php") then
+--       Require_Once (Globals.WP_CONTENT_DIR & "/maintenance.php");
+         Php.Die;
+      end if;
 
---         header( "Retry-After: 600" );
+--    require_once ABSPATH . WPINC . "/functions.php";
+      Wp_Load_Translations_Early;
 
---         wp_die(
---                 __( "Briefly unavailable for scheduled maintenance. Check back in a minute." ),
---                 __( "Maintenance" ),
---                 503
---         );
--- end;
+      Php.Header ("Retry-After: 600");
 
--- --
--- -- Check if maintenance mode is enabled.
--- --
--- -- Checks for a file in the WordPress root directory named ".maintenance".
--- -- This file will contain the variable upgrading, set to the time the file
--- -- was created. If the file was created less than 10 minutes ago, WordPress
--- -- is in maintenance mode.
--- --
--- -- @since 5.5.0
--- --
--- -- @global int upgrading The Unix timestamp marking when upgrading WordPress began.
--- --
--- -- @return bool True if maintenance mode is enabled, false otherwise.
--- --
--- function wp_is_maintenance_mode() then
+      Wp_Die
+        (abs "Briefly unavailable for scheduled maintenance. Check back in a minute.",
+         abs "Maintenance",
+         Code => 503);
+
+   end Wp_Maintenance;
+
+   ----------------------------
+   -- Wp_Is_Maintenance_Mode --
+   ----------------------------
+
+   function Wp_Is_Maintenance_Mode
+            return Boolean
 --         global upgrading;
+   is
+      use Hb_Common;
+   begin
+      if
+        not Php.File_Exists (Globals.ABSPATH & ".maintenance") -- or else
+--      Wp_Installing
+      then
+         return False;
+      end if;
 
---         if ( ! file_exists( ABSPATH . ".maintenance" ) || wp_installing() ) then
---                 return false;
---         end;
+--    require ABSPATH . ".maintenance";
+      -- If the upgrading timestamp is older than 10 minutes, consider maintenance
+      -- over.
+      -- if ( ( time() - upgrading ) >= 10 * MINUTE_IN_SECONDS ) then
+      --    return false;
+      -- end if;
 
---         require ABSPATH . ".maintenance";
---         // If the upgrading timestamp is older than 10 minutes, consider maintenance over.
---         if ( ( time() - upgrading ) >= 10-- MINUTE_IN_SECONDS ) then
---                 return false;
---         end;
+      --
+      -- Filters whether to enable maintenance mode.
+      --
+      -- This filter runs before it can be used by plugins. It is designed for
+      -- non-web runtimes. If this filter returns true, maintenance mode will be
+      -- active and the request will end. If false, the request will be allowed to
+      -- continue processing even if maintenance mode should be active.
+      --
+      -- @since 4.6.0
+      --
+      -- @param bool enable_checks Whether to enable maintenance mode. Default true.
+      -- @param int  upgrading     The timestamp set in the .maintenance file.
+      --
+--    if not Apply_Filters ("enable_maintenance_mode", True, Upgrading) then
+--       return False;
+--    end if;
 
---         --
---         -- Filters whether to enable maintenance mode.
---         --
---         -- This filter runs before it can be used by plugins. It is designed for
---         -- non-web runtimes. If this filter returns true, maintenance mode will be
---         -- active and the request will end. If false, the request will be allowed to
---         -- continue processing even if maintenance mode should be active.
---         --
---         -- @since 4.6.0
---         --
---         -- @param bool enable_checks Whether to enable maintenance mode. Default true.
---         -- @param int  upgrading     The timestamp set in the .maintenance file.
---         --
---         if ( ! apply_filters( "enable_maintenance_mode", true, upgrading ) ) then
---                 return false;
---         end;
-
---         return true;
--- end;
+      return True;
+   end Wp_Is_Maintenance_Mode;
 
 -- --
 -- -- Get the time elapsed so far during this PHP script.
@@ -350,22 +366,16 @@ is
 --         return microtime( true ) - _SERVER("REQUEST_TIME_FLOAT");
 -- end;
 
--- --
--- -- Start the WordPress micro-timer.
--- --
--- -- @since 0.71
--- -- @access private
--- --
--- -- @global float timestart Unix timestamp set at the beginning of the page load.
--- -- @see timer_stop()
--- --
--- -- @return bool Always returns true.
--- --
--- function timer_start() then
---         global timestart;
+   -----------------
+   -- Timer_Start --
+   -----------------
+
+   procedure Timer_Start
+   is
+   begin
+      Timestart := Ada.Calendar.Clock;
 --         timestart = microtime( true );
---         return true;
--- end;
+   end Timer_Start;
 
 -- --
 -- -- Retrieve or display the time from the page start to when function is called.
@@ -493,166 +503,153 @@ is
 --         end;
 -- end;
 
--- --
--- -- Set the location of the language directory.
--- --
--- -- To set directory manually, define the `WP_LANG_DIR` constant
--- -- in wp-config.php.
--- --
--- -- If the language directory exists within `WP_CONTENT_DIR`, it
--- -- is used. Otherwise the language directory is assumed to live
--- -- in `WPINC`.
--- --
--- -- @since 3.0.0
--- -- @access private
--- --
--- function wp_set_lang_dir() then
---         if ( ! defined( "WP_LANG_DIR" ) ) then
---                 if ( file_exists( WP_CONTENT_DIR . "/languages" ) && @is_dir( WP_CONTENT_DIR . "/languages" ) || ! @is_dir( ABSPATH . WPINC . "/languages" ) ) then
---                         --
---                         -- Server path of the language directory.
---                         --
---                         -- No leading slash, no trailing slash, full path, not relative to ABSPATH
---                         --
---                         -- @since 2.1.0
---                         --
---                         define( "WP_LANG_DIR", WP_CONTENT_DIR . "/languages" );
---                         if ( ! defined( "LANGDIR" ) ) then
---                                 // Old static relative path maintained for limited backward compatibility - won"t work in some cases.
---                                 define( "LANGDIR", "wp-content/languages" );
---                         end;
---                 end; else then
---                         --
---                         -- Server path of the language directory.
---                         --
---                         -- No leading slash, no trailing slash, full path, not relative to `ABSPATH`.
---                         --
---                         -- @since 2.1.0
---                         --
---                         define( "WP_LANG_DIR", ABSPATH . WPINC . "/languages" );
---                         if ( ! defined( "LANGDIR" ) ) then
---                                 // Old relative path maintained for backward compatibility.
---                                 define( "LANGDIR", WPINC . "/languages" );
---                         end;
---                 end;
---         end;
--- end;
+   ---------------------
+   -- Wp_Set_Lang_Dir --
+   ---------------------
 
--- --
--- -- Load the database class file and instantiate the `wpdb` global.
--- --
--- -- @since 2.5.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function require_wp_db() then
---         global wpdb;
+   procedure Wp_Set_Lang_Dir
+   is
+   begin
+      null;
+        -- if ( ! defined( "WP_LANG_DIR" ) ) then
+        --         if ( file_exists( WP_CONTENT_DIR . "/languages" ) && @is_dir( WP_CONTENT_DIR . "/languages" ) || ! @is_dir( ABSPATH . WPINC . "/languages" ) ) then
+        --                 --
+        --                 -- Server path of the language directory.
+        --                 --
+        --                 -- No leading slash, no trailing slash, full path, not relative to ABSPATH
+        --                 --
+        --                 -- @since 2.1.0
+        --                 --
+        --                 define( "WP_LANG_DIR", WP_CONTENT_DIR . "/languages" );
+        --                 if ( ! defined( "LANGDIR" ) ) then
+        --                         -- Old static relative path maintained for limited backward compatibility - won't work in some cases.
+        --                         define( "LANGDIR", "wp-content/languages" );
+        --                 end;
+        --         else
+        --                 --
+        --                 -- Server path of the language directory.
+        --                 --
+        --                 -- No leading slash, no trailing slash, full path, not relative to `ABSPATH`.
+        --                 --
+        --                 -- @since 2.1.0
+        --                 --
+        --                 define( "WP_LANG_DIR", ABSPATH . WPINC . "/languages" );
+        --                 if ( ! defined( "LANGDIR" ) ) then
+        --                         -- Old relative path maintained for backward compatibility.
+        --                         define( "LANGDIR", WPINC . "/languages" );
+        --                 end if;
+        --         end if;
+        -- end if;
+   end Wp_Set_Lang_Dir;
 
---         require_once ABSPATH . WPINC . "/class-wpdb.php";
+   -------------------
+   -- Require_Wp_DB --
+   -------------------
 
---         if ( file_exists( WP_CONTENT_DIR . "/db.php" ) ) then
---                 require_once WP_CONTENT_DIR . "/db.php";
---         end;
+   procedure Require_Wp_DB
+   is
+      use Globals;
+      use Wp_Config;
+      use Inc_Class_Wpdb;
 
---         if ( isset( wpdb ) ) then
---                 return;
---         end;
+      Dbuser     : constant String := DB_USER;
+      Dbpassword : constant String := DB_PASSWORD;
+      Dbname     : constant String := DB_NAME;
+      Dbhost     : constant String := DB_HOST;
+   begin
+      -- require_once ABSPATH . WPINC . "/class-wpdb.php";
 
---         dbuser     = defined( "DB_USER" ) ? DB_USER : "";
---         dbpassword = defined( "DB_PASSWORD" ) ? DB_PASSWORD : "";
---         dbname     = defined( "DB_NAME" ) ? DB_NAME : "";
---         dbhost     = defined( "DB_HOST" ) ? DB_HOST : "";
+      -- if ( file_exists( WP_CONTENT_DIR . "/db.php" ) ) then
+      --         require_once WP_CONTENT_DIR . "/db.php";
+      -- end;
 
---         wpdb = new wpdb( dbuser, dbpassword, dbname, dbhost );
--- end;
+      -- if ( isset( wpdb ) ) then
+      --         return;
+      -- end;
 
--- --
--- -- Set the database table prefix and the format specifiers for database
--- -- table columns.
--- --
--- -- Columns not listed here default to `%s`.
--- --
--- -- @since 3.0.0
--- -- @access private
--- --
--- -- @global wpdb   wpdb         WordPress database abstraction object.
--- -- @global string table_prefix The database table prefix.
--- --
--- function wp_set_wpdb_vars() then
---         global wpdb, table_prefix;
---         if ( ! empty( wpdb->error ) ) then
---                 dead_db();
---         end;
+      Globals.Wpdb := X_Construct (Dbuser, Dbpassword, Dbname, Dbhost);
+   end Require_Wp_DB;
 
---         wpdb->field_types = array(
---                 "post_author"      => "%d",
---                 "post_parent"      => "%d",
---                 "menu_order"       => "%d",
---                 "term_id"          => "%d",
---                 "term_group"       => "%d",
---                 "term_taxonomy_id" => "%d",
---                 "parent"           => "%d",
---                 "count"            => "%d",
---                 "object_id"        => "%d",
---                 "term_order"       => "%d",
---                 "ID"               => "%d",
---                 "comment_ID"       => "%d",
---                 "comment_post_ID"  => "%d",
---                 "comment_parent"   => "%d",
---                 "user_id"          => "%d",
---                 "link_id"          => "%d",
---                 "link_owner"       => "%d",
---                 "link_rating"      => "%d",
---                 "option_id"        => "%d",
---                 "blog_id"          => "%d",
---                 "meta_id"          => "%d",
---                 "post_id"          => "%d",
---                 "user_status"      => "%d",
---                 "umeta_id"         => "%d",
---                 "comment_karma"    => "%d",
---                 "comment_count"    => "%d",
---                 // Multisite:
---                 "active"           => "%d",
---                 "cat_id"           => "%d",
---                 "deleted"          => "%d",
---                 "lang_id"          => "%d",
---                 "mature"           => "%d",
---                 "public"           => "%d",
---                 "site_id"          => "%d",
---                 "spam"             => "%d",
---         );
+   ----------------------
+   -- Wp_Set_Wpdb_Vars --
+   ----------------------
 
---         prefix = wpdb->set_prefix( table_prefix );
+   procedure Wp_Set_Wpdb_Vars
+   is
+      use Ada.Strings.Unbounded;
+      use Arrays;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+--    global (Wpdb);
+--    global (Table_Prefix);
+      Prefix : Unbounded_String;
+   begin
+      -- if not Empty (Wpdb.error) then
+      --    Dead_DB; -- ()
+      -- end if;
 
---         if ( is_wp_error( prefix ) ) then
---                 wp_load_translations_early();
---                 wp_die(
---                         sprintf(
---                                 /* translators: 1: table_prefix, 2: wp-config.php--
---                                 __( "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores." ),
---                                 "<code>table_prefix</code>",
---                                 "<code>wp-config.php</code>"
---                         )
---                 );
---         end;
--- end;
+      Globals.Wpdb.Field_Types := Arrays.To_Array ((
+                Build ("post_author",      "%d"),
+                Build ("post_parent",      "%d"),
+                Build ("menu_order",       "%d"),
+                Build ("term_id",          "%d"),
+                Build ("term_group",       "%d"),
+                Build ("term_taxonomy_id", "%d"),
+                Build ("parent",           "%d"),
+                Build ("count",            "%d"),
+                Build ("object_id",        "%d"),
+                Build ("term_order",       "%d"),
+                Build ("ID",               "%d"),
+                Build ("comment_ID",       "%d"),
+                Build ("comment_post_ID",  "%d"),
+                Build ("comment_parent",   "%d"),
+                Build ("user_id",          "%d"),
+                Build ("link_id",          "%d"),
+                Build ("link_owner",       "%d"),
+                Build ("link_rating",      "%d"),
+                Build ("option_id",        "%d"),
+                Build ("blog_id",          "%d"),
+                Build ("meta_id",          "%d"),
+                Build ("post_id",          "%d"),
+                Build ("user_status",      "%d"),
+                Build ("umeta_id",         "%d"),
+                Build ("comment_karma",    "%d"),
+                Build ("comment_count",    "%d"),
+                -- Multisite:
+                Build ("active",           "%d"),
+                Build ("cat_id",           "%d"),
+                Build ("deleted",          "%d"),
+                Build ("lang_id",          "%d"),
+                Build ("mature",           "%d"),
+                Build ("public",           "%d"),
+                Build ("site_id",          "%d"),
+                Build ("spam",             "%d")
+        ));
 
--- --
--- -- Toggle `_wp_using_ext_object_cache` on and off without directly
--- -- touching global.
--- --
--- -- @since 3.7.0
--- --
--- -- @global bool _wp_using_ext_object_cache
--- --
--- -- @param bool using Whether external object cache is being used.
--- -- @return bool The current "using" setting.
--- --
+      Prefix := +Globals.Wpdb.Set_Prefix (Wp_Config.Table_Prefix);
+
+      if Is_Wp_Error (-Prefix) then
+         Wp_Load_Translations_Early;
+         Wp_Die (
+            Sprintf (
+              -- translators: 1: table_prefix, 2: wp-config.php
+              abs "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores.",
+              "<code>table_prefix</code>",
+              "<code>wp-config.php</code>"
+           ));
+      end if;
+   end Wp_Set_Wpdb_Vars;
+
+   -------------------------------
+   -- Wp_Using_Ext_Object_Cache --
+   -------------------------------
+
    function Wp_Using_Ext_Object_Cache (Using : Boolean := False) -- = null
                                        return Boolean
    is
 --    global _wp_using_ext_object_cache;
-      Current_Using : Boolean := X_Wp_Using_Ext_Object_Cache;
+      Current_Using : constant Boolean := X_Wp_Using_Ext_Object_Cache;
    begin
       if Using then
          X_Wp_Using_Ext_Object_Cache := Using;
@@ -1322,112 +1319,132 @@ is
 --         return absint( current_network->id );
 -- end;
 
--- --
--- -- Attempt an early load of translations.
--- --
--- -- Used for errors encountered during the initial loading process, before
--- -- the locale has been properly detected and loaded.
--- --
--- -- Designed for unusual load sequences (like setup-config.php) or for when
--- -- the script will then terminate with an error, otherwise there is a risk
--- -- that a file can be double-included.
--- --
--- -- @since 3.4.0
--- -- @access private
--- --
--- -- @global WP_Textdomain_Registry wp_textdomain_registry WordPress Textdomain Registry.
--- -- @global WP_Locale wp_locale WordPress date and time locale object.
--- --
--- function wp_load_translations_early() then
-   procedure Wp_Load_Translations_Early is null;
+   Static_Loaded : Boolean := False;
 
---         global wp_locale, wp_textdomain_registry;
+   -- wp_
 
---         static loaded = false;
---         if ( loaded ) then
---                 return;
---         end;
---         loaded = true;
+   --------------------------------
+   -- Wp_Load_Translations_Early --
+   --------------------------------
 
---         if ( function_exists( "did_action" ) && did_action( "init" ) ) then
---                 return;
---         end;
+   procedure Wp_Load_Translations_Early
+   is
+      use Ada.Strings.Unbounded;
+      use Arrays;
+      use Hb_Common;
+      use Php;
+      use Inc_L10n;
+      use Inc_Class_Wpdb;
+      use Inc_Class_Wp_Textdomain_Registry;
 
---         // We need wp_local_package.
---         require ABSPATH . WPINC . "/version.php";
+--    global (wp_locale, Wp_Textdomain_Registry);
+--    static loaded = false;
+      Locales   : List_Type;
+      Locations : List_Type;
+   begin
+      if Static_Loaded then
+         return;
+      end if;
+      Static_Loaded := True;
 
---         // Translation and localization.
---         require_once ABSPATH . WPINC . "/pomo/mo.php";
---         require_once ABSPATH . WPINC . "/l10n.php";
---         require_once ABSPATH . WPINC . "/class-wp-textdomain-registry.php";
---         require_once ABSPATH . WPINC . "/class-wp-locale.php";
---         require_once ABSPATH . WPINC . "/class-wp-locale-switcher.php";
+      -- if Function_Exists ("did_action") and then Did_Action ("init") then
+      --    return;
+      -- end if;
 
---         // General libraries.
---         require_once ABSPATH . WPINC . "/plugin.php";
+      -- -- We need wp_local_package.
+      -- require ABSPATH . WPINC . "/version.php";
 
---         locales   = array();
---         locations = array();
+      -- -- Translation and localization.
+      -- require_once ABSPATH . WPINC . "/pomo/mo.php";
+      -- require_once ABSPATH . WPINC . "/l10n.php";
+      -- require_once ABSPATH . WPINC . "/class-wp-textdomain-registry.php";
+      -- require_once ABSPATH . WPINC . "/class-wp-locale.php";
+      -- require_once ABSPATH . WPINC . "/class-wp-locale-switcher.php";
 
---         if ( ! wp_textdomain_registry instanceof WP_Textdomain_Registry ) then
---                 wp_textdomain_registry = new WP_Textdomain_Registry();
---         end;
+      -- -- General libraries.
+      -- require_once ABSPATH . WPINC . "/plugin.php";
 
---         while ( true ) then
---                 if ( defined( "WPLANG" ) ) then
---                         if ( "" === WPLANG ) then
---                                 break;
---                         end;
---                         locales() = WPLANG;
---                 end;
+      if Textdomain_Registry not in Wp_Textdomain_Registry then -- instanceof
+--       Textdomain_Registry := X_Construct; -- new WP_Textdomain_Registry();
+         null;
+      end if;
 
---                 if ( isset( wp_local_package ) ) then
---                         locales() = wp_local_package;
---                 end;
+      loop
+--         if Defined ("WPLANG") then
+            if "" = Globals.WPLANG then
+               exit;
+            end if;
+            Locales.Append (+Globals.WPLANG);
+--         end if;
 
---                 if ( ! locales ) then
---                         break;
---                 end;
+         -- if Isset (Wp_Local_Package) then
+         --    Locales.Append (Wp_Local_Package);
+         -- end if;
 
---                 if ( defined( "WP_LANG_DIR" ) && @is_dir( WP_LANG_DIR ) ) then
---                         locations() = WP_LANG_DIR;
---                 end;
+         exit when Locales.Is_Empty;
 
---                 if ( defined( "WP_CONTENT_DIR" ) && @is_dir( WP_CONTENT_DIR . "/languages" ) ) then
---                         locations() = WP_CONTENT_DIR . "/languages";
---                 end;
+         if
+--         Defined ("WP_LANG_DIR") and then
+           Is_Dir (Globals.WP_LANG_DIR)          -- @
+         then
+            Locations.Append (+Globals.WP_LANG_DIR);
+         end if;
 
---                 if ( @is_dir( ABSPATH . "wp-content/languages" ) ) then
---                         locations() = ABSPATH . "wp-content/languages";
---                 end;
+         if
+--         Defined ("WP_CONTENT_DIR") and then
+           Is_Dir (Globals.WP_CONTENT_DIR & "/languages") -- @
+         then
+            Locations.Append ((+Globals.WP_CONTENT_DIR) & "/languages");
+         end if;
 
---                 if ( @is_dir( ABSPATH . WPINC . "/languages" ) ) then
---                         locations() = ABSPATH . WPINC . "/languages";
---                 end;
+         if Is_Dir (Globals.ABSPATH & "wp-content/languages") then -- @
+            Locations.Append ((+Globals.ABSPATH) & "wp-content/languages");
+         end if;
 
---                 if ( ! locations ) then
---                         break;
---                 end;
+         if Is_Dir (Globals.ABSPATH & Globals.WPINC & "/languages") then -- @
+            Locations.Append ((+Globals.ABSPATH) & Globals.WPINC & "/languages");
+         end if;
 
---                 locations = array_unique( locations );
+         exit when Locations.Is_Empty;
 
---                 foreach ( locales as locale ) then
---                         foreach ( locations as location ) then
---                                 if ( file_exists( location . "/" . locale . ".mo" ) ) then
---                                         load_textdomain( "default", location . "/" . locale . ".mo", locale );
---                                         if ( defined( "WP_SETUP_CONFIG" ) && file_exists( location . "/admin-" . locale . ".mo" ) ) then
---                                                 load_textdomain( "default", location . "/admin-" . locale . ".mo", locale );
---                                         end;
---                                         break 2;
---                                 end;
---                         end;
---                 end;
+         Locations := Array_Unique (Locations);
 
---                 break;
---         end;
+         Find_Locale :
+         for Locale of Locales loop
 
---         wp_locale = new WP_Locale();
--- end;
+            Find_Location :
+            for Location of Locations loop
+               declare
+                  Filename : constant String := (-Location) & "/" & (-Locale) & ".mo";
+                  Unused   : Boolean;
+               begin
+                  if File_Exists (Filename) then
+                     Unused := Load_Textdomain ("default", Filename, -Locale);
+                     declare
+                        Filename_2 : constant String :=
+                          (-Location) & "/admin-" & (-Locale) & ".mo";
+                        Unused_2 : Boolean;
+                     begin
+                        if
+--                        Defined ("WP_SETUP_CONFIG") and then
+                          File_Exists (Filename_2)
+                        then
+                           Unused_2 :=
+                             Load_Textdomain ("default", Filename_2, -Locale);
+                        end if;
+                     end;
+                     exit Find_Locale;
+                  end if;
+               end;
+            end loop Find_Location;
+
+         end loop Find_Locale;
+         exit;
+
+      end loop;
+
+--    Globals.Wp_Locale := X_Construct; -- new WP_Locale();
+   end Wp_Load_Translations_Early;
 
 -- --
 -- -- Check or set whether WordPress is in "installation" mode.

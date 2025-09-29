@@ -36,6 +36,8 @@ with Inc_Rewrites;
 with Inc_Taxonomys;
 with Inc_Versions;
 
+with Wp_Load;
+
 package body Adm_Admin
 is
    use Ada.Strings.Unbounded;
@@ -84,6 +86,7 @@ is
          WP_LOAD_IMPORTERS := True;
       end if;
 
+      Wp_Load.Run;
       -- require_once dirname( __DIR__ ) . "/wp-load.php";
 
       Inc_Functions.Nocache_Headers; -- ();
@@ -355,7 +358,7 @@ is
                --
                -- @since 2.1.0
                --
-               Do_Action ("load-{page_hook}");
+               Do_Action ("load-" & (-Page_Hook));
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
                -- if not Isset (XX_GET ("noheader")) then
@@ -411,7 +414,7 @@ is
                --
                -- @since 1.5.0
                --
-               Do_Action ("load-{plugin_page}");
+               Do_Action ("load-" & String (-Plugin_Page));
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
                -- if not Isset (SX_GET ("noheader")) then
@@ -471,7 +474,7 @@ is
                --
                -- @since 3.5.0
                --
-               Do_Action ("load-importer-{importer}");
+               Do_Action ("load-importer-" & Importer);
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
                -- Used in the HTML title tag.
@@ -525,7 +528,7 @@ is
             --
             -- @since 2.1.0
             --
-            Do_Action ("load-{pagenow}");
+            Do_Action ("load-" & (-Pagenow));
             -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
             --

@@ -244,8 +244,13 @@ is
    --                         functions hooked to the action. Default empty.
    --
    procedure Do_Action (Hook_Name : String;
-                        Arg_2     : String := "");
+                        Arg_2     : String := "";
+                        Arg_3     : String := "");
    --                  , ...arg )
+   procedure Do_Action (Hook_Name : String;
+                        Arg_2     : String;
+                        Arg_3     : Boolean)
+                        is null;
 
 --
 -- Fires functions attached to a deprecated action hook.

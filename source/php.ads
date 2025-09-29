@@ -106,6 +106,10 @@ is
                    Characters : String := "")
                    return String is (Item);
 
+   function Rtrim (Item       : String;
+                   Characters : String := "")
+                   return String is (Item);
+
    function Trim (Item : String; Characters : String := "")
                   return String is (Item);
 
@@ -295,6 +299,19 @@ is
    function JSON_Decode (JSON : String)
                          return Array_Type
                          is (Empty_Array);
+
+   procedure Die
+             is null;
+
+   function Dirname (Path   : String;
+                     Levels : Positive := 1)
+                     return String
+                     is ("XXX-702");
+
+   function Glob (Pattern : String;
+                  Flags   : Integer := 0)
+                  return List_Type
+                  is (Empty_List);
 
    -------------------
    -- Echo handling --

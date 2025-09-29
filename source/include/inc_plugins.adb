@@ -422,7 +422,8 @@ is
 -- --
 -- function do_action( hook_name, ...arg ) then
    procedure Do_Action (Hook_Name : String;
-                        Arg_2     : String := "")
+                        Arg_2     : String := "";
+                        Arg_3     : String := "")
    is
       use Ada.Text_IO;
    begin

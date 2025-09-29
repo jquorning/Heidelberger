@@ -67,47 +67,47 @@ is
 -- @since 0.71
 --
 -- #[AllowDynamicProperties]
-        --
-        -- Connects to the database server and selects a database.
-        --
-        -- Does the actual setting up
-        -- of the class properties and connection to the database.
-        --
-        -- @since 2.0.8
-        --
-        -- @link https://core.trac.wordpress.org/ticket/3354
-        --
-        -- @param string dbuser     Database user.
-        -- @param string dbpassword Database password.
-        -- @param string dbname     Database name.
-        -- @param string dbhost     Database host.
-        --
-        -- public function __construct(dbuser, dbpassword, dbname, dbhost) then
-        --         if (WP_DEBUG && WP_DEBUG_DISPLAY) then
-        --                 this.show_errors();
-        --         end;
 
-        --         // Use the `mysqli` extension if it exists unless `WP_USE_EXT_MYSQL` is defined as true.
-        --         if (function_exists("mysqli_connect")) then
-        --                 this.use_mysqli = true;
+   -----------------
+   -- X_Construct --
+   -----------------
 
-        --                 if (defined("WP_USE_EXT_MYSQL")) then
-        --                         this.use_mysqli = ! WP_USE_EXT_MYSQL;
-        --                 end;
-        --         end;
+   function X_Construct (Dbuser     : String;
+                         Dbpassword : String;
+                         Dbname     : String;
+                         Dbhost     : String)
+                         return Wpdb_Class
+   is
+      This   : Wpdb_Class;
+      Unused : Boolean;
+   begin
+      -- if WP_DEBUG and then WP_DEBUG_DISPLAY then
+      --    This.Show_Errors; -- ()
+      -- end;
 
-        --         this.dbuser     = dbuser;
-        --         this.dbpassword = dbpassword;
-        --         this.dbname     = dbname;
-        --         this.dbhost     = dbhost;
+      -- Use the `mysqli` extension if it exists unless `WP_USE_EXT_MYSQL` is
+      -- defined as true.
+      -- if (function_exists("mysqli_connect")) then
+      --    this.use_mysqli = true;
+      --    if (defined("WP_USE_EXT_MYSQL")) then
+      --       this.use_mysqli = ! WP_USE_EXT_MYSQL;
+      --    end if;
+      -- end if;
 
-        --         // wp-config.php creation will manually connect when ready.
-        --         if (defined("WP_SETUP_CONFIG")) then
-        --                 return;
-        --         end;
+      This.Dbuser     := +Dbuser;
+      This.Dbpassword := +Dbpassword;
+      This.Dbname     := +Dbname;
+      This.Dbhost     := +Dbhost;
 
-        --         this.db_connect();
-        -- end;
+      -- wp-config.php creation will manually connect when ready.
+      -- if (defined("WP_SETUP_CONFIG")) then
+      --    return;
+      -- end if;
+
+      Unused := This.Db_Connect; -- ()
+
+      return This;
+   end X_Construct;
 
         --
         -- Makes private properties readable for backward compatibility.
@@ -355,51 +355,75 @@ is
         --         end;
         -- end;
 
-        --
-        -- Sets the table prefix for the WordPress tables.
-        --
-        -- @since 2.5.0
-        --
-        -- @param string prefix          Alphanumeric name for the new prefix.
-        -- @param bool   set_table_names Optional. Whether the table names, e.g. wpdb::posts,
-        --                                should be updated or not. Default true.
-        -- @return string|WP_Error Old prefix or WP_Error on error.
-        --
-        -- public function set_prefix(prefix, set_table_names = true) then
+   ----------------
+   -- Set_Prefix --
+   ----------------
 
-        --         if (preg_match("|[^a-z0-9_]|i", prefix)) then
-        --                 return new WP_Error("invalid_db_prefix", "Invalid database prefix");
-        --         end;
+   function Set_Prefix (This            : in out Wpdb_Class;
+                        Prefix          : String;
+                        Set_Table_Names : Boolean := True)
+                        return String
+   is
+      Old_Prefix   : Unbounded_String;
+      Unused_Match : Array_Type;
+   begin
+      if 0 = Preg_Match ("|[^a-z0-9_]|i", Prefix, Unused_Match) then
+         return "";
+--       return new Wp_Error ("invalid_db_prefix", "Invalid database prefix");
+      end if;
 
-        --         old_prefix = is_multisite() ? "" : prefix;
+      Old_Prefix := +(if Inc_Load.Is_Multisite then "" else Prefix);
 
-        --         if (isset(this.base_prefix)) then
-        --                 old_prefix = this.base_prefix;
-        --         end;
+      if Isset (-This.Base_Prefix) then
+         Old_Prefix := This.Base_Prefix;
+      end if;
 
-        --         this.base_prefix = prefix;
+      This.Base_Prefix := +Prefix;
 
-        --         if (set_table_names) then
-        --                 foreach (this.tables("global") as table => prefixed_table) then
-        --                         this.table = prefixed_table;
-        --                 end;
+      if Set_Table_Names then
 
-        --                 if (is_multisite() && empty(this.blogid)) then
-        --                         return old_prefix;
-        --                 end;
+         -- for A of This.Tables ("global") loop
+         --    declare
+         --       use String_Maps;
 
-        --                 this.prefix = this.get_blog_prefix();
+         --       Table          : constant String := Key   (A);
+         --       Prefixed_Table : constant String := Value (A);
+         --    begin
+         --       null; -- This (Table) := Prefixed_Table;
+         --    end;
+         -- end loop;
 
-        --                 foreach (this.tables("blog") as table => prefixed_table) then
-        --                         this.table = prefixed_table;
-        --                 end;
+         if Inc_Load.Is_Multisite and then This.Blogid = 0 then
+            return -Old_Prefix;
+         end if;
 
-        --                 foreach (this.tables("old") as table => prefixed_table) then
-        --                         this.table = prefixed_table;
-        --                 end;
-        --         end;
-        --         return old_prefix;
-        -- end;
+         This.Prefix := +This.Get_Blog_Prefix; -- ()
+
+         -- for A of This.Tables ("blog") loop
+         --    declare
+         --       use String_Maps;
+
+         --       Table          : constant String := Key   (A);
+         --       Prefixed_Table : constant String := Value (A);
+         --    begin
+         --       null; -- Set (This, Table, Prefixed_Table);
+         --    end;
+         -- end loop;
+
+         -- for A of This.Tables ("old") loop
+         --    declare
+         --       use String_Maps;
+
+         --       Table          : constant String := Key   (A);
+         --       Prefixed_Table : constant String := Value (A);
+         --    begin
+         --       null; -- Set (This, Table, Prefixed_Table);
+         --    end;
+         -- end loop;
+
+      end if;
+      return -Old_Prefix;
+   end Set_Prefix;
 
         --
         -- Sets blog ID.
@@ -1161,6 +1185,12 @@ is
         -- @return bool True with a successful connection, false on failure.
         --
         -- public function db_connect(allow_bail = true) then
+   function Db_Connect (This       : in out Wpdb_Class;
+                        Allow_Bail : Boolean := True)
+                        return Boolean
+                        is (False);
+--   is
+--   begin
         --         this.is_mysql = true;
 
         --         /*
@@ -2192,6 +2222,23 @@ is
         -- @return array|object|null|void Database query result in format specified by output or null on failure.
         --
 --        public function get_row(query = null, output = OBJECT, y = 0)
+   procedure Get_Row (Db      : in out Wpdb_Class;
+                      Post    : Inc_Class_Wp_Posts.Wp_Post;
+                      Query   : String  := ""; -- = null,
+                      Output  : String  := ""; -- = OBJECT,
+                      Y       : Natural := 0;
+                      Success : out Boolean)
+   is
+      Result : constant String :=
+        Get_Row (Db      => Db,
+                 Post    => Post,
+                 Query   => Query,
+                 Output  => Output,
+                 Y       => Y,
+                 Success => Success);
+   begin
+      null;
+   end Get_Row;
 
    function Get_Row (Db      : in out Wpdb_Class;
                      Post    : Inc_Class_Wp_Posts.Wp_Post;

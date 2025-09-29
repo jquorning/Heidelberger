@@ -1,5 +1,11 @@
+--
+-- These functions are needed to load WordPress.
+--
+-- @package WordPress
+--
 
 with Ada.Containers.Indefinite_Vectors;
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
@@ -15,290 +21,302 @@ is
                                          Element_Type => String);
    subtype String_List is String_Vectors.Vector;
 
+   package String_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => String);
+
    type Wpdb_Class is tagged  -- _class added jq
       record
-
-        --
-        -- Whether to show SQL/DB errors.
-        --
-        -- Default is to show errors if both WP_DEBUG and WP_DEBUG_DISPLAY evaluate to true.
-        --
-        -- @since 0.71
-        --
-        -- @var bool
-        --
+         --
+         -- Whether to show SQL/DB errors.
+         --
+         -- Default is to show errors if both WP_DEBUG and WP_DEBUG_DISPLAY evaluate
+         -- to true.
+         --
+         -- @since 0.71
+         --
+         -- @var bool
+         --
 --        public $show_errors = false;
 
-        --
-        -- Whether to suppress errors during the DB bootstrapping. Default false.
-        --
-        -- @since 2.5.0
-        --
-        -- @var bool
-        --
+         --
+         -- Whether to suppress errors during the DB bootstrapping. Default false.
+         --
+         -- @since 2.5.0
+         --
+         -- @var bool
+         --
 --        public $suppress_errors = false;
 
-        --
-        -- The error encountered during the last query.
-        --
-        -- @since 2.5.0
-        --
-        -- @var string
-        --
+         --
+         -- The error encountered during the last query.
+         --
+         -- @since 2.5.0
+         --
+         -- @var string
+         --
 --        public $last_error = '';
 
-        --
-        -- The number of queries made.
-        --
-        -- @since 1.2.0
-        --
-        -- @var int
-        --
+         --
+         -- The number of queries made.
+         --
+         -- @since 1.2.0
+         --
+         -- @var int
+         --
 --        public $num_queries = 0;
 
-        --
-        -- Count of rows returned by the last query.
-        --
-        -- @since 0.71
-        --
-        -- @var int
-        --
+         --
+         -- Count of rows returned by the last query.
+         --
+         -- @since 0.71
+         --
+         -- @var int
+         --
 --        public $num_rows = 0;
 
-        --
-        -- Count of rows affected by the last query.
-        --
-        -- @since 0.71
-        --
-        -- @var int
-        --
+         --
+         -- Count of rows affected by the last query.
+         --
+         -- @since 0.71
+         --
+         -- @var int
+         --
 --        public $rows_affected = 0;
 
-        --
-        -- The ID generated for an AUTO_INCREMENT column by the last query (usually INSERT).
-        --
-        -- @since 0.71
-        --
-        -- @var int
-        --
+         --
+         -- The ID generated for an AUTO_INCREMENT column by the last query (usually
+         -- INSERT).
+         --
+         -- @since 0.71
+         --
+         -- @var int
+         --
 --        public $insert_id = 0;
 
-        --
-        -- The last query made.
-        --
-        -- @since 0.71
-        --
-        -- @var string
-        --
+         --
+         -- The last query made.
+         --
+         -- @since 0.71
+         --
+         -- @var string
+         --
 --        public $last_query;
 
-        --
-        -- Results of the last query.
-        --
-        -- @since 0.71
-        --
-        -- @var stdClass[]|null
-        --
-        Last_Result : String_List;
+         --
+         -- Results of the last query.
+         --
+         -- @since 0.71
+         --
+         -- @var stdClass[]|null
+         --
+         Last_Result : String_List;
 
-        --
-        -- Database query result.
-        --
-        -- Possible values:
-        --
-        -- - For successful SELECT, SHOW, DESCRIBE, or EXPLAIN queries:
-        --   - `mysqli_result` instance when the `mysqli` driver is in use
-        --   - `resource` when the older `mysql` driver is in use
-        -- - `true` for other query types that were successful
-        -- - `null` if a query is yet to be made or if the result has since been flushed
-        -- - `false` if the query returned an error
-        --
-        -- @since 0.71
-        --
-        -- @var mysqli_result|resource|bool|null
-        --
+         --
+         -- Database query result.
+         --
+         -- Possible values:
+         --
+         -- - For successful SELECT, SHOW, DESCRIBE, or EXPLAIN queries:
+         --   - `mysqli_result` instance when the `mysqli` driver is in use
+         --   - `resource` when the older `mysql` driver is in use
+         -- - `true` for other query types that were successful
+         -- - `null` if a query is yet to be made or if the result has since been
+         --          flushed
+         -- - `false` if the query returned an error
+         --
+         -- @since 0.71
+         --
+         -- @var mysqli_result|resource|bool|null
+         --
 --        protected $result;
 
-        --
-        -- Cached column info, for sanity checking data before inserting.
-        --
-        -- @since 4.2.0
-        --
-        -- @var array
-        --
+         --
+         -- Cached column info, for sanity checking data before inserting.
+         --
+         -- @since 4.2.0
+         --
+         -- @var array
+         --
 --        protected $col_meta = array();
-        Col_Meta : Array_Type;
+         Col_Meta : Array_Type;
 
-        --
-        -- Calculated character sets keyed by table name.
-        --
-        -- @since 4.2.0
-        --
-        -- @var string[]
-        --
+         --
+         -- Calculated character sets keyed by table name.
+         --
+         -- @since 4.2.0
+         --
+         -- @var string[]
+         --
 --        protected $table_charset = array();
 
-        --
-        -- Whether text fields in the current query need to be sanity checked.
-        --
-        -- @since 4.2.0
-        --
-        -- @var bool
-        --
-        Check_Current_Query : Boolean := True;
+         --
+         -- Whether text fields in the current query need to be sanity checked.
+         --
+         -- @since 4.2.0
+         --
+         -- @var bool
+         --
+         Check_Current_Query : Boolean := True;
 
-        --
-        -- Flag to ensure we don't run into recursion problems when checking the collation.
-        --
-        -- @since 4.2.0
-        --
-        -- @see wpdb::check_safe_collation()
-        -- @var bool
-        --
-        Checking_Collation : Boolean := False;
+         --
+         -- Flag to ensure we don't run into recursion problems when checking the
+         -- collation.
+         --
+         -- @since 4.2.0
+         --
+         -- @see wpdb::check_safe_collation()
+         -- @var bool
+         --
+         Checking_Collation : Boolean := False;
 
-        --
-        -- Saved info on the table column.
-        --
-        -- @since 0.71
-        --
-        -- @var array
-        --
+         --
+         -- Saved info on the table column.
+         --
+         -- @since 0.71
+         --
+         -- @var array
+         --
 --        protected $col_info;
 
-        --
-        -- Log of queries that were executed, for debugging purposes.
-        --
-        -- @since 1.5.0
-        -- @since 2.5.0 The third element in each query log was added to record the calling functions.
-        -- @since 5.1.0 The fourth element in each query log was added to record the start time.
-        -- @since 5.3.0 The fifth element in each query log was added to record custom data.
-        --
-        -- @var array[] then
-        --     Array of arrays containing information about queries that were executed.
-        --
-        --     @type array ...$0 then
-        --         Data for each query.
-        --
-        --         @type string $0 The query's SQL.
-        --         @type float  $1 Total time spent on the query, in seconds.
-        --         @type string $2 Comma-separated list of the calling functions.
-        --         @type float  $3 Unix timestamp of the time at the start of the query.
-        --         @type array  $4 Custom query data.
-        --     end;
-        -- end;
-        --
+         --
+         -- Log of queries that were executed, for debugging purposes.
+         --
+         -- @since 1.5.0
+         -- @since 2.5.0 The third element in each query log was added to record the
+         --              calling functions.
+         -- @since 5.1.0 The fourth element in each query log was added to record the
+         --              start time.
+         -- @since 5.3.0 The fifth element in each query log was added to record
+         --              custom data.
+         --
+         -- @var array[] then
+         --     Array of arrays containing information about queries that were executed.
+         --
+         --     @type array ...$0 then
+         --         Data for each query.
+         --
+         --         @type string $0 The query's SQL.
+         --         @type float  $1 Total time spent on the query, in seconds.
+         --         @type string $2 Comma-separated list of the calling functions.
+         --         @type float  $3 Unix timestamp of the time at the start of the query.
+         --         @type array  $4 Custom query data.
+         --     end;
+         -- end;
+         --
 --        public $queries;
 
-        --
-        -- The number of times to retry reconnecting before dying. Default 5.
-        --
-        -- @since 3.9.0
-        --
-        -- @see wpdb::check_connection()
-        -- @var int
-        --
+         --
+         -- The number of times to retry reconnecting before dying. Default 5.
+         --
+         -- @since 3.9.0
+         --
+         -- @see wpdb::check_connection()
+         -- @var int
+         --
 --        protected $reconnect_retries = 5;
 
-        --
-        -- WordPress table prefix.
-        --
-        -- You can set this to have multiple WordPress installations in a single database.
-        -- The second reason is for possible security precautions.
-        --
-        -- @since 2.5.0
-        --
-        -- @var string
-        --
---        public $prefix = '';
+         --
+         -- WordPress table prefix.
+         --
+         -- You can set this to have multiple WordPress installations in a single
+         -- database. The second reason is for possible security precautions.
+         --
+         -- @since 2.5.0
+         --
+         -- @var string
+         --
+         Prefix : Unbounded_String; -- = '';
 
-        --
-        -- WordPress base table prefix.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
---        public $base_prefix;
+         --
+         -- WordPress base table prefix.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
+         Base_Prefix : Unbounded_String;
 
-        --
-        -- Whether the database queries are ready to start executing.
-        --
-        -- @since 2.3.2
-        --
-        -- @var bool
-        --
+         --
+         -- Whether the database queries are ready to start executing.
+         --
+         -- @since 2.3.2
+         --
+         -- @var bool
+         --
 --        public $ready = false;
 
-        --
-        -- Blog ID.
-        --
-        -- @since 3.0.0
-        --
-        -- @var int
-        --
---        public $blogid = 0;
+         --
+         -- Blog ID.
+         --
+         -- @since 3.0.0
+         --
+         -- @var int
+         --
+         Blogid : Integer := 0;
 
-        --
-        -- Site ID.
-        --
-        -- @since 3.0.0
-        --
-        -- @var int
-        --
+         --
+         -- Site ID.
+         --
+         -- @since 3.0.0
+         --
+         -- @var int
+         --
 --        public $siteid = 0;
 
-        --
-        -- List of WordPress per-site tables.
-        --
-        -- @since 2.5.0
-        --
-        -- @see wpdb::tables()
-        -- @var string[]
-        --
---        public $tables = array(
---                'posts',
---                'comments',
---                'links',
---                'options',
---                'postmeta',
---                'terms',
---                'term_taxonomy',
---                'term_relationships',
---                'termmeta',
---                'commentmeta',
---        );
+         --
+         -- List of WordPress per-site tables.
+         --
+         -- @since 2.5.0
+         --
+         -- @see wpdb::tables()
+         -- @var string[]
+         --
+         Tables : String_Maps.Map;
+         --  := To_Map ((
+         --       Build ("posts",              ""),
+         --       Build ("comments",           ""),
+         --       Build ("links",              ""),
+         --       Build ("options",            ""),
+         --       Build ("postmeta",           ""),
+         --       Build ("terms",              ""),
+         --       Build ("term_taxonomy",      ""),
+         --       Build ("term_relationships", ""),
+         --       Build ("termmeta",           ""),
+         --       Build ("Commentmeta",        "")
+         -- ));
 
-        --
-        -- List of deprecated WordPress tables.
-        --
-        -- 'categories', 'post2cat', and 'link2cat' were deprecated in 2.3.0, db version 5539.
-        --
-        -- @since 2.9.0
-        --
-        -- @see wpdb::tables()
-        -- @var string[]
-        --
+         --
+         -- List of deprecated WordPress tables.
+         --
+         -- 'categories', 'post2cat', and 'link2cat' were deprecated in 2.3.0,
+         -- db version 5539.
+         --
+         -- @since 2.9.0
+         --
+         -- @see wpdb::tables()
+         -- @var string[]
+         --
 --        public $old_tables = array( 'categories', 'post2cat', 'link2cat' );
 
-        --
-        -- List of WordPress global tables.
-        --
-        -- @since 3.0.0
-        --
-        -- @see wpdb::tables()
-        -- @var string[]
-        --
+         --
+         -- List of WordPress global tables.
+         --
+         -- @since 3.0.0
+         --
+         -- @see wpdb::tables()
+         -- @var string[]
+         --
 --        public $global_tables = array( 'users', 'usermeta' );
 
-        --
-        -- List of Multisite global tables.
-        --
-        -- @since 3.0.0
-        --
-        -- @see wpdb::tables()
-        -- @var string[]
-        --
+         --
+         -- List of Multisite global tables.
+         --
+         -- @since 3.0.0
+         --
+         -- @see wpdb::tables()
+         -- @var string[]
+         --
 --        public $ms_global_tables = array(
 --                'blogs',
 --                'blogmeta',
@@ -308,308 +326,312 @@ is
 --                'registration_log',
 --        );
 
-        --
-        -- List of deprecated WordPress Multisite global tables.
-        --
-        -- @since 6.1.0
-        --
-        -- @see wpdb::tables()
-        -- @var string[]
-        --
+         --
+         -- List of deprecated WordPress Multisite global tables.
+         --
+         -- @since 6.1.0
+         --
+         -- @see wpdb::tables()
+         -- @var string[]
+         --
 --        public $old_ms_global_tables = array( 'sitecategories' );
 
-        --
-        -- WordPress Comments table.
-        --
-        -- @since 1.5.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Comments table.
+         --
+         -- @since 1.5.0
+         --
+         -- @var string
+         --
 --        public $comments;
 
-        --
-        -- WordPress Comment Metadata table.
-        --
-        -- @since 2.9.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Comment Metadata table.
+         --
+         -- @since 2.9.0
+         --
+         -- @var string
+         --
 --        public $commentmeta;
 
-        --
-        -- WordPress Links table.
-        --
-        -- @since 1.5.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Links table.
+         --
+         -- @since 1.5.0
+         --
+         -- @var string
+         --
 --        public $links;
 
-        --
-        -- WordPress Options table.
-        --
-        -- @since 1.5.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Options table.
+         --
+         -- @since 1.5.0
+         --
+         -- @var string
+         --
 --        public $options;
 
-        --
-        -- WordPress Post Metadata table.
-        --
-        -- @since 1.5.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Post Metadata table.
+         --
+         -- @since 1.5.0
+         --
+         -- @var string
+         --
 --        public $postmeta;
 
-        --
-        -- WordPress Posts table.
-        --
-        -- @since 1.5.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Posts table.
+         --
+         -- @since 1.5.0
+         --
+         -- @var string
+         --
 --        public $posts;
 
-        --
-        -- WordPress Terms table.
-        --
-        -- @since 2.3.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Terms table.
+         --
+         -- @since 2.3.0
+         --
+         -- @var string
+         --
 --        public $terms;
 
-        --
-        -- WordPress Term Relationships table.
-        --
-        -- @since 2.3.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Term Relationships table.
+         --
+         -- @since 2.3.0
+         --
+         -- @var string
+         --
 --        public $term_relationships;
 
-        --
-        -- WordPress Term Taxonomy table.
-        --
-        -- @since 2.3.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Term Taxonomy table.
+         --
+         -- @since 2.3.0
+         --
+         -- @var string
+         --
 --        public $term_taxonomy;
 
-        --
-        -- WordPress Term Meta table.
-        --
-        -- @since 4.4.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Term Meta table.
+         --
+         -- @since 4.4.0
+         --
+         -- @var string
+         --
 --        public $termmeta;
 
-        --
-        -- Global and Multisite tables
-        --
+         --
+         -- Global and Multisite tables
+         --
 
-        --
-        -- WordPress User Metadata table.
-        --
-        -- @since 2.3.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress User Metadata table.
+         --
+         -- @since 2.3.0
+         --
+         -- @var string
+         --
 --        public $usermeta;
 
-        --
-        -- WordPress Users table.
-        --
-        -- @since 1.5.0
-        --
-        -- @var string
-        --
+         --
+         -- WordPress Users table.
+         --
+         -- @since 1.5.0
+         --
+         -- @var string
+         --
 --        public $users;
 
-        --
-        -- Multisite Blogs table.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Blogs table.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
 --        public $blogs;
 
-        --
-        -- Multisite Blog Metadata table.
-        --
-        -- @since 5.1.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Blog Metadata table.
+         --
+         -- @since 5.1.0
+         --
+         -- @var string
+         --
 --        public $blogmeta;
 
-        --
-        -- Multisite Registration Log table.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Registration Log table.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
 --        public $registration_log;
 
-        --
-        -- Multisite Signups table.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Signups table.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
 --        public $signups;
 
-        --
-        -- Multisite Sites table.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Sites table.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
 --        public $site;
 
-        --
-        -- Multisite Sitewide Terms table.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Sitewide Terms table.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
 --        public $sitecategories;
 
-        --
-        -- Multisite Site Metadata table.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
+         --
+         -- Multisite Site Metadata table.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
 --        public $sitemeta;
 
-        --
-        -- Format specifiers for DB columns.
-        --
-        -- Columns not listed here default to %s. Initialized during WP load.
-        -- Keys are column names, values are format types: 'ID' => '%d'.
-        --
-        -- @since 2.8.0
-        --
-        -- @see wpdb::prepare()
-        -- @see wpdb::insert()
-        -- @see wpdb::update()
-        -- @see wpdb::delete()
-        -- @see wp_set_wpdb_vars()
-        -- @var array
-        --
---        public $field_types = array();
+         --
+         -- Format specifiers for DB columns.
+         --
+         -- Columns not listed here default to %s. Initialized during WP load.
+         -- Keys are column names, values are format types: 'ID' => '%d'.
+         --
+         -- @since 2.8.0
+         --
+         -- @see wpdb::prepare()
+         -- @see wpdb::insert()
+         -- @see wpdb::update()
+         -- @see wpdb::delete()
+         -- @see wp_set_wpdb_vars()
+         -- @var array
+         --
+         Field_Types : Array_Type;
 
-        --
-        -- Database table columns charset.
-        --
-        -- @since 2.2.0
-        --
-        -- @var string
-        --
+         --
+         -- Database table columns charset.
+         --
+         -- @since 2.2.0
+         --
+         -- @var string
+         --
 --        public $charset;
 
-        --
-        -- Database table columns collate.
-        --
-        -- @since 2.2.0
-        --
-        -- @var string
-        --
+         --
+         -- Database table columns collate.
+         --
+         -- @since 2.2.0
+         --
+         -- @var string
+         --
 --        public $collate;
 
-        --
-        -- Database Username.
-        --
-        -- @since 2.9.0
-        --
-        -- @var string
-        --
---        protected $dbuser;
+         --
+         -- Database Username.
+         --
+         -- @since 2.9.0
+         --
+         -- @var string
+         --
+--        protected
+         Dbuser : Unbounded_String;
 
-        --
-        -- Database Password.
-        --
-        -- @since 3.1.0
-        --
-        -- @var string
-        --
---        protected $dbpassword;
+         --
+         -- Database Password.
+         --
+         -- @since 3.1.0
+         --
+         -- @var string
+         --
+--        protected
+         Dbpassword : Unbounded_String;
 
-        --
-        -- Database Name.
-        --
-        -- @since 3.1.0
-        --
-        -- @var string
-        --
---        protected $dbname;
+         --
+         -- Database Name.
+         --
+         -- @since 3.1.0
+         --
+         -- @var string
+         --
+--        protected
+         Dbname : Unbounded_String;
 
-        --
-        -- Database Host.
-        --
-        -- @since 3.1.0
-        --
-        -- @var string
-        --
---        protected $dbhost;
+         --
+         -- Database Host.
+         --
+         -- @since 3.1.0
+         --
+         -- @var string
+         --
+--        protected
+         Dbhost : Unbounded_String;
 
-        --
-        -- Database handle.
-        --
-        -- Possible values:
-        --
-        -- - `mysqli` instance when the `mysqli` driver is in use
-        -- - `resource` when the older `mysql` driver is in use
-        -- - `null` if the connection is yet to be made or has been closed
-        -- - `false` if the connection has failed
-        --
-        -- @since 0.71
-        --
-        -- @var mysqli|resource|false|null
-        --
+         --
+         -- Database handle.
+         --
+         -- Possible values:
+         --
+         -- - `mysqli` instance when the `mysqli` driver is in use
+         -- - `resource` when the older `mysql` driver is in use
+         -- - `null` if the connection is yet to be made or has been closed
+         -- - `false` if the connection has failed
+         --
+         -- @since 0.71
+         --
+         -- @var mysqli|resource|false|null
+         --
 --        protected $dbh;
 
-        --
-        -- A textual description of the last query/get_row/get_var call.
-        --
-        -- @since 3.0.0
-        --
-        -- @var string
-        --
-        Func_Call : Unbounded_String;
+         --
+         -- A textual description of the last query/get_row/get_var call.
+         --
+         -- @since 3.0.0
+         --
+         -- @var string
+         --
+         Func_Call : Unbounded_String;
 
-        --
-        -- Whether MySQL is used as the database engine.
-        --
-        -- Set in wpdb::db_connect() to true, by default. This is used when checking
-        -- against the required MySQL version for WordPress. Normally, a replacement
-        -- database drop-in (db.php) will skip these checks, but setting this to true
-        -- will force the checks to occur.
-        --
-        -- @since 3.3.0
-        --
-        -- @var bool
-        --
+         --
+         -- Whether MySQL is used as the database engine.
+         --
+         -- Set in wpdb::db_connect() to true, by default. This is used when checking
+         -- against the required MySQL version for WordPress. Normally, a replacement
+         -- database drop-in (db.php) will skip these checks, but setting this to true
+         -- will force the checks to occur.
+         --
+         -- @since 3.3.0
+         --
+         -- @var bool
+         --
 --        public $is_mysql = null;
 
-        --
-        -- A list of incompatible SQL modes.
-        --
-        -- @since 3.9.0
-        --
-        -- @var string[]
-        --
+         --
+         -- A list of incompatible SQL modes.
+         --
+         -- @since 3.9.0
+         --
+         -- @var string[]
+         --
 --        protected $incompatible_modes = array(
 --                'NO_ZERO_DATE',
 --                'ONLY_FULL_GROUP_BY',
@@ -619,46 +641,79 @@ is
 --                'ANSI',
 --        );
 
-        --
-        -- Whether to use mysqli over mysql. Default false.
-        --
-        -- @since 3.9.0
-        --
-        -- @var bool
-        --
+         --
+         -- Whether to use mysqli over mysql. Default false.
+         --
+         -- @since 3.9.0
+         --
+         -- @var bool
+         --
 --        private $use_mysqli = false;
 
-        --
-        -- Whether we've managed to successfully connect at some point.
-        --
-        -- @since 3.9.0
-        --
-        -- @var bool
-        --
+         --
+         -- Whether we've managed to successfully connect at some point.
+         --
+         -- @since 3.9.0
+         --
+         -- @var bool
+         --
 --        private $has_connected = false;
 
-        --
-        -- Time when the last query was performed.
-        --
-        -- Only set when `SAVEQUERIES` is defined and truthy.
-        --
-        -- @since 1.5.0
-        --
-        -- @var float
-        --
+         --
+         -- Time when the last query was performed.
+         --
+         -- Only set when `SAVEQUERIES` is defined and truthy.
+         --
+         -- @since 1.5.0
+         --
+         -- @var float
+         --
 --        public $time_start = null;
 
-        --
-        -- The last SQL error that was encountered.
-        --
-        -- @since 2.5.0
-        --
-        -- @var WP_Error|string
-        --
+         --
+         -- The last SQL error that was encountered.
+         --
+         -- @since 2.5.0
+         --
+         -- @var WP_Error|string
+         --
 --        public $error = null;
 
       end record;
 
+   --
+   -- Connects to the database server and selects a database.
+   --
+   -- Does the actual setting up
+   -- of the class properties and connection to the database.
+   --
+   -- @since 2.0.8
+   --
+   -- @link https://core.trac.wordpress.org/ticket/3354
+   --
+   -- @param string dbuser     Database user.
+   -- @param string dbpassword Database password.
+   -- @param string dbname     Database name.
+   -- @param string dbhost     Database host.
+   --
+   function X_Construct (Dbuser     : String;
+                         Dbpassword : String;
+                         Dbname     : String;
+                         Dbhost     : String)
+                         return Wpdb_Class;
+
+   --
+   -- Gets blog prefix.
+   --
+   -- @since 3.0.0
+   --
+   -- @param int blog_id Optional.
+   -- @return string Blog prefix.
+   --
+   function Get_Blog_Prefix (This    : Wpdb_Class;
+                             Blog_Id : Integer := 0) -- null
+                             return String
+                             is ("XXX-709");
    --
    -- Checks if a string is ASCII.
    --
@@ -674,6 +729,23 @@ is
    function Check_Ascii (This : Wpdb_Class;
                          Item : String)
                          return Boolean is (False);
+
+   --
+   -- Connects to and selects database.
+   --
+   -- If `allow_bail` is false, the lack of database connection will need to be
+   -- handled manually.
+   --
+   -- @since 3.0.0
+   -- @since 3.9.0 allow_bail parameter added.
+   --
+   -- @param bool allow_bail Optional. Allows the function to bail. Default true.
+   -- @return bool True with a successful connection, false on failure.
+   --
+   function Db_Connect (This       : in out Wpdb_Class;
+                        Allow_Bail : Boolean := True)
+                        return Boolean;
+
    --
    -- Checks if the query is accessing a collation considered safe on the current
    -- version of MySQL.
@@ -823,8 +895,16 @@ is
                       Query   : String  := ""; -- = null,
                       Output  : String  := ""; -- = OBJECT,
                       Y       : Natural := 0;
-                      Success : out Boolean) is null;
-                      -- return Array_Type;
+                      Success : out Boolean);
+
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Post    : Inc_Class_Wp_Posts.Wp_Post;
+                     Query   : String  := ""; -- = null,
+                     Output  : String  := ""; -- = OBJECT,
+                     Y       : Natural := 0;
+                     Success : out Boolean)
+                     return String;
+
    --
    -- Retrieves one column from the database.
    --
@@ -874,5 +954,21 @@ is
                                   Query : String)
                                   return String
                                   is ("XXX-203");
+
+   --
+   -- Sets the table prefix for the WordPress tables.
+   --
+   -- @since 2.5.0
+   --
+   -- @param string prefix          Alphanumeric name for the new prefix.
+   -- @param bool   set_table_names Optional. Whether the table names, e.g.
+   --                               wpdb::posts, should be updated or not. Default
+   --                               true.
+   -- @return string|WP_Error Old prefix or WP_Error on error.
+   --
+   function Set_Prefix (This            : in out Wpdb_Class;
+                        Prefix          : String;
+                        Set_Table_Names : Boolean := True)
+                        return String;
 
 end Inc_Class_Wpdb;

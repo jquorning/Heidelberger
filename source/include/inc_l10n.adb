@@ -6,6 +6,17 @@
 -- @since 1.2.0
 --
 
+with Ada.Strings.Unbounded;
+
+with Binder;
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Formatting;
+with Inc_Plugins;
+with Inc_Load;
+
 package body Inc_L10n is
 
    function "abs" (Item : String) return String is (Item);
@@ -122,62 +133,82 @@ package body Inc_L10n is
 --         return locale ? locale : get_locale();
 -- end;
 
--- --
--- -- Determines the current locale desired for the request.
--- --
--- -- @since 5.0.0
--- --
--- -- @global string pagenow The filename of the current screen.
--- --
--- -- @return string The determined locale.
--- --
--- function determine_locale() then
---         --
---         -- Filters the locale for the current request prior to the default determination process.
---         --
---         -- Using this filter allows to override the default logic, effectively short-circuiting the function.
---         --
---         -- @since 5.0.0
---         --
---         -- @param string|null locale The locale to return and short-circuit. Default null.
---         --
---         determined_locale = apply_filters( "pre_determine_locale", null );
+   ----------------------
+   -- Determine_Locale --
+   ----------------------
 
---         if ( ! empty( determined_locale ) && is_string( determined_locale ) ) then
---                 return determined_locale;
---         end;
+   function Determine_Locale
+            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Binder;
+      use Globals;
+      use Hb_Common;
+      use Inc_Formatting;
 
---         determined_locale = get_locale();
+      Determined_Locale : Unbounded_String;
+      Wp_Lang           : Unbounded_String;
+   begin
+      --
+      -- Filters the locale for the current request prior to the default determination
+      -- process.
+      --
+      -- Using this filter allows to override the default logic, effectively
+      -- short-circuiting the function.
+      --
+      -- @since 5.0.0
+      --
+      -- @param string|null locale The locale to return and short-circuit. Default
+      --                    null.
+      --
+      Determined_Locale := +Apply_Filters ("pre_determine_locale", ""); -- null
 
---         if ( is_admin() ) then
---                 determined_locale = get_user_locale();
---         end;
+      if
+        not Empty (-Determined_Locale) and then
+        Php.Is_String (-Determined_Locale)
+      then
+         return -Determined_Locale;
+      end if;
 
---         if ( isset( _GET["_locale"] ) && "user" === _GET["_locale"] && wp_is_json_request() ) then
---                 determined_locale = get_user_locale();
---         end;
+      Determined_Locale := +Get_Locale; -- ()
 
---         wp_lang = "";
+      if Inc_Load.Is_Admin then
+         Determined_Locale := +Get_User_Locale; -- ()
+      end if;
 
---         if ( ! empty( _GET["wp_lang"] ) ) then
---                 wp_lang = sanitize_locale_name( wp_unslash( _GET["wp_lang"] ) );
---         end; elseif ( ! empty( _COOKIE["wp_lang"] ) ) then
---                 wp_lang = sanitize_locale_name( wp_unslash( _COOKIE["wp_lang"] ) );
---         end;
+      if
+        Isset (XX_GET, "_locale") and then
+        "user" = Get (XX_GET, "_locale") and then
+        Inc_Load.Wp_Is_Json_Request
+      then
+         Determined_Locale := +Get_User_Locale;
+      end if;
 
---         if ( ! empty( wp_lang ) && ! empty( GLOBALS["pagenow"] ) && "wp-login.php" === GLOBALS["pagenow"] ) then
---                 determined_locale = wp_lang;
---         end;
+      Wp_Lang := +"";
 
---         --
---         -- Filters the locale for the current request.
---         --
---         -- @since 5.0.0
---         --
---         -- @param string locale The locale.
---         --
---         return apply_filters( "determine_locale", determined_locale );
--- end;
+      if not Empty (XX_GET, "wp_lang") then
+         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (Get (XX_GET, "wp_lang")));
+      elsif not Empty (X_COOKIE, "wp_lang") then
+         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (Get (X_COOKIE, "wp_lang")));
+      end if;
+
+      if
+        not Empty (-Wp_Lang) and then
+        not Empty (Globals.GLOBALS, "pagenow") and then
+        "wp-login.php" = Get (Globals.GLOBALS, "pagenow")
+      then
+         Determined_Locale := Wp_Lang;
+      end if;
+
+      --
+      -- Filters the locale for the current request.
+      --
+      -- @since 5.0.0
+      --
+      -- @param string locale The locale.
+      --
+      return Apply_Filters ("determine_locale", -Determined_Locale);
+   end Determine_Locale;
 
 -- --
 -- -- Retrieves the translation of text.
@@ -705,159 +736,188 @@ package body Inc_L10n is
 --         end;
 -- end;
 
--- --
--- -- Loads a .mo file into the text domain domain.
--- --
--- -- If the text domain already exists, the translations will be merged. If both
--- -- sets have the same string, the translation from the original value will be taken.
--- --
--- -- On success, the .mo file will be placed in the l10n global by domain
--- -- and will be a MO object.
--- --
--- -- @since 1.5.0
--- -- @since 6.1.0 Added the `locale` parameter.
--- --
--- -- @global MO[]                   l10n                   An array of all currently loaded text domains.
--- -- @global MO[]                   l10n_unloaded          An array of all text domains that have been unloaded again.
--- -- @global WP_Textdomain_Registry wp_textdomain_registry WordPress Textdomain Registry.
--- --
--- -- @param string domain Text domain. Unique identifier for retrieving translated strings.
--- -- @param string mofile Path to the .mo file.
--- -- @param string locale Optional. Locale. Default is the current locale.
--- -- @return bool True on success, false on failure.
--- --
--- function load_textdomain( domain, mofile, locale = null ) then
---         -- @var WP_Textdomain_Registry wp_textdomain_registry--
---         global l10n, l10n_unloaded, wp_textdomain_registry;
+   ---------------------
+   -- Load_Textdomain --
+   ---------------------
 
---         l10n_unloaded = (array) l10n_unloaded;
+   procedure Load_Textdomain (Domain : String;
+                              Mofile : String;
+                              Locale : String := "")
+   is
+      Unused : constant Boolean :=
+        Load_Textdomain (Domain, Mofile, Locale);
+   begin
+      null;
+   end Load_Textdomain;
 
---         --
---         -- Filters whether to override the .mo file loading.
---         --
---         -- @since 2.9.0
---         --
---         -- @param bool   override Whether to override the .mo file loading. Default false.
---         -- @param string domain   Text domain. Unique identifier for retrieving translated strings.
---         -- @param string mofile   Path to the MO file.
---         --
---         plugin_override = apply_filters( "override_load_textdomain", false, domain, mofile );
+   function Load_Textdomain (Domain : String;
+                             Mofile : String;
+                             Locale : String := "") -- null
+                             return Boolean
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Plugins;
 
---         if ( true === (bool) plugin_override ) then
---                 unset( l10n_unloaded[ domain ] );
+-- @var WP_Textdomain_Registry wp_textdomain_registry
+--    global (l10n, l10n_unloaded, Wp_Textdomain_Registry);
+      Mofile_2        : Unbounded_String;
+      Plugin_Override : Unbounded_String;
+      Locale_2        : Unbounded_String := +Locale;
+   begin
+--    l10n_unloaded := (array) l10n_unloaded;
 
---                 return true;
---         end;
+      --
+      -- Filters whether to override the .mo file loading.
+      --
+      -- @since 2.9.0
+      --
+      -- @param bool   override Whether to override the .mo file loading. Default
+      --                        false.
+      -- @param string domain   Text domain. Unique identifier for retrieving
+      --                        translated strings.
+      -- @param string mofile   Path to the MO file.
+      --
+      Plugin_Override := +Apply_Filters ("override_load_textdomain",
+                                         False, Domain, Mofile);
 
---         --
---         -- Fires before the MO translation file is loaded.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string domain Text domain. Unique identifier for retrieving translated strings.
---         -- @param string mofile Path to the .mo file.
---         --
---         do_action( "load_textdomain", domain, mofile );
+      if "" /= Plugin_Override then
+--    if True = (bool) Plugin_Override then
+--       unset( l10n_unloaded[ domain ] );
 
---         --
---         -- Filters MO file path for loading translations for a specific text domain.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string mofile Path to the MO file.
---         -- @param string domain Text domain. Unique identifier for retrieving translated strings.
---         --
---         mofile = apply_filters( "load_textdomain_mofile", mofile, domain );
+         return True;
+      end if;
 
---         if ( ! is_readable( mofile ) ) then
---                 return false;
---         end;
+      --
+      -- Fires before the MO translation file is loaded.
+      --
+      -- @since 2.9.0
+      --
+      -- @param string domain Text domain. Unique identifier for retrieving
+      --                      translated strings.
+      -- @param string mofile Path to the .mo file.
+      --
+      Do_Action ("load_textdomain", Domain, Mofile);
 
---         if ( ! locale ) then
---                 locale = determine_locale();
---         end;
+      --
+      -- Filters MO file path for loading translations for a specific text domain.
+      --
+      -- @since 2.9.0
+      --
+      -- @param string mofile Path to the MO file.
+      -- @param string domain Text domain. Unique identifier for retrieving
+      --                      translated strings.
+      --
+      Mofile_2 := +Apply_Filters ("load_textdomain_mofile", Mofile, Domain);
 
---         mo = new MO();
---         if ( ! mo.import_from_file( mofile ) ) then
---                 wp_textdomain_registry.set( domain, locale, false );
+      if not Is_Readable (-Mofile_2) then
+         return False;
+      end if;
 
---                 return false;
---         end;
+      if Locale = "" then
+         Locale_2 := +Determine_Locale; -- ()
+      end if;
 
---         if ( isset( l10n[ domain ] ) ) then
---                 mo.merge_with( l10n[ domain ] );
---         end;
+      declare
+         MO : POMO_MO.MO; -- = new MO();
+      begin
+         if not MO.Import_From_File (-Mofile_2) then
+            Textdomain_Registry.Set (Domain, -Locale_2, "false"); -- False
 
---         unset( l10n_unloaded[ domain ] );
+            return False;
+         end if;
 
---         l10n[ domain ] = &mo;
+--       if Isset (L10n (Domain)) then
+            MO.Merge_With (L10n (Domain));
+--       end if;
 
---         wp_textdomain_registry.set( domain, locale, dirname( mofile ) );
+--       Unset (L10n_Unloaded (Domain));
 
---         return true;
--- end;
+         L10n (Domain) := MO; -- &mo;
+      end;
 
--- --
--- -- Unloads translations for a text domain.
--- --
--- -- @since 3.0.0
--- -- @since 6.1.0 Added the `reloadable` parameter.
--- --
--- -- @global MO[] l10n          An array of all currently loaded text domains.
--- -- @global MO[] l10n_unloaded An array of all text domains that have been unloaded again.
--- --
--- -- @param string domain     Text domain. Unique identifier for retrieving translated strings.
--- -- @param bool   reloadable Whether the text domain can be loaded just-in-time again.
--- -- @return bool Whether textdomain was unloaded.
--- --
--- function unload_textdomain( domain, reloadable = false ) then
+      Textdomain_Registry.Set (Domain, -Locale_2, Php.Dirname (-Mofile_2));
+
+      return True;
+   end Load_Textdomain;
+
+   -----------------------
+   -- Unload_Textdomain --
+   -----------------------
+
+   procedure Unload_Textdomain (Domain     : String;
+                                Reloadable : Boolean := False)
+   is
+      Unused : constant Boolean :=
+        Unload_Textdomain (Domain, Reloadable);
+   begin
+      null;
+   end Unload_Textdomain;
+
+   function Unload_Textdomain (Domain     : String;
+                               Reloadable : Boolean := False)
+                               return Boolean
+   is
+      use Hb_Common;
+      use Inc_Plugins;
+
 --         global l10n, l10n_unloaded;
+      Plugin_Override : Boolean;
+   begin
+--    l10n_unloaded := (array) l10n_unloaded;
 
---         l10n_unloaded = (array) l10n_unloaded;
+      --
+      -- Filters whether to override the text domain unloading.
+      --
+      -- @since 3.0.0
+      -- @since 6.1.0 Added the `reloadable` parameter.
+      --
+      -- @param bool   override   Whether to override the text domain unloading.
+      --                          Default false.
+      -- @param string domain     Text domain. Unique identifier for retrieving
+      --                          translated strings.
+      -- @param bool   reloadable Whether the text domain can be loaded just-in-time
+      --                          again.
+      --
+      Plugin_Override := Apply_Filters ("override_unload_textdomain",
+                                        False, Domain, Reloadable);
 
---         --
---         -- Filters whether to override the text domain unloading.
---         --
---         -- @since 3.0.0
---         -- @since 6.1.0 Added the `reloadable` parameter.
---         --
---         -- @param bool   override   Whether to override the text domain unloading. Default false.
---         -- @param string domain     Text domain. Unique identifier for retrieving translated strings.
---         -- @param bool   reloadable Whether the text domain can be loaded just-in-time again.
---         --
---         plugin_override = apply_filters( "override_unload_textdomain", false, domain, reloadable );
+      if Plugin_Override then
+         if not Reloadable then
+            L10n_Unloaded.Include (Domain); --  := True;
+         end if;
 
---         if ( plugin_override ) then
---                 if ( ! reloadable ) then
---                         l10n_unloaded[ domain ] = true;
---                 end;
+         return True;
+      end if;
 
---                 return true;
---         end;
+      --
+      -- Fires before the text domain is unloaded.
+      --
+      -- @since 3.0.0
+      -- @since 6.1.0 Added the `reloadable` parameter.
+      --
+      -- @param string domain     Text domain. Unique identifier for retrieving
+      --                          translated strings.
+      -- @param bool   reloadable Whether the text domain can be loaded just-in-time
+      --                          again.
+      --
+      Do_Action ("unload_textdomain", Domain, Reloadable);
 
---         --
---         -- Fires before the text domain is unloaded.
---         --
---         -- @since 3.0.0
---         -- @since 6.1.0 Added the `reloadable` parameter.
---         --
---         -- @param string domain     Text domain. Unique identifier for retrieving translated strings.
---         -- @param bool   reloadable Whether the text domain can be loaded just-in-time again.
---         --
---         do_action( "unload_textdomain", domain, reloadable );
+      if L10n.Contains (Domain) then
+--    if Isset (L10n (Domain)) then
+         L10n.Delete (Domain);
+--       Unset (L10n (Domain));
 
---         if ( isset( l10n[ domain ] ) ) then
---                 unset( l10n[ domain ] );
+         if not Reloadable then
+            L10n_Unloaded.Include (Domain); -- := True;
+         end if;
 
---                 if ( ! reloadable ) then
---                         l10n_unloaded[ domain ] = true;
---                 end;
+         return True;
+      end if;
 
---                 return true;
---         end;
-
---         return false;
--- end;
+      return False;
+   end Unload_Textdomain;
 
 -- --
 -- -- Loads default translated strings based on locale.
@@ -873,30 +933,53 @@ package body Inc_L10n is
 -- -- @return bool Whether the textdomain was loaded.
 -- --
 -- function load_default_textdomain( locale = null ) then
---         if ( null === locale ) then
---                 locale = determine_locale();
---         end;
+   function Load_Default_Textdomain (Locale : String := "") -- null
+                                     return Boolean
+   is
+      use Globals;
+      use Inc_Load;
 
---         // Unload previously loaded strings so we can switch translations.
---         unload_textdomain( "default" );
+      Locale_2 : constant String := (if Locale = ""
+                                     then Determine_Locale
+                                     else Locale);
+   begin
+      -- Unload previously loaded strings so we can switch translations.
+      Unload_Textdomain ("default");
 
---         return = load_textdomain( "default", WP_LANG_DIR . "/locale.mo", locale );
+      declare
+         Retur : constant Boolean :=
+           Load_Textdomain ("default", WP_LANG_DIR & "/locale.mo", Locale_2);
+      begin
+         if
+           (Is_Multisite or else
+            WP_INSTALLING_NETWORK) and then
+            not Php.File_Exists (WP_LANG_DIR & "/admin-locale.mo")
+         then
+            Load_Textdomain ("default",
+                             WP_LANG_DIR & "/ms-locale.mo", Locale_2);
+            return Retur;
+         end if;
 
---         if ( ( is_multisite() || ( defined( "WP_INSTALLING_NETWORK" ) && WP_INSTALLING_NETWORK ) ) && ! file_exists( WP_LANG_DIR . "/admin-locale.mo" ) ) then
---                 load_textdomain( "default", WP_LANG_DIR . "/ms-locale.mo", locale );
---                 return return;
---         end;
+         if
+           Is_Admin      or else
+           WP_INSTALLING or else
+           WP_REPAIRING
+         then
+            Load_Textdomain ("default",
+                             WP_LANG_DIR & "/admin-locale.mo", Locale_2);
+         end if;
 
---         if ( is_admin() || wp_installing() || ( defined( "WP_REPAIRING" ) && WP_REPAIRING ) ) then
---                 load_textdomain( "default", WP_LANG_DIR . "/admin-locale.mo", locale );
---         end;
+         if
+           Is_Network_Admin or else
+           WP_INSTALLING_NETWORK
+         then
+            Load_Textdomain ("default",
+                             WP_LANG_DIR & "/admin-network-locale.mo", Locale_2);
+         end if;
 
---         if ( is_network_admin() || ( defined( "WP_INSTALLING_NETWORK" ) && WP_INSTALLING_NETWORK ) ) then
---                 load_textdomain( "default", WP_LANG_DIR . "/admin-network-locale.mo", locale );
---         end;
-
---         return return;
--- end;
+         return Retur;
+      end;
+   end Load_Default_Textdomain;
 
 -- --
 -- -- Loads a plugin"s translated strings.

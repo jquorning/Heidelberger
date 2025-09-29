@@ -338,6 +338,19 @@ is
                      Code    : Integer := 0) -- , $args = array() ) then
                      is null;
 
+   --
+   -- Guesses the URL for the site.
+   --
+   -- Will remove wp-admin links to retrieve only return URLs not in the wp-admin
+   -- directory.
+   --
+   -- @since 2.6.0
+   --
+   -- @return string The guessed URL.
+   --
+   function Wp_Guess_URL
+            return String;
+
 --
 -- Attempts to raise the PHP memory limit for memory intensive processes.
 --
