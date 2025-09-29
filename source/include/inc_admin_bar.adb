@@ -598,9 +598,9 @@ is
                                        Wp_Customize_Url);
       if Is_Customize_Preview then
          Customize_Url :=
-            Add_Query_Arg (Arrays.To_Array ((1 =>
+            +Add_Query_Arg (Arrays.To_Array ((1 =>
                Build ("changeset_uuid", -Wp_Customize.Changeset_Uuid))),
-                           Customize_Url);
+                           -Customize_Url);
       end if;
 
       declare

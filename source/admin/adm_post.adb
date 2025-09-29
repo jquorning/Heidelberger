@@ -64,6 +64,7 @@ is
       use Adm_Menu;
       use Adi_Posts;
       use Inc_Capabilities;
+      use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_Posts;
 
@@ -159,7 +160,6 @@ is
                else
                   declare
                      use String_Vectors;
-                     use Inc_Functions;
 
                      Arg : constant String_Array := Empty_String_Array &
                                                     "trashed"   &
@@ -432,12 +432,12 @@ is
                      end if;
 
                      Inc_Pluggables.Wp_Redirect (
-                           -Add_Query_Arg (
+                           Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("trashed", "1"),
                                         Build ("ids",     Post_Id'Image)
                                 )),
-                                Sendback));
+                                -Sendback));
                   end;
                   goto Bailout; -- return; --  exit;
 
@@ -462,12 +462,12 @@ is
                         (abs "Error in restoring the item from Trash.");
                   end if;
 
-                  Sendback := Add_Query_Arg (
+                  Sendback := +Add_Query_Arg (
                            To_Array (List => (
                               Build ("untrashed", "1"),
                               Build ("ids",       Post_Id'Image)
                            )),
-                           Sendback);
+                           -Sendback);
                   Inc_Pluggables.Wp_Redirect (-Sendback);
                   goto Bailout; -- return; -- exit;
 
@@ -502,7 +502,8 @@ is
                      end if;
                   end if;
 
-                  Inc_Pluggables.Wp_Redirect (-Add_Query_Arg ("deleted", 1, Sendback));
+                  Inc_Pluggables.Wp_Redirect (
+                    Add_Query_Arg ("deleted", "1", -Sendback));
                   goto Bailout; -- return; -- exit;
 
                elsif Action = "preview" then

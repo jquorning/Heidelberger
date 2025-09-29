@@ -68,6 +68,7 @@ is
       use Adi_Screens;
       use Inc_Capabilities;
       use Inc_Formatting;
+      use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_Taxonomys;
       use Inc_Class_Wp_Taxonomy;
@@ -159,7 +160,6 @@ is
 
          declare
             use String_Vectors;
-            use Inc_Functions;
 
             Ww : constant String_Array := Empty_String_Array &
                                           "_wp_http_referer" &
@@ -189,14 +189,14 @@ is
                                                          -Taxonomy, X_POST);
             begin
                if Ret and then not Is_Wp_Error (Ret) then
-                  Location := Add_Query_Arg ("message", 1, Referer);
+                  Location := +Add_Query_Arg ("message", "1", -Referer);
                else
-                  Location := Add_Query_Arg (
+                  Location := +Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("error", "true"),
                                         Build ("message", "4")
                                 )),
-                                Referer
+                                -Referer
                         );
                end if;
             end;
@@ -221,12 +221,11 @@ is
 
                Wp_Delete_Term (Tag_ID, -Taxonomy);
 
-               Location := Add_Query_Arg ("message", 2, Referer);
+               Location := +Add_Query_Arg ("message", "2", -Referer);
 
                -- When deleting a term, prevent the action from redirecting back to
                -- a term that no longer exists.
                declare
-                  use Inc_Functions;
                   use String_Vectors;
 
                   Arg : constant String_Array := Empty_String_Array &
@@ -255,7 +254,7 @@ is
                   Wp_Delete_Term (Integer'Value (-Tag_ID.Key), -Taxonomy);  -- Added .key
                end loop;
 
-               Location := Add_Query_Arg ("message", 6, Referer);
+               Location := +Add_Query_Arg ("message", "6", -Referer);
             end;
 
          elsif "edit" =  X_Wp_List_Table.Current_Action then
@@ -313,14 +312,14 @@ is
                         Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
                   begin
                      if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
-                        Location := Add_Query_Arg ("message", 3, Referer);
+                        Location := +Add_Query_Arg ("message", "3", -Referer);
                      else
-                        Location := Add_Query_Arg (
+                        Location := +Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("error", "true"),
                                         Build ("message", "5")
                                 )),
-                                Referer
+                                -Referer
                         );
                      end if;
                   end;
@@ -354,7 +353,6 @@ is
          then  -- not
             declare
                use String_Vectors;
-               use Inc_Functions;
 
                Arg : constant String_Array := Empty_String_Array &
                                               "_wp_http_referer" & "_wpnonce";
@@ -366,7 +364,7 @@ is
 
          if Location /= "" then
             if Pagenum > 1 then
-               Location := Add_Query_Arg ("paged", Pagenum, Location);
+               Location := +Add_Query_Arg ("paged", Pagenum'Image, -Location);
                -- pagenum takes care of total_pages.
             end if;
             --
@@ -888,7 +886,6 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_remove_message_and_error" then
                      declare
-                        use Inc_Functions;
                         use String_Vectors;
 
                         Arg : constant String_Array := Empty_String_Array &

@@ -16,6 +16,7 @@ with Php;
 with Adi_Plugins;
 with Inc_Capabilities;
 with Inc_Formatting;
+with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
 
@@ -92,6 +93,7 @@ is
       Submenu_As_Parent : Boolean := True)
    is
       use Inc_Capabilities;
+      use Inc_Functions;
       use Inc_Formatting;
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
@@ -391,15 +393,15 @@ is
                                                       String (-Item.Menu_Slug))) or else
                                           File_Exists (String (Menu_File))
                                        then
-                                          Sub_Item_Url := Add_Query_Arg (
+                                          Sub_Item_Url := +Add_Query_Arg (
                                              Arrays.To_Array ((1 =>
                                                 Build ("page", String (-Sub_Item.Menu_Slug)))),
-                                                        Unbounded_String (Item.Menu_Slug));
+                                                        String (-Item.Menu_Slug));
                                        else
-                                          Sub_Item_Url := Add_Query_Arg (
+                                          Sub_Item_Url := +Add_Query_Arg (
                                              Arrays.To_Array ((1 =>
                                                 Build ("page", String (-Sub_Item.Menu_Slug)))),
-                                                        +"admin.php");
+                                                        "admin.php");
                                        end if;
                                        Sub_Item_Url := +ESC_URL (-Sub_Item_Url);
                                        Echo ("<liclass><a href=""" & (-Sub_Item_Url) &

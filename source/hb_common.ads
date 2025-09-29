@@ -31,14 +31,6 @@ is
                       S  : String)
                       return Array_Type is (Empty_Array);
 
-   function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
-      return Unbounded_String;
-   function Add_Query_Arg (Item : String; N : String; I : String)
-      return String is ("XXX-120");
-   function Add_Query_Arg (Item : String; N : String) return String;
-   function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
-      return Unbounded_String;
-
    function Absint (Item : Assoc_List) return String;
    function Absint (Item : String)     return String is ("XXX-213");
 

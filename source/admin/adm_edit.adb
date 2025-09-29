@@ -176,7 +176,7 @@ is
                         Sendback := +Admin_URL (String (-Globals.Parent_File));
                      end if;
 
-                     Sendback := Add_Query_Arg ("paged", Pagenum, Sendback);
+                     Sendback := +Add_Query_Arg ("paged", Pagenum'Image, -Sendback);
                      if Index (Sendback, "post") /= 0 then
                         Sendback := +Admin_URL (-Globals.Post_New_File);
                      end if;
@@ -256,13 +256,13 @@ is
                                  <<Continue>>
                               end loop;
 
-                              Sendback := Add_Query_Arg (
+                              Sendback := +Add_Query_Arg (
                                 To_Array (List => (
                                         Build ("trashed", Trashed'Image),
 --                                        Build ("ids",     Implode (",", Post_Ids)),
                                         Build ("locked",  Locked'Image)
                                 )),
-                                Sendback);
+                                -Sendback);
                            end;
 
                         elsif "untrash" = Doaction then
@@ -295,7 +295,7 @@ is
 
                                  Untrashed := Untrashed + 1;
                               end loop;
-                              Sendback := Add_Query_Arg ("untrashed", Untrashed, Sendback);
+                              Sendback := +Add_Query_Arg ("untrashed", Untrashed'Image, -Sendback);
 
                               Remove_Filter ("wp_untrash_post_status",
                                              "wp_untrash_post_set_previous_status", 10);
@@ -330,7 +330,7 @@ is
                                     Deleted := Deleted + 1;
                                  end;
                               end loop;
-                              Sendback := Add_Query_Arg ("deleted", Deleted, Sendback);
+                              Sendback := +Add_Query_Arg ("deleted", Deleted'Image, -Sendback);
                            end;
 
                         elsif "edit" = Doaction then
@@ -346,7 +346,7 @@ is
                                     Set (Done, "skipped", Count (Get (Done, "skipped")));
                                     -- Done ("skipped") := Count (Done ("skipped"));
                                     Set (Done, "locked",  Count (Get (Done, "locked")));
-                                    Sendback := Add_Query_Arg (Done, Sendback);
+                                    Sendback := +Add_Query_Arg (Done, -Sendback);
                                  end if;
                               end;
                            end if;

@@ -429,7 +429,7 @@ is
                   Array_2 : constant Array_Type := Arrays.To_Array ((1 =>
                                                    Build ("autofocus", Array_1)));
                   Customize_Header_Url : constant String :=
-                     -Add_Query_Arg (Array_2, +Customize_Url);
+                     Add_Query_Arg (Array_2, Customize_Url);
                begin
                   Set (Submenu, "themes.php", 15, abs "Header", Appearance_Cap,
                        ESC_URL (Customize_Header_Url), "", "hide-if-no-customize");
@@ -448,7 +448,7 @@ is
                      Arrays.To_Array ((1 => Build ("autofocus", Array_1)));
 
                   Customize_Background_Url : constant String :=
-                     -Add_Query_Arg (Array_2, +Customize_Url);
+                     Add_Query_Arg (Array_2, Customize_Url);
                begin
                   Set (Submenu, "themes.php", 20, abs "Background", Appearance_Cap,
                        ESC_URL (Customize_Background_Url), "", "hide-if-no-customize");
