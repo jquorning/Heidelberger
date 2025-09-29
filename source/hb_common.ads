@@ -221,8 +221,6 @@ is
                            is (False);
 
    procedure Unset (A : String) is null;
-   function Wp_Get_Attachment_Metadata (Id : String; V : Boolean) return Array_Type
-     is (Empty_Array);
 
    type Walker_Type is access procedure;
 

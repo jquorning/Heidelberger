@@ -1044,6 +1044,33 @@ is
                                    is ("XXX-209");
 
    --
+   -- Retrieves attachment metadata for attachment ID.
+   --
+   -- @since 2.1.0
+   -- @since 6.0.0 The `filesize` value was added to the returned array.
+   --
+   -- @param int  attachment_id Attachment post ID. Defaults to global post.
+   -- @param bool unfiltered    Optional. If True, filters are not run. Default False.
+   -- @return array|False {
+   --     Attachment metadata. False on failure.
+   --
+   --     @type int    width      The width of the attachment.
+   --     @type int    height     The height of the attachment.
+   --     @type string file       The file path relative to `wp-content/uploads`.
+   --     @type array  sizes      Keys are size slugs, each value is an array
+   --                             containing "file", "width", "height", and
+   --                             "mime-type".
+   --     @type array  image_meta Image metadata.
+   --     @type int    filesize   File size of the attachment.
+   -- }
+   --
+
+   function Wp_Get_Attachment_Metadata (Attachment_Id : Integer := 0;
+                                        Unfiltered    : Boolean := False)
+                                        return Array_Type
+                                        is (Empty_Array);
+
+   --
    -- Returns whether the post can be edited in the block editor.
    --
    -- @since 5.0.0

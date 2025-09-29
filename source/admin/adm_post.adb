@@ -366,7 +366,7 @@ is
 
                      Unused  : Integer;
                      Newmeta : Array_Type :=
-                        Wp_Get_Attachment_Metadata (Post_Id'Image, True);
+                        Wp_Get_Attachment_Metadata (Post_Id, True);
                   begin
                      Set (Newmeta, "thumb", Wp_Basename (Get (X_POST, "thumb")));
 
