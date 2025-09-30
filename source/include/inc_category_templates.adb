@@ -1351,7 +1351,7 @@ is
       begin
          if Length (Terms) = 0 then  -- false =
             Terms := Wp_Get_Object_Terms (Empty_Integer_Array & Integer (Post_2.Id),
-                                          To_Array (Taxonomy));
+                                          To_Array ((1 => Build (Taxonomy, ""))));
             if not Is_Wp_Error ("Terms") then
                declare
                   Term_Ids : constant Array_Type := Wp_List_Pluck (Terms, "term_id");

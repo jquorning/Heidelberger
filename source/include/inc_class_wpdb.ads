@@ -851,7 +851,7 @@ is
    --
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
-                     Args  : Array_Type) --, ...$args )
+                     Args  : List_Type) --, ...$args )
                      return String;
    function Prepare (Db    : Wpdb_Class;
                      Query : String;

@@ -184,7 +184,7 @@ is
                                       "Translate this to be the equivalent of English Translators in your language for the credits page Translators section");
             elsif Placeholders.Kind = JSON_Array_Type then  -- Isset
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
-               Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_Array); -- Placeholders.Get);
+               Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_List); -- Placeholders.Get);
             else
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
                Globals.Title := +Translate (Name.Get);

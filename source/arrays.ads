@@ -52,7 +52,14 @@ is
    function Count (Arry : Array_Type) return Natural is (1);
 
    type Item_List is array (Positive range <>) of Item_Type;
-   function To_List (List : Item_List) return List_Type is (Empty_List);
+
+   function To_List (List : Item_List)
+                     return List_Type
+                     is (Empty_List);
+
+   function To_List (Item : String)
+                     return List_Type
+                     is (Empty_List);
 
    package String_Vectors is
       new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,

@@ -251,10 +251,11 @@ is
 
             declare
                Taxonomy : Unbounded_String;
-               Tags : constant Array_Type := To_Array (Item => Get (X_REQUEST, "delete_tags"));
+               Tags : constant List_Type :=
+                 To_List (Item => Get (X_REQUEST, "delete_tags"));
             begin
                for Tag_ID of Tags loop
-                  Wp_Delete_Term (Integer'Value (-Tag_ID.Key), -Taxonomy);  -- Added .key
+                  Wp_Delete_Term (Integer'Value (-Tag_ID), -Taxonomy);
                end loop;
 
                Location := +Add_Query_Arg ("message", "6", -Referer);
@@ -341,7 +342,8 @@ is
                use Inc_Plugins;
 
                Screen : String := -Get_Current_Screen.Id;
-               Tags   : constant Array_Type := To_Array (Item => Get (X_REQUEST, "delete_tags"));
+               Tags   : constant List_Type :=
+                 To_List (Item => Get (X_REQUEST, "delete_tags"));
             begin
                -- This action is documented in wp-admin/edit.php
                Location := +Apply_Filters ("handle_bulk_actions-thenscreenend;",
@@ -549,7 +551,7 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("edit_category_form",
-                           Arrays.To_Array ((1 => Build ("parent", "0"))),
+                                              To_List ("parent"),
                                               "3.0.0", Taxonomy & "_add_form");
                      elsif "link_category" = Taxonomy then
                         --
@@ -561,8 +563,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("edit_link_category_form",
-                           Arrays.To_Array ((1 => Build ("parent", "0"))),
-                                      "3.0.0", Taxonomy & "_add_form");
+                                              To_List ("parent"),
+                                              "3.0.0", Taxonomy & "_add_form");
                      else
                         --
                         -- Fires at the end of the Add Tag form.
@@ -572,7 +574,7 @@ is
                         --
                         -- @param string taxonomy The taxonomy slug.
                         --
-                        Do_Action_Deprecated ("add_tag_form", To_Array (Taxonomy),
+                        Do_Action_Deprecated ("add_tag_form", To_List (Taxonomy),
                                       "3.0.0", Taxonomy & "_add_form");
                      end if;
 
@@ -684,8 +686,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("add_category_form_pre",
-                               Arrays.To_Array ((1 => Build ("parent", "0"))),
-                               "3.0.0", Taxonomy & "_pre_add_form");
+                                              To_List ("parent"),
+                                              "3.0.0", Taxonomy & "_pre_add_form");
                      elsif "link_category" = Taxonomy then
                         --
                         -- Fires before the link category form.
@@ -697,8 +699,8 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("add_link_category_form_pre",
-                                  Arrays.To_Array ((1 => Build ("parent", "0"))),
-                                  "3.0.0", Taxonomy & "_pre_add_form");
+                                              To_List ("parent"),
+                                              "3.0.0", Taxonomy & "_pre_add_form");
                      else
                         --
                         -- Fires before the Add Tag form.
@@ -710,7 +712,7 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         --
                         Do_Action_Deprecated ("add_tag_form_pre",
-                                              To_Array (Taxonomy),
+                                              To_List (Taxonomy),
                                               "3.0.0", "{taxonomy}_pre_add_form");
                      end if;
 

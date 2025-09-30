@@ -75,7 +75,7 @@ is
       Parent_File   := +Slug_Type'("edit.php");
       Submenu_File  := +"edit.php";
 
-      Adi_Misc.Wp_Reset_Vars (To_Array ("action"));
+      Adi_Misc.Wp_Reset_Vars (To_List ("action"));
       declare
          Post_Id : Integer;
       begin
@@ -212,9 +212,9 @@ is
                      Set (X_POST, "content",
                         Sprintf (
                            "<!-- wp:paragraph -->%s<!-- /wp:paragraph -->",
-                            Str_Replace (To_List ((+"\r\n",
-                                                     +"\r",
-                                                     +"\n")),
+                            Str_Replace (To_List (List => (+"\r\n",
+                                                           +"\r",
+                                                           +"\n")),
                             "<br />",
                             Get (X_POST, "content"))
                         ));

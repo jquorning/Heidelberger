@@ -88,7 +88,7 @@ is
                                     Locale : String)
                                     return String
    is
-      Locations : List_Type := To_List ((
+      Locations : List_Type := To_List (List => (
          +Globals.WP_LANG_DIR & "/plugins",
          +Globals.WP_LANG_DIR & "/themes"
       ));

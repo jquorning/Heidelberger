@@ -24,7 +24,7 @@ is
    --
    -- @param array vars An array of globals to reset.
    --
-   procedure Wp_Reset_Vars (Vars : Array_Type)
+   procedure Wp_Reset_Vars (Vars : List_Type)
                            is null;
 
 end Adi_Misc;

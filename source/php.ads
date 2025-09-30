@@ -52,9 +52,6 @@ is
                             Offset  : Integer := 0)
                             return Integer is (1);
 
-   function Vsprintf (Format : String;
-                      Arg    : Array_Type) return String is (Format);
-
    function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (True);
    function Is_Object (Arry : Array_Type) return Boolean is (False);
    function Is_Array  (Arry : Array_Type) return Boolean is (True);
@@ -330,6 +327,11 @@ is
                      Arg_2  : String := "";
                      Arg_3  : String := "")
       return String is (Format & "XXX-201");
+
+   function Vsprintf (Format : String;
+                      Arg    : List_Type)
+                      return String
+                      is (Format);
 
    -------------------
    -- Echo handling --

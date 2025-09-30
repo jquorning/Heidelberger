@@ -734,13 +734,13 @@ is
       Echo ("<li id=""" & ESC_Attr ("wp-admin-bar-" & (-Node.Id)) & """menuclass>");
 
       if Has_Link then
-         Attributes := To_List ((+"onclick", +"target", +"title",
-                                 +"rel", +"lang", +"dir"));
+         Attributes := To_List (List => (+"onclick", +"target", +"title",
+                                         +"rel", +"lang", +"dir"));
          Echo ("<a class=""ab-item""aria_attributes href=""" & ESC_URL (-Node.Href) &
                """");
       else
-         Attributes := To_List ((+"onclick", +"target", +"title",
-                                 +"rel", +"lang", +"dir"));
+         Attributes := To_List (List => (+"onclick", +"target", +"title",
+                                         +"rel", +"lang", +"dir"));
          Echo ("<div class=""ab-item ab-empty-item""" & (-Aria_Attributes));
       end if;
 

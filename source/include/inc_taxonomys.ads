@@ -436,7 +436,7 @@ is
    --
    function Wp_Get_Object_Terms (Object_Ids : Integer;
                                  Taxonomies : String;
-                                 Args       : Array_Type := Empty_Array)
+                                 Args       : List_Type := Empty_List)
                                  return Array_Type
                                  -- Inc_Class_Wp_Terms.Wp_Term_Array;
                                  is (Empty_Array);

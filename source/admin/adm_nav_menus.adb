@@ -143,7 +143,7 @@ is
                         -- Arrays.To_Array ((1 => Build (X_REQUEST, "menu")))
                         else Inc_Taxonomys.Wp_Get_Object_Terms (Menu_Item_Id,
                                                                 "nav_menu",
-                                Arrays.To_Array ((1 => Build ("fields", "ids")))));
+                                To_List (List => (+"fields", +"ids"))));
                   begin
                      if
 --                     not Is_Wp_Error (Menus) and then

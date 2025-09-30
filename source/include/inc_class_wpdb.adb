@@ -817,18 +817,18 @@ is
 
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
-                     Args  : Array_Type) --, ...args)
+                     Args  : List_Type) --, ...args)
                      return String
    is
       use Inc_Functions;
 
-            function Func return Array_Type;
+      function Func return Array_Type;
 
-            function Func return Array_Type
-            is
-            begin
-               return To_Array (Db, "escape_by_ref");
-            end Func;
+      function Func return Array_Type
+      is
+      begin
+         return To_Array (Db, "escape_by_ref");
+      end Func;
 
    begin
       if Query = "" then
@@ -840,14 +840,13 @@ is
       if Strpos (Query, "%") = 0 then
          Inc_Load.Wp_Load_Translations_Early;  -- ();
          X_Doing_It_Wrong (
-                                "wpdb::prepare",
-                                Sprintf (
-                                        -- translators: %s: wpdb::prepare()
-                                        abs "The query argument of %s must have a placeholder.",
-                                        "wpdb::prepare()"
-                               ),
-                                "3.9.0"
-                       );
+            "wpdb::prepare",
+            Sprintf (
+               -- translators: %s: wpdb::prepare()
+               abs "The query argument of %s must have a placeholder.",
+               "wpdb::prepare()"
+            ),
+            "3.9.0");
       end if;
 
       -- If args were passed as an array (as in vsprintf), move them up.
@@ -918,7 +917,7 @@ is
                Placeholders : constant Integer :=
                   Preg_Match_All ("/(^|[^%]|(%%)+)%(allowed_format)?[sdF]/",
                                   -Query_2, Matches);
-               Args_Count : constant Integer := Count (Args);
+               Args_Count : constant Natural := Natural (List_Vectors.Length (Args));
             begin
                if Args_Count /= Placeholders then
                   if 1 = Placeholders and then Passed_As_Array then
@@ -2734,7 +2733,7 @@ is
          -- If any of the columns don"t have one of these collations, it needs
          -- more sanity checking.
          declare
-            Safe_Collations : List_Type := To_List (
+            Safe_Collations : List_Type := To_List (List =>
                        (+"utf8_bin",
                         +"utf8_general_ci",
                         +"utf8mb3_bin",

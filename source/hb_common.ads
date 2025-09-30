@@ -22,7 +22,7 @@ is
    TAB    : constant String := "" & Ada.Characters.Latin_1.HT;
    NL_TAB : constant String := NL & TAB;
 
-   function To_Array (Item : String) return Array_Type;
+-- function To_Array (Item : String) return Array_Type;
    function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
                       S  : String)
                       return Array_Type is (Empty_Array);

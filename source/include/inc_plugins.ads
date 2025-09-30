@@ -418,7 +418,7 @@ is
 -- @param string message     Optional. A message regarding the change. Default empty.
 --
    procedure Do_Action_Deprecated (Hook_Name   : String;
-                                   Args        : Array_Type;
+                                   Args        : List_Type;
                                    Version     : String;
                                    Replacement : String := "";
                                    Message     : String := "")

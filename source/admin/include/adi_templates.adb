@@ -2830,9 +2830,9 @@ is
       Typ_2            : List_Type;
 
       Button_Shorthand : constant List_Type :=
-         To_List ((+"primary", +"small", +"large"));
+         To_List (List => (+"primary", +"small", +"large"));
 
-      Classes          : List_Type := To_List ((1 => +"button"));
+      Classes          : List_Type := To_List ("button");
    begin
 --      if not Is_Array (Typ) then
          Typ_2 := Explode (" ", Typ);

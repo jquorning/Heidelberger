@@ -217,7 +217,7 @@ is
 
       Register_Taxonomy (
          "wp_theme",
-         To_List ((+"wp_template", +"wp_template_part", +"wp_global_styles")),
+         To_List (List => (+"wp_template", +"wp_template_part", +"wp_global_styles")),
          Arrays.To_Array ((
             Build ("public",            False),
             Build ("hierarchical",      False),
@@ -236,7 +236,7 @@ is
 
       Register_Taxonomy (
          "wp_template_part_area",
-         To_List ((1 => +"wp_template_part")),
+         To_List ("wp_template_part"),
          Arrays.To_Array ((
             Build ("public",            False),
             Build ("hierarchical",      False),
@@ -520,7 +520,7 @@ is
    is
    begin
       Register_Taxonomy (Taxonomy,
-                         To_List ((1 => +Object_Type)),
+                         To_List (Object_Type),
                          Args);
    end Register_Taxonomy;
 

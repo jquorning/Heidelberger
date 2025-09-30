@@ -47,7 +47,7 @@ is
             Statement : constant String
               := Wpdb.Prepare
                 ("SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
-                 (To_Array (Id'Image)));
+                 (To_List (Item => Id'Image)));
          begin
             Inc_Class_Wpdb.Get_Row (Wpdb, Post,
                                     Query   => Statement,
@@ -245,8 +245,8 @@ is
       Post_2 : Array_Type := Php.Get_Object_Vars (Post);
    begin
       for
-        Key of To_List ((+"ancestors", +"page_template",
-                         +"post_category", +"tags_input"))
+        Key of To_List (List => (+"ancestors", +"page_template",
+                                 +"post_category", +"tags_input"))
       loop
          if X_Isset (Post_2, -Key) then
             Set (Post_2, -Key, Value => String'(Get (Post_2, -Key))); -- x_get

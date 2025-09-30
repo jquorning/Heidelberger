@@ -2003,9 +2003,10 @@ is
          -- Core transients that do not have a timeout. Listed here so querying
          -- timeouts can be avoided.
          declare
-            No_Timeout : constant List_Type := To_List ((+"update_core",
-                                                         +"update_plugins",
-                                                         +"update_themes"));
+            No_Timeout : constant List_Type :=
+              To_List (List => (+"update_core",
+                                +"update_plugins",
+                                +"update_themes"));
             Transient_Option : constant String := "_site_transient_" & Transient;
          begin
             if not In_Array (Transient, No_Timeout, True) then

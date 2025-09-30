@@ -69,7 +69,11 @@ is
                         Query_Var_Bool        => False,
                         Query_Var             => Null_Unbounded_String,
                         Delete_With_User      => True,
-                        Supports              => To_List ((+"title", +"editor", +"author", +"thumbnail", +"excerpt", +"trackbacks", +"custom-fields", +"comments", +"revisions", +"post-formats")),
+                        Supports              =>
+                          To_List (List => (+"title", +"editor", +"author",
+                                            +"thumbnail", +"excerpt", +"trackbacks",
+                                            +"custom-fields", +"comments",
+                                            +"revisions", +"post-formats")),
                         Show_In_REST          => True,
                         REST_Base             => +"posts",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
@@ -117,7 +121,11 @@ is
                         Rewrite               => Empty_Rewrite,
                         Query_Var             => Null_Unbounded_String,
                         Delete_With_User      => True,
-                        Supports              => To_List ((+"title", +"editor", +"author", +"thumbnail", +"page-attributes", +"custom-fields", +"comments", +"revisions")),
+                        Supports              =>
+                          To_List (List => (+"title", +"editor", +"author",
+                                            +"thumbnail", +"page-attributes",
+                                            +"custom-fields", +"comments",
+                                            +"revisions")),
                         Show_In_REST          => True,
                         REST_Base             => +"pages",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
@@ -174,7 +182,8 @@ is
                         Query_Var             => Null_Unbounded_String,
                         Show_In_Nav_Menus     => False,
                         Delete_With_User      => True,
-                        Supports              => To_List ((+"title", +"author", +"comments")),
+                        Supports              =>
+                          To_List (List => (+"title", +"author", +"comments")),
                         Show_In_REST          => True,
                         REST_Base             => +"media",
                         REST_Controller_Class => +"WP_REST_Attachments_Controller",
@@ -226,7 +235,7 @@ is
                         Query_Var        => Null_Unbounded_String,
                         Can_Export       => False,
                         Delete_With_User => True,
-                        Supports         => To_List ((1 => +"author")),
+                        Supports         => To_List ("author"),
 
                         -- Added
                         Label                => Null_Unbounded_String,
@@ -346,7 +355,7 @@ is
                         Delete_With_User => False,
                         Can_Export       => True,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
-                        Supports         => To_List ((+"title", +"revisions")),
+                        Supports         => To_List (List => (+"title", +"revisions")),
                         Capabilities     => Arrays.To_Array ((
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_post",            "edit_theme_options"),
@@ -422,7 +431,7 @@ is
                         Query_Var        => Null_Unbounded_String,
                         Can_Export       => False,
                         Delete_With_User => False,
-                        Supports         => To_List ((+"title", +"author")),
+                        Supports         => To_List (List => (+"title", +"author")),
                         Capability_Type_String => +"customize_changeset",
                         Capability_Type_Array  => Empty_Array,
                         Capabilities     => Arrays.To_Array ((
@@ -630,7 +639,7 @@ is
                                 Build ("delete_others_posts",    "delete_others_posts")
                         )),
                         Map_Meta_Cap          => True,
-                        Supports              => To_List ((
+                        Supports              => To_List (List => (
                                 +"title",
                                 +"editor",
                                 +"revisions"
@@ -726,7 +735,7 @@ is
                                 Build ("read_private_posts",     "edit_theme_options")
                         )),
                         Map_Meta_Cap          => True,
-                        Supports              => To_List ((
+                        Supports              => To_List (List => (
                                 +"title",
                                 +"slug",
                                 +"excerpt",
@@ -823,7 +832,7 @@ is
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("read_private_posts",     "edit_theme_options")
                         )),
-                        Supports              => To_List ((
+                        Supports              => To_List (List => (
                                 +"title",
                                 +"slug",
                                 +"excerpt",
@@ -892,7 +901,7 @@ is
                                 Build ("delete_others_posts",    "edit_theme_options")
                         )),
                         Map_Meta_Cap => True,
-                        Supports     => To_List ((
+                        Supports     => To_List (List => (
                                 +"title",
                                 +"editor",
                                 +"revisions"
@@ -987,7 +996,7 @@ is
                         )),
                         REST_Base             => +"navigation",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
-                        Supports              => To_List ((
+                        Supports              => To_List (List => (
                                 +"title",
                                 +"editor",
                                 +"revisions"
@@ -3485,10 +3494,11 @@ is
    is
       use Wp_Common;
 
-      Int_Fields : List_Type  := To_List ((+"ID", +"post_parent", +"menu_order"));
+      Int_Fields : List_Type  := To_List (List => (+"ID", +"post_parent",
+                                                   +"menu_order"));
       Value_2    : Array_Type := Value;
       pragma Unreferenced (Value);
-      Array_Int_Fields : constant List_Type := To_List ((1 => +"ancestors"));
+      Array_Int_Fields : constant List_Type := To_List ("ancestors");
    begin
 --      if In_Array (Field, Int_Fields, True) then
 --         Value_2 := Integer (Value_2);
@@ -3518,8 +3528,8 @@ is
          end if;
 
          if "edit" = Context then
-            Format_To_Edit := To_List ((+"post_content", +"post_excerpt",
-                                        +"post_title",   +"post_password"));
+            Format_To_Edit := To_List (List => (+"post_content", +"post_excerpt",
+                                                +"post_title",   +"post_password"));
 
             if Prefixed then
                --

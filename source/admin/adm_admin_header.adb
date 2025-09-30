@@ -281,7 +281,7 @@ is
       end if;
 
       Append (Admin_Body_Class, " branch-" &
-        Str_Replace (Arrays.To_List ((+".", +",")), "-",
+        Str_Replace (Arrays.To_List (List => (+".", +",")), "-",
                      Inc_General_Templates.Get_Bloginfo ("version")));
 
       Append (Admin_Body_Class, " version-" & Str_Replace (".", "-",

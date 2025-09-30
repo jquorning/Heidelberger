@@ -315,8 +315,8 @@ is
 
       declare
          Initial_Meta_Boxes : List_Type :=
-            To_List ((+"add-post-type-page", +"add-post-type-post",
-                      +"add-custom-links",   +"add-category"));
+            To_List (List => (+"add-post-type-page", +"add-post-type-post",
+                              +"add-custom-links",   +"add-category"));
          Hidden_Meta_Boxes : constant Array_Type := Empty_Array;
       begin
          for Context of Wp_Meta_Boxes ("nav-menus") loop
@@ -723,7 +723,7 @@ is
          declare
             use Inc_Functions;
 
-            Removed_Args : constant List_Type := To_List ((
+            Removed_Args : constant List_Type := To_List (List => (
                 +"action",
                 +"customlink-tab",
                 +"edit-menu-item",
@@ -1106,7 +1106,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
       declare
          use Inc_Functions;
 
-         Removed_Args : constant List_Type := To_List ((
+         Removed_Args : constant List_Type := To_List (List => (
                 +"action",
                 +"customlink-tab",
                 +"edit-menu-item",
@@ -1583,7 +1583,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       Menu_Items : Array_Type;       -- := Empty_Array;
 
       Post_Fields : constant List_Type :=
-         To_List ((
+         To_List (List => (
                 +"menu-item-db-id",
                 +"menu-item-object-id",
                 +"menu-item-object",
@@ -1746,7 +1746,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                                         Matches);
                   declare
                      Array_Bits    : List_Type  :=
-                        To_List ((1 => Matches (Matches.First_Index + 1).Key));
+                        To_List (-Matches (Matches.First_Index + 1).Key);
 --                   Array_Bits    : List_Type  := To_List ((1 => Matches (1)));
                      New_Post_Data : Array_Type := Empty_Array;
                   begin
