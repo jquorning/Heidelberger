@@ -90,4 +90,17 @@ is
                            A2, A3, A4 : Array_Type)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Id        : Inc_Class_Wp_Posts.Wp_Post)
+                           return Boolean
+                           is (True);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           Id        : Inc_Class_Wp_Posts.Post_Id)
+                           return Array_Type
+                           is (Empty_Array);
+
 end Wp_Common;

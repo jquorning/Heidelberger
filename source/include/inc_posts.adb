@@ -8,6 +8,7 @@
 with Globals;
 with Hb_Common;
 with Php;
+with Wp_Common;
 
 with Inc_Formatting;
 with Inc_L10n;
@@ -3481,6 +3482,8 @@ is
                                  Context : String := "display")
                                  return Array_Type
    is
+      use Wp_Common;
+
       Int_Fields : List_Type  := To_List ((+"ID", +"post_parent", +"menu_order"));
       Value_2    : Array_Type := Value;
       pragma Unreferenced (Value);

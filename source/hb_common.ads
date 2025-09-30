@@ -165,13 +165,6 @@ is
    function Empty (Table : Array_Type) return Boolean;
    function Empty (Arry : Array_Type; Key : String) return Boolean is (False);
 
-   function Apply_Filters (Item : String; S : String; D : Inc_Class_Wp_Posts.Wp_Post)
-      return Boolean is (True);
-   function Apply_Filters (Hook_Name : String;
-                           Arg_2     : Array_Type;
-                           Id        : Inc_Class_Wp_Posts.Post_Id)
-                           return Array_Type is (Empty_Array);
-
    function Apply_Filters (Hook_Name : String;
                            Arg_2     : Array_Type)
                            return Array_Type is (Empty_Array);
