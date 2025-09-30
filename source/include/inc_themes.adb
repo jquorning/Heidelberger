@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 with Globals;
 with Php;
 
+with Inc_Formatting;
 with Inc_Options;
 
 package body Inc_Themes
@@ -420,41 +421,47 @@ is
       return Theme_Roots;
    end Get_Theme_Roots;
 
--- --
--- -- Registers a directory that contains themes.
--- --
--- -- @since 2.9.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @param string directory Either the full filesystem path to a theme folder
--- --                          or a folder within WP_CONTENT_DIR.
--- -- @return bool True if successfully registered a directory that contains themes,
--- --              false if the directory does not exist.
--- --
--- function register_theme_directory( directory ) then
---         global wp_theme_directories;
+   ------------------------------
+   -- Register_Theme_Directory --
+   ------------------------------
 
---         if ( ! file_exists( directory ) ) then
---                 // Try prepending as the theme directory could be relative to the content directory.
---                 directory = WP_CONTENT_DIR . "/" . directory;
---                 // If this directory does not exist, return and do not register.
---                 if ( ! file_exists( directory ) ) then
---                         return false;
---                 end;
---         end;
+   function Register_Theme_Directory (Directory : String)
+                                      return Boolean
+   is
+      use Ada.Strings.Unbounded;
+      use Globals;
+      use Hb_Common;
+      use Php;
+      use Inc_Formatting;
 
---         if ( ! is_array( wp_theme_directories ) ) then
---                 wp_theme_directories = array();
---         end;
+      Directory_2 : Unbounded_String;
+      Untrailed   : Unbounded_String;
+   begin
+      if not File_Exists (Directory) then
+         -- Try prepending as the theme directory could be relative to the content
+         -- directory.
+         Directory_2 := +WP_CONTENT_DIR & "/" & Directory;
 
---         untrailed = untrailingslashit( directory );
---         if ( ! empty( untrailed ) && ! in_array( untrailed, wp_theme_directories, true ) ) then
---                 wp_theme_directories[] = untrailed;
---         end;
+         -- If this directory does not exist, return and do not register.
+         if not File_Exists (-Directory_2) then
+            return False;
+         end if;
+      end if;
 
---         return true;
--- end;
+--      if ( ! is_array( wp_theme_directories ) ) then
+--              wp_theme_directories = array();
+--      end;
+
+      Untrailed := +Untrailingslashit (-Directory_2);
+      if
+        not Empty (-Untrailed) and then
+        not In_Array (-Untrailed, Wp_Theme_Directories, True)
+      then
+         Wp_Theme_Directories.Append (Untrailed);
+      end if;
+
+      return True;
+   end Register_Theme_Directory;
 
 -- --
 -- -- Searches all registered theme directories for complete and valid themes.

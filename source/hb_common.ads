@@ -231,12 +231,6 @@ is
                       S    : Boolean)
                       return Boolean is (True);
 
-   -- function In_Array (Needle   : String;
-   --                    Haystack : List_Type;
-   --                    Strict   : Boolean := False)
-   --                    return Boolean
-   --                    is (True);
-
    function Isset (Item : Array_Type) return Boolean;
    function Isset (Item : String) return Boolean;
 

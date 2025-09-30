@@ -484,7 +484,14 @@ is
 --    Wp_Start_Scraping_Edited_File_Errors;
 
       -- Register the default theme directory root.
-      Inc_Themes.Register_Theme_Directory (Get_Theme_Root);
+      declare
+         use Inc_Themes;
+
+         Unused : constant Boolean :=
+            Register_Theme_Directory (Get_Theme_Root);
+      begin
+         null;
+      end;
 
 --    if not Inc_Load.Is_Multisite then
          -- Handle users requesting a recovery mode link and initiating recovery mode.

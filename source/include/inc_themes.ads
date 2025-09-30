@@ -63,6 +63,21 @@ is
             return Hb_Common.String_Maps.Map;
 
    --
+   -- Registers a directory that contains themes.
+   --
+   -- @since 2.9.0
+   --
+   -- @global array wp_theme_directories
+   --
+   -- @param string directory Either the full filesystem path to a theme folder
+   --                          or a folder within WP_CONTENT_DIR.
+   -- @return bool True if successfully registered a directory that contains themes,
+   --              false if the directory does not exist.
+   --
+   function Register_Theme_Directory (Directory : String)
+                                      return Boolean;
+
+   --
    -- Retrieves name of the current stylesheet.
    --
    -- The theme name that is currently set as the front end theme.
