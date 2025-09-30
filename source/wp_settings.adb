@@ -11,7 +11,7 @@ with Globals;
 with Php;
 
 with Inc_Default_Filters;
--- with Inc_Default_Constants;
+with Inc_Default_Constants;
 with Inc_L10n;
 with Inc_Load;
 with Inc_Plugins;
@@ -91,7 +91,7 @@ is
 
       -- Set initial default constants including WP_MEMORY_LIMIT, WP_MAX_MEMORY_LIMIT,
       -- WP_DEBUG, SCRIPT_DEBUG, WP_CONTENT_DIR and WP_CACHE.
---    Inc_Default_Constants.Wp_Initial_Constants;
+      Inc_Default_Constants.Wp_Initial_Constants;
 
       -- Make sure we register the shutdown handler for fatal errors as soon as
       -- possible.
@@ -519,7 +519,6 @@ is
 --    unset( $plugin, $_wp_plugin_file );
 
       -- Load pluggable functions.
-      Inc_Pluggables.Run;
 --    require ABSPATH . WPINC . '/pluggable.php';
 --    require ABSPATH . WPINC . '/pluggable-deprecated.php';
 

@@ -242,7 +242,7 @@ is
 
                         if not Empty (Menu_Hook)
                                 or else (("index.php" /= Menu_File)
-                                        and then File_Exists (WP_PLUGIN_DIR & "/menu_file")
+                                        and then File_Exists (-WP_PLUGIN_DIR & "/menu_file")
                                         and then not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
@@ -270,7 +270,7 @@ is
 
                         if not Empty (Menu_Hook)
                                 or else (("index.php" /= Item.Menu_Slug)
-                                        and then File_Exists (WP_PLUGIN_DIR & "/menu_file")
+                                        and then File_Exists (-WP_PLUGIN_DIR & "/menu_file")
                                         and then not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
@@ -377,7 +377,7 @@ is
                                  if
                                     Menu_Hook /= "" or else
                                     (("index.php" /= Sub_Item.Menu_Slug)       and then
-                                     File_Exists (WP_PLUGIN_DIR & "/sub_file") and then
+                                     File_Exists (-WP_PLUGIN_DIR & "/sub_file") and then
                                      not File_Exists (ABSPATH & "/wp-admin/sub_file"))
                                  then
                                     declare
@@ -388,8 +388,8 @@ is
                                        -- admin directory.
                                        if
                                          (not Admin_Is_Parent and then
-                                          File_Exists (WP_PLUGIN_DIR & "/menu_file") and then
-                                          not Is_Dir (WP_PLUGIN_DIR & "/" &
+                                          File_Exists (-WP_PLUGIN_DIR & "/menu_file") and then
+                                          not Is_Dir (-WP_PLUGIN_DIR & "/" &
                                                       String (-Item.Menu_Slug))) or else
                                           File_Exists (String (Menu_File))
                                        then

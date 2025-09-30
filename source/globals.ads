@@ -22,11 +22,28 @@ is
 
    ABSPATH         : constant String := "";
    WPINC           : constant String := "";
-   WP_PLUGIN_DIR   : constant String := "";
-   WPMU_PLUGIN_DIR : constant String := "";
+   WP_PLUGIN_DIR   : Unbounded_String;
+   WPMU_PLUGIN_DIR : Unbounded_String;
    WP_CONTENT_DIR  : constant String := "";
    WP_SITEURL      : constant String := "";
    WP_LANG_DIR     : constant String := "";
+
+   WP_CONTENT_URL  : Unbounded_String;
+   WP_PLUGIN_URL   : Unbounded_String;
+   PLUGINDIR       : Unbounded_String;
+   WPMU_PLUGIN_URL : Unbounded_String;
+   MUPLUGINDIR     : Unbounded_String;
+
+   AUTOSAVE_INTERVAL    : Natural;
+   EMPTY_TRASH_DAYS     : Natural;
+   WP_POST_REVISIONS    : Boolean;
+   WP_CRON_LOCK_TIMEOUT : Natural;
+
+   TEMPLATEPATH     : Unbounded_String;
+   STYLESHEETPATH   : Unbounded_String;
+   WP_DEFAULT_THEME : Unbounded_String;
+
+   MINUTE_IN_SECONDS : Natural;
 
    WPLANG : constant String := "da_DK";
 
