@@ -7,9 +7,7 @@ with Arrays;
 
 with Inc_Class_Wpdb;
 with Inc_Class_Wp_Posts;
-with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Terms;
-with Inc_Taxonomys;
 
 package Hb_Common
 is
@@ -174,10 +172,6 @@ is
                  Key : String)
                  return String
                  is ("XXX-251");
-
-   function Get (Post : Inc_Class_Wp_Post_Type.Wp_Post_Type;
-                 Key  : String)
-                 return String is ("XXX-250");
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 

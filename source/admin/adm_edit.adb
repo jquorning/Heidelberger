@@ -13,9 +13,8 @@ with Templates_Parser;
 with Arrays;
 with Binder;
 with Globals;
-with Php;
-
 with Hb_Common;
+with Php;
 with Wp_Common;
 
 with Adm_Admin;
@@ -667,7 +666,7 @@ is
                            URL  : constant String :=
                               ESC_URL  (Admin_URL (-Globals.Post_New_File));
                            HTML : constant String :=
-                              ESC_HTML (String'(Hb_Common.Get (Post_Type_Object,
+                              ESC_HTML (String'(Wp_Common.Get (Post_Type_Object,
                                                      "labels.add_new")));
                         begin
                            if
@@ -710,7 +709,7 @@ is
 
                      elsif Var_Name = "VAR_page_edit_search_box" then
                         X_Wp_List_Table.Search_Box
-                          (String'(Hb_Common.Get (Post_Type_Object,
+                          (String'(Wp_Common.Get (Post_Type_Object,
                                                  "labels.search_items")),
                            "post");
                         Set ("VAR_page_edit_search_box", "XXX-454");

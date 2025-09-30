@@ -19,6 +19,7 @@ with Binder;
 with Hb_Common;
 with Globals;
 with Php;
+with Wp_Common;
 
 with Adi_Templates;
 
@@ -357,6 +358,7 @@ is
       use Inc_Posts;
       use String_Vectors;
       use Ada.Containers;
+      use Wp_Common;
 
       Post_Types : constant Wp_Post_Type_Array :=
          Get_Post_Types (Arrays.To_Array ((1 => Build ("show_in_nav_menus", "true"))),

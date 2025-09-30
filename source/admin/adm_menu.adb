@@ -9,6 +9,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Php;
+with Wp_Common;
 
 with Adi_Plugins;
 
@@ -61,6 +62,7 @@ is
    procedure Run
    is
       use Binder;
+      use Wp_Common;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Updates;
