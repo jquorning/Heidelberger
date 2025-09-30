@@ -38,6 +38,7 @@ is
    procedure Create_Initial_Taxonomies
    is
       use Inc_Options;
+      use Inc_Plugins;
 --         global wp_rewrite;
       Rewrite          : Array_Type;
       Post_Format_Base : Unbounded_String;
@@ -2304,6 +2305,8 @@ is
          Arrays.Array_Vectors.Append (Object_Ids_3, New_Item => (+Id'Image, +""));
       end loop;
       declare
+         use Inc_Plugins;
+
          Object_Ids_2 : constant Array_Type := Array_Map ("intval", Object_Ids_3);
          Args_2       : Array_Type := Inc_Functions.Wp_Parse_Args (Args);
          Taxonomies_2 : Array_Type;

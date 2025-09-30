@@ -115,6 +115,8 @@ is
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String
    is
+      use Inc_Plugins;
+
       Output : Unbounded_String;
 
       Defaults : constant Array_Type := To_Array (Assoc_List'(

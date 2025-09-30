@@ -12,6 +12,7 @@
 with Hb_Common;
 
 with Adi_Caches;
+with Inc_Plugins;
 
 package body Inc_Meta
 is
@@ -757,10 +758,12 @@ is
 --        end if;
 
       declare
+         use Inc_Plugins;
+
          -- This filter is documented in wp-includes/meta.php
          Check : constant Integer
            := Apply_Filters (Hook_Name => "get_" & Meta_Type & "_metadata",
-                             Value     => null,
+                             Value     => 0, -- null,
                              Arg_2     => Object_Id,
                              Arg_3     => Meta_Key,
                              Arg_4     => True,

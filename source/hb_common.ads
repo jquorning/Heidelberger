@@ -41,79 +41,6 @@ is
 
    function Count (Item : String) return String;
 
-   function Apply_Filters (Item : String;
-                           S : String;
-                           D : String;
-                           X : Assoc_List)
-                           return String
-                           is ("XXX-220");
-
-   function Apply_Filters (Item : String;
-                           S    : String;
-                           D    : String := "";
-                           X    : String := "")
-                           return String;
-
-   function Apply_Filters (Item : String;
-                           S    : Assoc_List;
-                           D    : Assoc_List)
-                           return Assoc_List;
-
-   function Apply_Filters (Hook_Name : String;
-                           A         : Array_Type;
-                           B         : Array_Type)
-                           return Array_Type
-                           is (Empty_Array);
-
-   function Apply_Filters (Item : String;
-                           A    : Array_Type;
-                           V    : String;
-                           N    : String)
-                           return Array_Type;
-
-   function Apply_Filters (Item  : String;
-                           Left  : Array_Type;
-                           Right : Integer)
-                           return Array_Type is (Empty_Array);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : access Integer;
-                           Arg_2     : Positive;
-                           Arg_3     : String;
-                           Arg_4     : Boolean;
-                           Arg_5     : String)
-                           return Integer is (1);
-
-   function Apply_Filters (Hook_Name : String;
-                           Arg_2     : Array_Type;
-                           Arg_3     : Array_Type;
-                           Arg_4     : Array_Type)
-                           return Array_Type is (Empty_Array);
-
-   function Apply_Filters (Hook_Name : String;
-                           S         : String;
-                           D         : String;
-                           P         : Array_Type)
-                           return String
-                           is ("XXX-221");
-
-   function Apply_Filters (Hook_Name : String;
-                           S         : String;
-                           D         : String;
-                           P         : List_Type)
-                           return String
-                           is ("XXX-230");
-
-   function Apply_Filters (Hook_Name : String;
-                           List      : List_Type)
-                           return List_Type
-                           is (Empty_List);
-
-   function Apply_Filters (Hook_Name : String;
-                           Arg       : Boolean)
-                           return Boolean
-                           is (True);
-
    function Count (Al : Assoc_List) return Natural;
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
@@ -153,20 +80,6 @@ is
    function Apply_Filters (Hook_Name : String;
                            Arg_2     : Array_Type)
                            return Array_Type is (Empty_Array);
-
-   function Apply_Filters (Hook_Name : String;
-                           A         : Boolean;
-                           B         : String;
-                           D         : String)
-                           return String
-                           is ("XXX-701");
-
-   function Apply_Filters (Hook_Name : String;
-                           A         : Boolean;
-                           B         : String;
-                           D         : Boolean)
-                           return Boolean
-                           is (False);
 
    procedure Unset (A : String) is null;
 

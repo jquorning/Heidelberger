@@ -337,6 +337,8 @@ is
             Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
             declare
+               use Inc_Plugins;
+
                Screen : String := -Get_Current_Screen.Id;
                Tags   : constant Array_Type := To_Array (Item => Get (X_REQUEST, "delete_tags"));
             begin
@@ -377,8 +379,9 @@ is
             -- @param string      location The destination URL.
             -- @param WP_Taxonomy tax      The taxonomy object.
             --
-            Inc_Pluggables.Wp_Redirect
-               (Apply_Filters ("redirect_term_location", -Location, -Tax.Name));  -- .name added
+            Inc_Pluggables.Wp_Redirect (
+              Inc_Plugins.Apply_Filters ("redirect_term_location",
+                                         -Location, -Tax.Name));  -- .name added
             goto Bailout; -- return;  --  exit;
          end if;
 

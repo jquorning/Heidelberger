@@ -13,6 +13,7 @@ with Php;
 
 with Inc_Formatting;
 with Inc_Options;
+with Inc_Plugins;
 
 package body Inc_Themes
 is
@@ -178,6 +179,7 @@ is
    is
       use Hb_Common;
       use Inc_Options;
+      use Inc_Plugins;
    begin
       --
       -- Filters the name of current stylesheet.
@@ -197,6 +199,7 @@ is
             return String
    is
       use Hb_Common;
+      use Inc_Plugins;
 
       Stylesheet     : constant String := Get_Stylesheet; -- ();
       Theme_Root     : constant String := Get_Theme_Root (Stylesheet);
@@ -316,6 +319,7 @@ is
    is
       use Hb_Common;
       use Inc_Options;
+      use Inc_Plugins;
    begin
       --
       -- Filters the name of the active theme.
@@ -335,6 +339,7 @@ is
             return String
    is
       use Hb_Common;
+      use Inc_Plugins;
 
       Template     : constant String := Get_Template; -- ();
       Theme_Root   : constant String := Get_Theme_Root (Template);
@@ -616,6 +621,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Inc_Plugins;
 
 --      global wp_theme_directories;
 

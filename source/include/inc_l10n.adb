@@ -145,6 +145,7 @@ package body Inc_L10n is
       use Globals;
       use Hb_Common;
       use Inc_Formatting;
+      use Inc_Plugins;
 
       Determined_Locale : Unbounded_String;
       Wp_Lang           : Unbounded_String;

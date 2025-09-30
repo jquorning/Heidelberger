@@ -3,14 +3,14 @@ package body Hb_Common
 is
    function To_Array (Item : String) return Array_Type is (Empty_Array);
 
-   function Apply_Filters (Item : String;
-                           S : String;
-                           D : String := "";
-                           X : String := "")
-      return String is ("XXX-105");
+   -- function Apply_Filters (Item : String;
+   --                         S : String;
+   --                         D : String := "";
+   --                         X : String := "")
+   --    return String is ("XXX-105");
 
-   function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
-      return Array_Type is (Empty_Array);
+   -- function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
+   --    return Array_Type is (Empty_Array);
 
    function Empty (Table : Array_Type) return Boolean is (True);
 
@@ -35,13 +35,13 @@ is
 
    function Count (Item : String) return String is ("XXX 8");
 
-   function Apply_Filters (Item : String; S : Assoc_List; D : Assoc_List)
-      return Assoc_List
-   is
-      Al : constant Assoc_List := (1 .. 0 => <>);
-   begin
-      return Al;
-   end Apply_Filters;
+   -- function Apply_Filters (Item : String; S : Assoc_List; D : Assoc_List)
+   --    return Assoc_List
+   -- is
+   --    Al : constant Assoc_List := (1 .. 0 => <>);
+   -- begin
+   --    return Al;
+   -- end Apply_Filters;
 
    function "abs" (List : Array_Type) return String is ("XXX 12");
 

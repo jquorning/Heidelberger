@@ -12,6 +12,7 @@ with Php;
 
 with Inc_Caches;
 with Inc_Load;
+with Inc_Plugins;
 
 package body Inc_Options
 is
@@ -2042,6 +2043,8 @@ is
       -- @param string transient Transient name.
       --
       declare
+         use Inc_Plugins;
+
          M : Hb_Common.String_Maps.Map;
          R : constant String :=
            Apply_Filters ("site_transient_" & Transient, -Value, Transient);

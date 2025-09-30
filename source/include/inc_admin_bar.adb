@@ -790,6 +790,7 @@ is
       --
       declare
          use Inc_Formatting;
+         use Inc_Plugins;
 
          Show_Site_Icons : constant Boolean :=
             Apply_Filters ("wp_admin_bar_show_site_icons", True);
@@ -1672,6 +1673,8 @@ is
       use Globals;
       use Inc_Load;
       use Inc_Pluggables;
+      use Inc_Plugins;
+
 --    global show_admin_bar, pagenow;
    begin
       -- For all these types of requests, we never want an admin bar.

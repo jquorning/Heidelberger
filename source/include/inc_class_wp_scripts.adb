@@ -18,7 +18,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
--- with Inc_Plugins;
+with Inc_Plugins;
 with Inc_Script_Loader;
 with Inc_Themes;
 
@@ -257,6 +257,8 @@ is
                      -- @param string handle Script handle.
                      --
                      declare
+                        use Inc_Plugins;
+
                         Srce : constant String :=
                            Apply_Filters ("script_loader_src", -Src, Handle);
                      begin
@@ -330,14 +332,17 @@ is
                   end if;
 
                   -- This filter is documented in wp-includes/class-wp-scripts.php
-                  Src := +ESC_URL (Apply_Filters ("script_loader_src", -Src,
-                                                  Handle));
+                  Src := +ESC_URL (
+                    Inc_Plugins.Apply_Filters ("script_loader_src", -Src,
+                                               Handle));
 
                   if Src = "" then
                      return True;
                   end if;
 
                   declare
+                     use Inc_Plugins;
+
                      Tag : Unbounded_String :=
                         Translations & Cond_Before & Before_Handle;
                   begin
@@ -641,6 +646,8 @@ is
                       Group     : Boolean := False)
                       return Boolean
    is
+      use Inc_Plugins;
+
       R : constant Boolean := False; -- Parent::All_Deps (Handles, Recursion, Group);
    begin
       if not Recursion then

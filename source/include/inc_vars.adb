@@ -21,6 +21,7 @@ with Hb_Common;
 with Php;
 
 with Inc_Load;
+with Inc_Plugins;
 
 package body Inc_Vars
 is
@@ -95,6 +96,8 @@ is
 
       if Isset (X_SERVER, "HTTP_USER_AGENT") then
          declare
+            use Inc_Plugins;
+
             Http_User_Agent : constant String := Get (X_SERVER, "HTTP_USER_AGENT");
             Is_Admin : Boolean;
          begin
@@ -234,7 +237,7 @@ is
       --
       -- @param bool is_mobile Whether the request is from a mobile device or not.
       --
-      return Apply_Filters ("wp_is_mobile", Is_Mobile);
+      return Inc_Plugins.Apply_Filters ("wp_is_mobile", Is_Mobile);
    end Wp_Is_Mobile;
 
 end Inc_Vars;

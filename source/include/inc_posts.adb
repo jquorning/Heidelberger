@@ -13,6 +13,7 @@ with Wp_Common;
 with Inc_Formatting;
 with Inc_L10n;
 with Inc_Meta;
+with Inc_Plugins;
 
 package body Inc_Posts
 is
@@ -3620,11 +3621,11 @@ is
                --                        Accepts "raw", "edit", "db", "display",
                --                        "attribute", or "js". Default "display".
                --
-               Value_2 := Apply_Filters (Field, Value_2, Post_Id'Image,
-                                         Context);
+               Value_2 := Inc_Plugins.Apply_Filters (Field, Value_2, Post_Id'Image,
+                                                    Context);
             else
-               Value_2 := Apply_Filters ("post_" & Field, Value_2,
-                                         Post_Id'Image, Context);
+               Value_2 := Inc_Plugins.Apply_Filters ("post_" & Field, Value_2,
+                                                     Post_Id'Image, Context);
             end if;
 
             -- if "attribute" = Context then

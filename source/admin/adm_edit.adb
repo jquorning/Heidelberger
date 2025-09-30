@@ -70,6 +70,7 @@ is
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Link_Templates;
+      use Inc_Plugins;
       use Inc_Posts;
       use Binder;
 --
@@ -267,8 +268,6 @@ is
                         elsif "untrash" = Doaction then
 --              when "untrash" =>
                            declare
-                              use Inc_Plugins;
-
                               Untrashed : Natural := 0;
                            begin
                               if
@@ -375,7 +374,7 @@ is
 --
                               Sendback := +Apply_Filters
                                  (Hook_Name => "handle_bulk_actions-" & Screen,
-                                  S         => -Sendback,
+                                  Value     => -Sendback,
                                   D         => Doaction,
                                   P         => Post_Ids);
                               -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
@@ -626,8 +625,8 @@ is
                --
                Bulk_Messages
                   := Apply_Filters (Hook_Name => "bulk_post_updated_messages",
-                                    A         => Bulk_Messages,
-                                    B         => Bulk_Counts);  -- x => added
+                                    Value     => Bulk_Messages,
+                                    Arg_3     => Bulk_Counts);  -- x => added
                Bulk_Counts   := Array_Filter  (Bulk_Counts);
 
                declare
