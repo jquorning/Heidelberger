@@ -88,6 +88,18 @@ is
                            return String
                            is ("XXX-712");
 
+   --
+   -- Walks the array while sanitizing the contents.
+   --
+   -- @since 0.71
+   -- @since 5.5.0 Non-string values are left untouched.
+   --
+   -- @param array $array Array to walk while sanitizing contents.
+   -- @return array Sanitized $array.
+   --
+   function Add_Magic_Quotes (Arry : Array_Type)
+            return Array_Type;
+
 --
 -- Marks a function as deprecated and inform when it has been used.
 --

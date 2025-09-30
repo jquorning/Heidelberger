@@ -7,6 +7,7 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Binder;
 with Globals;
 with Hb_Common;
 with Php;
@@ -1093,25 +1094,25 @@ is
 --         end;
 -- end;
 
--- --
--- -- Add magic quotes to `_GET`, `_POST`, `_COOKIE`, and `_SERVER`.
--- --
--- -- Also forces `_REQUEST` to be `_GET + _POST`. If `_SERVER`,
--- -- `_COOKIE`, or `_ENV` are needed, use those superglobals directly.
--- --
--- -- @since 3.0.0
--- -- @access private
--- --
--- function wp_magic_quotes() then
---         // Escape with wpdb.
---         _GET    = add_magic_quotes( _GET );
---         _POST   = add_magic_quotes( _POST );
---         _COOKIE = add_magic_quotes( _COOKIE );
---         _SERVER = add_magic_quotes( _SERVER );
+   ---------------------
+   -- Wp_Magic_Quotes --
+   ---------------------
 
---         // Force REQUEST to be GET + POST.
---         _REQUEST = array_merge( _GET, _POST );
--- end;
+   procedure Wp_Magic_Quotes
+   is
+      use Binder;
+      use Php;
+      use Inc_Functions;
+   begin
+      -- Escape with wpdb.
+      XX_GET   := Add_Magic_Quotes (XX_GET);
+      X_POST   := Add_Magic_Quotes (X_POST);
+      X_COOKIE := Add_Magic_Quotes (X_COOKIE);
+      X_SERVER := Add_Magic_Quotes (X_SERVER);
+
+      -- Force REQUEST to be GET + POST.
+      X_REQUEST := Array_Merge (XX_GET, X_POST);
+   end Wp_Magic_Quotes;
 
 -- --
 -- -- Runs just before PHP shuts down execution.

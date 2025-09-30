@@ -1276,28 +1276,38 @@ is
 --         return apply_filters( 'removable_query_args', $removable_query_args );
 -- end;
 
---
--- Walks the array while sanitizing the contents.
---
--- @since 0.71
--- @since 5.5.0 Non-string values are left untouched.
---
--- @param array $array Array to walk while sanitizing contents.
--- @return array Sanitized $array.
---
--- function add_magic_quotes( $array ) then
---         foreach ( (array) $array as $k => $v ) then
---                 if ( is_array( $v ) ) then
---                         $array[ $k ] = add_magic_quotes( $v );
---                 end; elseif ( is_string( $v ) ) then
---                         $array[ $k ] = addslashes( $v );
---                 end; else then
---                         continue;
---                 end;
---         end;
+   ----------------------
+   -- Add_Magic_Quotes --
+   ----------------------
 
---         return $array;
--- end;
+   function Add_Magic_Quotes (Arry : Array_Type)
+            return Array_Type
+   is
+      use Hb_Common;
+
+      Array_2 : Array_Type := Arry;
+   begin
+      for A of Array_2 loop -- ( (array) $array as $k => $v ) then
+         declare
+            use Arrays.Array_Vectors;
+
+            K : constant String := -A.Key;
+            V : constant String := -A.Value;
+         begin
+            Array_2.Append ((+K, +Addslash (V)));
+            -- if Is_Array (V) then
+            --    Array_2 (K) := Add_Magic_Quotes (V);
+            -- elsif Is_String (V) then
+            --    Array_2 (K) := Addslashes (V);
+            -- else
+            --    goto Continue;
+            -- end if;
+         end;
+         << Continue >>
+      end loop;
+
+      return Array_2;
+   end Add_Magic_Quotes;
 
 --
 -- HTTP request for URI to retrieve content.

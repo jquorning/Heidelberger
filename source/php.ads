@@ -313,6 +313,10 @@ is
                   return List_Type
                   is (Empty_List);
 
+   function Addslash (Item : String)
+            return String
+            is ("XXX-713");
+
    -------------------
    -- Echo handling --
    -------------------
