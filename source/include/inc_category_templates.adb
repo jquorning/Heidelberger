@@ -8,14 +8,15 @@
 
 with Ada.Containers;
 
+with Hb_Common;
+with Wp_Common;
+
 with Adi_Caches;
 
 with Inc_Functions;
 with Inc_Load;
 with Inc_Posts;
 with Inc_Taxonomys;
-
-with Hb_Common;
 
 package body Inc_Category_Templates
 is
@@ -1329,6 +1330,7 @@ is
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            -- Inc_Class_Posts.Wp_Post
    is
+      use Wp_Common;
       use Adi_Caches;
       use Inc_Class_Wp_Terms;
       use Inc_Taxonomys;

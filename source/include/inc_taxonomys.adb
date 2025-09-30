@@ -2272,6 +2272,7 @@ is
                                  Args       : Array_Type := Empty_Array)
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Wp_Common;
       use Adi_Templates;
       use Inc_Class_Wp_Terms;
       use Array_Vectors;

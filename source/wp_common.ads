@@ -77,4 +77,24 @@ is
                       return Boolean
                       is (True);
 
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Id        : String;
+                           Taxonomy  : String)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           A1 : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           A2 : String;
+                           A3 : String;
+                           A4 : Array_Type)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+
+   function Apply_Filters (Hook_Name  : String;
+                           A1         : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           A2, A3, A4 : Array_Type)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
 end Wp_Common;

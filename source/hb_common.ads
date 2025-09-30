@@ -7,7 +7,6 @@ with Arrays;
 
 with Inc_Class_Wpdb;
 with Inc_Class_Wp_Posts;
-with Inc_Class_Wp_Terms;
 
 package Hb_Common
 is
@@ -79,13 +78,6 @@ is
                            return Array_Type is (Empty_Array);
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           Id        : String;
-                           Taxonomy  : String)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
-                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
-
-   function Apply_Filters (Hook_Name : String;
                            Value     : access Integer;
                            Arg_2     : Positive;
                            Arg_3     : String;
@@ -98,14 +90,6 @@ is
                            Arg_3     : Array_Type;
                            Arg_4     : Array_Type)
                            return Array_Type is (Empty_Array);
-
-   function Apply_Filters (Hook_Name : String;
-                           A1 : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           A2 : String;
-                           A3 : String;
-                           A4 : Array_Type)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
-                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
    function Apply_Filters (Hook_Name : String;
                            S         : String;
@@ -192,11 +176,6 @@ is
                            Arg_2     : Array_Type)
                            return Array_Type is (Empty_Array);
 
-   function Apply_Filters (Hook_Name  : String;
-                           A1         : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           A2, A3, A4 : Array_Type)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
-                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
    function Apply_Filters (Hook_Name : String;
                            A         : Boolean;
                            B         : String;
