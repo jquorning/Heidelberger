@@ -114,20 +114,6 @@ is
                            return Boolean
                            is (True);
 
-   function Printf (Format : String;
-                    Arg_1  : String;
-                    Arg_2  : String := "";
-                    Arg_3  : String := "";
-                    Arg_4  : String := "")
-                    return String
-                    is (Format & " XXX-310 " & Arg_1);
-
-   function Sprintf (Format : String;
-                     Arg_1 : String;
-                     Arg_2 : String := "";
-                     Arg_3 : String := "")
-      return String is (Format & "XXX-201");
-
    function Count (Al : Assoc_List) return Natural;
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;

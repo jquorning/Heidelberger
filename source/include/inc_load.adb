@@ -633,7 +633,7 @@ is
       if Is_Wp_Error (-Prefix) then
          Wp_Load_Translations_Early;
          Wp_Die (
-            Sprintf (
+            Php.Sprintf (
               -- translators: 1: table_prefix, 2: wp-config.php
               abs "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores.",
               "<code>table_prefix</code>",
