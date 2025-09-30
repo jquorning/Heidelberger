@@ -220,7 +220,8 @@ is
                         elsif Isset (String'(Get (X_REQUEST, "ids"))) then
                            Post_Ids := List_Type'(Explode (",", Get_List (X_REQUEST, "ids")));
                         elsif not Empty (String'(Get (X_REQUEST, "post"))) then
-                           Post_Ids := List_Type'(Array_Map ("intval", Get (X_REQUEST, "post")));
+                           Post_Ids := List_Type'(
+                             Array_Map ("intval", Get_Array (X_REQUEST, "post")));
                         end if;
 
                         if Post_Ids.Is_Empty then
@@ -336,14 +337,17 @@ is
                            if Isset (String'(Get (X_REQUEST, "bulk_edit"))) then
                               declare
                                  Done : Array_Type :=
-                                    Adi_Posts.Bulk_Edit_Posts (Get (X_REQUEST, ""));
+                                    Adi_Posts.Bulk_Edit_Posts (
+                                       Get_Array (X_REQUEST, ""));
                                  -- (item => ) added
                               begin
                                  if Is_Array (Done) then
-                                    Set (Done, "updated", Count (Get (Done, "updated")));
-                                    Set (Done, "skipped", Count (Get (Done, "skipped")));
-                                    -- Done ("skipped") := Count (Done ("skipped"));
-                                    Set (Done, "locked",  Count (Get (Done, "locked")));
+                                    Set_Integer (Done, "updated",
+                                                 Count (Get (Done, "updated")));
+                                    Set_Integer (Done, "skipped",
+                                                 Count (Get (Done, "skipped")));
+                                    Set_Integer (Done, "locked",
+                                                 Count (Get (Done, "locked")));
                                     Sendback := +Add_Query_Arg (Done, -Sendback);
                                  end if;
                               end;
@@ -828,8 +832,10 @@ is
                declare
                   use Inc_Formatting;
 
-                  Ids   : constant Integer := Preg_Replace ("/[^0-9,]/", "",
-                                                            Get (X_REQUEST, "ids"));
+                  Ids   : constant Integer :=
+                    Preg_Replace ("/[^0-9,]/", "",
+                      Get_Array (X_REQUEST, "ids"));
+
                   URL_2 : constant String
                      := """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
                         Ids'Image & """";

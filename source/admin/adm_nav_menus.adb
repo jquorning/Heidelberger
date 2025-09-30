@@ -116,12 +116,13 @@ is
 
             if Isset (X_REQUEST, "nav-menu-locations") then
                Unused_2 := Set_Theme_Mod ("nav_menu_locations",
-                             Array_Map ("absint", Get (X_REQUEST, "menu-locations")));
+                             Array_Map ("absint",
+                               Get_Array (X_REQUEST, "menu-locations")));
 
             elsif Isset (X_REQUEST, "menu-item") then
                Unused := Adi_Nav_Menus.Wp_Save_Nav_Menu_Items
                            (Nav_Menu_Selected_Id,
-                            Get (X_REQUEST, "menu-item"));
+                            Get_Array (X_REQUEST, "menu-item"));
             end if;
 
 --        case "move-down-menu-item":
@@ -288,9 +289,10 @@ is
                                  Unused : Integer;
                               begin
                                  Unused :=
-                                    Inc_Posts.Update_Post_Meta (Get_Integer (Menu_Item_Data, "ID"),
-                                                "_menu_item_menu_item_parent",
-                                                Get (Menu_Item_Data, "menu_item_parent")); -- (int)
+                                   Inc_Posts.Update_Post_Meta (
+                                     Get_Integer (Menu_Item_Data, "ID"),
+                                                  "_menu_item_menu_item_parent",
+                                     Get_Array (Menu_Item_Data, "menu_item_parent")); -- (int)
                               end;
                            end if;
                         end;

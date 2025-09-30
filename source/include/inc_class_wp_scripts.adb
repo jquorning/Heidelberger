@@ -461,7 +461,7 @@ is
 
       -- back compat, preserve the code in "l10n_print_after" if present.
       if Is_Array (L10n_2) and then Isset (L10n_2, "l10n_print_after") then
-         After := Get (L10n_2, "l10n_print_after");
+         After := Get_Array (L10n_2, "l10n_print_after");
 --         Unset (L10n_2 ("l10n_print_after"));
       end if;
 

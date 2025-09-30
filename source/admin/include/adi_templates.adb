@@ -176,9 +176,9 @@ is
          Set (Args_2, "list_only",
               Boolean'Image (not Empty (Parsed_Args, "list_only")));
 
-         if Is_Array (Get (Parsed_Args, "selected_cats")) then
+         if Is_Array (Get_Array  (Parsed_Args, "selected_cats")) then
             Set (Args_2, "selected_cats",
-                 Array_Map ("intval", Get (Parsed_Args, "selected_cats")));
+                 Array_Map ("intval", Get_Array (Parsed_Args, "selected_cats")));
          elsif Post_Id /= 0 then
             null;
 --                Set (Args_2, "selected_cats",
@@ -188,9 +188,9 @@ is
             Set (Args_2, "selected_cats", Empty_Array);
          end if;
 
-         if Is_Array (Get (Parsed_Args, "popular_cats")) then
+         if Is_Array (Get_Array (Parsed_Args, "popular_cats")) then
             Set (Args_2, "popular_cats",
-                 Array_Map ("intval", Get (Parsed_Args, "popular_cats")));
+                 Array_Map ("intval", Get_Array (Parsed_Args, "popular_cats")));
          else
             Set (Args_2, "popular_cats",
                      Get_Terms (
@@ -240,7 +240,7 @@ is
             begin
                for K of Keys loop
                   if In_Array (Get_Term_Array (Categories, -K).Term_Id,
-                               Get (Args_2, "selected_cats"), True)
+                               Get_Array (Args_2, "selected_cats"), True)
                   then
                      Checked_Categories := Get_Array (Categories, -K); -- ()
 --                   Unset (Categories (K));

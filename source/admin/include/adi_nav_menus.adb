@@ -1610,7 +1610,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       -- Loop through all the menu items" POST variables.
       if Get (X_POST, "menu-item-db-id") /= "" then
 --    if not Empty (Get (X_POST, "menu-item-db-id")) then
-         for A of Array_Type'(Get (X_POST, "menu-item-db-id")) loop
+         for A of Get_Array (X_POST, "menu-item-db-id") loop
             declare
                X_Key : constant String := -A.Key;
                K     : constant String := -A.Value;
@@ -1673,7 +1673,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
          if Auto_Add then
             if
               not In_Array (Nav_Menu_Selected_Id,
-                            Get (Nav_Menu_Option, "auto_add"), True)
+                            Get_Array (Nav_Menu_Option, "auto_add"), True)
             then
                Set (Nav_Menu_Option, "auto_add", Nav_Menu_Selected_Id); -- ()
             end if;
@@ -1681,7 +1681,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
             declare
                Key : constant String :=
                   Array_Search (Nav_Menu_Selected_Id,
-                                Get (Nav_Menu_Option, "auto_add"), True);
+                                Get_Array (Nav_Menu_Option, "auto_add"), True);
             begin
                if "" /= Key then -- False
                   null;

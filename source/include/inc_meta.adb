@@ -784,7 +784,7 @@ is
 
          if Array_Vectors.Length (Meta_Cache) in 0 then  -- not
             Meta_Cache := Update_Meta_Cache (Meta_Type, (1 => Object_Id)); -- to_array
-            Meta_Cache := Get (Meta_Cache, Object_Id'Image);
+            Meta_Cache := Get_Array (Meta_Cache, Object_Id'Image);
          end if;
 
          if "" /= Get (Meta_Cache, Meta_Key) then -- isset

@@ -39,13 +39,15 @@ is
                           Value : Integer)
                           is null;
 
-   function Count (Item : String) return String;
-
-   function Count (Al : Assoc_List) return Natural;
+   function Count (Item : String)
+                   return Natural
+                   is (7);
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
-   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
-                 return Array_Type;
+
+   function Get_Array (Arr : Array_Type; Key : String; Arg_2 : String := "")
+                       return Array_Type
+                       is (Empty_Array);
 
    function Get_2 (Arry : Array_Type; Key_1, Key_2 : String)
                   return String is ("XXX-303");

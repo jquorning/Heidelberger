@@ -48,14 +48,6 @@ is
    function Count (Al : Assoc_List) return Natural is (1);
 
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
-                 return Array_Type
-   is
-      A : constant Array_Type := Empty_Array;
-   begin
-      return A;
-   end Get;
-
-   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
                  return String is (Key & " XXX-68");
 
    -----------
