@@ -43,14 +43,12 @@ is
                    return Natural
                    is (7);
 
-   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "") return String;
+   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
+                 return String;
 
    function Get_Array (Arr : Array_Type; Key : String; Arg_2 : String := "")
                        return Array_Type
                        is (Empty_Array);
-
-   function Get_2 (Arry : Array_Type; Key_1, Key_2 : String)
-                  return String is ("XXX-303");
 
    function Get_List (Arry : Array_Type; Key : String)
                       return List_Type
