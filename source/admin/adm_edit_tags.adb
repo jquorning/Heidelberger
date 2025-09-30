@@ -14,6 +14,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Php;
+with Wp_Common;
 
 with Adm_Menu;
 
@@ -65,6 +66,7 @@ is
    procedure Render
    is
       use Binder;
+      use Wp_Common;
       use Adi_Screens;
       use Inc_Capabilities;
       use Inc_Formatting;

@@ -29,6 +29,11 @@ is
                            return List_Type
                            is (Empty_List);
 
+   function In_Array (Taxonomy   : String;
+                      Taxonomies : Inc_Taxonomys.Taxonomy_Array;
+                      S          : Boolean)
+                      return Boolean is (True);
+
    function In_Array (A      : Integer;
                       B      : Array_Type;
                       Strict : Boolean)

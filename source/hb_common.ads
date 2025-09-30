@@ -221,11 +221,6 @@ is
 
    type Walker_Type is access procedure;
 
-   function In_Array (Taxonomy   : String;
-                      Taxonomies : Inc_Taxonomys.Taxonomy_Array;
-                      S          : Boolean)
-                      return Boolean is (True);
-
    function In_Array (Key  : String;
                       Arry : String_Array;
                       S    : Boolean)

@@ -18,6 +18,7 @@ with Inc_Themes;
 
 with Hb_Common;
 with Php;
+with Wp_Common;
 
 package body Inc_Taxonomys
 is
@@ -5029,6 +5030,7 @@ is
                                    Taxonomy    : String)
                                    return Boolean
    is
+      use Wp_Common;
       use Taxonomy_Vectors;
 
       Taxonomies : constant Taxonomy_Array := Get_Object_Taxonomies (Object_Type);
