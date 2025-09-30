@@ -21,6 +21,7 @@ with Inc_Pluggables;
 with Inc_Plugins;
 with Inc_Themes;
 with Inc_Users;
+with Inc_Vars;
 
 package body Inc_Class_Wp_Admin_Bar
 is
@@ -596,7 +597,7 @@ is
    begin
       -- Add browser classes.
       -- We have to do this here since admin bar shows on the front end.
-      if Wp_Is_Mobile then
+      if Inc_Vars.Wp_Is_Mobile then
          Class := Class & " mobile";
       end if;
            -- ?>

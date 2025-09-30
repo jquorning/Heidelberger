@@ -39,6 +39,7 @@ with Inc_Link_Templates;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Pluggables;
+with Inc_Vars;
 
 package body Adm_Edit_Tags
 is
@@ -881,7 +882,7 @@ is
                           Get (Tax.Labels, "name_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_not_is_mobile" then
-                     Set ("VAR_edit_tags_not_is_mobile", not Wp_Is_Mobile);
+                     Set ("VAR_edit_tags_not_is_mobile", not Inc_Vars.Wp_Is_Mobile);
 
                   elsif Var_Name = "VAR_edit_tags_post_tag_and_user_can_import" then
                      Set ("VAR_edit_tags_post_tag_and_user_can_import",

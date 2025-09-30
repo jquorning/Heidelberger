@@ -35,6 +35,7 @@ with Inc_Post_Templates;
 with Inc_Posts;
 with Inc_Themes;
 with Inc_Users;
+with Inc_Vars;
 
 package body Adm_Admin_Header
 is
@@ -293,7 +294,7 @@ is
                                Sanitize_Html_Class (Strtolower (
                                  Str_Replace ("_", "-", Get_User_Locale)))));
 
-      if Wp_Is_Mobile then
+      if Inc_Vars.Wp_Is_Mobile then
          Append (Admin_Body_Class, " mobile");
       end if;
 

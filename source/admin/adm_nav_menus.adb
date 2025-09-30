@@ -28,6 +28,7 @@ with Inc_Pluggables;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
+with Inc_Vars;
 
 package body Adm_Nav_Menus
 is
@@ -71,7 +72,7 @@ is
 
       Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("nav-menu");
 
-      if Wp_Is_Mobile then
+      if Inc_Vars.Wp_Is_Mobile then
          Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("jquery-touch-punch");
       end if;
 

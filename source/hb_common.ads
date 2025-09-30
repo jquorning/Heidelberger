@@ -71,8 +71,6 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   function Wp_Is_Mobile return Boolean is (False);
-
    function Empty (A : String) return Boolean is (True);
    function Empty (Table : Array_Type) return Boolean;
    function Empty (Arry : Array_Type; Key : String) return Boolean is (False);
