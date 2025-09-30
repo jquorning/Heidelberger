@@ -270,7 +270,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
-                           Right     : Integer)
+                           Right     : Integer := 0)
                            return Array_Type is (Empty_Array);
 
    function Apply_Filters (Hook_Name : String;

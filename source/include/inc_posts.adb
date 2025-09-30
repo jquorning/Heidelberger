@@ -3505,6 +3505,8 @@ is
       end if;
 
       declare
+         use Inc_Plugins;
+
          Prefixed        : Boolean    := False;
          Field_No_Prefix : Unbounded_String;
 --         Value_2         : Array_Type := Value_2;
@@ -3520,36 +3522,35 @@ is
                                         +"post_title",   +"post_password"));
 
             if Prefixed then
+               --
+               -- Filters the value of a specific post field to edit.
+               --
+               -- The dynamic portion of the hook name, `field`, refers to the post
+               -- field name.
+               --
+               -- @since 2.3.0
+               --
+               -- @param mixed value   Value of the post field.
+               -- @param int   post_id Post ID.
+               --
+               Value_2 := Apply_Filters ("edit_" & Field, Value_2, Post_Id);
 
                --
-                        -- Filters the value of a specific post field to edit.
-                        --
-                        -- The dynamic portion of the hook name, `field`, refers to the post
-                        -- field name.
-                        --
-                        -- @since 2.3.0
-                        --
-                        -- @param mixed value   Value of the post field.
-                        -- @param int   post_id Post ID.
-                        --
-                        Value_2 := Apply_Filters ("edit_" & Field, Value_2, Post_Id);
-
-                        --
-                        -- Filters the value of a specific post field to edit.
-                        --
-                        -- The dynamic portion of the hook name, `field_no_prefix`, refers to
-                        -- the post field name.
-                        --
-                        -- @since 2.3.0
-                        --
-                        -- @param mixed value   Value of the post field.
-                        -- @param int   post_id Post ID.
-                        --
-                        Value_2 := Apply_Filters (-Field_No_Prefix & "_edit_pre",
-                                                  Value_2, Post_Id);
+               -- Filters the value of a specific post field to edit.
+               --
+               -- The dynamic portion of the hook name, `field_no_prefix`, refers to
+               -- the post field name.
+               --
+               -- @since 2.3.0
+               --
+               -- @param mixed value   Value of the post field.
+               -- @param int   post_id Post ID.
+               --
+               Value_2 := Apply_Filters (-Field_No_Prefix & "_edit_pre",
+                                         Value_2, Post_Id);
             else
-                        Value_2 := Apply_Filters ("edit_post_" & Field,
-                                                  Value_2, Post_Id);
+               Value_2 := Apply_Filters ("edit_post_" & Field,
+                                         Value_2, Post_Id);
             end if;
 
                 -- if In_Array (Field, Format_To_Edit, True) then

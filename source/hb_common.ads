@@ -77,10 +77,6 @@ is
    function Empty (Table : Array_Type) return Boolean;
    function Empty (Arry : Array_Type; Key : String) return Boolean is (False);
 
-   function Apply_Filters (Hook_Name : String;
-                           Arg_2     : Array_Type)
-                           return Array_Type is (Empty_Array);
-
    procedure Unset (A : String) is null;
 
    type Walker_Type is access procedure;
