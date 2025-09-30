@@ -11,6 +11,10 @@ with Adi_Caches;
 with Adi_Templates;
 
 with Inc_Functions;
+with Inc_L10n;
+with Inc_Options;
+with Inc_Plugins;
+with Inc_Themes;
 
 with Hb_Common;
 with Php;
@@ -20,223 +24,233 @@ is
    use Ada.Containers;
    use Hb_Common;
    use Php;
---
--- Taxonomy registration.
---
+   use Inc_L10n;
 
---
--- Creates the initial taxonomies.
---
--- This function fires twice: in wp-settings.php before plugins are loaded (for
--- backward compatibility reasons), and again on the {@see "init"} action. We must
--- avoid registering rewrite rules before the {@see "init"} action.
---
--- @since 2.8.0
--- @since 5.9.0 Added `"wp_template_part_area"` taxonomy.
---
--- @global WP_Rewrite wp_rewrite WordPress rewrite component.
---
--- function create_initial_taxonomies() then
+   --
+   -- Taxonomy registration.
+   --
+
+   -------------------------------
+   -- Create_Initial_Taxonomies --
+   -------------------------------
+
+   procedure Create_Initial_Taxonomies
+   is
+      use Inc_Options;
 --         global wp_rewrite;
+      Rewrite          : Array_Type;
+      Post_Format_Base : Unbounded_String;
+   begin
+--    Reset_Default_Labels; -- WP_Taxonomy::reset_default_labels();
 
---         WP_Taxonomy::reset_default_labels();
+      if False then -- not Did_Action ("init") then
+         Rewrite := Arrays.To_Array ((
+            Build ("category",    False),
+            Build ("post_tag",    False),
+            Build ("post_format", False)
+         ));
+      else
+         --
+         -- Filters the post formats rewrite base.
+         --
+         -- @since 3.1.0
+         --
+         -- @param string context Context of the rewrite base. Default "type".
+         --
+         Post_Format_Base := +Apply_Filters ("post_format_rewrite_base", "type");
 
---         if  (! did_action ("init")) then
---                 rewrite = array(
---                         "category"    => false,
---                         "post_tag"    => false,
---                         "post_format" => false,
---                );
---         end; else then
+         Rewrite          := Arrays.To_Array ((
+            Build ("category",    Arrays.To_Array ((
+               Build ("hierarchical", True),
+               Build ("slug",         (if "" /= Get_Option ("category_base")
+                                       then Get_Option ("category_base")
+                                       else "category")) -- ,
+--             Build ("with_front",   "" = Get_Option ("category_base") or else
+--                                    Wp_Rewrite.Using_Index_Permalinks), -- ()
+--             Build ("ep_mask",      Ep_Categories)
+            ))),
+            Build ("post_tag",    Arrays.To_Array ((
+               Build ("hierarchical", False),
+               Build ("slug",         (if "" /= Get_Option ("tag_base")
+                                       then Get_Option ("tag_base") else "tag")) -- ,
+--             Build ("with_front",   "" = Get_Option ("tag_base") or else
+--                                    Wp_Rewrite.Using_Index_Permalinks),
+--               Build ("ep_mask",      Ep_Tags)
+            ))),
+            Build ("post_format",
+              (if Post_Format_Base /= ""
+               then Arrays.To_Array ((1 => Build ("slug", -Post_Format_Base)))
+               else Empty_Array)) -- False))
+         ));
+      end if;
 
---                 --
---                 -- Filters the post formats rewrite base.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param string context Context of the rewrite base. Default "type".
---                 --
---                 post_format_base = apply_filters ("post_format_rewrite_base", "type");
---                 rewrite          = array(
---                         "category"    => array(
---                                 "hierarchical" => true,
---                                 "slug"         => get_option ("category_base") ? get_option ("category_base") : "category",
---                                 "with_front"   => ! get_option ("category_base") || wp_rewrite->using_index_permalinks(),
---                                 "ep_mask"      => EP_CATEGORIES,
---                        ),
---                         "post_tag"    => array(
---                                 "hierarchical" => false,
---                                 "slug"         => get_option ("tag_base") ? get_option ("tag_base") : "tag",
---                                 "with_front"   => ! get_option ("tag_base") || wp_rewrite->using_index_permalinks(),
---                                 "ep_mask"      => EP_TAGS,
---                        ),
---                         "post_format" => post_format_base ? array ("slug" => post_format_base) : false,
---                );
---         end;
+      Register_Taxonomy (
+         "category",
+         "post",
+         Arrays.To_Array ((
+            Build ("hierarchical",          True),
+            Build ("query_var",             "category_name"),
+            Build ("rewrite",
+               String'(Get (Rewrite, "category"))),
+            Build ("public",                True),
+            Build ("show_ui",               True),
+            Build ("show_admin_column",     True),
+            Build ("_builtin",              True),
+            Build ("capabilities",          Arrays.To_Array ((
+               Build ("manage_terms", "manage_categories"),
+               Build ("edit_terms",   "edit_categories"),
+               Build ("delete_terms", "delete_categories"),
+               Build ("assign_terms", "assign_categories")
+            ))),
+            Build ("show_in_rest",          True),
+            Build ("rest_base",             "categories"),
+            Build ("rest_controller_class", "WP_REST_Terms_Controller")
+         ))
+      );
 
---         register_taxonomy(
---                 "category",
---                 "post",
---                 array(
---                         "hierarchical"          => true,
---                         "query_var"             => "category_name",
---                         "rewrite"               => rewrite("category"),
---                         "public"                => true,
---                         "show_ui"               => true,
---                         "show_admin_column"     => true,
---                         "_builtin"              => true,
---                         "capabilities"          => array(
---                                 "manage_terms" => "manage_categories",
---                                 "edit_terms"   => "edit_categories",
---                                 "delete_terms" => "delete_categories",
---                                 "assign_terms" => "assign_categories",
---                        ),
---                         "show_in_rest"          => true,
---                         "rest_base"             => "categories",
---                         "rest_controller_class" => "WP_REST_Terms_Controller",
---                )
---        );
+      Register_Taxonomy (
+         "post_tag",
+         "post",
+         Arrays.To_Array ((
+            Build ("hierarchical",          False),
+            Build ("query_var",             "tag"),
+            Build ("rewrite",
+               String'(Get (Rewrite, "post_tag"))),
+            Build ("public",                True),
+            Build ("show_ui",               True),
+            Build ("show_admin_column",     True),
+            Build ("_builtin",              True),
+            Build ("capabilities",          Arrays.To_Array ((
+               Build ("manage_terms", "manage_post_tags"),
+               Build ("edit_terms",   "edit_post_tags"),
+               Build ("delete_terms", "delete_post_tags"),
+               Build ("assign_terms", "assign_post_tags")
+            ))),
+            Build ("show_in_rest",          True),
+            Build ("rest_base",             "tags"),
+            Build ("rest_controller_class", "WP_REST_Terms_Controller")
+         ))
+      );
 
---         register_taxonomy(
---                 "post_tag",
---                 "post",
---                 array(
---                         "hierarchical"          => false,
---                         "query_var"             => "tag",
---                         "rewrite"               => rewrite("post_tag"),
---                         "public"                => true,
---                         "show_ui"               => true,
---                         "show_admin_column"     => true,
---                         "_builtin"              => true,
---                         "capabilities"          => array(
---                                 "manage_terms" => "manage_post_tags",
---                                 "edit_terms"   => "edit_post_tags",
---                                 "delete_terms" => "delete_post_tags",
---                                 "assign_terms" => "assign_post_tags",
---                        ),
---                         "show_in_rest"          => true,
---                         "rest_base"             => "tags",
---                         "rest_controller_class" => "WP_REST_Terms_Controller",
---                )
---        );
+      Register_Taxonomy (
+         "nav_menu",
+         "nav_menu_item",
+         Arrays.To_Array ((
+            Build ("public",                False),
+            Build ("hierarchical",          False),
+            Build ("labels",                Arrays.To_Array ((
+               Build ("name",          abs "Navigation Menus"),
+               Build ("singular_name", abs "Navigation Menu")
+            ))),
+            Build ("query_var",             False),
+            Build ("rewrite",               False),
+            Build ("show_ui",               False),
+            Build ("_builtin",              True),
+            Build ("show_in_nav_menus",     False),
+            Build ("capabilities",          Arrays.To_Array ((
+               Build ("manage_terms", "edit_theme_options"),
+               Build ("edit_terms",   "edit_theme_options"),
+               Build ("delete_terms", "edit_theme_options"),
+               Build ("assign_terms", "edit_theme_options")
+            ))),
+            Build ("show_in_rest",          True),
+            Build ("rest_base",             "menus"),
+            Build ("rest_controller_class", "WP_REST_Menus_Controller")
+         ))
+      );
 
---         register_taxonomy(
---                 "nav_menu",
---                 "nav_menu_item",
---                 array(
---                         "public"                => false,
---                         "hierarchical"          => false,
---                         "labels"                => array(
---                                 "name"          => __ ("Navigation Menus"),
---                                 "singular_name" => __ ("Navigation Menu"),
---                        ),
---                         "query_var"             => false,
---                         "rewrite"               => false,
---                         "show_ui"               => false,
---                         "_builtin"              => true,
---                         "show_in_nav_menus"     => false,
---                         "capabilities"          => array(
---                                 "manage_terms" => "edit_theme_options",
---                                 "edit_terms"   => "edit_theme_options",
---                                 "delete_terms" => "edit_theme_options",
---                                 "assign_terms" => "edit_theme_options",
---                        ),
---                         "show_in_rest"          => true,
---                         "rest_base"             => "menus",
---                         "rest_controller_class" => "WP_REST_Menus_Controller",
---                )
---        );
+      Register_Taxonomy (
+         "link_category",
+         "link",
+         Arrays.To_Array ((
+            Build ("hierarchical", False),
+            Build ("labels",       Arrays.To_Array ((
+               Build ("name",                       abs "Link Categories"),
+               Build ("singular_name",              abs "Link Category"),
+               Build ("search_items",               abs "Search Link Categories"),
+               Build ("popular_items",              ""), -- null),
+               Build ("all_items",                  abs "All Link Categories"),
+               Build ("edit_item",                  abs "Edit Link Category"),
+               Build ("update_item",                abs "Update Link Category"),
+               Build ("add_new_item",               abs "Add New Link Category"),
+               Build ("new_item_name",              abs "New Link Category Name"),
+               Build ("separate_items_with_commas", ""), -- null),
+               Build ("add_or_remove_items",        ""), -- null),
+               Build ("choose_from_most_used",      ""), -- null),
+               Build ("back_to_items",              abs "&larr; Go to Link Categories")
+            ))),
+            Build ("capabilities", Arrays.To_Array ((
+               Build ("manage_terms", "manage_links"),
+               Build ("edit_terms",   "manage_links"),
+               Build ("delete_terms", "manage_links"),
+               Build ("assign_terms", "manage_links")
+            ))),
+            Build ("query_var",    False),
+            Build ("rewrite",      False),
+            Build ("public",       False),
+            Build ("show_ui",      True),
+            Build ("_builtin",     True)
+         ))
+      );
 
---         register_taxonomy(
---                 "link_category",
---                 "link",
---                 array(
---                         "hierarchical" => false,
---                         "labels"       => array(
---                                 "name"                       => __ ("Link Categories"),
---                                 "singular_name"              => __ ("Link Category"),
---                                 "search_items"               => __ ("Search Link Categories"),
---                                 "popular_items"              => null,
---                                 "all_items"                  => __ ("All Link Categories"),
---                                 "edit_item"                  => __ ("Edit Link Category"),
---                                 "update_item"                => __ ("Update Link Category"),
---                                 "add_new_item"               => __ ("Add New Link Category"),
---                                 "new_item_name"              => __ ("New Link Category Name"),
---                                 "separate_items_with_commas" => null,
---                                 "add_or_remove_items"        => null,
---                                 "choose_from_most_used"      => null,
---                                 "back_to_items"              => __ ("&larr; Go to Link Categories"),
---                        ),
---                         "capabilities" => array(
---                                 "manage_terms" => "manage_links",
---                                 "edit_terms"   => "manage_links",
---                                 "delete_terms" => "manage_links",
---                                 "assign_terms" => "manage_links",
---                        ),
---                         "query_var"    => false,
---                         "rewrite"      => false,
---                         "public"       => false,
---                         "show_ui"      => true,
---                         "_builtin"     => true,
---                )
---        );
+      Register_Taxonomy (
+         "post_format",
+         "post",
+         Arrays.To_Array ((
+            Build ("public",            True),
+            Build ("hierarchical",      False),
+            Build ("labels",            Arrays.To_Array ((
+               Build ("name",          X_X ("Formats", "post format")),
+               Build ("singular_name", X_X ("Format", "post format"))
+            ))),
+            Build ("query_var",         True),
+            Build ("rewrite",
+               String'(Get (Rewrite, "post_format"))),
+            Build ("show_ui",           False),
+            Build ("_builtin",          True),
+            Build ("show_in_nav_menus",
+                   Inc_Themes.Current_Theme_Supports ("post-formats"))
+         ))
+       );
 
---         register_taxonomy(
---                 "post_format",
---                 "post",
---                 array(
---                         "public"            => true,
---                         "hierarchical"      => false,
---                         "labels"            => array(
---                                 "name"          => _x ("Formats", "post format"),
---                                 "singular_name" => _x ("Format", "post format"),
---                        ),
---                         "query_var"         => true,
---                         "rewrite"           => rewrite("post_format"),
---                         "show_ui"           => false,
---                         "_builtin"          => true,
---                         "show_in_nav_menus" => current_theme_supports ("post-formats"),
---                )
---        );
+      Register_Taxonomy (
+         "wp_theme",
+         To_List ((+"wp_template", +"wp_template_part", +"wp_global_styles")),
+         Arrays.To_Array ((
+            Build ("public",            False),
+            Build ("hierarchical",      False),
+            Build ("labels",            Arrays.To_Array ((
+               Build ("name",          abs "Themes"),
+               Build ("singular_name", abs "Theme")
+            ))),
+            Build ("query_var",         False),
+            Build ("rewrite",           False),
+            Build ("show_ui",           False),
+            Build ("_builtin",          True),
+            Build ("show_in_nav_menus", False),
+            Build ("show_in_rest",      False)
+         ))
+      );
 
---         register_taxonomy(
---                 "wp_theme",
---                 array ("wp_template", "wp_template_part", "wp_global_styles"),
---                 array(
---                         "public"            => false,
---                         "hierarchical"      => false,
---                         "labels"            => array(
---                                 "name"          => __ ("Themes"),
---                                 "singular_name" => __ ("Theme"),
---                        ),
---                         "query_var"         => false,
---                         "rewrite"           => false,
---                         "show_ui"           => false,
---                         "_builtin"          => true,
---                         "show_in_nav_menus" => false,
---                         "show_in_rest"      => false,
---                )
---        );
-
---         register_taxonomy(
---                 "wp_template_part_area",
---                 array ("wp_template_part"),
---                 array(
---                         "public"            => false,
---                         "hierarchical"      => false,
---                         "labels"            => array(
---                                 "name"          => __ ("Template Part Areas"),
---                                 "singular_name" => __ ("Template Part Area"),
---                        ),
---                         "query_var"         => false,
---                         "rewrite"           => false,
---                         "show_ui"           => false,
---                         "_builtin"          => true,
---                         "show_in_nav_menus" => false,
---                         "show_in_rest"      => false,
---                )
---        );
--- end;
+      Register_Taxonomy (
+         "wp_template_part_area",
+         To_List ((1 => +"wp_template_part")),
+         Arrays.To_Array ((
+            Build ("public",            False),
+            Build ("hierarchical",      False),
+            Build ("labels",            Arrays.To_Array ((
+               Build ("name",          abs "Template Part Areas"),
+               Build ("singular_name", abs "Template Part Area")
+            ))),
+            Build ("query_var",         False),
+            Build ("rewrite",           False),
+            Build ("show_ui",           False),
+            Build ("_builtin",          True),
+            Build ("show_in_nav_menus", False),
+            Build ("show_in_rest",      False)
+         ))
+      );
+   end Create_Initial_Taxonomies;
 
 --
 -- Retrieves a list of registered taxonomy names or objects.
@@ -416,7 +430,7 @@ is
 -- @param string       taxonomy    Taxonomy key, must not exceed 32 characters and may only contain lowercase alphanumeric
 --                                  characters, dashes, and underscores. See sanitize_key().
 -- @param array|string object_type Object type or array of object types with which the taxonomy should be associated.
--- @param array|string args        then
+-- @param array|string args        {
 --     Optional. Array or query string of arguments for registering a taxonomy.
 --
 --     @type string()      labels                An array of labels for this taxonomy. By default, Tag labels are
@@ -458,15 +472,15 @@ is
 --     @type callable      meta_box_sanitize_cb  Callback function for sanitizing taxonomy data saved from a meta
 --                                                box. If no callback is defined, an appropriate one is determined
 --                                                based on the value of `meta_box_cb`.
---     @type string()      capabilities then
+--     @type string()      capabilities {
 --         Array of capabilities for this taxonomy.
 --
 --         @type string manage_terms Default "manage_categories".
 --         @type string edit_terms   Default "manage_categories".
 --         @type string delete_terms Default "manage_categories".
 --         @type string assign_terms Default "edit_posts".
---     end;
---     @type bool|array    rewrite then
+--     }
+--     @type bool|array    rewrite {
 --         Triggers the handling of rewrites for this taxonomy. Default true, using taxonomy as slug. To prevent
 --         rewrite, set to false. To specify rewrite rules, an array can be passed with any of these keys:
 --
@@ -474,7 +488,7 @@ is
 --         @type bool   with_front   Should the permastruct be prepended with WP_Rewrite::front. Default true.
 --         @type bool   hierarchical Either hierarchical rewrite tag or not. Default false.
 --         @type int    ep_mask      Assign an endpoint mask. Default `EP_NONE`.
---     end;
+--     }
 --     @type string|bool   query_var             Sets the query var key for this taxonomy. Default `taxonomy` key. If
 --                                                false, a taxonomy cannot be loaded at `?thenquery_varend;=thenterm_slugend;`. If a
 --                                                string, the query `?thenquery_varend;=thenterm_slugend;` will be valid.
@@ -483,25 +497,56 @@ is
 --                                                to post types, which confirms that the objects are published before
 --                                                counting them. Default _update_generic_term_count() for taxonomies
 --                                                attached to other object types, such as users.
---     @type string|array  default_term then
+--     @type string|array  default_term {
 --         Default term to be used for the taxonomy.
 --
 --         @type string name         Name of default term.
 --         @type string slug         Slug for default term. Default empty.
 --         @type string description  Description for default term. Default empty.
---     end;
+--     }
 --     @type bool          sort                  Whether terms in this taxonomy should be sorted in the order they are
 --                                                provided to `wp_set_object_terms()`. Default null which equates to false.
 --     @type array         args                  Array of arguments to automatically use inside `wp_get_object_terms()`
 --                                                for this taxonomy.
 --     @type bool          _builtin              This taxonomy is a "built-in" taxonomy. INTERNAL USE ONLY!
 --                                                Default false.
--- end;
+-- }
 -- @return WP_Taxonomy|WP_Error The registered taxonomy object on success, WP_Error object on failure.
+   procedure Register_Taxonomy (Taxonomy    : String;
+                                Object_Type : String;
+                                Args        : Array_Type)
+   is
+   begin
+      Register_Taxonomy (Taxonomy,
+                         To_List ((1 => +Object_Type)),
+                         Args);
+   end Register_Taxonomy;
+
+   procedure Register_Taxonomy (Taxonomy    : String;
+                                Object_Type : List_Type;
+                                Args        : Array_Type)
+   is
+      use Inc_Class_Wp_Taxonomy;
+
+      Unused : constant Wp_Taxonomy :=
+         Register_Taxonomy (Taxonomy,
+                            Object_Type,
+                            Args);
+   begin
+      null;
+   end Register_Taxonomy;
 --
 -- function register_taxonomy (taxonomy, object_type, args = array()) then
---         global wp_taxonomies;
+   function Register_Taxonomy (Taxonomy    : String;
+                               Object_Type : List_Type; -- String;
+                               Args        : Array_Type)
+                               return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
+   is
+      use Inc_Class_Wp_Taxonomy;
 
+--         global wp_taxonomies;
+   begin
+      return Null_Taxonomy;
 --         if  (! is_array (wp_taxonomies)) then
 --                 wp_taxonomies = array();
 --         end;
@@ -572,7 +617,7 @@ is
 --         do_action ("registered_taxonomy_thentaxonomyend;", taxonomy, object_type, (array) taxonomy_object);
 
 --         return taxonomy_object;
--- end;
+   end Register_Taxonomy;
 
 --
 -- Unregisters a taxonomy.

@@ -38,6 +38,9 @@ is
 
    function Build (Key : String; Value : String)     return Assoc_Type;
    function Build (Key : String; Value : Integer)    return Assoc_Type;
+   function Build (Key : String; Value : Boolean)    return Assoc_Type
+   is (Build (Key, Boolean'Image (Value)));
+
    function Build (Key : String; Value : Array_Type) return Assoc_Type;
 
    type Assoc_List is array (Positive range <>) of Assoc_Type;

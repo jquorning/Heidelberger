@@ -9,7 +9,6 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Globals;
-with Hb_Common;
 with Php;
 
 with Inc_Options;
