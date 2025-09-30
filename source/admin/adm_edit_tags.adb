@@ -569,13 +569,14 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         --
                         Do_Action_Deprecated ("add_tag_form", To_Array (Taxonomy),
-                                      "3.0.0", "{taxonomy}_add_form");
+                                      "3.0.0", Taxonomy & "_add_form");
                      end if;
 
                      --
                      -- Fires at the end of the Add Term form for all taxonomies.
                      --
-                     -- The dynamic portion of the hook name, `taxonomy`, refers to the taxonomy slug.
+                     -- The dynamic portion of the hook name, `taxonomy`, refers to
+                     -- the taxonomy slug.
                      --
                      -- Possible hook names include:
                      --
@@ -586,7 +587,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ("{taxonomy}_add_form", Taxonomy);
+                     Do_Action (Taxonomy & "_add_form", Taxonomy);
 
                      Set ("VAR_edit_tags_add_form", "XXX-81");
 
@@ -723,7 +724,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ("{taxonomy}_pre_add_form", Taxonomy);
+                     Do_Action (Taxonomy & "_pre_add_form", Taxonomy);
 
                      Set ("VAR_edit_tags_do_action_deprecated", "XXX-83");
 
@@ -742,7 +743,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy name.
                      --
-                     Do_Action ("after-{taxonomy}-table", Taxonomy);
+                     Do_Action ("after-" & Taxonomy & "-table", Taxonomy);
                      -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
                      Set ("VAR_edit_tags_do_after_table", "XXX-84");
 
@@ -759,7 +760,7 @@ is
                      --
                      -- @since 3.7.0
                      --
-                     Do_Action ("{taxonomy}_term_new_form_tag");
+                     Do_Action (Taxonomy & "_term_new_form_tag");
                      Set ("VAR_edit_tags_do_new_form", "XX-85");
 
                   elsif Var_Name = "VAR_edit_tags_do_tax_add_form_fields" then
@@ -788,7 +789,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ("{taxonomy}_add_form_fields", Taxonomy);
+                     Do_Action (Taxonomy & "_add_form_fields", Taxonomy);
 
                      Set ("VAR_edit_tags_do_tax_add_form_fields", "XX-86");
 
