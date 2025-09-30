@@ -31,9 +31,6 @@ is
                       S  : String)
                       return Array_Type is (Empty_Array);
 
-   function Absint (Item : Assoc_List) return String;
-   function Absint (Item : String)     return String is ("XXX-213");
-
    function Array_Filter (List : Array_Type) return Assoc_List;
    function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
    function Array_Filter (List : List_Type) return List_Type is (Empty_List);

@@ -529,18 +529,16 @@ is
             declare
                Bulk_Counts : Array_Type
                   := To_Array (List => (
-        Build ("updated",   (if Isset (String'(Get (X_REQUEST, "updated")))
-                             then Absint (Get (X_REQUEST, "updated"))
-                             else "0")),
-        Build ("locked",    (if Isset (String'(Get (X_REQUEST, "locked")))
-                             then Absint (Get (X_REQUEST, "locked"))
-                             else "0")),
-        Build ("deleted",   (if Isset (String'(Get (X_REQUEST, "deleted")))
-                             then Absint (Get (X_REQUEST, "deleted"))   else "0")),
-        Build ("trashed",   (if Isset (String'(Get (X_REQUEST, "trashed")))
-                             then Absint (Get (X_REQUEST, "trashed"))   else "0")),
-        Build ("untrashed", (if Isset (String'(Get (X_REQUEST, "untrashed")))
-                             then Absint (Get (X_REQUEST, "untrashed")) else "0"))
+        Build ("updated",   (if Isset (X_REQUEST, "updated")
+                             then abs Get_Integer (X_REQUEST, "updated") else 0)),
+        Build ("locked",    (if Isset (X_REQUEST, "locked")
+                             then abs Get_Integer (X_REQUEST, "locked") else 0)),
+        Build ("deleted",   (if Isset (X_REQUEST, "deleted")
+                             then abs Get_Integer (X_REQUEST, "deleted")   else 0)),
+        Build ("trashed",   (if Isset (X_REQUEST, "trashed")
+                             then abs Get_Integer (X_REQUEST, "trashed")   else 0)),
+        Build ("untrashed", (if Isset (X_REQUEST, "untrashed")
+                             then abs Get_Integer (X_REQUEST, "untrashed") else 0))
                ));
                Bulk_Messages    : Array_Type := Empty_Array; --          := To_Array; --  ();begin
             begin
