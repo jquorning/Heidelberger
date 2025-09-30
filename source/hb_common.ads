@@ -6,7 +6,6 @@ with Ada.Strings.Unbounded;
 with Arrays;
 
 with Inc_Class_Wpdb;
-with Inc_Class_Wp_Posts;
 
 package Hb_Common
 is
