@@ -182,7 +182,7 @@ is
                      end if;
 
                      declare
-                        use Array_Vectors;
+                        use Array_Maps;
 
                         Post_Ids    : List_Type; --  := To_Array; -- ()
                         Post_Status : Unbounded_String;

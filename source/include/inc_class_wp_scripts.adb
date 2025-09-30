@@ -399,7 +399,7 @@ is
       end if;
 
       declare
-         use Array_Vectors;
+         use Array_Maps;
 
          Script : Unbounded_String := +This.Get_Data (Handle, -Position_2); -- (array)
       begin
@@ -449,7 +449,7 @@ is
                       return Boolean
    is
       use Inc_Functions;
-      use Array_Vectors;
+      use Array_Maps;
 
       L10n_2   : Array_Type := L10n;
       After    : Array_Type;
@@ -532,7 +532,7 @@ is
                        return Boolean
    is
       use Ada.Containers;
-      use Array_Vectors;
+      use Array_Maps;
 
       Grp : Integer;
    begin

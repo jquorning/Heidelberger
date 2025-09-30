@@ -27,22 +27,15 @@ is
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Item_Type);
 
-   -- package Array_Vectors is
-   --    new Ada.Containers.Vectors (Index_Type   => Positive,
-   --                                Element_Type => Assoc_Type);
-
    package Array_Maps is
       new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                                   Element_Type => String);
-   package Array_Vectors renames Array_Maps;
 
    subtype List_Type  is List_Vectors.Vector;
    subtype Array_Type is Array_Maps.Map;
--- subtype Array_Type is Array_Vectors.Vector;
 
    Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
    Empty_Array : Array_Type renames Array_Maps.Empty_Map;
--- Empty_Array : Array_Type renames Array_Vectors.Empty_Vector;
 
    function Build (Key : String; Value : String)     return Assoc_Type;
    function Build (Key : String; Value : Integer)    return Assoc_Type;

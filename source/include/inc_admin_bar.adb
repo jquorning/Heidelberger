@@ -1199,7 +1199,7 @@ is
          Ada.Containers.Indefinite_Ordered_Maps
            (Key_Type     => String,
             Element_Type => Array_Type,
-            "="          => Arrays.Array_Vectors."=");
+            "="          => Arrays.Array_Maps."=");
 
       function Array_Keys (Map : Action_Maps.Map)
                            return List_Type;

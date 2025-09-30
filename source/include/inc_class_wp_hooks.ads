@@ -16,7 +16,7 @@ is
       Ada.Containers.Indefinite_Ordered_Maps
         (Key_Type     => String,
          Element_Type => Arrays.Array_Type,
-         "="          => Arrays.Array_Vectors."=");
+         "="          => Arrays.Array_Maps."=");
 
    package Ee_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps

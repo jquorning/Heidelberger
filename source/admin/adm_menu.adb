@@ -609,7 +609,7 @@ is
                   Current_User_Can ("view_site_health_checks")
                then
                   declare
-                     use Array_Vectors;
+                     use Array_Maps;
 
                      Get_Issues   : String :=
                         Inc_Options.Get_Transient ("health-check-site-status-result");

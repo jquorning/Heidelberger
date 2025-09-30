@@ -58,7 +58,7 @@ is
 
    procedure X_Wp_Ajax_Menu_Quick_Search (Request : Array_Type := Empty_Array)
    is
-      use Array_Vectors;
+      use Array_Maps;
 
       Args : constant Array_Type := Empty_Array;
 

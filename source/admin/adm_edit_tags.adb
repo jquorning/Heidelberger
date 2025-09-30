@@ -310,7 +310,7 @@ is
                   end if;
 
                   declare
-                     use Array_Vectors;
+                     use Array_Maps;
 
                      Ret : constant Array_Type :=
                         Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);

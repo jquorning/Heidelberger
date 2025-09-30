@@ -954,7 +954,7 @@ is
                      --
                      if Args_Count < Placeholders then
                         declare
-                           use Array_Vectors;
+                           use Array_Maps;
 
                            Max_Numbered_Placeholder : constant Integer :=
                              (if Matches (3) /= "" -- not in 0  -- not empty

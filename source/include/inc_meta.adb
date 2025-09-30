@@ -782,7 +782,7 @@ is
       begin
          Wp_Cache_Get (Object_Id, Meta_Type & "_meta", Meta_Cache, Hit);
 
-         if Array_Vectors.Length (Meta_Cache) in 0 then  -- not
+         if Array_Maps.Length (Meta_Cache) in 0 then  -- not
             Meta_Cache := Update_Meta_Cache (Meta_Type, (1 => Object_Id)); -- to_array
             Meta_Cache := Get_Array (Meta_Cache, Object_Id'Image);
          end if;

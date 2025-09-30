@@ -1701,7 +1701,7 @@ is
       end if;
 
       declare
-         use Array_Vectors;
+         use Array_Maps;
 
          Ancestors : Array_Type := Empty_Array;
 

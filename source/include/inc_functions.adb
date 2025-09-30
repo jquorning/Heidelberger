@@ -1289,7 +1289,7 @@ is
    begin
       for A in Array_2.Iterate loop -- ( (array) $array as $k => $v ) then
          declare
-            use Arrays.Array_Vectors;
+            use Arrays.Array_Maps;
 
             K : constant String := Key (A);
             V : constant String := Element (A);

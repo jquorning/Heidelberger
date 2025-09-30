@@ -98,7 +98,7 @@ is
                       return Boolean
    is
       use List_Vectors;
-      use Array_Vectors;
+      use Array_Maps;
 
       Handles_2 : constant List_Type := Handles; -- (array)
    begin

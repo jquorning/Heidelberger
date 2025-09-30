@@ -2625,7 +2625,7 @@ is
 
       use Inc_Themes;
       use Inc_Posts;
-      use Array_Vectors;
+      use Array_Maps;
       use Inc_Class_Wp_Posts;
 
       Media_States : Unbounded_String; -- Array_Type := Empty_Array;
