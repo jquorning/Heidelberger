@@ -80,15 +80,8 @@ is
    function Apply_Filters (Hook_Name : String;
                            Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
                            Id        : String;
-                           Taxonomy  : String)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
-                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
-
-   function Apply_Filters (Hook_Name : String;
-                           A1 : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           A2 : String;
-                           A3 : String;
-                           A4 : Array_Type)
+                           Taxonomy  : String;
+                           A4        : Array_Type := Empty_Array)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
 
