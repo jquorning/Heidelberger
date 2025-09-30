@@ -2868,13 +2868,15 @@ is
             Attributes : Unbounded_String;
          begin
             if Is_Array (Other_Attributes) then
-               for A of Other_Attributes loop
+               for A in Other_Attributes.Iterate loop
                   declare
-                     Attribute : constant Key_Type   := A.Key;
-                     Value     : constant Value_Type := A.Value;
+                     use Array_Maps;
+
+                     Attribute : constant String := Key (A); -- A.Key;
+                     Value     : constant String := Element (A); -- A.Value;
                   begin
                      Attributes := Attributes & Attribute & "=""" &
-                                   ESC_Attr (-Value) & """ ";
+                                   ESC_Attr (Value) & """ ";
                      -- Trailing space is important.
                   end;
                end loop;

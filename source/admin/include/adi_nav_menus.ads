@@ -23,7 +23,7 @@ is
    package Priority_Maps is new
       Ada.Containers.Ordered_Maps (Key_Type     => Integer,
                                    Element_Type => Array_Type,
-                                   "="          => Array_Vectors."=");
+                                   "="          => Array_Maps."=");
    package Context_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                               Element_Type => Priority_Maps.Map,

@@ -40,14 +40,14 @@ is
 
    function Preg_Match (Pattern : String;
                         Subject : String;
-                        Matches : out Array_Type;
+                        Matches : out List_Type;
                         Flags   : Integer := 0;
                         Offset  : Integer := 0)
                         return Integer is (1);
 
    function Preg_Match_All (Pattern : String;
                             Subject : String;
-                            Matches : out Array_Type;
+                            Matches : out List_Type;
                             Flags   : Integer := 0;
                             Offset  : Integer := 0)
                             return Integer is (1);

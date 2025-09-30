@@ -1709,7 +1709,7 @@ is
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
-         Arrays.Array_Vectors.Append (Ancestors, New_Item => (+Id'Image, +""));
+         Ancestors.Include (Key => Id'Image, New_Item => "");
          Ancestor := Inc_Posts.Get_Post (Id);
          loop -- while Ancestor loop
             -- Loop detection: If the ancestor has been seen before, break.
@@ -1722,7 +1722,7 @@ is
             end if;
 
             Id := Ancestor.Post_Parent;
-            Ancestors.Append (New_Item => (+Id'Image, +"")); -- []
+            Ancestors.Include (Key => Id'Image, New_Item => ""); -- []
 
             Ancestor := Get_Post (Id);
          end loop;

@@ -2290,7 +2290,7 @@ is
 --        end;
 
       for Taxonomy of Taxonomies loop
-         if not Taxonomy_Exists (-Taxonomy.Key) then
+         if not Taxonomy_Exists (Taxonomy) then
             return Empty_Term_Array;
 --            return new Wp_Error ("invalid_taxonomy",
 --                                 abs "Invalid taxonomy.");
@@ -2302,7 +2302,7 @@ is
 --        end;
 
       for Id of Object_Ids loop
-         Arrays.Array_Vectors.Append (Object_Ids_3, New_Item => (+Id'Image, +""));
+         Object_Ids_3.Include (Key => Id'Image, New_Item => "");
       end loop;
       declare
          use Inc_Plugins;
@@ -2312,7 +2312,7 @@ is
          Taxonomies_2 : Array_Type;
       begin
          for Tax of Taxonomies loop       -- By jq
-            Array_Vectors.Append (Taxonomies_2, New_Item => Tax);
+            Taxonomies_2.Include (Tax, New_Item => Tax);
          end loop;
          --
          -- Filters arguments for retrieving object terms.
@@ -2336,10 +2336,10 @@ is
             T     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy; -- Unbounded_String;
          begin
             if Length (Taxonomies_2) > 1 then
-               for X of Taxonomies_2 loop
+               for X in Taxonomies_2.Iterate loop
                   declare
-                     Index    : String          := -X.Key;
-                     Taxonomy : constant String := -X.Value;
+                     Index    : String          := Key (X); -- -X.Key;
+                     Taxonomy : constant String := Element (X); -- -X.Value;
                   begin
                      T := Get_Taxonomy (Taxonomy);
                      if
@@ -2359,7 +2359,7 @@ is
                   end;
                end loop;
             else
-               T := Get_Taxonomy (-Taxonomies_2 (1).Key);    -- 0
+               T := Get_Taxonomy (Taxonomies_2.First_Key); --  (1).Key);    -- 0
                if Isset (T.Args) and then Is_Array (T.Args) then
                   Args_2 := Array_Merge (Args, T.Args);
                end if;
@@ -3865,7 +3865,7 @@ is
          for Term_Id of Term_Ids loop
             declare
                Term : constant Wp_Term
-                  := Get_Term (Integer'Value (-Term_Id.Key), Taxonomy);
+                  := Get_Term (Integer'Value (Term_Id), Taxonomy);
             begin
 --               if Is_Wp_Error (Term) then
 --                  return Term;

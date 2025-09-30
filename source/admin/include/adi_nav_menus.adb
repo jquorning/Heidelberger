@@ -75,7 +75,7 @@ is
          +(if Isset (Request, "response-format")
            then Get (Request, "response-format") else "");
 
-      Matches : Array_Type;
+      Matches : List_Type;
    begin
       if "" = Response_Format or else -Response_Format not in "json" | "markup" then
          Response_Format := +"json";
@@ -145,15 +145,15 @@ is
                          Typ, Matches)
       then
          if
-           "posttype" = Matches (1).Key and then
-           Inc_Posts.Get_Post_Type_Object (-Matches (2).Key)
+           "posttype" = Matches (1) and then
+           Inc_Posts.Get_Post_Type_Object (-Matches (2))
          then
             declare
                use Inc_Class_Wp_Post_Type;
 
                Post_Type_Obj : Wp_Post := -- Array_Type :=
                   X_Wp_Nav_Menu_Meta_Box_Object
-                    (Wp_Post_Type'(Inc_Posts.Get_Post_Type_Object (-Matches (2).Key)));
+                    (Wp_Post_Type'(Inc_Posts.Get_Post_Type_Object (-Matches (2))));
 
                   Args_2 : constant Array_Type := Array_Merge (
                      Args,
@@ -162,7 +162,7 @@ is
                         Build ("update_post_meta_cache", "false"),
                         Build ("update_post_term_cache", "false"),
                         Build ("posts_per_page",         "10"),
-                        Build ("post_type",              -Matches (2).Key),
+                        Build ("post_type",              -Matches (2)),
                         Build ("s",                      Query)
                      ))
                   );
@@ -203,7 +203,7 @@ is
                                  Build ("post_title",
                                         Inc_Post_Templates.Get_The_Title
                                            (Integer (Post.Id))),
-                                 Build ("post_type",  -Matches (2).Key)
+                                 Build ("post_type",  -Matches (2))
                               ))
                            ));
                            Echo ("\n");
@@ -212,7 +212,7 @@ is
                   end loop;
                end;
             end;
-         elsif "taxonomy" = Matches (1).Key then
+         elsif "taxonomy" = Matches (1) then
             declare
                use Inc_Class_Wp_Terms;
                use Inc_Nav_Menu_Templates;
@@ -220,7 +220,7 @@ is
                Terms : constant Wp_Term_Array :=
                   Inc_Taxonomys.Get_Terms (
                      Arrays.To_Array ((
-                        Build ("taxonomy",   -Matches (2).Key),
+                        Build ("taxonomy",   -Matches (2)),
                         Build ("name__like", Query),
                         Build ("number",     "10"),
                         Build ("hide_empty", "false")
@@ -245,7 +245,7 @@ is
                         Arrays.To_Array ((
                            Build ("ID",         Term.Term_Id),
                            Build ("post_title", -Term.Name),
-                           Build ("post_type",  -Matches (2).Key)
+                           Build ("post_type",  -Matches (2))
                         ))
                      ));
                      Echo ("\n");
@@ -1278,10 +1278,12 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       if 0 = Menu_Id or else Is_Nav_Menu (Menu_Id) then
 
          -- Loop through all the menu items" POST values.
-         for A of Menu_Data loop -- (array)
+         for A in Menu_Data.Iterate loop -- (array)
             declare
-               X_Possible_Db_Id   : String := -A.Key;
-               X_Item_Object_Data : String := -A.Value;
+               use Array_Maps;
+
+               X_Possible_Db_Id   : String := Key (A); -- -A.Key;
+               X_Item_Object_Data : String := Element (A); -- -A.Value;
                Args : Array_Type;
             begin
 --                if
@@ -1610,10 +1612,12 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       -- Loop through all the menu items" POST variables.
       if Get (X_POST, "menu-item-db-id") /= "" then
 --    if not Empty (Get (X_POST, "menu-item-db-id")) then
-         for A of Get_Array (X_POST, "menu-item-db-id") loop
+         for A in Get_Array (X_POST, "menu-item-db-id").Iterate loop
             declare
-               X_Key : constant String := -A.Key;
-               K     : constant String := -A.Value;
+               use Array_Maps;
+
+               X_Key : constant String := Key (A);
+               K     : constant String := Element (A);
             begin
                null;
 
@@ -1734,28 +1738,30 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       begin
 
 --       if not Is_Null (Data) and then Data then
-            for Post_Input_Data of Data loop
+            for Post_Input_Data in Data.Iterate loop
                declare
-                  Matches : Array_Type;
+                  use Array_Maps;
+
+                  Matches : List_Type;
                   Unused  : Integer;
                begin
                   -- For input names that are arrays (e.g. `menu-item-db-id(3)(4)(5)`),
                   -- derive the array path keys via regex and set the value in _POST.
                   Unused := Preg_Match ("#((^\()*)(\((.+)\))?#",
-                                        -Post_Input_Data.Key, -- Post_Input_Data.Name,
+                                        Key (Post_Input_Data), -- Post_Input_Data.Name,
                                         Matches);
                   declare
                      Array_Bits    : List_Type  :=
-                        To_List (-Matches (Matches.First_Index + 1).Key);
+                        To_List (-Matches (1));
 --                   Array_Bits    : List_Type  := To_List ((1 => Matches (1)));
                      New_Post_Data : Array_Type := Empty_Array;
                   begin
 
-                     if Isset (-Matches (Matches.First_Index + 3).Key) then
+                     if Isset (-Matches (3)) then
 --                   if Isset (Matches (3)) then
                         Array_Bits :=
                            Array_Merge (Array_Bits,
-                              Explode (")(", -Matches (Matches.First_Index + 3).Key));
+                              Explode (")(", -Matches (3)));
 --                         Array_Merge (Array_Bits, Explode (")(", Matches (3)));
                      end if;
 
@@ -1767,7 +1773,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                         if I = Array_Bits.Last_Index then
 --                      if Count (Array_Bits) - 1 = I then
                            Set (New_Post_Data, -Array_Bits (I),
-                                Wp_Slash (-Post_Input_Data.Value));
+                                Wp_Slash (Element (Post_Input_Data)));
 --                         New_Post_Data (Array_Bits (I)) :=
 --                           Wp_Slash (Post_Input_Data.Value);
                         else

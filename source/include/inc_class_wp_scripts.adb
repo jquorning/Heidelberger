@@ -204,7 +204,7 @@ is
             After_Handle  : Unbounded_String :=
                +This.Print_Inline_Script (Handle, "after",  False);
 
-            Unused_Matches : Array_Type;
+            Unused_Matches : List_Type;
          begin
 
             if Before_Handle /= "" then
@@ -486,10 +486,10 @@ is
 --      if Is_String (L10n_2) then
 --         L10n_2 := Html_Entity_Decode (L10n_2, ENT_QUOTES, "UTF-8");
 --      elsif Is_Array (L10n_2) then
-         for A of L10n_2 loop --  as key => value ) loop
+         for A in L10n_2.Iterate loop --  as key => value ) loop
             declare
-               Key   : constant String := -A.Key;
-               Value : constant String := -A.Value;
+               Key   : constant String := Array_Maps.Key (A); -- -A.Key;
+               Value : constant String := Array_Maps.Element (A); -- -A.Value;
             begin
 --               if not Is_Scalar (Value) then
 --                  goto Continue_1;

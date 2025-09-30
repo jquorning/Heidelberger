@@ -808,13 +808,14 @@ is
       -- Messages := array();
    begin
       -- If we have a bulk message to issue:
-      for X of Bulk_Counts loop   -- foreach
+      for X in Bulk_Counts.Iterate loop   -- foreach
 --            for (Message, Count) of Bulk_Counts loop   -- foreach
          declare
             use Inc_Functions;
+            use Array_Maps;
 
-            Count   : constant Natural := Natural'Value (-X.Key);   -- Count;
-            Message : constant String  := -X.Value; -- Message;
+            Count   : constant Natural := Natural'Value (Key (X)); -- -X.Key); -- Count;
+            Message : constant String  := Element (X); -- -X.Value; -- Message;
          begin
             if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, Post_Type, Message),

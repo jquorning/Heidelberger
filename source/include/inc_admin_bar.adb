@@ -1306,7 +1306,7 @@ is
          Arry  : constant Array_Type :=
             Action_Maps.Element (Actions.Find ("user-new.php"));
 
-         Value : constant String := -Arry.First_Element.Key;
+         Value : constant String := Arry.First_Key;
       begin
          Node.Id    := +"new-content";
          Node.Title := +Title;
@@ -1319,9 +1319,9 @@ is
             declare
                Link   : constant String     := Action_Maps.Key (A);
                Action : constant Array_Type := Action_Maps.Element (A);
-               Title  : constant String     := -Action.First_Element.Key;
+               Title  : constant String     := Action.First_Key;
                -- Title; -- list()
-               Id     : constant String     := -Action.First_Element.Value; -- Id;
+               Id     : constant String     := Action.First_Element; -- Id;
 
                Node : Node_Args;
             begin

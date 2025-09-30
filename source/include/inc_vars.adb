@@ -39,7 +39,7 @@ is
       use Inc_Load;
 
       Php_Self : constant String := Get (X_SERVER, "PHP_SELF");
-      Self_Matches : Arrays.Array_Type;
+      Self_Matches : Arrays.List_Type;
       Unused : Integer;
    begin
       -- On which page are we?
@@ -54,8 +54,8 @@ is
             Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
          end if;
 
-         Pagenow := +(if "" /= Self_Matches (1).Key
-                     then -Self_Matches (1).Key else "");
+         Pagenow := +(if "" /= Self_Matches (1)
+                     then -Self_Matches (1) else "");
          Pagenow := +Trim (-Pagenow, "/");
          Pagenow := +Preg_Replace ("#\?.*?#", "", -Pagenow);
 
@@ -63,7 +63,7 @@ is
             Pagenow := +"index.php";
          else
             Unused  := Preg_Match ("#(.*?)(/|)#", -Pagenow, Self_Matches);
-            Pagenow := +Strtolower (-Self_Matches (1).Key);
+            Pagenow := +Strtolower (-Self_Matches (1));
 
             if ".php" /= Substr (-Pagenow, -4, 4) then
                Pagenow := Pagenow & ".php";
@@ -75,7 +75,7 @@ is
          if
            0 /= Preg_Match ("#((^/)+\.php)((?/).*?)?#i", Php_Self, Self_Matches)
          then
-            Pagenow := +Strtolower (-Self_Matches (1).Key);
+            Pagenow := +Strtolower (-Self_Matches (1));
          else
             Pagenow := +"index.php";
          end if;

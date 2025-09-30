@@ -67,13 +67,14 @@ is
                    return Boolean
    is
    begin
-      for A of Arry loop
-         if A.Key = Key then
-            return True;
-         end if;
-      end loop;
+      return Array_Maps.Has_Element (Arry.Find (Key));
+      -- for A of Arry loop
+      --    if A.Key = Key then
+      --       return True;
+      --    end if;
+      -- end loop;
 
-      return False;
+      -- return False;
    end Isset;
 
 end Hb_Common;

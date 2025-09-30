@@ -365,7 +365,7 @@ is
                         return String
    is
       Old_Prefix   : Unbounded_String;
-      Unused_Match : Array_Type;
+      Unused_Match : List_Type;
    begin
       if 0 = Preg_Match ("|[^a-z0-9_]|i", Prefix, Unused_Match) then
          return "";
@@ -913,7 +913,7 @@ is
             -- Escape any unescaped percents.
             declare
                -- Count the number of valid placeholders in the query.
-               Matches : Array_Type;
+               Matches : List_Type;
                Placeholders : constant Integer :=
                   Preg_Match_All ("/(^|[^%]|(%%)+)%(allowed_format)?[sdF]/",
                                   -Query_2, Matches);
@@ -957,10 +957,10 @@ is
                            use Array_Vectors;
 
                            Max_Numbered_Placeholder : constant Integer :=
-                             (if Element (Matches, 3) /= (+"", +"") -- not in 0  -- not empty
-                              then Max (Array_Map
-                                       ("intval",
-                                        Empty_Array & Matches (3)))
+                             (if Matches (3) /= "" -- not in 0  -- not empty
+                              then 99 -- Max (Array_Map
+                                       -- ("intval",
+                                       --  Empty_Array & Matches (3)))
 --              Table => To_Array (List => (1 => Build (Element (Matches, 3)))))
                               else 0);
                         begin
@@ -2687,7 +2687,7 @@ is
                                   return Boolean
    is
       Query_2        : constant String := Ltrim (Query, "\r\n\t (");
-      Unused_Matches : Array_Type;
+      Unused_Matches : List_Type;
    begin
       if This.Checking_Collation then
          return True;

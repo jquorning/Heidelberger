@@ -255,32 +255,8 @@ is
                   -- make the first submenu the new parent.
                   --
                   if New_Parent /= Old_Parent then
-                     declare
-                        use Arrays.Array_Vectors;
-                        Pos   : Extended_Index;
-                        Found : Boolean := False;
-                     begin
-                        for
-                           E in X_Wp_Real_Parent_File.First_Index
-                             .. X_Wp_Real_Parent_File.Last_Index
-                        loop
-                           if
-                             Slug_Type (-X_Wp_Real_Parent_File (E).Key) = Old_Parent
-                           then
-                              Pos   := E;
-                              Found := True;
-                              exit;
-                           end if;
-                        end loop;
-
-                        if Found then
-                           X_Wp_Real_Parent_File.Replace_Element
-                              (Pos, (+String (Old_Parent), +String (New_Parent)));
-                        else
-                           X_Wp_Real_Parent_File.Append
-                              ((+String (Old_Parent), +String (New_Parent)));
-                        end if;
-                     end;
+                     X_Wp_Real_Parent_File.Include (Key      => String (Old_Parent),
+                                                    New_Item => String (New_Parent));
 --                   X_Wp_Real_Parent_File (Old_Parent) := New_Parent;
                      Menu (Id).Menu_Slug                := +New_Parent; -- (2)
 --                   Menu (Id) (2)                      := New_Parent;

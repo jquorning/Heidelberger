@@ -1287,14 +1287,14 @@ is
 
       Array_2 : Array_Type := Arry;
    begin
-      for A of Array_2 loop -- ( (array) $array as $k => $v ) then
+      for A in Array_2.Iterate loop -- ( (array) $array as $k => $v ) then
          declare
             use Arrays.Array_Vectors;
 
-            K : constant String := -A.Key;
-            V : constant String := -A.Value;
+            K : constant String := Key (A);
+            V : constant String := Element (A);
          begin
-            Array_2.Append ((+K, +Addslash (V)));
+            Array_2.Include (K, New_Item => Addslash (V));
             -- if Is_Array (V) then
             --    Array_2 (K) := Add_Magic_Quotes (V);
             -- elsif Is_String (V) then
@@ -4823,8 +4823,8 @@ is
    begin
       if Is_Object (Args) then
          Parsed_Args := Get_Object_Vars (Args);
-      elsif Is_Array (Args) then
-         Array_Vectors.Append (Parsed_Args, Args);
+--    elsif Is_Array (Args) then
+--       Array_Vectors.Include (Parsed_Args, New_Item => "args"); -- Args);
       else
          Wp_Parse_Str ("Args", Parsed_Args); -- args ???
       end if;
