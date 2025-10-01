@@ -18,17 +18,25 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Binder;
 with Hb_Common;
 with Globals;
 with Php;
 
 with Inc_Class_Wp_Theme_Json_Resolver;
+with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
-with Inc_Versions;
 with Inc_L10n;
+with Inc_Load;
 with Inc_Link_Templates;
+with Inc_Options;
+with Inc_Pluggables;
+with Inc_Plugins;
+with Inc_REST_API;
+with Inc_Users;
+with Inc_Versions;
 
 package body Inc_Script_Loader
 is
@@ -89,97 +97,114 @@ is
 --         scripts->add( "wp-tinymce-lists", includes_url( "js/tinymce/plugins/lists/pluginsuffix.js" ), array( "wp-tinymce" ), tinymce_version );
 -- end;
 
--- --
--- -- Registers all the WordPress vendor scripts that are in the standardized
--- -- `js/dist/vendor/` location.
--- --
--- -- For the order of `scripts->add` see `wp_default_scripts`.
--- --
--- -- @since 5.0.0
--- --
--- -- @global WP_Locale wp_locale WordPress date and time locale object.
--- --
--- -- @param WP_Scripts scripts WP_Scripts object.
--- --
--- function wp_default_packages_vendor( scripts ) then
---         global wp_locale;
+   --------------------------------
+   -- Wp_Default_Packages_Vendor --
+   --------------------------------
 
---         suffix = wp_scripts_get_suffix();
+   procedure Wp_Default_Packages_Vendor
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   is
+      use Inc_L10n;
+      use Inc_Functions;
+      use Inc_Options;
+      use Inc_Plugins;
+--    global wp_locale;
 
---         vendor_scripts = array(
---                 "react"       => array( "wp-polyfill" ),
---                 "react-dom"   => array( "react" ),
---                 "regenerator-runtime",
---                 "moment",
---                 "lodash",
---                 "wp-polyfill-fetch",
---                 "wp-polyfill-formdata",
---                 "wp-polyfill-node-contains",
---                 "wp-polyfill-url",
---                 "wp-polyfill-dom-rect",
---                 "wp-polyfill-element-closest",
---                 "wp-polyfill-object-fit",
---                 "wp-polyfill" => array( "regenerator-runtime" ),
---         );
+      Suffix : String := Wp_Scripts_Get_Suffix;
 
---         vendor_scripts_versions = array(
---                 "react"                       => "17.0.1",
---                 "react-dom"                   => "17.0.1",
---                 "regenerator-runtime"         => "0.13.9",
---                 "moment"                      => "2.29.4",
---                 "lodash"                      => "4.17.19",
---                 "wp-polyfill-fetch"           => "3.6.2",
---                 "wp-polyfill-formdata"        => "4.0.10",
---                 "wp-polyfill-node-contains"   => "4.4.0",
---                 "wp-polyfill-url"             => "3.6.4",
---                 "wp-polyfill-dom-rect"        => "4.4.0",
---                 "wp-polyfill-element-closest" => "2.0.2",
---                 "wp-polyfill-object-fit"      => "2.3.5",
---                 "wp-polyfill"                 => "3.15.0",
---         );
+      Vendor_Scripts : constant Array_Type := To_Array ((
+        Build ("react",       To_Array ((1 => Build ("wp-polyfill", "")))),
+        Build ("react-dom",   To_Array ((1 => Build ("react", "")))),
+        Build ("regenerator-runtime", ""),
+        Build ("moment", ""),
+        Build ("lodash", ""),
+        Build ("wp-polyfill-fetch", ""),
+        Build ("wp-polyfill-formdata", ""),
+        Build ("wp-polyfill-node-contains", ""),
+        Build ("wp-polyfill-url", ""),
+        Build ("wp-polyfill-dom-rect", ""),
+        Build ("wp-polyfill-element-closest", ""),
+        Build ("wp-polyfill-object-fit", ""),
+        Build ("wp-polyfill", To_Array ((1 => Build ("regenerator-runtime", ""))))
+      ));
 
---         foreach ( vendor_scripts as handle => dependencies ) then
---                 if ( is_string( dependencies ) ) then
---                         handle       = dependencies;
---                         dependencies = array();
---                 end;
+      Vendor_Scripts_Versions : constant Array_Type := To_Array ((
+        Build ("react",                       "17.0.1"),
+        Build ("react-dom",                   "17.0.1"),
+        Build ("regenerator-runtime",         "0.13.9"),
+        Build ("moment",                      "2.29.4"),
+        Build ("lodash",                      "4.17.19"),
+        Build ("wp-polyfill-fetch",           "3.6.2"),
+        Build ("wp-polyfill-formdata",        "4.0.10"),
+        Build ("wp-polyfill-node-contains",   "4.4.0"),
+        Build ("wp-polyfill-url",             "3.6.4"),
+        Build ("wp-polyfill-dom-rect",        "4.4.0"),
+        Build ("wp-polyfill-element-closest", "2.0.2"),
+        Build ("wp-polyfill-object-fit",      "2.3.5"),
+        Build ("wp-polyfill",                 "3.15.0")
+      ));
+   begin
+      for A in Vendor_Scripts.Iterate loop
+         declare
+            use Ada.Strings.Unbounded;
+            use Array_Maps;
+            use Hb_Common;
 
---                 path    = "/wp-includes/js/dist/vendor/handlesuffix.js";
---                 version = vendor_scripts_versions[ handle ];
+            Handle       : constant String := Key     (A);
+            Dependencies : constant String := Element (A);
+            Path    : Unbounded_String;
+            Version : Unbounded_String;
+         begin
+            -- if ( is_string( dependencies ) ) then
+            --         handle       = dependencies;
+            --         dependencies = array();
+            -- end if;
 
---                 scripts->add( handle, path, dependencies, version, 1 );
---         end;
+            Path    := +"/wp-includes/js/dist/vendor/handlesuffix.js";
+            Version := +Vendor_Scripts_Versions (Handle);
 
---         did_action( "init" ) && scripts->add_inline_script( "lodash", "window.lodash = _.noConflict();" );
+            Scripts.Add (Handle, -Path, To_List (Dependencies), -Version, 1);
+         end;
+      end loop;
 
---         did_action( "init" ) && scripts->add_inline_script(
---                 "moment",
---                 sprintf(
---                         "moment.updateLocale( "%s", %s );",
---                         get_user_locale(),
---                         wp_json_encode(
---                                 array(
---                                         "months"         => array_values( wp_locale->month ),
---                                         "monthsShort"    => array_values( wp_locale->month_abbrev ),
---                                         "weekdays"       => array_values( wp_locale->weekday ),
---                                         "weekdaysShort"  => array_values( wp_locale->weekday_abbrev ),
---                                         "week"           => array(
---                                                 "dow" => (int) get_option( "start_of_week", 0 ),
---                                         ),
---                                         "longDateFormat" => array(
---                                                 "LT"   => get_option( "time_format", __( "g:i a" ) ),
---                                                 "LTS"  => null,
---                                                 "L"    => null,
---                                                 "LL"   => get_option( "date_format", __( "F j, Y" ) ),
---                                                 "LLL"  => __( "F j, Y g:i a" ),
---                                                 "LLLL" => null,
---                                         ),
---                                 )
---                         )
---                 ),
---                 "after"
---         );
--- end;
+      if Did_Action ("init") then
+         Scripts.Add_Inline_Script ("lodash", "window.lodash = _.noConflict();");
+      end if;
+
+      if Did_Action ("init") then
+         Scripts.Add_Inline_Script (
+            "moment",
+            Php.Sprintf (
+              "moment.updateLocale( ""%s"", %s );",
+              Get_User_Locale,
+              Wp_Json_Encode (
+                To_Array ((
+                  Build ("months",
+                         Php.Array_Values (Globals.Wp_Locale.Month)),
+                  Build ("monthsShort",
+                         Php.Array_Values (Globals.Wp_Locale.Month_Abbrev)),
+                  Build ("weekdays",
+                         Php.Array_Values (Globals.Wp_Locale.Weekday)),
+                  Build ("weekdaysShort",
+                         Php.Array_Values (Globals.Wp_Locale.Weekday_Abbrev)),
+                  Build ("week",           To_Array ((1 =>
+                    Build ("dow", Get_Option ("start_of_week", "0")) -- (int), 0
+                  ))),
+                  Build ("longDateFormat", To_Array ((
+                    Build ("LT",   Get_Option ("time_format", abs "g:i a")),
+--                                              "LTS"  => null,
+--                                              "L"    => null,
+                    Build ("LL",   Get_Option ("date_format", abs "F j, Y")),
+                    Build ("LLL",  abs "F j, Y g:i a")
+--                                             "LLLL" => null,
+                  )))
+                ))
+              )
+            ),
+            "after"
+         );
+      end if;
+   end Wp_Default_Packages_Vendor;
 
 -- --
 -- -- Returns contents of an inline script used in appending polyfill scripts for
@@ -274,72 +299,93 @@ is
 --         scripts->registered["react"]->deps[] = "wp-react-refresh-entry";
 -- end;
 
--- --
--- -- Registers all the WordPress packages scripts that are in the standardized
--- -- `js/dist/` location.
--- --
--- -- For the order of `scripts->add` see `wp_default_scripts`.
--- --
--- -- @since 5.0.0
--- --
--- -- @param WP_Scripts scripts WP_Scripts object.
--- --
--- function wp_default_packages_scripts( scripts ) then
---         suffix = defined( "WP_RUN_CORE_TESTS" ) ? ".min" : wp_scripts_get_suffix();
---         /*
---         -- Expects multidimensional array like:
---         --
---         --     "a11y.js" => array("dependencies" => array(...), "version" => "..."),
---         --     "annotations.js" => array("dependencies" => array(...), "version" => "..."),
---         --     "api-fetch.js" => array(...
---         --
---         assets = include ABSPATH . WPINC . "/assets/script-loader-packagesthensuffixend;.php";
+   ---------------------------------
+   -- Wp_Default_Packages_Scripts --
+   ---------------------------------
 
---         foreach ( assets as file_name => package_data ) then
---                 basename = str_replace( suffix . ".js", "", basename( file_name ) );
---                 handle   = "wp-" . basename;
---                 path     = "/wp-includes/js/dist/thenbasenameend;thensuffixend;.js";
+   procedure Wp_Default_Packages_Scripts
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   is
+      use Php;
 
---                 if ( ! empty( package_data["dependencies"] ) ) then
---                         dependencies = package_data["dependencies"];
---                 end; else then
---                         dependencies = array();
---                 end;
+      Suffix : String := (if Globals.WP_RUN_CORE_TESTS then ".min"
+                          else Wp_Scripts_Get_Suffix);
+      --
+      -- Expects multidimensional array like:
+      --
+      --     "a11y.js" => array("dependencies" => array(...), "version" => "..."),
+      --     "annotations.js" => array("dependencies" => array(...),
+      --                                              "version" => "..."),
+      --     "api-fetch.js" => array(...
+      --
+      Assets : Array_Type; -- := include ABSPATH & WPINC & "/assets/script-loader-packages{suffix}.php";
+   begin
+      for A in Assets.Iterate loop -- as file_name => package_data ) then
+         declare
+            use Array_Maps;
+            use Hb_Common;
 
---                 -- Add dependencies that cannot be detected and generated by build tools.
---                 switch ( handle ) then
---                         case "wp-block-library":
---                                 array_push( dependencies, "editor" );
---                                 break;
---                         case "wp-edit-post":
---                                 array_push( dependencies, "media-models", "media-views", "postbox", "wp-dom-ready" );
---                                 break;
---                         case "wp-preferences":
---                                 array_push( dependencies, "wp-preferences-persistence" );
---                                 break;
---                 end;
+            File_Name    : constant String := Key     (A);
+            Package_Data : Array_Type;
+--          Package_Data : String := Element (A);
+            Basename     : constant String := Str_Replace (Suffix & ".js", "",
+                                                           Php.Basename (File_Name));
+            Handle       : constant String := "wp-" & Basename;
+            Path         : constant String :=
+              "/wp-includes/js/dist/" & Basename & Suffix & ".js";
 
---                 scripts->add( handle, path, dependencies, package_data["version"], 1 );
+            Dependencies : List_Type;
+            Unused       : List_Type;
+         begin
+            if not Empty (Package_Data ("dependencies")) then
+               Dependencies := Get_List (Package_Data, "dependencies");
+            else
+               Dependencies := Empty_List;
+            end if;
 
---                 if ( in_array( "wp-i18n", dependencies, true ) ) then
---                         scripts->set_translations( handle );
---                 end;
+            -- Add dependencies that cannot be detected and generated by build tools.
+            if Handle = "wp-block-library" then
+               Unused := Array_Push (Dependencies, "editor");
 
---                 /*
---                 -- Manually set the text direction localization after wp-i18n is printed.
---                 -- This ensures that wp.i18n.isRTL() returns true in RTL languages.
---                 -- We cannot use scripts->set_translations( "wp-i18n" ) to do this
---                 -- because WordPress prints a script"s translations--before* the script,
---                 -- which means, in the case of wp-i18n, that wp.i18n.setLocaleData()
---                 -- is called before wp.i18n is defined.
---                 --
---                 if ( "wp-i18n" === handle ) then
---                         ltr    = _x( "ltr", "text direction" );
---                         script = sprintf( "wp.i18n.setLocaleData( then "text direction\u0004ltr": [ "%s" ] end; );", ltr );
---                         scripts->add_inline_script( handle, script, "after" );
---                 end;
---         end;
--- end;
+            elsif Handle = "wp-edit-post" then
+               Unused := Array_Push (Dependencies, "media-models");
+               Unused := Array_Push (Dependencies, "media-views");
+               Unused := Array_Push (Dependencies, "postbox");
+               Unused := Array_Push (Dependencies, "wp-dom-ready");
+
+            elsif Handle = "wp-preferences" then
+               Unused := Array_Push (Dependencies, "wp-preferences-persistence");
+
+            end if;
+
+            Scripts.Add (Handle, Path, Dependencies, Package_Data ("version"), 1);
+
+            if In_Array ("wp-i18n", Dependencies, True) then
+               Scripts.Set_Translations (Handle);
+            end if;
+
+            --
+            -- Manually set the text direction localization after wp-i18n is printed.
+            -- This ensures that wp.i18n.isRTL() returns true in RTL languages.
+            -- We cannot use scripts->set_translations( "wp-i18n" ) to do this
+            -- because WordPress prints a script"s translations--before* the script,
+            -- which means, in the case of wp-i18n, that wp.i18n.setLocaleData()
+            -- is called before wp.i18n is defined.
+            --
+            if "wp-i18n" = Handle then
+               declare
+                  LTR    : constant String := Inc_L10n.X_X ("ltr", "text direction");
+                  Script : constant String :=
+                    Sprintf (
+                      "wp.i18n.setLocaleData( { ""text direction\u0004ltr"": [ ""%s"" ] } );",
+                      LTR);
+               begin
+                  Scripts.Add_Inline_Script (Handle, Script, "after");
+               end;
+            end if;
+         end;
+      end loop;
+   end Wp_Default_Packages_Scripts;
 
 -- --
 -- -- Adds inline scripts required for the WordPress JavaScript packages.
@@ -704,785 +750,862 @@ is
       return Get (Suffixes, "suffix");
    end Wp_Scripts_Get_Suffix;
 
--- --
--- -- Registers all WordPress scripts.
--- --
--- -- Localizes some of them.
--- -- args order: `scripts->add( "handle", "url", "dependencies", "query-string", 1 );`
--- -- when last arg === 1 queues the script for the footer
--- --
--- -- @since 2.6.0
--- --
--- -- @param WP_Scripts scripts WP_Scripts object.
--- --
--- function wp_default_scripts( scripts ) then
---         suffix     = wp_scripts_get_suffix();
---         dev_suffix = wp_scripts_get_suffix( "dev" );
---         guessurl   = site_url();
-
---         if ( ! guessurl ) then
---                 guessed_url = true;
---                 guessurl    = wp_guess_url();
---         end;
-
---         scripts->base_url        = guessurl;
---         scripts->content_url     = defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
---         scripts->default_version = get_bloginfo( "version" );
---         scripts->default_dirs    = array( "/wp-admin/js/", "/wp-includes/js/" );
-
---         scripts->add( "utils", "/wp-includes/js/utilssuffix.js" );
---         did_action( "init" ) && scripts->localize(
---                 "utils",
---                 "userSettings",
---                 array(
---                         "url"    => (string) SITECOOKIEPATH,
---                         "uid"    => (string) get_current_user_id(),
---                         "time"   => (string) time(),
---                         "secure" => (string) ( "https" === parse_url( site_url(), PHP_URL_SCHEME ) ),
---                 )
---         );
-
---         scripts->add( "common", "/wp-admin/js/commonsuffix.js", array( "jquery", "hoverIntent", "utils" ), false, 1 );
---         scripts->set_translations( "common" );
-
---         scripts->add( "wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js", array(), false, 1 );
-
---         scripts->add( "sack", "/wp-includes/js/tw-sacksuffix.js", array(), "1.6.1", 1 );
-
---         scripts->add( "quicktags", "/wp-includes/js/quicktagssuffix.js", array(), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "quicktags",
---                 "quicktagsL10n",
---                 array(
---                         "closeAllOpenTags"      => __( "Close all open tags" ),
---                         "closeTags"             => __( "close tags" ),
---                         "enterURL"              => __( "Enter the URL" ),
---                         "enterImageURL"         => __( "Enter the URL of the image" ),
---                         "enterImageDescription" => __( "Enter a description of the image" ),
---                         "textdirection"         => __( "text direction" ),
---                         "toggleTextdirection"   => __( "Toggle Editor Text Direction" ),
---                         "dfw"                   => __( "Distraction-free writing mode" ),
---                         "strong"                => __( "Bold" ),
---                         "strongClose"           => __( "Close bold tag" ),
---                         "em"                    => __( "Italic" ),
---                         "emClose"               => __( "Close italic tag" ),
---                         "link"                  => __( "Insert link" ),
---                         "blockquote"            => __( "Blockquote" ),
---                         "blockquoteClose"       => __( "Close blockquote tag" ),
---                         "del"                   => __( "Deleted text (strikethrough)" ),
---                         "delClose"              => __( "Close deleted text tag" ),
---                         "ins"                   => __( "Inserted text" ),
---                         "insClose"              => __( "Close inserted text tag" ),
---                         "image"                 => __( "Insert image" ),
---                         "ul"                    => __( "Bulleted list" ),
---                         "ulClose"               => __( "Close bulleted list tag" ),
---                         "ol"                    => __( "Numbered list" ),
---                         "olClose"               => __( "Close numbered list tag" ),
---                         "li"                    => __( "List item" ),
---                         "liClose"               => __( "Close list item tag" ),
---                         "code"                  => __( "Code" ),
---                         "codeClose"             => __( "Close code tag" ),
---                         "more"                  => __( "Insert Read More tag" ),
---                 )
---         );
-
---         scripts->add( "colorpicker", "/wp-includes/js/colorpickersuffix.js", array( "prototype" ), "3517m" );
-
---         scripts->add( "editor", "/wp-admin/js/editorsuffix.js", array( "utils", "jquery" ), false, 1 );
-
---         scripts->add( "clipboard", "/wp-includes/js/clipboardsuffix.js", array(), "2.0.11", 1 );
-
---         scripts->add( "wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js", array( "jquery", "wp-a11y" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "wp-ajax-response",
---                 "wpAjax",
---                 array(
---                         "noPerm" => __( "Sorry, you are not allowed to do that." ),
---                         "broken" => __( "Something went wrong." ),
---                 )
---         );
-
---         scripts->add( "wp-api-request", "/wp-includes/js/api-requestsuffix.js", array( "jquery" ), false, 1 );
---         -- `wpApiSettings` is also used by `wp-api`, which depends on this script.
---         did_action( "init" ) && scripts->localize(
---                 "wp-api-request",
---                 "wpApiSettings",
---                 array(
---                         "root"          => sanitize_url( get_rest_url() ),
---                         "nonce"         => wp_installing() ? "" : wp_create_nonce( "wp_rest" ),
---                         "versionString" => "wp/v2/",
---                 )
---         );
-
---         scripts->add( "wp-pointer", "/wp-includes/js/wp-pointersuffix.js", array( "jquery-ui-core" ), false, 1 );
---         scripts->set_translations( "wp-pointer" );
-
---         scripts->add( "autosave", "/wp-includes/js/autosavesuffix.js", array( "heartbeat" ), false, 1 );
-
---         scripts->add( "heartbeat", "/wp-includes/js/heartbeatsuffix.js", array( "jquery", "wp-hooks" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "heartbeat",
---                 "heartbeatSettings",
---                 --
---                 -- Filters the Heartbeat settings.
---                 --
---                 -- @since 3.6.0
---                 --
---                 -- @param array settings Heartbeat settings array.
---                 --
---                 apply_filters( "heartbeat_settings", array() )
---         );
-
---         scripts->add( "wp-auth-check", "/wp-includes/js/wp-auth-checksuffix.js", array( "heartbeat" ), false, 1 );
---         scripts->set_translations( "wp-auth-check" );
-
---         scripts->add( "wp-lists", "/wp-includes/js/wp-listssuffix.js", array( "wp-ajax-response", "jquery-color" ), false, 1 );
-
---         -- WordPress no longer uses or bundles Prototype or script.aculo.us. These are now pulled from an external source.
---         scripts->add( "prototype", "https:--ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js", array(), "1.7.1" );
---         scripts->add( "scriptaculous-root", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js", array( "prototype" ), "1.9.0" );
---         scripts->add( "scriptaculous-builder", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js", array( "scriptaculous-root" ), "1.9.0" );
---         scripts->add( "scriptaculous-dragdrop", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js", array( "scriptaculous-builder", "scriptaculous-effects" ), "1.9.0" );
---         scripts->add( "scriptaculous-effects", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js", array( "scriptaculous-root" ), "1.9.0" );
---         scripts->add( "scriptaculous-slider", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js", array( "scriptaculous-effects" ), "1.9.0" );
---         scripts->add( "scriptaculous-sound", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js", array( "scriptaculous-root" ), "1.9.0" );
---         scripts->add( "scriptaculous-controls", "https:--ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js", array( "scriptaculous-root" ), "1.9.0" );
---         scripts->add( "scriptaculous", false, array( "scriptaculous-dragdrop", "scriptaculous-slider", "scriptaculous-controls" ) );
-
---         -- Not used in core, replaced by Jcrop.js.
---         scripts->add( "cropper", "/wp-includes/js/crop/cropper.js", array( "scriptaculous-dragdrop" ) );
-
---         -- jQuery.
---         -- The unminified jquery.js and jquery-migrate.js are included to facilitate debugging.
---         scripts->add( "jquery", false, array( "jquery-core", "jquery-migrate" ), "3.6.1" );
---         scripts->add( "jquery-core", "/wp-includes/js/jquery/jquerysuffix.js", array(), "3.6.1" );
---         scripts->add( "jquery-migrate", "/wp-includes/js/jquery/jquery-migratesuffix.js", array(), "3.3.2" );
-
---         -- Full jQuery UI.
---         -- The build process in 1.12.1 has changed significantly.
---         -- In order to keep backwards compatibility, and to keep the optimized loading,
---         -- the source files were flattened and included with some modifications for AMD loading.
---         -- A notable change is that "jquery-ui-core" now contains "jquery-ui-position" and "jquery-ui-widget".
---         scripts->add( "jquery-ui-core", "/wp-includes/js/jquery/ui/coresuffix.js", array( "jquery" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-core", "/wp-includes/js/jquery/ui/effectsuffix.js", array( "jquery" ), "1.13.2", 1 );
-
---         scripts->add( "jquery-effects-blind", "/wp-includes/js/jquery/ui/effect-blindsuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-bounce", "/wp-includes/js/jquery/ui/effect-bouncesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-clip", "/wp-includes/js/jquery/ui/effect-clipsuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-drop", "/wp-includes/js/jquery/ui/effect-dropsuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-explode", "/wp-includes/js/jquery/ui/effect-explodesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-fade", "/wp-includes/js/jquery/ui/effect-fadesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-fold", "/wp-includes/js/jquery/ui/effect-foldsuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-highlight", "/wp-includes/js/jquery/ui/effect-highlightsuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-puff", "/wp-includes/js/jquery/ui/effect-puffsuffix.js", array( "jquery-effects-core", "jquery-effects-scale" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-pulsate", "/wp-includes/js/jquery/ui/effect-pulsatesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-scale", "/wp-includes/js/jquery/ui/effect-scalesuffix.js", array( "jquery-effects-core", "jquery-effects-size" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-shake", "/wp-includes/js/jquery/ui/effect-shakesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-size", "/wp-includes/js/jquery/ui/effect-sizesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-slide", "/wp-includes/js/jquery/ui/effect-slidesuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-effects-transfer", "/wp-includes/js/jquery/ui/effect-transfersuffix.js", array( "jquery-effects-core" ), "1.13.2", 1 );
-
---         -- Widgets
---         scripts->add( "jquery-ui-accordion", "/wp-includes/js/jquery/ui/accordionsuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-autocomplete", "/wp-includes/js/jquery/ui/autocompletesuffix.js", array( "jquery-ui-menu", "wp-a11y" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-button", "/wp-includes/js/jquery/ui/buttonsuffix.js", array( "jquery-ui-core", "jquery-ui-controlgroup", "jquery-ui-checkboxradio" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-datepicker", "/wp-includes/js/jquery/ui/datepickersuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-dialog", "/wp-includes/js/jquery/ui/dialogsuffix.js", array( "jquery-ui-resizable", "jquery-ui-draggable", "jquery-ui-button" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-menu", "/wp-includes/js/jquery/ui/menusuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-mouse", "/wp-includes/js/jquery/ui/mousesuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-progressbar", "/wp-includes/js/jquery/ui/progressbarsuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-selectmenu", "/wp-includes/js/jquery/ui/selectmenusuffix.js", array( "jquery-ui-menu" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-slider", "/wp-includes/js/jquery/ui/slidersuffix.js", array( "jquery-ui-mouse" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-spinner", "/wp-includes/js/jquery/ui/spinnersuffix.js", array( "jquery-ui-button" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-tabs", "/wp-includes/js/jquery/ui/tabssuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-tooltip", "/wp-includes/js/jquery/ui/tooltipsuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
-
---         -- New in 1.12.1
---         scripts->add( "jquery-ui-checkboxradio", "/wp-includes/js/jquery/ui/checkboxradiosuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-controlgroup", "/wp-includes/js/jquery/ui/controlgroupsuffix.js", array( "jquery-ui-core" ), "1.13.2", 1 );
-
---         -- Interactions
---         scripts->add( "jquery-ui-draggable", "/wp-includes/js/jquery/ui/draggablesuffix.js", array( "jquery-ui-mouse" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-droppable", "/wp-includes/js/jquery/ui/droppablesuffix.js", array( "jquery-ui-draggable" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-resizable", "/wp-includes/js/jquery/ui/resizablesuffix.js", array( "jquery-ui-mouse" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-selectable", "/wp-includes/js/jquery/ui/selectablesuffix.js", array( "jquery-ui-mouse" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-sortable", "/wp-includes/js/jquery/ui/sortablesuffix.js", array( "jquery-ui-mouse" ), "1.13.2", 1 );
-
---         -- As of 1.12.1 `jquery-ui-position` and `jquery-ui-widget` are part of `jquery-ui-core`.
---         -- Listed here for back-compat.
---         scripts->add( "jquery-ui-position", false, array( "jquery-ui-core" ), "1.13.2", 1 );
---         scripts->add( "jquery-ui-widget", false, array( "jquery-ui-core" ), "1.13.2", 1 );
-
---         -- Strings for "jquery-ui-autocomplete" live region messages.
---         did_action( "init" ) && scripts->localize(
---                 "jquery-ui-autocomplete",
---                 "uiAutocompleteL10n",
---                 array(
---                         "noResults"    => __( "No results found." ),
---                         /* translators: Number of results found when using jQuery UI Autocomplete.--
---                         "oneResult"    => __( "1 result found. Use up and down arrow keys to navigate." ),
---                         /* translators: %d: Number of results found when using jQuery UI Autocomplete.--
---                         "manyResults"  => __( "%d results found. Use up and down arrow keys to navigate." ),
---                         "itemSelected" => __( "Item selected." ),
---                 )
---         );
-
---         -- Deprecated, not used in core, most functionality is included in jQuery 1.3.
---         scripts->add( "jquery-form", "/wp-includes/js/jquery/jquery.formsuffix.js", array( "jquery" ), "4.3.0", 1 );
-
---         -- jQuery plugins.
---         scripts->add( "jquery-color", "/wp-includes/js/jquery/jquery.color.min.js", array( "jquery" ), "2.2.0", 1 );
---         scripts->add( "schedule", "/wp-includes/js/jquery/jquery.schedule.js", array( "jquery" ), "20m", 1 );
---         scripts->add( "jquery-query", "/wp-includes/js/jquery/jquery.query.js", array( "jquery" ), "2.2.3", 1 );
---         scripts->add( "jquery-serialize-object", "/wp-includes/js/jquery/jquery.serialize-object.js", array( "jquery" ), "0.2-wp", 1 );
---         scripts->add( "jquery-hotkeys", "/wp-includes/js/jquery/jquery.hotkeyssuffix.js", array( "jquery" ), "0.0.2m", 1 );
---         scripts->add( "jquery-table-hotkeys", "/wp-includes/js/jquery/jquery.table-hotkeyssuffix.js", array( "jquery", "jquery-hotkeys" ), false, 1 );
---         scripts->add( "jquery-touch-punch", "/wp-includes/js/jquery/jquery.ui.touch-punch.js", array( "jquery-ui-core", "jquery-ui-mouse" ), "0.2.2", 1 );
-
---         -- Not used any more, registered for backward compatibility.
---         scripts->add( "suggest", "/wp-includes/js/jquery/suggestsuffix.js", array( "jquery" ), "1.1-20110113", 1 );
-
---         -- Masonry v2 depended on jQuery. v3 does not. The older jquery-masonry handle is a shiv.
---         -- It sets jQuery as a dependency, as the theme may have been implicitly loading it this way.
---         scripts->add( "imagesloaded", "/wp-includes/js/imagesloaded.min.js", array(), "4.1.4", 1 );
---         scripts->add( "masonry", "/wp-includes/js/masonry.min.js", array( "imagesloaded" ), "4.2.2", 1 );
---         scripts->add( "jquery-masonry", "/wp-includes/js/jquery/jquery.masonry.min.js", array( "jquery", "masonry" ), "3.1.2b", 1 );
-
---         scripts->add( "thickbox", "/wp-includes/js/thickbox/thickbox.js", array( "jquery" ), "3.1-20121105", 1 );
---         did_action( "init" ) && scripts->localize(
---                 "thickbox",
---                 "thickboxL10n",
---                 array(
---                         "next"             => __( "Next &gt;" ),
---                         "prev"             => __( "&lt; Prev" ),
---                         "image"            => __( "Image" ),
---                         "of"               => __( "of" ),
---                         "close"            => __( "Close" ),
---                         "noiframes"        => __( "This feature requires inline frames. You have iframes disabled or your browser does not support them." ),
---                         "loadingAnimation" => includes_url( "js/thickbox/loadingAnimation.gif" ),
---                 )
---         );
-
---         -- Not used in core, replaced by imgAreaSelect.
---         scripts->add( "jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.js", array( "jquery" ), "0.9.15" );
-
---         scripts->add( "swfobject", "/wp-includes/js/swfobject.js", array(), "2.2-20120417" );
-
---         -- Error messages for Plupload.
---         uploader_l10n = array(
---                 "queue_limit_exceeded"      => __( "You have attempted to queue too many files." ),
---                 /* translators: %s: File name.--
---                 "file_exceeds_size_limit"   => __( "%s exceeds the maximum upload size for this site." ),
---                 "zero_byte_file"            => __( "This file is empty. Please try another." ),
---                 "invalid_filetype"          => __( "Sorry, you are not allowed to upload this file type." ),
---                 "not_an_image"              => __( "This file is not an image. Please try another." ),
---                 "image_memory_exceeded"     => __( "Memory exceeded. Please try another smaller file." ),
---                 "image_dimensions_exceeded" => __( "This is larger than the maximum size. Please try another." ),
---                 "default_error"             => __( "An error occurred in the upload. Please try again later." ),
---                 "missing_upload_url"        => __( "There was a configuration error. Please contact the server administrator." ),
---                 "upload_limit_exceeded"     => __( "You may only upload 1 file." ),
---                 "http_error"                => __( "Unexpected response from the server. The file may have been uploaded successfully. Check in the Media Library or reload the page." ),
---                 "http_error_image"          => __( "The server cannot process the image. This can happen if the server is busy or does not have enough resources to complete the task. Uploading a smaller image may help. Suggested maximum size is 2560 pixels." ),
---                 "upload_failed"             => __( "Upload failed." ),
---                 /* translators: 1: Opening link tag, 2: Closing link tag.--
---                 "big_upload_failed"         => __( "Please try uploading this file with the %1sbrowser uploader%2s." ),
---                 /* translators: %s: File name.--
---                 "big_upload_queued"         => __( "%s exceeds the maximum upload size for the multi-file uploader when used in your browser." ),
---                 "io_error"                  => __( "IO error." ),
---                 "security_error"            => __( "Security error." ),
---                 "file_cancelled"            => __( "File canceled." ),
---                 "upload_stopped"            => __( "Upload stopped." ),
---                 "dismiss"                   => __( "Dismiss" ),
---                 "crunching"                 => __( "Crunching&hellip;" ),
---                 "deleted"                   => __( "moved to the Trash." ),
---                 /* translators: %s: File name.--
---                 "error_uploading"           => __( "&#8220;%s&#8221; has failed to upload." ),
---                 "unsupported_image"         => __( "This image cannot be displayed in a web browser. For best results convert it to JPEG before uploading." ),
---                 "noneditable_image"         => __( "This image cannot be processed by the web server. Convert it to JPEG or PNG before uploading." ),
---                 "file_url_copied"           => __( "The file URL has been copied to your clipboard" ),
---         );
-
---         scripts->add( "moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", array(), "1.3.5" );
---         scripts->add( "plupload", "/wp-includes/js/plupload/pluploadsuffix.js", array( "moxiejs" ), "2.1.9" );
---         -- Back compat handles:
---         foreach ( array( "all", "html5", "flash", "silverlight", "html4" ) as handle ) then
---                 scripts->add( "plupload-handle", false, array( "plupload" ), "2.1.1" );
---         end;
-
---         scripts->add( "plupload-handlers", "/wp-includes/js/plupload/handlerssuffix.js", array( "clipboard", "jquery", "plupload", "underscore", "wp-a11y", "wp-i18n" ) );
---         did_action( "init" ) && scripts->localize( "plupload-handlers", "pluploadL10n", uploader_l10n );
-
---         scripts->add( "wp-plupload", "/wp-includes/js/plupload/wp-pluploadsuffix.js", array( "plupload", "jquery", "json2", "media-models" ), false, 1 );
---         did_action( "init" ) && scripts->localize( "wp-plupload", "pluploadL10n", uploader_l10n );
-
---         -- Keep "swfupload" for back-compat.
---         scripts->add( "swfupload", "/wp-includes/js/swfupload/swfupload.js", array(), "2201-20110113" );
---         scripts->add( "swfupload-all", false, array( "swfupload" ), "2201" );
---         scripts->add( "swfupload-handlers", "/wp-includes/js/swfupload/handlerssuffix.js", array( "swfupload-all", "jquery" ), "2201-20110524" );
---         did_action( "init" ) && scripts->localize( "swfupload-handlers", "swfuploadL10n", uploader_l10n );
-
---         scripts->add( "comment-reply", "/wp-includes/js/comment-replysuffix.js", array(), false, 1 );
-
---         scripts->add( "json2", "/wp-includes/js/json2suffix.js", array(), "2015-05-03" );
---         did_action( "init" ) && scripts->add_data( "json2", "conditional", "lt IE 8" );
-
---         scripts->add( "underscore", "/wp-includes/js/underscoredev_suffix.js", array(), "1.13.4", 1 );
---         scripts->add( "backbone", "/wp-includes/js/backbonedev_suffix.js", array( "underscore", "jquery" ), "1.4.1", 1 );
-
---         scripts->add( "wp-util", "/wp-includes/js/wp-utilsuffix.js", array( "underscore", "jquery" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "wp-util",
---                 "_wpUtilSettings",
---                 array(
---                         "ajax" => array(
---                                 "url" => admin_url( "admin-ajax.php", "relative" ),
---                         ),
---                 )
---         );
-
---         scripts->add( "wp-backbone", "/wp-includes/js/wp-backbonesuffix.js", array( "backbone", "wp-util" ), false, 1 );
-
---         scripts->add( "revisions", "/wp-admin/js/revisionssuffix.js", array( "wp-backbone", "jquery-ui-slider", "hoverIntent" ), false, 1 );
-
---         scripts->add( "imgareaselect", "/wp-includes/js/imgareaselect/jquery.imgareaselectsuffix.js", array( "jquery" ), false, 1 );
-
---         scripts->add( "mediaelement", false, array( "jquery", "mediaelement-core", "mediaelement-migrate" ), "4.2.17", 1 );
---         scripts->add( "mediaelement-core", "/wp-includes/js/mediaelement/mediaelement-and-playersuffix.js", array(), "4.2.17", 1 );
---         scripts->add( "mediaelement-migrate", "/wp-includes/js/mediaelement/mediaelement-migratesuffix.js", array(), false, 1 );
-
---         did_action( "init" ) && scripts->add_inline_script(
---                 "mediaelement-core",
---                 sprintf(
---                         "var mejsL10n = %s;",
---                         wp_json_encode(
---                                 array(
---                                         "language" => strtolower( strtok( determine_locale(), "_-" ) ),
---                                         "strings"  => array(
---                                                 "mejs.download-file"       => __( "Download File" ),
---                                                 "mejs.install-flash"       => __( "You are using a browser that does not have Flash player enabled or installed. Please turn on your Flash player plugin or download the latest version from https:--get.adobe.com/flashplayer/" ),
---                                                 "mejs.fullscreen"          => __( "Fullscreen" ),
---                                                 "mejs.play"                => __( "Play" ),
---                                                 "mejs.pause"               => __( "Pause" ),
---                                                 "mejs.time-slider"         => __( "Time Slider" ),
---                                                 "mejs.time-help-text"      => __( "Use Left/Right Arrow keys to advance one second, Up/Down arrows to advance ten seconds." ),
---                                                 "mejs.live-broadcast"      => __( "Live Broadcast" ),
---                                                 "mejs.volume-help-text"    => __( "Use Up/Down Arrow keys to increase or decrease volume." ),
---                                                 "mejs.unmute"              => __( "Unmute" ),
---                                                 "mejs.mute"                => __( "Mute" ),
---                                                 "mejs.volume-slider"       => __( "Volume Slider" ),
---                                                 "mejs.video-player"        => __( "Video Player" ),
---                                                 "mejs.audio-player"        => __( "Audio Player" ),
---                                                 "mejs.captions-subtitles"  => __( "Captions/Subtitles" ),
---                                                 "mejs.captions-chapters"   => __( "Chapters" ),
---                                                 "mejs.none"                => __( "None" ),
---                                                 "mejs.afrikaans"           => __( "Afrikaans" ),
---                                                 "mejs.albanian"            => __( "Albanian" ),
---                                                 "mejs.arabic"              => __( "Arabic" ),
---                                                 "mejs.belarusian"          => __( "Belarusian" ),
---                                                 "mejs.bulgarian"           => __( "Bulgarian" ),
---                                                 "mejs.catalan"             => __( "Catalan" ),
---                                                 "mejs.chinese"             => __( "Chinese" ),
---                                                 "mejs.chinese-simplified"  => __( "Chinese (Simplified)" ),
---                                                 "mejs.chinese-traditional" => __( "Chinese (Traditional)" ),
---                                                 "mejs.croatian"            => __( "Croatian" ),
---                                                 "mejs.czech"               => __( "Czech" ),
---                                                 "mejs.danish"              => __( "Danish" ),
---                                                 "mejs.dutch"               => __( "Dutch" ),
---                                                 "mejs.english"             => __( "English" ),
---                                                 "mejs.estonian"            => __( "Estonian" ),
---                                                 "mejs.filipino"            => __( "Filipino" ),
---                                                 "mejs.finnish"             => __( "Finnish" ),
---                                                 "mejs.french"              => __( "French" ),
---                                                 "mejs.galician"            => __( "Galician" ),
---                                                 "mejs.german"              => __( "German" ),
---                                                 "mejs.greek"               => __( "Greek" ),
---                                                 "mejs.haitian-creole"      => __( "Haitian Creole" ),
---                                                 "mejs.hebrew"              => __( "Hebrew" ),
---                                                 "mejs.hindi"               => __( "Hindi" ),
---                                                 "mejs.hungarian"           => __( "Hungarian" ),
---                                                 "mejs.icelandic"           => __( "Icelandic" ),
---                                                 "mejs.indonesian"          => __( "Indonesian" ),
---                                                 "mejs.irish"               => __( "Irish" ),
---                                                 "mejs.italian"             => __( "Italian" ),
---                                                 "mejs.japanese"            => __( "Japanese" ),
---                                                 "mejs.korean"              => __( "Korean" ),
---                                                 "mejs.latvian"             => __( "Latvian" ),
---                                                 "mejs.lithuanian"          => __( "Lithuanian" ),
---                                                 "mejs.macedonian"          => __( "Macedonian" ),
---                                                 "mejs.malay"               => __( "Malay" ),
---                                                 "mejs.maltese"             => __( "Maltese" ),
---                                                 "mejs.norwegian"           => __( "Norwegian" ),
---                                                 "mejs.persian"             => __( "Persian" ),
---                                                 "mejs.polish"              => __( "Polish" ),
---                                                 "mejs.portuguese"          => __( "Portuguese" ),
---                                                 "mejs.romanian"            => __( "Romanian" ),
---                                                 "mejs.russian"             => __( "Russian" ),
---                                                 "mejs.serbian"             => __( "Serbian" ),
---                                                 "mejs.slovak"              => __( "Slovak" ),
---                                                 "mejs.slovenian"           => __( "Slovenian" ),
---                                                 "mejs.spanish"             => __( "Spanish" ),
---                                                 "mejs.swahili"             => __( "Swahili" ),
---                                                 "mejs.swedish"             => __( "Swedish" ),
---                                                 "mejs.tagalog"             => __( "Tagalog" ),
---                                                 "mejs.thai"                => __( "Thai" ),
---                                                 "mejs.turkish"             => __( "Turkish" ),
---                                                 "mejs.ukrainian"           => __( "Ukrainian" ),
---                                                 "mejs.vietnamese"          => __( "Vietnamese" ),
---                                                 "mejs.welsh"               => __( "Welsh" ),
---                                                 "mejs.yiddish"             => __( "Yiddish" ),
---                                         ),
---                                 )
---                         )
---                 ),
---                 "before"
---         );
-
---         scripts->add( "mediaelement-vimeo", "/wp-includes/js/mediaelement/renderers/vimeo.min.js", array( "mediaelement" ), "4.2.17", 1 );
---         scripts->add( "wp-mediaelement", "/wp-includes/js/mediaelement/wp-mediaelementsuffix.js", array( "mediaelement" ), false, 1 );
---         mejs_settings = array(
---                 "pluginPath"  => includes_url( "js/mediaelement/", "relative" ),
---                 "classPrefix" => "mejs-",
---                 "stretching"  => "responsive",
---         );
---         did_action( "init" ) && scripts->localize(
---                 "mediaelement",
---                 "_wpmejsSettings",
---                 --
---                 -- Filters the MediaElement configuration settings.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @param array mejs_settings MediaElement settings array.
---                 --
---                 apply_filters( "mejs_settings", mejs_settings )
---         );
-
---         scripts->add( "wp-codemirror", "/wp-includes/js/codemirror/codemirror.min.js", array(), "5.29.1-alpha-ee20357" );
---         scripts->add( "csslint", "/wp-includes/js/codemirror/csslint.js", array(), "1.0.5" );
---         scripts->add( "esprima", "/wp-includes/js/codemirror/esprima.js", array(), "4.0.0" );
---         scripts->add( "jshint", "/wp-includes/js/codemirror/fakejshint.js", array( "esprima" ), "2.9.5" );
---         scripts->add( "jsonlint", "/wp-includes/js/codemirror/jsonlint.js", array(), "1.6.2" );
---         scripts->add( "htmlhint", "/wp-includes/js/codemirror/htmlhint.js", array(), "0.9.14-xwp" );
---         scripts->add( "htmlhint-kses", "/wp-includes/js/codemirror/htmlhint-kses.js", array( "htmlhint" ) );
---         scripts->add( "code-editor", "/wp-admin/js/code-editorsuffix.js", array( "jquery", "wp-codemirror", "underscore" ) );
---         scripts->add( "wp-theme-plugin-editor", "/wp-admin/js/theme-plugin-editorsuffix.js", array( "common", "wp-util", "wp-sanitize", "jquery", "jquery-ui-core", "wp-a11y", "underscore" ) );
---         scripts->set_translations( "wp-theme-plugin-editor" );
-
---         scripts->add( "wp-playlist", "/wp-includes/js/mediaelement/wp-playlistsuffix.js", array( "wp-util", "backbone", "mediaelement" ), false, 1 );
-
---         scripts->add( "zxcvbn-async", "/wp-includes/js/zxcvbn-asyncsuffix.js", array(), "1.0" );
---         did_action( "init" ) && scripts->localize(
---                 "zxcvbn-async",
---                 "_zxcvbnSettings",
---                 array(
---                         "src" => empty( guessed_url ) ? includes_url( "/js/zxcvbn.min.js" ) : scripts->base_url . "/wp-includes/js/zxcvbn.min.js",
---                 )
---         );
-
---         scripts->add( "password-strength-meter", "/wp-admin/js/password-strength-metersuffix.js", array( "jquery", "zxcvbn-async" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "password-strength-meter",
---                 "pwsL10n",
---                 array(
---                         "unknown"  => _x( "Password strength unknown", "password strength" ),
---                         "short"    => _x( "Very weak", "password strength" ),
---                         "bad"      => _x( "Weak", "password strength" ),
---                         "good"     => _x( "Medium", "password strength" ),
---                         "strong"   => _x( "Strong", "password strength" ),
---                         "mismatch" => _x( "Mismatch", "password mismatch" ),
---                 )
---         );
---         scripts->set_translations( "password-strength-meter" );
-
---         scripts->add( "application-passwords", "/wp-admin/js/application-passwordssuffix.js", array( "jquery", "wp-util", "wp-api-request", "wp-date", "wp-i18n", "wp-hooks" ), false, 1 );
---         scripts->set_translations( "application-passwords" );
-
---         scripts->add( "auth-app", "/wp-admin/js/auth-appsuffix.js", array( "jquery", "wp-api-request", "wp-i18n", "wp-hooks" ), false, 1 );
---         scripts->set_translations( "auth-app" );
-
---         scripts->add( "user-profile", "/wp-admin/js/user-profilesuffix.js", array( "jquery", "password-strength-meter", "wp-util" ), false, 1 );
---         scripts->set_translations( "user-profile" );
---         user_id = isset( _GET["user_id"] ) ? (int) _GET["user_id"] : 0;
---         did_action( "init" ) && scripts->localize(
---                 "user-profile",
---                 "userProfileL10n",
---                 array(
---                         "user_id" => user_id,
---                         "nonce"   => wp_installing() ? "" : wp_create_nonce( "reset-password-for-" . user_id ),
---                 )
---         );
-
---         scripts->add( "language-chooser", "/wp-admin/js/language-choosersuffix.js", array( "jquery" ), false, 1 );
-
---         scripts->add( "user-suggest", "/wp-admin/js/user-suggestsuffix.js", array( "jquery-ui-autocomplete" ), false, 1 );
-
---         scripts->add( "admin-bar", "/wp-includes/js/admin-barsuffix.js", array( "hoverintent-js" ), false, 1 );
-
---         scripts->add( "wplink", "/wp-includes/js/wplinksuffix.js", array( "jquery", "wp-a11y" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "wplink",
---                 "wpLinkL10n",
---                 array(
---                         "title"          => __( "Insert/edit link" ),
---                         "update"         => __( "Update" ),
---                         "save"           => __( "Add Link" ),
---                         "noTitle"        => __( "(no title)" ),
---                         "noMatchesFound" => __( "No results found." ),
---                         "linkSelected"   => __( "Link selected." ),
---                         "linkInserted"   => __( "Link inserted." ),
---                         /* translators: Minimum input length in characters to start searching posts in the "Insert/edit link" modal.--
---                         "minInputLength" => (int) _x( "3", "minimum input length for searching post links" ),
---                 )
---         );
-
---         scripts->add( "wpdialogs", "/wp-includes/js/wpdialogsuffix.js", array( "jquery-ui-dialog" ), false, 1 );
-
---         scripts->add( "word-count", "/wp-admin/js/word-countsuffix.js", array(), false, 1 );
-
---         scripts->add( "media-upload", "/wp-admin/js/media-uploadsuffix.js", array( "thickbox", "shortcode" ), false, 1 );
-
---         scripts->add( "hoverIntent", "/wp-includes/js/hoverIntentsuffix.js", array( "jquery" ), "1.10.2", 1 );
-
---         -- JS-only version of hoverintent (no dependencies).
---         scripts->add( "hoverintent-js", "/wp-includes/js/hoverintent-js.min.js", array(), "2.2.1", 1 );
-
---         scripts->add( "customize-base", "/wp-includes/js/customize-basesuffix.js", array( "jquery", "json2", "underscore" ), false, 1 );
---         scripts->add( "customize-loader", "/wp-includes/js/customize-loadersuffix.js", array( "customize-base" ), false, 1 );
---         scripts->add( "customize-preview", "/wp-includes/js/customize-previewsuffix.js", array( "wp-a11y", "customize-base" ), false, 1 );
---         scripts->add( "customize-models", "/wp-includes/js/customize-models.js", array( "underscore", "backbone" ), false, 1 );
---         scripts->add( "customize-views", "/wp-includes/js/customize-views.js", array( "jquery", "underscore", "imgareaselect", "customize-models", "media-editor", "media-views" ), false, 1 );
---         scripts->add( "customize-controls", "/wp-admin/js/customize-controlssuffix.js", array( "customize-base", "wp-a11y", "wp-util", "jquery-ui-core" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "customize-controls",
---                 "_wpCustomizeControlsL10n",
---                 array(
---                         "activate"                => __( "Activate &amp; Publish" ),
---                         "save"                    => __( "Save &amp; Publish" ), -- @todo Remove as not required.
---                         "publish"                 => __( "Publish" ),
---                         "published"               => __( "Published" ),
---                         "saveDraft"               => __( "Save Draft" ),
---                         "draftSaved"              => __( "Draft Saved" ),
---                         "updating"                => __( "Updating" ),
---                         "schedule"                => _x( "Schedule", "customizer changeset action/button label" ),
---                         "scheduled"               => _x( "Scheduled", "customizer changeset status" ),
---                         "invalid"                 => __( "Invalid" ),
---                         "saveBeforeShare"         => __( "Please save your changes in order to share the preview." ),
---                         "futureDateError"         => __( "You must supply a future date to schedule." ),
---                         "saveAlert"               => __( "The changes you made will be lost if you navigate away from this page." ),
---                         "saved"                   => __( "Saved" ),
---                         "cancel"                  => __( "Cancel" ),
---                         "close"                   => __( "Close" ),
---                         "action"                  => __( "Action" ),
---                         "discardChanges"          => __( "Discard changes" ),
---                         "cheatin"                 => __( "Something went wrong." ),
---                         "notAllowedHeading"       => __( "You need a higher level of permission." ),
---                         "notAllowed"              => __( "Sorry, you are not allowed to customize this site." ),
---                         "previewIframeTitle"      => __( "Site Preview" ),
---                         "loginIframeTitle"        => __( "Session expired" ),
---                         "collapseSidebar"         => _x( "Hide Controls", "label for hide controls button without length constraints" ),
---                         "expandSidebar"           => _x( "Show Controls", "label for hide controls button without length constraints" ),
---                         "untitledBlogName"        => __( "(Untitled)" ),
---                         "unknownRequestFail"      => __( "Looks like something&#8217;s gone wrong. Wait a couple seconds, and then try again." ),
---                         "themeDownloading"        => __( "Downloading your new theme&hellip;" ),
---                         "themePreviewWait"        => __( "Setting up your live preview. This may take a bit." ),
---                         "revertingChanges"        => __( "Reverting unpublished changes&hellip;" ),
---                         "trashConfirm"            => __( "Are you sure you want to discard your unpublished changes?" ),
---                         /* translators: %s: Display name of the user who has taken over the changeset in customizer.--
---                         "takenOverMessage"        => __( "%s has taken over and is currently customizing." ),
---                         /* translators: %s: URL to the Customizer to load the autosaved version.--
---                         "autosaveNotice"          => __( "There is a more recent autosave of your changes than the one you are previewing. <a href="%s">Restore the autosave</a>" ),
---                         "videoHeaderNotice"       => __( "This theme does not support video headers on this page. Navigate to the front page or another page that supports video headers." ),
---                         -- Used for overriding the file types allowed in Plupload.
---                         "allowedFiles"            => __( "Allowed Files" ),
---                         "customCssError"          => array(
---                                 /* translators: %d: Error count.--
---                                 "singular" => _n( "There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 1 ),
---                                 /* translators: %d: Error count.--
---                                 "plural"   => _n( "There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 2 ),
---                                 -- @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
---                         ),
---                         "pageOnFrontError"        => __( "Homepage and posts page must be different." ),
---                         "saveBlockedError"        => array(
---                                 /* translators: %s: Number of invalid settings.--
---                                 "singular" => _n( "Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 1 ),
---                                 /* translators: %s: Number of invalid settings.--
---                                 "plural"   => _n( "Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 2 ),
---                                 -- @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
---                         ),
---                         "scheduleDescription"     => __( "Schedule your customization changes to publish ("go live") at a future date." ),
---                         "themePreviewUnavailable" => __( "Sorry, you cannot preview new themes when you have changes scheduled or saved as a draft. Please publish your changes, or wait until they publish to preview new themes." ),
---                         "themeInstallUnavailable" => sprintf(
---                                 /* translators: %s: URL to Add Themes admin screen.--
---                                 __( "You will not be able to install new themes from here yet since your install requires SFTP credentials. For now, please <a href="%s">add themes in the admin</a>." ),
---                                 esc_url( admin_url( "theme-install.php" ) )
---                         ),
---                         "publishSettings"         => __( "Publish Settings" ),
---                         "invalidDate"             => __( "Invalid date." ),
---                         "invalidValue"            => __( "Invalid value." ),
---                         "blockThemeNotification"  => sprintf(
---                                 /* translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
---                                 __( "Hurray! Your theme supports site editing with blocks. <a href="%1s">Tell me more</a>. %2s" ),
---                                 __( "https:--wordpress.org/support/article/site-editor/" ),
---                                 sprintf(
---                                         "<button type="button" data-action="%1s" class="button switch-to-editor">%2s</button>",
---                                         esc_url( admin_url( "site-editor.php" ) ),
---                                         __( "Use Site Editor" )
---                                 )
---                         ),
---                 )
---         );
---         scripts->add( "customize-selective-refresh", "/wp-includes/js/customize-selective-refreshsuffix.js", array( "jquery", "wp-util", "customize-preview" ), false, 1 );
-
---         scripts->add( "customize-widgets", "/wp-admin/js/customize-widgetssuffix.js", array( "jquery", "jquery-ui-sortable", "jquery-ui-droppable", "wp-backbone", "customize-controls" ), false, 1 );
---         scripts->add( "customize-preview-widgets", "/wp-includes/js/customize-preview-widgetssuffix.js", array( "jquery", "wp-util", "customize-preview", "customize-selective-refresh" ), false, 1 );
-
---         scripts->add( "customize-nav-menus", "/wp-admin/js/customize-nav-menussuffix.js", array( "jquery", "wp-backbone", "customize-controls", "accordion", "nav-menu", "wp-sanitize" ), false, 1 );
---         scripts->add( "customize-preview-nav-menus", "/wp-includes/js/customize-preview-nav-menussuffix.js", array( "jquery", "wp-util", "customize-preview", "customize-selective-refresh" ), false, 1 );
-
---         scripts->add( "wp-custom-header", "/wp-includes/js/wp-custom-headersuffix.js", array( "wp-a11y" ), false, 1 );
-
---         scripts->add( "accordion", "/wp-admin/js/accordionsuffix.js", array( "jquery" ), false, 1 );
-
---         scripts->add( "shortcode", "/wp-includes/js/shortcodesuffix.js", array( "underscore" ), false, 1 );
---         scripts->add( "media-models", "/wp-includes/js/media-modelssuffix.js", array( "wp-backbone" ), false, 1 );
---         did_action( "init" ) && scripts->localize(
---                 "media-models",
---                 "_wpMediaModelsL10n",
---                 array(
---                         "settings" => array(
---                                 "ajaxurl" => admin_url( "admin-ajax.php", "relative" ),
---                                 "post"    => array( "id" => 0 ),
---                         ),
---                 )
---         );
-
---         scripts->add( "wp-embed", "/wp-includes/js/wp-embedsuffix.js", array(), false, 1 );
-
---         -- To enqueue media-views or media-editor, call wp_enqueue_media().
---         -- Both rely on numerous settings, styles, and templates to operate correctly.
---         scripts->add( "media-views", "/wp-includes/js/media-viewssuffix.js", array( "utils", "media-models", "wp-plupload", "jquery-ui-sortable", "wp-mediaelement", "wp-api-request", "wp-a11y", "clipboard" ), false, 1 );
---         scripts->set_translations( "media-views" );
-
---         scripts->add( "media-editor", "/wp-includes/js/media-editorsuffix.js", array( "shortcode", "media-views" ), false, 1 );
---         scripts->set_translations( "media-editor" );
---         scripts->add( "media-audiovideo", "/wp-includes/js/media-audiovideosuffix.js", array( "media-editor" ), false, 1 );
---         scripts->add( "mce-view", "/wp-includes/js/mce-viewsuffix.js", array( "shortcode", "jquery", "media-views", "media-audiovideo" ), false, 1 );
-
---         scripts->add( "wp-api", "/wp-includes/js/wp-apisuffix.js", array( "jquery", "backbone", "underscore", "wp-api-request" ), false, 1 );
-
---         if ( is_admin() ) then
---                 scripts->add( "admin-tags", "/wp-admin/js/tagssuffix.js", array( "jquery", "wp-ajax-response" ), false, 1 );
---                 scripts->set_translations( "admin-tags" );
-
---                 scripts->add( "admin-comments", "/wp-admin/js/edit-commentssuffix.js", array( "wp-lists", "quicktags", "jquery-query" ), false, 1 );
---                 scripts->set_translations( "admin-comments" );
---                 did_action( "init" ) && scripts->localize(
---                         "admin-comments",
---                         "adminCommentsSettings",
---                         array(
---                                 "hotkeys_highlight_first" => isset( _GET["hotkeys_highlight_first"] ),
---                                 "hotkeys_highlight_last"  => isset( _GET["hotkeys_highlight_last"] ),
---                         )
---                 );
-
---                 scripts->add( "xfn", "/wp-admin/js/xfnsuffix.js", array( "jquery" ), false, 1 );
-
---                 scripts->add( "postbox", "/wp-admin/js/postboxsuffix.js", array( "jquery-ui-sortable", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "postbox" );
-
---                 scripts->add( "tags-box", "/wp-admin/js/tags-boxsuffix.js", array( "jquery", "tags-suggest" ), false, 1 );
---                 scripts->set_translations( "tags-box" );
-
---                 scripts->add( "tags-suggest", "/wp-admin/js/tags-suggestsuffix.js", array( "jquery-ui-autocomplete", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "tags-suggest" );
-
---                 scripts->add( "post", "/wp-admin/js/postsuffix.js", array( "suggest", "wp-lists", "postbox", "tags-box", "underscore", "word-count", "wp-a11y", "wp-sanitize", "clipboard" ), false, 1 );
---                 scripts->set_translations( "post" );
-
---                 scripts->add( "editor-expand", "/wp-admin/js/editor-expandsuffix.js", array( "jquery", "underscore" ), false, 1 );
-
---                 scripts->add( "link", "/wp-admin/js/linksuffix.js", array( "wp-lists", "postbox" ), false, 1 );
-
---                 scripts->add( "comment", "/wp-admin/js/commentsuffix.js", array( "jquery", "postbox" ), false, 1 );
---                 scripts->set_translations( "comment" );
-
---                 scripts->add( "admin-gallery", "/wp-admin/js/gallerysuffix.js", array( "jquery-ui-sortable" ) );
-
---                 scripts->add( "admin-widgets", "/wp-admin/js/widgetssuffix.js", array( "jquery-ui-sortable", "jquery-ui-draggable", "jquery-ui-droppable", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "admin-widgets" );
-
---                 scripts->add( "media-widgets", "/wp-admin/js/widgets/media-widgetssuffix.js", array( "jquery", "media-models", "media-views", "wp-api-request" ) );
---                 scripts->add_inline_script( "media-widgets", "wp.mediaWidgets.init();", "after" );
-
---                 scripts->add( "media-audio-widget", "/wp-admin/js/widgets/media-audio-widgetsuffix.js", array( "media-widgets", "media-audiovideo" ) );
---                 scripts->add( "media-image-widget", "/wp-admin/js/widgets/media-image-widgetsuffix.js", array( "media-widgets" ) );
---                 scripts->add( "media-gallery-widget", "/wp-admin/js/widgets/media-gallery-widgetsuffix.js", array( "media-widgets" ) );
---                 scripts->add( "media-video-widget", "/wp-admin/js/widgets/media-video-widgetsuffix.js", array( "media-widgets", "media-audiovideo", "wp-api-request" ) );
---                 scripts->add( "text-widgets", "/wp-admin/js/widgets/text-widgetssuffix.js", array( "jquery", "backbone", "editor", "wp-util", "wp-a11y" ) );
---                 scripts->add( "custom-html-widgets", "/wp-admin/js/widgets/custom-html-widgetssuffix.js", array( "jquery", "backbone", "wp-util", "jquery-ui-core", "wp-a11y" ) );
-
---                 scripts->add( "theme", "/wp-admin/js/themesuffix.js", array( "wp-backbone", "wp-a11y", "customize-base" ), false, 1 );
-
---                 scripts->add( "inline-edit-post", "/wp-admin/js/inline-edit-postsuffix.js", array( "jquery", "tags-suggest", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "inline-edit-post" );
-
---                 scripts->add( "inline-edit-tax", "/wp-admin/js/inline-edit-taxsuffix.js", array( "jquery", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "inline-edit-tax" );
-
---                 scripts->add( "plugin-install", "/wp-admin/js/plugin-installsuffix.js", array( "jquery", "jquery-ui-core", "thickbox" ), false, 1 );
---                 scripts->set_translations( "plugin-install" );
-
---                 scripts->add( "site-health", "/wp-admin/js/site-healthsuffix.js", array( "clipboard", "jquery", "wp-util", "wp-a11y", "wp-api-request", "wp-url", "wp-i18n", "wp-hooks" ), false, 1 );
---                 scripts->set_translations( "site-health" );
-
---                 scripts->add( "privacy-tools", "/wp-admin/js/privacy-toolssuffix.js", array( "jquery", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "privacy-tools" );
-
---                 scripts->add( "updates", "/wp-admin/js/updatessuffix.js", array( "common", "jquery", "wp-util", "wp-a11y", "wp-sanitize", "wp-i18n" ), false, 1 );
---                 scripts->set_translations( "updates" );
---                 did_action( "init" ) && scripts->localize(
---                         "updates",
---                         "_wpUpdatesSettings",
---                         array(
---                                 "ajax_nonce" => wp_installing() ? "" : wp_create_nonce( "updates" ),
---                         )
---                 );
-
---                 scripts->add( "farbtastic", "/wp-admin/js/farbtastic.js", array( "jquery" ), "1.2" );
-
---                 scripts->add( "iris", "/wp-admin/js/iris.min.js", array( "jquery-ui-draggable", "jquery-ui-slider", "jquery-touch-punch" ), "1.1.1", 1 );
---                 scripts->add( "wp-color-picker", "/wp-admin/js/color-pickersuffix.js", array( "iris" ), false, 1 );
---                 scripts->set_translations( "wp-color-picker" );
-
---                 scripts->add( "dashboard", "/wp-admin/js/dashboardsuffix.js", array( "jquery", "admin-comments", "postbox", "wp-util", "wp-a11y", "wp-date" ), false, 1 );
---                 scripts->set_translations( "dashboard" );
-
---                 scripts->add( "list-revisions", "/wp-includes/js/wp-list-revisionssuffix.js" );
-
---                 scripts->add( "media-grid", "/wp-includes/js/media-gridsuffix.js", array( "media-editor" ), false, 1 );
---                 scripts->add( "media", "/wp-admin/js/mediasuffix.js", array( "jquery", "clipboard", "wp-i18n", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "media" );
-
---                 scripts->add( "image-edit", "/wp-admin/js/image-editsuffix.js", array( "jquery", "jquery-ui-core", "json2", "imgareaselect", "wp-a11y" ), false, 1 );
---                 scripts->set_translations( "image-edit" );
-
---                 scripts->add( "set-post-thumbnail", "/wp-admin/js/set-post-thumbnailsuffix.js", array( "jquery" ), false, 1 );
---                 scripts->set_translations( "set-post-thumbnail" );
-
---                 /*
---                 -- Navigation Menus: Adding underscore as a dependency to utilize _.debounce
---                 -- see https:--core.trac.wordpress.org/ticket/42321
---                 --
---                 scripts->add( "nav-menu", "/wp-admin/js/nav-menusuffix.js", array( "jquery-ui-sortable", "jquery-ui-draggable", "jquery-ui-droppable", "wp-lists", "postbox", "json2", "underscore" ) );
---                 scripts->set_translations( "nav-menu" );
-
---                 scripts->add( "custom-header", "/wp-admin/js/custom-header.js", array( "jquery-masonry" ), false, 1 );
---                 scripts->add( "custom-background", "/wp-admin/js/custom-backgroundsuffix.js", array( "wp-color-picker", "media-views" ), false, 1 );
---                 scripts->add( "media-gallery", "/wp-admin/js/media-gallerysuffix.js", array( "jquery" ), false, 1 );
-
---                 scripts->add( "svg-painter", "/wp-admin/js/svg-painter.js", array( "jquery" ), false, 1 );
---         end;
--- end;
+   ------------------------
+   -- Wp_Default_Scripts --
+   ------------------------
+
+   procedure Wp_Default_Scripts (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   is
+      use Ada.Strings.Unbounded;
+      use Binder;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_General_Templates;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Load;
+      use Inc_Plugins;
+
+      Suffix      : String := Wp_Scripts_Get_Suffix;
+      Dev_Suffix  : String := Wp_Scripts_Get_Suffix ("dev");
+      GuessURL    : Unbounded_String := +Site_URL;
+      Guessed_URL : Boolean := False;
+   begin
+      if GuessURL = "" then
+         Guessed_URL := True;
+         GuessURL    := +Wp_Guess_URL;
+      end if;
+
+      Scripts.Base_URL        := GuessURL;
+      Scripts.Content_URL     := Globals.WP_CONTENT_URL; -- defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
+      Scripts.Default_Version := +Get_Bloginfo ("version");
+      Scripts.Default_Dirs    := To_List (List => (+"/wp-admin/js/", +"/wp-includes/js/"));
+
+      Scripts.Add ("utils", "/wp-includes/js/utilssuffix.js");
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "utils",
+                "userSettings",
+                To_Array ((
+                        Build ("url",    -Globals.SITECOOKIEPATH), -- (string)
+                        Build ("uid",    Inc_Users.Get_Current_User_Id), -- (string)
+--                      Build ("time",   (string) time(),
+                        Build ("secure", Boolean'Image ("https" = Php.Parse_URL (Site_URL, Php.PHP_URL_SCHEME)))
+                ))
+         );
+      end if;
+
+      Scripts.Add ("common", "/wp-admin/js/commonsuffix.js", To_List (List => (+"jquery", +"hoverIntent", +"utils")), False, 1);
+      Scripts.Set_Translations ("common");
+
+      Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js", Empty_List, False, 1);
+
+      Scripts.Add ("sack", "/wp-includes/js/tw-sacksuffix.js", Empty_List, "1.6.1", 1);
+
+      Scripts.Add ("quicktags", "/wp-includes/js/quicktagssuffix.js", Empty_List, False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "quicktags",
+                "quicktagsL10n",
+                To_Array ((
+                        Build ("closeAllOpenTags",      abs "Close all open tags"),
+                        Build ("closeTags",             abs "close tags"),
+                        Build ("enterURL",              abs "Enter the URL"),
+                        Build ("enterImageURL",         abs "Enter the URL of the image"),
+                        Build ("enterImageDescription", abs "Enter a description of the image"),
+                        Build ("textdirection",         abs "text direction"),
+                        Build ("toggleTextdirection",   abs "Toggle Editor Text Direction"),
+                        Build ("dfw",                   abs "Distraction-free writing mode"),
+                        Build ("strong",                abs "Bold"),
+                        Build ("strongClose",           abs "Close bold tag"),
+                        Build ("em",                    abs "Italic"),
+                        Build ("emClose",               abs "Close italic tag"),
+                        Build ("link",                  abs "Insert link"),
+                        Build ("blockquote",            abs "Blockquote"),
+                        Build ("blockquoteClose",       abs "Close blockquote tag"),
+                        Build ("del",                   abs "Deleted text (strikethrough)"),
+                        Build ("delClose",              abs "Close deleted text tag"),
+                        Build ("ins",                   abs "Inserted text"),
+                        Build ("insClose",              abs "Close inserted text tag"),
+                        Build ("image",                 abs "Insert image"),
+                        Build ("ul",                    abs "Bulleted list"),
+                        Build ("ulClose",               abs "Close bulleted list tag"),
+                        Build ("ol",                    abs "Numbered list"),
+                        Build ("olClose",               abs "Close numbered list tag"),
+                        Build ("li",                    abs "List item"),
+                        Build ("liClose",               abs "Close list item tag"),
+                        Build ("code",                  abs "Code"),
+                        Build ("codeClose",             abs "Close code tag"),
+                        Build ("more",                  abs "Insert Read More tag")
+                ))
+         );
+      end if;
+
+      Scripts.Add ("colorpicker", "/wp-includes/js/colorpickersuffix.js", To_List ("prototype"), "3517m");
+
+      Scripts.Add ("editor", "/wp-admin/js/editorsuffix.js", To_List (List => (+"utils", +"jquery")), False, 1);
+
+      Scripts.Add ("clipboard", "/wp-includes/js/clipboardsuffix.js", Empty_List, "2.0.11", 1);
+
+      Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js", To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "wp-ajax-response",
+                "wpAjax",
+                To_Array ((
+                        Build ("noPerm", abs "Sorry, you are not allowed to do that."),
+                        Build ("broken", abs "Something went wrong.")
+                ))
+         );
+      end if;
+
+      Scripts.Add ("wp-api-request", "/wp-includes/js/api-requestsuffix.js", To_List ("jquery"), False, 1);
+
+      -- `wpApiSettings` is also used by `wp-api`, which depends on this script.
+      if Did_Action ("init") then
+         Scripts.Localize (
+           "wp-api-request",
+           "wpApiSettings",
+           To_Array ((
+             Build ("root",     Sanitize_URL (Inc_REST_API.Get_REST_URL)),
+             Build ("nonce",    (if Globals.WP_INSTALLING then ""
+                                 else Inc_Pluggables.Wp_Create_Nonce ("wp_rest"))),
+             Build ("versionString", "wp/v2/")
+           ))
+         );
+      end if;
+
+      Scripts.Add ("wp-pointer", "/wp-includes/js/wp-pointersuffix.js", To_List ("jquery-ui-core"), False, 1);
+      Scripts.Set_Translations ("wp-pointer");
+
+      Scripts.Add ("autosave", "/wp-includes/js/autosavesuffix.js", To_List ("heartbeat"), False, 1);
+
+      Scripts.Add ("heartbeat", "/wp-includes/js/heartbeatsuffix.js", To_List (List => (+"jquery", +"wp-hooks")), False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "heartbeat",
+                "heartbeatSettings",
+                --
+                -- Filters the Heartbeat settings.
+                --
+                -- @since 3.6.0
+                --
+                -- @param array settings Heartbeat settings array.
+                --
+                Apply_Filters ("heartbeat_settings", Empty_Array)
+         );
+      end if;
+
+      Scripts.Add ("wp-auth-check", "/wp-includes/js/wp-auth-checksuffix.js", To_List ("heartbeat"), False, 1);
+      Scripts.Set_Translations ("wp-auth-check");
+
+      Scripts.Add ("wp-lists", "/wp-includes/js/wp-listssuffix.js", To_List (List => (+"wp-ajax-response", +"jquery-color")), False, 1);
+
+      -- WordPress no longer uses or bundles Prototype or script.aculo.us. These are now pulled from an external source.
+      Scripts.Add ("prototype", "https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js", Empty_List, "1.7.1");
+      Scripts.Add ("scriptaculous-root", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js", To_List ("prototype"), "1.9.0");
+      Scripts.Add ("scriptaculous-builder", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js", To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous-dragdrop", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js", To_List (List => (+"scriptaculous-builder", +"scriptaculous-effects")), "1.9.0");
+      Scripts.Add ("scriptaculous-effects", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js", To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous-slider", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js", To_List ("scriptaculous-effects"), "1.9.0");
+      Scripts.Add ("scriptaculous-sound", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js", To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous-controls", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js", To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous", False, To_List (List => (+"scriptaculous-dragdrop", +"scriptaculous-slider", +"scriptaculous-controls")));
+
+      -- Not used in core, replaced by Jcrop.js.
+      Scripts.Add ("cropper", "/wp-includes/js/crop/cropper.js", To_List ("scriptaculous-dragdrop"));
+
+      -- jQuery.
+      -- The unminified jquery.js and jquery-migrate.js are included to facilitate debugging.
+      Scripts.Add ("jquery", False, To_List (List => (+"jquery-core", +"jquery-migrate")), "3.6.1");
+      Scripts.Add ("jquery-core", "/wp-includes/js/jquery/jquerysuffix.js", Empty_List, "3.6.1");
+      Scripts.Add ("jquery-migrate", "/wp-includes/js/jquery/jquery-migratesuffix.js", Empty_List, "3.3.2");
+
+      -- Full jQuery UI.
+      -- The build process in 1.12.1 has changed significantly.
+      -- In order to keep backwards compatibility, and to keep the optimized loading,
+      -- the source files were flattened and included with some modifications for AMD loading.
+      -- A notable change is that "jquery-ui-core" now contains "jquery-ui-position" and "jquery-ui-widget".
+      Scripts.Add ("jquery-ui-core", "/wp-includes/js/jquery/ui/coresuffix.js", To_List ("jquery"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-core", "/wp-includes/js/jquery/ui/effectsuffix.js", To_List ("jquery"), "1.13.2", 1);
+
+      Scripts.Add ("jquery-effects-blind", "/wp-includes/js/jquery/ui/effect-blindsuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-bounce", "/wp-includes/js/jquery/ui/effect-bouncesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-clip", "/wp-includes/js/jquery/ui/effect-clipsuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-drop", "/wp-includes/js/jquery/ui/effect-dropsuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-explode", "/wp-includes/js/jquery/ui/effect-explodesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-fade", "/wp-includes/js/jquery/ui/effect-fadesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-fold", "/wp-includes/js/jquery/ui/effect-foldsuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-highlight", "/wp-includes/js/jquery/ui/effect-highlightsuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-puff", "/wp-includes/js/jquery/ui/effect-puffsuffix.js", To_List (List => (+"jquery-effects-core", +"jquery-effects-scale")), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-pulsate", "/wp-includes/js/jquery/ui/effect-pulsatesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-scale", "/wp-includes/js/jquery/ui/effect-scalesuffix.js", To_List (List => (+"jquery-effects-core", +"jquery-effects-size")), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-shake", "/wp-includes/js/jquery/ui/effect-shakesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-size", "/wp-includes/js/jquery/ui/effect-sizesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-slide", "/wp-includes/js/jquery/ui/effect-slidesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-effects-transfer", "/wp-includes/js/jquery/ui/effect-transfersuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
+
+      -- Widgets
+      Scripts.Add ("jquery-ui-accordion", "/wp-includes/js/jquery/ui/accordionsuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-autocomplete", "/wp-includes/js/jquery/ui/autocompletesuffix.js", To_List (List => (+"jquery-ui-menu", +"wp-a11y")), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-button", "/wp-includes/js/jquery/ui/buttonsuffix.js",
+                   To_List (List => (+"jquery-ui-core", +"jquery-ui-controlgroup", +"jquery-ui-checkboxradio")), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-datepicker", "/wp-includes/js/jquery/ui/datepickersuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-dialog", "/wp-includes/js/jquery/ui/dialogsuffix.js",
+                   To_List (List => (+"jquery-ui-resizable", +"jquery-ui-draggable", +"jquery-ui-button")), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-menu", "/wp-includes/js/jquery/ui/menusuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-mouse", "/wp-includes/js/jquery/ui/mousesuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-progressbar", "/wp-includes/js/jquery/ui/progressbarsuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-selectmenu", "/wp-includes/js/jquery/ui/selectmenusuffix.js", To_List ("jquery-ui-menu"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-slider", "/wp-includes/js/jquery/ui/slidersuffix.js", To_List ("jquery-ui-mouse"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-spinner", "/wp-includes/js/jquery/ui/spinnersuffix.js", To_List ("jquery-ui-button"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-tabs", "/wp-includes/js/jquery/ui/tabssuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-tooltip", "/wp-includes/js/jquery/ui/tooltipsuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+
+      -- New in 1.12.1
+      Scripts.Add ("jquery-ui-checkboxradio", "/wp-includes/js/jquery/ui/checkboxradiosuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-controlgroup", "/wp-includes/js/jquery/ui/controlgroupsuffix.js", To_List ("jquery-ui-core"), "1.13.2", 1);
+
+      -- Interactions
+      Scripts.Add ("jquery-ui-draggable", "/wp-includes/js/jquery/ui/draggablesuffix.js", To_List ("jquery-ui-mouse"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-droppable", "/wp-includes/js/jquery/ui/droppablesuffix.js", To_List ("jquery-ui-draggable"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-resizable", "/wp-includes/js/jquery/ui/resizablesuffix.js", To_List ("jquery-ui-mouse"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-selectable", "/wp-includes/js/jquery/ui/selectablesuffix.js", To_List ("jquery-ui-mouse"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-sortable", "/wp-includes/js/jquery/ui/sortablesuffix.js", To_List ("jquery-ui-mouse"), "1.13.2", 1);
+
+      -- As of 1.12.1 `jquery-ui-position` and `jquery-ui-widget` are part of `jquery-ui-core`.
+      -- Listed here for back-compat.
+      Scripts.Add ("jquery-ui-position", False, To_List ("jquery-ui-core"), "1.13.2", 1);
+      Scripts.Add ("jquery-ui-widget", False, To_List ("jquery-ui-core"), "1.13.2", 1);
+
+      -- Strings for "jquery-ui-autocomplete" live region messages.
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "jquery-ui-autocomplete",
+                "uiAutocompleteL10n",
+                To_Array ((
+                        Build ("noResults",    abs "No results found."),
+                        -- translators: Number of results found when using jQuery UI Autocomplete.
+                        Build ("oneResult",    abs "1 result found. Use up and down arrow keys to navigate."),
+                        -- translators: %d: Number of results found when using jQuery UI Autocomplete.
+                        Build ("manyResults",  abs "%d results found. Use up and down arrow keys to navigate."),
+                        Build ("itemSelected", abs "Item selected.")
+                ))
+         );
+      end if;
+
+      -- Deprecated, not used in core, most functionality is included in jQuery 1.3.
+      Scripts.Add ("jquery-form", "/wp-includes/js/jquery/jquery.formsuffix.js", To_List ("jquery"), "4.3.0", 1);
+
+      -- jQuery plugins.
+      Scripts.Add ("jquery-color", "/wp-includes/js/jquery/jquery.color.min.js", To_List ("jquery"), "2.2.0", 1);
+      Scripts.Add ("schedule", "/wp-includes/js/jquery/jquery.schedule.js", To_List ("jquery"), "20m", 1);
+      Scripts.Add ("jquery-query", "/wp-includes/js/jquery/jquery.query.js", To_List ("jquery"), "2.2.3", 1);
+      Scripts.Add ("jquery-serialize-object", "/wp-includes/js/jquery/jquery.serialize-object.js", To_List ("jquery"), "0.2-wp", 1);
+      Scripts.Add ("jquery-hotkeys", "/wp-includes/js/jquery/jquery.hotkeyssuffix.js", To_List ("jquery"), "0.0.2m", 1);
+      Scripts.Add ("jquery-table-hotkeys", "/wp-includes/js/jquery/jquery.table-hotkeyssuffix.js", To_List (List => (+"jquery", +"jquery-hotkeys")), False, 1);
+      Scripts.Add ("jquery-touch-punch", "/wp-includes/js/jquery/jquery.ui.touch-punch.js", To_List (List => (+"jquery-ui-core", +"jquery-ui-mouse")), "0.2.2", 1);
+
+      -- Not used any more, registered for backward compatibility.
+      Scripts.Add ("suggest", "/wp-includes/js/jquery/suggestsuffix.js", To_List ("jquery"), "1.1-20110113", 1);
+
+      -- Masonry v2 depended on jQuery. v3 does not. The older jquery-masonry handle is a shiv.
+      -- It sets jQuery as a dependency, as the theme may have been implicitly loading it this way.
+      Scripts.Add ("imagesloaded", "/wp-includes/js/imagesloaded.min.js", Empty_List, "4.1.4", 1);
+      Scripts.Add ("masonry", "/wp-includes/js/masonry.min.js", To_List ("imagesloaded"), "4.2.2", 1);
+      Scripts.Add ("jquery-masonry", "/wp-includes/js/jquery/jquery.masonry.min.js", To_List (List => (+"jquery", +"masonry")), "3.1.2b", 1);
+
+      Scripts.Add ("thickbox", "/wp-includes/js/thickbox/thickbox.js", To_List ("jquery"), "3.1-20121105", 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "thickbox",
+                "thickboxL10n",
+                To_Array ((
+                        Build ("next",             abs "Next &gt;"),
+                        Build ("prev",             abs "&lt; Prev"),
+                        Build ("image",            abs "Image"),
+                        Build ("of",               abs "of"),
+                        Build ("close",            abs "Close"),
+                        Build ("noiframes",        abs "This feature requires inline frames. You have iframes disabled or your browser does not support them."),
+                        Build ("loadingAnimation", Includes_URL ("js/thickbox/loadingAnimation.gif"))
+                ))
+         );
+      end if;
+
+      -- Not used in core, replaced by imgAreaSelect.
+      Scripts.Add ("jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.js", To_List ("jquery"), "0.9.15");
+
+      Scripts.Add ("swfobject", "/wp-includes/js/swfobject.js", Empty_List, "2.2-20120417");
+
+      -- Error messages for Plupload.
+      declare
+         Uploader_L10n : constant Array_Type := To_Array ((
+                Build ("queue_limit_exceeded",      abs "You have attempted to queue too many files."),
+                -- translators: %s: File name.
+                Build ("file_exceeds_size_limit",   abs "%s exceeds the maximum upload size for this site."),
+                Build ("zero_byte_file",            abs "This file is empty. Please try another."),
+                Build ("invalid_filetype",          abs "Sorry, you are not allowed to upload this file type."),
+                Build ("not_an_image",              abs "This file is not an image. Please try another."),
+                Build ("image_memory_exceeded",     abs "Memory exceeded. Please try another smaller file."),
+                Build ("image_dimensions_exceeded", abs "This is larger than the maximum size. Please try another."),
+                Build ("default_error",             abs "An error occurred in the upload. Please try again later."),
+                Build ("missing_upload_url",        abs "There was a configuration error. Please contact the server administrator."),
+                Build ("upload_limit_exceeded",     abs "You may only upload 1 file."),
+                Build ("http_error",                abs "Unexpected response from the server. The file may have been uploaded successfully. Check in the Media Library or reload the page."),
+                Build ("http_error_image",          abs "The server cannot process the image. This can happen if the server is busy or does not have enough resources to complete the task. Uploading a smaller image may help. Suggested maximum size is 2560 pixels."),
+                Build ("upload_failed",             abs "Upload failed."),
+                -- translators: 1: Opening link tag, 2: Closing link tag.
+                Build ("big_upload_failed",         abs "Please try uploading this file with the %1sbrowser uploader%2s."),
+                -- translators: %s: File name.
+                Build ("big_upload_queued",         abs "%s exceeds the maximum upload size for the multi-file uploader when used in your browser."),
+                Build ("io_error",                  abs "IO error."),
+                Build ("security_error",            abs "Security error."),
+                Build ("file_cancelled",            abs "File canceled."),
+                Build ("upload_stopped",            abs "Upload stopped."),
+                Build ("dismiss",                   abs "Dismiss"),
+                Build ("crunching",                 abs "Crunching&hellip;"),
+                Build ("deleted",                   abs "moved to the Trash."),
+                -- translators: %s: File name.
+                Build ("error_uploading",           abs "&#8220;%s&#8221; has failed to upload."),
+                Build ("unsupported_image",         abs "This image cannot be displayed in a web browser. For best results convert it to JPEG before uploading."),
+                Build ("noneditable_image",         abs "This image cannot be processed by the web server. Convert it to JPEG or PNG before uploading."),
+                Build ("file_url_copied",           abs "The file URL has been copied to your clipboard")
+         ));
+      begin
+         Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", Empty_List, "1.3.5");
+         Scripts.Add ("plupload", "/wp-includes/js/plupload/pluploadsuffix.js", To_List ("moxiejs"), "2.1.9");
+         -- Back compat handles:
+         for Handle of To_List (List => (+"all", +"html5", +"flash", +"silverlight", +"html4")) loop
+            Scripts.Add ("plupload-" & (-Handle), False, To_List ("plupload"), "2.1.1");
+         end loop;
+
+         Scripts.Add ("plupload-handlers", "/wp-includes/js/plupload/handlerssuffix.js",
+                      To_List (List => (+"clipboard", +"jquery", +"plupload", +"underscore", +"wp-a11y", +"wp-i18n")));
+         if Did_Action ("init") then
+            Scripts.Localize ("plupload-handlers", "pluploadL10n", Uploader_L10n);
+         end if;
+
+         Scripts.Add ("wp-plupload", "/wp-includes/js/plupload/wp-pluploadsuffix.js", To_List (List => (+"plupload", +"jquery", +"json2", +"media-models")), False, 1);
+         if Did_Action ("init") then
+            Scripts.Localize ("wp-plupload", "pluploadL10n", Uploader_L10n);
+         end if;
+
+         -- Keep "swfupload" for back-compat.
+         Scripts.Add ("swfupload", "/wp-includes/js/swfupload/swfupload.js", Empty_List, "2201-20110113");
+         Scripts.Add ("swfupload-all", False, To_List ("swfupload"), "2201");
+         Scripts.Add ("swfupload-handlers", "/wp-includes/js/swfupload/handlerssuffix.js", To_List (List => (+"swfupload-all", +"jquery")), "2201-20110524");
+         if Did_Action ("init") then
+            Scripts.Localize ("swfupload-handlers", "swfuploadL10n", Uploader_L10n);
+         end if;
+      end;
+      Scripts.Add ("comment-reply", "/wp-includes/js/comment-replysuffix.js", Empty_List, False, 1);
+
+      Scripts.Add ("json2", "/wp-includes/js/json2suffix.js", Empty_List, "2015-05-03");
+      if Did_Action ("init") then
+         Scripts.Add_Data ("json2", "conditional", "lt IE 8");
+      end if;
+
+      Scripts.Add ("underscore", "/wp-includes/js/underscoredev_suffix.js", Empty_List, "1.13.4", 1);
+      Scripts.Add ("backbone", "/wp-includes/js/backbonedev_suffix.js", To_List (List => (+"underscore", +"jquery")), "1.4.1", 1);
+
+      Scripts.Add ("wp-util", "/wp-includes/js/wp-utilsuffix.js", To_List (List => (+"underscore", +"jquery")), False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "wp-util",
+                "_wpUtilSettings",
+                To_Array ((1 =>
+                        Build ("ajax", To_Array ((1 =>
+                                Build ("url", Admin_URL ("admin-ajax.php", "relative"))
+                       )))
+                ))
+         );
+      end if;
+
+      Scripts.Add ("wp-backbone", "/wp-includes/js/wp-backbonesuffix.js", To_List (List => (+"backbone", +"wp-util")), False, 1);
+
+      Scripts.Add ("revisions", "/wp-admin/js/revisionssuffix.js", To_List (List => (+"wp-backbone", +"jquery-ui-slider", +"hoverIntent")), False, 1);
+
+      Scripts.Add ("imgareaselect", "/wp-includes/js/imgareaselect/jquery.imgareaselectsuffix.js", To_List ("jquery"), False, 1);
+
+      Scripts.Add ("mediaelement", False, To_List (List => (+"jquery", +"mediaelement-core", +"mediaelement-migrate")), "4.2.17", 1);
+      Scripts.Add ("mediaelement-core", "/wp-includes/js/mediaelement/mediaelement-and-playersuffix.js", Empty_List, "4.2.17", 1);
+      Scripts.Add ("mediaelement-migrate", "/wp-includes/js/mediaelement/mediaelement-migratesuffix.js", Empty_List, False, 1);
+
+      if Did_Action ("init") then
+         Scripts.Add_Inline_Script (
+           "mediaelement-core",
+           Php.Sprintf (
+             "var mejsL10n = %s;",
+             Wp_Json_Encode (
+               To_Array ((
+                 Build ("language", Php.Strtolower (Php.Strtok (Determine_Locale, "_-"))),
+                 Build ("strings",  To_Array ((
+                 Build ("mejs.download-file",       abs "Download File"),
+                 Build ("mejs.install-flash",       abs "You are using a browser that does not have Flash player enabled or installed. Please turn on your Flash player plugin or download the latest version from https://get.adobe.com/flashplayer/"),
+                 Build ("mejs.fullscreen",          abs "Fullscreen"),
+                 Build ("mejs.play",                abs "Play"),
+                 Build ("mejs.pause",               abs "Pause"),
+                 Build ("mejs.time-slider",         abs "Time Slider"),
+                 Build ("mejs.time-help-text",      abs "Use Left/Right Arrow keys to advance one second, Up/Down arrows to advance ten seconds."),
+                 Build ("mejs.live-broadcast",      abs "Live Broadcast"),
+                 Build ("mejs.volume-help-text",    abs "Use Up/Down Arrow keys to increase or decrease volume."),
+                 Build ("mejs.unmute",              abs "Unmute"),
+                 Build ("mejs.mute",                abs "Mute"),
+                 Build ("mejs.volume-slider",       abs "Volume Slider"),
+                 Build ("mejs.video-player",        abs "Video Player"),
+                 Build ("mejs.audio-player",        abs "Audio Player"),
+                 Build ("mejs.captions-subtitles",  abs "Captions/Subtitles"),
+                 Build ("mejs.captions-chapters",   abs "Chapters"),
+                 Build ("mejs.none",                abs "None"),
+                 Build ("mejs.afrikaans",           abs "Afrikaans"),
+                 Build ("mejs.albanian",            abs "Albanian"),
+                 Build ("mejs.arabic",              abs "Arabic"),
+                 Build ("mejs.belarusian",          abs "Belarusian"),
+                 Build ("mejs.bulgarian",           abs "Bulgarian"),
+                 Build ("mejs.catalan",             abs "Catalan"),
+                 Build ("mejs.chinese",             abs "Chinese"),
+                 Build ("mejs.chinese-simplified",  abs "Chinese (Simplified)"),
+                 Build ("mejs.chinese-traditional", abs "Chinese (Traditional)"),
+                 Build ("mejs.croatian",            abs "Croatian"),
+                 Build ("mejs.czech",               abs "Czech"),
+                 Build ("mejs.danish",              abs "Danish"),
+                 Build ("mejs.dutch",               abs "Dutch"),
+                 Build ("mejs.english",             abs "English"),
+                 Build ("mejs.estonian",            abs "Estonian"),
+                 Build ("mejs.filipino",            abs "Filipino"),
+                 Build ("mejs.finnish",             abs "Finnish"),
+                 Build ("mejs.french",              abs "French"),
+                 Build ("mejs.galician",            abs "Galician"),
+                 Build ("mejs.german",              abs "German"),
+                 Build ("mejs.greek",               abs "Greek"),
+                 Build ("mejs.haitian-creole",      abs "Haitian Creole"),
+                 Build ("mejs.hebrew",              abs "Hebrew"),
+                 Build ("mejs.hindi",               abs "Hindi"),
+                 Build ("mejs.hungarian",           abs "Hungarian"),
+                 Build ("mejs.icelandic",           abs "Icelandic"),
+                 Build ("mejs.indonesian",          abs "Indonesian"),
+                 Build ("mejs.irish",               abs "Irish"),
+                 Build ("mejs.italian",             abs "Italian"),
+                 Build ("mejs.japanese",            abs "Japanese"),
+                 Build ("mejs.korean",              abs "Korean"),
+                 Build ("mejs.latvian",             abs "Latvian"),
+                 Build ("mejs.lithuanian",          abs "Lithuanian"),
+                 Build ("mejs.macedonian",          abs "Macedonian"),
+                 Build ("mejs.malay",               abs "Malay"),
+                 Build ("mejs.maltese",             abs "Maltese"),
+                 Build ("mejs.norwegian",           abs "Norwegian"),
+                 Build ("mejs.persian",             abs "Persian"),
+                 Build ("mejs.polish",              abs "Polish"),
+                 Build ("mejs.portuguese",          abs "Portuguese"),
+                 Build ("mejs.romanian",            abs "Romanian"),
+                 Build ("mejs.russian",             abs "Russian"),
+                 Build ("mejs.serbian",             abs "Serbian"),
+                 Build ("mejs.slovak",              abs "Slovak"),
+                 Build ("mejs.slovenian",           abs "Slovenian"),
+                 Build ("mejs.spanish",             abs "Spanish"),
+                 Build ("mejs.swahili",             abs "Swahili"),
+                 Build ("mejs.swedish",             abs "Swedish"),
+                 Build ("mejs.tagalog",             abs "Tagalog"),
+                 Build ("mejs.thai",                abs "Thai"),
+                 Build ("mejs.turkish",             abs "Turkish"),
+                 Build ("mejs.ukrainian",           abs "Ukrainian"),
+                 Build ("mejs.vietnamese",          abs "Vietnamese"),
+                 Build ("mejs.welsh",               abs "Welsh"),
+                 Build ("mejs.yiddish",             abs "Yiddish")
+               )))
+             ))
+           )
+           ),
+           "before"
+         );
+      end if;
+
+      Scripts.Add ("mediaelement-vimeo", "/wp-includes/js/mediaelement/renderers/vimeo.min.js", To_List ("mediaelement"), "4.2.17", 1);
+      Scripts.Add ("wp-mediaelement", "/wp-includes/js/mediaelement/wp-mediaelementsuffix.js", To_List ("mediaelement"), False, 1);
+
+      declare
+         Mejs_Settings : constant Array_Type := To_Array ((
+                Build ("pluginPath",  Includes_URL ("js/mediaelement/", "relative")),
+                Build ("classPrefix", "mejs-"),
+                Build ("stretching",  "responsive")
+         ));
+      begin
+         if Did_Action ("init") then
+            Scripts.Localize (
+                "mediaelement",
+                "_wpmejsSettings",
+                --
+                -- Filters the MediaElement configuration settings.
+                --
+                -- @since 4.4.0
+                --
+                -- @param array mejs_settings MediaElement settings array.
+                --
+                Apply_Filters ("mejs_settings", Mejs_Settings)
+            );
+         end if;
+      end;
+
+      Scripts.Add ("wp-codemirror", "/wp-includes/js/codemirror/codemirror.min.js", Empty_List, "5.29.1-alpha-ee20357");
+      Scripts.Add ("csslint", "/wp-includes/js/codemirror/csslint.js", Empty_List, "1.0.5");
+      Scripts.Add ("esprima", "/wp-includes/js/codemirror/esprima.js", Empty_List, "4.0.0");
+      Scripts.Add ("jshint", "/wp-includes/js/codemirror/fakejshint.js", To_List ("esprima"), "2.9.5");
+      Scripts.Add ("jsonlint", "/wp-includes/js/codemirror/jsonlint.js", Empty_List, "1.6.2");
+      Scripts.Add ("htmlhint", "/wp-includes/js/codemirror/htmlhint.js", Empty_List, "0.9.14-xwp");
+      Scripts.Add ("htmlhint-kses", "/wp-includes/js/codemirror/htmlhint-kses.js", To_List ("htmlhint"));
+      Scripts.Add ("code-editor", "/wp-admin/js/code-editorsuffix.js", To_List (List => (+"jquery", +"wp-codemirror", +"underscore")));
+      Scripts.Add ("wp-theme-plugin-editor", "/wp-admin/js/theme-plugin-editorsuffix.js",
+                   To_List (List => (+"common", +"wp-util", +"wp-sanitize", +"jquery", +"jquery-ui-core", +"wp-a11y", +"underscore")));
+      Scripts.Set_Translations ("wp-theme-plugin-editor");
+
+      Scripts.Add ("wp-playlist", "/wp-includes/js/mediaelement/wp-playlistsuffix.js", To_List (List => (+"wp-util", +"backbone", +"mediaelement")), False, 1);
+
+      Scripts.Add ("zxcvbn-async", "/wp-includes/js/zxcvbn-asyncsuffix.js", Empty_List, "1.0");
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "zxcvbn-async",
+                "_zxcvbnSettings",
+                To_Array ((1 =>
+                        Build ("src", (if not Guessed_URL
+                                       then Includes_URL ("/js/zxcvbn.min.js")
+                                       else -Scripts.Base_URL & "/wp-includes/js/zxcvbn.min.js"))
+                ))
+         );
+      end if;
+
+      Scripts.Add ("password-strength-meter", "/wp-admin/js/password-strength-metersuffix.js", To_List (List => (+"jquery", +"zxcvbn-async")), False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "password-strength-meter",
+                "pwsL10n",
+                To_Array ((
+                        Build ("unknown",  X_X ("Password strength unknown", "password strength")),
+                        Build ("short",    X_X ("Very weak", "password strength")),
+                        Build ("bad",      X_X ("Weak", "password strength")),
+                        Build ("good",     X_X ("Medium", "password strength")),
+                        Build ("strong",   X_X ("Strong", "password strength")),
+                        Build ("mismatch", X_X ("Mismatch", "password mismatch"))
+                ))
+         );
+      end if;
+
+      Scripts.Set_Translations ("password-strength-meter");
+
+      Scripts.Add ("application-passwords", "/wp-admin/js/application-passwordssuffix.js", To_List (List => (+"jquery", +"wp-util", +"wp-api-request", +"wp-date", +"wp-i18n", +"wp-hooks")), False, 1);
+      Scripts.Set_Translations ("application-passwords");
+
+      Scripts.Add ("auth-app", "/wp-admin/js/auth-appsuffix.js", To_List (List => (+"jquery", +"wp-api-request", +"wp-i18n", +"wp-hooks")), False, 1);
+      Scripts.Set_Translations ("auth-app");
+
+      Scripts.Add ("user-profile", "/wp-admin/js/user-profilesuffix.js", To_List (List => (+"jquery", +"password-strength-meter", +"wp-util")), False, 1);
+      Scripts.Set_Translations ("user-profile");
+
+      declare
+         User_Id : constant Integer :=
+           (if Isset (XX_GET, "user_id") then Get_Integer (XX_GET, "user_id") else 0);
+      begin
+         if Did_Action ("init") then
+            Scripts.Localize (
+                "user-profile",
+                "userProfileL10n",
+                To_Array ((
+                        Build ("user_id", User_Id),
+                        Build ("nonce",   (if Wp_Installing then ""
+                                           else Inc_Pluggables.Wp_Create_Nonce ("reset-password-for-" & User_Id'Image)))
+                ))
+            );
+         end if;
+      end;
+
+      Scripts.Add ("language-chooser", "/wp-admin/js/language-choosersuffix.js", To_List ("jquery"), False, 1);
+
+      Scripts.Add ("user-suggest", "/wp-admin/js/user-suggestsuffix.js", To_List ("jquery-ui-autocomplete"), False, 1);
+
+      Scripts.Add ("admin-bar", "/wp-includes/js/admin-barsuffix.js", To_List ("hoverintent-js"), False, 1);
+
+      Scripts.Add ("wplink", "/wp-includes/js/wplinksuffix.js", To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "wplink",
+                "wpLinkL10n",
+                To_Array ((
+                        Build ("title",          abs "Insert/edit link"),
+                        Build ("update",         abs "Update"),
+                        Build ("save",           abs "Add Link"),
+                        Build ("noTitle",        abs "(no title)"),
+                        Build ("noMatchesFound", abs "No results found."),
+                        Build ("linkSelected",   abs "Link selected."),
+                        Build ("linkInserted",   abs "Link inserted."),
+                        -- translators: Minimum input length in characters to start searching posts in the "Insert/edit link" modal.
+                        Build ("minInputLength", Integer'Value (X_X ("3", "minimum input length for searching post links")))
+                ))
+         );
+      end if;
+
+      Scripts.Add ("wpdialogs", "/wp-includes/js/wpdialogsuffix.js", To_List ("jquery-ui-dialog"), False, 1);
+
+      Scripts.Add ("word-count", "/wp-admin/js/word-countsuffix.js", Empty_List, False, 1);
+
+      Scripts.Add ("media-upload", "/wp-admin/js/media-uploadsuffix.js", To_List (List => (+"thickbox", +"shortcode")), False, 1);
+
+      Scripts.Add ("hoverIntent", "/wp-includes/js/hoverIntentsuffix.js", To_List ("jquery"), "1.10.2", 1);
+
+      -- JS-only version of hoverintent (no dependencies).
+      Scripts.Add ("hoverintent-js", "/wp-includes/js/hoverintent-js.min.js", Empty_List, "2.2.1", 1);
+
+      Scripts.Add ("customize-base", "/wp-includes/js/customize-basesuffix.js", To_List (List => (+"jquery", +"json2", +"underscore")), False, 1);
+      Scripts.Add ("customize-loader", "/wp-includes/js/customize-loadersuffix.js", To_List ("customize-base"), False, 1);
+      Scripts.Add ("customize-preview", "/wp-includes/js/customize-previewsuffix.js", To_List (List => (+"wp-a11y", +"customize-base")), False, 1);
+      Scripts.Add ("customize-models", "/wp-includes/js/customize-models.js", To_List (List => (+"underscore", +"backbone")), False, 1);
+      Scripts.Add ("customize-views", "/wp-includes/js/customize-views.js", To_List (List => (+"jquery", +"underscore", +"imgareaselect", +"customize-models", +"media-editor", +"media-views")), False, 1);
+      Scripts.Add ("customize-controls", "/wp-admin/js/customize-controlssuffix.js", To_List (List => (+"customize-base", +"wp-a11y", +"wp-util", +"jquery-ui-core")), False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "customize-controls",
+                "_wpCustomizeControlsL10n",
+                To_Array ((
+                        Build ("activate",                abs "Activate &amp; Publish"),
+                        Build ("save",                    abs "Save &amp; Publish"), -- @todo Remove as not required.
+                        Build ("publish",                 abs "Publish"),
+                        Build ("published",               abs "Published"),
+                        Build ("saveDraft",               abs "Save Draft"),
+                        Build ("draftSaved",              abs "Draft Saved"),
+                        Build ("updating",                abs "Updating"),
+                        Build ("schedule",                X_X ("Schedule", "customizer changeset action/button label")),
+                        Build ("scheduled",               X_X ("Scheduled", "customizer changeset status")),
+                        Build ("invalid",                 abs "Invalid"),
+                        Build ("saveBeforeShare",         abs "Please save your changes in order to share the preview."),
+                        Build ("futureDateError",         abs "You must supply a future date to schedule."),
+                        Build ("saveAlert",               abs "The changes you made will be lost if you navigate away from this page."),
+                        Build ("saved",                   abs "Saved"),
+                        Build ("cancel",                  abs "Cancel"),
+                        Build ("close",                   abs "Close"),
+                        Build ("action",                  abs "Action"),
+                        Build ("discardChanges",          abs "Discard changes"),
+                        Build ("cheatin",                 abs "Something went wrong."),
+                        Build ("notAllowedHeading",       abs "You need a higher level of permission."),
+                        Build ("notAllowed",              abs "Sorry, you are not allowed to customize this site."),
+                        Build ("previewIframeTitle",      abs "Site Preview"),
+                        Build ("loginIframeTitle",        abs "Session expired"),
+                        Build ("collapseSidebar",         X_X ("Hide Controls", "label for hide controls button without length constraints")),
+                        Build ("expandSidebar",           X_X ("Show Controls", "label for hide controls button without length constraints")),
+                        Build ("untitledBlogName",        abs "(Untitled)"),
+                        Build ("unknownRequestFail",      abs "Looks like something&#8217;s gone wrong. Wait a couple seconds, and then try again."),
+                        Build ("themeDownloading",        abs "Downloading your new theme&hellip;"),
+                        Build ("themePreviewWait",        abs "Setting up your live preview. This may take a bit."),
+                        Build ("revertingChanges",        abs "Reverting unpublished changes&hellip;"),
+                        Build ("trashConfirm",            abs "Are you sure you want to discard your unpublished changes?"),
+                        -- translators: %s: Display name of the user who has taken over the changeset in customizer.
+                        Build ("takenOverMessage",        abs "%s has taken over and is currently customizing."),
+                        -- translators: %s: URL to the Customizer to load the autosaved version.
+                        Build ("autosaveNotice",          abs "There is a more recent autosave of your changes than the one you are previewing. <a href=""%s"">Restore the autosave</a>"),
+                        Build ("videoHeaderNotice",       abs "This theme does not support video headers on this page. Navigate to the front page or another page that supports video headers."),
+                        -- Used for overriding the file types allowed in Plupload.
+                        Build ("allowedFiles",            abs "Allowed Files"),
+                        Build ("customCssError",          To_Array ((
+                                -- translators: %d: Error count.
+                                Build ("singular", X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 1)),
+                                -- translators: %d: Error count.
+                                Build ("plural",   X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 2))
+                                -- @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
+                       ))),
+                        Build ("pageOnFrontError",        abs "Homepage and posts page must be different."),
+                        Build ("saveBlockedError",        To_Array ((
+                                -- translators: %s: Number of invalid settings.
+                                Build ("singular", X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 1)),
+                                -- translators: %s: Number of invalid settings.
+                                Build ("plural",   X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 2))
+                                -- @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
+                        ))),
+                        Build ("scheduleDescription",     abs "Schedule your customization changes to publish ('go live') at a future date."),
+                        Build ("themePreviewUnavailable", abs "Sorry, you cannot preview new themes when you have changes scheduled or saved as a draft. Please publish your changes, or wait until they publish to preview new themes."),
+                        Build ("themeInstallUnavailable", Php.Sprintf (
+                                -- translators: %s: URL to Add Themes admin screen.
+                                abs "You will not be able to install new themes from here yet since your install requires SFTP credentials. For now, please <a href=""%s"">add themes in the admin</a>.",
+                                ESC_URL (Admin_URL ("theme-install.php")))
+                        ),
+                        Build ("publishSettings",         abs "Publish Settings"),
+                        Build ("invalidDate",             abs "Invalid date."),
+                        Build ("invalidValue",            abs "Invalid value."),
+                        Build ("blockThemeNotification", Php.Sprintf (
+                                -- translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
+                                abs "Hurray! Your theme supports site editing with blocks. <a href=""%1s"">Tell me more</a>. %2s",
+                                abs "https://wordpress.org/support/article/site-editor/",
+                                Php.Sprintf (
+                                        "<button type=""button"" data-action=""%1s"" class=""button switch-to-editor"">%2s</button>",
+                                        ESC_URL (Admin_URL ("site-editor.php")),
+                                        abs "Use Site Editor"
+                                )
+                       ))
+                ))
+         );
+      end if;
+
+      Scripts.Add ("customize-selective-refresh", "/wp-includes/js/customize-selective-refreshsuffix.js",
+                   To_List (List => (+"jquery", +"wp-util", +"customize-preview")), False, 1);
+
+      Scripts.Add ("customize-widgets", "/wp-admin/js/customize-widgetssuffix.js",
+                   To_List (List => (+"jquery", +"jquery-ui-sortable", +"jquery-ui-droppable", +"wp-backbone", +"customize-controls")), False, 1);
+      Scripts.Add ("customize-preview-widgets", "/wp-includes/js/customize-preview-widgetssuffix.js",
+                   To_List (List => (+"jquery", +"wp-util", +"customize-preview", +"customize-selective-refresh")), False, 1);
+
+      Scripts.Add ("customize-nav-menus", "/wp-admin/js/customize-nav-menussuffix.js",
+                   To_List (List => (+"jquery", +"wp-backbone", +"customize-controls", +"accordion", +"nav-menu", +"wp-sanitize")), False, 1);
+      Scripts.Add ("customize-preview-nav-menus", "/wp-includes/js/customize-preview-nav-menussuffix.js",
+                   To_List (List => (+"jquery", +"wp-util", +"customize-preview", +"customize-selective-refresh")), False, 1);
+
+      Scripts.Add ("wp-custom-header", "/wp-includes/js/wp-custom-headersuffix.js", To_List ("wp-a11y"), False, 1);
+
+      Scripts.Add ("accordion", "/wp-admin/js/accordionsuffix.js", To_List ("jquery"), False, 1);
+
+      Scripts.Add ("shortcode", "/wp-includes/js/shortcodesuffix.js", To_List ("underscore"), False, 1);
+      Scripts.Add ("media-models", "/wp-includes/js/media-modelssuffix.js", To_List ("wp-backbone"), False, 1);
+      if Did_Action ("init") then
+         Scripts.Localize (
+                "media-models",
+                "_wpMediaModelsL10n",
+                To_Array ((1 =>
+                        Build ("settings", To_Array ((
+                                Build ("ajaxurl", Admin_URL ("admin-ajax.php", "relative")),
+                                Build ("post",    To_Array ((1 => Build ("id", 0))))
+                       )))
+                ))
+         );
+      end if;
+      Scripts.Add ("wp-embed", "/wp-includes/js/wp-embedsuffix.js", Empty_List, False, 1);
+
+      -- To enqueue media-views or media-editor, call wp_enqueue_media().
+      -- Both rely on numerous settings, styles, and templates to operate correctly.
+      Scripts.Add ("media-views", "/wp-includes/js/media-viewssuffix.js",
+                   To_List (List => (+"utils", +"media-models", +"wp-plupload", +"jquery-ui-sortable", +"wp-mediaelement", +"wp-api-request", +"wp-a11y", +"clipboard")), False, 1);
+      Scripts.Set_Translations ("media-views");
+
+      Scripts.Add ("media-editor", "/wp-includes/js/media-editorsuffix.js", To_List (List => (+"shortcode", +"media-views")), False, 1);
+      Scripts.Set_Translations ("media-editor");
+      Scripts.Add ("media-audiovideo", "/wp-includes/js/media-audiovideosuffix.js", To_List ("media-editor"), False, 1);
+      Scripts.Add ("mce-view", "/wp-includes/js/mce-viewsuffix.js", To_List (List => (+"shortcode", +"jquery", +"media-views", +"media-audiovideo")), False, 1);
+
+      Scripts.Add ("wp-api", "/wp-includes/js/wp-apisuffix.js", To_List (List => (+"jquery", +"backbone", +"underscore", +"wp-api-request")), False, 1);
+
+      if Is_Admin then
+         Scripts.Add ("admin-tags", "/wp-admin/js/tagssuffix.js", To_List (List => (+"jquery", +"wp-ajax-response")), False, 1);
+         Scripts.Set_Translations ("admin-tags");
+
+         Scripts.Add ("admin-comments", "/wp-admin/js/edit-commentssuffix.js", To_List (List => (+"wp-lists", +"quicktags", +"jquery-query")), False, 1);
+         Scripts.Set_Translations ("admin-comments");
+         if Did_Action ("init") then
+            Scripts.Localize (
+                        "admin-comments",
+                        "adminCommentsSettings",
+                        To_Array ((
+                                Build ("hotkeys_highlight_first", Isset (XX_GET, "hotkeys_highlight_first")),
+                                Build ("hotkeys_highlight_last",  Isset (XX_GET, "hotkeys_highlight_last"))
+                        ))
+            );
+         end if;
+
+         Scripts.Add ("xfn", "/wp-admin/js/xfnsuffix.js", To_List ("jquery"), False, 1);
+
+         Scripts.Add ("postbox", "/wp-admin/js/postboxsuffix.js", To_List (List => (+"jquery-ui-sortable", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("postbox");
+
+         Scripts.Add ("tags-box", "/wp-admin/js/tags-boxsuffix.js", To_List (List => (+"jquery", +"tags-suggest")), False, 1);
+         Scripts.Set_Translations ("tags-box");
+
+         Scripts.Add ("tags-suggest", "/wp-admin/js/tags-suggestsuffix.js", To_List (List => (+"jquery-ui-autocomplete", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("tags-suggest");
+
+         Scripts.Add ("post", "/wp-admin/js/postsuffix.js", To_List (List => (+"suggest", +"wp-lists", +"postbox", +"tags-box", +"underscore", +"word-count", +"wp-a11y", +"wp-sanitize", +"clipboard")), False, 1);
+         Scripts.Set_Translations ("post");
+
+         Scripts.Add ("editor-expand", "/wp-admin/js/editor-expandsuffix.js", To_List (List => (+"jquery", +"underscore")), False, 1);
+
+         Scripts.Add ("link", "/wp-admin/js/linksuffix.js", To_List (List => (+"wp-lists", +"postbox")), False, 1);
+
+         Scripts.Add ("comment", "/wp-admin/js/commentsuffix.js", To_List (List => (+"jquery", +"postbox")), False, 1);
+         Scripts.Set_Translations ("comment");
+
+         Scripts.Add ("admin-gallery", "/wp-admin/js/gallerysuffix.js", To_List ("jquery-ui-sortable"));
+
+         Scripts.Add ("admin-widgets", "/wp-admin/js/widgetssuffix.js", To_List (List => (+"jquery-ui-sortable", +"jquery-ui-draggable", +"jquery-ui-droppable", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("admin-widgets");
+
+         Scripts.Add ("media-widgets", "/wp-admin/js/widgets/media-widgetssuffix.js", To_List (List => (+"jquery", +"media-models", +"media-views", +"wp-api-request")));
+         Scripts.Add_Inline_Script ("media-widgets", "wp.mediaWidgets.init();", "after");
+
+         Scripts.Add ("media-audio-widget", "/wp-admin/js/widgets/media-audio-widgetsuffix.js", To_List (List => (+"media-widgets", +"media-audiovideo")));
+         Scripts.Add ("media-image-widget", "/wp-admin/js/widgets/media-image-widgetsuffix.js", To_List ("media-widgets"));
+         Scripts.Add ("media-gallery-widget", "/wp-admin/js/widgets/media-gallery-widgetsuffix.js", To_List ("media-widgets"));
+         Scripts.Add ("media-video-widget", "/wp-admin/js/widgets/media-video-widgetsuffix.js", To_List (List => (+"media-widgets", +"media-audiovideo", +"wp-api-request")));
+         Scripts.Add ("text-widgets", "/wp-admin/js/widgets/text-widgetssuffix.js", To_List (List => (+"jquery", +"backbone", +"editor", +"wp-util", +"wp-a11y")));
+         Scripts.Add ("custom-html-widgets", "/wp-admin/js/widgets/custom-html-widgetssuffix.js", To_List (List => (+"jquery", +"backbone", +"wp-util", +"jquery-ui-core", +"wp-a11y")));
+
+         Scripts.Add ("theme", "/wp-admin/js/themesuffix.js", To_List (List => (+"wp-backbone", +"wp-a11y", +"customize-base")), False, 1);
+
+         Scripts.Add ("inline-edit-post", "/wp-admin/js/inline-edit-postsuffix.js", To_List (List => (+"jquery", +"tags-suggest", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("inline-edit-post");
+
+         Scripts.Add ("inline-edit-tax", "/wp-admin/js/inline-edit-taxsuffix.js", To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("inline-edit-tax");
+
+         Scripts.Add ("plugin-install", "/wp-admin/js/plugin-installsuffix.js", To_List (List => (+"jquery", +"jquery-ui-core", +"thickbox")), False, 1);
+         Scripts.Set_Translations ("plugin-install");
+
+         Scripts.Add ("site-health", "/wp-admin/js/site-healthsuffix.js", To_List (List => (+"clipboard", +"jquery", +"wp-util", +"wp-a11y", +"wp-api-request", +"wp-url", +"wp-i18n", +"wp-hooks")), False, 1);
+         Scripts.Set_Translations ("site-health");
+
+         Scripts.Add ("privacy-tools", "/wp-admin/js/privacy-toolssuffix.js", To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("privacy-tools");
+
+         Scripts.Add ("updates", "/wp-admin/js/updatessuffix.js", To_List (List => (+"common", +"jquery", +"wp-util", +"wp-a11y", +"wp-sanitize", +"wp-i18n")), False, 1);
+         Scripts.Set_Translations ("updates");
+         if Did_Action ("init") then
+            Scripts.Localize (
+                        "updates",
+                        "_wpUpdatesSettings",
+                        To_Array ((1 =>
+                                Build ("ajax_nonce", (if Wp_Installing then "" else Inc_Pluggables.Wp_Create_Nonce ("updates")))
+                        ))
+            );
+         end if;
+
+         Scripts.Add ("farbtastic", "/wp-admin/js/farbtastic.js", To_List ("jquery"), "1.2");
+
+         Scripts.Add ("iris", "/wp-admin/js/iris.min.js", To_List (List => (+"jquery-ui-draggable", +"jquery-ui-slider", +"jquery-touch-punch")), "1.1.1", 1);
+         Scripts.Add ("wp-color-picker", "/wp-admin/js/color-pickersuffix.js", To_List ("iris"), False, 1);
+         Scripts.Set_Translations ("wp-color-picker");
+
+         Scripts.Add ("dashboard", "/wp-admin/js/dashboardsuffix.js", To_List (List => (+"jquery", +"admin-comments", +"postbox", +"wp-util", +"wp-a11y", +"wp-date")), False, 1);
+         Scripts.Set_Translations ("dashboard");
+
+         Scripts.Add ("list-revisions", "/wp-includes/js/wp-list-revisionssuffix.js");
+
+         Scripts.Add ("media-grid", "/wp-includes/js/media-gridsuffix.js", To_List ("media-editor"), False, 1);
+         Scripts.Add ("media", "/wp-admin/js/mediasuffix.js", To_List (List => (+"jquery", +"clipboard", +"wp-i18n", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("media");
+
+         Scripts.Add ("image-edit", "/wp-admin/js/image-editsuffix.js", To_List (List => (+"jquery", +"jquery-ui-core", +"json2", +"imgareaselect", +"wp-a11y")), False, 1);
+         Scripts.Set_Translations ("image-edit");
+
+         Scripts.Add ("set-post-thumbnail", "/wp-admin/js/set-post-thumbnailsuffix.js", To_List ("jquery"), False, 1);
+         Scripts.Set_Translations ("set-post-thumbnail");
+
+         --
+         -- Navigation Menus: Adding underscore as a dependency to utilize _.debounce
+         -- see https://core.trac.wordpress.org/ticket/42321
+         --
+         Scripts.Add ("nav-menu", "/wp-admin/js/nav-menusuffix.js", To_List (List => (+"jquery-ui-sortable", +"jquery-ui-draggable", +"jquery-ui-droppable", +"wp-lists", +"postbox", +"json2", +"underscore")));
+         Scripts.Set_Translations ("nav-menu");
+
+         Scripts.Add ("custom-header", "/wp-admin/js/custom-header.js", To_List ("jquery-masonry"), False, 1);
+         Scripts.Add ("custom-background", "/wp-admin/js/custom-backgroundsuffix.js", To_List (List => (+"wp-color-picker", +"media-views")), False, 1);
+         Scripts.Add ("media-gallery", "/wp-admin/js/media-gallerysuffix.js", To_List ("jquery"), False, 1);
+
+         Scripts.Add ("svg-painter", "/wp-admin/js/svg-painter.js", To_List ("jquery"), False, 1);
+      end if;
+   end Wp_Default_Scripts;
 
    Editor_Styles : Array_Type;
 
@@ -1510,7 +1633,7 @@ is
       -- require ABSPATH . WPINC . "/version.php";
 
       -- if ( ! defined( "SCRIPT_DEBUG" ) ) then
-      --         define( "SCRIPT_DEBUG", false !== strpos( wp_version, "-src" ) );
+      --         define( "SCRIPT_DEBUG", False !== strpos( wp_version, "-src" ));
       -- end;
 
       GuessURL := +Site_URL; -- ();
@@ -1586,7 +1709,7 @@ is
       Styles.Add ("code-editor", "/wp-admin/css/code-editorsuffix.css", To_List ("wp-codemirror"));
       Styles.Add ("site-health", "/wp-admin/css/site-healthsuffix.css");
 
-      Styles.Add ("wp-admin", "false", -- False
+      Styles.Add ("wp-admin", "False", -- False
                   To_List (List => (+"dashicons", +"common",
                                                        +"forms", +"admin-menu",
                                                        +"dashboard", +"list-tables",
@@ -1629,7 +1752,7 @@ is
       Styles.Add ("deprecated-media", "/wp-admin/css/deprecated-mediasuffix.css");
       Styles.Add ("farbtastic", "/wp-admin/css/farbtasticsuffix.css", Empty_List, "1.3u1");
       Styles.Add ("jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.css", Empty_List, "0.9.15");
-      Styles.Add ("colors-fresh", "false", -- False
+      Styles.Add ("colors-fresh", "False", -- False
                   To_List (List => (+"wp-admin", +"buttons"))); -- Old handle.
       Styles.Add ("open-sans", -Open_Sans_Font_URL); -- No longer used in core as of 4.6.
 
@@ -1662,13 +1785,13 @@ is
                 "wp-reset-editor-styles",
                 "/wp-includes/css/dist/block-library/resetsuffix.css",
                 To_List (List => (+"common", +"forms")) -- Make sure the reset is loaded after the default WP Admin styles.
-      );
+     );
 
       Styles.Add (
                 "wp-editor-classic-layout-styles",
                 "/wp-includes/css/dist/edit-post/classicsuffix.css",
                 Empty_List -- Array
-      );
+     );
 
       declare
          Wp_Edit_Blocks_Dependencies : List_Type := To_List (List => (
@@ -1700,7 +1823,7 @@ is
                 "wp-edit-blocks",
                 "/wp-includes/css/dist/block-library/editorsuffix.css",
                 Wp_Edit_Blocks_Dependencies
-         );
+        );
       end;
 
       declare
@@ -1836,7 +1959,7 @@ is
                 -- Deprecated CSS.
                 +"deprecated-media",
                 +"farbtastic")
-         );
+        );
       begin
 
          for RTL_Style of RTL_Styles loop
@@ -1858,15 +1981,15 @@ is
 -- -- @return string[] Reordered array, if needed.
 -- --
 -- function wp_prototype_before_jquery( js_array ) then
---         prototype = array_search( "prototype", js_array, true );
+--         prototype = array_search( "prototype", js_array, true);
 
---         if ( false === prototype ) then
+--         if ( False === prototype ) then
 --                 return js_array;
 --         end;
 
---         jquery = array_search( "jquery", js_array, true );
+--         jquery = array_search( "jquery", js_array, true);
 
---         if ( false === jquery ) then
+--         if ( False === jquery ) then
 --                 return js_array;
 --         end;
 
@@ -1874,9 +1997,9 @@ is
 --                 return js_array;
 --         end;
 
---         unset( js_array[ prototype ] );
+--         unset( js_array[ prototype ]);
 
---         array_splice( js_array, jquery, 0, "prototype" );
+--         array_splice( js_array, jquery, 0, "prototype");
 
 --         return js_array;
 -- end;
@@ -1897,7 +2020,7 @@ is
 --                         "autosaveInterval" => AUTOSAVE_INTERVAL,
 --                         "blog_id"          => get_current_blog_id(),
 --                 )
---         );
+--        );
 
 --         wp_localize_script(
 --                 "mce-view",
@@ -1905,7 +2028,7 @@ is
 --                 array(
 --                         "shortcodes" => ! empty( GLOBALS["shortcode_tags"] ) ? array_keys( GLOBALS["shortcode_tags"] ) : array(),
 --                 )
---         );
+--        );
 
 --         wp_localize_script(
 --                 "word-count",
@@ -1916,10 +2039,10 @@ is
 --                         -- enter "characters_excluding_spaces" or "characters_including_spaces". Otherwise, enter "words".
 --                         -- Do not translate into your own language.
 --                         --
---                         "type"       => _x( "words", "Word count type. Do not translate!" ),
+--                         "type"       => _x( "words", "Word count type. Do not translate!"),
 --                         "shortcodes" => ! empty( GLOBALS["shortcode_tags"] ) ? array_keys( GLOBALS["shortcode_tags"] ) : array(),
 --                 )
---         );
+--        );
 -- end;
 
 -- --
@@ -1951,7 +2074,7 @@ is
 --                         "m", -- Month.
 --                         "Y",
 --                         "y", -- Year.
---                 ),
+--                ),
 --                 array(
 --                         "dd",
 --                         "d",
@@ -1963,28 +2086,28 @@ is
 --                         "mm",
 --                         "yy",
 --                         "y",
---                 ),
+--                ),
 --                 get_option( "date_format" )
---         );
+--        );
 
 --         datepicker_defaults = wp_json_encode(
 --                 array(
---                         "closeText"       => __( "Close" ),
---                         "currentText"     => __( "Today" ),
---                         "monthNames"      => array_values( wp_locale->month ),
---                         "monthNamesShort" => array_values( wp_locale->month_abbrev ),
---                         "nextText"        => __( "Next" ),
---                         "prevText"        => __( "Previous" ),
---                         "dayNames"        => array_values( wp_locale->weekday ),
---                         "dayNamesShort"   => array_values( wp_locale->weekday_abbrev ),
---                         "dayNamesMin"     => array_values( wp_locale->weekday_initial ),
+--                         "closeText"       => abs "Close"),
+--                         "currentText"     => abs "Today"),
+--                         "monthNames"      => array_values( wp_locale.month),
+--                         "monthNamesShort" => array_values( wp_locale.month_abbrev),
+--                         "nextText"        => abs "Next"),
+--                         "prevText"        => abs "Previous"),
+--                         "dayNames"        => array_values( wp_locale.weekday),
+--                         "dayNamesShort"   => array_values( wp_locale.weekday_abbrev),
+--                         "dayNamesMin"     => array_values( wp_locale.weekday_initial),
 --                         "dateFormat"      => datepicker_date_format,
---                         "firstDay"        => absint( get_option( "start_of_week" ) ),
---                         "isRTL"           => wp_locale->is_rtl(),
+--                         "firstDay"        => absint( get_option( "start_of_week" )),
+--                         "isRTL"           => wp_locale.is_rtl(),
 --                 )
---         );
+--        );
 
---         wp_add_inline_script( "jquery-ui-datepicker", "jQuery(function(jQuery)thenjQuery.datepicker.setDefaults(thendatepicker_defaultsend;);end;);" );
+--         wp_add_inline_script( "jquery-ui-datepicker", "jQuery(function(jQuery)thenjQuery.datepicker.setDefaults(thendatepicker_defaultsend;);end;);");
 -- end;
 
 -- --
@@ -2000,8 +2123,8 @@ is
 --         require_once ABSPATH . "wp-admin/includes/class-wp-community-events.php";
 
 --         user_id            = get_current_user_id();
---         saved_location     = get_user_option( "community-events-location", user_id );
---         saved_ip_address   = isset( saved_location["ip"] ) ? saved_location["ip"] : false;
+--         saved_location     = get_user_option( "community-events-location", user_id);
+--         saved_ip_address   = isset( saved_location["ip"] ) ? saved_location["ip"] : False;
 --         current_ip_address = WP_Community_Events::get_unsafe_client_ip();
 
 --         /*
@@ -2013,20 +2136,20 @@ is
 --         --
 --         if ( saved_ip_address && current_ip_address && current_ip_address !== saved_ip_address ) then
 --                 saved_location["ip"] = current_ip_address;
---                 update_user_meta( user_id, "community-events-location", saved_location );
+--                 update_user_meta( user_id, "community-events-location", saved_location);
 --         end;
 
---         events_client = new WP_Community_Events( user_id, saved_location );
+--         events_client = new WP_Community_Events( user_id, saved_location);
 
 --         wp_localize_script(
 --                 "dashboard",
 --                 "communityEventsData",
 --                 array(
---                         "nonce"       => wp_create_nonce( "community_events" ),
---                         "cache"       => events_client->get_cached_events(),
---                         "time_format" => get_option( "time_format" ),
+--                         "nonce"       => wp_create_nonce( "community_events"),
+--                         "cache"       => events_client.get_cached_events(),
+--                         "time_format" => get_option( "time_format"),
 --                 )
---         );
+--        );
 -- end;
 
 -- --
@@ -2048,33 +2171,33 @@ is
 -- --
 -- -- @param string src    Source URL.
 -- -- @param string handle Either "colors" or "colors-rtl".
--- -- @return string|false URL path to CSS stylesheet for Administration Screens.
+-- -- @return string|False URL path to CSS stylesheet for Administration Screens.
 -- --
 -- function wp_style_loader_src( src, handle ) then
 --         global _wp_admin_css_colors;
 
 --         if ( wp_installing() ) then
---                 return preg_replace( "#^wp-admin/#", "./", src );
+--                 return preg_replace( "#^wp-admin/#", "./", src);
 --         end;
 
 --         if ( "colors" === handle ) then
---                 color = get_user_option( "admin_color" );
+--                 color = get_user_option( "admin_color");
 
 --                 if ( empty( color ) || ! isset( _wp_admin_css_colors[ color ] ) ) then
 --                         color = "fresh";
 --                 end;
 
 --                 color = _wp_admin_css_colors[ color ];
---                 url   = color->url;
+--                 url   = color.url;
 
 --                 if ( ! url ) then
---                         return false;
+--                         return False;
 --                 end;
 
---                 parsed = parse_url( src );
+--                 parsed = parse_url( src);
 --                 if ( isset( parsed["query"] ) && parsed["query"] ) then
---                         wp_parse_str( parsed["query"], qv );
---                         url = add_query_arg( qv, url );
+--                         wp_parse_str( parsed["query"], qv);
+--                         url = add_query_arg( qv, url);
 --                 end;
 
 --                 return url;
@@ -2102,14 +2225,14 @@ is
 
 --         if ( ! did_action( "wp_print_scripts" ) ) then
 --                 -- This action is documented in wp-includes/functions.wp-scripts.php--
---                 do_action( "wp_print_scripts" );
+--                 do_action( "wp_print_scripts");
 --         end;
 
 --         wp_scripts = wp_scripts();
 
 --         script_concat_settings();
---         wp_scripts->do_concat = concatenate_scripts;
---         wp_scripts->do_head_items();
+--         wp_scripts.do_concat = concatenate_scripts;
+--         wp_scripts.do_head_items();
 
 --         --
 --         -- Filters whether to print the head scripts.
@@ -2122,8 +2245,8 @@ is
 --                 _print_scripts();
 --         end;
 
---         wp_scripts->reset();
---         return wp_scripts->done;
+--         wp_scripts.reset();
+--         return wp_scripts.done;
 -- end;
 
 -- --
@@ -2143,8 +2266,8 @@ is
 --                 return array(); -- No need to run if not instantiated.
 --         end;
 --         script_concat_settings();
---         wp_scripts->do_concat = concatenate_scripts;
---         wp_scripts->do_footer_items();
+--         wp_scripts.do_concat = concatenate_scripts;
+--         wp_scripts.do_footer_items();
 
 --         --
 --         -- Filters whether to print the footer scripts.
@@ -2157,8 +2280,8 @@ is
 --                 _print_scripts();
 --         end;
 
---         wp_scripts->reset();
---         return wp_scripts->done;
+--         wp_scripts.reset();
+--         return wp_scripts.done;
 -- end;
 
 -- --
@@ -2177,31 +2300,31 @@ is
 --                 zip = "gzip";
 --         end;
 
---         concat    = trim( wp_scripts->concat, ", " );
+--         concat    = trim( wp_scripts.concat, ", ");
 --         type_attr = current_theme_supports( "html5", "script" ) ? "" : " type="text/javascript"";
 
 --         if ( concat ) then
---                 if ( ! empty( wp_scripts->print_code ) ) then
+--                 if ( ! empty( wp_scripts.print_code ) ) then
 --                         echo "\n<scriptthentype_attrend;>\n";
 --                         echo "/* <![CDATA[--\n"; -- Not needed in HTML 5.
---                         echo wp_scripts->print_code;
+--                         echo wp_scripts.print_code;
 --                         echo "/* ]]>--\n";
 --                         echo "</script>\n";
 --                 end;
 
---                 concat       = str_split( concat, 128 );
+--                 concat       = str_split( concat, 128);
 --                 concatenated = "";
 
 --                 foreach ( concat as key => chunk ) then
 --                         concatenated .= "&load%5Bchunk_thenkeyend;%5D=thenchunkend;";
 --                 end;
 
---                 src = wp_scripts->base_url . "/wp-admin/load-scripts.php?c=thenzipend;" . concatenated . "&ver=" . wp_scripts->default_version;
+--                 src = wp_scripts.base_url . "/wp-admin/load-scripts.php?c=thenzipend;" . concatenated . "&ver=" . wp_scripts.default_version;
 --                 echo "<scriptthentype_attrend; src="" . esc_attr( src ) . ""></script>\n";
 --         end;
 
---         if ( ! empty( wp_scripts->print_html ) ) then
---                 echo wp_scripts->print_html;
+--         if ( ! empty( wp_scripts.print_html ) ) then
+--                 echo wp_scripts.print_html;
 --         end;
 -- end;
 
@@ -2222,7 +2345,7 @@ is
 
 --         if ( ! did_action( "wp_print_scripts" ) ) then
 --                 -- This action is documented in wp-includes/functions.wp-scripts.php--
---                 do_action( "wp_print_scripts" );
+--                 do_action( "wp_print_scripts");
 --         end;
 
 --         if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
@@ -2253,7 +2376,7 @@ is
 --         --
 --         -- @since 2.8.0
 --         --
---         do_action( "wp_print_footer_scripts" );
+--         do_action( "wp_print_footer_scripts");
 -- end;
 
 -- --
@@ -2270,7 +2393,7 @@ is
 --         --
 --         -- @since 2.8.0
 --         --
---         do_action( "wp_enqueue_scripts" );
+--         do_action( "wp_enqueue_scripts");
 -- end;
 
 -- --
@@ -2288,8 +2411,8 @@ is
 --         wp_styles = wp_styles();
 
 --         script_concat_settings();
---         wp_styles->do_concat = concatenate_scripts;
---         wp_styles->do_items( false );
+--         wp_styles.do_concat = concatenate_scripts;
+--         wp_styles.do_items( False);
 
 --         --
 --         -- Filters whether to print the admin styles.
@@ -2302,8 +2425,8 @@ is
 --                 _print_styles();
 --         end;
 
---         wp_styles->reset();
---         return wp_styles->done;
+--         wp_styles.reset();
+--         return wp_styles.done;
 -- end;
 
 -- --
@@ -2324,8 +2447,8 @@ is
 --         end;
 
 --         script_concat_settings();
---         wp_styles->do_concat = concatenate_scripts;
---         wp_styles->do_footer_items();
+--         wp_styles.do_concat = concatenate_scripts;
+--         wp_styles.do_footer_items();
 
 --         --
 --         -- Filters whether to print the styles queued too late for the HTML head.
@@ -2338,8 +2461,8 @@ is
 --                 _print_styles();
 --         end;
 
---         wp_styles->reset();
---         return wp_styles->done;
+--         wp_styles.reset();
+--         return wp_styles.done;
 -- end;
 
 -- --
@@ -2360,32 +2483,32 @@ is
 --                 zip = "gzip";
 --         end;
 
---         concat    = trim( wp_styles->concat, ", " );
+--         concat    = trim( wp_styles.concat, ", ");
 --         type_attr = current_theme_supports( "html5", "style" ) ? "" : " type="text/css"";
 
 --         if ( concat ) then
---                 dir = wp_styles->text_direction;
---                 ver = wp_styles->default_version;
+--                 dir = wp_styles.text_direction;
+--                 ver = wp_styles.default_version;
 
---                 concat       = str_split( concat, 128 );
+--                 concat       = str_split( concat, 128);
 --                 concatenated = "";
 
 --                 foreach ( concat as key => chunk ) then
 --                         concatenated .= "&load%5Bchunk_thenkeyend;%5D=thenchunkend;";
 --                 end;
 
---                 href = wp_styles->base_url . "/wp-admin/load-styles.php?c=thenzipend;&dir=thendirend;" . concatenated . "&ver=" . ver;
+--                 href = wp_styles.base_url . "/wp-admin/load-styles.php?c=thenzipend;&dir=thendirend;" . concatenated . "&ver=" . ver;
 --                 echo "<link rel="stylesheet" href="" . esc_attr( href ) . ""thentype_attrend; media="all" />\n";
 
---                 if ( ! empty( wp_styles->print_code ) ) then
+--                 if ( ! empty( wp_styles.print_code ) ) then
 --                         echo "<stylethentype_attrend;>\n";
---                         echo wp_styles->print_code;
+--                         echo wp_styles.print_code;
 --                         echo "\n</style>\n";
 --                 end;
 --         end;
 
---         if ( ! empty( wp_styles->print_html ) ) then
---                 echo wp_styles->print_html;
+--         if ( ! empty( wp_styles.print_html ) ) then
+--                 echo wp_styles.print_html;
 --         end;
 -- end;
 
@@ -2401,28 +2524,28 @@ is
 -- function script_concat_settings() then
 --         global concatenate_scripts, compress_scripts, compress_css;
 
---         compressed_output = ( ini_get( "zlib.output_compression" ) || "ob_gzhandler" === ini_get( "output_handler" ) );
+--         compressed_output = ( ini_get( "zlib.output_compression" ) || "ob_gzhandler" === ini_get( "output_handler" ));
 
---         can_compress_scripts = ! wp_installing() && get_site_option( "can_compress_scripts" );
+--         can_compress_scripts = ! wp_installing() && get_site_option( "can_compress_scripts");
 
 --         if ( ! isset( concatenate_scripts ) ) then
 --                 concatenate_scripts = defined( "CONCATENATE_SCRIPTS" ) ? CONCATENATE_SCRIPTS : true;
 --                 if ( ( ! is_admin() && ! did_action( "login_init" ) ) || ( defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG ) ) then
---                         concatenate_scripts = false;
+--                         concatenate_scripts = False;
 --                 end;
 --         end;
 
 --         if ( ! isset( compress_scripts ) ) then
 --                 compress_scripts = defined( "COMPRESS_SCRIPTS" ) ? COMPRESS_SCRIPTS : true;
 --                 if ( compress_scripts && ( ! can_compress_scripts || compressed_output ) ) then
---                         compress_scripts = false;
+--                         compress_scripts = False;
 --                 end;
 --         end;
 
 --         if ( ! isset( compress_css ) ) then
 --                 compress_css = defined( "COMPRESS_CSS" ) ? COMPRESS_CSS : true;
 --                 if ( compress_css && ( ! can_compress_scripts || compressed_output ) ) then
---                         compress_css = false;
+--                         compress_css = False;
 --                 end;
 --         end;
 -- end;
@@ -2438,21 +2561,21 @@ is
 --                 return;
 --         end;
 
---         wp_enqueue_style( "wp-block-library" );
+--         wp_enqueue_style( "wp-block-library");
 
 --         if ( current_theme_supports( "wp-block-styles" ) ) then
 --                 if ( wp_should_load_separate_core_block_assets() ) then
 --                         suffix = defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG ? "css" : "min.css";
---                         files  = glob( __DIR__ . "/blocks--theme.suffix" );
+--                         files  = glob( __DIR__ . "/blocks--theme.suffix");
 --                         foreach ( files as path ) then
---                                 block_name = basename( dirname( path ) );
+--                                 block_name = basename( dirname( path ));
 --                                 if ( is_rtl() && file_exists( __DIR__ . "/blocks/block_name/theme-rtl.suffix" ) ) then
 --                                         path = __DIR__ . "/blocks/block_name/theme-rtl.suffix";
 --                                 end;
---                                 wp_add_inline_style( "wp-block-thenblock_nameend;", file_get_contents( path ) );
+--                                 wp_add_inline_style( "wp-block-thenblock_nameend;", file_get_contents( path ));
 --                         end;
 --                 end; else then
---                         wp_enqueue_style( "wp-block-library-theme" );
+--                         wp_enqueue_style( "wp-block-library-theme");
 --                 end;
 --         end;
 
@@ -2466,7 +2589,7 @@ is
 --         --
 --         -- @since 5.0.0
 --         --
---         do_action( "enqueue_block_assets" );
+--         do_action( "enqueue_block_assets");
 -- end;
 
 -- --
@@ -2487,10 +2610,10 @@ is
 --         return array_filter(
 --                 nodes,
 --                 function( node ) then
---                         return ! in_array( "blocks", node["path"], true );
+--                         return ! in_array( "blocks", node["path"], true);
 --                 end;,
 --                 ARRAY_FILTER_USE_BOTH
---         );
+--        );
 -- end;
 
 -- --
@@ -2522,7 +2645,7 @@ is
 --         -- This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
 --         -- This filter must be registered before calling wp_get_global_stylesheet();
 --         --
---         add_filter( "wp_theme_json_get_style_nodes", "wp_filter_out_block_nodes" );
+--         add_filter( "wp_theme_json_get_style_nodes", "wp_filter_out_block_nodes");
 
 --         stylesheet = wp_get_global_stylesheet();
 
@@ -2530,9 +2653,9 @@ is
 --                 return;
 --         end;
 
---         wp_register_style( "global-styles", false, array(), true, true );
---         wp_add_inline_style( "global-styles", stylesheet );
---         wp_enqueue_style( "global-styles" );
+--         wp_register_style( "global-styles", False, array(), true, true);
+--         wp_add_inline_style( "global-styles", stylesheet);
+--         wp_enqueue_style( "global-styles");
 
 --         -- Add each block as an inline css.
 --         wp_add_global_styles_for_blocks();
@@ -2555,7 +2678,7 @@ is
 --         --
 --         if (
 --                 is_admin() &&
---                 ! get_current_screen()->is_block_editor()
+--                 ! get_current_screen().is_block_editor()
 --         ) then
 --                 return;
 --         end;
@@ -2579,7 +2702,7 @@ is
 -- function wp_should_load_block_editor_scripts_and_styles() then
 --         global current_screen;
 
---         is_block_editor_screen = ( current_screen instanceof WP_Screen ) && current_screen->is_block_editor();
+--         is_block_editor_screen = ( current_screen instanceof WP_Screen ) && current_screen.is_block_editor();
 
 --         --
 --         -- Filters the flag that decides whether or not block editor scripts and styles
@@ -2589,7 +2712,7 @@ is
 --         --
 --         -- @param bool is_block_editor_screen Current value of the flag.
 --         --
---         return apply_filters( "should_load_block_editor_scripts_and_styles", is_block_editor_screen );
+--         return apply_filters( "should_load_block_editor_scripts_and_styles", is_block_editor_screen);
 -- end;
 
 -- --
@@ -2599,7 +2722,7 @@ is
 -- -- only load their assets on-render, and each block loads its own, individual
 -- -- assets. Third-party blocks only load their assets when rendered.
 -- --
--- -- When this function returns false, all core block assets are loaded regardless
+-- -- When this function returns False, all core block assets are loaded regardless
 -- -- of whether they are rendered in a page or not, because they are all part of
 -- -- the `block-library/style.css` file. Assets for third-party blocks are always
 -- -- enqueued regardless of whether they are rendered or not.
@@ -2615,21 +2738,21 @@ is
 -- --
 -- function wp_should_load_separate_core_block_assets() then
 --         if ( is_admin() || is_feed() || ( defined( "REST_REQUEST" ) && REST_REQUEST ) ) then
---                 return false;
+--                 return False;
 --         end;
 
 --         --
 --         -- Filters whether block styles should be loaded separately.
 --         --
---         -- Returning false loads all core block assets, regardless of whether they are rendered
+--         -- Returning False loads all core block assets, regardless of whether they are rendered
 --         -- in a page or not. Returning true loads core block assets only when they are rendered.
 --         --
 --         -- @since 5.8.0
 --         --
 --         -- @param bool load_separate_assets Whether separate assets will be loaded.
---         --                                   Default false (all block assets are loaded, even when not used).
+--         --                                   Default False (all block assets are loaded, even when not used).
 --         --
---         return apply_filters( "should_load_separate_core_block_assets", false );
+--         return apply_filters( "should_load_separate_core_block_assets", False);
 -- end;
 
 -- --
@@ -2650,26 +2773,26 @@ is
 --         load_editor_scripts_and_styles = is_admin() && wp_should_load_block_editor_scripts_and_styles();
 
 --         block_registry = WP_Block_Type_Registry::get_instance();
---         foreach ( block_registry->get_all_registered() as block_name => block_type ) then
+--         foreach ( block_registry.get_all_registered() as block_name => block_type ) then
 --                 -- Front-end and editor styles.
---                 foreach ( block_type->style_handles as style_handle ) then
---                         wp_enqueue_style( style_handle );
+--                 foreach ( block_type.style_handles as style_handle ) then
+--                         wp_enqueue_style( style_handle);
 --                 end;
 
 --                 -- Front-end and editor scripts.
---                 foreach ( block_type->script_handles as script_handle ) then
---                         wp_enqueue_script( script_handle );
+--                 foreach ( block_type.script_handles as script_handle ) then
+--                         wp_enqueue_script( script_handle);
 --                 end;
 
 --                 if ( load_editor_scripts_and_styles ) then
 --                         -- Editor styles.
---                         foreach ( block_type->editor_style_handles as editor_style_handle ) then
---                                 wp_enqueue_style( editor_style_handle );
+--                         foreach ( block_type.editor_style_handles as editor_style_handle ) then
+--                                 wp_enqueue_style( editor_style_handle);
 --                         end;
 
 --                         -- Editor scripts.
---                         foreach ( block_type->editor_script_handles as editor_script_handle ) then
---                                 wp_enqueue_script( editor_script_handle );
+--                         foreach ( block_type.editor_script_handles as editor_script_handle ) then
+--                                 wp_enqueue_script( editor_script_handle);
 --                         end;
 --                 end;
 --         end;
@@ -2685,7 +2808,7 @@ is
 -- function enqueue_block_styles_assets() then
 --         global wp_styles;
 
---         block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+--         block_styles = WP_Block_Styles_Registry::get_instance().get_all_registered();
 
 --         foreach ( block_styles as block_name => styles ) then
 --                 foreach ( styles as style_properties ) then
@@ -2697,15 +2820,15 @@ is
 --                                                 "render_block",
 --                                                 function( html, block ) use ( block_name, style_properties ) then
 --                                                         if ( block["blockName"] === block_name ) then
---                                                                 wp_enqueue_style( style_properties["style_handle"] );
+--                                                                 wp_enqueue_style( style_properties["style_handle"]);
 --                                                         end;
 --                                                         return html;
 --                                                 end;,
 --                                                 10,
 --                                                 2
---                                         );
+--                                        );
 --                                 end; else then
---                                         wp_enqueue_style( style_properties["style_handle"] );
+--                                         wp_enqueue_style( style_properties["style_handle"]);
 --                                 end;
 --                         end;
 --                         if ( isset( style_properties["inline_style"] ) ) then
@@ -2715,15 +2838,15 @@ is
 
 --                                 -- If the site loads separate styles per-block, check if the block has a stylesheet registered.
 --                                 if ( wp_should_load_separate_core_block_assets() ) then
---                                         block_stylesheet_handle = generate_block_asset_handle( block_name, "style" );
+--                                         block_stylesheet_handle = generate_block_asset_handle( block_name, "style");
 
---                                         if ( isset( wp_styles->registered[ block_stylesheet_handle ] ) ) then
+--                                         if ( isset( wp_styles.registered[ block_stylesheet_handle ] ) ) then
 --                                                 handle = block_stylesheet_handle;
 --                                         end;
 --                                 end;
 
 --                                 -- Add inline styles to the calculated handle.
---                                 wp_add_inline_style( handle, style_properties["inline_style"] );
+--                                 wp_add_inline_style( handle, style_properties["inline_style"]);
 --                         end;
 --                 end;
 --         end;
@@ -2735,31 +2858,31 @@ is
 -- -- @since 5.3.0
 -- --
 -- function enqueue_editor_block_styles_assets() then
---         block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+--         block_styles = WP_Block_Styles_Registry::get_instance().get_all_registered();
 
---         register_script_lines = array( "( function() then" );
+--         register_script_lines = array( "( function() then");
 --         foreach ( block_styles as block_name => styles ) then
 --                 foreach ( styles as style_properties ) then
 --                         block_style = array(
 --                                 "name"  => style_properties["name"],
 --                                 "label" => style_properties["label"],
---                         );
+--                        );
 --                         if ( isset( style_properties["is_default"] ) ) then
 --                                 block_style["isDefault"] = style_properties["is_default"];
 --                         end;
 --                         register_script_lines[] = sprintf(
---                                 "       wp.blocks.registerBlockStyle( \"%s\", %s );",
+--                                 "       wp.blocks.registerBlockStyle( \"%s\", %s);",
 --                                 block_name,
 --                                 wp_json_encode( block_style )
---                         );
+--                        );
 --                 end;
 --         end;
 --         register_script_lines[] = "end; )();";
---         inline_script           = implode( "\n", register_script_lines );
+--         inline_script           = implode( "\n", register_script_lines);
 
---         wp_register_script( "wp-block-styles", false, array( "wp-blocks" ), true, true );
---         wp_add_inline_script( "wp-block-styles", inline_script );
---         wp_enqueue_script( "wp-block-styles" );
+--         wp_register_script( "wp-block-styles", False, array( "wp-blocks"), true, true);
+--         wp_add_inline_script( "wp-block-styles", inline_script);
+--         wp_enqueue_script( "wp-block-styles");
 -- end;
 
 -- --
@@ -2768,8 +2891,8 @@ is
 -- -- @since 5.5.0
 -- --
 -- function wp_enqueue_editor_block_directory_assets() then
---         wp_enqueue_script( "wp-block-directory" );
---         wp_enqueue_style( "wp-block-directory" );
+--         wp_enqueue_script( "wp-block-directory");
+--         wp_enqueue_style( "wp-block-directory");
 -- end;
 
 -- --
@@ -2778,8 +2901,8 @@ is
 -- -- @since 5.8.0
 -- --
 -- function wp_enqueue_editor_format_library_assets() then
---         wp_enqueue_script( "wp-format-library" );
---         wp_enqueue_style( "wp-format-library" );
+--         wp_enqueue_script( "wp-format-library");
+--         wp_enqueue_style( "wp-format-library");
 -- end;
 
 -- --
@@ -2794,7 +2917,7 @@ is
 -- -- @return string String made of sanitized `<script>` tag attributes.
 -- --
 -- function wp_sanitize_script_attributes( attributes ) {
---         html5_script_support = ! is_admin() && ! current_theme_supports( "html5", "script" );
+--         html5_script_support = ! is_admin() && ! current_theme_supports( "html5", "script");
 --         attributes_string    = "";
 
 --         -- If HTML5 script tag is supported, only the attribute name is added
@@ -2802,10 +2925,10 @@ is
 --         foreach ( attributes as attribute_name => attribute_value ) then
 --                 if ( is_bool( attribute_value ) ) then
 --                         if ( attribute_value ) then
---                                 attributes_string .= html5_script_support ? sprintf( " %1s="%2s"", esc_attr( attribute_name ), esc_attr( attribute_name ) ) : " " . esc_attr( attribute_name );
+--                                 attributes_string .= html5_script_support ? sprintf( " %1s="%2s"", esc_attr( attribute_name), esc_attr( attribute_name ) ) : " " . esc_attr( attribute_name);
 --                         }
 --                 end; else then
---                         attributes_string .= sprintf( " %1s="%2s"", esc_attr( attribute_name ), esc_attr( attribute_value ) );
+--                         attributes_string .= sprintf( " %1s="%2s"", esc_attr( attribute_name), esc_attr( attribute_value ));
 --                 end;
 --         end;
 
@@ -2836,9 +2959,9 @@ is
 --         --                          Only the attribute name is added to the `<script>` tag for
 --         --                          entries with a boolean value, and that are true.
 --         --
---         attributes = apply_filters( "wp_script_attributes", attributes );
+--         attributes = apply_filters( "wp_script_attributes", attributes);
 
---         return sprintf( "<script%s></script>\n", wp_sanitize_script_attributes( attributes ) );
+--         return sprintf( "<script%s></script>\n", wp_sanitize_script_attributes( attributes ));
 -- end;
 
 -- --
@@ -2852,7 +2975,7 @@ is
 -- -- @param array attributes Key-value pairs representing `<script>` tag attributes.
 -- --
 -- function wp_print_script_tag( attributes ) then
---         echo wp_get_script_tag( attributes );
+--         echo wp_get_script_tag( attributes);
 -- end;
 
 -- --
@@ -2881,11 +3004,11 @@ is
 --         --                           entries with a boolean value, and that are true.
 --         -- @param string javascript Inline JavaScript code.
 --         --
---         attributes = apply_filters( "wp_inline_script_attributes", attributes, javascript );
+--         attributes = apply_filters( "wp_inline_script_attributes", attributes, javascript);
 
 --         javascript = "\n" . trim( javascript, "\n\r " ) . "\n";
 
---         return sprintf( "<script%s>%s</script>\n", wp_sanitize_script_attributes( attributes ), javascript );
+--         return sprintf( "<script%s>%s</script>\n", wp_sanitize_script_attributes( attributes), javascript);
 -- end;
 
 -- --
@@ -2900,7 +3023,7 @@ is
 -- -- @param array  attributes Optional. Key-value pairs representing `<script>` tag attributes.
 -- --
 -- function wp_print_inline_script_tag( javascript, attributes = array() ) then
---         echo wp_get_inline_script_tag( javascript, attributes );
+--         echo wp_get_inline_script_tag( javascript, attributes);
 -- end;
 
 -- --
@@ -2909,7 +3032,7 @@ is
 -- -- This improves performance and sustainability, and is opt-in. Stylesheets can opt in
 -- -- by adding `path` data using `wp_style_add_data`, and defining the file"s absolute path:
 -- --
--- --     wp_style_add_data( style_handle, "path", file_path );
+-- --     wp_style_add_data( style_handle, "path", file_path);
 -- --
 -- -- @since 5.8.0
 -- --
@@ -2926,19 +3049,19 @@ is
 --         --
 --         -- @param int total_inline_limit The file-size threshold, in bytes. Default 20000.
 --         --
---         total_inline_limit = apply_filters( "styles_inline_size_limit", total_inline_limit );
+--         total_inline_limit = apply_filters( "styles_inline_size_limit", total_inline_limit);
 
 --         styles = array();
 
 --         -- Build an array of styles that have a path defined.
---         foreach ( wp_styles->queue as handle ) then
---                 if ( wp_styles()->get_data( handle, "path" ) && file_exists( wp_styles->registered[ handle ]->extra["path"] ) ) then
+--         foreach ( wp_styles.queue as handle ) then
+--                 if ( wp_styles().get_data( handle, "path" ) && file_exists( wp_styles.registered[ handle ].extra["path"] ) ) then
 --                         styles[] = array(
 --                                 "handle" => handle,
---                                 "src"    => wp_styles->registered[ handle ]->src,
---                                 "path"   => wp_styles->registered[ handle ]->extra["path"],
---                                 "size"   => filesize( wp_styles->registered[ handle ]->extra["path"] ),
---                         );
+--                                 "src"    => wp_styles.registered[ handle ].src,
+--                                 "path"   => wp_styles.registered[ handle ].extra["path"],
+--                                 "size"   => filesize( wp_styles.registered[ handle ].extra["path"]),
+--                        );
 --                 end;
 --         end;
 
@@ -2949,7 +3072,7 @@ is
 --                         static function( a, b ) then
 --                                 return ( a["size"] <= b["size"] ) ? -1 : 1;
 --                         end;
---                 );
+--                );
 
 --                 /*
 --                 -- The total inlined size.
@@ -2968,18 +3091,18 @@ is
 --                         end;
 
 --                         -- Get the styles if we don"t already have them.
---                         style["css"] = file_get_contents( style["path"] );
+--                         style["css"] = file_get_contents( style["path"]);
 
 --                         -- Check if the style contains relative URLs that need to be modified.
 --                         -- URLs relative to the stylesheet"s path should be converted to relative to the site"s root.
---                         style["css"] = _wp_normalize_relative_css_links( style["css"], style["src"] );
+--                         style["css"] = _wp_normalize_relative_css_links( style["css"], style["src"]);
 
---                         -- Set `src` to `false` and add styles inline.
---                         wp_styles->registered[ style["handle"] ]->src = false;
---                         if ( empty( wp_styles->registered[ style["handle"] ]->extra["after"] ) ) then
---                                 wp_styles->registered[ style["handle"] ]->extra["after"] = array();
+--                         -- Set `src` to `False` and add styles inline.
+--                         wp_styles.registered[ style["handle"] ].src = False;
+--                         if ( empty( wp_styles.registered[ style["handle"] ].extra["after"] ) ) then
+--                                 wp_styles.registered[ style["handle"] ].extra["after"] = array();
 --                         end;
---                         array_unshift( wp_styles->registered[ style["handle"] ]->extra["after"], style["css"] );
+--                         array_unshift( wp_styles.registered[ style["handle"] ].extra["after"], style["css"]);
 
 --                         -- Add the styles size to the total_inline_size var.
 --                         total_inline_size += (int) style["size"];
@@ -2999,7 +3122,7 @@ is
 -- -- @return string The CSS with URLs made relative to the WordPress installation.
 -- --
 -- function _wp_normalize_relative_css_links( css, stylesheet_url ) then
---         has_src_results = preg_match_all( "#url\s*\(\s*[\""]?\s*([^\""\)]+)#", css, src_results );
+--         has_src_results = preg_match_all( "#url\s*\(\s*[\""]?\s*([^\""\)]+)#", css, src_results);
 --         if ( has_src_results ) then
 --                 -- Loop through the URLs to find relative ones.
 --                 foreach ( src_results[1] as src_index => src_result ) then
@@ -3020,16 +3143,16 @@ is
 
 --                         -- Build the absolute URL.
 --                         absolute_url = dirname( stylesheet_url ) . "/" . src_result;
---                         absolute_url = str_replace( "/./", "/", absolute_url );
+--                         absolute_url = str_replace( "/./", "/", absolute_url);
 --                         -- Convert to URL related to the site root.
---                         relative_url = wp_make_link_relative( absolute_url );
+--                         relative_url = wp_make_link_relative( absolute_url);
 
 --                         -- Replace the URL in the CSS.
 --                         css = str_replace(
 --                                 src_results[0][ src_index ],
---                                 str_replace( src_result, relative_url, src_results[0][ src_index ] ),
+--                                 str_replace( src_result, relative_url, src_results[0][ src_index ]),
 --                                 css
---                         );
+--                        );
 --                 end;
 --         end;
 
@@ -3042,9 +3165,9 @@ is
 -- -- @since 5.9.0
 -- --
 -- function wp_enqueue_global_styles_css_custom_properties() then
---         wp_register_style( "global-styles-css-custom-properties", false, array(), true, true );
---         wp_add_inline_style( "global-styles-css-custom-properties", wp_get_global_stylesheet( array( "variables" ) ) );
---         wp_enqueue_style( "global-styles-css-custom-properties" );
+--         wp_register_style( "global-styles-css-custom-properties", False, array(), true, true);
+--         wp_add_inline_style( "global-styles-css-custom-properties", wp_get_global_stylesheet( array( "variables" ) ));
+--         wp_enqueue_style( "global-styles-css-custom-properties");
 -- end;
 
 -- --
@@ -3072,7 +3195,7 @@ is
 --                         echo "<style>style</style>\n";
 --                 end;,
 --                 priority
---         );
+--        );
 -- end;
 
 -- --
@@ -3086,7 +3209,7 @@ is
 -- -- @param array options then
 -- --     Optional. An array of options to pass to wp_style_engine_get_stylesheet_from_context(). Default empty array.
 -- --
--- --     @type bool optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+-- --     @type bool optimize Whether to optimize the CSS output, e.g., combine rules. Default is `False`.
 -- --     @type bool prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
 -- -- end;
 -- --
@@ -3107,7 +3230,7 @@ is
 --                 return;
 --         end;
 
---         core_styles_keys         = array( "block-supports" );
+--         core_styles_keys         = array( "block-supports");
 --         compiled_core_stylesheet = "";
 --         style_tag_id             = "core";
 --         -- Adds comment if code is prettified to identify core styles sections in debugging.
@@ -3118,14 +3241,14 @@ is
 --                 end;
 --                 -- Chains core store ids to signify what the styles contain.
 --                 style_tag_id             .= "-" . style_key;
---                 compiled_core_stylesheet .= wp_style_engine_get_stylesheet_from_context( style_key, options );
+--                 compiled_core_stylesheet .= wp_style_engine_get_stylesheet_from_context( style_key, options);
 --         end;
 
 --         -- Combines Core styles.
 --         if ( ! empty( compiled_core_stylesheet ) ) then
---                 wp_register_style( style_tag_id, false, array(), true, true );
---                 wp_add_inline_style( style_tag_id, compiled_core_stylesheet );
---                 wp_enqueue_style( style_tag_id );
+--                 wp_register_style( style_tag_id, False, array(), true, true);
+--                 wp_add_inline_style( style_tag_id, compiled_core_stylesheet);
+--                 wp_enqueue_style( style_tag_id);
 --         end;
 
 --         -- Prints out any other stores registered by themes or otherwise.
@@ -3134,12 +3257,12 @@ is
 --                 if ( in_array( store_name, core_styles_keys, true ) ) then
 --                         continue;
 --                 end;
---                 styles = wp_style_engine_get_stylesheet_from_context( store_name, options );
+--                 styles = wp_style_engine_get_stylesheet_from_context( store_name, options);
 --                 if ( ! empty( styles ) ) then
 --                         key = "wp-style-engine-store_name";
---                         wp_register_style( key, false, array(), true, true );
---                         wp_add_inline_style( key, styles );
---                         wp_enqueue_style( key );
+--                         wp_register_style( key, False, array(), true, true);
+--                         wp_add_inline_style( key, styles);
+--                         wp_enqueue_style( key);
 --                 end;
 --         end;
 -- end;
@@ -3163,10 +3286,10 @@ is
 --                         "handle" => "",
 --                         "src"    => "",
 --                         "deps"   => array(),
---                         "ver"    => false,
+--                         "ver"    => False,
 --                         "media"  => "all",
 --                 )
---         );
+--        );
 
 --         --
 --         -- Callback function to register and enqueue styles.
@@ -3179,28 +3302,28 @@ is
 --         callback = static function( content ) use ( args ) then
 --                 -- Register the stylesheet.
 --                 if ( ! empty( args["src"] ) ) then
---                         wp_register_style( args["handle"], args["src"], args["deps"], args["ver"], args["media"] );
+--                         wp_register_style( args["handle"], args["src"], args["deps"], args["ver"], args["media"]);
 --                 end;
 
 --                 -- Add `path` data if provided.
 --                 if ( isset( args["path"] ) ) then
---                         wp_style_add_data( args["handle"], "path", args["path"] );
+--                         wp_style_add_data( args["handle"], "path", args["path"]);
 
 --                         -- Get the RTL file path.
---                         rtl_file_path = str_replace( ".css", "-rtl.css", args["path"] );
+--                         rtl_file_path = str_replace( ".css", "-rtl.css", args["path"]);
 
 --                         -- Add RTL stylesheet.
 --                         if ( file_exists( rtl_file_path ) ) then
---                                 wp_style_add_data( args["handle"], "rtl", "replace" );
+--                                 wp_style_add_data( args["handle"], "rtl", "replace");
 
 --                                 if ( is_rtl() ) then
---                                         wp_style_add_data( args["handle"], "path", rtl_file_path );
+--                                         wp_style_add_data( args["handle"], "path", rtl_file_path);
 --                                 end;
 --                         end;
 --                 end;
 
 --                 -- Enqueue the stylesheet.
---                 wp_enqueue_style( args["handle"] );
+--                 wp_enqueue_style( args["handle"]);
 
 --                 return content;
 --         end;;
@@ -3216,7 +3339,7 @@ is
 --                 --
 --                 callback_separate = static function( content, block ) use ( block_name, callback ) then
 --                         if ( ! empty( block["blockName"] ) && block_name === block["blockName"] ) then
---                                 return callback( content );
+--                                 return callback( content);
 --                         end;
 --                         return content;
 --                 end;;
@@ -3230,7 +3353,7 @@ is
 --                 -- which is why in this case, using an anonymous function
 --                 -- was deemed acceptable.
 --                 --
---                 add_filter( "render_block", callback_separate, 10, 2 );
+--                 add_filter( "render_block", callback_separate, 10, 2);
 --                 return;
 --         end;
 
@@ -3243,10 +3366,10 @@ is
 --         -- which is why in this case, using an anonymous function
 --         -- was deemed acceptable.
 --         --
---         add_filter( hook, callback );
+--         add_filter( hook, callback);
 
 --         -- Enqueue assets in the editor.
---         add_action( "enqueue_block_assets", callback );
+--         add_action( "enqueue_block_assets", callback);
 -- end;
 
 -- --
@@ -3295,7 +3418,7 @@ is
 --         --
 --         fn_get_webfonts_from_theme_json = static function() then
 --                 -- Get settings from theme.json.
---                 settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
+--                 settings = WP_Theme_JSON_Resolver::get_merged_data().get_settings();
 
 --                 -- If in the editor, add webfonts defined in variations.
 --                 if ( is_admin() || ( defined( "REST_REQUEST" ) && REST_REQUEST ) ) then
@@ -3318,8 +3441,8 @@ is
 --                                 end;
 
 --                                 -- Combine variations with settings. Remove duplicates.
---                                 settings["typography"]["fontFamilies"]["theme"] = array_merge( settings["typography"]["fontFamilies"]["theme"], variation["settings"]["typography"]["fontFamilies"]["theme"] );
---                                 settings["typography"]["fontFamilies"]          = array_unique( settings["typography"]["fontFamilies"] );
+--                                 settings["typography"]["fontFamilies"]["theme"] = array_merge( settings["typography"]["fontFamilies"]["theme"], variation["settings"]["typography"]["fontFamilies"]["theme"]);
+--                                 settings["typography"]["fontFamilies"]          = array_unique( settings["typography"]["fontFamilies"]);
 --                         end;
 --                 end;
 
@@ -3344,7 +3467,7 @@ is
 --                                         continue;
 --                                 end;
 
---                                 webfonts = array_merge( webfonts, font_family["fontFace"] );
+--                                 webfonts = array_merge( webfonts, font_family["fontFace"]);
 --                         end;
 --                 end;
 
@@ -3371,7 +3494,7 @@ is
 --                                 continue;
 --                         end;
 
---                         src[ key ] = get_theme_file_uri( str_replace( "file:./", "", url ) );
+--                         src[ key ] = get_theme_file_uri( str_replace( "file:./", "", url ));
 --                 end;
 
 --                 return src;
@@ -3387,10 +3510,10 @@ is
 --         --
 --         fn_convert_keys_to_kebab_case = static function( array font_face ) then
 --                 foreach ( font_face as property => value ) then
---                         kebab_case               = _wp_to_kebab_case( property );
+--                         kebab_case               = _wp_to_kebab_case( property);
 --                         font_face[ kebab_case ] = value;
 --                         if ( kebab_case !== property ) then
---                                 unset( font_face[ property ] );
+--                                 unset( font_face[ property ]);
 --                         end;
 --                 end;
 
@@ -3403,7 +3526,7 @@ is
 --         -- @since 6.0.0
 --         --
 --         -- @param array webfont The webfont arguments.
---         -- @return array|false The validated webfont arguments, or false if the webfont is invalid.
+--         -- @return array|False The validated webfont arguments, or False if the webfont is invalid.
 --         --
 --         fn_validate_webfont = static function( webfont ) then
 --                 webfont = wp_parse_args(
@@ -3415,40 +3538,40 @@ is
 --                                 "font-display" => "fallback",
 --                                 "src"          => array(),
 --                         )
---                 );
+--                );
 
 --                 -- Check the font-family.
 --                 if ( empty( webfont["font-family"] ) || ! is_string( webfont["font-family"] ) ) then
---                         trigger_error( __( "Webfont font family must be a non-empty string." ) );
+--                         trigger_error( abs "Webfont font family must be a non-empty string." ));
 
---                         return false;
+--                         return False;
 --                 end;
 
 --                 -- Check that the `src` property is defined and a valid type.
 --                 if ( empty( webfont["src"] ) || ( ! is_string( webfont["src"] ) && ! is_array( webfont["src"] ) ) ) then
---                         trigger_error( __( "Webfont src must be a non-empty string or an array of strings." ) );
+--                         trigger_error( abs "Webfont src must be a non-empty string or an array of strings." ));
 
---                         return false;
+--                         return False;
 --                 end;
 
 --                 -- Validate the `src` property.
 --                 foreach ( (array) webfont["src"] as src ) then
 --                         if ( ! is_string( src ) || "" === trim( src ) ) then
---                                 trigger_error( __( "Each webfont src must be a non-empty string." ) );
+--                                 trigger_error( abs "Each webfont src must be a non-empty string." ));
 
---                                 return false;
+--                                 return False;
 --                         end;
 --                 end;
 
 --                 -- Check the font-weight.
 --                 if ( ! is_string( webfont["font-weight"] ) && ! is_int( webfont["font-weight"] ) ) then
---                         trigger_error( __( "Webfont font weight must be a properly formatted string or integer." ) );
+--                         trigger_error( abs "Webfont font weight must be a properly formatted string or integer." ));
 
---                         return false;
+--                         return False;
 --                 end;
 
 --                 -- Check the font-display.
---                 if ( ! in_array( webfont["font-display"], array( "auto", "block", "fallback", "swap" ), true ) ) then
+--                 if ( ! in_array( webfont["font-display"], array( "auto", "block", "fallback", "swap"), true ) ) then
 --                         webfont["font-display"] = "fallback";
 --                 end;
 
@@ -3467,11 +3590,11 @@ is
 --                         "size-adjust",
 --                         "src",
 --                         "unicode-range",
---                 );
+--                );
 
 --                 foreach ( webfont as prop => value ) then
 --                         if ( ! in_array( prop, valid_props, true ) ) then
---                                 unset( webfont[ prop ] );
+--                                 unset( webfont[ prop ]);
 --                         end;
 --                 end;
 
@@ -3496,11 +3619,11 @@ is
 --                                 continue;
 --                         end;
 
---                         webfont = fn_convert_keys_to_kebab_case( webfont );
+--                         webfont = fn_convert_keys_to_kebab_case( webfont);
 
---                         webfont = fn_validate_webfont( webfont );
+--                         webfont = fn_validate_webfont( webfont);
 
---                         webfont["src"] = fn_transform_src_into_uri( (array) webfont["src"] );
+--                         webfont["src"] = fn_transform_src_into_uri( (array) webfont["src"]);
 
 --                         -- Skip if not valid.
 --                         if ( empty( webfont ) ) then
@@ -3525,55 +3648,55 @@ is
 
 --                 foreach ( webfont["src"] as url ) then
 --                         -- Add data URIs first.
---                         if ( str_starts_with( trim( url ), "data:" ) ) then
+--                         if ( str_starts_with( trim( url), "data:" ) ) then
 --                                 src_ordered[] = array(
 --                                         "url"    => url,
 --                                         "format" => "data",
---                                 );
+--                                );
 --                                 continue;
 --                         end;
---                         format         = pathinfo( url, PATHINFO_EXTENSION );
+--                         format         = pathinfo( url, PATHINFO_EXTENSION);
 --                         src[ format ] = url;
 --                 end;
 
 --                 -- Add woff2.
 --                 if ( ! empty( src["woff2"] ) ) then
 --                         src_ordered[] = array(
---                                 "url"    => sanitize_url( src["woff2"] ),
+--                                 "url"    => sanitize_url( src["woff2"]),
 --                                 "format" => "woff2",
---                         );
+--                        );
 --                 end;
 
 --                 -- Add woff.
 --                 if ( ! empty( src["woff"] ) ) then
 --                         src_ordered[] = array(
---                                 "url"    => sanitize_url( src["woff"] ),
+--                                 "url"    => sanitize_url( src["woff"]),
 --                                 "format" => "woff",
---                         );
+--                        );
 --                 end;
 
 --                 -- Add ttf.
 --                 if ( ! empty( src["ttf"] ) ) then
 --                         src_ordered[] = array(
---                                 "url"    => sanitize_url( src["ttf"] ),
+--                                 "url"    => sanitize_url( src["ttf"]),
 --                                 "format" => "truetype",
---                         );
+--                        );
 --                 end;
 
 --                 -- Add eot.
 --                 if ( ! empty( src["eot"] ) ) then
 --                         src_ordered[] = array(
---                                 "url"    => sanitize_url( src["eot"] ),
+--                                 "url"    => sanitize_url( src["eot"]),
 --                                 "format" => "embedded-opentype",
---                         );
+--                        );
 --                 end;
 
 --                 -- Add otf.
 --                 if ( ! empty( src["otf"] ) ) then
 --                         src_ordered[] = array(
---                                 "url"    => sanitize_url( src["otf"] ),
+--                                 "url"    => sanitize_url( src["otf"]),
 --                                 "format" => "opentype",
---                         );
+--                        );
 --                 end;
 --                 webfont["src"] = src_ordered;
 
@@ -3598,7 +3721,7 @@ is
 --                                 str_starts_with( item["url"], site_url() ) ||
 --                                 str_starts_with( item["url"], home_url() )
 --                         ) then
---                                 item["url"] = wp_make_link_relative( item["url"] );
+--                                 item["url"] = wp_make_link_relative( item["url"]);
 --                         end;
 
 --                         src .= ( "data" === item["format"] )
@@ -3661,12 +3784,12 @@ is
 
 --                         -- Compile the "src" parameter.
 --                         if ( "src" === key ) then
---                                 value = fn_compile_src( webfont["font-family"], value );
+--                                 value = fn_compile_src( webfont["font-family"], value);
 --                         end;
 
 --                         -- If font-variation-settings is an array, convert it to a string.
 --                         if ( "font-variation-settings" === key && is_array( value ) ) then
---                                 value = fn_compile_variations( value );
+--                                 value = fn_compile_variations( value);
 --                         end;
 
 --                         if ( ! empty( value ) ) then
@@ -3693,7 +3816,7 @@ is
 
 --                 foreach ( registered_webfonts as webfont ) then
 --                         -- Order the Webfont's `src` items to optimize for browser support.
---                         webfont = fn_order_src( webfont );
+--                         webfont = fn_order_src( webfont);
 
 --                         -- Build the @font-face CSS for this webfont.
 --                         css .= "@font-facethen" . fn_build_font_face_css( webfont ) . "end;";
@@ -3719,11 +3842,11 @@ is
 --                 end;
 
 --                 -- Enqueue the stylesheet.
---                 wp_register_style( "wp-webfonts", "" );
---                 wp_enqueue_style( "wp-webfonts" );
+--                 wp_register_style( "wp-webfonts", "");
+--                 wp_enqueue_style( "wp-webfonts");
 
 --                 -- Add the styles to the stylesheet.
---                 wp_add_inline_style( "wp-webfonts", styles );
+--                 wp_add_inline_style( "wp-webfonts", styles);
 --         end;;
 
 --         --
@@ -3742,12 +3865,12 @@ is
 --                         return;
 --                 end;
 
---                 wp_add_inline_style( "wp-block-library", styles );
+--                 wp_add_inline_style( "wp-block-library", styles);
 --         end;;
 
---         add_action( "wp_loaded", fn_register_webfonts );
---         add_action( "wp_enqueue_scripts", fn_generate_and_enqueue_styles );
---         add_action( "admin_init", fn_generate_and_enqueue_editor_styles );
+--         add_action( "wp_loaded", fn_register_webfonts);
+--         add_action( "wp_enqueue_scripts", fn_generate_and_enqueue_styles);
+--         add_action( "admin_init", fn_generate_and_enqueue_editor_styles);
 -- end;
 
 -- --
@@ -3802,13 +3925,13 @@ is
 --         -- but we can't use get_block_editor_theme_styles directly as it
 --         -- only handles external files or theme files.
 --         classic_theme_styles_settings = array(
---                 "css"            => file_get_contents( classic_theme_styles ),
+--                 "css"            => file_get_contents( classic_theme_styles),
 --                 "__unstableType" => "core",
---                 "isGlobalStyles" => false,
---         );
+--                 "isGlobalStyles" => False,
+--        );
 
 --         -- Add these settings to the start of the array so that themes can override them.
---         array_unshift( editor_settings["styles"], classic_theme_styles_settings );
+--         array_unshift( editor_settings["styles"], classic_theme_styles_settings);
 
 --         return editor_settings;
 -- end;

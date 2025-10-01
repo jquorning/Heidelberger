@@ -85,7 +85,8 @@ is
                         return Integer
                         is (1);
 
-   function Get_Option (Option : String)
+   function Get_Option (Option  : String;
+                        Default : String := "")
                         return String;
 
    --

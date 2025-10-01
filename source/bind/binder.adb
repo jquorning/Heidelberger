@@ -9,6 +9,7 @@ with Adm_Admin_Header;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
+with Adm_Load_Scripts;
 with Adm_Load_Styles;
 with Adm_Menu_Header;
 with Adm_Menu;
@@ -69,6 +70,9 @@ is
 
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;
+
+      elsif Index (URL, "/wp-admin/load-scripts.php") /= 0 then
+         Adm_Load_Scripts.Run;
 
       elsif Index (URL, "/wp-admin/load-styles.php") /= 0 then
          Adm_Load_Styles.Run;

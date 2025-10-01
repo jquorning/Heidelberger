@@ -962,8 +962,8 @@ package body Inc_L10n is
          end if;
 
          if
-           Is_Admin      or else
-           WP_INSTALLING or else
+           Is_Admin              or else
+           Globals.WP_INSTALLING or else
            WP_REPAIRING
          then
             Load_Textdomain ("default",

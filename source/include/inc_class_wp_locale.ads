@@ -31,7 +31,7 @@ is
          -- @since 2.1.0
          -- @var string[]
          --
---        public weekday;
+         Weekday : Array_Type;
 
          --
          -- Stores the translated strings for the one character weekday names.
@@ -44,7 +44,7 @@ is
          -- @since 2.1.0
          -- @var string[]
          --
---        public weekday_initial;
+         Weekday_Initial : Array_Type;
 
          --
          -- Stores the translated strings for the abbreviated weekday names.
@@ -52,7 +52,7 @@ is
          -- @since 2.1.0
          -- @var string[]
          --
---        public weekday_abbrev;
+         Weekday_Abbrev : Array_Type;
 
          --
          -- Stores the translated strings for the full month names.
@@ -60,7 +60,7 @@ is
          -- @since 2.1.0
          -- @var string[]
          --
---        public month;
+         Month : Array_Type;
 
          --
          -- Stores the translated strings for the month names in genitive case, if
@@ -69,7 +69,7 @@ is
          -- @since 4.4.0
          -- @var string[]
          --
---        public month_genitive;
+         Month_Genitive : Array_Type;
 
          --
          -- Stores the translated strings for the abbreviated month names.
@@ -77,7 +77,7 @@ is
          -- @since 2.1.0
          -- @var string[]
          --
---        public month_abbrev;
+         Month_Abbrev : Array_Type;
 
          --
          -- Stores the translated strings for 'am' and 'pm'.
@@ -87,7 +87,7 @@ is
          -- @since 2.1.0
          -- @var string[]
          --
---        public meridiem;
+         Meridiem : Array_Type;
 
          --
          -- The text direction of the locale language.
@@ -97,7 +97,7 @@ is
          -- @since 2.1.0
          -- @var string
          --
---        public text_direction = 'ltr';
+         Text_Direction : Unbounded_String := To_Unbounded_String ("ltr");
 
          --
          -- The thousands separator and decimal point values used for localizing

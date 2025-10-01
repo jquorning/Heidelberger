@@ -19,6 +19,7 @@
 -- @package WordPress
 --
 
+with Inc_Class_Wp_Scripts;
 with Inc_Class_Wp_Styles;
 
 package Inc_Script_Loader
@@ -67,6 +68,47 @@ is
    --
    function Wp_Scripts_Get_Suffix (Typ : String := "")
                                    return String;
+
+   --
+   -- Registers all WordPress scripts.
+   --
+   -- Localizes some of them.
+   -- args order: `scripts->add( "handle", "url", "dependencies", "query-string", 1 );`
+   -- when last arg === 1 queues the script for the footer
+   --
+   -- @since 2.6.0
+   --
+   -- @param WP_Scripts scripts WP_Scripts object.
+   --
+   procedure Wp_Default_Scripts (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+
+   --
+   -- Registers all the WordPress vendor scripts that are in the standardized
+   -- `js/dist/vendor/` location.
+   --
+   -- For the order of `scripts->add` see `wp_default_scripts`.
+   --
+   -- @since 5.0.0
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   --
+   -- @param WP_Scripts scripts WP_Scripts object.
+   --
+   procedure Wp_Default_Packages_Vendor
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+
+   --
+   -- Registers all the WordPress packages scripts that are in the standardized
+   -- `js/dist/` location.
+   --
+   -- For the order of `scripts->add` see `wp_default_scripts`.
+   --
+   -- @since 5.0.0
+   --
+   -- @param WP_Scripts scripts WP_Scripts object.
+   --
+   procedure Wp_Default_Packages_Scripts
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
 
    --
    -- Loads classic theme styles on classic themes in the frontend.

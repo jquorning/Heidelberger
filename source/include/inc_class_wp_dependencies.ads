@@ -244,6 +244,30 @@ is
                   Ver    : String    := "";
                   Args   : String    := "");
 
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : String;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : String    := "";
+                  Args   : Integer)
+                  is null;
+
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : String;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : Boolean;
+                  Args   : Integer)
+                  is null;
+
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : Boolean;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : String    := "";
+                  Args   : Integer   := 0)
+                  is null;
+
    --
    -- Add extra item data.
    --

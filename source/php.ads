@@ -148,6 +148,10 @@ is
                           return List_Type
                           is (Empty_List);
 
+   function Array_Values (Arry : Array_Type)
+                          return Array_Type
+                          is (Empty_Array);
+
    function File_Exists (Filename : String)
                          return Boolean
                          is (True);
@@ -219,6 +223,11 @@ is
                         Value : Integer)
                         return Integer
                         is (1);
+
+   function Array_Push (Arry  : List_Type;
+                        Value : String)
+                        return List_Type
+                        is (Empty_List);
 
    function Array_Push (Arry  : List_Type;
                         Value : String_Array) -- Integer)
@@ -340,6 +349,21 @@ is
    function File_Get_Contents (Filename : String)
             return String
             is ("XXX-780");
+
+   procedure Error_Reporting (Error_Level : Integer := 0)
+             is null;
+
+   PHP_URL_SCHEME : constant Integer := 1; -- XXX guess
+
+   function Parse_URL (URL       : String;
+                       Component : Integer := -1)
+            return String
+            is ("XXX-781");
+
+   function Strtok (Item  : String;
+                    Token : String)
+                    return String
+                    is ("XXX-783");
 
    -------------------
    -- Echo handling --

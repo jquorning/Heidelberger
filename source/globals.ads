@@ -38,12 +38,15 @@ is
    EMPTY_TRASH_DAYS     : Natural;
    WP_POST_REVISIONS    : Boolean;
    WP_CRON_LOCK_TIMEOUT : Natural;
+   WP_RUN_CORE_TESTS    : Boolean;
 
    TEMPLATEPATH     : Unbounded_String;
    STYLESHEETPATH   : Unbounded_String;
    WP_DEFAULT_THEME : Unbounded_String;
 
    MINUTE_IN_SECONDS : Natural;
+
+   SITECOOKIEPATH : Unbounded_String;
 
    WPLANG : constant String := "da_DK";
 

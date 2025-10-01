@@ -311,7 +311,7 @@ is
                   if Src = "" then
                      if Inline_Script_Tag /= "" then
                         if This.Do_Concat then
-                           Append (This.Print_Html, Inline_Script_Tag);
+                           Append (This.Print_HTML, Inline_Script_Tag);
                         else
                            Echo (-Inline_Script_Tag);
                         end if;
@@ -321,10 +321,10 @@ is
 
                   if
                     0 /= Preg_Match ("|^(https?:)?//|", -Src, Unused_Matches)
-                    and then not (This.Content_Url /= "" and then
-                    0 = Strpos (-Src, -This.Content_Url))
+                    and then not (This.Content_URL /= "" and then
+                    0 = Strpos (-Src, -This.Content_URL))
                   then
-                     Src := This.Base_Url & Src;
+                     Src := This.Base_URL & Src;
                   end if;
 
                   if not Empty (-Ver) then
@@ -365,7 +365,7 @@ is
                         ("script_loader_tag", -Tag, Handle, -Src);
 
                      if This.Do_Concat then
-                        Append (This.Print_Html, Tag);
+                        Append (This.Print_HTML, Tag);
                      else
                         Echo (-Tag);
                      end if;
@@ -381,6 +381,17 @@ is
    -----------------------
    -- Add_Inline_Script --
    -----------------------
+
+   procedure Add_Inline_Script (This     : in out Wp_Scripts;
+                                Handle   : String;
+                                Data     : String;
+                                Position : String := "after")
+   is
+      Unused : constant Boolean :=
+        Add_Inline_Script (This, Handle, Data, Position);
+   begin
+      null;
+   end Add_Inline_Script;
 
    function Add_Inline_Script (This     : in out Wp_Scripts;
                                Handle   : String;
@@ -441,6 +452,17 @@ is
    --------------
    -- Localize --
    --------------
+
+   procedure Localize (This        : in out Wp_Scripts;
+                       Handle      : String;
+                       Object_Name : String;
+                       L10n        : Array_Type)
+   is
+      Unused : constant Boolean :=
+        Localize (This, Handle, Object_Name, L10n);
+   begin
+      null;
+   end Localize;
 
    function Localize (This        : in out Wp_Scripts;
                       Handle      : String;
@@ -555,6 +577,17 @@ is
    ----------------------
    -- Set_Translations --
    ----------------------
+
+   procedure Set_Translations (This   : Wp_Scripts;
+                               Handle : String;
+                               Domain : String := "default";
+                               Path   : String := "")
+   is
+      Unused : constant Boolean :=
+        Set_Translations (This, Handle, Domain, Path);
+   begin
+      null;
+   end Set_Translations;
 
    function Set_Translations (This   : Wp_Scripts;
                               Handle : String;
@@ -724,7 +757,7 @@ is
       This.Print_Code     := +"";
       This.Concat         := +"";
       This.Concat_Version := +"";
-      This.Print_Html     := +"";
+      This.Print_HTML     := +"";
       This.Ext_Version    := +"";
       This.Ext_Handles    := +"";
    end Reset;

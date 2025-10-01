@@ -88,7 +88,8 @@ is
 -- --               boolean `false` is returned.
 -- --
 -- function get_option( option, default = false ) then
-   function Get_Option (Option : String)
+   function Get_Option (Option  : String;
+                        Default : String := "")
                         return String
    is
    begin

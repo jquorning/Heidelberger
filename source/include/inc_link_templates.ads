@@ -296,6 +296,22 @@ is
                       is ("XXX-778");
 
    --
+   -- Retrieves the URL to the includes directory.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string      path   Optional. Path relative to the includes URL. Default
+   --                           empty.
+   -- @param string|null scheme Optional. Scheme to give the includes URL context.
+   --                            Accepts "http", "https", or "relative". Default null.
+   -- @return string Includes URL link with optional path appended.
+   --
+   function Includes_URL (Path   : String := "";
+                          Scheme : String := "") -- null
+                          return String
+                          is ("XXX-782");
+
+   --
    -- Retrieves default data about the avatar.
    --
    -- @since 4.2.0

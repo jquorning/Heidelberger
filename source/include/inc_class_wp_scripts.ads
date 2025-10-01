@@ -35,7 +35,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Base_Url : Unbounded_String;
+        Base_URL : Unbounded_String;
 
         --
         -- URL of the content directory.
@@ -43,7 +43,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Content_Url : Unbounded_String;
+        Content_URL : Unbounded_String;
 
         --
         -- Default version string for scripts.
@@ -93,7 +93,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Print_Html : Unbounded_String;
+        Print_HTML : Unbounded_String;
 
         --
         -- Holds inline code if concatenation is enabled.
@@ -257,6 +257,11 @@ is
                                Position : String := "after")
                               return Boolean;
 
+   procedure Add_Inline_Script (This     : in out Wp_Scripts;
+                                Handle   : String;
+                                Data     : String;
+                                Position : String := "after");
+
    --
    -- Prints inline scripts registered for a specific handle.
    --
@@ -291,6 +296,11 @@ is
                       Object_Name : String;
                       L10n        : Array_Type)
                       return Boolean;
+
+   procedure Localize (This        : in out Wp_Scripts;
+                       Handle      : String;
+                       Object_Name : String;
+                       L10n        : Array_Type);
 
    --
    -- Sets handle group.
@@ -329,6 +339,11 @@ is
                               Domain : String := "default";
                               Path   : String := "")
                               return Boolean;
+
+   procedure Set_Translations (This   : Wp_Scripts;
+                               Handle : String;
+                               Domain : String := "default";
+                               Path   : String := "");
 
    --
    -- Prints translations set for a specific handle.

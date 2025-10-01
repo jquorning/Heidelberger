@@ -400,6 +400,18 @@ is
                         Arg_3     : Boolean)
                         is null;
 
+   --
+   -- @since 2.1.0
+   --
+   -- @global int[] wp_actions Stores the number of times each action was triggered.
+   --
+   -- @param string hook_name The name of the action hook.
+   -- @return int The number of times the action hook has been fired.
+   --
+   function Did_Action (Hook_Name : String)
+            return Boolean
+            is (True);
+
 --
 -- Fires functions attached to a deprecated action hook.
 --

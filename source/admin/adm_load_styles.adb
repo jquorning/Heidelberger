@@ -103,7 +103,7 @@ is
             Path    : Unbounded_String;
          begin
 
-            if Has_Element (Wp_Styles.Registered.Find (-Handle)) then
+            if not Has_Element (Wp_Styles.Registered.Find (-Handle)) then
 --          if not Array_Key_Exists (-Handle, Wp_Styles.Registered) then
                goto Continue;
             end if;
