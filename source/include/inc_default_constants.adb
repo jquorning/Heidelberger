@@ -180,7 +180,7 @@ is
       -- @since 2.6.0
       --
 --    if ( ! defined( "WP_PLUGIN_DIR" ) ) then
-      WP_PLUGIN_DIR := +WP_CONTENT_DIR & "/plugins";
+      WP_PLUGIN_DIR := WP_CONTENT_DIR & "/plugins";
       -- Full path, no trailing slash.
 --    end;
 
@@ -210,7 +210,7 @@ is
       -- @since 2.8.0
       --
 --    if ( ! defined( "WPMU_PLUGIN_DIR" ) ) then
-      WPMU_PLUGIN_DIR := +WP_CONTENT_DIR & "/mu-plugins";
+      WPMU_PLUGIN_DIR := WP_CONTENT_DIR & "/mu-plugins";
       -- Full path, no trailing slash.
 --    end;
 

@@ -701,7 +701,7 @@ is
          return True;
       end if;
 
-      if 0 = Strpos (Src, "/" & WPINC & "/js/l10n") then
+      if 0 = Strpos (Src, "/" & (-WPINC) & "/js/l10n") then
          return False;
       end if;
 

@@ -285,6 +285,8 @@ is
 
    procedure Wp_Maintenance
    is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -293,7 +295,7 @@ is
          return;
       end if;
 
-      if Php.File_Exists (Globals.WP_CONTENT_DIR & "/maintenance.php") then
+      if Php.File_Exists (-Globals.WP_CONTENT_DIR & "/maintenance.php") then
 --       Require_Once (Globals.WP_CONTENT_DIR & "/maintenance.php");
          Php.Die;
       end if;
@@ -1393,16 +1395,16 @@ is
 
          if
 --         Defined ("WP_CONTENT_DIR") and then
-           Is_Dir (Globals.WP_CONTENT_DIR & "/languages") -- @
+           Is_Dir (-Globals.WP_CONTENT_DIR & "/languages") -- @
          then
-            Locations.Append ((+Globals.WP_CONTENT_DIR) & "/languages");
+            Locations.Append ((Globals.WP_CONTENT_DIR) & "/languages");
          end if;
 
          if Is_Dir (Globals.ABSPATH & "wp-content/languages") then -- @
             Locations.Append ((+Globals.ABSPATH) & "wp-content/languages");
          end if;
 
-         if Is_Dir (Globals.ABSPATH & Globals.WPINC & "/languages") then -- @
+         if Is_Dir (Globals.ABSPATH & (-Globals.WPINC) & "/languages") then -- @
             Locations.Append ((+Globals.ABSPATH) & Globals.WPINC & "/languages");
          end if;
 

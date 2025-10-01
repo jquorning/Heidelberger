@@ -4,18 +4,19 @@ with Ada.Strings.Fixed;
 with Php;
 with Hb_Common;
 
+with Adm_Admin;
+with Adm_Admin_Header;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
-with Adm_Post;
+with Adm_Load_Styles;
 with Adm_Menu_Header;
-with Adm_Admin;
 with Adm_Menu;
-
-with Adi_Nav_Menus;
 with Adm_Nav_Menus;
-with Adm_Admin_Header;
+with Adm_Post;
+
 with Adi_Menu;
+with Adi_Nav_Menus;
 
 with Inc_Default_Filters;
 with Inc_Admin_Bar;
@@ -68,6 +69,9 @@ is
 
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;
+
+      elsif Index (URL, "/wp-admin/load-styles.php") /= 0 then
+         Adm_Load_Styles.Run;
 
       end if;
 

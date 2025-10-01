@@ -1,5 +1,22 @@
 
+with Ada.Strings.Unbounded;
+with Arrays;
+with Binder;
+with Globals;
+with Hb_Common;
+with Php;
+
+with Adi_Noop;
 -- with Inc_Class_Wp_Styles;
+with Inc_Class_Wp_Dependency;
+with Inc_Script_Loader;
+with Inc_Versions;
+-- require ABSPATH . 'wp-admin/includes/noop.php';
+-- require ABSPATH . WPINC . '/theme.php';
+-- require ABSPATH . WPINC . '/class-wp-theme-json-resolver.php';
+-- require ABSPATH . WPINC . '/global-styles-and-settings.php';
+-- require ABSPATH . WPINC . '/script-loader.php';
+-- require ABSPATH . WPINC . '/version.php';
 
 package body Adm_Load_Styles
 is
@@ -9,6 +26,23 @@ is
 
    procedure Run
    is
+      use Ada.Strings.Unbounded;
+      use Arrays;
+      use Binder;
+      use Globals;
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Dependency;
+
+      Protocol : Unbounded_String;
+      Load     : Unbounded_String;
+      Load_2   : List_Type;
+      RTL      : Boolean;
+      Outt     : Unbounded_String;
+
+      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles;
+
+      Expires_Offset : Natural;
    begin
 -- --
 -- -- Disable error reporting.
@@ -22,85 +56,99 @@ is
 --         define( 'ABSPATH', dirname( __DIR__ ) . '/' );
 -- }
 
--- define( 'WPINC', 'wp-includes' );
--- define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+      WPINC          := +"wp-includes";
+      WP_CONTENT_DIR := +ABSPATH & "wp-content";
 
--- require ABSPATH . 'wp-admin/includes/noop.php';
--- require ABSPATH . WPINC . '/theme.php';
--- require ABSPATH . WPINC . '/class-wp-theme-json-resolver.php';
--- require ABSPATH . WPINC . '/global-styles-and-settings.php';
--- require ABSPATH . WPINC . '/script-loader.php';
--- require ABSPATH . WPINC . '/version.php';
+      Protocol := +Get (X_SERVER, "SERVER_PROTOCOL");
+      if not In_Array (-Protocol, To_List (List => (+"HTTP/1.1", +"HTTP/2",
+                                                    +"HTTP/2.0", +"HTTP/3")), True)
+      then
+         Protocol := +"HTTP/1.0";
+      end if;
 
--- $protocol = $_SERVER['SERVER_PROTOCOL'];
--- if ( ! in_array( $protocol, array( 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0', 'HTTP/3' ), true ) ) {
---         $protocol = 'HTTP/1.0';
--- }
+      Load := +Get (XX_GET, "load");
+-- if ( is_array( load ) ) then
+--         ksort( load );
+--         load := implode( "", load );
+-- end;
 
--- $load = $_GET['load'];
--- if ( is_array( $load ) ) {
---         ksort( $load );
---         $load = implode( '', $load );
--- }
+      Load   := +Preg_Replace ("/[^a-z0-9,_-]+/i", "", -Load);
+      Load_2 := Array_Unique (Explode (",", -Load));
 
--- $load = preg_replace( '/[^a-z0-9,_-]+/i', '', $load );
--- $load = array_unique( explode( ',', $load ) );
+      if Empty (-Load) then
+         Header ((-Protocol) & " 400 Bad Request");
+         return; -- exit;
+      end if;
 
--- if ( empty( $load ) ) {
---         header( "$protocol 400 Bad Request" );
---         exit;
--- }
+      RTL            := Isset (XX_GET, "dir") and then "rtl" = Get (XX_GET, "dir");
+      Expires_Offset := 31536000; -- 1 year.
+      Outt           := +"";
 
--- $rtl            = ( isset( $_GET['dir'] ) && 'rtl' === $_GET['dir'] );
--- $expires_offset = 31536000; // 1 year.
--- $out            = '';
+      Inc_Script_Loader.Wp_Default_Styles (Wp_Styles);
 
--- $wp_styles = new WP_Styles();
--- wp_default_styles( $wp_styles );
+      if
+        Isset (X_SERVER, "HTTP_IF_NONE_MATCH") and then
+        Stripslashes (Get (X_SERVER, "HTTP_IF_NONE_MATCH")) = Inc_Versions.Wp_Version
+      then
+         Header ((-Protocol) & " 304 Not Modified");
+         return; -- exit;
+      end if;
 
--- if ( isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) && stripslashes( $_SERVER['HTTP_IF_NONE_MATCH'] ) === $wp_version ) {
---         header( "$protocol 304 Not Modified" );
---         exit;
--- }
+      for Handle of Load_2 loop
+         declare
+            use Dependency_Maps;
 
--- foreach ( $load as $handle ) {
---         if ( ! array_key_exists( $handle, $wp_styles->registered ) ) {
---                 continue;
---         }
+            Style   : X_Wp_Dependency renames Wp_Styles.Registered (-Handle);
+            Content : Unbounded_String;
+            Path    : Unbounded_String;
+         begin
 
---         $style = $wp_styles->registered[ $handle ];
+            if Has_Element (Wp_Styles.Registered.Find (-Handle)) then
+--          if not Array_Key_Exists (-Handle, Wp_Styles.Registered) then
+               goto Continue;
+            end if;
 
---         if ( empty( $style->src ) ) {
---                 continue;
---         }
+            if Empty (-Style.Src) then
+               goto Continue;
+            end if;
 
---         $path = ABSPATH . $style->src;
+            Path := ABSPATH & Style.Src;
 
---         if ( $rtl && ! empty( $style->extra['rtl'] ) ) {
---                 // All default styles have fully independent RTL files.
---                 $path = str_replace( '.min.css', '-rtl.min.css', $path );
---         }
+            if RTL and then not Empty (Style.Extra ("rtl")) then
+               -- All default styles have fully independent RTL files.
+               Path := +Str_Replace (".min.css", "-rtl.min.css", -Path);
+            end if;
 
---         $content = get_file( $path ) . "\n";
+            Content := +Adi_Noop.Get_File (-Path) & NL; -- "\n";
 
---         if ( strpos( $style->src, '/' . WPINC . '/css/' ) === 0 ) {
---                 $content = str_replace( '../images/', '../' . WPINC . '/images/', $content );
---                 $content = str_replace( '../js/tinymce/', '../' . WPINC . '/js/tinymce/', $content );
---                 $content = str_replace( '../fonts/', '../' . WPINC . '/fonts/', $content );
---                 $out    .= $content;
---         } else {
---                 $out .= str_replace( '../images/', 'images/', $content );
---         }
--- }
+            if Strpos (-Style.Src, "/" & (-WPINC) & "/css/") = 0 then
 
--- header( "Etag: $wp_version" );
--- header( 'Content-Type: text/css; charset=UTF-8' );
--- header( 'Expires: ' . gmdate( 'D, d M Y H:i:s', time() + $expires_offset ) . ' GMT' );
--- header( "Cache-Control: public, max-age=$expires_offset" );
+               Content := +Str_Replace (
+                             "../images/", "../" & (-WPINC) & "/images/",
+                             -Content);
 
--- echo $out;
--- exit;
-      null;
+               Content := +Str_Replace (
+                             "../js/tinymce/", "../" & (-WPINC) & "/js/tinymce/",
+                             -Content);
+
+               Content := +Str_Replace (
+                             "../fonts/", "../" & (-WPINC) & "/fonts/",
+                             -Content);
+               Append (Outt, Content);
+            else
+               Append (Outt, Str_Replace ("../images/", "images/", -Content));
+            end if;
+         end;
+         << Continue >>
+      end loop;
+
+      Header ("Etag: " & Inc_Versions.Wp_Version);
+      Header ("Content-Type: text/css; charset=UTF-8");
+--    Header ("Expires: " & Gmdate ("D, d M Y H:i:s", Time () + Expires_Offset) &
+--            " GMT");
+      Header ("Cache-Control: public, max-age=expires_offset");
+
+      Echo (-Outt);
    end Run;
 
 end Adm_Load_Styles;

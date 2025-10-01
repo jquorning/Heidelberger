@@ -179,7 +179,19 @@ is
    -- Add --
    ---------
 
---        public function add( handle, src, deps = array(), ver = false, args = null ) then
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : String;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : String       := "";
+                  Args   : String       := "")
+   is
+      Unused : constant Boolean :=
+        Add (This, Handle, Src, Deps, Ver, Args);
+   begin
+      null;
+   end Add;
+
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
@@ -227,7 +239,17 @@ is
    -- Add_Data --
    --------------
 
---        public function add_data( handle, key, value ) then
+   procedure Add_Data (This   : in out Wp_Dependencies;
+                       Handle : String;
+                       Key    : String;
+                       Value  : String)
+   is
+      Unused : constant Boolean :=
+        Add_Data (This, Handle, Key, Value);
+   begin
+      null;
+   end Add_Data;
+
    function Add_Data (This   : in out Wp_Dependencies;
                       Handle : String;
                       Key    : String;
@@ -241,7 +263,14 @@ is
          return False;
       end if;
 
-      return This.Registered (Handle).Add_Data (Key, Value);
+      declare
+         use Inc_Class_Wp_Dependency;
+
+         S : X_Wp_Dependency renames This.Registered (Handle);
+      begin
+         return S.Add_Data (Key, Value);
+--       return This.Registered (Handle).Add_Data (Key, Value);
+      end;
    end Add_Data;
 
    --------------

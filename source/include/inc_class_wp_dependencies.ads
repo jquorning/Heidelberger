@@ -237,6 +237,13 @@ is
                  Args   : String    := "") -- = null
                  return Boolean;
 
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : String;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : String    := "";
+                  Args   : String    := "");
+
    --
    -- Add extra item data.
    --
@@ -254,6 +261,11 @@ is
                       Key    : String;
                       Value  : String) -- Array_Type)
                       return Boolean;
+
+   procedure Add_Data (This   : in out Wp_Dependencies;
+                       Handle : String;
+                       Key    : String;
+                       Value  : String);
 
    --
    -- Get extra item data.

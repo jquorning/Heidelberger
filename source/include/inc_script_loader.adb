@@ -15,14 +15,20 @@
 -- @package WordPress
 --
 
+with Ada.Strings.Unbounded;
+
 with Arrays;
 with Hb_Common;
 with Globals;
 with Php;
 
 with Inc_Class_Wp_Theme_Json_Resolver;
+with Inc_Functions;
 with Inc_Functions_Wp_Styles;
+with Inc_General_Templates;
 with Inc_Versions;
+with Inc_L10n;
+with Inc_Link_Templates;
 
 package body Inc_Script_Loader
 is
@@ -1478,311 +1484,370 @@ is
 --         end;
 -- end;
 
--- --
--- -- Assigns default styles to styles object.
--- --
--- -- Nothing is returned, because the styles parameter is passed by reference.
--- -- Meaning that whatever object is passed will be updated without having to
--- -- reassign the variable that was passed back to the same value. This saves
--- -- memory.
--- --
--- -- Adding default styles is not the only task, it also assigns the base_url
--- -- property, the default version, and text direction for the object.
--- --
--- -- @since 2.6.0
--- --
--- -- @global array editor_styles
--- --
--- -- @param WP_Styles styles
--- --
--- function wp_default_styles( styles ) then
+   Editor_Styles : Array_Type;
+
+   -----------------------
+   -- Wp_Default_Styles --
+   -----------------------
+
+   procedure Wp_Default_Styles (Styles : in out Inc_Class_Wp_Styles.Wp_Styles)
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_General_Templates;
+      use Inc_L10n;
+      use Inc_Link_Templates;
+
 --         global editor_styles;
+      GuessURL           : Unbounded_String;
+      Open_Sans_Font_URL : Unbounded_String;
+      Fonts_URL          : Unbounded_String;
+      Font_Family        : Unbounded_String;
+      Suffix             : Unbounded_String;
+   begin
+      -- -- Include an unmodified wp_version.
+      -- require ABSPATH . WPINC . "/version.php";
 
---         -- Include an unmodified wp_version.
---         require ABSPATH . WPINC . "/version.php";
+      -- if ( ! defined( "SCRIPT_DEBUG" ) ) then
+      --         define( "SCRIPT_DEBUG", false !== strpos( wp_version, "-src" ) );
+      -- end;
 
---         if ( ! defined( "SCRIPT_DEBUG" ) ) then
---                 define( "SCRIPT_DEBUG", false !== strpos( wp_version, "-src" ) );
---         end;
+      GuessURL := +Site_URL; -- ();
 
---         guessurl = site_url();
+      if GuessURL = "" then
+         GuessURL := +Wp_Guess_URL; -- ();
+      end if;
 
---         if ( ! guessurl ) then
---                 guessurl = wp_guess_url();
---         end;
+      Styles.Base_URL        := GuessURL;
+      Styles.Content_URL     := Globals.WP_CONTENT_URL; --  ) ? WP_CONTENT_URL : "";
+      Styles.Default_Version := +Get_Bloginfo ("version");
+      Styles.Text_Direction  := +(if Is_RTL then "rtl" else "ltr");
+--    Styles.Text_Direction  := function_exists( "is_rtl" ) && (if is_rtl then "rtl" else "ltr");
+      Styles.Default_Dirs    :=
+        To_List (List => (+"/wp-admin/", +"/wp-includes/css/"));
 
---         styles->base_url        = guessurl;
---         styles->content_url     = defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
---         styles->default_version = get_bloginfo( "version" );
---         styles->text_direction  = function_exists( "is_rtl" ) && is_rtl() ? "rtl" : "ltr";
---         styles->default_dirs    = array( "/wp-admin/", "/wp-includes/css/" );
+      -- Open Sans is no longer used by core, but may be relied upon by themes
+      -- and plugins.
+      Open_Sans_Font_URL := +"";
 
---         -- Open Sans is no longer used by core, but may be relied upon by themes and plugins.
---         open_sans_font_url = "";
+      --
+      -- translators: If there are characters in your language that are not supported
+      -- by Open Sans, translate this to "off". Do not translate into your own
+      -- language.
+      --
+      if "off" /= X_X ("on", "Open Sans font: on or off") then
+         declare
+            Subsets : Unbounded_String := +"latin,latin-ext";
+            Subset  : Unbounded_String;
+         begin
+            --
+            -- translators: To add an additional Open Sans character subset specific
+            -- to your language, translate this to "greek", "cyrillic" or
+            -- "vietnamese". Do not translate into your own language.
+            --
+            Subset := +X_X ("no-subset",
+               "Open Sans font: add new subset (greek, cyrillic, vietnamese)");
 
---         /*
---         -- translators: If there are characters in your language that are not supported
---         -- by Open Sans, translate this to "off". Do not translate into your own language.
---         --
---         if ( "off" !== _x( "on", "Open Sans font: on or off" ) ) then
---                 subsets = "latin,latin-ext";
+            if "cyrillic" = Subset then
+               Append (Subsets, ",cyrillic,cyrillic-ext");
+            elsif "greek" = Subset then
+               Append (Subsets, ",greek,greek-ext");
+            elsif "vietnamese" = Subset then
+               Append (Subsets, ",vietnamese");
+            end if;
 
---                 /*
---                 -- translators: To add an additional Open Sans character subset specific to your language,
---                 -- translate this to "greek", "cyrillic" or "vietnamese". Do not translate into your own language.
---                 --
---                 subset = _x( "no-subset", "Open Sans font: add new subset (greek, cyrillic, vietnamese)" );
+            -- Hotlink Open Sans, for now.
+            Open_Sans_Font_URL := +"https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=subsets&display=fallback";
+         end;
+      end if;
 
---                 if ( "cyrillic" === subset ) then
---                         subsets .= ",cyrillic,cyrillic-ext";
---                 end; elseif ( "greek" === subset ) then
---                         subsets .= ",greek,greek-ext";
---                 end; elseif ( "vietnamese" === subset ) then
---                         subsets .= ",vietnamese";
---                 end;
+      -- Register a stylesheet for the selected admin color scheme.
+      Styles.Add ("colors", "true",    -- True
+                  To_List (List => (+"wp-admin", +"buttons")));
 
---                 -- Hotlink Open Sans, for now.
---                 open_sans_font_url = "https:--fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=subsets&display=fallback";
---         end;
+      Suffix := +(if Globals.SCRIPT_DEBUG then "" else ".min");
 
---         -- Register a stylesheet for the selected admin color scheme.
---         styles->add( "colors", true, array( "wp-admin", "buttons" ) );
+      -- Admin CSS.
+      Styles.Add ("common",      "/wp-admin/css/commonsuffix.css");
+      Styles.Add ("forms",       "/wp-admin/css/formssuffix.css");
+      Styles.Add ("admin-menu",  "/wp-admin/css/admin-menusuffix.css");
+      Styles.Add ("dashboard",   "/wp-admin/css/dashboardsuffix.css");
+      Styles.Add ("list-tables", "/wp-admin/css/list-tablessuffix.css");
+      Styles.Add ("edit",        "/wp-admin/css/editsuffix.css");
+      Styles.Add ("revisions",   "/wp-admin/css/revisionssuffix.css");
+      Styles.Add ("media",       "/wp-admin/css/mediasuffix.css");
+      Styles.Add ("themes",      "/wp-admin/css/themessuffix.css");
+      Styles.Add ("about",       "/wp-admin/css/aboutsuffix.css");
+      Styles.Add ("nav-menus",   "/wp-admin/css/nav-menussuffix.css");
+      Styles.Add ("widgets",     "/wp-admin/css/widgetssuffix.css", To_List ("wp-pointer"));
+      Styles.Add ("site-icon",   "/wp-admin/css/site-iconsuffix.css");
+      Styles.Add ("l10n",        "/wp-admin/css/l10nsuffix.css");
+      Styles.Add ("code-editor", "/wp-admin/css/code-editorsuffix.css", To_List ("wp-codemirror"));
+      Styles.Add ("site-health", "/wp-admin/css/site-healthsuffix.css");
 
---         suffix = SCRIPT_DEBUG ? "" : ".min";
+      Styles.Add ("wp-admin", "false", -- False
+                  To_List (List => (+"dashicons", +"common",
+                                                       +"forms", +"admin-menu",
+                                                       +"dashboard", +"list-tables",
+                                                       +"edit", +"revisions",
+                                                       +"media", +"themes",
+                                                       +"about", +"nav-menus",
+                                                       +"widgets", +"site-icon",
+                                                       +"l10n")));
 
---         -- Admin CSS.
---         styles->add( "common", "/wp-admin/css/commonsuffix.css" );
---         styles->add( "forms", "/wp-admin/css/formssuffix.css" );
---         styles->add( "admin-menu", "/wp-admin/css/admin-menusuffix.css" );
---         styles->add( "dashboard", "/wp-admin/css/dashboardsuffix.css" );
---         styles->add( "list-tables", "/wp-admin/css/list-tablessuffix.css" );
---         styles->add( "edit", "/wp-admin/css/editsuffix.css" );
---         styles->add( "revisions", "/wp-admin/css/revisionssuffix.css" );
---         styles->add( "media", "/wp-admin/css/mediasuffix.css" );
---         styles->add( "themes", "/wp-admin/css/themessuffix.css" );
---         styles->add( "about", "/wp-admin/css/aboutsuffix.css" );
---         styles->add( "nav-menus", "/wp-admin/css/nav-menussuffix.css" );
---         styles->add( "widgets", "/wp-admin/css/widgetssuffix.css", array( "wp-pointer" ) );
---         styles->add( "site-icon", "/wp-admin/css/site-iconsuffix.css" );
---         styles->add( "l10n", "/wp-admin/css/l10nsuffix.css" );
---         styles->add( "code-editor", "/wp-admin/css/code-editorsuffix.css", array( "wp-codemirror" ) );
---         styles->add( "site-health", "/wp-admin/css/site-healthsuffix.css" );
+      Styles.Add ("login",   "/wp-admin/css/loginsuffix.css",   To_List (List => (+"dashicons", +"buttons", +"forms", +"l10n")));
+      Styles.Add ("install", "/wp-admin/css/installsuffix.css", To_List (List => (+"dashicons", +"buttons", +"forms", +"l10n")));
+      Styles.Add ("wp-color-picker",     "/wp-admin/css/color-pickersuffix.css");
+      Styles.Add ("customize-controls",  "/wp-admin/css/customize-controlssuffix.css",  To_List (List => (+"wp-admin", +"colors", +"imgareaselect")));
+      Styles.Add ("customize-widgets",   "/wp-admin/css/customize-widgetssuffix.css",   To_List (List => (+"wp-admin", +"colors")));
+      Styles.Add ("customize-nav-menus", "/wp-admin/css/customize-nav-menussuffix.css", To_List (List => (+"wp-admin", +"colors")));
 
---         styles->add( "wp-admin", false, array( "dashicons", "common", "forms", "admin-menu", "dashboard", "list-tables", "edit", "revisions", "media", "themes", "about", "nav-menus", "widgets", "site-icon", "l10n" ) );
+      -- Common dependencies.
+      Styles.Add ("buttons",   "/wp-includes/css/buttonssuffix.css");
+      Styles.Add ("dashicons", "/wp-includes/css/dashiconssuffix.css");
 
---         styles->add( "login", "/wp-admin/css/loginsuffix.css", array( "dashicons", "buttons", "forms", "l10n" ) );
---         styles->add( "install", "/wp-admin/css/installsuffix.css", array( "dashicons", "buttons", "forms", "l10n" ) );
---         styles->add( "wp-color-picker", "/wp-admin/css/color-pickersuffix.css" );
---         styles->add( "customize-controls", "/wp-admin/css/customize-controlssuffix.css", array( "wp-admin", "colors", "imgareaselect" ) );
---         styles->add( "customize-widgets", "/wp-admin/css/customize-widgetssuffix.css", array( "wp-admin", "colors" ) );
---         styles->add( "customize-nav-menus", "/wp-admin/css/customize-nav-menussuffix.css", array( "wp-admin", "colors" ) );
+      -- Includes CSS.
+      Styles.Add ("admin-bar",      "/wp-includes/css/admin-barsuffix.css",     To_List ("dashicons"));
+      Styles.Add ("wp-auth-check",  "/wp-includes/css/wp-auth-checksuffix.css", To_List ("dashicons"));
+      Styles.Add ("editor-buttons", "/wp-includes/css/editorsuffix.css", To_List ("dashicons"));
+      Styles.Add ("media-views",    "/wp-includes/css/media-viewssuffix.css", To_List (List => (+"buttons", +"dashicons", +"wp-mediaelement")));
+      Styles.Add ("wp-pointer",     "/wp-includes/css/wp-pointersuffix.css", To_List ("dashicons"));
+      Styles.Add ("customize-preview",    "/wp-includes/css/customize-previewsuffix.css", To_List ("dashicons"));
+      Styles.Add ("wp-embed-template-ie", "/wp-includes/css/wp-embed-template-iesuffix.css");
+      Styles.Add_Data ("wp-embed-template-ie", "conditional", "lte IE 8");
 
---         -- Common dependencies.
---         styles->add( "buttons", "/wp-includes/css/buttonssuffix.css" );
---         styles->add( "dashicons", "/wp-includes/css/dashiconssuffix.css" );
+      -- External libraries and friends.
+      Styles.Add ("imgareaselect", "/wp-includes/js/imgareaselect/imgareaselect.css", Empty_List, "0.9.8");
+      Styles.Add ("wp-jquery-ui-dialog", "/wp-includes/css/jquery-ui-dialogsuffix.css", To_List ("dashicons"));
+      Styles.Add ("mediaelement", "/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css", Empty_List, "4.2.17");
+      Styles.Add ("wp-mediaelement", "/wp-includes/js/mediaelement/wp-mediaelementsuffix.css", To_List ("mediaelement"));
+      Styles.Add ("thickbox", "/wp-includes/js/thickbox/thickbox.css", To_List ("dashicons"));
+      Styles.Add ("wp-codemirror", "/wp-includes/js/codemirror/codemirror.min.css", Empty_List, "5.29.1-alpha-ee20357");
 
---         -- Includes CSS.
---         styles->add( "admin-bar", "/wp-includes/css/admin-barsuffix.css", array( "dashicons" ) );
---         styles->add( "wp-auth-check", "/wp-includes/css/wp-auth-checksuffix.css", array( "dashicons" ) );
---         styles->add( "editor-buttons", "/wp-includes/css/editorsuffix.css", array( "dashicons" ) );
---         styles->add( "media-views", "/wp-includes/css/media-viewssuffix.css", array( "buttons", "dashicons", "wp-mediaelement" ) );
---         styles->add( "wp-pointer", "/wp-includes/css/wp-pointersuffix.css", array( "dashicons" ) );
---         styles->add( "customize-preview", "/wp-includes/css/customize-previewsuffix.css", array( "dashicons" ) );
---         styles->add( "wp-embed-template-ie", "/wp-includes/css/wp-embed-template-iesuffix.css" );
---         styles->add_data( "wp-embed-template-ie", "conditional", "lte IE 8" );
+      -- Deprecated CSS.
+      Styles.Add ("deprecated-media", "/wp-admin/css/deprecated-mediasuffix.css");
+      Styles.Add ("farbtastic", "/wp-admin/css/farbtasticsuffix.css", Empty_List, "1.3u1");
+      Styles.Add ("jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.css", Empty_List, "0.9.15");
+      Styles.Add ("colors-fresh", "false", -- False
+                  To_List (List => (+"wp-admin", +"buttons"))); -- Old handle.
+      Styles.Add ("open-sans", -Open_Sans_Font_URL); -- No longer used in core as of 4.6.
 
---         -- External libraries and friends.
---         styles->add( "imgareaselect", "/wp-includes/js/imgareaselect/imgareaselect.css", array(), "0.9.8" );
---         styles->add( "wp-jquery-ui-dialog", "/wp-includes/css/jquery-ui-dialogsuffix.css", array( "dashicons" ) );
---         styles->add( "mediaelement", "/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css", array(), "4.2.17" );
---         styles->add( "wp-mediaelement", "/wp-includes/js/mediaelement/wp-mediaelementsuffix.css", array( "mediaelement" ) );
---         styles->add( "thickbox", "/wp-includes/js/thickbox/thickbox.css", array( "dashicons" ) );
---         styles->add( "wp-codemirror", "/wp-includes/js/codemirror/codemirror.min.css", array(), "5.29.1-alpha-ee20357" );
+      -- Noto Serif is no longer used by core, but may be relied upon by themes and plugins.
+      Fonts_URL := +"";
 
---         -- Deprecated CSS.
---         styles->add( "deprecated-media", "/wp-admin/css/deprecated-mediasuffix.css" );
---         styles->add( "farbtastic", "/wp-admin/css/farbtasticsuffix.css", array(), "1.3u1" );
---         styles->add( "jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.css", array(), "0.9.15" );
---         styles->add( "colors-fresh", false, array( "wp-admin", "buttons" ) ); -- Old handle.
---         styles->add( "open-sans", open_sans_font_url ); -- No longer used in core as of 4.6.
+      --
+      -- translators: Use this to specify the proper Google Font name and variants
+      -- to load that is supported by your language. Do not translate.
+      -- Set to "off" to disable loading.
+      --
+      Font_Family := +X_X ("Noto Serif:400,400i,700,700i",
+                           "Google Font Name and Variants");
+      if "off" /= Font_Family then
+         Fonts_URL := +"https://fonts.googleapis.com/css?family=" &
+                      Php.Urlencode (-Font_Family);
+      end if;
+      Styles.Add ("wp-editor-font", -Fonts_URL); -- No longer used in core as of 5.7.
 
---         -- Noto Serif is no longer used by core, but may be relied upon by themes and plugins.
---         fonts_url = "";
+      declare
+         Block_Library_Theme_Path : constant String :=
+           -Globals.WPINC & "/css/dist/block-library/themesuffix.css";
+      begin
+         Styles.Add ("wp-block-library-theme", "/block_library_theme_path");
+         Styles.Add_Data ("wp-block-library-theme", "path",
+                          Globals.ABSPATH & Block_Library_Theme_Path);
+      end;
 
---         /*
---         -- translators: Use this to specify the proper Google Font name and variants
---         -- to load that is supported by your language. Do not translate.
---         -- Set to "off" to disable loading.
---         --
---         font_family = _x( "Noto Serif:400,400i,700,700i", "Google Font Name and Variants" );
---         if ( "off" !== font_family ) then
---                 fonts_url = "https:--fonts.googleapis.com/css?family=" . urlencode( font_family );
---         end;
---         styles->add( "wp-editor-font", fonts_url ); -- No longer used in core as of 5.7.
---         block_library_theme_path = WPINC . "/css/dist/block-library/themesuffix.css";
---         styles->add( "wp-block-library-theme", "/block_library_theme_path" );
---         styles->add_data( "wp-block-library-theme", "path", ABSPATH . block_library_theme_path );
+      Styles.Add (
+                "wp-reset-editor-styles",
+                "/wp-includes/css/dist/block-library/resetsuffix.css",
+                To_List (List => (+"common", +"forms")) -- Make sure the reset is loaded after the default WP Admin styles.
+      );
 
---         styles->add(
---                 "wp-reset-editor-styles",
---                 "/wp-includes/css/dist/block-library/resetsuffix.css",
---                 array( "common", "forms" ) -- Make sure the reset is loaded after the default WP Admin styles.
---         );
+      Styles.Add (
+                "wp-editor-classic-layout-styles",
+                "/wp-includes/css/dist/edit-post/classicsuffix.css",
+                Empty_List -- Array
+      );
 
---         styles->add(
---                 "wp-editor-classic-layout-styles",
---                 "/wp-includes/css/dist/edit-post/classicsuffix.css",
---                 array()
---         );
+      declare
+         Wp_Edit_Blocks_Dependencies : List_Type := To_List (List => (
+                +"wp-components",
+                +"wp-editor",
+                -- This need to be added before the block library styles,
+                -- The block library styles override the "reset" styles.
+                +"wp-reset-editor-styles",
+                +"wp-block-library",
+                +"wp-reusable-blocks"
+         ));
+      begin
 
---         wp_edit_blocks_dependencies = array(
---                 "wp-components",
---                 "wp-editor",
---                 -- This need to be added before the block library styles,
---                 -- The block library styles override the "reset" styles.
---                 "wp-reset-editor-styles",
---                 "wp-block-library",
---                 "wp-reusable-blocks",
---         );
+         -- Only load the default layout and margin styles for themes without
+         -- theme.json file.
+         if
+           True -- not Inc_Class_Wp_Theme_Json_Resolver.Theme_Has_Support -- ::
+         then
+            Wp_Edit_Blocks_Dependencies.Append (+"wp-editor-classic-layout-styles");
+         end if;
 
---         -- Only load the default layout and margin styles for themes without theme.json file.
---         if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) then
---                 wp_edit_blocks_dependencies[] = "wp-editor-classic-layout-styles";
---         end;
+         if not Php.Is_Array (Editor_Styles) or else Count (Editor_Styles) = 0 then
+            -- Include opinionated block styles if no editor_styles are declared,
+            -- so the editor never appears broken.
+            Wp_Edit_Blocks_Dependencies.Append (+"wp-block-library-theme");
+         end if;
 
---         if ( ! is_array( editor_styles ) || count( editor_styles ) === 0 ) then
---                 -- Include opinionated block styles if no editor_styles are declared, so the editor never appears broken.
---                 wp_edit_blocks_dependencies[] = "wp-block-library-theme";
---         end;
+         Styles.Add (
+                "wp-edit-blocks",
+                "/wp-includes/css/dist/block-library/editorsuffix.css",
+                Wp_Edit_Blocks_Dependencies
+         );
+      end;
 
---         styles->add(
---                 "wp-edit-blocks",
---                 "/wp-includes/css/dist/block-library/editorsuffix.css",
---                 wp_edit_blocks_dependencies
---         );
+      declare
+         Package_Styles : constant Array_Type := To_Array ((
+                Build ("block-editor",         To_Array ((1 => Build ("wp-components", "")))),
+                Build ("block-library",        Empty_Array),
+                Build ("block-directory",      Empty_Array),
+                Build ("components",           Empty_Array),
+                Build ("edit-post",            To_Array ((
+                        Build ("wp-components",    ""),
+                        Build ("wp-block-editor",  ""),
+                        Build ("wp-editor",        ""),
+                        Build ("wp-edit-blocks",   ""),
+                        Build ("wp-block-library", ""),
+                        Build ("wp-nux",           "")
+                ))),
+                Build ("editor",               To_Array ((
+                        Build ("wp-components",      ""),
+                        Build ("wp-block-editor",    ""),
+                        Build ("wp-nux",             ""),
+                        Build ("wp-reusable-blocks", "")
+                ))),
+                Build ("format-library",       Empty_Array),
+                Build ("list-reusable-blocks", To_Array ((1 => Build ("wp-components", "")))),
+                Build ("reusable-blocks",      To_Array ((1 => Build ("wp-components", "")))),
+                Build ("nux",                  To_Array ((1 => Build ("wp-components", "")))),
+                Build ("widgets",              To_Array ((1 =>
+                        Build ("wp-components", "")
+                ))),
+                Build ("edit-widgets",         To_Array ((
+                        Build ("wp-widgets",         ""),
+                        Build ("wp-block-editor",    ""),
+                        Build ("wp-edit-blocks",     ""),
+                        Build ("wp-block-library",   ""),
+                        Build ("wp-reusable-blocks", "")
+                ))),
+                Build ("customize-widgets",    To_Array ((
+                        Build ("wp-widgets",         ""),
+                        Build ("wp-block-editor",    ""),
+                        Build ("wp-edit-blocks",     ""),
+                        Build ("wp-block-library",   ""),
+                        Build ("wp-reusable-blocks", "")
+                ))),
+                Build ("edit-site",            To_Array ((
+                        Build ("wp-components",   ""),
+                        Build ("wp-block-editor", ""),
+                        Build ("wp-edit-blocks",  "")
+                )))
+         ));
 
---         package_styles = array(
---                 "block-editor"         => array( "wp-components" ),
---                 "block-library"        => array(),
---                 "block-directory"      => array(),
---                 "components"           => array(),
---                 "edit-post"            => array(
---                         "wp-components",
---                         "wp-block-editor",
---                         "wp-editor",
---                         "wp-edit-blocks",
---                         "wp-block-library",
---                         "wp-nux",
---                 ),
---                 "editor"               => array(
---                         "wp-components",
---                         "wp-block-editor",
---                         "wp-nux",
---                         "wp-reusable-blocks",
---                 ),
---                 "format-library"       => array(),
---                 "list-reusable-blocks" => array( "wp-components" ),
---                 "reusable-blocks"      => array( "wp-components" ),
---                 "nux"                  => array( "wp-components" ),
---                 "widgets"              => array(
---                         "wp-components",
---                 ),
---                 "edit-widgets"         => array(
---                         "wp-widgets",
---                         "wp-block-editor",
---                         "wp-edit-blocks",
---                         "wp-block-library",
---                         "wp-reusable-blocks",
---                 ),
---                 "customize-widgets"    => array(
---                         "wp-widgets",
---                         "wp-block-editor",
---                         "wp-edit-blocks",
---                         "wp-block-library",
---                         "wp-reusable-blocks",
---                 ),
---                 "edit-site"            => array(
---                         "wp-components",
---                         "wp-block-editor",
---                         "wp-edit-blocks",
---                 ),
---         );
+      begin
 
---         foreach ( package_styles as package => dependencies ) then
---                 handle = "wp-" . package;
---                 path   = "/wp-includes/css/dist/package/stylesuffix.css";
+         for P in Package_Styles.Iterate loop
+            declare
+               use Array_Maps;
 
---                 if ( "block-library" === package && wp_should_load_separate_core_block_assets() ) then
---                         path = "/wp-includes/css/dist/package/commonsuffix.css";
---                 end;
---                 styles->add( handle, path, dependencies );
---                 styles->add_data( handle, "path", ABSPATH . path );
---         end;
+               Packag       : constant String := Key     (P);
+               Dependencies : String := Element (P);
+               Dependencies_2 : List_Type;
+               Handle       : constant String := "wp-" & Packag;
 
---         -- RTL CSS.
---         rtl_styles = array(
---                 -- Admin CSS.
---                 "common",
---                 "forms",
---                 "admin-menu",
---                 "dashboard",
---                 "list-tables",
---                 "edit",
---                 "revisions",
---                 "media",
---                 "themes",
---                 "about",
---                 "nav-menus",
---                 "widgets",
---                 "site-icon",
---                 "l10n",
---                 "install",
---                 "wp-color-picker",
---                 "customize-controls",
---                 "customize-widgets",
---                 "customize-nav-menus",
---                 "customize-preview",
---                 "login",
---                 "site-health",
---                 -- Includes CSS.
---                 "buttons",
---                 "admin-bar",
---                 "wp-auth-check",
---                 "editor-buttons",
---                 "media-views",
---                 "wp-pointer",
---                 "wp-jquery-ui-dialog",
---                 -- Package styles.
---                 "wp-reset-editor-styles",
---                 "wp-editor-classic-layout-styles",
---                 "wp-block-library-theme",
---                 "wp-edit-blocks",
---                 "wp-block-editor",
---                 "wp-block-library",
---                 "wp-block-directory",
---                 "wp-components",
---                 "wp-customize-widgets",
---                 "wp-edit-post",
---                 "wp-edit-site",
---                 "wp-edit-widgets",
---                 "wp-editor",
---                 "wp-format-library",
---                 "wp-list-reusable-blocks",
---                 "wp-reusable-blocks",
---                 "wp-nux",
---                 "wp-widgets",
---                 -- Deprecated CSS.
---                 "deprecated-media",
---                 "farbtastic",
---         );
+               Path   : Unbounded_String;
+            begin
 
---         foreach ( rtl_styles as rtl_style ) then
---                 styles->add_data( rtl_style, "rtl", "replace" );
---                 if ( suffix ) then
---                         styles->add_data( rtl_style, "suffix", suffix );
---                 end;
---         end;
--- end;
+               Path := +"/wp-includes/css/dist/package/stylesuffix.css";
+
+               if
+                 "block-library" = Packag and then
+                 Wp_Should_Load_Separate_Core_Block_Assets
+               then
+                  Path := +"/wp-includes/css/dist/package/commonsuffix.css";
+               end if;
+
+               Styles.Add (Handle, -Path, Dependencies_2);
+               Styles.Add_Data (Handle, "path", Globals.ABSPATH & (-Path));
+            end;
+         end loop;
+      end;
+
+      declare
+         -- RTL CSS.
+         RTL_Styles : constant List_Type := To_List (List => (
+                -- Admin CSS.
+                +"common",
+                +"forms",
+                +"admin-menu",
+                +"dashboard",
+                +"list-tables",
+                +"edit",
+                +"revisions",
+                +"media",
+                +"themes",
+                +"about",
+                +"nav-menus",
+                +"widgets",
+                +"site-icon",
+                +"l10n",
+                +"install",
+                +"wp-color-picker",
+                +"customize-controls",
+                +"customize-widgets",
+                +"customize-nav-menus",
+                +"customize-preview",
+                +"login",
+                +"site-health",
+                -- Includes CSS.
+                +"buttons",
+                +"admin-bar",
+                +"wp-auth-check",
+                +"editor-buttons",
+                +"media-views",
+                +"wp-pointer",
+                +"wp-jquery-ui-dialog",
+                -- Package styles.
+                +"wp-reset-editor-styles",
+                +"wp-editor-classic-layout-styles",
+                +"wp-block-library-theme",
+                +"wp-edit-blocks",
+                +"wp-block-editor",
+                +"wp-block-library",
+                +"wp-block-directory",
+                +"wp-components",
+                +"wp-customize-widgets",
+                +"wp-edit-post",
+                +"wp-edit-site",
+                +"wp-edit-widgets",
+                +"wp-editor",
+                +"wp-format-library",
+                +"wp-list-reusable-blocks",
+                +"wp-reusable-blocks",
+                +"wp-nux",
+                +"wp-widgets",
+                -- Deprecated CSS.
+                +"deprecated-media",
+                +"farbtastic")
+         );
+      begin
+
+         for RTL_Style of RTL_Styles loop
+            Styles.Add_Data (-RTL_Style, "rtl", "replace");
+            if Suffix /= "" then
+               Styles.Add_Data (-RTL_Style, "suffix", -Suffix);
+            end if;
+         end loop;
+
+      end;
+   end Wp_Default_Styles;
 
 -- --
 -- -- Reorders JavaScript scripts array to place prototype before jQuery.
@@ -3696,6 +3761,7 @@ is
    procedure Wp_Enqueue_Classic_Theme_Styles
    is
       use Globals;
+      use Hb_Common;
       use Inc_Class_Wp_Theme_Json_Resolver;
       use Inc_Functions_Wp_Styles;
    begin
@@ -3707,7 +3773,7 @@ is
             Unused :=
               Wp_Register_Style
                 ("classic-theme-styles",
-                 "/" & WPINC & "/css/classic-themes" & Suffix & ".css",
+                 "/" & (-WPINC) & "/css/classic-themes" & Suffix & ".css",
                  Empty_List, Ver => "true"); -- Ver => True
 
             Wp_Enqueue_Style ("classic-theme-styles");

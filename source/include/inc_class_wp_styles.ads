@@ -34,7 +34,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Base_Url : Unbounded_String;
+        Base_URL : Unbounded_String;
 
         --
         -- URL of the content directory.
@@ -42,7 +42,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Content_Url : Unbounded_String;
+        Content_URL : Unbounded_String;
 
         --
         -- Default version string for stylesheets.
@@ -108,7 +108,7 @@ is
         -- @since 2.8.0
         -- @var array
         --
-        Default_Dirs : Array_Type;
+        Default_Dirs : List_Type;
 
         --
         -- Holds a string which contains the type attribute for style tag.

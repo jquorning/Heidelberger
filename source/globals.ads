@@ -21,10 +21,10 @@ is
    GLOBALS : Array_Type := Empty_Array;
 
    ABSPATH         : constant String := "";
-   WPINC           : constant String := "";
+   WPINC           : Unbounded_String;
    WP_PLUGIN_DIR   : Unbounded_String;
    WPMU_PLUGIN_DIR : Unbounded_String;
-   WP_CONTENT_DIR  : constant String := "";
+   WP_CONTENT_DIR  : Unbounded_String;
    WP_SITEURL      : constant String := "";
    WP_LANG_DIR     : constant String := "";
 

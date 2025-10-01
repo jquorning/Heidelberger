@@ -1,14 +1,57 @@
+--
+-- WordPress scripts and styles default loader.
+--
+-- Several constants are used to manage the loading, concatenating and compression
+-- of scripts and CSS:
+-- define('SCRIPT_DEBUG', true); loads the development (non-minified) versions of
+-- all scripts and CSS, and disables compression and concatenation,
+-- define('CONCATENATE_SCRIPTS', false); disables compression and concatenation of
+-- scripts and CSS,
+-- define('COMPRESS_SCRIPTS', false); disables compression of scripts,
+-- define('COMPRESS_CSS', false); disables compression of CSS,
+-- define('ENFORCE_GZIP', true); forces gzip for compression (default is deflate).
+--
+-- The globals concatenate_scripts, compress_scripts and compress_css can be set by
+-- plugins to temporarily override the above settings. Also a compression test is
+-- run once and the result is saved as option 'can_compress_scripts' (0/1). The
+-- test will run again if that option is deleted.
+--
+-- @package WordPress
+--
+
+with Inc_Class_Wp_Styles;
+
 package Inc_Script_Loader
 is
    procedure Dummy;
---
--- Prints scripts (internal use only)
---
--- @ignore
---
--- @global WP_Scripts wp_scripts
--- @global bool       compress_scripts
---
+
+   --
+   -- Assigns default styles to styles object.
+   --
+   -- Nothing is returned, because the styles parameter is passed by reference.
+   -- Meaning that whatever object is passed will be updated without having to
+   -- reassign the variable that was passed back to the same value. This saves
+   -- memory.
+   --
+   -- Adding default styles is not the only task, it also assigns the base_url
+   -- property, the default version, and text direction for the object.
+   --
+   -- @since 2.6.0
+   --
+   -- @global array editor_styles
+   --
+   -- @param WP_Styles styles
+   --
+   procedure Wp_Default_Styles (Styles : in out Inc_Class_Wp_Styles.Wp_Styles);
+
+   --
+   -- Prints scripts (internal use only)
+   --
+   -- @ignore
+   --
+   -- @global WP_Scripts wp_scripts
+   -- @global bool       compress_scripts
+   --
    procedure X_Print_Scripts
              is null;
 
@@ -33,5 +76,30 @@ is
    -- @since 6.1.0
    --
    procedure Wp_Enqueue_Classic_Theme_Styles;
+
+   --
+   -- Checks whether separate styles should be loaded for core blocks on-render.
+   --
+   -- When this function returns true, other functions ensure that core blocks
+   -- only load their assets on-render, and each block loads its own, individual
+   -- assets. Third-party blocks only load their assets when rendered.
+   --
+   -- When this function returns false, all core block assets are loaded regardless
+   -- of whether they are rendered in a page or not, because they are all part of
+   -- the `block-library/style.css` file. Assets for third-party blocks are always
+   -- enqueued regardless of whether they are rendered or not.
+   --
+   -- This only affects front end and not the block editor screens.
+   --
+   -- @see wp_enqueue_registered_block_scripts_and_styles()
+   -- @see register_block_style_handle()
+   --
+   -- @since 5.8.0
+   --
+   -- @return bool Whether separate assets will be loaded.
+   --
+   function Wp_Should_Load_Separate_Core_Block_Assets
+            return Boolean
+            is (True);
 
 end Inc_Script_Loader;

@@ -333,6 +333,14 @@ is
                       return String
                       is (Format);
 
+   function Realpath (Path : String)
+            return String
+            is ("XXX-779");
+
+   function File_Get_Contents (Filename : String)
+            return String
+            is ("XXX-780");
+
    -------------------
    -- Echo handling --
    -------------------

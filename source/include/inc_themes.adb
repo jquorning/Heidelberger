@@ -445,7 +445,7 @@ is
       if not File_Exists (Directory) then
          -- Try prepending as the theme directory could be relative to the content
          -- directory.
-         Directory_2 := +WP_CONTENT_DIR & "/" & Directory;
+         Directory_2 := WP_CONTENT_DIR & "/" & Directory;
 
          -- If this directory does not exist, return and do not register.
          if not File_Exists (-Directory_2) then
@@ -640,7 +640,7 @@ is
       end if;
 
       if Theme_Root /= "" then
-         Theme_Root := +WP_CONTENT_DIR & "/themes";
+         Theme_Root := WP_CONTENT_DIR & "/themes";
       end if;
 
       --
