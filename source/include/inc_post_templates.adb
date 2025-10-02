@@ -437,7 +437,7 @@ is
 -- -- Determines whether the post has a custom excerpt.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+-- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
 -- -- Conditional Tagsend; article in the Theme Developer Handbook.
 -- --
 -- -- @since 2.3.0
@@ -1775,7 +1775,7 @@ is
 -- -- and then the check will be specific to that template.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+-- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
 -- -- Conditional Tagsend; article in the Theme Developer Handbook.
 -- --
 -- -- @since 2.5.0
@@ -1857,7 +1857,7 @@ is
 --                 return false;
 --         end;
 
---         /* translators: Revision date format, see https:--www.php.net/manual/datetime.format.php--
+--         /* translators: Revision date format, see https://www.php.net/manual/datetime.format.php--
 --         datef = _x( "F j, Y @ H:i:s", "revision date format" );
 --         /* translators: %s: Revision date.--
 --         autosavef = __( "%s [Autosave]" );
@@ -1900,7 +1900,7 @@ is
 --         end;
 
 --         author = get_the_author_meta( "display_name", revision.post_author );
---         /* translators: Revision date format, see https:--www.php.net/manual/datetime.format.php--
+--         /* translators: Revision date format, see https://www.php.net/manual/datetime.format.php--
 --         datef = _x( "F j, Y @ H:i:s", "revision date format" );
 
 --         gravatar = get_avatar( revision.post_author, 24 );

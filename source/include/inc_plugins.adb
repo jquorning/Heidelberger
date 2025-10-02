@@ -929,7 +929,7 @@ is
 -- -- Functions and static method callbacks are just returned as strings and
 -- -- shouldn't have any speed penalty.
 -- --
--- -- @link https:--core.trac.wordpress.org/ticket/3875
+-- -- @link https://core.trac.wordpress.org/ticket/3875
 -- --
 -- -- @since 2.2.3
 -- -- @since 5.3.0 Removed workarounds for spl_object_hash().

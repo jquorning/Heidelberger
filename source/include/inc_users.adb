@@ -1127,7 +1127,7 @@ is
 -- --
 -- -- @since 3.0.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/delete_user_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/delete_user_meta/
 -- --
 -- -- @param int    user_id    User ID
 -- -- @param string meta_key   Metadata name.
@@ -1145,7 +1145,7 @@ is
 -- --
 -- -- @since 3.0.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/get_user_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/get_user_meta/
 -- --
 -- -- @param int    user_id User ID.
 -- -- @param string key     Optional. The meta key to retrieve. By default,
@@ -1172,7 +1172,7 @@ is
 -- --
 -- -- @since 3.0.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/update_user_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/update_user_meta/
 -- --
 -- -- @param int    user_id    User ID.
 -- -- @param string meta_key   Metadata key.
@@ -1911,7 +1911,7 @@ is
 -- -- Determines whether the given username exists.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+-- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
 -- -- Conditional Tagsend; article in the Theme Developer Handbook.
 -- --
 -- -- @since 2.0.0
@@ -1943,7 +1943,7 @@ is
 -- -- Determines whether the given email exists.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+-- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
 -- -- Conditional Tagsend; article in the Theme Developer Handbook.
 -- --
 -- -- @since 2.1.0
@@ -3256,7 +3256,7 @@ is
 --                         sprintf(
 --                                 /* translators: %s: Documentation URL.--
 --                                 __( "<strong>Error:</strong> The email could not be sent. Your site may not be correctly configured to send emails. <a href="%s">Get support for resetting your password</a>." ),
---                                 esc_url( __( "https:--wordpress.org/support/article/resetting-your-password/" ) )
+--                                 esc_url( __( "https://wordpress.org/support/article/resetting-your-password/" ) )
 --                         )
 --                 );
 --                 return errors;

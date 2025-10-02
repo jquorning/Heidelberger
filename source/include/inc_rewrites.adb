@@ -573,7 +573,7 @@ is
 --         end;
 
 --         if ( false !== strpos( trailingslashit( url ), home_url( "/" ) ) ) then
---                 -- Chop off http:--domain.com/[path].
+--                 -- Chop off http://domain.com/[path].
 --                 url = str_replace( home_url(), "", url );
 --         end; else then
 --                 -- Chop off /path/to/blog.

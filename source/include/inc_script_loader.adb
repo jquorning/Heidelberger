@@ -261,7 +261,7 @@ is
 -- --
 -- -- Registers development scripts that integrate with `@wordpress/scripts`.
 -- --
--- -- @see https:--github.com/WordPress/gutenberg/tree/trunk/packages/scripts#start
+-- -- @see https://github.com/WordPress/gutenberg/tree/trunk/packages/scripts#start
 -- --
 -- -- @since 6.0.0
 -- --
@@ -294,7 +294,7 @@ is
 --                 );
 --         end;
 
---         -- See https:--github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
+--         -- See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
 --         scripts->registered["react"]->deps[] = "wp-react-refresh-entry";
 -- end;
 
@@ -495,13 +495,13 @@ is
 --                                                 "startOfWeek"   => (int) get_option( "start_of_week", 0 ),
 --                                         ),
 --                                         "formats"  => array(
---                                                 /* translators: Time format, see https:--www.php.net/manual/datetime.format.php--
+--                                                 /* translators: Time format, see https://www.php.net/manual/datetime.format.php--
 --                                                 "time"                => get_option( "time_format", __( "g:i a" ) ),
---                                                 /* translators: Date format, see https:--www.php.net/manual/datetime.format.php--
+--                                                 /* translators: Date format, see https://www.php.net/manual/datetime.format.php--
 --                                                 "date"                => get_option( "date_format", __( "F j, Y" ) ),
---                                                 /* translators: Date/Time format, see https:--www.php.net/manual/datetime.format.php--
+--                                                 /* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php--
 --                                                 "datetime"            => __( "F j, Y g:i a" ),
---                                                 /* translators: Abbreviated date/time format, see https:--www.php.net/manual/datetime.format.php--
+--                                                 /* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php--
 --                                                 "datetimeAbbreviated" => __( "M j, Y g:i a" ),
 --                                         ),
 --                                         "timezone" => array(
@@ -526,7 +526,7 @@ is
 --         -- wp-editor module is exposed as window.wp.editor.
 --         -- Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
 --         -- Solution: fuse the two objects together to maintain backward compatibility.
---         -- For more context, see https:--github.com/WordPress/gutenberg/issues/33203.
+--         -- For more context, see https://github.com/WordPress/gutenberg/issues/33203.
 --         --
 --         scripts->add_inline_script(
 --                 "wp-editor",
@@ -2049,7 +2049,7 @@ is
 -- --
 -- -- @since 4.6.0
 -- --
--- -- @link https:--api.jqueryui.com/datepicker/#options
+-- -- @link https://api.jqueryui.com/datepicker/#options
 -- --
 -- -- @global WP_Locale wp_locale WordPress date and time locale object.
 -- --
@@ -2659,7 +2659,7 @@ is
 --         -- Global styles should be printed in the head when loading all styles combined.
 --         -- The footer should only be used to print global styles for classic themes with separate core assets enabled.
 --         --
---         -- See https:--core.trac.wordpress.org/ticket/53494.
+--         -- See https://core.trac.wordpress.org/ticket/53494.
 --         --
 --         if (
 --                 ( is_block_theme && doing_action( "wp_footer" ) ) ||
@@ -3208,7 +3208,7 @@ is
 -- -- For block themes, styles are loaded in the head.
 -- -- For classic ones, styles are loaded in the body because the wp_head action happens before render_block.
 -- --
--- -- @link https:--core.trac.wordpress.org/ticket/53494.
+-- -- @link https://core.trac.wordpress.org/ticket/53494.
 -- --
 -- -- @param string style    String containing the CSS styles to be added.
 -- -- @param int    priority To set the priority for the add_action.
@@ -3231,7 +3231,7 @@ is
 -- -- Fetches, processes and compiles stored core styles, then combines and renders them to the page.
 -- -- Styles are stored via the style engine API.
 -- --
--- -- @link https:--developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+-- -- @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
 -- --
 -- -- @since 6.1.0
 -- --
@@ -3424,7 +3424,7 @@ is
 -- --       the Webfonts API is introduced in Core.
 -- --    b. To make `fontFace` declarations in `theme.json` work.
 -- --
--- -- @link  https:--github.com/WordPress/gutenberg/issues/40472
+-- -- @link  https://github.com/WordPress/gutenberg/issues/40472
 -- --
 -- -- @since 6.0.0
 -- -- @access private

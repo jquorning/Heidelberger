@@ -1737,8 +1737,8 @@ is
 -- --
 -- function wp_lazy_loading_enabled( tag_name, context ) then
 --         -- By default add to all "img" and "iframe" tags.
---         -- See https:--html.spec.whatwg.org/multipage/embedded-content.html#attr-img-loading
---         -- See https:--html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-loading
+--         -- See https://html.spec.whatwg.org/multipage/embedded-content.html#attr-img-loading
+--         -- See https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-loading
 --         default = ( "img" === tag_name || "iframe" === tag_name );
 
 --         --
@@ -3415,7 +3415,7 @@ is
 --                 end; elseif ( is_vimeo ) then
 --                         -- Remove all query arguments and force SSL - see #40866.
 --                         parsed_vimeo_url = wp_parse_url( atts["src"] );
---                         vimeo_src        = "https:--" . parsed_vimeo_url["host"] . parsed_vimeo_url["path"];
+--                         vimeo_src        = "https://" . parsed_vimeo_url["host"] . parsed_vimeo_url["path"];
 
 --                         -- Add loop param for mejs bug - see #40977, not needed after #39686.
 --                         loop        = atts["loop"] ? "1" : "0";
@@ -4439,7 +4439,7 @@ is
 --         -- @since 4.7.4
 --         -- @since 4.8.0 The filter"s default value is `true` rather than `null`.
 --         --
---         -- @link https:--core.trac.wordpress.org/ticket/31071
+--         -- @link https://core.trac.wordpress.org/ticket/31071
 --         --
 --         -- @param bool|null show Whether to show the button, or `null` to decide based
 --         --                        on whether any audio files exist in the media library.
@@ -4469,7 +4469,7 @@ is
 --         -- @since 4.7.4
 --         -- @since 4.8.0 The filter"s default value is `true` rather than `null`.
 --         --
---         -- @link https:--core.trac.wordpress.org/ticket/31071
+--         -- @link https://core.trac.wordpress.org/ticket/31071
 --         --
 --         -- @param bool|null show Whether to show the button, or `null` to decide based
 --         --                        on whether any video files exist in the media library.
@@ -4497,7 +4497,7 @@ is
 --         --
 --         -- @since 4.7.4
 --         --
---         -- @link https:--core.trac.wordpress.org/ticket/31071
+--         -- @link https://core.trac.wordpress.org/ticket/31071
 --         --
 --         -- @param stdClass[]|null months An array of objects with `month` and `year`
 --         --                                properties, or `null` for default behavior.
@@ -5327,7 +5327,7 @@ is
 --                 -- "corrupt JPEG data: 7191 extraneous bytes before marker",
 --                 -- even when it"s able to provide image size information.
 --                 --
---                 -- See https:--core.trac.wordpress.org/ticket/42480
+--                 -- See https://core.trac.wordpress.org/ticket/42480
 --                 --
 --                 if ( 2 === func_num_args() ) then
 --                         -- phpcs:ignore WordPress.PHP.NoSilencedErrors
@@ -5405,7 +5405,7 @@ is
 --         end;
 
 --         -- The headers are a little different for each of the three formats.
---         -- Header values based on WebP docs, see https:--developers.google.com/speed/webp/docs/riff_container.
+--         -- Header values based on WebP docs, see https://developers.google.com/speed/webp/docs/riff_container.
 --         switch ( substr( magic, 12, 4 ) ) then
 --                 -- Lossy WebP.
 --                 case "VP8 ":

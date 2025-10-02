@@ -423,7 +423,7 @@ is
 -- --
 -- -- @since 2.9.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/add_comment_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/add_comment_meta/
 -- --
 -- -- @param int    comment_id Comment ID.
 -- -- @param string meta_key   Metadata name.
@@ -445,7 +445,7 @@ is
 -- --
 -- -- @since 2.9.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/delete_comment_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/delete_comment_meta/
 -- --
 -- -- @param int    comment_id Comment ID.
 -- -- @param string meta_key   Metadata name.
@@ -463,7 +463,7 @@ is
 -- --
 -- -- @since 2.9.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/get_comment_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/get_comment_meta/
 -- --
 -- -- @param int    comment_id Comment ID.
 -- -- @param string key        Optional. The meta key to retrieve. By default,
@@ -490,7 +490,7 @@ is
 -- --
 -- -- @since 2.9.0
 -- --
--- -- @link https:--developer.wordpress.org/reference/functions/update_comment_meta/
+-- -- @link https://developer.wordpress.org/reference/functions/update_comment_meta/
 -- --
 -- -- @param int    comment_id Comment ID.
 -- -- @param string meta_key   Metadata key.
@@ -2180,7 +2180,7 @@ is
 -- -- We use `REMOTE_ADDR` here directly. If you are behind a proxy, you should ensure
 -- -- that it is properly set, such as in wp-config.php, for your environment.
 -- --
--- -- See then@link https:--core.trac.wordpress.org/ticket/9235end;
+-- -- See then@link https://core.trac.wordpress.org/ticket/9235end;
 -- --
 -- -- @since 1.5.0
 -- -- @since 4.3.0 Introduced the `comment_agent` and `comment_author_IP` arguments.
@@ -3057,7 +3057,7 @@ is
 --         include_once ABSPATH . WPINC . "/class-IXR.php";
 --         include_once ABSPATH . WPINC . "/class-wp-http-ixr-client.php";
 
---         -- Original code by Mort (http:--mort.mine.nu:8080).
+--         -- Original code by Mort (http://mort.mine.nu:8080).
 --         post_links = array();
 
 --         post = get_post( post );
@@ -3083,9 +3083,9 @@ is
 --         -- Walking through the links array.
 --         -- First we get rid of links pointing to sites, not to specific files.
 --         -- Example:
---         -- http:--dummy-weblog.org
---         -- http:--dummy-weblog.org/
---         -- http:--dummy-weblog.org/post.php
+--         -- http://dummy-weblog.org
+--         -- http://dummy-weblog.org/
+--         -- http://dummy-weblog.org/post.php
 --         -- We don"t wanna ping first and second types, even if they have a valid <link/>.
 --         --
 --         foreach ( (array) post_links_temp as link_test ) then
@@ -3256,7 +3256,7 @@ is
 -- --
 -- -- @since 3.5.1
 -- --
--- -- @link https:--www.hixie.ch/specs/pingback/pingback#TOC3
+-- -- @link https://www.hixie.ch/specs/pingback/pingback#TOC3
 -- --
 -- -- @param IXR_Error ixr_error
 -- -- @return IXR_Error

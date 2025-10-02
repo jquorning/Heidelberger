@@ -1009,10 +1009,10 @@ is
 --                         end; elseif ( gmdate( "Y-m-d", time ) === tomorrow ) then
 --                                 relative = __( "Tomorrow" );
 --                         end; elseif ( gmdate( "Y", time ) !== year ) then
---                                 -- translators: Date and time format for recent posts on the dashboard, from a different calendar year, see https:--www.php.net/manual/datetime.format.php--
+--                                 -- translators: Date and time format for recent posts on the dashboard, from a different calendar year, see https://www.php.net/manual/datetime.format.php--
 --                                 relative = date_i18n( __( "M jS Y" ), time );
 --                         end; else then
---                                 -- translators: Date and time format for recent posts on the dashboard, see https:--www.php.net/manual/datetime.format.php--
+--                                 -- translators: Date and time format for recent posts on the dashboard, see https://www.php.net/manual/datetime.format.php--
 --                                 relative = date_i18n( __( "M jS" ), time );
 --                         end;
 
@@ -1294,7 +1294,7 @@ is
 --                 <?php
 --                         printf(
 --                                 "<a href="%1s" target="_blank">%2s <span class="screen-reader-text">%3s</span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>",
---                                 "https:--make.wordpress.org/community/meetups-landing-page",
+--                                 "https://make.wordpress.org/community/meetups-landing-page",
 --                                 __( "Meetups" ),
 --                                 -- translators: Accessibility text.--
 --                                 __( "(opens in a new tab)" )
@@ -1306,7 +1306,7 @@ is
 --                 <?php
 --                         printf(
 --                                 "<a href="%1s" target="_blank">%2s <span class="screen-reader-text">%3s</span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>",
---                                 "https:--central.wordcamp.org/schedule/",
+--                                 "https://central.wordcamp.org/schedule/",
 --                                 __( "WordCamps" ),
 --                                 -- translators: Accessibility text.--
 --                                 __( "(opens in a new tab)" )
@@ -1318,8 +1318,8 @@ is
 --                 <?php
 --                         printf(
 --                                 "<a href="%1s" target="_blank">%2s <span class="screen-reader-text">%3s</span><span aria-hidden="true" class="dashicons dashicons-external"></span></a>",
---                                 -- translators: If a Rosetta site exists (e.g. https:--es.wordpress.org/news/), then use that. Otherwise, leave untranslated.--
---                                 esc_url( _x( "https:--wordpress.org/news/", "Events and News dashboard widget" ) ),
+--                                 -- translators: If a Rosetta site exists (e.g. https://es.wordpress.org/news/), then use that. Otherwise, leave untranslated.--
+--                                 esc_url( _x( "https://wordpress.org/news/", "Events and News dashboard widget" ) ),
 --                                 __( "News" ),
 --                                 -- translators: Accessibility text.--
 --                                 __( "(opens in a new tab)" )
@@ -1463,7 +1463,7 @@ is
 --                                 printf(
 --                                         -- translators: %s: Localized meetup organization documentation URL.--
 --                                         __( "Want more events? <a href="%s">Help organize the next one</a>!" ),
---                                         __( "https:--make.wordpress.org/community/organize-event-landing-page/" )
+--                                         __( "https://make.wordpress.org/community/organize-event-landing-page/" )
 --                                 );
 --                                 ?>
 --                         </li>
@@ -1479,7 +1479,7 @@ is
 --                                         -- translators: 1: The city the user searched for, 2: Meetup organization documentation URL.--
 --                                         __( "There are no events scheduled near %1s at the moment. Would you like to <a href="%2s">organize a WordPress event</a>?" ),
 --                                         "thenthen data.location.description end;end;",
---                                         __( "https:--make.wordpress.org/community/handbook/meetup-organizer/welcome/" )
+--                                         __( "https://make.wordpress.org/community/handbook/meetup-organizer/welcome/" )
 --                                 );
 --                                 ?>
 
@@ -1488,7 +1488,7 @@ is
 --                                 printf(
 --                                         -- translators: %s: Meetup organization documentation URL.--
 --                                         __( "There are no events scheduled near you at the moment. Would you like to <a href="%s">organize a WordPress event</a>?" ),
---                                         __( "https:--make.wordpress.org/community/handbook/meetup-organizer/welcome/" )
+--                                         __( "https://make.wordpress.org/community/handbook/meetup-organizer/welcome/" )
 --                                 );
 --                                 ?>
 --                         <# end; #>
@@ -1514,7 +1514,7 @@ is
 --                         --
 --                         -- @param string link The widget"s primary link URL.
 --                         --
---                         "link"         => apply_filters( "dashboard_primary_link", __( "https:--wordpress.org/news/" ) ),
+--                         "link"         => apply_filters( "dashboard_primary_link", __( "https://wordpress.org/news/" ) ),
 
 --                         --
 --                         -- Filters the primary feed URL for the "WordPress Events and News" dashboard widget.
@@ -1523,7 +1523,7 @@ is
 --                         --
 --                         -- @param string url The widget"s primary feed URL.
 --                         --
---                         "url"          => apply_filters( "dashboard_primary_feed", __( "https:--wordpress.org/news/feed/" ) ),
+--                         "url"          => apply_filters( "dashboard_primary_feed", __( "https://wordpress.org/news/feed/" ) ),
 
 --                         --
 --                         -- Filters the primary link title for the "WordPress Events and News" dashboard widget.
@@ -1547,7 +1547,7 @@ is
 --                         --
 --                         -- @param string link The widget"s secondary link URL.
 --                         --
---                         "link"         => apply_filters( "dashboard_secondary_link", __( "https:--planet.wordpress.org/" ) ),
+--                         "link"         => apply_filters( "dashboard_secondary_link", __( "https://planet.wordpress.org/" ) ),
 
 --                         --
 --                         -- Filters the secondary feed URL for the "WordPress Events and News" dashboard widget.
@@ -1556,7 +1556,7 @@ is
 --                         --
 --                         -- @param string url The widget"s secondary feed URL.
 --                         --
---                         "url"          => apply_filters( "dashboard_secondary_feed", __( "https:--planet.wordpress.org/feed/" ) ),
+--                         "url"          => apply_filters( "dashboard_secondary_feed", __( "https://planet.wordpress.org/feed/" ) ),
 
 --                         --
 --                         -- Filters the secondary link title for the "WordPress Events and News" dashboard widget.
@@ -1710,7 +1710,7 @@ is
 --                 end;
 --                 notice .= "<p class="browser-update-nagthenbrowser_nag_classend;">thenmsgend;</p>";
 
---                 browsehappy = "https:--browsehappy.com/";
+--                 browsehappy = "https://browsehappy.com/";
 --                 locale      = get_user_locale();
 --                 if ( "en_US" !== locale ) then
 --                         browsehappy = add_query_arg( "locale", locale, browsehappy );
@@ -1787,7 +1787,7 @@ is
 --                 -- Include an unmodified wp_version.
 --                 require ABSPATH . WPINC . "/version.php";
 
---                 url     = "http:--api.wordpress.org/core/browse-happy/1.1/";
+--                 url     = "http://api.wordpress.org/core/browse-happy/1.1/";
 --                 options = array(
 --                         "body"       => array( "useragent" => _SERVER["HTTP_USER_AGENT"] ),
 --                         "user-agent" => "WordPress/" . wp_version . "; " . home_url( "/" ),
@@ -1953,7 +1953,7 @@ is
 --         <div class="health-check-widget">
 --                 <div class="health-check-widget-title-section site-health-progress-wrapper loading hide-if-no-js">
 --                         <div class="site-health-progress">
---                                 <svg role="img" aria-hidden="true" focusable="false" width="100%" height="100%" viewBox="0 0 200 200" version="1.1" xmlns="http:--www.w3.org/2000/svg">
+--                                 <svg role="img" aria-hidden="true" focusable="false" width="100%" height="100%" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
 --                                         <circle r="90" cx="100" cy="100" fill="transparent" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
 --                                         <circle id="bar" r="90" cx="100" cy="100" fill="transparent" stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
 --                                 </svg>
@@ -2051,7 +2051,7 @@ is
 --         </div>
 --         <div class="welcome-panel-column-container">
 --                 <div class="welcome-panel-column">
---                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http:--www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+--                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 --                                 <rect width="48" height="48" rx="4" fill="#1E1E1E"/>
 --                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M32.0668 17.0854L28.8221 13.9454L18.2008 24.671L16.8983 29.0827L21.4257 27.8309L32.0668 17.0854ZM16 32.75H24V31.25H16V32.75Z" fill="white"/>
 --                         </svg>
@@ -2062,7 +2062,7 @@ is
 --                         </div>
 --                 </div>
 --                 <div class="welcome-panel-column">
---                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http:--www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+--                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 --                                 <rect width="48" height="48" rx="4" fill="#1E1E1E"/>
 --                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M18 16h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2zm12 1.5H18a.5.5 0 0 0-.5.5v3h13v-3a.5.5 0 0 0-.5-.5zm.5 5H22v8h8a.5.5 0 0 0 .5-.5v-7.5zm-10 0h-3V30a.5.5 0 0 0 .5.5h2.5v-8z" fill="#fff"/>
 --                         </svg>
@@ -2081,7 +2081,7 @@ is
 --                         </div>
 --                 </div>
 --                 <div class="welcome-panel-column">
---                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http:--www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+--                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 --                                 <rect width="48" height="48" rx="4" fill="#1E1E1E"/>
 --                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M31 24a7 7 0 0 1-7 7V17a7 7 0 0 1 7 7zm-7-8a8 8 0 1 1 0 16 8 8 0 0 1 0-16z" fill="#fff"/>
 --                         </svg>

@@ -1353,7 +1353,7 @@ is
 --                                 "message" => __( "Error while saving." ),
 --                         );
 --                 end; else then
---                         /* translators: Draft saved date format, see https:--www.php.net/manual/datetime.format.php--
+--                         /* translators: Draft saved date format, see https://www.php.net/manual/datetime.format.php--
 --                         draft_saved_date_format = __( "g:i:s a" );
 --                         response["wp_autosave"] = array(
 --                                 "success" => true,
@@ -1382,7 +1382,7 @@ is
 --         end;
 
 --         -- Ensure we"re using an absolute URL.
---         current_url  = set_url_scheme( "http:--" . _SERVER["HTTP_HOST"] . _SERVER["REQUEST_URI"] );
+--         current_url  = set_url_scheme( "http://" . _SERVER["HTTP_HOST"] . _SERVER["REQUEST_URI"] );
 --         filtered_url = remove_query_arg( removable_query_args, current_url );
 --         ?>
 --         <link id="wp-admin-canonical" rel="canonical" href="<?php echo esc_url( filtered_url ); ?>" />
@@ -1408,7 +1408,7 @@ is
 --         -- @since 4.9.0
 --         -- @since 4.9.5 The default value was changed to "strict-origin-when-cross-origin".
 --         --
---         -- @link https:--developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+--         -- @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
 --         --
 --         -- @param string policy The admin referrer policy header value. Default "strict-origin-when-cross-origin".
 --         --
@@ -1567,7 +1567,7 @@ is
 --         response = get_site_transient( "php_check_" . key );
 
 --         if ( false === response ) then
---                 url = "http:--api.wordpress.org/core/serve-happy/1.0/";
+--                 url = "http://api.wordpress.org/core/serve-happy/1.0/";
 
 --                 if ( wp_http_supports( array( "ssl" ) ) ) then
 --                         url = set_url_scheme( url, "https" );

@@ -374,7 +374,7 @@ is
 --                 -- Some hosts will block outgoing mail from this address if it doesn't exist,
 --                 -- but there's no easy alternative. Defaulting to admin_email might appear to be
 --                 -- another option, but some hosts may refuse to relay mail from an unknown domain.
---                 -- See https:--core.trac.wordpress.org/ticket/5007.
+--                 -- See https://core.trac.wordpress.org/ticket/5007.
 --                 --
 --                 if ( ! isset( from_email ) ) then
 --                         -- Get the site domain and get rid of www.
@@ -1143,7 +1143,7 @@ is
 --         -- Determines whether the current visitor is a logged in user.
 --         --
 --         -- For more information on this and similar theme functions, check out
---         -- the then@link https:--developer.wordpress.org/themes/basics/conditional-tags/
+--         -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
 --         -- Conditional Tagsend; article in the Theme Developer Handbook.
 --         --
 --         -- @since 2.0.0
@@ -1186,7 +1186,7 @@ is
 --                                 wp_redirect( set_url_scheme( _SERVER['REQUEST_URI'], 'https' ) );
 --                                 exit;
 --                         end; else then
---                                 wp_redirect( 'https:--' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
+--                                 wp_redirect( 'https://' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
 --                                 exit;
 --                         end;
 --                 end;
@@ -1217,7 +1217,7 @@ is
 --                                         wp_redirect( set_url_scheme( _SERVER['REQUEST_URI'], 'https' ) );
 --                                         exit;
 --                                 end; else then
---                                         wp_redirect( 'https:--' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
+--                                         wp_redirect( 'https://' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
 --                                         exit;
 --                                 end;
 --                         end;
@@ -1228,7 +1228,7 @@ is
 --                 -- The cookie is no good, so force login.
 --                 nocache_headers();
 
---                 redirect = ( strpos( _SERVER['REQUEST_URI'], '/options.php' ) && wp_get_referer() ) ? wp_get_referer() : set_url_scheme( 'http:--' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
+--                 redirect = ( strpos( _SERVER['REQUEST_URI'], '/options.php' ) && wp_get_referer() ) ? wp_get_referer() : set_url_scheme( 'http://' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
 
 --                 login_url = wp_login_url( redirect, true );
 
@@ -1554,8 +1554,8 @@ is
 --                         location = 'http:' . location;
 --                 end;
 
---                 -- In PHP 5 parse_url() may fail if the URL query part contains 'http:--'.
---                 -- See https:--bugs.php.net/bug.php?id=38143
+--                 -- In PHP 5 parse_url() may fail if the URL query part contains 'http://'.
+--                 -- See https://bugs.php.net/bug.php?id=38143
 --                 cut  = strpos( location, '?' );
 --                 test = cut ? substr( location, 0, cut ) : location;
 
@@ -1574,7 +1574,7 @@ is
 --                 if ( ! isset( lp['host'] ) && ! empty( lp['path'] ) && '/' !== lp['path'][0] ) then
 --                         path = '';
 --                         if ( ! empty( _SERVER['REQUEST_URI'] ) ) then
---                                 path = dirname( parse_url( 'http:--placeholder' . _SERVER['REQUEST_URI'], PHP_URL_PATH ) . '?' );
+--                                 path = dirname( parse_url( 'http://placeholder' . _SERVER['REQUEST_URI'], PHP_URL_PATH ) . '?' );
 --                                 path = wp_normalize_path( path );
 --                         end;
 --                         location = '/' . ltrim( path . '/', '/' ) . location;
@@ -2370,7 +2370,7 @@ is
 --         -- The secret keys in wp-config.php should be updated to strong, random keys to maximize
 --         -- security. Below is an example of how the secret key constants are defined.
 --         -- Do not paste this example directly into wp-config.php. Instead, have a
---         -- then@link https:--api.wordpress.org/secret-key/1.1/salt/ secret key createdend; just
+--         -- then@link https://api.wordpress.org/secret-key/1.1/salt/ secret key createdend; just
 --         -- for you.
 --         --
 --         --     define('AUTH_KEY',         ' Xakm<o xQy rw4EMsLKM-?!T+,PFFend;)H4lzcW57AF0U@N@< >M%G4Yt>f`z]MON');
@@ -2387,7 +2387,7 @@ is
 --         --
 --         -- @since 2.5.0
 --         --
---         -- @link https:--api.wordpress.org/secret-key/1.1/salt/ Create secrets for wp-config.php
+--         -- @link https://api.wordpress.org/secret-key/1.1/salt/ Create secrets for wp-config.php
 --         --
 --         -- @param string scheme Authentication scheme (auth, secure_auth, logged_in, nonce).
 --         -- @return string Salt value
@@ -2414,7 +2414,7 @@ is
 --                                 /*
 --                                 -- translators: This string should only be translated if wp-config-sample.php is localized.
 --                                 -- You can check the localized release package or
---                                 -- https:--i18n.svn.wordpress.org/<locale code>/branches/<wp version>/dist/wp-config-sample.php
+--                                 -- https://i18n.svn.wordpress.org/<locale code>/branches/<wp version>/dist/wp-config-sample.php
 --                                 --
 --                                 __( 'put your unique phrase here' ) => true,
 --                         );
