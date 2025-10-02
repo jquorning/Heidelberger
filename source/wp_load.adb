@@ -71,7 +71,7 @@ is
       --
       -- If neither set of conditions is true, initiate loading the setup process.
       --
-      if False then
+      if True then
 --    if File_Exists (ABSPATH & "wp-config.php") then
 
          -- The config file resides in ABSPATH

@@ -45,8 +45,9 @@ is
    function Build (Key : String; Value : Array_Type) return Assoc_Type;
 
    type Assoc_List is array (Positive range <>) of Assoc_Type;
-   function To_Array (List : Assoc_List) return Array_Type
-      is (Empty_Array);
+
+   function To_Array (List : Assoc_List)
+            return Array_Type;
 
    function Exists (Arry : Array_Type; Key : String) return Boolean is (True);
 --   function Array_Keys (Arry : Array_Type) return List_Type is (Empty_List);

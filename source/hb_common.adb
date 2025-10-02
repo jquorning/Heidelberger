@@ -31,7 +31,17 @@ is
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer) is null;
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer) is null;
 
-   procedure Set (Arr : in out Array_Type; Key : String; Value : String) is null;
+   ---------
+   -- Set --
+   ---------
+
+   procedure Set (Arr   : in out Array_Type;
+                  Key   : String;
+                  Value : String)
+   is
+   begin
+      Arr.Include (Key => Key, New_Item => Value);
+   end Set;
 
    function Count (Item : String) return String is ("XXX 8");
 
@@ -47,8 +57,18 @@ is
 
    function Count (Al : Assoc_List) return Natural is (1);
 
-   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
-                 return String is (Key & " XXX-68");
+   ---------
+   -- Get --
+   ---------
+
+   function Get (Arr   : Array_Type;
+                 Key   : String;
+                 Arg_2 : String := "")
+                 return String
+   is
+   begin
+      return Array_Maps.Element (Arr.Find (Key));
+   end Get;
 
    -----------
    -- Isset --
@@ -68,13 +88,6 @@ is
    is
    begin
       return Array_Maps.Has_Element (Arry.Find (Key));
-      -- for A of Arry loop
-      --    if A.Key = Key then
-      --       return True;
-      --    end if;
-      -- end loop;
-
-      -- return False;
    end Isset;
 
 end Hb_Common;

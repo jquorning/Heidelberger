@@ -2041,8 +2041,8 @@ is
         --         args.label_count = _n_noop( args.label, args.label );
         -- end;
 
-      Wp_Post_Statuses (Post_Status) := Args;
-
+--    Wp_Post_Statuses (Post_Status) := Args;
+      null;
 --    return args;
    end Register_Post_Status;
 

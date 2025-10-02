@@ -5,6 +5,8 @@
 -- @subpackage Administration
 --
 
+with Ada.Text_IO;
+
 with Binder;
 with Globals;
 with Hb_Common;
@@ -632,6 +634,7 @@ is
                      declare
                         Health : constant String := Get (Issue_Counts, "critical");
                      begin
+Ada.Text_IO.Put_Line (Health);
                         Site_Health_Count := +Sprintf (
                            "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
                            Health,
@@ -782,9 +785,11 @@ is
       use Submenu_Maps;
       use Inner_Maps;
 
-      A : Inner_Maps.Map := Submenu (Menu_Slug);
+      B : constant Submenu_Maps.Cursor := Submenu.Find (Menu_Slug);
+--    A : Inner_Maps.Map := Submenu (Menu_Slug);
    begin
-      if A = Inner_Maps.Empty_Map then
+      if not Submenu_Maps.Has_Element (B) then
+--    if A = Inner_Maps.Empty_Map then
          declare
             Map : Inner_Maps.Map;
          begin
@@ -793,6 +798,7 @@ is
          end;
       else
          declare
+            A : Inner_Maps.Map := Submenu (Menu_Slug);
 --          M : Submenu_Maps.Map;
             E : constant Inner_Maps.Cursor := A.Find (Key => Position);
          begin

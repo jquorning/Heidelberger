@@ -1,6 +1,9 @@
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 
+with GNAT.Regexp;
+with GNAT.Regpat;
+
 with Hb_Common;
 
 package body Php
@@ -8,6 +11,53 @@ is
    use Ada.Strings.Unbounded;
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type is (Empty_Array);
+
+   ------------
+   -- Strpos --
+   ------------
+
+   function Strpos (Item    : String;
+                    Pattern : String)
+                    return Natural
+   is
+      use Ada.Strings.Fixed;
+   begin
+      return Index (Source  => Item,
+                    Pattern => Pattern);
+   end Strpos;
+
+   ----------------
+   -- Preg_Match --
+   ----------------
+
+   function Preg_Match (Pattern : String;
+                        Subject : String;
+                        Matches : out List_Type;
+                        Flags   : Integer := 0;
+                        Offset  : Integer := 0)
+                        return Integer
+   is
+      use GNAT.Regexp;
+      use GNAT.Regpat;
+      use Hb_Common;
+
+      Re : constant Pattern_Matcher := Compile (Pattern);
+      Result : Match_Array (0 .. Paren_Count (Re));
+   begin
+      Match (Re, Subject, Result);
+      if Result (0) = No_Match then
+         return 0;
+      else
+         for A in 1 .. Paren_Count (Re) loop
+            declare
+               M : String renames Subject (Result (A).First .. Result (A).Last);
+            begin
+               Matches.Append (+M);
+            end;
+         end loop;
+         return Paren_Count (Re);
+      end if;
+   end Preg_Match;
 
    -------------
    -- Explode --

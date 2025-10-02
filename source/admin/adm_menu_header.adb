@@ -99,6 +99,7 @@ is
 --        global self, parent_file, submenu_file, plugin_page, typenow;
       First : Boolean := True;
    begin
+
       -- 0 := menu_title, 1 := capability, 2 := menu_slug,
       -- 3 := page_title, 4 := classes, 5 := hookname, 6 := icon_url.
       for Item of Menu loop
@@ -110,7 +111,7 @@ is
 
             Admin_Is_Parent : Boolean    := False;
             Class           : List_Type  := Empty_List;
-            Aria_Attributes : List_Type  := Empty_List;
+            Aria_Attributes : Unbounded_String;
             Aria_Hidden     : Unbounded_String;
             Is_Separator    : Boolean    := False;
 
@@ -124,7 +125,7 @@ is
 
             if Item.Menu_Slug /= "" then
                Append (Class, +"wp-has-submenu"); -- ()
-               Submenu_Items := Submenu (-Item.Menu_Slug);
+--             Submenu_Items := Submenu (-Item.Menu_Slug);
             end if;
 
             if
@@ -200,15 +201,15 @@ is
                declare
                   Arrow : constant String :=
                      "<div class=""wp-menu-arrow""><div></div></div>";
-                  Title : Unbounded_String :=
-                     +Inc_Formatting.Wptexturize (-Item.Menu_Title);
+                  Title : constant String :=
+                     Inc_Formatting.Wptexturize (-Item.Menu_Title);
                begin
                   -- Hide separators from screen readers.
                   if Is_Separator then
                      Aria_Hidden := +" aria-hidden=""true""";
                   end if;
 
-                  Echo ("\n\t<liclassidaria_hidden>");
+                  Echo ("\n\t<li" & Class_2 & Id & (-Aria_Hidden) & ">");
 
                   if Is_Separator then
                      Echo ("<div class=""separator""></div>");
@@ -240,15 +241,26 @@ is
                              Slug_Type (Substr (String (Menu_File), 0, Pos));
                         end if;
 
-                        if not Empty (Menu_Hook)
-                                or else (("index.php" /= Menu_File)
-                                        and then File_Exists (-WP_PLUGIN_DIR & "/menu_file")
-                                        and then not File_Exists (ABSPATH & "/wp-admin/menu_file"))
+                        if
+                          not Empty (Menu_Hook) or else
+                          (("index.php" /= Menu_File)                  and then
+                           File_Exists (-WP_PLUGIN_DIR & "/menu_file") and then
+                           not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
-                           Echo ("<a href=""admin.php?page=" & String (Menu_File) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">title</div></a>");
+                           Echo ("<a href=""admin.php?page=" & String (Menu_File) &
+                                 "" & Class_2 & " " & (-Aria_Attributes) & ">" & Arrow &
+                                 "<div class=""wp-menu-image" & (-Img_Class) & """" &
+                                 (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
+                                 "</div><div class=""wp-menu-name"">" & Title &
+                                 "</div></a>");
                         else
-                           Echo ("\n\t<a href=""" & String (Menu_File) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">title</div></a>");
+                           Echo ("\n\t<a href=""" & String (Menu_File) & """" &
+                                 Class_2 & " " & (-Aria_Attributes) & ">" & Arrow &
+                                 "<div class=""wp-menu-image" & (-Img_Class) & """" &
+                                 (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
+                                 "</div><div class=""wp-menu-name"">" & Title &
+                                 "</div></a>");
                         end if;
                      end;
 
@@ -268,15 +280,27 @@ is
                              Slug_Type (Substr (String (Menu_File), 0, Pos));
                         end if;
 
-                        if not Empty (Menu_Hook)
-                                or else (("index.php" /= Item.Menu_Slug)
-                                        and then File_Exists (-WP_PLUGIN_DIR & "/menu_file")
-                                        and then not File_Exists (ABSPATH & "/wp-admin/menu_file"))
+                        if
+                          not Empty (Menu_Hook) or else
+                          ("index.php" /= Item.Menu_Slug               and then
+                           File_Exists (-WP_PLUGIN_DIR & "/menu_file") and then
+                           not File_Exists (ABSPATH & "/wp-admin/menu_file"))
                         then
                            Admin_Is_Parent := True;
-                           Echo ("\n\t<a href=""admin.php?page=" & String (-Item.Menu_Slug) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">" & (-Item.Menu_Title) & "</div></a>");
+                           Echo ("\n\t<a href=""admin.php?page=" &
+                                 String (-Item.Menu_Slug) & """" & Class_2 & " " &
+                                 (-Aria_Attributes) & ">" & Arrow &
+                                 "<div class=""wp-menu-image" & (-Img_Class) & """" &
+                                 (-Img_Style) & " aria-hidden=""true"">" & (-Img) &
+                                 "</div><div class=""wp-menu-name"">" &
+                                 (-Item.Menu_Title) & "</div></a>");
                         else
-                           Echo ("\n\t<a href=""" & String (-Item.Menu_Slug) & """class aria_attributes>arrow<div class=""wp-menu-imageimg_class""img_style aria-hidden=""true"">img</div><div class=""wp-menu-name"">" & (-Item.Menu_Title) & "</div></a>");
+                           Echo ("\n\t<a href=""" & String (-Item.Menu_Slug) &
+                                 """" & Class_2 & " " & (-Aria_Attributes) & ">" &
+                                 Arrow & "<div class=""wp-menu-image" & (-Img_Class) &
+                                 """" & (-Img_Style) & " aria-hidden=""true"">" &
+                                 (-Img) & "</div><div class=""wp-menu-name"">" &
+                                 (-Item.Menu_Title) & "</div></a>");
                         end if;
                      end;
                   end if;
@@ -295,7 +319,7 @@ is
                         declare
                            Sub_Item        : constant Adm_Menu.Submenu_Item := Sub;
                            Class           : List_Type := Empty_List;
-                           Aria_Attributes : List_Type := Empty_List;
+                           Aria_Attributes : Unbounded_String;
                         begin
                            if Current_User_Can (-Sub_Item.Capability) then
                               goto Continue_1;
@@ -365,14 +389,15 @@ is
 
                                  Pos : constant Integer :=
                                    Strpos (String (Sub_File), "?");
+
+                                 Title : constant String :=
+                                   Inc_Formatting.Wptexturize (-Sub_Item.Menu_Title);
+
                               begin
                                  if 0 /= Pos then
                                     Sub_File :=
                                       Slug_Type (Substr (String (Sub_File), 0, Pos));
                                  end if;
-
-                                 Title :=
-                                    +Inc_Formatting.Wptexturize (-Sub_Item.Menu_Title);
 
                                  if
                                     Menu_Hook /= "" or else
@@ -404,13 +429,16 @@ is
                                                         "admin.php");
                                        end if;
                                        Sub_Item_Url := +ESC_URL (-Sub_Item_Url);
-                                       Echo ("<liclass><a href=""" & (-Sub_Item_Url) &
-                                             """classaria_attributes>title</a></li>");
+                                       Echo ("<li" & Class_2 & "><a href=""" &
+                                            (-Sub_Item_Url) &
+                                             """" & Class_2 & (-Aria_Attributes) &
+                                             ">" & Title & "</a></li>");
                                     end;
                                  else
-                                    Echo ("<liclass><a href=""" &
+                                    Echo ("<li" & Class_2 & "><a href=""" &
                                           String (-Sub_Item.Menu_Slug) &
-                                          """classaria_attributes>title</a></li>");
+                                          """" & Class_2 & (-Aria_Attributes) &
+                                          ">" & Title & "</a></li>");
                                  end if;
                               end;
                            end;

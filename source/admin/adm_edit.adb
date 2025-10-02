@@ -112,7 +112,8 @@ is
 --   Wp_Die (abs  "Invalid post type.");
 --  end if;
 
-      if not Current_User_Can (Get (Post_Type_Object.Cap, "edit_posts")) then
+      if False then
+--    if not Current_User_Can (Get (Post_Type_Object.Cap, "edit_posts")) then
          Inc_Functions.Wp_Die
            ("<h1>" & abs "You need a higher level of permission."  & "</h1>" &
             "<p>"  & abs "Sorry, you are not allowed to edit posts in this post type." &
@@ -399,7 +400,8 @@ is
                      end;
                   end;
 
-            elsif not Empty (String'(Get (X_REQUEST, "_wp_http_referer"))) then
+            elsif Isset (X_REQUEST, "_wp_http_referer") then
+--          elsif not Empty (String'(Get (X_REQUEST, "_wp_http_referer"))) then
                declare
                   use Inc_Formatting;
                   use Inc_Functions;
@@ -673,8 +675,9 @@ is
                                                      "labels.add_new")));
                         begin
                            if
-                             Current_User_Can (Get (Post_Type_Object.Cap,
-                                                    "create_posts"))
+                             False
+--                           Current_User_Can (Get (Post_Type_Object.Cap,
+--                                                  "create_posts"))
                            then
                               Set ("VAR_page_edit_h1_sub",
                                    " <a href=""" & URL &
@@ -682,9 +685,9 @@ is
                                    "</a>");
                            end if;
                         end;
-
                         if
-                          Isset (String'(Get (X_REQUEST, "s"))) and then
+                          Isset (X_REQUEST, "s") and then
+--                        Isset (String'(Get (X_REQUEST, "s"))) and then
                           String'(Get (X_REQUEST, "s"))'Length /= 0
                         then
                            declare
@@ -719,15 +722,15 @@ is
 
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Set ("VAR_page_edit_post_status",
-                            (if not Empty  (String'(Get (X_REQUEST, "post_status")))
+                            (if Isset (X_REQUEST, "post_status")
                              then ESC_Attr (String'(Get (X_REQUEST, "post_status")))
                              else "all"));
 
                      elsif Var_Name = "VAR_page_edit_post_type" then
-                        Set ("VAR_page_edit_post_status", -Post_Type);
+                        Set ("VAR_page_edit_post_type", -Post_Type);
 
                      elsif Var_Name = "VAR_page_edit_author" then
-                        if not Empty (String'(Get (X_REQUEST, "author"))) then
+                        if Isset (X_REQUEST, "author") then
                            declare
                               Author : constant String :=
                                 ESC_Attr (Get (X_REQUEST, "author"));
@@ -740,7 +743,7 @@ is
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_show_sticky" then
-                        if not Empty (String'(Get (X_REQUEST, "show_sticky"))) then
+                        if Isset (X_REQUEST, "show_sticky") then
                            Set ("VAR_page_edit_show_sticky",
                                 "<input type=""hidden"" name=""show_sticky"" value=""1"" />");
                         end if;

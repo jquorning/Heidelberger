@@ -187,9 +187,11 @@ package body Inc_L10n is
 
       Wp_Lang := +"";
 
-      if not Empty (XX_GET, "wp_lang") then
+      if Isset (XX_GET, "wp_lang") then
+--    if not Empty (XX_GET, "wp_lang") then
          Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (Get (XX_GET, "wp_lang")));
-      elsif not Empty (X_COOKIE, "wp_lang") then
+      elsif Isset (X_COOKIE, "wp_lang") then
+--    elsif not Empty (X_COOKIE, "wp_lang") then
          Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (Get (X_COOKIE, "wp_lang")));
       end if;
 
@@ -1729,7 +1731,7 @@ package body Inc_L10n is
 -- --
 -- -- For more information on this and similar theme functions, check out
 -- -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tags} article in the Theme Developer Handbook.
+-- -- Conditional Tags}  article in the Theme Developer Handbook.
 -- --
 -- -- @since 3.0.0
 -- --

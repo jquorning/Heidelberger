@@ -14,6 +14,8 @@
 -- @package WordPress
 --
 
+with Ada.Text_Io;
+
 with Arrays;
 with Binder;
 with Globals;
@@ -51,7 +53,9 @@ is
          elsif Is_User_Admin then
             Unused := Preg_Match ("#/wp-admin/user/?(.*?)#i", Php_Self, Self_Matches);
          else
-            Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
+Ada.Text_Io.Put_Line (Php_Self);
+            Unused := Preg_Match ("/wp-admin/?(.*?)", Php_Self, Self_Matches);
+--          Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
          end if;
 
          Pagenow := +(if "" /= Self_Matches (1)
@@ -152,7 +156,7 @@ is
       end if;
 
       declare
-         Http_User_Agent : constant String := Get (X_SERVER, "HPPT_USER_AGENT");
+         Http_User_Agent : constant String := Get (X_SERVER, "HTTP_USER_AGENT");
       begin
          if
            Is_Safari and then Stripos (Http_User_Agent, "mobile") /= 0

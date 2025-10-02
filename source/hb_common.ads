@@ -31,7 +31,10 @@ is
    function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
    function Array_Filter (List : List_Type) return List_Type is (Empty_List);
 
-   procedure Set (Arr : in out Array_Type; Key : String; Value : String);
+   procedure Set (Arr   : in out Array_Type;
+                  Key   : String;
+                  Value : String);
+
    procedure Set (Arr : in out Array_Type; Key : String; Value : Array_Type)
      is null;
    procedure Set_Integer (Arr   : in out Array_Type;
@@ -46,7 +49,7 @@ is
    function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
                  return String;
 
-   function Get_Array (Arr : Array_Type; Key : String; Arg_2 : String := "")
+   function Get_Array (Arr : Array_Type; Key : String) -- ; Arg_2 : String := "")
                        return Array_Type
                        is (Empty_Array);
 

@@ -9,8 +9,9 @@ is
    function Get_Object_Vars (Object : Inc_Class_Wp_Posts.Wp_Post)
                              return Array_Type is (Empty_Array);
 
-   function Strpos (Item : String; Pattern : String) return Natural
-      is (1);
+   function Strpos (Item    : String;
+                    Pattern : String)
+                    return Natural;
 
    function Stripos (Heystack : String; Needle : String) return Natural
       is (1);
@@ -43,7 +44,7 @@ is
                         Matches : out List_Type;
                         Flags   : Integer := 0;
                         Offset  : Integer := 0)
-                        return Integer is (1);
+                        return Integer;
 
    function Preg_Match_All (Pattern : String;
                             Subject : String;

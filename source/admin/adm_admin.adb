@@ -80,7 +80,7 @@ is
       end if;
 
       if
-        Isset (String'(Get (XX_GET, "import"))) and then
+        Isset (XX_GET, "import") and then
         not WP_LOAD_IMPORTERS
       then
          WP_LOAD_IMPORTERS := True;
@@ -255,13 +255,16 @@ is
             Taxnow := +"";
          end if;
 
-         -- if WP_NETWORK_ADMIN then
-         --    require ABSPATH . "wp-admin/network/menu.php";
-         -- elsif WP_USER_ADMIN then
-         --    require ABSPATH . "wp-admin/user/menu.php";
-         -- else
-         --    require ABSPATH . "wp-admin/menu.php";
-         -- end if;
+         if WP_NETWORK_ADMIN then
+            null;
+--          require ABSPATH . "wp-admin/network/menu.php";
+         elsif WP_USER_ADMIN then
+            null;
+--          require ABSPATH . "wp-admin/user/menu.php";
+         else
+            Adm_Menu.Run;
+--          require ABSPATH . "wp-admin/menu.php";
+         end if;
 
          if Inc_Capabilities.Current_User_Can ("manage_options") then
             Unused := Inc_Functions.Wp_Raise_Memory_Limit ("admin");
@@ -559,7 +562,8 @@ is
          end if;
       end;
 
-      if not Empty (X_REQUEST, "action") then
+      if Isset (X_REQUEST, "action") then
+--    if not Empty (X_REQUEST, "action") then
          declare
             Action : constant String := Get (X_REQUEST, "action");
          begin

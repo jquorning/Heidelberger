@@ -50,7 +50,7 @@ is
    type Menu_Index is range 0 .. 99;
 
    package Menu_Vectors is new
-      Ada.Containers.vectors (Index_Type   => Menu_Index,
+      Ada.Containers.Vectors (Index_Type   => Menu_Index,
                               Element_Type => Menu_Item);
 
    subtype Menu_Type is Menu_Vectors.Vector;
@@ -88,7 +88,7 @@ is
 
    function "<" (Left, Right : Slug_Type) return Boolean is (True);
 
-   Menu    : Menu_Type;
+   Menu    : Menu_Type := Menu_Vectors.To_Vector (Length => 100);
    Submenu : Submenu_Type;
 
    --

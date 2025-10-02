@@ -209,7 +209,7 @@ is
    --
    function Is_Network_Admin
             return Boolean
-            is (True);
+            is (False);
 
    --
    -- Determines whether the current request is for a user admin screen.
@@ -227,7 +227,7 @@ is
    --
    function Is_User_Admin
             return Boolean
-            is (True);
+            is (False);
 
    --
    -- Toggle `_wp_using_ext_object_cache` on and off without directly

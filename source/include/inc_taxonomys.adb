@@ -92,8 +92,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          True),
             Build ("query_var",             "category_name"),
-            Build ("rewrite",
-               String'(Get (Rewrite, "category"))),
+            Build ("rewrite",               Rewrite ("category")),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
