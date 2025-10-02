@@ -302,6 +302,10 @@ is
                      return String
                      is ("XXX-602");
 
+   function Ini_Get (Option : String)
+                     return Boolean
+                     is (True);
+
    function JSON_Decode (JSON : String)
                          return Array_Type
                          is (Empty_Array);
@@ -364,6 +368,11 @@ is
                     Token : String)
                     return String
                     is ("XXX-783");
+
+   function Str_Split (Item   : String;
+                       Length : Natural := 1)
+                       return Array_Type
+                       is (Empty_Array);
 
    -------------------
    -- Echo handling --

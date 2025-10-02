@@ -183,7 +183,7 @@ is
    function Print_Scripts (This    : in out Wp_Scripts;
                            Handles : List_Type := Empty_List;
                            Group   : Integer      := 0) -- False)
-                           return String_Array;
+                           return List_Type;
 
    --
    -- Prints extra scripts of a registered script.
@@ -393,7 +393,7 @@ is
    -- @return string() Handles of items that have been processed.
    --
    function Do_Head_Items (This : in out Wp_Scripts)
-                           return String_Array;
+                           return List_Type;
 
    --
    -- Processes items and dependencies for the footer group.
@@ -405,7 +405,7 @@ is
    -- @return string() Handles of items that have been processed.
    --
    function Do_Footer_Items (This : in out Wp_Scripts)
-                             return String_Array;
+                             return List_Type;
 
    --
    -- Whether a handle"s source is in a default directory.

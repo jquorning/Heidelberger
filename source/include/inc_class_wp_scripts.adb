@@ -78,7 +78,7 @@ is
    function Print_Scripts (This    : in out Wp_Scripts;
                            Handles : List_Type := Empty_List;
                            Group   : Integer      := 0) -- False)
-                           return String_Array
+                           return List_Type -- String_Array
    is
    begin
       return This.Do_Items (Handles, Group);
@@ -701,9 +701,10 @@ is
    -------------------
 
    function Do_Head_Items (This : in out Wp_Scripts)
-                           return String_Array
+                           return List_Type
    is
-      Unused : String_Array := Do_Items (This, False, Group => 0);
+      Unused : constant List_Type :=
+        Do_Items (This, False, Group => 0);
    begin
       return This.Done;
    end Do_Head_Items;
@@ -713,9 +714,10 @@ is
    ---------------------
 
    function Do_Footer_Items (This : in out Wp_Scripts)
-                             return String_Array
+                             return List_Type
    is
-      Unused : String_Array := Do_Items (This, False, Group => 1);
+      Unused : constant List_Type :=
+        Do_Items (This, False, Group => 1);
    begin
       return This.Done;
    end Do_Footer_Items;

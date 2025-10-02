@@ -123,6 +123,12 @@ is
                              Deprecated : Boolean := True)
                              return String;
 
+   function Get_Site_Option (Option     : String;
+                             Default    : Boolean := False;
+                             Deprecated : Boolean := True)
+                             return Boolean
+                             is (True);
+
    --
    -- Retrieves a network"s option value based on the option name.
    --
@@ -231,7 +237,5 @@ is
    --
    function Get_Site_Transient (Transient : String)
                                 return Hb_Common.String_Maps.Map;
-
-   procedure Dummy;
 
 end Inc_Options;

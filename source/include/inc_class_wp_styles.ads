@@ -92,7 +92,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Print_Html : Unbounded_String;
+        Print_HTML : Unbounded_String;
 
         --
         -- Holds inline styles if concatenation is enabled.
@@ -131,5 +131,29 @@ is
    --
    function X_Construct
             return Wp_Styles;
+
+   --
+   -- Processes items and dependencies for the footer group.
+   --
+   -- HTML 5 allows styles in the body, grab late enqueued items and output them in
+   -- the footer.
+   --
+   -- @since 3.3.0
+   --
+   -- @see WP_Dependencies::do_items()
+   --
+   -- @return string[] Handles of items that have been processed.
+   --
+   function Do_Footer_Items (This : in out Wp_Styles)
+            return List_Type;
+
+   procedure Do_Footer_Items (This : in out Wp_Styles);
+
+   --
+   -- Resets class properties.
+   --
+   -- @since 3.3.0
+   --
+   procedure Reset (This : in out Wp_Styles);
 
 end Inc_Class_Wp_Styles;

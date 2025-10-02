@@ -16,7 +16,6 @@ with Inc_Plugins;
 
 package body Inc_Options
 is
-   procedure Dummy is null;
 
 -- --
 -- -- Retrieves an option value based on an option name.

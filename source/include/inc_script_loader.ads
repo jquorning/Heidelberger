@@ -19,12 +19,14 @@
 -- @package WordPress
 --
 
+with Arrays;
+
 with Inc_Class_Wp_Scripts;
 with Inc_Class_Wp_Styles;
 
 package Inc_Script_Loader
 is
-   procedure Dummy;
+   use Arrays;
 
    --
    -- Assigns default styles to styles object.
@@ -143,5 +145,51 @@ is
    function Wp_Should_Load_Separate_Core_Block_Assets
             return Boolean
             is (True);
+
+   --
+   -- Prints the styles queue in the HTML head on admin pages.
+   --
+   -- @since 2.8.0
+   --
+   -- @global bool concatenate_scripts
+   --
+   -- @return array
+   --
+   function Print_Admin_Styles
+            return List_Type;
+
+   --
+   -- Prints the styles that were queued too late for the HTML head.
+   --
+   -- @since 3.3.0
+   --
+   -- @global WP_Styles wp_styles
+   -- @global bool      concatenate_scripts
+   --
+   -- @return array|void
+   --
+   function Print_Late_Styles
+            return List_Type;
+
+   --
+   -- Prints styles (internal use only).
+   --
+   -- @ignore
+   -- @since 3.3.0
+   --
+   -- @global bool compress_css
+   --
+   procedure X_Print_Styles;
+
+   --
+   -- Determines the concatenation and compression settings for scripts and styles.
+   --
+   -- @since 2.8.0
+   --
+   -- @global bool concatenate_scripts
+   -- @global bool compress_scripts
+   -- @global bool compress_css
+   --
+   procedure Script_Concat_Settings;
 
 end Inc_Script_Loader;

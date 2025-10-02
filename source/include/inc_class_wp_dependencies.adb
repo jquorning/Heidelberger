@@ -24,11 +24,20 @@ is
    -- Do_Items --
    --------------
 
---        public function do_items( $handles = false, $group = false ) then
+   procedure Do_Items (This    : in out Wp_Dependencies;
+                       Handles : Boolean;
+                       Group   : Integer := 0)
+   is
+      Unused : constant List_Type :=
+        Do_Items (This, Handles, Group);
+   begin
+      null;
+   end Do_Items;
+
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : List_Type := Empty_List; -- = false,
                       Group   : Integer   := 0) --  = false
-                      return String_Array
+                      return List_Type
    is
       use List_Vectors;
                 --
@@ -60,7 +69,7 @@ is
                -- Unset the item from the to_do array.
                --
                if This.Do_Item (Handle, Group) then
-                  This.Done.Append (Handle); -- ()
+                  This.Done.Append (+Handle); -- ()
                end if;
 
 --               Unset (This.To_Do (Key));
@@ -75,7 +84,6 @@ is
    -- Do_Item --
    -------------
 
---        public function do_item( handle, group = false ) then
    function Do_Item (This   : Wp_Dependencies;
                      Handle : String;
                      Group  : Integer := 0) -- false
@@ -90,7 +98,6 @@ is
    -- All_Deps --
    --------------
 
---        public function all_deps( handles, recursion = false, group = false ) then
    function All_Deps (This      : in out Wp_Dependencies;
                       Handles   : List_Type; -- String_Array;
                       Recursion : Boolean := False;
@@ -166,7 +173,7 @@ is
                      New_Item => -Handle_Parts (Handle_Parts.First_Index + 1));
                end if;
 
-               This.To_Do.Append (+Handle_2); -- ()
+               This.To_Do.Append (+Handle_2);
             end;
             << Continue >>
          end;

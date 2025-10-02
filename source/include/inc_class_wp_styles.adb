@@ -346,32 +346,37 @@ is
 --                 return false;
 --         end;
 
---         --
---         -- Processes items and dependencies for the footer group.
---         --
---         -- HTML 5 allows styles in the body, grab late enqueued items and output them in the footer.
---         --
---         -- @since 3.3.0
---         --
---         -- @see WP_Dependencies::do_items()
---         --
---         -- @return string[] Handles of items that have been processed.
---         --
---         public function do_footer_items() then
---                 this.do_items( false, 1 );
---                 return this.done;
---         end;
+   ---------------------
+   -- Do_Footer_Items --
+   ---------------------
 
---         --
---         -- Resets class properties.
---         --
---         -- @since 3.3.0
---         --
---         public function reset() then
---                 this.do_concat      = false;
---                 this.concat         = "";
---                 this.concat_version = "";
---                 this.print_html     = "";
---         end;
+   procedure Do_Footer_Items (This : in out Wp_Styles)
+   is
+      Unused : constant List_Type :=
+         Do_Footer_Items (This);
+   begin
+      null;
+   end Do_Footer_Items;
+
+   function Do_Footer_Items (This : in out Wp_Styles)
+            return List_Type
+   is
+   begin
+      This.Do_Items (False, 1);
+      return This.Done;
+   end Do_Footer_Items;
+
+   -----------
+   -- Reset --
+   -----------
+
+   procedure Reset (This : in out Wp_Styles)
+   is
+   begin
+      This.Do_Concat      := False;
+      This.Concat         := +"";
+      This.Concat_Version := +"";
+      This.Print_HTML     := +"";
+   end Reset;
 
 end Inc_Class_Wp_Styles;

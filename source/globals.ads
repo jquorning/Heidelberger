@@ -39,6 +39,10 @@ is
    WP_POST_REVISIONS    : Boolean;
    WP_CRON_LOCK_TIMEOUT : Natural;
    WP_RUN_CORE_TESTS    : Boolean;
+   ENFORCE_GZIP         : Boolean;
+   CONCATENATE_SCRIPTS  : Boolean;
+   COMPRESS_SCRIPTS     : Boolean;
+   COMPRESS_CSS         : Boolean;
 
    TEMPLATEPATH     : Unbounded_String;
    STYLESHEETPATH   : Unbounded_String;

@@ -49,7 +49,7 @@ is
         --
         -- @var string[]
         --
-        Queue : List_Type; -- String_Array; -- = array();
+        Queue : List_Type;
 
         --
         -- An array of handles of dependencies to queue.
@@ -58,7 +58,7 @@ is
         --
         -- @var string[]
         --
-        To_Do : List_Type;  -- = array();
+        To_Do : List_Type;
 
         --
         -- An array of handles of dependencies already queued.
@@ -67,7 +67,7 @@ is
         --
         -- @var string[]
         --
-        Done : String_Array; -- = array();
+        Done : List_Type;
 
         --
         -- An array of additional arguments passed when a handle is registered.
@@ -78,13 +78,13 @@ is
         --
         -- @var array
         --
-        Args : Inc_Class_Wp_Dependency.String_Map; -- Array_Type; -- = array();
+        Args : Inc_Class_Wp_Dependency.String_Map;
 
         --
         -- An array of dependency groups to enqueue.
         --
-        -- Each entry is keyed by handle and represents the integer group level or boolean
-        -- false if the handle has no group.
+        -- Each entry is keyed by handle and represents the integer group level or
+        -- boolean false if the handle has no group.
         --
         -- @since 2.8.0
         --
@@ -142,14 +142,18 @@ is
    --
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : List_Type := Empty_List; -- = false,
-                      -- Handles : String_Array := Empty_String_Array; -- = false,
-                      Group   : Integer      := 0) --  = false
-                      return String_Array;
+                      Group   : Integer   := 0) --  = false
+                      return List_Type;
+
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : Boolean;
-                      Group   : Integer      := 0) --  = false
-                      return String_Array
-                      is (Empty_String_Array);
+                      Group   : Integer := 0) --  = false
+                      return List_Type
+                      is (Empty_List);
+
+   procedure Do_Items (This    : in out Wp_Dependencies;
+                       Handles : Boolean;
+                       Group   : Integer := 0); --  = false
 
    --
    -- Processes a dependency.

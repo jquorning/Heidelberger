@@ -17,11 +17,12 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
 with Binder;
 with Hb_Common;
 with Globals;
 with Php;
+
+with Adm_Load_Styles;
 
 with Inc_Class_Wp_Theme_Json_Resolver;
 with Inc_Formatting;
@@ -35,14 +36,12 @@ with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
 with Inc_REST_API;
+with Inc_Themes;
 with Inc_Users;
 with Inc_Versions;
 
 package body Inc_Script_Loader
 is
-   use Arrays;
-
-   procedure Dummy is null;
 
 -- -- WordPress Dependency Class
 -- require ABSPATH . WPINC . "/class-wp-dependency.php";
@@ -2396,159 +2395,189 @@ is
 --         do_action( "wp_enqueue_scripts");
 -- end;
 
--- --
--- -- Prints the styles queue in the HTML head on admin pages.
--- --
--- -- @since 2.8.0
--- --
--- -- @global bool concatenate_scripts
--- --
--- -- @return array
--- --
--- function print_admin_styles() then
+   Concatenate_Scripts : Boolean;
+   Compress_CSS        : Boolean;
+   Compress_Scripts    : Boolean;
+
+   ------------------------
+   -- Print_Admin_Styles --
+   ------------------------
+
+   function Print_Admin_Styles
+            return List_Type
+   is
+      use Inc_Plugins;
 --         global concatenate_scripts;
+      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles;
+   begin
+      Script_Concat_Settings;
+      Wp_Styles.Do_Concat := Concatenate_Scripts;
+      Wp_Styles.Do_Items (False);
 
---         wp_styles = wp_styles();
+      --
+      -- Filters whether to print the admin styles.
+      --
+      -- @since 2.8.0
+      --
+      -- @param bool print Whether to print the admin styles. Default true.
+      --
+      if Apply_Filters ("print_admin_styles", True) then
+         X_Print_Styles;
+      end if;
 
---         script_concat_settings();
---         wp_styles.do_concat = concatenate_scripts;
---         wp_styles.do_items( False);
+      Wp_Styles.Reset;
+      return Wp_Styles.Done;
+   end Print_Admin_Styles;
 
---         --
---         -- Filters whether to print the admin styles.
---         --
---         -- @since 2.8.0
---         --
---         -- @param bool print Whether to print the admin styles. Default true.
---         --
---         if ( apply_filters( "print_admin_styles", true ) ) then
---                 _print_styles();
---         end;
+   -----------------------
+   -- Print_Late_Styles --
+   -----------------------
 
---         wp_styles.reset();
---         return wp_styles.done;
--- end;
+   function Print_Late_Styles
+            return List_Type
+   is
+      use Inc_Plugins;
+--    global wp_styles, concatenate_scripts;
+      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
+   begin
+      -- if not ( wp_styles instanceof WP_Styles ) ) then
+      --         return;
+      -- end if;
 
--- --
--- -- Prints the styles that were queued too late for the HTML head.
--- --
--- -- @since 3.3.0
--- --
--- -- @global WP_Styles wp_styles
--- -- @global bool      concatenate_scripts
--- --
--- -- @return array|void
--- --
--- function print_late_styles() then
---         global wp_styles, concatenate_scripts;
+      Script_Concat_Settings;
+      Wp_Styles.Do_Concat := Concatenate_Scripts;
+      Wp_Styles.Do_Footer_Items;
 
---         if ( ! ( wp_styles instanceof WP_Styles ) ) then
---                 return;
---         end;
+      --
+      -- Filters whether to print the styles queued too late for the HTML head.
+      --
+      -- @since 3.3.0
+      --
+      -- @param bool print Whether to print the "late" styles. Default true.
+      --
+      if Apply_Filters ("print_late_styles", True) then
+         X_Print_Styles;
+      end if;
 
---         script_concat_settings();
---         wp_styles.do_concat = concatenate_scripts;
---         wp_styles.do_footer_items();
+      Wp_Styles.Reset;
+      return Wp_Styles.Done;
+   end Print_Late_Styles;
 
---         --
---         -- Filters whether to print the styles queued too late for the HTML head.
---         --
---         -- @since 3.3.0
---         --
---         -- @param bool print Whether to print the "late" styles. Default true.
---         --
---         if ( apply_filters( "print_late_styles", true ) ) then
---                 _print_styles();
---         end;
+   --------------------
+   -- X_Print_Styles --
+   --------------------
 
---         wp_styles.reset();
---         return wp_styles.done;
--- end;
+   procedure X_Print_Styles
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Formatting;
+      use Inc_Themes;
+--      global compress_css;
 
--- --
--- -- Prints styles (internal use only).
--- --
--- -- @ignore
--- -- @since 3.3.0
--- --
--- -- @global bool compress_css
--- --
--- function _print_styles() then
---         global compress_css;
+      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles; -- := wp_styles();
 
---         wp_styles = wp_styles();
+      Zip : constant String :=
+        (if Compress_CSS and then Globals.ENFORCE_GZIP then "gzip" else "");
 
---         zip = compress_css ? 1 : 0;
---         if ( zip && defined( "ENFORCE_GZIP" ) && ENFORCE_GZIP ) then
---                 zip = "gzip";
---         end;
+      Concat : constant String := Php.Trim (-Wp_Styles.Concat, ", ");
 
---         concat    = trim( wp_styles.concat, ", ");
---         type_attr = current_theme_supports( "html5", "style" ) ? "" : " type="text/css"";
+      Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
+                              then "" else " type=""text/css""");
+   begin
 
---         if ( concat ) then
---                 dir = wp_styles.text_direction;
---                 ver = wp_styles.default_version;
+      if Concat /= "" then
+         declare
+            Dir : constant String := -Wp_Styles.Text_Direction;
+            Ver : constant String := -Wp_Styles.Default_Version;
 
---                 concat       = str_split( concat, 128);
---                 concatenated = "";
+            Concat_2     : constant Array_Type := Str_Split (Concat, 128);
+            Concatenated : Unbounded_String := +"";
+         begin
+            for A in Concat_2.Iterate loop
+               declare
+                  Key   : constant String := Array_Maps.Key (A);
+                  Chunk : constant String := Array_Maps.Element (A);
+               begin
+                  Append (Concatenated, "&load%5Bchunk_" & Key & "%5D=" & Chunk);
+               end;
+            end loop;
 
---                 foreach ( concat as key => chunk ) then
---                         concatenated .= "&load%5Bchunk_thenkeyend;%5D=thenchunkend;";
---                 end;
+            declare
+               Href : constant String :=
+                 -Wp_Styles.Base_URL & "/wp-admin/load-styles.php?c=" & Zip &
+                 "&dir=" & Dir & (-Concatenated) & "&ver=" & Ver;
+            begin
+               Echo ("<link rel=""stylesheet"" href=""" & ESC_Attr (Href) & """" &
+                     Type_Attr & " media=""all"" />" & NL);
+            end;
 
---                 href = wp_styles.base_url . "/wp-admin/load-styles.php?c=thenzipend;&dir=thendirend;" . concatenated . "&ver=" . ver;
---                 echo "<link rel="stylesheet" href="" . esc_attr( href ) . ""thentype_attrend; media="all" />\n";
+            if not Empty (-Wp_Styles.Print_Code) then
+               Echo ("<style" & Type_Attr & ">" & NL);
+               Echo (-Wp_Styles.Print_Code);
+               Echo (NL & "</style>\n");
+            end if;
+         end;
+      end if;
 
---                 if ( ! empty( wp_styles.print_code ) ) then
---                         echo "<stylethentype_attrend;>\n";
---                         echo wp_styles.print_code;
---                         echo "\n</style>\n";
---                 end;
---         end;
+      if not Empty (-Wp_Styles.Print_HTML) then
+         Echo (-Wp_Styles.Print_HTML);
+      end if;
+   end X_Print_Styles;
 
---         if ( ! empty( wp_styles.print_html ) ) then
---                 echo wp_styles.print_html;
---         end;
--- end;
+   ----------------------------
+   -- Script_Concat_Settings --
+   ----------------------------
 
--- --
--- -- Determines the concatenation and compression settings for scripts and styles.
--- --
--- -- @since 2.8.0
--- --
--- -- @global bool concatenate_scripts
--- -- @global bool compress_scripts
--- -- @global bool compress_css
--- --
--- function script_concat_settings() then
---         global concatenate_scripts, compress_scripts, compress_css;
+   procedure Script_Concat_Settings
+   is
+      use Php;
+      use Hb_Common;
+--    global concatenate_scripts, compress_scripts, compress_css;
 
---         compressed_output = ( ini_get( "zlib.output_compression" ) || "ob_gzhandler" === ini_get( "output_handler" ));
+      Compressed_Output : constant Boolean :=
+        Ini_Get ("zlib.output_compression") or else
+        "ob_gzhandler" = Ini_Get ("output_handler");
 
---         can_compress_scripts = ! wp_installing() && get_site_option( "can_compress_scripts");
+      Can_Compress_Scripts : constant Boolean :=
+        not Inc_Load.Wp_Installing and then
+        Inc_Options.Get_Site_Option ("can_compress_scripts");
 
---         if ( ! isset( concatenate_scripts ) ) then
---                 concatenate_scripts = defined( "CONCATENATE_SCRIPTS" ) ? CONCATENATE_SCRIPTS : true;
---                 if ( ( ! is_admin() && ! did_action( "login_init" ) ) || ( defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG ) ) then
---                         concatenate_scripts = False;
---                 end;
---         end;
+   begin
+      if not Concatenate_Scripts then
+         Concatenate_Scripts := Globals.CONCATENATE_SCRIPTS;
+--       Concatenate_Scripts :=
+--         defined( "CONCATENATE_SCRIPTS" ) ? CONCATENATE_SCRIPTS : true;
+         if
+           (not Inc_Load.Is_Admin and then
+            not Inc_Plugins.Did_Action ("login_init")) or else
+           Globals.SCRIPT_DEBUG
+         then
+            Concatenate_Scripts := False;
+         end if;
+      end if;
 
---         if ( ! isset( compress_scripts ) ) then
---                 compress_scripts = defined( "COMPRESS_SCRIPTS" ) ? COMPRESS_SCRIPTS : true;
---                 if ( compress_scripts && ( ! can_compress_scripts || compressed_output ) ) then
---                         compress_scripts = False;
---                 end;
---         end;
+      if not Compress_Scripts then
+         Compress_Scripts := Globals.COMPRESS_SCRIPTS;
+         if
+           Compress_Scripts and then
+           (not Can_Compress_Scripts or else Compressed_Output)
+         then
+            Compress_Scripts := False;
+         end if;
+      end if;
 
---         if ( ! isset( compress_css ) ) then
---                 compress_css = defined( "COMPRESS_CSS" ) ? COMPRESS_CSS : true;
---                 if ( compress_css && ( ! can_compress_scripts || compressed_output ) ) then
---                         compress_css = False;
---                 end;
---         end;
--- end;
+      if not Compress_CSS then
+         Compress_CSS := Globals.COMPRESS_CSS;
+         if
+           Compress_CSS and then
+           (not Can_Compress_Scripts or else Compressed_Output)
+         then
+            Compress_CSS := False;
+         end if;
+      end if;
+   end Script_Concat_Settings;
 
 -- --
 -- -- Handles the enqueueing of block scripts and styles that are common to both
