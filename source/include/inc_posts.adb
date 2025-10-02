@@ -2118,8 +2118,8 @@ is
 -- Determines whether a post type is registered.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 3.0.0
 --
@@ -2634,7 +2634,7 @@ is
 --          by `post_type_object.label`. Default is "Posts" / "Pages".
 -- - `singular_name` - Name for one object of this post type. Default is "Post" / "Page".
 -- - `add_new` - Default is "Add New" for both hierarchical and non-hierarchical types.
---             When internationalizing this string, please use a then@link https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#disambiguation-by-context gettext contextend;
+--             When internationalizing this string, please use a {@link https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#disambiguation-by-context gettext context}
 --             matching your post type. Example: `x_x ("Add New", "product", "textdomain" );`.
 -- - `add_new_item` - Label for adding a new singular item. Default is "Add New Post" / "Add New Page".
 -- - `edit_item` - Label for editing a singular item. Default is "Edit Post" / "Edit Page".
@@ -3073,8 +3073,8 @@ is
 -- Retrieves an array of the latest posts, or posts matching the given criteria.
 --
 -- For more information on the accepted arguments, see the
--- then@link https://developer.wordpress.org/reference/classes/wp_query/
--- WP_Queryend; documentation in the Developer Handbook.
+-- {@link https://developer.wordpress.org/reference/classes/wp_query/
+-- WP_Query} documentation in the Developer Handbook.
 --
 -- The `ignore_sticky_posts` and `no_found_rows` arguments are ignored by
 -- this function and both are set to `True`.
@@ -3373,8 +3373,8 @@ is
 -- given, then The Loop ID for the current post will be used.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 2.7.0
 --
@@ -7052,8 +7052,8 @@ is
 -- Determines whether an attachment URI is local and really an attachment.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 2.0.0
 --
@@ -7609,8 +7609,8 @@ is
 -- Determines whether an attachment is an image.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 2.1.0
 -- @since 4.2.0 Modified into wrapper for wp_attachment_is() and

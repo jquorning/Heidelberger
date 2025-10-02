@@ -1143,8 +1143,8 @@ is
 --         -- Determines whether the current visitor is a logged in user.
 --         --
 --         -- For more information on this and similar theme functions, check out
---         -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
---         -- Conditional Tagsend; article in the Theme Developer Handbook.
+--         -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+--         -- Conditional Tags} article in the Theme Developer Handbook.
 --         --
 --         -- @since 2.0.0
 --         --
@@ -2370,7 +2370,7 @@ is
 --         -- The secret keys in wp-config.php should be updated to strong, random keys to maximize
 --         -- security. Below is an example of how the secret key constants are defined.
 --         -- Do not paste this example directly into wp-config.php. Instead, have a
---         -- then@link https://api.wordpress.org/secret-key/1.1/salt/ secret key createdend; just
+--         -- {@link https://api.wordpress.org/secret-key/1.1/salt/ secret key created} just
 --         -- for you.
 --         --
 --         --     define('AUTH_KEY',         ' Xakm<o xQy rw4EMsLKM-?!T+,PFFend;)H4lzcW57AF0U@N@< >M%G4Yt>f`z]MON');

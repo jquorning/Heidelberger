@@ -516,8 +516,8 @@ is
 -- -- return false for those plugins.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
+-- -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- -- Conditional Tags} article in the Theme Developer Handbook.
 -- --
 -- -- @since 2.5.0
 -- --
@@ -534,8 +534,8 @@ is
 -- -- Reverse of is_plugin_active(). Used as a callback.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
+-- -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- -- Conditional Tags} article in the Theme Developer Handbook.
 -- --
 -- -- @since 3.1.0
 -- --
@@ -557,8 +557,8 @@ is
 -- -- return false for those plugins.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
+-- -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- -- Conditional Tags} article in the Theme Developer Handbook.
 -- --
 -- -- @since 3.0.0
 -- --
@@ -2377,8 +2377,8 @@ is
 -- -- loading.
 -- --
 -- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
+-- -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- -- Conditional Tags} article in the Theme Developer Handbook.
 -- --
 -- -- @since 5.2.0
 -- --

@@ -2180,7 +2180,7 @@ is
 -- -- We use `REMOTE_ADDR` here directly. If you are behind a proxy, you should ensure
 -- -- that it is properly set, such as in wp-config.php, for your environment.
 -- --
--- -- See then@link https://core.trac.wordpress.org/ticket/9235end;
+-- -- See {@link https://core.trac.wordpress.org/ticket/9235}
 -- --
 -- -- @since 1.5.0
 -- -- @since 4.3.0 Introduced the `comment_agent` and `comment_author_IP` arguments.

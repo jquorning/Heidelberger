@@ -257,8 +257,8 @@ is
 -- A false return value might also mean that the taxonomy does not exist.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 2.3.0
 --
@@ -521,8 +521,8 @@ is
 -- Formerly is_taxonomy(), introduced in 2.3.0.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 3.0.0
 --

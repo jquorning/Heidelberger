@@ -264,8 +264,8 @@ is
 -- As of 2.7, the function can be used anywhere if it is provided a post ID or post object.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 1.2.0
 -- @since 2.7.0 The `$post` parameter was added.
@@ -1575,8 +1575,8 @@ is
 -- If no tags are given, determines if post has any tags.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 2.6.0
 -- @since 2.7.0 Tags given as integers are only checked against

@@ -446,9 +446,9 @@ is
 --         -- than the theme"s, and the theme"s higher than default"s.
 --         --
 --         -- Unlike the getters
---         -- then@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_core_data/ get_core_dataend;,
---         -- then@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_theme_data/ get_theme_dataend;,
---         -- and then@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_user_data/ get_user_dataend;,
+--         -- {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_core_data/ get_core_data},
+--         -- {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_theme_data/ get_theme_data},
+--         -- and {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_user_data/ get_user_data},
 --         -- this method returns data after it has been merged with the previous origins.
 --         -- This means that if the same piece of data is declared in different origins
 --         -- (user, theme, and core), the last origin overrides the previous.

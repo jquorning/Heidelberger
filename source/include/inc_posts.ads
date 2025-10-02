@@ -49,8 +49,8 @@ is
 -- Determines whether a post type is registered.
 --
 -- For more information on this and similar theme functions, check out
--- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tagsend; article in the Theme Developer Handbook.
+-- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+-- Conditional Tags} article in the Theme Developer Handbook.
 --
 -- @since 3.0.0
 --
