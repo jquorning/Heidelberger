@@ -71,6 +71,19 @@ is
    end Get;
 
    -----------
+   -- Empty --
+   -----------
+
+   function Empty (Arry : Array_Type;
+                   Key  : String)
+                   return Boolean
+   is
+      use Array_Maps;
+   begin
+      return not Has_Element (Arry.Find (Key));
+   end Empty;
+
+   -----------
    -- Isset --
    -----------
 

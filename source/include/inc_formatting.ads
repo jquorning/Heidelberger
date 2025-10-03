@@ -1,4 +1,13 @@
+--
+-- Main WordPress Formatting API.
+--
+-- Handles many functions for formatting output.
+--
+-- @package WordPress
+--
+
 with Arrays;
+with Php;
 
 package Inc_Formatting
 is
@@ -49,6 +58,43 @@ is
    --
    procedure Wp_Parse_Str (Str  :     String;
                            Arry : out Array_Type);
+
+   --
+   -- Converts a number of special characters into their HTML entities.
+   --
+   -- Specifically deals with: `&`, `<`, `>`, `"`, and `"`.
+   --
+   -- `quote_style` can be set to ENT_COMPAT to encode `"` to
+   -- `&quot;`, or ENT_QUOTES to do both. Default is ENT_NOQUOTES where no quotes are
+   -- encoded.
+   --
+   -- @since 1.2.2
+   -- @since 5.5.0 `quote_style` also accepts `ENT_XML1`.
+   -- @access private
+   --
+   -- @param string       string        The text which is to be encoded.
+   -- @param int|string   quote_style   Optional. Converts double quotes if set to
+   --                                   ENT_COMPAT, both single and double if set to
+   --                                   ENT_QUOTES or none if set to ENT_NOQUOTES.
+   --                                   Converts single and double quotes, as well as
+   --                                   converting HTML named entities (that are not
+   --                                   also XML named entities) to their code points
+   --                                   if set to ENT_XML1. Also compatible with old
+   --                                   values; converting single quotes if set to
+   --                                   "single", double if set to "double" or both
+   --                                   if otherwise set. Default is ENT_NOQUOTES.
+   -- @param false|string charset       Optional. The character encoding of the
+   --                                   string. Default false.
+   -- @param bool         double_encode Optional. Whether to encode existing HTML
+   --                                   entities. Default false.
+   -- @return string The encoded text with HTML entities.
+   --
+   function X_Wp_Specialchars (Item          : String;
+                               Quote_Style   : Php.Flag_Type := Php.ENT_NOQUOTES;
+--                             Quote_Style   : Integer := Php.ENT_NOQUOTES;
+                               Charset       : String  := ""; -- Boolean := False;
+                               Double_Encode : Boolean := False)
+                               return String;
 
    --
    -- Sanitizes an HTML classname to ensure it only contains valid characters.
@@ -172,10 +218,22 @@ is
    -- @param string text
    -- @return string
    --
-   -- function esc_attr( text ) then
-   function ESC_Attr (Item : String)
-                      return String
-                      is ("XXX-325");
+   function ESC_Attr (Text : String)
+                      return String;
+
+   --
+   -- Checks for invalid UTF8 in a string.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string string The text which is to be checked.
+   -- @param bool   strip  Optional. Whether to attempt to strip out invalid UTF8.
+   --                      Default false.
+   -- @return string The checked text.
+   --
+   function Wp_Check_Invalid_UTF8 (Item  : String;
+                                   Strip : Boolean := False)
+                                   return String;
 
    --
    -- Appends a trailing slash.

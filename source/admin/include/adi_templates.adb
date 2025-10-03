@@ -10,6 +10,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Binder;
 with Wp_Common;
 with Php;
 
@@ -2286,19 +2287,18 @@ is
 --       return ESC_HTML (-Title);
 --    end X_Draft_Or_Post_Title;
 
--- --
--- -- Displays the search query.
--- --
--- -- A simple wrapper to display the "s" parameter in a `GET` URI. This function
--- -- should only be used when the_search_query() cannot.
--- --
--- -- @since 2.7.0
--- --/
--- procedure X_Admin_Search_Query
--- is
--- begin
---         Echo (if Isset (X_REQUEST ("s")) then Esc_Attr (Hb_Unslash (X_REQUEST ("s"))) else "");
--- end X_Admin_Search_Query;
+   --------------------------
+   -- X_Admin_Search_Query --
+   --------------------------
+
+   procedure X_Admin_Search_Query
+   is
+      use Binder;
+      use Inc_Formatting;
+   begin
+      Echo ((if Isset (X_REQUEST, "s")
+             then ESC_Attr (Wp_Unslash (X_REQUEST ("s"))) else ""));
+   end X_Admin_Search_Query;
 
 -- --
 -- -- Generic Iframe header for use with Thickbox.

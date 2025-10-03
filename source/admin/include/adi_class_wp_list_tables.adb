@@ -5,8 +5,19 @@
 -- @subpackage List_Table
 -- @since 3.1.0
 --
+
+with Ada.Text_IO; use Ada.Text_IO;
+with Binder;
+with Hb_Common;
+with Php;
+
+with Adi_Templates;
+with Inc_Formatting;
+with Inc_Plugins;
+
 package body Adi_Class_Wp_List_Tables
 is
+
    procedure Dummy is null;
 
 --         --
@@ -238,41 +249,60 @@ is
 --                 _e( "No items found." );
 --         end;
 
---         --
---         -- Displays the search box.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string text     The "submit" button label.
---         -- @param string input_id ID attribute value for the search input field.
---         --
---         public function search_box( text, input_id ) then
---                 if ( empty( _REQUEST["s"] ) && ! this.has_items() ) then
---                         return;
---                 end;
+   ----------------
+   -- Search_Box --
+   ----------------
 
---                 input_id = input_id . "-search-input";
+   procedure Search_Box (This     : Wp_List_Table;
+                         Text     : String;
+                         Input_Id : String)
+   is
+      use Binder;
+      use Hb_Common;
+      use Php;
+      use Adi_Templates;
+      use Inc_Formatting;
 
---                 if ( ! empty( _REQUEST["orderby"] ) ) then
---                         echo "<input type="hidden" name="orderby" value="" . esc_attr( _REQUEST["orderby"] ) . "" />";
---                 end;
---                 if ( ! empty( _REQUEST["order"] ) ) then
---                         echo "<input type="hidden" name="order" value="" . esc_attr( _REQUEST["order"] ) . "" />";
---                 end;
---                 if ( ! empty( _REQUEST["post_mime_type"] ) ) then
---                         echo "<input type="hidden" name="post_mime_type" value="" . esc_attr( _REQUEST["post_mime_type"] ) . "" />";
---                 end;
---                 if ( ! empty( _REQUEST["detached"] ) ) then
---                         echo "<input type="hidden" name="detached" value="" . esc_attr( _REQUEST["detached"] ) . "" />";
---                 end;
---                 ?>
--- <p class="search-box">
---         <label class="screen-reader-text" for="<?php echo esc_attr( input_id ); ?>"><?php echo text; ?>:</label>
---         <input type="search" id="<?php echo esc_attr( input_id ); ?>" name="s" value="<?php _admin_search_query(); ?>" />
---                 <?php submit_button( text, "", "", false, array( "id" => "search-submit" ) ); ?>
--- </p>
---                 <?php
---         end;
+      Input_Id_2 : constant String := Input_Id & "-search-input";
+   begin
+      if Empty (X_REQUEST, "s") and then not This.Has_Items then
+         return;
+      end if;
+
+      if not Empty (X_REQUEST, "orderby") then
+         Echo ("<input type=""hidden"" name=""orderby"" value=""""" &
+               ESC_Attr (X_REQUEST ("orderby")) & """ />");
+      end if;
+
+      if not Empty (X_REQUEST, "order") then
+         Echo ("<input type=""hidden"" name=""order"" value=""""" &
+               ESC_Attr (X_REQUEST ("order")) & """ />");
+      end if;
+
+      if not Empty (X_REQUEST, "post_mime_type") then
+         Echo ("<input type=""hidden"" name=""post_mime_type"" value=""""" &
+               ESC_Attr (X_REQUEST ("post_mime_type")) & """ />");
+      end if;
+
+      if not Empty (X_REQUEST, "detached") then
+         Echo ("<input type=""hidden"" name=""detached"" value=""""" &
+               ESC_Attr (X_REQUEST ("detached")) & """ />");
+      end if;
+
+      Echo ("<p class=""search-box"">" & NL);
+      Echo ("  <label class=""screen-reader-text"" for=" & ESC_Attr (Input_Id_2) &
+            ">" & Text & "</label>" & NL);
+      Echo ("  <input type=""search"" id=" & ESC_Attr (Input_Id_2) &
+            " name=""s"" value=""");
+      X_Admin_Search_Query;
+      Echo (""" />" & NL);
+      Echo ("  ");
+      Submit_Button
+         (Text, "", "", False,
+          To_Array ((1 => Build ("id", "search-submit"))));
+      Echo ("</p>" & NL);
+
+   end Search_Box;
 
 --         --
 --         -- Generates views links.
@@ -347,52 +377,62 @@ is
 --                 return views_links;
 --         end;
 
---         --
---         -- Gets the list of views available on this table.
---         --
---         -- The format is an associative array:
---         -- - `"id" => "link"`
---         --
---         -- @since 3.1.0
---         --
---         -- @return array
---         --
---         protected function get_views() then
---                 return array();
---         end;
+   ---------------
+   -- Get_Views --
+   ---------------
 
---         --
---         -- Displays the list of views available on this table.
---         --
---         -- @since 3.1.0
---         --
---         public function views() then
---                 views = this.get_views();
---                 --
---                 -- Filters the list of available list table views.
---                 --
---                 -- The dynamic portion of the hook name, `this.screen.id`, refers
---                 -- to the ID of the current screen.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param string[] views An array of available list table views.
---                 --
---                 views = apply_filters( "views_thenthis.screen.idend;", views );
+   function Get_Views (This : Wp_List_Table)
+            return Array_Type
+   is
+   begin
+      return Empty_Array;
+   end Get_Views;
 
---                 if ( empty( views ) ) then
---                         return;
---                 end;
+   -----------
+   -- Views --
+   -----------
 
---                 this.screen.render_screen_reader_content( "heading_views" );
+   procedure Views (This : Wp_List_Table)
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Plugins;
 
---                 echo "<ul class="subsubsub">\n";
---                 foreach ( views as class => view ) then
---                         views[ class ] = "\t<li class="class">view";
---                 end;
---                 echo implode( " |</li>\n", views ) . "</li>\n";
---                 echo "</ul>";
---         end;
+      Views : Array_Type := This.Get_Views;
+   begin
+      --
+      -- Filters the list of available list table views.
+      --
+      -- The dynamic portion of the hook name, `this.screen.id`, refers
+      -- to the ID of the current screen.
+      --
+      -- @since 3.1.0
+      --
+      -- @param string[] views An array of available list table views.
+      --
+      Views := Apply_Filters ("views_" & (-This.Screen.Id), Views);
+
+      if Views.Is_Empty then
+--    if Empty (Views) then
+         return;
+      end if;
+
+      This.Screen.Render_Screen_Reader_Content ("heading_views");
+
+      Echo ("<ul class=""subsubsub"">\n");
+      for A in Views.Iterate loop --  as class => view ) loop
+         declare
+            use Array_Maps;
+
+            Class : constant String := Key (A);
+            View  : constant String := Element (A);
+         begin
+            Views (Class) := "\t<li class=""" & Class  & """>" & View;
+         end;
+      end loop;
+      Echo (Implode (" |</li>\n", Views) & "</li>\n");
+      Echo ("</ul>");
+   end Views;
 
 --         --
 --         -- Retrieves the list of bulk actions available for this table.

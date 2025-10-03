@@ -6,6 +6,9 @@
 -- @since 4.4.0
 --
 
+with Hb_Common;
+with Php;
+
 package body Adi_Class_Wp_Screens
 is
    procedure Dummy is null;
@@ -1152,21 +1155,22 @@ is
 --                 <?php
 --         end;
 
---         --
---         -- Renders screen reader text.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string $key The screen reader text array named key.
---         -- @param string $tag Optional. The HTML tag to wrap the screen reader text. Default h2.
---         --
---         public function render_screen_reader_content( $key = "", $tag = "h2" ) then
+   ----------------------------------
+   -- Render_Screen_Reader_Content --
+   ----------------------------------
 
---                 if ( ! isset( $this->_screen_reader_content[ $key ] ) ) then
---                         return;
---                 end;
---                 echo "<$tag class="screen-reader-text">" . $this->_screen_reader_content[ $key ] . "</$tag>";
---         end;
--- end;
+   procedure Render_Screen_Reader_Content (This : Wp_Screen;
+                                           Key  : String := "";
+                                           Tag  : String := "h2")
+   is
+      use Hb_Common;
+      use Php;
+   begin
+      if not Isset (This.X_Screen_Reader_Content (Key)) then
+         return;
+      end if;
+      Echo ("<" & Tag & " class=""screen-reader-text"">" &
+            This.X_Screen_Reader_Content (Key) & "</" & Tag & ">");
+   end Render_Screen_Reader_Content;
 
 end Adi_Class_Wp_Screens;

@@ -7,7 +7,7 @@
 
 with Ada.Containers;
 with Ada.Strings.Unbounded;
-
+with Ada.Text_IO;
 with Templates_Parser;
 
 with Arrays;
@@ -108,7 +108,7 @@ is
 
       Post_Type        := Globals.Typenow;
       Post_Type_Object := Inc_Posts.Get_Post_Type_Object (-Post_Type);
---  if Post_Type_Object = 0 then  -- not
+--  if Post_Type_Object = 0   -- not
 --   Wp_Die (abs  "Invalid post type.");
 --  end if;
 
@@ -636,6 +636,7 @@ is
                Bulk_Counts   := Array_Filter  (Bulk_Counts);
 
                declare
+                  use Ada.Text_IO;
                   use Templates_Parser;
 
                   type My_Lazy is new Dynamic.Lazy_Tag with null record;
@@ -710,15 +711,18 @@ is
                              Var_Bulk (Bulk_Messages, Bulk_Counts, -Post_Type));
 
                      elsif Var_Name = "VAR_page_edit_views" then
-                        X_Wp_List_Table.Views; -- ()
-                        Set ("VAR_page_edit_views", "XX-449");
+                        Clear_Echo;
+                        X_Wp_List_Table.Views;
+                        Set ("VAR_page_edit_views", Get_Echo);
 
                      elsif Var_Name = "VAR_page_edit_search_box" then
-                        X_Wp_List_Table.Search_Box
-                          (String'(Wp_Common.Get (Post_Type_Object,
-                                                 "labels.search_items")),
+                        Clear_Echo;
+                        X_Wp_List_Table.Search_Box (
+                          "XXX-794",
+--                        String'(Get (Post_Type_Object.Labels,
+--                                               "search_items")),
                            "post");
-                        Set ("VAR_page_edit_search_box", "XXX-454");
+                        Set ("VAR_page_edit_search_box", Get_Echo);
 
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Set ("VAR_page_edit_post_status",

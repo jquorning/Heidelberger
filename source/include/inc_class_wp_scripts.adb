@@ -517,7 +517,7 @@ is
 --                  goto Continue_1;
 --               end if;
 
-               Set (L10n_2, Key, Html_Entity_Decode (Value, Ent_Quotes, "UTF-8"));
+               Set (L10n_2, Key, Html_Entity_Decode (Value, ENT_QUOTES, "UTF-8"));
             end;
 --            << Continue_1 >>
          end loop;

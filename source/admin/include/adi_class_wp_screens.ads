@@ -156,7 +156,7 @@ is
         -- @since 4.4.0
         -- @var array
         --
---        private _screen_reader_content = array();
+         X_Screen_Reader_Content : Array_Type;
 
         --
         -- Stores old string-based help.
@@ -304,5 +304,18 @@ is
    procedure Set_Screen_Reader_Content (This    : Wp_Screen;
                                         Content : Array_Type)
                                         is null;
+
+   --
+   -- Renders screen reader text.
+   --
+   -- @since 4.4.0
+   --
+   -- @param string $key The screen reader text array named key.
+   -- @param string $tag Optional. The HTML tag to wrap the screen reader text.
+   --                    Default h2.
+   --
+   procedure Render_Screen_Reader_Content (This : Wp_Screen;
+                                           Key  : String := "";
+                                           Tag  : String := "h2");
 
 end Adi_Class_Wp_Screens;

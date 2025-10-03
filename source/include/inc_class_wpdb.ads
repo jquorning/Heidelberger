@@ -46,7 +46,8 @@ is
          --
          -- @var bool
          --
---        public $suppress_errors = false;
+         X_Suppress_Errors : Boolean := False;
+         -- X_ added to avoid conflict with method
 
          --
          -- The error encountered during the last query.
@@ -874,6 +875,22 @@ is
                           Str : String := "") is null;
 
    --
+   -- Enables or disables suppressing of database errors.
+   --
+   -- By default database errors are suppressed.
+   --
+   -- @since 2.5.0
+   --
+   -- @see wpdb::hide_errors()
+   --
+   -- @param bool suppress Optional. Whether to suppress errors. Default true.
+   -- @return bool Whether suppressing of errors was previously active.
+   --
+   function Suppress_Errors (This     : in out Wpdb_Class;
+                             Suppress : Boolean := True)
+                             return Boolean;
+
+   --
    -- Retrieves one row from the database.
    --
    -- Executes a SQL query and returns the row from the SQL result.
@@ -925,6 +942,30 @@ is
                      X     : Integer := 0)
                      return List_Type
                      is (Empty_List);
+
+   --
+   -- Retrieves an entire SQL result set from the database (i.e., many rows).
+   --
+   -- Executes a SQL query and returns the entire SQL result.
+   --
+   -- @since 0.71
+   --
+   -- @param string query  SQL query.
+   -- @param string output Optional. Any of ARRAY_A | ARRAY_N | OBJECT | OBJECT_K
+   --                      constants. With one of the first three, return an array of
+   --                      rows indexed from 0 by SQL result row number. Each row is
+   --                      an associative array (column => value, ...), a numerically
+   --                      indexed array (0 => value, ...), or an object (.column =
+   --                      value), respectively. With OBJECT_K. return an associative
+   --                      array of row objects keyed by the value of each row"s
+   --                      first column"s value. Duplicate keys are discarded.
+   -- @return array|object|null Database query results.
+   --
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : String := ""; -- null
+                         Output : String := "OBJECT")
+                         return Array_Type
+                         is (Empty_Array);
 
    --
    -- Retrieves the character set for the given table.

@@ -76,7 +76,10 @@ is
 
    function Empty (A : String) return Boolean is (True);
    function Empty (Table : Array_Type) return Boolean;
-   function Empty (Arry : Array_Type; Key : String) return Boolean is (False);
+
+   function Empty (Arry : Array_Type;
+                   Key  : String)
+                   return Boolean;
 
    procedure Unset (A : String) is null;
 

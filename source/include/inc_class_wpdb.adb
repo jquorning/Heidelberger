@@ -1123,23 +1123,19 @@ is
         --         return show;
         -- end;
 
-        --
-        -- Enables or disables suppressing of database errors.
-        --
-        -- By default database errors are suppressed.
-        --
-        -- @since 2.5.0
-        --
-        -- @see wpdb::hide_errors()
-        --
-        -- @param bool suppress Optional. Whether to suppress errors. Default true.
-        -- @return bool Whether suppressing of errors was previously active.
-        --
-        -- public function suppress_errors(suppress = true) then
-        --         errors                = this.suppress_errors;
-        --         this.suppress_errors = (bool) suppress;
-        --         return errors;
-        -- end;
+   ---------------------
+   -- Suppress_Errors --
+   ---------------------
+
+   function Suppress_Errors (This     : in out Wpdb_Class;
+                             Suppress : Boolean := True)
+                             return Boolean
+   is
+      Errors : constant Boolean := This.X_Suppress_Errors;
+   begin
+      This.X_Suppress_Errors := Suppress; -- (bool)
+      return Errors;
+   end Suppress_Errors;
 
         --
         -- Kills cached query results.

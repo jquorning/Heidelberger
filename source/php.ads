@@ -46,6 +46,12 @@ is
                         Offset  : Integer := 0)
                         return Integer;
 
+   function Preg_Match (Pattern : String;
+                        Subject : String;
+                        Flags   : Integer := 0;
+                        Offset  : Integer := 0)
+                        return Boolean;
+
    function Preg_Match_All (Pattern : String;
                             Subject : String;
                             Matches : out List_Type;
@@ -171,7 +177,14 @@ is
                           return String
                           is (Item);
 
-   type Flag_Type is (Ent_Quotes, Ent_Substitute, Ent_Html404);
+   type Flag_Type is new Natural;
+
+   ENT_QUOTES     : constant Flag_Type := 16#0001#;
+   ENT_SUBSTITUTE : constant Flag_Type := 16#0002#;
+   ENT_HTML404    : constant Flag_Type := 16#0004#;
+   ENT_NOQUOTES   : constant Flag_Type := 16#0008#;
+   ENT_XML1       : constant Flag_Type := 16#0010#;
+   ENT_HTML401    : constant Flag_Type := 16#0020#;
    -- Shold be or'ed together instead
 
    function Html_Entity_Decode (Item     : String;
@@ -181,11 +194,20 @@ is
                                 is ("XXX-312");
 
    function Htmlentities (Item          : String;
-                          Flags         : Flag_Type := Ent_Quotes;
+                          Flags         : Flag_Type := ENT_QUOTES;
                           Encoding      : String  := "";
                           Double_Encode : Boolean := True)
                           return String
                           is ("XXX-462");
+
+   function Htmlspecialchars (Item          : String;
+                              Flags         : Flag_Type := ENT_QUOTES +
+                                                           ENT_SUBSTITUTE +
+                                                           ENT_HTML401;
+                              Encoding      : String := "";
+                              Double_Encode : Boolean := True)
+                              return String
+                              is (Item);
 
    function Array_Keys (Arry : Array_Type)
                         return List_Type

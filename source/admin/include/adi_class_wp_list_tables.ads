@@ -8,9 +8,14 @@
 
 with Ada.Strings.Unbounded;
 
+with Arrays;
+
+with Adi_Class_Wp_Screens;
+
 package Adi_Class_Wp_List_Tables
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
 
    procedure Dummy;
 
@@ -53,7 +58,8 @@ is
 --         -- @since 3.1.0
 --         -- @var WP_Screen
 --         --
---         protected screen;
+--         protected
+          Screen : Adi_Class_Wp_Screens.Wp_Screen;
 
 --         --
 --         -- Cached bulk actions.
@@ -165,16 +171,28 @@ is
    --
    procedure Search_Box (This     : Wp_List_Table;
                          Text     : String;
-                         Input_Id : String)
-                         is null;
+                         Input_Id : String);
+
+   --
+   -- Gets the list of views available on this table.
+   --
+   -- The format is an associative array:
+   -- - `"id" => "link"`
+   --
+   -- @since 3.1.0
+   --
+   -- @return array
+   --
+   -- protected
+   function Get_Views (This : Wp_List_Table)
+            return Array_Type;
 
    --
    -- Displays the list of views available on this table.
    --
    -- @since 3.1.0
    --
-   procedure Views (This : Wp_List_Table)
-                   is null;
+   procedure Views (This : Wp_List_Table);
 
    --
    -- Gets the current action selected from the bulk actions dropdown.

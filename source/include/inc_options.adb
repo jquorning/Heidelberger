@@ -7,7 +7,7 @@
 --
 
 with Ada.Strings.Unbounded;
--- with Hb_Common;
+with Globals;
 with Php;
 
 with Inc_Caches;
@@ -309,63 +309,82 @@ is
 --         echo esc_attr( get_option( option ) );
 -- end;
 
--- --
--- -- Loads and caches all autoloaded options, if available or all options.
--- --
--- -- @since 2.2.0
--- -- @since 5.3.1 The `force_cache` parameter was added.
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param bool force_cache Optional. Whether to force an update of the local cache
--- --                          from the persistent cache. Default false.
--- -- @return array List of all options.
--- --
--- function wp_load_alloptions( force_cache = false ) then
---         global wpdb;
+   ------------------------
+   -- Wp_Load_Alloptions --
+   ------------------------
 
---         if ( ! wp_installing() || ! is_multisite() ) then
---                 alloptions = wp_cache_get( "alloptions", "options", force_cache );
---         end; else then
---                 alloptions = false;
---         end;
+   function Wp_Load_Alloptions (Force_Cache : Boolean := False)
+            return Array_Type
+   is
+      use Inc_Caches;
+      use Inc_Load;
+      use Inc_Plugins;
 
---         if ( ! alloptions ) then
---                 suppress      = wpdb->suppress_errors();
---                 alloptions_db = wpdb->get_results( "SELECT option_name, option_value FROM wpdb->options WHERE autoload = "yes"" );
---                 if ( ! alloptions_db ) then
---                         alloptions_db = wpdb->get_results( "SELECT option_name, option_value FROM wpdb->options" );
---                 end;
---                 wpdb->suppress_errors( suppress );
+--    global wpdb;
+      Unused_Found : Boolean;
+      Alloptions   : Array_Type;
+   begin
+      if not Wp_Installing or else not Is_Multisite then
+         Alloptions :=
+           Wp_Cache_Get ("alloptions", "options", Force_Cache, Unused_Found);
+      else
+         Alloptions := Empty_Array; -- false;
+      end if;
 
---                 alloptions = array();
---                 foreach ( (array) alloptions_db as o ) then
---                         alloptions[ o->option_name ] = o->option_value;
---                 end;
+      if Alloptions.Is_Empty then
+         declare
+            Unused   : Boolean;
+            Suppress : constant Boolean := Globals.Wpdb.Suppress_Errors;
 
---                 if ( ! wp_installing() || ! is_multisite() ) then
---                         --
---                         -- Filters all options before caching them.
---                         --
---                         -- @since 4.9.0
---                         --
---                         -- @param array alloptions Array with all options.
---                         --
---                         alloptions = apply_filters( "pre_cache_alloptions", alloptions );
+            Alloptions_DB : Array_Type :=
+              Globals.Wpdb.Get_Results (
+                "SELECT option_name, option_value FROM wpdb->options WHERE autoload = ""yes""");
+         begin
+            if Alloptions_DB.Is_Empty then
+               Alloptions_DB := Globals.Wpdb.Get_Results (
+                 "SELECT option_name, option_value FROM wpdb->options");
+            end if;
 
---                         wp_cache_add( "alloptions", alloptions, "options" );
---                 end;
---         end;
+            Unused := Globals.Wpdb.Suppress_Errors (Suppress);
 
---         --
---         -- Filters all options after retrieving them.
---         --
---         -- @since 4.9.0
---         --
---         -- @param array alloptions Array with all options.
---         --
---         return apply_filters( "alloptions", alloptions );
--- end;
+            Alloptions := Empty_Array;
+            for A in Alloptions_DB.Iterate loop -- o
+               declare
+                  use Array_Maps;
+               begin
+                  Alloptions.Include (Key      => Key     (A),
+                                      New_Item => Element (A));
+               end;
+--             Alloptions.Include (Key      => A.Option_Name,
+--                                 New_Item => A.Option_Value);
+--             Alloptions (A.Option_Name) := A.Option_Value;
+            end loop;
+
+            if not Wp_Installing or else not Is_Multisite then
+               --
+               -- Filters all options before caching them.
+               --
+               -- @since 4.9.0
+               --
+               -- @param array alloptions Array with all options.
+               --
+               Alloptions := Apply_Filters ("pre_cache_alloptions", Alloptions);
+
+               Unused :=
+                 Wp_Cache_Add ("alloptions", Alloptions, "options");
+            end if;
+         end;
+      end if;
+
+      --
+      -- Filters all options after retrieving them.
+      --
+      -- @since 4.9.0
+      --
+      -- @param array alloptions Array with all options.
+      --
+      return Apply_Filters ("alloptions", Alloptions);
+   end Wp_Load_Alloptions;
 
 -- --
 -- -- Loads and caches certain often requested site options if is_multisite() and a persistent cache is not being used.

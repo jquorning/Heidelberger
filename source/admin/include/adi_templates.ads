@@ -194,6 +194,16 @@ is
                             Other_Attributes : Array_Type := Empty_Array);
 
    --
+   -- Displays the search query.
+   --
+   -- A simple wrapper to display the "s" parameter in a `GET` URI. This function
+   -- should only be used when the_search_query() cannot.
+   --
+   -- @since 2.7.0
+   --
+   procedure X_Admin_Search_Query;
+
+   --
    -- Returns a submit button, with provided text and appropriate class.
    --
    -- @since 3.1.0

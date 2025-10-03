@@ -59,6 +59,19 @@ is
       end if;
    end Preg_Match;
 
+   function Preg_Match (Pattern : String;
+                        Subject : String;
+                        Flags   : Integer := 0;
+                        Offset  : Integer := 0)
+                        return Boolean
+   is
+      Unused : List_Type;
+      Count : constant Natural :=
+         Preg_Match (Pattern, Subject, Unused, Flags, Offset);
+   begin
+      return Count /= 0;
+   end Preg_Match;
+
    -------------
    -- Explode --
    -------------

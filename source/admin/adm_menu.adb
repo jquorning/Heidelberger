@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Text_IO;
-
 with Binder;
 with Globals;
 with Hb_Common;
@@ -634,7 +632,6 @@ is
                      declare
                         Health : constant String := Get (Issue_Counts, "critical");
                      begin
-Ada.Text_IO.Put_Line (Health);
                         Site_Health_Count := +Sprintf (
                            "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
                            Health,

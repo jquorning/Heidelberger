@@ -1,13 +1,22 @@
--- --
--- -- Main WordPress Formatting API.
--- --
--- -- Handles many functions for formatting output.
--- --
--- -- @package WordPress
--- --
+--
+-- Main WordPress Formatting API.
+--
+-- Handles many functions for formatting output.
+--
+-- @package WordPress
+--
+
+with Ada.Strings.Unbounded;
+
+with Hb_Common;
+
+with Inc_Kses;
+with Inc_Options;
+with Inc_Plugins;
 
 package body Inc_Formatting
 is
+   use Ada.Strings.Unbounded;
 
 -- --
 -- -- Replaces common plain text characters with formatted entities.
@@ -908,90 +917,103 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Converts a number of special characters into their HTML entities.
--- --
--- -- Specifically deals with: `&`, `<`, `>`, `"`, and `"`.
--- --
--- -- `quote_style` can be set to ENT_COMPAT to encode `"` to
--- -- `&quot;`, or ENT_QUOTES to do both. Default is ENT_NOQUOTES where no quotes are encoded.
--- --
--- -- @since 1.2.2
--- -- @since 5.5.0 `quote_style` also accepts `ENT_XML1`.
--- -- @access private
--- --
--- -- @param string       string        The text which is to be encoded.
--- -- @param int|string   quote_style   Optional. Converts double quotes if set to ENT_COMPAT,
--- --                                    both single and double if set to ENT_QUOTES or none if set to ENT_NOQUOTES.
--- --                                    Converts single and double quotes, as well as converting HTML
--- --                                    named entities (that are not also XML named entities) to their
--- --                                    code points if set to ENT_XML1. Also compatible with old values;
--- --                                    converting single quotes if set to "single",
--- --                                    double if set to "double" or both if otherwise set.
--- --                                    Default is ENT_NOQUOTES.
--- -- @param false|string charset       Optional. The character encoding of the string. Default false.
--- -- @param bool         double_encode Optional. Whether to encode existing HTML entities. Default false.
--- -- @return string The encoded text with HTML entities.
--- --
--- function _wp_specialchars( string, quote_style = ENT_NOQUOTES, charset = false, double_encode = false ) then
---         string = (string) string;
+   Static_X_Charset_Set : Boolean := False;
+   Static_X_Charset     : Unbounded_String;
 
---         if ( 0 === strlen( string ) ) then
---                 return "";
---         end;
+   -----------------------
+   -- X_Wp_Specialchars --
+   -----------------------
 
---         // Don"t bother if there are no specialchars - saves some processing.
---         if ( ! preg_match( "/[&<>"\"]/", string ) ) then
---                 return string;
---         end;
+   function X_Wp_Specialchars (Item          : String;
+                               Quote_Style   : Php.Flag_Type := Php.ENT_NOQUOTES;
+--                             Quote_Style   : Integer := ENT_NOQUOTES;
+                               Charset       : String  := "";
+                               Double_Encode : Boolean := False)
+                               return String
+   is
+      use Hb_Common;
+      use Php;
 
---         // Account for the previous behaviour of the function when the quote_style is not an accepted value.
---         if ( empty( quote_style ) ) then
---                 quote_style = ENT_NOQUOTES;
---         end; elseif ( ENT_XML1 === quote_style ) then
---                 quote_style = ENT_QUOTES | ENT_XML1;
---         end; elseif ( ! in_array( quote_style, array( ENT_NOQUOTES, ENT_COMPAT, ENT_QUOTES, "single", "double" ), true ) ) then
---                 quote_style = ENT_QUOTES;
---         end;
+--    string = (string) string;
+      Quote_Style_2 : Flag_Type := Quote_Style;
+      X_Quote_Style : Flag_Type := Quote_Style;
+      Charset_2     : Unbounded_String := +Charset;
+      Item_2        : Unbounded_String := +Item;
+   begin
+      if 0 = Item'Length then
+         return "";
+      end if;
 
---         // Store the site charset as a static to avoid multiple calls to wp_load_alloptions().
---         if ( ! charset ) then
---                 static _charset = null;
---                 if ( ! isset( _charset ) ) then
---                         alloptions = wp_load_alloptions();
---                         _charset   = isset( alloptions["blog_charset"] ) ? alloptions["blog_charset"] : "";
---                 end;
---                 charset = _charset;
---         end;
+      -- Don't bother if there are no specialchars - saves some processing.
+      if not Php.Preg_Match ("/[&<>'\']/", Item) then
+         return Item;
+      end if;
 
---         if ( in_array( charset, array( "utf8", "utf-8", "UTF8" ), true ) ) then
---                 charset = "UTF-8";
---         end;
+      -- Account for the previous behaviour of the function when the quote_style is
+      -- not an accepted value.
+      if False then -- Empty (Quote_Style) then
+         Quote_Style_2 := ENT_NOQUOTES;
+      elsif ENT_XML1 = Quote_Style then
+         Quote_Style_2 := ENT_QUOTES + ENT_XML1; -- or
+      elsif True
+--      not In_Array (Quote_Style,
+--                    To_List (List => (ENT_NOQUOTES, ENT_COMPAT, ENT_QUOTES,
+--                                      +"single", +"double")), True)
+      then
+         Quote_Style_2 := ENT_QUOTES;
+      end if;
 
---         _quote_style = quote_style;
+      -- Store the site charset as a static to avoid multiple calls to
+      -- wp_load_alloptions().
+      if Charset = "" then
+--       static _charset = null;
+         if not Static_X_Charset_Set then
+            declare
+               Alloptions : constant Array_Type :=
+                 Inc_Options.Wp_Load_Alloptions; -- ()
+            begin
+               Static_X_Charset :=
+                 +(if Isset (Alloptions, "blog_charset")
+                   then Alloptions ("blog_charset") else "");
+            end;
+            Static_X_Charset_Set := True;
+         end if;
+         Charset_2 := Static_X_Charset;
+      end if;
 
---         if ( "double" === quote_style ) then
---                 quote_style  = ENT_COMPAT;
---                 _quote_style = ENT_COMPAT;
---         end; elseif ( "single" === quote_style ) then
---                 quote_style = ENT_NOQUOTES;
---         end;
+      if
+        In_Array (Charset, To_List (List => (+"utf8", +"utf-8", +"UTF8")), True)
+      then
+         Charset_2 := +"UTF-8";
+      end if;
 
---         if ( ! double_encode ) then
---                 // Guarantee every &entity; is valid, convert &garbage; into &amp;garbage;
---                 // This is required for PHP < 5.4.0 because ENT_HTML401 flag is unavailable.
---                 string = wp_kses_normalize_entities( string, ( quote_style & ENT_XML1 ) ? "xml" : "html" );
---         end;
+      X_Quote_Style := Quote_Style;
 
---         string = htmlspecialchars( string, quote_style, charset, double_encode );
+      -- if "double" = Quote_Style then
+      --    Quote_Style   := ENT_COMPAT;
+      --    X_Quote_Style := ENT_COMPAT;
+      -- elsif "single" = Quote_Style then
+      --    Quote_Style := ENT_NOQUOTES;
+      -- end if;
 
---         // Back-compat.
---         if ( "single" === _quote_style ) then
---                 string = str_replace( """, "&#039;", string );
---         end;
+      if not Double_Encode then
+         -- Guarantee every &entity; is valid, convert &garbage; into &amp;garbage;
+         -- This is required for PHP < 5.4.0 because ENT_HTML401 flag is unavailable.
+         Item_2 :=
+           +Inc_Kses.Wp_Kses_Normalize_Entities (-Item_2,
+                                        (if Quote_Style mod ENT_XML1 /= 16#0000#
+                                         then "xml" else "html"));
+      end if;
 
---         return string;
--- end;
+      Item_2 := +Htmlspecialchars (-Item_2, Quote_Style, Charset, Double_Encode);
+
+      -- -- Back-compat.
+      -- if "single" = X_Quote_Style then
+      --    Item_2 := +Str_Replace ("'", "&#039;", -Item_2);
+      -- end if;
+
+      return -Item_2;
+   end X_Wp_Specialchars;
 
 -- --
 -- -- Converts a number of HTML entities into their special characters.
@@ -1087,54 +1109,67 @@ is
 --         return strtr( string, translation );
 -- end;
 
--- --
--- -- Checks for invalid UTF8 in a string.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string string The text which is to be checked.
--- -- @param bool   strip  Optional. Whether to attempt to strip out invalid UTF8. Default false.
--- -- @return string The checked text.
--- --
--- function wp_check_invalid_utf8( string, strip = false ) then
---         string = (string) string;
+   Static_Is_UTF8      : Boolean := False;
+   Static_Is_UTF8_Bool : Boolean := False;
 
---         if ( 0 === strlen( string ) ) then
---                 return "";
---         end;
+   ---------------------------
+   -- Wp_Check_Invalid_UTF8 --
+   ---------------------------
 
---         // Store the site charset as a static to avoid multiple calls to get_option().
---         static is_utf8 = null;
---         if ( ! isset( is_utf8 ) ) then
---                 is_utf8 = in_array( get_option( "blog_charset" ), array( "utf8", "utf-8", "UTF8", "UTF-8" ), true );
---         end;
---         if ( ! is_utf8 ) then
---                 return string;
---         end;
+   function Wp_Check_Invalid_UTF8 (Item  : String;
+                                   Strip : Boolean := False)
+                                   return String
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Options;
 
---         // Check for support for utf8 in the installed PCRE library once and store the result in a static.
---         static utf8_pcre = null;
---         if ( ! isset( utf8_pcre ) ) then
---                 // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
---                 utf8_pcre = @preg_match( "/^./u", "a" );
---         end;
---         // We can"t demand utf8 in the PCRE installation, so just return the string in those cases.
---         if ( ! utf8_pcre ) then
---                 return string;
---         end;
+--    string = (string) string;
+   begin
+      if 0 = Item'Length then
+         return "";
+      end if;
 
---         // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- preg_match fails when it encounters invalid UTF8 in string.
---         if ( 1 === @preg_match( "/^./us", string ) ) then
---                 return string;
---         end;
+      -- Store the site charset as a static to avoid multiple calls to get_option().
+--    static is_utf8 = null;
+      if not Static_Is_UTF8_Bool then
+         Static_Is_UTF8 :=
+           In_Array (Get_Option ("blog_charset"),
+                     To_List (List => (+"utf8", +"utf-8", +"UTF8", +"UTF-8")), True);
+         Static_Is_UTF8_Bool := True;
+      end if;
 
---         // Attempt to strip the bad chars if requested (not recommended).
---         if ( strip && function_exists( "iconv" ) ) then
---                 return iconv( "utf-8", "utf-8", string );
---         end;
+      if not Static_Is_UTF8 then
+         return Item;
+      end if;
 
---         return "";
--- end;
+      -- Check for support for utf8 in the installed PCRE library once and store the
+      -- result in a static.
+      -- static utf8_pcre = null;
+      -- if ( ! isset( utf8_pcre ) ) then
+      --    -- phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+      --    utf8_pcre = @preg_match( "/^./u", "a" );
+      -- end if;
+
+      -- We Can't demand utf8 in the PCRE installation, so just return the string in
+      -- those cases.
+      -- if ( ! utf8_pcre ) then
+      return Item;
+      -- end if;
+
+      -- phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+      -- preg_match fails when it encounters invalid UTF8 in string.
+      -- if ( 1 === @preg_match( "/^./us", string ) ) then
+      --    return string;
+      -- end if;
+
+      -- Attempt to strip the bad chars if requested (not recommended).
+      -- if Strip then -- and then function_exists( "iconv" ) ) then
+      --    return Wp_Iconv.Iconv ("utf-8", "utf-8", Item);
+      -- end if;
+
+--    return "";
+   end Wp_Check_Invalid_UTF8;
 
 -- --
 -- -- Encodes the Unicode values to be used in the URI.
@@ -4610,30 +4645,31 @@ is
       return Item;
    end ESC_HTML;
 
--- --
--- -- Escaping for HTML attributes.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text
--- -- @return string
--- --
--- function esc_attr( text ) then
---         safe_text = wp_check_invalid_utf8( text );
---         safe_text = _wp_specialchars( safe_text, ENT_QUOTES );
---         --
---         -- Filters a string cleaned and escaped for output in an HTML attribute.
---         --
---         -- Text passed to esc_attr() is stripped of invalid or special characters
---         -- before output.
---         --
---         -- @since 2.0.6
---         --
---         -- @param string safe_text The text after it has been escaped.
---         -- @param string text      The text prior to being escaped.
---         --
---         return apply_filters( "attribute_escape", safe_text, text );
--- end;
+   --------------
+   -- ESC_Attr --
+   --------------
+
+   function ESC_Attr (Text : String)
+                      return String
+   is
+      use Inc_Plugins;
+
+      Safe_Text_2 : constant String := Wp_Check_Invalid_UTF8 (Text);
+      Safe_Text   : constant String := X_Wp_Specialchars (Safe_Text_2, Php.ENT_QUOTES);
+   begin
+      --
+      -- Filters a string cleaned and escaped for output in an HTML attribute.
+      --
+      -- Text passed to esc_attr() is stripped of invalid or special characters
+      -- before output.
+      --
+      -- @since 2.0.6
+      --
+      -- @param string safe_text The text after it has been escaped.
+      -- @param string text      The text prior to being escaped.
+      --
+      return Apply_Filters ("attribute_escape", Safe_Text, Text);
+   end ESC_Attr;
 
 -- --
 -- -- Escaping for textarea values.
