@@ -237,11 +237,18 @@ is
                             Output   : String     := "names";
                             Operator : String     := "and")
                             return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array;
+
    function Get_Post_Types (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
                             Operator : String     := "and")
                             return String_Array
                             is (Empty_String_Array);
+
+   function Get_Post_Types (Args     : Array_Type := Empty_Array;
+                            Output   : String     := "names";
+                            Operator : String     := "and")
+                            return List_Type
+                            is (Empty_List);
 
 --     @type bool|array   rewrite               {
    type Rewrite_Rec is
@@ -671,6 +678,32 @@ is
    procedure Register_Post_Type (Post_Type : String;
                                  Args      : Args_Type); -- Array_Type := Empty_Array)
    --                            return incWp_Post_Type.Wp_Post_Type;
+
+   --
+   -- Gets a list of post statuses.
+   --
+   -- @since 3.0.0
+   --
+   -- @global stdClass[] wp_post_statuses List of post statuses.
+   --
+   -- @see register_post_status()
+   --
+   -- @param array|string args     Optional. Array or string of post status arguments
+   --                               to compare against properties of the global
+   --                               `wp_post_statuses objects`. Default empty array.
+   -- @param string       output   Optional. The type of output to return, either
+   --                               "names" or "objects". Default "names".
+   -- @param string       operator Optional. The logical operation to perform. "or"
+   --                               means only one element from the array needs to
+   --                               match; "and" means all elements must match.
+   --                               Default "and".
+   -- @return string[]|stdClass[] A list of post status names or objects.
+   --
+   function Get_Post_Stati (Args     : Array_Type := Empty_Array;
+                            Output   : String     := "names";
+                            Operator : String     := "and")
+                            return List_Type
+                            is (Empty_List);
 
    --
    -- Determines whether the post type is hierarchical.

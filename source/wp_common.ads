@@ -1,5 +1,7 @@
 with Arrays;
 
+with Adi_Class_Wp_Screens;
+
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Terms;
@@ -100,6 +102,13 @@ is
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            Id        : Inc_Class_Wp_Posts.Post_Id)
+                           return Array_Type
+                           is (Empty_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           Id        : Adi_Class_Wp_Screens.Wp_Screen;
+                           Arg_4     : Boolean := False)
                            return Array_Type
                            is (Empty_Array);
 

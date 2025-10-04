@@ -5453,29 +5453,29 @@ is
 --         return str;
 -- end;
 
--- --
--- -- Properly strips all HTML tags including script and style
--- --
--- -- This differs from strip_tags() because it removes the contents of
--- -- the `<script>` and `<style>` tags. E.g. `strip_tags( "<script>something</script>" )`
--- -- will return "something". wp_strip_all_tags will return ""
--- --
--- -- @since 2.9.0
--- --
--- -- @param string string        String containing HTML tags
--- -- @param bool   remove_breaks Optional. Whether to remove left over line breaks and white space chars
--- -- @return string The processed string.
--- --
--- function wp_strip_all_tags( string, remove_breaks = false ) then
---         string = preg_replace( "@<(script|style)[^>]*?>.*?</\\1>@si", "", string );
---         string = strip_tags( string );
+   -----------------------
+   -- Wp_Strip_All_Tags --
+   -----------------------
 
---         if ( remove_breaks ) then
---                 string = preg_replace( "/[\r\n\t ]+/", " ", string );
---         end;
+   function Wp_Strip_All_Tags (Item          : String;
+                               Remove_Breaks : Boolean := False)
+                               return String
+   is
+      use Hb_Common;
+      use Php;
 
---         return trim( string );
--- end;
+      Item_3 : constant String :=
+        Preg_Replace ("@<(script|style)[^>]*?>.*?</\\1>@si", "", Item);
+
+      Item_2 : constant String := Strip_Tags (Item_3);
+      Item_1 : Unbounded_String := +Item_2;
+   begin
+      if Remove_Breaks then
+         Item_1 := +Preg_Replace ("/[\r\n\t ]+/", " ", Item_2);
+      end if;
+
+      return Trim (-Item_1);
+   end Wp_Strip_All_Tags;
 
 -- --
 -- -- Sanitizes a string from user input or from the database.

@@ -6,24 +6,26 @@
 -- @since 4.4.0
 --
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Hb_Common;
 with Php;
 
 package body Adi_Class_Wp_Screens
 is
    procedure Dummy is null;
---         --
---         -- Fetches a screen object.
---         --
---         -- @since 3.3.0
---         --
---         -- @global string $hook_suffix
---         --
---         -- @param string|WP_Screen $hook_name Optional. The hook name (also known as the hook suffix) used to determine the screen.
---         --                                    Defaults to the current $hook_suffix global.
---         -- @return WP_Screen Screen object.
---         --
---         public static function get( $hook_name = "" ) then
+
+   ---------
+   -- Get --
+   ---------
+
+   function Get (Hook_Name : String := "")
+                 return Wp_Screen
+   is
+      S : Wp_Screen;
+   begin
+      return S;
+   end Get;
 --                 if ( $hook_name instanceof WP_Screen ) then
 --                         return $hook_name;
 --                 end;
@@ -1166,9 +1168,10 @@ is
       use Hb_Common;
       use Php;
    begin
-      if not Isset (This.X_Screen_Reader_Content (Key)) then
+      if not Isset (This.X_Screen_Reader_Content, Key) then
          return;
       end if;
+
       Echo ("<" & Tag & " class=""screen-reader-text"">" &
             This.X_Screen_Reader_Content (Key) & "</" & Tag & ">");
    end Render_Screen_Reader_Content;

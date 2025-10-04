@@ -1012,4 +1012,28 @@ is
                         Set_Table_Names : Boolean := True)
                         return String;
 
+   --
+   -- Retrieves one variable from the database.
+   --
+   -- Executes a SQL query and returns the value from the SQL result.
+   -- If the SQL result contains more than one column and/or more than one row,
+   -- the value in the column and row specified is returned. If query is null,
+   -- the value in the specified column and row from the previous SQL result is
+   -- returned.
+   --
+   -- @since 0.71
+   --
+   -- @param string|null query Optional. SQL query. Defaults to null, use the result
+   --                          from the previous query.
+   -- @param int         x     Optional. Column of value to return. Indexed from 0.
+   -- @param int         y     Optional. Row of value to return. Indexed from 0.
+   -- @return string|null Database query result (as string), or null on failure.
+   --
+   function Get_Var (This  : Wpdb_Class;
+                     Query : String  := ""; -- null
+                     X     : Integer := 0;
+                     Y     : Integer := 0)
+                     return String
+                     is ("1"); -- "XXX-887"
+
 end Inc_Class_Wpdb;

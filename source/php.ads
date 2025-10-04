@@ -93,7 +93,12 @@ is
                        Table : Array_Type)
                        return Array_Type is (Empty_Array);
 
-   function Array_Map (Item : String; Table : Array_Type)
+   function Array_Map (Item  : String;
+                       Table : Array_Type)
+                       return List_Type is (Empty_List);
+
+   function Array_Map (Item : String;
+                       List : List_Type)
                        return List_Type is (Empty_List);
 
    function In_Array (Needle   : String;
@@ -142,6 +147,11 @@ is
    function Implode (Separator : String;
                      List      : List_Type)
                      return String is ("XXX-307");
+
+   function Compact (Var_Name  : String;
+                     Var_Names : String)
+                     return Array_Type
+                     is (Empty_Array);
 
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
@@ -234,6 +244,11 @@ is
                              return Array_Type
                              is (Empty_Array);
 
+   function Array_Filter (Arry     : Array_Type;
+                          Callback : Integer := 0)
+                          return List_Type
+                          is (Empty_List);
+
    function Array_Pop (Arry : Array_Type)
                        return Integer
                        is (1);
@@ -287,6 +302,11 @@ is
                              return Array_Type
                              is (Empty_Array);
 
+   function Array_Intersect (List   : List_Type;
+                             List_2 : List_Type)
+                             return List_Type
+                             is (Empty_List);
+
    function Array_Replace_Recursive (Arry    : Array_Type;
                                      Array_2 : Array_Type)
                                      return Array_Type
@@ -333,7 +353,7 @@ is
                          return Array_Type
                          is (Empty_Array);
 
-   procedure Die
+   procedure Die (Reason : String := "")
              is null;
 
    function Dirname (Path   : String;

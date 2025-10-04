@@ -5,55 +5,77 @@
 -- @subpackage Administration
 -- @since 3.1.0
 --
+
+with Ada.Strings.Unbounded;
+
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Functions;
+with Inc_Taxonomys;
+with Inc_L10n;
+with Inc_Posts;
+
 package body Adi_Class_Wp_Terms_List_Tables
 is
-   procedure Dummy is null;
+   use Ada.Strings.Unbounded;
 
---         --
---         -- Constructor.
---         --
---         -- @since 3.1.0
---         --
---         -- @see WP_List_Table::__construct() for more information on default arguments.
---         --
---         -- @global string post_type
---         -- @global string taxonomy
---         -- @global string action
---         -- @global object tax
---         --
---         -- @param array args An associative array of arguments.
---         --
---         public function __construct( args = array() ) then
---                 global post_type, taxonomy, action, tax;
+   -----------------
+   -- X_Construct --
+   -----------------
 
---                 parent::__construct(
---                         array(
---                                 "plural"   => "tags",
---                                 "singular" => "tag",
---                                 "screen"   => isset( args["screen"] ) ? args["screen"] : null,
---                         )
---                 );
+   function X_Construct (Args : Array_Type := Empty_Array)
+                         return Wp_Terms_List_Table
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_L10n;
+      use Inc_Posts;
 
---                 action    = this.screen.action;
---                 post_type = this.screen.post_type;
---                 taxonomy  = this.screen.taxonomy;
+--    global post_type, taxonomy, action, tax;
+      This : constant Wp_Terms_List_Table := (
+        Adi_Class_Wp_List_Tables.X_Construct (
+--      parent::x_Construct (
+          To_Array ((
+            Build ("plural",   "tags"),
+            Build ("singular", "tag"),
+            Build ("screen",   (if Isset (Args, "screen")
+                                then Args ("screen") else "null"))
+          ))
+        )
+        with
+          Level => 0
+      );
 
---                 if ( empty( taxonomy ) ) then
---                         taxonomy = "post_tag";
---                 end;
+   begin
+      Globals.Action    := This.Screen.Action;
+      Globals.Post_Type := This.Screen.Post_Type;
+      Globals.Taxonomy  := This.Screen.Taxonomy;
 
---                 if ( ! taxonomy_exists( taxonomy ) ) then
---                         wp_die( __( "Invalid taxonomy." ) );
---                 end;
+      if Empty (-Globals.Taxonomy) then
+         Globals.Taxonomy := +"post_tag";
+      end if;
 
---                 tax = get_taxonomy( taxonomy );
+      if not Inc_Taxonomys.Taxonomy_Exists (-Globals.Taxonomy) then
+         Inc_Functions.Wp_Die (abs "Invalid taxonomy.");
+      end if;
 
---                 -- @todo Still needed? Maybe just the show_ui part.
---                 if ( empty( post_type ) || ! in_array( post_type, get_post_types( array( "show_ui" => true ) ), true ) ) then
---                         post_type = "post";
---                 end;
+      Globals.Tax := Inc_Taxonomys.Get_Taxonomy (-Globals.Taxonomy);
 
---         end;
+      -- @todo Still needed? Maybe just the show_ui part.
+      if
+        Empty (-Globals.Post_Type) or else
+        not Php.In_Array (-Globals.Post_Type,
+                          Inc_Posts.Get_Post_Types (To_Array ((1 =>
+                            Build ("show_ui", "true")))),
+                          True)
+      then
+         Globals.Post_Type := +"post";
+      end if;
+
+      return This;
+   end X_Construct;
 
 --         --
 --         -- @return bool

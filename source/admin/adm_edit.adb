@@ -125,7 +125,7 @@ is
          use Adi_Class_Wp_Posts_List_Tables;
          use Adi_List_Tables;
 
-         X_Wp_List_Table : constant Wp_Posts_List_Table :=
+         X_Wp_List_Table : Wp_Posts_List_Table :=
             Wp_Posts_List_Table (X_Get_List_Table ("Wp_Posts_List_Table"));
 
          Pagenum         : constant Natural := X_Wp_List_Table.Get_Pagenum; -- ();
@@ -753,8 +753,9 @@ is
                         end if;
 
                      elsif Var_Name = "VAR_page_edit_display" then
-                        X_Wp_List_Table.Display;  -- ()
-                        Set ("VAR_page_edit_display", "XXX-450");
+                        Clear_Echo;
+                        X_Wp_List_Table.Display;
+                        Set ("VAR_page_edit_display", Get_Echo);
 
                      elsif Var_Name = "VAR_page_edit_inline_edit" then
                         if X_Wp_List_Table.Has_Items then -- ()

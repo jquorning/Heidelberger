@@ -318,4 +318,20 @@ is
                                            Key  : String := "";
                                            Tag  : String := "h2");
 
+   --
+   -- Fetches a screen object.
+   --
+   -- @since 3.3.0
+   --
+   -- @global string $hook_suffix
+   --
+   -- @param string|WP_Screen $hook_name Optional. The hook name (also known as the
+   --                                    hook suffix) used to determine the screen.
+   --                                    Defaults to the current $hook_suffix global.
+   -- @return WP_Screen Screen object.
+   --
+   -- static
+   function Get (Hook_Name : String := "")
+                 return Wp_Screen;
+
 end Adi_Class_Wp_Screens;

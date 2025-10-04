@@ -10,6 +10,7 @@ with Inc_Class_Wpdb;
 with Inc_Class_Wp_Locale;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Taxonomy;
 
 package Globals
 is
@@ -100,5 +101,9 @@ is
    Post_Type        : Unbounded_String;
    Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
    Post             : Inc_Class_Wp_Posts.Wp_Post;
+
+   Action   : Unbounded_String;
+   Taxonomy : Unbounded_String;
+   Tax      : Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
 
 end Globals;

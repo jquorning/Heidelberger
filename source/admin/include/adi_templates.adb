@@ -2946,37 +2946,38 @@ is
 --         <?php
    end X_Wp_Admin_Html_Begin;
 
--- --
--- -- Converts a screen string to a screen object.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string hook_name The hook name (also known as the hook suffix) used to determine the screen.
--- -- @return WP_Screen Screen object.
--- --
--- function Convert_To_Screen (Hook_Name : String) return Hb_Screen
--- is
--- begin
---         if not Class_Exists ("WP_Screen") then
---                 X_Doing_It_Wrong (
---                         "convert_to_screen(), add_meta_box()",
---                         Sprintf (
---                                 -- translators: 1: wp-admin/includes/template.php, 2: add_meta_box(), 3: add_meta_boxes
---                                 abs "Likely direct inclusion of %1s in order to use %2s. This is very wrong. Hook the %2s call into the %3s action instead.",
---                                 "<code>wp-admin/includes/template.php</code>",
---                                 "<code>add_meta_box()</code>",
---                                 "<code>add_meta_boxes</code>"
---                        ),
---                         "3.3.0"
---                );
---                 return To_array ((
---                         Build ("id",   "_invalid"),
---                         Build ("base", "_are_belong_to_us")
---                ));
---         end if;
+   -----------------------
+   -- Convert_To_Screen --
+   -----------------------
 
---         return Wp_Screen.get (Hook_Name); -- ::
--- end Convert_To_Screen;
+   function Convert_To_Screen (Hook_Name : String)
+                               return Adi_Class_Wp_Screens.Wp_Screen
+   is
+      use Adi_Class_Wp_Screens;
+      use Inc_Functions;
+   begin
+      if False then -- not Class_Exists ("WP_Screen") then
+         X_Doing_It_Wrong (
+           "convert_to_screen(), add_meta_box()",
+           Sprintf (
+             -- translators: 1: wp-admin/includes/template.php, 2: add_meta_box(), 3: add_meta_boxes
+             abs "Likely direct inclusion of %1s in order to use %2s. This is very wrong. Hook the %2s call into the %3s action instead.",
+             "<code>wp-admin/includes/template.php</code>",
+             "<code>add_meta_box()</code>",
+             "<code>add_meta_boxes</code>"
+           ),
+           "3.3.0"
+         );
+
+         -- return
+         --   To_Array ((
+         --     Build ("id",   "_invalid"),
+         --     Build ("base", "_are_belong_to_us")
+         --   ));
+      end if;
+
+      return Adi_Class_Wp_Screens.Get (Hook_Name); -- ::
+   end Convert_To_Screen;
 
 -- --
 -- -- Outputs the HTML for restoring the post data from DOM storage

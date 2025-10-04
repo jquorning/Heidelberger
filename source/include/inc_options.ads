@@ -82,6 +82,10 @@ is
                         is (Empty_Array);
 
    function Get_Option (Option : String)
+                        return List_Type
+                        is (Empty_List);
+
+   function Get_Option (Option : String)
                         return Integer
                         is (1);
 
@@ -219,7 +223,7 @@ is
    --               doesn't exist.
    --
    function Get_User_Setting (Name    : String;
-                              Default : Boolean := False)
+                              Default : String := "") -- Boolean := False)
                               return String
                               is ("XXX-601");
 

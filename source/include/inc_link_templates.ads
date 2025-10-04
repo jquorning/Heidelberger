@@ -352,6 +352,23 @@ is
                              return Array_Type
                              is (Empty_Array);
 
+   --
+   -- Sets the scheme for a URL.
+   --
+   -- @since 3.4.0
+   -- @since 4.4.0 The "rest" scheme was added.
+   --
+   -- @param string      url    Absolute URL that includes a scheme
+   -- @param string|null scheme Optional. Scheme to give url. Currently "http",
+   --                           "https", "login", "login_post", "admin", "relative",
+   --                           "rest", "rpc", or null. Default null.
+   -- @return string URL with chosen scheme.
+   --
+   function Set_URL_Scheme (URL    : String;
+                            Scheme : String := "") -- null
+                            return String
+                            is ("XXX-801");
+
 --
 -- Retrieves the URL used for the post preview.
 --

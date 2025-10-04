@@ -3,6 +3,8 @@ with Arrays;
 
 with Hb_Common;
 
+with Adi_Class_Wp_Screens;
+
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
 
@@ -237,5 +239,17 @@ is
    -- @global bool is_IE
    --
    procedure X_Wp_Admin_Html_Begin;
+
+   --
+   -- Converts a screen string to a screen object.
+   --
+   -- @since 3.0.0
+   --
+   -- @param string hook_name The hook name (also known as the hook suffix) used to
+   --                          determine the screen.
+   -- @return WP_Screen Screen object.
+   --
+   function Convert_To_Screen (Hook_Name : String)
+                               return Adi_Class_Wp_Screens.Wp_Screen;
 
 end Adi_Templates;

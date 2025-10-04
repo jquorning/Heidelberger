@@ -4,87 +4,103 @@
 -- @package WordPress
 -- @subpackage Administration
 --
+
+with Hb_Common;
+with Wp_Common;
+with Php;
+
+with Inc_Plugins;
+with Inc_Users;
+
 package body Adi_Screens
 is
    Current_Screen : Adi_Class_Wp_Screens.Wp_Screen;
 
--- --
--- -- Get the column headers for a screen
--- --
--- -- @since 2.7.0
--- --
--- -- @param string|WP_Screen screen The screen you want the headers for
--- -- @return string[] The column header labels keyed by column ID.
--- --
--- function get_column_headers( screen ) then
---         static column_headers = array();
+   Static_Column_Headers : Array_Type := Empty_Array;
 
---         if ( is_string( screen ) ) then
---                 screen = convert_to_screen( screen );
---         end;
+   ------------------------
+   -- Get_Column_Headers --
+   ------------------------
 
---         if ( ! isset( column_headers[ screen.id ] ) ) then
---                 --
---                 -- Filters the column headers for a list table on a specific screen.
---                 --
---                 -- The dynamic portion of the hook name, `screen.id`, refers to the
---                 -- ID of a specific screen. For example, the screen ID for the Posts
---                 -- list table is edit-post, so the filter for that screen would be
---                 -- manage_edit-post_columns.
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string[] columns The column header labels keyed by column ID.
---                 --
---                 column_headers[ screen.id ] = apply_filters( "manage_thenscreen.idend;_columns", array() );
---         end;
+   function Get_Column_Headers (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+                                return Array_Type
+   is
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Plugins;
+--    static column_headers = array();
+   begin
+      -- if ( is_string( screen ) ) then
+      --         screen = convert_to_screen( screen );
+      -- end if;
 
---         return column_headers[ screen.id ];
--- end;
+      if not Isset (Static_Column_Headers, -Screen.Id) then
+         --
+         -- Filters the column headers for a list table on a specific screen.
+         --
+         -- The dynamic portion of the hook name, `screen.id`, refers to the
+         -- ID of a specific screen. For example, the screen ID for the Posts
+         -- list table is edit-post, so the filter for that screen would be
+         -- manage_edit-post_columns.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string[] columns The column header labels keyed by column ID.
+         --
+         Set (Static_Column_Headers, -Screen.Id,
+              Apply_Filters ("manage_" & (-Screen.Id) & "_columns", Empty_Array));
+      end if;
 
--- --
--- -- Get a list of hidden columns.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string|WP_Screen screen The screen you want the hidden columns for
--- -- @return string[] Array of IDs of hidden columns.
--- --
--- function get_hidden_columns( screen ) then
---         if ( is_string( screen ) ) then
---                 screen = convert_to_screen( screen );
---         end;
+      return Static_Column_Headers; --  (-Screen.Id);
+   end Get_Column_Headers;
 
---         hidden = get_user_option( 'manage' . screen.id . 'columnshidden' );
+   ------------------------
+   -- Get_Hidden_Columns --
+   ------------------------
 
---         use_defaults = ! is_array( hidden );
+   function Get_Hidden_Columns (Screen : Adi_Class_Wp_Screens.Wp_Screen)
+                                return Array_Type
+   is
+      use Hb_Common;
+      use Wp_Common;
+      use Php;
+      use Inc_Plugins;
 
---         if ( use_defaults ) then
---                 hidden = array();
+      Hidden : Array_Type :=
+        Inc_Users.Get_User_Option ("manage" & (-Screen.Id) & "columnshidden");
 
---                 --
---                 -- Filters the default list of hidden columns.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @param string[]  hidden Array of IDs of columns hidden by default.
---                 -- @param WP_Screen screen WP_Screen object of the current screen.
---                 --
---                 hidden = apply_filters( 'default_hidden_columns', hidden, screen );
---         end;
+      Use_Defaults : constant Boolean := not Is_Array (Hidden);
+   begin
+      -- if ( is_string( screen ) ) then
+      --         screen = convert_to_screen( screen );
+      -- end;
 
---         --
---         -- Filters the list of hidden columns.
---         --
---         -- @since 4.4.0
---         -- @since 4.4.1 Added the `use_defaults` parameter.
---         --
---         -- @param string[]  hidden       Array of IDs of hidden columns.
---         -- @param WP_Screen screen       WP_Screen object of the current screen.
---         -- @param bool      use_defaults Whether to show the default columns.
---         --
---         return apply_filters( 'hidden_columns', hidden, screen, use_defaults );
--- end;
+      if Use_Defaults then
+         Hidden := Empty_Array;
+
+         --
+         -- Filters the default list of hidden columns.
+         --
+         -- @since 4.4.0
+         --
+         -- @param string[]  hidden Array of IDs of columns hidden by default.
+         -- @param WP_Screen screen WP_Screen object of the current screen.
+         --
+         Hidden := Apply_Filters ("default_hidden_columns", Hidden, Screen);
+      end if;
+
+      --
+      -- Filters the list of hidden columns.
+      --
+      -- @since 4.4.0
+      -- @since 4.4.1 Added the `use_defaults` parameter.
+      --
+      -- @param string[]  hidden       Array of IDs of hidden columns.
+      -- @param WP_Screen screen       WP_Screen object of the current screen.
+      -- @param bool      use_defaults Whether to show the default columns.
+      --
+      return Apply_Filters ("hidden_columns", Hidden, Screen, Use_Defaults);
+   end Get_Hidden_Columns;
 
 -- --
 -- -- Prints the meta box preferences for screen meta.

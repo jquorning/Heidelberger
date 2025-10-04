@@ -5,78 +5,115 @@
 -- @subpackage Administration
 -- @since 3.1.0
 --
+
+with Ada.Strings.Unbounded;
+
+with Binder;
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Class_Wp_Post_Type;
+with Inc_Options;
+with Inc_Posts;
+with Inc_Capabilities;
+with Inc_Users;
+
 package body Adi_Class_Wp_Posts_List_Tables
 is
-   procedure Dummy is null;
 
---         --
---         -- Constructor.
---         --
---         -- @since 3.1.0
---         --
---         -- @see WP_List_Table::__construct() for more information on default arguments.
---         --
---         -- @global WP_Post_Type post_type_object
---         -- @global wpdb         wpdb             WordPress database abstraction object.
---         --
---         -- @param array args An associative array of arguments.
---         --
---         public function __construct( args = array() ) then
---                 global post_type_object, wpdb;
+   -----------------
+   -- X_Construct --
+   -----------------
 
---                 parent::__construct(
---                         array(
---                                 "plural" => "posts",
---                                 "screen" => isset( args["screen"] ) ? args["screen"] : null,
---                         )
---                 );
+   function X_Construct (Args : Array_Type := Empty_Array)
+                         return Wp_Posts_List_Table
+   is
+      use Hb_Common;
+      use Binder;
+      use Globals;
+      use Php;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Capabilities;
+      use Inc_Posts;
+--    global post_type_object, wpdb;
 
---                 post_type        = this->screen->post_type;
---                 post_type_object = get_post_type_object( post_type );
+      This : Wp_Posts_List_Table := (
+        Adi_Class_Wp_List_Tables.X_Construct (
+          To_Array ((
+            Build ("plural", "posts"),
+            Build ("screen", (if Isset (Args, "screen")
+                              then Args ("screen") else "null"))
+          ))
+        )
+        with
+          Hierarchical_Display => False,
+          User_Posts_Count     => 0,
+          Sticky_Posts_Count   => 0
+      );
 
---                 exclude_states = get_post_stati(
---                         array(
---                                 "show_in_admin_all_list" => false,
---                         )
---                 );
+--    Post_Type        : String       := -This.Screen.Post_Type;
+--    Post_Type_Object : Wp_Post_Type := Get_Post_Type_Object (Post_Type);
 
---                 this->user_posts_count = (int) wpdb->get_var(
---                         wpdb->prepare(
---                                 "SELECT COUNT( 1 )
---                                 FROM wpdb->posts
---                                 WHERE post_type = %s
---                                 AND post_status NOT IN ( "" . implode( "","", exclude_states ) . "" )
---                                 AND post_author = %d",
---                                 post_type,
---                                 get_current_user_id()
---                         )
---                 );
+      Exclude_States : constant List_Type := Get_Post_Stati (
+        To_Array ((1 =>
+          Build ("show_in_admin_all_list", "false")
+        ))
+      );
+   begin
+      Globals.Post_Type        := This.Screen.Post_Type;
+      Globals.Post_Type_Object := Get_Post_Type_Object (-Post_Type);
 
---                 if ( this->user_posts_count
---                         && ! current_user_can( post_type_object->cap->edit_others_posts )
---                         && empty( _REQUEST["post_status"] ) && empty( _REQUEST["all_posts"] )
---                         && empty( _REQUEST["author"] ) && empty( _REQUEST["show_sticky"] )
---                 ) then
---                         _GET["author"] = get_current_user_id();
---                 end;
+      This.User_Posts_Count := Natural'Value (
+        Wpdb.Get_Var ( -- (int)
+          Wpdb.Prepare (
+            "SELECT COUNT( 1 ) "    &
+            "FROM wpdb->posts "     &
+            "WHERE post_type = %s " &
+            "AND post_status NOT IN ( """ & Implode ("','", Exclude_States) & " ) " &
+            "AND post_author = %d",
+            -Post_Type,
+            Inc_Users.Get_Current_User_Id'Image
+          )));
 
---                 sticky_posts = get_option( "sticky_posts" );
+      if
+        This.User_Posts_Count /= 0
+--      and then not Current_User_Can (Post_Type_Object.Cap.Edit_Others_Posts)
+        and then Empty (X_REQUEST, "post_status")
+        and then Empty (X_REQUEST, "all_posts")
+        and then Empty (X_REQUEST, "author")
+        and then Empty (X_REQUEST, "show_sticky")
+      then
+         Set (XX_GET, "author", Value => Inc_Users.Get_Current_User_Id'Image);
+      end if;
 
---                 if ( "post" === post_type && sticky_posts ) then
---                         sticky_posts = implode( ", ", array_map( "absint", (array) sticky_posts ) );
+      declare
+         use Ada.Strings.Unbounded;
 
---                         this->sticky_posts_count = (int) wpdb->get_var(
---                                 wpdb->prepare(
---                                         "SELECT COUNT( 1 )
---                                         FROM wpdb->posts
---                                         WHERE post_type = %s
---                                         AND post_status NOT IN ("trash", "auto-draft")
---                                         AND ID IN (sticky_posts)",
---                                         post_type
---                                 )
---                         );
---                 end;
---         end;
+         Sticky_Posts : constant List_Type :=
+           Inc_Options.Get_Option ("sticky_posts");
+      begin
+         if "post" = Post_Type and not Sticky_Posts.Is_Empty then
+            declare
+               Sticky_Posts_2 : constant String :=
+                 Implode (", ", Array_Map ("absint", Sticky_Posts)); -- (array)
+            begin
+               This.Sticky_Posts_Count := Natural'Value (
+                 Wpdb.Get_Var ( -- (int)
+                   Wpdb.Prepare (
+                     "SELECT COUNT( 1 ) "    &
+                     "FROM wpdb->posts "     &
+                     "WHERE post_type = %s " &
+                     "AND post_status NOT IN (""trash"", ""auto-draft"") " &
+                     "AND ID IN (" & Sticky_Posts_2 & ")",
+                     -Post_Type
+                 )));
+            end;
+         end if;
+      end;
+
+      return This;
+   end X_Construct;
 
 --         --
 --         -- Sets whether the table layout should be hierarchical or not.

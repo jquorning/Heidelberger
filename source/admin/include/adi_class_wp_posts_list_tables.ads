@@ -6,11 +6,13 @@
 -- @since 3.1.0
 --
 
+with Arrays;
+
 with Adi_Class_Wp_List_Tables;
 
 package Adi_Class_Wp_Posts_List_Tables
 is
-   procedure Dummy;
+   use Arrays;
 
    --
    -- Core class used to implement displaying posts in a list table.
@@ -39,21 +41,23 @@ is
 --         --
 --         protected comment_pending_count;
 
---         --
---         -- Holds the number of posts for this user.
---         --
---         -- @since 3.1.0
---         -- @var int
---         --
---         private user_posts_count;
+         --
+         -- Holds the number of posts for this user.
+         --
+         -- @since 3.1.0
+         -- @var int
+         --
+         -- private
+         User_Posts_Count : Natural;
 
---         --
---         -- Holds the number of posts which are sticky.
---         --
---         -- @since 3.1.0
---         -- @var int
---         --
---         private sticky_posts_count = 0;
+         --
+         -- Holds the number of posts which are sticky.
+         --
+         -- @since 3.1.0
+         -- @var int
+         --
+         -- private
+         Sticky_Posts_Count : Natural := 0;
 
 --         private is_trash;
 
@@ -66,6 +70,21 @@ is
 --         protected current_level = 0;
 
       end record;
+
+   --
+   -- Constructor.
+   --
+   -- @since 3.1.0
+   --
+   -- @see WP_List_Table::__construct() for more information on default arguments.
+   --
+   -- @global WP_Post_Type post_type_object
+   -- @global wpdb         wpdb             WordPress database abstraction object.
+   --
+   -- @param array args An associative array of arguments.
+   --
+   function X_Construct (Args : Array_Type := Empty_Array)
+                         return Wp_Posts_List_Table;
 
    --
    -- Outputs the hidden row displayed when inline editing

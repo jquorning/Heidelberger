@@ -29,13 +29,14 @@ is
                               Args       : Array_Type := Empty_Array)
                               return Adi_Class_Wp_List_Tables.Wp_List_Table'Class
    is
-      P : Adi_Class_Wp_Posts_List_Tables.Wp_Posts_List_Table;
-      T : Adi_Class_Wp_Terms_List_Tables.Wp_Terms_List_Table;
    begin
+
       if Class_Name = "Wp_Posts_List_Table" then
-         return P;
+         return Adi_Class_Wp_Posts_List_Tables.X_Construct;
+
       elsif Class_Name = "Wp_Terms_List_Table" then
-         return T;
+         return Adi_Class_Wp_Terms_List_Tables.X_Construct;
+
       end if;
       raise Program_Error;
    end X_Get_List_Table;

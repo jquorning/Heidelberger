@@ -392,7 +392,7 @@ is
             Customize_Url : constant String :=
                 Add_Query_Arg
                   ("return",
-                   Urlencode (Remove_Query_Arg (Wp_Removable_Query_Args,
+                   Urlencode (Remove_Query_Arg (List_Type'(Wp_Removable_Query_Args),
                                           Wp_Unslash (Get (X_SERVER, "REQUEST_URI")))),
                    "customize.php");
          begin

@@ -67,6 +67,11 @@ is
                          return Integer
                          is (1);
 
+   function Get_Boolean (Arry : Array_Type;
+                         Key  : String)
+                         return Boolean
+                         is (True);
+
    function Get (A   : String;
                  Key : String)
                  return String

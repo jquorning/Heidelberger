@@ -114,7 +114,7 @@ is
 
          Post_Type : constant String := ""; -- jq
 
-         X_Wp_List_Table : constant Wp_Terms_List_Table :=
+         X_Wp_List_Table : Wp_Terms_List_Table :=
             Wp_Terms_List_Table (X_Get_List_Table ("Wp_Terms_List_Table"));
 
          Pagenum : constant Natural := X_Wp_List_Table.Get_Pagenum;  -- ();

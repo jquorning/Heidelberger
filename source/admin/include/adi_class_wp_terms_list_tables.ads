@@ -6,11 +6,13 @@
 -- @since 3.1.0
 --
 
+with Arrays;
+
 with Adi_Class_Wp_List_Tables;
 
 package Adi_Class_Wp_Terms_List_Tables
 is
-   procedure Dummy;
+   use Arrays;
 
    --
    -- Core class used to implement displaying terms in a list table.
@@ -28,6 +30,23 @@ is
          Level : Integer;  -- ?
 
       end record;
+
+   --
+   -- Constructor.
+   --
+   -- @since 3.1.0
+   --
+   -- @see WP_List_Table::__construct() for more information on default arguments.
+   --
+   -- @global string post_type
+   -- @global string taxonomy
+   -- @global string action
+   -- @global object tax
+   --
+   -- @param array args An associative array of arguments.
+   --
+   function X_Construct (Args : Array_Type := Empty_Array)
+                         return Wp_Terms_List_Table;
 
    --
    -- Outputs the hidden row displayed when inline editing
