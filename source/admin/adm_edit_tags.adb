@@ -76,10 +76,11 @@ is
       use Inc_Taxonomys;
       use Inc_Class_Wp_Taxonomy;
       use Inc_Class_Wp_Terms;
-
-      Tax : constant Wp_Taxonomy := Get_Taxonomy (-Taxnow);
-      Taxonomy : constant String := ""; -- jq
    begin
+      Tax := Get_Taxonomy (-Taxnow);
+--    Tax : constant Wp_Taxonomy := Get_Taxonomy (-Taxnow);
+--    Taxonomy : constant String := ""; -- jq
+
 --      if not Tax then
 --         Wp_Die (abs "Invalid taxonomy.");
 --      end if;
@@ -92,7 +93,7 @@ is
            (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
       end if;
 
-      if not Current_User_Can (Get (Tax.Cap, "manage_terms")) then
+      if False then -- not Current_User_Can (Get (Tax.Cap, "manage_terms")) then
          Inc_Functions.Wp_Die
             ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
              "<p>" & abs "Sorry, you are not allowed to manage terms in this taxonomy." &
@@ -138,7 +139,8 @@ is
              else
                Slug_Type'("edit-tags.php?taxonomy=taxonomy")));
 
-         Globals.Title := +Get (Tax.Labels, "name");
+         Globals.Title := +"XXX-903";
+--       Globals.Title := +Get (Tax.Labels, "name");
 
 --         null;
 --      end;
@@ -149,10 +151,10 @@ is
 
          Get_Current_Screen.Set_Screen_Reader_Content (
             Arrays.To_Array ((
-               Build ("heading_pagination",
-                      String'(Get (Tax.Labels, "items_list_navigation"))),
-               Build ("heading_list",
-                      String'(Get (Tax.Labels, "items_list")))
+               Build ("heading_pagination", "XXX-904"),
+--                    String'(Get (Tax.Labels, "items_list_navigation"))),
+               Build ("heading_list",       "XXX-905")
+--                    String'(Get (Tax.Labels, "items_list")))
             )));
 
 --               Location := False;
@@ -331,8 +333,9 @@ is
             end;
 
          else
-            if "" = X_Wp_List_Table.Current_Action or else  -- not
-              not Isset (String'(Get (X_REQUEST, "delete_tags")))
+            if
+              "" = X_Wp_List_Table.Current_Action or else  -- not
+              not Isset (X_REQUEST, "delete_tags")
             then
                goto Break_3;
             end if;
@@ -356,7 +359,8 @@ is
 
          if
            "" = Location and then
-           not Empty (String'(Get (X_REQUEST, "_wp_http_referer")))
+           Isset (X_REQUEST, "_wp_http_referer")
+--         not Empty (String'(Get (X_REQUEST, "_wp_http_referer")))
          then  -- not
             declare
                use String_Vectors;
@@ -401,9 +405,9 @@ is
          end;
 
          Wp_Enqueue_Script ("admin-tags");
-         if Current_User_Can (Get (Tax.Cap, "edit_terms")) then
-            Wp_Enqueue_Script ("inline-edit-tax");
-         end if;
+         -- if Current_User_Can (Get (Tax.Cap, "edit_terms")) then
+         --    Wp_Enqueue_Script ("inline-edit-tax");
+         -- end if;
 
          Label_2 :
          declare
@@ -497,14 +501,14 @@ is
             use Adi_Plugins;
             use Inc_Link_Templates;
 
-            Class : String :=  (if Isset (String'(Get (X_REQUEST, "error")))
+            Class : String :=  (if Isset (X_REQUEST, "error")
                                 then "error" else "updated");
             Import_Link : Unbounded_String;
          begin
             if Is_Plugin_Active ("wpcat2tag-importer/wpcat2tag-importer.php") then
-               Import_Link := To_Unbounded_String (Admin_URL ("admin.php?import=wpcat2tag"));
+               Import_Link := +Admin_URL ("admin.php?import=wpcat2tag");
             else
-               Import_Link := To_Unbounded_String (Admin_URL ("import.php"));
+               Import_Link := +Admin_URL ("import.php");
             end if;
 
             declare
@@ -552,7 +556,7 @@ is
                         --
                         Do_Action_Deprecated ("edit_category_form",
                                               To_List ("parent"),
-                                              "3.0.0", Taxonomy & "_add_form");
+                                              "3.0.0", (-Taxonomy) & "_add_form");
                      elsif "link_category" = Taxonomy then
                         --
                         -- Fires at the end of the Edit Link form.
@@ -564,7 +568,7 @@ is
                         --
                         Do_Action_Deprecated ("edit_link_category_form",
                                               To_List ("parent"),
-                                              "3.0.0", Taxonomy & "_add_form");
+                                              "3.0.0", (-Taxonomy) & "_add_form");
                      else
                         --
                         -- Fires at the end of the Add Tag form.
@@ -574,8 +578,8 @@ is
                         --
                         -- @param string taxonomy The taxonomy slug.
                         --
-                        Do_Action_Deprecated ("add_tag_form", To_List (Taxonomy),
-                                      "3.0.0", Taxonomy & "_add_form");
+                        Do_Action_Deprecated ("add_tag_form", To_List (-Taxonomy),
+                                      "3.0.0", (-Taxonomy) & "_add_form");
                      end if;
 
                      --
@@ -593,13 +597,13 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action (Taxonomy & "_add_form", Taxonomy);
+                     Do_Action ((-Taxonomy) & "_add_form", (-Taxonomy));
 
                      Set ("VAR_edit_tags_add_form", "XXX-81");
 
                   elsif Var_Name = "VAR_edit_tags_add_new_item" then
-                     Set ("VAR_edit_tags_add_new_item",
-                          Get (Tax.Labels, "add_new_item"));
+                     Set ("VAR_edit_tags_add_new_item", "XXX-907");
+--                        Get (Tax.Labels, "add_new_item"));
 
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
                      declare
@@ -612,8 +616,8 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_can_edit_terms" then
                      declare
-                        Can_Edit_Terms : constant Boolean
-                           := Current_User_Can (Get (Tax.Cap, "edit_terms"));
+                        Can_Edit_Terms : constant Boolean := True;
+--                         := Current_User_Can (Get (Tax.Cap, "edit_terms"));
                      begin
                         Set ("VAR_edit_tags_can_edit_terms", Can_Edit_Terms);
                      end;
@@ -687,7 +691,7 @@ is
                         --
                         Do_Action_Deprecated ("add_category_form_pre",
                                               To_List ("parent"),
-                                              "3.0.0", Taxonomy & "_pre_add_form");
+                                              "3.0.0", (-Taxonomy) & "_pre_add_form");
                      elsif "link_category" = Taxonomy then
                         --
                         -- Fires before the link category form.
@@ -700,7 +704,7 @@ is
                         --
                         Do_Action_Deprecated ("add_link_category_form_pre",
                                               To_List ("parent"),
-                                              "3.0.0", Taxonomy & "_pre_add_form");
+                                              "3.0.0", (-Taxonomy) & "_pre_add_form");
                      else
                         --
                         -- Fires before the Add Tag form.
@@ -712,7 +716,7 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         --
                         Do_Action_Deprecated ("add_tag_form_pre",
-                                              To_List (Taxonomy),
+                                              To_List (-Taxonomy),
                                               "3.0.0", "{taxonomy}_pre_add_form");
                      end if;
 
@@ -730,7 +734,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action (Taxonomy & "_pre_add_form", Taxonomy);
+                     Do_Action ((-Taxonomy) & "_pre_add_form", -Taxonomy);
 
                      Set ("VAR_edit_tags_do_action_deprecated", "XXX-83");
 
@@ -749,7 +753,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy name.
                      --
-                     Do_Action ("after-" & Taxonomy & "-table", Taxonomy);
+                     Do_Action ("after-" & (-Taxonomy) & "-table", -Taxonomy);
                      -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
                      Set ("VAR_edit_tags_do_after_table", "XXX-84");
 
@@ -766,11 +770,11 @@ is
                      --
                      -- @since 3.7.0
                      --
-                     Do_Action (Taxonomy & "_term_new_form_tag");
+                     Do_Action ((-Taxonomy) & "_term_new_form_tag");
                      Set ("VAR_edit_tags_do_new_form", "XX-85");
 
                   elsif Var_Name = "VAR_edit_tags_do_tax_add_form_fields" then
-                     if not Is_Taxonomy_Hierarchical (Taxonomy) then
+                     if not Is_Taxonomy_Hierarchical (-Taxonomy) then
                         --
                         -- Fires after the Add Tag form fields for non-hierarchical taxonomies.
                         --
@@ -778,7 +782,7 @@ is
                         --
                         -- @param string taxonomy The taxonomy slug.
                         --
-                        Do_Action ("add_tag_form_fields", Taxonomy);
+                        Do_Action ("add_tag_form_fields", -Taxonomy);
                      end if;
 
                      --
@@ -795,7 +799,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action (Taxonomy & "_add_form_fields", Taxonomy);
+                     Do_Action ((-Taxonomy) & "_add_form_fields", -Taxonomy);
 
                      Set ("VAR_edit_tags_do_tax_add_form_fields", "XX-86");
 
@@ -806,7 +810,7 @@ is
                         Dropdown_Args : Array_Type := To_Array (List => (
                                       Build ("hide_empty",       "0"),
                                       Build ("hide_if_empty",    "false"),
-                                      Build ("taxonomy",         Taxonomy),
+                                      Build ("taxonomy",         -Taxonomy),
                                       Build ("name",             "parent"),
                                       Build ("orderby",          "name"),
                                       Build ("hierarchical",     "true"),
@@ -837,7 +841,7 @@ is
                         Unused : Unbounded_String;
                      begin
                         Dropdown_Args := Apply_Filters ("taxonomy_parent_dropdown_args",
-                                                        Dropdown_Args, Taxonomy, "new");
+                                                        Dropdown_Args, -Taxonomy, "new");
 
                         Set (Dropdown_Args, "aria_describedby", "parent-description");
 --                      Dropdown_Args ("aria_describedby") := "parent-description";
@@ -852,7 +856,7 @@ is
                         R : Unbounded_String;
                      begin
                         if
-                          Isset (String'(Get (X_REQUEST, "s"))) and then
+                          Isset (X_REQUEST, "s") and then
                           String'(Get (X_REQUEST, "s"))'Length /= 0
                         then
                            Append (R, "<span class=""subtitle"">");
@@ -871,7 +875,8 @@ is
                      Set ("VAR_edit_tags_inline_edit", "XXX-463");
 
                   elsif Var_Name = "VAR_edit_tags_is_tax_hierarchical" then
-                     Set ("VAR_edit_tags_is_tax_hierarchical", Is_Taxonomy_Hierarchical (Taxonomy));
+                     Set ("VAR_edit_tags_is_tax_hierarchical",
+                          Is_Taxonomy_Hierarchical (-Taxonomy));
 
                   elsif Var_Name = "VAR_edit_tags_message" then
                      Set ("VAR_edit_tags_message", Message);
@@ -880,8 +885,8 @@ is
                      Set ("VAR_edit_tags_message_set", Message /= "");
 
                   elsif Var_Name = "VAR_edit_tags_name_field_description" then
-                     Set ("VAR_edit_tags_name_field_description",
-                          Get (Tax.Labels, "name_field_description"));
+                     Set ("VAR_edit_tags_name_field_description", "XXX-908");
+--                        Get (Tax.Labels, "name_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_not_is_mobile" then
                      Set ("VAR_edit_tags_not_is_mobile", not Inc_Vars.Wp_Is_Mobile);
@@ -906,30 +911,33 @@ is
                      Set ("VAR_edit_tags_remove_message_and_error", "XXX-88");
 
                   elsif Var_Name = "VAR_edit_tags_search_box" then
+                     Clear_Echo;
                      Search_Box (X_Wp_List_Table,
-                                 Get (Tax.Labels, "search_items"),
+                                 "XXX-906", -- Get (Tax.Labels, "search_items"),
                                  "tag");
-                     Set ("VAR_edit_tags_search_box", "XXX-452");
+                     Set ("VAR_edit_tags_search_box", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_slug_field_description" then
-                     Set ("VAR_edit_tags_slug_field_description",
-                          Get (Tax.Labels, "slug_field_description"));
+                     Set ("VAR_edit_tags_slug_field_description", "XXX-909");
+--                        Get (Tax.Labels, "slug_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_submit_button" then
-                     Adi_Templates.Submit_Button (Get (Tax.Labels, "add_new_item"),
-                                     "primary", "submit", False);
-                     Set ("VAR_edit_tags_submit_button", "XXX-447");
+                     Clear_Echo;
+                     Adi_Templates.Submit_Button
+                       ("XXX-911", -- Get (Tax.Labels, "add_new_item"),
+                        "primary", "submit", False);
+                     Set ("VAR_edit_tags_submit_button", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_tax_field_description" then
-                     Set ("VAR_edit_tags_tax_field_description",
-                          Get (Tax.Labels, "parent_field_description"));
+                     Set ("VAR_edit_tags_tax_field_description", "XXX-910");
+--                        Get (Tax.Labels, "parent_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_tax_parent_item" then
-                     Set ("VAR_edit_tags_tax_parent_item",
-                          Inc_Formatting.ESC_HTML (Get (Tax.Labels, "parent_item")));
+                     Set ("VAR_edit_tags_tax_parent_item", "XXX-910");
+--                        Inc_Formatting.ESC_HTML (Get (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
-                     Set ("VAR_edit_tags_taxonomy", ESC_Attr (Taxonomy));
+                     Set ("VAR_edit_tags_taxonomy", ESC_Attr (-Taxonomy));
 
                   elsif Var_Name = "VAR_edit_tags_term_name" then
                      Set ("VAR_edit_tags_term_name", X_Ex ("Name", "term name"));

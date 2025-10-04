@@ -123,6 +123,7 @@ if  (can_edit_terms) then
 <!--<h2><?php echo tax.labels.add_new_item; ?></h2>-->
 <form id="addtag" method="post" action="edit-tags.php" class="validate"
 @_VAR_edit_tags_do_new_form_@
+>
 <!--
         <?php
         /**
@@ -139,8 +140,8 @@ if  (can_edit_terms) then
          */
         do_action ("{taxonomy}_term_new_form_tag");
         ?>
--->
         >
+-->
 <input type="hidden" name="action" value="add-tag" />
 <input type="hidden" name="screen" value="@_VAR_edit_tags_current_screen_id_@" />
 <input type="hidden" name="taxonomy" value="@_VAR_edit_tags_taxonomy_@" />

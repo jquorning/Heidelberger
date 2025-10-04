@@ -567,10 +567,6 @@ is
       <<Bailout>>
 
       Clear_Echo;
-
-   exception
-      when others =>
-         Put_Line ("EXCEPTION");
    end Render;
 
 end Adm_Post;
