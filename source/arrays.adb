@@ -38,4 +38,23 @@ is
       return Result;
    end To_Array;
 
+   -------------
+   -- To_List --
+   -------------
+
+   function To_List (List : Item_List)
+                     return List_Type
+   is
+      Result : List_Type;
+   begin
+      for A of List loop
+         Result.Append (A);
+      end loop;
+      return Result;
+   end To_List;
+
+   function To_List (Item : String)
+                     return List_Type
+   is (To_List (List => (1 => To_Unbounded_String (Item))));
+
 end Arrays;

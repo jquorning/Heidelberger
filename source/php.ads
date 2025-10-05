@@ -372,17 +372,15 @@ is
 
    function Printf (Format : String;
                     Args   : List_Type)
-                    return String
-                    is (Format & " XXX-310");
+                    return String;
 
    function Sprintf (Format : String;
                      Args   : List_Type)
-                     return String is (Format & "XXX-201");
+                     return String;
 
    function Vsprintf (Format : String;
-                      Arg    : List_Type)
-                      return String
-                      is (Format);
+                      Args   : List_Type)
+                      return String;
 
    function Realpath (Path : String)
             return String
@@ -419,7 +417,7 @@ is
    procedure Echo (Item : String);
 
    procedure Printf (Format : String;
-                     Arg_1  : String);
+                     Args   : List_Type);
 
    procedure Clear_Echo;
    function Get_Echo

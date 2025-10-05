@@ -1,5 +1,6 @@
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.Regexp;
 with GNAT.Regpat;
@@ -92,6 +93,47 @@ is
       return Res;
    end Explode;
 
+   ------------
+   -- Printf --
+   ------------
+
+   function Printf (Format : String;
+                    Args   : List_Type)
+                    return String
+   is
+      Buffer : Unbounded_String;
+      A : Natural := Format'First;
+      B : Natural := Args.First_Index;
+   begin
+      while A <= Format'Last loop
+         if Format (A) = '%' then
+            if Format (A + 1) in 's' | 'd' then
+               Append (Buffer, Args (B));
+               B := B + 1;
+               A := A + 2;
+            elsif Format (A + 2) in 's' | 'd' then
+               Append (Buffer, Args (B));
+               B := B + 1;
+               A := A + 3;
+            end if;
+         else
+            Append (Buffer, Format (A));
+            A := A + 1;
+         end if;
+      end loop;
+      return To_String (Buffer);
+   end Printf;
+
+   function Sprintf (Format : String;
+                     Args   : List_Type)
+                     return String
+   is (Printf (Format, Args));
+
+   function Vsprintf (Format : String;
+                      Args   : List_Type)
+                      return String
+   is (Printf (Format, Args));
+
    -----------------------------------------------------------------------------
 
    Echo_Buffer : Unbounded_String;
@@ -111,11 +153,11 @@ is
    ----------
 
    procedure Printf (Format : String;
-                     Arg_1  : String)
+                     Args   : List_Type)
    is
       use Hb_Common;
 
-      Item : constant String := Printf (Format, To_List (Arg_1));
+      Item : constant String := Printf (Format, Args);
    begin
       Append (Echo_Buffer, Item);
    end Printf;

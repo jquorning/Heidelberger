@@ -56,12 +56,10 @@ is
    type Item_List is array (Positive range <>) of Item_Type;
 
    function To_List (List : Item_List)
-                     return List_Type
-                     is (Empty_List);
+                     return List_Type;
 
    function To_List (Item : String)
-                     return List_Type
-                     is (Empty_List);
+                     return List_Type;
 
    package String_Vectors is
       new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
