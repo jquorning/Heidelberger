@@ -126,7 +126,7 @@ is
    --       end if;
 
             if
-              Isset (String'(Get (X_POST, "post_type"))) and then
+              Isset (X_POST, "post_type") and then
    --         Post and then
               Post_Type /= Get (X_POST, "post_type")
             then
@@ -135,10 +135,10 @@ is
                    abs "Sorry, you are not allowed to edit this item.", 400);
             end if;
 
-               if Isset (String'(Get (X_POST, "deletepost"))) then
+               if Isset (X_POST, "deletepost") then
                   Action := +"delete";
                elsif
-                 Isset (String'(Get (X_POST, "wp-preview"))) and then
+                 Isset (X_POST, "wp-preview") and then
                  "dopreview" = String'(Get (X_POST, "wp-preview"))
                then
                   Action := +"preview";
@@ -566,7 +566,7 @@ is
 
       <<Bailout>>
 
-      Clear_Echo;
+--    Clear_Echo;
    end Render;
 
 end Adm_Post;
