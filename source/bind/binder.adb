@@ -15,6 +15,7 @@ with Adm_Menu_Header;
 with Adm_Menu;
 with Adm_Nav_Menus;
 with Adm_Post;
+with Adm_Privacy;
 
 with Adi_Menu;
 with Adi_Nav_Menus;
@@ -61,6 +62,9 @@ is
 
       if Index (URL, "/wp-admin/credits.php") /= 0 then
          Adm_Credits.Render;
+
+      elsif Index (URL, "/wp-admin/privacy.php") /= 0 then
+         Adm_Privacy.Run;
 
       elsif Index (URL, "/wp-admin/edit.php") /= 0 then
          Adm_Edit.Render;
