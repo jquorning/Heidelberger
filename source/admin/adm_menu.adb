@@ -109,12 +109,14 @@ is
               Sprintf (
                  -- translators: %s: Number of pending updates.
                  abs "Updates %s",
-                 Sprintf (
+                 To_List (Sprintf (
                     "<span class=""update-plugins count-%s""><span class=""update-count"">%s</span></span>",
-                    Counts_Total'Image,
-                     -- Update_Data ("counts") ("total"),
-                     Number_Format_I18n (Float (Counts_Total)))),
-                     -- Update_Data ("counts") ("total"))
+                    To_List (List => (
+                      1 => +Counts_Total'Image,
+                           -- Update_Data ("counts") ("total"),
+                      2 => +Number_Format_I18n (Float (Counts_Total))
+                           -- Update_Data ("counts") ("total"))
+                 ))))),
               -Cap,
               "update-core.php");
 
@@ -173,18 +175,19 @@ is
                Sprintf (X_N ("%s Comment in moderation",
                               "%s Comments in moderation",
                               Awaiting_Mod),
-                        Awaiting_Mod_I18n);
+                        To_List (Awaiting_Mod_I18n));
          begin
             Menu (25) := To_Menu (
-                -- translators: %s: Number of comments.
-                Sprintf (abs "Comments %s",
-                         "<span class=""awaiting-mod count-" &
+              -- translators: %s: Number of comments.
+              Sprintf (
+                abs "Comments %s",
+                To_List ("<span class=""awaiting-mod count-" &
                          Awaiting_Mod'Image &
                          """><span class=""pending-count"" aria-hidden=""true"">" &
                          Awaiting_Mod_I18n &
                          "</span><span class=""comments-in-moderation-text " &
                          "screen-reader-text"">" &
-                         Awaiting_Mod_Text & "</span></span>"),
+                         Awaiting_Mod_Text & "</span></span>")),
                 "edit_posts",
                 "edit-comments.php",
                 "",
@@ -316,7 +319,7 @@ is
                   Set (Submenu, -Ptype_File, I,
                        ESC_Attr (Get (Tax.Labels, "menu_name")),
                        Get (Tax.Cap, "manage_terms"),
-                       Sprintf (-Edit_Tags_File, -Tax.Name));
+                       Sprintf (-Edit_Tags_File, To_List (-Tax.Name)));
                   I := I + 1;
                   << Continue_3 >>
                end loop;
@@ -354,25 +357,26 @@ is
                begin
                   Count := +Sprintf (
                      "<span class=""update-plugins count-%s""><span class=""theme-count"">%s</span></span>",
-                     Theme_Count,
-                     Number_Format_I18n (Float'Value (Theme_Count)));
+                     To_List (List =>
+                       (1 => +Theme_Count,
+                        2 => +Number_Format_I18n (Float'Value (Theme_Count)))));
                end;
             end if;
 
             -- translators: %s: Number of available theme updates.
-            Set (Submenu, "themes.php", 5, Sprintf (abs "Themes %s", -Count),
+            Set (Submenu, "themes.php", 5, Sprintf (abs "Themes %s", To_List (-Count)),
                  Appearance_Cap, "themes.php");
          end;
 
          if Inc_Themes.Wp_Is_Block_Theme then -- ()
             Set (Submenu, "themes.php", 6,
-                  Sprintf (
-                        -- translators: %s: "beta" label
-                        abs "Editor %s",
-                        "<span class=""awaiting-mod"">" & abs "beta" & "</span>"
-                  ),
-                  "edit_theme_options",
-                  "site-editor.php");
+              Sprintf (
+                -- translators: %s: "beta" label
+                abs "Editor %s",
+                To_List ("<span class=""awaiting-mod"">" & abs "beta" & "</span>"
+              )),
+              "edit_theme_options",
+              "site-editor.php");
          end if;
 
          if
@@ -533,13 +537,14 @@ is
 --                Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
                   Count := +Sprintf (
                      "<span class=""update-plugins count-%s""><span class=""plugin-count"">%s</span></span>",
-                     -Plugin_Count,
-                     Number_Format_I18n (Float'Value (-Plugin_Count))
+                     To_List (List =>
+                       (1 => Plugin_Count,
+                        2 => +Number_Format_I18n (Float'Value (-Plugin_Count))))
                   );
                end if;
 
                -- translators: %s: Number of available plugin updates.
-               Menu (65) := To_Menu (Sprintf (abs "Plugins %s", -Count),
+               Menu (65) := To_Menu (Sprintf (abs "Plugins %s", To_List (-Count)),
                                   "activate_plugins",
                                   "plugins.php", "", "menu-top menu-icon-plugins",
                                   "menu-plugins", "dashicons-admin-plugins");
@@ -634,8 +639,9 @@ is
                      begin
                         Site_Health_Count := +Sprintf (
                            "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
-                           Health,
-                           Number_Format_I18n (Float'Value (Health)));
+                           To_List (List =>
+                             (1 => +Health,
+                              2 => +Number_Format_I18n (Float'Value (Health)))));
                      end;
                   end;
                end if;
@@ -649,7 +655,7 @@ is
                Set (Submenu, "tools.php", 15, abs "Export", "export", "export.php");
                -- translators: %s: Number of critical Site Health checks.
                Set (Submenu, "tools.php", 20, Sprintf (abs "Site Health %s",
-                                                    -Site_Health_Count),
+                                                       To_List (-Site_Health_Count)),
                     "view_site_health_checks", "site-health.php");
                Set (Submenu, "tools.php", 25, abs "Export Personal Data",
                     "export_others_personal_data", "export-personal-data.php");

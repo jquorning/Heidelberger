@@ -844,7 +844,7 @@ is
             Sprintf (
                -- translators: %s: wpdb::prepare()
                abs "The query argument of %s must have a placeholder.",
-               "wpdb::prepare()"
+               To_List ("wpdb::prepare()")
             ),
             "3.9.0");
       end if;
@@ -944,8 +944,9 @@ is
                            -- translators: 1: Number of placeholders, 2: Number of
                            -- arguments passed.
                            abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
-                           Placeholders'Image,
-                           Args_Count'Image),
+                           To_List (List => (
+                             1 => +Placeholders'Image,
+                             2 => +Args_Count'Image))),
                         "4.8.3");
 
                      --

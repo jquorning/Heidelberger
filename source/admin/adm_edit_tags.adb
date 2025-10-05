@@ -424,7 +424,7 @@ is
                   Set_Unbounded_String (Help, "<p>" & Sprintf (
                         -- translators: %s: URL to Writing Settings screen.
                         abs "You can use categories to define sections of your site and group related posts. The default category is &#8220;Uncategorized&#8221; until you change it in your <a href=""%s"">writing settings</a>.",
-                        "options-writing.php"
+                        To_List ("options-writing.php")
                ) & "</p>");
                elsif "link_category" = Taxonomy then
                   Set_Unbounded_String (Help, "<p>" & abs "You can create groups of links by using Link Categories. Link Category names must be unique and Link Categories are separate from the categories you use for posts." & "</p>");
@@ -638,7 +638,7 @@ is
                         R : constant String := Printf (
                         -- translators: %s: URL to Categories to Tags Converter tool.
                         abs "Tags can be selectively converted to categories using the <a href=""%s"">tag to category converter</a>.",
-                        ESC_URL (-Import_Link));
+                        To_List (ESC_URL (-Import_Link)));
                      begin
                         Set ("VAR_edit_tags_convert_help", R);
                      end;
@@ -648,7 +648,7 @@ is
                         R : constant String := Printf (
                         -- translators: %s: URL to Categories to Tags Converter tool.
                         abs "Categories can be selectively converted to tags using the <a href=""%s"">category to tag converter</a>.",
-                        ESC_URL (-Import_Link));
+                        To_List (ESC_URL (-Import_Link)));
                      begin
                         Set ("VAR_edit_tags_converter_help", R);
                      end;
@@ -666,8 +666,8 @@ is
                         -- translators: %s: Default category.
                         abs "Deleting a category does not delete the posts in that category. Instead, posts that were only assigned to the deleted category are set to the default category %s. The default category cannot be deleted.",
                         -- This filter is documented in wp-includes/category-template.php
-                        "<strong>" & Apply_Filters ("the_category",
-                                                    Get_Cat_Name (Get_Option ("default_category")), "", "") & "</strong>");
+                        To_List ("<strong>" & Apply_Filters ("the_category",
+                                                    Get_Cat_Name (Get_Option ("default_category")), "", "") & "</strong>"));
                      begin
                         Set ("VAR_edit_tags_delete_help", R);
                      end;
@@ -866,8 +866,8 @@ is
                            Append (R, Printf (
                               -- translators: %s: Search query.
                               abs "Search results for: %s",
-                              "<strong>" & ESC_HTML (Wp_Unslash (Get (X_REQUEST, "s"))) & "</strong>"
-                           ));
+                              To_List ("<strong>" & ESC_HTML (Wp_Unslash (Get (X_REQUEST, "s"))) & "</strong>"
+                           )));
                            Append (R, "</span>");
                         end if;
                         Set ("VAR_edit_tags_h1_sub", -R);

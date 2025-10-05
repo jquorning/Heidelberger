@@ -236,9 +236,12 @@ is
 --          New_Parent := Back_Compat_Parents (-Args_2.Parent) (New_Parent);
 --          Version    := Back_Compat_Parents (-Args_2.Parent) (Version);
 
-            X_Deprecated_Argument ("__METHOD__", -Version,
-                                   Sprintf ("Use <code>%s</code> as the parent for the <code>%s</code> admin bar node instead of <code>%s</code>.",
-                                            -New_Parent, -Args_2.Id, -Args_2.Parent));
+            X_Deprecated_Argument (
+              "__METHOD__", -Version,
+              Sprintf ("Use <code>%s</code> as the parent for the <code>%s</code> admin bar node instead of <code>%s</code>.",
+                To_List (List => (1 => New_Parent,
+                                  2 => Args_2.Id,
+                                  3 => Args_2.Parent))));
             Args_2.Parent := New_Parent;
          end if;
       end;

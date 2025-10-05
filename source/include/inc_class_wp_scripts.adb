@@ -122,8 +122,10 @@ is
          return -Output;
       end if;
 
-      Unused := +Printf ("<script%s id=""%s-js-extra"">\n", -This.Type_Attr,
-                         ESC_Attr (Handle));
+      Unused := +Printf ("<script%s id=""%s-js-extra"">\n",
+                         To_List (List => (
+                           1 => This.Type_Attr,
+                           2 => +ESC_Attr (Handle))));
 
       -- CDATA is not needed for HTML 5.
       if This.Type_Attr /= "" then
@@ -210,13 +212,20 @@ is
             if Before_Handle /= "" then
                Before_Handle :=
                   +Sprintf ("<script%s id=""%s-js-before"">\n%s\n</script>\n",
-                            -This.Type_Attr, ESC_Attr (Handle), -Before_Handle);
+                            To_List (List =>
+                              (1 => This.Type_Attr,
+                               2 => +ESC_Attr (Handle),
+                               3 => Before_Handle)));
             end if;
 
             if After_Handle /= "" then
                After_Handle :=
-                  +Sprintf ("<script%s id=""%s-js-after"">\n%s\n</script>\n",
-                            -This.Type_Attr, ESC_Attr (Handle), -After_Handle);
+                  +Sprintf (
+                     "<script%s id=""%s-js-after"">\n%s\n</script>\n",
+                     To_List (List =>
+                        (1 => This.Type_Attr,
+                         2 => +ESC_Attr (Handle),
+                         3 => After_Handle)));
             end if;
 
             declare
@@ -244,7 +253,10 @@ is
                   if Translations /= "" then
                      Translations := +Sprintf (
                         "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                        -This.Type_Attr, ESC_Attr (Handle), -Translations);
+                        To_List (List =>
+                          (1 => This.Type_Attr,
+                           2 => +ESC_Attr (Handle),
+                           3 => Translations)));
                   end if;
 
                   if This.Do_Concat then
@@ -347,8 +359,12 @@ is
                         Translations & Cond_Before & Before_Handle;
                   begin
                      Append (Tag,
-                        Sprintf ("<script%s src=""%s"" id=""%s-js""></script>\n",
-                                 -This.Type_Attr, -Src, ESC_Attr (Handle)));
+                        Sprintf (
+                          "<script%s src=""%s"" id=""%s-js""></script>\n",
+                          To_List (List =>
+                            (1 => This.Type_Attr,
+                             2 => Src,
+                             3 => +ESC_Attr (Handle)))));
                      Append (Tag, After_Handle & Cond_After);
 
                      --
@@ -443,7 +459,11 @@ is
 
       if Display then
          Unused := +Printf ("<script%s id=""%s-js-%s"">\n%s\n</script>\n",
-                 -This.Type_Attr, ESC_Attr (Handle), ESC_Attr (Position), -Output);
+                 To_List (List =>
+                   (1 => This.Type_Attr,
+                    2 => +ESC_Attr (Handle),
+                    3 => +ESC_Attr (Position),
+                    4 => Output)));
       end if;
 
       return -Output;
@@ -491,12 +511,12 @@ is
          X_Doing_It_Wrong
            ("__METHOD__",
             Sprintf (
-                     -- translators: 1: l10n, 2: wp_add_inline_script()--
-                     abs "The %1s parameter must be an array. To pass arbitrary data to scripts, use the %2s function instead.",
-                     "<code>l10n</code>",
-                     "<code>wp_add_inline_script()</code>"
-                     ),
-                     "5.7.0");
+              -- translators: 1: l10n, 2: wp_add_inline_script()--
+              abs "The %1s parameter must be an array. To pass arbitrary data to scripts, use the %2s function instead.",
+              To_List (List => (1 => +"<code>l10n</code>",
+                                2 => +"<code>wp_add_inline_script()</code>"))
+            ),
+            "5.7.0");
 
          -- if L10n_2.Is_Empty then
          --    -- This should really not be needed, but is necessary for backward
@@ -662,7 +682,10 @@ is
 
          if Display then
             Unused := +Printf ("<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                              -This.Type_Attr, ESC_Attr (Handle), -Output);
+                               To_List (List => (
+                                 1 => This.Type_Attr,
+                                 2 => +ESC_Attr (Handle),
+                                 3 => Output)));
          end if;
 
          return -Output;

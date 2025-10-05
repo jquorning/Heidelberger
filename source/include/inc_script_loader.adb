@@ -103,6 +103,7 @@ is
    procedure Wp_Default_Packages_Vendor
      (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
    is
+      use Hb_Common;
       use Inc_L10n;
       use Inc_Functions;
       use Inc_Options;
@@ -147,7 +148,6 @@ is
          declare
             use Ada.Strings.Unbounded;
             use Array_Maps;
-            use Hb_Common;
 
             Handle       : constant String := Key     (A);
             Dependencies : constant String := Element (A);
@@ -175,9 +175,10 @@ is
             "moment",
             Php.Sprintf (
               "moment.updateLocale( ""%s"", %s );",
-              Get_User_Locale,
-              Wp_Json_Encode (
-                To_Array ((
+              To_List (List => (
+                1 => +Get_User_Locale,
+                2 => +Wp_Json_Encode (
+                  To_Array ((
                   Build ("months",
                          Php.Array_Values (Globals.Wp_Locale.Month)),
                   Build ("monthsShort",
@@ -199,7 +200,7 @@ is
                   )))
                 ))
               )
-            ),
+            ))),
             "after"
          );
       end if;
@@ -377,7 +378,7 @@ is
                   Script : constant String :=
                     Sprintf (
                       "wp.i18n.setLocaleData( { ""text direction\u0004ltr"": [ ""%s"" ] } );",
-                      LTR);
+                      To_List (LTR));
                begin
                   Scripts.Add_Inline_Script (Handle, Script, "after");
                end;
@@ -1137,7 +1138,7 @@ is
            "mediaelement-core",
            Php.Sprintf (
              "var mejsL10n = %s;",
-             Wp_Json_Encode (
+             To_List (Wp_Json_Encode (
                To_Array ((
                  Build ("language", Php.Strtolower (Php.Strtok (Determine_Locale, "_-"))),
                  Build ("strings",  To_Array ((
@@ -1214,7 +1215,7 @@ is
                  Build ("mejs.welsh",               abs "Welsh"),
                  Build ("mejs.yiddish",             abs "Yiddish")
                )))
-             ))
+             )))
            )
            ),
            "before"
@@ -1423,20 +1424,25 @@ is
                         Build ("themeInstallUnavailable", Php.Sprintf (
                                 -- translators: %s: URL to Add Themes admin screen.
                                 abs "You will not be able to install new themes from here yet since your install requires SFTP credentials. For now, please <a href=""%s"">add themes in the admin</a>.",
-                                ESC_URL (Admin_URL ("theme-install.php")))
+                                To_List (ESC_URL (Admin_URL ("theme-install.php"))))
                         ),
                         Build ("publishSettings",         abs "Publish Settings"),
                         Build ("invalidDate",             abs "Invalid date."),
                         Build ("invalidValue",            abs "Invalid value."),
-                        Build ("blockThemeNotification", Php.Sprintf (
-                                -- translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
-                                abs "Hurray! Your theme supports site editing with blocks. <a href=""%1s"">Tell me more</a>. %2s",
-                                abs "https://wordpress.org/support/article/site-editor/",
-                                Php.Sprintf (
+                        Build ("blockThemeNotification",
+                          Php.Sprintf (
+                            -- translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
+                            abs "Hurray! Your theme supports site editing with blocks. <a href=""%1s"">Tell me more</a>. %2s",
+                            To_List (List => (
+                              1 => +abs "https://wordpress.org/support/article/site-editor/",
+                              2 => +Php.Sprintf (
                                         "<button type=""button"" data-action=""%1s"" class=""button switch-to-editor"">%2s</button>",
-                                        ESC_URL (Admin_URL ("site-editor.php")),
-                                        abs "Use Site Editor"
-                                )
+                                      To_List (List => (
+                                          1 => +ESC_URL (Admin_URL ("site-editor.php")),
+                                          2 => +abs "Use Site Editor"
+                                      ))
+                                   )
+                            ))
                        ))
                 ))
          );

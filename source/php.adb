@@ -115,7 +115,7 @@ is
    is
       use Hb_Common;
 
-      Item : constant String := Printf (Format, Arg_1);
+      Item : constant String := Printf (Format, To_List (Arg_1));
    begin
       Append (Echo_Buffer, Item);
    end Printf;

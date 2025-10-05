@@ -702,7 +702,7 @@ is
                                     Printf (
                                       -- translators: %s: Search query.
                                       abs "Search results for: %s",
-                                      "<strong>" & Get_Search_Query & "</strong>") &
+                                      To_List ("<strong>" & Get_Search_Query & "</strong>")) &
                                       "</span>";
                            begin
                               Set ("VAR_page_edit_h1_sub", Buffer);
@@ -830,17 +830,17 @@ is
          begin
             if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, Post_Type, Message),
-                                          Number_Format_I18n (Float (Count))));
+                                          To_List (Number_Format_I18n (Float (Count)))));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
             elsif Isset (String'(Get (Bulk_Messages, "post", Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, "post", Message),
-                                          Number_Format_I18n (Float (Count))));
+                                          To_List (Number_Format_I18n (Float (Count)))));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
             end if;
 
-            if "trashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
+            if "trashed" = Message and then Isset (X_REQUEST, "ids") then
                declare
                   use Inc_Formatting;
 

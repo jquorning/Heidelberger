@@ -131,7 +131,7 @@ is
    is
       use Inc_Formatting;
    begin
-      Display_Name := "<a href=""" & ESC_URL (Sprintf (Profiles, Username)) &
+      Display_Name := "<a href=""" & ESC_URL (Sprintf (Profiles, To_List (Username))) &
                       """>" & ESC_HTML (Display_Name) & "</a>";
    end X_Wp_Credits_Add_Profile_Link;
 
@@ -270,7 +270,7 @@ is
                      ESC_Attr (Get (Person_Data, 3).Get) & """>" & NL_TAB); -- (2)
                Echo ("<a href=""" &
                      ESC_URL (Sprintf ("%s", -- Get (Credits_Data, "profiles").Get,
-                                       Get (Person_Data, 2).Get)) &
+                                       To_List (Get (Person_Data, 2).Get))) &
                      """ class=""web"">");
                declare
                   use Inc_Link_Templates;

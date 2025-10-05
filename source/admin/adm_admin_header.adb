@@ -47,13 +47,14 @@ is
    procedure Run
    is
       use Ada.Strings.Unbounded;
+      use Arrays;
+      use Hb_Common;
+      use Php;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Load;
       use Inc_Options;
       use Inc_Plugins;
-      use Hb_Common;
-      use Php;
 
       function RTL_To_String (RTL : Boolean)
                               return String;
@@ -103,12 +104,12 @@ is
       if Is_Network_Admin then
          -- translators: Network admin screen title. %s: Network title.
          Admin_Title := +Sprintf (abs "Network Admin: %s",
-                                  -Inc_Ms_Networks.Get_Network.Site_Name);
+                                  To_List (-Inc_Ms_Networks.Get_Network.Site_Name));
 
       elsif Is_User_Admin then
          -- translators: User dashboard screen title. %s: Network title.
          Admin_Title := +Sprintf (abs "User Dashboard: %s",
-                                  -Inc_Ms_Networks.Get_Network.Site_Name);
+                                  To_List (-Inc_Ms_Networks.Get_Network.Site_Name));
 
       else
          Admin_Title := +Inc_General_Templates.Get_Bloginfo ("name");
@@ -116,7 +117,8 @@ is
 
       if Admin_Title = Globals.Title then
          -- translators: Admin screen title. %s: Admin screen name.
-         Admin_Title := +Sprintf (abs "%s &#8212; WordPress", -Globals.Title);
+         Admin_Title := +Sprintf (abs "%s &#8212; WordPress",
+                                  To_List (-Globals.Title));
       else
          Screen_Title := Globals.Title;
 
@@ -140,8 +142,9 @@ is
                      Screen_Title  := +Sprintf (
                         -- translators: Editor admin screen title. 1: "Edit item" text for the post type, 2: Post title.
                         abs "%1s &#8220;%2s&#8221;",
-                        "XX-603", -- Post_Type_Obj.Labels.Edit_Item,
-                        -Post_Title);
+                        To_List (List => (+"XXX-603",
+                                          -- Post_Type_Obj.Labels.Edit_Item,
+                                          Post_Title)));
                   end;
                end if;
             end;
@@ -149,12 +152,14 @@ is
 
          -- translators: Admin screen title. 1: Admin screen name, 2: Network or site name.
          Admin_Title := +Sprintf (abs "%1s &lsaquo; %2s &#8212; WordPress",
-                                  -Screen_Title, -Admin_Title);
+                                  To_List (List => (Screen_Title,
+                                                    Admin_Title)));
       end if;
 
       if Wp_Is_Recovery_Mode then
          -- translators: %s: Admin screen title.
-         Admin_Title := +Sprintf (abs "Recovery Mode &#8212; %s", -Admin_Title);
+         Admin_Title := +Sprintf (abs "Recovery Mode &#8212; %s",
+                                  To_List (-Admin_Title));
       end if;
 
       --
@@ -313,8 +318,6 @@ is
       end if;
 
       declare
-         use Arrays;
-
          Error_Get_Last : constant Array_Type := Php.Error_Get_Last; --()
       begin
          -- Print a CSS class to make PHP errors visible.

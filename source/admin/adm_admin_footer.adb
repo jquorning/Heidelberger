@@ -7,6 +7,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Arrays;
 with Hb_Common;
 with Globals;
 with Php;
@@ -22,6 +23,7 @@ with Inc_Plugins;
 package body Adm_Admin_Footer
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
    use Hb_Common;
    use Php;
 
@@ -57,7 +59,7 @@ is
       Text := +Sprintf (
         -- translators: %s: https://wordpress.org/
         abs "Thank you for creating with <a href=""%s"">WordPress</a>.",
-        abs "https://wordpress.org/");
+        To_List (abs "https://wordpress.org/"));
 
       --
       -- Filters the "Thank you" text displayed in the admin footer.

@@ -2962,9 +2962,10 @@ is
            Sprintf (
              -- translators: 1: wp-admin/includes/template.php, 2: add_meta_box(), 3: add_meta_boxes
              abs "Likely direct inclusion of %1s in order to use %2s. This is very wrong. Hook the %2s call into the %3s action instead.",
-             "<code>wp-admin/includes/template.php</code>",
-             "<code>add_meta_box()</code>",
-             "<code>add_meta_boxes</code>"
+             To_List (List => (
+               1 => +"<code>wp-admin/includes/template.php</code>",
+               2 => +"<code>add_meta_box()</code>",
+               3 => +"<code>add_meta_boxes</code>"))
            ),
            "3.3.0"
          );

@@ -303,9 +303,9 @@ is
          -- translators: %s: Current user"s display name.
          Howdy : constant String :=
             Sprintf (abs "Howdy, %s",
-                     "<span class=""display-name"">"  &
-                     (-Current_User.Dyn.Display_Name) &
-                     "</span>");
+                     To_List ("<span class=""display-name"">"  &
+                              (-Current_User.Dyn.Display_Name) &
+                              "</span>"));
 
          Class : String := (if Empty (Avatar) then "" else "with-avatar");
          Node  : Node_Args;
@@ -443,11 +443,11 @@ is
       if Is_Network_Admin then
          -- translators: %s: Site title.
          Blogname := +Sprintf (abs "Network Admin: %s",
-                               ESC_HTML (-Get_Network.Site_Name));
+                               To_List (ESC_HTML (-Get_Network.Site_Name)));
       elsif Is_User_Admin then
          -- translators: %s: Site title.
          Blogname := +Sprintf (abs "User Dashboard: %s",
-                               ESC_HTML (-Get_Network.Site_Name));
+                               To_List (ESC_HTML (-Get_Network.Site_Name)));
       end if;
 
       declare
@@ -809,12 +809,14 @@ is
                Unused := Switch_To_Blog (Blog.Userblog_Id);
 
                if True = Show_Site_Icons and then Has_Site_Icon then
-                  Blavatar := +Sprintf (
-                                "<img class=""blavatar"" src=""%s"" srcset=""%s 2x"" alt="""" width=""16"" height=""16""%s />",
-                                ESC_URL (Get_Site_Icon_Url (16)),
-                                ESC_URL (Get_Site_Icon_Url (32)),
-                                (if Wp_Lazy_Loading_Enabled ("img", "site_icon_in_toolbar") then " loading=""lazy""" else "")
-                       );
+                  Blavatar :=
+                    +Sprintf (
+                      "<img class=""blavatar"" src=""%s"" srcset=""%s 2x"" alt="""" width=""16"" height=""16""%s />",
+                      To_List (List =>
+                        (1 => +ESC_URL (Get_Site_Icon_Url (16)),
+                         2 => +ESC_URL (Get_Site_Icon_Url (32)),
+                         3 => +(if Wp_Lazy_Loading_Enabled ("img", "site_icon_in_toolbar") then " loading=""lazy""" else "")))
+                    );
                else
                   Blavatar := +"<div class=""blavatar""></div>";
                end if;
@@ -1353,7 +1355,7 @@ is
                   -- translators: %s: Number of comments.
                   X_N ("%s Comment in moderation",
                        "%s Comments in moderation", Awaiting_Mod),
-                  Number_Format_I18n (Float (Awaiting_Mod)));
+                  To_List (Number_Format_I18n (Float (Awaiting_Mod))));
       Icon  : Unbounded_String;
       Title : Unbounded_String;
       Node  : Node_Args;
@@ -1497,7 +1499,7 @@ is
                 -- translators: %s: Total number of updates available.
                 X_N ("%s update available", "%s updates available",
                      Counts_Total),
-                Number_Format_I18n (Float (Counts_Total)));
+                To_List (Number_Format_I18n (Float (Counts_Total))));
 
       Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
       Title := +"<span class=""ab-label"" aria-hidden=""true"">" &

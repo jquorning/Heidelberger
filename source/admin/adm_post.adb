@@ -209,15 +209,22 @@ is
                   if Ada.Strings.Fixed.Index (Get (X_POST, "content"),
                                               "<!-- wp:paragraph -->") = 0
                   then
-                     Set (X_POST, "content",
-                        Sprintf (
-                           "<!-- wp:paragraph -->%s<!-- /wp:paragraph -->",
-                            Str_Replace (To_List (List => (+"\r\n",
-                                                           +"\r",
-                                                           +"\n")),
-                            "<br />",
-                            Get (X_POST, "content"))
-                        ));
+                     declare
+                        Value_2 : constant String := Get (X_POST, "content");
+
+                        Needle  : constant List_Type := To_List (List => (
+                          +"\r\n",
+                          +"\r",
+                          +"\n"));
+
+                        Value : constant String :=
+                          Sprintf (
+                             "<!-- wp:paragraph -->%s<!-- /wp:paragraph -->",
+                              To_List (Str_Replace (Needle, "<br />", Value_2))
+                          );
+                     begin
+                        Set (X_POST, "content", Value);
+                     end;
                   end if;
 
                   declare
@@ -423,8 +430,10 @@ is
                            User : constant Wp_User := Get_Userdata (User_Id);
                         begin
                            -- translators: %s: User"s display name.
-                           Inc_Functions.Wp_Die
-                              (Sprintf (abs "You cannot move this item to the Trash. %s is currently editing.", "XXX-362")); -- -User.Display_Name));
+                           Inc_Functions.Wp_Die (
+                             Sprintf (
+                               abs "You cannot move this item to the Trash. %s is currently editing.",
+                               To_List ("XXX-362"))); -- -User.Display_Name));
                         end;
                      end if;
 

@@ -17,11 +17,11 @@ is
       is (1);
 
    function Str_Replace (Search  : String;
-                         replace : String;
+                         Replace : String;
                          Item    : String) return String is ("XXX-112");
 
    function Str_Replace (Search  : List_Type;
-                         replace : String;
+                         Replace : String;
                          Item    : String) return String is ("XXX-221");
 
    function Preg_Replace (Left : String; Right : String) return Integer is (1);
@@ -371,18 +371,13 @@ is
             is ("XXX-713");
 
    function Printf (Format : String;
-                    Arg_1  : String;
-                    Arg_2  : String := "";
-                    Arg_3  : String := "";
-                    Arg_4  : String := "")
+                    Args   : List_Type)
                     return String
-                    is (Format & " XXX-310 " & Arg_1);
+                    is (Format & " XXX-310");
 
    function Sprintf (Format : String;
-                     Arg_1  : String;
-                     Arg_2  : String := "";
-                     Arg_3  : String := "")
-      return String is (Format & "XXX-201");
+                     Args   : List_Type)
+                     return String is (Format & "XXX-201");
 
    function Vsprintf (Format : String;
                       Arg    : List_Type)

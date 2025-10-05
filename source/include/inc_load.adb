@@ -638,8 +638,8 @@ is
             Php.Sprintf (
               -- translators: 1: table_prefix, 2: wp-config.php
               abs "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores.",
-              "<code>table_prefix</code>",
-              "<code>wp-config.php</code>"
+              To_List (List => (1 => +"<code>table_prefix</code>",
+                                2 => +"<code>wp-config.php</code>"))
            ));
       end if;
    end Wp_Set_Wpdb_Vars;

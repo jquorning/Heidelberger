@@ -1724,9 +1724,9 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       Messages :=  -- ()
          +"<div id=""message"" class=""updated notice is-dismissible""><p>" &
            Sprintf (
-                        -- translators: %s: Nav menu title.
-                        abs "%s has been updated.",
-                        "<strong>" & Nav_Menu_Selected_Title & "</strong>"
+             -- translators: %s: Nav menu title.
+             abs "%s has been updated.",
+             To_List ("<strong>" & Nav_Menu_Selected_Title & "</strong>")
            ) & "</p></div>";
 
 --    Unset (Menu_Items);
