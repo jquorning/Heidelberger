@@ -251,7 +251,7 @@ is
       use Php;
       use Inc_L10n;
    begin
-      Echo (X_E ("No items found."));
+      X_E ("No items found.");
    end No_Items;
 
    ----------------

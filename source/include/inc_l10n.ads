@@ -29,53 +29,6 @@ is
    Textdomain_Registry : Inc_Class_Wp_Textdomain_Registry.Wp_Textdomain_Registry;
    L10n                : String_Maps.Map;
    L10n_Unloaded       : String_Sets.Set;
-   --
-   -- Determines whether the current locale is right-to-left (RTL).
-   --
-   -- For more information on this and similar theme functions, check out
-   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
-   -- Conditional Tags} article in the Theme Developer Handbook.
-   --
-   -- @since 3.0.0
-   --
-   -- @global WP_Locale wp_locale WordPress date and time locale object.
-   --
-   -- @return bool Whether locale is RTL.
-   --
-   function Is_RTL
-            return Boolean
-            is (False);
-
-   function "abs" (Item : String) return String;
-   function Plural (Single : String; Plural : String; Argument : String) return String;
-   function Gettext (Item : String) return String;
-   function X_E (Item : String) return String is (Item & " XXX-103");
-   function X_Ex (Item : String; Arg : String := "") return String is ("XXX-104");
-   function X_X (Item : String; A2 : String)
-                 return String
-                 is (Item & " XXX-231 " & A2);
-   function X_N (Single : String; Plural : String; Switch : Natural)
-                return String is ("XXX-232");
-   function Esc_Attr_E (Item : String) return String is (Item & "XXX-309");
-   function Esc_Attr_X (Item : String) return String is (Item & "XXX-514");
-
-   function Load_Script_Textdomain (Handle : String;
-                                    Domain : String;
-                                    Path   : String)
-                                    return String
-                                    is ("XXX-311");
-
-   function X_N_Noop (Arg_1, Arg_2 : String)
-                      return Array_Type
-                      is (Empty_Array);
-
-   function Get_User_Locale (User : Integer := 0)
-                             return String
-                             is ("da_DK");
-   function Translate (Text   : String;
-                       Domain : String := "default")
-                       return String
-                       is (Text);
 
    --
    -- Retrieves the current locale.
@@ -102,6 +55,21 @@ is
             is ("XXX-704");
 
    --
+   -- Retrieves the locale of a user.
+   --
+   -- If the user has a locale set to a non-empty string then it will be
+   -- returned. Otherwise it returns the locale of get_locale().
+   --
+   -- @since 4.7.0
+   --
+   -- @param int|WP_User user User"s ID or a WP_User object. Defaults to current user.
+   -- @return string The locale of the user.
+   --
+   function Get_User_Locale (User : Integer := 0)
+                             return String
+                             is ("da_DK");
+
+   --
    -- Determines the current locale desired for the request.
    --
    -- @since 5.0.0
@@ -112,6 +80,240 @@ is
    --
    function Determine_Locale
             return String;
+
+   --
+   -- Retrieves the translation of text.
+   --
+   -- If there is no translation, or the text domain isn"t loaded, the original text
+   -- is returned.
+   --
+   -- *Note:* Don"t use translate() directly, use __() or related functions.
+   --
+   -- @since 2.2.0
+   -- @since 5.5.0 Introduced gettext-thendomainend; filter.
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   -- @return string Translated text.
+   --
+   function Translate (Text   : String;
+                       Domain : String := "default")
+                       return String
+                       is (Text);
+
+   --
+   -- Retrieves the translation of text.
+   --
+   -- If there is no translation, or the text domain isn"t loaded, the original text
+   -- is returned.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   -- @return string Translated text.
+   --
+   function X (Text   : String;
+               Domain : String := "default")
+               return String
+               is (Text);
+
+   function "abs" (Item : String) return String;
+
+   --
+   -- Retrieves the translation of text and escapes it for safe use in an attribute.
+   --
+   -- If there is no translation, or the text domain isn't loaded, the original text
+   -- is returned.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   -- @return string Translated text on success, original text on failure.
+   --
+   function Esc_Attr_X (Item   : String;
+                        Domain : String := "default")
+                        return String
+                        is (Item & "XXX-514");
+
+   --
+   -- Displays translated text.
+   --
+   -- @since 1.2.0
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   --
+   procedure X_E (Item   : String;
+                  Domain : String := "default")
+                  is null;
+
+   --
+   -- Displays translated text that has been escaped for safe use in an attribute.
+   --
+   -- Encodes `< > & " "` (less than, greater than, ampersand, double quote, single
+   -- quote). Will never double encode entities.
+   --
+   -- If you need the value for use in PHP, use esc_attr__().
+   --
+   -- @since 2.8.0
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   --
+   procedure Esc_Attr_E (Text   : String;
+                         Domain : String := "default")
+                         is null;
+
+   --
+   -- Retrieves translated string with gettext context.
+   --
+   -- Quite a few times, there will be collisions with similar translatable text
+   -- found in more than two places, but with different translated context.
+   --
+   -- By including the context in the pot file, translators can translate the two
+   -- strings differently.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string text    Text to translate.
+   -- @param string context Context information for the translators.
+   -- @param string domain  Optional. Text domain. Unique identifier for retrieving
+   --                        translated strings. Default "default".
+   -- @return string Translated context string without pipe.
+   --
+   function X_X (Text    : String;
+                 Context : String;
+                 Domain  : String := "default")
+                 return String
+                 is (Text & " XXX-231 " & Context);
+
+   --
+   -- Displays translated string with gettext context.
+   --
+   -- @since 3.0.0
+   --
+   -- @param string text    Text to translate.
+   -- @param string context Context information for the translators.
+   -- @param string domain  Optional. Text domain. Unique identifier for retrieving
+   --                        translated strings. Default "default".
+   --
+   procedure X_Ex (Text    : String;
+                   Context : String;
+                   Domain  : String := "default")
+                   is null;
+
+   --
+   -- Translates and retrieves the singular or plural form based on the supplied
+   -- number.
+   --
+   -- Used when you want to use the appropriate form of a string based on whether a
+   -- number is singular or plural.
+   --
+   -- Example:
+   --
+   --     printf( _n( "%s person", "%s people", count, "text-domain" ),
+   --            number_format_i18n( count ) );
+   --
+   -- @since 2.8.0
+   -- @since 5.5.0 Introduced ngettext-{domain} filter.
+   --
+   -- @param string single The text to be used if the number is singular.
+   -- @param string plural The text to be used if the number is plural.
+   -- @param int    number The number to compare against to use either the singular
+   --                       or plural form.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   -- @return string The translated singular or plural form.
+   --
+   function X_N (Single : String;
+                 Plural : String;
+                 Number : Integer;
+                 Domain : String := "default")
+                 return String
+                 is ("XXX-232");
+
+   --
+   -- Translates and retrieves the singular or plural form based on the supplied
+   -- number, with gettext context.
+   --
+   -- This is a hybrid of _n() and _x(). It supports context and plurals.
+   --
+   -- Used when you want to use the appropriate form of a string with context based
+   -- on whether a number is singular or plural.
+   --
+   -- Example of a generic phrase which is disambiguated via the context parameter:
+   --
+   --     printf( _nx( "%s group", "%s groups", people, "group of people",
+   --                  "text-domain" ), number_format_i18n( people ) );
+   --     printf( _nx( "%s group", "%s groups", animals, "group of animals",
+   --                  "text-domain" ), number_format_i18n( animals ) );
+   --
+   -- @since 2.8.0
+   -- @since 5.5.0 Introduced ngettext_with_context-thendomainend; filter.
+   --
+   -- @param string single  The text to be used if the number is singular.
+   -- @param string plural  The text to be used if the number is plural.
+   -- @param int    number  The number to compare against to use either the singular
+   --                        or plural form.
+   -- @param string context Context information for the translators.
+   -- @param string domain  Optional. Text domain. Unique identifier for retrieving
+   --                        translated strings. Default "default".
+   -- @return string The translated singular or plural form.
+   --
+   function X_Nx (Single  : String;
+                  Plural  : String;
+                  Number  : String;
+                  Context : String;
+                  Domain  : String := "default")
+                  return String
+                  is ("XXX-902");
+
+   function X_N_Noop (Arg_1, Arg_2 : String)
+                      return Array_Type
+                      is (Empty_Array);
+
+   --
+   -- Registers plural strings in POT file, but does not translate them.
+   --
+   -- Used when you want to keep structures with translatable plural
+   -- strings and use them later when the number is known.
+   --
+   -- Example:
+   --
+   --     message = _n_noop( "%s post", "%s posts", "text-domain" );
+   --     ...
+   --     printf( translate_nooped_plural( message, count, "text-domain" ),
+   --             number_format_i18n( count ) );
+   --
+   -- @since 2.5.0
+   --
+   -- @param string singular Singular form to be localized.
+   -- @param string plural   Plural form to be localized.
+   -- @param string domain   Optional. Text domain. Unique identifier for retrieving
+   --                         translated strings. Default null.
+   -- @return array {
+   --     Array of translation information for the strings.
+   --
+   --     @type string      0        Singular form to be localized. No longer used.
+   --     @type string      1        Plural form to be localized. No longer used.
+   --     @type string      singular Singular form to be localized.
+   --     @type string      plural   Plural form to be localized.
+   --     @type null        context  Context information for the translators.
+   --     @type string|null domain   Text domain.
+   -- }
+   --
+   function X_N_Noop (Singular : String;
+                      Plural   : String;
+                      Domain   : String := "default") -- null
+                      return String_Array
+                      is (Empty_String_Array);
 
    --
    -- Loads a .mo file into the text domain domain.
@@ -187,5 +389,44 @@ is
    --
    function Load_Default_Textdomain (Locale : String := "") -- null
                                      return Boolean;
+
+   --
+   -- Loads the script translated strings.
+   --
+   -- @since 5.0.0
+   -- @since 5.0.2 Uses load_script_translations() to load translation data.
+   -- @since 5.1.0 The `domain` parameter was made optional.
+   --
+   -- @see WP_Scripts::set_translations()
+   --
+   -- @param string handle Name of the script to register a translation domain to.
+   -- @param string domain Optional. Text domain. Default "default".
+   -- @param string path   Optional. The full file path to the directory containing
+   --                       translation files.
+   -- @return string|false The translated strings in JSON encoding on success,
+   --                      false if the script textdomain could not be loaded.
+   --
+   function Load_Script_Textdomain (Handle : String;
+                                    Domain : String;
+                                    Path   : String)
+                                    return String
+                                    is ("XXX-311");
+
+   --
+   -- Determines whether the current locale is right-to-left (RTL).
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 3.0.0
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   --
+   -- @return bool Whether locale is RTL.
+   --
+   function Is_RTL
+            return Boolean
+            is (False);
 
 end Inc_L10n;

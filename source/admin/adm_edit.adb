@@ -548,74 +548,77 @@ is
             begin
                Set (Bulk_Messages, "post", To_Array (List => (    --  abs added
         -- translators: %s: Number of posts.
-        Build ("updated", Plural ("%s post updated.",
-                                     "%s posts updated.", Get (Bulk_Counts, "updated"))),
+        Build ("updated", X_N ("%s post updated.",
+                               "%s posts updated.",
+                               Get_Integer (Bulk_Counts, "updated"))),
         Build ("locked", (if "1" = Get (Bulk_Counts, "locked")   --  1 -> "1"
                           then abs "1 post not updated, somebody is editing it."
                           -- translators: %s: Number of posts.
-                          else Plural ("%s post not updated, somebody is editing it.",
-                                       "%s posts not updated, somebody is editing them.",
-                                        Get (Bulk_Counts, "locked")))),
+                          else X_N ("%s post not updated, somebody is editing it.",
+                                    "%s posts not updated, somebody is editing them.",
+                                    Get_Integer (Bulk_Counts, "locked")))),
         -- translators: %s: Number of posts.
-        Build ("deleted",   Plural ("%s post permanently deleted.",
-                                    "%s posts permanently deleted.",
-                                    Get (Bulk_Counts, "deleted"))),
+        Build ("deleted",   X_N ("%s post permanently deleted.",
+                                 "%s posts permanently deleted.",
+                                 Get_Integer (Bulk_Counts, "deleted"))),
         -- translators: %s: Number of posts.
-        Build ("trashed",   Plural ("%s post moved to the Trash.",
-                                    "%s posts moved to the Trash.",
-                                    Get (Bulk_Counts, "trashed"))),
+        Build ("trashed",   X_N ("%s post moved to the Trash.",
+                                 "%s posts moved to the Trash.",
+                                 Get_Integer (Bulk_Counts, "trashed"))),
         -- translators: %s: Number of posts.
-        Build ("untrashed", Plural ("%s post restored from the Trash.",
-                                    "%s posts restored from the Trash.",
-                                    Get (Bulk_Counts, "untrashed")))
+        Build ("untrashed", X_N ("%s post restored from the Trash.",
+                                 "%s posts restored from the Trash.",
+                                 Get_Integer (Bulk_Counts, "untrashed")))
                )));
 
                Set (Bulk_Messages, "page", To_Array (List => (
         -- translators: %s: Number of pages.
-        Build ("updated", Plural ("%s page updated.", "%s pages updated.", Get (Bulk_Counts, "updated"))),
+        Build ("updated", X_N ("%s page updated.",
+                               "%s pages updated.",
+                               Get_Integer (Bulk_Counts, "updated"))),
         Build ("locked",  (if "1" = Get (Bulk_Counts, "locked")
                            then abs "1 page not updated, somebody is editing it."
                            -- translators: %s: Number of pages.
-                           else Plural ("%s page not updated, somebody is editing it.",
-                                        "%s pages not updated, somebody is editing them.",
-                                        Get (Bulk_Counts, "locked")))),
+                           else X_N ("%s page not updated, somebody is editing it.",
+                                     "%s pages not updated, somebody is editing them.",
+                                     Get_Integer (Bulk_Counts, "locked")))),
         -- translators: %s: Number of pages.
-        Build ("deleted", Plural ("%s page permanently deleted.",
-                                  "%s pages permanently deleted.",
-                                  Get (Bulk_Counts, "deleted"))),
+        Build ("deleted", X_N ("%s page permanently deleted.",
+                               "%s pages permanently deleted.",
+                               Get_Integer (Bulk_Counts, "deleted"))),
         -- translators: %s: Number of pages.
-        Build ("trashed", Plural ("%s page moved to the Trash.",
-                                  "%s pages moved to the Trash.",
-                                  Get (Bulk_Counts, "trashed"))),
+        Build ("trashed", X_N ("%s page moved to the Trash.",
+                               "%s pages moved to the Trash.",
+                               Get_Integer (Bulk_Counts, "trashed"))),
         -- translators: %s: Number of pages. */
-        Build ("untrashed", Plural ("%s page restored from the Trash.",
-                                    "%s pages restored from the Trash.",
-                                    Get (Bulk_Counts, "untrashed")))
+        Build ("untrashed", X_N ("%s page restored from the Trash.",
+                                 "%s pages restored from the Trash.",
+                                 Get_Integer (Bulk_Counts, "untrashed")))
                )));
 
                Set (Bulk_Messages, "wp_block", To_Array (List => (
         -- translators: %s: Number of blocks.
-        Build ("updated", Plural ("%s block updated.",
-                                  "%s blocks updated.",
-                                  Get (Bulk_Counts, "updated"))),
+        Build ("updated", X_N ("%s block updated.",
+                               "%s blocks updated.",
+                               Get_Integer (Bulk_Counts, "updated"))),
         Build ("locked",  (if "1" = Get (Bulk_Counts, "locked")
                            then abs "1 block not updated, somebody is editing it."
                            -- translators: %s: Number of blocks.
-                           else Plural ("%s block not updated, somebody is editing it.",
-                                        "%s blocks not updated, somebody is editing them.",
-                                        Get (Bulk_Counts, "locked")))),
+                           else X_N ("%s block not updated, somebody is editing it.",
+                                     "%s blocks not updated, somebody is editing them.",
+                                     Get_Integer (Bulk_Counts, "locked")))),
         -- translators: %s: Number of blocks.
-        Build ("deleted",   Plural ("%s block permanently deleted.",
-                                    "%s blocks permanently deleted.",
-                                    Get (Bulk_Counts, "deleted"))),
+        Build ("deleted",   X_N ("%s block permanently deleted.",
+                                 "%s blocks permanently deleted.",
+                                 Get_Integer (Bulk_Counts, "deleted"))),
         -- translators: %s: Number of blocks.
-        Build ("trashed",   Plural ("%s block moved to the Trash.",
-                                    "%s blocks moved to the Trash.",
-                                    Get (Bulk_Counts, "trashed"))),
+        Build ("trashed",   X_N ("%s block moved to the Trash.",
+                                 "%s blocks moved to the Trash.",
+                                  Get_Integer (Bulk_Counts, "trashed"))),
         -- translators: %s: Number of blocks.
-        Build ("untrashed", Plural ("%s block restored from the Trash.",
-                                    "%s blocks restored from the Trash.",
-                                    Get (Bulk_Counts, "untrashed")))
+        Build ("untrashed", X_N ("%s block restored from the Trash.",
+                                 "%s blocks restored from the Trash.",
+                                 Get_Integer (Bulk_Counts, "untrashed")))
                )));
 
                --

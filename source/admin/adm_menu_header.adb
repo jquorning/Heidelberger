@@ -471,13 +471,15 @@ is
       use Inc_Plugins;
    begin
 -- ?>
-      Echo
-         ("<div id=""adminmenumain"" role=""navigation"" aria-label=""" &
-          Esc_Attr_E ("Main menu") & """>" &
-          "<a href=""#wpbody-content"" class=""screen-reader-shortcut"">" &
-          X_E ("Skip to main content") & "</a>" &
-          "<a href=""#wp-toolbar"" class=""screen-reader-shortcut"">" &
-          X_E ("Skip to toolbar") & "</a>" &
+      Echo ("<div id=""adminmenumain"" role=""navigation"" aria-label=""");
+      Esc_Attr_E ("Main menu");
+      Echo (""">");
+      Echo ("<a href=""#wpbody-content"" class=""screen-reader-shortcut"">");
+      X_E ("Skip to main content");
+      Echo ("</a>");
+      Echo ("<a href=""#wp-toolbar"" class=""screen-reader-shortcut"">");
+      X_E ("Skip to toolbar");
+      Echo ("</a>" &
           "<div id=""adminmenuback""></div>" &
           "<div id=""adminmenuwrap"">" &
           "<ul id=""adminmenu"">");

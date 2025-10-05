@@ -77,7 +77,9 @@ is
             use Adi_Credits;
          begin
             if Var_Name = "VAR_credits_contributors" then
-               Set ("VAR_credits_contributors", X_E ("Contributors"));
+               Clear_Echo;
+               X_E ("Contributors");
+               Set ("VAR_credits_contributors", Get_Echo);
 
             elsif Var_Name = "VAR_credits_header" then
                Clear_Echo;
@@ -88,16 +90,24 @@ is
                Set ("VAR_credits_header", Get_Echo);
 
             elsif Var_Name = "VAR_credits_about" then
-               Set ("VAR_credits_about", X_E ("What&#8217;s New"));
+               Clear_Echo;
+               X_E ("What&#8217;s New");
+               Set ("VAR_credits_about", Get_Echo);
 
             elsif Var_Name = "VAR_credits_credits" then
-               Set ("VAR_credits_credits", X_E ("Credits"));
+               Clear_Echo;
+               X_E ("Credits");
+               Set ("VAR_credits_credits", Get_Echo);
 
             elsif Var_Name = "VAR_credits_freedoms" then
-               Set ("VAR_credits_freedoms", X_E ("Freedoms"));
+               Clear_Echo;
+               X_E ("Freedoms");
+               Set ("VAR_credits_freedoms", Get_Echo);
 
             elsif Var_Name = "VAR_credits_privacy" then
-               Set ("VAR_credits_privacy", X_E ("Privacy"));
+               Clear_Echo;
+               X_E ("Privacy");
+               Set ("VAR_credits_privacy", Get_Echo);
 
             elsif Var_Name = "VAR_credits_not_credits" then
                Set ("VAR_credits_not_credits", Credits.Is_Empty);
@@ -111,8 +121,9 @@ is
                Set ("VAR_credits_created", Get_Echo);
 
             elsif Var_Name = "VAR_credits_see_your_name" then
-               Set ("VAR_credits_see_your_name",
-                    X_E ("Want to see your name in lights on this page?"));
+               Clear_Echo;
+               X_E ("Want to see your name in lights on this page?");
+               Set ("VAR_credits_see_your_name", Get_Echo);
 
             elsif Var_Name = "VAR_credits_core_developers" then
                Clear_Echo;

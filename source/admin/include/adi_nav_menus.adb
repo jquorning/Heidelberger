@@ -751,26 +751,33 @@ is
       Echo ("                <li " & (if "most-recent" = Current_Tab then " class=""tabs""" else "") & ">" & NL);
       Echo ("                        <a class=""nav-tab-link"" data-type=""tabs-panel-posttype-" & Esc_Attr (post_type_name) & "-most-recent"" href=""" &
             (-Most_Recent_Url) & "#tabs-panel-posttype-" & Post_Type_Name & "-most-recent"">" & NL);
-      Echo ("                                " & X_E ("Most Recent") & "" & NL);
+      Echo ("                                ");
+      X_E ("Most Recent");
+      Echo (NL);
       Echo ("                        </a>" & NL);
       Echo ("                </li>" & NL);
       Echo ("                <li " & (if "all" = current_tab then " class=""tabs""" else "") & ">" & NL);
       Echo ("                        <a class=""nav-tab-link"" data-type=""" & Esc_Attr (post_type_name) & "-all"" href=""" & (-View_All_Url) & "#" &
            Post_Type_Name & "-all"">" & NL);
-      Echo ("                                " & X_E ("View All") & "" & NL);
+      Echo ("                                ");
+      X_E ("View All");
+      Echo (NL);
       Echo ("                        </a>" & NL);
       Echo ("                </li>" & NL);
       Echo ("                <li " & (if "search" = Current_Tab then " class=""tabs""" else "") & ">" & NL);
       Echo ("                        <a class=""nav-tab-link"" data-type=""tabs-panel-posttype-" & Esc_Attr (Post_Type_Name) & "-search"" href=""" &
             (-Search_URL) & "#tabs-panel-posttype-" & Post_Type_Name & "-search"">" & NL);
-      Echo ("                                " & X_E ("Search") & "" & NL);
+      Echo ("                                ");
+      X_E ("Search");
+      Echo (NL);
       Echo ("                        </a>" & NL);
       Echo ("                </li>" & NL);
       Echo ("        </ul><!-- .posttype-tabs -->" & NL);
 
       Echo ("        <div id=""tabs-panel-posttype-" & Post_Type_Name & "-most-recent"" class=""tabs-panel " &
-            (if "most-recent" = current_tab then "tabs-panel-active" else "tabs-panel-inactive") & " role=""region"" aria-label=""" & X_E ("Most Recent") &
-            """ tabindex=""0"">" & NL);
+            (if "most-recent" = current_tab then "tabs-panel-active" else "tabs-panel-inactive") & " role=""region"" aria-label=""");
+      X_E ("Most Recent");
+      Echo (""" tabindex=""0"">" & NL);
       Echo ("                <ul id=""" & Post_Type_Name & "checklist-most-recent"" class=""categorychecklist form-no-clear"">" & NL);
 
       pragma Style_Checks (On);
@@ -854,7 +861,9 @@ is
                pragma Style_Checks (Off);
 
       Echo ("        <p class=""quick-search-wrap"">" & Nl);
-      Echo ("                <label for=""quick-search-posttype-" & Post_Type_Name & """ class=""screen-reader-text"">" & X_E ("Search") & "</label>" & Nl);
+      Echo ("                <label for=""quick-search-posttype-" & Post_Type_Name & """ class=""screen-reader-text"">");
+      X_E ("Search");
+      Echo ("</label>" & NL);
       Echo ("                <input type=""search""" &
             Wp_Nav_Menu_Disabled_Check (Nav_Menu_Selected_Id'Image) &
             """ class=""quick-search"" value=""" & (-Searched) &
@@ -971,15 +980,17 @@ Echo ("                        <input type=""checkbox""" &
 --    Wp_Nav_Menu_Disabled_Check (Nav_Menu_Selected_Id) & " id=""" &
       Esc_Attr (Tab_Name) & " class=""select-all"" />" & NL);
 Echo ("                        <label for=""" & esc_attr (tab_name) &
-      """>" & X_E ("Select All") & "</label>" & NL);
+      """>");
+X_E ("Select All");
+Echo ("</label>" & NL);
 Echo ("                </span>" & nl);
 
 Echo ("                <span class=""add-to-menu"">" & NL);
 Echo ("                        <input type=""submit""" &
 --    Wp_Nav_Menu_Disabled_Check (Nav_Menu_Selected_Id) &
-      " class=""button submit-add-to-menu right"" value=""" &
-      Esc_Attr_E ("Add to Menu") &
-      """ name=""add-post-type-menu-item"" id=""" &
+      " class=""button submit-add-to-menu right"" value=""");
+Esc_Attr_E ("Add to Menu");
+Echo (""" name=""add-post-type-menu-item"" id=""" &
       Esc_Attr ("submit-posttype-" & Post_Type_Name) & " />" & NL);
 Echo ("                        <span class=""spinner""></span>" & NL);
 Echo ("                </span>" & NL);
@@ -1146,7 +1157,9 @@ Echo ("                <li " &
 Echo ("                        <a class=""nav-tab-link"" data-type=""tabs-panel-" &
       Esc_Attr (Taxonomy_Name) & "-all"" href=""" & (-View_All_URL) & "#tabs-panel-" &
       Taxonomy_Name & "-all"">" & NL);
-Echo ("                                " & X_E ("View All") & """" & NL);
+Echo ("                                ");
+X_E ("View All");
+Echo ("""" & NL);
 Echo ("                        </a>" & NL);
 Echo ("                </li>" & NL);
 Echo ("                <li " &
@@ -1154,7 +1167,9 @@ Echo ("                <li " &
 Echo ("                        <a class=""nav-tab-link"" data-type=""tabs-panel-search-taxonomy-" &
       Esc_Attr (Taxonomy_Name) & """ href=""" & (-Search_URL) &
       "#tabs-panel-search-taxonomy-" & Taxonomy_Name & """>" & NL);
-Echo ("                                " & X_E ("Search") & """" & NL);
+Echo ("                                ");
+X_E ("Search");
+Echo ("""" & NL);
 Echo ("                        </a>" & NL);
 Echo ("                </li>" & NL);
 Echo ("        </ul><!-- .taxonomy-tabs -->" & NL);
