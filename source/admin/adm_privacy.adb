@@ -15,7 +15,7 @@ with Php;
 with Templates_Parser;
 
 with Adm_Admin;
--- with Adm_Admin_Footer;
+with Adm_Admin_Footer;
 with Adm_Admin_Header;
 
 with Inc_Formatting;
@@ -139,7 +139,7 @@ is
          Clear_Echo;
          Echo (-Payload);
       end;
-      -- Adm_Admin_Footer.Run;
+      Adm_Admin_Footer.Run;
    end Run;
 
 end Adm_Privacy;
