@@ -287,18 +287,16 @@ is
                                          Build ("size", Size * 2)))); -- (1)
                begin
                   Echo ("<span class=""wp-person-avatar""><img src=""" &
-                        ESC_URL (Get (Data,   "url")) & """ srcset=""" &
-                        ESC_URL (Get (Data2x, "url")) &
+--                      ESC_URL (Get (Data,   "url")) & """ srcset=""" &
+--                      ESC_URL (Get (Data2x, "url")) &
                         " 2x"" class=""gravatar"" alt="""" /></span>" & NL);
                   Echo (ESC_HTML (Get (Person_Data, 1).Get) & "</a>" & NL_TAB); -- (0)
                end;
-
                if not Compact and then String'(Get (Person_Data, 4).Get) /= "" then
                   -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
                   Echo ("<span class=""title"">" & Translate (Get (Person_Data, 4).Get) & "</span>" & NL); -- (3)
                end if;
                Echo ("</li>" & NL);
-
             end Print_Them;
 
          begin
@@ -334,7 +332,6 @@ is
 --             end loop;
          end;
          Echo ("</ul>" & NL);
-
       end if;
    end Wp_Credits_Section_List;
 

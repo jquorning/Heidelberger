@@ -6,6 +6,7 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Globals;
@@ -127,7 +128,6 @@ is
 
             elsif Var_Name = "VAR_credits_core_developers" then
                Clear_Echo;
-
                declare
                   Groups    : constant Json_Value := Credits.Get ("groups");
                   Core_Devs : constant Json_Value := Groups. Get ("core-developers");
