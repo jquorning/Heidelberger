@@ -61,16 +61,15 @@ is
    -- Get --
    ---------
 
-   function Get (Arr   : Array_Type;
-                 Key   : String;
-                 Arg_2 : String := "")
+   function Get (Arry : Array_Type;
+                 Key  : String)
                  return String
    is
       use Array_Maps;
    begin
-      pragma Assert (Arr.Find (Key) /= No_Element);
-      pragma Assert (Element (Arr.Find (Key)).Kind = Is_String);
-      return To_String (Array_Maps.Element (Arr.Find (Key)).Str);
+      pragma Assert (Arry.Find (Key) /= No_Element);
+      pragma Assert (Element (Arry.Find (Key)).Kind = Is_String);
+      return To_String (Array_Maps.Element (Arry.Find (Key)).Str);
    end Get;
 
    -----------

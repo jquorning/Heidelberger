@@ -820,23 +820,26 @@ is
    begin
       -- If we have a bulk message to issue:
       for X in Bulk_Counts.Iterate loop   -- foreach
---            for (Message, Count) of Bulk_Counts loop   -- foreach
          declare
             use Inc_Functions;
             use Array_Maps;
 
-            Count   : constant Natural := Natural'Value (Key (X)); -- -X.Key); -- Count;
+            Count   : constant Natural := Natural'Value (Key (X));
             Message : constant String  := Get (Bulk_Counts, Key (X));
-            -- Element (X); -- -X.Value; -- Message;
+            Message_Array : Array_Type renames Get_Array (Bulk_Messages, Post_Type);
+            Post_Array    : Array_Type renames Get_Array (Bulk_Messages, Post_Type);
          begin
-            if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
-               Append (Messages, Sprintf (Get (Bulk_Messages, Post_Type, Message),
-                                          To_List (Number_Format_I18n (Float (Count)))));
+            if Isset (Message_Array, Message) then
+--          if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
+               Append (Messages,
+                       Sprintf (Get (Message_Array, Message),
+                                To_List (Number_Format_I18n (Float (Count)))));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
-            elsif Isset (String'(Get (Bulk_Messages, "post", Message))) then
-               Append (Messages, Sprintf (Get (Bulk_Messages, "post", Message),
-                                          To_List (Number_Format_I18n (Float (Count)))));
+            elsif Isset (Post_Array, Message) then
+               Append (Messages,
+                       Sprintf (Get (Post_Array, Message),
+                                To_List (Number_Format_I18n (Float (Count)))));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
             end if;

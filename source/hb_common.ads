@@ -46,7 +46,8 @@ is
                    return Natural
                    is (7);
 
-   function Get (Arr : Array_Type; Key : String; Arg_2 : String := "")
+   function Get (Arry : Array_Type;
+                 Key  : String)
                  return String;
 
    function Get_Array (Arr : Array_Type; Key : String) -- ; Arg_2 : String := "")
