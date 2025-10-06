@@ -53,13 +53,13 @@ is
           ))
         );
    begin
-      This.Screen := Convert_To_Screen (Args ("screen"));
+      This.Screen := Convert_To_Screen (Get (Args, "screen"));
 
       Add_Filter ("manage_" & (-This.Screen.Id) & "_columns",
                   "Empty_Array", -- To_Array (This, "get_columns"),
                   0);
 
-      if "" = Args_2 ("plural") then
+      if "" = Get (Args_2, "plural") then
 --    if not Args_2 ("plural") then
          Set (Args_2, "plural", Value => -This.Screen.Base);
       end if;
@@ -276,22 +276,22 @@ is
 
       if not Empty (X_REQUEST, "orderby") then
          Echo ("<input type=""hidden"" name=""orderby"" value=""""" &
-               ESC_Attr (X_REQUEST ("orderby")) & """ />");
+               ESC_Attr (Get (X_REQUEST, "orderby")) & """ />");
       end if;
 
       if not Empty (X_REQUEST, "order") then
          Echo ("<input type=""hidden"" name=""order"" value=""""" &
-               ESC_Attr (X_REQUEST ("order")) & """ />");
+               ESC_Attr (Get (X_REQUEST, "order")) & """ />");
       end if;
 
       if not Empty (X_REQUEST, "post_mime_type") then
          Echo ("<input type=""hidden"" name=""post_mime_type"" value=""""" &
-               ESC_Attr (X_REQUEST ("post_mime_type")) & """ />");
+               ESC_Attr (Get (X_REQUEST, "post_mime_type")) & """ />");
       end if;
 
       if not Empty (X_REQUEST, "detached") then
          Echo ("<input type=""hidden"" name=""detached"" value=""""" &
-               ESC_Attr (X_REQUEST ("detached")) & """ />");
+               ESC_Attr (Get (X_REQUEST, "detached")) & """ />");
       end if;
 
       Echo ("<p class=""search-box"">" & NL);
@@ -430,9 +430,9 @@ is
             use Array_Maps;
 
             Class : constant String := Key (A);
-            View  : constant String := Element (A);
+            View  : constant String := Get (Views, Class); -- Element (A);
          begin
-            Views (Class) := "\t<li class=""" & Class  & """>" & View;
+            Set (Views, Class, "\t<li class=""" & Class  & """>" & View);
          end;
       end loop;
       Echo (Implode (" |</li>\n", Views) & "</li>\n");
@@ -504,7 +504,8 @@ is
       for A in This.X_Actions.Iterate loop --  as key => value ) then
          declare
             Key   : constant String := Array_Maps.Key     (A);
-            Value : constant String := Array_Maps.Element (A);
+            Value : constant String := Get (This.X_Actions, Key);
+            -- Array_Maps.Element (A);
          begin
             if False then -- Is_Array (Value) then
                Echo (TAB & "<optgroup label=""" & ESC_Attr (Key) & """>" & NL & NL);
@@ -512,7 +513,8 @@ is
                for B in Empty_Array.Iterate loop -- Value.Iterate loop
                   declare
                      Name  : constant String := Array_Maps.Key (B);
-                     Title : constant String := Array_Maps.Element (B);
+                     Title : constant String := Get (Empty_Array, Name);
+                     -- Array_Maps.Element (B);
 
                      Class : constant String :=
                        (if "edit" = Name
@@ -964,7 +966,7 @@ is
          Current              := This.Get_Pagenum;
 --       Removable_Query_Args := Wp_Removable_Query_Args;
 
-         Current_URL := +Set_URL_Scheme ("http://" & X_SERVER ("HTTP_HOST") & X_SERVER ("REQUEST_URI"));
+         Current_URL := +Set_URL_Scheme ("http://" & Get (X_SERVER, "HTTP_HOST") & Get (X_SERVER, "REQUEST_URI"));
 
          Current_URL := +Remove_Query_Arg (Removable_Query_Args, -Current_URL);
 
@@ -1135,7 +1137,8 @@ is
       for A in Columns.Iterate loop
          declare
             Col         : constant String := Array_Maps.Key     (A);
-            Column_Name :          String := Array_Maps.Element (A);
+            Column_Name :          String := Get (Columns, Col);
+            -- Array_Maps.Element (A);
          begin
             if "cb" = Col then
                goto Continue;
@@ -1320,7 +1323,8 @@ is
       Hidden   : constant List_Type :=
         Array_Intersect (Array_Keys (Columns), Array_Filter (Hidden_2));
    begin
-      return Natural (Array_Maps.Length (Columns) - List_Vectors.Length (Hidden));
+      return Natural (Length (Columns) - List_Vectors.Length (Hidden));
+--    return Natural (Array_Maps.Length (Columns) - List_Vectors.Length (Hidden));
    end Get_Column_Count;
 
    Static_CB_Counter : Positive := 1;
@@ -1358,12 +1362,12 @@ is
       Current_Order   : Unbounded_String;
    begin
       if Isset (XX_GET, "orderby") then
-         Current_Orderby := +XX_GET ("orderby");
+         Current_Orderby := +Get (XX_GET, "orderby");
       else
          Current_Orderby := +"";
       end if;
 
-      if Isset (XX_GET, "order") and then "desc" = XX_GET ("order") then
+      if Isset (XX_GET, "order") and then "desc" = Get (XX_GET, "order") then
          Current_Order := +"desc";
       else
          Current_Order := +"asc";
@@ -1371,11 +1375,11 @@ is
 
       if not Get_Array (Columns, "cb").Is_Empty then
 --       static cb_counter = 1;
-         Columns ("cb") :=
+         Set (Columns, "cb",
            "<label class=""screen-reader-text"" for=""cb-select-all-" &
            Static_CB_Counter'Image & """>" & abs "Select All" & "</label>" &
            "<input id=""cb-select-all-" & Static_CB_Counter'Image &
-           """ type=""checkbox"" />";
+           """ type=""checkbox"" />");
 
          Static_CB_Counter := Static_CB_Counter + 1;
       end if;
@@ -1385,7 +1389,7 @@ is
             use Array_Maps;
 
             Column_Key          : constant String := Key (A);
-            Column_Display_Name : String := Element (A);
+            Column_Display_Name : String := Get (Columns, Column_Key); -- Element (A);
             Class : List_Type := To_List (List => (+"manage-column",
                                                    +"column-column_key"));
          begin
@@ -1410,10 +1414,10 @@ is
             if Isset (Sortable, Column_Key) then
                declare
                   Orderby    : constant String :=
-                    Get_Array (Sortable, Column_Key) ("orderby");
+                    Get (Get_Array (Sortable, Column_Key), "orderby");
 
                   Desc_First : constant String :=
-                    Get_Array (Sortable, Column_Key) ("desc_first");
+                    Get (Get_Array (Sortable, Column_Key), "desc_first");
 
 --                List (orderby, desc_first) := Sortable (Column_Key);
                   Order : Unbounded_String;
@@ -1530,7 +1534,7 @@ is
       Mode_Class : constant String := ESC_Attr ("table-view-" & Mode);
    begin
       return To_List (List => (+"widefat", +"fixed", +"striped",
-                               +Mode_Class, +This.X_Args ("plural")));
+                               +Mode_Class, +Get (This.X_Args, "plural")));
    end Get_Table_Classes;
 
    ----------------------
@@ -1548,13 +1552,13 @@ is
       Unused : Unbounded_String;
    begin
       declare
-         Unused : String := This.X_Args ("plural");
+         Unused : constant String := Get (This.X_Args, "plural");
       begin
          null;
       end;
 
       if "top" = Which then
-         Unused := +Wp_Nonce_Field ("bulk-" & This.X_Args ("plural"));
+         Unused := +Wp_Nonce_Field ("bulk-" & Get (This.X_Args, "plural"));
       end if;
 
       Echo ("  <div class=""tablenav " & ESC_Attr (Which) & ">" & NL);
@@ -1612,11 +1616,17 @@ is
    procedure Display_Rows (This : in out Wp_List_Table)
    is
       use Array_Maps;
+      use Hb_Common;
    begin
       for Item in This.Items.Iterate loop
-         This.Single_Row (To_Array ((1 =>
-                            Build (Key (Item), Element (Item))
+         declare
+            K : constant String := Key (Item);
+            V : constant String := Get (This.Items, K);
+         begin
+            This.Single_Row (To_Array ((1 =>
+                            Build (Key (Item), Get (This.Items, Key (Item))) -- Element (Item))
                          )));
+         end;
       end loop;
    end Display_Rows;
 
@@ -1679,7 +1689,8 @@ is
       for A in Columns.Iterate loop
          declare
             Column_Name         : constant String := Array_Maps.Key     (A);
-            Column_Display_Name : constant String := Array_Maps.Element (A);
+            Column_Display_Name : constant String := Get (Columns, Column_Name);
+            -- Array_Maps.Element (A);
 
             Classes    : Unbounded_String := +"column_name column-column_name";
             Data       : Unbounded_String;

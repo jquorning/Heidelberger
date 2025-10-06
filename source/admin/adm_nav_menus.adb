@@ -147,11 +147,11 @@ is
                   begin
                      if
 --                     not Is_Wp_Error (Menus) and then
-                       Menus.First_Element /= "" --  (0)
+                       Menus.First_Element.Str /= "" --  (0)
                      then
                         declare
                            Menu_Id : constant String :=
-                             Menus.First_Element; -- (0)
+                             -Menus.First_Element.Str; -- (0)
 
                            Ordered_Menu_Items : constant Menu_Item_Array := -- Array_Type :=
                               Wp_Get_Nav_Menu_Items (Menu_Id);

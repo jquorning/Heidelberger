@@ -3,6 +3,25 @@ is
    function "+" (Item : String) return Unbounded_String
       renames To_Unbounded_String;
 
+   -------------
+   -- Include --
+   -------------
+
+   procedure Include (Arry     : in out Array_Type;
+                      Key      : String;
+                      New_Item : String)
+   is
+      Item : Array_Record;
+   begin
+      Item.Kind := Is_String;
+      Item.Str  := +New_Item;
+      Arry.Include (Key, Item);
+   end Include;
+
+   -----------
+   -- Build --
+   -----------
+
    function Build (Key : String; Value : String) return Assoc_Type
    is
    begin

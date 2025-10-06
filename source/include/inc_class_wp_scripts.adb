@@ -531,7 +531,8 @@ is
          for A in L10n_2.Iterate loop --  as key => value ) loop
             declare
                Key   : constant String := Array_Maps.Key (A); -- -A.Key;
-               Value : constant String := Array_Maps.Element (A); -- -A.Value;
+               Value : constant String := Get (L10n_2, Key);
+               -- Array_Maps.Element (A); -- -A.Value;
             begin
 --               if not Is_Scalar (Value) then
 --                  goto Continue_1;

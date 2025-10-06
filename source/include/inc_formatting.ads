@@ -271,7 +271,7 @@ is
    --
    -- Safely extracts not more than the first count characters from HTML string.
    --
-   -- UTF-8, tags and entities safe prefix extraction. Entities inside will--NOT*
+   -- UTF-8, tags and entities safe prefix extraction. Entities inside will *NOT*
    -- be counted as one character. For example &amp; will be counted as 4, &lt; as
    -- 3, etc.
    --

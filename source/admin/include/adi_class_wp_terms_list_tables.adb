@@ -41,7 +41,7 @@ is
             Build ("plural",   "tags"),
             Build ("singular", "tag"),
             Build ("screen",   (if Isset (Args, "screen")
-                                then Args ("screen") else "null"))
+                                then Get (Args, "screen") else "null"))
           ))
         )
         with

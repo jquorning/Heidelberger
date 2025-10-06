@@ -92,7 +92,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          True),
             Build ("query_var",             "category_name"),
-            Build ("rewrite",               Rewrite ("category")),
+            Build ("rewrite",               Get_Array (Rewrite, "category")),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
@@ -2288,12 +2288,16 @@ is
 --                taxonomies = array (taxonomies);
 --        end;
 
-      for Taxonomy of Taxonomies loop
-         if not Taxonomy_Exists (Taxonomy) then
-            return Empty_Term_Array;
+      for A in Taxonomies.Iterate loop
+         declare
+            Taxonomy : constant String := Get (Taxonomies, Key (A));
+         begin
+            if not Taxonomy_Exists (Taxonomy) then
+               return Empty_Term_Array;
 --            return new Wp_Error ("invalid_taxonomy",
 --                                 abs "Invalid taxonomy.");
-         end if;
+            end if;
+         end;
       end loop;
 
 --        if  (! is_array (object_ids)) then
@@ -2310,8 +2314,12 @@ is
          Args_2       : Array_Type := Inc_Functions.Wp_Parse_Args (Args);
          Taxonomies_2 : Array_Type;
       begin
-         for Tax of Taxonomies loop       -- By jq
-            Taxonomies_2.Include (Tax, New_Item => Tax);
+         for A in Taxonomies.Iterate loop       -- By jq
+            declare
+               Tax : constant String := Get (Taxonomies, Key (A));
+            begin
+               Taxonomies_2.Include (Tax, New_Item => Tax);
+            end;
          end loop;
          --
          -- Filters arguments for retrieving object terms.
@@ -2337,8 +2345,9 @@ is
             if Length (Taxonomies_2) > 1 then
                for X in Taxonomies_2.Iterate loop
                   declare
-                     Index    : String          := Key (X); -- -X.Key;
-                     Taxonomy : constant String := Element (X); -- -X.Value;
+                     Index    : constant String := Key (X); -- -X.Key;
+                     Taxonomy : constant String := Get (Taxonomies_2, Index);
+                     -- Element (X); -- -X.Value;
                   begin
                      T := Get_Taxonomy (Taxonomy);
                      if
@@ -3861,9 +3870,10 @@ is
 
          Terms : Wp_Term_Array;
       begin
-         for Term_Id of Term_Ids loop
+         for A in Term_Ids.Iterate loop
             declare
-               Term : constant Wp_Term
+               Term_Id : constant String := Key (A);
+               Term    : constant Wp_Term
                   := Get_Term (Integer'Value (Term_Id), Taxonomy);
             begin
 --               if Is_Wp_Error (Term) then

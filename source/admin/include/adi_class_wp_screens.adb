@@ -1173,7 +1173,7 @@ is
       end if;
 
       Echo ("<" & Tag & " class=""screen-reader-text"">" &
-            This.X_Screen_Reader_Content (Key) & "</" & Tag & ">");
+            Get (This.X_Screen_Reader_Content, Key) & "</" & Tag & ">");
    end Render_Screen_Reader_Content;
 
 end Adi_Class_Wp_Screens;

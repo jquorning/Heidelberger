@@ -149,9 +149,8 @@ is
    -- @param string domain Optional. Text domain. Unique identifier for retrieving
    --                       translated strings. Default "default".
    --
-   procedure X_E (Item   : String;
-                  Domain : String := "default")
-                  is null;
+   procedure X_E (Text   : String;
+                  Domain : String := "default");
 
    --
    -- Displays translated text that has been escaped for safe use in an attribute.

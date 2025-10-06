@@ -369,18 +369,17 @@ package body Inc_L10n is
 --         return esc_html( translate( text, domain ) );
 -- end;
 
--- --
--- -- Displays translated text.
--- --
--- -- @since 1.2.0
--- --
--- -- @param string text   Text to translate.
--- -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                       Default "default".
--- --
--- function _e( text, domain = "default" ) then
---         echo translate( text, domain );
--- end;
+   ---------
+   -- X_E --
+   ---------
+
+   procedure X_E (Text   : String;
+                  Domain : String := "default")
+   is
+      use Php;
+   begin
+      Echo (Translate (Text, Domain));
+   end X_E;
 
 -- --
 -- -- Displays translated text that has been escaped for safe use in an attribute.

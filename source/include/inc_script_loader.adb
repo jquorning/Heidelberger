@@ -150,7 +150,8 @@ is
             use Array_Maps;
 
             Handle       : constant String := Key     (A);
-            Dependencies : constant String := Element (A);
+            Dependencies : constant String := Get (Vendor_Scripts, Handle);
+            -- Element (A);
             Path    : Unbounded_String;
             Version : Unbounded_String;
          begin
@@ -160,7 +161,7 @@ is
             -- end if;
 
             Path    := +"/wp-includes/js/dist/vendor/handlesuffix.js";
-            Version := +Vendor_Scripts_Versions (Handle);
+            Version := +Get (Vendor_Scripts_Versions, Handle);
 
             Scripts.Add (Handle, -Path, To_List (Dependencies), -Version, 1);
          end;
@@ -337,7 +338,8 @@ is
             Dependencies : List_Type;
             Unused       : List_Type;
          begin
-            if not Empty (Package_Data ("dependencies")) then
+            if Isset (Package_Data, "dependencies") then
+--          if not Empty (Package_Data ("dependencies")) then
                Dependencies := Get_List (Package_Data, "dependencies");
             else
                Dependencies := Empty_List;
@@ -358,7 +360,7 @@ is
 
             end if;
 
-            Scripts.Add (Handle, Path, Dependencies, Package_Data ("version"), 1);
+            Scripts.Add (Handle, Path, Dependencies, Get (Package_Data, "version"), 1);
 
             if In_Array ("wp-i18n", Dependencies, True) then
                Scripts.Set_Translations (Handle);
@@ -1886,7 +1888,7 @@ is
                use Array_Maps;
 
                Packag       : constant String := Key     (P);
-               Dependencies : String := Element (P);
+               Dependencies : String := Get (Package_Styles, Packag); -- Element (P);
                Dependencies_2 : List_Type;
                Handle       : constant String := "wp-" & Packag;
 
@@ -2504,7 +2506,8 @@ is
             for A in Concat_2.Iterate loop
                declare
                   Key   : constant String := Array_Maps.Key (A);
-                  Chunk : constant String := Array_Maps.Element (A);
+                  Chunk : constant String := Get (Concat_2, Key);
+                  -- Array_Maps.Element (A);
                begin
                   Append (Concatenated, "&load%5Bchunk_" & Key & "%5D=" & Chunk);
                end;

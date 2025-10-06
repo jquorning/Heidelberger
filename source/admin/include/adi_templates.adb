@@ -2297,7 +2297,7 @@ is
       use Inc_Formatting;
    begin
       Echo ((if Isset (X_REQUEST, "s")
-             then ESC_Attr (Wp_Unslash (X_REQUEST ("s"))) else ""));
+             then ESC_Attr (Wp_Unslash (Get (X_REQUEST, "s"))) else ""));
    end X_Admin_Search_Query;
 
 -- --
@@ -2873,10 +2873,10 @@ is
                      use Array_Maps;
 
                      Attribute : constant String := Key (A); -- A.Key;
-                     Value     : constant String := Element (A); -- A.Value;
+                     Value     : constant String := Get (Other_Attributes, Attribute);
+                     -- Element (A); -- A.Value;
                   begin
-                     Attributes := Attributes & Attribute & "=""" &
-                                   ESC_Attr (Value) & """ ";
+                     Append (Attributes, "=""" & ESC_Attr (Value) & """ ");
                      -- Trailing space is important.
                   end;
                end loop;

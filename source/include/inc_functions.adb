@@ -1292,7 +1292,7 @@ is
             use Arrays.Array_Maps;
 
             K : constant String := Key (A);
-            V : constant String := Element (A);
+            V : constant String := Get (Array_2, K); -- Element (A);
          begin
             Array_2.Include (K, New_Item => Addslash (V));
             -- if Is_Array (V) then

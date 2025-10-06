@@ -66,8 +66,11 @@ is
                  Arg_2 : String := "")
                  return String
    is
+      use Array_Maps;
    begin
-      return Array_Maps.Element (Arr.Find (Key));
+      pragma Assert (Arr.Find (Key) /= No_Element);
+      pragma Assert (Element (Arr.Find (Key)).Kind = Is_String);
+      return To_String (Array_Maps.Element (Arr.Find (Key)).Str);
    end Get;
 
    -----------

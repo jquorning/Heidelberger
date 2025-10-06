@@ -1298,7 +1298,8 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                use Array_Maps;
 
                X_Possible_Db_Id   : String := Key (A); -- -A.Key;
-               X_Item_Object_Data : String := Element (A); -- -A.Value;
+               X_Item_Object_Data : String := Get (Menu_Data, Key (A));
+               -- Element (A); -- -A.Value;
                Args : Array_Type;
             begin
 --                if
@@ -1627,14 +1628,17 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       -- Loop through all the menu items" POST variables.
       if Get (X_POST, "menu-item-db-id") /= "" then
 --    if not Empty (Get (X_POST, "menu-item-db-id")) then
-         for A in Get_Array (X_POST, "menu-item-db-id").Iterate loop
-            declare
-               use Array_Maps;
+         declare
+            Arry : constant Array_Type := Get_Array (X_POST, "menu-item-db-id");
+         begin
+            for A in Arry.Iterate loop
+               declare
+                  use Array_Maps;
 
-               X_Key : constant String := Key (A);
-               K     : constant String := Element (A);
-            begin
-               null;
+                  X_Key : constant String := Key (A);
+                  K     : constant String := Get (Arry, Key (A)); -- Element (A);
+               begin
+                  null;
 
                -- Menu item title can"t be blank.
                -- if
@@ -1661,8 +1665,9 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                -- else
                --    Unset (Menu_Items (Menu_Item_Db_Id));
                -- end if;
-            end;
-         end loop;
+               end;
+            end loop;
+         end;
       end if;
 
       -- Remove menu items from the menu that weren"t in _POST.
@@ -1788,7 +1793,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                         if I = Array_Bits.Last_Index then
 --                      if Count (Array_Bits) - 1 = I then
                            Set (New_Post_Data, -Array_Bits (I),
-                                Wp_Slash (Element (Post_Input_Data)));
+                                Wp_Slash (-Element (Post_Input_Data).Str));
 --                         New_Post_Data (Array_Bits (I)) :=
 --                           Wp_Slash (Post_Input_Data.Value);
                         else

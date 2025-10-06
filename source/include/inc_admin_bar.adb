@@ -1201,7 +1201,7 @@ is
          Ada.Containers.Indefinite_Ordered_Maps
            (Key_Type     => String,
             Element_Type => Array_Type,
-            "="          => Arrays.Array_Maps."=");
+            "="          => Arrays."="); -- Array_Maps."=");
 
       function Array_Keys (Map : Action_Maps.Map)
                            return List_Type;
@@ -1323,7 +1323,7 @@ is
                Action : constant Array_Type := Action_Maps.Element (A);
                Title  : constant String     := Action.First_Key;
                -- Title; -- list()
-               Id     : constant String     := Action.First_Element; -- Id;
+               Id     : constant String     := -Action.First_Element.Str; -- Id;
 
                Node : Node_Args;
             begin

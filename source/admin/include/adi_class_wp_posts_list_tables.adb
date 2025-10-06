@@ -43,7 +43,7 @@ is
           To_Array ((
             Build ("plural", "posts"),
             Build ("screen", (if Isset (Args, "screen")
-                              then Args ("screen") else "null"))
+                              then Get (Args, "screen") else "null"))
           ))
         )
         with

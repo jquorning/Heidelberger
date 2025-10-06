@@ -974,7 +974,7 @@ is
             begin
                Static_X_Charset :=
                  +(if Isset (Alloptions, "blog_charset")
-                   then Alloptions ("blog_charset") else "");
+                   then Get (Alloptions, "blog_charset") else "");
             end;
             Static_X_Charset_Set := True;
          end if;

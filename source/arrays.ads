@@ -27,20 +27,31 @@ is
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Item_Type);
 
+   subtype List_Type  is List_Vectors.Vector;
+   Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
+
+   type Array_Kind is (Is_String, Is_Integer, Is_Array, Is_Boolean);
+   type Array_Type;
+
+   type Array_Record is
+      record
+         Kind : Array_Kind;
+         Str  : Unbounded_String;
+         Int  : Integer;
+         Arry : access Array_Type;
+         Bool : Boolean;
+      end record;
+
    package Array_Maps is
       new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                                  Element_Type => String);
+                                                  Element_Type => Array_Record);
+                                                  -- String);
 
-   subtype List_Type  is List_Vectors.Vector;
-   subtype Array_Type is Array_Maps.Map;
+   type Array_Type is new Array_Maps.Map with null record;
 
-   Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
-   Empty_Array : Array_Type renames Array_Maps.Empty_Map;
-
-   function Build (Key : String; Value : String)     return Assoc_Type;
-   function Build (Key : String; Value : Integer)    return Assoc_Type;
-   function Build (Key : String; Value : Boolean)    return Assoc_Type
-   is (Build (Key, Boolean'Image (Value)));
+   procedure Include (Arry     : in out Array_Type;
+                      Key      : String;
+                      New_Item : String);
 
    function Build (Key : String; Value : Array_Type) return Assoc_Type;
 
@@ -52,6 +63,13 @@ is
    function Exists (Arry : Array_Type; Key : String) return Boolean is (True);
 --   function Array_Keys (Arry : Array_Type) return List_Type is (Empty_List);
    function Count (Arry : Array_Type) return Natural is (1);
+
+   Empty_Array : Array_Type := (Array_Maps.Empty_Map with null record);
+
+   function Build (Key : String; Value : String)     return Assoc_Type;
+   function Build (Key : String; Value : Integer)    return Assoc_Type;
+   function Build (Key : String; Value : Boolean)    return Assoc_Type
+   is (Build (Key, Boolean'Image (Value)));
 
    type Item_List is array (Positive range <>) of Item_Type;
 

@@ -826,7 +826,8 @@ is
             use Array_Maps;
 
             Count   : constant Natural := Natural'Value (Key (X)); -- -X.Key); -- Count;
-            Message : constant String  := Element (X); -- -X.Value; -- Message;
+            Message : constant String  := Get (Bulk_Counts, Key (X));
+            -- Element (X); -- -X.Value; -- Message;
          begin
             if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages, Sprintf (Get (Bulk_Messages, Post_Type, Message),
