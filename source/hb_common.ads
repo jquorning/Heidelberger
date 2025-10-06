@@ -50,28 +50,26 @@ is
                  Key  : String)
                  return String;
 
-   function Get_Array (Arr : Array_Type; Key : String) -- ; Arg_2 : String := "")
-                       return Array_Type
-                       is (Empty_Array);
+   function Get_Array (Arry : Array_Type;
+                       Key  : String)
+                       return Array_Type;
 
-   function Get_List (Arry : Array_Type; Key : String)
-                      return List_Type
-                      is (Empty_List);
+   function Get_List (Arry : Array_Type;
+                      Key  : String)
+                      return List_Type;
+
+   function Get_Integer (Arry : Array_Type;
+                         Key  : String)
+                         return Integer;
+
+   function Get_Boolean (Arry : Array_Type;
+                         Key  : String)
+                         return Boolean;
 
    function Get (List : List_Type;
                  Key  : String)
                  return String
                  is ("XXX-220");
-
-   function Get_Integer (Arry : Array_Type;
-                         Key  : String)
-                         return Integer
-                         is (1);
-
-   function Get_Boolean (Arry : Array_Type;
-                         Key  : String)
-                         return Boolean
-                         is (True);
 
    function Get (A   : String;
                  Key : String)

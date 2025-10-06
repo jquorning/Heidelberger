@@ -72,6 +72,60 @@ is
       return To_String (Array_Maps.Element (Arry.Find (Key)).Str);
    end Get;
 
+   ---------------
+   -- Get_Array --
+   ---------------
+
+   function Get_Array (Arry : Array_Type;
+                       Key  : String)
+                       return Array_Type
+   is
+      use Array_Maps;
+   begin
+      pragma Assert (Arry.Find (Key) /= No_Element);
+      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Array);
+      return Array_Maps.Element (Arry.Find (Key)).Arry.all;
+   end Get_Array;
+
+   --------------
+   -- Get_List --
+   --------------
+
+   function Get_List (Arry : Array_Type;
+                      Key  : String)
+                      return List_Type
+                      is (Empty_List);
+
+   -----------------
+   -- Get_Integer --
+   -----------------
+
+   function Get_Integer (Arry : Array_Type;
+                         Key  : String)
+                         return Integer
+   is
+      use Array_Maps;
+   begin
+      pragma Assert (Arry.Find (Key) /= No_Element);
+      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Integer);
+      return Array_Maps.Element (Arry.Find (Key)).Int;
+   end Get_Integer;
+
+   -----------------
+   -- Get_Boolean --
+   -----------------
+
+   function Get_Boolean (Arry : Array_Type;
+                         Key  : String)
+                         return Boolean
+   is
+      use Array_Maps;
+   begin
+      pragma Assert (Arry.Find (Key) /= No_Element);
+      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Boolean);
+      return Array_Maps.Element (Arry.Find (Key)).Bool;
+   end Get_Boolean;
+
    -----------
    -- Empty --
    -----------

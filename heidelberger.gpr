@@ -18,6 +18,7 @@ project Heidelberger is
    package Compiler is
       for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
          "-g",
+         "-gnata",
          "-gnatwaCFMUV", -- U must be removed eventually
          "-gnatef",
          "-gnatf",
