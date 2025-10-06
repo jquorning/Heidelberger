@@ -252,26 +252,27 @@ is
                            D         : String := "";
                            X         : String := "")
                            return String
-                           is ("XXX-776");
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            Arg_3     : Array_Type;
                            Arg_4     : Array_Type := Empty_Array)
                            return Array_Type
-                           is (Empty_Array);
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            V         : String;
                            N         : String)
                            return Array_Type
-                           is (Empty_Array);
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            Right     : Integer := 0)
-                           return Array_Type is (Empty_Array);
+                           return Array_Type
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Integer;
@@ -279,45 +280,46 @@ is
                            Arg_3     : String;
                            Arg_4     : Boolean;
                            Arg_5     : String)
-                           return Integer is (1);
+                           return Integer
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
                            D         : String;
                            P         : Array_Type)
                            return String
-                           is ("XXX-221");
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
                            D         : String;
                            P         : List_Type)
                            return String
-                           is ("XXX-230");
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : List_Type)
                            return List_Type
-                           is (Empty_List);
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean)
                            return Boolean
-                           is (True);
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean;
                            B         : String;
                            D         : String)
-                           return String
-                           is ("XXX-701");
+                           return Boolean
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean;
                            B         : String;
                            D         : Boolean)
                            return Boolean
-                           is (False);
+                           is (Value);
 
    --
    -- Removes a callback function from a filter hook.

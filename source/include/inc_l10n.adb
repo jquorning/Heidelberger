@@ -757,7 +757,7 @@ package body Inc_L10n is
 -- @var WP_Textdomain_Registry wp_textdomain_registry
 --    global (l10n, l10n_unloaded, Wp_Textdomain_Registry);
       Mofile_2        : Unbounded_String;
-      Plugin_Override : Unbounded_String;
+      Plugin_Override : Boolean;
       Locale_2        : Unbounded_String := +Locale;
    begin
 --    l10n_unloaded := (array) l10n_unloaded;
@@ -773,11 +773,11 @@ package body Inc_L10n is
       --                        translated strings.
       -- @param string mofile   Path to the MO file.
       --
-      Plugin_Override := +Apply_Filters ("override_load_textdomain",
-                                         False, Domain, Mofile);
+      Plugin_Override := Apply_Filters ("override_load_textdomain",
+                                        False, Domain, Mofile);
 
-      if "" /= Plugin_Override then
---    if True = (bool) Plugin_Override then
+      if Plugin_Override then
+         L10n_Unloaded.Delete (Domain);
 --       unset( l10n_unloaded[ domain ] );
 
          return True;
