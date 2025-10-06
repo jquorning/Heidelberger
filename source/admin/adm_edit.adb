@@ -551,7 +551,7 @@ is
         Build ("updated", X_N ("%s post updated.",
                                "%s posts updated.",
                                Get_Integer (Bulk_Counts, "updated"))),
-        Build ("locked", (if "1" = Get (Bulk_Counts, "locked")   --  1 -> "1"
+        Build ("locked", (if 1 = Get_Integer (Bulk_Counts, "locked")
                           then abs "1 post not updated, somebody is editing it."
                           -- translators: %s: Number of posts.
                           else X_N ("%s post not updated, somebody is editing it.",
@@ -576,7 +576,7 @@ is
         Build ("updated", X_N ("%s page updated.",
                                "%s pages updated.",
                                Get_Integer (Bulk_Counts, "updated"))),
-        Build ("locked",  (if "1" = Get (Bulk_Counts, "locked")
+        Build ("locked",  (if 1 = Get_Integer (Bulk_Counts, "locked")
                            then abs "1 page not updated, somebody is editing it."
                            -- translators: %s: Number of pages.
                            else X_N ("%s page not updated, somebody is editing it.",
@@ -601,7 +601,7 @@ is
         Build ("updated", X_N ("%s block updated.",
                                "%s blocks updated.",
                                Get_Integer (Bulk_Counts, "updated"))),
-        Build ("locked",  (if "1" = Get (Bulk_Counts, "locked")
+        Build ("locked",  (if 1 = Get_Integer (Bulk_Counts, "locked")
                            then abs "1 block not updated, somebody is editing it."
                            -- translators: %s: Number of blocks.
                            else X_N ("%s block not updated, somebody is editing it.",

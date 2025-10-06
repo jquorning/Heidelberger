@@ -22,37 +22,74 @@ is
    -- Build --
    -----------
 
-   function Build (Key : String; Value : String) return Assoc_Type
+   function Build (Key   : String;
+                   Value : String)
+                   return Array_Type
    is
+      Item : Array_Record;
+      Map  : Array_Type;
    begin
-      return (+Key, +Value);
+      Item.Kind := Is_String;
+      Item.Str  := +Value;
+      Map.Insert (Key => Key, New_Item => Item);
+      return Map;
    end Build;
 
-   function Build (Key : String; Value : Integer) return Assoc_Type
+   function Build (Key   : String;
+                   Value : Integer)
+                   return Array_Type
    is
+      Item : Array_Record;
+      Map  : Array_Type;
    begin
-      return (+Key, +Value'Image);
+      Item.Kind := Is_Integer;
+      Item.Int  := Value;
+      Map.Insert (Key => Key, New_Item => Item);
+      return Map;
    end Build;
 
-   function Build (Key : String; Value : Array_Type) return Assoc_Type
+   function Build (Key   : String;
+                   Value : Array_Type)
+                   return Array_Type
    is
-      A : Assoc_Type;
+      Item : Array_Record;
+      Map  : Array_Type;
    begin
-      return Build (Key, "XXX-791");
+      Item.Kind := Is_Array;
+      Item.Arry := new Array_Type'(Value);
+      Map.Insert (Key => Key, New_Item => Item);
+      return Map;
+   end Build;
+
+   function Build (Key   : String;
+                   Value : Boolean)
+                   return Array_Type
+   is
+      Item : Array_Record;
+      Map  : Array_Type;
+   begin
+      Item.Kind := Is_Boolean;
+      Item.Bool := Value;
+      Map.Insert (Key => Key, New_Item => Item);
+      return Map;
    end Build;
 
    --------------
    -- To_Array --
    --------------
 
-   function To_Array (List : Assoc_List)
+   function To_Array (List : Array_List)
             return Array_Type
    is
+      use Array_Maps;
+
       Result : Array_Type;
    begin
       for A of List loop
-         Result.Include (Key      => To_String (A.Key),
-                         New_Item => To_String (A.Value));
+         for B in A.Iterate loop
+            Result.Insert (Key      => Key     (B),
+                           New_Item => Element (B));
+         end loop;
       end loop;
       return Result;
    end To_Array;

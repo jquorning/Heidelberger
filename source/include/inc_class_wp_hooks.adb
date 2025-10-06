@@ -48,8 +48,8 @@ is
       Priority_Existed : constant Boolean :=
         Ee_Maps.Has_Element (This.Callbacks.Find (Priority));
    begin
-      This.Callbacks (Priority) (Idx) := Arrays.To_Array ((
-         Build ("function",      Callback),
+      This.Callbacks (Priority) (Idx) := Arrays.To_Array ((1 =>
+--       Build ("function",      Callback),
          Build ("accepted_args", Accepted_Args)
       ));
 

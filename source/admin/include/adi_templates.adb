@@ -73,7 +73,7 @@ is
    is
       Unused : String := Wp_Terms_Checklist (
                 Post_Id,
-                To_Array (Assoc_List'(
+                To_Array (List => (
                         Build ("taxonomy",             "category"),
                         Build ("descendants_and_self", Descendants_And_Self'Image),
 --                        Build ("selected_cats",        Selected_Cats),
@@ -120,7 +120,7 @@ is
 
       Output : Unbounded_String;
 
-      Defaults : constant Array_Type := To_Array (Assoc_List'(
+      Defaults : constant Array_Type := To_Array (List => (
                 Build ("descendants_and_self", "0"),
                 Build ("selected_cats",        "false"),
                 Build ("popular_cats",         "false"),
@@ -195,7 +195,7 @@ is
          else
             Set (Args_2, "popular_cats",
                      Get_Terms (
-                        To_Array (Assoc_List'(
+                        To_Array (List => (
                                 Build ("taxonomy",     Taxonomy),
                                 Build ("fields",       "ids"),
                                 Build ("orderby",      "count"),
@@ -208,7 +208,7 @@ is
 
          if Descendants_And_Self /= 0 then
             Categories := Get_Terms (  -- (array)
-                        To_Array (Assoc_List'(
+                        To_Array (List => (
                                 Build ("taxonomy",     Taxonomy),
                                 Build ("child_of",     Descendants_And_Self'Image),
                                 Build ("hierarchical", "0"),
@@ -222,7 +222,7 @@ is
             end;
          else
             Categories := Get_Terms ( -- (array)
-                        To_Array (Assoc_List'(
+                        To_Array (List => (
                                 Build ("taxonomy", Taxonomy),
                                 Build ("get",      "all")
                        ))

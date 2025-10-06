@@ -20,13 +20,13 @@ is
    function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
       return Unbounded_String is (Null_Unbounded_String);
 
-   function Absint (Item : Assoc_List) return String is ("1");
+-- function Absint (Item : Assoc_List) return String is ("1");
 
-   function Array_Filter (List : Array_Type) return Assoc_List is
-      AL : constant Assoc_List := (1 .. 0 => <>);
-   begin
-      return AL;
-   end Array_Filter;
+   -- function Array_Filter (List : Array_Type) return Assoc_List is
+   --    AL : constant Assoc_List := (1 .. 0 => <>);
+   -- begin
+   --    return AL;
+   -- end Array_Filter;
 
    procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer) is null;
    procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer) is null;
@@ -55,7 +55,7 @@ is
 
    function "abs" (List : Array_Type) return String is ("XXX 12");
 
-   function Count (Al : Assoc_List) return Natural is (1);
+-- function Count (Al : Assoc_List) return Natural is (1);
 
    ---------
    -- Get --

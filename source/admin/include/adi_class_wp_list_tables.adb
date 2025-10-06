@@ -48,7 +48,7 @@ is
           To_Array ((
             Build ("plural",   ""),
             Build ("singular", ""),
-            Build ("ajax",     "false"),
+            Build ("ajax",     False),
             Build ("screen",   "null")
           ))
         );
@@ -1373,7 +1373,7 @@ is
          Current_Order := +"asc";
       end if;
 
-      if not Get_Array (Columns, "cb").Is_Empty then
+      if Isset (Columns, "cb") then
 --       static cb_counter = 1;
          Set (Columns, "cb",
            "<label class=""screen-reader-text"" for=""cb-select-all-" &
@@ -1480,7 +1480,7 @@ is
       use Hb_Common;
       use Php;
 
-      Singular : constant Boolean := Get_Boolean (This.X_Args, "singular");
+      Singular : constant String := Get (This.X_Args, "singular");
    begin
       This.Display_Tablenav ("top");
       This.Screen.Render_Screen_Reader_Content ("heading_list");
@@ -1497,8 +1497,8 @@ is
       Echo (NL);
       Echo ("  <tbody id=""the-list""" & NL);
 
-      if Singular then
-         Echo (" data-wp-lists=""list:singular""");
+      if Singular /= "" then
+         Echo (" data-wp-lists=""list:" & Singular & """");
       end if;
       Echo ("          >" & NL);
       Echo ("          ");
@@ -1516,7 +1516,6 @@ is
       Echo (NL);
       Echo ("</table>" & NL);
       This.Display_Tablenav ("bottom");
-
    end Display;
 
    -----------------------

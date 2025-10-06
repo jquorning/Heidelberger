@@ -32,20 +32,20 @@ is
 
    type Array_Kind is (Is_String, Is_Integer, Is_Array, Is_Boolean);
    type Array_Type;
+   type Array_Access is access all Array_Type;
 
    type Array_Record is
       record
          Kind : Array_Kind;
          Str  : Unbounded_String;
          Int  : Integer;
-         Arry : access Array_Type;
+         Arry : Array_Access;
          Bool : Boolean;
       end record;
 
    package Array_Maps is
       new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                                   Element_Type => Array_Record);
-                                                  -- String);
 
    type Array_Type is new Array_Maps.Map with null record;
 
@@ -53,23 +53,37 @@ is
                       Key      : String;
                       New_Item : String);
 
-   function Build (Key : String; Value : Array_Type) return Assoc_Type;
+   function Build (Key   : String;
+                   Value : Array_Type)
+                   return Array_Type;
 
-   type Assoc_List is array (Positive range <>) of Assoc_Type;
+   type Array_List is array (Positive range <>) of Array_Type;
 
-   function To_Array (List : Assoc_List)
+   function To_Array (List : Array_List)
             return Array_Type;
 
-   function Exists (Arry : Array_Type; Key : String) return Boolean is (True);
---   function Array_Keys (Arry : Array_Type) return List_Type is (Empty_List);
-   function Count (Arry : Array_Type) return Natural is (1);
+   function Exists (Arry : Array_Type;
+                    Key  : String)
+                    return Boolean
+                    is (True);
+
+   function Count (Arry : Array_Type)
+                   return Natural
+                   is (1);
+
+   function Build (Key   : String;
+                   Value : String)
+                   return Array_Type;
+
+   function Build (Key   : String;
+                   Value : Integer)
+                   return Array_Type;
+
+   function Build (Key   : String;
+                   Value : Boolean)
+                   return Array_Type;
 
    Empty_Array : Array_Type := (Array_Maps.Empty_Map with null record);
-
-   function Build (Key : String; Value : String)     return Assoc_Type;
-   function Build (Key : String; Value : Integer)    return Assoc_Type;
-   function Build (Key : String; Value : Boolean)    return Assoc_Type
-   is (Build (Key, Boolean'Image (Value)));
 
    type Item_List is array (Positive range <>) of Item_Type;
 

@@ -27,7 +27,7 @@ is
                       S  : String)
                       return Array_Type is (Empty_Array);
 
-   function Array_Filter (List : Array_Type) return Assoc_List;
+-- function Array_Filter (List : Array_Type) return Assoc_List;
    function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
    function Array_Filter (List : List_Type) return List_Type is (Empty_List);
 

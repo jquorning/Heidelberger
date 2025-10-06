@@ -115,8 +115,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          False),
             Build ("query_var",             "tag"),
-            Build ("rewrite",
-               String'(Get (Rewrite, "post_tag"))),
+            Build ("rewrite",               Get_Array (Rewrite, "post_tag")),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
@@ -205,8 +204,7 @@ is
                Build ("singular_name", X_X ("Format", "post format"))
             ))),
             Build ("query_var",         True),
-            Build ("rewrite",
-               String'(Get (Rewrite, "post_format"))),
+            Build ("rewrite",           Get_Array (Rewrite, "post_format")),
             Build ("show_ui",           False),
             Build ("_builtin",          True),
             Build ("show_in_nav_menus",
