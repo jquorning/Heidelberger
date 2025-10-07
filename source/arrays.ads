@@ -17,11 +17,13 @@ is
    subtype Value_Type is Unbounded_String;
    subtype Item_Type  is Unbounded_String;
 
-   type Assoc_Type is
-      record
-         Key   : Key_Type;
-         Value : Value_Type;
-      end record;
+   type Callable is access procedure;
+
+   -- type Assoc_Type is
+   --    record
+   --       Key   : Key_Type;
+   --       Value : Value_Type;
+   --    end record;
 
    package List_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Positive,
@@ -30,7 +32,7 @@ is
    subtype List_Type  is List_Vectors.Vector;
    Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
 
-   type Array_Kind is (Is_String, Is_Integer, Is_Array, Is_Boolean);
+   type Array_Kind is (Is_String, Is_Integer, Is_Array, Is_Boolean, Is_Callable);
    type Array_Type;
    type Array_Access is access all Array_Type;
 
@@ -40,6 +42,7 @@ is
          Str  : Unbounded_String;
          Int  : Integer;
          Arry : Array_Access;
+         Func : Callable;
          Bool : Boolean;
       end record;
 

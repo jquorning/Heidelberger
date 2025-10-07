@@ -22,6 +22,7 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Arrays;
+with Php;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Hooks;
@@ -30,8 +31,9 @@ with Inc_Class_Wp_Styles;
 package Inc_Plugins
 is
    use Arrays;
+   use Inc_Class_Wp_Hooks;
 
-   subtype Callable is Inc_Class_Wp_Hooks.Callable;
+   subtype Callable is Arrays.Callable;
    type Callable_2 is access function return Array_Type;
    type Callable_3 is access function (New_Status      : String;
                                        Post_Id         : Integer;
@@ -181,26 +183,26 @@ is
    --
    function Add_Filter (Hook_Name     : String;
                         Callback      : Callable;
-                        Priority      : Integer := 10;
-                        Accepted_Args : Integer := 1)
+                        Priority      : Priority_Type := 10;
+                        Accepted_Args : Integer       := 1)
                         return Boolean;
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable_2;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1)
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
                          is null;
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable_3;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1)
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
                          is null;
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : String;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1)
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
                          is null;
 
    --
@@ -464,17 +466,35 @@ is
 
    procedure Add_Action (Hook_Name     : String;
                          Callback      : Callable; -- _4;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1);
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1);
 --                       is null;
 
    procedure Add_Action (Hook_Name     : String;
                          Callback      : String;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1);
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1);
 --                       is null;
 
-   procedure Dummy;
+   --
+   -- Calls the 'all' hook, which will process the functions hooked into it.
+   --
+   -- The 'all' hook passes all of the arguments or parameters that were used for
+   -- the hook, which this function was called for.
+   --
+   -- This function is used internally for apply_filters(), do_action(), and
+   -- do_action_ref_array() and is not meant to be used from outside those
+   -- functions. This function does not check for the existence of the all hook, so
+   -- it will fail unless the all hook exists prior to this function call.
+   --
+   -- @since 2.5.0
+   -- @access private
+   --
+   -- @global WP_Hook[] wp_filter Stores all of the filters and actions.
+   --
+   -- @param array args The collected parameters from the hook that was called.
+   --
+   procedure X_Wp_Call_All_Hook (Args : Array_Type);
 
    --
    -- Builds Unique ID for storage and retrieval.

@@ -14,18 +14,20 @@ with Inc_Plugins;
 
 package body Inc_Class_Wp_Hooks
 is
-   function Build (Key   : String;
-                   Value : Callable)
-                   return Arrays.Assoc_Type;
 
-   function Build (Key   : String;
-                   Value : Callable)
-                   return Arrays.Assoc_Type
+   function Array_Keys (Map : Ee_Maps.Map)
+                        return List_Type
    is
-      A : Arrays.Assoc_Type;
+      use Hb_Common;
+      use Ee_Maps;
+
+      Result : List_Type;
    begin
-      return A;
-   end Build;
+      for A in Map.Iterate loop
+         Result.Append (+Priority_Type'Image (Key (A)));
+      end loop;
+      return Result;
+   end Array_Keys;
 
    -----------------
    -- Add_Filterr --
@@ -33,17 +35,16 @@ is
 
    procedure Add_Filter (This          : in out Wp_Hook;
                          Hook_Name     : String;
-                         Callback      : Callable;
-                         Priority      : Integer;
+                         Callback      : Arrays.Callable;
+                         Priority      : Priority_Type; -- Integer;
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
       use Inc_Plugins;
-      use Arrays;
       use Hb_Common;
 
       Idx : constant String :=
-        X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, Priority);
+        X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, Integer (Priority));
 
       Priority_Existed : constant Boolean :=
         Ee_Maps.Has_Element (This.Callbacks.Find (Priority));
@@ -244,53 +245,85 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Calls the callback functions that have been added to a filter hook.
---         --
---         -- @since 4.7.0
---         --
---         -- @param mixed value The value to filter.
---         -- @param array args  Additional parameters to pass to the callback functions.
---         --                     This array is expected to include value at index 0.
---         -- @return mixed The filtered value after all hooked functions are applied to it.
---         --
---         public function apply_filters( value, args ) then
---                 if ( ! this.callbacks ) then
---                         return value;
---                 end;
+   -------------------
+   -- Apply_Filters --
+   -------------------
 
---                 nesting_level = this.nesting_level++;
+   function Apply_Filters (This  : in out Wp_Hook;
+                           Value : String;
+                           Args  : Array_Type) -- Args_Type) -- Array_Type)
+                           return String
+   is
+      use Hb_Common;
+      use Php;
 
---                 this.iterations[ nesting_level ] = array_keys( this.callbacks );
---                 num_args                           = count( args );
+      Args_2        : constant Array_Type := Args;
+      Nesting_Level : Nesting_Type; -- Natural;
+      Num_Args      : Natural;
+      Value_2       : Unbounded_String := +Value;
+   begin
+--       if not This.Callbacks then
+-- --    if not This.Callbacks then
+--          return Value;
+--       end if;
 
---                 do then
---                         this.current_priority[ nesting_level ] = current( this.iterations[ nesting_level ] );
---                         priority                                 = this.current_priority[ nesting_level ];
+      Nesting_Level := This.Nesting_Level;
 
---                         foreach ( this.callbacks[ priority ] as the_ ) then
---                                 if ( ! this.doing_action ) then
---                                         args[0] = value;
---                                 end;
+      This.Nesting_Level :=
+        This.Nesting_Level + 1;
 
---                                 -- Avoid the array_slice() if possible.
---                                 if ( 0 == the_["accepted_args"] ) then
---                                         value = call_user_func( the_["function"] );
---                                 end; elseif ( the_["accepted_args"] >= num_args ) then
---                                         value = call_user_func_array( the_["function"], args );
---                                 end; else then
---                                         value = call_user_func_array( the_["function"], array_slice( args, 0, (int) the_["accepted_args"] ) );
---                                 end;
---                         end;
---                 end; while ( false !== next( this.iterations[ nesting_level ] ) );
+      This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
+      Num_Args                        := Count (Args);
 
---                 unset( this.iterations[ nesting_level ] );
---                 unset( this.current_priority[ nesting_level ] );
+      loop
+--       This.Current_Priority (Nesting_Level) :=
+--         Current (This.Iterations (Nesting_Level));
 
---                 this.nesting_level--;
+         declare
+            Priority : constant Priority_Type :=
+              This.Current_Priority (Nesting_Level);
+         begin
 
---                 return value;
---         end;
+            for The_X of This.Callbacks (Priority) loop
+               -- if not This.Doing_Action then
+               --    Args_2 (Args_2.First_Index) := Value_2;
+               -- end if;
+
+               declare
+                  Accepted_Args : constant Natural  :=
+                    Get_Integer (The_X, "accepted_args");
+
+                  User_Function : constant Callable :=
+                    Get_Func (The_X, "function");
+               begin
+
+                  -- Avoid the array_slice() if possible.
+                  if 0 = Accepted_Args then
+                     Value_2 := +Call_User_Func (User_Function);
+                  elsif Accepted_Args >= Num_Args then
+                     Value_2 := +Call_User_Func_Array (User_Function, Args_2);
+                  else
+                     Value_2 :=
+                       +Call_User_Func_Array (
+                          User_Function,
+                          Array_Slice (Args_2, 0, Accepted_Args)); -- (int)
+                  end if;
+               end;
+            end loop;
+         end;
+         exit when True; -- not Next (This.Iterations (Nesting_Level));
+      end loop;
+
+      This.Iterations      .Delete (Nesting_Level);
+      This.Current_Priority.Delete (Nesting_Level);
+--    Unset (This.Iterations (Nesting_Level));
+--    Unset (This.Current_Priority (Nesting_Level));
+
+      This.Nesting_Level :=
+        This.Nesting_Level - 1;
+
+      return -Value_2;
+   end Apply_Filters;
 
 --         --
 --         -- Calls the callback functions that have been added to an action hook.
@@ -309,28 +342,42 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Processes the functions hooked into the "all" hook.
---         --
---         -- @since 4.7.0
---         --
---         -- @param array args Arguments to pass to the hook callbacks. Passed by reference.
---         --
---         public function do_all_hook( &args ) then
---                 nesting_level                      = this.nesting_level++;
---                 this.iterations[ nesting_level ] = array_keys( this.callbacks );
+   -----------------
+   -- Do_All_Hook --
+   -----------------
 
---                 do then
---                         priority = current( this.iterations[ nesting_level ] );
+   procedure Do_All_Hook (This : in out Wp_Hook;
+                          Args : Array_Type)
+   is
+      use Hb_Common;
+      use Php;
 
---                         foreach ( this.callbacks[ priority ] as the_ ) then
---                                 call_user_func_array( the_["function"], args );
---                         end;
---                 end; while ( false !== next( this.iterations[ nesting_level ] ) );
+      Nesting_Level : constant Nesting_Type := This.Nesting_Level;
+   begin
+      This.Nesting_Level := This.Nesting_Level + 1;
+      This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
 
---                 unset( this.iterations[ nesting_level ] );
---                 this.nesting_level--;
---         end;
+      loop
+         declare
+            Priority : constant Priority_Type := 0;
+            -- Current (This.Iterations (Nesting_Level));
+         begin
+            for The_X of This.Callbacks (Priority) loop
+               declare
+                  Unused : Unbounded_String;
+                  Func   : constant Callable := Get_Func (The_X, "function");
+               begin
+                  Unused := +Call_User_Func_Array (Func, Args);
+               end;
+            end loop;
+         end;
+         exit when True; -- not Next (This.Iterations (Nesting_Level));
+      end loop;
+
+      This.Iterations.Delete (Nesting_Level);
+--    Unset (This.Iterations (Nesting_Level));
+      This.Nesting_Level := This.Nesting_Level - 1;
+   end Do_All_Hook;
 
 --         --
 --         -- Return the current priority level of the currently running iteration of the hook.
@@ -467,33 +514,31 @@ is
 --                 unset( this.callbacks[ offset ] );
 --         end;
 
---         --
---         -- Returns the current element.
---         --
---         -- @since 4.7.0
---         --
---         -- @link https://www.php.net/manual/en/iterator.current.php
---         --
---         -- @return array Of callbacks at current priority.
---         --
---         #[ReturnTypeWillChange]
---         public function current() then
---                 return current( this.callbacks );
---         end;
+   -------------
+   -- Current --
+   -------------
 
---         --
---         -- Moves forward to the next element.
---         --
---         -- @since 4.7.0
---         --
---         -- @link https://www.php.net/manual/en/iterator.next.php
---         --
---         -- @return array Of callbacks at next priority.
---         --
---         #[ReturnTypeWillChange]
---         public function next() then
---                 return next( this.callbacks );
---         end;
+   -- #[ReturnTypeWillChange]
+   -- public function current() then
+   function Current (This : Wp_Hook)
+                     return String
+   is
+   begin
+      return ""; -- Php.Current (This.Callbacks);
+   end Current;
+
+   ----------
+   -- Next --
+   ----------
+
+   -- #[ReturnTypeWillChange]
+   -- public function next() then
+   function Next (This : in out Wp_Hook)
+                  return String
+   is
+   begin
+      return ""; -- Php.Next (This.Callbacks);
+   end Next;
 
 --         --
 --         -- Returns the key of the current element.

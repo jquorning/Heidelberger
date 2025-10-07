@@ -943,61 +943,67 @@ is
 --                           Filter : String := "display")
 --                           return Array_Type;
 
---
--- Sanitizes a post field based on context.
---
--- Possible context values are:  'raw', 'edit', 'db', 'display', 'attribute' and
--- 'js'. The 'display' context is used by default. 'attribute' and 'js' contexts
--- are treated like 'display' when calling filters.
---
--- @since 2.3.0
--- @since 4.4.0 Like `sanitize_post()`, `$context` defaults to 'display'.
---
--- @param string $field   The Post Object field name.
--- @param mixed  $value   The Post Object value.
--- @param int    $post_id Post ID.
--- @param string $context Optional. How to sanitize the field. Possible values are 'raw', 'edit',
---                        'db', 'display', 'attribute' and 'js'. Default 'display'.
--- @return mixed Sanitized value.
---
+   --
+   -- Sanitizes a post field based on context.
+   --
+   -- Possible context values are:  'raw', 'edit', 'db', 'display', 'attribute' and
+   -- 'js'. The 'display' context is used by default. 'attribute' and 'js' contexts
+   -- are treated like 'display' when calling filters.
+   --
+   -- @since 2.3.0
+   -- @since 4.4.0 Like `sanitize_post()`, `$context` defaults to 'display'.
+   --
+   -- @param string $field   The Post Object field name.
+   -- @param mixed  $value   The Post Object value.
+   -- @param int    $post_id Post ID.
+   -- @param string $context Optional. How to sanitize the field. Possible values
+   --                        are 'raw', 'edit', 'db', 'display', 'attribute' and
+   --                        'js'. Default 'display'.
+   -- @return mixed Sanitized value.
+   --
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
                                  Post_Id : Inc_Class_Wp_Posts.Post_Id;
                                  Context : String := "display")
                                  return Array_Type;
---
--- Moves a post or page to the Trash
---
--- If Trash is disabled, the post or page is permanently deleted.
---
--- @since 2.9.0
---
--- @see wp_delete_post()
---
--- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`
---                     if `EMPTY_TRASH_DAYS` equals true.
--- @return WP_Post|false|null Post data on success, false or null on failure.
---
--- function wp_trash_post( $post_id = 0 ) then
-   function Wp_Trash_Post (Post_Id : Assoc_Type) return Boolean is (True);
-   function Wp_Trash_Post (Post_Id : String)     return Boolean is (True);
+   --
+   -- Moves a post or page to the Trash
+   --
+   -- If Trash is disabled, the post or page is permanently deleted.
+   --
+   -- @since 2.9.0
+   --
+   -- @see wp_delete_post()
+   --
+   -- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`
+   --                     if `EMPTY_TRASH_DAYS` equals true.
+   -- @return WP_Post|false|null Post data on success, false or null on failure.
+   --
+   function Wp_Trash_Post (Post_Id : String)
+                           return Boolean
+                           is (True);
 
---
--- Restores a post from the Trash.
---
--- @since 2.9.0
--- @since 5.6.0 An untrashed post is now returned to 'draft' status by default, except for
---              attachments which are returned to their original 'inherit' status.
---
--- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`.
--- @return WP_Post|false|null Post data on success, false or null on failure.
---
+   --
+   -- Restores a post from the Trash.
+   --
+   -- @since 2.9.0
+   -- @since 5.6.0 An untrashed post is now returned to 'draft' status by default,
+   --              except for attachments which are returned to their original
+   --              'inherit' status.
+   --
+   -- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`.
+   -- @return WP_Post|false|null Post data on success, false or null on failure.
+   --
    function Wp_Untrash_Post (Post_Id : Integer := 0)
                              return Wp_Post;
-   function Wp_Untrash_Post (Item : Assoc_Type) return Boolean is (True);
-   function Wp_Untrash_Post (Item : String) return Boolean is (True);
+
+   function Wp_Untrash_Post (Item : String)
+                             return Boolean
+                             is (True);
+
    function Wp_Untrash_Post (Item : Inc_Class_Wp_Posts.Wp_Post)
-                             return Boolean is (True);
+                             return Boolean
+                             is (True);
 
 --
 -- Retrieves the IDs of the ancestors of a post.

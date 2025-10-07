@@ -4,11 +4,13 @@
 -- @since 1.5.0
 --
 
+with Ada.Strings.Unbounded;
 with Ada.Text_IO;
+
+with Hb_Common;
 
 package body Inc_Plugins
 is
-   procedure Dummy is null;
 
 -- -- Initialize the filter globals.
 -- require __DIR__ . '/class-wp-hook.php';
@@ -49,12 +51,11 @@ is
 
    function Add_Filter (Hook_Name     : String;
                         Callback      : Callable;
-                        Priority      : Integer := 10;
+                        Priority      : Priority_Type := 10;
                         Accepted_Args : Integer := 1)
                         return Boolean
    is
       use Hook_Maps;
-      use Inc_Class_Wp_Hooks;
 
       Hook : Wp_Hook;
    begin
@@ -70,84 +71,91 @@ is
       return True;
    end Add_Filter;
 
--- --
--- -- Calls the callback functions that have been added to a filter hook.
--- --
--- -- This function invokes all functions attached to filter hook `hook_name`.
--- -- It is possible to create new filter hooks by simply calling this function,
--- -- specifying the name of the new hook using the `hook_name` parameter.
--- --
--- -- The function also allows for multiple additional arguments to be passed to hooks.
--- --
--- -- Example usage:
--- --
--- --     -- The filter callback function.
--- --     function example_callback( string, arg1, arg2 ) then
--- --         -- (maybe) modify string.
--- --         return string;
--- --     end;
--- --     add_filter( 'example_filter', 'example_callback', 10, 3 );
--- --
--- --     /*
--- --     -- Apply the filters by calling the 'example_callback()' function
--- --     -- that's hooked onto `example_filter` above.
--- --     --
--- --     -- - 'example_filter' is the filter hook.
--- --     -- - 'filter me' is the value being filtered.
--- --     -- - arg1 and arg2 are the additional arguments passed to the callback.
--- --     value = apply_filters( 'example_filter', 'filter me', arg1, arg2 );
--- --
--- -- @since 0.71
--- -- @since 6.0.0 Formalized the existing and already documented `...args` parameter
--- --              by adding it to the function signature.
--- --
--- -- @global WP_Hook[] wp_filter         Stores all of the filters and actions.
--- -- @global int[]     wp_filters        Stores the number of times each filter was triggered.
--- -- @global string[]  wp_current_filter Stores the list of current filters with the current one last.
--- --
--- -- @param string hook_name The name of the filter hook.
--- -- @param mixed  value     The value to filter.
--- -- @param mixed  ...args   Additional parameters to pass to the callback functions.
--- -- @return mixed The filtered value after all hooked functions are applied to it.
--- --
--- function apply_filters( hook_name, value, ...args ) then
---         global wp_filter, wp_filters, wp_current_filter;
+   -- package Hook_Maps is new
+   --    Ada.Containers.Indefinite_Ordered_Maps
+   --      (Key_Type     => String,
+   --       Element_Type => Inc_Class_Wp_Hooks.Wp_Hook,
+   --       "="          => Inc_Class_Wp_Hooks."=");
 
---         if ( ! isset( wp_filters[ hook_name ] ) ) then
---                 wp_filters[ hook_name ] = 1;
---         end; else then
---                 ++wp_filters[ hook_name ];
---         end;
+   package Natural_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => Natural);
 
---         -- Do 'all' actions first.
---         if ( isset( wp_filter['all'] ) ) then
---                 wp_current_filter[] = hook_name;
+-- Wp_Filter         : Hook_Maps.Map;
+   Wp_Filters        : Natural_Maps.Map;
+   Wp_Current_Filter : List_Type;
 
---                 all_args = func_get_args(); -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
---                 _wp_call_all_hook( all_args );
---         end;
+   -------------------
+   -- Apply_Filters --
+   -------------------
 
---         if ( ! isset( wp_filter[ hook_name ] ) ) then
---                 if ( isset( wp_filter['all'] ) ) then
---                         array_pop( wp_current_filter );
---                 end;
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Args      : Array_Type)
+                           return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
 
---                 return value;
---         end;
+      Args_2 : Array_Type := Args;
+   begin
+      if Natural_Maps.Has_Element (Wp_Filters.Find (Hook_Name)) then
+--    if not Isset (Wp_Filters (Hook_Name)) then
+         Wp_Filters (Hook_Name) := 1;
+      else
+         Wp_Filters (Hook_Name) :=
+           Wp_Filters (Hook_Name) + 1;
+      end if;
 
---         if ( ! isset( wp_filter['all'] ) ) then
---                 wp_current_filter[] = hook_name;
---         end;
+      -- Do 'all' actions first.
+      if Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
+--    if Isset (Wp_Filter ("all")) then
+         Wp_Current_Filter.Append (+Hook_Name);
 
---         -- Pass the value to WP_Hook.
---         array_unshift( args, value );
+         declare
+            All_Args : constant Array_Type := Func_Get_Args; -- ()
+            -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
+         begin
+            X_Wp_Call_All_Hook (All_Args);
+         end;
+      end if;
 
---         filtered = wp_filter[ hook_name ]->apply_filters( value, args );
+      if not Hook_Maps.Has_Element (Wp_Filter.Find (Hook_Name)) then
+--    if not Isset (Wp_Filter (Hook_Name)) then
+         if Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
+--       if Isset (Wp_Filter ("all")) then
+            declare
+               Unused : Unbounded_String;
+            begin
+               Unused := +Array_Pop (Wp_Current_Filter);
+            end;
+         end if;
 
---         array_pop( wp_current_filter );
+         return Value;
+      end if;
 
---         return filtered;
--- end;
+      if not Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
+--    if not Isset (Wp_Filter ("all")) then
+         Wp_Current_Filter.Append (+Hook_Name);
+      end if;
+
+      -- Pass the value to WP_Hook.
+      Array_Unshift (Args_2, Value);
+
+      declare
+         Unused   : Unbounded_String;
+         Filter   : Wp_Hook renames Wp_Filter (Hook_Name);
+         Filtered : constant String :=
+           Filter.Apply_Filters (Value, Args_2);
+--         Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
+      begin
+
+         Unused := +Array_Pop (Wp_Current_Filter);
+
+         return Filtered;
+      end;
+   end Apply_Filters;
 
 -- --
 -- -- Calls the callback functions that have been added to a filter hook, specifying arguments in an array.
@@ -364,8 +372,8 @@ is
 
    procedure Add_Action (Hook_Name     : String;
                          Callback      : Callable;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1)
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
 --                        return Boolean
    is
       Unused : Boolean;
@@ -375,8 +383,8 @@ is
 
    procedure Add_Action (Hook_Name     : String;
                          Callback      : String;
-                         Priority      : Integer := 10;
-                         Accepted_Args : Integer := 1)
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
    is
       use Ada.Text_IO;
    begin
@@ -888,29 +896,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Calls the 'all' hook, which will process the functions hooked into it.
--- --
--- -- The 'all' hook passes all of the arguments or parameters that were used for
--- -- the hook, which this function was called for.
--- --
--- -- This function is used internally for apply_filters(), do_action(), and
--- -- do_action_ref_array() and is not meant to be used from outside those
--- -- functions. This function does not check for the existence of the all hook, so
--- -- it will fail unless the all hook exists prior to this function call.
--- --
--- -- @since 2.5.0
--- -- @access private
--- --
--- -- @global WP_Hook[] wp_filter Stores all of the filters and actions.
--- --
--- -- @param array args The collected parameters from the hook that was called.
--- --
--- function _wp_call_all_hook( args ) then
---         global wp_filter;
+   ------------------------
+   -- X_Wp_Call_All_Hook --
+   ------------------------
 
---         wp_filter['all']->do_all_hook( args );
--- end;
+   procedure X_Wp_Call_All_Hook (Args : Array_Type)
+   is
+--    global wp_filter;
+      Filter : Wp_Hook renames Wp_Filter ("all");
+   begin
+      Filter.Do_All_Hook (Args);
+   end X_Wp_Call_All_Hook;
 
 -- --
 -- -- Builds Unique ID for storage and retrieval.

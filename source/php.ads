@@ -277,6 +277,11 @@ is
                         return Integer
                         is (1);
 
+   function Array_Slice (Arry   : Array_Type;
+                         Offset : Natural;
+                         Length : Natural)
+                         return Array_Type;
+
    function Is_Numeric (Value : String)
                         return Boolean
                         is (False);
@@ -409,6 +414,25 @@ is
                        Length : Natural := 1)
                        return Array_Type
                        is (Empty_Array);
+
+   function Build (Key   : String;
+                   Value : Callable)
+                   return Arrays.Array_Type;
+
+   function Get_Func (Arry : Array_Type;
+                      Key  : String)
+                      return Callable;
+
+   function Call_User_Func (Callback : Callable;
+                            Args     : String := "")
+                            return String;
+
+   function Call_User_Func_Array (Callback : Callable;
+                                  Args     : Array_Type)
+                                  return String;
+
+   function Func_Get_Args
+            return Array_Type;
 
    -------------------
    -- Echo handling --

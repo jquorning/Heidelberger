@@ -7,11 +7,20 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded;
 
 with Arrays;
+with Php;
 
 package Inc_Class_Wp_Hooks
 is
+   use Ada.Strings.Unbounded;
+   use Arrays;
+
+   type Nesting_Type  is new Natural;
+   type Priority_Type is new Natural;
+
    package Dd_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
         (Key_Type     => String,
@@ -20,9 +29,21 @@ is
 
    package Ee_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => Integer,
+        (Key_Type     => Priority_Type, -- Integer,
          Element_Type => Dd_Maps.Map,
          "="          => Dd_Maps."=");
+
+   function Array_Keys (Map : Ee_Maps.Map)
+                        return List_Type;
+
+   package List_Vectors is new
+      Ada.Containers.Vectors (Index_Type   => Nesting_Type, -- Natural,
+                              Element_Type => List_Type,    -- Natural
+                              "="          => List_Vectors."=");
+
+   package Priority_Vectors is new
+      Ada.Containers.Vectors (Index_Type   => Nesting_Type, -- Natural,
+                              Element_Type => Priority_Type);    -- Natural
 
    --
    -- Core class used to implement action and filter hook functionality.
@@ -49,7 +70,8 @@ is
          -- @since 4.7.0
          -- @var array
          --
---        private iterations = array();
+         -- private
+         Iterations : List_Vectors.Vector; -- Array_Type;
 
          --
          -- The current priority of actively running iterations of a hook.
@@ -57,7 +79,8 @@ is
          -- @since 4.7.0
          -- @var array
          --
---        private current_priority = array();
+         -- private
+         Current_Priority : Priority_Vectors.Vector; -- Array_Type;
 
          --
          -- Number of levels this hook can be recursively called.
@@ -65,8 +88,8 @@ is
          -- @since 4.7.0
          -- @var int
          --
---        private
-         Nesting_Level : Natural := 0;
+         -- private
+         Nesting_Level : Nesting_Type := 0; -- Natural := 0;
 
          --
          -- Flag for if we"re currently doing an action, rather than a filter.
@@ -74,12 +97,12 @@ is
          -- @since 4.7.0
          -- @var bool
          --
---        private
+         -- private
          Doing_Action : Boolean := False;
 
       end record;
 
-   type Callable is access procedure;
+-- type Callable is access procedure;
 
    --
    -- Adds a callback function to a filter hook.
@@ -97,9 +120,47 @@ is
    --
    procedure Add_Filter (This          : in out Wp_Hook;
                          Hook_Name     : String;
-                         Callback      : Callable;
-                         Priority      : Integer;
+                         Callback      : Arrays.Callable;
+                         Priority      : Priority_Type; -- Integer;
                          Accepted_Args : Integer);
+
+   --
+   -- Calls the callback functions that have been added to a filter hook.
+   --
+   -- @since 4.7.0
+   --
+   -- @param mixed value The value to filter.
+   -- @param array args  Additional parameters to pass to the callback functions.
+   --                     This array is expected to include value at index 0.
+   -- @return mixed The filtered value after all hooked functions are applied to it.
+   --
+
+   -- type Args_Type is
+   --    record
+   --       Text_1    : Unbounded_String;
+   --       Text_2    : Unbounded_String;
+   --       Array_1   : Array_Type;
+   --       Array_2   : Array_Type;
+   --       Integer_1 : Integer;
+   --       Integer_2 : Integer;
+   --       Bool      : Boolean;
+   --       List      : List_Type;
+   --    end record;
+
+   function Apply_Filters (This  : in out Wp_Hook;
+                           Value : String;
+                           Args  : Array_Type) -- Args_Type) -- Array_Type)
+                           return String;
+
+   --
+   -- Processes the functions hooked into the "all" hook.
+   --
+   -- @since 4.7.0
+   --
+   -- @param array args Arguments to pass to the hook callbacks. Passed by reference.
+   --
+   procedure Do_All_Hook (This : in out Wp_Hook;
+                          Args : Array_Type);
 
    --
    -- Handles resetting callback priority keys mid-iteration.
@@ -115,8 +176,34 @@ is
    --
    -- private
    procedure Resort_Active_Iterations (This             : Wp_Hook;
-                                       New_Priority     : Integer := 0; -- false
+                                       New_Priority     : Priority_Type := 0; -- false
                                        Priority_Existed : Boolean := False)
                                        is null;
+
+   --
+   -- Returns the current element.
+   --
+   -- @since 4.7.0
+   --
+   -- @link https://www.php.net/manual/en/iterator.current.php
+   --
+   -- @return array Of callbacks at current priority.
+   --
+   -- #[ReturnTypeWillChange]
+   function Current (This : Wp_Hook)
+                     return String;
+
+   --
+   -- Moves forward to the next element.
+   --
+   -- @since 4.7.0
+   --
+   -- @link https://www.php.net/manual/en/iterator.next.php
+   --
+   -- @return array Of callbacks at next priority.
+   --
+   -- #[ReturnTypeWillChange]
+   function Next (This : in out Wp_Hook)
+                  return String;
 
 end Inc_Class_Wp_Hooks;

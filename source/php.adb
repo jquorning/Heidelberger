@@ -93,6 +93,86 @@ is
       return Res;
    end Explode;
 
+   -----------
+   -- Build --
+   -----------
+
+   function Build (Key   : String;
+                   Value : Callable)
+                   return Array_Type
+   is
+      Item : Array_Record;
+      Map  : Array_Type;
+   begin
+      Item.Kind := Is_Callable;
+      Item.Func := Value;
+      Map.Insert (Key => Key, New_Item => Item);
+      return Map;
+   end Build;
+
+   --------------
+   -- Get_Func --
+   --------------
+
+   function Get_Func (Arry : Array_Type;
+                      Key  : String)
+                      return Callable
+   is
+      use Array_Maps;
+   begin
+      pragma Assert (Arry.Find (Key) /= No_Element);
+      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Callable);
+      return Array_Maps.Element (Arry.Find (Key)).Func;
+   end Get_Func;
+
+   -----------------
+   -- Array_Slice --
+   -----------------
+
+   function Array_Slice (Arry   : Array_Type;
+                         Offset : Natural;
+                         Length : Natural)
+                         return Array_Type
+   is
+   begin
+      return Arry;
+   end Array_Slice;
+
+   --------------------
+   -- Call_User_Func --
+   --------------------
+
+   function Call_User_Func (Callback : Callable;
+                            Args     : String := "")
+                            return String
+   is
+   begin
+      return ""; -- Callback.all (Args);
+   end Call_User_Func;
+
+   --------------------------
+   -- Call_User_Func_Array --
+   --------------------------
+
+   function Call_User_Func_Array (Callback : Callable;
+                                  Args     : Array_Type)
+                                  return String
+   is
+   begin
+      return ""; -- Callback.all (Args);
+   end Call_User_Func_Array;
+
+   -------------------
+   -- Func_Get_Args --
+   -------------------
+
+   function Func_Get_Args
+            return Array_Type
+   is
+   begin
+      return Empty_Array;
+   end Func_Get_Args;
+
    ------------
    -- Printf --
    ------------

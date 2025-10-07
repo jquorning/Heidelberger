@@ -99,7 +99,8 @@ is
 --
 -- function wp_check_post_lock( $post ) then
 
-   function Wp_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
+-- function Wp_Check_Post_Lock (Post_Id : Array_Type) return Boolean is (True);
+-- function Wp_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
    function Wp_Check_Post_Lock (Post_Id : String)     return Integer is (1);
 
    --
