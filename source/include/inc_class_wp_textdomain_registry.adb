@@ -7,6 +7,7 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Globals;
 with Hb_Common;
@@ -61,10 +62,18 @@ is
                   Locale : String;
                   Path   : String)
    is
+      Path_2 : constant String := (if Path /= ""
+                                   then Trailingslashit (Path) else ""); -- False
+      Map : String_Maps.Map;
    begin
-      This.Alll (Domain) (Locale) := (if Path /= ""
-                                      then Trailingslashit (Path) else ""); -- False
-      This.Current (Domain)       := This.Alll (Domain) (Locale);
+      Map.Include (Key      => Locale,
+                   New_Item => Path_2);
+
+      This.Alll.Include (Key      => Domain,
+                         New_Item => Map);
+
+      This.Current.Include (Key      => Domain,
+                            New_Item => This.Alll (Domain) (Locale));
    end Set;
 
    ---------------------
@@ -144,7 +153,7 @@ is
 --    Mo_Files := Php.Glob (Path & "/*.mo");
 
       if not Mo_Files.Is_Empty then
-         null; --   This.Cached_Mo_Files (Path) := Mo_Files;
+         null; -- This.Cached_Mo_Files.include (Path, Mo_Files);
       end if;
    end Set_Cached_Mo_Files;
 
