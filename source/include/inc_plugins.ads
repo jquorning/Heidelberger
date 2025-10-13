@@ -27,6 +27,7 @@ with Php;
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Hooks;
 with Inc_Class_Wp_Styles;
+with Inc_Class_Wp_Taxonomy;
 
 package Inc_Plugins
 is
@@ -272,8 +273,36 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
+                           V         : String;
+                           List      : List_Type)
+                           return Array_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           V         : String;
+                           N         : String;
+                           I         : Integer)
+                           return Array_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           V         : String;
+                           N         : Array_Type)
+                           return Array_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
                            Right     : Integer := 0)
                            return Array_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : List_Type;
+                           Right     : Integer := 0)
+                           return List_Type
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
@@ -299,10 +328,10 @@ is
                            return String
                            is (Value);
 
-   function Apply_Filters (Hook_Name : String;
-                           Value     : List_Type)
-                           return List_Type
-                           is (Value);
+   -- function Apply_Filters (Hook_Name : String;
+   --                         Value     : List_Type)
+   --                         return List_Type
+   --                         is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean)
@@ -402,6 +431,11 @@ is
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;
                         Arg_3     : Boolean)
+                        is null;
+   procedure Do_Action (Hook_Name : String;
+                        Tax       : String;
+                        Arg_3     : List_Type;
+                        Tax_2     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
                         is null;
 
    --

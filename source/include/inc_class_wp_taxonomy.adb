@@ -1,258 +1,348 @@
--- --
--- -- Taxonomy API: WP_Taxonomy class
--- --
--- -- @package WordPress
--- -- @subpackage Taxonomy
--- -- @since 4.7.0
--- --
+--
+-- Taxonomy API: WP_Taxonomy class
+--
+-- @package WordPress
+-- @subpackage Taxonomy
+-- @since 4.7.0
+--
+
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Class_Wp;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_L10n;
+with Inc_Load;
+with Inc_Options;
+with Inc_Rewrites;
+with Inc_Plugins;
+with Inc_Taxonomys;
 
 package body Inc_Class_Wp_Taxonomy
 is
-   procedure Dummy is null;
---         --
---         -- Constructor.
---         --
---         -- See the register_taxonomy() function for accepted arguments for `args`.
---         --
---         -- @since 4.7.0
---         --
---         -- @global WP wp Current WordPress environment instance.
---         --
---         -- @param string       taxonomy    Taxonomy key, must not exceed 32 characters.
---         -- @param array|string object_type Name of the object type for the taxonomy object.
---         -- @param array|string args        Optional. Array or query string of arguments for registering a taxonomy.
---         --                                  Default empty array.
---         --
---         public function __construct( taxonomy, object_type, args = array() ) then
---                 this->name = taxonomy;
 
---                 this->set_props( object_type, args );
---         end;
+   -----------------
+   -- X_Construct --
+   -----------------
 
---         --
---         -- Sets taxonomy properties.
---         --
---         -- See the register_taxonomy() function for accepted arguments for `args`.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string|string[] object_type Name or array of names of the object types for the taxonomy.
---         -- @param array|string    args        Array or query string of arguments for registering a taxonomy.
---         --
---         public function set_props( object_type, args ) then
---                 args = wp_parse_args( args );
+   function X_Construct (Taxonomy    : String;
+                         Object_Type : List_Type;
+                         Args        : Array_Type := Empty_Array)
+                         return Wp_Taxonomy
+   is
+      use Hb_Common;
 
---                 --
---                 -- Filters the arguments for registering a taxonomy.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @param array    args        Array of arguments for registering a taxonomy.
---                 --                              See the register_taxonomy() function for accepted arguments.
---                 -- @param string   taxonomy    Taxonomy key.
---                 -- @param string[] object_type Array of names of object types for the taxonomy.
---                 --
---                 args = apply_filters( 'register_taxonomy_args', args, this->name, (array) object_type );
+      This : Wp_Taxonomy;
+   begin
+      This.Name := +Taxonomy;
 
---                 taxonomy = this->name;
+      This.Set_Props (Object_Type, Args);
+      return This;
+   end X_Construct;
 
---                 --
---                 -- Filters the arguments for registering a specific taxonomy.
---                 --
---                 -- The dynamic portion of the filter name, `taxonomy`, refers to the taxonomy key.
---                 --
---                 -- Possible hook names include:
---                 --
---                 --  - `register_category_taxonomy_args`
---                 --  - `register_post_tag_taxonomy_args`
---                 --
---                 -- @since 6.0.0
---                 --
---                 -- @param array    args        Array of arguments for registering a taxonomy.
---                 --                              See the register_taxonomy() function for accepted arguments.
---                 -- @param string   taxonomy    Taxonomy key.
---                 -- @param string[] object_type Array of names of object types for the taxonomy.
---                 --
---                 args = apply_filters( "register_thentaxonomyend;_taxonomy_args", args, this->name, (array) object_type );
+   ---------------
+   -- Set_Props --
+   ---------------
 
---                 defaults = array(
---                         'labels'                => array(),
---                         'description'           => '',
---                         'public'                => true,
---                         'publicly_queryable'    => null,
---                         'hierarchical'          => false,
---                         'show_ui'               => null,
---                         'show_in_menu'          => null,
---                         'show_in_nav_menus'     => null,
---                         'show_tagcloud'         => null,
---                         'show_in_quick_edit'    => null,
---                         'show_admin_column'     => false,
---                         'meta_box_cb'           => null,
---                         'meta_box_sanitize_cb'  => null,
---                         'capabilities'          => array(),
---                         'rewrite'               => true,
---                         'query_var'             => this->name,
---                         'update_count_callback' => '',
---                         'show_in_rest'          => false,
---                         'rest_base'             => false,
---                         'rest_namespace'        => false,
---                         'rest_controller_class' => false,
---                         'default_term'          => null,
---                         'sort'                  => null,
---                         'args'                  => null,
---                         '_builtin'              => false,
---                 );
+   procedure Set_Props (This        : in out Wp_Taxonomy;
+                        Object_Type : List_Type;
+                        Args        : Array_Type)
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Plugins;
 
---                 args = array_merge( defaults, args );
+      Args_2 : Array_Type := Wp_Parse_Args (Args);
+   begin
+      --
+      -- Filters the arguments for registering a taxonomy.
+      --
+      -- @since 4.4.0
+      --
+      -- @param array    args        Array of arguments for registering a taxonomy.
+      --                              See the register_taxonomy() function for
+      --                              accepted arguments.
+      -- @param string   taxonomy    Taxonomy key.
+      -- @param string[] object_type Array of names of object types for the taxonomy.
+      --
+      Args_2 := Apply_Filters ("register_taxonomy_args", Args_2, -This.Name,
+                               Object_Type); -- (array)
 
---                 // If not set, default to the setting for 'public'.
---                 if ( null === args['publicly_queryable'] ) then
---                         args['publicly_queryable'] = args['public'];
---                 end;
+      Globals.Taxonomy := This.Name;
 
---                 if ( false !== args['query_var'] && ( is_admin() || false !== args['publicly_queryable'] ) ) then
---                         if ( true === args['query_var'] ) then
---                                 args['query_var'] = this->name;
---                         end; else then
---                                 args['query_var'] = sanitize_title_with_dashes( args['query_var'] );
---                         end;
---                 end; else then
---                         // Force 'query_var' to false for non-public taxonomies.
---                         args['query_var'] = false;
---                 end;
+      --
+      -- Filters the arguments for registering a specific taxonomy.
+      --
+      -- The dynamic portion of the filter name, `taxonomy`, refers to the taxonomy key.
+      --
+      -- Possible hook names include:
+      --
+      --  - `register_category_taxonomy_args`
+      --  - `register_post_tag_taxonomy_args`
+      --
+      -- @since 6.0.0
+      --
+      -- @param array    args        Array of arguments for registering a taxonomy.
+      --                              See the register_taxonomy() function for
+      --                              accepted arguments.
+      -- @param string   taxonomy    Taxonomy key.
+      -- @param string[] object_type Array of names of object types for the taxonomy.
+      --
+      Args_2 := Apply_Filters ("register_" & (-Globals.Taxonomy) & "_taxonomy_args",
+                               Args_2, -This.Name, Object_Type); -- (array)
+      declare
+         Defaults : constant Array_Type := To_Array (List => (
+           Build ("labels",                Empty_Array),
+           Build ("description",           ""),
+           Build ("public",                True),
+           Build ("publicly_queryable",    Null_Value),
+           Build ("hierarchical",          False),
+           Build ("show_ui",               Null_Value),
+           Build ("show_in_menu",          Null_Value),
+           Build ("show_in_nav_menus",     Null_Value),
+           Build ("show_tagcloud",         Null_Value),
+           Build ("show_in_quick_edit",    Null_Value),
+           Build ("show_admin_column",     False),
+           Build ("meta_box_cb",           Null_Value),
+           Build ("meta_box_sanitize_cb",  Null_Value),
+           Build ("capabilities",          Empty_Array),
+           Build ("rewrite",               True),
+           Build ("query_var",             -This.Name),
+           Build ("update_count_callback", ""),
+           Build ("show_in_rest",          False),
+           Build ("rest_base",             False),
+           Build ("rest_namespace",        False),
+           Build ("rest_controller_class", False),
+           Build ("default_term",          Null_Value),
+           Build ("sort",                  Null_Value),
+           Build ("args",                  Null_Value),
+           Build ("_builtin",              False)
+         ));
+      begin
+         Args_2 := Array_Merge (Defaults, Args_2);
+      end;
 
---                 if ( false !== args['rewrite'] && ( is_admin() || get_option( 'permalink_structure' ) ) ) then
---                         args['rewrite'] = wp_parse_args(
---                                 args['rewrite'],
---                                 array(
---                                         'with_front'   => true,
---                                         'hierarchical' => false,
---                                         'ep_mask'      => EP_NONE,
---                                 )
---                         );
+      -- If not set, default to the setting for "public".
+      if not Isset (Args_2, "publicly_queryable") then
+--    if ( null === args["publicly_queryable"] ) then
+         Set (Args_2, "publicly_queryable", Get (Args_2, "public"));
+      end if;
 
---                         if ( empty( args['rewrite']['slug'] ) ) then
---                                 args['rewrite']['slug'] = sanitize_title_with_dashes( this->name );
---                         end;
---                 end;
+      if
+        Get_Boolean (Args_2, "query_var") and then
+        (Inc_Load.Is_Admin or else Get_Boolean (Args_2, "publicly_queryable"))
+      then
+         if Get_Boolean (Args_2, "query_var") then
+            Set (Args_2, "query_var", -This.Name);
+         else
+            Set (Args_2, "query_var",
+                 Sanitize_Title_With_Dashes (Get (Args_2, "query_var")));
+         end if;
+      else
+         -- Force "query_var" to false for non-public taxonomies.
+         Set_Boolean (Args_2, "query_var", False);
+      end if;
 
---                 // If not set, default to the setting for 'public'.
---                 if ( null === args['show_ui'] ) then
---                         args['show_ui'] = args['public'];
---                 end;
+      if
+        Get_Boolean (Args_2, "rewrite") and then
+        (Inc_Load.Is_Admin or else Inc_Options.Get_Option ("permalink_structure"))
+      then
+         Set_Array (Args_2, "rewrite", Wp_Parse_Args (
+           Get_Array (Args_2, "rewrite"),
+           To_Array (List => (
+             Build ("with_front",   True),
+             Build ("hierarchical", False) -- ,
+--           Build ("ep_mask",      Ep_None)
+           ))
+         ));
 
---                 // If not set, default to the setting for 'show_ui'.
---                 if ( null === args['show_in_menu'] || ! args['show_ui'] ) then
---                         args['show_in_menu'] = args['show_ui'];
---                 end;
+         -- if Empty (Args_2 ("rewrite") ("slug")) then
+         --    Args_2 ("rewrite") ("slug") := Sanitize_Title_With_Dashes (This.Name);
+         -- end if;
+      end if;
 
---                 // If not set, default to the setting for 'public'.
---                 if ( null === args['show_in_nav_menus'] ) then
---                         args['show_in_nav_menus'] = args['public'];
---                 end;
+      -- If not set, default to the setting for "public".
+      if Get_Null (Args_2, "show_ui") then
+         Args_2 ("show_ui") := Args_2 ("public");
+      end if;
 
---                 // If not set, default to the setting for 'show_ui'.
---                 if ( null === args['show_tagcloud'] ) then
---                         args['show_tagcloud'] = args['show_ui'];
---                 end;
+      -- If not set, default to the setting for "show_ui".
+      if
+        Get_Null (Args_2, "show_in_menu") or else
+        not Get_Boolean (Args_2, "show_ui")
+      then
+         Args_2 ("show_in_menu") := Args_2 ("show_ui");
+      end if;
 
---                 // If not set, default to the setting for 'show_ui'.
---                 if ( null === args['show_in_quick_edit'] ) then
---                         args['show_in_quick_edit'] = args['show_ui'];
---                 end;
+      -- If not set, default to the setting for "public".
+      if Get_Null (Args_2, "show_in_nav_menus") then
+         Args_2 ("show_in_nav_menus") := Args_2 ("public");
+      end if;
 
---                 // If not set, default rest_namespace to wp/v2 if show_in_rest is true.
---                 if ( false === args['rest_namespace'] && ! empty( args['show_in_rest'] ) ) then
---                         args['rest_namespace'] = 'wp/v2';
---                 end;
+      -- If not set, default to the setting for "show_ui".
+      if Get_Null (Args_2, "show_tagcloud") then
+         Args_2 ("show_tagcloud") := Args_2 ("show_ui");
+      end if;
 
---                 default_caps = array(
---                         'manage_terms' => 'manage_categories',
---                         'edit_terms'   => 'manage_categories',
---                         'delete_terms' => 'manage_categories',
---                         'assign_terms' => 'edit_posts',
---                 );
+      -- If not set, default to the setting for "show_ui".
+      if Get_Null (Args_2, "show_in_quick_edit") then
+         Args_2 ("show_in_quick_edit") := Args_2 ("show_ui");
+      end if;
 
---                 args['cap'] = (object) array_merge( default_caps, args['capabilities'] );
---                 unset( args['capabilities'] );
+      -- If not set, default rest_namespace to wp/v2 if show_in_rest is true.
+      if
+        not Get_Boolean (Args_2, "rest_namespace") and then
+        Isset (Args_2, "show_in_rest")
+--      not Empty (Args_2 ("show_in_rest"))
+      then
+         Set (Args_2, "rest_namespace", "wp/v2");
+      end if;
 
---                 args['object_type'] = array_unique( (array) object_type );
+      declare
+         Default_Caps : constant Array_Type := To_Array (List => (
+           Build ("manage_terms", "manage_categories"),
+           Build ("edit_terms",   "manage_categories"),
+           Build ("delete_terms", "manage_categories"),
+           Build ("assign_terms", "edit_posts")
+         ));
+      begin
+         Set_Array (Args_2, "cap",
+                    Array_Merge (Default_Caps, Get_Array (Args_2, "capabilities"))); -- (object)
+      end;
+      Args_2.Delete ("capabilities");
+--    Unset (Args_2 ("capabilities"));
 
---                 // If not set, use the default meta box.
---                 if ( null === args['meta_box_cb'] ) then
---                         if ( args['hierarchical'] ) then
---                                 args['meta_box_cb'] = 'post_categories_meta_box';
---                         end; else then
---                                 args['meta_box_cb'] = 'post_tags_meta_box';
---                         end;
---                 end;
+      Set_Array (Args_2, "object_type", Array_Unique (Object_Type)); -- (array)
 
---                 args['name'] = this->name;
+      -- If not set, use the default meta box.
+      if Get_Null (Args_2, "meta_box_cb") then
+         if Get_Boolean (Args_2, "hierarchical") then
+            Set (Args_2, "meta_box_cb", "post_categories_meta_box");
+         else
+            Set (Args_2, "meta_box_cb", "post_tags_meta_box");
+         end if;
+      end if;
 
---                 // Default meta box sanitization callback depends on the value of 'meta_box_cb'.
---                 if ( null === args['meta_box_sanitize_cb'] ) then
---                         switch ( args['meta_box_cb'] ) then
---                                 case 'post_categories_meta_box':
---                                         args['meta_box_sanitize_cb'] = 'taxonomy_meta_box_sanitize_cb_checkboxes';
---                                         break;
+      Set (Args_2, "name", -This.Name);
 
---                                 case 'post_tags_meta_box':
---                                 default:
---                                         args['meta_box_sanitize_cb'] = 'taxonomy_meta_box_sanitize_cb_input';
---                                         break;
---                         end;
---                 end;
+      -- Default meta box sanitization callback depends on the value of "meta_box_cb".
+      if Get_Null (Args_2, "meta_box_sanitize_cb") then
+         declare
+            Arc : constant String := Get (Args_2, "meta_box_cb");
+         begin
+            if Arc = "post_categories_meta_box" then
+               Set (Args_2, "meta_box_sanitize_cb",
+                    "taxonomy_meta_box_sanitize_cb_checkboxes");
+                                       --  break;
 
---                 // Default taxonomy term.
---                 if ( ! empty( args['default_term'] ) ) then
---                         if ( ! is_array( args['default_term'] ) ) then
---                                 args['default_term'] = array( 'name' => args['default_term'] );
---                         end;
---                         args['default_term'] = wp_parse_args(
---                                 args['default_term'],
---                                 array(
---                                         'name'        => '',
---                                         'slug'        => '',
---                                         'description' => '',
---                                 )
---                         );
---                 end;
+            else
+               --  "post_tags_meta_box":
+               --  default:
+               Set (Args_2, "meta_box_sanitize_cb",
+                    "taxonomy_meta_box_sanitize_cb_input");
+               -- break;
+            end if;
+         end;
+      end if;
 
---                 foreach ( args as property_name => property_value ) then
---                         this->property_name = property_value;
---                 end;
+      -- Default taxonomy term.
+      if not Empty (Args_2, "default_term") then
+         -- if not Is_Array (Args_2, "default_term") then
+         --    Set (Args_2, "default_term",
+         --         To_Array (List => (1 =>
+         --           Build ("name", Get (Args_2, "default_term")))));
+         -- end if;
+         Set_Array (Args_2, "default_term", Wp_Parse_Args (
+           Get_Array (Args_2, "default_term"),
+           To_Array (List => (
+             Build ("name",        ""),
+             Build ("slug",        ""),
+             Build ("description", "")
+           ))
+         ));
+      end if;
 
---                 this->labels = get_taxonomy_labels( this );
---                 this->label  = this->labels->name;
---         end;
+      for A in Args_2.Iterate loop
+         declare
+            Property_Name  : String       := Array_Maps.Key (A);
+            Property_Value : Array_Record := Array_Maps.Element (A);
+         begin
+            null;
+            -- case Property_Value.Kind is
+            -- when Is_String =>
+            --    Set (This, Property_Name, -Property_Value.Str);
+            -- when Is_Integer =>
+            --    Set_Integer (This, Property_Name, Property_Value.Int);
+            -- when Is_Array =>
+            --    Set (This, Property_Name, Property_Value.Arry.all);
+            -- when Is_Boolean =>
+            --    Set (This, Property_Name, Property_Value.Bool);
+            -- when Is_Callable =>
+            --    null;
+            -- when Is_Null =>
+            --    null;
+            -- end case;
+         end;
+      end loop;
 
---         --
---         -- Adds the necessary rewrite rules for the taxonomy.
---         --
---         -- @since 4.7.0
---         --
---         -- @global WP wp Current WordPress environment instance.
---         --
---         public function add_rewrite_rules() then
+      This.Labels := Inc_Taxonomys.Get_Taxonomy_Labels (This);
+--    This.Label  := This.Labels.Name;
+   end Set_Props;
+
+   Wp : Inc_Class_Wp.Wp;
+
+   -----------------------
+   -- Add_Rewrite_Rules --
+   -----------------------
+
+   procedure Add_Rewrite_Rules (This : Wp_Taxonomy)
+   is
+      use Hb_Common;
+      use Inc_Options;
+      use Inc_Plugins;
+      use Inc_Rewrites;
 --                 /* @var WP wp--
 --                 global wp;
+   begin
+      -- Non-publicly queryable taxonomies should not register query vars, except
+      -- in the admin.
+      if "" /= This.Query_Var then -- and then Wp then
+--    if False /= This.Query_Var and then wp then
+         Wp.Add_Query_Var (-This.Query_Var);
+      end if;
 
---                 // Non-publicly queryable taxonomies should not register query vars, except in the admin.
---                 if ( false !== this->query_var && wp ) then
---                         wp->add_query_var( this->query_var );
---                 end;
+      if
+        Empty_Array /= This.Rewrite and then
+--      False /= This.Rewrite and then
+        (Inc_Load.Is_Admin or else Get_Option ("permalink_structure"))
+      then
+         declare
+            Tag : Unbounded_String;
+         begin
+            if
+              This.Hierarchical and then
+              Get_Boolean (This.Rewrite, "hierarchical")
+            then
+               Tag := +"(.+?)";
+            else
+               Tag := +"([^/]+)";
+            end if;
 
---                 if ( false !== this->rewrite && ( is_admin() || get_option( 'permalink_structure' ) ) ) then
---                         if ( this->hierarchical && this->rewrite['hierarchical'] ) then
---                                 tag = '(.+?)';
---                         end; else then
---                                 tag = '([^/]+)';
---                         end;
-
---                         add_rewrite_tag( "%this->name%", tag, this->query_var ? "thenthis->query_varend;=" : "taxonomy=this->name&term=" );
---                         add_permastruct( this->name, "thenthis->rewrite['slug']end;/%this->name%", this->rewrite );
---                 end;
---         end;
+            Add_Rewrite_Tag ("%" & (-This.Name) & "%", -Tag,
+                             (if This.Query_Var /= ""
+                              then (-This.Query_Var) & "="
+                              else "taxonomy=" & (-This.Name) & "&term="));
+            Add_Permastruct
+              (-This.Name,
+               Get (This.Rewrite, "slug") & "/%" & (-This.Name) & "%",
+               This.Rewrite);
+         end;
+      end if;
+   end Add_Rewrite_Rules;
 
 --         --
 --         -- Removes any rewrite rules, permastructs, and rules for the taxonomy.
@@ -265,26 +355,29 @@ is
 --                 /* @var WP wp--
 --                 global wp;
 
---                 // Remove query var.
---                 if ( false !== this->query_var ) then
---                         wp->remove_query_var( this->query_var );
+--                 -- Remove query var.
+--                 if ( false !== this.query_var ) then
+--                         wp.remove_query_var( this.query_var );
 --                 end;
 
---                 // Remove rewrite tags and permastructs.
---                 if ( false !== this->rewrite ) then
---                         remove_rewrite_tag( "%this->name%" );
---                         remove_permastruct( this->name );
+--                 -- Remove rewrite tags and permastructs.
+--                 if ( false !== this.rewrite ) then
+--                         remove_rewrite_tag( "%this.name%" );
+--                         remove_permastruct( this.name );
 --                 end;
 --         end;
 
---         --
---         -- Registers the ajax callback for the meta box.
---         --
---         -- @since 4.7.0
---         --
---         public function add_hooks() then
---                 add_filter( 'wp_ajax_add-' . this->name, '_wp_ajax_add_hierarchical_term' );
---         end;
+   ---------------
+   -- Add_Hooks --
+   ---------------
+
+   procedure Add_Hooks (This : Wp_Taxonomy)
+   is
+      use Hb_Common;
+      use Inc_Plugins;
+   begin
+      Add_Filter ("wp_ajax_add-" & (-This.Name), "_wp_ajax_add_hierarchical_term");
+   end Add_Hooks;
 
 --         --
 --         -- Removes the ajax callback for the meta box.
@@ -292,7 +385,7 @@ is
 --         -- @since 4.7.0
 --         --
 --         public function remove_hooks() then
---                 remove_filter( 'wp_ajax_add-' . this->name, '_wp_ajax_add_hierarchical_term' );
+--                 remove_filter( "wp_ajax_add-" . this.name, "_wp_ajax_add_hierarchical_term" );
 --         end;
 
 --         --
@@ -306,11 +399,11 @@ is
 --         --                                 is set not to show in rest.
 --         --
 --         public function get_rest_controller() then
---                 if ( ! this->show_in_rest ) then
+--                 if ( ! this.show_in_rest ) then
 --                         return null;
 --                 end;
 
---                 class = this->rest_controller_class ? this->rest_controller_class : WP_REST_Terms_Controller::class;
+--                 class = this.rest_controller_class ? this.rest_controller_class : WP_REST_Terms_Controller::class;
 
 --                 if ( ! class_exists( class ) ) then
 --                         return null;
@@ -320,74 +413,75 @@ is
 --                         return null;
 --                 end;
 
---                 if ( ! this->rest_controller ) then
---                         this->rest_controller = new class( this->name );
+--                 if ( ! this.rest_controller ) then
+--                         this.rest_controller = new class( this.name );
 --                 end;
 
---                 if ( ! ( this->rest_controller instanceof class ) ) then
+--                 if ( ! ( this.rest_controller instanceof class ) ) then
 --                         return null;
 --                 end;
 
---                 return this->rest_controller;
+--                 return this.rest_controller;
 --         end;
 
---         --
---         -- Returns the default labels for taxonomies.
---         --
---         -- @since 6.0.0
---         --
---         -- @return (string|null)[][] The default labels for taxonomies.
---         --
---         public static function get_default_labels() then
---                 if ( ! empty( self::default_labels ) ) then
---                         return self::default_labels;
---                 end;
+   ------------------------
+   -- Get_Default_Lables --
+   ------------------------
 
---                 name_field_description   = __( 'The name is how it appears on your site.' );
---                 slug_field_description   = __( 'The &#8220;slug&#8221; is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.' );
---                 parent_field_description = __( 'Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.' );
---                 desc_field_description   = __( 'The description is not prominent by default; however, some themes may show it.' );
+   function Get_Default_Labels
+            return Array_Type
+   is
+      use Inc_L10n;
 
---                 self::default_labels = array(
---                         'name'                       => array( _x( 'Tags', 'taxonomy general name' ), _x( 'Categories', 'taxonomy general name' ) ),
---                         'singular_name'              => array( _x( 'Tag', 'taxonomy singular name' ), _x( 'Category', 'taxonomy singular name' ) ),
---                         'search_items'               => array( __( 'Search Tags' ), __( 'Search Categories' ) ),
---                         'popular_items'              => array( __( 'Popular Tags' ), null ),
---                         'all_items'                  => array( __( 'All Tags' ), __( 'All Categories' ) ),
---                         'parent_item'                => array( null, __( 'Parent Category' ) ),
---                         'parent_item_colon'          => array( null, __( 'Parent Category:' ) ),
---                         'name_field_description'     => array( name_field_description, name_field_description ),
---                         'slug_field_description'     => array( slug_field_description, slug_field_description ),
---                         'parent_field_description'   => array( null, parent_field_description ),
---                         'desc_field_description'     => array( desc_field_description, desc_field_description ),
---                         'edit_item'                  => array( __( 'Edit Tag' ), __( 'Edit Category' ) ),
---                         'view_item'                  => array( __( 'View Tag' ), __( 'View Category' ) ),
---                         'update_item'                => array( __( 'Update Tag' ), __( 'Update Category' ) ),
---                         'add_new_item'               => array( __( 'Add New Tag' ), __( 'Add New Category' ) ),
---                         'new_item_name'              => array( __( 'New Tag Name' ), __( 'New Category Name' ) ),
---                         'separate_items_with_commas' => array( __( 'Separate tags with commas' ), null ),
---                         'add_or_remove_items'        => array( __( 'Add or remove tags' ), null ),
---                         'choose_from_most_used'      => array( __( 'Choose from the most used tags' ), null ),
---                         'not_found'                  => array( __( 'No tags found.' ), __( 'No categories found.' ) ),
---                         'no_terms'                   => array( __( 'No tags' ), __( 'No categories' ) ),
---                         'filter_by_item'             => array( null, __( 'Filter by category' ) ),
---                         'items_list_navigation'      => array( __( 'Tags list navigation' ), __( 'Categories list navigation' ) ),
---                         'items_list'                 => array( __( 'Tags list' ), __( 'Categories list' ) ),
---                         /* translators: Tab heading when selecting from the most used terms.--
---                         'most_used'                  => array( _x( 'Most Used', 'tags' ), _x( 'Most Used', 'categories' ) ),
---                         'back_to_items'              => array( __( '&larr; Go to Tags' ), __( '&larr; Go to Categories' ) ),
---                         'item_link'                  => array(
---                                 _x( 'Tag Link', 'navigation link block title' ),
---                                 _x( 'Category Link', 'navigation link block title' ),
---                         ),
---                         'item_link_description'      => array(
---                                 _x( 'A link to a tag.', 'navigation link block description' ),
---                                 _x( 'A link to a category.', 'navigation link block description' ),
---                         ),
---                 );
+      -- if ( ! empty( self::default_labels ) ) then
+      --    return self::default_labels;
+      -- end if;
 
---                 return self::default_labels;
---         end;
+      Name_Field_Description   : constant String := abs "The name is how it appears on your site.";
+      Slug_Field_Description   : constant String := abs "The &#8220;slug&#8221; is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.";
+      Parent_Field_Description : constant String := abs "Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.";
+      Desc_Field_Description   : constant String := abs "The description is not prominent by default; however, some themes may show it.";
+   begin
+      Self_Default_Labels := To_Array (List => (
+         Build ("name",                       To_Array ((1 => Build (X_X ("Tags", "taxonomy general name"), X_X ("Categories", "taxonomy general name"))))),
+         Build ("singular_name",              To_Array ((1 => Build (X_X ("Tag", "taxonomy singular name"), X_X ("Category", "taxonomy singular name"))))),
+         Build ("search_items",               To_Array ((1 => Build (abs "Search Tags", abs "Search Categories")))),
+--       Build ("popular_items",              To_Array ((1 => Build (abs "Popular Tags", null)))),
+         Build ("all_items",                  To_Array ((1 => Build (abs "All Tags", abs "All Categories")))),
+--       Build ("parent_item",                To_Array ((1 => Build (null, abs "Parent Category")))),
+--       Build ("parent_item_colon",          To_Array ((1 => Build (null, abs "Parent Category:")))),
+         Build ("name_field_description",     To_Array ((1 => Build (Name_Field_Description, Name_Field_Description)))),
+         Build ("slug_field_description",     To_Array ((1 => Build (Slug_Field_Description, Slug_Field_Description)))),
+--       Build ("parent_field_description",   To_Array ((1 => Build (null, Parent_Field_Description)))),
+         Build ("desc_field_description",     To_Array ((1 => Build (Desc_Field_Description, Desc_Field_Description)))),
+         Build ("edit_item",                  To_Array ((1 => Build (abs "Edit Tag", abs "Edit Category")))),
+         Build ("view_item",                  To_Array ((1 => Build (abs "View Tag", abs "View Category")))),
+         Build ("update_item",                To_Array ((1 => Build (abs "Update Tag", abs "Update Category")))),
+         Build ("add_new_item",               To_Array ((1 => Build (abs "Add New Tag", abs "Add New Category")))),
+         Build ("new_item_name",              To_Array ((1 => Build (abs "New Tag Name", abs "New Category Name")))),
+--       Build ("separate_items_with_commas", To_Array ((1 => Build (abs "Separate tags with commas", null)))),
+--       Build ("add_or_remove_items",        To_Array ((1 => Build (abs "Add or remove tags", null)))),
+--       Build ("choose_from_most_used",      To_Array ((1 => Build (abs "Choose from the most used tags", null)))),
+         Build ("not_found",                  To_Array ((1 => Build (abs "No tags found.", abs "No categories found.")))),
+         Build ("no_terms",                   To_Array ((1 => Build (abs "No tags", abs "No categories")))),
+--       Build ("filter_by_item",             To_Array ((1 => Build (null, abs "Filter by category")))),
+         Build ("items_list_navigation",      To_Array ((1 => Build (abs "Tags list navigation", abs "Categories list navigation")))),
+         Build ("items_list",                 To_Array ((1 => Build (abs "Tags list", abs "Categories list")))),
+         -- translators: Tab heading when selecting from the most used terms.
+         Build ("most_used",                  To_Array ((1 => Build (X_X ("Most Used", "tags"), X_X ("Most Used", "categories"))))),
+         Build ("back_to_items",              To_Array ((1 => Build (abs "&larr; Go to Tags", abs "&larr; Go to Categories")))),
+         Build ("item_link",                  To_Array (List => (1 =>
+                 Build (X_X ("Tag Link", "navigation link block title"),
+                        X_X ("Category Link", "navigation link block title"))))
+         ),
+         Build ("item_link_description",      To_Array (List => (1 =>
+                 Build (X_X ("A link to a tag.", "navigation link block description"),
+                        X_X ("A link to a category.", "navigation link block description"))))
+         )
+      ));
+
+      return Self_Default_Labels;
+   end Get_Default_Labels;
 
 --         --
 --         -- Resets the cache for the default labels.

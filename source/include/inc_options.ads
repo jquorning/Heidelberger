@@ -93,6 +93,11 @@ is
                         Default : String := "")
                         return String;
 
+   function Get_Option (Option  : String;
+                        Default : String := "")
+                        return Boolean
+                        is (True);
+
    --
    -- Loads and caches all autoloaded options, if available or all options.
    --
@@ -211,6 +216,12 @@ is
                             Value    : Array_Type;
                             Autoload : Boolean := False) -- = null
                             is null;
+
+   procedure Update_Option (Option   : String;
+                            Value    : String;
+                            Autoload : Boolean := False) -- = null
+                            is null;
+
    --
    -- Retrieves user interface setting value based on setting name.
    --

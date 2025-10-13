@@ -74,6 +74,18 @@ is
       return Map;
    end Build;
 
+   function Build (Key   : String;
+                   Value : Null_Type)
+                   return Array_Type
+   is
+      Item : Array_Record;
+      Map  : Array_Type;
+   begin
+      Item.Kind := Is_Null;
+      Map.Insert (Key => Key, New_Item => Item);
+      return Map;
+   end Build;
+
    --------------
    -- To_Array --
    --------------

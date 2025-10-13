@@ -35,13 +35,46 @@ is
    -- Set --
    ---------
 
-   procedure Set (Arr   : in out Array_Type;
+   procedure Set (Arry  : in out Array_Type;
                   Key   : String;
                   Value : String)
    is
    begin
-      Arr.Include (Key => Key, New_Item => Value);
+      Arry.Include (Key => Key, New_Item => Value);
    end Set;
+
+   procedure Set_Array (Arry : in out Array_Type;
+                       Key   : String;
+                       Value : Array_Type)
+   is
+      Item : Array_Record;
+   begin
+      Item.Kind := Is_Array;
+      Item.Arry := new Array_Type'(Value);
+      Arry.Include (Key => Key, New_Item => Item);
+   end Set_Array;
+
+   procedure Set_Integer (Arry  : in out Array_Type;
+                          Key   : String;
+                          Value : Integer)
+   is
+      Item : Array_Record;
+   begin
+      Item.Kind := Is_Integer;
+      Item.Int  := Value;
+      Arry.Include (Key => Key, New_Item => Item);
+   end Set_Integer;
+
+   procedure Set_Boolean (Arry  : in out Array_Type;
+                          Key   : String;
+                          Value : Boolean)
+   is
+      Item : Array_Record;
+   begin
+      Item.Kind := Is_Boolean;
+      Item.Bool := Value;
+      Arry.Include (Key => Key, New_Item => Item);
+   end Set_Boolean;
 
    function Count (Item : String) return String is ("XXX 8");
 
@@ -125,6 +158,17 @@ is
       pragma Assert (Element (Arry.Find (Key)).Kind = Is_Boolean);
       return Array_Maps.Element (Arry.Find (Key)).Bool;
    end Get_Boolean;
+
+   function Get_Null (Arry : Array_Type;
+                      Key  : String)
+                      return Boolean
+   is
+      use Array_Maps;
+   begin
+      pragma Assert (Arry.Find (Key) /= No_Element);
+      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Null);
+      return True;
+   end Get_Null;
 
    -----------
    -- Empty --

@@ -190,10 +190,10 @@ is
 
             declare
                Taxonomy : Unbounded_String;  --  Added by jq. Not declared anywhere
-               Ret : constant Boolean := Wp_Insert_Term (Get (X_POST, "tag-name"),
+               Ret : constant Array_Type := Wp_Insert_Term (Get (X_POST, "tag-name"),
                                                          -Taxonomy, X_POST);
             begin
-               if Ret and then not Is_Wp_Error (Ret) then
+               if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
                   Location := +Add_Query_Arg ("message", "1", -Referer);
                else
                   Location := +Add_Query_Arg (

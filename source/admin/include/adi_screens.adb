@@ -47,11 +47,11 @@ is
          --
          -- @param string[] columns The column header labels keyed by column ID.
          --
-         Set (Static_Column_Headers, -Screen.Id,
+         Set_Array (Static_Column_Headers, -Screen.Id,
               Apply_Filters ("manage_" & (-Screen.Id) & "_columns", Empty_Array));
       end if;
 
-      return Static_Column_Headers; --  (-Screen.Id);
+      return Get_Array (Static_Column_Headers, -Screen.Id);
    end Get_Column_Headers;
 
    ------------------------

@@ -2735,53 +2735,87 @@ is
 --         return labels;
 -- end;
 
---
--- Builds an object with custom-something object (post type, taxonomy) labels
--- out of a custom-something object
---
--- @since 3.0.0
--- @access private
---
--- @param object object                  A custom-something object.
--- @param array  nohier_vs_hier_defaults Hierarchical vs non-hierarchical default labels.
--- @return object Object containing labels for the given custom-something object.
---
--- function _get_custom_object_labels( object, nohier_vs_hier_defaults ) then
---         object.labels = (array) object.labels;
+   --------------------------------
+   -- X_Get_Custom_Object_Labels --
+   --------------------------------
 
---         if ( isset( object.label ) && empty( object.labels["name"] ) ) then
---                 object.labels["name"] = object.label;
---         end;
+   function X_Get_Custom_Object_Labels
+      (Object                 : in out Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+      Nohier_Vs_Hier_Defaults : Array_Type)
+      return Array_Type
+   is
+      use Array_Maps;
+   begin
+--      object.labels = (array) object.labels;
 
---         if ( ! isset( object.labels["singular_name"] ) && isset( object.labels["name"] ) ) then
---                 object.labels["singular_name"] = object.labels["name"];
---         end;
+      if
+        Isset (-Object.Label) and then
+        not Has_Element (Object.Labels.Find ("name"))
+      then
+         Object.Labels.Include ("name", -Object.Label);
+      end if;
 
---         if ( ! isset( object.labels["name_admin_bar"] ) ) then
---                 object.labels["name_admin_bar"] = isset( object.labels["singular_name"] ) ? object.labels["singular_name"] : object.name;
---         end;
+      if
+        not Isset (Object.Labels, "singular_name") and then
+        Isset (Get (Object.Labels, "name"))
+      then
+         Object.Labels.Include ("singular_name", Object.Labels ("name"));
+      end if;
 
---         if ( ! isset( object.labels["menu_name"] ) && isset( object.labels["name"] ) ) then
---                 object.labels["menu_name"] = object.labels["name"];
---         end;
+      if not Isset (Object.Labels, "name_admin_bar") then
+         Object.Labels.Include
+           ("name_admin_bar",
+            (if Isset (Object.Labels, "singular_name")
+             then Get (Object.Labels, "singular_name") else -Object.Name));
+      end if;
 
---         if ( ! isset( object.labels["all_items"] ) && isset( object.labels["menu_name"] ) ) then
---                 object.labels["all_items"] = object.labels["menu_name"];
---         end;
+      if
+        not Isset (Object.Labels, "menu_name") and then
+        Isset (Object.Labels, "name")
+      then
+         Object.Labels ("menu_name") := Object.Labels ("name");
+      end if;
 
---         if ( ! isset( object.labels["archives"] ) && isset( object.labels["all_items"] ) ) then
---                 object.labels["archives"] = object.labels["all_items"];
---         end;
+      if
+        not Isset (Object.Labels, "all_items") and then
+        Isset (Object.Labels, "menu_name")
+      then
+         Object.Labels ("all_items") := Object.Labels ("menu_name");
+      end if;
 
---         defaults = to_array ();
---         foreach ( nohier_vs_hier_defaults as key => value ) then
---                 defaults[ key ] = object.hierarchical ? value[1] : value[0];
---         end;
---         labels         = array_merge( defaults, object.labels );
---         object.labels = (object) object.labels;
+      if
+         not Isset (Object.Labels, "archives") and then
+         Isset (Object.Labels, "all_items")
+      then
+         Object.Labels ("archives") := Object.Labels ("all_items");
+      end if;
 
---         return (object) labels;
--- end;
+      declare
+         Defaults : Array_Type;
+      begin
+         for A in Nohier_Vs_Hier_Defaults.Iterate loop
+            declare
+               Key   : constant String       := Array_Maps.Key (A);
+               Value : constant Array_Record := Array_Maps.Element (A);
+            begin
+               Defaults.Include (Key,
+                                 (if Object.Hierarchical
+                                  then "XXX-923"   -- "Get (Value) --  (1)
+                                  else "XXX-924")); -- First_Key     (Value));   --  (0)
+            end;
+         end loop;
+
+         declare
+            Labels : constant Array_Type :=
+              Array_Merge (Defaults, Object.Labels);
+         begin
+--       Object.Labels := (object) object.labels;
+
+            return Labels;
+         end;
+--       return (object) labels;
+      end;
+   end X_Get_Custom_Object_Labels;
 
 --
 -- Adds submenus for post types.

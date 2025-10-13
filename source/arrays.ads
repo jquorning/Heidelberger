@@ -32,7 +32,13 @@ is
    subtype List_Type  is List_Vectors.Vector;
    Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
 
-   type Array_Kind is (Is_String, Is_Integer, Is_Array, Is_Boolean, Is_Callable);
+   type Array_Kind is (Is_String,  Is_Integer,  Is_Array,
+                       Is_Boolean, Is_Callable, Is_Null);
+
+   type Null_Type is null record;
+
+   Null_Value : constant Null_Type := (null record);
+
    type Array_Type;
    type Array_Access is access all Array_Type;
 
@@ -84,6 +90,10 @@ is
 
    function Build (Key   : String;
                    Value : Boolean)
+                   return Array_Type;
+
+   function Build (Key   : String;
+                   Value : Null_Type)
                    return Array_Type;
 
    Empty_Array : Array_Type := (Array_Maps.Empty_Map with null record);

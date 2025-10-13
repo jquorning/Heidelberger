@@ -2292,6 +2292,11 @@ is
 -- -- @return string The sanitized title.
 -- --
 -- function sanitize_title_with_dashes( title, raw_title = "", context = "display" ) then
+   function Sanitize_Title_With_Dashes (Title     : String;
+                                        Raw_Title : String := "";
+                                        Context   : String := "display")
+                                        return String
+                                        is (Title);
 --         title = strip_tags( title );
 --         // Preserve escaped octets.
 --         title = preg_replace( "|%([a-fA-F0-9][a-fA-F0-9])|", "---1---", title );

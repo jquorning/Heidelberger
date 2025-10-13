@@ -223,6 +223,10 @@ is
                         return List_Type
                         is (Empty_List);
 
+   function Array_Keys (List : List_Type)
+                        return List_Type
+                        is (Empty_List);
+
    function Array_Key_Exists (Key  : String;
                               Arry : Array_Type)
                               return Boolean
@@ -301,6 +305,11 @@ is
                           Flags : Unique_Flags := Sort_String)
                           return List_Type
                           is (Empty_List);
+
+   function Array_Unique (Arry  : List_Type;
+                          Flags : Unique_Flags := Sort_String)
+                          return Array_Type
+                          is (Empty_Array);
 
    function Array_Intersect (Arry    : Array_Type;
                              Array_2 : Array_Type)

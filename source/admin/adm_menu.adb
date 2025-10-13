@@ -137,7 +137,7 @@ is
 
       I := 15;
       for Tax of Inc_Media.Get_Taxonomies_For_Attachments ("objects") loop
-         if not Tax.Show_Ui or else not Tax.Show_In_Menu then
+         if not Tax.Show_UI or else not Tax.Show_In_Menu then
             goto Continue_1;
          end if;
 
@@ -309,7 +309,7 @@ is
                I := 15;
                for Tax of Inc_Taxonomys.Get_Taxonomies (Empty_Array, "objects") loop
                   if
-                    not Tax.Show_Ui      or else
+                    not Tax.Show_UI      or else
                     not Tax.Show_In_Menu or else
                     not In_Array (Ptype, Tax.Object_Type, True) -- (array)
                   then

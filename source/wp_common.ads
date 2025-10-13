@@ -21,15 +21,12 @@ is
                         return List_Type
                         is (Empty_List);
 
+   -- function Array_Shift (Arry : Inc_Class_Wp_Terms.Wp_Term_Array)
+   --                       return Inc_Class_Wp_Terms.Wp_Term_Array;
+
    procedure Array_Unshift (Arry : in out Inc_Class_Wp_Terms.Wp_Term_Array;
                             S    : Inc_Class_Wp_Terms.Wp_Term)
                             is null;
-
-   function Apply_Filters (A : String;
-                           B : String;
-                           C : Inc_Class_Wp_Posts.Wp_Post)
-                           return List_Type
-                           is (Empty_List);
 
    function In_Array (Taxonomy   : String;
                       Taxonomies : Inc_Taxonomys.Taxonomy_Array;
@@ -104,6 +101,12 @@ is
                            Id        : Inc_Class_Wp_Posts.Post_Id)
                            return Array_Type
                            is (Empty_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           B         : String;
+                           C         : Inc_Class_Wp_Posts.Wp_Post)
+                           return List_Type
+                           is (Empty_List);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;

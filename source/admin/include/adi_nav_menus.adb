@@ -633,7 +633,7 @@ is
 
          -- Add suppression array to arguments for WP_Query.
          if not Empty (Suppress_Page_Ids) then
-            Set (Args, "post__not_in", Suppress_Page_Ids);
+            Set_Array (Args, "post__not_in", Suppress_Page_Ids);
          end if;
       end if;
 
@@ -1691,7 +1691,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       begin
 
          if not Isset (Nav_Menu_Option, "auto_add") then
-            Set (Nav_Menu_Option, "auto_add", Empty_Array);
+            Set_Array (Nav_Menu_Option, "auto_add", Empty_Array);
          end if;
 
          if Auto_Add then

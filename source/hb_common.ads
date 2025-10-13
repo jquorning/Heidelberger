@@ -31,16 +31,21 @@ is
    function Array_Filter (List : Array_Type) return Array_Type is (Empty_Array);
    function Array_Filter (List : List_Type) return List_Type is (Empty_List);
 
-   procedure Set (Arr   : in out Array_Type;
+   procedure Set (Arry  : in out Array_Type;
                   Key   : String;
                   Value : String);
 
-   procedure Set (Arr : in out Array_Type; Key : String; Value : Array_Type)
-     is null;
-   procedure Set_Integer (Arr   : in out Array_Type;
+   procedure Set_Array (Arry : in out Array_Type;
+                       Key   : String;
+                       Value : Array_Type);
+
+   procedure Set_Integer (Arry  : in out Array_Type;
                           Key   : String;
-                          Value : Integer)
-                          is null;
+                          Value : Integer);
+
+   procedure Set_Boolean (Arry  : in out Array_Type;
+                          Key   : String;
+                          Value : Boolean);
 
    function Count (Item : String)
                    return Natural
@@ -65,6 +70,10 @@ is
    function Get_Boolean (Arry : Array_Type;
                          Key  : String)
                          return Boolean;
+
+   function Get_Null (Arry : Array_Type;
+                      Key  : String)
+                      return Boolean;
 
    function Get (List : List_Type;
                  Key  : String)
@@ -102,6 +111,11 @@ is
    function Isset (Arry : Array_Type;
                    Key  : String)
                    return Boolean;
+
+   function Isset (Arry : List_Type;
+                   Key  : String)
+                   return Boolean
+                   is (True);
 
    function Isset (Arry : Array_Type;
                    Key  : Integer)

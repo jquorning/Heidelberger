@@ -279,7 +279,7 @@ is
                                                      "menu_item_parent"), -- (int)
                                                 Orders_To_Dbids, True)
                            then
-                              Set (Menu_Item_Data, "menu_item_parent",
+                              Set_Array (Menu_Item_Data, "menu_item_parent",
                                  Inc_Posts.Get_Post_Meta
                                     (Inc_Class_Wp_Posts.Post_Id (Get_Integer (Menu_Item_Data,
                                                            "menu_item_parent")),

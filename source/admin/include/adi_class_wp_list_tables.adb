@@ -9,6 +9,7 @@
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Arrays.Io;
 with Binder;
 with Hb_Common;
 with Php;
@@ -1174,6 +1175,7 @@ is
       use Hb_Common;
       use Inc_Plugins;
 
+--    Columns : constant List_Type := Adi_Screens.Get_Column_Headers (This.Screen);
       Columns : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
       Default : Unbounded_String    := +This.Get_Default_Primary_Column_Name;
    begin
@@ -1209,7 +1211,7 @@ is
    ---------------------
 
    function Get_Column_Info (This : in out Wp_List_Table)
-                             return Columns_Type -- Array_Type
+                             return Columns_Type
    is
       use type Ada.Containers.Count_Type;
       use Hb_Common;
@@ -1255,7 +1257,9 @@ is
 --       end if;
 
       declare
+--       Columns : constant List_Type := Adi_Screens.Get_Column_Headers (This.Screen);
          Columns : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
+--       Hidden  : constant List_Type := Adi_Screens.Get_Hidden_Columns (This.Screen);
          Hidden  : constant Array_Type := Adi_Screens.Get_Hidden_Columns (This.Screen);
 
          Sortable_Columns : constant Array_Type := This.Get_Sortable_Columns; -- ()
@@ -1274,6 +1278,7 @@ is
            Apply_Filters ("manage_" & (-This.Screen.Id) & "_sortable_columns",
                           Sortable_Columns);
 
+--       Sortable : constant List_Type := Empty_List;
          Sortable : constant Array_Type := Empty_Array;
       begin
          -- for A in X_Sortable.Iterate loop --  as id => data ) then
@@ -1317,7 +1322,9 @@ is
       use Php;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
+--    Columns  : constant List_Type  := Column_Info.Columns;
       Columns  : constant Array_Type := Column_Info.Columns;
+--    Hidden_2 : constant List_Type  := Column_Info.Hidden;
       Hidden_2 : constant Array_Type := Column_Info.Hidden;
 
       Hidden   : constant List_Type :=
@@ -1345,6 +1352,9 @@ is
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
 
+      -- Columns  :          List_Type := Column_Info.Columns;
+      -- Hidden   : constant List_Type := Column_Info.Hidden;
+      -- Sortable : constant List_Type := Column_Info.Sortable;
       Columns  :          Array_Type := Column_Info.Columns;
       Hidden   : constant Array_Type := Column_Info.Hidden;
       Sortable : constant Array_Type := Column_Info.Sortable;
@@ -1361,6 +1371,7 @@ is
       Current_Orderby : Unbounded_String;
       Current_Order   : Unbounded_String;
    begin
+
       if Isset (XX_GET, "orderby") then
          Current_Orderby := +Get (XX_GET, "orderby");
       else
@@ -1386,10 +1397,13 @@ is
 
       for A in Columns.Iterate loop
          declare
-            use Array_Maps;
-
-            Column_Key          : constant String := Key (A);
-            Column_Display_Name : String := Get (Columns, Column_Key); -- Element (A);
+--          use Array_Maps;
+            use List_Vectors;
+--          Column_Key          : constant Integer := -To_Index (A); -- Key (A);
+            Column_Key          : constant String := Array_Maps.Key (A);
+--          Column_Display_Name : String := -Columns (Column_Key); -- Element (A);
+            Column_Display_Name : String := Get (Columns, Column_Key);
+            -- Array_Maps.Element (A);
             Class : List_Type := To_List (List => (+"manage-column",
                                                    +"column-column_key"));
          begin
@@ -1414,7 +1428,9 @@ is
             if Isset (Sortable, Column_Key) then
                declare
                   Orderby    : constant String :=
-                    Get (Get_Array (Sortable, Column_Key), "orderby");
+
+                    Get (Sortable, "orderby");
+--                  Get (Get_List (Sortable, Column_Key), "orderby");
 
                   Desc_First : constant String :=
                     Get (Get_Array (Sortable, Column_Key), "desc_first");
@@ -1516,6 +1532,7 @@ is
       Echo (NL);
       Echo ("</table>" & NL);
       This.Display_Tablenav ("bottom");
+
    end Display;
 
    -----------------------

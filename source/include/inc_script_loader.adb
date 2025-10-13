@@ -189,13 +189,13 @@ is
                   Build ("weekdaysShort",
                          Php.Array_Values (Globals.Wp_Locale.Weekday_Abbrev)),
                   Build ("week",           To_Array ((1 =>
-                    Build ("dow", Get_Option ("start_of_week", "0")) -- (int), 0
+                    Build ("dow", String'(Get_Option ("start_of_week", "0"))) -- (int), 0
                   ))),
                   Build ("longDateFormat", To_Array ((
-                    Build ("LT",   Get_Option ("time_format", abs "g:i a")),
+                    Build ("LT",   String'(Get_Option ("time_format", abs "g:i a"))),
 --                                              "LTS"  => null,
 --                                              "L"    => null,
-                    Build ("LL",   Get_Option ("date_format", abs "F j, Y")),
+                    Build ("LL",   String'(Get_Option ("date_format", abs "F j, Y"))),
                     Build ("LLL",  abs "F j, Y g:i a")
 --                                             "LLLL" => null,
                   )))

@@ -178,7 +178,7 @@ is
               Boolean'Image (not Empty (Parsed_Args, "list_only")));
 
          if Is_Array (Get_Array  (Parsed_Args, "selected_cats")) then
-            Set (Args_2, "selected_cats",
+            Set_Array (Args_2, "selected_cats",
                  Array_Map ("intval", Get_Array (Parsed_Args, "selected_cats")));
          elsif Post_Id /= 0 then
             null;
@@ -186,11 +186,11 @@ is
 --                     Wp_Get_Object_Terms (Empty_Term_Array & Post_Id'Image, Taxonomy,
 --                                          Array_Merge (Args, To_array (List => (1 => Build ("fields", "ids"))))));
          else
-            Set (Args_2, "selected_cats", Empty_Array);
+            Set_Array (Args_2, "selected_cats", Empty_Array);
          end if;
 
          if Is_Array (Get_Array (Parsed_Args, "popular_cats")) then
-            Set (Args_2, "popular_cats",
+            Set_Array (Args_2, "popular_cats",
                  Array_Map ("intval", Get_Array (Parsed_Args, "popular_cats")));
          else
             Set (Args_2, "popular_cats",

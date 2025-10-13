@@ -104,6 +104,6 @@ is
 
    Action   : Unbounded_String;
    Taxonomy : Unbounded_String;
-   Tax      : Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+   Tax      : Inc_Class_Wp_Taxonomy.Wp_Taxonomy; -- := Inc_Class_Wp_Taxonomy.X_Construct;
 
 end Globals;
