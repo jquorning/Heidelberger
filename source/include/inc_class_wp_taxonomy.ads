@@ -372,4 +372,12 @@ is
    function Get_Default_Labels
             return Array_Type;
 
+   --
+   -- Resets the cache for the default labels.
+   --
+   -- @since 6.0.0
+   --
+   -- static
+   procedure Reset_Default_Labels;
+
 end Inc_Class_Wp_Taxonomy;

@@ -467,7 +467,7 @@ is
 --    end if;
 
       -- Define constants after multisite is loaded.
---    Wp_Cookie_Constants;
+      Inc_Default_Constants.Wp_Cookie_Constants;
 
       -- Define and enforce our SSL constants.
 --    Wp_SSL_Constants;

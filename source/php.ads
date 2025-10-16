@@ -443,6 +443,11 @@ is
    function Func_Get_Args
             return Array_Type;
 
+   function MD5 (Item   : String;
+                 Binary : Boolean := False)
+                 return String
+                 is ("XXX-937");
+
    -------------------
    -- Echo handling --
    -------------------

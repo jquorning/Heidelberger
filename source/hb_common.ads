@@ -87,7 +87,10 @@ is
 
    function Is_Wp_Error (Ret : Boolean) return Boolean is (True);
 
-   function Empty (A : String) return Boolean is (True);
+   function Empty (A : String)
+                   return Boolean
+                   is (A'Length = 0);
+
    function Empty (Table : Array_Type) return Boolean;
 
    function Empty (Arry : Array_Type;
@@ -101,7 +104,8 @@ is
    function In_Array (Key  : String;
                       Arry : String_Array;
                       S    : Boolean)
-                      return Boolean is (True);
+                      return Boolean
+                      is (True);
 
    function Isset (Item : Array_Type) return Boolean;
    function Isset (Item : String) return Boolean;

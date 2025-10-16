@@ -6,6 +6,9 @@
 -- @since 4.7.0
 --
 
+with Ada.Text_IO; use Ada.Text_IO;
+
+with Arrays.Io;
 with Globals;
 with Hb_Common;
 with Php;
@@ -133,10 +136,10 @@ is
       end if;
 
       if
-        Get_Boolean (Args_2, "query_var") and then
+        Get (Args_2, "query_var") /= "" and then
         (Inc_Load.Is_Admin or else Get_Boolean (Args_2, "publicly_queryable"))
       then
-         if Get_Boolean (Args_2, "query_var") then
+         if Get (Args_2, "query_var") /= "" then
             Set (Args_2, "query_var", -This.Name);
          else
             Set (Args_2, "query_var",
@@ -152,7 +155,7 @@ is
         (Inc_Load.Is_Admin or else Inc_Options.Get_Option ("permalink_structure"))
       then
          Set_Array (Args_2, "rewrite", Wp_Parse_Args (
-           Get_Array (Args_2, "rewrite"),
+           Get_Boolean (Args_2, "rewrite"),
            To_Array (List => (
              Build ("with_front",   True),
              Build ("hierarchical", False) -- ,
@@ -257,7 +260,7 @@ is
          --           Build ("name", Get (Args_2, "default_term")))));
          -- end if;
          Set_Array (Args_2, "default_term", Wp_Parse_Args (
-           Get_Array (Args_2, "default_term"),
+           False, -- Get_Array (Args_2, "default_term"),
            To_Array (List => (
              Build ("name",        ""),
              Build ("slug",        ""),
@@ -446,25 +449,25 @@ is
          Build ("name",                       To_Array ((1 => Build (X_X ("Tags", "taxonomy general name"), X_X ("Categories", "taxonomy general name"))))),
          Build ("singular_name",              To_Array ((1 => Build (X_X ("Tag", "taxonomy singular name"), X_X ("Category", "taxonomy singular name"))))),
          Build ("search_items",               To_Array ((1 => Build (abs "Search Tags", abs "Search Categories")))),
---       Build ("popular_items",              To_Array ((1 => Build (abs "Popular Tags", null)))),
+         Build ("popular_items",              To_Array ((1 => Build (abs "Popular Tags", "null")))),
          Build ("all_items",                  To_Array ((1 => Build (abs "All Tags", abs "All Categories")))),
---       Build ("parent_item",                To_Array ((1 => Build (null, abs "Parent Category")))),
---       Build ("parent_item_colon",          To_Array ((1 => Build (null, abs "Parent Category:")))),
+         Build ("parent_item",                To_Array ((1 => Build ("null", abs "Parent Category")))),
+         Build ("parent_item_colon",          To_Array ((1 => Build ("null", abs "Parent Category:")))),
          Build ("name_field_description",     To_Array ((1 => Build (Name_Field_Description, Name_Field_Description)))),
          Build ("slug_field_description",     To_Array ((1 => Build (Slug_Field_Description, Slug_Field_Description)))),
---       Build ("parent_field_description",   To_Array ((1 => Build (null, Parent_Field_Description)))),
+         Build ("parent_field_description",   To_Array ((1 => Build ("null", Parent_Field_Description)))),
          Build ("desc_field_description",     To_Array ((1 => Build (Desc_Field_Description, Desc_Field_Description)))),
          Build ("edit_item",                  To_Array ((1 => Build (abs "Edit Tag", abs "Edit Category")))),
          Build ("view_item",                  To_Array ((1 => Build (abs "View Tag", abs "View Category")))),
          Build ("update_item",                To_Array ((1 => Build (abs "Update Tag", abs "Update Category")))),
          Build ("add_new_item",               To_Array ((1 => Build (abs "Add New Tag", abs "Add New Category")))),
          Build ("new_item_name",              To_Array ((1 => Build (abs "New Tag Name", abs "New Category Name")))),
---       Build ("separate_items_with_commas", To_Array ((1 => Build (abs "Separate tags with commas", null)))),
---       Build ("add_or_remove_items",        To_Array ((1 => Build (abs "Add or remove tags", null)))),
---       Build ("choose_from_most_used",      To_Array ((1 => Build (abs "Choose from the most used tags", null)))),
+         Build ("separate_items_with_commas", To_Array ((1 => Build (abs "Separate tags with commas", "null")))),
+         Build ("add_or_remove_items",        To_Array ((1 => Build (abs "Add or remove tags", "null")))),
+         Build ("choose_from_most_used",      To_Array ((1 => Build (abs "Choose from the most used tags", "null")))),
          Build ("not_found",                  To_Array ((1 => Build (abs "No tags found.", abs "No categories found.")))),
          Build ("no_terms",                   To_Array ((1 => Build (abs "No tags", abs "No categories")))),
---       Build ("filter_by_item",             To_Array ((1 => Build (null, abs "Filter by category")))),
+         Build ("filter_by_item",             To_Array ((1 => Build ("null", abs "Filter by category")))),
          Build ("items_list_navigation",      To_Array ((1 => Build (abs "Tags list navigation", abs "Categories list navigation")))),
          Build ("items_list",                 To_Array ((1 => Build (abs "Tags list", abs "Categories list")))),
          -- translators: Tab heading when selecting from the most used terms.
@@ -483,14 +486,14 @@ is
       return Self_Default_Labels;
    end Get_Default_Labels;
 
---         --
---         -- Resets the cache for the default labels.
---         --
---         -- @since 6.0.0
---         --
---         public static function reset_default_labels() then
---                 self::default_labels = array();
---         end;
--- end;
+   --------------------------
+   -- Reset_Default_Labels --
+   --------------------------
+
+   procedure Reset_Default_Labels
+   is
+   begin
+      Self_Default_Labels := Empty_Array;
+   end Reset_Default_Labels;
 
 end Inc_Class_Wp_Taxonomy;

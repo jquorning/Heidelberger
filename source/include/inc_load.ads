@@ -74,7 +74,7 @@ is
    --
    -- @return bool True if SSL, otherwise false.
    --
-   function Is_Ssl
+   function Is_SSL
             return Boolean
             is (False);
 

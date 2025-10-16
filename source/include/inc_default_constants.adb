@@ -4,10 +4,9 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 with Globals;
 with Hb_Common;
+with Php;
 
 with Inc_Themes;
 with Inc_Options;
@@ -149,13 +148,14 @@ is
       -- @since 3.5.0
       -- @since 4.4.0 Introduced `MONTH_IN_SECONDS`.
       --
-      MINUTE_IN_SECONDS := 60;
-      -- define( "HOUR_IN_SECONDS", 60 * MINUTE_IN_SECONDS );
-      -- define( "DAY_IN_SECONDS", 24 * HOUR_IN_SECONDS );
+--    MINUTE_IN_SECONDS := 60;
+--    HOUR_IN_SECONDS   := 60 * MINUTE_IN_SECONDS;
+--    DAY_IN_SECONDS    := 24 * HOUR_IN_SECONDS;
       -- define( "WEEK_IN_SECONDS", 7 * DAY_IN_SECONDS );
       -- define( "MONTH_IN_SECONDS", 30 * DAY_IN_SECONDS );
       -- define( "YEAR_IN_SECONDS", 365 * DAY_IN_SECONDS );
       --#@-
+      null;
    end Wp_Initial_Constants;
 
    -----------------------------------
@@ -164,7 +164,6 @@ is
 
    procedure Wp_Plugin_Directory_Constants
    is
-      use Ada.Strings.Unbounded;
       use Globals;
       use Hb_Common;
       use Inc_Options;
@@ -236,112 +235,95 @@ is
 --    end;
    end Wp_Plugin_Directory_Constants;
 
--- --
--- -- Defines cookie-related WordPress constants.
--- --
--- -- Defines constants after multisite is loaded.
--- --
--- -- @since 3.0.0
--- --
--- function wp_cookie_constants() then
---         --
---         -- Used to guarantee unique hash cookies.
---         --
---         -- @since 1.5.0
---         --
---         if ( ! defined( "COOKIEHASH" ) ) then
---                 $siteurl = get_site_option( "siteurl" );
---                 if ( $siteurl ) then
---                         define( "COOKIEHASH", md5( $siteurl ) );
---                 end; else then
---                         define( "COOKIEHASH", "" );
---                 end;
---         end;
+   -------------------------
+   -- Wp_Cookie_Constants --
+   -------------------------
 
---         --
---         -- @since 2.0.0
---         --
---         if ( ! defined( "USER_COOKIE" ) ) then
---                 define( "USER_COOKIE", "wordpressuser_" . COOKIEHASH );
---         end;
+   procedure Wp_Cookie_Constants
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Options;
+   begin
+      --
+      -- Used to guarantee unique hash cookies.
+      --
+      -- @since 1.5.0
+      --
+      if COOKIEHASH = "undefined" then
+         declare
+            SiteURL : constant String := Get_Site_Option ("siteurl");
+         begin
+            if SiteURL /= "" then
+               COOKIEHASH := +MD5 (SiteURL);
+            else
+               COOKIEHASH := +"";
+            end if;
+         end;
+      end if;
 
---         --
---         -- @since 2.0.0
---         --
---         if ( ! defined( "PASS_COOKIE" ) ) then
---                 define( "PASS_COOKIE", "wordpresspass_" . COOKIEHASH );
---         end;
+      --
+      -- @since 2.0.0
+      --
+      USER_COOKIE := "wordpressuser_" & COOKIEHASH;
 
---         --
---         -- @since 2.5.0
---         --
---         if ( ! defined( "AUTH_COOKIE" ) ) then
---                 define( "AUTH_COOKIE", "wordpress_" . COOKIEHASH );
---         end;
+      --
+      -- @since 2.0.0
+      --
+      PASS_COOKIE := "wordpresspass_" & COOKIEHASH;
 
---         --
---         -- @since 2.6.0
---         --
---         if ( ! defined( "SECURE_AUTH_COOKIE" ) ) then
---                 define( "SECURE_AUTH_COOKIE", "wordpress_sec_" . COOKIEHASH );
---         end;
+      --
+      -- @since 2.5.0
+      --
+      AUTH_COOKIE := "wordpress_" & COOKIEHASH;
 
---         --
---         -- @since 2.6.0
---         --
---         if ( ! defined( "LOGGED_IN_COOKIE" ) ) then
---                 define( "LOGGED_IN_COOKIE", "wordpress_logged_in_" . COOKIEHASH );
---         end;
+      --
+      -- @since 2.6.0
+      --
+      SECURE_AUTH_COOKIE := "wordpress_sec_" & COOKIEHASH;
 
---         --
---         -- @since 2.3.0
---         --
---         if ( ! defined( "TEST_COOKIE" ) ) then
---                 define( "TEST_COOKIE", "wordpress_test_cookie" );
---         end;
+      --
+      -- @since 2.6.0
+      --
+      LOGGED_IN_COOKIE := "wordpress_logged_in_" & COOKIEHASH;
 
---         --
---         -- @since 1.2.0
---         --
---         if ( ! defined( "COOKIEPATH" ) ) then
---                 define( "COOKIEPATH", preg_replace( "|https?://[^/]+|i", "", get_option( "home" ) . "/" ) );
---         end;
+      --
+      -- @since 2.3.0
+      --
+      TEST_COOKIE := +"wordpress_test_cookie";
 
---         --
---         -- @since 1.5.0
---         --
---         if ( ! defined( "SITECOOKIEPATH" ) ) then
---                 define( "SITECOOKIEPATH", preg_replace( "|https?://[^/]+|i", "", get_option( "siteurl" ) . "/" ) );
---         end;
+      --
+      -- @since 1.2.0
+      --
+      COOKIEPATH := +Preg_Replace ("|https?://[^/]+|i", "", Get_Option ("home") & "/");
 
---         --
---         -- @since 2.6.0
---         --
---         if ( ! defined( "ADMIN_COOKIE_PATH" ) ) then
---                 define( "ADMIN_COOKIE_PATH", SITECOOKIEPATH . "wp-admin" );
---         end;
+      --
+      -- @since 1.5.0
+      --
+      SITECOOKIEPATH :=
+        +Preg_Replace ("|https?://[^/]+|i", "", Get_Option ("siteurl") & "/");
 
---         --
---         -- @since 2.6.0
---         --
---         if ( ! defined( "PLUGINS_COOKIE_PATH" ) ) then
---                 define( "PLUGINS_COOKIE_PATH", preg_replace( "|https?://[^/]+|i", "", WP_PLUGIN_URL ) );
---         end;
+      --
+      -- @since 2.6.0
+      --
+      ADMIN_COOKIE_PATH := SITECOOKIEPATH & "wp-admin";
 
---         --
---         -- @since 2.0.0
---         --
---         if ( ! defined( "COOKIE_DOMAIN" ) ) then
---                 define( "COOKIE_DOMAIN", false );
---         end;
+      --
+      -- @since 2.6.0
+      --
+      PLUGINS_COOKIE_PATH := +Preg_Replace ("|https?://[^/]+|i", "",
+                                            -Globals.WP_PLUGIN_URL);
 
---         if ( ! defined( "RECOVERY_MODE_COOKIE" ) ) then
---                 --
---                 -- @since 5.2.0
---                 --
---                 define( "RECOVERY_MODE_COOKIE", "wordpress_rec_" . COOKIEHASH );
---         end;
--- end;
+      --
+      -- @since 2.0.0
+      --
+      COOKIE_DOMAIN := False;
+
+      --
+      -- @since 5.2.0
+      --
+      RECOVERY_MODE_COOKIE := "wordpress_rec_" & COOKIEHASH;
+   end Wp_Cookie_Constants;
 
 -- --
 -- -- Defines SSL-related WordPress constants.

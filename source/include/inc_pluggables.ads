@@ -6,10 +6,13 @@
 -- @package WordPress
 --
 
+with Arrays;
+
 with Inc_Class_Wp_Users;
 
 package Inc_Pluggables
 is
+   use Arrays;
 
    --
    -- Retrieves the current user object.
@@ -84,12 +87,51 @@ is
    -- @return string The token.
    --
    function Wp_Create_Nonce (Action : Integer := -1)
-            return String
-            is ("XXX-779");
+            return String;
 
    function Wp_Create_Nonce (Action : String)
             return String
             is ("XXX-780");
+
+   --
+   -- Returns the time-dependent variable for nonce creation.
+   --
+   -- A nonce has a lifespan of two ticks. Nonces in their second tick may be
+   -- updated, e.g. by autosave.
+   --
+   -- @since 2.5.0
+   -- @since 6.1.0 Added `action` argument.
+   --
+   -- @param string|int action Optional. The nonce action. Default -1.
+   -- @return float Float value rounded up to the next highest integer.
+   --
+   function Wp_Nonce_Tick (Action : Integer := -1)
+                           return Float;
+
+   --
+   -- Parses a cookie into its components.
+   --
+   -- @since 2.7.0
+   -- @since 4.0.0 The `token` element was added to the return value.
+   --
+   -- @param string cookie Authentication cookie.
+   -- @param string scheme Optional. The cookie scheme to use: 'auth', 'secure_auth',
+   --                       or 'logged_in'.
+   -- @return string[]|false {
+   --     Authentication cookie components. None of the components should be assumed
+   --     to be valid as they come directly from a client-provided cookie value. If
+   --     the cookie value is malformed, false is returned.
+   --
+   --     @type string username   User's username.
+   --     @type string expiration The time the cookie expires as a UNIX timestamp.
+   --     @type string token      User's session token used.
+   --     @type string hmac       The security hash for the cookie.
+   --     @type string scheme     The cookie scheme to use.
+   -- }
+   --
+   function Wp_Parse_Auth_Cookie (Cookie : String := "";
+                                  Scheme : String := "")
+                                  return Array_Type;
 
    --
    -- Ensures intent by verifying that a user was referred from another admin page
@@ -233,6 +275,85 @@ is
                         Args        : Integer := 0) -- = null
                         return String
                         is ("XXX-358");
+
+   --
+   -- Returns a salt to add to hashes.
+   --
+   -- Salts are created using secret keys. Secret keys are located in two places:
+   -- in the database and in the wp-config.php file. The secret key in the database
+   -- is randomly generated and will be appended to the secret keys in wp-config.php.
+   --
+   -- The secret keys in wp-config.php should be updated to strong, random keys to
+   -- maximize security. Below is an example of how the secret key constants are
+   -- defined. Do not paste this example directly into wp-config.php. Instead, have a
+   -- {@link https://api.wordpress.org/secret-key/1.1/salt/ secret key created} just
+   -- for you.
+   --
+   --     define('AUTH_KEY',
+   --        ' Xakm<o xQy rw4EMsLKM-?!T+,PFFend;)H4lzcW57AF0U@N@< >M%G4Yt>f`z]MON');
+   --     define('SECURE_AUTH_KEY',
+   --        'LzJend;op]mr|6+![Pend;Ak:uNdJCJZd>(Hx.-Mh#Tz)pCIU#uGEnfFz|f ;;eU%/U^O~');
+   --     define('LOGGED_IN_KEY',
+   --        '|i|Ux`9<p-haFf(qnT:sDO:D1P^wZ/Ra@miTJi9G;ddp_<qend;6H1)o|a +&JCM');
+   --     define('NONCE_KEY',
+   --        '%:Rthen[P|,s.KuMltH5end;cI;/k<Gx~j!f0I)m_sIyu+&NJZ)-iO>z7X>QYR0Z_XnZ@|');
+   --     define('AUTH_SALT',
+   --        'eZyT)-Naw]F8CwA*VaW#q*|.)g@o}||wf~@C-YSt}(dh_r6EbI#A,y|nU2{B#JBW');
+   --     define('SECURE_AUTH_SALT',
+   --        '!=oLUTXh,QW=H `}`L|9/^4-3 STz},T(w}W<I`.JjPi)<Bmf1v,HpGe}T1:Xt7n');
+   --     define('LOGGED_IN_SALT',
+   --        '+XSqHc;@Q*K_b|Z?NC[3H!!EONbh.n<+=uKR:>*c(u`g~EJBf#8u#RthenmUEZrozmm');
+   --     define('NONCE_SALT',
+   --        'h`GXHhD>SLWVfg1(1(N{;.V!MoE(SfbA_ksP@&`+AycHcAV+?@3q+rxV{%^VyKT');
+   --
+   -- Salting passwords helps against tools which has stored hashed values of
+   -- common dictionary strings. The added values makes it harder to crack.
+   --
+   -- @since 2.5.0
+   --
+   -- @link https://api.wordpress.org/secret-key/1.1/salt/ Create secrets for
+   --                                                      wp-config.php
+   --
+   -- @param string scheme Authentication scheme (auth, secure_auth, logged_in, nonce).
+   -- @return string Salt value
+   --
+   function Wp_Salt (Scheme : String := "auth")
+                     return String;
+
+   --
+   -- Gets hash of given string.
+   --
+   -- @since 2.0.3
+   --
+   -- @param string data   Plain text to hash.
+   -- @param string scheme Authentication scheme (auth, secure_auth, logged_in, nonce).
+   -- @return string Hash of data.
+   --
+   function Wp_Hash (Data   : String;
+                     Scheme : String := "auth")
+                     return String;
+
+   --
+   -- Generates a random password drawn from the defined set of characters.
+   --
+   -- Uses wp_rand() is used to create passwords with far less predictability
+   -- than similar native PHP functions like `rand()` or `mt_rand()`.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int  length              Optional. The length of password to generate.
+   --                                  Default 12.
+   -- @param bool special_chars       Optional. Whether to include standard special
+   --                                  characters. Default true.
+   -- @param bool extra_special_chars Optional. Whether to include other special
+   --                                  characters. Used when generating secret keys
+   --                                  and salts. Default false.
+   -- @return string The random password.
+   --
+   function Wp_Generate_Password (Length              : Natural := 12;
+                                  Special_Chars       : Boolean := True;
+                                  Extra_Special_Chars : Boolean := False)
+                                  return String;
 
    --
    -- Verifies that a correct security nonce was used with time limit.

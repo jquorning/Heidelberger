@@ -41,7 +41,7 @@ is
       use Inc_Load;
    begin
       if Name = "proto" then
-         return (if Is_Ssl
+         return (if Is_SSL
                  then "https://"
                  else "http://");
 

@@ -5,9 +5,11 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 with Inc_Class_Wp_List_Util;
 with Inc_Formatting;
+with Inc_Pluggables;
 
 with Globals;
 with Hb_Common;
@@ -1869,68 +1871,56 @@ is
 --         return esc_html( add_query_arg( $name, wp_create_nonce( $action ), $actionurl ) );
 -- end;
 
---
--- Retrieves or display nonce hidden field for forms.
---
--- The nonce field is used to validate that the contents of the form came from
--- the location on the current site and not somewhere else. The nonce does not
--- offer absolute protection, but should protect against most cases. It is very
--- important to use nonce field in forms.
---
--- The $action and $name are optional, but if you want to have better security,
--- it is strongly suggested to set those two parameters. It is easier to just
--- call the function without any parameters, because validation of the nonce
--- doesn't require any parameters, but since crackers know what the default is
--- it won't be difficult for them to find a way around your nonce and cause
--- damage.
---
--- The input name will be whatever $name value you gave. The input value will be
--- the nonce creation value.
---
--- @since 2.0.4
---
--- @param int|string $action  Optional. Action name. Default -1.
--- @param string     $name    Optional. Nonce name. Default '_wpnonce'.
--- @param bool       $referer Optional. Whether to set the referer field for validation. Default true.
--- @param bool       $echo    Optional. Whether to display or return hidden form field. Default true.
--- @return string Nonce field HTML markup.
---
--- function wp_nonce_field( $action = -1, $name = '_wpnonce', $referer = true, $echo = true ) then
---         $name        = esc_attr( $name );
---         $nonce_field = '<input type="hidden" id="' . $name . '" name="' . $name . '" value="' . wp_create_nonce( $action ) . '" />';
+   --------------------
+   -- Wp_Nonce_Field --
+   --------------------
 
---         if ( $referer ) then
---                 $nonce_field .= wp_referer_field( false );
---         end;
+   function Wp_Nonce_Field (Action  : String  := "-1"; -- = -1
+                            Name    : String  := "_wpnonce";
+                            Referer : Boolean := True;
+                            Echo    : Boolean := True)
+                            return String
+   is
+      use Inc_Formatting;
+      use Inc_Pluggables;
+      use Hb_Common;
 
---         if ( $echo ) then
---                 echo $nonce_field;
---         end;
+      Name_2 : constant String := ESC_Attr (Name);
+      Nonce_Field : Unbounded_String :=
+        +"<input type=""hidden"" id=""" & Name_2 & """ name=""" & Name_2 &
+        """ value=""" & Wp_Create_Nonce (Action) & """ />";
+   begin
+      if Referer then
+         Append (Nonce_Field, Wp_Referer_Field (False));
+      end if;
 
---         return $nonce_field;
--- end;
+      if Echo then
+         Php.Echo (-Nonce_Field);
+      end if;
 
---
--- Retrieves or displays referer hidden field for forms.
---
--- The referer link is the current Request URI from the server super global. The
--- input name is '_wp_http_referer', in case you wanted to check manually.
---
--- @since 2.0.4
---
--- @param bool $echo Optional. Whether to echo or return the referer field. Default true.
--- @return string Referer field HTML markup.
---
--- function wp_referer_field( $echo = true ) then
---         $request_url   = remove_query_arg( '_wp_http_referer' );
---         $referer_field = '<input type="hidden" name="_wp_http_referer" value="' . esc_url( $request_url ) . '" />';
+      return -Nonce_Field;
+   end Wp_Nonce_Field;
 
---         if ( $echo ) then
---                 echo $referer_field;
---         end;
+   ----------------------
+   -- Wp_Referer_Field --
+   ----------------------
 
---         return $referer_field;
--- end;
+   function Wp_Referer_Field (Echo : Boolean := True)
+                              return String
+   is
+      use Inc_Formatting;
+
+      Request_URL   : constant String := Remove_Query_Arg ("_wp_http_referer");
+      Referer_Field : constant String :=
+        "<input type=""hidden"" name=""_wp_http_referer"" value=""" &
+        ESC_URL (Request_URL) & """ />";
+   begin
+      if Echo then
+         Php.Echo (Referer_Field);
+      end if;
+
+      return Referer_Field;
+   end Wp_Referer_Field;
 
 --
 -- Retrieves or displays original referer hidden field for forms.
@@ -3664,6 +3654,14 @@ is
 -- end;
 --
 -- function wp_die( $message = '', $title = '', $args = array() ) then
+   procedure Wp_Die (Message : String  := "";
+                     Title   : String  := "";
+                     Code    : Integer := 0) -- , $args = array()
+   is
+   begin
+      raise Program_Die
+        with Title & " " & Message & " " & Integer'Image (Code);
+   end Wp_Die;
 --         global $wp_query;
 
 --         if ( is_int( $args ) ) then
@@ -4813,6 +4811,17 @@ is
 --
 -- function wp_parse_args( $args, $defaults = array() ) then
 
+   function Wp_Parse_Args (Args     : String;
+                           Defaults : Array_Type := Empty_Array)
+                           return Array_Type
+   is
+      Parsed_Args : Array_Type;
+   begin
+      Inc_Formatting.Wp_Parse_Str (Args, Parsed_Args);
+
+      return Array_Merge (Defaults, Parsed_Args);
+   end Wp_Parse_Args;
+
    function Wp_Parse_Args (Args     : Array_Type;
                            Defaults : Array_Type := Empty_Array)
                            return Array_Type
@@ -4833,6 +4842,17 @@ is
          return Array_Merge (Defaults, Parsed_Args);
       end if;
       return Parsed_Args;
+   end Wp_Parse_Args;
+
+   function Wp_Parse_Args (Args     : Boolean;
+                           Defaults : Array_Type := Empty_Array)
+                           return Array_Type
+   is
+      Parsed_Args : Array_Type;
+   begin
+--    Parsed_Args := Get_Object_Vars (Args);
+
+      return Array_Merge (Defaults, Parsed_Args);
    end Wp_Parse_Args;
 
 --
@@ -5837,8 +5857,12 @@ is
                                Message : String;
                                Version : String)
    is
+      use Ada.Text_IO;
    begin
-      null;
+      Put_Line ("X_Doing_It_Wrong");
+      Put_Line (Funct);
+      Put_Line (Message);
+      Put_Line (Version);
 
 --         --
 --         -- Fires when the given function is being used incorrectly.

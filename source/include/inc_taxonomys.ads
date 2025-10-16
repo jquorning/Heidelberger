@@ -5,7 +5,9 @@
 -- @subpackage Taxonomy
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
+
 with Ada.Strings.Unbounded;
 
 with Arrays;
@@ -17,6 +19,16 @@ package Inc_Taxonomys
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+
+   Taxonomy_Does_Not_Exist : exception;
+
+   package Taxonomy_Maps is new
+      Ada.Containers.Indefinite_Ordered_maps
+        (Key_Type     => String,
+         Element_Type => Inc_Class_Wp_Taxonomy.Wp_Taxonomy,
+         "="          => Inc_Class_Wp_Taxonomy."=");
+
+   Taxonomy_Map : Taxonomy_Maps.Map; -- Wp_Taxonomy
 
    --
    -- Taxonomy registration.
@@ -369,27 +381,45 @@ is
                                       return Boolean
                                       is (True);
 
---
--- Retrieves the taxonomy object of taxonomy.
---
--- The get_taxonomy function will first check that the parameter string given
--- is a taxonomy object and if it is, it will return it.
---
--- @since 2.3.0
---
--- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
---
--- @param string taxonomy Name of taxonomy object to return.
--- @return WP_Taxonomy|false The taxonomy object or false if taxonomy doesn"t exist.
---
-   function Get_Taxonomy (Taxonomy : String)
-                          return Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
-
+   --
+   -- Retrieves a list of registered taxonomy names or objects.
+   --
+   -- @since 3.0.0
+   --
+   -- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
+   --
+   -- @param array  args     Optional. An array of `key => value` arguments to match
+   --                         against the taxonomy objects. Default empty array.
+   -- @param string output   Optional. The type of output to return in the array.
+   --                         Accepts either taxonomy "names" or "objects". Default
+   --                         "names".
+   -- @param string operator Optional. The logical operation to perform. Accepts "and"
+   --                         or "or". "or" means only one element from the array
+   --                         needs to match; "and" means all elements must match.
+   --                         Default "and".
+   -- @return string()|WP_Taxonomy() An array of taxonomy names or objects.
+   --
    function Get_Taxonomies (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
                             Operator : String     := "and")
                             return Taxonomy_Array
                             is (Empty_Taxonomy_Array);
+
+   --
+   -- Retrieves the taxonomy object of taxonomy.
+   --
+   -- The get_taxonomy function will first check that the parameter string given
+   -- is a taxonomy object and if it is, it will return it.
+   --
+   -- @since 2.3.0
+   --
+   -- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
+   --
+   -- @param string taxonomy Name of taxonomy object to return.
+   -- @return WP_Taxonomy|false The taxonomy object or false if taxonomy doesn't exist.
+   --
+   function Get_Taxonomy (Taxonomy : String)
+                          return Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
 
 --
 -- Retrieves the cached term objects for the given object ID.
@@ -615,33 +645,34 @@ is
    function Is_Object_In_Taxonomy (Object_Type : String;
                                    Taxonomy    : String)
                                    return Boolean;
---
--- Determines whether the taxonomy name exists.
---
--- Formerly is_taxonomy(), introduced in 2.3.0.
---
--- For more information on this and similar theme functions, check out
--- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tags} article in the Theme Developer Handbook.
---
--- @since 3.0.0
---
--- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
---
--- @param string taxonomy Name of taxonomy object.
--- @return bool Whether the taxonomy exists.
---
-   function Taxonomy_Exists (Taxonomy : String)
-                             return Boolean is (True);
 
---
--- Enables or disables term counting.
---
--- @since 2.5.0
---
--- @param bool defer Optional. Enable if true, disable if false.
--- @return bool Whether term counting is enabled or disabled.
---
+   --
+   -- Determines whether the taxonomy name exists.
+   --
+   -- Formerly is_taxonomy(), introduced in 2.3.0.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 3.0.0
+   --
+   -- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
+   --
+   -- @param string taxonomy Name of taxonomy object.
+   -- @return bool Whether the taxonomy exists.
+   --
+   function Taxonomy_Exists (Taxonomy : String)
+                                return Boolean;
+
+   --
+   -- Enables or disables term counting.
+   --
+   -- @since 2.5.0
+   --
+   -- @param bool defer Optional. Enable if true, disable if false.
+   -- @return bool Whether term counting is enabled or disabled.
+   --
    function Wp_Defer_Term_Counting (Defer : Boolean := False) -- = null
                                     return Boolean
                                     is (False);

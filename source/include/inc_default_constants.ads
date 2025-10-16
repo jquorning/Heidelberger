@@ -5,8 +5,12 @@
 -- @package WordPress
 --
 
+with Ada.Strings.Unbounded;
+
 package Inc_Default_Constants
 is
+   use Ada.Strings.Unbounded;
+
    --
    -- Defines initial WordPress constants.
    --
@@ -28,6 +32,29 @@ is
    -- @since 3.0.0
    --
    procedure Wp_Plugin_Directory_Constants;
+
+   COOKIEHASH           : Unbounded_String := To_Unbounded_String ("undefined");
+   USER_COOKIE          : Unbounded_String;
+   PASS_COOKIE          : Unbounded_String;
+   AUTH_COOKIE          : Unbounded_String;
+   SECURE_AUTH_COOKIE   : Unbounded_String;
+   LOGGED_IN_COOKIE     : Unbounded_String;
+   TEST_COOKIE          : Unbounded_String;
+   COOKIEPATH           : Unbounded_String;
+   SITECOOKIEPATH       : Unbounded_String;
+   ADMIN_COOKIE_PATH    : Unbounded_String;
+   PLUGINS_COOKIE_PATH  : Unbounded_String;
+   COOKIE_DOMAIN        : Boolean;
+   RECOVERY_MODE_COOKIE : Unbounded_String;
+
+   --
+   -- Defines cookie-related WordPress constants.
+   --
+   -- Defines constants after multisite is loaded.
+   --
+   -- @since 3.0.0
+   --
+   procedure Wp_Cookie_Constants;
 
    --
    -- Defines functionality-related WordPress constants.

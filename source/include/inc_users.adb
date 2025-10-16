@@ -6,6 +6,10 @@
 -- @subpackage Users
 --
 
+with Hb_Common;
+
+with Inc_Pluggables;
+
 package body Inc_Users
 is
    procedure Dummy is null;
@@ -3442,17 +3446,21 @@ is
 --         wp_new_user_notification( user_id, null, notify );
 -- end;
 
--- --
--- -- Retrieves the current session token from the logged_in cookie.
--- --
--- -- @since 4.0.0
--- --
--- -- @return string Token.
--- --
--- function wp_get_session_token() then
---         cookie = wp_parse_auth_cookie( "", "logged_in" );
---         return ! empty( cookie["token"] ) ? cookie["token"] : "";
--- end;
+   --------------------------
+   -- Wp_Get_Session_Token --
+   --------------------------
+
+   function Wp_Get_Session_Token
+            return String
+   is
+      use Hb_Common;
+      use Inc_Pluggables;
+
+      Cookie : constant Array_Type := Wp_Parse_Auth_Cookie ("", "logged_in");
+   begin
+      return (if not Isset (Cookie, "token") then Get (Cookie, "token") else "");
+--    return (if not Empty (Cookie ("token")) then Get (Cookie, "token") else "");
+   end Wp_Get_Session_Token;
 
 -- --
 -- -- Retrieves a list of sessions for the current user.

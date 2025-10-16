@@ -6,6 +6,7 @@
 --
 
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Adi_Caches;
 with Adi_Templates;
@@ -39,15 +40,16 @@ is
 
    procedure Create_Initial_Taxonomies
    is
+      use Inc_Class_Wp_Taxonomy;
       use Inc_Options;
       use Inc_Plugins;
 --         global wp_rewrite;
       Rewrite          : Array_Type;
       Post_Format_Base : Unbounded_String;
    begin
---    Reset_Default_Labels; -- WP_Taxonomy::reset_default_labels();
+      Reset_Default_Labels; -- WP_Taxonomy::reset_default_labels();
 
-      if False then -- not Did_Action ("init") then
+      if not Did_Action ("init") then
          Rewrite := Arrays.To_Array ((
             Build ("category",    False),
             Build ("post_tag",    False),
@@ -269,15 +271,6 @@ is
 --                         Default "and".
 -- @return string()|WP_Taxonomy() An array of taxonomy names or objects.
 --
-
-   function Get_Taxonomy (Taxonomy : String)
-                          return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
-   is
-      T : Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
-   begin
-      return T;
-   end Get_Taxonomy;
-
 -- function get_taxonomies (args = array(), output = "names", operator = "and") then
 --         global wp_taxonomies;
 
@@ -333,50 +326,37 @@ is
 --         return taxonomies;
 -- end;
 
---
--- Retrieves the taxonomy object of taxonomy.
---
--- The get_taxonomy function will first check that the parameter string given
--- is a taxonomy object and if it is, it will return it.
---
--- @since 2.3.0
---
--- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
---
--- @param string taxonomy Name of taxonomy object to return.
--- @return WP_Taxonomy|false The taxonomy object or false if taxonomy doesn"t exist.
---
--- function get_taxonomy (taxonomy) then
---         global wp_taxonomies;
+   ------------------
+   -- Get_Taxonomy --
+   ------------------
 
---         if  (! taxonomy_exists (taxonomy)) then
---                 return false;
---         end;
+   function Get_Taxonomy (Taxonomy : String)
+                          return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
+   is
+      use Taxonomy_Maps;
+   begin
+      if not Taxonomy_Exists (Taxonomy) then
+         raise Taxonomy_Does_Not_Exist;
+--       return False;
+      end if;
 
---         return wp_taxonomies (taxonomy);
--- end;
+      return Element (Taxonomy_Map.Find (Taxonomy));
+   end Get_Taxonomy;
 
---
--- Determines whether the taxonomy name exists.
---
--- Formerly is_taxonomy(), introduced in 2.3.0.
---
--- For more information on this and similar theme functions, check out
--- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tags} article in the Theme Developer Handbook.
---
--- @since 3.0.0
---
--- @global WP_Taxonomy() wp_taxonomies The registered taxonomies.
---
--- @param string taxonomy Name of taxonomy object.
--- @return bool Whether the taxonomy exists.
---
--- function taxonomy_exists (taxonomy) then
---         global wp_taxonomies;
+   ---------------------
+   -- Taxonomy_Exists --
+   ---------------------
 
---         return is_string (taxonomy) && isset (wp_taxonomies (taxonomy));
--- end;
+   function Taxonomy_Exists (Taxonomy : String)
+                                return Boolean
+   is
+      use Taxonomy_Maps;
+   begin
+      return
+        Is_String (Taxonomy) and then
+        Has_Element (Taxonomy_Map.Find (Taxonomy));
+--      Isset (Taxonomy_Map (Taxonomy));
+   end Taxonomy_Exists;
 
 --
 -- Determines whether the taxonomy object is hierarchical.
@@ -524,7 +504,7 @@ is
    --                       Args);
    -- end Register_Taxonomy;
 
-   Taxonomies : Array_Type;
+-- Taxonomies : Array_Type;
 
    procedure Register_Taxonomy (Taxonomy    : String;
                                 Object_Type : List_Type;
@@ -577,6 +557,8 @@ is
       begin
          Taxonomy_Object.Add_Rewrite_Rules;
 
+         Taxonomy_Map.Include (Key      => Taxonomy,
+                               New_Item => Taxonomy_Object);
 --       Set (Taxonomies, Taxonomy, Taxonomy_Object);
 --       Wp_Taxonomies (Taxonomy) := Taxonomy_Object;
 
@@ -729,7 +711,8 @@ is
          Default_Labels : Array_Type;
          Taxonomy       : Unbounded_String;
       begin
-         Nohier_Vs_Hier_Defaults ("menu_name") := Nohier_Vs_Hier_Defaults ("name");
+         Set_Array (Nohier_Vs_Hier_Defaults, "menu_name",
+              Get_Array (Nohier_Vs_Hier_Defaults, "name"));
 
          Labels := Inc_Posts.X_Get_Custom_Object_Labels (Tax, Nohier_Vs_Hier_Defaults);
 

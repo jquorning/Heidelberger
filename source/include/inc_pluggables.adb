@@ -6,6 +6,21 @@
 -- @package WordPress
 --
 
+with Ada.Containers;
+with Ada.Strings.Unbounded;
+with Ada.Numerics.Discrete_Random;
+
+with Hb_Common;
+with Binder;
+with Globals;
+with Php;
+
+with Inc_Compat;
+with Inc_Default_Constants;
+with Inc_Load;
+with Inc_L10n;
+with Inc_Options;
+with Inc_Plugins;
 with Inc_Users;
 
 package body Inc_Pluggables
@@ -892,63 +907,80 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_parse_auth_cookie' ) ) :
---         --
---         -- Parses a cookie into its components.
---         --
---         -- @since 2.7.0
---         -- @since 4.0.0 The `token` element was added to the return value.
---         --
---         -- @param string cookie Authentication cookie.
---         -- @param string scheme Optional. The cookie scheme to use: 'auth', 'secure_auth', or 'logged_in'.
---         -- @return string[]|false then
---         --     Authentication cookie components. None of the components should be assumed
---         --     to be valid as they come directly from a client-provided cookie value. If
---         --     the cookie value is malformed, false is returned.
---         --
---         --     @type string username   User's username.
---         --     @type string expiration The time the cookie expires as a UNIX timestamp.
---         --     @type string token      User's session token used.
---         --     @type string hmac       The security hash for the cookie.
---         --     @type string scheme     The cookie scheme to use.
---         -- end;
---         --
---         function wp_parse_auth_cookie( cookie = '', scheme = '' ) then
---                 if ( empty( cookie ) ) then
---                         switch ( scheme ) then
---                                 case 'auth':
---                                         cookie_name = AUTH_COOKIE;
---                                         break;
---                                 case 'secure_auth':
---                                         cookie_name = SECURE_AUTH_COOKIE;
---                                         break;
---                                 case 'logged_in':
---                                         cookie_name = LOGGED_IN_COOKIE;
---                                         break;
---                                 default:
---                                         if ( is_ssl() ) then
---                                                 cookie_name = SECURE_AUTH_COOKIE;
---                                                 scheme      = 'secure_auth';
---                                         end; else then
---                                                 cookie_name = AUTH_COOKIE;
---                                                 scheme      = 'auth';
---                                         end;
---                         end;
 
---                         if ( empty( _COOKIE[ cookie_name ] ) ) then
---                                 return false;
---                         end;
---                         cookie = _COOKIE[ cookie_name ];
---                 end;
+   --------------------------
+   -- Wp_Parse_Auth_Cookie --
+   --------------------------
 
---                 cookie_elements = explode( '|', cookie );
---                 if ( count( cookie_elements ) !== 4 ) then
---                         return false;
---                 end;
+   function Wp_Parse_Auth_Cookie (Cookie : String := "";
+                                  Scheme : String := "")
+                                  return Array_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Binder;
+      use Hb_Common;
+      use Inc_Default_Constants;
+      use Inc_Load;
 
---                 list( username, expiration, token, hmac ) = cookie_elements;
+      Cookie_Name : Unbounded_String;
+      Cookie_2    : Unbounded_String := +Cookie;
+      Scheme_2    : Unbounded_String := +Scheme;
+   begin
+      if Cookie = "" then
+--    if ( empty( cookie ) ) then
+         if Scheme = "auth" then
+            -- case 'auth':
+            Cookie_Name := AUTH_COOKIE;
 
---                 return compact( 'username', 'expiration', 'token', 'hmac', 'scheme' );
---         end;
+         elsif Scheme = "secure_auth" then
+            Cookie_Name := SECURE_AUTH_COOKIE;
+
+         elsif Scheme = "logged_in" then
+            Cookie_Name := LOGGED_IN_COOKIE;
+
+         else
+            if Is_SSL then
+               Cookie_Name := SECURE_AUTH_COOKIE;
+               Scheme_2    := +"secure_auth";
+            else
+               Cookie_Name := AUTH_COOKIE;
+               Scheme_2    := +"auth";
+            end if;
+         end if;
+
+         if Empty (X_COOKIE, -Cookie_Name) then
+            return Empty_Array; -- false;
+         end if;
+         Cookie_2 := +Get (X_COOKIE, -Cookie_Name);
+      end if;
+
+      declare
+         use Ada.Containers;
+
+         Cookie_Elements : constant List_Type := Php.Explode ("|", -Cookie_2);
+      begin
+         if Cookie_Elements.Length /= 4 then
+            return Empty_Array; -- false;
+         end if;
+
+         declare
+            Username   : constant String := -Cookie_Elements (1);
+            Expiration : constant String := -Cookie_Elements (2);
+            Token      : constant String := -Cookie_Elements (3);
+            Hmac       : constant String := -Cookie_Elements (4);
+         begin
+            return To_Array (List => (
+              Build ("username",   Username),
+              Build ("expiration", Expiration),
+              Build ("token",      Token),
+              Build ("hmac",       Hmac),
+              Build ("scheme",     -Scheme_2)
+            ));
+--          return Php.Compact ("username", "expiration", "token", "hmac", "scheme");
+         end;
+      end;
+   end Wp_Parse_Auth_Cookie;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_set_auth_cookie' ) ) :
@@ -2239,32 +2271,34 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_nonce_tick' ) ) :
---         --
---         -- Returns the time-dependent variable for nonce creation.
---         --
---         -- A nonce has a lifespan of two ticks. Nonces in their second tick may be
---         -- updated, e.g. by autosave.
---         --
---         -- @since 2.5.0
---         -- @since 6.1.0 Added `action` argument.
---         --
---         -- @param string|int action Optional. The nonce action. Default -1.
---         -- @return float Float value rounded up to the next highest integer.
---         --
---         function wp_nonce_tick( action = -1 ) then
---                 --
---                 -- Filters the lifespan of nonces in seconds.
---                 --
---                 -- @since 2.5.0
---                 -- @since 6.1.0 Added `action` argument to allow for more targeted filters.
---                 --
---                 -- @param int        lifespan Lifespan of nonces in seconds. Default 86,400 seconds, or one day.
---                 -- @param string|int action   The nonce action, or -1 if none was provided.
---                 --
---                 nonce_life = apply_filters( 'nonce_life', DAY_IN_SECONDS, action );
 
---                 return ceil( time() / ( nonce_life / 2 ) );
---         end;
+   -------------------
+   -- Wp_Nonce_Tick --
+   -------------------
+
+   function Wp_Nonce_Tick (Action : Integer := -1)
+                           return Float
+   is
+      use Globals;
+      use Inc_Plugins;
+
+      Nonce_Life : Integer;
+   begin
+      --
+      -- Filters the lifespan of nonces in seconds.
+      --
+      -- @since 2.5.0
+      -- @since 6.1.0 Added `action` argument to allow for more targeted filters.
+      --
+      -- @param int        lifespan Lifespan of nonces in seconds. Default 86,400
+      --                            seconds, or one day.
+      -- @param string|int action   The nonce action, or -1 if none was provided.
+      --
+      Nonce_Life := Apply_Filters ("nonce_life", DAY_IN_SECONDS, Action);
+
+      return Float'Ceiling (0.0 / Float (Nonce_Life / 2));
+--    return Float'Ceil (time() / ( nonce_life / 2));
+   end Wp_Nonce_Tick;
 -- endif;
 
 -- if ( ! function_exists( 'wp_verify_nonce' ) ) :
@@ -2334,158 +2368,189 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_create_nonce' ) ) :
---         --
---         -- Creates a cryptographic token tied to a specific action, user, user session,
---         -- and window of time.
---         --
---         -- @since 2.0.3
---         -- @since 4.0.0 Session tokens were integrated with nonce creation.
---         --
---         -- @param string|int action Scalar value to add context to the nonce.
---         -- @return string The token.
---         --
---         function wp_create_nonce( action = -1 ) then
---                 user = wp_get_current_user();
---                 uid  = (int) user->ID;
---                 if ( ! uid ) then
---                         -- This filter is documented in wp-includes/pluggable.php--
---                         uid = apply_filters( 'nonce_user_logged_out', uid, action );
---                 end;
 
---                 token = wp_get_session_token( action );
---                 i     = wp_nonce_tick( action );
+   ---------------------
+   -- Wp_Create_Nonce --
+   ---------------------
 
---                 return substr( wp_hash( i . '|' . action . '|' . uid . '|' . token, 'nonce' ), -12, 10 );
---         end;
+   function Wp_Create_Nonce (Action : Integer := -1)
+            return String
+   is
+      use Inc_Class_Wp_Users;
+      use Inc_Plugins;
+      use Inc_Users;
+
+      User : constant Wp_User := Wp_Get_Current_User;
+      Uid  : Integer := User.ID; -- (int)
+   begin
+      if Uid = 0 then
+         -- This filter is documented in wp-includes/pluggable.php
+         Uid := Apply_Filters ("nonce_user_logged_out", Uid, Action);
+      end if;
+
+      declare
+         Token : constant String := Wp_Get_Session_Token;
+         I     : constant Float  := Wp_Nonce_Tick (Action);
+      begin
+         return Php.Substr
+           (Wp_Hash (Float'Image (I) & '|' & Integer'Image (Action) & '|' &
+                     Integer'Image (Uid) & '|' & Token, "nonce"),
+                    -12, 10);
+      end;
+   end Wp_Create_Nonce;
 -- endif;
 
 -- if ( ! function_exists( 'wp_salt' ) ) :
---         --
---         -- Returns a salt to add to hashes.
---         --
---         -- Salts are created using secret keys. Secret keys are located in two places:
---         -- in the database and in the wp-config.php file. The secret key in the database
---         -- is randomly generated and will be appended to the secret keys in wp-config.php.
---         --
---         -- The secret keys in wp-config.php should be updated to strong, random keys to maximize
---         -- security. Below is an example of how the secret key constants are defined.
---         -- Do not paste this example directly into wp-config.php. Instead, have a
---         -- {@link https://api.wordpress.org/secret-key/1.1/salt/ secret key created} just
---         -- for you.
---         --
---         --     define('AUTH_KEY',         ' Xakm<o xQy rw4EMsLKM-?!T+,PFFend;)H4lzcW57AF0U@N@< >M%G4Yt>f`z]MON');
---         --     define('SECURE_AUTH_KEY',  'LzJend;op]mr|6+![Pend;Ak:uNdJCJZd>(Hx.-Mh#Tz)pCIU#uGEnfFz|f ;;eU%/U^O~');
---         --     define('LOGGED_IN_KEY',    '|i|Ux`9<p-haFf(qnT:sDO:D1P^wZ/Ra@miTJi9G;ddp_<qend;6H1)o|a +&JCM');
---         --     define('NONCE_KEY',        '%:Rthen[P|,s.KuMltH5end;cI;/k<Gx~j!f0I)m_sIyu+&NJZ)-iO>z7X>QYR0Z_XnZ@|');
---         --     define('AUTH_SALT',        'eZyT)-Naw]F8CwA*VaW#q*|.)g@oend;||wf~@C-YStend;(dh_r6EbI#A,y|nU2thenB#JBW');
---         --     define('SECURE_AUTH_SALT', '!=oLUTXh,QW=H `end;`L|9/^4-3 STzend;,T(wend;W<I`.JjPi)<Bmf1v,HpGeend;T1:Xt7n');
---         --     define('LOGGED_IN_SALT',   '+XSqHc;@Q*K_b|Z?NC[3H!!EONbh.n<+=uKR:>*c(u`g~EJBf#8u#RthenmUEZrozmm');
---         --     define('NONCE_SALT',       'h`GXHhD>SLWVfg1(1(Nthen;.V!MoE(SfbA_ksP@&`+AycHcAV+?@3q+rxVthen%^VyKT');
---         --
---         -- Salting passwords helps against tools which has stored hashed values of
---         -- common dictionary strings. The added values makes it harder to crack.
---         --
---         -- @since 2.5.0
---         --
---         -- @link https://api.wordpress.org/secret-key/1.1/salt/ Create secrets for wp-config.php
---         --
---         -- @param string scheme Authentication scheme (auth, secure_auth, logged_in, nonce).
---         -- @return string Salt value
---         --
---         function wp_salt( scheme = 'auth' ) then
---                 static cached_salts = array();
---                 if ( isset( cached_salts[ scheme ] ) ) then
---                         --
---                         -- Filters the WordPress salt.
---                         --
---                         -- @since 2.5.0
---                         --
---                         -- @param string cached_salt Cached salt for the given scheme.
---                         -- @param string scheme      Authentication scheme. Values include 'auth',
---                         --                            'secure_auth', 'logged_in', and 'nonce'.
---                         --
---                         return apply_filters( 'salt', cached_salts[ scheme ], scheme );
---                 end;
 
---                 static duplicated_keys;
---                 if ( null === duplicated_keys ) then
---                         duplicated_keys = array(
---                                 'put your unique phrase here'       => true,
---                                 /*
---                                 -- translators: This string should only be translated if wp-config-sample.php is localized.
---                                 -- You can check the localized release package or
---                                 -- https://i18n.svn.wordpress.org/<locale code>/branches/<wp version>/dist/wp-config-sample.php
---                                 --
---                                 __( 'put your unique phrase here' ) => true,
---                         );
---                         foreach ( array( 'AUTH', 'SECURE_AUTH', 'LOGGED_IN', 'NONCE', 'SECRET' ) as first ) then
---                                 foreach ( array( 'KEY', 'SALT' ) as second ) then
---                                         if ( ! defined( "thenfirstend;_thensecondend;" ) ) then
---                                                 continue;
---                                         end;
---                                         value                     = constant( "thenfirstend;_thensecondend;" );
---                                         duplicated_keys[ value ] = isset( duplicated_keys[ value ] );
---                                 end;
---                         end;
---                 end;
+   Static_Cached_Salts    : Array_Type;
+   Static_Duplicated_Keys : Array_Type;
 
---                 values = array(
---                         'key'  => '',
---                         'salt' => '',
---                 );
---                 if ( defined( 'SECRET_KEY' ) && SECRET_KEY && empty( duplicated_keys[ SECRET_KEY ] ) ) then
---                         values['key'] = SECRET_KEY;
---                 end;
---                 if ( 'auth' === scheme && defined( 'SECRET_SALT' ) && SECRET_SALT && empty( duplicated_keys[ SECRET_SALT ] ) ) then
---                         values['salt'] = SECRET_SALT;
---                 end;
+   SECRET_KEY  : constant String := "";
+   SECRET_SALT : constant String := "";
 
---                 if ( in_array( scheme, array( 'auth', 'secure_auth', 'logged_in', 'nonce' ), true ) ) then
---                         foreach ( array( 'key', 'salt' ) as type ) then
---                                 const = strtoupper( "thenschemeend;_thentypeend;" );
---                                 if ( defined( const ) && constant( const ) && empty( duplicated_keys[ constant( const ) ] ) ) then
---                                         values[ type ] = constant( const );
---                                 end; elseif ( ! values[ type ] ) then
---                                         values[ type ] = get_site_option( "thenschemeend;_thentypeend;" );
---                                         if ( ! values[ type ] ) then
---                                                 values[ type ] = wp_generate_password( 64, true, true );
---                                                 update_site_option( "thenschemeend;_thentypeend;", values[ type ] );
---                                         end;
---                                 end;
---                         end;
---                 end; else then
---                         if ( ! values['key'] ) then
---                                 values['key'] = get_site_option( 'secret_key' );
---                                 if ( ! values['key'] ) then
---                                         values['key'] = wp_generate_password( 64, true, true );
---                                         update_site_option( 'secret_key', values['key'] );
---                                 end;
---                         end;
---                         values['salt'] = hash_hmac( 'md5', scheme, values['key'] );
---                 end;
+   -------------
+   -- Wp_Salt --
+   -------------
 
---                 cached_salts[ scheme ] = values['key'] . values['salt'];
+   function Wp_Salt (Scheme : String := "auth")
+                     return String
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_L10n;
+      use Inc_Options;
+      use Inc_Plugins;
+   begin
+      if Isset (Static_Cached_Salts, Scheme) then
+         --
+         -- Filters the WordPress salt.
+         --
+         -- @since 2.5.0
+         --
+         -- @param string cached_salt Cached salt for the given scheme.
+         -- @param string scheme      Authentication scheme. Values include 'auth',
+         --                            'secure_auth', 'logged_in', and 'nonce'.
+         --
+         return Apply_Filters ("salt", Get (Static_Cached_Salts, Scheme), Scheme);
+      end if;
 
---                 -- This filter is documented in wp-includes/pluggable.php--
---                 return apply_filters( 'salt', cached_salts[ scheme ], scheme );
---         end;
+      if Static_Duplicated_Keys = Empty_Array then
+         Static_Duplicated_Keys := To_Array (List => (
+           Build ("put your unique phrase here", True),
+           --
+           -- translators: This string should only be translated if
+           -- wp-config-sample.php is localized.
+           -- You can check the localized release package or
+           -- https://i18n.svn.wordpress.org/<locale code>/branches/<wp version>
+           -- /dist/wp-config-sample.php
+           --
+           Build (abs "put your unique phrase here", True)
+         ));
+         for
+           First of To_List (List => (+"AUTH", +"SECURE_AUTH", +"LOGGED_IN",
+                                      +"NONCE", +"SECRET"))
+         loop
+            for Second of To_List (List => (+"KEY", +"SALT")) loop
+--             if not Defined ("{first}_{second}") then
+--                goto Continue;
+--             end if;
+
+               declare
+                  Value : constant String := (-First) & "_" & (-Second);
+               begin
+                  Set_Boolean (Static_Duplicated_Keys, Value,
+                               Isset (Static_Duplicated_Keys, Value));
+               end;
+               << Continue >>
+            end loop;
+         end loop;
+      end if;
+
+      declare
+         Values : Array_Type := To_Array (List => (
+           Build ("key",  ""),
+           Build ("salt", "")
+         ));
+      begin
+         if
+--         Defined ('SECRET_KEY') and then
+           SECRET_KEY /= "" and then
+           Empty (Static_Duplicated_Keys, SECRET_KEY)
+         then
+            Set (Values, "key", SECRET_KEY);
+         end if;
+
+         if
+           "auth" = Scheme and then
+--         Defined ("SECRET_SALT") and then
+           SECRET_SALT /= "" and then
+           Empty (Static_Duplicated_Keys, SECRET_SALT)
+         then
+            Set (Values, "salt", SECRET_SALT);
+         end if;
+
+         if
+           In_Array (Scheme, To_List (List => (+"auth", +"secure_auth",
+                                               +"logged_in", +"nonce")), True)
+         then
+            for Typ of To_List (List => (+"key", +"salt")) loop
+               declare
+                  Const : constant String := Php.Strtoupper (Scheme & "_" & (-Typ));
+               begin
+                  if
+--                  Defined (const) and then
+--                  constant( const ) and then
+                    Empty (Static_Duplicated_Keys, Const) -- [ constant( const ) ])
+                  then
+                     Set (Values, -Typ, Const); -- constant( const ));
+                  elsif not Isset (Values, -Typ) then
+--                elsif not Values (Typ) then
+                     Set (Values, -Typ, Get_Site_Option (Scheme & "_" & (-Typ)));
+                     if not Isset (Values, -Typ) then
+--                   if not Values (Typ) then
+                        Set (Values, -Typ, Wp_Generate_Password (64, True, True));
+                        Update_Site_Option (Scheme & "_" & (-Typ), Get (Values, -Typ));
+                     end if;
+                  end if;
+               end;
+            end loop;
+         else
+            if not Isset (Values, "key") then
+--          if not Values ("key") then
+               Set (Values, "key", Get_Site_Option ("secret_key"));
+               if not Isset (Values, "key") then
+--             if not Values ("key") then
+                  Set (Values, "key", Wp_Generate_Password (64, True, True));
+                  Update_Site_Option ("secret_key", Get (Values, "key"));
+               end if;
+            end if;
+            Set (Values, "salt", Inc_Compat.Hash_Hmac ("md5", Scheme, Get (Values, "key")));
+         end if;
+
+         Set (Static_Cached_Salts, Scheme, Get (Values, "key") & Get (Values, "salt"));
+--       Set (Static_Cached_Salts, Scheme, Values ("key") & Values ("salt"));
+
+         -- This filter is documented in wp-includes/pluggable.php--
+         return Apply_Filters ("salt", Get (Static_Cached_Salts, Scheme), Scheme);
+      end;
+   end Wp_Salt;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_hash' ) ) :
---         --
---         -- Gets hash of given string.
---         --
---         -- @since 2.0.3
---         --
---         -- @param string data   Plain text to hash.
---         -- @param string scheme Authentication scheme (auth, secure_auth, logged_in, nonce).
---         -- @return string Hash of data.
---         --
---         function wp_hash( data, scheme = 'auth' ) then
---                 salt = wp_salt( scheme );
 
---                 return hash_hmac( 'md5', data, salt );
---         end;
+   -------------
+   -- Wp_Hash --
+   -------------
+
+   function Wp_Hash (Data   : String;
+                     Scheme : String := "auth")
+                     return String
+   is
+      Salt : constant String := Wp_Salt (Scheme);
+   begin
+      return Inc_Compat.Hash_Hmac ("md5", Data, Salt);
+   end Wp_Hash;
 -- endif;
 
 -- if ( ! function_exists( 'wp_hash_password' ) ) :
@@ -2579,48 +2644,68 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_generate_password' ) ) :
---         --
---         -- Generates a random password drawn from the defined set of characters.
---         --
---         -- Uses wp_rand() is used to create passwords with far less predictability
---         -- than similar native PHP functions like `rand()` or `mt_rand()`.
---         --
---         -- @since 2.5.0
---         --
---         -- @param int  length              Optional. The length of password to generate. Default 12.
---         -- @param bool special_chars       Optional. Whether to include standard special characters.
---         --                                  Default true.
---         -- @param bool extra_special_chars Optional. Whether to include other special characters.
---         --                                  Used when generating secret keys and salts. Default false.
---         -- @return string The random password.
---         --
---         function wp_generate_password( length = 12, special_chars = true, extra_special_chars = false ) then
---                 chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
---                 if ( special_chars ) then
---                         chars .= '!@#%^&*()';
---                 end;
---                 if ( extra_special_chars ) then
---                         chars .= '-_ []thenend;<>~`+=,.;:/?|';
---                 end;
 
---                 password = '';
---                 for ( i = 0; i < length; i++ ) then
---                         password .= substr( chars, wp_rand( 0, strlen( chars ) - 1 ), 1 );
---                 end;
+   --------------------------
+   -- Wp_Generate_Password --
+   --------------------------
 
---                 --
---                 -- Filters the randomly-generated password.
---                 --
---                 -- @since 3.0.0
---                 -- @since 5.3.0 Added the `length`, `special_chars`, and `extra_special_chars` parameters.
---                 --
---                 -- @param string password            The generated password.
---                 -- @param int    length              The length of password to generate.
---                 -- @param bool   special_chars       Whether to include standard special characters.
---                 -- @param bool   extra_special_chars Whether to include other special characters.
---                 --
---                 return apply_filters( 'random_password', password, length, special_chars, extra_special_chars );
---         end;
+   function Wp_Generate_Password (Length              : Natural := 12;
+                                  Special_Chars       : Boolean := True;
+                                  Extra_Special_Chars : Boolean := False)
+                                  return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Plugins;
+
+      Chars : Unbounded_String :=
+        +"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      Password : Unbounded_String;
+   begin
+      if Special_Chars then
+         Append (Chars, "!@#%^&*()");
+      end if;
+
+      if Extra_Special_Chars then
+         Append (Chars, "-_ []{}<>~`+=,.;:/?|");
+      end if;
+
+      declare
+         subtype Result_Type is Positive
+           range 1 .. Ada.Strings.Unbounded.Length (Chars);
+
+         package Rand is new
+           Ada.Numerics.Discrete_Random (Result_Subtype => Result_Type);
+
+         Gen : Rand.Generator;
+      begin
+         Rand.Reset (Gen);
+
+         for I in 1 .. Length loop
+            Append (Password,
+                    Substr (-Chars, Rand.Random (Gen), 1));
+--                       Wp_Rand (0, Ada.Strings.Unbounded.Length (Chars) - 1), 1));
+         end loop;
+      end;
+
+      --
+      -- Filters the randomly-generated password.
+      --
+      -- @since 3.0.0
+      -- @since 5.3.0 Added the `length`, `special_chars`, and `extra_special_chars`
+      --              parameters.
+      --
+      -- @param string password            The generated password.
+      -- @param int    length              The length of password to generate.
+      -- @param bool   special_chars       Whether to include standard special
+      --                                    characters.
+      -- @param bool   extra_special_chars Whether to include other special characters.
+      --
+      return Apply_Filters ("random_password", -Password, Length,
+                            Special_Chars, Extra_Special_Chars);
+   end Wp_Generate_Password;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_rand' ) ) :

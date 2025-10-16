@@ -347,9 +347,23 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean;
-                           B         : String;
-                           D         : Boolean)
+                           S         : String;
+                           B         : Boolean)
                            return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Integer;
+                           B         : Integer)
+                           return Integer
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           B         : Integer;
+                           S         : Boolean;
+                           E         : Boolean)
+                           return String
                            is (Value);
 
    --

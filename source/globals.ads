@@ -49,7 +49,9 @@ is
    STYLESHEETPATH   : Unbounded_String;
    WP_DEFAULT_THEME : Unbounded_String;
 
-   MINUTE_IN_SECONDS : Natural;
+   MINUTE_IN_SECONDS : constant Natural := 60;
+   HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
+   DAY_IN_SECONDS    : constant Natural := 24 * HOUR_IN_SECONDS;
 
    SITECOOKIEPATH : Unbounded_String;
 

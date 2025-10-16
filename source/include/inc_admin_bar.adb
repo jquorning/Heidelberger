@@ -583,7 +583,7 @@ is
          return;
       end if;
 
-      Current_Url := +(if Is_Ssl then "https://" else "http://") &
+      Current_Url := +(if Is_SSL then "https://" else "http://") &
                        Get (X_SERVER, "HTTP_HOST") &
                        Get (X_SERVER, "REQUEST_URI");
 

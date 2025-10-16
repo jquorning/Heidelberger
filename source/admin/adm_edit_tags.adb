@@ -6,16 +6,18 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Templates_Parser;
 
-with Arrays;
+with Arrays.Io;
 with Binder;
 with Globals;
 with Hb_Common;
 with Php;
 with Wp_Common;
 
+with Adm_Admin;
 with Adm_Menu;
 
 with Adi_Class_Wp_Screens;
@@ -77,7 +79,15 @@ is
       use Inc_Class_Wp_Taxonomy;
       use Inc_Class_Wp_Terms;
    begin
-      Tax := Get_Taxonomy (-Taxnow);
+      Adm_Admin.Run;
+
+      begin
+         Tax := Get_Taxonomy (-Taxnow);
+      exception
+         when Taxonomy_Does_Not_Exist =>
+            null;
+--          Wp_Die (abs "Invalid taxonomy.");
+      end;
 --    Tax : constant Wp_Taxonomy := Get_Taxonomy (-Taxnow);
 --    Taxonomy : constant String := ""; -- jq
 
@@ -349,7 +359,7 @@ is
                  To_List (Item => Get (X_REQUEST, "delete_tags"));
             begin
                -- This action is documented in wp-admin/edit.php
-               Location := +Apply_Filters ("handle_bulk_actions-thenscreenend;",
+               Location := +Apply_Filters ("handle_bulk_actions-{screen}",
                                            -Location, X_Wp_List_Table.Current_Action,
                                            Tags);
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
@@ -606,12 +616,13 @@ is
 --                        Get (Tax.Labels, "add_new_item"));
 
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
+                     Clear_Echo;
                      declare
                         Unused : String :=
                            Inc_Functions.Wp_Nonce_Field ("add-tag",
                                                          "_wpnonce_add-tag");
                      begin
-                        Set ("VAR_edit_tags_add_tag", "XXX-82");
+                        Set ("VAR_edit_tags_add_tag", Get_Echo);
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_can_edit_terms" then
@@ -678,8 +689,9 @@ is
                      Set ("VAR_edit_tags_description", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_display" then
+                     Clear_Echo;
                      X_Wp_List_Table.Display;
-                     Set ("VAR_edit_tags_display", "XXX-451");
+                     Set ("VAR_edit_tags_display", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_do_action_deprecated" then
                      if "category" = Taxonomy then
@@ -745,7 +757,8 @@ is
                      --
                      -- Fires after the taxonomy list table.
                      --
-                     -- The dynamic portion of the hook name, `taxonomy`, refers to the taxonomy slug.
+                     -- The dynamic portion of the hook name, `taxonomy`, refers to
+                     -- the taxonomy slug.
                      --
                      -- Possible hook names include:
                      --
@@ -764,7 +777,8 @@ is
                      --
                      -- Fires inside the Add Tag form tag.
                      --
-                     -- The dynamic portion of the hook name, `taxonomy`, refers to the taxonomy slug.
+                     -- The dynamic portion of the hook name, `taxonomy`, refers to
+                     -- the taxonomy slug.
                      --
                      -- Possible hook names include:
                      --
@@ -779,7 +793,8 @@ is
                   elsif Var_Name = "VAR_edit_tags_do_tax_add_form_fields" then
                      if not Is_Taxonomy_Hierarchical (-Taxonomy) then
                         --
-                        -- Fires after the Add Tag form fields for non-hierarchical taxonomies.
+                        -- Fires after the Add Tag form fields for non-hierarchical
+                        -- taxonomies.
                         --
                         -- @since 3.0.0
                         --
@@ -791,7 +806,8 @@ is
                      --
                      -- Fires after the Add Term form fields.
                      --
-                     -- The dynamic portion of the hook name, `taxonomy`, refers to the taxonomy slug.
+                     -- The dynamic portion of the hook name, `taxonomy`, refers to
+                     -- the taxonomy slug.
                      --
                      -- Possible hook names include:
                      --
@@ -804,19 +820,19 @@ is
                      --
                      Do_Action ((-Taxonomy) & "_add_form_fields", -Taxonomy);
 
-                     Set ("VAR_edit_tags_do_tax_add_form_fields", "XX-86");
+                     Set ("VAR_edit_tags_do_tax_add_form_fields", "XXX-86");
 
                   elsif Var_Name = "VAR_edit_tags_dropdown" then
                      declare
                         use Inc_Category_Templates;
 
                         Dropdown_Args : Array_Type := To_Array (List => (
-                                      Build ("hide_empty",       "0"),
-                                      Build ("hide_if_empty",    "false"),
+                                      Build ("hide_empty",       0),
+                                      Build ("hide_if_empty",    False),
                                       Build ("taxonomy",         -Taxonomy),
                                       Build ("name",             "parent"),
                                       Build ("orderby",          "name"),
-                                      Build ("hierarchical",     "true"),
+                                      Build ("hierarchical",     True),
                                       Build ("show_option_none", abs "None")
                                       ));
 
@@ -843,15 +859,15 @@ is
                         --
                         Unused : Unbounded_String;
                      begin
-                        Dropdown_Args := Apply_Filters ("taxonomy_parent_dropdown_args",
-                                                        Dropdown_Args, -Taxonomy, "new");
+                        Dropdown_Args :=
+                          Apply_Filters ("taxonomy_parent_dropdown_args",
+                                         Dropdown_Args, -Taxonomy, "new");
 
                         Set (Dropdown_Args, "aria_describedby", "parent-description");
---                      Dropdown_Args ("aria_describedby") := "parent-description";
 
                         Unused := +Wp_Dropdown_Categories (Dropdown_Args);
 
-                        Set ("VAR_edit_tags_dropdown", "XXX-87");
+                        Set ("VAR_edit_tags_dropdown", -Unused);
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_h1_sub" then
@@ -874,8 +890,9 @@ is
                      end;
 
                   elsif Var_Name = "VAR_edit_tags_inline_edit" then
+                     Clear_Echo;
                      X_Wp_List_Table.Inline_Edit;
-                     Set ("VAR_edit_tags_inline_edit", "XXX-463");
+                     Set ("VAR_edit_tags_inline_edit", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_is_tax_hierarchical" then
                      Set ("VAR_edit_tags_is_tax_hierarchical",
@@ -888,8 +905,8 @@ is
                      Set ("VAR_edit_tags_message_set", Message /= "");
 
                   elsif Var_Name = "VAR_edit_tags_name_field_description" then
-                     Set ("VAR_edit_tags_name_field_description", "XXX-908");
---                        Get (Tax.Labels, "name_field_description"));
+                     Set ("VAR_edit_tags_name_field_description",
+                          Get (Tax.Labels, "name_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_not_is_mobile" then
                      Set ("VAR_edit_tags_not_is_mobile", not Inc_Vars.Wp_Is_Mobile);
@@ -916,28 +933,28 @@ is
                   elsif Var_Name = "VAR_edit_tags_search_box" then
                      Clear_Echo;
                      Search_Box (X_Wp_List_Table,
-                                 "XXX-906", -- Get (Tax.Labels, "search_items"),
+                                 Get (Tax.Labels, "search_items"),
                                  "tag");
                      Set ("VAR_edit_tags_search_box", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_slug_field_description" then
-                     Set ("VAR_edit_tags_slug_field_description", "XXX-909");
---                        Get (Tax.Labels, "slug_field_description"));
+                     Set ("VAR_edit_tags_slug_field_description",
+                          Get (Tax.Labels, "slug_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_submit_button" then
                      Clear_Echo;
                      Adi_Templates.Submit_Button
-                       ("XXX-911", -- Get (Tax.Labels, "add_new_item"),
+                       (Get (Tax.Labels, "add_new_item"),
                         "primary", "submit", False);
                      Set ("VAR_edit_tags_submit_button", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_tax_field_description" then
-                     Set ("VAR_edit_tags_tax_field_description", "XXX-910");
---                        Get (Tax.Labels, "parent_field_description"));
+                     Set ("VAR_edit_tags_tax_field_description",
+                          Get (Tax.Labels, "parent_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_tax_parent_item" then
-                     Set ("VAR_edit_tags_tax_parent_item", "XXX-910");
---                        Inc_Formatting.ESC_HTML (Get (Tax.Labels, "parent_item")));
+                     Set ("VAR_edit_tags_tax_parent_item",
+                          Inc_Formatting.ESC_HTML (Get (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
                      Set ("VAR_edit_tags_taxonomy", ESC_Attr (-Taxonomy));
@@ -952,8 +969,9 @@ is
                           Current_User_Can ("import"));
 
                   elsif Var_Name = "VAR_edit_tags_views" then
+                     Clear_Echo;
                      X_Wp_List_Table.Views;
-                     Set ("VAR_edit_tags_views", "XXX-452");
+                     Set ("VAR_edit_tags_views", Get_Echo);
                   end if;
                end Value;
 

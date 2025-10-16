@@ -1631,7 +1631,7 @@ is
    begin
       if
 --         Empty (Post) and then
-        Isset (String'(Get (Globals.GLOBALS, "post")))
+        Isset (Globals.GLOBALS, "post")
       then
          null;
 --       Post_2 := Get (Globals.GLOBALS, "post");
@@ -2759,7 +2759,7 @@ is
         not Isset (Object.Labels, "singular_name") and then
         Isset (Get (Object.Labels, "name"))
       then
-         Object.Labels.Include ("singular_name", Object.Labels ("name"));
+         Object.Labels.Include ("singular_name", Get (Object.Labels, "name"));
       end if;
 
       if not Isset (Object.Labels, "name_admin_bar") then
@@ -2773,21 +2773,24 @@ is
         not Isset (Object.Labels, "menu_name") and then
         Isset (Object.Labels, "name")
       then
-         Object.Labels ("menu_name") := Object.Labels ("name");
+         Set (Object.Labels, "menu_name",
+              Get (Object.Labels, "name"));
       end if;
 
       if
         not Isset (Object.Labels, "all_items") and then
         Isset (Object.Labels, "menu_name")
       then
-         Object.Labels ("all_items") := Object.Labels ("menu_name");
+         Set (Object.Labels, "all_items",
+              Get (Object.Labels, "menu_name"));
       end if;
 
       if
          not Isset (Object.Labels, "archives") and then
          Isset (Object.Labels, "all_items")
       then
-         Object.Labels ("archives") := Object.Labels ("all_items");
+         Set (Object.Labels, "archives",
+              Get (Object.Labels, "all_items"));
       end if;
 
       declare
@@ -2797,11 +2800,12 @@ is
             declare
                Key   : constant String       := Array_Maps.Key (A);
                Value : constant Array_Record := Array_Maps.Element (A);
+               Arry  : constant Array_Type   := Value.Arry.all;
             begin
                Defaults.Include (Key,
                                  (if Object.Hierarchical
-                                  then "XXX-923"   -- "Get (Value) --  (1)
-                                  else "XXX-924")); -- First_Key     (Value));   --  (0)
+                                  then Arry.Last_Element
+                                  else Arry.First_Element));
             end;
          end loop;
 

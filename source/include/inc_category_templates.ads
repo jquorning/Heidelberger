@@ -72,7 +72,7 @@ is
    --
    function Wp_Dropdown_Categories (Args : Array_Type := Empty_Array) -- := "")
                                     return String
-                                    is ("XXX-447");
+                                    is ("XXX-449");
 
    --
    -- Retrieves the terms of the taxonomy that are attached to the post.
