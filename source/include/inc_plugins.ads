@@ -316,7 +316,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
-                           D         : String;
+                           D         : String := "";
                            P         : Array_Type)
                            return String
                            is (Value);

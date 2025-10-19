@@ -32,47 +32,71 @@ is
    -- @since 6.1.0 Introduced the `aria_describedby` argument.
    --
    -- @param array|string $args {
-   --     Optional. Array or string of arguments to generate a categories drop-down element. See WP_Term_Query::__construct()
-   --     for information on additional accepted arguments.
+   --     Optional. Array or string of arguments to generate a categories drop-down
+   --     element. See WP_Term_Query::__construct() for information on additional
+   --     accepted arguments.
    --
-   --     @type string       $show_option_all   Text to display for showing all categories. Default empty.
-   --     @type string       $show_option_none  Text to display for showing no categories. Default empty.
-   --     @type string       $option_none_value Value to use when no category is selected. Default empty.
-   --     @type string       $orderby           Which column to use for ordering categories. See get_terms() for a list
-   --                                           of accepted values. Default 'id' (term_id).
-   --     @type bool         $pad_counts        See get_terms() for an argument description. Default false.
-   --     @type bool|int     $show_count        Whether to include post counts. Accepts 0, 1, or their bool equivalents.
-   --                                           Default 0.
-   --     @type bool|int     $echo              Whether to echo or return the generated markup. Accepts 0, 1, or their
-   --                                           bool equivalents. Default 1.
-   --     @type bool|int     $hierarchical      Whether to traverse the taxonomy hierarchy. Accepts 0, 1, or their bool
+   --     @type string       $show_option_all   Text to display for showing all
+   --                                           categories. Default empty.
+   --     @type string       $show_option_none  Text to display for showing no
+   --                                           categories. Default empty.
+   --     @type string       $option_none_value Value to use when no category is
+   --                                           selected. Default empty.
+   --     @type string       $orderby           Which column to use for ordering
+   --                                           categories. See get_terms() for a list
+   --                                           of accepted values. Default 'id'
+   --                                           (term_id).
+   --     @type bool         $pad_counts        See get_terms() for an argument
+   --                                           description. Default false.
+   --     @type bool|int     $show_count        Whether to include post counts.
+   --                                           Accepts 0, 1, or their bool
+   --                                           equivalents. Default 0.
+   --     @type bool|int     $echo              Whether to echo or return the
+   --                                           generated markup. Accepts 0, 1, or
+   --                                           their bool equivalents. Default 1.
+   --     @type bool|int     $hierarchical      Whether to traverse the taxonomy
+   --                                           hierarchy. Accepts 0, 1, or their bool
    --                                           equivalents. Default 0.
    --     @type int          $depth             Maximum depth. Default 0.
-   --     @type int          $tab_index         Tab index for the select element. Default 0 (no tabindex).
-   --     @type string       $name              Value for the 'name' attribute of the select element. Default 'cat'.
-   --     @type string       $id                Value for the 'id' attribute of the select element. Defaults to the value
+   --     @type int          $tab_index         Tab index for the select element.
+   --                                           Default 0 (no tabindex).
+   --     @type string       $name              Value for the 'name' attribute of the
+   --                                           select element. Default 'cat'.
+   --     @type string       $id                Value for the 'id' attribute of the
+   --                                           select element. Defaults to the value
    --                                           of `$name`.
-   --     @type string       $class             Value for the 'class' attribute of the select element. Default 'postform'.
-   --     @type int|string   $selected          Value of the option that should be selected. Default 0.
-   --     @type string       $value_field       Term field that should be used to populate the 'value' attribute
-   --                                           of the option elements. Accepts any valid term field: 'term_id', 'name',
-   --                                           'slug', 'term_group', 'term_taxonomy_id', 'taxonomy', 'description',
-   --                                           'parent', 'count'. Default 'term_id'.
-   --     @type string|array $taxonomy          Name of the taxonomy or taxonomies to retrieve. Default 'category'.
-   --     @type bool         $hide_if_empty     True to skip generating markup if no categories are found.
-   --                                           Default false (create select element even if no categories are found).
-   --     @type bool         $required          Whether the `<select>` element should have the HTML5 'required' attribute.
+   --     @type string       $class             Value for the 'class' attribute of the
+   --                                           select element. Default 'postform'.
+   --     @type int|string   $selected          Value of the option that should be
+   --                                           selected. Default 0.
+   --     @type string       $value_field       Term field that should be used to
+   --                                           populate the 'value' attribute of the
+   --                                           option elements. Accepts any valid
+   --                                           term field: 'term_id', 'name', 'slug',
+   --                                           'term_group', 'term_taxonomy_id',
+   --                                           'taxonomy', 'description', 'parent',
+   --                                           'count'. Default 'term_id'.
+   --     @type string|array $taxonomy          Name of the taxonomy or taxonomies to
+   --                                           retrieve. Default 'category'.
+   --     @type bool         $hide_if_empty     True to skip generating markup if no
+   --                                           categories are found. Default false
+   --                                           (create select element even if no
+   --                                           categories are found).
+   --     @type bool         $required          Whether the `<select>` element should
+   --                                           have the HTML5 'required' attribute.
    --                                           Default false.
-   --     @type Walker       $walker            Walker object to use to build the output. Default empty which results in a
-   --                                           Walker_CategoryDropdown instance being used.
-   --     @type string       $aria_describedby  The 'id' of an element that contains descriptive text for the select.
+   --     @type Walker       $walker            Walker object to use to build the
+   --                                           output. Default empty which results
+   --                                           in a Walker_CategoryDropdown instance
+   --                                           being used.
+   --     @type string       $aria_describedby  The 'id' of an element that contains
+   --                                           descriptive text for the select.
    --                                           Default empty string.
    -- }
    -- @return string HTML dropdown list of categories.
    --
    function Wp_Dropdown_Categories (Args : Array_Type := Empty_Array) -- := "")
-                                    return String
-                                    is ("XXX-449");
+                                    return String;
 
    --
    -- Retrieves the terms of the taxonomy that are attached to the post.
@@ -89,5 +113,25 @@ is
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array;
                            -- Inc_Class_Posts.Wp_Post;
+
+   --
+   -- Retrieves HTML dropdown (select) content for category list.
+   --
+   -- @since 2.1.0
+   -- @since 5.3.0 Formalized the existing `...$args` parameter by adding it
+   --              to the function signature.
+   --
+   -- @uses Walker_CategoryDropdown to create HTML dropdown content.
+   -- @see Walker::walk() for parameters and return description.
+   --
+   -- @param mixed ...$args Elements array, maximum hierarchical depth and optional
+   --                       additional arguments.
+   -- @return string
+   --
+   function Walk_Category_Dropdown_Tree
+     (Categories : Array_Type; -- Inc_Class_Wp_Terms.Wp_Term_Array; -- ...$args
+      Depth      : Integer;
+      Args       : Array_Type)
+      return String;
 
 end Inc_Category_Templates;

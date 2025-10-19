@@ -6,9 +6,11 @@
 -- @since 4.7.0
 --
 
+with Hb_Common;
+with Php;
+
 package body Inc_Class_Wp_Querys
 is
-   procedure Dummy is null;
 
 --         --
 --         -- Resets query flags to false.
@@ -1317,23 +1319,23 @@ is
 --                 do_action_ref_array( 'set_404', array( $this ) );
 --         end;
 
---         --
---         -- Retrieves the value of a query variable.
---         --
---         -- @since 1.5.0
---         -- @since 3.9.0 The `$default_value` argument was introduced.
---         --
---         -- @param string $query_var     Query variable key.
---         -- @param mixed  $default_value Optional. Value to return if the query variable is not set. Default empty string.
---         -- @return mixed Contents of the query variable.
---         --
---         public function get( $query_var, $default_value = '' ) then
---                 if ( isset( $this->query_vars[ $query_var ] ) ) then
---                         return $this->query_vars[ $query_var ];
---                 end;
+   ---------
+   -- Get --
+   ---------
 
---                 return $default_value;
---         end;
+   function Get (This          : Wp_Query;
+                 Query_Var     : String;
+                 Default_Value : String := "")
+                 return String
+   is
+      use Hb_Common;
+   begin
+      if Isset (This.Query_Vars, Query_Var) then
+         return Get (This.Query_Vars, Query_Var);
+      end if;
+
+      return Default_Value;
+   end Get;
 
 --         --
 --         -- Sets the value of a query variable.
@@ -3593,44 +3595,49 @@ is
 --                 return false;
 --         end;
 
---         --
---         -- Is the query for an existing category archive page?
---         --
---         -- If the $category parameter is specified, this function will additionally
---         -- check if the query is for one of the categories specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @param int|string|int[]|string[] $category Optional. Category ID, name, slug, or array of such
---         --                                            to check against. Default empty.
---         -- @return bool Whether the query is for an existing category archive page.
---         --
---         public function is_category( $category = '' ) then
---                 if ( ! $this->is_category ) then
---                         return false;
---                 end;
+   -----------------
+   -- Is_Category --
+   -----------------
 
---                 if ( empty( $category ) ) then
---                         return true;
---                 end;
+   function Is_Category (This     : Wp_Query;
+                         Category : String := "")
+                         return Boolean
+   is
+      use Hb_Common;
+      use Php;
+   begin
+      if not This.Is_Category then
+         return False;
+      end if;
 
---                 $cat_obj = $this->get_queried_object();
---                 if ( ! $cat_obj ) then
---                         return false;
---                 end;
+      if Empty (Category) then
+         return True;
+      end if;
 
---                 $category = array_map( 'strval', (array) $category );
+      declare
+         use Inc_Class_Wp_Terms; -- Posts;
 
---                 if ( in_array( (string) $cat_obj->term_id, $category, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $cat_obj->name, $category, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $cat_obj->slug, $category, true ) ) then
---                         return true;
---                 end;
+         Cat_Obj : constant Wp_Term := This.Get_Queried_Object;
+      begin
+         if Cat_Obj = Null_Term then
+--       if not Cat_Obj then
+            return False;
+         end if;
 
---                 return false;
---         end;
+         declare
+            Category_2 : List_Type; --  := Category; -- Array_Map ("strval", (array) Category);
+         begin
+            if In_Array (Integer'Image (Cat_Obj.Term_Id), Category_2, True) then -- (string)
+               return True;
+            elsif In_Array (-Cat_Obj.Name, Category_2, True) then
+               return True;
+            elsif In_Array (-Cat_Obj.Slug, Category_2, True) then
+               return True;
+            end if;
+         end;
+      end;
+      return False;
+   end Is_Category;
 
 --         --
 --         -- Is the query for an existing tag archive page?

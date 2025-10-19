@@ -109,14 +109,18 @@ is
 
       end record;
 
-   Null_Term : constant Wp_Term := (Term_Id => 0, Term_Group => 0,
-                                    Term_Taxonomy_Id => 0, Parent => 0,
-                                    Count => 0, others => Null_Unbounded_String);
+   Null_Term : constant Wp_Term :=
+     (Term_Id          => 0,
+      Term_Group       => 0,
+      Term_Taxonomy_Id => 0,
+      Parent           => 0,
+      Count            => 0,
+      others           => Null_Unbounded_String);
 
    package Term_Vectors is new
       Ada.Containers.Vectors (Index_Type   => Positive,
                               Element_Type => Wp_Term);
---                              "="          => Inc_Class_Wp_Terms."=");
+
    subtype Wp_Term_Array is Term_Vectors.Vector;
    Empty_Term_Array : constant Wp_Term_Array := Term_Vectors.Empty_Vector;
 

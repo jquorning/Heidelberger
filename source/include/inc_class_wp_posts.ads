@@ -317,8 +317,11 @@ is
                       return Array_Type;
 
    Null_Post : constant Wp_Post :=
-     (Id => 0, Post_Parent => 0, Menu_Order => 0, Dyn => Null_Property_Type,
-      others => Null_Unbounded_String);
+     (Id          => 0,
+      Post_Parent => 0,
+      Menu_Order  => 0,
+      Dyn         => Null_Property_Type,
+      others      => Null_Unbounded_String);
 
    type Wp_Post_Array is array (Positive range <>) of Wp_Post;
 

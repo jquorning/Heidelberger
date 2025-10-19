@@ -11,26 +11,24 @@ with Ada.Strings.Unbounded;
 with Arrays;
 
 with Inc_Class_Wp_Posts;
--- with Inc_Class_Posts;
+with Inc_Class_Wp_Terms;
 
 package Inc_Class_Wp_Querys
 is
    use Ada.Strings.Unbounded;
    use Arrays;
 
-   procedure Dummy;
---
--- The WordPress Query class.
---
--- @link https://developer.wordpress.org/reference/classes/wp_query/
---
--- @since 1.5.0
--- @since 4.5.0 Removed the `$comments_popup` property.
---
--- #[AllowDynamicProperties]
+   --
+   -- The WordPress Query class.
+   --
+   -- @link https://developer.wordpress.org/reference/classes/wp_query/
+   --
+   -- @since 1.5.0
+   -- @since 4.5.0 Removed the `$comments_popup` property.
+   --
+   -- #[AllowDynamicProperties]
    type Wp_Query is tagged
       record
-
         --
         -- Query vars set by the user.
         --
@@ -284,7 +282,7 @@ is
         -- @since 1.5.0
         -- @var bool
         --
-        Is_Category : Boolean := False;
+        Is_Category_2 : Boolean := False; -- _2 add to avoid clash with method
 
         --
         -- Signifies whether the current query is for a tag archive.
@@ -504,6 +502,22 @@ is
                        is (Inc_Class_Wp_Posts.Null_Post);
 
    --
+   -- Retrieves the value of a query variable.
+   --
+   -- @since 1.5.0
+   -- @since 3.9.0 The `$default_value` argument was introduced.
+   --
+   -- @param string $query_var     Query variable key.
+   -- @param mixed  $default_value Optional. Value to return if the query variable
+   --                              is not set. Default empty string.
+   -- @return mixed Contents of the query variable.
+   --
+   function Get (This          : Wp_Query;
+                 Query_Var     : String;
+                 Default_Value : String := "")
+                 return String;
+
+   --
    -- Retrieves the currently queried object.
    --
    -- If queried object is not set, then the queried object will be set from
@@ -518,6 +532,27 @@ is
                                 return Inc_Class_Wp_Posts.Wp_Post
                                 is (Inc_Class_Wp_Posts.Null_Post);
 
+   function Get_Queried_Object (This : Wp_Query)
+                                return Inc_Class_Wp_Terms.Wp_Term
+                                is (Inc_Class_Wp_Terms.Null_Term);
+
+   --
+   -- Is the query for an existing category archive page?
+   --
+   -- If the $category parameter is specified, this function will additionally
+   -- check if the query is for one of the categories specified.
+   --
+   -- @since 3.1.0
+   --
+   -- @param int|string|int[]|string[] $category Optional. Category ID, name, slug,
+   --                                            or array of such to check against.
+   --                                            Default empty.
+   -- @return bool Whether the query is for an existing category archive page.
+   --
+   function Is_Category (This     : Wp_Query;
+                         Category : String := "")
+                         return Boolean;
+
    --
    -- Sets up the WordPress query by parsing query string.
    --
@@ -531,5 +566,19 @@ is
    function Query (Query : Array_Type)
                    return Inc_Class_Wp_Posts.Wp_Post_Array
                    is (Inc_Class_Wp_Posts.Empty_Wp_Post_Array);
+
+   Null_Query : constant Wp_Query :=
+     (Query                 => Empty_Array,
+      Query_Vars            => Empty_Array,
+      Queried_Object_Id     => 0,
+      Request               => Null_Unbounded_String,
+      Post_Count            => 0,
+      Current_Post          => 0,
+      Comment_Count         => 0,
+      Current_Comment       => 0,
+      Found_Posts           => 0,
+      Max_Num_Pages         => 0,
+      Max_Num_Comment_Pages => 0,
+      others                => False);
 
 end Inc_Class_Wp_Querys;
