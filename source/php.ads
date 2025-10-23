@@ -5,9 +5,16 @@ package Php
 is
    use Arrays;
 
+   Debug : exception;
+
    function Get_Object_Vars (Arry : Array_Type) return Array_Type;
    function Get_Object_Vars (Object : Inc_Class_Wp_Posts.Wp_Post)
                              return Array_Type is (Empty_Array);
+
+   function Strstr (Haystack      : String;
+                    Needle        : String;
+                    Before_Needle : Boolean := False)
+                    return String;
 
    function Strpos (Item    : String;
                     Pattern : String)
@@ -18,11 +25,17 @@ is
 
    function Str_Replace (Search  : String;
                          Replace : String;
-                         Item    : String) return String is ("XXX-112");
+                         Subject : String)
+                         return String;
 
    function Str_Replace (Search  : List_Type;
                          Replace : String;
                          Item    : String) return String is ("XXX-221");
+
+   function Substr (Str    : String;
+                    Offset : Integer;
+                    Length : Integer := 0)
+                    return String;
 
    function Preg_Replace (Left : String; Right : String) return Integer is (1);
 
@@ -80,6 +93,10 @@ is
                         Right : String) return List_Type
       is (Left);
 
+   function Strlen (Item : String)
+                    return Natural
+                    is (Item'Length);
+
    function Strtoupper (Item : String) return String is (Item);
    function Strtolower (Item : String) return String is (Item);
 
@@ -133,16 +150,17 @@ is
                      is (Empty_List);
 
    function Explode (Separator : String;
-                     Item      : String)
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
                      return List_Type;
 
    function Implode (Separator : String;
                      Arry      : Array_Type)
-                     return String is ("XXX-206");
+                     return String;
 
    function Implode (Separator : String;
                      Arry      : String)
-                     return String is ("XXX-206");
+                     return String is ("XXX-208");
 
    function Implode (Separator : String;
                      List      : List_Type)
@@ -156,7 +174,7 @@ is
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
 
-   function Urlencode (Item : String) return String is ("XXX-301");
+   function URLencode (Item : String) return String is ("XXX-301");
 
    function Is_Int (A : Integer)   return Boolean is (True);
    function Is_String (A : String) return Boolean is (True);
@@ -176,12 +194,6 @@ is
    function Is_Dir (Filename : String)
                     return Boolean
                     is (False);
-
-   function Substr (Str    : String;
-                    Offset : Integer;
-                    Length : Integer := 0)
-                    return String
-                    is ("XXX-309");
 
    function Stripslashes (Item : String)
                           return String
@@ -261,10 +273,17 @@ is
                        return String
                        is ("XXX-332");
 
+   procedure Array_Pop (Arry : List_Type)
+                        is null;
+
    function Array_Push (Arry  : Array_Type;
                         Value : Integer)
                         return Integer
                         is (1);
+
+   procedure Array_Push (Arry  : Array_Type;
+                         Value : String)
+                         is null;
 
    function Array_Push (Arry  : List_Type;
                         Value : String)
@@ -380,9 +399,8 @@ is
                   return List_Type
                   is (Empty_List);
 
-   function Addslash (Item : String)
-            return String
-            is ("XXX-713");
+   function Addslashes (Item : String)
+            return String;
 
    function Printf (Format : String;
                     Args   : List_Type)

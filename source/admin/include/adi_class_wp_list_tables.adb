@@ -72,7 +72,8 @@ is
 
       if Get_Boolean (Args_2, "ajax") then
          -- wp_enqueue_script( "list-table" );
-         Add_Action ("admin_footer", "Empty_Array"); -- To_Array (This, "_js_vars"));
+--       Add_Action ("admin_footer", "Empty_Array"); -- To_Array (This, "_js_vars"));
+         null;
       end if;
 
       if Empty (This.Modes) then

@@ -205,6 +205,18 @@ is
                     is (Item & "XXX-513");
 
    --
+   -- Navigates through an array, object, or scalar, and encodes the values to be used
+   -- in a URL.
+   --
+   -- @since 2.2.0
+   --
+   -- @param mixed value The array or string to be encoded.
+   -- @return mixed The encoded value.
+   --
+   function URLencode_Deep (Value : Array_Type)
+                            return Array_Type;
+
+   --
    -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
    --
    -- Escapes text strings for echoing in JS. It is intended to be used for inline JS
@@ -350,6 +362,24 @@ is
                          Suffix : String := "")
                          return String
                          is ("XXX-446");
+
+   --
+   -- Maps a function to all non-iterable elements of an array or an object.
+   --
+   -- This is similar to `array_walk_recursive()` but acts upon objects too.
+   --
+   -- @since 4.4.0
+   --
+   -- @param mixed    value    The array, object, or scalar.
+   -- @param callable callback The function to map onto value.
+   -- @return mixed The value with the callback applied to all non-arrays and
+   --               non-objects inside it.
+   --
+   type Callable is access function (Item : String) return String;
+
+   function Map_Deep (Value    : Array_Type;
+                      Callback : Callable)
+                      return Array_Type;
 
    --
    -- WordPress implementation of PHP sprintf() with filters.

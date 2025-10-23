@@ -11,6 +11,7 @@ with Inc_Class_Wp_List_Util;
 with Inc_Formatting;
 with Inc_Pluggables;
 
+with Binder;
 with Globals;
 with Hb_Common;
 with Php;
@@ -1034,200 +1035,227 @@ is
 --         end;
 -- end;
 
---
--- Builds URL query based on an associative and, or indexed array.
---
--- This is a convenient function for easily building url queries. It sets the
--- separator to '&' and uses _http_build_query() function.
---
--- @since 2.3.0
---
--- @see _http_build_query() Used to build the query
--- @link https://www.php.net/manual/en/function.http-build-query.php for more on what
---       http_build_query() does.
---
--- @param array $data URL-encode key/value pairs.
--- @return string URL-encoded string.
---
--- function build_query( $data ) then
---         return _http_build_query( $data, null, '&', '', false );
--- end;
+   -----------------
+   -- Build_Query --
+   -----------------
 
---
--- From php.net (modified by Mark Jaquith to behave like the native PHP5 function).
---
--- @since 3.2.0
--- @access private
---
--- @see https://www.php.net/manual/en/function.http-build-query.php
---
--- @param array|object $data      An array or object of data. Converted to array.
--- @param string       $prefix    Optional. Numeric index. If set, start parameter numbering with it.
---                                Default null.
--- @param string       $sep       Optional. Argument separator; defaults to 'arg_separator.output'.
---                                Default null.
--- @param string       $key       Optional. Used to prefix key name. Default empty.
--- @param bool         $urlencode Optional. Whether to use urlencode() in the result. Default true.
--- @return string The query string.
---
--- function _http_build_query( $data, $prefix = null, $sep = null, $key = '', $urlencode = true ) then
---         $ret = array();
+   function Build_Query (Data : Array_Type)
+                         return String
+   is
+   begin
+      return X_HTTP_Build_Query (Data, "", "&", "", False); -- First "" was null
+   end Build_Query;
 
---         foreach ( (array) $data as $k => $v ) then
---                 if ( $urlencode ) then
---                         $k = urlencode( $k );
---                 end;
---                 if ( is_int( $k ) && null != $prefix ) then
---                         $k = $prefix . $k;
---                 end;
---                 if ( ! empty( $key ) ) then
---                         $k = $key . '%5B' . $k . '%5D';
---                 end;
---                 if ( null === $v ) then
---                         continue;
---                 end; elseif ( false === $v ) then
---                         $v = '0';
---                 end;
+   ------------------------
+   -- X_HTTP_Build_Query --
+   ------------------------
 
---                 if ( is_array( $v ) || is_object( $v ) ) then
---                         array_push( $ret, _http_build_query( $v, '', $sep, $k, $urlencode ) );
---                 end; elseif ( $urlencode ) then
---                         array_push( $ret, $k . '=' . urlencode( $v ) );
---                 end; else then
---                         array_push( $ret, $k . '=' . $v );
---                 end;
---         end;
+   function X_HTTP_Build_Query (Data      : Array_Type;
+                                Prefix    : String := ""; -- null
+                                Sep       : String := ""; -- null
+                                Key       : String := "";
+                                URLencode : Boolean := True)
+                                return String
+   is
+      use Hb_Common;
 
---         if ( null === $sep ) then
---                 $sep = ini_get( 'arg_separator.output' );
---         end;
+      Ret : Array_Type;
+   begin
+      for A in Data.Iterate loop
+         declare
+            K   : Unbounded_String      := +Array_Maps.Key (A);
+            V   : constant Array_Record := Array_Maps.Element (A);
+            V_2 : Unbounded_String      := +To_String (V.Str);
+         begin
+            if URLencode then
+               K := +Php.URLencode (-K);
+            end if;
 
---         return implode( $sep, $ret );
--- end;
+--          if K.Is_Integer and then "" /= Prefix then
+--          if Is_Int (-K) and then "" /= Prefix then
+--             K := +Prefix & K.Int'Image;
+--          end if;
 
---
--- Retrieves a modified URL query string.
---
--- You can rebuild the URL and append query variables to the URL query by using this function.
--- There are two ways to use this function; either a single key and value, or an associative array.
---
--- Using a single key and value:
---
---     add_query_arg( 'key', 'value', 'http://example.com' );
---
--- Using an associative array:
---
---     add_query_arg( array(
---         'key1' => 'value1',
---         'key2' => 'value2',
---     ), 'http://example.com' );
---
--- Omitting the URL from either use results in the current URL being used
--- (the value of `$_SERVER['REQUEST_URI']`).
---
--- Values are expected to be encoded appropriately with urlencode() or rawurlencode().
---
--- Setting any query variable's value to boolean false removes the key (see remove_query_arg()).
---
--- Important: The return value of add_query_arg() is not escaped by default. Output should be
--- late-escaped with esc_url() or similar to help prevent vulnerability to cross-site scripting
--- (XSS) attacks.
---
--- @since 1.5.0
--- @since 5.3.0 Formalized the existing and already documented parameters
---              by adding `...$args` to the function signature.
---
--- @param string|array $key   Either a query variable key, or an associative array of query variables.
--- @param string       $value Optional. Either a query variable value, or a URL to act upon.
--- @param string       $url   Optional. A URL to act upon.
--- @return string New URL query string (unescaped).
---
--- function add_query_arg( ...$args ) then
---         if ( is_array( $args[0] ) ) then
---                 if ( count( $args ) < 2 || false === $args[1] ) then
---                         $uri = $_SERVER['REQUEST_URI'];
---                 end; else then
---                         $uri = $args[1];
---                 end;
---         end; else then
---                 if ( count( $args ) < 3 || false === $args[2] ) then
---                         $uri = $_SERVER['REQUEST_URI'];
---                 end; else then
---                         $uri = $args[2];
---                 end;
---         end;
+            if not Empty (Key) then
+               K := +Key & "%5B" & K & "%5D";
+            end if;
 
---         $frag = strstr( $uri, '#' );
---         if ( $frag ) then
---                 $uri = substr( $uri, 0, -strlen( $frag ) );
---         end; else then
---                 $frag = '';
---         end;
+            if V.Kind = Is_Null then
+--          if "" = V then
+               goto Continue;
+            elsif V.Kind = Is_Boolean and then V.Bool = False then
+--          elsif false = V then
+               V_2 := +"0";
+            end if;
 
---         if ( 0 === stripos( $uri, 'http://' ) ) then
---                 $protocol = 'http://';
---                 $uri      = substr( $uri, 7 );
---         end; elseif ( 0 === stripos( $uri, 'https://' ) ) then
---                 $protocol = 'https://';
---                 $uri      = substr( $uri, 8 );
---         end; else then
---                 $protocol = '';
---         end;
+            if V.Kind = Is_Array then -- (V) or else Is_Object (V) then
+--          if Is_Array (V) or else Is_Object (V) then
+               Array_Push (Ret, X_HTTP_Build_Query
+                  (V.Arry.all, "", Sep, -K, URLencode));
 
---         if ( strpos( $uri, '?' ) !== false ) then
---                 list( $base, $query ) = explode( '?', $uri, 2 );
---                 $base                .= '?';
---         end; elseif ( $protocol || strpos( $uri, '=' ) === false ) then
---                 $base  = $uri . '?';
---                 $query = '';
---         end; else then
---                 $base  = '';
---                 $query = $uri;
---         end;
+            elsif URLencode then
+               Array_Push (Ret, -(K & "=" & Php.URLencode (-V_2)));
 
---         wp_parse_str( $query, $qs );
---         $qs = urlencode_deep( $qs ); // This re-URL-encodes things that were already in the query string.
---         if ( is_array( $args[0] ) ) then
---                 foreach ( $args[0] as $k => $v ) then
---                         $qs[ $k ] = $v;
---                 end;
---         end; else then
---                 $qs[ $args[0] ] = $args[1];
---         end;
+            else
+               Array_Push (Ret, -(K & "=" & (-V_2)));
+            end if;
+         end;
+         << Continue >>
+      end loop;
 
---         foreach ( $qs as $k => $v ) then
---                 if ( false === $v ) then
---                         unset( $qs[ $k ] );
---                 end;
---         end;
+      declare
+         Sep_2 : constant String :=
+           (if Sep = "" then Ini_Get ("arg_separator.output") else Sep);
+      begin
+         return Implode (Sep_2, Ret);
+      end;
+   end X_HTTP_Build_Query;
 
---         $ret = build_query( $qs );
---         $ret = trim( $ret, '?' );
---         $ret = preg_replace( '#=(&|$)#', '$1', $ret );
---         $ret = $protocol . $base . $ret . $frag;
---         $ret = rtrim( $ret, '?' );
---         $ret = str_replace( '?#', '#', $ret );
---         return $ret;
--- end;
+   -------------------
+   -- Add_Query_Arg --
+   -------------------
 
---
--- Removes an item or items from a query string.
---
--- @since 1.5.0
---
--- @param string|string[] $key   Query key or keys to remove.
--- @param false|string    $query Optional. When false uses the current URL. Default false.
--- @return string New URL query string.
---
--- function remove_query_arg( $key, $query = false ) then
---         if ( is_array( $key ) ) then // Removing multiple keys.
---                 foreach ( $key as $k ) then
---                         $query = add_query_arg( $k, false, $query );
---                 end;
---                 return $query;
---         end;
---         return add_query_arg( $key, false, $query );
--- end;
+   function Add_Query_Arg (Key   : List_Type;
+                           Value : String;
+                           URL   : String := "")
+                           return String
+   is
+      use Hb_Common;
+      use Inc_Formatting;
+
+      Protocol : Unbounded_String;
+      Frag     : Unbounded_String;
+      Base     : Unbounded_String;
+      Qs       : Array_Type;
+   begin
+        -- if is_array( $args[0] ) then
+        --         if count( $args ) < 2 || false === $args[1] then
+        --                 $uri = $_SERVER['REQUEST_URI'];
+        --         else
+        --                 $uri = $args[1];
+        --         end if;
+        -- else
+        --         if count( $args ) < 3 || false === $args[2] then
+        --                 $uri = $_SERVER['REQUEST_URI'];
+        --         else
+        --                 $uri = $args[2];
+        --         end if;
+        -- end if;
+      declare
+         URI      : Unbounded_String := +Get (Binder.X_SERVER, "REQUEST_URI");
+         Query    : Unbounded_String;
+      begin
+         Frag := +Strstr (-URI, "#");
+         if Frag = "" then
+            URI  := +Substr (-URI, 0, -Strlen (-Frag));
+         else
+            Frag := +"";
+         end if;
+
+         if 0 = Stripos (-URI, "http://") then
+            Protocol := +"http://";
+            URI      := +Substr (-URI, 7);
+
+         elsif 0 = Stripos (-URI, "https://") then
+            Protocol := +"https://";
+            URI      := +Substr (-URI, 8);
+
+         else
+            Protocol := +"";
+         end if;
+
+         if Strpos (-URI, "?") /= 0 then
+            declare
+               List : constant List_Type := Explode ("?", -URI, 2);
+            begin
+               Base  := List (1);
+               Query := List (2);
+--             list( $base, $query ) := Explode ("?", -URI, 2);
+            end;
+            Append (Base, "?");
+         elsif Protocol /= "" or else Strpos (-URI, "=") = 0 then
+            Base  := URI & "?";
+            Query := +"";
+         else
+            Base  := +"";
+            Query := URI;
+         end if;
+
+         Wp_Parse_Str (-Query, Qs);
+         Qs := URLencode_Deep (Qs);
+      end;
+      -- This re-URL-encodes things that were already in the query string.
+
+      -- if is_array( $args[0] ) then
+      --    for ( $args[0] as $k => $v ) loop
+      --       $qs[ $k ] = $v;
+      --    end loop;
+      -- else
+      --    $qs[ $args[0] ] = $args[1];
+      -- end if;
+
+      -- for ( $qs as $k => $v ) loop
+      --    if ( false === $v ) then
+      --       unset( $qs[ $k ] );
+      --    end if;
+      -- end loop;
+
+      declare
+         Ret_6 : constant String := Build_Query (Qs);
+         Ret_5 : constant String := Trim (Ret_6, "?");
+         Ret_4 : constant String := Preg_Replace ("#=(&|$)#", "$1", Ret_5);
+         Ret_3 : constant String := (-Protocol) & (-Base) & Ret_4 & (-Frag);
+         Ret_2 : constant String := Rtrim (Ret_3, "?");
+         Ret_1 : constant String := Str_Replace ("?#", "#", Ret_2);
+      begin
+         return Ret_1;
+      end;
+   end Add_Query_Arg;
+
+   function Add_Query_Arg (Key   : String;
+                           Value : String;
+                           URL   : String := "")
+                           return String
+   is (Add_Query_Arg (To_List (Key), Value, URL));
+
+   function Add_Query_Arg (Key   : Array_Type;
+                           Value : String;
+                           URL   : String := "")
+                           return String
+   is
+      use Hb_Common;
+      use Array_Maps;
+
+      Res : Unbounded_String := +URL;
+   begin
+      for A in Key.Iterate loop
+         Res := +Add_Query_Arg (Array_Maps.Key (A), -Element (A).Str, -Res);
+      end loop;
+      return -Res;
+   end Add_Query_Arg;
+
+   ----------------------
+   -- Remove_Query_Arg --
+   ----------------------
+
+   function Remove_Query_Arg (Key   : List_Type;
+                              Query : String := "")
+                              return String
+   is
+      use Hb_Common;
+
+      Query_2 : Unbounded_String := +Query;
+   begin
+      for K of Key loop
+         Query_2 := +Add_Query_Arg (-K, "", -Query_2); -- "" was False
+      end loop;
+      return -Query_2;
+   end Remove_Query_Arg;
+
+   function Remove_Query_Arg (Key   : String;
+                              Query : String := "")
+                              return String
+   is (Remove_Query_Arg (To_List (Key), Query));
 
 --
 -- Returns an array of single-use query variable names that can be removed from a URL.
@@ -1296,7 +1324,7 @@ is
             K : constant String := Key (A);
             V : constant String := Get (Array_2, K); -- Element (A);
          begin
-            Array_2.Include (K, New_Item => Addslash (V));
+            Array_2.Include (K, New_Item => Addslashes (V));
             -- if Is_Array (V) then
             --    Array_2 (K) := Add_Magic_Quotes (V);
             -- elsif Is_String (V) then

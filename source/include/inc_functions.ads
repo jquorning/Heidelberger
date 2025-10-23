@@ -34,6 +34,50 @@ is
                            Field     : String;
                            Index_Key : String := "")  -- null)
                            return Array_Type is (Empty_Array);
+
+   --
+   -- Builds URL query based on an associative and, or indexed array.
+   --
+   -- This is a convenient function for easily building url queries. It sets the
+   -- separator to '&' and uses _http_build_query() function.
+   --
+   -- @since 2.3.0
+   --
+   -- @see _http_build_query() Used to build the query
+   -- @link https://www.php.net/manual/en/function.http-build-query.php for more on
+   --       what http_build_query() does.
+   --
+   -- @param array $data URL-encode key/value pairs.
+   -- @return string URL-encoded string.
+   --
+   function Build_Query (Data : Array_Type)
+                         return String;
+
+   --
+   -- From php.net (modified by Mark Jaquith to behave like the native PHP5 function).
+   --
+   -- @since 3.2.0
+   -- @access private
+   --
+   -- @see https://www.php.net/manual/en/function.http-build-query.php
+   --
+   -- @param array|object $data      An array or object of data. Converted to array.
+   -- @param string       $prefix    Optional. Numeric index. If set, start parameter
+   --                                numbering with it. Default null.
+   -- @param string       $sep       Optional. Argument separator; defaults to
+   --                                'arg_separator.output'. Default null.
+   -- @param string       $key       Optional. Used to prefix key name. Default empty.
+   -- @param bool         $urlencode Optional. Whether to use urlencode() in the
+   --                                result. Default true.
+   -- @return string The query string.
+   --
+   function X_HTTP_Build_Query (Data      : Array_Type;
+                                Prefix    : String := ""; -- null
+                                Sep       : String := ""; -- null
+                                Key       : String := "";
+                                URLencode : Boolean := True)
+                                return String;
+
    --
    -- Retrieves a modified URL query string.
    --
@@ -81,14 +125,17 @@ is
    function Add_Query_Arg (Key   : String;
                            Value : String;
                            URL   : String := "")
-                           return String
-                           is ("XXX-120");
+                           return String;
+
+   function Add_Query_Arg (Key   : List_Type;
+                           Value : String;
+                           URL   : String := "")
+                           return String;
 
    function Add_Query_Arg (Key   : Array_Type;
                            Value : String;
                            URL   : String := "")
-                           return String
-                           is ("XXX-712");
+                           return String;
 
    --
    -- Walks the array while sanitizing the contents.
@@ -340,29 +387,24 @@ is
                                 Decimals : Integer := 0)
                                 return String
                                 is ("XXX-302");
---
--- Removes an item or items from a query string.
---
--- @since 1.5.0
---
--- @param string|string[] $key   Query key or keys to remove.
--- @param false|string    $query Optional. When false uses the current URL. Default false.
--- @return string New URL query string.
---
+
+   --
+   -- Removes an item or items from a query string.
+   --
+   -- @since 1.5.0
+   --
+   -- @param string|string[] $key   Query key or keys to remove.
+   -- @param false|string    $query Optional. When false uses the current URL. Default
+   --                               false.
+   -- @return string New URL query string.
+   --
    function Remove_Query_Arg (Key   : String;
                               Query : String := "") -- False)
-                              return String
-                              is ("XXX-304");
-
-   function Remove_Query_Arg (Key   : String_Array;
-                              Query : String := "") -- False)
-                              return String
-                              is ("XXX-305");
+                              return String;
 
    function Remove_Query_Arg (Key   : List_Type;
                               Query : String := "")
-                              return String
-                              is ("XXX-615");
+                              return String;
 
 --
 -- Validates a file name and path against an allowed set of rules.
@@ -491,6 +533,6 @@ is
                             Options : Integer := 0;
                             Depth   : Integer := 512)
                             return String
-                            is ("XXX-305");
+                            is ("XXX-306");
 
 end Inc_Functions;

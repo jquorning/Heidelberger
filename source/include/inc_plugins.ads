@@ -47,7 +47,14 @@ is
          Element_Type => Inc_Class_Wp_Hooks.Wp_Hook,
          "="          => Inc_Class_Wp_Hooks."=");
 
-   Wp_Filter : Hook_Maps.Map;
+   package Count_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Natural);
+
+   Wp_Filter  : Hook_Maps.Map;
+   Wp_Actions : Count_Maps.Map;
+
 --
 -- Checks if any action has been registered for a hook.
 --
@@ -516,13 +523,11 @@ is
                          Callback      : Callable; -- _4;
                          Priority      : Priority_Type := 10;
                          Accepted_Args : Integer       := 1);
---                       is null;
 
-   procedure Add_Action (Hook_Name     : String;
-                         Callback      : String;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1);
---                       is null;
+   -- procedure Add_Action (Hook_Name     : String;
+   --                       Callback      : String;
+   --                       Priority      : Priority_Type := 10;
+   --                       Accepted_Args : Integer       := 1);
 
    --
    -- Calls the 'all' hook, which will process the functions hooked into it.

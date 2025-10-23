@@ -7,6 +7,7 @@
 --
 
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 
@@ -15,11 +16,11 @@ with Inc_Plugins;
 package body Inc_Class_Wp_Hooks
 is
 
-   function Array_Keys (Map : Ee_Maps.Map)
+   function Array_Keys (Map : Priority_Maps.Map)
                         return List_Type
    is
       use Hb_Common;
-      use Ee_Maps;
+      use Priority_Maps;
 
       Result : List_Type;
    begin
@@ -29,30 +30,37 @@ is
       return Result;
    end Array_Keys;
 
-   -----------------
-   -- Add_Filterr --
-   -----------------
+   ----------------
+   -- Add_Filter --
+   ----------------
 
    procedure Add_Filter (This          : in out Wp_Hook;
                          Hook_Name     : String;
                          Callback      : Arrays.Callable;
-                         Priority      : Priority_Type; -- Integer;
+                         Priority      : Priority_Type;
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
       use Inc_Plugins;
       use Hb_Common;
+      use Php;
 
-      Idx : constant String :=
+      Index : constant String :=
         X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, Integer (Priority));
 
       Priority_Existed : constant Boolean :=
-        Ee_Maps.Has_Element (This.Callbacks.Find (Priority));
-   begin
-      This.Callbacks (Priority) (Idx) := Arrays.To_Array ((1 =>
---       Build ("function",      Callback),
-         Build ("accepted_args", Accepted_Args)
+        Priority_Maps.Has_Element (This.Callbacks.Find (Priority));
+
+      Item : constant Array_Type := Arrays.To_Array ((
+        Build ("function",      Callback),
+        Build ("accepted_args", Accepted_Args)
       ));
+
+      Map : Index_Maps.Map;
+   begin
+      Map.Include (Key => Index, New_Item => Item);
+      This.Callbacks.Include (Key => Priority, New_Item => Map);
+--    This.Callbacks (Priority) (Idx) := Item;
 
       -- If we're adding a new priority to the list, put them back in sorted order.
       if not Priority_Existed and then This.Callbacks.Length > 1 then
@@ -262,6 +270,7 @@ is
       Num_Args      : Natural;
       Value_2       : Unbounded_String := +Value;
    begin
+Put_Line ("#Apply_Filters method");
 --       if not This.Callbacks then
 -- --    if not This.Callbacks then
 --          return Value;
@@ -273,7 +282,7 @@ is
         This.Nesting_Level + 1;
 
       This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
-      Num_Args                        := Count (Args);
+      Num_Args                        := Arrays.Count (Args);
 
       loop
 --       This.Current_Priority (Nesting_Level) :=
@@ -325,22 +334,33 @@ is
       return -Value_2;
    end Apply_Filters;
 
---         --
---         -- Calls the callback functions that have been added to an action hook.
---         --
---         -- @since 4.7.0
---         --
---         -- @param array args Parameters to pass to the callback functions.
---         --
---         public function do_action( args ) then
---                 this.doing_action = true;
---                 this.apply_filters( "", args );
+   procedure Apply_Filters (This  : in out Wp_Hook;
+                            Value : String;
+                            Args  : Array_Type)
+   is
+      Unused : constant String := Apply_Filters (This, Value, Args);
+   begin
+      null;
+   end Apply_Filters;
 
---                 -- If there are recursive calls to the current action, we haven"t finished it until we get to the last one.
---                 if ( ! this.nesting_level ) then
---                         this.doing_action = false;
---                 end;
---         end;
+   ---------------
+   -- Do_Action --
+   ---------------
+
+   procedure Do_Action (This : in out Wp_Hook;
+                        Args : Array_Type)
+   is
+   begin
+Put_Line ("#Do_Action method");
+      This.Doing_Action := True;
+      This.Apply_Filters ("", Args);
+
+      -- If there are recursive calls to the current action, we haven't finished it
+      -- until we get to the last one.
+      if This.Nesting_Level = 0 then
+         This.Doing_Action := False;
+      end if;
+   end Do_Action;
 
    -----------------
    -- Do_All_Hook --
@@ -354,6 +374,7 @@ is
 
       Nesting_Level : constant Nesting_Type := This.Nesting_Level;
    begin
+Put_Line ("#Do_All_Hook method");
       This.Nesting_Level := This.Nesting_Level + 1;
       This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
 

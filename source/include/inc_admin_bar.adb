@@ -594,7 +594,7 @@ is
          Current_Url := +Remove_Query_Arg ("customize_changeset_uuid", -Current_Url);
       end if;
 
-      Customize_Url := +Add_Query_Arg ("url", Urlencode (-Current_Url),
+      Customize_Url := +Add_Query_Arg ("url", URLencode (-Current_Url),
                                        Wp_Customize_Url);
       if Is_Customize_Preview then
          Customize_Url :=
@@ -615,7 +615,7 @@ is
          Admin_Bar.Add_Node (Node);
       end;
 
-      Add_Action ("wp_before_admin_bar_render", "wp_customize_support_script");
+      Add_Action ("wp_before_admin_bar_render", Wp_Customize_Support_Script'Access);
    end Wp_Admin_Bar_Customize_Menu;
 
    --------------------------------

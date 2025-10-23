@@ -5,7 +5,7 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 
@@ -100,6 +100,7 @@ is
 
       Args_2 : Array_Type := Args;
    begin
+Put_Line ("#Apply_Filters");
       if Natural_Maps.Has_Element (Wp_Filters.Find (Hook_Name)) then
 --    if not Isset (Wp_Filters (Hook_Name)) then
          Wp_Filters (Hook_Name) := 1;
@@ -381,100 +382,82 @@ is
       Unused := Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
    end Add_Action;
 
-   procedure Add_Action (Hook_Name     : String;
-                         Callback      : String;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1)
-   is
-      use Ada.Text_IO;
-   begin
-      Put (Hook_Name & ", ");
-   end Add_Action;
+   -- procedure Add_Action (Hook_Name     : String;
+   --                       Callback      : String;
+   --                       Priority      : Priority_Type := 10;
+   --                       Accepted_Args : Integer       := 1)
+   -- is
+   -- begin
+   --    Put ("#Add_Action  " & Hook_Name & ", ");
+   -- end Add_Action;
 
--- --
--- -- Calls the callback functions that have been added to an action hook.
--- --
--- -- This function invokes all functions attached to action hook `hook_name`.
--- -- It is possible to create new action hooks by simply calling this function,
--- -- specifying the name of the new hook using the `hook_name` parameter.
--- --
--- -- You can pass extra arguments to the hooks, much like you can with `apply_filters()`.
--- --
--- -- Example usage:
--- --
--- --     -- The action callback function.
--- --     function example_callback( arg1, arg2 ) then
--- --         -- (maybe) do something with the args.
--- --     end;
--- --     add_action( 'example_action', 'example_callback', 10, 2 );
--- --
--- --     /*
--- --     -- Trigger the actions by calling the 'example_callback()' function
--- --     -- that's hooked onto `example_action` above.
--- --     --
--- --     -- - 'example_action' is the action hook.
--- --     -- - arg1 and arg2 are the additional arguments passed to the callback.
--- --     do_action( 'example_action', arg1, arg2 );
--- --
--- -- @since 1.2.0
--- -- @since 5.3.0 Formalized the existing and already documented `...arg` parameter
--- --              by adding it to the function signature.
--- --
--- -- @global WP_Hook[] wp_filter         Stores all of the filters and actions.
--- -- @global int[]     wp_actions        Stores the number of times each action was triggered.
--- -- @global string[]  wp_current_filter Stores the list of current filters with the current one last.
--- --
--- -- @param string hook_name The name of the action to be executed.
--- -- @param mixed  ...arg    Optional. Additional arguments which are passed on to the
--- --                          functions hooked to the action. Default empty.
--- --
--- function do_action( hook_name, ...arg ) then
+   ---------------
+   -- Do_Action --
+   ---------------
+
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String := "";
                         Arg_3     : String := "")
    is
-      use Ada.Text_IO;
+      use Hb_Common;
+      use Php;
+      use Count_Maps;
+      use Hook_Maps;
+
+--    global wp_filter, wp_actions, wp_current_filter;
    begin
-      null; -- Put_Line ("Do_Action " & Hook_Name & " arg: " & Arg_2);
+Put_Line ("Do_Action " & Hook_Name & " arg: " & Arg_2);
+
+      if not Has_Element (Wp_Actions.Find (Hook_Name)) then
+--    if not Isset (Wp_Actions, Hook_Name) then
+         Wp_Actions.Include (Hook_Name, 1);
+      else
+         Wp_Actions.Include (Hook_Name,
+                             Wp_Actions (Hook_Name) + 1);
+      end if;
+
+      -- Do 'all' actions first.
+      if Has_Element (Wp_Filter.Find ("all")) then
+--    if Isset (Wp_Filter, "all") then
+         Wp_Current_Filter.Append (+Hook_Name);
+         declare
+            All_Args : Array_Type; --            := Func_Get_Args;
+         begin
+            -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
+            X_Wp_Call_All_Hook (All_Args);
+         end;
+      end if;
+
+      if not Has_Element (Wp_Filter.Find (Hook_Name)) then
+--    if not Isset (Wp_Filter, Hook_Name) then
+         if Has_Element (Wp_Filter.Find ("all")) then
+--       if Isset (Wp_Filter, "all") then
+            Array_Pop (Wp_Current_Filter);
+         end if;
+
+         return;
+      end if;
+
+      if not Has_Element (Wp_Filter.Find ("all")) then
+         Wp_Current_Filter.Append (+Hook_Name);
+      end if;
+
+      declare
+         Arg : Array_Type; --  := Arg_2;
+      begin
+         Arg.Include (Arg_2, "");
+         Arg.Include (Arg_3, "");
+        -- if ( empty( arg ) ) then
+        --         arg[] = '';
+        -- end; elseif ( is_array( arg[0] ) && 1 === count( arg[0] ) && isset( arg[0][0] ) && is_object( arg[0][0] ) ) then
+        --         -- Backward compatibility for PHP4-style passing of `array( &this )` as action `arg`.
+        --         arg[0] = arg[0][0];
+        -- end;
+
+         Wp_Filter (Hook_Name).Do_Action (Arg);
+      end;
+      Array_Pop (Wp_Current_Filter);
    end Do_Action;
---         global wp_filter, wp_actions, wp_current_filter;
-
---         if ( ! isset( wp_actions[ hook_name ] ) ) then
---                 wp_actions[ hook_name ] = 1;
---         end; else then
---                 ++wp_actions[ hook_name ];
---         end;
-
---         -- Do 'all' actions first.
---         if ( isset( wp_filter['all'] ) ) then
---                 wp_current_filter[] = hook_name;
---                 all_args            = func_get_args(); -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
---                 _wp_call_all_hook( all_args );
---         end;
-
---         if ( ! isset( wp_filter[ hook_name ] ) ) then
---                 if ( isset( wp_filter['all'] ) ) then
---                         array_pop( wp_current_filter );
---                 end;
-
---                 return;
---         end;
-
---         if ( ! isset( wp_filter['all'] ) ) then
---                 wp_current_filter[] = hook_name;
---         end;
-
---         if ( empty( arg ) ) then
---                 arg[] = '';
---         end; elseif ( is_array( arg[0] ) && 1 === count( arg[0] ) && isset( arg[0][0] ) && is_object( arg[0][0] ) ) then
---                 -- Backward compatibility for PHP4-style passing of `array( &this )` as action `arg`.
---                 arg[0] = arg[0][0];
---         end;
-
---         wp_filter[ hook_name ]->do_action( arg );
-
---         array_pop( wp_current_filter );
--- end;
 
 -- --
 -- -- Calls the callback functions that have been added to an action hook, specifying arguments in an array.

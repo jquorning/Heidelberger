@@ -102,4 +102,24 @@ is
    function Filter_And_Sort (Submenu : Submenu_Type)
                              return Submenu_Type;
 
+   --
+   -- Adds the "Theme File Editor" menu item to the bottom of the Appearance
+   -- (non-block themes) or Tools (block themes) menu.
+   --
+   -- @access private
+   -- @since 3.0.0
+   -- @since 5.9.0 Renamed "Theme Editor" to "Theme File Editor".
+   --              Relocates to Tools for block themes.
+   --
+   procedure X_Add_Themes_Utility_Last;
+
+   --
+   -- Adds the "Plugin File Editor" menu item after the "Themes File Editor" in Tools
+   -- for block themes.
+   --
+   -- @access private
+   -- @since 5.9.0
+   --
+   procedure X_Add_Plugin_File_Editor_To_Tools;
+
 end Adm_Menu;

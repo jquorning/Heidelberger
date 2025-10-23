@@ -163,13 +163,11 @@ is
                   declare
                      use String_Vectors;
 
-                     Arg : constant String_Array := Empty_String_Array &
-                                                    "trashed"   &
-                                                    "untrashed" &
-                                                    "deleted"   &
-                                                    "ids";
+                     List : constant List_Type :=
+                       To_List (List => (+"trashed", +"untrashed",
+                                         +"deleted", +"ids"));
                   begin
-                     Sendback := +Remove_Query_Arg (Arg, -Sendback);
+                     Sendback := +Remove_Query_Arg (List, -Sendback);
                   end;
                end if;
 

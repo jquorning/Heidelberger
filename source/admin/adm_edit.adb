@@ -163,15 +163,12 @@ is
                      use String_Vectors;
                      use Inc_Functions;
 
-                     Arg : constant String_Array := Empty_String_Array &
-                                                    "trashed"   &
-                                                    "untrashed" &
-                                                    "deleted"   &
-                                                    "locked"    &
-                                                    "ids";
+                     List : constant List_Type :=
+                       To_List (List => (+"trashed", +"untrashed", +"deleted",
+                                         +"locked",  +"ids"));
 
                      Sendback : Unbounded_String
-                       := +Remove_Query_Arg (Arg, Wp_Get_Referer);
+                       := +Remove_Query_Arg (List, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
                         Sendback := +Admin_URL (String (-Globals.Parent_File));
@@ -387,13 +384,13 @@ is
                         end if; --      end case;
 
                         declare
-                           Arg : constant String_Array := Empty_String_Array &
-                                                 "action" & "action2" & "tags_input" &
-                                                 "post_author" & "comment_status"    &
-                                                 "ping_status" & "_status" & "post"  &
-                                                 "bulk_edit"   & "post_view";
+                           List : constant List_Type :=
+                             To_List (List => (+"action", +"action2", +"tags_input",
+                                               +"post_author", +"comment_status",
+                                               +"ping_status", +"_status", +"post",
+                                               +"bulk_edit",   +"post_view"));
                         begin
-                           Sendback := +Remove_Query_Arg (Arg, -Sendback);
+                           Sendback := +Remove_Query_Arg (List, -Sendback);
                         end;
                         Inc_Pluggables.Wp_Redirect (-Sendback);
                         return; -- exit;  -- redirect
@@ -407,13 +404,12 @@ is
                   use Inc_Functions;
                   use String_Vectors;
 
-                  Arg : constant String_Array := Empty_String_Array &
-                                                 "_wp_http_referer" &
-                                                 "_wpnonce";
+                  List : constant List_Type :=
+                    To_List (List => (+"_wp_http_referer", +"_wpnonce"));
                begin
                   Inc_Pluggables.Wp_Redirect
                             (Remove_Query_Arg
-                             (Arg,
+                             (List,
                               Wp_Unslash (Get (X_SERVER, "REQUEST_URI"))));
                end;
                return; -- exit;  -- redirect
@@ -917,13 +913,12 @@ is
          use Inc_Functions;
          use String_Vectors;
 
-         Arg : constant String_Array := Empty_String_Array    &
-                                        "locked"  & "skipped" &
-                                        "updated" & "deleted" &
-                                        "trashed" & "untrashed";
+         List : constant List_Type :=
+           To_List (List => (+"locked", +"skipped", +"updated", +"deleted",
+                             +"trashed", +"untrashed"));
       begin
          Set (X_SERVER, "REQUEST_URI",
-              Remove_Query_Arg (Arg, Get (X_SERVER, "REQUEST_URI")));
+              Remove_Query_Arg (List, Get (X_SERVER, "REQUEST_URI")));
       end;
       return "XXX-51";
    end Var_Bulk;

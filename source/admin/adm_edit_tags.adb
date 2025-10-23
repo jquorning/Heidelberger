@@ -176,14 +176,14 @@ is
          declare
             use String_Vectors;
 
-            Ww : constant String_Array := Empty_String_Array &
-                                          "_wp_http_referer" &
-                                          "_wpnonce" &
-                                          "error"    &
-                                          "message"  &
-                                          "paged";
+            List : constant List_Type := To_List (List => (
+                                          +"_wp_http_referer",
+                                          +"_wpnonce",
+                                          +"error",
+                                          +"message",
+                                          +"paged"));
          begin
-            Referer := +Remove_Query_Arg (Ww, -Referer);
+            Referer := +Remove_Query_Arg (List, -Referer);
          end;
 
 -- case Hb_List_Table.Current_Action then
@@ -243,10 +243,10 @@ is
                declare
                   use String_Vectors;
 
-                  Arg : constant String_Array := Empty_String_Array &
-                                                 "tag_ID" & "action";
+                  List : constant List_Type :=
+                    To_List (List => (+"tag_ID", +"action"));
                begin
-                  Location := +Remove_Query_Arg (Arg, -Location);
+                  Location := +Remove_Query_Arg (List, -Location);
                end;
             end;
             <<Break>>
@@ -375,11 +375,11 @@ is
             declare
                use String_Vectors;
 
-               Arg : constant String_Array := Empty_String_Array &
-                                              "_wp_http_referer" & "_wpnonce";
+               List : constant List_Type :=
+                 To_List (List => (+"_wp_http_referer", +"_wpnonce"));
             begin
                Location := +Remove_Query_Arg
-                  (Arg, Wp_Unslash (Get (X_SERVER, "REQUEST_URI")));
+                  (List, Wp_Unslash (Get (X_SERVER, "REQUEST_URI")));
             end;
          end if;
 
@@ -612,8 +612,8 @@ is
                      Set ("VAR_edit_tags_add_form", "XXX-81");
 
                   elsif Var_Name = "VAR_edit_tags_add_new_item" then
-                     Set ("VAR_edit_tags_add_new_item", "XXX-907");
---                        Get (Tax.Labels, "add_new_item"));
+                     Set ("VAR_edit_tags_add_new_item",
+                          Get (Tax.Labels, "add_new_item"));
 
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
                      Clear_Echo;
@@ -922,13 +922,15 @@ is
                      declare
                         use String_Vectors;
 
-                        Arg : constant String_Array := Empty_String_Array &
-                                                       "message" & "error";
+                        List : constant List_Type :=
+                          To_List (List => (+"message", +"error"));
+
+                        Str : constant String :=
+                          Remove_Query_Arg (List, Get (X_SERVER, "REQUEST_URI"));
                      begin
-                        Set (X_SERVER, "REQUEST_URI",
-                             Remove_Query_Arg (Arg, Get (X_SERVER, "REQUEST_URI")));
+                        Set (X_SERVER, "REQUEST_URI", Str);
+                        Set ("VAR_edit_tags_remove_message_and_error", Str);
                      end;
-                     Set ("VAR_edit_tags_remove_message_and_error", "XXX-88");
 
                   elsif Var_Name = "VAR_edit_tags_search_box" then
                      Clear_Echo;

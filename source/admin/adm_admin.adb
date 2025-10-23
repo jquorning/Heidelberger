@@ -111,7 +111,7 @@ is
             Inc_Pluggables.Wp_Redirect
                (Inc_Link_Templates.Admin_URL
                  ("upgrade.php?_wp_http_referer=" &
-                  Php.Urlencode (Inc_Formatting.Wp_Unslash
+                  Php.URLencode (Inc_Formatting.Wp_Unslash
                                   (Get (X_SERVER, "REQUEST_URI")))));
             return; -- exit;
          end if;

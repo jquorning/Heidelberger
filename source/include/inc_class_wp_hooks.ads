@@ -21,29 +21,29 @@ is
    type Nesting_Type  is new Natural;
    type Priority_Type is new Natural;
 
-   package Dd_Maps is new
+   package Index_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
         (Key_Type     => String,
          Element_Type => Arrays.Array_Type,
-         "="          => Arrays."="); -- .Array_Maps."=");
+         "="          => Arrays."=");
 
-   package Ee_Maps is new
+   package Priority_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => Priority_Type, -- Integer,
-         Element_Type => Dd_Maps.Map,
-         "="          => Dd_Maps."=");
+        (Key_Type     => Priority_Type,
+         Element_Type => Index_Maps.Map,
+         "="          => Index_Maps."=");
 
-   function Array_Keys (Map : Ee_Maps.Map)
+   function Array_Keys (Map : Priority_Maps.Map)
                         return List_Type;
 
    package List_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Nesting_Type, -- Natural,
-                              Element_Type => List_Type,    -- Natural
+      Ada.Containers.Vectors (Index_Type   => Nesting_Type,
+                              Element_Type => List_Type,
                               "="          => List_Vectors."=");
 
    package Priority_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Nesting_Type, -- Natural,
-                              Element_Type => Priority_Type);    -- Natural
+      Ada.Containers.Vectors (Index_Type   => Nesting_Type,
+                              Element_Type => Priority_Type);
 
    --
    -- Core class used to implement action and filter hook functionality.
@@ -53,7 +53,7 @@ is
    -- @see Iterator
    -- @see ArrayAccess
    --
---#[AllowDynamicProperties]
+   --#[AllowDynamicProperties]
    type Wp_Hook is tagged -- implements Iterator, ArrayAccess
       record
          --
@@ -62,7 +62,7 @@ is
          -- @since 4.7.0
          -- @var array
          --
-         Callbacks : Ee_Maps.Map; -- Arrays.Array_Type;
+         Callbacks : Priority_Maps.Map;
 
          --
          -- The priority keys of actively running iterations of a hook.
@@ -151,6 +151,16 @@ is
                            Value : String;
                            Args  : Array_Type) -- Args_Type) -- Array_Type)
                            return String;
+
+   --
+   -- Calls the callback functions that have been added to an action hook.
+   --
+   -- @since 4.7.0
+   --
+   -- @param array args Parameters to pass to the callback functions.
+   --
+   procedure Do_Action (This : in out Wp_Hook;
+                        Args : Array_Type);
 
    --
    -- Processes the functions hooked into the "all" hook.

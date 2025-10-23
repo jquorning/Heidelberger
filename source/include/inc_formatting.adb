@@ -2886,17 +2886,13 @@ is
 --         return is_string( value ) ? stripslashes( value ) : value;
 -- end;
 
--- --
--- -- Navigates through an array, object, or scalar, and encodes the values to be used in a URL.
--- --
--- -- @since 2.2.0
--- --
--- -- @param mixed value The array or string to be encoded.
--- -- @return mixed The encoded value.
--- --
--- function urlencode_deep( value ) then
---         return map_deep( value, "urlencode" );
--- end;
+   --------------------
+   -- URLencode_Deep --
+   --------------------
+
+   function URLencode_Deep (Value : Array_Type)
+                            return Array_Type
+   is (Map_Deep (Value, Php.URLencode'Access));
 
 -- --
 -- -- Navigates through an array, object, or scalar, and raw-encodes the values to be used in a URL.
@@ -5074,33 +5070,70 @@ is
 --         return apply_filters( "sanitize_option_thenoptionend;", value, option, original_value );
 -- end;
 
--- --
--- -- Maps a function to all non-iterable elements of an array or an object.
--- --
--- -- This is similar to `array_walk_recursive()` but acts upon objects too.
--- --
--- -- @since 4.4.0
--- --
--- -- @param mixed    value    The array, object, or scalar.
--- -- @param callable callback The function to map onto value.
--- -- @return mixed The value with the callback applied to all non-arrays and non-objects inside it.
--- --
--- function map_deep( value, callback ) then
---         if ( is_array( value ) ) then
---                 foreach ( value as index => item ) then
---                         value[ index ] = map_deep( item, callback );
---                 end;
---         end; elseif ( is_object( value ) ) then
---                 object_vars = get_object_vars( value );
---                 foreach ( object_vars as property_name => property_value ) then
---                         value->property_name = map_deep( property_value, callback );
---                 end;
---         end; else then
---                 value = call_user_func( callback, value );
---         end;
+   --------------
+   -- Map_Deep --
+   --------------
 
---         return value;
--- end;
+   function Map_Deep (Value    : Array_Type;
+                      Callback : Callable)
+                      return Array_Type
+   is
+      use Hb_Common;
+
+      Value_2 : Array_Type;
+   begin
+      -- if ( is_array( value ) ) then
+      for A in Value.Iterate loop
+         declare
+            Index : constant String       := Array_Maps.Key     (A);
+            Item  : constant Array_Record := Array_Maps.Element (A);
+         begin
+            case Item.Kind is
+            when Is_Array =>
+               Set_Array (Value_2, Index,
+                          Map_Deep (Item.Arry.all, Callback));
+--             Value_2.Include (Key      => Index,
+--                              New_Item => Map_Deep (Item.Arry.all, Callback));
+--             value[ index ] = map_deep( item, callback );
+            when Is_String =>
+               Set (Value_2, Index,
+                    Callback (-Item.Str));
+            when others => null;
+            end case;
+         end;
+      end loop;
+         -- end; elseif ( is_object( value ) ) then
+         --         object_vars = get_object_vars( value );
+         --         foreach ( object_vars as property_name => property_value ) then
+         --              value->property_name = map_deep( property_value, callback );
+         --         end;
+         -- end; else then
+         --         value = call_user_func( callback, value );
+         -- end;
+
+         -- return value;
+      return Value_2;
+   end Map_Deep;
+
+--    function Map_Deep (Value    : String;
+--                       Callback : Callable)
+--                       return String
+--    is
+--       Value_2 : Array_Type;
+--    begin
+--       -- if ( is_array( value ) ) then
+--       for A in Value.Iterate loop
+--          declare
+--             Index : constant String       := Array_Maps.Key     (A);
+--             Item  : constant Array_Record := Array_Maps.Element (A);
+--          begin
+--             Value_2.Include (Key      => Index,
+--                              New_Item => Map_Deep (Item.Arry.all, Callback));
+-- --          value[ index ] = map_deep( item, callback );
+--          end;
+--       end loop;
+--       return Value_2;
+--    end Max_Deep;
 
 --
 -- Parses a string into variables to be stored in an array.

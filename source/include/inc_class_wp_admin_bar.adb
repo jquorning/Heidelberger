@@ -9,6 +9,7 @@
 with Hb_Common;
 with Php;
 
+with Inc_Admin_Bar;
 with Inc_Ms_Functions;
 with Inc_Formatting;
 with Inc_Functions;
@@ -60,6 +61,7 @@ is
 
    procedure Initialize (This : in out Wp_Admin_Bar)
    is
+      use Inc_Admin_Bar;
       use Inc_Class_Wp_Sites;
       use Inc_Ms_Functions;
       use Inc_Formatting;
@@ -94,9 +96,8 @@ is
          end if;
       end if;
 
-      Add_Action ("wp_head", "wp_admin_bar_header");
-
-      Add_Action ("admin_head", "wp_admin_bar_header");
+      Add_Action ("wp_head",    Wp_Admin_Bar_Header'Access);
+      Add_Action ("admin_head", Wp_Admin_Bar_Header'Access);
 
       declare
          Admin_Bar_Args  : String_Array; -- Array_Type;
@@ -116,7 +117,7 @@ is
             Header_Callback := +"_admin_bar_bump_cb";
          end if;
 
-         Add_Action ("wp_head", -Header_Callback);
+--       Add_Action ("wp_head", -Header_Callback);
       end;
 
       Wp_Enqueue_Script ("admin-bar");
@@ -805,32 +806,34 @@ is
 
    procedure Add_Menus (This : Wp_Admin_Bar)
    is
+      use Inc_Admin_Bar;
       use Inc_Load;
       use Inc_Plugins;
    begin
       -- User-related, aligned right.
-      Add_Action ("admin_bar_menu", "wp_admin_bar_my_account_menu", 0);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_search_menu", 4);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_my_account_item", 7);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_recovery_mode_menu", 8);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_My_Account_Menu'Access, 0);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Search_Menu'Access, 4);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_My_Account_Item'Access, 7);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Recovery_Mode_Menu'Access, 8);
 
       -- Site-related.
-      Add_Action ("admin_bar_menu", "wp_admin_bar_sidebar_toggle", 0);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_wp_menu", 10);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_my_sites_menu", 20);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_site_menu", 30);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_edit_site_menu", 40);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_customize_menu", 40);
-      Add_Action ("admin_bar_menu", "wp_admin_bar_updates_menu", 50);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Sidebar_Toggle'Access, 0);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Wp_Menu'Access, 10);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_My_Sites_Menu'Access, 20);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Site_Menu'Access, 30);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Edit_Site_Menu'Access, 40);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Customize_Menu'Access, 40);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Updates_Menu'Access, 50);
 
       -- Content-related.
       if not Is_Network_Admin and then not Is_User_Admin then
-         Add_Action ("admin_bar_menu", "wp_admin_bar_comments_menu", 60);
-         Add_Action ("admin_bar_menu", "wp_admin_bar_new_content_menu", 70);
+--       Add_Action ("admin_bar_menu", Wp_Admin_Bar_Comments_Menu'Access, 60);
+--       Add_Action ("admin_bar_menu", Wp_Admin_Bar_New_Content_Menu'Access, 70);
+         null;
       end if;
-      Add_Action ("admin_bar_menu", "wp_admin_bar_edit_menu", 80);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Edit_Menu'Access, 80);
 
-      Add_Action ("admin_bar_menu", "wp_admin_bar_add_secondary_groups", 200);
+--    Add_Action ("admin_bar_menu", Wp_Admin_Bar_Add_Secondary_Groups'Access, 200);
 
       --
       -- Fires after menus are added to the menu bar.

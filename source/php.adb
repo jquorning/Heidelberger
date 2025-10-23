@@ -1,4 +1,5 @@
 with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -14,6 +15,30 @@ is
    function Get_Object_Vars (Arry : Array_Type) return Array_Type is (Empty_Array);
 
    ------------
+   -- Strstr --
+   ------------
+
+   function Strstr (Haystack      : String;
+                    Needle        : String;
+                    Before_Needle : Boolean := False)
+                    return String
+   is
+      use Ada.Strings.Fixed;
+
+      Pos : constant Natural := Index (Needle, Haystack);
+   begin
+      if Pos = 0 then
+         return Haystack;
+      else
+         if Before_Needle then
+            return Haystack (Haystack'First .. Pos - 1);
+         else
+            return Haystack (Pos .. Haystack'Last);
+         end if;
+      end if;
+   end Strstr;
+
+   ------------
    -- Strpos --
    ------------
 
@@ -26,6 +51,47 @@ is
       return Index (Source  => Item,
                     Pattern => Pattern);
    end Strpos;
+
+   -----------------
+   -- Str_Replace --
+   -----------------
+
+   function Str_Replace (Search  : String;
+                         Replace : String;
+                         Subject : String)
+                         return String
+   is
+      use Ada.Strings.Fixed;
+      Pos : constant Natural := Index (Search, Subject);
+   begin
+      if Pos = 0 then
+         return Subject;
+      else
+         return
+           Subject (Subject'First .. Pos - 1) &
+           Replace &
+           Str_Replace (Search, Replace,
+                        Subject => Subject (Pos + Subject'Length .. Subject'Last));
+      end if;
+   end Str_Replace;
+
+   ------------
+   -- Substr --
+   ------------
+
+   function Substr (Str    : String;
+                    Offset : Integer;
+                    Length : Integer := 0)
+                    return String
+   is
+   begin
+Put_Line ("#substr");
+Put_Line ("  " & Str);
+Put_Line ("  " & Offset'Image);
+Put_Line ("  " & Length'Image);
+      raise Debug;
+      return Str;
+   end Substr;
 
    ----------------
    -- Preg_Match --
@@ -78,7 +144,8 @@ is
    -------------
 
    function Explode (Separator : String;
-                     Item      : String)
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
                      return List_Type
    is
       use Ada.Strings.Fixed;
@@ -92,6 +159,29 @@ is
 
       return Res;
    end Explode;
+
+   -------------
+   -- Implode --
+   -------------
+
+   function Implode (Separator : String;
+                     Arry      : Array_Type)
+                     return String
+   is
+      use Hb_Common;
+
+      Ret   : Unbounded_String;
+      First : Boolean := True;
+   begin
+      for A in Arry.Iterate loop
+         if not First then
+            Append (Ret, Separator);
+         end if;
+         Append (Ret, Array_Maps.Key (A));
+         First := False;
+      end loop;
+      return -Ret;
+   end Implode;
 
    -----------
    -- Build --
@@ -172,6 +262,35 @@ is
    begin
       return Empty_Array;
    end Func_Get_Args;
+
+   ----------------
+   -- Addslashes --
+   ----------------
+
+   function Addslashes (Item : String)
+            return String
+   is
+      use Ada.Strings;
+      use Ada.Strings.Maps;
+
+      Needles : constant Character_Set :=
+         To_Set (''') and To_Set ('"') and To_Set ('\') and To_Set (ASCII.NUL);
+      First : Positive;
+      Last  : Natural;
+   begin
+      Fixed.Find_Token (Source => Item,
+                        Set    => Needles,
+                        Test   => Inside,
+                        First  => First,
+                        Last   => Last);
+      if Last = 0 then
+         return Item;
+      else
+         return
+           Item (Item'First .. First - 1) & "\" & Item (First) &
+           Addslashes (Item (Last + 1 .. Item'Last));
+      end if;
+   end Addslashes;
 
    ------------
    -- Printf --
