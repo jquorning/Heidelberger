@@ -10,7 +10,7 @@ is
          declare
             use Array_Maps;
 
-            Rec : Array_Record := Element (A);
+            Rec : constant Array_Record := Element (A);
          begin
             Put ("key: " & Key (A));
             Put ("  kind: " & Rec.Kind'Image);

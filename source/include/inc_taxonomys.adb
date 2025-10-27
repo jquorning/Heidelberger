@@ -1535,7 +1535,7 @@ is
 --         return unregister_meta_key ("term", meta_key, taxonomy);
 -- end;
 
-   X_Wp_Suspend_Cache_Invalidation : Boolean := False;
+   X_Wp_Suspend_Cache_Invalidation : constant Boolean := False;
 
    -----------------
    -- Term_Exists --
@@ -2349,6 +2349,7 @@ is
                        Is_Array (T.Args) and then
                        Array_Merge (Args, T.Args) /= Args
                      then
+--                      Taxonomies.Delete (Index);
 --                      Unset (Taxonomies (Index));
 --                        Terms := Terms &
 --                                 Wp_Get_Object_Terms (Object_Ids_2, Taxonomy,

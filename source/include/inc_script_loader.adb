@@ -16,6 +16,7 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Binder;
 with Hb_Common;
@@ -1820,7 +1821,10 @@ is
             Wp_Edit_Blocks_Dependencies.Append (+"wp-editor-classic-layout-styles");
          end if;
 
-         if not Php.Is_Array (Editor_Styles) or else Count (Editor_Styles) = 0 then
+         if
+           not Php.Is_Array (Editor_Styles) or else
+           Arrays.Count (Editor_Styles) = 0
+         then
             -- Include opinionated block styles if no editor_styles are declared,
             -- so the editor never appears broken.
             Wp_Edit_Blocks_Dependencies.Append (+"wp-block-library-theme");
@@ -2386,22 +2390,22 @@ is
 --         do_action( "wp_print_footer_scripts");
 -- end;
 
--- --
--- -- Wrapper for do_action( "wp_enqueue_scripts" ).
--- --
--- -- Allows plugins to queue scripts for the front end using wp_enqueue_script().
--- -- Runs first in wp_head() where all is_home(), is_page(), etc. functions are available.
--- --
--- -- @since 2.8.0
--- --
--- function wp_enqueue_scripts() then
---         --
---         -- Fires when scripts and styles are enqueued.
---         --
---         -- @since 2.8.0
---         --
---         do_action( "wp_enqueue_scripts");
--- end;
+   ------------------------
+   -- Wp_Enqueue_Scripts --
+   ------------------------
+
+   procedure Wp_Enqueue_Scripts
+   is
+      use Inc_Plugins;
+   begin
+Put_Line ("#Wp_Enqueue_Scripts");
+      --
+      -- Fires when scripts and styles are enqueued.
+      --
+      -- @since 2.8.0
+      --
+      Do_Action ("wp_enqueue_scripts");
+   end Wp_Enqueue_Scripts;
 
    Concatenate_Scripts : Boolean;
    Compress_CSS        : Boolean;

@@ -147,6 +147,17 @@ is
             is (True);
 
    --
+   -- Wrapper for do_action( "wp_enqueue_scripts" ).
+   --
+   -- Allows plugins to queue scripts for the front end using wp_enqueue_script().
+   -- Runs first in wp_head() where all is_home(), is_page(), etc. functions are
+   -- available.
+   --
+   -- @since 2.8.0
+   --
+   procedure Wp_Enqueue_Scripts;
+
+   --
    -- Prints the styles queue in the HTML head on admin pages.
    --
    -- @since 2.8.0

@@ -881,15 +881,19 @@ is
       Echo ("        <ul id=""" & Post_Type_Name &
             "-search-checklist"" data-wp-lists=""list:" & Post_Type_Name &
             " class=""categorychecklist form-no-clear"">" & Nl);
-      if not Empty (Search_Results) then -- and then not Is_Wp_Error (search_results) then
-         null;
+      if
+        not Empty (Search_Results) -- and then
+        --  not Is_Wp_Error (search_results)
+      then
 --                      args("walker") = walker;
 --                      echo walk_nav_menu_tree (array_map ("wp_setup_nav_menu_item", search_results), 0, (object) args);
---      echo ("                ?>
---      elsif Is_Wp_Error (Search_Results) then
+         Echo ("                " & NL); -- ?>
+--    elsif Is_Wp_Error (Search_Results) then
 --      Echo ("                <li>" & Search_Results.Get_Error_Message & "</li>" & Nl);
---      elsif not Empty (Searched) then
---      Echo ("                <li>" & X_E ("No results found.") & "</li>" & Nl);
+      elsif not Empty (-Searched) then
+         Echo ("                <li>");
+         X_E ("No results found.");
+         Echo ("</li>" & NL);
       end if;
       Echo ("        </ul>" & Nl);
       Echo ("</div><!-- /.tabs-panel -->" & Nl);
@@ -1708,7 +1712,12 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                                 Get_Array (Nav_Menu_Option, "auto_add"), True);
             begin
                if "" /= Key then -- False
-                  null;
+                  declare
+                     Arry : Array_Type;
+                     --  renames Get_Array (Nav_Menu_Option, "auto_add");
+                  begin
+                     Arry.Delete (Key);
+                  end;
 --                Unset (Nav_Menu_Option ("auto_add") (key));
                end if;
             end;

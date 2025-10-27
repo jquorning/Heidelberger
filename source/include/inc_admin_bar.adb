@@ -7,6 +7,7 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Binder;
@@ -95,6 +96,13 @@ is
       X_Wp_Admin_Bar.Add_Menus;
 
       return True;
+   end X_Wp_Admin_Bar_Init;
+
+   procedure X_Wp_Admin_Bar_Init
+   is
+      Unused : constant Boolean := X_Wp_Admin_Bar_Init;
+   begin
+Put_Line ("#X_Wp_Admin_Bar_Init");
    end X_Wp_Admin_Bar_Init;
 
    -------------------------

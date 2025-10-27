@@ -133,14 +133,14 @@ is
          Location : Unbounded_String;  -- jq
          Referer  : Unbounded_String;  -- jq
       begin
-         Globals.Parent_File :=
+         Parent_File :=
             +Slug_Type ((if "post" /= Post_Type then (if "attachment" = Post_Type
                                           then Slug_Type'("upload.php")
                                           else "edit.php?post_type=post_type")
              elsif "link_category" = Tax.Name then Slug_Type'("link-manager.php")
              else                                  "edit.php"));
 
-         Globals.Submenu_File :=
+         Submenu_File :=
             +Slug_Type ((if "post" /= Post_Type
              then Slug_Type'("edit-tags.php?taxonomy=taxonomy&amp;post_type=post_type")
              elsif "link_category" = Tax.Name

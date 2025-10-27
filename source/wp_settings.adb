@@ -174,7 +174,7 @@ is
 --    Inc_Load.Wp_Start_Object_Cache;
 
       -- Attach the default filters.
---    Inc_Default_Filters.Run;
+      Inc_Default_Filters.Run;
 --    require ABSPATH & WPINC & "/default-filters.php";
 
       -- Initialize multisite if enabled.

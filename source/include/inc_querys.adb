@@ -13,11 +13,15 @@
 
 with Hb_Common;
 
+with Inc_Class_Wp_Querys;
 with Inc_Functions;
 with Inc_L10n;
 
 package body Inc_Querys
 is
+
+   Wp_Query : constant Inc_Class_Wp_Querys.Wp_Query :=
+     Inc_Class_Wp_Querys.Null_Query;
 
    -------------------
    -- Get_Query_Var --

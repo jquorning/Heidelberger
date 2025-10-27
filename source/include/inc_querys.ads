@@ -10,13 +10,8 @@
 -- @subpackage Query
 --
 
-with Inc_Class_Wp_Querys;
-
 package Inc_Querys
 is
-
-   Wp_Query : Inc_Class_Wp_Querys.Wp_Query :=
-     Inc_Class_Wp_Querys.Null_Query;
 
    --
    -- Retrieves the value of a query variable in the WP_Query class.

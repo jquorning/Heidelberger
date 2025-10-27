@@ -71,7 +71,7 @@ is
          -- @var array
          --
          -- private
-         Iterations : List_Vectors.Vector; -- Array_Type;
+         Iterations : List_Vectors.Vector;
 
          --
          -- The current priority of actively running iterations of a hook.
@@ -80,7 +80,7 @@ is
          -- @var array
          --
          -- private
-         Current_Priority : Priority_Vectors.Vector; -- Array_Type;
+         Current_Priority : Priority_Vectors.Vector;
 
          --
          -- Number of levels this hook can be recursively called.
@@ -89,7 +89,7 @@ is
          -- @var int
          --
          -- private
-         Nesting_Level : Nesting_Type := 0; -- Natural := 0;
+         Nesting_Level : Nesting_Type := 0;
 
          --
          -- Flag for if we"re currently doing an action, rather than a filter.
@@ -101,8 +101,6 @@ is
          Doing_Action : Boolean := False;
 
       end record;
-
--- type Callable is access procedure;
 
    --
    -- Adds a callback function to a filter hook.
@@ -149,8 +147,12 @@ is
 
    function Apply_Filters (This  : in out Wp_Hook;
                            Value : String;
-                           Args  : Array_Type) -- Args_Type) -- Array_Type)
+                           Args  : Array_Type)
                            return String;
+
+   procedure Apply_Filters (This  : in out Wp_Hook;
+                            Value : String;
+                            Args  : Array_Type);
 
    --
    -- Calls the callback functions that have been added to an action hook.

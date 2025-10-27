@@ -379,7 +379,8 @@ is
       use Hb_Common;
       use Inc_Plugins;
    begin
-      Add_Filter ("wp_ajax_add-" & (-This.Name), "_wp_ajax_add_hierarchical_term");
+--    Add_Filter ("wp_ajax_add-" & (-This.Name), "_wp_ajax_add_hierarchical_term");
+      null;
    end Add_Hooks;
 
 --         --

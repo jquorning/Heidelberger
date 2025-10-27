@@ -13,9 +13,6 @@ package Adm_Menu_Header
 is
    use Ada.Strings.Unbounded;
 
---        global self, parent_file, submenu_file, plugin_page, typenow;
-   Self         : Adm_Menu.Unbounded_Slug;
-
    --
    -- Display menu.
    --

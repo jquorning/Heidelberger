@@ -146,11 +146,11 @@ is
 
             Doaction : String := X_Wp_List_Table.Current_Action; -- ();
          begin
-            Globals.Parent_File   :=
+            Parent_File :=
               +Slug_Type (if "post" = Post_Type then Slug_Type'("edit")
                           else "edit?post_type=" & (-Post_Type));
 
-            Globals.Submenu_File  :=
+            Submenu_File :=
               +Slug_Type (if "post" = Post_Type then Slug_Type'("edit")
                           else "edit?post_type=" & (-Post_Type));
 
@@ -171,7 +171,7 @@ is
                        := +Remove_Query_Arg (List, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
-                        Sendback := +Admin_URL (String (-Globals.Parent_File));
+                        Sendback := +Admin_URL (String (-Parent_File));
                      end if;
 
                      Sendback := +Add_Query_Arg ("paged", Pagenum'Image, -Sendback);

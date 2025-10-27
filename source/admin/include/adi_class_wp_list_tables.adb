@@ -56,9 +56,9 @@ is
    begin
       This.Screen := Convert_To_Screen (Get (Args, "screen"));
 
-      Add_Filter ("manage_" & (-This.Screen.Id) & "_columns",
-                  "Empty_Array", -- To_Array (This, "get_columns"),
-                  0);
+--    Add_Filter ("manage_" & (-This.Screen.Id) & "_columns",
+--                "Empty_Array", -- To_Array (This, "get_columns"),
+--                0);
 
       if "" = Get (Args_2, "plural") then
 --    if not Args_2 ("plural") then

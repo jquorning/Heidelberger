@@ -248,8 +248,10 @@ Put_Line ("  " & Length'Image);
                                   Args     : Array_Type)
                                   return String
    is
+--    Unused : constant String := Callback.all; --  ("XXX-990"); --  (Args);
    begin
-      return ""; -- Callback.all (Args);
+      Callback.all;
+      return "XXX-991";
    end Call_User_Func_Array;
 
    -------------------

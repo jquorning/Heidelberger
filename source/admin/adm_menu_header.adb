@@ -28,6 +28,12 @@ is
    use Inc_L10n;
    use Hb_Common;
 
+   -------------
+   -- Globals --
+   -------------
+
+   Self : Unbounded_String; -- Adm_Menu.Unbounded_Slug;
+
    --
    -- The current page.
    --
@@ -38,7 +44,7 @@ is
       use Binder;
       use Adm_Menu;
 
-      Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
+--    Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
       Unused : Unbounded_String;
       Self_2 : constant String := Get (X_SERVER, "PHP_SELF");
       Self_3 : constant String := Preg_Replace ("|^.*/wp-admin/network/|i",
@@ -47,7 +53,7 @@ is
       Self_5 : constant String := Preg_Replace ("|^.*/plugins/|i", "",    Self_4);
       Self_6 : constant String := Preg_Replace ("|^.*/mu-plugins/|i", "", Self_5);
    begin
-      Self := +Adm_Menu.Slug_Type (Self_6);
+      Self := +Self_6;
 
       --
       -- For when admin-header is included from within a function.
@@ -130,7 +136,7 @@ is
 
             if
               (Parent_File /= "" and then Item.Menu_Slug = Parent_File) or else
-              (Empty (-Typenow) and then Self = Item.Menu_Slug)
+              (Empty (-Typenow) and then Unbounded_Slug (Self) = Item.Menu_Slug)
             then
                if Submenu_Items = Inner_Maps.Empty_Map then
 --             if not Empty (Submenu_Items) then
@@ -339,7 +345,7 @@ is
                               -- which won't match self.
                               Self_Type : String :=
                                  (if not Empty (-Typenow)
-                                  then String (-Self) & "?post_type=" & (-Typenow)
+                                  then (-Self) & "?post_type=" & (-Typenow)
                                   else "nothing");
                            begin
                               if 0 /= Pos then
@@ -358,12 +364,12 @@ is
                                  -- under different parents.
                               elsif
                                 (Plugin_Page /= "" and then
-                                 Self = Sub_Item.Menu_Slug)
+                                 Unbounded_Slug (Self) = Sub_Item.Menu_Slug)
                                 or else
                                  (Plugin_Page /= ""               and then
                                   Plugin_Page = Sub_Item.Menu_Slug and then
-                                  (Item.Menu_Slug = Self_Type or else
-                                   Item.Menu_Slug = Self      or else
+                                  (Item.Menu_Slug = Self_Type             or else
+                                   Item.Menu_Slug = Unbounded_Slug (Self) or else
                                    not File_Exists (String (Menu_File))))
                               then
                                  Append (Class,           +"current");  -- ()

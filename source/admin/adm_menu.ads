@@ -88,6 +88,14 @@ is
 
    function "<" (Left, Right : Slug_Type) return Boolean is (True);
 
+   -------------
+   -- Globals --
+   -------------
+
+   Plugin_Page  : Unbounded_Slug;
+   Parent_File  : Unbounded_Slug;
+   Submenu_File : Unbounded_Slug;
+
    Menu    : Menu_Type := Menu_Vectors.To_Vector (Length => 100);
    Submenu : Submenu_Type;
 

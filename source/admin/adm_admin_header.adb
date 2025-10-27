@@ -387,7 +387,7 @@ is
       declare
          use Adm_Menu;
       begin
-         Globals.Current_Screen.Set_Parentage (String (-Globals.Parent_File));
+         Globals.Current_Screen.Set_Parentage (String (-Parent_File));
       end;
 
       Echo ("<div id=""wpbody-content"">" & NL);

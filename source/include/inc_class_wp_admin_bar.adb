@@ -97,7 +97,7 @@ is
       end if;
 
       Add_Action ("wp_head",    Wp_Admin_Bar_Header'Access);
-      Add_Action ("admin_head", Wp_Admin_Bar_Header'Access);
+--    Add_Action ("admin_head", Wp_Admin_Bar_Header'Access);
 
       declare
          Admin_Bar_Args  : String_Array; -- Array_Type;
@@ -257,7 +257,8 @@ is
                          Args : Node_Args) -- Array_Type)
    is
    begin
-      This.Nodes (Integer'Value (-Args.Id)) := Args; -- (object)
+      This.Nodes.Include (Key      => -Args.Id,
+                          New_Item => Args); -- (object)
    end X_Set_Node;
 
    --------------
@@ -296,11 +297,15 @@ is
          Id_2 := +"root";
       end if;
 
-      for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
-         if Id_2 = -This.Nodes (A).Id then
-            return This.Nodes (A);
-         end if;
-      end loop;
+      if Has_Element (This.Nodes.Find (-Id_2)) then
+         return Element (This.Nodes.Find (-Id_2));
+      end if;
+
+      -- for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
+      --    if Id_2 = -This.Nodes (A).Id then
+      --       return This.Nodes (A);
+      --    end if;
+      -- end loop;
 
       return Null_Node_Args;
    end X_Get_Node;
@@ -372,13 +377,15 @@ is
                            Id   : String)
    is
    begin
-      for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
-         if Id = -This.Nodes (A).Id then
-            This.Nodes.Delete (A);
-            return;
-         end if;
-      end loop;
---    This.Nodes.Delete (Id);
+      -- for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
+      --    if Id = -This.Nodes (A).Id then
+      --       This.Nodes.Delete (A);
+      --       return;
+      --    end if;
+      -- end loop;
+      if Node_Maps.Has_Element (This.Nodes.Find (Id)) then
+         This.Nodes.Delete (Id);
+      end if;
 --    Unset (this.Nodes (id));
    end X_Unset_Node;
 
@@ -500,8 +507,10 @@ is
                         --    Build ("href",     "false")
                         -- ))
 
-                     Default         := This.X_Get_Node (Default_Id);
-                     Parent.Children.Append (Default); -- ()
+                     Default := This.X_Get_Node (Default_Id);
+                     Parent.Children.Include (Key      => "XXX-989",
+                                              New_Item => Default);
+                     -- .Append (Default); -- ()
                   end if;
                   Parent := Default;
                end;
@@ -518,8 +527,9 @@ is
                      -- Use _set_node because add_node can be overloaded.
                      -- Make sure to specify default settings for all properties.
                      declare
-                        V : constant Node_Array := To_Vector (Parent, Length => 1);
+                        V : Node_Array; -- := To_Vector (Parent, Length => 1);
                      begin
+                        V.Include (Key => "XXX-988", New_Item => Parent);
                         This.X_Set_Node (
                            Node_Args'(
                               Id       =>  +Container_Id,
@@ -540,23 +550,29 @@ is
                         Grandparent : constant Node_Args :=
                            This.X_Get_Node (-Parent.Parent);
 
-                        Index : Integer := 0;
+                        Index : Node_Maps.Cursor := Node_Maps.No_Element;
+--                      Index : Integer := 0;
                      begin
                         if Grandparent /= Null_Node_Args then
                            Container.Parent := Grandparent.Id;
 
-                           for
-                             A in Grandparent.Children.First_Index ..
-                                  Grandparent.Children.Last_Index
-                           loop
-                              if Parent.Id = Grandparent.Children (A).Id then
+--                         Index :=
+--                           Array_Search (Parent, Grandparent.Children.all, True);
+
+                           for A in Grandparent.Children.Iterate loop
+                              if
+                                Parent.Id =
+                                Grandparent.Children (Node_Maps.Key (A)).Id
+                              then
                                  Index := A;
                                  exit;
                               end if;
                            end loop;
 
-                           if Index = 0 then
-                              Grandparent.Children.Append (Container); -- ()
+                           if Node_Maps.Has_Element (Index) then
+--                         if Index = 0 then
+                              Grandparent.Children.Include (Key      => "XXX-987",
+                                                            New_Item => Container);
                            else
                               Grandparent.Children.Replace_Element (Index, Container);
                            end if;
@@ -581,7 +597,9 @@ is
             Node.Parent := Parent.Id;
 
             -- Add the node to the tree.
-            Parent.Children.Append (Node); -- ()
+--          Parent.Children.Append (Node);
+            Parent.Children.Include (Key      => "XXX-986",
+                                     New_Item => Node);
          end;
          << Continue >>
       end loop;

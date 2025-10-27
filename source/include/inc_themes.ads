@@ -196,7 +196,7 @@ is
                                     Arg_2   : String := "")
 --                                   , ...args )
                                     return Boolean
-                                    is (True);
+                                    is (False);
 
    --
    -- Retrieves all theme modifications.

@@ -46,6 +46,8 @@ is
    function X_Wp_Admin_Bar_Init
             return Boolean;
 
+   procedure X_Wp_Admin_Bar_Init;
+
    --
    -- Renders the admin bar to the page based on the wp_admin_bar.menu member var.
    --

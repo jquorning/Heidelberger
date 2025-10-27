@@ -19,11 +19,19 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
 
+   ---------------
+   -- Blog_Type --
+   ---------------
+
    type Blog_Type is
       record
          Userblog_Id : Integer;
          Blogname    : Unbounded_String;
       end record;
+
+   ---------------
+   -- Blog_List --
+   ---------------
 
    package Blog_Vectors is new
       Ada.Containers.Vectors (Index_Type   => Positive,
@@ -32,9 +40,13 @@ is
    subtype Blog_List is Blog_Vectors.Vector;
    Empty_Blog_List : constant Blog_List := Blog_Vectors.Empty_Vector;
 
+   ---------------
+   -- User_Type --
+   ---------------
+
    type User_Type is
       record
-         Blogs          : Blog_List; -- Blog_Vectors.Vector; -- String_Array;
+         Blogs          : Blog_List;
          Active_Blog    : Inc_Class_Wp_Sites.Wp_Site;
          Domain         : Unbounded_String;
          Account_Domain : Unbounded_String;
@@ -44,6 +56,10 @@ is
 
    type Node_Array;
    type Node_Array_Access is access all Node_Array;
+
+   ---------------
+   -- Node_Args --
+   ---------------
 
    type Node_Args is
       record
@@ -68,33 +84,28 @@ is
          --  "html", "class", "rel", "lang", "dir",
          --  "onclick", "target", "title", "tabindex".
          --   Default empty.
+
          Typ      : Typ_Type;
          Children : Node_Array_Access;
       end record;
 
    Null_Node_Args : constant Node_Args :=
-     (Group => False, Meta => Empty_Array, Typ => Typ_Item, Children => null,
-      others => Null_Unbounded_String);
+     (Group    => False,
+      Meta     => Empty_Array,
+      Typ      => Typ_Item,
+      Children => null,
+      others   => Null_Unbounded_String);
 
    ----------------
    -- Node_Array --
    ----------------
 
-   package Node_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Positive,
-                              Element_Type => Node_Args);
-
-   type Node_Array is new Node_Vectors.Vector with null record;
-
-   --------------
-   -- Node_Map --
-   --------------
-
    package Node_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => Node_Args);
-   type Node_Map is new Node_Maps.Map with null record;
-   Empty_Node_Map : constant Node_Map := (Node_Maps.Empty_Map with null record);
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Node_Args);
+
+   type Node_Array is new Node_Maps.Map with null record;
 
    --
    -- Core class used to implement the Toolbar API.
@@ -106,7 +117,8 @@ is
    type Wp_Admin_Bar is tagged
       record
          -- private
-         Nodes : Node_Array_Access;
+         Nodes : Node_Array_Access :=
+           new Node_Array'(Node_Maps.Empty_Map with null record);
 
          -- private
          Bound : Boolean := False;
@@ -164,9 +176,11 @@ is
    --     @type string title  Title of the node.
    --     @type string parent Optional. ID of the parent node.
    --     @type string href   Optional. Link for the item.
-   --     @type bool   group  Optional. Whether or not the node is a group. Default false.
-   --     @type array  meta   Meta data including the following keys: "html", "class", "rel", "lang", "dir",
-   --                          "onclick", "target", "title", "tabindex". Default empty.
+   --     @type bool   group  Optional. Whether or not the node is a group. Default
+   --                          false.
+   --     @type array  meta   Meta data including the following keys: "html",
+   --                          "class", "rel", "lang", "dir", "onclick", "target",
+   --                          "title", "tabindex". Default empty.
    -- }
    --
    procedure Add_Node (This : in out Wp_Admin_Bar;
@@ -226,7 +240,8 @@ is
    --
    -- Adds a group to a toolbar menu node.
    --
-   -- Groups can be used to organize toolbar items into distinct sections of a toolbar menu.
+   -- Groups can be used to organize toolbar items into distinct sections of a
+   -- toolbar menu.
    --
    -- @since 3.3.0
    --

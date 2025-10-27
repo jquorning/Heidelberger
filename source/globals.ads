@@ -88,11 +88,8 @@ is
    Taxnow      : Unbounded_String;
    Pagenow     : Unbounded_String;
    Hook_Suffix : Unbounded_String;
-   Plugin_Page : Adm_Menu.Unbounded_Slug;
 
    Title         : Unbounded_String;
-   Parent_File   : Adm_Menu.Unbounded_Slug;
-   Submenu_File  : Adm_Menu.Unbounded_Slug;
    Post_New_File : Unbounded_String;
 
    Current_Screen     : Adi_Class_Wp_Screens.Wp_Screen;

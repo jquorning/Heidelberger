@@ -9,12 +9,19 @@
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Arrays.Io;
 with Hb_Common;
 
+with Inc_Elab_Hooks;
+with Inc_Elab_Plugins;
 with Inc_Plugins;
 
 package body Inc_Class_Wp_Hooks
 is
+
+   ----------------
+   -- Array_Keys --
+   ----------------
 
    function Array_Keys (Map : Priority_Maps.Map)
                         return List_Type
@@ -41,9 +48,10 @@ is
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
-      use Inc_Plugins;
       use Hb_Common;
       use Php;
+      use Inc_Elab_Plugins;
+      use Inc_Plugins;
 
       Index : constant String :=
         X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, Integer (Priority));
@@ -58,6 +66,7 @@ is
 
       Map : Index_Maps.Map;
    begin
+Put_Line ("#Add_Filter method");
       Map.Include (Key => Index, New_Item => Item);
       This.Callbacks.Include (Key => Priority, New_Item => Map);
 --    This.Callbacks (Priority) (Idx) := Item;
@@ -266,25 +275,33 @@ is
       use Php;
 
       Args_2        : constant Array_Type := Args;
-      Nesting_Level : Nesting_Type; -- Natural;
+      Nesting_Level : Nesting_Type;
       Num_Args      : Natural;
       Value_2       : Unbounded_String := +Value;
    begin
 Put_Line ("#Apply_Filters method");
---       if not This.Callbacks then
--- --    if not This.Callbacks then
---          return Value;
---       end if;
+      if This.Callbacks.Is_Empty then
+         return Value;
+      end if;
 
       Nesting_Level := This.Nesting_Level;
 
       This.Nesting_Level :=
         This.Nesting_Level + 1;
 
-      This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
+      if This.Iterations.Last_Index < Nesting_Level then
+         This.Iterations.Append (Array_Keys (This.Callbacks));
+      else
+         This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
+      end if;
+--    This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
       Num_Args                        := Arrays.Count (Args);
 
       loop
+         if This.Current_Priority.Last_Index < Nesting_Level then
+            This.Current_Priority.Append (
+              This.Callbacks.First_Key);
+         end if;
 --       This.Current_Priority (Nesting_Level) :=
 --         Current (This.Iterations (Nesting_Level));
 
@@ -292,7 +309,16 @@ Put_Line ("#Apply_Filters method");
             Priority : constant Priority_Type :=
               This.Current_Priority (Nesting_Level);
          begin
-
+-- Put_Line ("  Priority: " & Priority'Image);
+-- for A in This.Callbacks.Iterate loop
+--    Put_Line ("  " & Priority_Maps.Key (A)'Image);
+--    for B in Priority_Maps.Element (A).Iterate loop
+--       Put ("    " & Index_Maps.Key (B));
+--       Put ("  ");
+-- --    Put ("  " & Array_Maps.Key (Index_Maps.Element (B)));
+--       New_Line;
+--    end loop;
+-- end loop;
             for The_X of This.Callbacks (Priority) loop
                -- if not This.Doing_Action then
                --    Args_2 (Args_2.First_Index) := Value_2;
@@ -305,7 +331,6 @@ Put_Line ("#Apply_Filters method");
                   User_Function : constant Callable :=
                     Get_Func (The_X, "function");
                begin
-
                   -- Avoid the array_slice() if possible.
                   if 0 = Accepted_Args then
                      Value_2 := +Call_User_Func (User_Function);
@@ -320,7 +345,8 @@ Put_Line ("#Apply_Filters method");
                end;
             end loop;
          end;
-         exit when True; -- not Next (This.Iterations (Nesting_Level));
+         exit when True;
+--       exit when not Next (This.Iterations (Nesting_Level).Element);
       end loop;
 
       This.Iterations      .Delete (Nesting_Level);
@@ -414,62 +440,6 @@ Put_Line ("#Do_All_Hook method");
 --                 end;
 
 --                 return current( current( this.iterations ) );
---         end;
-
---         --
---         -- Normalizes filters set up before WordPress has initialized to WP_Hook objects.
---         --
---         -- The `filters` parameter should be an array keyed by hook name, with values
---         -- containing either:
---         --
---         --  - A `WP_Hook` instance
---         --  - An array of callbacks keyed by their priorities
---         --
---         -- Examples:
---         --
---         --     filters = array(
---         --         "wp_fatal_error_handler_enabled" => array(
---         --             10 => array(
---         --                 array(
---         --                     "accepted_args" => 0,
---         --                     "function"      => function() then
---         --                         return false;
---         --                     end;,
---         --                 ),
---         --             ),
---         --         ),
---         --     );
---         --
---         -- @since 4.7.0
---         --
---         -- @param array filters Filters to normalize. See documentation above for details.
---         -- @return WP_Hook[] Array of normalized filters.
---         --
---         public static function build_preinitialized_hooks( filters ) then
---                 -- @var WP_Hook[] normalized
---                 normalized = array();
-
---                 foreach ( filters as hook_name => callback_groups ) then
---                         if ( is_object( callback_groups ) && callback_groups instanceof WP_Hook ) then
---                                 normalized[ hook_name ] = callback_groups;
---                                 continue;
---                         end;
-
---                         hook = new WP_Hook();
-
---                         -- Loop through callback groups.
---                         foreach ( callback_groups as priority => callbacks ) then
-
---                                 -- Loop through callbacks.
---                                 foreach ( callbacks as cb ) then
---                                         hook.add_filter( hook_name, cb["function"], priority, cb["accepted_args"] );
---                                 end;
---                         end;
-
---                         normalized[ hook_name ] = hook;
---                 end;
-
---                 return normalized;
 --         end;
 
 --         --

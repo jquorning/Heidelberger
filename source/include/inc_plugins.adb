@@ -4,13 +4,17 @@
 -- @since 1.5.0
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 
+with Inc_Elab_Hooks;
+
 package body Inc_Plugins
 is
+   use Inc_Elab_Hooks;
 
 -- -- Initialize the filter globals.
 -- require __DIR__ . '/class-wp-hook.php';
@@ -45,6 +49,27 @@ is
 --         wp_current_filter = array();
 -- end;
 
+   package Count_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Natural);
+
+   package Natural_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Natural);
+
+   -------------
+   -- Globals --
+   -------------
+
+   Wp_Filter         : Inc_Elab_Hooks.Hook_Maps.Map :=
+     Inc_Elab_Hooks.Build_Preinitialized_Hooks (Empty_Array); --  (Wp_Filter);
+
+   Wp_Actions        : Count_Maps.Map;
+   Wp_Filters        : Natural_Maps.Map;
+   Wp_Current_Filter : List_Type;
+
    ----------------
    -- Add_Filter --
    ----------------
@@ -55,13 +80,14 @@ is
                         Accepted_Args : Integer := 1)
                         return Boolean
    is
-      use Hook_Maps;
-
       Hook : Wp_Hook;
    begin
-      if not Has_Element (Wp_Filter.Find (Hook_Name)) then
+Put_Line ("#Add_Filter  " & Hook_Name);
+      if not Hook_Maps.Has_Element (Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
-         Wp_Filter.Include (Hook_Name, Hook);
+Put_Line ("#Add_Filter  #4-1");
+         Wp_Filter.Include (Hook_Name, Hook); -- Tampering with cursor
+Put_Line ("#Add_Filter  #4-2");
 --       Wp_Filter (Hook_Name) := new WP_Hook();
       end if;
 
@@ -71,19 +97,34 @@ is
       return True;
    end Add_Filter;
 
-   -- package Hook_Maps is new
-   --    Ada.Containers.Indefinite_Ordered_Maps
-   --      (Key_Type     => String,
-   --       Element_Type => Inc_Class_Wp_Hooks.Wp_Hook,
-   --       "="          => Inc_Class_Wp_Hooks."=");
+   procedure Add_Filter (Hook_Name     : String;
+                         Callback      : Callable;
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer := 1)
+   is
+      Unused : constant Boolean :=
+        Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
+   begin
+      null;
+   end Add_Filter;
 
-   package Natural_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                              Element_Type => Natural);
+   procedure Add_Filter (Hook_Name     : String;
+                         Callback      : Callable_2;
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
+   is
+   begin
+Put_Line ("#Add_Filter callable_2 is null");
+   end Add_Filter;
 
--- Wp_Filter         : Hook_Maps.Map;
-   Wp_Filters        : Natural_Maps.Map;
-   Wp_Current_Filter : List_Type;
+   procedure Add_Filter (Hook_Name     : String;
+                         Callback      : Callable_3;
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
+   is
+   begin
+Put_Line ("#Add_Filter callable_3 is null");
+   end Add_Filter;
 
    -------------------
    -- Apply_Filters --
@@ -126,11 +167,7 @@ Put_Line ("#Apply_Filters");
 --    if not Isset (Wp_Filter (Hook_Name)) then
          if Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
 --       if Isset (Wp_Filter ("all")) then
-            declare
-               Unused : Unbounded_String;
-            begin
-               Unused := +Array_Pop (Wp_Current_Filter);
-            end;
+            Array_Pop (Wp_Current_Filter);
          end if;
 
          return Value;
@@ -406,7 +443,7 @@ Put_Line ("#Apply_Filters");
 
 --    global wp_filter, wp_actions, wp_current_filter;
    begin
-Put_Line ("Do_Action " & Hook_Name & " arg: " & Arg_2);
+Put_Line ("#Do_Action " & Hook_Name & " arg: " & Arg_2);
 
       if not Has_Element (Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
@@ -886,70 +923,9 @@ Put_Line ("Do_Action " & Hook_Name & " arg: " & Arg_2);
    procedure X_Wp_Call_All_Hook (Args : Array_Type)
    is
 --    global wp_filter;
-      Filter : Wp_Hook renames Wp_Filter ("all");
+--    Filter : Wp_Hook renames Wp_Filter ("all");
    begin
-      Filter.Do_All_Hook (Args);
+      Wp_Filter ("all").Do_All_Hook (Args);
    end X_Wp_Call_All_Hook;
-
--- --
--- -- Builds Unique ID for storage and retrieval.
--- --
--- -- The old way to serialize the callback caused issues and this function is the
--- -- solution. It works by checking for objects and creating a new property in
--- -- the class to keep track of the object and new objects of the same class that
--- -- need to be added.
--- --
--- -- It also allows for the removal of actions and filters for objects after they
--- -- change class properties. It is possible to include the property wp_filter_id
--- -- in your class and set it to "null" or a number to bypass the workaround.
--- -- However this will prevent you from adding new classes and any new classes
--- -- will overwrite the previous hook by the same class.
--- --
--- -- Functions and static method callbacks are just returned as strings and
--- -- shouldn't have any speed penalty.
--- --
--- -- @link https://core.trac.wordpress.org/ticket/3875
--- --
--- -- @since 2.2.3
--- -- @since 5.3.0 Removed workarounds for spl_object_hash().
--- --              `hook_name` and `priority` are no longer used,
--- --              and the function always returns a string.
--- --
--- -- @access private
--- --
--- -- @param string                hook_name Unused. The name of the filter to build ID for.
--- -- @param callable|string|array callback  The callback to generate ID for. The callback may
--- --                                         or may not exist.
--- -- @param int                   priority  Unused. The order in which the functions
--- --                                         associated with a particular action are executed.
--- -- @return string Unique function ID for usage as array key.
--- --
--- function _wp_filter_build_unique_id( hook_name, callback, priority ) then
-   function X_Wp_Filter_Build_Unique_Id (Hook_Name : String;
-                                         Callback  : Callable;
-                                         Priority  : Integer)
-                                         return String
-   is
-   begin
---        if ( is_string( callback ) ) then
---                return callback;
---        end if;
-
-        -- if Is_Object (callback) then
-        --         Closures are currently implemented as objects.
-        --         callback = array( callback, '' );
-        -- else
-        --         callback = (array) callback;
-        -- end if;
-
-        -- if is_object( callback[0] ) then
-        --         Object class calling.
-        --         return spl_object_hash( callback[0] ) . callback[1];
-        -- elsif is_string( callback[0] ) then
-        --         Static calling.
-        --         return callback[0] . '::' . callback[1];
-        -- end if;
-      return "XXX-610";
-   end X_Wp_Filter_Build_Unique_Id;
 
 end Inc_Plugins;
