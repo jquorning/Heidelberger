@@ -334,7 +334,7 @@ is
    -----------------
 
    function X_Get_Nodes (This : Wp_Admin_Bar)
-                         return Node_Array_Access -- Array_Type
+                         return Node_Array_Access
    is
    begin
       if This.Bound then
@@ -349,7 +349,7 @@ is
    ---------------
 
    procedure Add_Group (This : in out Wp_Admin_Bar;
-                        Args : Node_Args) -- Array_Type)
+                        Args : Node_Args)
    is
       Args_2 : Node_Args := Args;
    begin
@@ -377,16 +377,9 @@ is
                            Id   : String)
    is
    begin
-      -- for A in This.Nodes.First_Index .. This.Nodes.Last_Index loop
-      --    if Id = -This.Nodes (A).Id then
-      --       This.Nodes.Delete (A);
-      --       return;
-      --    end if;
-      -- end loop;
       if Node_Maps.Has_Element (This.Nodes.Find (Id)) then
          This.Nodes.Delete (Id);
       end if;
---    Unset (this.Nodes (id));
    end X_Unset_Node;
 
    ------------
@@ -407,7 +400,7 @@ is
    ------------
 
    function X_Bind (This : in out Wp_Admin_Bar)
-            return Node_Args -- Array_Type
+            return Node_Args
    is
       Parent : Node_Args;
    begin

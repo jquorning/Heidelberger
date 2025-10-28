@@ -133,6 +133,20 @@ is
             return Wp_Styles;
 
    --
+   -- Adds extra CSS styles to a registered stylesheet.
+   --
+   -- @since 3.3.0
+   --
+   -- @param string handle The style"s registered handle.
+   -- @param string code   String containing the CSS styles to be added.
+   -- @return bool True on success, false on failure.
+   --
+   function Add_Inline_Style (This   : in out Wp_Styles;
+                              Handle : String;
+                              Code   : String)
+                              return Boolean;
+
+   --
    -- Processes items and dependencies for the footer group.
    --
    -- HTML 5 allows styles in the body, grab late enqueued items and output them in

@@ -665,14 +665,16 @@ Put_Line ("#Inc_Default_Filters.Run");
 
       -- Script Loader.
 --    Add_Action ("wp_default_scripts", Inc_Script_Loader.Wp_Default_Scripts'Access);
---    Add_Action ("wp_default_scripts", Wp_Default_Packages'Access);
+--    Add_Action ("wp_default_scripts", Inc_Script_Loader.Wp_Default_Packages'Access);
 
 --    Add_Action ("wp_enqueue_scripts", Wp_Localize_Jquery_Ui_Datepicker'Access, 1000);
---    Add_Action ("wp_enqueue_scripts", Wp_Common_Block_Scripts_And_Styles'Access);
+      Add_Action ("wp_enqueue_scripts",
+                  Inc_Script_Loader.Wp_Common_Block_Scripts_And_Styles'Access);
       Add_Action ("wp_enqueue_scripts",
                   Inc_Script_Loader.Wp_Enqueue_Classic_Theme_Styles'Access);
 --    Add_Action ("admin_enqueue_scripts", Wp_Localize_Jquery_Ui_Datepicker'Access, 1000);
---    Add_Action ("admin_enqueue_scripts", Wp_Common_Block_Scripts_And_Styles'Access);
+      Add_Action ("admin_enqueue_scripts",
+                  Inc_Script_Loader.Wp_Common_Block_Scripts_And_Styles'Access);
 --    Add_Action ("enqueue_block_assets",
 --                Wp_Enqueue_Registered_Block_Scripts_And_Styles'Access);
 --    Add_Action ("enqueue_block_assets", Enqueue_Block_Styles_Assets'Access, 30);

@@ -21,6 +21,7 @@ is
 
    GLOBALS : Array_Type := Empty_Array;
 
+   X_DIR_X         : constant String := "";
    ABSPATH         : constant String := "";
    WPINC           : Unbounded_String;
    WP_PLUGIN_DIR   : Unbounded_String;

@@ -546,7 +546,7 @@ is
 
       declare
          Script : Unbounded_String :=
-            +"var object_name = " & Wp_Json_Encode (L10n_2) & ";";
+            +"var object_name = " & Wp_JSON_Encode (L10n_2) & ";";
       begin
          if not Empty (After) then
             Append (Script, "\nafter;");

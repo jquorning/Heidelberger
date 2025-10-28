@@ -207,29 +207,33 @@ is
 --                 return true;
 --         end;
 
---         --
---         -- Adds extra CSS styles to a registered stylesheet.
---         --
---         -- @since 3.3.0
---         --
---         -- @param string handle The style"s registered handle.
---         -- @param string code   String containing the CSS styles to be added.
---         -- @return bool True on success, false on failure.
---         --
---         public function add_inline_style( handle, code ) then
---                 if ( not code ) then
---                         return false;
---                 end;
+   ----------------------
+   -- Add_Inline_Style --
+   ----------------------
 
---                 after = this.get_data( handle, "after" );
---                 if ( not after ) then
---                         after = array();
---                 end;
+   function Add_Inline_Style (This   : in out Wp_Styles;
+                              Handle : String;
+                              Code   : String)
+                              return Boolean
+   is
+      use Arrays.List_Vectors;
 
---                 after[] = code;
+      After : List_Type;
+   begin
+      if Code = "" then
+         return False;
+      end if;
 
---                 return this.add_data( handle, "after", after );
---         end;
+      After := This.Get_Data (Handle, "after");
+      if After = Empty_List then
+--    if not After then
+         After := Empty_List; -- Empty_Array;
+      end if;
+
+      After.Append (+Code);
+
+      return This.Add_Data (Handle, "after", After);
+   end Add_Inline_Style;
 
 --         --
 --         -- Prints extra CSS styles of a registered stylesheet.

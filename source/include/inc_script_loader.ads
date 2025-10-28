@@ -29,6 +29,23 @@ is
    use Arrays;
 
    --
+   -- Registers TinyMCE scripts.
+   --
+   -- @since 5.0.0
+   --
+   -- @global string tinymce_version
+   -- @global bool   concatenate_scripts
+   -- @global bool   compress_scripts
+   --
+   -- @param WP_Scripts scripts            WP_Scripts object.
+   -- @param bool       force_uncompressed Whether to forcibly prevent gzip
+   --                                      compression. Default false.
+   --
+   procedure Wp_Register_TinyMCE_Scripts
+     (Scripts            : in out Inc_Class_Wp_Scripts.Wp_Scripts;
+      Force_Uncompressed : Boolean := False);
+
+   --
    -- Assigns default styles to styles object.
    --
    -- Nothing is returned, because the styles parameter is passed by reference.
@@ -57,6 +74,15 @@ is
    --
    procedure X_Print_Scripts
              is null;
+
+   --
+   -- Registers all the WordPress packages scripts.
+   --
+   -- @since 5.0.0
+   --
+   -- @param WP_Scripts scripts WP_Scripts object.
+   --
+   procedure Wp_Default_Packages (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
 
    --
    -- Returns the suffix that can be used for the scripts.
@@ -100,6 +126,18 @@ is
      (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
 
    --
+   -- Registers development scripts that integrate with `@wordpress/scripts`.
+   --
+   -- @see https://github.com/WordPress/gutenberg/tree/trunk/packages/scripts#start
+   --
+   -- @since 6.0.0
+   --
+   -- @param WP_Scripts scripts WP_Scripts object.
+   --
+   procedure Wp_Register_Development_Scripts
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+
+   --
    -- Registers all the WordPress packages scripts that are in the standardized
    -- `js/dist/` location.
    --
@@ -110,6 +148,19 @@ is
    -- @param WP_Scripts scripts WP_Scripts object.
    --
    procedure Wp_Default_Packages_Scripts
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+
+   --
+   -- Adds inline scripts required for the WordPress JavaScript packages.
+   --
+   -- @since 5.0.0
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   -- @global wpdb      wpdb      WordPress database abstraction object.
+   --
+   -- @param WP_Scripts scripts WP_Scripts object.
+   --
+   procedure Wp_Default_Packages_Inline_Scripts
      (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
 
    --
@@ -202,5 +253,26 @@ is
    -- @global bool compress_css
    --
    procedure Script_Concat_Settings;
+
+   --
+   -- Handles the enqueueing of block scripts and styles that are common to both
+   -- the editor and the front-end.
+   --
+   -- @since 5.0.0
+   --
+   procedure Wp_Common_Block_Scripts_And_Styles;
+
+   --
+   -- Checks if the editor scripts and styles for all registered block types
+   -- should be enqueued on the current screen.
+   --
+   -- @since 5.6.0
+   --
+   -- @global WP_Screen current_screen WordPress current screen object.
+   --
+   -- @return bool Whether scripts and styles should be enqueued.
+   --
+   function Wp_Should_Load_Block_Editor_Scripts_And_Styles
+            return Boolean;
 
 end Inc_Script_Loader;

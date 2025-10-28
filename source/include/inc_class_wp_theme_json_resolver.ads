@@ -6,7 +6,7 @@
 -- @since 5.8.0
 --
 
-package Inc_Class_Wp_Theme_Json_Resolver
+package Inc_Class_Wp_Theme_JSON_Resolver
 is
    --
    -- Class that abstracts the processing of the different data sources
@@ -20,7 +20,7 @@ is
    -- @access private
    --
 -- #[AllowDynamicProperties]
-   type Wp_Theme_Json_Resolver is tagged
+   type Wp_Theme_JSON_Resolver is tagged
       record
 
          --
@@ -114,7 +114,7 @@ is
    -- @return bool
    --
    -- public static
-   function Theme_Has_Support (This : Wp_Theme_Json_Resolver)
+   function Theme_Has_Support (This : Wp_Theme_JSON_Resolver)
            return Boolean;
 
    --
@@ -130,11 +130,11 @@ is
    -- @return string The whole file path or empty if the file doesn"t exist.
    --
    -- protected static
-   function Get_File_Path_From_Theme (This      : Wp_Theme_Json_Resolver;
+   function Get_File_Path_From_Theme (This      : Wp_Theme_JSON_Resolver;
                                       File_Name : String;
                                       Template  : Boolean := False)
                                       return String;
 
-   Static : Wp_Theme_Json_Resolver;
+   Static : Wp_Theme_JSON_Resolver;
 
-end Inc_Class_Wp_Theme_Json_Resolver;
+end Inc_Class_Wp_Theme_JSON_Resolver;

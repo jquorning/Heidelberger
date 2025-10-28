@@ -85,7 +85,8 @@ is
                         return List_Type
                         is (Empty_List);
 
-   function Get_Option (Option : String)
+   function Get_Option (Option  : String;
+                        Default : Integer := 0)
                         return Integer
                         is (1);
 

@@ -96,7 +96,7 @@ is
 --                                        echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item",
 --                                              To_array (Get_Post (Object_Id))), 0, Args)); -- (object)
                   elsif "json" = Response_Format then
-                     Echo (Inc_Functions.Wp_Json_Encode (
+                     Echo (Inc_Functions.Wp_JSON_Encode (
                         Arrays.To_Array ((
                            Build ("ID",         Object_Id),
                            Build ("post_title",
@@ -127,7 +127,7 @@ is
                         Post_Obj : constant Wp_Term :=
                           Get_Term (Object_Id, Object_Type);
                      begin
-                        Echo (Inc_Functions.Wp_Json_Encode (
+                        Echo (Inc_Functions.Wp_JSON_Encode (
                            Arrays.To_Array ((
                               Build ("ID",         Object_Id),
                               Build ("post_title", -Post_Obj.Name),
@@ -197,7 +197,7 @@ is
                                  To_Array (Inc_Posts.Get_Post (Integer (Var_By_Ref)))), 0, Args_2)); -- (object)
                            end;
                         elsif "json" = Response_Format then
-                           Echo (Inc_Functions.Wp_Json_Encode (
+                           Echo (Inc_Functions.Wp_JSON_Encode (
                               Arrays.To_Array ((
                                  Build ("ID",         Integer (Post.Id)),
                                  Build ("post_title",
@@ -241,7 +241,7 @@ is
 --                         Arrays.To_Array ((1 => Build (Term, "")))), 0, Args)); -- (object)
 
                   elsif "json" = Response_Format then
-                     Echo (Inc_Functions.Wp_Json_Encode (
+                     Echo (Inc_Functions.Wp_JSON_Encode (
                         Arrays.To_Array ((
                            Build ("ID",         Term.Term_Id),
                            Build ("post_title", -Term.Name),

@@ -25,7 +25,11 @@ with Php;
 
 with Adm_Load_Styles;
 
-with Inc_Class_Wp_Theme_Json_Resolver;
+with Adi_Class_Wp_Screens;
+
+with Inc_Class_Wp_Admin_Bar;
+with Inc_Class_Wp_Dependency;
+with Inc_Class_Wp_Theme_JSON_Resolver;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
@@ -61,41 +65,67 @@ is
 
 -- -- WordPress Styles Functions
 -- require ABSPATH . WPINC . "/functions.wp-styles.php";
+   Static_Compress_Scripts   : constant Boolean := False;
+   Static_Concatenate_Script : constant Boolean := False;
 
--- --
--- -- Registers TinyMCE scripts.
--- --
--- -- @since 5.0.0
--- --
--- -- @global string tinymce_version
--- -- @global bool   concatenate_scripts
--- -- @global bool   compress_scripts
--- --
--- -- @param WP_Scripts scripts            WP_Scripts object.
--- -- @param bool       force_uncompressed Whether to forcibly prevent gzip compression. Default false.
--- --
--- function wp_register_tinymce_scripts( scripts, force_uncompressed = false ) then
---         global tinymce_version, concatenate_scripts, compress_scripts;
+   ---------------------------------
+   -- Wp_Register_Tinymse_Scritps --
+   ---------------------------------
 
---         suffix     = wp_scripts_get_suffix();
---         dev_suffix = wp_scripts_get_suffix( "dev" );
+   procedure Wp_Register_TinyMCE_Scripts
+     (Scripts            : in out Inc_Class_Wp_Scripts.Wp_Scripts;
+      Force_Uncompressed : Boolean := False)
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Link_Templates;
+      use Inc_Versions;
 
---         script_concat_settings();
+--        global tinymce_version
+--        global concatenate_scripts
+--        global compress_scripts
+      Suffix     : String := Wp_Scripts_Get_Suffix;
+      Dev_Suffix : String := Wp_Scripts_Get_Suffix ("dev");
+      Compressed : Boolean;
+   begin
+      Script_Concat_Settings;
 
---         compressed = compress_scripts && concatenate_scripts && isset( _SERVER["HTTP_ACCEPT_ENCODING"] )
---                 && false !== stripos( _SERVER["HTTP_ACCEPT_ENCODING"], "gzip" ) && ! force_uncompressed;
+      Compressed :=
+        Static_Compress_Scripts   and then
+        Static_Concatenate_Script and then
+        Isset (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING") and then
+        0 /= Stripos (Get (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING"), "gzip") and then
+        not Force_Uncompressed;
 
---         -- Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production)
---         -- or tinymce.min.js (when SCRIPT_DEBUG is true).
---         if ( compressed ) then
---                 scripts->add( "wp-tinymce", includes_url( "js/tinymce/" ) . "wp-tinymce.js", array(), tinymce_version );
---         end; else then
---                 scripts->add( "wp-tinymce-root", includes_url( "js/tinymce/" ) . "tinymcedev_suffix.js", array(), tinymce_version );
---                 scripts->add( "wp-tinymce", includes_url( "js/tinymce/" ) . "plugins/compat3x/plugindev_suffix.js", array( "wp-tinymce-root" ), tinymce_version );
---         end;
+      -- Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in
+      -- production) or tinymce.min.js (when SCRIPT_DEBUG is true).
+      if Compressed then
+         Scripts.Add
+           ("wp-tinymce",
+            Includes_URL ("js/tinymce/") & "wp-tinymce.js",
+            Empty_List,
+            Tinymce_Version);
+      else
+         Scripts.Add
+           ("wp-tinymce-root",
+            Includes_URL ("js/tinymce/") & "tinymcedev_suffix.js",
+            Empty_List,
+            Tinymce_Version);
 
---         scripts->add( "wp-tinymce-lists", includes_url( "js/tinymce/plugins/lists/pluginsuffix.js" ), array( "wp-tinymce" ), tinymce_version );
--- end;
+         Scripts.Add
+           ("wp-tinymce",
+            Includes_URL ("js/tinymce/") & "plugins/compat3x/plugindev_suffix.js",
+            To_List ("wp-tinymce-root"),
+            Tinymce_Version);
+      end if;
+
+      Scripts.Add
+        ("wp-tinymce-lists",
+         Includes_URL ("js/tinymce/plugins/lists/pluginsuffix.js"),
+         To_List ("wp-tinymce"),
+         Tinymce_Version);
+
+   end Wp_Register_TinyMCE_Scripts;
 
    --------------------------------
    -- Wp_Default_Packages_Vendor --
@@ -179,7 +209,7 @@ is
               "moment.updateLocale( ""%s"", %s );",
               To_List (List => (
                 1 => +Get_User_Locale,
-                2 => +Wp_Json_Encode (
+                2 => +Wp_JSON_Encode (
                   To_Array ((
                   Build ("months",
                          Php.Array_Values (Globals.Wp_Locale.Month)),
@@ -261,45 +291,53 @@ is
 --         return polyfill;
 -- end;
 
--- --
--- -- Registers development scripts that integrate with `@wordpress/scripts`.
--- --
--- -- @see https://github.com/WordPress/gutenberg/tree/trunk/packages/scripts#start
--- --
--- -- @since 6.0.0
--- --
--- -- @param WP_Scripts scripts WP_Scripts object.
--- --
--- function wp_register_development_scripts( scripts ) then
---         if (
---                 ! defined( "SCRIPT_DEBUG" ) || ! SCRIPT_DEBUG
---                 || empty( scripts->registered["react"] )
---                 || defined( "WP_RUN_CORE_TESTS" )
---         ) then
---                 return;
---         end;
+   -------------------------------------
+   -- Wp_Register_Development_Scripts --
+   -------------------------------------
 
---         development_scripts = array(
---                 "react-refresh-entry",
---                 "react-refresh-runtime",
---         );
+   procedure Wp_Register_Development_Scripts
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   is
+      use Hb_Common;
 
---         foreach ( development_scripts as script_name ) then
---                 assets = include ABSPATH . WPINC . "/assets/script-loader-" . script_name . ".php";
---                 if ( ! is_array( assets ) ) then
---                         return;
---                 end;
---                 scripts->add(
---                         "wp-" . script_name,
---                         "/wp-includes/js/dist/development/" . script_name . ".js",
---                         assets["dependencies"],
---                         assets["version"]
---                 );
---         end;
+      Development_Scripts : constant List_Type :=
+        To_List (List => (
+          +"react-refresh-entry",
+          +"react-refresh-runtime"
+        ));
+   begin
+      if
+--      not Defined ("SCRIPT_DEBUG") or else
+        not Globals.SCRIPT_DEBUG
+        or else not Inc_Class_Wp_Dependency.Dependency_Maps.Has_Element (Scripts.Registered.Find ("react"))
+--      or else Empty (Scripts.Registered, "react")
+--      or else Defined ("WP_RUN_CORE_TESTS")
+        or else Globals.WP_RUN_CORE_TESTS
+      then
+         return;
+      end if;
 
---         -- See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
---         scripts->registered["react"]->deps[] = "wp-react-refresh-entry";
--- end;
+      for Script_Name of Development_Scripts loop
+         declare
+            Assets : Array_Type; -- String := "";
+--            include ABSPATH & WPINC & "/assets/script-loader-" & Script_Name & ".php";
+         begin
+            -- if not Is_Array (Assets) then
+            --    return;
+            -- end if;
+
+            Scripts.Add (
+              "wp-" & (-Script_Name),
+              "/wp-includes/js/dist/development/" & (-Script_Name) & ".js",
+              To_List (Get (Assets, "dependencies")),
+              Get (Assets, "version")
+            );
+         end;
+      end loop;
+
+      -- See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
+      Scripts.Registered ("react").Deps.Append (+"wp-react-refresh-entry");
+   end Wp_Register_Development_Scripts;
 
    ---------------------------------
    -- Wp_Default_Packages_Scripts --
@@ -390,154 +428,183 @@ is
       end loop;
    end Wp_Default_Packages_Scripts;
 
--- --
--- -- Adds inline scripts required for the WordPress JavaScript packages.
--- --
--- -- @since 5.0.0
--- --
--- -- @global WP_Locale wp_locale WordPress date and time locale object.
--- -- @global wpdb      wpdb      WordPress database abstraction object.
--- --
--- -- @param WP_Scripts scripts WP_Scripts object.
--- --
--- function wp_default_packages_inline_scripts( scripts ) then
---         global wp_locale, wpdb;
+   ---------------------------------------
+   -- Wp_Default_Package_Inline_Scripts --
+   ---------------------------------------
 
---         if ( isset( scripts->registered["wp-api-fetch"] ) ) then
---                 scripts->registered["wp-api-fetch"]->deps[] = "wp-hooks";
---         end;
---         scripts->add_inline_script(
---                 "wp-api-fetch",
---                 sprintf(
---                         "wp.apiFetch.use( wp.apiFetch.createRootURLMiddleware( "%s" ) );",
---                         sanitize_url( get_rest_url() )
---                 ),
---                 "after"
---         );
---         scripts->add_inline_script(
---                 "wp-api-fetch",
---                 implode(
---                         "\n",
---                         array(
---                                 sprintf(
---                                         "wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );",
---                                         wp_installing() ? "" : wp_create_nonce( "wp_rest" )
---                                 ),
---                                 "wp.apiFetch.use( wp.apiFetch.nonceMiddleware );",
---                                 "wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );",
---                                 sprintf(
---                                         "wp.apiFetch.nonceEndpoint = "%s";",
---                                         admin_url( "admin-ajax.php?action=rest-nonce" )
---                                 ),
---                         )
---                 ),
---                 "after"
---         );
+   procedure Wp_Default_Packages_Inline_Scripts
+     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Inc_Formatting;
+      use Inc_Link_Templates;
+      use Inc_REST_API;
+--    global wp_locale, wpdb;
+   begin
+      if Has_Element (Scripts.Registered.Find ("wp-api-fetch")) then
+--    if Isset (Scripts.Registered, "wp-api-fetch") then
+         Scripts.Registered ("wp-api-fetch").Deps.Append (+"wp-hooks");
+      end if;
 
---         meta_key     = wpdb->get_blog_prefix() . "persisted_preferences";
---         user_id      = get_current_user_id();
---         preload_data = get_user_meta( user_id, meta_key, true );
---         scripts->add_inline_script(
---                 "wp-preferences",
---                 sprintf(
---                         "( function() then
---                                 var serverData = %s;
---                                 var userId = "%d";
---                                 var persistenceLayer = wp.preferencesPersistence.__unstableCreatePersistenceLayer( serverData, userId );
---                                 var preferencesStore = wp.preferences.store;
---                                 wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer );
---                         end; ) ();",
---                         wp_json_encode( preload_data ),
---                         user_id
---                 )
---         );
+      Scripts.Add_Inline_Script (
+        "wp-api-fetch",
+        Sprintf (
+          "wp.apiFetch.use( wp.apiFetch.createRootURLMiddleware( ""%s"" ) );",
+          To_List (Sanitize_URL (Get_REST_URL))
+        ),
+        "after"
+      );
 
---         -- Backwards compatibility - configure the old wp-data persistence system.
---         scripts->add_inline_script(
---                 "wp-data",
---                 implode(
---                         "\n",
---                         array(
---                                 "( function() then",
---                                 "       var userId = " . get_current_user_ID() . ";",
---                                 "       var storageKey = "WP_DATA_USER_" + userId;",
---                                 "       wp.data",
---                                 "               .use( wp.data.plugins.persistence, then storageKey: storageKey end; );",
---                                 "end; )();",
---                         )
---                 )
---         );
+      Scripts.Add_Inline_Script (
+        "wp-api-fetch",
+        Implode (
+          NL, -- "\n",
+          To_List (List => (
+            +Sprintf (
+              "wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( ""%s"" );",
+              To_List ((if Inc_Load.Wp_Installing then ""
+                        else Inc_Pluggables.Wp_Create_Nonce ("wp_rest")))
+            ),
+            +"wp.apiFetch.use( wp.apiFetch.nonceMiddleware );",
+            +"wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );",
+            +Sprintf (
+              "wp.apiFetch.nonceEndpoint = ""%s"";",
+              To_List (Admin_URL ("admin-ajax.php?action=rest-nonce"))
+            )
+          ))
+        ),
+        "after"
+      );
 
---         -- Calculate the timezone abbr (EDT, PST) if possible.
---         timezone_string = get_option( "timezone_string", "UTC" );
---         timezone_abbr   = "";
+      declare
+         use Inc_Functions;
+         use Inc_Users;
 
---         if ( ! empty( timezone_string ) ) then
---                 timezone_date = new DateTime( "now", new DateTimeZone( timezone_string ) );
---                 timezone_abbr = timezone_date->format( "T" );
---         end;
+         Meta_Key : constant String  :=
+           Globals.Wpdb.Get_Blog_Prefix & "persisted_preferences";
 
---         scripts->add_inline_script(
---                 "wp-date",
---                 sprintf(
---                         "wp.date.setSettings( %s );",
---                         wp_json_encode(
---                                 array(
---                                         "l10n"     => array(
---                                                 "locale"        => get_user_locale(),
---                                                 "months"        => array_values( wp_locale->month ),
---                                                 "monthsShort"   => array_values( wp_locale->month_abbrev ),
---                                                 "weekdays"      => array_values( wp_locale->weekday ),
---                                                 "weekdaysShort" => array_values( wp_locale->weekday_abbrev ),
---                                                 "meridiem"      => (object) wp_locale->meridiem,
---                                                 "relative"      => array(
---                                                         /* translators: %s: Duration.--
---                                                         "future" => __( "%s from now" ),
---                                                         /* translators: %s: Duration.--
---                                                         "past"   => __( "%s ago" ),
---                                                 ),
---                                                 "startOfWeek"   => (int) get_option( "start_of_week", 0 ),
---                                         ),
---                                         "formats"  => array(
---                                                 /* translators: Time format, see https://www.php.net/manual/datetime.format.php--
---                                                 "time"                => get_option( "time_format", __( "g:i a" ) ),
---                                                 /* translators: Date format, see https://www.php.net/manual/datetime.format.php--
---                                                 "date"                => get_option( "date_format", __( "F j, Y" ) ),
---                                                 /* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php--
---                                                 "datetime"            => __( "F j, Y g:i a" ),
---                                                 /* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php--
---                                                 "datetimeAbbreviated" => __( "M j, Y g:i a" ),
---                                         ),
---                                         "timezone" => array(
---                                                 "offset" => (float) get_option( "gmt_offset", 0 ),
---                                                 "string" => timezone_string,
---                                                 "abbr"   => timezone_abbr,
---                                         ),
---                                 )
---                         )
---                 ),
---                 "after"
---         );
+         User_Id      : constant Integer := Get_Current_User_Id;
+         Preload_Data : constant Boolean := Get_User_Meta (User_Id, Meta_Key, True);
+      begin
+         Scripts.Add_Inline_Script (
+           "wp-preferences",
+           Sprintf (
+             "( function() then "        &
+             "  var serverData = %s; "   &
+             "  var userId = ""%d"";   " &
+             "  var persistenceLayer = wp.preferencesPersistence.__unstableCreatePersistenceLayer( serverData, userId ); "      &
+             "  var preferencesStore = wp.preferences.store; " &
+             "  wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer ); " &
+             "end; ) ();",
+             To_List (List =>
+               (1 => +Wp_JSON_Encode (Preload_Data),
+                2 => +User_Id'Image))
+           )
+         );
 
---         -- Loading the old editor and its config to ensure the classic block works as expected.
---         scripts->add_inline_script(
---                 "editor",
---                 "window.wp.oldEditor = window.wp.editor;",
---                 "after"
---         );
+         -- Backwards compatibility - configure the old wp-data persistence system.
+         Scripts.Add_Inline_Script (
+           "wp-data",
+           Implode (
+             NL, -- "\n",
+             To_List (List => (
+               +"( function() then",
+               +("       var userId = " & Get_Current_User_Id'Image & ";"),
+               +"       var storageKey = ""WP_DATA_USER_"" + userId;",
+               +"       wp.data",
+               +"  .use( wp.data.plugins.persistence, { storageKey: storageKey } );",
+               +"end; )();"
+             ))
+           )
+         );
+      end;
 
---         /*
---         -- wp-editor module is exposed as window.wp.editor.
---         -- Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
---         -- Solution: fuse the two objects together to maintain backward compatibility.
---         -- For more context, see https://github.com/WordPress/gutenberg/issues/33203.
---         --
---         scripts->add_inline_script(
---                 "wp-editor",
---                 "Object.assign( window.wp.editor, window.wp.oldEditor );",
---                 "after"
---         );
--- end;
+      declare
+         use Globals;
+         use Inc_Functions;
+         use Inc_L10n;
+         use Inc_Options;
+
+         -- Calculate the timezone abbr (EDT, PST) if possible.
+         Timezone_String : constant String := Get_Option ("timezone_string", "UTC");
+         Timezone_Abbr   : constant String := "";
+      begin
+         -- if not Empty (Timezone_String) then
+         --    Timezone_Date :=
+         --      new Datetime ("now", new DatetimeZone (Timezone_String));
+         --    Timezone_Abbr := Timezone_Date.Format ("T");
+         -- end if;
+
+         Scripts.Add_Inline_Script (
+           "wp-date",
+           Sprintf (
+             "wp.date.setSettings( %s );",
+             To_List (Wp_JSON_Encode (
+               To_Array ((
+                 Build ("l10n",     To_Array ((
+                   Build ("locale",        Get_User_Locale),
+                   Build ("months",        Array_Values (Wp_Locale.Month)),
+                   Build ("monthsShort",   Array_Values (Wp_Locale.Month_Abbrev)),
+                   Build ("weekdays",      Array_Values (Wp_Locale.Weekday)),
+                   Build ("weekdaysShort", Array_Values (Wp_Locale.Weekday_Abbrev)),
+                   Build ("meridiem",      Wp_Locale.Meridiem), -- (object)
+                   Build ("relative",      To_Array ((
+                      -- translators: %s: Duration.
+                      Build ("future", abs "%s from now"),
+                      -- translators: %s: Duration.
+                      Build ("past",   abs "%s ago")
+                   ))),
+                   Build ("startOfWeek",   Integer'(Get_Option ("start_of_week", 0)))
+                 ))),
+                 Build ("formats",  To_Array ((
+                   -- translators: Time format, see
+                   -- https://www.php.net/manual/datetime.format.php
+                   Build ("time",  String'(Get_Option ("time_format", abs "g:i a"))),
+                   -- translators: Date format, see
+                   -- https://www.php.net/manual/datetime.format.php
+                   Build ("date",  String'(Get_Option ("date_format", abs "F j, Y"))),
+                   -- translators: Date/Time format, see
+                   -- https://www.php.net/manual/datetime.format.php
+                   Build ("datetime", abs "F j, Y g:i a"),
+                   -- translators: Abbreviated date/time format, see
+                   -- https://www.php.net/manual/datetime.format.php
+                   Build ("datetimeAbbreviated", abs "M j, Y g:i a")
+                 ))),
+                 Build ("timezone", To_Array ((
+                   Build ("offset", Get_Option ("gmt_offset", 0)), -- (float)
+                   Build ("string", Timezone_String),
+                   Build ("abbr",   Timezone_Abbr)
+                 )))
+               ))
+             ))
+           ),
+           "after"
+         );
+      end;
+
+      -- Loading the old editor and its config to ensure the classic block works
+      -- as expected.
+      Scripts.Add_Inline_Script (
+        "editor",
+        "window.wp.oldEditor = window.wp.editor;",
+        "after"
+      );
+
+      --
+      -- wp-editor module is exposed as window.wp.editor.
+      -- Problem: there is quite some code expecting window.wp.oldEditor object
+      -- available under window.wp.editor.
+      -- Solution: fuse the two objects together to maintain backward compatibility.
+      -- For more context, see https://github.com/WordPress/gutenberg/issues/33203.
+      --
+      Scripts.Add_Inline_Script (
+        "wp-editor",
+        "Object.assign( window.wp.editor, window.wp.oldEditor );",
+        "after"
+      );
+   end Wp_Default_Packages_Inline_Scripts;
 
 -- --
 -- -- Adds inline scripts required for the TinyMCE in the block editor.
@@ -683,25 +750,24 @@ is
 --         wp_scripts->add_inline_script( "wp-block-library", script, "before" );
 -- end;
 
--- --
--- -- Registers all the WordPress packages scripts.
--- --
--- -- @since 5.0.0
--- --
--- -- @param WP_Scripts scripts WP_Scripts object.
--- --
--- function wp_default_packages( scripts ) then
---         wp_default_packages_vendor( scripts );
---         wp_register_development_scripts( scripts );
---         wp_register_tinymce_scripts( scripts );
---         wp_default_packages_scripts( scripts );
+   -------------------------
+   -- Wp_Default_Packages --
+   -------------------------
 
---         if ( did_action( "init" ) ) then
---                 wp_default_packages_inline_scripts( scripts );
---         end;
--- end;
+   procedure Wp_Default_Packages (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   is
+      use Inc_Plugins;
+   begin
+      Wp_Register_Development_Scripts (Scripts);
+      Wp_Register_TinyMCE_Scripts (Scripts);
+      Wp_Default_Packages_Scripts (Scripts);
 
-   Suffixes : Array_Type;
+      if Did_Action ("init") then
+         Wp_Default_Packages_Inline_Scripts (Scripts);
+      end if;
+   end Wp_Default_Packages;
+
+   Static_Suffixes : Array_Type;
 
 -- --
 -- -- Returns the suffix that can be used for the scripts.
@@ -722,7 +788,7 @@ is
       use Inc_Versions;
 --         static suffixes;
    begin
-      if Suffixes.Is_Empty then --  = Empty_Array then -- null =
+      if Static_Suffixes.Is_Empty then --  = Empty_Array then -- null =
          declare
             -- Include an unmodified wp_version.
 --          require ABSPATH . WPINC . "/version.php";
@@ -738,7 +804,7 @@ is
                Suffix     : constant String := (if SCRIPT_DEBUG then "" else ".min");
                Dev_Suffix : constant String := (if Develop_Src  then "" else ".min");
             begin
-               Suffixes := Arrays.To_Array ((
+               Static_Suffixes := Arrays.To_Array ((
                   Build ("suffix",     Suffix),
                   Build ("dev_suffix", Dev_Suffix)
                ));
@@ -747,10 +813,10 @@ is
       end if;
 
       if "dev" = Typ then
-         return Get (Suffixes, "dev_suffix");
+         return Get (Static_Suffixes, "dev_suffix");
       end if;
 
-      return Get (Suffixes, "suffix");
+      return Get (Static_Suffixes, "suffix");
    end Wp_Scripts_Get_Suffix;
 
    ------------------------
@@ -1141,7 +1207,7 @@ is
            "mediaelement-core",
            Php.Sprintf (
              "var mejsL10n = %s;",
-             To_List (Wp_Json_Encode (
+             To_List (Wp_JSON_Encode (
                To_Array ((
                  Build ("language", Php.Strtolower (Php.Strtok (Determine_Locale, "_-"))),
                  Build ("strings",  To_Array ((
@@ -2592,47 +2658,75 @@ Put_Line ("#Wp_Enqueue_Scripts");
       end if;
    end Script_Concat_Settings;
 
--- --
--- -- Handles the enqueueing of block scripts and styles that are common to both
--- -- the editor and the front-end.
--- --
--- -- @since 5.0.0
--- --
--- function wp_common_block_scripts_and_styles() then
---         if ( is_admin() && ! wp_should_load_block_editor_scripts_and_styles() ) then
---                 return;
---         end;
+   ----------------------------------------
+   -- Wp_Common_Block_Scripts_And_Styles --
+   ----------------------------------------
 
---         wp_enqueue_style( "wp-block-library");
+   procedure Wp_Common_Block_Scripts_And_Styles
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Functions_Wp_Styles;
+      use Inc_L10n;
+      use Inc_Plugins;
 
---         if ( current_theme_supports( "wp-block-styles" ) ) then
---                 if ( wp_should_load_separate_core_block_assets() ) then
---                         suffix = defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG ? "css" : "min.css";
---                         files  = glob( __DIR__ . "/blocks--theme.suffix");
---                         foreach ( files as path ) then
---                                 block_name = basename( dirname( path ));
---                                 if ( is_rtl() && file_exists( __DIR__ . "/blocks/block_name/theme-rtl.suffix" ) ) then
---                                         path = __DIR__ . "/blocks/block_name/theme-rtl.suffix";
---                                 end;
---                                 wp_add_inline_style( "wp-block-thenblock_nameend;", file_get_contents( path ));
---                         end;
---                 end; else then
---                         wp_enqueue_style( "wp-block-library-theme");
---                 end;
---         end;
+      X_DIR_X : String renames Globals.X_DIR_X;
+   begin
+      if
+        Inc_Load.Is_Admin and then
+        not Wp_Should_Load_Block_Editor_Scripts_And_Styles
+      then
+         return;
+      end if;
 
---         --
---         -- Fires after enqueuing block assets for both editor and front-end.
---         --
---         -- Call `add_action` on any hook before "wp_enqueue_scripts".
---         --
---         -- In the function call you supply, simply use `wp_enqueue_script` and
---         -- `wp_enqueue_style` to add your functionality to the Gutenberg editor.
---         --
---         -- @since 5.0.0
---         --
---         do_action( "enqueue_block_assets");
--- end;
+      Wp_Enqueue_Style ("wp-block-library");
+
+      if Inc_Themes.Current_Theme_Supports ("wp-block-styles") then
+         if Wp_Should_Load_Separate_Core_Block_Assets then
+            declare
+               Suffix : String := (if Globals.SCRIPT_DEBUG then "css" else "min.css");
+--             Suffix := defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG ? "css" : "min.css";
+
+               Files  : constant List_Type :=
+                 Glob (X_DIR_X & "/blocks/*theme." & Suffix);
+            begin
+               for Path of Files loop
+                  declare
+                     Block_Name : constant String := Basename (Dirname (-Path));
+                     Path_2     : Unbounded_String := Path;
+                     Unused     : Boolean;
+                  begin
+                     if
+                       Is_RTL and then
+                       File_Exists (X_DIR_X & "/blocks/block_name/theme-rtl." & Suffix)
+                     then
+                        Path_2 := +X_DIR_X & "/blocks/block_name/theme-rtl." & Suffix;
+                     end if;
+                     Unused :=
+                       Wp_Add_Inline_Style ("wp-block-" & Block_Name,
+                                            File_Get_Contents (-Path_2));
+                  end;
+               end loop;
+            end;
+         else
+            Wp_Enqueue_Style ("wp-block-library-theme");
+         end if;
+      end if;
+
+      --
+      -- Fires after enqueuing block assets for both editor and front-end.
+      --
+      -- Call `add_action` on any hook before "wp_enqueue_scripts".
+      --
+      -- In the function call you supply, simply use `wp_enqueue_script` and
+      -- `wp_enqueue_style` to add your functionality to the Gutenberg editor.
+      --
+      -- @since 5.0.0
+      --
+      Do_Action ("enqueue_block_assets");
+
+   end Wp_Common_Block_Scripts_And_Styles;
 
 -- --
 -- -- Applies a filter to the list of style nodes that comes from WP_Theme_JSON::get_style_nodes().
@@ -2731,31 +2825,31 @@ Put_Line ("#Wp_Enqueue_Scripts");
 --         end;
 -- end;
 
--- --
--- -- Checks if the editor scripts and styles for all registered block types
--- -- should be enqueued on the current screen.
--- --
--- -- @since 5.6.0
--- --
--- -- @global WP_Screen current_screen WordPress current screen object.
--- --
--- -- @return bool Whether scripts and styles should be enqueued.
--- --
--- function wp_should_load_block_editor_scripts_and_styles() then
---         global current_screen;
+   -----------------------------------------------
+   -- Wp_Should_Load_Separate_Core_Block_Assets --
+   -----------------------------------------------
 
---         is_block_editor_screen = ( current_screen instanceof WP_Screen ) && current_screen.is_block_editor();
+   function Wp_Should_Load_Block_Editor_Scripts_And_Styles
+            return Boolean
+   is
+      use Inc_Plugins;
+--    global current_screen;
+      Is_Block_Editor_Screen : constant Boolean :=
+        Globals.Current_Screen in Adi_Class_Wp_Screens.Wp_Screen and then -- instanceof
+        Globals.Current_Screen.Is_Block_Editor;
+   begin
+      --
+      -- Filters the flag that decides whether or not block editor scripts and styles
+      -- are going to be enqueued on the current screen.
+      --
+      -- @since 5.6.0
+      --
+      -- @param bool is_block_editor_screen Current value of the flag.
+      --
+      return Apply_Filters ("should_load_block_editor_scripts_and_styles",
+                            Is_Block_Editor_Screen);
 
---         --
---         -- Filters the flag that decides whether or not block editor scripts and styles
---         -- are going to be enqueued on the current screen.
---         --
---         -- @since 5.6.0
---         --
---         -- @param bool is_block_editor_screen Current value of the flag.
---         --
---         return apply_filters( "should_load_block_editor_scripts_and_styles", is_block_editor_screen);
--- end;
+   end Wp_Should_Load_Block_Editor_Scripts_And_Styles;
 
 -- --
 -- -- Checks whether separate styles should be loaded for core blocks on-render.
@@ -3927,7 +4021,7 @@ Put_Line ("#Wp_Enqueue_Scripts");
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wp_Theme_Json_Resolver;
+      use Inc_Class_Wp_Theme_JSON_Resolver;
       use Inc_Functions_Wp_Styles;
    begin
       if not Static.Theme_Has_Support then -- Wp_Theme_Json_Resolver::

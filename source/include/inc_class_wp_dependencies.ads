@@ -287,8 +287,15 @@ is
    function Add_Data (This   : in out Wp_Dependencies;
                       Handle : String;
                       Key    : String;
-                      Value  : String) -- Array_Type)
+                      Value  : String)
                       return Boolean;
+
+   function Add_Data (This   : in out Wp_Dependencies;
+                      Handle : String;
+                      Key    : String;
+                      Value  : List_Type)
+                      return Boolean
+                      is (True);
 
    procedure Add_Data (This   : in out Wp_Dependencies;
                        Handle : String;
@@ -309,7 +316,13 @@ is
    function Get_Data (This : Wp_Dependencies;
                       Handle : String;
                       Key    : String)
-                      return String; -- Array_Type;
+                      return String;
+
+   function Get_Data (This : Wp_Dependencies;
+                      Handle : String;
+                      Key    : String)
+                      return List_Type
+                      is (Empty_List);
 
    --
    -- Un-register an item or items.

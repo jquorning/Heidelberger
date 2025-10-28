@@ -7,11 +7,15 @@
 -- @subpackage Dependencies
 --
 
+with Ada.Strings.Unbounded;
+
 with Adm_Load_Styles;
 
 with Inc_Class_Wp_Dependencies;
 with Inc_Class_Wp_Styles;
+with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
+with Inc_L10n;
 
 with Hb_Common;
 with Php;
@@ -88,65 +92,47 @@ is
 --         return wp_styles().do_items( handles );
 -- end;
 
--- --
--- -- Add extra CSS styles to a registered stylesheet.
--- --
--- -- Styles will only be added if the stylesheet is already in the queue.
--- -- Accepts a string data containing the CSS. If two or more CSS code blocks
--- -- are added to the same stylesheet handle, they will be printed in the order
--- -- they were added, i.e. the latter added styles can redeclare the previous.
--- --
--- -- @see WP_Styles::add_inline_style()
--- --
--- -- @since 3.3.0
--- --
--- -- @param string handle Name of the stylesheet to add the extra styles to.
--- -- @param string data   String containing the CSS styles to be added.
--- -- @return bool True on success, false on failure.
--- --
--- function wp_add_inline_style( handle, data ) then
---         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__, handle );
+   -------------------------
+   -- Wp_Add_Inline_Style --
+   -------------------------
 
---         if ( false !== stripos( data, '</style>' ) ) then
---                 _doing_it_wrong(
---                         __FUNCTION__,
---                         sprintf(
---                                 /* translators: 1: <style>, 2: wp_add_inline_style()--
---                                 __( 'Do not pass %1s tags to %2s.' ),
---                                 '<code>&lt;style&gt;</code>',
---                                 '<code>wp_add_inline_style()</code>'
---                         ),
---                         '3.7.0'
---                 );
---                 data = trim( preg_replace( '#<style[^>]*>(.*)</style>#is', '1', data ) );
---         end;
+   function Wp_Add_Inline_Style (Handle : String;
+                                 Data   : String)
+                                 return Boolean
+   is
+      use Ada.Strings.Unbounded;
+      use Adm_Load_Styles;
+      use Inc_Functions;
+      use Inc_Functions_Wp_Scripts;
+      use Inc_L10n;
 
---         return wp_styles().add_inline_style( handle, data );
--- end;
+      Data_2 : Unbounded_String := +Data;
+   begin
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 
--- --
--- -- Register a CSS stylesheet.
--- --
--- -- @see WP_Dependencies::add()
--- -- @link https://www.w3.org/TR/CSS2/media.html#media-types List of CSS media types.
--- --
--- -- @since 2.6.0
--- -- @since 4.3.0 A return value was added.
--- --
--- -- @param string           handle Name of the stylesheet. Should be unique.
--- -- @param string|false     src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
--- --                                 If source is set to false, stylesheet is an alias of other stylesheets it depends on.
--- -- @param string[]         deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
--- -- @param string|bool|null ver    Optional. String specifying stylesheet version number, if it has one, which is added to the URL
--- --                                 as a query string for cache busting purposes. If version is set to false, a version
--- --                                 number is automatically added equal to current installed WordPress version.
--- --                                 If set to null, no version is added.
--- -- @param string           media  Optional. The media for which this stylesheet has been defined.
--- --                                 Default 'all'. Accepts media types like 'all', 'print' and 'screen', or media queries like
--- --                                 '(orientation: portrait)' and '(max-width: 640px)'.
--- -- @return bool Whether the style has been registered. True on success, false on failure.
--- --
--- function wp_register_style( handle, src, deps = array(), ver = false, media = 'all' ) then
+      if 0 /= Stripos (Data, "</style>") then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           Sprintf (
+             -- translators: 1: <style>, 2: wp_add_inline_style()
+             abs "Do not pass %1s tags to %2s.",
+             To_List (List => (
+               1 => +"<code>&lt;style&gt;</code>",
+               2 => +"<code>wp_add_inline_style()</code>"
+             ))
+           ),
+           "3.7.0"
+         );
+         Data_2 := +Trim (Preg_Replace ("#<style[^>]*>(.*)</style>#is", "1", Data));
+      end if;
+
+      return Styles.Add_Inline_Style (Handle, -Data_2);
+   end Wp_Add_Inline_Style;
+
+   -----------------------
+   -- Wp_Register_Style --
+   -----------------------
+
    function Wp_Register_Style (Handle : String;
                                Src    : String;
                                Deps   : List_Type := Empty_List;
