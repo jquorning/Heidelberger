@@ -647,11 +647,12 @@ is
 --    Add_Action ("transition_post_status", X_Clear_Multi_Author_Cache'Access); -- __
 
       -- Post.
---    Add_Action ("init", Create_Initial_Post_Types'Access, 0); -- Highest priority.
+      Add_Action ("init", Inc_Posts.Create_Initial_Post_Types'Access, 0);
+      -- Highest priority.
       Add_Action ("admin_menu", Inc_Posts.X_Add_Post_Type_Submenus'Access);
 --    Add_Action ("before_delete_post", X_Reset_Front_Page_Settings_For_Post'Access);
 --    Add_Action ("wp_trash_post", X_Reset_Front_Page_Settings_For_Post'Access);
---    Add_Action ("change_locale", Create_Initial_Post_Types'Access);
+      Add_Action ("change_locale", Inc_Posts.Create_Initial_Post_Types'Access);
 
       -- Post Formats.
 --    Add_Filter ("request", "_post_format_request");
