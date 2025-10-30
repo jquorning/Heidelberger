@@ -8,8 +8,19 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php;
+with Wp_Common;
 
+with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Users;
+with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Querys;
+with Inc_Querys;
 with Inc_Options;
+with Inc_Plugins;
+with Inc_Posts;
+with Inc_Themes;
+with Inc_L10n;
 with Inc_Versions;
 
 package body Inc_General_Templates
@@ -1165,154 +1176,190 @@ is
 --         echo get_custom_logo( blog_id );
 -- end;
 
--- --
--- -- Returns document title for the current page.
--- --
--- -- @since 4.4.0
--- --
--- -- @global int page  Page number of a single post.
--- -- @global int paged Page number of a list of posts.
--- --
--- -- @return string Tag with the document title.
--- --
--- function wp_get_document_title() then
+   Global_Page  : Natural;
+   Global_Paged : Natural;
 
---         --
---         -- Filters the document title before it is generated.
---         --
---         -- Passing a non-empty value will short-circuit wp_get_document_title(),
---         -- returning that value instead.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string title The document title. Default empty string.
---         --
---         title = apply_filters( "pre_get_document_title", "" );
---         if ( ! empty( title ) ) then
---                 return title;
---         end;
+   ---------------------------
+   -- Wp_Get_Document_Title --
+   ---------------------------
 
---         global page, paged;
+   function Wp_Get_Document_Title
+            return String
+   is
+      use Arrays;
+      use Php;
+      use Hb_Common;
+      use Inc_Class_Wp_Terms;
+      use Inc_Class_Wp_Querys;
+      use Inc_L10n;
+      use Inc_Plugins;
+      use Inc_Querys;
 
---         title = array(
---                 "title" => "",
---         );
+      Page  : Natural renames Global_Page;
+      Paged : Natural renames Global_Paged;
 
---         // If it"s a 404 page, use a "Page not found" title.
---         if ( is_404() ) then
---                 title["title"] = __( "Page not found" );
+      Title : Array_Type := To_Array ((1 =>
+         Build ("title", "")
+      ));
+   begin
+      --
+      -- Filters the document title before it is generated.
+      --
+      -- Passing a non-empty value will short-circuit wp_get_document_title(),
+      -- returning that value instead.
+      --
+      -- @since 4.4.0
+      --
+      -- @param string title The document title. Default empty string.
+      --
+      declare
+         Title : constant String := Apply_Filters ("pre_get_document_title", "");
+      begin
+         if not Empty (Title) then
+            return Title;
+         end if;
+      end;
 
---                 // If it"s a search, use a dynamic search results title.
---         end; elseif ( is_search() ) then
---                 /* translators: %s: Search query.--
---                 title["title"] = sprintf( __( "Search Results for &#8220;%s&#8221;" ), get_search_query() );
+      -- If it's a 404 page, use a "Page not found" title.
+      if Is_404 then
+         Set (Title, "title", abs "Page not found");
 
---                 // If on the front page, use the site title.
---         end; elseif ( is_front_page() ) then
---                 title["title"] = get_bloginfo( "name", "display" );
+      -- If it's a search, use a dynamic search results title.
+      elsif Is_Search then
+         -- translators: %s: Search query.
+         Set (Title, "title", Sprintf (abs "Search Results for &#8220;%s&#8221;",
+                                       To_List (Get_Search_Query)));
 
---                 // If on a post type archive, use the post type archive title.
---         end; elseif ( is_post_type_archive() ) then
---                 title["title"] = post_type_archive_title( "", false );
+      -- If on the front page, use the site title.
+      elsif Is_Front_Page then
+         Set (Title, "title", Get_Bloginfo ("name", "display"));
 
---                 // If on a taxonomy archive, use the term title.
---         end; elseif ( is_tax() ) then
---                 title["title"] = single_term_title( "", false );
+      -- If on a post type archive, use the post type archive title.
+      elsif Is_Post_Type_Archive then
+         Set (Title, "title", Post_Type_Archive_Title ("", False));
 
---                 /*
---                -- If we"re on the blog page that is not the homepage
---                -- or a single post of any post type, use the post title.
---                --
---         end; elseif ( is_home() || is_singular() ) then
---                 title["title"] = single_post_title( "", false );
+      -- If on a taxonomy archive, use the term title.
+      elsif Is_Tax then
+         Set (Title, "title", Single_Term_Title ("", False));
 
---                 // If on a category or tag archive, use the term title.
---         end; elseif ( is_category() || is_tag() ) then
---                 title["title"] = single_term_title( "", false );
+      --
+      -- If we're on the blog page that is not the homepage
+      -- or a single post of any post type, use the post title.
+      --
+      elsif Is_Home or else Is_Singular then
+         Set (Title, "title", Single_Post_Title ("", False));
 
---                 // If on an author archive, use the author"s display name.
---         end; elseif ( is_author() && get_queried_object() ) then
---                 author         = get_queried_object();
---                 title["title"] = author->display_name;
+      -- If on a category or tag archive, use the term title.
+      elsif Is_Category or Is_Tag then
+         Set (Title, "title", Single_Term_Title ("", False));
 
---                 // If it"s a date archive, use the date as the title.
---         end; elseif ( is_year() ) then
---                 title["title"] = get_the_date( _x( "Y", "yearly archives date format" ) );
+      -- If on an author archive, use the author's display name.
+      elsif
+        Is_Author and then
+        Get_Queried_Object /= Null_Term
+--      Get_Queried_Object
+      then
+         declare
+            use Inc_Class_Wp_Users;
 
---         end; elseif ( is_month() ) then
---                 title["title"] = get_the_date( _x( "F Y", "monthly archives date format" ) );
+            Author : constant Wp_User := Get_Queried_Object;
+         begin
+            Set (Title, "title", -Author.Prop.Display_Name);
+         end;
 
---         end; elseif ( is_day() ) then
---                 title["title"] = get_the_date();
---         end;
+      -- If it's a date archive, use the date as the title.
+      elsif Is_Year then
+         Set (Title, "title",
+              Get_The_Date (X_X ("Y", "yearly archives date format")));
 
---         // Add a page number if necessary.
---         if ( ( paged >= 2 || page >= 2 ) && ! is_404() ) then
---                 /* translators: %s: Page number.--
---                 title["page"] = sprintf( __( "Page %s" ), max( paged, page ) );
---         end;
+      elsif Is_Month then
+         Set (Title, "title",
+              Get_The_Date (X_X ("F Y", "monthly archives date format")));
 
---         // Append the description or site title to give context.
---         if ( is_front_page() ) then
---                 title["tagline"] = get_bloginfo( "description", "display" );
---         end; else then
---                 title["site"] = get_bloginfo( "name", "display" );
---         end;
+      elsif Is_Day then
+         Set (Title, "title", Get_The_Date);
+      end if;
 
---         --
---         -- Filters the separator for the document title.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string sep Document title separator. Default "-".
---         --
---         sep = apply_filters( "document_title_separator", "-" );
+      -- Add a page number if necessary.
+      if (Paged >= 2 or Page >= 2) and then not Is_404 then
+         declare
+            P : constant Natural := Natural'Max (Paged, Page);
+            Page_Image : constant String := P'Image;
+         begin
+            -- translators: %s: Page number.
+            Set (Title, "page",
+                 Sprintf (abs "Page %s", To_List (Page_Image)));
+         end;
+      end if;
 
---         --
---         -- Filters the parts of the document title.
---         --
---         -- @since 4.4.0
---         --
---         -- @param array title then
---         --     The document title parts.
---         --
---         --     @type string title   Title of the viewed page.
---         --     @type string page    Optional. Page number if paginated.
---         --     @type string tagline Optional. Site description when on home page.
---         --     @type string site    Optional. Site title when not on home page.
---         -- end;
---         --
---         title = apply_filters( "document_title_parts", title );
+      -- Append the description or site title to give context.
+      if Is_Front_Page then
+         Set (Title, "tagline", Get_Bloginfo ("description", "display"));
+      else
+         Set (Title, "site", Get_Bloginfo ("name", "display"));
+      end if;
 
---         title = implode( " sep ", array_filter( title ) );
+      declare
+         --
+         -- Filters the separator for the document title.
+         --
+         -- @since 4.4.0
+         --
+         -- @param string sep Document title separator. Default "-".
+         --
+         Sep : constant String :=
+           Apply_Filters ("document_title_separator", "-");
 
---         --
---         -- Filters the document title.
---         --
---         -- @since 5.8.0
---         --
---         -- @param string title Document title.
---         --
---         title = apply_filters( "document_title", title );
+         --
+         -- Filters the parts of the document title.
+         --
+         -- @since 4.4.0
+         --
+         -- @param array title {
+         --     The document title parts.
+         --
+         --     @type string title   Title of the viewed page.
+         --     @type string page    Optional. Page number if paginated.
+         --     @type string tagline Optional. Site description when on home page.
+         --     @type string site    Optional. Site title when not on home page.
+         -- }
+         --
+         Title_2 : constant Array_Type :=
+           Apply_Filters ("document_title_parts", Title);
 
---         return title;
--- end;
+         Title_3 : constant String :=
+           Php.Implode (" " & Sep & " ", Array_Type'(Array_Filter (Title_2)));
 
--- --
--- -- Displays title tag with content.
--- --
--- -- @ignore
--- -- @since 4.1.0
--- -- @since 4.4.0 Improved title output replaced `wp_title()`.
--- -- @access private
--- --
--- function _wp_render_title_tag() then
---         if ( ! current_theme_supports( "title-tag" ) ) then
---                 return;
---         end;
+         --
+         -- Filters the document title.
+         --
+         -- @since 5.8.0
+         --
+         -- @param string title Document title.
+         --
+         Title_4 : constant String :=
+           Apply_Filters ("document_title", Title_3);
+      begin
+         return Title_4;
+      end;
+   end Wp_Get_Document_Title;
 
---         echo "<title>" . wp_get_document_title() . "</title>" . "\n";
--- end;
+   ---------------------------
+   -- W_Wp_Render_Title_Tag --
+   ---------------------------
+
+   procedure X_Wp_Render_Title_Tag
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Themes;
+   begin
+      if not Current_Theme_Supports ("title-tag") then
+         return;
+      end if;
+
+      Echo ("<title>" & Wp_Get_Document_Title & "</title>" & NL);
+   end X_Wp_Render_Title_Tag;
 
 -- --
 -- -- Displays or retrieves page title for all areas of blog.
@@ -1468,85 +1515,98 @@ is
 --         end;
 -- end;
 
--- --
--- -- Displays or retrieves page title for post.
--- --
--- -- This is optimized for single.php template file for displaying the post title.
--- --
--- -- It does not support placing the separator after the title, but by leaving the
--- -- prefix parameter empty, you can set the title separator manually. The prefix
--- -- does not automatically place a space between the prefix, so if there should
--- -- be a space, the parameter value will need to have it at the end.
--- --
--- -- @since 0.71
--- --
--- -- @param string prefix  Optional. What to display before the title.
--- -- @param bool   display Optional. Whether to display or retrieve title. Default true.
--- -- @return string|void Title when retrieving.
--- --
--- function single_post_title( prefix = "", display = true ) then
---         _post = get_queried_object();
+   -----------------------
+   -- Single_Post_Title --
+   -----------------------
 
---         if ( ! isset( _post->post_title ) ) then
---                 return;
---         end;
+   function Single_Post_Title (Prefix  : String  := "";
+                               Display : Boolean := True)
+                               return String
+   is
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Plugins;
+      use Inc_Querys;
 
---         --
---         -- Filters the page title for a single post.
---         --
---         -- @since 0.71
---         --
---         -- @param string  _post_title The single post page title.
---         -- @param WP_Post _post       The current post.
---         --
---         title = apply_filters( "single_post_title", _post->post_title, _post );
---         if ( display ) then
---                 echo prefix . title;
---         end; else then
---                 return prefix . title;
---         end;
--- end;
+      X_Post : constant Inc_Class_Wp_Posts.Wp_Post :=
+        Get_Queried_Object;
+   begin
+      if not Isset (-X_Post.Post_Title) then
+         return ""; -- "" added
+      end if;
 
--- --
--- -- Displays or retrieves title for a post type archive.
--- --
--- -- This is optimized for archive.php and archive-thenpost_typeend;.php template files
--- -- for displaying the title of the post type.
--- --
--- -- @since 3.1.0
--- --
--- -- @param string prefix  Optional. What to display before the title.
--- -- @param bool   display Optional. Whether to display or retrieve title. Default true.
--- -- @return string|void Title when retrieving, null when displaying or failure.
--- --
--- function post_type_archive_title( prefix = "", display = true ) then
---         if ( ! is_post_type_archive() ) then
---                 return;
---         end;
+      --
+      -- Filters the page title for a single post.
+      --
+      -- @since 0.71
+      --
+      -- @param string  _post_title The single post page title.
+      -- @param WP_Post _post       The current post.
+      --
+      declare
+         Title : constant String :=
+           Apply_Filters ("single_post_title", -X_Post.Post_Title, X_Post);
+      begin
+         if Display then
+            Php.Echo (Prefix & Title);
+            return ""; -- added
+         else
+            return Prefix & Title;
+         end if;
+      end;
+   end Single_Post_Title;
 
---         post_type = get_query_var( "post_type" );
---         if ( is_array( post_type ) ) then
---                 post_type = reset( post_type );
---         end;
+   -----------------------------
+   -- Post_Type_Archive_Title --
+   -----------------------------
 
---         post_type_obj = get_post_type_object( post_type );
+   function Post_Type_Archive_Title (Prefix  : String  := "";
+                                     Display : Boolean := True)
+                                     return String
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Plugins;
+      use Inc_Posts;
+      use Inc_Querys;
+   begin
+      if not Is_Post_Type_Archive then
+         return ""; -- "" added
+      end if;
 
---         --
---         -- Filters the post type archive title.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string post_type_name Post type "name" label.
---         -- @param string post_type      Post type.
---         --
---         title = apply_filters( "post_type_archive_title", post_type_obj->labels->name, post_type );
+      declare
+         Post_Type : constant String :=
+           Get_Query_Var ("post_type");
+      begin
+         -- if Is_Array (Post_Type) then
+         --    Post_Type := Reset (Post_Type);
+         -- end if;
 
---         if ( display ) then
---                 echo prefix . title;
---         end; else then
---                 return prefix . title;
---         end;
--- end;
+         declare
+            Post_Type_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+              Get_Post_Type_Object (Post_Type);
+
+            --
+            -- Filters the post type archive title.
+            --
+            -- @since 3.1.0
+            --
+            -- @param string post_type_name Post type "name" label.
+            -- @param string post_type      Post type.
+            --
+            Title : constant String :=
+              Apply_Filters ("post_type_archive_title",
+                             Get (Post_Type_Obj.Labels, "name"), Post_Type);
+         begin
+            if Display then
+               Echo (Prefix & Title);
+               return ""; -- added
+            else
+               return Prefix & Title;
+            end if;
+         end;
+      end;
+   end Post_Type_Archive_Title;
 
 -- --
 -- -- Displays or retrieves page title for category archive.
@@ -1565,84 +1625,85 @@ is
 --         return single_term_title( prefix, display );
 -- end;
 
--- --
--- -- Displays or retrieves page title for tag post archive.
--- --
--- -- Useful for tag template files for displaying the tag page title. The prefix
--- -- does not automatically place a space between the prefix, so if there should
--- -- be a space, the parameter value will need to have it at the end.
--- --
--- -- @since 2.3.0
--- --
--- -- @param string prefix  Optional. What to display before the title.
--- -- @param bool   display Optional. Whether to display or retrieve title. Default true.
--- -- @return string|void Title when retrieving.
--- --
--- function single_tag_title( prefix = "", display = true ) then
---         return single_term_title( prefix, display );
--- end;
+   ----------------------
+   -- Single_Tag_Title --
+   ----------------------
 
--- --
--- -- Displays or retrieves page title for taxonomy term archive.
--- --
--- -- Useful for taxonomy term template files for displaying the taxonomy term page title.
--- -- The prefix does not automatically place a space between the prefix, so if there should
--- -- be a space, the parameter value will need to have it at the end.
--- --
--- -- @since 3.1.0
--- --
--- -- @param string prefix  Optional. What to display before the title.
--- -- @param bool   display Optional. Whether to display or retrieve title. Default true.
--- -- @return string|void Title when retrieving.
--- --
--- function single_term_title( prefix = "", display = true ) then
---         term = get_queried_object();
+   function Single_Tag_Title (Prefix  : String  := "";
+                              Display : Boolean := True)
+                              return String
+   is
+   begin
+      return Single_Term_Title (Prefix, Display);
+   end Single_Tag_Title;
 
---         if ( ! term ) then
---                 return;
---         end;
+   -----------------------
+   -- Single_Term_Title --
+   -----------------------
 
---         if ( is_category() ) then
---                 --
---                 -- Filters the category archive page title.
---                 --
---                 -- @since 2.0.10
---                 --
---                 -- @param string term_name Category name for archive being displayed.
---                 --
---                 term_name = apply_filters( "single_cat_title", term->name );
---         end; elseif ( is_tag() ) then
---                 --
---                 -- Filters the tag archive page title.
---                 --
---                 -- @since 2.3.0
---                 --
---                 -- @param string term_name Tag name for archive being displayed.
---                 --
---                 term_name = apply_filters( "single_tag_title", term->name );
---         end; elseif ( is_tax() ) then
---                 --
---                 -- Filters the custom taxonomy archive page title.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param string term_name Term name for archive being displayed.
---                 --
---                 term_name = apply_filters( "single_term_title", term->name );
---         end; else then
---                 return;
---         end;
+   function Single_Term_Title (Prefix  : String  := "";
+                               Display : Boolean := True)
+                               return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Inc_Class_Wp_Terms;
+      use Inc_Plugins;
+      use Inc_Querys;
 
---         if ( empty( term_name ) ) then
---                 return;
---         end;
+      Term      : constant Inc_Class_Wp_Terms.Wp_Term := Get_Queried_Object;
+      Term_Name : Unbounded_String;
+   begin
+--    if not Term then
+      if Term = Null_Term then
+         return ""; -- "" added
+      end if;
 
---         if ( display ) then
---                 echo prefix . term_name;
---         end; else then
---                 return prefix . term_name;
---         end;
--- end;
+      if Is_Category then
+         --
+         -- Filters the category archive page title.
+         --
+         -- @since 2.0.10
+         --
+         -- @param string term_name Category name for archive being displayed.
+         --
+         Term_Name := +Apply_Filters ("single_cat_title", -Term.Name);
+
+      elsif Is_Tag then
+         --
+         -- Filters the tag archive page title.
+         --
+         -- @since 2.3.0
+         --
+         -- @param string term_name Tag name for archive being displayed.
+         --
+         Term_Name := +Apply_Filters ("single_tag_title", -Term.Name);
+
+      elsif Is_Tax then
+         --
+         -- Filters the custom taxonomy archive page title.
+         --
+         -- @since 3.1.0
+         --
+         -- @param string term_name Term name for archive being displayed.
+         --
+         Term_Name := +Apply_Filters ("single_term_title", -Term.Name);
+
+      else
+         return ""; -- "" added
+      end if;
+
+      if Empty (-Term_Name) then
+         return ""; -- "" added
+      end if;
+
+      if Display then
+         Php.Echo (Prefix & (-Term_Name));
+         return ""; -- added
+      else
+         return Prefix & (-Term_Name);
+      end if;
+   end Single_Term_Title;
 
 -- --
 -- -- Displays or retrieves page title for post archive based on date.
@@ -2568,40 +2629,47 @@ is
 --         end;
 -- end;
 
--- --
--- -- Retrieves the date on which the post was written.
--- --
--- -- Unlike the_date() this function will always return the date.
--- -- Modify output with the {@see "get_the_date"} filter.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string      format Optional. PHP date format. Defaults to the "date_format" option.
--- -- @param int|WP_Post post   Optional. Post ID or WP_Post object. Default current post.
--- -- @return string|int|false Date the current post was written. False on failure.
--- --
--- function get_the_date( format = "", post = null ) then
---         post = get_post( post );
+   ------------------
+   -- Get_The_Date --
+   ------------------
 
---         if ( ! post ) then
---                 return false;
---         end;
+   function Get_The_Date (Format : String  := "";
+                          Post   : Integer := 0) -- null
+                          return String
+   is
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Options;
+      use Inc_Plugins;
 
---         _format = ! empty( format ) ? format : get_option( "date_format" );
+      Post_2 : constant Wp_Post := Inc_Posts.Get_Post (Post_Id (Post));
+   begin
+--    if not Post_2 then
+      if Post_2 = Null_Post then
+         return ""; -- False;
+      end if;
 
---         the_date = get_post_time( _format, false, post, true );
+      declare
+         X_Format : String := (if not Empty (Format)
+                               then Format else Get_Option ("date_format"));
 
---         --
---         -- Filters the date a post was published.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string|int  the_date Formatted date string or Unix timestamp if `format` is "U" or "G".
---         -- @param string      format   PHP date format.
---         -- @param WP_Post     post     The post object.
---         --
---         return apply_filters( "get_the_date", the_date, format, post );
--- end;
+         The_Date : constant String :=
+           Get_Post_Time (X_Format, False, Post_2, True);
+      begin
+         --
+         -- Filters the date a post was published.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string|int  the_date Formatted date string or Unix timestamp if
+         --                     `format` is "U" or "G".
+         -- @param string      format   PHP date format.
+         -- @param WP_Post     post     The post object.
+         --
+         return Apply_Filters ("get_the_date", The_Date, Format, Post_2);
+      end;
+   end Get_The_Date;
 
 -- --
 -- -- Displays the date on which the post was last modified.

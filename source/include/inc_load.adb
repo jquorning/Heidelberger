@@ -570,7 +570,7 @@ is
       --         return;
       -- end;
 
-      Globals.Wpdb := X_Construct (Dbuser, Dbpassword, Dbname, Dbhost);
+      Globals.WpDB := X_Construct (Dbuser, Dbpassword, Dbname, Dbhost);
    end Require_Wp_DB;
 
    ----------------------
@@ -592,7 +592,7 @@ is
       --    Dead_DB; -- ()
       -- end if;
 
-      Globals.Wpdb.Field_Types := Arrays.To_Array ((
+      Globals.WpDB.Field_Types := Arrays.To_Array ((
                 Build ("post_author",      "%d"),
                 Build ("post_parent",      "%d"),
                 Build ("menu_order",       "%d"),
@@ -630,7 +630,7 @@ is
                 Build ("spam",             "%d")
         ));
 
-      Prefix := +Globals.Wpdb.Set_Prefix (Wp_Config.Table_Prefix);
+      Prefix := +Globals.WpDB.Set_Prefix (Wp_Config.Table_Prefix);
 
       if Is_Wp_Error (-Prefix) then
          Wp_Load_Translations_Early;

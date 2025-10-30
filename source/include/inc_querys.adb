@@ -23,6 +23,21 @@ is
    Wp_Query : constant Inc_Class_Wp_Querys.Wp_Query :=
      Inc_Class_Wp_Querys.Null_Query;
 
+   function Isset (Query : Inc_Class_Wp_Querys.Wp_Query)
+                   return Boolean;
+
+   -----------
+   -- Isset --
+   -----------
+
+   function Isset (Query : Inc_Class_Wp_Querys.Wp_Query)
+                   return Boolean
+   is
+      use Inc_Class_Wp_Querys;
+   begin
+      return Query = Null_Query;
+   end Isset;
+
    -------------------
    -- Get_Query_Var --
    -------------------
@@ -31,21 +46,28 @@ is
                            Default : String := "")
                            return String
    is
---    global wp_query;
    begin
       return Wp_Query.Get (Var, Default);
    end Get_Query_Var;
 
---    ------------------------
---    -- Get_Queried_Object --
---    ------------------------
+   ------------------------
+   -- Get_Queried_Object --
+   ------------------------
 
---    function Get_Queried_Object()
---    is
--- --    global wp_query;
---    begin
---         return wp_query->get_queried_object();
---    end Get_Queried_Object;
+   function Get_Queried_Object
+            return Inc_Class_Wp_Terms.Wp_Term
+   is
+   begin
+      return Wp_Query.Get_Queried_Object;
+   end Get_Queried_Object;
+
+   function Get_Queried_Object
+            return Inc_Class_Wp_Posts.Wp_Post
+            is (Inc_Class_Wp_Posts.Null_Post);
+
+   function Get_Queried_Object
+            return Inc_Class_Wp_Users.Wp_User
+            is (Inc_Class_Wp_Users.Null_User);
 
 -- --
 -- -- Retrieves the ID of the currently queried object.
@@ -171,31 +193,27 @@ is
 --         return wp_query->is_archive();
 -- end;
 
--- --
--- -- Determines whether the query is for an existing post type archive page.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 3.1.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param string|string[] post_types Optional. Post type or array of posts types
--- --                                    to check against. Default empty.
--- -- @return bool Whether the query is for an existing post type archive page.
--- --
--- function is_post_type_archive( post_types = "" ) then
---         global wp_query;
+   --------------------------
+   -- Is_Post_Type_Archive --
+   --------------------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Post_Type_Archive (Post_Types : String := "")
+                                  return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_post_type_archive( post_types );
--- end;
+      return Wp_Query.Is_Post_Type_Archive (Post_Types);
+   end Is_Post_Type_Archive;
 
 -- --
 -- -- Determines whether the query is for an existing attachment page.
@@ -223,34 +241,27 @@ is
 --         return wp_query->is_attachment( attachment );
 -- end;
 
--- --
--- -- Determines whether the query is for an existing author archive page.
--- --
--- -- If the author parameter is specified, this function will additionally
--- -- check if the query is for one of the authors specified.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param int|string|int[]|string[] author Optional. User ID, nickname, nicename, or array of such
--- --                                          to check against. Default empty.
--- -- @return bool Whether the query is for an existing author archive page.
--- --
--- function is_author( author = "" ) then
---         global wp_query;
+   ---------------
+   -- Is_Author --
+   ---------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Author (Author : String := "")
+                       return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_author( author );
--- end;
+      return Wp_Query.Is_Author (Author);
+   end Is_Author;
 
    -----------------
    -- Is_Category --
@@ -260,13 +271,10 @@ is
                          return Boolean
    is
       use Hb_Common;
-      use Inc_Class_Wp_Querys;
       use Inc_Functions;
       use Inc_L10n;
---    global wp_query;
    begin
-      if Wp_Query = Null_Query then
---    if not Isset (Wp_Query) then
+      if not Isset (Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -278,71 +286,50 @@ is
       return Wp_Query.Is_Category (Category);
    end Is_Category;
 
--- --
--- -- Determines whether the query is for an existing tag archive page.
--- --
--- -- If the tag parameter is specified, this function will additionally
--- -- check if the query is for one of the tags specified.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 2.3.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param int|string|int[]|string[] tag Optional. Tag ID, name, slug, or array of such
--- --                                       to check against. Default empty.
--- -- @return bool Whether the query is for an existing tag archive page.
--- --
--- function is_tag( tag = "" ) then
---         global wp_query;
+   ------------
+   -- Is_Tag --
+   ------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Tag (Tag : String := "")
+                    return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_tag( tag );
--- end;
+      return Wp_Query.Is_Tag (Tag);
+   end Is_Tag;
 
--- --
--- -- Determines whether the query is for an existing custom taxonomy archive page.
--- --
--- -- If the taxonomy parameter is specified, this function will additionally
--- -- check if the query is for that specific taxonomy.
--- --
--- -- If the term parameter is specified in addition to the taxonomy parameter,
--- -- this function will additionally check if the query is for one of the terms
--- -- specified.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 2.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param string|string[]           taxonomy Optional. Taxonomy slug or slugs to check against.
--- --                                            Default empty.
--- -- @param int|string|int[]|string[] term     Optional. Term ID, name, slug, or array of such
--- --                                            to check against. Default empty.
--- -- @return bool Whether the query is for an existing custom taxonomy archive page.
--- --              True for custom taxonomy archive pages, false for built-in taxonomies
--- --              (category and tag archives).
--- --
--- function is_tax( taxonomy = "", term = "" ) then
---         global wp_query;
+   ------------
+   -- Is_Tax --
+   ------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Tax (Taxonomy : String := "";
+                    Term     : String := "")
+                    return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_tax( taxonomy, term );
--- end;
+      return Wp_Query.Is_Tax (Taxonomy, Term);
+   end Is_Tax;
 
 -- --
 -- -- Determines whether the query is for an existing date archive.
@@ -368,31 +355,28 @@ is
 --         return wp_query->is_date();
 -- end;
 
--- --
--- -- Determines whether the query is for an existing day archive.
--- --
--- -- A conditional check to test whether the page is a date-based archive page displaying posts for the current day.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for an existing day archive.
--- --
--- function is_day() then
---         global wp_query;
+   ------------
+   -- Is_Day --
+   ------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Day
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+--    global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_day();
--- end;
+      return Wp_Query.Is_Day;
+   end Is_Day;
 
 -- --
 -- -- Determines whether the query is for a feed.
@@ -440,71 +424,51 @@ is
 --         return wp_query->is_comment_feed();
 -- end;
 
--- --
--- -- Determines whether the query is for the front page of the site.
--- --
--- -- This is for what is displayed at your site"s main URL.
--- --
--- -- Depends on the site"s "Front page displays" Reading Settings "show_on_front" and "page_on_front".
--- --
--- -- If you set a static page for the front page of your site, this function will return
--- -- true when viewing that page.
--- --
--- -- Otherwise the same as @see is_home()
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 2.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for the front page of the site.
--- --
--- function is_front_page() then
+   -------------------
+   -- Is_Front_Page --
+   -------------------
+
+   function Is_Front_Page
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
 --         global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+      return Wp_Query.Is_Front_Page;
+   end Is_Front_Page;
 
---         return wp_query->is_front_page();
--- end;
+   -------------
+   -- Is_Home --
+   -------------
 
--- --
--- -- Determines whether the query is for the blog homepage.
--- --
--- -- The blog homepage is the page that shows the time-based blog content of the site.
--- --
--- -- is_home() is dependent on the site"s "Front page displays" Reading Settings "show_on_front"
--- -- and "page_for_posts".
--- --
--- -- If a static page is set for the front page of the site, this function will return true only
--- -- on the page you set as the "Posts page".
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @see is_front_page()
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for the blog homepage.
--- --
--- function is_home() then
+   function Is_Home
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
 --         global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
-
---         return wp_query->is_home();
--- end;
+      return Wp_Query.Is_Home;
+   end Is_Home;
 
 -- --
 -- -- Determines whether the query is for the Privacy Policy page.
@@ -536,29 +500,28 @@ is
 --         return wp_query->is_privacy_policy();
 -- end;
 
--- --
--- -- Determines whether the query is for an existing month archive.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for an existing month archive.
--- --
--- function is_month() then
+   --------------
+   -- Is_Month --
+   --------------
+
+   function Is_Month
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
 --         global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
-
---         return wp_query->is_month();
--- end;
+      return Wp_Query.Is_Month;
+   end Is_Month;
 
 -- --
 -- -- Determines whether the query is for an existing single page.
@@ -679,95 +642,71 @@ is
 --         return wp_query->is_favicon();
 -- end;
 
--- --
--- -- Determines whether the query is for a search.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for a search.
--- --
--- function is_search() then
---         global wp_query;
+   ---------------
+   -- Is_Search --
+   ---------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Search
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_search();
--- end;
+      return Wp_Query.Is_Search;
+   end Is_Search;
 
--- --
--- -- Determines whether the query is for an existing single post.
--- --
--- -- Works for any post type, except attachments and pages
--- --
--- -- If the post parameter is specified, this function will additionally
--- -- check if the query is for one of the Posts specified.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @see is_page()
--- -- @see is_singular()
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param int|string|int[]|string[] post Optional. Post ID, title, slug, or array of such
--- --                                        to check against. Default empty.
--- -- @return bool Whether the query is for an existing single post.
--- --
--- function is_single( post = "" ) then
---         global wp_query;
+   ---------------
+   -- Is_Single --
+   ---------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Single (Post : String := "")
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_single( post );
--- end;
+      return Wp_Query.Is_Single (Post);
+   end Is_Single;
 
--- --
--- -- Determines whether the query is for an existing single post of any post type
--- -- (post, attachment, page, custom post types).
--- --
--- -- If the post_types parameter is specified, this function will additionally
--- -- check if the query is for one of the Posts Types specified.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @see is_page()
--- -- @see is_single()
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @param string|string[] post_types Optional. Post type or array of post types
--- --                                    to check against. Default empty.
--- -- @return bool Whether the query is for an existing single post
--- --              or any of the given post types.
--- --
--- function is_singular( post_types = "" ) then
---         global wp_query;
+   -----------------
+   -- Is_Singular --
+   -----------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+   function Is_Singular (Post_Types : String := "")
+                         return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         return wp_query->is_singular( post_types );
--- end;
+      return Wp_Query.Is_Singular (Post_Types);
+   end Is_Singular;
 
 -- --
 -- -- Determines whether the query is for a specific time.
@@ -817,53 +756,51 @@ is
 --         return wp_query->is_trackback();
 -- end;
 
--- --
--- -- Determines whether the query is for an existing year archive.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is for an existing year archive.
--- --
--- function is_year() then
+   -------------
+   -- Is_Year --
+   -------------
+
+   function Is_Year
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
 --         global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
+      return Wp_Query.Is_Year;
+   end Is_Year;
 
---         return wp_query->is_year();
--- end;
+   ------------
+   -- Is_404 --
+   ------------
 
--- --
--- -- Determines whether the query has resulted in a 404 (returns no results).
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is a 404 error.
--- --
--- function is_404() then
---         global wp_query;
+   function Is_404
+            return Boolean
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+--    global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "3.1.0");
+         return False;
+      end if;
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "3.1.0" );
---                 return false;
---         end;
-
---         return wp_query->is_404();
--- end;
+      return Wp_Query.Is_404;
+   end Is_404;
 
 -- --
 -- -- Is the query for an embedded post?

@@ -65,8 +65,8 @@ is
       Globals.Post_Type_Object := Get_Post_Type_Object (-Post_Type);
 
       This.User_Posts_Count := Natural'Value (
-        Wpdb.Get_Var ( -- (int)
-          Wpdb.Prepare (
+        WpDB.Get_Var ( -- (int)
+          WpDB.Prepare (
             "SELECT COUNT( 1 ) "    &
             "FROM wpdb->posts "     &
             "WHERE post_type = %s " &
@@ -99,8 +99,8 @@ is
                  Implode (", ", Array_Map ("absint", Sticky_Posts)); -- (array)
             begin
                This.Sticky_Posts_Count := Natural'Value (
-                 Wpdb.Get_Var ( -- (int)
-                   Wpdb.Prepare (
+                 WpDB.Get_Var ( -- (int)
+                   WpDB.Prepare (
                      "SELECT COUNT( 1 ) "    &
                      "FROM wpdb->posts "     &
                      "WHERE post_type = %s " &

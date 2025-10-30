@@ -109,6 +109,19 @@ is
                            is (Empty_List);
 
    function Apply_Filters (Hook_Name : String;
+                           B         : String;
+                           C         : Inc_Class_Wp_Posts.Wp_Post)
+                           return String
+                           is ("XXX-980");
+
+   function Apply_Filters (Hook_Name : String;
+                           B         : String;
+                           A         : String;
+                           C         : Inc_Class_Wp_Posts.Wp_Post)
+                           return String
+                           is ("XXX-981");
+
+   function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            Id        : Adi_Class_Wp_Screens.Wp_Screen;
                            Arg_4     : Boolean := False)

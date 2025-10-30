@@ -157,8 +157,9 @@ is
                               Wp_Get_Nav_Menu_Items (Menu_Id);
 
                            Menu_Item_Data : Array_Type :=  -- (array)
-                              Wp_Setup_Nav_Menu_Item
-                                 (Inc_Posts.Get_Post (Menu_Item_Id));
+                              Wp_Setup_Nav_Menu_Item (
+                                Inc_Posts.Get_Post (
+                                  Inc_Class_Wp_Posts.Post_Id (Menu_Item_Id)));
 
                            -- Set up the data we need in one pass through the array
                            -- of menu items.

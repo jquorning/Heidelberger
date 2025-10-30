@@ -5,12 +5,16 @@
 -- @subpackage Post
 --
 
+with Ada.Containers;
+
 with Globals;
 with Hb_Common;
 with Php;
 with Wp_Common;
 
+with Inc_Caches;
 with Inc_Formatting;
+with Inc_Functions;
 with Inc_L10n;
 with Inc_Meta;
 with Inc_Plugins;
@@ -1667,9 +1671,9 @@ is
       return X_Post;
    end Get_Post;
 
-   function Get_Post (Post   : Integer := 0;
-                      Output : String := "OBJECT"; --  = OBJECT,
-                      Filter : String := "raw")
+   function Get_Post (Post   : Post_Id := 0;
+                      Output : String  := "OBJECT"; --  = OBJECT,
+                      Filter : String  := "raw")
                       return Wp_Post
    is
       P : Wp_Post;
@@ -1695,7 +1699,7 @@ is
       if
 --        not Post or else
         Post.Post_Parent = 0 or else -- empty
-        Post.Post_Parent = Integer (Post.Id)
+        Post.Post_Parent = Post.Id
       then
          return Empty_Array;
       end if;
@@ -1705,7 +1709,7 @@ is
 
          Ancestors : Array_Type := Empty_Array;
 
-         Id        : Integer    := Post.Post_Parent;
+         Id        : Post_Id    := Post.Post_Parent;
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
@@ -1714,8 +1718,8 @@ is
          loop -- while Ancestor loop
             -- Loop detection: If the ancestor has been seen before, break.
             if
-              Ancestor.Post_Parent /= 0                or else -- empty
-              Ancestor.Post_Parent = Integer (Post.Id) or else
+              Ancestor.Post_Parent /= 0      or else -- empty
+              Ancestor.Post_Parent = Post.Id or else
               In_Array (Ancestor.Post_Parent'Image, Ancestors, True)
             then
                exit;
@@ -6470,102 +6474,125 @@ is
 --         return get_post( page, output, filter );
 -- end;
 
---
--- Retrieves a page given its path.
---
--- @since 2.1.0
---
--- @global wpdb wpdb WordPress database abstraction object.
---
--- @param string       page_path Page path.
--- @param string       output    Optional. The required return type. One of OBJECT, ARRAY_A, or ARRAY_N, which
---                                correspond to a WP_Post object, an associative array, or a numeric array,
---                                respectively. Default OBJECT.
--- @param string|array post_type Optional. Post type or array of post types. Default "page".
--- @return WP_Post|array|null WP_Post (or array) on success, or null on failure.
---
--- function get_page_by_path( page_path, output = OBJECT, post_type = "page" ) then
---         global wpdb;
+   ----------------------
+   -- Get_Page_By_Path --
+   ----------------------
 
---         last_changed = wp_cache_get_last_changed( "posts" );
+   function Get_Page_By_Path (Page_Path : String;
+                              Output    : String := "OBJECT";
+                              Post_Type : String := "page")
+                              return Wp_Post
+   is
+      use Ada.Containers;
+      use Inc_Caches;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use type Inc_Class_Wp_Posts.Post_Id;
 
---         hash      = md5( page_path . serialize( post_type ) );
---         cache_key = "get_page_by_path:hash:last_changed";
---         cached    = wp_cache_get( cache_key, "posts" );
---         if ( False !== cached ) then
---                 // Special case: "0" is a bad `page_path`.
---                 if ( "0" === cached || 0 === cached ) then
---                         return;
---                 end; else then
---                         return get_post( cached, output );
---                 end;
---         end;
+      Last_Changed : constant String := Wp_Cache_Get_Last_Changed ("posts");
 
---         page_path     = rawurlencode( urldecode( page_path ) );
---         page_path     = str_replace( "%2F", "/", page_path );
---         page_path     = str_replace( "%20", " ", page_path );
---         parts         = explode( "/", trim( page_path, "/" ) );
---         parts         = array_map( "sanitize_title_for_query", parts );
---         escaped_parts = esc_sql( parts );
+      Unused    : Boolean;
+      Hash      : constant String  := MD5 (Page_Path & Serialize (Post_Type));
+      Cache_Key : constant String  := "get_page_by_path:" & Hash & ":" & Last_Changed;
+      Cached    : constant Wp_Post :=
+        Wp_Cache_Get (Cache_Key, "posts", Found => Unused);
+   begin
+      if Null_Post /= Cached then
+--    if False /= Cached then
+         -- Special case: "0" is a bad `page_path`.
+         -- if "0" = Cached then -- or else 0 = Cached then
+         --    return Null_Post; -- null_post added
+         -- else
+         --    return Get_Post (Cached, Output);
+         -- end if;
+         null;
+      end if;
 
---         in_string = """ . implode( "","", escaped_parts ) . """;
+      declare
+         Page_Path_2   : constant String := RawURLencode (URLdecode (Page_Path));
+         Page_Path_3   : constant String := Str_Replace ("%2F", "/", Page_Path_2);
+         Page_Path     : constant String := Str_Replace ("%20", " ", Page_Path_3);
 
---         if ( is_to_array ( post_type ) ) then
---                 post_types = post_type;
---         end; else then
---                 post_types = to_array ( post_type, "attachment" );
---         end;
+         Parts_2       : constant List_Type := Explode ("/", Trim (Page_Path, "/"));
+         Parts         : constant List_Type := Array_Map ("sanitize_title_for_query", Parts_2);
+         Escaped_Parts : constant List_Type := ESC_SQL (Parts);
 
---         post_types          = esc_sql( post_types );
---         post_type_in_string = """ . implode( "","", post_types ) . """;
---         sql                 = "
---                 SELECT ID, post_name, post_parent, post_type
---                 FROM wpdb.posts
---                 WHERE post_name IN (in_string)
---                 AND post_type IN (post_type_in_string)
---         ";
+         In_String : constant String := """" & Implode (",", Escaped_Parts) & """";
 
---         pages = wpdb.get_results( sql, OBJECT_K );
+         -- if Is_Array (Post_Type) then
+         --    Post_Types_2 := Post_Type;
+         -- else
+         Post_Types_2 : constant List_Type :=
+           To_List (List => (+Post_Type, +"attachment"));
+--       Post_Types_2 := To_Array (Post_Type, "attachment");
+         -- end if;
 
---         revparts = array_reverse( parts );
+         Post_Types_3 : constant List_Type := ESC_SQL (Post_Types_2);
 
---         foundid = 0;
---         foreach ( (array) pages as page ) then
---                 if ( page.post_name == revparts[0] ) then
---                         count = 0;
---                         p     = page;
+         Post_Type_In_String : constant String :=
+           """" & Implode (",", Post_Types_3) & """";
 
---                         --
---                         -- Loop through the given path parts from right to left,
---                         -- ensuring each matches the post ancestry.
---                         --
---                         while ( 0 != p.post_parent && isset( pages[ p.post_parent ] ) ) then
---                                 count++;
---                                 parent = pages[ p.post_parent ];
---                                 if ( ! isset( revparts[ count ] ) || parent.post_name != revparts[ count ] ) then
---                                         break;
---                                 end;
---                                 p = parent;
---                         end;
+         SQL : constant String :=
+                "SELECT ID, post_name, post_parent, post_type " &
+                "FROM wpdb.posts " &
+                "WHERE post_name IN (" & In_String & ") " &
+                "AND post_type IN (" & Post_Type_In_String & ") ";
 
---                         if ( 0 == p.post_parent && count( revparts ) == count + 1 && p.post_name == revparts[ count ] ) then
---                                 foundid = page.ID;
---                                 if ( page.post_type == post_type ) then
---                                         break;
---                                 end;
---                         end;
---                 end;
---         end;
+         Pages    : Post_Array := Globals.WpDB.Get_Results (SQL, "OBJECT_K");
+         Revparts : constant List_Type  := Array_Reverse (Parts);
 
---         // We cache misses as well as hits.
---         wp_cache_set( cache_key, foundid, "posts" );
+         Foundid : Natural := 0;
+      begin
+         Outer :
+         for Page of Pages loop -- (array)
+            if Page.Post_Name = Revparts (1) then -- (0)
+               declare
+                  Count : Natural := 0;
+                  P     : Wp_Post renames Page;
+               begin
+                  --
+                  -- Loop through the given path parts from right to left,
+                  -- ensuring each matches the post ancestry.
+                  --
+                  Inner :
+                  while
+                    0 /= P.Post_Parent and then
+                    Null_Post /= Pages (P.Post_Parent)
+--                  Isset (Pages (P.Post_Parent))
+                  loop
+                     declare
+                        Parent : Wp_Post renames Pages (P.Post_Parent);
+                     begin
+                        Count  := Count + 1;
+--                      exit Inner when Null_Post = Revparts (Count);
+                        exit Inner when not Isset (-Revparts (Count));
+                        exit Inner when Parent.Post_Name /= Revparts (Count);
+                        P := Parent;
+                     end;
+                  end loop Inner;
 
---         if ( foundid ) then
---                 return get_post( foundid, output );
---         end;
+                  if
+                    0 = P.Post_Parent                        and then
+                    Revparts.Length = Count_Type (Count + 1) and then
+--                  Count (Revparts) = Count + 1 and then
+                    P.Post_Name = Revparts (Count)
+                  then
+                     Foundid := Integer (Page.Id);
+                     exit Outer when Page.Post_Type = Post_Type;
+                  end if;
+               end;
+            end if;
+         end loop Outer;
 
---         return null;
--- end;
+         -- We cache misses as well as hits.
+         Wp_Cache_Set (Cache_Key, Foundid, "posts");
+
+         if Foundid /= 0 then
+            return Get_Post (Post_Id (Foundid), Output);
+         end if;
+      end;
+      return Null_Post; -- null;
+   end Get_Page_By_Path;
 
 --
 -- Retrieves a page given its title.

@@ -6,6 +6,7 @@
 -- @since 4.4.0
 --
 
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Arrays;
@@ -42,206 +43,207 @@ is
 
    type Wp_Post is tagged
       record
-        --
-        -- Post ID.
-        --
-        -- @since 3.5.0
-        -- @var int
-        --
-        Id : Post_Id;
+         --
+         -- Post ID.
+         --
+         -- @since 3.5.0
+         -- @var int
+         --
+         Id : Post_Id;
 
-        --
-        -- ID of post author.
-        --
-        -- A numeric string, for compatibility reasons.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Author : Unbounded_String;
+         --
+         -- ID of post author.
+         --
+         -- A numeric string, for compatibility reasons.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Author : Unbounded_String;
 
-        --
-        -- The post's local publication time.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Date : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         --
+         -- The post's local publication time.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Date : Unbounded_String := To_Us ("0000-00-00 00:00:00");
 
-        --
-        -- The post's GMT publication time.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Date_Gmt : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         --
+         -- The post's GMT publication time.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Date_GMT : Unbounded_String := To_Us ("0000-00-00 00:00:00");
 
-        --
-        -- The post's content.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Content : Unbounded_String;
+         --
+         -- The post's content.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Content : Unbounded_String;
 
-        --
-        -- The post's title.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Title : Unbounded_String;
+         --
+         -- The post's title.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Title : Unbounded_String;
 
-        --
-        -- The post's excerpt.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Excerpt : Unbounded_String;
+         --
+         -- The post's excerpt.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Excerpt : Unbounded_String;
 
-        --
-        -- The post's status.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Status : Unbounded_String := To_Us ("publish");
+         --
+         -- The post's status.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Status : Unbounded_String := To_Us ("publish");
 
-        --
-        -- Whether comments are allowed.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Comment_Status : Unbounded_String := To_Us ("open");
+         --
+         -- Whether comments are allowed.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Comment_Status : Unbounded_String := To_Us ("open");
 
-        --
-        -- Whether pings are allowed.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Ping_Status : Unbounded_String := To_Us ("open");
+         --
+         -- Whether pings are allowed.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Ping_Status : Unbounded_String := To_Us ("open");
 
-        --
-        -- The post's password in plain text.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Password : Unbounded_String;
+         --
+         -- The post's password in plain text.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Password : Unbounded_String;
 
-        --
-        -- The post's slug.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Name : Unbounded_String;
+         --
+         -- The post's slug.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Name : Unbounded_String;
 
-        --
-        -- URLs queued to be pinged.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        To_Ping : Unbounded_String;
+         --
+         -- URLs queued to be pinged.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         To_Ping : Unbounded_String;
 
-        --
-        -- URLs that have been pinged.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Pinged : Unbounded_String;
+         --
+         -- URLs that have been pinged.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Pinged : Unbounded_String;
 
-        --
-        -- The post's local modified time.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Modified : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         --
+         -- The post's local modified time.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Modified : Unbounded_String := To_Us ("0000-00-00 00:00:00");
 
-        --
-        -- The post's GMT modified time.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Modified_Gmt : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         --
+         -- The post's GMT modified time.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Modified_GMT : Unbounded_String := To_Us ("0000-00-00 00:00:00");
 
-        --
-        -- A utility DB field for post content.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Content_Filtered : Unbounded_String;
+         --
+         -- A utility DB field for post content.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Content_Filtered : Unbounded_String;
 
-        --
-        -- ID of a post's parent post.
-        --
-        -- @since 3.5.0
-        -- @var int
-        --
-        Post_Parent : Integer := 0;
+         --
+         -- ID of a post's parent post.
+         --
+         -- @since 3.5.0
+         -- @var int
+         --
+         Post_Parent : Post_Id := 0; -- Integer := 0;
 
-        --
-        -- The unique identifier for a post, not necessarily a URL, used as the feed GUID.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Guid : Unbounded_String;
+         --
+         -- The unique identifier for a post, not necessarily a URL, used as the
+         -- feed GUID.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         GUID : Unbounded_String;
 
-        --
-        -- A field used for ordering posts.
-        --
-        -- @since 3.5.0
-        -- @var int
-        --
-        Menu_Order : Integer := 0;
+         --
+         -- A field used for ordering posts.
+         --
+         -- @since 3.5.0
+         -- @var int
+         --
+         Menu_Order : Integer := 0;
 
-        --
-        -- The post's type, like post or page.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Type : Unbounded_String := To_Us ("post");
+         --
+         -- The post's type, like post or page.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Type : Unbounded_String := To_Us ("post");
 
-        --
-        -- An attachment's mime type.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Post_Mime_Type : Unbounded_String;
+         --
+         -- An attachment's mime type.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Post_Mime_Type : Unbounded_String;
 
-        --
-        -- Cached comment count.
-        --
-        -- A numeric string, for compatibility reasons.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Comment_Count : Unbounded_String;
+         --
+         -- Cached comment count.
+         --
+         -- A numeric string, for compatibility reasons.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Comment_Count : Unbounded_String;
 
-        --
-        -- Stores the post object's sanitization level.
-        --
-        -- Does not correspond to a DB field.
-        --
-        -- @since 3.5.0
-        -- @var string
-        --
-        Filter : Unbounded_String;
+         --
+         -- Stores the post object's sanitization level.
+         --
+         -- Does not correspond to a DB field.
+         --
+         -- @since 3.5.0
+         -- @var string
+         --
+         Filter : Unbounded_String;
 
          -- Added by jq
-         Dyn : Property_Type;
+         Props : Property_Type;
 
       end record;
 
@@ -320,11 +322,23 @@ is
      (Id          => 0,
       Post_Parent => 0,
       Menu_Order  => 0,
-      Dyn         => Null_Property_Type,
+      Props       => Null_Property_Type,
       others      => Null_Unbounded_String);
 
    type Wp_Post_Array is array (Positive range <>) of Wp_Post;
 
    Empty_Wp_Post_Array : constant Wp_Post_Array := (1 .. 0 => Null_Post);
+
+   ----------------
+   -- Post_Array --
+   ----------------
+
+   package Post_Arrays is new
+      Ada.Containers.Vectors (Index_Type   => Post_Id, -- Positive,
+                              Element_Type => Wp_Post);
+
+   subtype Post_Array is Post_Arrays.Vector;
+
+   Empty_Post_Array : constant Post_Array := Post_Arrays.Empty_Vector;
 
 end Inc_Class_Wp_Posts;

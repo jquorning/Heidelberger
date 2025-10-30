@@ -255,6 +255,33 @@ is
                       return String;
 
    --
+   -- Escapes data for use in a MySQL query.
+   --
+   -- Usually you should prepare queries using wpdb::prepare().
+   -- Sometimes, spot-escaping is required or useful. One example
+   -- is preparing an array for use in an IN clause.
+   --
+   -- NOTE: Since 4.8.3, "%" characters will be replaced with a placeholder string,
+   -- this prevents certain SQLi attacks from taking place. This change in behaviour
+   -- may cause issues for code that expects the return value of esc_sql() to be
+   -- useable for other purposes.
+   --
+   -- @since 2.8.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string|array data Unescaped data.
+   -- @return string|array Escaped data, in the same type as supplied.
+   --
+   function ESC_SQL (Data : List_Type)
+                     return List_Type
+                     is (Empty_List);
+
+   function ESC_SQL (Data : String)
+                     return String
+                     is ("XXX-971");
+
+   --
    -- Checks for invalid UTF8 in a string.
    --
    -- @since 2.8.0

@@ -24,6 +24,7 @@ with Hb_Common;
 with Globals;
 
 with Inc_Admin_Bar;
+with Inc_General_Templates;
 with Inc_Load;
 with Inc_Plugins;
 with Inc_Script_Loader;
@@ -408,7 +409,7 @@ Put_Line ("#Inc_Default_Filters.Run");
 --    Add_Filter ("rest_authentication_errors", "rest_cookie_check_errors", 100);
 
       -- Actions.
---    Add_Action ("wp_head", X_Wp_Render_Title_Tag'Access, 1);
+      Add_Action ("wp_head", Inc_General_Templates.X_Wp_Render_Title_Tag'Access, 1);
       Add_Action ("wp_head", Inc_Script_Loader.Wp_Enqueue_Scripts'Access, 1);
 --    Add_Action ("wp_head", Wp_Resource_Hints'Access, 2);
 --    Add_Action ("wp_head", Wp_Preload_Resources'Access, 1);

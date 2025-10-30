@@ -6,8 +6,15 @@
 -- @since 4.7.0
 --
 
+with Ada.Containers;
+
 with Hb_Common;
 with Php;
+with Wp_Common;
+
+with Inc_Class_Wp_Post_Type;
+with Inc_Options;
+with Inc_Posts;
 
 package body Inc_Class_Wp_Querys
 is
@@ -3494,32 +3501,41 @@ is
 --                 return (bool) $this->is_archive;
 --         end;
 
---         --
---         -- Is the query for an existing post type archive page?
---         --
---         -- @since 3.1.0
---         --
---         -- @param string|string[] $post_types Optional. Post type or array of posts types
---         --                                    to check against. Default empty.
---         -- @return bool Whether the query is for an existing post type archive page.
---         --
---         public function is_post_type_archive( $post_types = '' ) then
---                 if ( empty( $post_types ) || ! $this->is_post_type_archive ) then
---                         return (bool) $this->is_post_type_archive;
---                 end;
+   --------------------------
+   -- Is_Post_Type_Archive --
+   --------------------------
 
---                 $post_type = $this->get( 'post_type' );
---                 if ( is_array( $post_type ) ) then
---                         $post_type = reset( $post_type );
---                 end;
---                 $post_type_object = get_post_type_object( $post_type );
+   function Is_Post_Type_Archive (This       : Wp_Query;
+                                  Post_Types : String := "")
+                                  return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Post_Type;
 
---                 if ( ! $post_type_object ) then
---                         return false;
---                 end;
+      Post_Type : Unbounded_String;
+   begin
+      if Empty (Post_Types) or else not This.Is_Post_Type_Archive then
+         return This.Is_Post_Type_Archive; -- (bool)
+      end if;
 
---                 return in_array( $post_type_object->name, (array) $post_types, true );
---         end;
+      declare
+         Post_Type : constant String := This.Get ("post_type");
+         -- if Is_Array (Post_Type) then
+         --    Post_Type := Reset (Post_Type);
+         -- end if;
+         Post_Type_Object : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+           Inc_Posts.Get_Post_Type_Object (Post_Type);
+      begin
+         if Post_Type_Object = Null_Post_Type then
+--       if not Post_Type_Object then
+            return False;
+         end if;
+
+         return In_Array (-Post_Type_Object.Name, To_List (Post_Types), True);
+--       return In_Array (-Post_Type_Object.Name, Post_Types, True); -- (array)
+      end;
+   end Is_Post_Type_Archive;
 
 --         --
 --         -- Is the query for an existing attachment page?
@@ -3556,44 +3572,50 @@ is
 --                 return false;
 --         end;
 
---         --
---         -- Is the query for an existing author archive page?
---         --
---         -- If the $author parameter is specified, this function will additionally
---         -- check if the query is for one of the authors specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @param int|string|int[]|string[] $author Optional. User ID, nickname, nicename, or array of such
---         --                                          to check against. Default empty.
---         -- @return bool Whether the query is for an existing author archive page.
---         --
---         public function is_author( $author = '' ) then
---                 if ( ! $this->is_author ) then
---                         return false;
---                 end;
+   ---------------
+   -- Is_Author --
+   ---------------
 
---                 if ( empty( $author ) ) then
---                         return true;
---                 end;
+   function Is_Author (This   : Wp_Query;
+                       Author : String := "")
+                       return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Users;
+   begin
+      if not This.Is_Author then
+         return False;
+      end if;
 
---                 $author_obj = $this->get_queried_object();
---                 if ( ! $author_obj ) then
---                         return false;
---                 end;
+      if Empty (Author) then
+         return True;
+      end if;
 
---                 $author = array_map( 'strval', (array) $author );
+      declare
+         Author_Obj : constant Wp_User :=
+           This.Get_Queried_Object;
+      begin
+         if Author_Obj = Null_User then
+--       if not Author_Obj then
+            return False;
+         end if;
 
---                 if ( in_array( (string) $author_obj->ID, $author, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $author_obj->nickname, $author, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $author_obj->user_nicename, $author, true ) ) then
---                         return true;
---                 end;
-
---                 return false;
---         end;
+         declare
+            Author_2 : constant List_Type :=
+              Array_Map ("strval", To_List (Author)); -- (array)
+         begin
+            if In_Array (Author_Obj.Id'Image, Author_2, True) then -- (string)
+               return True;
+            elsif In_Array (-Author_Obj.Prop.Nickname, Author_2, True) then
+               return True;
+            elsif In_Array (-Author_Obj.Prop.User_Nicename, Author_2, True) then
+               return True;
+            end if;
+         end;
+      end;
+      return False;
+   end Is_Author;
 
    -----------------
    -- Is_Category --
@@ -3606,7 +3628,7 @@ is
       use Hb_Common;
       use Php;
    begin
-      if not This.Is_Category then
+      if not This.M_Is_Category then
          return False;
       end if;
 
@@ -3639,100 +3661,114 @@ is
       return False;
    end Is_Category;
 
---         --
---         -- Is the query for an existing tag archive page?
---         --
---         -- If the $tag parameter is specified, this function will additionally
---         -- check if the query is for one of the tags specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @param int|string|int[]|string[] $tag Optional. Tag ID, name, slug, or array of such
---         --                                       to check against. Default empty.
---         -- @return bool Whether the query is for an existing tag archive page.
---         --
---         public function is_tag( $tag = '' ) then
---                 if ( ! $this->is_tag ) then
---                         return false;
---                 end;
+   ------------
+   -- Is_Tag --
+   ------------
 
---                 if ( empty( $tag ) ) then
---                         return true;
---                 end;
+   function Is_Tag (This : Wp_Query;
+                    Tag  : String := "")
+                    return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Terms;
+   begin
+      if not This.Is_Tag then
+         return False;
+      end if;
 
---                 $tag_obj = $this->get_queried_object();
---                 if ( ! $tag_obj ) then
---                         return false;
---                 end;
+      if Empty (Tag) then
+         return True;
+      end if;
 
---                 $tag = array_map( 'strval', (array) $tag );
+      declare
+         Tag_Obj : constant Wp_Term :=
+           This.Get_Queried_Object;
+      begin
+         if Tag_Obj = Null_Term then
+--       if not Tag_Obj then
+            return False;
+         end if;
 
---                 if ( in_array( (string) $tag_obj->term_id, $tag, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $tag_obj->name, $tag, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $tag_obj->slug, $tag, true ) ) then
---                         return true;
---                 end;
+         declare
+            Tag_2 : constant List_Type :=
+              Array_Map ("strval", To_List (Tag)); -- (array)
+         begin
+            if In_Array (Tag_Obj.Term_Id'Image, Tag_2, True) then -- (string)
+               return True;
+            elsif In_Array (-Tag_Obj.Name, Tag_2, True) then
+               return True;
+            elsif In_Array (-Tag_Obj.Slug, Tag_2, True) then
+               return True;
+            end if;
+         end;
+      end;
+      return False;
+   end Is_Tag;
 
---                 return false;
---         end;
+   Wp_Taxonomies : List_Type;
 
---         --
---         -- Is the query for an existing custom taxonomy archive page?
---         --
---         -- If the $taxonomy parameter is specified, this function will additionally
---         -- check if the query is for that specific $taxonomy.
---         --
---         -- If the $term parameter is specified in addition to the $taxonomy parameter,
---         -- this function will additionally check if the query is for one of the terms
---         -- specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @global WP_Taxonomy[] $wp_taxonomies Registered taxonomies.
---         --
---         -- @param string|string[]           $taxonomy Optional. Taxonomy slug or slugs to check against.
---         --                                            Default empty.
---         -- @param int|string|int[]|string[] $term     Optional. Term ID, name, slug, or array of such
---         --                                            to check against. Default empty.
---         -- @return bool Whether the query is for an existing custom taxonomy archive page.
---         --              True for custom taxonomy archive pages, false for built-in taxonomies
---         --              (category and tag archives).
---         --
---         public function is_tax( $taxonomy = '', $term = '' ) then
---                 global $wp_taxonomies;
+   ------------
+   -- Is_Tax --
+   ------------
 
---                 if ( ! $this->is_tax ) then
---                         return false;
---                 end;
+   function Is_Tax (This     : Wp_Query;
+                    Taxonomy : String := "";
+                    Term     : String := "")
+                    return Boolean
+   is
+      use Ada.Containers;
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Terms;
+   begin
+      if not This.Is_Tax then
+         return False;
+      end if;
 
---                 if ( empty( $taxonomy ) ) then
---                         return true;
---                 end;
+      if Empty (Taxonomy) then
+         return True;
+      end if;
 
---                 $queried_object = $this->get_queried_object();
---                 $tax_array      = array_intersect( array_keys( $wp_taxonomies ), (array) $taxonomy );
---                 $term_array     = (array) $term;
+      declare
+         Queried_Object : constant Wp_Term :=
+           This.Get_Queried_Object;
 
---                 // Check that the taxonomy matches.
---                 if ( ! ( isset( $queried_object->taxonomy ) && count( $tax_array ) && in_array( $queried_object->taxonomy, $tax_array, true ) ) ) then
---                         return false;
---                 end;
+         Tax_Array : constant List_Type :=
+           Array_Intersect (Array_Keys (Wp_Taxonomies), To_List (Taxonomy));
 
---                 // Only a taxonomy provided.
---                 if ( empty( $term ) ) then
---                         return true;
---                 end;
+         Term_Array : constant List_Type := To_List (Term); -- (array)
+      begin
+         -- Check that the taxonomy matches.
+         if
+           Isset (-Queried_Object.Taxonomy) and then
+           Tax_Array.Length /= 0            and then
+--         Count (Tax_Array)                and then
+           In_Array (-Queried_Object.Taxonomy, Tax_Array, True)
+         then
+            null;
+         else
+            return False;
+         end if;
 
---                 return isset( $queried_object->term_id ) &&
---                         count(
---                                 array_intersect(
---                                         array( $queried_object->term_id, $queried_object->name, $queried_object->slug ),
---                                         $term_array
---                                 )
---                         );
---         end;
+         -- Only a taxonomy provided.
+         if Empty (Term) then
+            return True;
+         end if;
+
+         return
+           Queried_Object.Term_Id /= 0 and then
+--         Isset (Queried_Object.Term_Id) and then
+--         Count (
+             Array_Intersect (
+               To_List (List => (+Queried_Object.Term_Id'Image,
+                                 Queried_Object.Name,
+                                 Queried_Object.Slug)),
+               Term_Array
+             ).Length /= 0;
+--         );
+      end;
+   end Is_Tax;
 
 --         --
 --         -- Whether the current URL is within the comments popup window.
@@ -3803,34 +3839,32 @@ is
 --                 return (bool) $this->is_comment_feed;
 --         end;
 
---         --
---         -- Is the query for the front page of the site?
---         --
---         -- This is for what is displayed at your site's main URL.
---         --
---         -- Depends on the site's "Front page displays" Reading Settings 'show_on_front' and 'page_on_front'.
---         --
---         -- If you set a static page for the front page of your site, this function will return
---         -- true when viewing that page.
---         --
---         -- Otherwise the same as @see WP_Query::is_home()
---         --
---         -- @since 3.1.0
---         --
---         -- @return bool Whether the query is for the front page of the site.
---         --
---         public function is_front_page() then
---                 // Most likely case.
---                 if ( 'posts' === get_option( 'show_on_front' ) && $this->is_home() ) then
---                         return true;
---                 end; elseif ( 'page' === get_option( 'show_on_front' ) && get_option( 'page_on_front' )
---                         && $this->is_page( get_option( 'page_on_front' ) )
---                 ) then
---                         return true;
---                 end; else then
---                         return false;
---                 end;
---         end;
+   -------------------
+   -- Is_Front_Page --
+   -------------------
+
+   function Is_Front_Page (This : Wp_Query)
+                           return Boolean
+   is
+      use Inc_Options;
+   begin
+      -- Most likely case.
+      if
+        "posts" = Get_Option ("show_on_front") and then
+        This.Is_Home
+      then
+         return True;
+
+      elsif
+        "page" = Get_Option ("show_on_front") and then
+        Get_Option ("page_on_front")          and then
+        This.Is_Page (Get_Option ("page_on_front"))
+      then
+         return True;
+      else
+         return False;
+      end if;
+   end Is_Front_Page;
 
 --         --
 --         -- Is the query for the blog homepage?
@@ -3886,58 +3920,70 @@ is
 --                 return (bool) $this->is_month;
 --         end;
 
---         --
---         -- Is the query for an existing single page?
---         --
---         -- If the $page parameter is specified, this function will additionally
---         -- check if the query is for one of the pages specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @see WP_Query::is_single()
---         -- @see WP_Query::is_singular()
---         --
---         -- @param int|string|int[]|string[] $page Optional. Page ID, title, slug, path, or array of such
---         --                                        to check against. Default empty.
---         -- @return bool Whether the query is for an existing single page.
---         --
---         public function is_page( $page = '' ) then
---                 if ( ! $this->is_page ) then
---                         return false;
---                 end;
+   -------------
+   -- Is_Page --
+   -------------
 
---                 if ( empty( $page ) ) then
---                         return true;
---                 end;
+   function Is_Page (This : Wp_Query;
+                     Page : String := "")
+                     return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Posts;
+      use Inc_Posts;
+   begin
+      if not This.Is_Page then
+         return False;
+      end if;
 
---                 $page_obj = $this->get_queried_object();
---                 if ( ! $page_obj ) then
---                         return false;
---                 end;
+      if Empty (Page) then
+         return True;
+      end if;
 
---                 $page = array_map( 'strval', (array) $page );
+      declare
+         Page_Obj : constant Wp_Post :=
+           This.Get_Queried_Object;
+      begin
+         if Page_Obj = Null_Post then
+--       if not Page_Obj then
+            return False;
+         end if;
 
---                 if ( in_array( (string) $page_obj->ID, $page, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $page_obj->post_title, $page, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $page_obj->post_name, $page, true ) ) then
---                         return true;
---                 end; else then
---                         foreach ( $page as $pagepath ) then
---                                 if ( ! strpos( $pagepath, '/' ) ) then
---                                         continue;
---                                 end;
---                                 $pagepath_obj = get_page_by_path( $pagepath );
+         declare
+            Page_2 : constant List_Type :=
+              Array_Map ("strval", To_List (Page)); -- (array)
+         begin
+            if In_Array (Page_Obj.Id'Image, Page_2, True) then -- (string)
+               return True;
+            elsif In_Array (-Page_Obj.Post_Title, Page_2, True) then
+               return True;
+            elsif In_Array (-Page_Obj.Post_Name, Page_2, True) then
+               return True;
+            else
+               for Pagepath of Page_2 loop
+                  if 0 /= Strpos (-Pagepath, "/") then
+                     goto Continue;
+                  end if;
 
---                                 if ( $pagepath_obj && ( $pagepath_obj->ID == $page_obj->ID ) ) then
---                                         return true;
---                                 end;
---                         end;
---                 end;
-
---                 return false;
---         end;
+                  declare
+                     Pagepath_Obj : constant Wp_Post :=
+                       Get_Page_By_Path (-Pagepath);
+                  begin
+                     if
+                       Pagepath_Obj /= Null_Post and then
+                       Pagepath_Obj.Id = Page_Obj.Id
+                     then
+                        return True;
+                     end if;
+                  end;
+                  << Continue >>
+               end loop;
+            end if;
+         end;
+      end;
+      return False;
+   end Is_Page;
 
 --         --
 --         -- Is the query for a paged result and not for the first page?
@@ -3994,89 +4040,99 @@ is
 --                 return (bool) $this->is_search;
 --         end;
 
---         --
---         -- Is the query for an existing single post?
---         --
---         -- Works for any post type excluding pages.
---         --
---         -- If the $post parameter is specified, this function will additionally
---         -- check if the query is for one of the Posts specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @see WP_Query::is_page()
---         -- @see WP_Query::is_singular()
---         --
---         -- @param int|string|int[]|string[] $post Optional. Post ID, title, slug, path, or array of such
---         --                                        to check against. Default empty.
---         -- @return bool Whether the query is for an existing single post.
---         --
---         public function is_single( $post = '' ) then
---                 if ( ! $this->is_single ) then
---                         return false;
---                 end;
+   ---------------
+   -- Is_Single --
+   ---------------
 
---                 if ( empty( $post ) ) then
---                         return true;
---                 end;
+   function Is_Single (This : Wp_Query;
+                       Post : String := "")
+                       return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Posts;
+      use Inc_Posts;
+   begin
+      if not This.Is_Single then
+         return False;
+      end if;
 
---                 $post_obj = $this->get_queried_object();
---                 if ( ! $post_obj ) then
---                         return false;
---                 end;
+      if Empty (Post) then
+         return True;
+      end if;
 
---                 $post = array_map( 'strval', (array) $post );
+      declare
+         Post_Obj : constant Wp_Post :=
+           This.Get_Queried_Object;
+      begin
+         if Post_Obj = Null_Post then
+            return False;
+         end if;
 
---                 if ( in_array( (string) $post_obj->ID, $post, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $post_obj->post_title, $post, true ) ) then
---                         return true;
---                 end; elseif ( in_array( $post_obj->post_name, $post, true ) ) then
---                         return true;
---                 end; else then
---                         foreach ( $post as $postpath ) then
---                                 if ( ! strpos( $postpath, '/' ) ) then
---                                         continue;
---                                 end;
---                                 $postpath_obj = get_page_by_path( $postpath, OBJECT, $post_obj->post_type );
+         declare
+            Post_2 : constant List_Type := Array_Map ("strval", To_List (Post));
+         begin
+            if In_Array (Post_Obj.Id'Image, Post_2, True) then
+               return True;
+            elsif In_Array (-Post_Obj.Post_Title, Post_2, True) then
+               return True;
+            elsif In_Array (-Post_Obj.Post_Name, Post_2, True) then
+               return True;
+            else
+               for Postpath of Post_2 loop
+                  if 0 /= Strpos (-Postpath, "/") then
+                     goto Continue;
+                  end if;
 
---                                 if ( $postpath_obj && ( $postpath_obj->ID == $post_obj->ID ) ) then
---                                         return true;
---                                 end;
---                         end;
---                 end;
---                 return false;
---         end;
+                  declare
+                     Postpath_Obj : constant Wp_Post :=
+                       Get_Page_By_Path (-Postpath, "OBJECT", -Post_Obj.Post_Type);
+                  begin
+                     if
+                        Postpath_Obj /= Null_Post and then
+                        Postpath_Obj.Id = Post_Obj.Id
+                     then
+                        return True;
+                     end if;
+                  end;
+                  << Continue >>
+               end loop;
+            end if;
+         end;
+      end;
+      return False;
+   end Is_Single;
 
---         --
---         -- Is the query for an existing single post of any post type (post, attachment, page,
---         -- custom post types)?
---         --
---         -- If the $post_types parameter is specified, this function will additionally
---         -- check if the query is for one of the Posts Types specified.
---         --
---         -- @since 3.1.0
---         --
---         -- @see WP_Query::is_page()
---         -- @see WP_Query::is_single()
---         --
---         -- @param string|string[] $post_types Optional. Post type or array of post types
---         --                                    to check against. Default empty.
---         -- @return bool Whether the query is for an existing single post
---         --              or any of the given post types.
---         --
---         public function is_singular( $post_types = '' ) then
---                 if ( empty( $post_types ) || ! $this->is_singular ) then
---                         return (bool) $this->is_singular;
---                 end;
+   -----------------
+   -- Is_Singular --
+   -----------------
 
---                 $post_obj = $this->get_queried_object();
---                 if ( ! $post_obj ) then
---                         return false;
---                 end;
+   function Is_Singular (This       : Wp_Query;
+                         Post_Types : String := "")
+                         return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Posts;
+   begin
+      if
+        Empty (Post_Types) or else
+        not This.Is_Singular
+      then
+         return This.Is_Singular; -- (bool)
+      end if;
 
---                 return in_array( $post_obj->post_type, (array) $post_types, true );
---         end;
+      declare
+         Post_Obj : constant Wp_Post :=
+           This.Get_Queried_Object;
+      begin
+         if Post_Obj = Null_Post then
+            return False;
+         end if;
+
+         return In_Array (-Post_Obj.Post_Type, To_List (Post_Types), True);
+      end;
+   end Is_Singular;
 
 --         --
 --         -- Is the query for a specific time?

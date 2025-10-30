@@ -7,6 +7,8 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Posts;
+
 package Inc_General_Templates
 is
 
@@ -296,5 +298,144 @@ is
                       Echo    : Boolean := True)
                       return String
                       is ("XXX-998");
+
+   --
+   -- Returns document title for the current page.
+   --
+   -- @since 4.4.0
+   --
+   -- @global int page  Page number of a single post.
+   -- @global int paged Page number of a list of posts.
+   --
+   -- @return string Tag with the document title.
+   --
+   function Wp_Get_Document_Title
+            return String;
+
+   --
+   -- Displays title tag with content.
+   --
+   -- @ignore
+   -- @since 4.1.0
+   -- @since 4.4.0 Improved title output replaced `wp_title()`.
+   -- @access private
+   --
+   procedure X_Wp_Render_Title_Tag;
+
+   --
+   -- Displays or retrieves title for a post type archive.
+   --
+   -- This is optimized for archive.php and archive-thenpost_typeend;.php template
+   -- files for displaying the title of the post type.
+   --
+   -- @since 3.1.0
+   --
+   -- @param string prefix  Optional. What to display before the title.
+   -- @param bool   display Optional. Whether to display or retrieve title. Default
+   --                        true.
+   -- @return string|void Title when retrieving, null when displaying or failure.
+   --
+   function Post_Type_Archive_Title (Prefix  : String  := "";
+                                     Display : Boolean := True)
+                                     return String;
+
+   --
+   -- Displays or retrieves page title for post.
+   --
+   -- This is optimized for single.php template file for displaying the post title.
+   --
+   -- It does not support placing the separator after the title, but by leaving the
+   -- prefix parameter empty, you can set the title separator manually. The prefix
+   -- does not automatically place a space between the prefix, so if there should
+   -- be a space, the parameter value will need to have it at the end.
+   --
+   -- @since 0.71
+   --
+   -- @param string prefix  Optional. What to display before the title.
+   -- @param bool   display Optional. Whether to display or retrieve title. Default
+   --                        true.
+   -- @return string|void Title when retrieving.
+   --
+   function Single_Post_Title (Prefix  : String  := "";
+                               Display : Boolean := True)
+                               return String;
+
+   --
+   -- Displays or retrieves page title for tag post archive.
+   --
+   -- Useful for tag template files for displaying the tag page title. The prefix
+   -- does not automatically place a space between the prefix, so if there should
+   -- be a space, the parameter value will need to have it at the end.
+   --
+   -- @since 2.3.0
+   --
+   -- @param string prefix  Optional. What to display before the title.
+   -- @param bool   display Optional. Whether to display or retrieve title. Default
+   --                        true.
+   -- @return string|void Title when retrieving.
+   --
+   function Single_Tag_Title (Prefix  : String  := "";
+                              Display : Boolean := True)
+                              return String;
+
+   --
+   -- Displays or retrieves page title for taxonomy term archive.
+   --
+   -- Useful for taxonomy term template files for displaying the taxonomy term page
+   -- title. The prefix does not automatically place a space between the prefix, so
+   -- if there should be a space, the parameter value will need to have it at the end.
+   --
+   -- @since 3.1.0
+   --
+   -- @param string $prefix  Optional. What to display before the title.
+   -- @param bool   $display Optional. Whether to display or retrieve title. Default
+   --                         true.
+   -- @return string|void Title when retrieving.
+   --
+   function Single_Term_Title (Prefix  : String  := "";
+                               Display : Boolean := True)
+                               return String;
+
+   --
+   -- Retrieves the date on which the post was written.
+   --
+   -- Unlike the_date() this function will always return the date.
+   -- Modify output with the {@see "get_the_date"} filter.
+   --
+   -- @since 3.0.0
+   --
+   -- @param string      format Optional. PHP date format. Defaults to the
+   --                            "date_format" option.
+   -- @param int|WP_Post post   Optional. Post ID or WP_Post object. Default current
+   --                            post.
+   -- @return string|int|false Date the current post was written. False on failure.
+   --
+   function Get_The_Date (Format : String := "";
+                          Post   : Integer := 0) -- null
+                          return String;
+
+   --
+   -- Retrieves the time at which the post was written.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string      format    Optional. Format to use for retrieving the time
+   --                               the post was written. Accepts "G", "U", or PHP
+   --                               date format. Default "U".
+   -- @param bool        gmt       Optional. Whether to retrieve the GMT time.
+   --                               Default false.
+   -- @param int|WP_Post post      Post ID or post object. Default is global `post`
+   --                               object.
+   -- @param bool        translate Whether to translate the time string. Default false.
+   -- @return string|int|false Formatted date string or Unix timestamp if `format`
+   --                           is "U" or "G". False on failure.
+   --
+   function Get_Post_Time (Format    : String  := "U";
+                           GMT       : Boolean := False;
+                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           -- Integer := 0; -- null
+                           Translate : Boolean := False)
+                           return String
+                           is ("XXX-982");
 
 end Inc_General_Templates;

@@ -848,28 +848,33 @@ is
    --
    -- @global WP_Post $post Global post object.
    --
-   -- @param int|WP_Post|null $post   Optional. Post ID or post object. `null`, `false`, `0` and other PHP falsey values
-   --                                 return the current global post inside the loop. A numerically valid post ID that
-   --                                 points to a non-existent post returns `null`. Defaults to global $post.
-   -- @param string           $output Optional. The required return type. One of OBJECT, ARRAY_A, or ARRAY_N, which
-   --                                 correspond to a WP_Post object, an associative array, or a numeric array,
-   --                                 respectively. Default OBJECT.
-   -- @param string           $filter Optional. Type of filter to apply. Accepts 'raw', 'edit', 'db',
-   --                                 or 'display'. Default 'raw'.
-   -- @return WP_Post|array|null Type corresponding to $output on success or null on failure.
-   --                            When $output is OBJECT, a `WP_Post` instance is returned.
+   -- @param int|WP_Post|null $post   Optional. Post ID or post object. `null`,
+   --                                 `false`, `0` and other PHP falsey values return
+   --                                 the current global post inside the loop. A
+   --                                 numerically valid post ID that points to a
+   --                                 non-existent post returns `null`. Defaults to
+   --                                 global $post.
+   -- @param string           $output Optional. The required return type. One of
+   --                                 OBJECT, ARRAY_A, or ARRAY_N, which correspond to
+   --                                 a WP_Post object, an associative array, or a
+   --                                 numeric array, respectively. Default OBJECT.
+   -- @param string           $filter Optional. Type of filter to apply. Accepts
+   --                                 'raw', 'edit', 'db', or 'display'. Default 'raw'.
+   -- @return WP_Post|array|null Type corresponding to $output on success or null on
+   --                            failure. When $output is OBJECT, a `WP_Post`
+   --                            instance is returned.
    --
    function Get_Post (Post   : Wp_Post; -- = null,
                       Output : String := "OBJECT"; --  = OBJECT,
                       Filter : String := "raw")
                       return Wp_Post;
 
-   function Get_Post (Post   : Integer := 0;
+   function Get_Post (Post   : Post_Id := 0;
                       Output : String  := "OBJECT"; --  = OBJECT,
                       Filter : String  := "raw")
                       return Wp_Post;
 
-   function Get_Post (Post   : Integer := 0;
+   function Get_Post (Post   : Post_Id := 0;
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
@@ -1023,6 +1028,27 @@ is
    function Wp_Untrash_Post (Item : Inc_Class_Wp_Posts.Wp_Post)
                              return Boolean
                              is (True);
+
+   --
+   -- Retrieves a page given its path.
+   --
+   -- @since 2.1.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string       page_path Page path.
+   -- @param string       output    Optional. The required return type. One of OBJECT,
+   --                                ARRAY_A, or ARRAY_N, which correspond to a
+   --                                WP_Post object, an associative array, or a
+   --                                numeric array, respectively. Default OBJECT.
+   -- @param string|array post_type Optional. Post type or array of post types.
+   --                                Default "page".
+   -- @return WP_Post|array|null WP_Post (or array) on success, or null on failure.
+   --
+   function Get_Page_By_Path (Page_Path : String;
+                              Output    : String := "OBJECT";
+                              Post_Type : String := "page")
+                              return Wp_Post;
 
    --
    -- Retrieves the IDs of the ancestors of a post.

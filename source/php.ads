@@ -340,6 +340,15 @@ is
                              return List_Type
                              is (Empty_List);
 
+   function Array_Reverse (Arry          : Array_Type;
+                           Preserve_Keys : Boolean := False)
+                           return Array_Type
+                           is (Empty_Array);
+
+   function Array_Reverse (List : List_Type)
+                           return List_Type
+                           is (Empty_List);
+
    function Array_Replace_Recursive (Arry    : Array_Type;
                                      Array_2 : Array_Type)
                                      return Array_Type
@@ -465,6 +474,18 @@ is
                  Binary : Boolean := False)
                  return String
                  is ("XXX-937");
+
+   function Serialize (Value : String)
+                       return String
+                       is ("XXX-978");
+
+   function RawURLencode (Item : String)
+                          return String
+                          is ("XXX-977");
+
+   function URLdecode (Item : String)
+                       return String
+                       is ("XXX-976");
 
    -------------------
    -- Echo handling --

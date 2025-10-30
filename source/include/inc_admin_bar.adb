@@ -20,7 +20,6 @@ with Adi_Class_Wp_Screens;
 with Adi_Screens;
 
 with Inc_Author_Templates;
-with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Recovery_Mode;
 with Inc_Class_Wp_Sites;
@@ -312,7 +311,7 @@ Put_Line ("#X_Wp_Admin_Bar_Init");
          Howdy : constant String :=
             Sprintf (abs "Howdy, %s",
                      To_List ("<span class=""display-name"">"  &
-                              (-Current_User.Dyn.Display_Name) &
+                              (-Current_User.Prop.Display_Name) &
                               "</span>"));
 
          Class : String := (if Empty (Avatar) then "" else "with-avatar");
@@ -369,11 +368,11 @@ Put_Line ("#X_Wp_Admin_Bar_Init");
 
       User_Info := +Get_Avatar (User_Id, 64);
       User_Info := User_Info & "<span class=""display-name"">" &
-                               Current_User.Dyn.Display_Name & "</span>";
+                               Current_User.Prop.Display_Name & "</span>";
 
-      if Current_User.Dyn.Display_Name /= Current_User.Dyn.User_Login then
+      if Current_User.Prop.Display_Name /= Current_User.Prop.User_Login then
          User_Info := User_Info & "<span class=""username"">" &
-                      Current_User.Dyn.User_Login & "</span>";
+                      Current_User.Prop.User_Login & "</span>";
       end if;
 
       declare
@@ -991,8 +990,8 @@ Put_Line ("#X_Wp_Admin_Bar_Init");
                Post_Type_Object := Get_Post_Type_Object (-Post.Post_Type);
             elsif "edit" = Current_Screen.Base then
                Post_Type_Object := Get_Post_Type_Object (-Current_Screen.Post_Type);
-            elsif "edit-comments" = Current_Screen.Base and then Post_Id /= 0 then
-               Post := Get_Post (Post_Id);
+            elsif "edit-comments" = Current_Screen.Base and then Id_Of_Post /= 0 then
+               Post := Get_Post (Id_Of_Post);
                if Post = Null_Post then
                   Post_Type_Object := Get_Post_Type_Object (-Post.Post_Type);
                end if;
@@ -1087,7 +1086,7 @@ Put_Line ("#X_Wp_Admin_Bar_Init");
                   User_Object : constant Wp_User := Get_Userdata (User_Id);
 
                   View_Link   : constant String :=
-                     Get_Author_Posts_Url (User_Object.ID);
+                     Get_Author_Posts_Url (User_Object.Id);
                begin
                   if User_Object.Exists or else View_Link /= "" then
                      declare
@@ -1141,21 +1140,21 @@ Put_Line ("#X_Wp_Admin_Bar_Init");
                   end if;
                end;
 
-            elsif Current_Object.Dyn.Taxonomy /= "" then
+            elsif Current_Object.Props.Taxonomy /= "" then
                declare
                   use Inc_Class_Wp_Taxonomy;
 
                   Tax : constant Wp_Taxonomy :=
-                     Get_Taxonomy (-Current_Object.Dyn.Taxonomy);
+                     Get_Taxonomy (-Current_Object.Props.Taxonomy);
 
                   Edit_Term_Link : constant String :=
-                     Get_Edit_Term_Link (Current_Object.Dyn.Term_Id,
-                                         -Current_Object.Dyn.Taxonomy);
+                     Get_Edit_Term_Link (Current_Object.Props.Term_Id,
+                                         -Current_Object.Props.Taxonomy);
                begin
                   if
                     Tax /= Null_Taxonomy or else
                     Edit_Term_Link /= "" or else
-                    Current_User_Can ("edit_term", Current_Object.Dyn.Term_Id)
+                    Current_User_Can ("edit_term", Current_Object.Props.Term_Id)
                   then
                      declare
                         Node : Node_Args;

@@ -967,6 +967,12 @@ is
                          return Array_Type
                          is (Empty_Array);
 
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : String := ""; -- null
+                         Output : String := "OBJECT")
+                         return Inc_Class_Wp_Posts.Post_Array
+                         is (Inc_Class_Wp_Posts.Empty_Post_Array);
+
    --
    -- Retrieves the character set for the given table.
    --

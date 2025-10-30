@@ -193,8 +193,11 @@ is
 
                               Var_By_Ref : constant Post_Id := Post.Id;
                            begin
-                              Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item",
-                                 To_Array (Inc_Posts.Get_Post (Integer (Var_By_Ref)))), 0, Args_2)); -- (object)
+                              Echo (
+                                Walk_Nav_Menu_Tree (
+                                  Array_Map ("wp_setup_nav_menu_item",
+                                    To_Array (
+                                      Inc_Posts.Get_Post (Var_By_Ref))), 0, Args_2)); -- (object)
                            end;
                         elsif "json" = Response_Format then
                            Echo (Inc_Functions.Wp_JSON_Encode (
@@ -285,7 +288,7 @@ is
             User : constant Wp_User := Wp_Get_Current_User; -- ();
          begin
             Update_User_Meta (
-                        User.ID,
+                        User.Id,
                         "managenav-menuscolumnshidden",
                         Arrays.To_Array ((
                            Build ("0", "link-target"),  -- "0" was 0
@@ -343,7 +346,7 @@ is
 
             User : constant Wp_User := Wp_Get_Current_User; -- ();
          begin
-            Update_User_Meta (User.ID, "metaboxhidden_nav-menus", Hidden_Meta_Boxes);
+            Update_User_Meta (User.Id, "metaboxhidden_nav-menus", Hidden_Meta_Boxes);
          end;
       end;
    end Wp_Initial_Nav_Menu_Meta_Boxes;
@@ -544,7 +547,7 @@ is
       --
       Important_Pages   : constant List_Type  := Empty_List; -- List_Array;
       Suppress_Page_Ids : Array_Type := Empty_Array;
-      Front_Page        : Natural    := 0;
+      Front_Page        : Post_Id    := 0;
       Front_Page_Obj    : Wp_Post;
    begin
 --    if Isset (Box ("args").X_Default_Query) then
@@ -558,7 +561,7 @@ is
          -- Insert Front Page or custom Home link.
          Front_Page :=
            (if "page" = Get_Option ("show_on_front")
-            then Integer'Value (Get_Option ("page_on_front")) else 0); -- (int)
+            then Post_Id'Value (Get_Option ("page_on_front")) else 0); -- (int)
 
          Front_Page_Obj := Null_Post; -- null;
 
@@ -590,9 +593,9 @@ is
 
          -- Insert Posts Page.
          declare
-            Posts_Page : constant Natural :=
+            Posts_Page : constant Post_Id :=
               (if "page" = Get_Option ("show_on_front")
-               then Get_Option ("page_for_posts") else 0);  -- (int)
+               then Post_Id (Integer'(Get_Option ("page_for_posts"))) else 0);
 
             Posts_Page_Obj : Wp_Post;
          begin
@@ -608,8 +611,8 @@ is
 
          -- Insert Privacy Policy Page.
          declare
-            Privacy_Policy_Page_Id : constant Natural :=
-              Get_Option ("wp_page_for_privacy_policy"); -- (int)
+            Privacy_Policy_Page_Id : constant Post_Id :=
+              Post_Id (Integer'(Get_Option ("wp_page_for_privacy_policy")));
          begin
             if Privacy_Policy_Page_Id /= 0 then
 --          if not Empty (Privacy_Policy_Page_Id) then
@@ -1567,9 +1570,17 @@ Echo ("                <ul id=""" & Taxonomy_Name &
    begin
       -- Delete orphaned draft menu items.
       declare
+         SQL : constant String :=
+           "SELECT ID FROM wpdb->posts AS p " &
+           "LEFT JOIN wpdb->postmeta AS m "   &
+           "ON p.ID = m.post_id "             &
+           "WHERE post_type = ""nav_menu_item"" "    &
+           "AND post_status = ""draft"" "            &
+           "AND meta_key = ""_menu_item_orphaned"" " &
+           "AND meta_value < &d";
+
          Menu_Items_To_Delete : constant List_Type :=
-            Wpdb.Get_Col (Wpdb.Prepare (
-               "SELECT ID FROM wpdb->posts AS p LEFT JOIN wpdb->postmeta AS m ON p.ID = m.post_id WHERE post_type = ""nav_menu_item"" AND post_status = ""draft"" AND meta_key = ""_menu_item_orphaned"" AND meta_value < %d", Delete_Timestamp));
+            WpDB.Get_Col (WpDB.Prepare (SQL, Delete_Timestamp));
          Unused : Wp_Post;
       begin
          for Menu_Item_Id of Menu_Items_To_Delete loop

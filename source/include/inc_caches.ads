@@ -9,6 +9,8 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Posts;
+
 package Inc_Caches
 is
    use Arrays;
@@ -67,8 +69,45 @@ is
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Posts.Wp_Post
+                          is (Inc_Class_Wp_Posts.Null_Post);
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
                           Found : out Boolean) -- = null
                           return Array_Type
                           is (Empty_Array);
+
+   --
+   -- Saves the data to the cache.
+   --
+   -- Differs from wp_cache_add() and wp_cache_replace() in that it will always write data.
+   --
+   -- @since 2.0.0
+   --
+   -- @see WP_Object_Cache::set()
+   -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
+   --
+   -- @param int|string $key    The cache key to use for retrieval later.
+   -- @param mixed      $data   The contents to store in the cache.
+   -- @param string     $group  Optional. Where to group the cache contents. Enables the same key
+   --                           to be used across groups. Default empty.
+   -- @param int        $expire Optional. When to expire the cache contents, in seconds.
+   --                           Default 0 (no expiration).
+   -- @return bool True on success, false on failure.
+   --
+   -- function Wp_Cache_Set (Key    : String;
+   --                        Data   : Integer;
+   --                        Group  : String  := "";
+   --                        Expire : Integer := 0)
+   --                        return Boolean;
+
+   procedure Wp_Cache_Set (Key    : String;
+                           Data   : Integer;
+                           Group  : String  := "";
+                           Expire : Integer := 0)
+                           is null;
 
 end Inc_Caches;

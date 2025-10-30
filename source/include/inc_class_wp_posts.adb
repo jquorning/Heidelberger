@@ -45,11 +45,11 @@ is
             use Globals;
 
             Statement : constant String
-              := Wpdb.Prepare
+              := WpDB.Prepare
                 ("SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
                  (To_List (Item => Id'Image)));
          begin
-            Inc_Class_Wpdb.Get_Row (Wpdb, Post,
+            Inc_Class_Wpdb.Get_Row (WpDB, Post,
                                     Query   => Statement,
                                     Success => Success);
 --            Post := Wpdb.Get_Row (Statement, Success);

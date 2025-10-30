@@ -204,8 +204,8 @@ is
                               --
                               -- global $wpdb;
                               --
-                              Post_Ids := Globals.Wpdb.Get_Col (
-                                 Globals.Wpdb.Prepare
+                              Post_Ids := Globals.WpDB.Get_Col (
+                                 Globals.WpDB.Prepare
                                     ("SELECT ID FROM " & (-Post_Type) &
                                      " WHERE post_type=%s AND post_status = %s",
                                      -Post_Type, -Post_Status));
@@ -303,23 +303,23 @@ is
                            declare
                               Deleted : Natural := 0;
                            begin
-                              for Post_Id of Post_Ids loop
+                              for Id of Post_Ids loop
                                  declare
-                                    Post_Del : constant Wp_Post
-                                       := Inc_Posts.Get_Post (Integer'Value (-Post_Id));
+                                    Post_Del : constant Wp_Post :=
+                                      Inc_Posts.Get_Post (Post_Id'Value (-Id));
                                  begin
-                                    if not Current_User_Can ("delete_post", -Post_Id) then
+                                    if not Current_User_Can ("delete_post", -Id) then
                                        Inc_Functions.Wp_Die
                                           (abs "Sorry, you are not allowed to delete this item.");
                                     end if;
 
                                     if "attachment" = Post_Del.Post_Type then
-                                       if Wp_Delete_Attachment (Integer'Value (-Post_Id)) = Null_Post then
+                                       if Wp_Delete_Attachment (Integer'Value (-Id)) = Null_Post then
                                           Inc_Functions.Wp_Die
                                              (abs "Error in deleting the attachment.");
                                        end if;
                                     else
-                                       if Wp_Delete_Post (Integer'Value (-Post_Id)) = Null_Post then
+                                       if Wp_Delete_Post (Integer'Value (-Id)) = Null_Post then
                                           Inc_Functions.Wp_Die
                                             (abs "Error in deleting the item.");
                                        end if;

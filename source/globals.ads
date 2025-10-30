@@ -60,7 +60,7 @@ is
 
    WP_SETUP_CONFIG : constant Boolean := False;
 
-   Wpdb : Inc_Class_Wpdb.Wpdb_Class;
+   WpDB : Inc_Class_Wpdb.Wpdb_Class;
 
    XMLRPC_REQUEST : Boolean := False;
    DOING_AJAX     : Boolean := False;
