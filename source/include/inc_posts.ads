@@ -699,6 +699,14 @@ is
       return Array_Type;
 
    --
+   -- Adds submenus for post types.
+   --
+   -- @access private
+   -- @since 3.1.0
+   --
+   procedure X_Add_Post_Type_Submenus;
+
+   --
    -- Gets a list of post statuses.
    --
    -- @since 3.0.0

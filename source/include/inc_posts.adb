@@ -12,6 +12,8 @@ with Hb_Common;
 with Php;
 with Wp_Common;
 
+with Adi_Plugins;
+
 with Inc_Caches;
 with Inc_Formatting;
 with Inc_Functions;
@@ -2825,22 +2827,43 @@ is
       end;
    end X_Get_Custom_Object_Labels;
 
---
--- Adds submenus for post types.
---
--- @access private
--- @since 3.1.0
---
--- function _add_post_type_submenus() then
---         foreach ( get_post_types( to_array ( "show_ui" => True ) ) as ptype ) then
---                 ptype_obj = get_post_type_object( ptype );
---                 // Sub-menus only.
---                 if ( ! ptype_obj.show_in_menu || True === ptype_obj.show_in_menu ) then
---                         continue;
---                 end;
---                 add_submenu_page( ptype_obj.show_in_menu, ptype_obj.labels.name, ptype_obj.labels.all_items, ptype_obj.cap.edit_posts, "edit.php?post_type=ptype" );
---         end;
--- end;
+   ------------------------------
+   -- X_Add_Post_Type_Submenus --
+   ------------------------------
+
+   procedure X_Add_Post_Type_Submenus
+   is
+      use Adi_Plugins;
+      use Inc_Class_Wp_Post_Type;
+
+      Post_Types : constant List_Type :=
+        Get_Post_Types (To_Array (List => (1 =>
+          Build ("show_ui", True))));
+   begin
+      for PType of Post_Types loop
+         declare
+            PType_Obj : constant Wp_Post_Type := Get_Post_Type_Object (-PType);
+         begin
+            -- Sub-menus only.
+            if
+              not PType_Obj.Show_In_Menu_Bool -- or else
+--            not PType_Obj.Show_In_Menu or else
+--            True = PType_Obj.Show_In_Menu
+            then
+               goto Continue;
+            end if;
+
+            Add_Submenu_Page
+              (Parent_Slug => -PType_Obj.Show_In_Menu,
+               Page_Title  => Get (PType_Obj.Labels, "name"),
+               Menu_Title  => Get (PType_Obj.Labels, "all_items"),
+               Capability  => Get (PType_Obj.Cap, "edit_posts"),
+               Menu_Slug   => "edit.php?post_type=ptype");
+
+         end;
+         << Continue >>
+      end loop;
+   end X_Add_Post_Type_Submenus;
 
 --
 -- Registers support of certain features for a post type.

@@ -99,9 +99,9 @@ is
 
    procedure X_Wp_Admin_Bar_Init
    is
-      Unused : constant Boolean := X_Wp_Admin_Bar_Init;
+      Unused : Boolean;
    begin
-Put_Line ("#X_Wp_Admin_Bar_Init");
+      Unused := X_Wp_Admin_Bar_Init;
    end X_Wp_Admin_Bar_Init;
 
    -------------------------

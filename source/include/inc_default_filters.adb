@@ -27,6 +27,7 @@ with Inc_Admin_Bar;
 with Inc_General_Templates;
 with Inc_Load;
 with Inc_Plugins;
+with Inc_Posts;
 with Inc_Script_Loader;
 with Inc_Taxonomys;
 
@@ -43,7 +44,6 @@ is
       use Inc_Load;
       use Inc_Plugins;
    begin
-Put_Line ("#Inc_Default_Filters.Run");
       -- Strip, trim, kses, special chars for string saves.
       for Filter of To_List (List => (+"pre_term_name", +"pre_comment_author_name",
                               +"pre_link_name", +"pre_link_target",
@@ -648,7 +648,7 @@ Put_Line ("#Inc_Default_Filters.Run");
 
       -- Post.
 --    Add_Action ("init", Create_Initial_Post_Types'Access, 0); -- Highest priority.
---    Add_Action ("admin_menu", X_Add_Post_Type_Submenus'Access);
+      Add_Action ("admin_menu", Inc_Posts.X_Add_Post_Type_Submenus'Access);
 --    Add_Action ("before_delete_post", X_Reset_Front_Page_Settings_For_Post'Access);
 --    Add_Action ("wp_trash_post", X_Reset_Front_Page_Settings_For_Post'Access);
 --    Add_Action ("change_locale", Create_Initial_Post_Types'Access);
