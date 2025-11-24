@@ -6,27 +6,39 @@
 -- @subpackage Media
 --
 
+with Hb_Common;
+with Php;
+
+with Inc_Load;
+with Inc_Options;
+with Inc_Plugins;
+
 package body Inc_Media
 is
-   procedure Dummy is null;
--- --
--- -- Retrieves additional image sizes.
--- --
--- -- @since 4.7.0
--- --
--- -- @global array _wp_additional_image_sizes
--- --
--- -- @return array Additional images size data.
--- --
--- function wp_get_additional_image_sizes() then
---         global _wp_additional_image_sizes;
 
---         if ( not _wp_additional_image_sizes ) then
---                 _wp_additional_image_sizes = array();
---         end;
+   Global_Wp_Additional_Image_Sizes : Array_Type;
 
---         return _wp_additional_image_sizes;
--- end;
+   function Apply_Filters (Hook  : String;
+                           Value : Natural;
+                           U     : Natural;
+                           P     : Natural)
+                           return Natural
+                           is (Value);
+
+   -----------------------------------
+   -- Wp_Get_Additional_Image_Sizes --
+   -----------------------------------
+
+   function Wp_Get_Additional_Image_Sizes
+            return Array_Type
+   is
+   begin
+      if Empty_Array = Global_Wp_Additional_Image_Sizes then
+         Global_Wp_Additional_Image_Sizes := Empty_Array;
+      end if;
+
+      return Global_Wp_Additional_Image_Sizes;
+   end Wp_Get_Additional_Image_Sizes;
 
 -- --
 -- -- Scales down the default size of an image.
@@ -852,87 +864,116 @@ is
 --         return apply_filters( "image_get_intermediate_size", data, post_id, size );
 -- end;
 
--- --
--- -- Gets the available intermediate image size names.
--- --
--- -- @since 3.0.0
--- --
--- -- @return string[] An array of image size names.
--- --
--- function get_intermediate_image_sizes() then
---         default_sizes    = array( "thumbnail", "medium", "medium_large", "large" );
---         additional_sizes = wp_get_additional_image_sizes();
+   ----------------------------------
+   -- Get_Intermediate_Image_Sizes --
+   ----------------------------------
 
---         if ( not empty( additional_sizes ) ) then
---                 default_sizes = array_merge( default_sizes, array_keys( additional_sizes ) );
---         end;
+   function Get_Intermediate_Image_Sizes
+            return List_Type
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Plugins;
 
---         --
---         -- Filters the list of intermediate image sizes.
---         --
---         -- @since 2.5.0
---         --
---         -- @param string[] default_sizes An array of intermediate image size names. Defaults
---         --                                are "thumbnail", "medium", "medium_large", "large".
---         --
---         return apply_filters( "intermediate_image_sizes", default_sizes );
--- end;
+      Default_Sizes_2 : constant List_Type := To_List (List => (
+        +"thumbnail", +"medium", +"medium_large", +"large"));
 
--- --
--- -- Returns a normalized list of all currently registered image sub-sizes.
--- --
--- -- @since 5.3.0
--- -- @uses wp_get_additional_image_sizes()
--- -- @uses get_intermediate_image_sizes()
--- --
--- -- @return array[] Associative array of arrays of image sub-size information,
--- --                 keyed by image size name.
--- --
--- function wp_get_registered_image_subsizes() then
---         additional_sizes = wp_get_additional_image_sizes();
---         all_sizes        = array();
+      Additional_Sizes : constant Array_Type := Wp_Get_Additional_Image_Sizes;
 
---         foreach ( get_intermediate_image_sizes() as size_name ) then
---                 size_data = array(
---                         "width"  => 0,
---                         "height" => 0,
---                         "crop"   => false,
---                 );
+      Default_Sizes : constant List_Type :=
+        (if not Empty (Additional_Sizes)
+         then Array_Merge (Default_Sizes_2, Array_Keys (Additional_Sizes))
+         else Default_Sizes_2);
 
---                 if ( isset( additional_sizes[ size_name ]["width"] ) ) then
---                         -- For sizes added by plugins and themes.
---                         size_data["width"] = (int) additional_sizes[ size_name ]["width"];
---                 end; else then
---                         -- For default sizes set in options.
---                         size_data["width"] = (int) get_option( "thensize_nameend;_size_w" );
---                 end;
+   begin
+      --
+      -- Filters the list of intermediate image sizes.
+      --
+      -- @since 2.5.0
+      --
+      -- @param string[] default_sizes An array of intermediate image size names.
+      --                                Defaults are "thumbnail", "medium",
+      --                                "medium_large", "large".
+      --
+      return Apply_Filters ("intermediate_image_sizes", Default_Sizes);
+   end Get_Intermediate_Image_Sizes;
 
---                 if ( isset( additional_sizes[ size_name ]["height"] ) ) then
---                         size_data["height"] = (int) additional_sizes[ size_name ]["height"];
---                 end; else then
---                         size_data["height"] = (int) get_option( "thensize_nameend;_size_h" );
---                 end;
+   --------------------------------------
+   -- Wp_Get_Registered_Image_Subsizes --
+   --------------------------------------
 
---                 if ( empty( size_data["width"] ) and then empty( size_data["height"] ) ) then
---                         -- This size isn"t set.
---                         continue;
---                 end;
+   function Wp_Get_Registered_Image_Subsizes
+            return Array_Type
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Options;
 
---                 if ( isset( additional_sizes[ size_name ]["crop"] ) ) then
---                         size_data["crop"] = additional_sizes[ size_name ]["crop"];
---                 end; else then
---                         size_data["crop"] = get_option( "thensize_nameend;_crop" );
---                 end;
+      Additional_Sizes : constant Array_Type :=
+        Wp_Get_Additional_Image_Sizes;
 
---                 if ( not is_array( size_data["crop"] ) || empty( size_data["crop"] ) ) then
---                         size_data["crop"] = (bool) size_data["crop"];
---                 end;
+      All_Sizes : Array_Type;
+   begin
+      for Size_Name_2 of Get_Intermediate_Image_Sizes loop
+         declare
+            Size_Name : constant String := -Size_Name_2;
 
---                 all_sizes[ size_name ] = size_data;
---         end;
+            Size_Data : Array_Type := To_Array (List => (
+              Build ("width",  0),
+              Build ("height", 0),
+              Build ("crop",   False)
+            ));
+         begin
+            if Isset_2 (Additional_Sizes, Size_Name, "width") then
+               -- For sizes added by plugins and themes.
+               Set (Size_Data, "width",
+                    Value => Get (Ref_2 (Additional_Sizes, Size_Name, "width")));
+            else
+               -- For default sizes set in options.
+               Set (Size_Data, "width",
+                    Value => From_Integer (Get_Option (Size_Name & "_size_w")));
+            end if;
 
---         return all_sizes;
--- end;
+            if Isset_2 (Additional_Sizes, Size_Name, "height") then
+               Set (Size_Data, "height",
+                    Value => Get (Ref_2 (Additional_Sizes, Size_Name, "height")));
+            else
+               Set (Size_Data, "height",
+                    Value => From_Integer (Get_Option (Size_Name & "_size_h")));
+            end if;
+
+            if
+              Empty (Size_Data, "width") and then
+              Empty (Size_Data, "height")
+            then
+               -- This size isn't set.
+               goto Continue;
+            end if;
+
+            if Isset_2 (Additional_Sizes, Size_Name, "crop") then
+               Set (Size_Data, "crop",
+                    Value => Get (Ref_2 (Additional_Sizes, Size_Name, "crop")));
+            else
+               Set (Size_Data, "crop",
+                    Value => From_Boolean (Get_Option (Size_Name & "_crop")));
+            end if;
+
+            if
+              Kind_Of (Get (Size_Data, "crop")) /= Kind_Array or else
+              Empty (Size_Data, "crop")
+            then
+               Set (Size_Data, "crop",
+                    Value => From_Boolean (As_Boolean (Get (Size_Data, "crop"))));
+            end if;
+
+            Set (All_Sizes, Key => Size_Name,
+                 Value => From_Array (Size_Data));
+         end;
+         << Continue >>
+      end loop;
+
+      return All_Sizes;
+   end Wp_Get_Registered_Image_Subsizes;
 
 -- --
 -- -- Retrieves an image to represent an attachment.
@@ -3832,28 +3873,36 @@ is
 --         return wp_constrain_dimensions( example_width-- 1000000, example_height-- 1000000, max_width, max_height );
 -- end;
 
--- --
--- -- Determines the maximum upload size allowed in php.ini.
--- --
--- -- @since 2.5.0
--- --
--- -- @return int Allowed upload size.
--- --
--- function wp_max_upload_size() then
---         u_bytes = wp_convert_hr_to_bytes( ini_get( "upload_max_filesize" ) );
---         p_bytes = wp_convert_hr_to_bytes( ini_get( "post_max_size" ) );
+   ------------------------
+   -- Wp_Max_Upload_Size --
+   ------------------------
 
---         --
---         -- Filters the maximum upload size allowed in php.ini.
---         --
---         -- @since 2.5.0
---         --
---         -- @param int size    Max upload size limit in bytes.
---         -- @param int u_bytes Maximum upload filesize in bytes.
---         -- @param int p_bytes Maximum size of POST data in bytes.
---         --
---         return apply_filters( "upload_size_limit", min( u_bytes, p_bytes ), u_bytes, p_bytes );
--- end;
+   function Wp_Max_Upload_Size
+            return Natural
+   is
+      use Php;
+      use Inc_Load;
+      use Inc_Plugins;
+
+      U_Bytes : constant Natural :=
+        Wp_Convert_Hr_To_Bytes (Ini_Get ("upload_max_filesize"));
+
+      P_Bytes : constant Natural :=
+        Wp_Convert_Hr_To_Bytes (Ini_Get ("post_max_size"));
+   begin
+      --
+      -- Filters the maximum upload size allowed in php.ini.
+      --
+      -- @since 2.5.0
+      --
+      -- @param int size    Max upload size limit in bytes.
+      -- @param int u_bytes Maximum upload filesize in bytes.
+      -- @param int p_bytes Maximum size of POST data in bytes.
+      --
+      return
+        Apply_Filters ("upload_size_limit",
+                       Natural'Min (U_Bytes, P_Bytes), U_Bytes, P_Bytes);
+   end Wp_Max_Upload_Size;
 
 -- --
 -- -- Returns a WP_Image_Editor instance and loads file into it.

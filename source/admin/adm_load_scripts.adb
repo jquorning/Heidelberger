@@ -55,7 +55,7 @@ is
 
       WPINC := +"wp-includes";
 
-      Protocol := +Get (X_SERVER, "SERVER_PROTOCOL");
+      Protocol := +As_String (Get (X_SERVER, "SERVER_PROTOCOL"));
       if
         not In_Array (-Protocol,
                       To_List (List => (+"HTTP/1.1", +"HTTP/2",
@@ -64,7 +64,7 @@ is
          Protocol := +"HTTP/1.0";
       end if;
 
-      Load := +Get (XX_GET, "load");
+      Load := +As_String (Get (XX_GET, "load"));
 -- if ( is_array( load ) ) then
 --         ksort( load );
 --         load = implode( "", load );
@@ -87,7 +87,7 @@ is
 
       if
         Isset (X_SERVER, "HTTP_IF_NONE_MATCH") and then
-        Stripslashes (Get (X_SERVER, "HTTP_IF_NONE_MATCH")) = Inc_Versions.Wp_Version
+        Stripslashes (As_String (Get (X_SERVER, "HTTP_IF_NONE_MATCH"))) = Inc_Versions.Wp_Version
       then
          Header (-Protocol & " 304 Not Modified");
          return; -- exit;

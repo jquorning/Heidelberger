@@ -23,7 +23,9 @@ with Arrays;
 with Php;
 
 with Inc_Class_Wp_Admin_Bar;
+with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Hooks;
+with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Styles;
 with Inc_Class_Wp_Taxonomy;
 
@@ -38,25 +40,31 @@ is
                                        Post_Id         : Integer;
                                        Previous_Status : String)
                                        return String;
+   type Callable_5 is access function (Arry : Array_Type)
+                                       return Array_Type;
 
---
--- Checks if any action has been registered for a hook.
---
--- When using the `callback` argument, this function may return a non-boolean value
--- that evaluates to false (e.g. 0), so use the `===` operator for testing the return value.
---
--- @since 2.5.0
---
--- @see has_filter() has_action() is an alias of has_filter().
---
--- @param string                      hook_name The name of the action hook.
--- @param callable|string|array|false callback  Optional. The callback to check for.
---                                               This function can be called unconditionally to speculatively check
---                                               a callback that may or may not exist. Default false.
--- @return bool|int If `callback` is omitted, returns boolean for whether the hook has
---                  anything registered. When checking a specific function, the priority
---                  of that hook is returned, or false if the function is not attached.
---
+   --
+   -- Checks if any action has been registered for a hook.
+   --
+   -- When using the `callback` argument, this function may return a non-boolean value
+   -- that evaluates to false (e.g. 0), so use the `===` operator for testing the
+   -- return value.
+   --
+   -- @since 2.5.0
+   --
+   -- @see has_filter() has_action() is an alias of has_filter().
+   --
+   -- @param string                      hook_name The name of the action hook.
+   -- @param callable|string|array|false callback  Optional. The callback to check for.
+   --                                               This function can be called
+   --                                               unconditionally to speculatively
+   --                                               check a callback that may or may
+   --                                               not exist. Default false.
+   -- @return bool|int If `callback` is omitted, returns boolean for whether the hook
+   --                  has anything registered. When checking a specific function,
+   --                  the priority of that hook is returned, or false if the function
+   --                  is not attached.
+   --
    function Has_Action (Hook_Name : String)
                         --, callback = false )
                         return Boolean
@@ -191,6 +199,11 @@ is
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable_3;
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1);
+
+   procedure Add_Filter (Hook_Name     : String;
+                         Callback      : Callable_5;
                          Priority      : Priority_Type := 10;
                          Accepted_Args : Integer       := 1);
 
@@ -354,6 +367,74 @@ is
                            return String
                            is (Value);
 
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           C         : String)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Id        : Integer)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Raw       : String;
+                           Strict    : Boolean)
+                           return String
+                           is (Value);
+   --
+   -- Checks if any filter has been registered for a hook.
+   --
+   -- When using the `callback` argument, this function may return a non-boolean value
+   -- that evaluates to false (e.g. 0), so use the `===` operator for testing the
+   -- return value.
+   --
+   -- @since 2.5.0
+   --
+   -- @global WP_Hook[] wp_filter Stores all of the filters and actions.
+   --
+   -- @param string                      hook_name The name of the filter hook.
+   -- @param callable|string|array|false callback  Optional. The callback to check for.
+   --                                               This function can be called
+   --                                               unconditionally to speculatively
+   --                                               check a callback that may or may
+   --                                               not exist. Default false.
+   -- @return bool|int If `callback` is omitted, returns boolean for whether the hook
+   --                  has anything registered. When checking a specific function, the
+   --                  priority of that hook is returned, or false if the function is
+   --                  not attached.
+   --
+   function Has_Filter (Hook_Name : String;
+                        Callback  : Boolean := False)
+                        return Boolean;
+
+   --
+   -- Returns whether or not a filter hook is currently being processed.
+   --
+   -- The function current_filter() only returns the most recent filter being executed.
+   -- did_filter() returns the number of times a filter has been applied during
+   -- the current request.
+   --
+   -- This function allows detection for any filter currently being executed
+   -- (regardless of whether it's the most recent filter to fire, in the case of
+   -- hooks called from hook callbacks) to be verified.
+   --
+   -- @since 3.9.0
+   --
+   -- @see current_filter()
+   -- @see did_filter()
+   -- @global string[] wp_current_filter Current filter.
+   --
+   -- @param string|null hook_name Optional. Filter hook to check. Defaults to null,
+   --                               which checks if any filter is currently being run.
+   -- @return bool Whether the filter is currently in the stack.
+   --
+   function Doing_Filter (Hook_Name : String := "") -- null
+                          return Boolean;
+
    --
    -- Removes a callback function from a filter hook.
    --
@@ -385,6 +466,11 @@ is
                             Callback  : String;
                             Priority  : Integer := 10)
                             is null;
+   function Remove_Filter (Hook_Name : String;
+                           Callback  : Callable;
+                           Priority  : Integer := 10)
+                           return Boolean
+                           is (False);
 
    --
    -- Calls the callback functions that have been added to an action hook.
@@ -439,6 +525,70 @@ is
                         Arg_3     : List_Type;
                         Tax_2     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
                         is null;
+   procedure Do_Action (Hook_Name : String;
+                        Role      : Inc_Class_Wp_Roles.Wp_Roles)
+                        is null;
+   procedure Do_Action (Hook_Name : String;
+                        Code      : String;
+                        Message   : String;
+                        Data      : String;
+                        Error     : Inc_Class_Wp_Errors.Wp_Error)
+                        is null;
+
+   --
+   -- Removes a callback function from an action hook.
+   --
+   -- This can be used to remove default functions attached to a specific action
+   -- hook and possibly replace them with a substitute.
+   --
+   -- To remove a hook, the `callback` and `priority` arguments must match
+   -- when the hook was added. This goes for both filters and actions. No warning
+   -- will be given on removal failure.
+   --
+   -- @since 1.2.0
+   --
+   -- @param string                hook_name The action hook to which the function to
+   --                                         be removed is hooked.
+   -- @param callable|string|array callback  The name of the function which should be
+   --                                         removed. This function can be called
+   --                                         unconditionally to speculatively remove
+   --                                         a callback that may or may not exist.
+   -- @param int                   priority  Optional. The exact priority used when
+   --                                         adding the original action callback.
+   --                                         Default 10.
+   -- @return bool Whether the function is removed.
+   --
+   function Remove_Action (Hook_Name : String;
+                           Callback  : Callable;
+                           Priority  : Integer := 10)
+                           return Boolean;
+
+   procedure Remove_Action (Hook_Name : String;
+                            Callback  : Callable;
+                            Priority  : Integer := 10);
+
+   --
+   -- Returns whether or not an action hook is currently being processed.
+   --
+   -- The function current_action() only returns the most recent action being executed.
+   -- did_action() returns the number of times an action has been fired during
+   -- the current request.
+   --
+   -- This function allows detection for any action currently being executed
+   -- (regardless of whether it's the most recent action to fire, in the case of
+   -- hooks called from hook callbacks) to be verified.
+   --
+   -- @since 3.9.0
+   --
+   -- @see current_action()
+   -- @see did_action()
+   --
+   -- @param string|null hook_name Optional. Action hook to check. Defaults to null,
+   --                               which checks if any action is currently being run.
+   -- @return bool Whether the action is currently in the stack.
+   --
+   function Doing_Action (Hook_Name : String := "") -- null
+                          return Boolean;
 
    --
    -- @since 2.1.0

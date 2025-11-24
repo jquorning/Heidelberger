@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Inc_Class_Wp_Posts;
+with Inc_Class_Wp_Users;
 
 package Inc_Class_Wpdb
 is
@@ -922,6 +923,15 @@ is
                      Success : out Boolean)
                      return String;
 
+   function Get_Row (Db      : in out Wpdb_Class;
+--                   User    : Integer;
+                     Query   : String  := ""; -- = null,
+                     Output  : String  := ""; -- = OBJECT,
+                     Y       : Natural := 0;
+                     Success : out Boolean)
+                     return Inc_Class_Wp_Users.Wp_User
+                     is (Inc_Class_Wp_Users.Null_User);
+
    --
    -- Retrieves one column from the database.
    --
@@ -1041,5 +1051,13 @@ is
                      Y     : Integer := 0)
                      return String
                      is ("1"); -- "XXX-887"
+
+   --
+   -- To_Array
+   --
+   function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
+                      S  : String)
+                      return Array_Type
+                      is (Empty_Array);
 
 end Inc_Class_Wpdb;

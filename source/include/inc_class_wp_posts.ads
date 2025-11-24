@@ -26,21 +26,21 @@ is
       end record;
 
    Null_Property_Type : constant Property_Type := (Null_Unbounded_String, 0);
---
--- Core class used to implement the WP_Post object.
---
--- @since 3.5.0
---
--- @property string $page_template
---
--- @property-read int[]    $ancestors
--- @property-read int[]    $post_category
--- @property-read string[] $tags_input
---
--- #[AllowDynamicProperties]
--- final class WP_Post {
+
    type Post_Id is new Natural;
 
+   --
+   -- Core class used to implement the WP_Post object.
+   --
+   -- @since 3.5.0
+   --
+   -- @property string $page_template
+   --
+   -- @property-read int[]    $ancestors
+   -- @property-read int[]    $post_category
+   -- @property-read string[] $tags_input
+   --
+   -- #[AllowDynamicProperties]
    type Wp_Post is tagged
       record
          --
@@ -59,7 +59,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Author : Unbounded_String;
+         Post_Author : Integer; -- Unbounded_String;
 
          --
          -- The post's local publication time.
@@ -320,6 +320,7 @@ is
 
    Null_Post : constant Wp_Post :=
      (Id          => 0,
+      Post_Author => 0,
       Post_Parent => 0,
       Menu_Order  => 0,
       Props       => Null_Property_Type,

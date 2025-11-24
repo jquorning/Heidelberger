@@ -10,22 +10,24 @@ is
          declare
             use Array_Maps;
 
-            Rec : constant Array_Record := Element (A);
+            Rec : constant Multi_Type := Element (A);
          begin
             Put ("key: " & Key (A));
             Put ("  kind: " & Rec.Kind'Image);
             case Rec.Kind is
-            when Is_String =>
+            when Kind_String =>
                Put ("  string: " & To_String (Rec.Str));
-            when Is_Integer =>
+            when Kind_Integer =>
                Put ("  integer: " & Rec.Int'Image);
-            when Is_Null =>
+            when Kind_Null =>
                Put ("  null");
-            when Is_Boolean =>
+            when Kind_Boolean =>
                Put ("  boolean: " & Rec.Bool'Image);
-            when Is_Array =>
+            when Kind_Array =>
                Put ("  array");
-            when Is_Callable =>
+            when Kind_List =>
+               Put ("  list");
+            when Kind_Callable =>
                Put ("  callable");
             end case;
             New_Line;

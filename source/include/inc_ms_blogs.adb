@@ -9,9 +9,17 @@
 -- require_once ABSPATH . WPINC . "/ms-site.php";
 -- require_once ABSPATH . WPINC . "/ms-network.php";
 
+with Inc_Capabilities;
+with Inc_Class_Wp_Roles;
+with Inc_Class_Wp_Users;
+with Inc_Load;
+with Inc_Options;
+with Inc_Pluggables;
+with Inc_Plugins;
+
 package body Inc_Ms_Blogs
 is
-   procedure Dummy is null;
+
 -- --
 -- -- Update the last_updated field for the current site.
 -- --
@@ -337,50 +345,47 @@ is
 --         wp_cache_delete( site_id, "blog-details" );
 -- end;
 
--- --
--- -- Retrieve option value for a given blog id based on name of option.
--- --
--- -- If the option does not exist or does not have a value, then the return value
--- -- will be false. This is useful to check whether you need to install an option
--- -- and is commonly used during installation of plugin options and to test
--- -- whether upgrading is required.
--- --
--- -- If the option was serialized then it will be unserialized when it is returned.
--- --
--- -- @since MU (3.0.0)
--- --
--- -- @param int    id      A blog ID. Can be null to refer to the current blog.
--- -- @param string option  Name of option to retrieve. Expected to not be SQL-escaped.
--- -- @param mixed  default Optional. Default value to return if the option does not exist.
--- -- @return mixed Value set for the option.
--- --
--- function get_blog_option( id, option, default = false ) then
---         id = (int) id;
+   ---------------------
+   -- Get_Blog_Option --
+   ---------------------
 
---         if ( empty( id ) ) then
---                 id = get_current_blog_id();
---         end;
+   function Get_Blog_Option (Id      : Integer;
+                             Option  : String;
+                             Default : Array_Type := Empty_Array) -- false
+                             return Array_Type
+   is
+      use Inc_Load;
+      use Inc_Options;
+      use Inc_Plugins;
 
---         if ( get_current_blog_id() == id ) then
---                 return get_option( option, default );
---         end;
+      Id_2 : constant Integer :=
+        (if Id = 0
+         then Get_Current_Blog_Id
+         else Id);
 
---         switch_to_blog( id );
---         value = get_option( option, default );
---         restore_current_blog();
+      Value : Array_Type;
+   begin
+      if Get_Current_Blog_Id = Id_2 then
+         return Get_Option (Option, Default);
+      end if;
 
---         --
---         -- Filters a blog option value.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the blog option name.
---         --
---         -- @since 3.5.0
---         --
---         -- @param string  value The option value.
---         -- @param int     id    Blog ID.
---         --
---         return apply_filters( "blog_option_thenoptionend;", value, id );
--- end;
+      Switch_To_Blog (Id_2);
+      Value := Get_Option (Option, Default);
+      Restore_Current_Blog; -- ()
+
+      --
+      -- Filters a blog option value.
+      --
+      -- The dynamic portion of the hook name, `option`, refers to the blog
+      -- option name.
+      --
+      -- @since 3.5.0
+      --
+      -- @param string  value The option value.
+      -- @param int     id    Blog ID.
+      --
+      return Apply_Filters ("blog_option_" & Option, Value, Id_2);
+   end Get_Blog_Option;
 
 -- --
 -- -- Add a new option for a given blog ID.
@@ -680,26 +685,41 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Switches the initialized roles and current user capabilities to another site.
--- --
--- -- @since 4.9.0
--- --
--- -- @param int new_site_id New site ID.
--- -- @param int old_site_id Old site ID.
--- --
--- function wp_switch_roles_and_user( new_site_id, old_site_id ) then
---         if ( new_site_id == old_site_id ) then
---                 return;
---         end;
+   ------------------------------
+   -- Wp_Switch_Roles_And_User --
+   ------------------------------
 
---         if ( ! did_action( "init" ) ) then
---                 return;
---         end;
+   procedure Wp_Switch_Roles_And_User (New_Site_Id : Integer;
+                                       Old_Site_Id : Integer)
+   is
+      use Inc_Capabilities;
+      use Inc_Pluggables;
+      use Inc_Plugins;
+   begin
+      if New_Site_Id = Old_Site_Id then
+         return;
+      end if;
 
---         wp_roles().for_site( new_site_id );
---         wp_get_current_user().for_site( new_site_id );
--- end;
+      if not Did_Action ("init") then
+         return;
+      end if;
+
+      declare
+         use Inc_Class_Wp_Roles;
+
+         Roles : Wp_Roles := Wp_Roles_X;
+      begin
+         Roles.For_Site (New_Site_Id); -- ()
+      end;
+
+      declare
+         use Inc_Class_Wp_Users;
+
+         User : Wp_User := Wp_Get_Current_User;
+      begin
+         User.For_Site (New_Site_Id); -- ()
+      end;
+   end Wp_Switch_Roles_And_User;
 
 -- --
 -- -- Determines if switch_to_blog() is in effect

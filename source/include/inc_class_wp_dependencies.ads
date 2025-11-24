@@ -196,12 +196,12 @@ is
                       Group     : Integer := 0) -- = false
                       return Boolean;
 
-   function All_Deps (This      : in out Wp_Dependencies;
-                      Handles   : String_Array;
-                      Recursion : Boolean := False;
-                      Group     : Integer := 0) -- = false
-                      return Boolean
-                      is (False);
+   -- function All_Deps (This      : in out Wp_Dependencies;
+   --                    Handles   : String_Array;
+   --                    Recursion : Boolean := False;
+   --                    Group     : Integer := 0) -- = false
+   --                    return Boolean
+   --                    is (False);
 
    --
    -- Register an item.
@@ -334,7 +334,7 @@ is
    --                                 strings).
    --
    procedure Remove (This    : in out Wp_Dependencies;
-                     Handles : String_Array);
+                     Handles : List_Type); -- String_Array);
 
    --
    -- Queue an item or items.
@@ -351,7 +351,7 @@ is
    --                                 of strings).
    --
    procedure Enqueue (This    : in out Wp_Dependencies;
-                      Handles : String_Array);
+                      Handles : List_Type); -- String_Array);
 
    --
    -- Dequeue an item or items.
@@ -366,7 +366,7 @@ is
    --                                 strings).
    --
    procedure Dequeue (This    : in out Wp_Dependencies;
-                      Handles : String_Array);
+                      Handles : List_Type); -- String_Array);
 
    --
    -- Recursively search the passed dependency tree for a handle.

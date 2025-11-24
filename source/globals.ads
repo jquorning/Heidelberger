@@ -78,6 +78,7 @@ is
    WP_DEBUG         : Boolean;
    WP_DEBUG_DISPLAY : Boolean;
    SCRIPT_DEBUG     : Boolean := False;
+   REST_REQUEST     : Boolean := False;
 
    WP_INSTALLING         : Boolean := False;
    WP_REPAIRING          : Boolean := False;
@@ -105,5 +106,19 @@ is
    Action   : Unbounded_String;
    Taxonomy : Unbounded_String;
    Tax      : Inc_Class_Wp_Taxonomy.Wp_Taxonomy; -- := Inc_Class_Wp_Taxonomy.X_Construct;
+
+   KB_IN_BYTES : constant := 1024;
+   MB_IN_BYTES : constant := 1024 * KB_IN_BYTES;
+   GB_IN_BYTES : constant := 1024 * MB_IN_BYTES;
+--         define( "TB_IN_BYTES", 1024 * GB_IN_BYTES );
+--         define( "PB_IN_BYTES", 1024 * TB_IN_BYTES );
+--         define( "EB_IN_BYTES", 1024 * PB_IN_BYTES );
+--         define( "ZB_IN_BYTES", 1024 * EB_IN_BYTES );
+--         define( "YB_IN_BYTES", 1024 * ZB_IN_BYTES );
+
+   ALLOW_UNFILTERED_UPLOADS : constant Boolean := True;
+   DISALLOW_UNFILTERED_HTML : constant Boolean := True;
+   DISALLOW_FILE_EDIT       : constant Boolean := True;
+   DISALLOW_FILE_MODS       : constant Boolean := True;
 
 end Globals;

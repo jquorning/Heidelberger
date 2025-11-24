@@ -8,11 +8,12 @@
 
 with Hb_Common;
 
+with Inc_Caches;
 with Inc_Pluggables;
 
 package body Inc_Users
 is
-   procedure Dummy is null;
+
 -- --
 -- -- Authenticates and logs a user in with 'remember' capability.
 -- --
@@ -1849,31 +1850,34 @@ is
 --         return value;
 -- end;
 
--- --
--- -- Updates all user caches.
--- --
--- -- @since 3.0.0
--- --
--- -- @param object|WP_User user User object or database row to be cached
--- -- @return void|false Void on success, false on failure.
--- --
--- function update_user_caches( user ) then
---         if ( user instanceof WP_User ) then
---                 if ( ! user->exists() ) then
---                         return false;
---                 end;
+   ------------------------
+   -- Update_User_Caches --
+   ------------------------
 
---                 user = user->data;
---         end;
+   procedure Update_User_Caches (User : Inc_Class_Wp_Users.Wp_User)
+   is
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Class_Wp_Users;
 
---         wp_cache_add( user->ID, user, "users" );
---         wp_cache_add( user->user_login, user->ID, "userlogins" );
---         wp_cache_add( user->user_nicename, user->ID, "userslugs" );
+      User_2 : Wp_User := User;
+   begin
+      if User_2 in Wp_User then -- instanceof
+         if not User.Exists then
+            return; -- false;
+         end if;
 
---         if ( ! empty( user->user_email ) ) then
---                 wp_cache_add( user->user_email, user->ID, "useremail" );
---         end;
--- end;
+         User_2 := User.Data.all;
+      end if;
+
+--    Wp_Cache_Add (User_2.Id'Image, User_2, "users");
+      Wp_Cache_Add (-User_2.Prop.User_Login, User_2.Id, "userlogins");
+      Wp_Cache_Add (-User_2.Prop.User_Nicename, User_2.Id, "userslugs");
+
+      if not Empty (-User_2.Prop.User_Email) then
+         Wp_Cache_Add (-User_2.Prop.User_Email, User_2.Id, "useremail");
+      end if;
+   end Update_User_Caches;
 
 -- --
 -- -- Cleans all user caches.
@@ -3458,7 +3462,7 @@ is
 
       Cookie : constant Array_Type := Wp_Parse_Auth_Cookie ("", "logged_in");
    begin
-      return (if not Isset (Cookie, "token") then Get (Cookie, "token") else "");
+      return (if not Isset (Cookie, "token") then As_String (Get (Cookie, "token")) else "");
 --    return (if not Empty (Cookie ("token")) then Get (Cookie, "token") else "");
    end Wp_Get_Session_Token;
 

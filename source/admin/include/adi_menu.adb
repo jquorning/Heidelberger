@@ -246,7 +246,7 @@ is
                   use Inner_Maps;
 
                   Subs       : constant Map       := Submenu (-Data.Menu_Slug);
-                  First_Sub  : constant Cursor    := Subs.First;
+                  First_Sub  : constant Inner_Maps.Cursor := Subs.First;
                   Old_Parent : constant Slug_Type := -Data.Menu_Slug;
                   New_Parent : constant Slug_Type := -Element (First_Sub).Menu_Slug;
                begin
@@ -255,8 +255,9 @@ is
                   -- make the first submenu the new parent.
                   --
                   if New_Parent /= Old_Parent then
-                     X_Wp_Real_Parent_File.Include (Key      => String (Old_Parent),
-                                                    New_Item => String (New_Parent));
+                     Set (X_Wp_Real_Parent_File,
+                          Key   => String (Old_Parent),
+                          Value => From_String (String (New_Parent)));
 --                   X_Wp_Real_Parent_File (Old_Parent) := New_Parent;
                      Menu (Id).Menu_Slug                := +New_Parent; -- (2)
 --                   Menu (Id) (2)                      := New_Parent;
@@ -354,7 +355,7 @@ is
                      use Inner_Maps;
 
                      Subs      : constant Map    := Submenu (Slug); -- (2)
-                     First_Sub : constant Cursor := Subs.First; -- Reset (Subs);
+                     First_Sub : constant Inner_Maps.Cursor := Subs.First; -- Reset (Subs);
                   begin
                      if Data.Menu_Slug = Element (First_Sub).Menu_Slug then -- 2x(2)
                         Submenu.Delete (Slug);   -- (2)

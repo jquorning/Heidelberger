@@ -14,6 +14,7 @@
 -- @package WordPress
 --
 
+with Arrays.IO;
 with Arrays;
 with Binder;
 with Globals;
@@ -34,11 +35,12 @@ is
 
    procedure Run
    is
+      use Arrays;
       use Binder;
       use Php;
       use Inc_Load;
 
-      Php_Self : constant String := Get (X_SERVER, "PHP_SELF");
+      Php_Self : constant String := As_String (Get (X_SERVER, "PHP_SELF"));
       Self_Matches : Arrays.List_Type;
       Unused : Integer;
    begin
@@ -99,7 +101,7 @@ is
          declare
             use Inc_Plugins;
 
-            Http_User_Agent : constant String := Get (X_SERVER, "HTTP_USER_AGENT");
+            Http_User_Agent : constant String := As_String (Get (X_SERVER, "HTTP_USER_AGENT"));
             Is_Admin : Boolean;
          begin
             if Strpos (Http_User_Agent, "Lynx") /= 0 then
@@ -153,7 +155,7 @@ is
       end if;
 
       declare
-         Http_User_Agent : constant String := Get (X_SERVER, "HTTP_USER_AGENT");
+         Http_User_Agent : constant String := As_String (Get (X_SERVER, "HTTP_USER_AGENT"));
       begin
          if
            Is_Safari and then Stripos (Http_User_Agent, "mobile") /= 0
@@ -166,7 +168,7 @@ is
 
       -- Server detection.
       declare
-         Server_Software : constant String := Get (X_SERVER, "SERVER_SOFTWARE");
+         Server_Software : constant String := As_String (Get (X_SERVER, "SERVER_SOFTWARE"));
       begin
          --
          -- Whether the server software is Apache or something else
@@ -209,9 +211,10 @@ is
    function Wp_Is_Mobile
             return Boolean
    is
+      use Arrays;
       use Php;
 
-      Http_User_Agent : constant String := Get (Binder.X_SERVER, "HTTP_USER_AGENT");
+      Http_User_Agent : constant String := As_String (Get (Binder.X_SERVER, "HTTP_USER_AGENT"));
       Is_Mobile : Boolean;
    begin
       if Empty (Http_User_Agent) then

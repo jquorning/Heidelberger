@@ -373,7 +373,7 @@ is
    is
       use Inc_Class_Wp_Scripts;
       use Inc_Class_Wp_Dependencies;
-      use String_Vectors;
+--    use String_Vectors;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
       declare
@@ -397,8 +397,7 @@ is
                end if;
             end;
          end if;
-         Scripts.Enqueue (To_Vector (New_Item => Handle,
-                                     Length   => 1));
+         Scripts.Enqueue (To_List (Handle));
       end;
    end Wp_Enqueue_Script;
 

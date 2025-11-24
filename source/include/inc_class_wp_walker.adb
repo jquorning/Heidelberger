@@ -70,8 +70,8 @@ is
       end if;
 
       declare
-         Id_Field : String := Get (This.DB_Fields, "id");
-         Id       : constant String := Get (Element, "term_id"); -- Element.Id_Field;
+         Id_Field : String := As_String (Get (This.DB_Fields, "id"));
+         Id       : constant String := As_String (Get (Element, "term_id"));
          Newlevel     : Boolean;
          Newlevel_Set : Boolean := False;
       begin
@@ -90,7 +90,7 @@ is
            (0 = Max_Depth or else Max_Depth > Depth + 1) and then
            Isset (Children_Elements, Id)
          then
-            for A in Get_Array (Children_Elements, Id).Iterate loop
+            for A in As_Array (Get (Children_Elements, Id)).Iterate loop
 --          for Child of Get_Array (Children_Elements, Id) loop
                declare
                   Child : Array_Type; -- String := Array_Maps.Key (A);
@@ -106,7 +106,7 @@ is
                                         Depth + 1, Args, Output);
                end;
             end loop;
-            Children_Elements.Delete (Id);
+            Delete (Ref (Children_Elements, Id));
 --          Unset (Children_Elements (Id));
          end if;
 
@@ -137,7 +137,6 @@ is
 
       Output : Unbounded_String;
    begin
-Put_Line ("#4-1");
       -- Invalid parameter or nothing to walk.
       if
         Max_Depth < -1 or else
@@ -147,19 +146,19 @@ Put_Line ("#4-1");
       then
          return -Output;
       end if;
-Put_Line ("#4-2");
       -- Flat display.
       if -1 = Max_Depth then
          declare
             Empty_Array : Array_Type;
          begin
-            for E of Elements loop
-               This.Display_Element (E.Arry.all, Empty_Array, 1, 0, Args, Output);
+            for E in Elements.Iterate loop
+               This.Display_Element (As_Array (Element (E)), Empty_Array,
+                                     1, 0, Args, Output);
             end loop;
             return -Output;
          end;
       end if;
-Put_Line ("#4-3");
+
       --
       -- Need to display in hierarchical order.
       -- Separate elements into two buckets: top level and children elements.
@@ -167,22 +166,26 @@ Put_Line ("#4-3");
       -- Children_elements[10][] contains all sub-elements whose parent is 10.
       --
       declare
-         Parent_Field : constant String := Get (This.DB_Fields, "parent");
+         Parent_Field : constant String := As_String (Get (This.DB_Fields, "parent"));
          Top_Level_Elements : Array_Type;
          Children_Elements  : Array_Type;
       begin
-         for E of Elements loop
-            if Empty (E.Arry.all, Parent_Field) then
---          if Empty (E.Parent_Field) then
-               Set_Array (Top_Level_Elements, Key => "XXX-994", Value => E.Arry.all);
---             Top_Level_Elements.Append (E.Arry.all);
-            else
-               Children_Elements.Include (Key      => Parent_Field,
-                                          New_Item => E);
---             Children_Elements (E.Parent_Field).Append (E);
-            end if;
+         for E_2 in Elements.Iterate loop
+            declare
+               E : constant Multi_Type := Arrays.Element (E_2);
+            begin
+               if Empty (As_Array (E), Parent_Field) then
+--             if Empty (E.Parent_Field) then
+                  Append (Top_Level_Elements, E);
+--                Top_Level_Elements.Append (E.Arry.all);
+               else
+                  Append (Children_Elements, Parent_Field,
+                          Value => E);
+--                Children_Elements (E.Parent_Field).Append (E);
+               end if;
+            end;
          end loop;
-Put_Line ("#4-4");
+
          --
          -- When none of the elements is top level.
          -- Assume the first one must be root of the sub elements.
@@ -190,32 +193,38 @@ Put_Line ("#4-4");
          if Empty (Top_Level_Elements) then
             declare
                First : constant Array_Type := Php.Array_Slice (Elements, 0, 1);
-               Root  : constant String     := -First.First_Element.Str; -- [0];
+               Root  : constant String     := As_String (First.First_Element); -- [0];
 
                Top_Level_Elements : Array_Type;
                Children_Elements  : Array_Type;
             begin
-               for E of Elements loop
-                  if Get (Root, Parent_Field) = Get (E.Arry.all, Parent_Field) then
---                if Root.Parent_Field = E.Parent_Field then
-                     Set_Array (Top_Level_Elements,
-                                Key   => "XXX-993",
-                                Value => E.Arry.all);
---                   Top_Level_Elements.Append (E);
-                  else
-                     Children_Elements.Include (Key      => Parent_Field,
-                                                New_Item => E);
---                   Children_Elements (E.Parent_Field).Append (E);
-                  end if;
+               for E_2 in Elements.Iterate loop
+                  declare
+                     E : constant Multi_Type := Arrays.Element (E_2);
+                  begin
+                     if
+                       Get (Root, Parent_Field) =
+                       As_String (Get (As_Array (E), Parent_Field))
+                     then
+--                   if Root.Parent_Field = E.Parent_Field then
+                        Append (Top_Level_Elements,
+                                Value => From_Array (As_Array (E)));
+--                      Top_Level_Elements.Append (E);
+                     else
+                        Append (Children_Elements, Parent_Field,
+                                Value => E);
+--                      Children_Elements (E.Parent_Field).Append (E);
+                     end if;
+                  end;
                end loop;
             end;
          end if;
-Put_Line ("#4-5");
-         for E of Top_Level_Elements loop
+
+         for E in Top_Level_Elements.Iterate loop
             This.Display_Element
-              (E.Arry.all, Children_Elements, Max_Depth, 0, Args, Output);
+              (As_Array (Element (E)), Children_Elements, Max_Depth, 0, Args, Output);
          end loop;
-Put_Line ("#4-6");
+
          --
          -- If we are displaying all levels, and remaining children_elements is not
          -- empty, then we got orphans, which should be displayed regardless.
@@ -224,15 +233,15 @@ Put_Line ("#4-6");
             declare
                Empty_Array : Array_Type;
             begin
-               for Orphans of Children_Elements loop
-                  for Op of Orphans.Arry.all loop
-                     This.Display_Element (Op.Arry.all, Empty_Array, 1, 0,
+               for Orphans in Children_Elements.Iterate loop
+                  for Op in As_Array (Element (Orphans)).Iterate loop
+                     This.Display_Element (As_Array (Element (Op)), Empty_Array, 1, 0,
                                            Args, Output);
                   end loop;
                end loop;
             end;
          end if;
-Put_Line ("#4-7");
+
          return -Output;
       end;
    end Walk;

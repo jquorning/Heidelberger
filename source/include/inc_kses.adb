@@ -29,9 +29,35 @@
 -- @subpackage KSES
 --
 
-package body Inc_Kses
+with Ada.Strings.Unbounded;
+
+with Hb_Common;
+with Php;
+
+with Inc_Functions;
+with Inc_Plugins;
+
+package body Inc_KSES
 is
-   procedure Dummy is null;
+
+   function Apply_Filters (Hook      : String;
+                           Value     : String;
+                           HTML      : Array_Type;
+                           Protocols : List_Type)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook    : String;
+                           HTML    : Array_Type;
+                           Context : String)
+                           return Array_Type
+                           is (HTML);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Boolean;
+                           A     : String)
+                           return Boolean
+                           is (Value);
 
 -- --
 -- -- Specifies the default allowable HTML tags.
@@ -692,38 +718,34 @@ is
 --         $allowedposttags = wp_kses_array_lc( $allowedposttags );
 -- end;
 
--- --
--- -- Filters text content and strips out disallowed HTML.
--- --
--- -- This function makes sure that only the allowed HTML element names, attribute
--- -- names, attribute values, and HTML entities will occur in the given text string.
--- --
--- -- This function expects unslashed data.
--- --
--- -- @see wp_kses_post() for specifically filtering post content and fields.
--- -- @see wp_allowed_protocols() for the default allowed protocols in link URLs.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string         $string            Text content to filter.
--- -- @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
--- --                                          or a context name such as "post". See wp_kses_allowed_html()
--- --                                          for the list of accepted context names.
--- -- @param string[]       $allowed_protocols Optional. Array of allowed URL protocols.
--- --                                          Defaults to the result of wp_allowed_protocols().
--- -- @return string Filtered content containing only the allowed HTML.
--- --
--- function wp_kses( $string, $allowed_html, $allowed_protocols = array() ) then
---         if ( empty( $allowed_protocols ) ) then
---                 $allowed_protocols = wp_allowed_protocols();
---         end;
+   -------------
+   -- Wp_KSES --
+   -------------
 
---         $string = wp_kses_no_null( $string, array( "slash_zero" => "keep" ) );
---         $string = wp_kses_normalize_entities( $string );
---         $string = wp_kses_hook( $string, $allowed_html, $allowed_protocols );
+   function Wp_KSES (Item              : String;
+                     Allowed_HTML      : Array_Type;
+                     Allowed_Protocols : List_Type := Empty_List)
+                     return String
+   is
+      use Inc_Functions;
 
---         return wp_kses_split( $string, $allowed_html, $allowed_protocols );
--- end;
+      Allowed_Protocols_2 : constant List_Type :=
+        (if Allowed_Protocols.Is_Empty
+         then Wp_Allowed_Protocols
+         else Allowed_Protocols);
+
+      String_3 : constant String :=
+        Wp_KSES_No_Null (Item, To_Array (List => (1 =>
+                                 Build ("slash_zero", "keep"))));
+
+      String_2 : constant String :=
+        Wp_KSES_Normalize_Entities (String_3);
+
+      String_1 : constant String :=
+        Wp_KSES_Hook (String_2, Allowed_HTML, Allowed_Protocols);
+   begin
+      return Wp_KSES_Split (String_1, Allowed_HTML, Allowed_Protocols);
+   end Wp_KSES;
 
 -- --
 -- -- Filters one HTML attribute and ensures its value is allowed.
@@ -798,120 +820,115 @@ is
 --         return $lead . $string . $trail;
 -- end;
 
--- --
--- -- Returns an array of allowed HTML tags and attributes for a given context.
--- --
--- -- @since 3.5.0
--- -- @since 5.0.1 `form` removed as allowable HTML tag.
--- --
--- -- @global array $allowedposttags
--- -- @global array $allowedtags
--- -- @global array $allowedentitynames
--- --
--- -- @param string|array $context The context for which to retrieve tags. Allowed values are "post",
--- --                              "strip", "data", "entities", or the name of a field filter such as
--- --                              "pre_user_description", or an array of allowed HTML elements and attributes.
--- -- @return array Array of allowed HTML tags and their allowed attributes.
--- --
--- function wp_kses_allowed_html( $context = "" ) then
---         global $allowedposttags, $allowedtags, $allowedentitynames;
+   --------------------------
+   -- Wp_KSES_Allowed_HTML --
+   --------------------------
 
---         if ( is_array( $context ) ) then
---                 // When `$context` is an array it"s actually an array of allowed HTML elements and attributes.
---                 $html    = $context;
---                 $context = "explicit";
+   function Wp_KSES_Allowed_HTML (Context : Array_Type := Empty_Array) -- ""
+                                  return Array_Type
+   is
+      use Php;
+--        global $allowedposttags, $allowedtags, $allowedentitynames;
+   begin
+      if Is_Array (Context) then
+         declare
+            -- When `$context` is an array it's actually an array of allowed HTML
+            -- elements and attributes.
+            HTML    : constant Array_Type := Context;
+            Context : constant String     := "explicit";
 
---                 --
---                 -- Filters the HTML tags that are allowed for a given context.
---                 --
---                 -- HTML tags and attribute names are case-insensitive in HTML but must be
---                 -- added to the KSES allow list in lowercase. An item added to the allow list
---                 -- in upper or mixed case will not recognized as permitted by KSES.
---                 --
---                 -- @since 3.5.0
---                 --
---                 -- @param array[] $html    Allowed HTML tags.
---                 -- @param string  $context Context name.
---                 --
---                 return apply_filters( "wp_kses_allowed_html", $html, $context );
---         end;
+            --
+            -- Filters the HTML tags that are allowed for a given context.
+            --
+            -- HTML tags and attribute names are case-insensitive in HTML but must be
+            -- added to the KSES allow list in lowercase. An item added to the allow
+            -- list in upper or mixed case will not recognized as permitted by KSES.
+            --
+            -- @since 3.5.0
+            --
+            -- @param array[] $html    Allowed HTML tags.
+            -- @param string  $context Context name.
+            --
+         begin
+            return Apply_Filters ("wp_kses_allowed_html", HTML, Context);
+         end;
+      end if;
 
---         switch ( $context ) then
---                 case "post":
---                         -- This filter is documented in wp-includes/kses.php--
---                         $tags = apply_filters( "wp_kses_allowed_html", $allowedposttags, $context );
+      return Empty_Array; -- added
 
---                         // 5.0.1 removed the `<form>` tag, allow it if a filter is allowing it"s sub-elements `<input>` or `<select>`.
---                         if ( ! CUSTOM_TAGS && ! isset( $tags["form"] ) && ( isset( $tags["input"] ) || isset( $tags["select"] ) ) ) then
---                                 $tags = $allowedposttags;
+        -- switch ( $context ) then
+        --         case "post":
+        --                 -- This filter is documented in wp-includes/kses.php--
+        --                 $tags = apply_filters( "wp_kses_allowed_html", $allowedposttags, $context );
 
---                                 $tags["form"] = array(
---                                         "action"         => true,
---                                         "accept"         => true,
---                                         "accept-charset" => true,
---                                         "enctype"        => true,
---                                         "method"         => true,
---                                         "name"           => true,
---                                         "target"         => true,
---                                 );
+        --                 -- 5.0.1 removed the `<form>` tag, allow it if a filter is allowing it's sub-elements `<input>` or `<select>`.
+        --                 if ( ! CUSTOM_TAGS && ! isset( $tags["form"] ) && ( isset( $tags["input"] ) || isset( $tags["select"] ) ) ) then
+        --                         $tags = $allowedposttags;
 
---                                 -- This filter is documented in wp-includes/kses.php--
---                                 $tags = apply_filters( "wp_kses_allowed_html", $tags, $context );
---                         end;
+        --                         $tags["form"] = array(
+        --                                 "action"         => true,
+        --                                 "accept"         => true,
+        --                                 "accept-charset" => true,
+        --                                 "enctype"        => true,
+        --                                 "method"         => true,
+        --                                 "name"           => true,
+        --                                 "target"         => true,
+        --                         );
 
---                         return $tags;
+        --                         -- This filter is documented in wp-includes/kses.php--
+        --                         $tags = apply_filters( "wp_kses_allowed_html", $tags, $context );
+        --                 end;
 
---                 case "user_description":
---                 case "pre_user_description":
---                         $tags             = $allowedtags;
---                         $tags["a"]["rel"] = true;
---                         -- This filter is documented in wp-includes/kses.php--
---                         return apply_filters( "wp_kses_allowed_html", $tags, $context );
+        --                 return $tags;
 
---                 case "strip":
---                         -- This filter is documented in wp-includes/kses.php--
---                         return apply_filters( "wp_kses_allowed_html", array(), $context );
+        --         case "user_description":
+        --         case "pre_user_description":
+        --                 $tags             = $allowedtags;
+        --                 $tags["a"]["rel"] = true;
+        --                 -- This filter is documented in wp-includes/kses.php--
+        --                 return apply_filters( "wp_kses_allowed_html", $tags, $context );
 
---                 case "entities":
---                         -- This filter is documented in wp-includes/kses.php--
---                         return apply_filters( "wp_kses_allowed_html", $allowedentitynames, $context );
+        --         case "strip":
+        --                 -- This filter is documented in wp-includes/kses.php--
+        --                 return apply_filters( "wp_kses_allowed_html", array(), $context );
 
---                 case "data":
---                 default:
---                         -- This filter is documented in wp-includes/kses.php--
---                         return apply_filters( "wp_kses_allowed_html", $allowedtags, $context );
---         end;
--- end;
+        --         case "entities":
+        --                 -- This filter is documented in wp-includes/kses.php--
+        --                 return apply_filters( "wp_kses_allowed_html", $allowedentitynames, $context );
 
--- --
--- -- You add any KSES hooks here.
--- --
--- -- There is currently only one KSES WordPress hook, then@see "pre_kses"end;, and it is called here.
--- -- All parameters are passed to the hooks and expected to receive a string.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string         $string            Content to filter through KSES.
--- -- @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
--- --                                          or a context name such as "post". See wp_kses_allowed_html()
--- --                                          for the list of accepted context names.
--- -- @param string[]       $allowed_protocols Array of allowed URL protocols.
--- -- @return string Filtered content through then@see "pre_kses"end; hook.
--- --
--- function wp_kses_hook( $string, $allowed_html, $allowed_protocols ) then
---         --
---         -- Filters content to be run through KSES.
---         --
---         -- @since 2.3.0
---         --
---         -- @param string         $string            Content to filter through KSES.
---         -- @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
---         --                                          or a context name such as "post". See wp_kses_allowed_html()
---         --                                          for the list of accepted context names.
---         -- @param string[]       $allowed_protocols Array of allowed URL protocols.
---         --
---         return apply_filters( "pre_kses", $string, $allowed_html, $allowed_protocols );
--- end;
+        --         case "data":
+        --         default:
+        --                 -- This filter is documented in wp-includes/kses.php--
+        --                 return apply_filters( "wp_kses_allowed_html", $allowedtags, $context );
+        -- end;
+   end Wp_KSES_Allowed_HTML;
+
+   ------------------
+   -- Wp_KSES_Hook --
+   ------------------
+
+   function Wp_KSES_Hook (Item              : String;
+                          Allowed_HTML      : Array_Type;
+                          Allowed_Protocols : List_Type)
+                          return String
+   is
+      use Inc_Plugins;
+   begin
+      --
+      -- Filters content to be run through KSES.
+      --
+      -- @since 2.3.0
+      --
+      -- @param string         $string            Content to filter through KSES.
+      -- @param array[]|string $allowed_html      An array of allowed HTML elements
+      --                                          and attributes, or a context name
+      --                                          such as "post". See
+      --                                          wp_kses_allowed_html() for the list
+      --                                          of accepted context names.
+      -- @param string[]       $allowed_protocols Array of allowed URL protocols.
+      --
+      return Apply_Filters ("pre_kses", Item, Allowed_HTML, Allowed_Protocols);
+   end Wp_KSES_Hook;
 
 -- --
 -- -- Returns the version number of KSES.
@@ -924,505 +941,545 @@ is
 --         return "0.2.2";
 -- end;
 
--- --
--- -- Searches for HTML tags, no matter how malformed.
--- --
--- -- It also matches stray `>` characters.
--- --
--- -- @since 1.0.0
--- --
--- -- @global array[]|string $pass_allowed_html      An array of allowed HTML elements and attributes,
--- --                                                or a context name such as "post".
--- -- @global string[]       $pass_allowed_protocols Array of allowed URL protocols.
--- --
--- -- @param string         $string            Content to filter.
--- -- @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
--- --                                          or a context name such as "post". See wp_kses_allowed_html()
--- --                                          for the list of accepted context names.
--- -- @param string[]       $allowed_protocols Array of allowed URL protocols.
--- -- @return string Content with fixed HTML tags
--- --
--- function wp_kses_split( $string, $allowed_html, $allowed_protocols ) then
---         global $pass_allowed_html, $pass_allowed_protocols;
+   Pass_Allowed_HTML      : Array_Type;
+   Pass_Allowed_Protocols : List_Type;
 
---         $pass_allowed_html      = $allowed_html;
---         $pass_allowed_protocols = $allowed_protocols;
+   -------------------
+   -- Wp_KSES_Split --
+   -------------------
 
---         return preg_replace_callback( "%(<!--.*?(-->|$))|(<[^>]*(>|$)|>)%", "_wp_kses_split_callback", $string );
--- end;
+   function Wp_KSES_Split (Item              :  String;
+                           Allowed_HTML      : Array_Type;
+                           Allowed_Protocols : List_Type)
+                           return String
+   is
+      use Php;
+   begin
+      Pass_Allowed_HTML      := Allowed_HTML;
+      Pass_Allowed_Protocols := Allowed_Protocols;
 
--- --
--- -- Returns an array of HTML attribute names whose value contains a URL.
--- --
--- -- This function returns a list of all HTML attributes that must contain
--- -- a URL according to the HTML specification.
--- --
--- -- This list includes URI attributes both allowed and disallowed by KSES.
--- --
--- -- @link https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
--- --
--- -- @since 5.0.1
--- --
--- -- @return string[] HTML attribute names whose value contains a URL.
--- --
--- function wp_kses_uri_attributes() then
---         $uri_attributes = array(
---                 "action",
---                 "archive",
---                 "background",
---                 "cite",
---                 "classid",
---                 "codebase",
---                 "data",
---                 "formaction",
---                 "href",
---                 "icon",
---                 "longdesc",
---                 "manifest",
---                 "poster",
---                 "profile",
---                 "src",
---                 "usemap",
---                 "xmlns",
---         );
+      return Preg_Replace_Callback ("%(<!--.*?(-->|$))|(<[^>]*(>|$)|>)%",
+                                    X_Wp_KSES_Split_Callback'Access, Item);
+   end Wp_KSES_Split;
 
---         --
---         -- Filters the list of attributes that are required to contain a URL.
---         --
---         -- Use this filter to add any `data-` attributes that are required to be
---         -- validated as a URL.
---         --
---         -- @since 5.0.1
---         --
---         -- @param string[] $uri_attributes HTML attribute names whose value contains a URL.
---         --
---         $uri_attributes = apply_filters( "wp_kses_uri_attributes", $uri_attributes );
+   ----------------------------
+   -- Wp_KSES_URI_Attributes --
+   ----------------------------
 
---         return $uri_attributes;
--- end;
+   function Wp_KSES_URI_Attributes
+            return List_Type
+   is
+      use Hb_Common;
+      use Inc_Plugins;
 
--- --
--- -- Callback for `wp_kses_split()`.
--- --
--- -- @since 3.1.0
--- -- @access private
--- -- @ignore
--- --
--- -- @global array[]|string $pass_allowed_html      An array of allowed HTML elements and attributes,
--- --                                                or a context name such as "post".
--- -- @global string[]       $pass_allowed_protocols Array of allowed URL protocols.
--- --
--- -- @param array $match preg_replace regexp matches
--- -- @return string
--- --
--- function _wp_kses_split_callback( $match ) then
---         global $pass_allowed_html, $pass_allowed_protocols;
+      URI_Attributes_2 : constant List_Type := To_List (List => (
+                +"action",
+                +"archive",
+                +"background",
+                +"cite",
+                +"classid",
+                +"codebase",
+                +"data",
+                +"formaction",
+                +"href",
+                +"icon",
+                +"longdesc",
+                +"manifest",
+                +"poster",
+                +"profile",
+                +"src",
+                +"usemap",
+                +"xmlns"
+      ));
 
---         return wp_kses_split2( $match[0], $pass_allowed_html, $pass_allowed_protocols );
--- end;
+      --
+      -- Filters the list of attributes that are required to contain a URL.
+      --
+      -- Use this filter to add any `data-` attributes that are required to be
+      -- validated as a URL.
+      --
+      -- @since 5.0.1
+      --
+      -- @param string[] $uri_attributes HTML attribute names whose value contains
+      --                                  a URL.
+      --
+      URI_Attributes : constant List_Type :=
+        Apply_Filters ("wp_kses_uri_attributes", URI_Attributes_2);
+   begin
+      return URI_Attributes;
+   end Wp_KSES_URI_Attributes;
 
--- --
--- -- Callback for `wp_kses_split()` for fixing malformed HTML tags.
--- --
--- -- This function does a lot of work. It rejects some very malformed things like
--- -- `<:::>`. It returns an empty string, if the element isn"t allowed (look ma, no
--- -- `strip_tags()`!). Otherwise it splits the tag into an element and an attribute
--- -- list.
--- --
--- -- After the tag is split into an element and an attribute list, it is run
--- -- through another filter which will remove illegal attributes and once that is
--- -- completed, will be returned.
--- --
--- -- @access private
--- -- @ignore
--- -- @since 1.0.0
--- --
--- -- @param string         $string            Content to filter.
--- -- @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
--- --                                          or a context name such as "post". See wp_kses_allowed_html()
--- --                                          for the list of accepted context names.
--- -- @param string[]       $allowed_protocols Array of allowed URL protocols.
--- -- @return string Fixed HTML element
--- --
--- function wp_kses_split2( $string, $allowed_html, $allowed_protocols ) then
---         $string = wp_kses_stripslashes( $string );
+   ------------------------------
+   -- X_Wp_KSES_Split_Callback --
+   ------------------------------
 
---         // It matched a ">" character.
---         if ( "<" !== substr( $string, 0, 1 ) ) then
---                 return "&gt;";
---         end;
+   function X_Wp_KSES_Split_Callback (Match : List_Type)
+                                      return String
+   is
+      use Hb_Common;
+   begin
+      return
+        Wp_KSES_Split2 (-Match.First_Element, -- (0),
+                        Pass_Allowed_HTML,
+                        Pass_Allowed_Protocols);
 
---         // Allow HTML comments.
---         if ( "<!--" === substr( $string, 0, 4 ) ) then
---                 $string = str_replace( array( "<!--", "-->" ), "", $string );
---                 while ( ( $newstring = wp_kses( $string, $allowed_html, $allowed_protocols ) ) != $string ) then
---                         $string = $newstring;
---                 end;
---                 if ( "" === $string ) then
---                         return "";
---                 end;
---                 // Prevent multiple dashes in comments.
---                 $string = preg_replace( "/--+/", "-", $string );
---                 // Prevent three dashes closing a comment.
---                 $string = preg_replace( "/-$/", "", $string );
---                 return "<!--then$stringend;-->";
---         end;
+   end X_Wp_KSES_Split_Callback;
 
---         // It"s seriously malformed.
---         if ( ! preg_match( "%^<\s*(/\s*)?([a-zA-Z0-9-]+)([^>]*)>?$%", $string, $matches ) ) then
---                 return "";
---         end;
+   --------------------
+   -- Wp_KSES_Split2 --
+   --------------------
 
---         $slash    = trim( $matches[1] );
---         $elem     = $matches[2];
---         $attrlist = $matches[3];
+   function Wp_KSES_Split2 (Item              : String;
+                            Allowed_HTML      : Array_Type;
+                            Allowed_Protocols : List_Type)
+                            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
 
---         if ( ! is_array( $allowed_html ) ) then
---                 $allowed_html = wp_kses_allowed_html( $allowed_html );
---         end;
+      String_2  : Unbounded_String := +Wp_KSES_Stripslashes (Item);
+      Newstring : Unbounded_String;
+   begin
+      -- It matched a ">" character.
+      if "<" /= Substr (-String_2, 0, 1) then
+         return "&gt;";
+      end if;
 
---         // They are using a not allowed HTML element.
---         if ( ! isset( $allowed_html[ strtolower( $elem ) ] ) ) then
---                 return "";
---         end;
+      -- Allow HTML comments.
+      if "<!--" = Substr (-String_2, 0, 4) then
+         String_2 := +Str_Replace (To_List (List => (+"<!--", +"-->")), "", -String_2);
 
---         // No attributes are allowed for closing elements.
---         if ( "" !== $slash ) then
---                 return "</$elem>";
---         end;
+         loop
+            Newstring := +Wp_KSES (-String_2, Allowed_HTML, Allowed_Protocols);
+            exit when Newstring /= String_2;
+            String_2 := Newstring;
+         end loop;
 
---         return wp_kses_attr( $elem, $attrlist, $allowed_html, $allowed_protocols );
--- end;
+         if "" = String_2 then
+            return "";
+         end if;
 
--- --
--- -- Removes all attributes, if none are allowed for this element.
--- --
--- -- If some are allowed it calls `wp_kses_hair()` to split them further, and then
--- -- it builds up new HTML code from the data that `wp_kses_hair()` returns. It also
--- -- removes `<` and `>` characters, if there are any left. One more thing it does
--- -- is to check if the tag has a closing XHTML slash, and if it does, it puts one
--- -- in the returned code as well.
--- --
--- -- An array of allowed values can be defined for attributes. If the attribute value
--- -- doesn"t fall into the list, the attribute will be removed from the tag.
--- --
--- -- Attributes can be marked as required. If a required attribute is not present,
--- -- KSES will remove all attributes from the tag. As KSES doesn"t match opening and
--- -- closing tags, it"s not possible to safely remove the tag itself, the safest
--- -- fallback is to strip all attributes from the tag, instead.
--- --
--- -- @since 1.0.0
--- -- @since 5.9.0 Added support for an array of allowed values for attributes.
--- --              Added support for required attributes.
--- --
--- -- @param string         $element           HTML element/tag.
--- -- @param string         $attr              HTML attributes from HTML element to closing HTML element tag.
--- -- @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
--- --                                          or a context name such as "post". See wp_kses_allowed_html()
--- --                                          for the list of accepted context names.
--- -- @param string[]       $allowed_protocols Array of allowed URL protocols.
--- -- @return string Sanitized HTML element.
--- --
--- function wp_kses_attr( $element, $attr, $allowed_html, $allowed_protocols ) then
---         if ( ! is_array( $allowed_html ) ) then
---                 $allowed_html = wp_kses_allowed_html( $allowed_html );
---         end;
+         -- Prevent multiple dashes in comments.
+         String_2 := +Preg_Replace ("/--+/", "-", -String_2);
 
---         // Is there a closing XHTML slash at the end of the attributes?
---         $xhtml_slash = "";
---         if ( preg_match( "%\s*/\s*$%", $attr ) ) then
---                 $xhtml_slash = " /";
---         end;
+         -- Prevent three dashes closing a comment.
+         String_2 := +Preg_Replace ("/-$/", "", -String_2);
+         return "<!--" & (-String_2) & "-->";
+      end if;
 
---         // Are any attributes allowed at all for this element?
---         $element_low = strtolower( $element );
---         if ( empty( $allowed_html[ $element_low ] ) || true === $allowed_html[ $element_low ] ) then
---                 return "<$element$xhtml_slash>";
---         end;
+      -- It's seriously malformed.
+      declare
+         Matches : List_Type;
+         Num     : constant Integer :=
+           Preg_Match ("%^<\s*(/\s*)?([a-zA-Z0-9-]+)([^>]*)>?$%",
+                       -String_2, Matches);
+      begin
+         if Num = 0 then
+            return "";
+         end if;
 
---         // Split it.
---         $attrarr = wp_kses_hair( $attr, $allowed_protocols );
+         declare
+            Slash    : constant String := Trim (-Matches (1));
+            Elem     : constant String := -Matches (2);
+            Attrlist : constant String := -Matches (3);
 
---         // Check if there are attributes that are required.
---         $required_attrs = array_filter(
---                 $allowed_html[ $element_low ],
---                 function( $required_attr_limits ) then
---                         return isset( $required_attr_limits["required"] ) && true === $required_attr_limits["required"];
---                 end;
---         );
+            Allowed_HTML_2 : constant Array_Type :=
+              (if not Is_Array (Allowed_HTML)
+               then Wp_KSES_Allowed_HTML (Allowed_HTML)
+               else Allowed_HTML);
+         begin
 
---         /*
---         -- If a required attribute check fails, we can return nothing for a self-closing tag,
---         -- but for a non-self-closing tag the best option is to return the element with attributes,
---         -- as KSES doesn"t handle matching the relevant closing tag.
---         --
---         $stripped_tag = "";
---         if ( empty( $xhtml_slash ) ) then
---                 $stripped_tag = "<$element>";
---         end;
+            -- They are using a not allowed HTML element.
+            if not Isset (Allowed_HTML_2, Strtolower (Elem)) then
+               return "";
+            end if;
 
---         // Go through $attrarr, and save the allowed attributes for this element in $attr2.
---         $attr2 = "";
---         foreach ( $attrarr as $arreach ) then
---                 // Check if this attribute is required.
---                 $required = isset( $required_attrs[ strtolower( $arreach["name"] ) ] );
+            -- No attributes are allowed for closing elements.
+            if "" /= Slash then
+               return "</" & Elem & ">";
+            end if;
 
---                 if ( wp_kses_attr_check( $arreach["name"], $arreach["value"], $arreach["whole"], $arreach["vless"], $element, $allowed_html ) ) then
---                         $attr2 .= " " . $arreach["whole"];
+            return Wp_KSES_Attr (Elem, Attrlist,
+                                 Allowed_HTML_2, Allowed_Protocols);
+         end;
+      end;
+   end Wp_KSES_Split2;
 
---                         // If this was a required attribute, we can mark it as found.
---                         if ( $required ) then
---                                 unset( $required_attrs[ strtolower( $arreach["name"] ) ] );
---                         end;
---                 end; elseif ( $required ) then
---                         // This attribute was required, but didn"t pass the check. The entire tag is not allowed.
---                         return $stripped_tag;
---                 end;
---         end;
+   -------------------
+   -- Filter_Limits --
+   -------------------
 
---         // If some required attributes weren"t set, the entire tag is not allowed.
---         if ( ! empty( $required_attrs ) ) then
---                 return $stripped_tag;
---         end;
+   function Filter_Limits (Required_Attr_Limits : Array_Type)
+                           return Boolean;
 
---         // Remove any "<" or ">" characters.
---         $attr2 = preg_replace( "/[<>]/", "", $attr2 );
+   function Filter_Limits (Required_Attr_Limits : Array_Type)
+                           return Boolean
+   is
+      use Hb_Common;
+   begin
+      return
+         Isset (Required_Attr_Limits, "required") and then
+         True = As_Boolean (Get (Required_Attr_Limits, "required"));
+   end Filter_Limits;
 
---         return "<$element$attr2$xhtml_slash>";
--- end;
+   ------------------
+   -- Wp_KSES_Attr --
+   ------------------
 
--- --
--- -- Determines whether an attribute is allowed.
--- --
--- -- @since 4.2.3
--- -- @since 5.0.0 Added support for `data-*` wildcard attributes.
--- --
--- -- @param string $name         The attribute name. Passed by reference. Returns empty string when not allowed.
--- -- @param string $value        The attribute value. Passed by reference. Returns a filtered value.
--- -- @param string $whole        The `name=value` input. Passed by reference. Returns filtered input.
--- -- @param string $vless        Whether the attribute is valueless. Use "y" or "n".
--- -- @param string $element      The name of the element to which this attribute belongs.
--- -- @param array  $allowed_html The full list of allowed elements and attributes.
--- -- @return bool Whether or not the attribute is allowed.
--- --
--- function wp_kses_attr_check( &$name, &$value, &$whole, $vless, $element, $allowed_html ) then
---         $name_low    = strtolower( $name );
---         $element_low = strtolower( $element );
+   function Wp_KSES_Attr (Element           : String;
+                          Attr              : String;
+                          Allowed_HTML      : Array_Type;
+                          Allowed_Protocols : List_Type)
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
 
---         if ( ! isset( $allowed_html[ $element_low ] ) ) then
---                 $name  = "";
---                 $value = "";
---                 $whole = "";
---                 return false;
---         end;
+      Allowed_HTML_2 : constant Array_Type :=
+        (if not Is_Array (Allowed_HTML)
+         then Wp_KSES_Allowed_HTML (Allowed_HTML)
+         else Allowed_HTML);
 
---         $allowed_attr = $allowed_html[ $element_low ];
+      -- Is there a closing XHTML slash at the end of the attributes?
+      XHTML_Slash : constant String :=
+        (if Preg_Match ("%\s*/\s*$%", Attr)
+        then " /" else "");
 
---         if ( ! isset( $allowed_attr[ $name_low ] ) || "" === $allowed_attr[ $name_low ] ) then
---                 /*
---                 -- Allow `data-*` attributes.
---                 --
---                 -- When specifying `$allowed_html`, the attribute name should be set as
---                 -- `data-*` (not to be mixed with the HTML 4.0 `data` attribute, see
---                 -- https://www.w3.org/TR/html40/struct/objects.html#adef-data).
---                 --
---                 -- Note: the attribute name should only contain `A-Za-z0-9_-` chars,
---                 -- double hyphens `--` are not accepted by WordPress.
---                 --
---                 if ( strpos( $name_low, "data-" ) === 0 && ! empty( $allowed_attr["data-*"] )
---                         && preg_match( "/^data(?:-[a-z0-9_]+)+$/", $name_low, $match )
---                 ) then
---                         /*
---                         -- Add the whole attribute name to the allowed attributes and set any restrictions
---                         -- for the `data-*` attribute values for the current element.
---                         --
---                         $allowed_attr[ $match[0] ] = $allowed_attr["data-*"];
---                 end; else then
---                         $name  = "";
---                         $value = "";
---                         $whole = "";
---                         return false;
---                 end;
---         end;
+      -- Are any attributes allowed at all for this element?
+      Element_Low : constant String := Strtolower (Element);
+   begin
+      if
+        Empty (Allowed_HTML_2, Element_Low) or else
+        True = As_Boolean (Get (Allowed_HTML_2, Element_Low))
+      then
+         return "<" & Element & XHTML_Slash & " & >";
+      end if;
 
---         if ( "style" === $name_low ) then
---                 $new_value = safecss_filter_attr( $value );
+      declare
+         -- Split it.
+         Attrarr : constant Array_Type := Wp_KSES_Hair (Attr, Allowed_Protocols);
 
---                 if ( empty( $new_value ) ) then
---                         $name  = "";
---                         $value = "";
---                         $whole = "";
---                         return false;
---                 end;
+         -- Check if there are attributes that are required.
+         Required_Attrs : constant Array_Type :=
+           Array_Filter (Arry     => As_Array (Get (Allowed_HTML, Element_Low)),
+                         Callback => Filter_Limits'Access);
 
---                 $whole = str_replace( $value, $new_value, $whole );
---                 $value = $new_value;
---         end;
+         --
+         -- If a required attribute check fails, we can return nothing for a
+         -- self-closing tag, but for a non-self-closing tag the best option is to
+         -- return the element with attributes, as KSES doesn't handle matching the
+         -- relevant closing tag.
+         --
+         Stripped_Tag : constant String := (if Empty (XHTML_Slash)
+                                            then "<" & Element & ">" else "");
 
---         if ( is_array( $allowed_attr[ $name_low ] ) ) then
---                 // There are some checks.
---                 foreach ( $allowed_attr[ $name_low ] as $currkey => $currval ) then
---                         if ( ! wp_kses_check_attr_val( $value, $vless, $currkey, $currval ) ) then
---                                 $name  = "";
---                                 $value = "";
---                                 $whole = "";
---                                 return false;
---                         end;
---                 end;
---         end;
+         Attr2 : Unbounded_String;
+      begin
+         -- Go through $attrarr, and save the allowed attributes for this element in
+         -- $attr2.
+         for Arreach in Attrarr.Iterate loop
+            declare
+               Arry     : constant Array_Type := As_Array (Arrays.Element (Arreach));
+               Name     :          String     := As_String (Get (Arry, "name"));
+               Value    :          String     := As_String (Get (Arry, "value"));
+               Whole    :          String     := As_String (Get (Arry, "whole"));
+               Vless    : constant String     := As_String (Get (Arry, "vless"));
+               Name_Low : constant String     := Strtolower (Name);
 
---         return true;
--- end;
+               -- Check if this attribute is required.
+               Required : constant Boolean := Isset (Required_Attrs, Name_Low);
+            begin
+               if
+                 Wp_KSES_Attr_Check (Name, Value, Whole, Vless,
+                                     Element, Allowed_HTML)
+               then
+                  Append (Attr2, " " & Whole);
 
--- --
--- -- Builds an attribute list from string containing attributes.
--- --
--- -- This function does a lot of work. It parses an attribute list into an array
--- -- with attribute data, and tries to do the right thing even if it gets weird
--- -- input. It will add quotes around attribute values that don"t have any quotes
--- -- or apostrophes around them, to make it easier to produce HTML code that will
--- -- conform to W3C"s HTML specification. It will also remove bad URL protocols
--- -- from attribute values. It also reduces duplicate attributes by using the
--- -- attribute defined first (`foo="bar" foo="baz"` will result in `foo="bar"`).
--- --
--- -- @since 1.0.0
--- --
--- -- @param string   $attr              Attribute list from HTML element to closing HTML element tag.
--- -- @param string[] $allowed_protocols Array of allowed URL protocols.
--- -- @return array[] Array of attribute information after parsing.
--- --
--- function wp_kses_hair( $attr, $allowed_protocols ) then
---         $attrarr  = array();
---         $mode     = 0;
---         $attrname = "";
---         $uris     = wp_kses_uri_attributes();
+                  -- If this was a required attribute, we can mark it as found.
+                  if Required then
+                     Delete (Ref (Required_Attrs, Name_Low));
+--                   Unset (Required_Attrs (Name_Low));
+                     null;
+                  end if;
 
---         // Loop through the whole attribute list.
+               elsif Required then
+                  -- This attribute was required, but didn"t pass the check. The entire
+                  -- tag is not allowed.
+                  return Stripped_Tag;
+               end if;
+            end;
+         end loop;
 
---         while ( strlen( $attr ) != 0 ) then
---                 $working = 0; // Was the last operation successful?
+         -- If some required attributes weren't set, the entire tag is not allowed.
+         if not Required_Attrs.Is_Empty then
+--       if not Empty (Required_Attrs) then
+            return Stripped_Tag;
+         end if;
 
---                 switch ( $mode ) then
---                         case 0:
---                                 if ( preg_match( "/^([_a-zA-Z][-_a-zA-Z0-9:.]*)/", $attr, $match ) ) then
---                                         $attrname = $match[1];
---                                         $working  = 1;
---                                         $mode     = 1;
---                                         $attr     = preg_replace( "/^[_a-zA-Z][-_a-zA-Z0-9:.]*/", "", $attr );
---                                 end;
+         declare
+            -- Remove any "<" or ">" characters.
+            Attr3 : constant String := Preg_Replace ("/[<>]/", "", -Attr2);
+         begin
+            return "<" & Element & Attr3 & XHTML_Slash & ">";
+         end;
+      end;
+   end Wp_KSES_Attr;
 
---                                 break;
+   ------------------------
+   -- Wp_KSES_Attr_Check --
+   ------------------------
 
---                         case 1:
---                                 if ( preg_match( "/^\s*=\s*/", $attr ) ) then // Equals sign.
---                                         $working = 1;
---                                         $mode    = 2;
---                                         $attr    = preg_replace( "/^\s*=\s*/", "", $attr );
---                                         break;
---                                 end;
+   function Wp_KSES_Attr_Check (Name         : in out String;
+                                Value        : in out String;
+                                Whole        : in out String;
+                                Vless        : String;
+                                Element      : String;
+                                Allowed_HTML : Array_Type)
+                                return Boolean
+   is
+      use Hb_Common;
+      use Php;
 
---                                 if ( preg_match( "/^\s+/", $attr ) ) then // Valueless.
---                                         $working = 1;
---                                         $mode    = 0;
---                                         if ( false === array_key_exists( $attrname, $attrarr ) ) then
---                                                 $attrarr[ $attrname ] = array(
---                                                         "name"  => $attrname,
---                                                         "value" => "",
---                                                         "whole" => $attrname,
---                                                         "vless" => "y",
---                                                 );
---                                         end;
---                                         $attr = preg_replace( "/^\s+/", "", $attr );
---                                 end;
+      Name_Low    : constant String := Strtolower (Name);
+      Element_Low : constant String := Strtolower (Element);
 
---                                 break;
+      Allowed_Attr : Array_Type :=
+        As_Array (Get (Allowed_HTML, Element_Low));
+   begin
+      if not Isset (Allowed_HTML, Element_Low) then
+         Name  := "";
+         Value := "";
+         Whole := "";
+         return False;
+      end if;
 
---                         case 2:
---                                 if ( preg_match( "%^"([^"]*)"(\s+|/?$)%", $attr, $match ) ) then
---                                         // "value"
---                                         $thisval = $match[1];
---                                         if ( in_array( strtolower( $attrname ), $uris, true ) ) then
---                                                 $thisval = wp_kses_bad_protocol( $thisval, $allowed_protocols );
---                                         end;
+      if
+        not Isset (Allowed_Attr, Name_Low) or else
+        "" = As_String (Get (Allowed_Attr, Name_Low))
+      then
+         --
+         -- Allow `data-*` attributes.
+         --
+         -- When specifying `$allowed_html`, the attribute name should be set as
+         -- `data-*` (not to be mixed with the HTML 4.0 `data` attribute, see
+         -- https://www.w3.org/TR/html40/struct/objects.html#adef-data).
+         --
+         -- Note: the attribute name should only contain `A-Za-z0-9_-` chars,
+         -- double hyphens `--` are not accepted by WordPress.
+         --
+         declare
+            Match : List_Type;
+         begin
+            if
+              Strpos (Name_Low, "data-") = 0     and then
+              not Empty (Allowed_Attr, "data-*") and then
+              0 /= Preg_Match ("/^data(?:-[a-z0-9_]+)+$/", Name_Low, Match)
+            then
+               --
+               -- Add the whole attribute name to the allowed attributes and set any
+               -- restrictions for the `data-*` attribute values for the current
+               -- element.
+               --
+               Set (Allowed_Attr,
+                    Key   => -Match (1),    -- (0)
+                    Value => Get (Allowed_Attr, "data-*"));
+            else
+               Name  := "";
+               Value := "";
+               Whole := "";
+               return False;
+            end if;
+         end;
+      end if;
 
---                                         if ( false === array_key_exists( $attrname, $attrarr ) ) then
---                                                 $attrarr[ $attrname ] = array(
---                                                         "name"  => $attrname,
---                                                         "value" => $thisval,
---                                                         "whole" => "$attrname=\"$thisval\"",
---                                                         "vless" => "n",
---                                                 );
---                                         end;
---                                         $working = 1;
---                                         $mode    = 0;
---                                         $attr    = preg_replace( "/^"[^"]*"(\s+|$)/", "", $attr );
---                                         break;
---                                 end;
+      if "style" = Name_Low then
+         declare
+            New_Value : constant String := SafeCSS_Filter_Attr (Value);
+         begin
+            if Empty (New_Value) then
+               Name  := "";
+               Value := "";
+               Whole := "";
+               return False;
+            end if;
 
---                                 if ( preg_match( "%^"([^"]*)"(\s+|/?$)%", $attr, $match ) ) then
---                                         // "value"
---                                         $thisval = $match[1];
---                                         if ( in_array( strtolower( $attrname ), $uris, true ) ) then
---                                                 $thisval = wp_kses_bad_protocol( $thisval, $allowed_protocols );
---                                         end;
+            Whole := Str_Replace (Value, New_Value, Whole);
+            Value := New_Value;
+         end;
+      end if;
 
---                                         if ( false === array_key_exists( $attrname, $attrarr ) ) then
---                                                 $attrarr[ $attrname ] = array(
---                                                         "name"  => $attrname,
---                                                         "value" => $thisval,
---                                                         "whole" => "$attrname="$thisval"",
---                                                         "vless" => "n",
---                                                 );
---                                         end;
---                                         $working = 1;
---                                         $mode    = 0;
---                                         $attr    = preg_replace( "/^"[^"]*"(\s+|$)/", "", $attr );
---                                         break;
---                                 end;
+      declare
+         Rec : constant Multi_Type :=
+           Arrays.Element (Allowed_Attr.Find (Name_Low));
+      begin
+         if Kind_Of (Rec) = Kind_Array then
+--       if Is_Array (Allowed_Attr (Name_Low)) then
+            -- There are some checks.
+            for A in As_Array (Rec).Iterate loop
+--          for A in Allowed_Attr (Name_Low).Iterate loop
+               declare
+                  Currkey : constant String := Key (A);
+                  Currval : constant String := As_String (Arrays.Element (A));
+               begin
+                  if not Wp_KSES_Check_Attr_Val (Value, Vless, Currkey, Currval) then
+                     Name  := "";
+                     Value := "";
+                     Whole := "";
+                     return False;
+                  end if;
+               end;
+            end loop;
+         end if;
+      end;
+      return True;
+   end Wp_KSES_Attr_Check;
 
---                                 if ( preg_match( "%^([^\s\""]+)(\s+|/?$)%", $attr, $match ) ) then
---                                         // value
---                                         $thisval = $match[1];
---                                         if ( in_array( strtolower( $attrname ), $uris, true ) ) then
---                                                 $thisval = wp_kses_bad_protocol( $thisval, $allowed_protocols );
---                                         end;
+   ------------------
+   -- Wp_KSES_Hair --
+   ------------------
 
---                                         if ( false === array_key_exists( $attrname, $attrarr ) ) then
---                                                 $attrarr[ $attrname ] = array(
---                                                         "name"  => $attrname,
---                                                         "value" => $thisval,
---                                                         "whole" => "$attrname=\"$thisval\"",
---                                                         "vless" => "n",
---                                                 );
---                                         end;
---                                         // We add quotes to conform to W3C"s HTML spec.
---                                         $working = 1;
---                                         $mode    = 0;
---                                         $attr    = preg_replace( "%^[^\s\""]+(\s+|$)%", "", $attr );
---                                 end;
+   function Wp_KSES_Hair (Attr              : String;
+                          Allowed_Protocols : List_Type)
+                          return Array_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
 
---                                 break;
---                 end; // End switch.
+      Attr_2   : Unbounded_String := +Attr;
+      Attrarr  : Array_Type;
+      Mode     : Natural range 0 .. 2 := 0;
+      Attrname : Unbounded_String;
+      URIs     : constant List_Type := Wp_KSES_URI_Attributes;
+      Working  : Boolean;
+   begin
+      -- Loop through the whole attribute list.
 
---                 if ( 0 == $working ) then // Not well-formed, remove and try again.
---                         $attr = wp_kses_html_error( $attr );
---                         $mode = 0;
---                 end;
---         end; // End while.
+      while Length (Attr_2) /= 0 loop
+         Working := False; -- Was the last operation successful?
 
---         if ( 1 == $mode && false === array_key_exists( $attrname, $attrarr ) ) then
---                 // Special case, for when the attribute list ends with a valueless
---                 // attribute like "selected".
---                 $attrarr[ $attrname ] = array(
---                         "name"  => $attrname,
---                         "value" => "",
---                         "whole" => $attrname,
---                         "vless" => "y",
---                 );
---         end;
+         case Mode is
 
---         return $attrarr;
--- end;
+         when 0 =>
+            declare
+               Match : List_Type;
+            begin
+               if 0 /= Preg_Match ("/^([_a-zA-Z][-_a-zA-Z0-9:.]*)/", -Attr_2, Match) then
+                  Attrname := Match (1);
+                  Working  := True;
+                  Mode     := 1;
+                  Attr_2   := +Preg_Replace ("/^[_a-zA-Z][-_a-zA-Z0-9:.]*/", "", -Attr_2);
+               end if;
+            end;
+
+         when 1 =>
+            if Preg_Match ("/^\s*=\s*/", Attr) then -- Equals sign.
+               Working := True;
+               Mode    := 2;
+               Attr_2  := +Preg_Replace ("/^\s*=\s*/", "", -Attr_2);
+
+            elsif Preg_Match ("/^\s+/", -Attr_2) then -- Valueless.
+               Working := True;
+               Mode    := 0;
+               if False = Array_Key_Exists (-Attrname, Attrarr) then
+                  Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                       Build ("name",  -Attrname),
+                       Build ("value", ""),
+                       Build ("whole", -Attrname),
+                       Build ("vless", "y")
+                  ))));
+               end if;
+               Attr_2 := +Preg_Replace ("/^\s+/", "", -Attr_2);
+            end if;
+
+         when 2 =>
+            declare
+               Match   : List_Type;
+               Thisval : Unbounded_String;
+            begin
+               if 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
+                  -- "value"
+                  Thisval := Match (1);
+                  if In_Array (Strtolower (-Attrname), URIs, True) then
+                     Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
+                  end if;
+
+                  if False = Array_Key_Exists (-Attrname, Attrarr) then
+                     Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                       Build ("name",  -Attrname),
+                       Build ("value", -Thisval),
+                       Build ("whole", -("""" & Attrname & "=\""" & Thisval & "\""")),
+                       Build ("vless", "n")
+                     ))));
+                  end if;
+                  Working := True;
+                  Mode    := 0;
+                  Attr_2  := +Preg_Replace ("/^'[^']*'(\s+|$)/", "", -Attr_2);
+
+               elsif 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
+                  -- "value"
+                  Thisval := Match (1);
+                  if In_Array (Strtolower (-Attrname), URIs, True) then
+                     Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
+                  end if;
+
+                  if False = Array_Key_Exists (-Attrname, Attrarr) then
+                     Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                       Build ("name",  -Attrname),
+                       Build ("value", -Thisval),
+                       Build ("whole", -("""" & Attrname & "=""" & Thisval & """")),
+                       Build ("vless", "n")
+                     ))));
+                  end if;
+                  Working := True;
+                  Mode    := 0;
+                  Attr_2  := +Preg_Replace ("/^'[^']*'(\s+|$)/", "", -Attr_2);
+
+               elsif 0 /= Preg_Match ("%^([^\s\""]+)(\s+|/?$)%", -Attr_2, Match) then
+                  -- value
+                  Thisval := Match (1);
+                  if In_Array (Strtolower (-Attrname), URIs, True) then
+                     Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
+                  end if;
+
+                  if False = Array_Key_Exists (-Attrname, Attrarr) then
+                     Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                       Build ("name",  -Attrname),
+                       Build ("value", -Thisval),
+                       Build ("whole", -("""" & Attrname & "=\""" & Thisval & "\""")),
+                       Build ("vless", "n")
+                     ))));
+                  end if;
+                  -- We add quotes to conform to W3C's HTML spec.
+                  Working := True;
+                  Mode    := 0;
+                  Attr_2  := +Preg_Replace ("%^[^\s\""]+(\s+|$)%", "", -Attr_2);
+               end if;
+            end;
+         end case;
+
+         if not Working then -- Not well-formed, remove and try again.
+            Attr_2 := +Wp_KSES_HTML_Error (-Attr_2);
+            Mode   := 0;
+         end if;
+
+      end loop; -- End while.
+
+      if 1 = Mode and then False = Array_Key_Exists (-Attrname, Attrarr) then
+         -- Special case, for when the attribute list ends with a valueless
+         -- attribute like "selected".
+         Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+           Build ("name",  -Attrname),
+           Build ("value", ""),
+           Build ("whole", -Attrname),
+           Build ("vless", "y")
+         ))));
+      end if;
+
+      return Attrarr;
+   end Wp_KSES_Hair;
 
 -- --
 -- -- Finds all attributes of an HTML element.
@@ -1529,185 +1586,170 @@ is
 --         end;
 -- end;
 
--- --
--- -- Performs different checks for attribute values.
--- --
--- -- The currently implemented checks are "maxlen", "minlen", "maxval", "minval",
--- -- and "valueless".
--- --
--- -- @since 1.0.0
--- --
--- -- @param string $value      Attribute value.
--- -- @param string $vless      Whether the attribute is valueless. Use "y" or "n".
--- -- @param string $checkname  What $checkvalue is checking for.
--- -- @param mixed  $checkvalue What constraint the value should pass.
--- -- @return bool Whether check passes.
--- --
--- function wp_kses_check_attr_val( $value, $vless, $checkname, $checkvalue ) then
---         $ok = true;
+   ----------------------------
+   -- Wp_KSES_Check_Attr_Val --
+   ----------------------------
 
---         switch ( strtolower( $checkname ) ) then
---                 case "maxlen":
---                         /*
---                         -- The maxlen check makes sure that the attribute value has a length not
---                         -- greater than the given value. This can be used to avoid Buffer Overflows
---                         -- in WWW clients and various Internet servers.
---                         --
+   function Wp_KSES_Check_Attr_Val (Value      : String;
+                                    Vless      : String;
+                                    Checkname  : String;
+                                    Checkvalue : String)
+                                    return Boolean
+   is
+      use Php;
 
---                         if ( strlen( $value ) > $checkvalue ) then
---                                 $ok = false;
---                         end;
---                         break;
+      Ok : Boolean := True;
+      Check_Low : constant String := Strtolower (Checkname);
+   begin
+      if Check_Low = "maxlen" then
+         --
+         -- The maxlen check makes sure that the attribute value has a length not
+         -- greater than the given value. This can be used to avoid Buffer Overflows
+         -- in WWW clients and various Internet servers.
+         --
+         if Value'Length > Integer'Value (Checkvalue) then
+            Ok := False;
+         end if;
 
---                 case "minlen":
---                         /*
---                         -- The minlen check makes sure that the attribute value has a length not
---                         -- smaller than the given value.
---                         --
+      elsif Check_Low = "minlen" then
+         --
+         -- The minlen check makes sure that the attribute value has a length not
+         -- smaller than the given value.
+         --
+         if Value'Length < Integer'Value (Checkvalue) then
+            Ok := False;
+         end if;
 
---                         if ( strlen( $value ) < $checkvalue ) then
---                                 $ok = false;
---                         end;
---                         break;
+      elsif Check_Low = "maxval" then
+         --
+         -- The maxval check does two things: it checks that the attribute value is
+         -- an integer from 0 and up, without an excessive amount of zeroes or
+         -- whitespace (to avoid Buffer Overflows). It also checks that the attribute
+         -- value is not greater than the given value.
+         -- This check can be used to avoid Denial of Service attacks.
+         --
+         if not Preg_Match ("/^\s{0,6}[0-9]{1,6}\s{0,6}$/", Value) then
+            Ok := False;
+         end if;
+         if Value > Checkvalue then
+            Ok := False;
+         end if;
 
---                 case "maxval":
---                         /*
---                         -- The maxval check does two things: it checks that the attribute value is
---                         -- an integer from 0 and up, without an excessive amount of zeroes or
---                         -- whitespace (to avoid Buffer Overflows). It also checks that the attribute
---                         -- value is not greater than the given value.
---                         -- This check can be used to avoid Denial of Service attacks.
---                         --
+      elsif Check_Low = "minval" then
+         --
+         -- The minval check makes sure that the attribute value is a positive integer,
+         -- and that it is not smaller than the given value.
+         --
+         if not Preg_Match ("/^\s{0,6}[0-9]{1,6}\s{0,6}$/", Value) then
+            Ok := False;
+         end if;
+         if Value < Checkvalue then
+            Ok := False;
+         end if;
 
---                         if ( ! preg_match( "/^\sthen0,6end;[0-9]then1,6end;\sthen0,6end;$/", $value ) ) then
---                                 $ok = false;
---                         end;
---                         if ( $value > $checkvalue ) then
---                                 $ok = false;
---                         end;
---                         break;
+      elsif Check_Low = "valueless" then
+         --
+         -- The valueless check makes sure if the attribute has a value
+         -- (like `<a href="blah">`) or not (`<option selected>`). If the given value
+         -- is a "y" or a "Y", the attribute must not have a value.
+         -- If the given value is an "n" or an "N", the attribute must have a value.
+         --
+         if Strtolower (Checkvalue) /= Vless then
+            Ok := False;
+         end if;
 
---                 case "minval":
---                         /*
---                         -- The minval check makes sure that the attribute value is a positive integer,
---                         -- and that it is not smaller than the given value.
---                         --
+      -- elsif Check_Low = "values" then
+      --    --
+      --    -- The values check is used when you want to make sure that the attribute
+      --    -- has one of the given values.
+      --    --
+      --    if False = Array_Search (Strtolower (Value), Checkvalue, True) then
+      --       Ok := False;
+      --    end if;
 
---                         if ( ! preg_match( "/^\sthen0,6end;[0-9]then1,6end;\sthen0,6end;$/", $value ) ) then
---                                 $ok = false;
---                         end;
---                         if ( $value < $checkvalue ) then
---                                 $ok = false;
---                         end;
---                         break;
+      -- elsif Check_Low = "value_callback" then
+      --    --
+      --    -- The value_callback check is used when you want to make sure that the
+      --    -- attribute value is accepted by the callback function.
+      --    --
+      --    if not Call_User_Func (Checkvalue, Value) then
+      --       Ok := False;
+      --    end if;
 
---                 case "valueless":
---                         /*
---                         -- The valueless check makes sure if the attribute has a value
---                         -- (like `<a href="blah">`) or not (`<option selected>`). If the given value
---                         -- is a "y" or a "Y", the attribute must not have a value.
---                         -- If the given value is an "n" or an "N", the attribute must have a value.
---                         --
+      end if; -- End switch.
 
---                         if ( strtolower( $checkvalue ) != $vless ) then
---                                 $ok = false;
---                         end;
---                         break;
+      return Ok;
+   end Wp_KSES_Check_Attr_Val;
 
---                 case "values":
---                         /*
---                         -- The values check is used when you want to make sure that the attribute
---                         -- has one of the given values.
---                         --
+   --------------------------
+   -- Wp_KSES_Bad_Protocol --
+   --------------------------
 
---                         if ( false === array_search( strtolower( $value ), $checkvalue, true ) ) then
---                                 $ok = false;
---                         end;
---                         break;
+   function Wp_KSES_Bad_Protocol (Item              : String;
+                                  Allowed_Protocols : List_Type)
+                                  return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
 
---                 case "value_callback":
---                         /*
---                         -- The value_callback check is used when you want to make sure that the attribute
---                         -- value is accepted by the callback function.
---                         --
+      Item_2          : Unbounded_String := +Wp_KSES_No_Null (Item);
+      Iterations      : Natural := 0;
+      Original_String : Unbounded_String;
+   begin
+      loop
+         Original_String := Item_2;
+         Item_2          := +Wp_KSES_Bad_Protocol_Once (-Item_2, Allowed_Protocols);
 
---                         if ( ! call_user_func( $checkvalue, $value ) ) then
---                                 $ok = false;
---                         end;
---                         break;
---         end; // End switch.
+         exit when Original_String = Item_2;
+         Iterations := Iterations + 1;
+         exit when Iterations >= 6;
+      end loop;
 
---         return $ok;
--- end;
+      if Original_String /= Item_2 then
+         return "";
+      end if;
 
--- --
--- -- Sanitizes a string and removed disallowed URL protocols.
--- --
--- -- This function removes all non-allowed protocols from the beginning of the
--- -- string. It ignores whitespace and the case of the letters, and it does
--- -- understand HTML entities. It does its work recursively, so it won"t be
--- -- fooled by a string like `javascript:javascript:alert(57)`.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string   $string            Content to filter bad protocols from.
--- -- @param string[] $allowed_protocols Array of allowed URL protocols.
--- -- @return string Filtered content.
--- --
--- function wp_kses_bad_protocol( $string, $allowed_protocols ) then
---         $string     = wp_kses_no_null( $string );
---         $iterations = 0;
+      return -Item_2;
+   end Wp_KSES_Bad_Protocol;
 
---         do then
---                 $original_string = $string;
---                 $string          = wp_kses_bad_protocol_once( $string, $allowed_protocols );
---         end; while ( $original_string != $string && ++$iterations < 6 );
+   ---------------------
+   -- Wp_KSES_No_Null --
+   ---------------------
 
---         if ( $original_string != $string ) then
---                 return "";
---         end;
+   function Wp_KSES_No_Null (Item    : String;
+                             Options : Array_Type := Empty_Array) -- null
+                             return String
+   is
+      use Hb_Common;
+      use Php;
 
---         return $string;
--- end;
+      Options_2 : constant Array_Type :=
+        (if not Isset (Options, "slash_zero")
+         then To_Array (List => (1 => Build ("slash_zero", "remove")))
+         else Options);
 
--- --
--- -- Removes any invalid control characters in a text string.
--- --
--- -- Also removes any instance of the `\0` string.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string $string  Content to filter null characters from.
--- -- @param array  $options Set "slash_zero" => "keep" when "\0" is allowed. Default is "remove".
--- -- @return string Filtered content.
--- --
--- function wp_kses_no_null( $string, $options = null ) then
---         if ( ! isset( $options["slash_zero"] ) ) then
---                 $options = array( "slash_zero" => "remove" );
---         end;
+      String_2 : constant String :=
+        Preg_Replace ("/[\x00-\x08\x0B\x0C\x0E-\x1F]/", "", Item);
 
---         $string = preg_replace( "/[\x00-\x08\x0B\x0C\x0E-\x1F]/", "", $string );
---         if ( "remove" === $options["slash_zero"] ) then
---                 $string = preg_replace( "/\\\\+0+/", "", $string );
---         end;
+      String_3 : constant String :=
+        (if "remove" = As_String (Get (Options, "slash_zero"))
+         then Preg_Replace ("/\\\\+0+/", "", String_2)
+         else String_2);
+   begin
+      return String_3;
+   end Wp_KSES_No_Null;
 
---         return $string;
--- end;
+   --------------------------
+   -- wp_KSES_Stripslashes --
+   --------------------------
 
--- --
--- -- Strips slashes from in front of quotes.
--- --
--- -- This function changes the character sequence `\"` to just `"`. It leaves all other
--- -- slashes alone. The quoting from `preg_replace(//e)` requires this.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string $string String to strip slashes from.
--- -- @return string Fixed string with quoted slashes.
--- --
--- function wp_kses_stripslashes( $string ) then
---         return preg_replace( "%\\\\"%", """, $string );
--- end;
+   function Wp_KSES_Stripslashes (Item : String)
+                                  return String
+   is
+      use Php;
+   begin
+      return Preg_Replace ("%\\\\'%", """", Item);
+   end Wp_KSES_Stripslashes;
 
 -- --
 -- -- Converts the keys of an array to lowercase.
@@ -1733,90 +1775,101 @@ is
 --         return $outarray;
 -- end;
 
--- --
--- -- Handles parsing errors in `wp_kses_hair()`.
--- --
--- -- The general plan is to remove everything to and including some whitespace,
--- -- but it deals with quotes and apostrophes as well.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string $string
--- -- @return string
--- --
--- function wp_kses_html_error( $string ) then
---         return preg_replace( "/^("[^"]*("|$)|\"[^\"]*(\"|$)|\S)*\s*/", "", $string );
--- end;
+   ------------------------
+   -- Wp_KSES_HTML_Error --
+   ------------------------
 
--- --
--- -- Sanitizes content from bad protocols and other characters.
--- --
--- -- This function searches for URL protocols at the beginning of the string, while
--- -- handling whitespace and HTML entities.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string   $string            Content to check for bad protocols.
--- -- @param string[] $allowed_protocols Array of allowed URL protocols.
--- -- @param int      $count             Depth of call recursion to this function.
--- -- @return string Sanitized content.
--- --
--- function wp_kses_bad_protocol_once( $string, $allowed_protocols, $count = 1 ) then
---         $string  = preg_replace( "/(&#0*58(?![;0-9])|&#x0*3a(?![;a-f0-9]))/i", "$1;", $string );
---         $string2 = preg_split( "/:|&#0*58;|&#x0*3a;|&colon;/i", $string, 2 );
---         if ( isset( $string2[1] ) && ! preg_match( "%/\?%", $string2[0] ) ) then
---                 $string   = trim( $string2[1] );
---                 $protocol = wp_kses_bad_protocol_once2( $string2[0], $allowed_protocols );
---                 if ( "feed:" === $protocol ) then
---                         if ( $count > 2 ) then
---                                 return "";
---                         end;
---                         $string = wp_kses_bad_protocol_once( $string, $allowed_protocols, ++$count );
---                         if ( empty( $string ) ) then
---                                 return $string;
---                         end;
---                 end;
---                 $string = $protocol . $string;
---         end;
+   function Wp_KSES_HTML_Error (Item : String)
+                                return String
+   is
+      use Php;
+   begin
+      return Preg_Replace ("/^(""[^""]*(""|$)|\""[^\""]*(\""|$)|\S)*\s*/",
+                           "", Item);
+   end Wp_KSES_HTML_Error;
 
---         return $string;
--- end;
+   -------------------------------
+   -- Wp_KSES_Bad_Protocol_Once --
+   -------------------------------
 
--- --
--- -- Callback for `wp_kses_bad_protocol_once()` regular expression.
--- --
--- -- This function processes URL protocols, checks to see if they"re in the
--- -- list of allowed protocols or not, and returns different data depending
--- -- on the answer.
--- --
--- -- @access private
--- -- @ignore
--- -- @since 1.0.0
--- --
--- -- @param string   $string            URI scheme to check against the list of allowed protocols.
--- -- @param string[] $allowed_protocols Array of allowed URL protocols.
--- -- @return string Sanitized content.
--- --
--- function wp_kses_bad_protocol_once2( $string, $allowed_protocols ) then
---         $string2 = wp_kses_decode_entities( $string );
---         $string2 = preg_replace( "/\s/", "", $string2 );
---         $string2 = wp_kses_no_null( $string2 );
---         $string2 = strtolower( $string2 );
+   function Wp_KSES_Bad_Protocol_Once (Item              : String;
+                                       Allowed_Protocols : List_Type;
+                                       Count             : Natural := 1)
+                                       return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
 
---         $allowed = false;
---         foreach ( (array) $allowed_protocols as $one_protocol ) then
---                 if ( strtolower( $one_protocol ) == $string2 ) then
---                         $allowed = true;
---                         break;
---                 end;
---         end;
+      Count_2 : Natural := Count;
 
---         if ( $allowed ) then
---                 return "$string2:";
---         end; else then
---                 return "";
---         end;
--- end;
+      Item_3 : constant String :=
+        Preg_Replace ("/(&#0*58(?![;0-9])|&#x0*3a(?![;a-f0-9]))/i", "$1;", Item);
+
+      Item_2 : constant List_Type :=
+        Preg_Split ("/:|&#0*58;|&#x0*3a;|&colon;/i", Item_3, 2);
+
+      Item_4 : Unbounded_String;
+   begin
+      if
+        Isset (-Item_2 (1)) and then
+        not Preg_Match ("%/\?%", -Item_2 (1)) -- (0)
+      then
+         Item_4 := +Trim (-Item_2 (2)); -- (1)
+         declare
+            Protocol : constant String :=
+              Wp_KSES_Bad_Protocol_Once2 (-Item_2 (1), -- (0)
+                                          Allowed_Protocols);
+         begin
+            if "feed:" = Protocol then
+               if Count > 2 then
+                  return "";
+               end if;
+               Count_2 := Count_2 + 1;
+               Item_4 := +Wp_KSES_Bad_Protocol_Once (-Item_4, Allowed_Protocols,
+                                                     Count_2);
+               if Empty (-Item_4) then
+                  return -Item_4;
+               end if;
+            end if;
+            Item_4 := Protocol & Item_4;
+         end;
+      end if;
+
+      return -Item_4;
+   end Wp_KSES_Bad_Protocol_Once;
+
+   --------------------------------
+   -- Wp_KSES_Bad_Protocol_Once2 --
+   --------------------------------
+
+   function Wp_KSES_Bad_Protocol_Once2 (Item              : String;
+                                        Allowed_Protocols : List_Type)
+                                        return String
+   is
+      use Hb_Common;
+      use Php;
+
+      String_5 : constant String := Wp_KSES_Decode_Entities (Item);
+      String_4 : constant String := Preg_Replace ("/\s/", "", String_5);
+      String_3 : constant String := Wp_KSES_No_Null (String_4);
+      String_2 : constant String := Strtolower (String_3);
+
+      Allowed : Boolean := False;
+   begin
+      for One_Protocol of Allowed_Protocols loop
+         if Strtolower (-One_Protocol) = String_2 then
+            Allowed := True;
+            exit;
+         end if;
+      end loop;
+
+      if Allowed then
+         return String_2 & ":";
+      else
+         return "";
+      end if;
+   end Wp_KSES_Bad_Protocol_Once2;
 
 -- --
 -- -- Converts and fixes HTML entities.
@@ -1974,52 +2027,52 @@ is
 --                         ( 0x10000 <= $i && $i <= 0x10ffff ) );
 -- end;
 
--- --
--- -- Converts all numeric HTML entities to their named counterparts.
--- --
--- -- This function decodes numeric HTML entities (`&#65;` and `&#x41;`).
--- -- It doesn"t do anything with named entities like `&auml;`, but we don"t
--- -- need them in the allowed URL protocols system anyway.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string $string Content to change entities.
--- -- @return string Content after decoded entities.
--- --
--- function wp_kses_decode_entities( $string ) then
---         $string = preg_replace_callback( "/&#([0-9]+);/", "_wp_kses_decode_entities_chr", $string );
---         $string = preg_replace_callback( "/&#[Xx]([0-9A-Fa-f]+);/", "_wp_kses_decode_entities_chr_hexdec", $string );
+   -----------------------------
+   -- Wp_KSES_Decode_Entities --
+   -----------------------------
 
---         return $string;
--- end;
+   function Wp_KSES_Decode_Entities (Item : String)
+                                     return String
+   is
+      use Php;
 
--- --
--- -- Regex callback for `wp_kses_decode_entities()`.
--- --
--- -- @since 2.9.0
--- -- @access private
--- -- @ignore
--- --
--- -- @param array $match preg match
--- -- @return string
--- --
--- function _wp_kses_decode_entities_chr( $match ) then
---         return chr( $match[1] );
--- end;
+      String_3 : constant String :=
+        Preg_Replace_Callback ("/&#([0-9]+);/",
+                               X_Wp_KSES_Decode_Entities_Chr'Access,
+                               Item);
 
--- --
--- -- Regex callback for `wp_kses_decode_entities()`.
--- --
--- -- @since 2.9.0
--- -- @access private
--- -- @ignore
--- --
--- -- @param array $match preg match
--- -- @return string
--- --
--- function _wp_kses_decode_entities_chr_hexdec( $match ) then
---         return chr( hexdec( $match[1] ) );
--- end;
+      String_2 : constant String :=
+        Preg_Replace_Callback ("/&#[Xx]([0-9A-Fa-f]+);/",
+                               X_Wp_KSES_Decode_Entities_Chr_Hexdec'Access,
+                               String_3);
+   begin
+      return String_2;
+   end Wp_KSES_Decode_Entities;
+
+   ---------------------------------------
+   -- X_Wp_KSES_Decode_Entities_Chr_Chr --
+   ---------------------------------------
+
+   function X_Wp_KSES_Decode_Entities_Chr (Match : List_Type)
+                                           return String
+   is
+      use Hb_Common;
+   begin
+      return Integer'Image (Integer'Value (-Match (2))); -- (1)
+   end X_Wp_KSES_Decode_Entities_Chr;
+
+   ------------------------------------------
+   -- X_Wp_KSES_Decode_Entities_Chr_Hexdec --
+   ------------------------------------------
+
+   function X_Wp_KSES_Decode_Entities_Chr_Hexdec (Match : List_Type)
+                                                  return String
+   is
+      use Hb_Common;
+      use Php;
+   begin
+      return Integer'Image (Hexdec (-Match (2))); -- (1)
+   end X_Wp_KSES_Decode_Entities_Chr_Hexdec;
 
 -- --
 -- -- Sanitize content with allowed HTML KSES rules.
@@ -2218,336 +2271,379 @@ is
 --         end;
 -- end;
 
--- --
--- -- Filters an inline style attribute and removes disallowed rules.
--- --
--- -- @since 2.8.1
--- -- @since 4.4.0 Added support for `min-height`, `max-height`, `min-width`, and `max-width`.
--- -- @since 4.6.0 Added support for `list-style-type`.
--- -- @since 5.0.0 Added support for `background-image`.
--- -- @since 5.1.0 Added support for `text-transform`.
--- -- @since 5.2.0 Added support for `background-position` and `grid-template-columns`.
--- -- @since 5.3.0 Added support for `grid`, `flex` and `column` layout properties.
--- --              Extended `background-*` support for individual properties.
--- -- @since 5.3.1 Added support for gradient backgrounds.
--- -- @since 5.7.1 Added support for `object-position`.
--- -- @since 5.8.0 Added support for `calc()` and `var()` values.
--- -- @since 6.1.0 Added support for `min()`, `max()`, `minmax()`, `clamp()`,
--- --              nested `var()` values, and assigning values to CSS variables.
--- --              Added support for `object-fit`, `gap`, `column-gap`, `row-gap`, and `flex-wrap`.
--- --              Extended `margin-*` and `padding-*` support for logical properties.
--- --
--- -- @param string $css        A string of CSS rules.
--- -- @param string $deprecated Not used.
--- -- @return string Filtered string of CSS rules.
--- --
--- function safecss_filter_attr( $css, $deprecated = "" ) then
---         if ( ! empty( $deprecated ) ) then
---                 _deprecated_argument( __FUNCTION__, "2.8.1" ); // Never implemented.
---         end;
+   -------------------------
+   -- SaveCSS_Filter_Attr --
+   -------------------------
 
---         $css = wp_kses_no_null( $css );
---         $css = str_replace( array( "\n", "\r", "\t" ), "", $css );
+   function SafeCSS_Filter_Attr (CSS        : String;
+                                 Deprecated : String := "")
+                                 return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Functions;
+      use Inc_Plugins;
 
---         $allowed_protocols = wp_allowed_protocols();
+      -- if ( ! empty( $deprecated ) ) then
+      --         _deprecated_argument( __FUNCTION__, "2.8.1" ); // Never implemented.
+      -- end;
 
---         $css_array = explode( ";", trim( $css ) );
+      CSS_2 : constant String := Wp_KSES_No_Null (CSS);
+      CSS_3 : constant String :=
+        Str_Replace (To_List (List => (+"\n", +"\r", +"\t")), "", CSS_2);
 
---         --
---         -- Filters the list of allowed CSS attributes.
---         --
---         -- @since 2.8.1
---         --
---         -- @param string[] $attr Array of allowed CSS attributes.
---         --
---         $allowed_attr = apply_filters(
---                 "safe_style_css",
---                 array(
---                         "background",
---                         "background-color",
---                         "background-image",
---                         "background-position",
---                         "background-size",
---                         "background-attachment",
---                         "background-blend-mode",
+      Allowed_Protocols : constant List_Type := Wp_Allowed_Protocols;
 
---                         "border",
---                         "border-radius",
---                         "border-width",
---                         "border-color",
---                         "border-style",
---                         "border-right",
---                         "border-right-color",
---                         "border-right-style",
---                         "border-right-width",
---                         "border-bottom",
---                         "border-bottom-color",
---                         "border-bottom-left-radius",
---                         "border-bottom-right-radius",
---                         "border-bottom-style",
---                         "border-bottom-width",
---                         "border-bottom-right-radius",
---                         "border-bottom-left-radius",
---                         "border-left",
---                         "border-left-color",
---                         "border-left-style",
---                         "border-left-width",
---                         "border-top",
---                         "border-top-color",
---                         "border-top-left-radius",
---                         "border-top-right-radius",
---                         "border-top-style",
---                         "border-top-width",
---                         "border-top-left-radius",
---                         "border-top-right-radius",
+      CSS_Array : constant List_Type := Explode (";", Trim (CSS_3));
 
---                         "border-spacing",
---                         "border-collapse",
---                         "caption-side",
+      --
+      -- Filters the list of allowed CSS attributes.
+      --
+      -- @since 2.8.1
+      --
+      -- @param string[] $attr Array of allowed CSS attributes.
+      --
+      Allowed_Attr : List_Type := Apply_Filters (
+        "safe_style_css",
+        To_List (List => (
+                        +"background",
+                        +"background-color",
+                        +"background-image",
+                        +"background-position",
+                        +"background-size",
+                        +"background-attachment",
+                        +"background-blend-mode",
 
---                         "columns",
---                         "column-count",
---                         "column-fill",
---                         "column-gap",
---                         "column-rule",
---                         "column-span",
---                         "column-width",
+                        +"border",
+                        +"border-radius",
+                        +"border-width",
+                        +"border-color",
+                        +"border-style",
+                        +"border-right",
+                        +"border-right-color",
+                        +"border-right-style",
+                        +"border-right-width",
+                        +"border-bottom",
+                        +"border-bottom-color",
+                        +"border-bottom-left-radius",
+                        +"border-bottom-right-radius",
+                        +"border-bottom-style",
+                        +"border-bottom-width",
+                        +"border-bottom-right-radius",
+                        +"border-bottom-left-radius",
+                        +"border-left",
+                        +"border-left-color",
+                        +"border-left-style",
+                        +"border-left-width",
+                        +"border-top",
+                        +"border-top-color",
+                        +"border-top-left-radius",
+                        +"border-top-right-radius",
+                        +"border-top-style",
+                        +"border-top-width",
+                        +"border-top-left-radius",
+                        +"border-top-right-radius",
 
---                         "color",
---                         "filter",
---                         "font",
---                         "font-family",
---                         "font-size",
---                         "font-style",
---                         "font-variant",
---                         "font-weight",
---                         "letter-spacing",
---                         "line-height",
---                         "text-align",
---                         "text-decoration",
---                         "text-indent",
---                         "text-transform",
+                        +"border-spacing",
+                        +"border-collapse",
+                        +"caption-side",
 
---                         "height",
---                         "min-height",
---                         "max-height",
+                        +"columns",
+                        +"column-count",
+                        +"column-fill",
+                        +"column-gap",
+                        +"column-rule",
+                        +"column-span",
+                        +"column-width",
 
---                         "width",
---                         "min-width",
---                         "max-width",
+                        +"color",
+                        +"filter",
+                        +"font",
+                        +"font-family",
+                        +"font-size",
+                        +"font-style",
+                        +"font-variant",
+                        +"font-weight",
+                        +"letter-spacing",
+                        +"line-height",
+                        +"text-align",
+                        +"text-decoration",
+                        +"text-indent",
+                        +"text-transform",
 
---                         "margin",
---                         "margin-right",
---                         "margin-bottom",
---                         "margin-left",
---                         "margin-top",
---                         "margin-block-start",
---                         "margin-block-end",
---                         "margin-inline-start",
---                         "margin-inline-end",
+                        +"height",
+                        +"min-height",
+                        +"max-height",
 
---                         "padding",
---                         "padding-right",
---                         "padding-bottom",
---                         "padding-left",
---                         "padding-top",
---                         "padding-block-start",
---                         "padding-block-end",
---                         "padding-inline-start",
---                         "padding-inline-end",
+                        +"width",
+                        +"min-width",
+                        +"max-width",
 
---                         "flex",
---                         "flex-basis",
---                         "flex-direction",
---                         "flex-flow",
---                         "flex-grow",
---                         "flex-shrink",
---                         "flex-wrap",
+                        +"margin",
+                        +"margin-right",
+                        +"margin-bottom",
+                        +"margin-left",
+                        +"margin-top",
+                        +"margin-block-start",
+                        +"margin-block-end",
+                        +"margin-inline-start",
+                        +"margin-inline-end",
 
---                         "gap",
---                         "column-gap",
---                         "row-gap",
+                        +"padding",
+                        +"padding-right",
+                        +"padding-bottom",
+                        +"padding-left",
+                        +"padding-top",
+                        +"padding-block-start",
+                        +"padding-block-end",
+                        +"padding-inline-start",
+                        +"padding-inline-end",
 
---                         "grid-template-columns",
---                         "grid-auto-columns",
---                         "grid-column-start",
---                         "grid-column-end",
---                         "grid-column-gap",
---                         "grid-template-rows",
---                         "grid-auto-rows",
---                         "grid-row-start",
---                         "grid-row-end",
---                         "grid-row-gap",
---                         "grid-gap",
+                        +"flex",
+                        +"flex-basis",
+                        +"flex-direction",
+                        +"flex-flow",
+                        +"flex-grow",
+                        +"flex-shrink",
+                        +"flex-wrap",
 
---                         "justify-content",
---                         "justify-items",
---                         "justify-self",
---                         "align-content",
---                         "align-items",
---                         "align-self",
+                        +"gap",
+                        +"column-gap",
+                        +"row-gap",
 
---                         "clear",
---                         "cursor",
---                         "direction",
---                         "float",
---                         "list-style-type",
---                         "object-fit",
---                         "object-position",
---                         "overflow",
---                         "vertical-align",
+                        +"grid-template-columns",
+                        +"grid-auto-columns",
+                        +"grid-column-start",
+                        +"grid-column-end",
+                        +"grid-column-gap",
+                        +"grid-template-rows",
+                        +"grid-auto-rows",
+                        +"grid-row-start",
+                        +"grid-row-end",
+                        +"grid-row-gap",
+                        +"grid-gap",
 
---                         // Custom CSS properties.
---                         "--*",
---                 )
---         );
+                        +"justify-content",
+                        +"justify-items",
+                        +"justify-self",
+                        +"align-content",
+                        +"align-items",
+                        +"align-self",
 
---         /*
---         -- CSS attributes that accept URL data types.
---         --
---         -- This is in accordance to the CSS spec and unrelated to
---         -- the sub-set of supported attributes above.
---         --
---         -- See: https://developer.mozilla.org/en-US/docs/Web/CSS/url
---         --
---         $css_url_data_types = array(
---                 "background",
---                 "background-image",
+                        +"clear",
+                        +"cursor",
+                        +"direction",
+                        +"float",
+                        +"list-style-type",
+                        +"object-fit",
+                        +"object-position",
+                        +"overflow",
+                        +"vertical-align",
 
---                 "cursor",
+                        -- Custom CSS properties.
+                        +"--*"
+        ))
+      );
 
---                 "list-style",
---                 "list-style-image",
---         );
+      --
+      -- CSS attributes that accept URL data types.
+      --
+      -- This is in accordance to the CSS spec and unrelated to
+      -- the sub-set of supported attributes above.
+      --
+      -- See: https://developer.mozilla.org/en-US/docs/Web/CSS/url
+      --
+      CSS_URL_Data_Types : constant List_Type := To_List (List => (
+                +"background",
+                +"background-image",
 
---         /*
---         -- CSS attributes that accept gradient data types.
---         --
---         --
---         $css_gradient_data_types = array(
---                 "background",
---                 "background-image",
---         );
+                +"cursor",
 
---         if ( empty( $allowed_attr ) ) then
---                 return $css;
---         end;
+                +"list-style",
+                +"list-style-image"
+      ));
 
---         $css = "";
---         foreach ( $css_array as $css_item ) then
---                 if ( "" === $css_item ) then
---                         continue;
---                 end;
+      --
+      -- CSS attributes that accept gradient data types.
+      --
+      --
+      CSS_Gradient_Data_Types : constant List_Type := To_List (List => (
+                +"background",
+                +"background-image"
+      ));
 
---                 $css_item        = trim( $css_item );
---                 $css_test_string = $css_item;
---                 $found           = false;
---                 $url_attr        = false;
---                 $gradient_attr   = false;
---                 $is_custom_var   = false;
+      CSS_4 : Unbounded_String;
+   begin
+      if Allowed_Attr.Is_Empty then
+         return CSS_3;
+      end if;
 
---                 if ( strpos( $css_item, ":" ) === false ) then
---                         $found = true;
---                 end; else then
---                         $parts        = explode( ":", $css_item, 2 );
---                         $css_selector = trim( $parts[0] );
+      for CSS_Item_2 of CSS_Array loop
+         if "" = CSS_Item_2 then
+            goto Continue;
+         end if;
 
---                         // Allow assigning values to CSS variables.
---                         if ( in_array( "--*", $allowed_attr, true ) && preg_match( "/^--[a-zA-Z0-9-_]+$/", $css_selector ) ) then
---                                 $allowed_attr[] = $css_selector;
---                                 $is_custom_var  = true;
---                         end;
+         declare
+            CSS_Item        : constant String  := Trim (-CSS_Item_2);
+            CSS_Test_String : Unbounded_String := +CSS_Item;
+            Found           : Boolean := False;
+            URL_Attr        : Boolean := False;
+            Gradient_Attr   : Boolean := False;
+            Is_Custom_Var   : Boolean := False;
+            Parts : List_Type;
+         begin
+            if Strpos (CSS_Item, ":") = 0 then
+               Found := True;
+            else
+               Parts := Explode (":", CSS_Item, 2);
 
---                         if ( in_array( $css_selector, $allowed_attr, true ) ) then
---                                 $found         = true;
---                                 $url_attr      = in_array( $css_selector, $css_url_data_types, true );
---                                 $gradient_attr = in_array( $css_selector, $css_gradient_data_types, true );
---                         end;
+               declare
+                  CSS_Selector : constant String    := Trim (-Parts (1)); -- (0)
+               begin
+                  -- Allow assigning values to CSS variables.
+                  if
+                    In_Array ("--*", Allowed_Attr, True) and then
+                    Preg_Match ("/^--[a-zA-Z0-9-_]+$/", CSS_Selector)
+                  then
+                     Allowed_Attr.Append (+CSS_Selector);
+                     Is_Custom_Var  := True;
+                  end if;
 
---                         if ( $is_custom_var ) then
---                                 $css_value     = trim( $parts[1] );
---                                 $url_attr      = str_starts_with( $css_value, "url(" );
---                                 $gradient_attr = str_contains( $css_value, "-gradient(" );
---                         end;
---                 end;
+                  if In_Array (CSS_Selector, Allowed_Attr, True) then
+                     Found         := True;
+                     URL_Attr      := In_Array (CSS_Selector,
+                                                CSS_URL_Data_Types, True);
+                     Gradient_Attr := In_Array (CSS_Selector,
+                                                CSS_Gradient_Data_Types, True);
+                  end if;
 
---                 if ( $found && $url_attr ) then
---                         // Simplified: matches the sequence `url(*)`.
---                         preg_match_all( "/url\([^)]+\)/", $parts[1], $url_matches );
+                  if Is_Custom_Var then
+                     declare
+                        CSS_Value : constant String := Trim (-Parts (2)); -- (1)
+                     begin
+                        URL_Attr      := Str_Starts_With (CSS_Value, "url(");
+                        Gradient_Attr := Str_Contains (CSS_Value, "-gradient(");
+                     end;
+                  end if;
+               end;
+            end if;
 
---                         foreach ( $url_matches[0] as $url_match ) then
---                                 // Clean up the URL from each of the matches above.
---                                 preg_match( "/^url\(\s*([\"\"]?)(.*)(\g1)\s*\)$/", $url_match, $url_pieces );
+            if Found and URL_Attr then
+               -- Simplified: matches the sequence `url(*)`.
+               declare
+                  URL_Matches : List_Type;
+                  Unused      : Integer;
+               begin
+                  Unused :=
+                    Preg_Match_All ("/url\([^)]+\)/", -Parts (2), URL_Matches); -- (1)
 
---                                 if ( empty( $url_pieces[2] ) ) then
---                                         $found = false;
---                                         break;
---                                 end;
+                  Match_Loop :
+                  for URL_Match of URL_Matches loop -- (1) loop -- (0)
+                     declare
+                        URL_Pieces : List_Type;
+                     begin
+                        -- Clean up the URL from each of the matches above.
+                        Unused := Preg_Match ("/^url\(\s*([\""\""]?)(.*)(\g1)\s*\)$/",
+                                              -URL_Match, URL_Pieces);
 
---                                 $url = trim( $url_pieces[2] );
+                        if Empty (-URL_Pieces (3)) then -- (2)
+                           Found := False;
+                           exit Match_Loop;
+                        end if;
 
---                                 if ( empty( $url ) || wp_kses_bad_protocol( $url, $allowed_protocols ) !== $url ) then
---                                         $found = false;
---                                         break;
---                                 end; else then
---                                         // Remove the whole `url(*)` bit that was matched above from the CSS.
---                                         $css_test_string = str_replace( $url_match, "", $css_test_string );
---                                 end;
---                         end;
---                 end;
+                        declare
+                           URL : constant String := Trim (-URL_Pieces (3)); -- (2)
+                        begin
+                           if
+                             Empty (URL) or else
+                             Wp_KSES_Bad_Protocol (URL, Allowed_Protocols) /= URL
+                           then
+                              Found := False;
+                              exit Match_Loop;
+                           else
+                              -- Remove the whole `url(*)` bit that was matched above
+                              -- from the CSS.
+                              CSS_Test_String := +Str_Replace (-URL_Match, "",
+                                                               -CSS_Test_String);
+                           end if;
+                        end;
+                     end;
+                  end loop Match_Loop;
+               end;
+            end if;
 
---                 if ( $found && $gradient_attr ) then
---                         $css_value = trim( $parts[1] );
---                         if ( preg_match( "/^(repeating-)?(linear|radial|conic)-gradient\(([^()]|rgb[a]?\([^()]*\))*\)$/", $css_value ) ) then
---                                 // Remove the whole `gradient` bit that was matched above from the CSS.
---                                 $css_test_string = str_replace( $css_value, "", $css_test_string );
---                         end;
---                 end;
+            if Found and then Gradient_Attr then
+               declare
+                  CSS_Value : constant String := Trim (-Parts (2));  -- (1)
+               begin
+                  if
+                    Preg_Match
+                      ("/^(repeating-)?(linear|radial|conic)-gradient\(([^()]|rgb[a]?\([^()]*\))*\)$/", CSS_Value)
+                  then
+                     -- Remove the whole `gradient` bit that was matched above from
+                     -- the CSS.
+                     CSS_Test_String := +Str_Replace (CSS_Value, "", -CSS_Test_String);
+                  end if;
+               end;
+            end if;
 
---                 if ( $found ) then
---                         /*
---                         -- Allow CSS functions like var(), calc(), etc. by removing them from the test string.
---                         -- Nested functions and parentheses are also removed, so long as the parentheses are balanced.
---                         --
---                         $css_test_string = preg_replace(
---                                 "/\b(?:var|calc|min|max|minmax|clamp)(\((?:[^()]|(?1))*\))/",
---                                 "",
---                                 $css_test_string
---                         );
+            if Found then
+               --
+               -- Allow CSS functions like var(), calc(), etc. by removing them from
+               -- the test string. Nested functions and parentheses are also removed,
+               -- so long as the parentheses are balanced.
+               --
+               CSS_Test_String :=
+                 +Preg_Replace (
+                   "/\b(?:var|calc|min|max|minmax|clamp)(\((?:[^()]|(?1))*\))/",
+                   "",
+                   -CSS_Test_String
+                 );
 
---                         /*
---                         -- Disallow CSS containing \ ( & end; = or comments, except for within url(), var(), calc(), etc.
---                         -- which were removed from the test string above.
---                         --
---                         $allow_css = ! preg_match( "%[\\\(&=end;]|/\*%", $css_test_string );
+               declare
+                  --
+                  -- Disallow CSS containing \ ( & end; = or comments, except for
+                  -- within url(), var(), calc(), etc.  which were removed from the
+                  -- test string above.
+                  --
+                  Allow_CSS_2 : constant Boolean :=
+                    not Preg_Match ("%[\\\(&=end;]|/\*%", -CSS_Test_String);
 
---                         --
---                         -- Filters the check for unsafe CSS in `safecss_filter_attr`.
---                         --
---                         -- Enables developers to determine whether a section of CSS should be allowed or discarded.
---                         -- By default, the value will be false if the part contains \ ( & end; = or comments.
---                         -- Return true to allow the CSS part to be included in the output.
---                         --
---                         -- @since 5.5.0
---                         --
---                         -- @param bool   $allow_css       Whether the CSS in the test string is considered safe.
---                         -- @param string $css_test_string The CSS string to test.
---                         --
---                         $allow_css = apply_filters( "safecss_filter_attr_allow_css", $allow_css, $css_test_string );
+                  --
+                  -- Filters the check for unsafe CSS in `safecss_filter_attr`.
+                  --
+                  -- Enables developers to determine whether a section of CSS should be
+                  -- allowed or discarded. By default, the value will be false if the
+                  -- part contains \ ( & end; = or comments.
+                  -- Return true to allow the CSS part to be included in the output.
+                  --
+                  -- @since 5.5.0
+                  --
+                  -- @param bool   $allow_css       Whether the CSS in the test
+                  --                                 string is considered safe.
+                  -- @param string $css_test_string The CSS string to test.
+                  --
+                  Allow_CSS : constant Boolean :=
+                    Apply_Filters ("safecss_filter_attr_allow_css",
+                                   Allow_CSS_2, -CSS_Test_String);
+               begin
+                  -- Only add the CSS part if it passes the regex check.
+                  if Allow_CSS then
+                     if "" /= CSS_4 then
+                        Append (CSS_4, ";");
+                     end if;
 
---                         // Only add the CSS part if it passes the regex check.
---                         if ( $allow_css ) then
---                                 if ( "" !== $css ) then
---                                         $css .= ";";
---                                 end;
+                     Append (CSS_4, CSS_Item);
+                  end if;
+               end;
+            end if;
+         end;
+         << Continue >>
+      end loop;
 
---                                 $css .= $css_item;
---                         end;
---                 end;
---         end;
-
---         return $css;
--- end;
+      return -CSS_4;
+   end SafeCSS_Filter_Attr;
 
 -- --
 -- -- Helper function to add global attributes to a tag in the allowed HTML list.
@@ -2627,4 +2723,4 @@ is
 --         return false;
 -- end;
 
-end Inc_Kses;
+end Inc_KSES;

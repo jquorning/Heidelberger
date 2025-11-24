@@ -160,7 +160,7 @@ is
             if Doaction = "" then   -- if doaction then
                Inc_Pluggables.Check_Admin_Referer ("bulk-posts");
                   declare
-                     use String_Vectors;
+--                   use String_Vectors;
                      use Inc_Functions;
 
                      List : constant List_Type :=
@@ -180,7 +180,7 @@ is
                      end if;
 
                      declare
-                        use Array_Maps;
+--                      use Array_Maps;
 
                         Post_Ids    : List_Type; --  := To_Array; -- ()
                         Post_Status : Unbounded_String;
@@ -191,13 +191,13 @@ is
                            Post_Status
                               := +Preg_Replace (Pattern     => "/(^a-z0-9_-)+/i",
                                                 Replacement => "",
-                                                Subject     => Get (X_REQUEST,
-                                                                    "post_status"));
+                                                Subject     => As_String (Get (X_REQUEST,
+                                                                    "post_status")));
 
                            -- Validate the post status exists.
                            if
                              Inc_Posts.Get_Post_Status_Object (-Post_Status)
-                                /= Empty_Array
+                                /= Null_Status
                            then
                               --
                               -- @global wpdb $wpdb WordPress database abstraction object.
@@ -212,14 +212,15 @@ is
                            end if;
                            Doaction := "delete";
 
-                        elsif Isset (String'(Get (X_REQUEST, "media"))) then
-                           Post_Ids := Get_List (X_REQUEST, "media");
+                        elsif Isset (As_String (Get (X_REQUEST, "media"))) then
+                           Post_Ids := As_List (Get (X_REQUEST, "media"));
 
-                        elsif Isset (String'(Get (X_REQUEST, "ids"))) then
-                           Post_Ids := List_Type'(Explode (",", Get_List (X_REQUEST, "ids")));
-                        elsif not Empty (String'(Get (X_REQUEST, "post"))) then
+                        elsif Isset (As_String (Get (X_REQUEST, "ids"))) then
+                           Post_Ids := Explode (",", As_List (Get (X_REQUEST, "ids")));
+
+                        elsif not Empty (As_String (Get (X_REQUEST, "post"))) then
                            Post_Ids := List_Type'(
-                             Array_Map ("intval", Get_Array (X_REQUEST, "post")));
+                             Array_Map ("intval", As_Array (Get (X_REQUEST, "post"))));
                         end if;
 
                         if Post_Ids.Is_Empty then
@@ -270,8 +271,8 @@ is
                               Untrashed : Natural := 0;
                            begin
                               if
-                                Isset (String'(Get (XX_GET, "doaction"))) and
-                                "undo" = String'(Get (XX_GET, "doaction"))
+                                Isset (As_String (Get (XX_GET, "doaction"))) and then
+                                "undo" = As_String (Get (XX_GET, "doaction"))
                               then
                                  Add_Filter
                                    ("wp_untrash_post_status",
@@ -332,20 +333,20 @@ is
 
                         elsif "edit" = Doaction then
 --              when "edit" =>
-                           if Isset (String'(Get (X_REQUEST, "bulk_edit"))) then
+                           if Isset (As_String (Get (X_REQUEST, "bulk_edit"))) then
                               declare
                                  Done : Array_Type :=
                                     Adi_Posts.Bulk_Edit_Posts (
-                                       Get_Array (X_REQUEST, ""));
+                                       As_Array (Get (X_REQUEST, "")));
                                  -- (item => ) added
                               begin
                                  if Is_Array (Done) then
-                                    Set_Integer (Done, "updated",
-                                                 Count (Get (Done, "updated")));
-                                    Set_Integer (Done, "skipped",
-                                                 Count (Get (Done, "skipped")));
-                                    Set_Integer (Done, "locked",
-                                                 Count (Get (Done, "locked")));
+                                    Set (Done, "updated",
+                                         From_Integer (Count (As_String (Get (Done, "updated")))));
+                                    Set (Done, "skipped",
+                                         From_Integer (Count (As_String (Get (Done, "skipped")))));
+                                    Set (Done, "locked",
+                                         From_Integer (Count (As_String (Get (Done, "locked")))));
                                     Sendback := +Add_Query_Arg (Done, -Sendback);
                                  end if;
                               end;
@@ -402,7 +403,7 @@ is
                declare
                   use Inc_Formatting;
                   use Inc_Functions;
-                  use String_Vectors;
+--                use String_Vectors;
 
                   List : constant List_Type :=
                     To_List (List => (+"_wp_http_referer", +"_wpnonce"));
@@ -410,7 +411,7 @@ is
                   Inc_Pluggables.Wp_Redirect
                             (Remove_Query_Arg
                              (List,
-                              Wp_Unslash (Get (X_SERVER, "REQUEST_URI"))));
+                              Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI")))));
                end;
                return; -- exit;  -- redirect
             end if;
@@ -530,92 +531,92 @@ is
                Bulk_Counts : Array_Type
                   := To_Array (List => (
         Build ("updated",   (if Isset (X_REQUEST, "updated")
-                             then abs Get_Integer (X_REQUEST, "updated") else 0)),
+                             then abs As_Integer (Get (X_REQUEST, "updated")) else 0)),
         Build ("locked",    (if Isset (X_REQUEST, "locked")
-                             then abs Get_Integer (X_REQUEST, "locked") else 0)),
+                             then abs As_Integer (Get (X_REQUEST, "locked")) else 0)),
         Build ("deleted",   (if Isset (X_REQUEST, "deleted")
-                             then abs Get_Integer (X_REQUEST, "deleted")   else 0)),
+                             then abs As_Integer (Get (X_REQUEST, "deleted")) else 0)),
         Build ("trashed",   (if Isset (X_REQUEST, "trashed")
-                             then abs Get_Integer (X_REQUEST, "trashed")   else 0)),
+                             then abs As_Integer (Get (X_REQUEST, "trashed")) else 0)),
         Build ("untrashed", (if Isset (X_REQUEST, "untrashed")
-                             then abs Get_Integer (X_REQUEST, "untrashed") else 0))
+                             then abs As_Integer (Get (X_REQUEST, "untrashed")) else 0))
                ));
                Bulk_Messages    : Array_Type := Empty_Array; --          := To_Array; --  ();begin
             begin
-               Set_Array (Bulk_Messages, "post", To_Array (List => (    --  abs added
+               Set (Bulk_Messages, "post", From_Array (To_Array (List => (    --  abs added
         -- translators: %s: Number of posts.
         Build ("updated", X_N ("%s post updated.",
                                "%s posts updated.",
-                               Get_Integer (Bulk_Counts, "updated"))),
-        Build ("locked", (if 1 = Get_Integer (Bulk_Counts, "locked")
+                               As_Integer (Get (Bulk_Counts, "updated")))),
+        Build ("locked", (if 1 = As_Integer (Get (Bulk_Counts, "locked"))
                           then abs "1 post not updated, somebody is editing it."
                           -- translators: %s: Number of posts.
                           else X_N ("%s post not updated, somebody is editing it.",
                                     "%s posts not updated, somebody is editing them.",
-                                    Get_Integer (Bulk_Counts, "locked")))),
+                                    As_Integer (Get (Bulk_Counts, "locked"))))),
         -- translators: %s: Number of posts.
         Build ("deleted",   X_N ("%s post permanently deleted.",
                                  "%s posts permanently deleted.",
-                                 Get_Integer (Bulk_Counts, "deleted"))),
+                                 As_Integer (Get (Bulk_Counts, "deleted")))),
         -- translators: %s: Number of posts.
         Build ("trashed",   X_N ("%s post moved to the Trash.",
                                  "%s posts moved to the Trash.",
-                                 Get_Integer (Bulk_Counts, "trashed"))),
+                                 As_Integer (Get (Bulk_Counts, "trashed")))),
         -- translators: %s: Number of posts.
         Build ("untrashed", X_N ("%s post restored from the Trash.",
                                  "%s posts restored from the Trash.",
-                                 Get_Integer (Bulk_Counts, "untrashed")))
-               )));
+                                 As_Integer (Get (Bulk_Counts, "untrashed"))))
+               ))));
 
-               Set_Array (Bulk_Messages, "page", To_Array (List => (
+               Set (Bulk_Messages, "page", From_Array (To_Array (List => (
         -- translators: %s: Number of pages.
         Build ("updated", X_N ("%s page updated.",
                                "%s pages updated.",
-                               Get_Integer (Bulk_Counts, "updated"))),
-        Build ("locked",  (if 1 = Get_Integer (Bulk_Counts, "locked")
+                               As_Integer (Get (Bulk_Counts, "updated")))),
+        Build ("locked",  (if 1 = As_Integer (Get (Bulk_Counts, "locked"))
                            then abs "1 page not updated, somebody is editing it."
                            -- translators: %s: Number of pages.
                            else X_N ("%s page not updated, somebody is editing it.",
                                      "%s pages not updated, somebody is editing them.",
-                                     Get_Integer (Bulk_Counts, "locked")))),
+                                     As_Integer (Get (Bulk_Counts, "locked"))))),
         -- translators: %s: Number of pages.
         Build ("deleted", X_N ("%s page permanently deleted.",
                                "%s pages permanently deleted.",
-                               Get_Integer (Bulk_Counts, "deleted"))),
+                               As_Integer (Get (Bulk_Counts, "deleted")))),
         -- translators: %s: Number of pages.
         Build ("trashed", X_N ("%s page moved to the Trash.",
                                "%s pages moved to the Trash.",
-                               Get_Integer (Bulk_Counts, "trashed"))),
+                               As_Integer (Get (Bulk_Counts, "trashed")))),
         -- translators: %s: Number of pages. */
         Build ("untrashed", X_N ("%s page restored from the Trash.",
                                  "%s pages restored from the Trash.",
-                                 Get_Integer (Bulk_Counts, "untrashed")))
-               )));
+                                 As_Integer (Get (Bulk_Counts, "untrashed"))))
+               ))));
 
-               Set_Array (Bulk_Messages, "wp_block", To_Array (List => (
+               Set (Bulk_Messages, "wp_block", From_Array (To_Array (List => (
         -- translators: %s: Number of blocks.
         Build ("updated", X_N ("%s block updated.",
                                "%s blocks updated.",
-                               Get_Integer (Bulk_Counts, "updated"))),
-        Build ("locked",  (if 1 = Get_Integer (Bulk_Counts, "locked")
+                               As_Integer (Get (Bulk_Counts, "updated")))),
+        Build ("locked",  (if 1 = As_Integer (Get (Bulk_Counts, "locked"))
                            then abs "1 block not updated, somebody is editing it."
                            -- translators: %s: Number of blocks.
                            else X_N ("%s block not updated, somebody is editing it.",
                                      "%s blocks not updated, somebody is editing them.",
-                                     Get_Integer (Bulk_Counts, "locked")))),
+                                     As_Integer (Get (Bulk_Counts, "locked"))))),
         -- translators: %s: Number of blocks.
         Build ("deleted",   X_N ("%s block permanently deleted.",
                                  "%s blocks permanently deleted.",
-                                 Get_Integer (Bulk_Counts, "deleted"))),
+                                 As_Integer (Get (Bulk_Counts, "deleted")))),
         -- translators: %s: Number of blocks.
         Build ("trashed",   X_N ("%s block moved to the Trash.",
                                  "%s blocks moved to the Trash.",
-                                  Get_Integer (Bulk_Counts, "trashed"))),
+                                  As_Integer (Get (Bulk_Counts, "trashed")))),
         -- translators: %s: Number of blocks.
         Build ("untrashed", X_N ("%s block restored from the Trash.",
                                  "%s blocks restored from the Trash.",
-                                 Get_Integer (Bulk_Counts, "untrashed")))
-               )));
+                                 As_Integer (Get (Bulk_Counts, "untrashed"))))
+               ))));
 
                --
                -- Filters the bulk action updated messages.
@@ -688,7 +689,7 @@ is
                         if
                           Isset (X_REQUEST, "s") and then
 --                        Isset (String'(Get (X_REQUEST, "s"))) and then
-                          String'(Get (X_REQUEST, "s"))'Length /= 0
+                          As_String (Get (X_REQUEST, "s"))'Length /= 0
                         then
                            declare
                               use Inc_General_Templates;
@@ -726,7 +727,7 @@ is
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Set ("VAR_page_edit_post_status",
                             (if Isset (X_REQUEST, "post_status")
-                             then ESC_Attr (String'(Get (X_REQUEST, "post_status")))
+                             then ESC_Attr (As_String (Get (X_REQUEST, "post_status")))
                              else "all"));
 
                      elsif Var_Name = "VAR_page_edit_post_type" then
@@ -736,7 +737,7 @@ is
                         if Isset (X_REQUEST, "author") then
                            declare
                               Author : constant String :=
-                                ESC_Attr (Get (X_REQUEST, "author"));
+                                ESC_Attr (As_String (Get (X_REQUEST, "author")));
                            begin
                               Set
                                 ("VAR_page_edit_author",
@@ -818,23 +819,23 @@ is
       for X in Bulk_Counts.Iterate loop   -- foreach
          declare
             use Inc_Functions;
-            use Array_Maps;
+--          use Array_Maps;
 
             Count   : constant Natural := Natural'Value (Key (X));
-            Message : constant String  := Get (Bulk_Counts, Key (X));
-            Message_Array : Array_Type renames Get_Array (Bulk_Messages, Post_Type);
-            Post_Array    : Array_Type renames Get_Array (Bulk_Messages, Post_Type);
+            Message : constant String  := As_String (Get (Bulk_Counts, Key (X)));
+            Message_Array : Array_Type renames As_Array (Get (Bulk_Messages, Post_Type));
+            Post_Array    : Array_Type renames As_Array (Get (Bulk_Messages, Post_Type));
          begin
             if Isset (Message_Array, Message) then
 --          if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages,
-                       Sprintf (Get (Message_Array, Message),
+                       Sprintf (As_String (Get (Message_Array, Message)),
                                 To_List (Number_Format_I18n (Float (Count)))));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
             elsif Isset (Post_Array, Message) then
                Append (Messages,
-                       Sprintf (Get (Post_Array, Message),
+                       Sprintf (As_String (Get (Post_Array, Message)),
                                 To_List (Number_Format_I18n (Float (Count)))));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
@@ -846,7 +847,7 @@ is
 
                   Ids   : constant Integer :=
                     Preg_Replace ("/[^0-9,]/", "",
-                      Get_Array (X_REQUEST, "ids"));
+                      As_Array (Get (X_REQUEST, "ids")));
 
                   URL_2 : constant String
                      := """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
@@ -860,12 +861,12 @@ is
                -- "bulk-posts" )) & """>" & abs "Undo" & "</a>";
             end if;
 
-            if "untrashed" = Message and then Isset (String'(Get (X_REQUEST, "ids"))) then
+            if "untrashed" = Message and then Isset (As_String (Get (X_REQUEST, "ids"))) then
                declare
                   use List_Vectors;
 
                   Ids : constant List_Type :=
-                     Explode (",", Get_List (X_REQUEST, "ids"));
+                     Explode (",", As_List (Get (X_REQUEST, "ids")));
                begin
                   if
                     1 = Length (Ids) and then
@@ -911,14 +912,15 @@ is
 
       declare
          use Inc_Functions;
-         use String_Vectors;
+--       use String_Vectors;
 
          List : constant List_Type :=
            To_List (List => (+"locked", +"skipped", +"updated", +"deleted",
                              +"trashed", +"untrashed"));
       begin
          Set (X_SERVER, "REQUEST_URI",
-              Remove_Query_Arg (List, Get (X_SERVER, "REQUEST_URI")));
+              From_String (
+                Remove_Query_Arg (List, As_String (Get (X_SERVER, "REQUEST_URI")))));
       end;
       return "XXX-51";
    end Var_Bulk;

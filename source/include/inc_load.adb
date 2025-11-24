@@ -15,10 +15,11 @@ with Php;
 with Wp_Config;
 
 with Inc_Class_Wpdb;
+with Inc_Class_Wp_Textdomain_Registry;
 with Inc_Functions;
 with Inc_L10n;
+with Inc_Plugins;
 with Inc_Versions;
-with Inc_Class_Wp_Textdomain_Registry;
 
 package body Inc_Load
 is
@@ -1501,33 +1502,30 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Converts a shorthand byte value to an integer byte value.
--- --
--- -- @since 2.3.0
--- -- @since 4.6.0 Moved from media.php to load.php.
--- --
--- -- @link https://www.php.net/manual/en/function.ini-get.php
--- -- @link https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
--- --
--- -- @param string value A (PHP ini) byte value, either shorthand or ordinary.
--- -- @return int An integer byte value.
--- --
--- function wp_convert_hr_to_bytes( value ) then
---         value = strtolower( trim( value ) );
---         bytes = (int) value;
+   ----------------------------
+   -- Wp_Convert_Hr_To_Bytes --
+   ----------------------------
 
---         if ( false !== strpos( value, "g" ) ) then
---                 bytes--= GB_IN_BYTES;
---         end; elseif ( false !== strpos( value, "m" ) ) then
---                 bytes--= MB_IN_BYTES;
---         end; elseif ( false !== strpos( value, "k" ) ) then
---                 bytes--= KB_IN_BYTES;
---         end;
+   function Wp_Convert_Hr_To_Bytes (Value : String)
+                                    return Natural
+   is
+      use Globals;
+      use Php;
 
---         // Deal with large (float) values which run into the maximum integer size.
---         return min( bytes, PHP_INT_MAX );
--- end;
+      Value_2 : constant String := Strtolower (Trim (Value));
+      Bytes   : Natural := Natural'Value (Value_2);
+   begin
+      if 0 /= Strpos (Value_2, "g") then
+         Bytes := Bytes * GB_IN_BYTES;
+      elsif 0 /= Strpos (Value_2, "m") then
+         Bytes := Bytes * MB_IN_BYTES;
+      elsif 0 /= Strpos (Value_2, "k") then
+         Bytes := Bytes * KB_IN_BYTES;
+      end if;
+
+      -- Deal with large (float) values which run into the maximum integer size.
+      return Natural'Min (Bytes, Natural'Last); -- PHP_INT_MAX
+   end Wp_Convert_Hr_To_Bytes;
 
 -- --
 -- -- Determines whether a PHP ini value is changeable at runtime.
@@ -1647,25 +1645,26 @@ is
 --         return is_wp_error;
 -- end;
 
--- --
--- -- Determines whether file modifications are allowed.
--- --
--- -- @since 4.8.0
--- --
--- -- @param string context The usage context.
--- -- @return bool True if file modification is allowed, false otherwise.
--- --
--- function wp_is_file_mod_allowed( context ) then
---         --
---         -- Filters whether file modifications are allowed.
---         --
---         -- @since 4.8.0
---         --
---         -- @param bool   file_mod_allowed Whether file modifications are allowed.
---         -- @param string context          The usage context.
---         --
---         return apply_filters( "file_mod_allowed", ! defined( "DISALLOW_FILE_MODS" ) || ! DISALLOW_FILE_MODS, context );
--- end;
+   ----------------------------
+   -- Wp_Is_File_Mod_Allowed --
+   ----------------------------
+
+   function Wp_Is_File_Mod_Allowed (Context : String)
+                                    return Boolean
+   is
+      use Inc_Plugins;
+   begin
+      --
+      -- Filters whether file modifications are allowed.
+      --
+      -- @since 4.8.0
+      --
+      -- @param bool   file_mod_allowed Whether file modifications are allowed.
+      -- @param string context          The usage context.
+      --
+      return
+        Apply_Filters ("file_mod_allowed", not Globals.DISALLOW_FILE_MODS, Context);
+   end Wp_Is_File_Mod_Allowed;
 
 -- --
 -- -- Start scraping edited file errors.

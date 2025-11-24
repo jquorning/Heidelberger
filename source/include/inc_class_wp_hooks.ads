@@ -123,6 +123,43 @@ is
                          Accepted_Args : Integer);
 
    --
+   -- Checks if a specific callback has been registered for this hook.
+   --
+   -- When using the `callback` argument, this function may return a non-boolean value
+   -- that evaluates to false (e.g. 0), so use the `===` operator for testing the
+   -- return value.
+   --
+   -- @since 4.7.0
+   --
+   -- @param string                      hook_name Optional. The name of the filter
+   --                                               hook. Default empty.
+   -- @param callable|string|array|false callback  Optional. The callback to check for.
+   --                                               This method can be called
+   --                                               unconditionally to speculatively
+   --                                               check a callback that may or may
+   --                                               not exist. Default false.
+   -- @return bool|int If `callback` is omitted, returns boolean for whether the hook
+   --                   has anything registered. When checking a specific function, the
+   --                   priority of that hook is returned, or false if the function is
+   --                   not attached.
+   --
+   function Has_Filter (This      : Wp_Hook;
+                        Hook_Name : String := "";
+                        Callback  : Boolean := False)
+                        return Boolean;
+
+   --
+   -- Checks if any callbacks have been registered for this hook.
+   --
+   -- @since 4.7.0
+   --
+   -- @return bool True if callbacks have been registered for the current hook,
+   --               otherwise false.
+   --
+   function Has_Filters (This : Wp_Hook)
+                         return Boolean;
+
+   --
    -- Calls the callback functions that have been added to a filter hook.
    --
    -- @since 4.7.0

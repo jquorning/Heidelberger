@@ -107,30 +107,31 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'get_user_by' ) ) :
---         --
---         -- Retrieves user info by a given field.
---         --
---         -- @since 2.8.0
---         -- @since 4.4.0 Added 'ID' as an alias of 'id' for the `field` parameter.
---         --
---         -- @global WP_User current_user The current user object which holds the user data.
---         --
---         -- @param string     field The field to retrieve the user with. id | ID | slug | email | login.
---         -- @param int|string value A value for field. A user ID, slug, email address, or login name.
---         -- @return WP_User|false WP_User object on success, false on failure.
---         --
---         function get_user_by( field, value ) then
---                 userdata = WP_User::get_data_by( field, value );
 
---                 if ( ! userdata ) then
---                         return false;
---                 end;
+   -----------------
+   -- Get_User_By --
+   -----------------
 
---                 user = new WP_User;
---                 user->init( userdata );
+   function Get_User_By (Field : String;
+                         Value : Integer)
+                         return Inc_Class_Wp_Users.Wp_User
+   is
+      use Inc_Class_Wp_Users;
 
---                 return user;
---         end;
+      Userdata : constant Wp_User := Get_Data_By (Field, Value);
+   begin
+      if Userdata = Null_User then
+         return Null_User; -- False;
+      end if;
+
+      declare
+         User : Wp_User; --  = new WP_User;
+      begin
+         User.Init (Userdata);
+
+         return User;
+      end;
+   end Get_User_By;
 -- endif;
 
 -- if ( ! function_exists( 'cache_users' ) ) :
@@ -951,7 +952,7 @@ is
          if Empty (X_COOKIE, -Cookie_Name) then
             return Empty_Array; -- false;
          end if;
-         Cookie_2 := +Get (X_COOKIE, -Cookie_Name);
+         Cookie_2 := +As_String (Get (X_COOKIE, -Cookie_Name));
       end if;
 
       declare
@@ -2381,7 +2382,7 @@ is
       use Inc_Users;
 
       User : constant Wp_User := Wp_Get_Current_User;
-      Uid  : Integer := User.ID; -- (int)
+      Uid  : Integer := User.Id; -- (int)
    begin
       if Uid = 0 then
          -- This filter is documented in wp-includes/pluggable.php
@@ -2431,7 +2432,7 @@ is
          -- @param string scheme      Authentication scheme. Values include 'auth',
          --                            'secure_auth', 'logged_in', and 'nonce'.
          --
-         return Apply_Filters ("salt", Get (Static_Cached_Salts, Scheme), Scheme);
+         return Apply_Filters ("salt", As_String (Get (Static_Cached_Salts, Scheme)), Scheme);
       end if;
 
       if Static_Duplicated_Keys = Empty_Array then
@@ -2458,8 +2459,8 @@ is
                declare
                   Value : constant String := (-First) & "_" & (-Second);
                begin
-                  Set_Boolean (Static_Duplicated_Keys, Value,
-                               Isset (Static_Duplicated_Keys, Value));
+                  Set (Static_Duplicated_Keys, Key => Value,
+                       Value => From_Boolean (Isset (Static_Duplicated_Keys, Value)));
                end;
                << Continue >>
             end loop;
@@ -2477,7 +2478,7 @@ is
            SECRET_KEY /= "" and then
            Empty (Static_Duplicated_Keys, SECRET_KEY)
          then
-            Set (Values, "key", SECRET_KEY);
+            Set (Values, "key", From_String (SECRET_KEY));
          end if;
 
          if
@@ -2486,7 +2487,7 @@ is
            SECRET_SALT /= "" and then
            Empty (Static_Duplicated_Keys, SECRET_SALT)
          then
-            Set (Values, "salt", SECRET_SALT);
+            Set (Values, "salt", From_String (SECRET_SALT));
          end if;
 
          if
@@ -2502,14 +2503,14 @@ is
 --                  constant( const ) and then
                     Empty (Static_Duplicated_Keys, Const) -- [ constant( const ) ])
                   then
-                     Set (Values, -Typ, Const); -- constant( const ));
+                     Set (Values, -Typ, From_String (Const)); -- constant( const ));
                   elsif not Isset (Values, -Typ) then
 --                elsif not Values (Typ) then
-                     Set (Values, -Typ, Get_Site_Option (Scheme & "_" & (-Typ)));
+                     Set (Values, -Typ, From_String (Get_Site_Option (Scheme & "_" & (-Typ))));
                      if not Isset (Values, -Typ) then
 --                   if not Values (Typ) then
-                        Set (Values, -Typ, Wp_Generate_Password (64, True, True));
-                        Update_Site_Option (Scheme & "_" & (-Typ), Get (Values, -Typ));
+                        Set (Values, -Typ, From_String (Wp_Generate_Password (64, True, True)));
+                        Update_Site_Option (Scheme & "_" & (-Typ), As_String (Get (Values, -Typ)));
                      end if;
                   end if;
                end;
@@ -2517,21 +2518,31 @@ is
          else
             if not Isset (Values, "key") then
 --          if not Values ("key") then
-               Set (Values, "key", Get_Site_Option ("secret_key"));
+
+               Set (Values, "key",
+                    From_String (Get_Site_Option ("secret_key")));
+
                if not Isset (Values, "key") then
 --             if not Values ("key") then
-                  Set (Values, "key", Wp_Generate_Password (64, True, True));
-                  Update_Site_Option ("secret_key", Get (Values, "key"));
+
+                  Set (Values, "key",
+                       From_String (Wp_Generate_Password (64, True, True)));
+
+                  Update_Site_Option ("secret_key", As_String (Get (Values, "key")));
                end if;
             end if;
-            Set (Values, "salt", Inc_Compat.Hash_Hmac ("md5", Scheme, Get (Values, "key")));
+            Set (Values, "salt",
+                 From_String (Inc_Compat.Hash_Hmac ("md5", Scheme,
+                                                    As_String (Get (Values, "key")))));
          end if;
 
-         Set (Static_Cached_Salts, Scheme, Get (Values, "key") & Get (Values, "salt"));
+         Set (Static_Cached_Salts, Scheme,
+              From_String (As_String (Get (Values, "key")) &
+                           As_String (Get (Values, "salt"))));
 --       Set (Static_Cached_Salts, Scheme, Values ("key") & Values ("salt"));
 
          -- This filter is documented in wp-includes/pluggable.php--
-         return Apply_Filters ("salt", Get (Static_Cached_Salts, Scheme), Scheme);
+         return Apply_Filters ("salt", As_String (Get (Static_Cached_Salts, Scheme)), Scheme);
       end;
    end Wp_Salt;
 

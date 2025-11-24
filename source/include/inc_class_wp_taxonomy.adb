@@ -136,32 +136,35 @@ is
       end if;
 
       if
-        Get (Args_2, "query_var") /= "" and then
-        (Inc_Load.Is_Admin or else Get_Boolean (Args_2, "publicly_queryable"))
+        As_String (Get (Args_2, "query_var")) /= "" and then
+        (Inc_Load.Is_Admin or else As_Boolean (Get (Args_2, "publicly_queryable")))
       then
-         if Get (Args_2, "query_var") /= "" then
-            Set (Args_2, "query_var", -This.Name);
+         if As_String (Get (Args_2, "query_var")) /= "" then
+            Set (Args_2, "query_var", From_String (-This.Name));
          else
             Set (Args_2, "query_var",
-                 Sanitize_Title_With_Dashes (Get (Args_2, "query_var")));
+                 From_String (
+                   Sanitize_Title_With_Dashes (As_String (Get (Args_2, "query_var")))));
          end if;
       else
          -- Force "query_var" to false for non-public taxonomies.
-         Set_Boolean (Args_2, "query_var", False);
+         Set (Args_2, "query_var", From_Boolean (False));
       end if;
 
       if
-        Get_Boolean (Args_2, "rewrite") and then
+        As_Boolean (Get (Args_2, "rewrite")) and then
         (Inc_Load.Is_Admin or else Inc_Options.Get_Option ("permalink_structure"))
       then
-         Set_Array (Args_2, "rewrite", Wp_Parse_Args (
-           Get_Boolean (Args_2, "rewrite"),
-           To_Array (List => (
-             Build ("with_front",   True),
-             Build ("hierarchical", False) -- ,
---           Build ("ep_mask",      Ep_None)
-           ))
-         ));
+         Set (Args_2, "rewrite",
+              From_Array (
+                Wp_Parse_Args (
+                  As_Boolean (Get (Args_2, "rewrite")),
+                  To_Array (List => (
+                    Build ("with_front",   True),
+                    Build ("hierarchical", False) -- ,
+--                  Build ("ep_mask",      Ep_None)
+                  ))
+              )));
 
          -- if Empty (Args_2 ("rewrite") ("slug")) then
          --    Args_2 ("rewrite") ("slug") := Sanitize_Title_With_Dashes (This.Name);
@@ -169,40 +172,52 @@ is
       end if;
 
       -- If not set, default to the setting for "public".
-      if Get_Null (Args_2, "show_ui") then
-         Args_2 ("show_ui") := Args_2 ("public");
+      if Is_Null (Get (Args_2, "show_ui")) then
+         Set (Args_2,
+              Key   => "show_ui",
+              Value => Get (Args_2, "public"));
       end if;
 
       -- If not set, default to the setting for "show_ui".
       if
-        Get_Null (Args_2, "show_in_menu") or else
-        not Get_Boolean (Args_2, "show_ui")
+        Is_Null (Get (Args_2, "show_in_menu")) or else
+        not As_Boolean (Get (Args_2, "show_ui"))
       then
-         Args_2 ("show_in_menu") := Args_2 ("show_ui");
+         Set (Args_2,
+              Key   => "show_in_menu",
+              Value => Get (Args_2, "show_ui"));
       end if;
 
       -- If not set, default to the setting for "public".
-      if Get_Null (Args_2, "show_in_nav_menus") then
-         Args_2 ("show_in_nav_menus") := Args_2 ("public");
+      if Is_Null (Get (Args_2, "show_in_nav_menus")) then
+         Set (Args_2,
+              Key   => "show_in_nav_menus",
+              Value => Get (Args_2, "public"));
       end if;
 
       -- If not set, default to the setting for "show_ui".
-      if Get_Null (Args_2, "show_tagcloud") then
-         Args_2 ("show_tagcloud") := Args_2 ("show_ui");
+      if Is_Null (Get (Args_2, "show_tagcloud")) then
+         Set (Args_2,
+              Key   => "show_tagcloud",
+              Value => Get (Args_2, "show_ui"));
       end if;
 
       -- If not set, default to the setting for "show_ui".
-      if Get_Null (Args_2, "show_in_quick_edit") then
-         Args_2 ("show_in_quick_edit") := Args_2 ("show_ui");
+      if Is_Null (Get (Args_2, "show_in_quick_edit")) then
+         Set (Args_2,
+              Key   => "show_in_quick_edit",
+              Value => Get (Args_2, "show_ui"));
       end if;
 
       -- If not set, default rest_namespace to wp/v2 if show_in_rest is true.
       if
-        not Get_Boolean (Args_2, "rest_namespace") and then
+        not As_Boolean (Get (Args_2, "rest_namespace")) and then
         Isset (Args_2, "show_in_rest")
 --      not Empty (Args_2 ("show_in_rest"))
       then
-         Set (Args_2, "rest_namespace", "wp/v2");
+         Set (Args_2,
+              Key   => "rest_namespace",
+              Value => From_String ("wp/v2"));
       end if;
 
       declare
@@ -213,40 +228,52 @@ is
            Build ("assign_terms", "edit_posts")
          ));
       begin
-         Set_Array (Args_2, "cap",
-                    Array_Merge (Default_Caps, Get_Array (Args_2, "capabilities"))); -- (object)
+         Set (Args_2,
+              Key   => "cap",
+              Value => From_Array (
+                Array_Merge (Default_Caps, As_Array (Get (Args_2, "capabilities"))))); -- (object)
       end;
-      Args_2.Delete ("capabilities");
+      Delete (Ref (Args_2, "capabilities"));
 --    Unset (Args_2 ("capabilities"));
 
-      Set_Array (Args_2, "object_type", Array_Unique (Object_Type)); -- (array)
+      Set (Args_2,
+           Key   => "object_type",
+           Value => From_Array (Array_Unique (Object_Type)));
 
       -- If not set, use the default meta box.
-      if Get_Null (Args_2, "meta_box_cb") then
-         if Get_Boolean (Args_2, "hierarchical") then
-            Set (Args_2, "meta_box_cb", "post_categories_meta_box");
+      if Is_Null (Get (Args_2, "meta_box_cb")) then
+         if As_Boolean (Get (Args_2, "hierarchical")) then
+            Set (Args_2,
+                 Key   => "meta_box_cb",
+                 Value => From_String ("post_categories_meta_box"));
          else
-            Set (Args_2, "meta_box_cb", "post_tags_meta_box");
+            Set (Args_2,
+                 Key   => "meta_box_cb",
+                 Value => From_String ("post_tags_meta_box"));
          end if;
       end if;
 
-      Set (Args_2, "name", -This.Name);
+      Set (Args_2,
+           Key   => "name",
+           Value => From_String (-This.Name));
 
       -- Default meta box sanitization callback depends on the value of "meta_box_cb".
-      if Get_Null (Args_2, "meta_box_sanitize_cb") then
+      if Is_Null (Get (Args_2, "meta_box_sanitize_cb")) then
          declare
-            Arc : constant String := Get (Args_2, "meta_box_cb");
+            Arc : constant String := As_String (Get (Args_2, "meta_box_cb"));
          begin
             if Arc = "post_categories_meta_box" then
-               Set (Args_2, "meta_box_sanitize_cb",
-                    "taxonomy_meta_box_sanitize_cb_checkboxes");
+               Set (Args_2,
+                    Key   => "meta_box_sanitize_cb",
+                    Value => From_String ("taxonomy_meta_box_sanitize_cb_checkboxes"));
                                        --  break;
 
             else
                --  "post_tags_meta_box":
                --  default:
-               Set (Args_2, "meta_box_sanitize_cb",
-                    "taxonomy_meta_box_sanitize_cb_input");
+               Set (Args_2,
+                    Key   => "meta_box_sanitize_cb",
+                    Value => From_String ("taxonomy_meta_box_sanitize_cb_input"));
                -- break;
             end if;
          end;
@@ -259,20 +286,22 @@ is
          --         To_Array (List => (1 =>
          --           Build ("name", Get (Args_2, "default_term")))));
          -- end if;
-         Set_Array (Args_2, "default_term", Wp_Parse_Args (
-           False, -- Get_Array (Args_2, "default_term"),
-           To_Array (List => (
-             Build ("name",        ""),
-             Build ("slug",        ""),
-             Build ("description", "")
-           ))
-         ));
+         Set (Args_2, "default_term",
+              From_Array (
+                Wp_Parse_Args (
+                  False, -- Get_Array (Args_2, "default_term"),
+                  To_Array (List => (
+                    Build ("name",        ""),
+                    Build ("slug",        ""),
+                    Build ("description", "")
+                  ))
+              )));
       end if;
 
       for A in Args_2.Iterate loop
          declare
-            Property_Name  : String       := Array_Maps.Key (A);
-            Property_Value : Array_Record := Array_Maps.Element (A);
+            Property_Name  : String     := Key (A);
+            Property_Value : Multi_Type := Element (A);
          begin
             null;
             -- case Property_Value.Kind is
@@ -328,7 +357,7 @@ is
          begin
             if
               This.Hierarchical and then
-              Get_Boolean (This.Rewrite, "hierarchical")
+              As_Boolean (Get (This.Rewrite, "hierarchical"))
             then
                Tag := +"(.+?)";
             else
@@ -341,7 +370,7 @@ is
                               else "taxonomy=" & (-This.Name) & "&term="));
             Add_Permastruct
               (-This.Name,
-               Get (This.Rewrite, "slug") & "/%" & (-This.Name) & "%",
+               As_String (Get (This.Rewrite, "slug")) & "/%" & (-This.Name) & "%",
                This.Rewrite);
          end;
       end if;

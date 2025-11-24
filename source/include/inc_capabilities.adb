@@ -4,841 +4,1056 @@
 -- -- @package WordPress
 -- -- @subpackage Users
 -- --
+
+with Ada.Strings.Unbounded;
+
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Class_Wp_Comments;
+with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Taxonomy;
+with Inc_Class_Wp_Terms;
+with Inc_Comments;
+with Inc_Functions;
+with Inc_Load;
+with Inc_L10n;
+with Inc_Taxonomys;
+with Inc_Meta;
+with Inc_Options;
+with Inc_Pluggables;
+with Inc_Plugins;
+with Inc_Posts;
+
 package body Inc_Capabilities
 is
-   procedure Dummy is null;
-
--- --
--- -- Maps a capability to the primitive capabilities required of the given user to
--- -- satisfy the capability being checked.
--- --
--- -- This function also accepts an ID of an object to map against if the capability is a meta capability. Meta
--- -- capabilities such as `edit_post` and `edit_user` are capabilities used by this function to map to primitive
--- -- capabilities that a user or role requires, such as `edit_posts` and `edit_others_posts`.
--- --
--- -- Example usage:
--- --
--- --     map_meta_cap( 'edit_posts', user.ID );
--- --     map_meta_cap( 'edit_post', user.ID, post.ID );
--- --     map_meta_cap( 'edit_post_meta', user.ID, post.ID, meta_key );
--- --
--- -- This function does not check whether the user has the required capabilities,
--- -- it just returns what the required capabilities are.
--- --
--- -- @since 2.0.0
--- -- @since 4.9.6 Added the `export_others_personal_data`, `erase_others_personal_data`,
--- --              and `manage_privacy_options` capabilities.
--- -- @since 5.1.0 Added the `update_php` capability.
--- -- @since 5.2.0 Added the `resume_plugin` and `resume_theme` capabilities.
--- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
--- --              by adding it to the function signature.
--- -- @since 5.7.0 Added the `create_app_password`, `list_app_passwords`, `read_app_password`,
--- --              `edit_app_password`, `delete_app_passwords`, `delete_app_password`,
--- --              and `update_https` capabilities.
--- --
--- -- @global array post_type_meta_caps Used to get post type meta capabilities.
--- --
--- -- @param string cap     Capability being checked.
--- -- @param int    user_id User ID.
--- -- @param mixed  ...args Optional further parameters, typically starting with an object ID.
--- -- @return string[] Primitive capabilities required of the user.
--- --
--- function map_meta_cap( cap, user_id, ...args ) then
---         caps = array();
-
---         switch ( cap ) then
---                 case 'remove_user':
---                         -- In multisite the user must be a super admin to remove themselves.
---                         if ( isset( args[0] ) && user_id == args[0] && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'remove_users';
---                         end;
---                         break;
---                 case 'promote_user':
---                 case 'add_users':
---                         caps[] = 'promote_users';
---                         break;
---                 case 'edit_user':
---                 case 'edit_users':
---                         -- Allow user to edit themselves.
---                         if ( 'edit_user' === cap && isset( args[0] ) && user_id == args[0] ) then
---                                 break;
---                         end;
-
---                         -- In multisite the user must have manage_network_users caps. If editing a super admin, the user must be a super admin.
---                         if ( is_multisite() && ( ( ! is_super_admin( user_id ) && 'edit_user' === cap && is_super_admin( args[0] ) ) || ! user_can( user_id, 'manage_network_users' ) ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'edit_users'; -- edit_user maps to edit_users.
---                         end;
---                         break;
---                 case 'delete_post':
---                 case 'delete_page':
---                         if ( ! isset( args[0] ) ) then
---                                 if ( 'delete_post' === cap ) then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific post.' );
---                                 end; else then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific page.' );
---                                 end;
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         post = get_post( args[0] );
---                         if ( ! post ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         if ( 'revision' === post.post_type ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         if ( ( get_option( 'page_for_posts' ) == post.ID ) || ( get_option( 'page_on_front' ) == post.ID ) ) then
---                                 caps[] = 'manage_options';
---                                 break;
---                         end;
-
---                         post_type = get_post_type_object( post.post_type );
---                         if ( ! post_type ) then
---                                 /* translators: 1: Post type, 2: Capability name.--
---                                 message = __( 'The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf(
---                                                 message,
---                                                 '<code>' . post.post_type . '</code>',
---                                                 '<code>' . cap . '</code>'
---                                         ),
---                                         '4.4.0'
---                                 );
-
---                                 caps[] = 'edit_others_posts';
---                                 break;
---                         end;
-
---                         if ( ! post_type.map_meta_cap ) then
---                                 caps[] = post_type.cap.cap;
---                                 -- Prior to 3.1 we would re-call map_meta_cap here.
---                                 if ( 'delete_post' === cap ) then
---                                         cap = post_type.cap.cap;
---                                 end;
---                                 break;
---                         end;
-
---                         -- If the post author is set and the user is the author...
---                         if ( post.post_author && user_id == post.post_author ) then
---                                 -- If the post is published or scheduled...
---                                 if ( in_array( post.post_status, array( 'publish', 'future' ), true ) ) then
---                                         caps[] = post_type.cap.delete_published_posts;
---                                 end; elseif ( 'trash' === post.post_status ) then
---                                         status = get_post_meta( post.ID, '_wp_trash_meta_status', true );
---                                         if ( in_array( status, array( 'publish', 'future' ), true ) ) then
---                                                 caps[] = post_type.cap.delete_published_posts;
---                                         end; else then
---                                                 caps[] = post_type.cap.delete_posts;
---                                         end;
---                                 end; else then
---                                         -- If the post is draft...
---                                         caps[] = post_type.cap.delete_posts;
---                                 end;
---                         end; else then
---                                 -- The user is trying to edit someone else's post.
---                                 caps[] = post_type.cap.delete_others_posts;
---                                 -- The post is published or scheduled, extra cap required.
---                                 if ( in_array( post.post_status, array( 'publish', 'future' ), true ) ) then
---                                         caps[] = post_type.cap.delete_published_posts;
---                                 end; elseif ( 'private' === post.post_status ) then
---                                         caps[] = post_type.cap.delete_private_posts;
---                                 end;
---                         end;
-
---                         /*
---                         -- Setting the privacy policy page requires `manage_privacy_options`,
---                         -- so deleting it should require that too.
---                         --
---                         if ( (int) get_option( 'wp_page_for_privacy_policy' ) === post.ID ) then
---                                 caps = array_merge( caps, map_meta_cap( 'manage_privacy_options', user_id ) );
---                         end;
-
---                         break;
---                 -- edit_post breaks down to edit_posts, edit_published_posts, or
---                 -- edit_others_posts.
---                 case 'edit_post':
---                 case 'edit_page':
---                         if ( ! isset( args[0] ) ) then
---                                 if ( 'edit_post' === cap ) then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific post.' );
---                                 end; else then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific page.' );
---                                 end;
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         post = get_post( args[0] );
---                         if ( ! post ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         if ( 'revision' === post.post_type ) then
---                                 post = get_post( post.post_parent );
---                                 if ( ! post ) then
---                                         caps[] = 'do_not_allow';
---                                         break;
---                                 end;
---                         end;
-
---                         post_type = get_post_type_object( post.post_type );
---                         if ( ! post_type ) then
---                                 /* translators: 1: Post type, 2: Capability name.--
---                                 message = __( 'The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf(
---                                                 message,
---                                                 '<code>' . post.post_type . '</code>',
---                                                 '<code>' . cap . '</code>'
---                                         ),
---                                         '4.4.0'
---                                 );
-
---                                 caps[] = 'edit_others_posts';
---                                 break;
---                         end;
-
---                         if ( ! post_type.map_meta_cap ) then
---                                 caps[] = post_type.cap.cap;
---                                 -- Prior to 3.1 we would re-call map_meta_cap here.
---                                 if ( 'edit_post' === cap ) then
---                                         cap = post_type.cap.cap;
---                                 end;
---                                 break;
---                         end;
-
---                         -- If the post author is set and the user is the author...
---                         if ( post.post_author && user_id == post.post_author ) then
---                                 -- If the post is published or scheduled...
---                                 if ( in_array( post.post_status, array( 'publish', 'future' ), true ) ) then
---                                         caps[] = post_type.cap.edit_published_posts;
---                                 end; elseif ( 'trash' === post.post_status ) then
---                                         status = get_post_meta( post.ID, '_wp_trash_meta_status', true );
---                                         if ( in_array( status, array( 'publish', 'future' ), true ) ) then
---                                                 caps[] = post_type.cap.edit_published_posts;
---                                         end; else then
---                                                 caps[] = post_type.cap.edit_posts;
---                                         end;
---                                 end; else then
---                                         -- If the post is draft...
---                                         caps[] = post_type.cap.edit_posts;
---                                 end;
---                         end; else then
---                                 -- The user is trying to edit someone else's post.
---                                 caps[] = post_type.cap.edit_others_posts;
---                                 -- The post is published or scheduled, extra cap required.
---                                 if ( in_array( post.post_status, array( 'publish', 'future' ), true ) ) then
---                                         caps[] = post_type.cap.edit_published_posts;
---                                 end; elseif ( 'private' === post.post_status ) then
---                                         caps[] = post_type.cap.edit_private_posts;
---                                 end;
---                         end;
-
---                         /*
---                         -- Setting the privacy policy page requires `manage_privacy_options`,
---                         -- so editing it should require that too.
---                         --
---                         if ( (int) get_option( 'wp_page_for_privacy_policy' ) === post.ID ) then
---                                 caps = array_merge( caps, map_meta_cap( 'manage_privacy_options', user_id ) );
---                         end;
-
---                         break;
---                 case 'read_post':
---                 case 'read_page':
---                         if ( ! isset( args[0] ) ) then
---                                 if ( 'read_post' === cap ) then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific post.' );
---                                 end; else then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific page.' );
---                                 end;
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         post = get_post( args[0] );
---                         if ( ! post ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         if ( 'revision' === post.post_type ) then
---                                 post = get_post( post.post_parent );
---                                 if ( ! post ) then
---                                         caps[] = 'do_not_allow';
---                                         break;
---                                 end;
---                         end;
-
---                         post_type = get_post_type_object( post.post_type );
---                         if ( ! post_type ) then
---                                 /* translators: 1: Post type, 2: Capability name.--
---                                 message = __( 'The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf(
---                                                 message,
---                                                 '<code>' . post.post_type . '</code>',
---                                                 '<code>' . cap . '</code>'
---                                         ),
---                                         '4.4.0'
---                                 );
-
---                                 caps[] = 'edit_others_posts';
---                                 break;
---                         end;
-
---                         if ( ! post_type.map_meta_cap ) then
---                                 caps[] = post_type.cap.cap;
---                                 -- Prior to 3.1 we would re-call map_meta_cap here.
---                                 if ( 'read_post' === cap ) then
---                                         cap = post_type.cap.cap;
---                                 end;
---                                 break;
---                         end;
-
---                         status_obj = get_post_status_object( get_post_status( post ) );
---                         if ( ! status_obj ) then
---                                 /* translators: 1: Post status, 2: Capability name.--
---                                 message = __( 'The post status %1s is not registered, so it may not be reliable to check the capability %2s against a post with that status.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf(
---                                                 message,
---                                                 '<code>' . get_post_status( post ) . '</code>',
---                                                 '<code>' . cap . '</code>'
---                                         ),
---                                         '5.4.0'
---                                 );
-
---                                 caps[] = 'edit_others_posts';
---                                 break;
---                         end;
-
---                         if ( status_obj.public ) then
---                                 caps[] = post_type.cap.read;
---                                 break;
---                         end;
-
---                         if ( post.post_author && user_id == post.post_author ) then
---                                 caps[] = post_type.cap.read;
---                         end; elseif ( status_obj.private ) then
---                                 caps[] = post_type.cap.read_private_posts;
---                         end; else then
---                                 caps = map_meta_cap( 'edit_post', user_id, post.ID );
---                         end;
---                         break;
---                 case 'publish_post':
---                         if ( ! isset( args[0] ) ) then
---                                 /* translators: %s: Capability name.--
---                                 message = __( 'When checking for the %s capability, you must always check it against a specific post.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         post = get_post( args[0] );
---                         if ( ! post ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         post_type = get_post_type_object( post.post_type );
---                         if ( ! post_type ) then
---                                 /* translators: 1: Post type, 2: Capability name.--
---                                 message = __( 'The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf(
---                                                 message,
---                                                 '<code>' . post.post_type . '</code>',
---                                                 '<code>' . cap . '</code>'
---                                         ),
---                                         '4.4.0'
---                                 );
-
---                                 caps[] = 'edit_others_posts';
---                                 break;
---                         end;
-
---                         caps[] = post_type.cap.publish_posts;
---                         break;
---                 case 'edit_post_meta':
---                 case 'delete_post_meta':
---                 case 'add_post_meta':
---                 case 'edit_comment_meta':
---                 case 'delete_comment_meta':
---                 case 'add_comment_meta':
---                 case 'edit_term_meta':
---                 case 'delete_term_meta':
---                 case 'add_term_meta':
---                 case 'edit_user_meta':
---                 case 'delete_user_meta':
---                 case 'add_user_meta':
---                         object_type = explode( '_', cap )[1];
-
---                         if ( ! isset( args[0] ) ) then
---                                 if ( 'post' === object_type ) then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific post.' );
---                                 end; elseif ( 'comment' === object_type ) then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific comment.' );
---                                 end; elseif ( 'term' === object_type ) then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific term.' );
---                                 end; else then
---                                         /* translators: %s: Capability name.--
---                                         message = __( 'When checking for the %s capability, you must always check it against a specific user.' );
---                                 end;
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         object_id = (int) args[0];
-
---                         object_subtype = get_object_subtype( object_type, object_id );
-
---                         if ( empty( object_subtype ) ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         caps = map_meta_cap( "edit_thenobject_typeend;", user_id, object_id );
-
---                         meta_key = isset( args[1] ) ? args[1] : false;
-
---                         if ( meta_key ) then
---                                 allowed = ! is_protected_meta( meta_key, object_type );
-
---                                 if ( ! empty( object_subtype ) && has_filter( "auth_thenobject_typeend;_meta_thenmeta_keyend;_for_thenobject_subtypeend;" ) ) then
-
---                                         --
---                                         -- Filters whether the user is allowed to edit a specific meta key of a specific object type and subtype.
---                                         --
---                                         -- The dynamic portions of the hook name, `object_type`, `meta_key`,
---                                         -- and `object_subtype`, refer to the metadata object type (comment, post, term or user),
---                                         -- the meta key value, and the object subtype respectively.
---                                         --
---                                         -- @since 4.9.8
---                                         --
---                                         -- @param bool     allowed   Whether the user can add the object meta. Default false.
---                                         -- @param string   meta_key  The meta key.
---                                         -- @param int      object_id Object ID.
---                                         -- @param int      user_id   User ID.
---                                         -- @param string   cap       Capability name.
---                                         -- @param string[] caps      Array of the user's capabilities.
---                                         --
---                                         allowed = apply_filters( "auth_thenobject_typeend;_meta_thenmeta_keyend;_for_thenobject_subtypeend;", allowed, meta_key, object_id, user_id, cap, caps );
---                                 end; else then
-
---                                         --
---                                         -- Filters whether the user is allowed to edit a specific meta key of a specific object type.
---                                         --
---                                         -- Return true to have the mapped meta caps from `edit_thenobject_typeend;` apply.
---                                         --
---                                         -- The dynamic portion of the hook name, `object_type` refers to the object type being filtered.
---                                         -- The dynamic portion of the hook name, `meta_key`, refers to the meta key passed to map_meta_cap().
---                                         --
---                                         -- @since 3.3.0 As `auth_post_meta_thenmeta_keyend;`.
---                                         -- @since 4.6.0
---                                         --
---                                         -- @param bool     allowed   Whether the user can add the object meta. Default false.
---                                         -- @param string   meta_key  The meta key.
---                                         -- @param int      object_id Object ID.
---                                         -- @param int      user_id   User ID.
---                                         -- @param string   cap       Capability name.
---                                         -- @param string[] caps      Array of the user's capabilities.
---                                         --
---                                         allowed = apply_filters( "auth_thenobject_typeend;_meta_thenmeta_keyend;", allowed, meta_key, object_id, user_id, cap, caps );
---                                 end;
-
---                                 if ( ! empty( object_subtype ) ) then
-
---                                         --
---                                         -- Filters whether the user is allowed to edit meta for specific object types/subtypes.
---                                         --
---                                         -- Return true to have the mapped meta caps from `edit_thenobject_typeend;` apply.
---                                         --
---                                         -- The dynamic portion of the hook name, `object_type` refers to the object type being filtered.
---                                         -- The dynamic portion of the hook name, `object_subtype` refers to the object subtype being filtered.
---                                         -- The dynamic portion of the hook name, `meta_key`, refers to the meta key passed to map_meta_cap().
---                                         --
---                                         -- @since 4.6.0 As `auth_post_thenpost_typeend;_meta_thenmeta_keyend;`.
---                                         -- @since 4.7.0 Renamed from `auth_post_thenpost_typeend;_meta_thenmeta_keyend;` to
---                                         --              `auth_thenobject_typeend;_thenobject_subtypeend;_meta_thenmeta_keyend;`.
---                                         -- @deprecated 4.9.8 Use {@see 'auth_thenobject_type}_meta_thenmeta_keyend;_for_thenobject_subtypeend;'end; instead.
---                                         --
---                                         -- @param bool     allowed   Whether the user can add the object meta. Default false.
---                                         -- @param string   meta_key  The meta key.
---                                         -- @param int      object_id Object ID.
---                                         -- @param int      user_id   User ID.
---                                         -- @param string   cap       Capability name.
---                                         -- @param string[] caps      Array of the user's capabilities.
---                                         --
---                                         allowed = apply_filters_deprecated(
---                                                 "auth_thenobject_typeend;_thenobject_subtypeend;_meta_thenmeta_keyend;",
---                                                 array( allowed, meta_key, object_id, user_id, cap, caps ),
---                                                 '4.9.8',
---                                                 "auth_thenobject_typeend;_meta_thenmeta_keyend;_for_thenobject_subtypeend;"
---                                         );
---                                 end;
-
---                                 if ( ! allowed ) then
---                                         caps[] = cap;
---                                 end;
---                         end;
---                         break;
---                 case 'edit_comment':
---                         if ( ! isset( args[0] ) ) then
---                                 /* translators: %s: Capability name.--
---                                 message = __( 'When checking for the %s capability, you must always check it against a specific comment.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         comment = get_comment( args[0] );
---                         if ( ! comment ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         post = get_post( comment.comment_post_ID );
-
---                         /*
---                         -- If the post doesn't exist, we have an orphaned comment.
---                         -- Fall back to the edit_posts capability, instead.
---                         --
---                         if ( post ) then
---                                 caps = map_meta_cap( 'edit_post', user_id, post.ID );
---                         end; else then
---                                 caps = map_meta_cap( 'edit_posts', user_id );
---                         end;
---                         break;
---                 case 'unfiltered_upload':
---                         if ( defined( 'ALLOW_UNFILTERED_UPLOADS' ) && ALLOW_UNFILTERED_UPLOADS && ( ! is_multisite() || is_super_admin( user_id ) ) ) then
---                                 caps[] = cap;
---                         end; else then
---                                 caps[] = 'do_not_allow';
---                         end;
---                         break;
---                 case 'edit_css':
---                 case 'unfiltered_html':
---                         -- Disallow unfiltered_html for all users, even admins and super admins.
---                         if ( defined( 'DISALLOW_UNFILTERED_HTML' ) && DISALLOW_UNFILTERED_HTML ) then
---                                 caps[] = 'do_not_allow';
---                         end; elseif ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'unfiltered_html';
---                         end;
---                         break;
---                 case 'edit_files':
---                 case 'edit_plugins':
---                 case 'edit_themes':
---                         -- Disallow the file editors.
---                         if ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) then
---                                 caps[] = 'do_not_allow';
---                         end; elseif ( ! wp_is_file_mod_allowed( 'capability_edit_themes' ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; elseif ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = cap;
---                         end;
---                         break;
---                 case 'update_plugins':
---                 case 'delete_plugins':
---                 case 'install_plugins':
---                 case 'upload_plugins':
---                 case 'update_themes':
---                 case 'delete_themes':
---                 case 'install_themes':
---                 case 'upload_themes':
---                 case 'update_core':
---                         -- Disallow anything that creates, deletes, or updates core, plugin, or theme files.
---                         -- Files in uploads are excepted.
---                         if ( ! wp_is_file_mod_allowed( 'capability_update_core' ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; elseif ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; elseif ( 'upload_themes' === cap ) then
---                                 caps[] = 'install_themes';
---                         end; elseif ( 'upload_plugins' === cap ) then
---                                 caps[] = 'install_plugins';
---                         end; else then
---                                 caps[] = cap;
---                         end;
---                         break;
---                 case 'install_languages':
---                 case 'update_languages':
---                         if ( ! wp_is_file_mod_allowed( 'can_install_language_pack' ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; elseif ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'install_languages';
---                         end;
---                         break;
---                 case 'activate_plugins':
---                 case 'deactivate_plugins':
---                 case 'activate_plugin':
---                 case 'deactivate_plugin':
---                         caps[] = 'activate_plugins';
---                         if ( is_multisite() ) then
---                                 -- update_, install_, and delete_ are handled above with is_super_admin().
---                                 menu_perms = get_site_option( 'menu_items', array() );
---                                 if ( empty( menu_perms['plugins'] ) ) then
---                                         caps[] = 'manage_network_plugins';
---                                 end;
---                         end;
---                         break;
---                 case 'resume_plugin':
---                         caps[] = 'resume_plugins';
---                         break;
---                 case 'resume_theme':
---                         caps[] = 'resume_themes';
---                         break;
---                 case 'delete_user':
---                 case 'delete_users':
---                         -- If multisite only super admins can delete users.
---                         if ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'delete_users'; -- delete_user maps to delete_users.
---                         end;
---                         break;
---                 case 'create_users':
---                         if ( ! is_multisite() ) then
---                                 caps[] = cap;
---                         end; elseif ( is_super_admin( user_id ) || get_site_option( 'add_new_users' ) ) then
---                                 caps[] = cap;
---                         end; else then
---                                 caps[] = 'do_not_allow';
---                         end;
---                         break;
---                 case 'manage_links':
---                         if ( get_option( 'link_manager_enabled' ) ) then
---                                 caps[] = cap;
---                         end; else then
---                                 caps[] = 'do_not_allow';
---                         end;
---                         break;
---                 case 'customize':
---                         caps[] = 'edit_theme_options';
---                         break;
---                 case 'delete_site':
---                         if ( is_multisite() ) then
---                                 caps[] = 'manage_options';
---                         end; else then
---                                 caps[] = 'do_not_allow';
---                         end;
---                         break;
---                 case 'edit_term':
---                 case 'delete_term':
---                 case 'assign_term':
---                         if ( ! isset( args[0] ) ) then
---                                 /* translators: %s: Capability name.--
---                                 message = __( 'When checking for the %s capability, you must always check it against a specific term.' );
-
---                                 _doing_it_wrong(
---                                         __FUNCTION__,
---                                         sprintf( message, '<code>' . cap . '</code>' ),
---                                         '6.1.0'
---                                 );
-
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         term_id = (int) args[0];
---                         term    = get_term( term_id );
---                         if ( ! term || is_wp_error( term ) ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         tax = get_taxonomy( term.taxonomy );
---                         if ( ! tax ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         if ( 'delete_term' === cap
---                                 && ( get_option( 'default_' . term.taxonomy ) == term.term_id
---                                         || get_option( 'default_term_' . term.taxonomy ) == term.term_id )
---                         ) then
---                                 caps[] = 'do_not_allow';
---                                 break;
---                         end;
-
---                         taxo_cap = cap . 's';
-
---                         caps = map_meta_cap( tax.cap.taxo_cap, user_id, term_id );
-
---                         break;
---                 case 'manage_post_tags':
---                 case 'edit_categories':
---                 case 'edit_post_tags':
---                 case 'delete_categories':
---                 case 'delete_post_tags':
---                         caps[] = 'manage_categories';
---                         break;
---                 case 'assign_categories':
---                 case 'assign_post_tags':
---                         caps[] = 'edit_posts';
---                         break;
---                 case 'create_sites':
---                 case 'delete_sites':
---                 case 'manage_network':
---                 case 'manage_sites':
---                 case 'manage_network_users':
---                 case 'manage_network_plugins':
---                 case 'manage_network_themes':
---                 case 'manage_network_options':
---                 case 'upgrade_network':
---                         caps[] = cap;
---                         break;
---                 case 'setup_network':
---                         if ( is_multisite() ) then
---                                 caps[] = 'manage_network_options';
---                         end; else then
---                                 caps[] = 'manage_options';
---                         end;
---                         break;
---                 case 'update_php':
---                         if ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'update_core';
---                         end;
---                         break;
---                 case 'update_https':
---                         if ( is_multisite() && ! is_super_admin( user_id ) ) then
---                                 caps[] = 'do_not_allow';
---                         end; else then
---                                 caps[] = 'manage_options';
---                                 caps[] = 'update_core';
---                         end;
---                         break;
---                 case 'export_others_personal_data':
---                 case 'erase_others_personal_data':
---                 case 'manage_privacy_options':
---                         caps[] = is_multisite() ? 'manage_network' : 'manage_options';
---                         break;
---                 case 'create_app_password':
---                 case 'list_app_passwords':
---                 case 'read_app_password':
---                 case 'edit_app_password':
---                 case 'delete_app_passwords':
---                 case 'delete_app_password':
---                         caps = map_meta_cap( 'edit_user', user_id, args[0] );
---                         break;
---                 default:
---                         -- Handle meta capabilities for custom post types.
---                         global post_type_meta_caps;
---                         if ( isset( post_type_meta_caps[ cap ] ) ) then
---                                 return map_meta_cap( post_type_meta_caps[ cap ], user_id, ...args );
---                         end;
-
---                         -- Block capabilities map to their post equivalent.
---                         block_caps = array(
---                                 'edit_blocks',
---                                 'edit_others_blocks',
---                                 'publish_blocks',
---                                 'read_private_blocks',
---                                 'delete_blocks',
---                                 'delete_private_blocks',
---                                 'delete_published_blocks',
---                                 'delete_others_blocks',
---                                 'edit_private_blocks',
---                                 'edit_published_blocks',
---                         );
---                         if ( in_array( cap, block_caps, true ) ) then
---                                 cap = str_replace( '_blocks', '_posts', cap );
---                         end;
-
---                         -- If no meta caps match, return the original cap.
---                         caps[] = cap;
---         end;
-
---         --
---         -- Filters the primitive capabilities required of the given user to satisfy the
---         -- capability being checked.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string[] caps    Primitive capabilities required of the user.
---         -- @param string   cap     Capability being checked.
---         -- @param int      user_id The user ID.
---         -- @param array    args    Adds context to the capability check, typically
---         --                          starting with an object ID.
---         --
---         return apply_filters( 'map_meta_cap', caps, cap, user_id, args );
--- end;
+   Global_Super_Admins        : List_Type;
+   Global_Post_Type_Meta_Caps : Array_Type;
+
+   Global_Wp_Roles : constant Inc_Class_Wp_Roles.Wp_Roles :=
+     Inc_Class_Wp_Roles.X_Construct;
+
+   function Apply_Filters (Hook  : String;
+                           Value : List_Type;
+                           S     : String;
+                           U     : Integer;
+                           Args  : Args_Type)
+                           return List_Type
+                           is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Boolean;
+                           S     : String;
+                           O_Id  : Integer;
+                           U_Id  : Integer;
+                           C     : String;
+                           L     : List_Type)
+                           return Boolean
+                           is (Value);
+   ------------------
+   -- Map_Meta_Cap --
+   ------------------
+
+   function Map_Meta_Cap (Cap     : String;
+                          User_Id : Integer;
+                          Args    : Args_Type := Null_Args_Type)
+                          return List_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Options;
+      use Inc_Plugins;
+      use Inc_Posts;
+
+      Caps  : List_Type;
+      Cap_2 : Unbounded_String;
+      Publish_Future : constant List_Type := To_List (List => (+"publish", +"future"));
+   begin
+      -- switch ( cap ) then
+      if Cap in "remove_user" then
+         -- In multisite the user must be a super admin to remove themselves.
+         if
+           Args.User_Id /= 0 and then
+           User_Id = Args.User_Id and then
+           not Is_Super_Admin (User_Id)
+         then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "remove_users");
+         end if;
+
+      elsif Cap in "promote_user" |
+                   "add_users"
+      then
+         Append (Caps, "promote_users");
+
+      elsif Cap in "edit_user" |
+                   "edit_users"
+      then
+         -- Allow user to edit themselves.
+         if
+           "edit_user" = Cap and then
+           Args.User_Id /= 0 and then
+           User_Id = Args.User_Id
+         then
+            goto Break_1;
+         end if;
+
+         -- In multisite the user must have manage_network_users caps. If editing a
+         -- super admin, the user must be a super admin.
+         if
+           Is_Multisite and then
+           ((not Is_Super_Admin (User_Id) and then
+             "edit_user" = Cap and then
+             Is_Super_Admin (Args.User_Id)) or else
+           not User_Can (User_Id, "manage_network_users"))
+         then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "edit_users"); -- edit_user maps to edit_users.
+         end if;
+         << Break_1 >>
+
+      elsif Cap in "delete_post" |
+                   "delete_page"
+      then
+         if Args.Post_Id = 0 then
+            declare
+               Message : Unbounded_String;
+            begin
+               if "delete_post" = Cap then
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific post.";
+               else
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific page.";
+               end if;
+
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (-Message,
+                          To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+            end;
+            Append (Caps, "do_not_allow");
+            goto Break_2;
+         end if;
+
+         declare
+            Post      : Wp_Post      := Null_Post;
+            Post_Type : Wp_Post_Type := Null_Post_Type;
+            Message   : Unbounded_String;
+         begin
+            Post := Get_Post (Args.Post_Id);
+            if Post = Null_Post then
+               Append (Caps, "do_not_allow");
+               goto Break_2;
+            end if;
+
+            if "revision" = Post.Post_Type then
+               Append (Caps, "do_not_allow");
+               goto Break_2;
+            end if;
+
+            if
+              (Get_Option ("page_for_posts") = Integer (Post.Id)) or else
+              (Get_Option ("page_on_front")  = Integer (Post.Id))
+            then
+               Append (Caps, "manage_options");
+               goto Break_2;
+            end if;
+
+            Post_Type := Get_Post_Type_Object (-Post.Post_Type);
+            if Post_Type = Null_Post_Type then
+               -- translators: 1: Post type, 2: Capability name.
+               Message := +abs "The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.";
+
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (
+                   -Message, To_List (List => (
+                     1 => +"<code>" & Post.Post_Type & "</code>",
+                     2 => +"<code>" & Cap & "</code>"
+                   ))
+                 ),
+                 "4.4.0"
+               );
+
+               Append (Caps, "edit_others_posts");
+               goto Break_2;
+            end if;
+
+            if not Post_Type.Map_Meta_Cap then
+               Append (Caps, As_String (Get (Post_Type.Cap, "cap")));
+               -- Prior to 3.1 we would re-call map_meta_cap here.
+               if "delete_post" = Cap then
+                  Cap_2 := +As_String (Get (Post_Type.Cap, "cap"));
+               end if;
+               goto Break_2;
+            end if;
+
+            -- If the post author is set and the user is the author...
+            if Post.Post_Author /= 0 and then User_Id = Post.Post_Author then
+               -- If the post is published or scheduled...
+               if In_Array (-Post.Post_Status, Publish_Future, True) then
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "delete_published_posts")));
+               elsif "trash" = Post.Post_Status then
+                  declare
+                     Status : constant String :=
+                       Get_Post_Meta (Post.Id, "_wp_trash_meta_status", True);
+                  begin
+                     if In_Array (Status, Publish_Future, True) then
+                        Append (Caps,
+                                As_String (Get (
+                                  Post_Type.Cap, "delete_published_posts")));
+                     else
+                        Append (Caps,
+                                As_String (Get (
+                                  Post_Type.Cap, "delete_posts")));
+                     end if;
+                  end;
+               else
+                  -- If the post is draft...
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "delete_posts")));
+               end if;
+            else
+               -- The user is trying to edit someone else"s post.
+               Append (Caps,
+                       As_String (Get (
+                         Post_Type.Cap, "delete_others_posts")));
+               -- The post is published or scheduled, extra cap required.
+               if
+                 In_Array (-Post.Post_Status, Publish_Future, True)
+               then
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "delete_published_posts")));
+               elsif "private" = Post.Post_Status then
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "delete_private_posts")));
+               end if;
+            end if;
+
+            --
+            -- Setting the privacy policy page requires `manage_privacy_options`,
+            -- so deleting it should require that too.
+            --
+            if Get_Option ("wp_page_for_privacy_policy") = Integer (Post.Id) then
+               Caps :=
+                 Array_Merge (Caps, Map_Meta_Cap ("manage_privacy_options", User_Id));
+            end if;
+         end;
+         << Break_2 >>
+
+      -- edit_post breaks down to edit_posts, edit_published_posts, or
+      -- edit_others_posts.
+      elsif Cap in "edit_post" |
+                   "edit_page"
+      then
+         if Args.Post_Id = 0 then
+            declare
+               Message : Unbounded_String;
+            begin
+               if "edit_post" = Cap then
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific post.";
+               else
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific page.";
+               end if;
+
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (-Message,
+                          To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+            end;
+            Append (Caps, "do_not_allow");
+            goto Break_3;
+         end if;
+
+         declare
+            Post      : Wp_Post      := Null_Post;
+            Post_Type : Wp_Post_Type := Null_Post_Type;
+            Message   : Unbounded_String;
+         begin
+            Post := Get_Post (Args.Post_Id);
+            if Post = Null_Post then
+               Append (Caps, "do_not_allow");
+               goto Break_3;
+            end if;
+
+            if "revision" = Post.Post_Type then
+               Post := Get_Post (Post.Post_Parent);
+               if Post = Null_Post then
+                  Append (Caps, "do_not_allow");
+                  goto Break_3;
+               end if;
+            end if;
+
+            Post_Type := Get_Post_Type_Object (-Post.Post_Type);
+            if Post_Type = Null_Post_Type then
+               -- translators: 1: Post type, 2: Capability name.
+               Message := +abs "The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.";
+
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (
+                   -Message, To_List (List => (
+                     1 => +"<code>" & Post.Post_Type & "</code>",
+                     2 => +"<code>" & Cap & "</code>"))
+                 ),
+                 "4.4.0"
+               );
+
+               Append (Caps, "edit_others_posts");
+               goto Break_3;
+            end if;
+
+            if not Post_Type.Map_Meta_Cap then
+               Append (Caps, As_String (Get (Post_Type.Cap, "cap")));
+               -- Prior to 3.1 we would re-call map_meta_cap here.
+               if "edit_post" = Cap then
+                  Cap_2 := +As_String (Get (Post_Type.Cap, "cap"));
+               end if;
+               goto Break_3;
+            end if;
+
+            -- If the post author is set and the user is the author...
+            if Post.Post_Author /= 0 and then User_Id = Post.Post_Author then
+               -- If the post is published or scheduled...
+               if In_Array (-Post.Post_Status, Publish_Future, True) then
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "edit_published_posts")));
+
+               elsif "trash" = Post.Post_Status then
+                  declare
+                     Status : constant String :=
+                       Get_Post_Meta (Post.Id, "_wp_trash_meta_status", True);
+                  begin
+                     if In_Array (Status, Publish_Future, True) then
+                        Append (Caps,
+                                As_String (Get (
+                                  Post_Type.Cap, "edit_published_posts")));
+                     else
+                        Append (Caps,
+                                As_String (Get (
+                                  Post_Type.Cap, "edit_posts")));
+                     end if;
+                  end;
+               else
+                  -- If the post is draft...
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "edit_posts")));
+               end if;
+            else
+               -- The user is trying to edit someone else"s post.
+               Append (Caps, As_String (Get (Post_Type.Cap, "edit_others_posts")));
+               -- The post is published or scheduled, extra cap required.
+               if In_Array (-Post.Post_Status, Publish_Future, True) then
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "edit_published_posts")));
+               elsif "private" = Post.Post_Status then
+                  Append (Caps,
+                          As_String (Get (
+                            Post_Type.Cap, "edit_private_posts")));
+               end if;
+            end if;
+
+            --
+            -- Setting the privacy policy page requires `manage_privacy_options`,
+            -- so editing it should require that too.
+            --
+            if Get_Option ("wp_page_for_privacy_policy") = Integer (Post.Id) then
+               Caps :=
+                 Array_Merge (Caps, Map_Meta_Cap ("manage_privacy_options", User_Id));
+            end if;
+         end;
+         << Break_3 >>
+
+      elsif Cap in "read_post" |
+                   "read_page"
+      then
+         if Args.Post_Id = 0 then
+            declare
+               Message : Unbounded_String;
+            begin
+               if "read_post" = Cap then
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific post.";
+               else
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific page.";
+               end if;
+
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (-Message, To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+            end;
+
+            Append (Caps, "do_not_allow");
+            goto Break_4;
+         end if;
+
+         declare
+            Post       : Wp_Post      := Null_Post;
+            Post_Type  : Wp_Post_Type := Null_Post_Type;
+            Status_Obj : Status_Type; -- Array_Type;
+         begin
+            Post := Get_Post (Args.Post_Id);
+            if Post = Null_Post then
+               Append (Caps, "do_not_allow");
+               goto Break_4;
+            end if;
+
+            if "revision" = Post.Post_Type then
+               Post := Get_Post (Post.Post_Parent);
+               if Post = Null_Post then
+                  Append (Caps, "do_not_allow");
+                  goto Break_4;
+               end if;
+            end if;
+
+            Post_Type := Get_Post_Type_Object (-Post.Post_Type);
+            if Post_Type = Null_Post_Type then
+               declare
+                  -- translators: 1: Post type, 2: Capability name.
+                  Message : constant String := abs "The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.";
+               begin
+                  X_Doing_It_Wrong (
+                    "__FUNCTION__",
+                    Sprintf (
+                      Message, To_List (List => (
+                        1 => +"<code>" & Post.Post_Type & "</code>",
+                        2 => +"<code>" & Cap & "</code>"))
+                      ),
+                      "4.4.0"
+                    );
+               end;
+               Append (Caps, "edit_others_posts");
+               goto Break_4;
+            end if;
+
+            if not Post_Type.Map_Meta_Cap then
+               Append (Caps, As_String (Get (Post_Type.Cap, "cap")));
+               -- Prior to 3.1 we would re-call map_meta_cap here.
+               if "read_post" = Cap then
+                  Cap_2 := +As_String (Get (Post_Type.Cap, "cap"));
+               end if;
+               goto Break_4;
+            end if;
+
+            Status_Obj := Get_Post_Status_Object (Get_Post_Status (Post));
+            if Status_Obj = Null_Status then
+               declare
+                  -- translators: 1: Post status, 2: Capability name.
+                  Message : constant String := abs "The post status %1s is not registered, so it may not be reliable to check the capability %2s against a post with that status.";
+               begin
+                  X_Doing_It_Wrong (
+                    "__FUNCTION__",
+                    Sprintf (
+                      Message, To_List (List => (
+                        1 => +"<code>" & Get_Post_Status (Post) & "</code>",
+                        2 => +"<code>" & Cap & "</code>"))
+                    ),
+                    "5.4.0"
+                  );
+               end;
+
+               Append (Caps, "edit_others_posts");
+               goto Break_4;
+            end if;
+
+            if Status_Obj.Public then
+               Append (Caps, As_String (Get (Post_Type.Cap, "read")));
+               goto Break_4;
+            end if;
+
+            if Post.Post_Author /= 0 and then User_Id = Post.Post_Author then
+               Append (Caps, As_String (Get (Post_Type.Cap, "read")));
+            elsif Status_Obj.Privat then
+               Append (Caps, As_String (Get (Post_Type.Cap, "read_private_posts")));
+            else
+               Caps := Map_Meta_Cap ("edit_post", User_Id, (Post_Id  => Post.Id,
+                                                            Meta_Key => False,
+                                                            others   => 0));
+            end if;
+         end;
+         << Break_4 >>
+
+      elsif Cap in "publish_post" then
+         if Args.Post_Id = 0 then
+            declare
+               -- translators: %s: Capability name.
+               Message : constant String := abs "When checking for the %s capability, you must always check it against a specific post.";
+            begin
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (Message, To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+            end;
+            Append (Caps, "do_not_allow");
+            goto Break_5;
+         end if;
+
+         declare
+            Post      : Wp_Post      := Null_Post;
+            Post_Type : Wp_Post_Type := Null_Post_Type;
+         begin
+            Post := Get_Post (Args.Post_Id);
+            if Post = Null_Post then
+               Append (Caps, "do_not_allow");
+               goto Break_5;
+            end if;
+
+            Post_Type := Get_Post_Type_Object (-Post.Post_Type);
+            if Post_Type = Null_Post_Type then
+               declare
+                  -- translators: 1: Post type, 2: Capability name.
+                  Message : constant String := abs "The post type %1s is not registered, so it may not be reliable to check the capability %2s against a post of that type.";
+               begin
+                  X_Doing_It_Wrong (
+                    "__FUNCTION__",
+                    Sprintf (
+                      Message, To_List (List => (
+                        1 => +"<code>" & Post.Post_Type & "</code>",
+                        2 => +"<code>" & Cap & "</code>"))
+                    ),
+                    "4.4.0"
+                  );
+               end;
+               Append (Caps, "edit_others_posts");
+               goto Break_5;
+            end if;
+
+            Append (Caps, As_String (Get (Post_Type.Cap, "publish_posts")));
+         end;
+         << Break_5 >>
+
+      elsif Cap in "edit_post_meta"
+                | "delete_post_meta"
+                | "add_post_meta"
+                | "edit_comment_meta"
+                | "delete_comment_meta"
+                | "add_comment_meta"
+                | "edit_term_meta"
+                | "delete_term_meta"
+                | "add_term_meta"
+                | "edit_user_meta"
+                | "delete_user_meta"
+                | "add_user_meta"
+      then
+         declare
+            Expl_Cap    : constant List_Type := Explode ("_", Cap);
+            Object_Type : constant String    := -Expl_Cap (2); -- [1]
+            Message     : Unbounded_String;
+         begin
+            if Args.Object_Id = 0 then
+               if "post" = Object_Type then
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific post.";
+               elsif "comment" = Object_Type then
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific comment.";
+               elsif  "term" = Object_Type then
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific term.";
+               else
+                  -- translators: %s: Capability name.
+                  Message := +abs "When checking for the %s capability, you must always check it against a specific user.";
+               end if;
+
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (-Message, To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+
+               Append (Caps, "do_not_allow");
+               goto Break_7;
+            end if;
+
+            declare
+               use Inc_Meta;
+
+               Object_Id : constant Integer := Args.Object_Id; -- (int)
+
+               Object_Subtype : constant String :=
+                 Get_Object_Subtype (Object_Type, Object_Id);
+
+               Meta_Key : Unbounded_String;
+               Allowed  : Boolean;
+            begin
+               if Empty (Object_Subtype) then
+                  Append (Caps, "do_not_allow");
+                  goto Break_7;
+               end if;
+
+               Caps := Map_Meta_Cap ("edit_" & Object_Type, User_Id,
+                                     (Object_Id => Object_Id,
+                                      Meta_Key  => False,
+                                      Post_Id   => 0,
+                                      others    => 0));
+
+               Meta_Key :=
+                 +Boolean'(if Args.Meta_Key then Args.Meta_Key else False)'Image;
+
+               if Meta_Key /= "" then
+                  Allowed := not Is_Protected_Meta (-Meta_Key, Object_Type);
+
+                  if
+                    not Empty (Object_Subtype) and then
+                    Has_Filter ("auth_{object_type}_meta_{meta_key}_for_{object_subtype}")
+                  then
+                     --
+                     -- Filters whether the user is allowed to edit a specific meta key of a specific object type and subtype.
+                     --
+                     -- The dynamic portions of the hook name, `object_type`, `meta_key`,
+                     -- and `object_subtype`, refer to the metadata object type (comment, post, term or user),
+                     -- the meta key value, and the object subtype respectively.
+                     --
+                     -- @since 4.9.8
+                     --
+                     -- @param bool     allowed   Whether the user can add the object meta. Default false.
+                     -- @param string   meta_key  The meta key.
+                     -- @param int      object_id Object ID.
+                     -- @param int      user_id   User ID.
+                     -- @param string   cap       Capability name.
+                     -- @param string[] caps      Array of the user"s capabilities.
+                     --
+                     Allowed := Apply_Filters ("auth_{object_type}_meta_{meta_key}_for_{object_subtype}", Allowed, -Meta_Key, Object_Id, User_Id, Cap, Caps);
+                  else
+
+                     --
+                     -- Filters whether the user is allowed to edit a specific meta key of a specific object type.
+                     --
+                     -- Return true to have the mapped meta caps from `edit_thenobject_typeend;` apply.
+                     --
+                     -- The dynamic portion of the hook name, `object_type` refers to the object type being filtered.
+                     -- The dynamic portion of the hook name, `meta_key`, refers to the meta key passed to map_meta_cap().
+                     --
+                     -- @since 3.3.0 As `auth_post_meta_thenmeta_keyend;`.
+                     -- @since 4.6.0
+                     --
+                     -- @param bool     allowed   Whether the user can add the object meta. Default false.
+                     -- @param string   meta_key  The meta key.
+                     -- @param int      object_id Object ID.
+                     -- @param int      user_id   User ID.
+                     -- @param string   cap       Capability name.
+                     -- @param string[] caps      Array of the user"s capabilities.
+                     --
+                     Allowed := Apply_Filters ("auth_{object_type}_meta_{meta_key}", Allowed, -Meta_Key, Object_Id, User_Id, Cap, Caps);
+                  end if;
+
+                  -- if not Empty (Object_Subtype) then
+
+                  --    --
+                  --    -- Filters whether the user is allowed to edit meta for specific object types/subtypes.
+                  --    --
+                  --    -- Return true to have the mapped meta caps from `edit_thenobject_typeend;` apply.
+                  --    --
+                  --    -- The dynamic portion of the hook name, `object_type` refers to the object type being filtered.
+                  --    -- The dynamic portion of the hook name, `object_subtype` refers to the object subtype being filtered.
+                  --    -- The dynamic portion of the hook name, `meta_key`, refers to the meta key passed to map_meta_cap().
+                  --    --
+                  --    -- @since 4.6.0 As `auth_post_thenpost_typeend;_meta_thenmeta_keyend;`.
+                  --    -- @since 4.7.0 Renamed from `auth_post_thenpost_typeend;_meta_thenmeta_keyend;` to
+                  --    --              `auth_thenobject_typeend;_thenobject_subtypeend;_meta_thenmeta_keyend;`.
+                  --    -- @deprecated 4.9.8 Use {@see "auth_thenobject_type}_meta_thenmeta_keyend;_for_thenobject_subtypeend;"end; instead.
+                  --    --
+                  --    -- @param bool     allowed   Whether the user can add the object meta. Default false.
+                  --    -- @param string   meta_key  The meta key.
+                  --    -- @param int      object_id Object ID.
+                  --    -- @param int      user_id   User ID.
+                  --    -- @param string   cap       Capability name.
+                  --    -- @param string[] caps      Array of the user"s capabilities.
+                  --    --
+                  --    Allowed := Apply_Filters_Deprecated (
+                  --      "auth_{object_type}_{object_subtype}_meta_{meta_key}",
+                  --      To_List (List => (Allowed, Meta_Key, Object_Id, User_Id, Cap, Caps)),
+                  --      "4.9.8",
+                  --      "auth_{object_type}_meta_{meta_key}_for_{object_subtype}"
+                  --    );
+                  -- end if;
+
+                  if not Allowed then
+                     Append (Caps, Cap);
+                  end if;
+               end if;
+            end;
+         end;
+         << Break_7 >>
+
+      elsif Cap in "edit_comment" then
+         if Args.Comment_Id = 0 then
+            declare
+               -- translators: %s: Capability name.
+               Message : constant String := abs "When checking for the %s capability, you must always check it against a specific comment.";
+            begin
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (Message, To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+            end;
+            Append (Caps, "do_not_allow");
+            goto Break_8;
+         end if;
+
+         declare
+            use Inc_Class_Wp_Comments;
+            use Inc_Comments;
+
+            Comment : constant Wp_Comment := Get_Comment (Args.Comment_Id);
+            Post    : Wp_Post    := Null_Post;
+         begin
+            if Comment = Null_Comment then
+               Append (Caps, "do_not_allow");
+               goto Break_8;
+            end if;
+
+            Post := Get_Post (Comment.Comment_Post_Id);
+
+            --
+            -- If the post doesn"t exist, we have an orphaned comment.
+            -- Fall back to the edit_posts capability, instead.
+            --
+            if Post /= Null_Post then
+               Caps := Map_Meta_Cap ("edit_post", User_Id, (Post_Id  => Post.Id,
+                                                            Meta_Key => False,
+                                                            others   => 0));
+            else
+               Caps := Map_Meta_Cap ("edit_posts", User_Id);
+            end if;
+         end;
+         << Break_8 >>
+
+      elsif Cap in "unfiltered_upload" then
+         if
+           Globals.ALLOW_UNFILTERED_UPLOADS and then
+           (not Is_Multisite or else
+            Is_Super_Admin (User_Id))
+         then
+            Append (Caps, Cap);
+         else
+            Append (Caps, "do_not_allow");
+         end if;
+
+      elsif Cap in "edit_css"
+                 | "unfiltered_html"
+      then
+         -- Disallow unfiltered_html for all users, even admins and super admins.
+         if Globals.DISALLOW_UNFILTERED_HTML then
+            Append (Caps, "do_not_allow");
+         elsif Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "unfiltered_html");
+         end if;
+
+      elsif Cap in "edit_files"
+                 | "edit_plugins"
+                 | "edit_themes"
+      then
+         -- Disallow the file editors.
+         if Globals.DISALLOW_FILE_EDIT then
+            Append (Caps, "do_not_allow");
+         elsif Wp_Is_File_Mod_Allowed ("capability_edit_themes") then
+            Append (Caps, "do_not_allow");
+         elsif Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, Cap);
+         end if;
+
+      elsif Cap in "update_plugins"
+                 | "delete_plugins"
+                 | "install_plugins"
+                 | "upload_plugins"
+                 | "update_themes"
+                 | "delete_themes"
+                 | "install_themes"
+                 | "upload_themes"
+                 | "update_core"
+      then
+         -- Disallow anything that creates, deletes, or updates core, plugin, or theme files.
+         -- Files in uploads are excepted.
+         if not Wp_Is_File_Mod_Allowed ("capability_update_core") then
+            Append (Caps, "do_not_allow");
+         elsif Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         elsif "upload_themes" = Cap then
+            Append (Caps, "install_themes");
+         elsif "upload_plugins" = Cap then
+            Append (Caps, "install_plugins");
+         else
+            Append (Caps, Cap);
+         end if;
+
+      elsif Cap in "install_languages"
+                 | "update_languages"
+      then
+         if not Wp_Is_File_Mod_Allowed ("can_install_language_pack") then
+            Append (Caps, "do_not_allow");
+         elsif Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "install_languages");
+         end if;
+
+      elsif Cap in "activate_plugins"
+                 | "deactivate_plugins"
+                 | "activate_plugin"
+                 | "deactivate_plugin"
+      then
+         Append (Caps, "activate_plugins");
+         if Is_Multisite then
+            declare
+               -- update_, install_, and delete_ are handled above with
+               -- is_super_admin().
+               Menu_Perms : constant Array_Type :=
+                 Get_Site_Option ("menu_items", Empty_List);
+            begin
+               if Empty (Menu_Perms, "plugins") then
+                  Append (Caps, "manage_network_plugins");
+               end if;
+            end;
+         end if;
+
+      elsif Cap in "resume_plugin" then
+         Append (Caps, "resume_plugins");
+
+      elsif Cap in "resume_theme" then
+         Append (Caps, "resume_themes");
+
+      elsif Cap in "delete_user"
+                 | "delete_users"
+      then
+         -- If multisite only super admins can delete users.
+         if Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "delete_users"); -- delete_user maps to delete_users.
+         end if;
+
+      elsif Cap in "create_users" then
+         if not Is_Multisite  then
+            Append (Caps, Cap);
+         elsif Is_Super_Admin (User_Id) or else Get_Site_Option ("add_new_users") then
+            Append (Caps, Cap);
+         else
+            Append (Caps, "do_not_allow");
+         end if;
+
+      elsif Cap in "manage_links" then
+         if Get_Option ("link_manager_enabled") then
+            Append (Caps, Cap);
+         else
+            Append (Caps, "do_not_allow");
+         end if;
+
+      elsif Cap in "customize" then
+         Append (Caps, "edit_theme_options");
+
+      elsif Cap in "delete_site" then
+         if Is_Multisite then
+            Append (Caps, "manage_options");
+         else
+            Append (Caps, "do_not_allow");
+         end if;
+
+      elsif Cap in "edit_term"
+                 | "delete_term"
+                 | "assign_term"
+      then
+         if Args.Term_Id = 0 then
+            declare
+               -- translators: %s: Capability name.
+               Message : constant String := abs "When checking for the %s capability, you must always check it against a specific term.";
+            begin
+               X_Doing_It_Wrong (
+                 "__FUNCTION__",
+                 Sprintf (Message, To_List ("<code>" & Cap & "</code>")),
+                 "6.1.0"
+               );
+            end;
+            Append (Caps, "do_not_allow");
+            goto Break_9;
+         end if;
+
+         declare
+            use Inc_Class_Wp_Taxonomy;
+            use Inc_Class_Wp_Terms;
+            use Inc_Taxonomys;
+
+            Term_Id  : constant Integer := Args.Term_Id;
+            Term     : constant Wp_Term := Get_Term (Term_Id);
+            Tax      : Wp_Taxonomy := Null_Taxonomy;
+            Taxo_Cap : Unbounded_String;
+         begin
+            if Term = Null_Term or else Is_Wp_Error (Term) then
+               Append (Caps, "do_not_allow");
+               goto Break_9;
+            end if;
+
+            Tax := Get_Taxonomy (-Term.Taxonomy);
+            if Tax = Null_Taxonomy then
+               Append (Caps, "do_not_allow");
+               goto Break_9;
+            end if;
+
+            if
+              "delete_term" = Cap and then
+              (Get_Option ("default_" & (-Term.Taxonomy)) = Term.Term_Id or else
+               Get_Option ("default_term_" & (-Term.Taxonomy)) = Term.Term_Id)
+            then
+               Append (Caps, "do_not_allow");
+               goto Break_9;
+            end if;
+
+            Taxo_Cap := +Cap & "s";
+
+            Caps := Map_Meta_Cap (As_String (Get (Tax.Cap, "taxo_cap")),
+                                  User_Id, (Term_Id  => Term_Id,
+                                            Meta_Key => False,
+                                            Post_Id  => 0,
+                                            others   => 0));
+         end;
+         << Break_9 >>
+
+      elsif Cap in "manage_post_tags"
+                 | "edit_categories"
+                 | "edit_post_tags"
+                 | "delete_categories"
+                 | "delete_post_tags"
+      then
+         Append (Caps, "manage_categories");
+
+      elsif Cap in "assign_categories"
+                 | "assign_post_tags"
+      then
+         Append (Caps, "edit_posts");
+
+      elsif Cap in "create_sites"
+                 | "delete_sites"
+                 | "manage_network"
+                 | "manage_sites"
+                 | "manage_network_users"
+                 | "manage_network_plugins"
+                 | "manage_network_themes"
+                 | "manage_network_options"
+                 | "upgrade_network"
+      then
+         Append (Caps, Cap);
+
+      elsif Cap in "setup_network" then
+         if Is_Multisite then
+            Append (Caps, "manage_network_options");
+         else
+            Append (Caps, "manage_options");
+         end if;
+
+      elsif Cap in "update_php" then
+         if Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "update_core");
+         end if;
+
+      elsif Cap in "update_https" then
+         if Is_Multisite and then not Is_Super_Admin (User_Id) then
+            Append (Caps, "do_not_allow");
+         else
+            Append (Caps, "manage_options");
+            Append (Caps, "update_core");
+         end if;
+
+      elsif Cap in "export_others_personal_data"
+                 | "erase_others_personal_data"
+                 | "manage_privacy_options"
+      then
+         Append (Caps, (if Is_Multisite
+                        then "manage_network"
+                        else "manage_options"));
+
+      elsif Cap in "create_app_password"
+                 | "list_app_passwords"
+                 | "read_app_password"
+                 | "edit_app_password"
+                 | "delete_app_passwords"
+                 | "delete_app_password"
+      then
+         Caps := Map_Meta_Cap ("edit_user", User_Id, (User_Id  => Args.User_Id,
+                                                      Meta_Key => False,
+                                                      Post_Id  => 0,
+                                                      others   => 0));
+
+      else -- default
+         -- Handle meta capabilities for custom post types.
+         if Isset (Global_Post_Type_Meta_Caps, Cap) then
+            return
+              Map_Meta_Cap (
+                As_String (Get (Global_Post_Type_Meta_Caps, Cap)),
+                User_Id, Args);
+         end if;
+
+         declare
+            -- Block capabilities map to their post equivalent.
+            Block_Caps : constant List_Type := To_List (List => (
+              +"edit_blocks",
+              +"edit_others_blocks",
+              +"publish_blocks",
+              +"read_private_blocks",
+              +"delete_blocks",
+              +"delete_private_blocks",
+              +"delete_published_blocks",
+              +"delete_others_blocks",
+              +"edit_private_blocks",
+              +"edit_published_blocks"
+            ));
+         begin
+            if In_Array (Cap, Block_Caps, True) then
+               Cap_2 := +Str_Replace ("_blocks", "_posts", Cap);
+            end if;
+         end;
+         -- If no meta caps match, return the original cap.
+         Append (Caps, -Cap_2);
+      end if; -- switch
+
+      --
+      -- Filters the primitive capabilities required of the given user to satisfy the
+      -- capability being checked.
+      --
+      -- @since 2.8.0
+      --
+      -- @param string[] caps    Primitive capabilities required of the user.
+      -- @param string   cap     Capability being checked.
+      -- @param int      user_id The user ID.
+      -- @param array    args    Adds context to the capability check, typically
+      --                          starting with an object ID.
+      --
+      return Apply_Filters ("map_meta_cap", Caps, -Cap_2, User_Id, Args);
+   end Map_Meta_Cap;
 
 -- --
 -- -- Returns whether the current user has the specified capability.
@@ -849,9 +1064,9 @@ is
 -- --
 -- -- Example usage:
 -- --
--- --     current_user_can( 'edit_posts' );
--- --     current_user_can( 'edit_post', post.ID );
--- --     current_user_can( 'edit_post_meta', post.ID, meta_key );
+-- --     current_user_can( "edit_posts" );
+-- --     current_user_can( "edit_post", post.ID );
+-- --     current_user_can( "edit_post_meta", post.ID, meta_key );
 -- --
 -- -- While checking against particular roles in place of a capability is supported
 -- -- in part, this practice is discouraged as it may produce unreliable results.
@@ -884,9 +1099,9 @@ is
 -- --
 -- -- Example usage:
 -- --
--- --     current_user_can_for_blog( blog_id, 'edit_posts' );
--- --     current_user_can_for_blog( blog_id, 'edit_post', post.ID );
--- --     current_user_can_for_blog( blog_id, 'edit_post_meta', post.ID, meta_key );
+-- --     current_user_can_for_blog( blog_id, "edit_posts" );
+-- --     current_user_can_for_blog( blog_id, "edit_post", post.ID );
+-- --     current_user_can_for_blog( blog_id, "edit_post_meta", post.ID, meta_key );
 -- --
 -- -- @since 3.0.0
 -- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
@@ -919,9 +1134,9 @@ is
 -- --
 -- -- Example usage:
 -- --
--- --     author_can( post, 'edit_posts' );
--- --     author_can( post, 'edit_post', post.ID );
--- --     author_can( post, 'edit_post_meta', post.ID, meta_key );
+-- --     author_can( post, "edit_posts" );
+-- --     author_can( post, "edit_post", post.ID );
+-- --     author_can( post, "edit_post_meta", post.ID, meta_key );
 -- --
 -- -- @since 2.9.0
 -- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
@@ -947,59 +1162,56 @@ is
 --         return author.has_cap( capability, ...args );
 -- end;
 
--- --
--- -- Returns whether a particular user has the specified capability.
--- --
--- -- This function also accepts an ID of an object to check against if the capability is a meta capability. Meta
--- -- capabilities such as `edit_post` and `edit_user` are capabilities used by the `map_meta_cap()` function to
--- -- map to primitive capabilities that a user or role has, such as `edit_posts` and `edit_others_posts`.
--- --
--- -- Example usage:
--- --
--- --     user_can( user.ID, 'edit_posts' );
--- --     user_can( user.ID, 'edit_post', post.ID );
--- --     user_can( user.ID, 'edit_post_meta', post.ID, meta_key );
--- --
--- -- @since 3.1.0
--- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
--- --              by adding it to the function signature.
--- --
--- -- @param int|WP_User user       User ID or object.
--- -- @param string      capability Capability name.
--- -- @param mixed       ...args    Optional further parameters, typically starting with an object ID.
--- -- @return bool Whether the user has the given capability.
--- --
--- function user_can( user, capability, ...args ) then
---         if ( ! is_object( user ) ) then
---                 user = get_userdata( user );
---         end;
+   --------------
+   -- User_Can --
+   --------------
 
---         if ( empty( user ) ) then
---                 -- User is logged out, create anonymous user object.
---                 user = new WP_User( 0 );
---                 user.init( new stdClass );
---         end;
+   function User_Can (User       : Inc_Class_Wp_Users.Wp_User;
+                      Capability : String)
+                      -- , ...args)
+                      return Boolean
+   is
+   begin
+      -- if ( ! is_object( user ) ) then
+      --    user = get_userdata( user );
+      -- end if;
 
---         return user.has_cap( capability, ...args );
--- end;
+      -- if ( empty( user ) ) then
+      --    -- User is logged out, create anonymous user object.
+      --    user = new WP_User( 0 );
+      --    user.init( new stdClass );
+      -- end if;
 
--- --
--- -- Retrieves the global WP_Roles instance and instantiates it if necessary.
--- --
--- -- @since 4.3.0
--- --
--- -- @global WP_Roles wp_roles WordPress role management object.
--- --
--- -- @return WP_Roles WP_Roles global instance if not already instantiated.
--- --
--- function wp_roles() then
---         global wp_roles;
+      return User.Has_Cap (Capability); -- , ...args );
+   end User_Can;
 
---         if ( ! isset( wp_roles ) ) then
---                 wp_roles = new WP_Roles();
---         end;
---         return wp_roles;
--- end;
+   function User_Can (User       : Integer;
+                      Capability : String)
+                      -- , ...args)
+                      return Boolean
+   is
+      use Inc_Class_Wp_Users;
+      use Inc_Pluggables;
+
+      User_2 : constant Wp_User := Get_Userdata (User);
+   begin
+      return User_Can (User_2, Capability);
+   end User_Can;
+
+   ----------------
+   -- Wp_Roles_X --
+   ----------------
+
+   function Wp_Roles_X -- _X added
+            return Inc_Class_Wp_Roles.Wp_Roles
+   is
+--        global wp_roles;
+   begin
+      -- if not Isset (Global_Wp_Roles) then
+      --    Global_Wp_Roles := new WP_Roles();
+      -- end if;
+      return Global_Wp_Roles;
+   end Wp_Roles_X;
 
 -- --
 -- -- Retrieves role object.
@@ -1021,7 +1233,7 @@ is
 -- -- @param string role         Role name.
 -- -- @param string display_name Display name for role.
 -- -- @param bool[] capabilities List of capabilities keyed by the capability name,
--- --                             e.g. array( 'edit_posts' => true, 'delete_posts' => false ).
+-- --                             e.g. array( "edit_posts" => true, "delete_posts" => false ).
 -- -- @return WP_Role|void WP_Role object, if the role is added.
 -- --
 -- function add_role( role, display_name, capabilities = array() ) then
@@ -1043,57 +1255,63 @@ is
 --         wp_roles().remove_role( role );
 -- end;
 
--- --
--- -- Retrieves a list of super admins.
--- --
--- -- @since 3.0.0
--- --
--- -- @global array super_admins
--- --
--- -- @return string[] List of super admin logins.
--- --
--- function get_super_admins() then
---         global super_admins;
+   ----------------------
+   -- Get_Super_Admins --
+   ----------------------
 
---         if ( isset( super_admins ) ) then
---                 return super_admins;
---         end; else then
---                 return get_site_option( 'site_admins', array( 'admin' ) );
---         end;
--- end;
+   function Get_Super_Admins
+            return List_Type
+   is
+      use Inc_Options;
+   begin
+      if not Global_Super_Admins.Is_Empty then
+--    if Isset (Global_Super_Admins) then
+         return Global_Super_Admins;
+      else
+         return Get_Site_Option ("site_admins", To_List ("admin"));
+      end if;
+   end Get_Super_Admins;
 
--- --
--- -- Determines whether user is a site admin.
--- --
--- -- @since 3.0.0
--- --
--- -- @param int|false user_id Optional. The ID of a user. Defaults to false, to check the current user.
--- -- @return bool Whether the user is a site admin.
--- --
--- function is_super_admin( user_id = false ) then
---         if ( ! user_id ) then
---                 user = wp_get_current_user();
---         end; else then
---                 user = get_userdata( user_id );
---         end;
+   --------------------
+   -- Is_Super_Admin --
+   --------------------
 
---         if ( ! user || ! user.exists() ) then
---                 return false;
---         end;
+   function Is_Super_Admin (User_Id : Integer := 0) -- false
+                            return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Users;
+      use Inc_Load;
+      use Inc_Pluggables;
 
---         if ( is_multisite() ) then
---                 super_admins = get_super_admins();
---                 if ( is_array( super_admins ) && in_array( user.user_login, super_admins, true ) ) then
---                         return true;
---                 end;
---         end; else then
---                 if ( user.has_cap( 'delete_users' ) ) then
---                         return true;
---                 end;
---         end;
+      User : Wp_User := (if User_Id = 0
+                         then Wp_Get_Current_User -- ()
+                         else Get_Userdata (User_Id));
+   begin
+      if User = Null_User or else not User.Exists then -- ()
+         return False;
+      end if;
 
---         return false;
--- end;
+      if Is_Multisite then
+         declare
+            Super_Admins : constant List_Type := Get_Super_Admins; -- ()
+         begin
+            if
+              Is_Array (Super_Admins) and then
+              In_Array (-User.Prop.User_Login, Super_Admins, True)
+            then
+               return True;
+            end if;
+         end;
+      else
+         if User.Has_Cap ("delete_users") then
+            return True;
+         end if;
+      end if;
+
+      return False;
+   end Is_Super_Admin;
 
 -- --
 -- -- Grants Super Admin privileges.
@@ -1108,7 +1326,7 @@ is
 -- --
 -- function grant_super_admin( user_id ) then
 --         -- If global super_admins override is defined, there is nothing to do here.
---         if ( isset( GLOBALS['super_admins'] ) || ! is_multisite() ) then
+--         if ( isset( GLOBALS["super_admins"] ) || ! is_multisite() ) then
 --                 return false;
 --         end;
 
@@ -1119,15 +1337,15 @@ is
 --         --
 --         -- @param int user_id ID of the user that is about to be granted Super Admin privileges.
 --         --
---         do_action( 'grant_super_admin', user_id );
+--         do_action( "grant_super_admin", user_id );
 
 --         -- Directly fetch site_admins instead of using get_super_admins().
---         super_admins = get_site_option( 'site_admins', array( 'admin' ) );
+--         super_admins = get_site_option( "site_admins", array( "admin" ) );
 
 --         user = get_userdata( user_id );
 --         if ( user && ! in_array( user.user_login, super_admins, true ) ) then
 --                 super_admins[] = user.user_login;
---                 update_site_option( 'site_admins', super_admins );
+--                 update_site_option( "site_admins", super_admins );
 
 --                 --
 --                 -- Fires after the user is granted Super Admin privileges.
@@ -1136,7 +1354,7 @@ is
 --                 --
 --                 -- @param int user_id ID of the user that was granted Super Admin privileges.
 --                 --
---                 do_action( 'granted_super_admin', user_id );
+--                 do_action( "granted_super_admin", user_id );
 --                 return true;
 --         end;
 --         return false;
@@ -1150,42 +1368,42 @@ is
 -- -- @global array super_admins
 -- --
 -- -- @param int user_id ID of the user Super Admin privileges to be revoked from.
--- -- @return bool True on success, false on failure. This can fail when the user's email
+-- -- @return bool True on success, false on failure. This can fail when the user"s email
 -- --              is the network admin email or when the `super_admins` global is defined.
 -- --
 -- function revoke_super_admin( user_id ) then
 --         -- If global super_admins override is defined, there is nothing to do here.
---         if ( isset( GLOBALS['super_admins'] ) || ! is_multisite() ) then
+--         if ( isset( GLOBALS["super_admins"] ) || ! is_multisite() ) then
 --                 return false;
 --         end;
 
 --         --
---         -- Fires before the user's Super Admin privileges are revoked.
+--         -- Fires before the user"s Super Admin privileges are revoked.
 --         --
 --         -- @since 3.0.0
 --         --
 --         -- @param int user_id ID of the user Super Admin privileges are being revoked from.
 --         --
---         do_action( 'revoke_super_admin', user_id );
+--         do_action( "revoke_super_admin", user_id );
 
 --         -- Directly fetch site_admins instead of using get_super_admins().
---         super_admins = get_site_option( 'site_admins', array( 'admin' ) );
+--         super_admins = get_site_option( "site_admins", array( "admin" ) );
 
 --         user = get_userdata( user_id );
---         if ( user && 0 !== strcasecmp( user.user_email, get_site_option( 'admin_email' ) ) ) then
+--         if ( user && 0 !== strcasecmp( user.user_email, get_site_option( "admin_email" ) ) ) then
 --                 key = array_search( user.user_login, super_admins, true );
 --                 if ( false !== key ) then
 --                         unset( super_admins[ key ] );
---                         update_site_option( 'site_admins', super_admins );
+--                         update_site_option( "site_admins", super_admins );
 
 --                         --
---                         -- Fires after the user's Super Admin privileges are revoked.
+--                         -- Fires after the user"s Super Admin privileges are revoked.
 --                         --
 --                         -- @since 3.0.0
 --                         --
 --                         -- @param int user_id ID of the user Super Admin privileges were revoked from.
 --                         --
---                         do_action( 'revoked_super_admin', user_id );
+--                         do_action( "revoked_super_admin", user_id );
 --                         return true;
 --                 end;
 --         end;
@@ -1193,52 +1411,52 @@ is
 -- end;
 
 -- --
--- -- Filters the user capabilities to grant the 'install_languages' capability as necessary.
+-- -- Filters the user capabilities to grant the "install_languages" capability as necessary.
 -- --
--- -- A user must have at least one out of the 'update_core', 'install_plugins', and
--- -- 'install_themes' capabilities to qualify for 'install_languages'.
+-- -- A user must have at least one out of the "update_core", "install_plugins", and
+-- -- "install_themes" capabilities to qualify for "install_languages".
 -- --
 -- -- @since 4.9.0
 -- --
--- -- @param bool[] allcaps An array of all the user's capabilities.
--- -- @return bool[] Filtered array of the user's capabilities.
+-- -- @param bool[] allcaps An array of all the user"s capabilities.
+-- -- @return bool[] Filtered array of the user"s capabilities.
 -- --
 -- function wp_maybe_grant_install_languages_cap( allcaps ) then
---         if ( ! empty( allcaps['update_core'] ) || ! empty( allcaps['install_plugins'] ) || ! empty( allcaps['install_themes'] ) ) then
---                 allcaps['install_languages'] = true;
+--         if ( ! empty( allcaps["update_core"] ) || ! empty( allcaps["install_plugins"] ) || ! empty( allcaps["install_themes"] ) ) then
+--                 allcaps["install_languages"] = true;
 --         end;
 
 --         return allcaps;
 -- end;
 
 -- --
--- -- Filters the user capabilities to grant the 'resume_plugins' and 'resume_themes' capabilities as necessary.
+-- -- Filters the user capabilities to grant the "resume_plugins" and "resume_themes" capabilities as necessary.
 -- --
 -- -- @since 5.2.0
 -- --
--- -- @param bool[] allcaps An array of all the user's capabilities.
--- -- @return bool[] Filtered array of the user's capabilities.
+-- -- @param bool[] allcaps An array of all the user"s capabilities.
+-- -- @return bool[] Filtered array of the user"s capabilities.
 -- --
 -- function wp_maybe_grant_resume_extensions_caps( allcaps ) then
 --         -- Even in a multisite, regular administrators should be able to resume plugins.
---         if ( ! empty( allcaps['activate_plugins'] ) ) then
---                 allcaps['resume_plugins'] = true;
+--         if ( ! empty( allcaps["activate_plugins"] ) ) then
+--                 allcaps["resume_plugins"] = true;
 --         end;
 
 --         -- Even in a multisite, regular administrators should be able to resume themes.
---         if ( ! empty( allcaps['switch_themes'] ) ) then
---                 allcaps['resume_themes'] = true;
+--         if ( ! empty( allcaps["switch_themes"] ) ) then
+--                 allcaps["resume_themes"] = true;
 --         end;
 
 --         return allcaps;
 -- end;
 
 -- --
--- -- Filters the user capabilities to grant the 'view_site_health_checks' capabilities as necessary.
+-- -- Filters the user capabilities to grant the "view_site_health_checks" capabilities as necessary.
 -- --
 -- -- @since 5.2.2
 -- --
--- -- @param bool[]   allcaps An array of all the user's capabilities.
+-- -- @param bool[]   allcaps An array of all the user"s capabilities.
 -- -- @param string[] caps    Required primitive capabilities for the requested capability.
 -- -- @param array    args then
 -- --     Arguments that accompany the requested capability check.
@@ -1248,11 +1466,11 @@ is
 -- --     @type mixed  ...2 Optional second and further parameters, typically object ID.
 -- -- end;
 -- -- @param WP_User  user    The user object.
--- -- @return bool[] Filtered array of the user's capabilities.
+-- -- @return bool[] Filtered array of the user"s capabilities.
 -- --
 -- function wp_maybe_grant_site_health_caps( allcaps, caps, args, user ) then
---         if ( ! empty( allcaps['install_plugins'] ) && ( ! is_multisite() || is_super_admin( user.ID ) ) ) then
---                 allcaps['view_site_health_checks'] = true;
+--         if ( ! empty( allcaps["install_plugins"] ) && ( ! is_multisite() || is_super_admin( user.ID ) ) ) then
+--                 allcaps["view_site_health_checks"] = true;
 --         end;
 
 --         return allcaps;
@@ -1262,14 +1480,14 @@ is
 
 -- -- Dummy gettext calls to get strings in the catalog.
 -- /* translators: User role for administrators.--
--- _x( 'Administrator', 'User role' );
+-- _x( "Administrator", "User role" );
 -- /* translators: User role for editors.--
--- _x( 'Editor', 'User role' );
+-- _x( "Editor", "User role" );
 -- /* translators: User role for authors.--
--- _x( 'Author', 'User role' );
+-- _x( "Author", "User role" );
 -- /* translators: User role for contributors.--
--- _x( 'Contributor', 'User role' );
+-- _x( "Contributor", "User role" );
 -- /* translators: User role for subscribers.--
--- _x( 'Subscriber', 'User role' );
+-- _x( "Subscriber", "User role" );
 
 end Inc_Capabilities;

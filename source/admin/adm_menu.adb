@@ -141,8 +141,8 @@ is
             goto Continue_1;
          end if;
 
-         Set (Submenu, "upload.php", I, ESC_Attr (Get (Tax.Labels, "menu_name")),
-              Get (Tax.Cap, "manage_terms"),
+         Set (Submenu, "upload.php", I, ESC_Attr (As_String (Get (Tax.Labels, "menu_name"))),
+              As_String (Get (Tax.Cap, "manage_terms")),
               "edit-tags.php?taxonomy=" & (-Tax.Name) & "&amp;post_type=attachment");
          I := I + 1;
          << Continue_1 >>
@@ -209,7 +209,7 @@ is
          X_Wp_Last_Object_Menu : Natural := 25;
          -- The index of the last top-level menu in the object menu group.
 
-         Types  : constant String_Array := Get_Post_Types (  -- (array)
+         Types  : constant List_Type := Get_Post_Types (  -- (array)
             Arrays.To_Array ((
                 Build ("show_ui",      "true"),
                 Build ("_builtin",     "false"),
@@ -223,7 +223,7 @@ is
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
                Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
-                  Inc_Posts.Get_Post_Type_Object (Ptype);
+                  Inc_Posts.Get_Post_Type_Object (-Ptype);
                Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : Unbounded_String;
                Menu_Icon           : Unbounded_String;
@@ -246,7 +246,7 @@ is
                end if;
 
                -- If we"re to use _wp_last_object_menu, increment it first.
-               Ptype_For_Id := +Inc_Formatting.Sanitize_Html_Class (Ptype);
+               Ptype_For_Id := +Inc_Formatting.Sanitize_Html_Class (-Ptype);
                Menu_Icon    := +"dashicons-admin-post";
 
                if Is_String (-Ptype_Obj.Menu_Icon) then
@@ -297,28 +297,28 @@ is
 
                Menu (Ptype_Menu_Position)  :=
                   To_Menu (ESC_Attr (Get (Ptype_Obj, "labels.menu_name")),
-                           Get (Ptype_Obj.Cap, "edit_posts"),
+                           As_String (Get (Ptype_Obj.Cap, "edit_posts")),
                            -Ptype_File, "", -Menu_Class, -Ptype_Menu_Id, -Menu_Icon);
 
                Set (Submenu, -Ptype_File, 5, Get (Ptype_Obj, "labels.all_items"),
-                    Get (Ptype_Obj.Cap, "edit_posts"), String (-Ptype_File));
+                    As_String (Get (Ptype_Obj.Cap, "edit_posts")), String (-Ptype_File));
 
                Set (Submenu, -Ptype_File, 10, Get (Ptype_Obj, "labels.add_new"),
-                    Get (Ptype_Obj.Cap, "create_posts"), -Post_New_File);
+                    As_String (Get (Ptype_Obj.Cap, "create_posts")), -Post_New_File);
 
                I := 15;
                for Tax of Inc_Taxonomys.Get_Taxonomies (Empty_Array, "objects") loop
                   if
                     not Tax.Show_UI      or else
                     not Tax.Show_In_Menu or else
-                    not In_Array (Ptype, Tax.Object_Type, True) -- (array)
+                    not In_Array (-Ptype, Tax.Object_Type, True) -- (array)
                   then
                      goto Continue_3;
                   end if;
 
                   Set (Submenu, -Ptype_File, I,
-                       ESC_Attr (Get (Tax.Labels, "menu_name")),
-                       Get (Tax.Cap, "manage_terms"),
+                       ESC_Attr (As_String (Get (Tax.Labels, "menu_name"))),
+                       As_String (Get (Tax.Cap, "manage_terms")),
                        Sprintf (-Edit_Tags_File, To_List (-Tax.Name)));
                   I := I + 1;
                   << Continue_3 >>
@@ -397,7 +397,7 @@ is
                 Add_Query_Arg
                   ("return",
                    URLencode (Remove_Query_Arg (List_Type'(Wp_Removable_Query_Args),
-                                          Wp_Unslash (Get (X_SERVER, "REQUEST_URI")))),
+                                          Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI"))))),
                    "customize.php");
          begin
             -- Hide Customize link on block themes unless a plugin or theme
@@ -532,7 +532,7 @@ is
          end if;
 
          if Current_User_Can ("list_users") then
-            Set (X_Wp_Real_Parent_File, "profile.php", Value => "users.php");
+            Set (X_Wp_Real_Parent_File, "profile.php", From_String ("users.php"));
             -- Back-compat for plugins adding submenus to profile.php.
 
             Set (Submenu, "users.php", 5, abs "All Users", "list_users",
@@ -547,7 +547,7 @@ is
 
             Set (Submenu, "users.php", 15, abs "Profile", "read", "profile.php");
          else
-            Set (X_Wp_Real_Parent_File, "users.php", Value => "profile.php");
+            Set (X_Wp_Real_Parent_File, "users.php", From_String ("profile.php"));
             Set (Submenu, "profile.php", 5, abs "Profile", "read", "profile.php");
 
             if Current_User_Can ("create_users") then
@@ -566,7 +566,7 @@ is
                Current_User_Can ("view_site_health_checks")
             then
                declare
-                  use Array_Maps;
+--                use Array_Maps;
 
                   Get_Issues   : String :=
                      Inc_Options.Get_Transient ("health-check-site-status-result");
@@ -587,7 +587,7 @@ is
                   end if;
 
                   declare
-                     Health : constant String := Get (Issue_Counts, "critical");
+                     Health : constant String := As_String (Get (Issue_Counts, "critical"));
                   begin
                      Site_Health_Count := +Sprintf (
                         "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",

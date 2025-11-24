@@ -698,7 +698,8 @@ is
 
       -- Global styles can be enqueued in both the header and the footer. See
       -- https://core.trac.wordpress.org/ticket/53494.
---    Add_Action ("wp_enqueue_scripts", Wp_Enqueue_Global_Styles'Access);
+      Add_Action ("wp_enqueue_scripts",
+                  Inc_Script_Loader.Wp_Enqueue_Global_Styles'Access);
 --    Add_Action ("wp_footer", Wp_Enqueue_Global_Styles'Access, 1);
 
       -- Block supports, and other styles parsed and stored in the Style Engine.

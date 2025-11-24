@@ -33,6 +33,9 @@ is
                                  Data   : String)
                                  return Boolean;
 
+   procedure Wp_Add_Inline_Style (Handle : String;
+                                  Data   : String);
+
    --
    -- Register a CSS stylesheet.
    --
@@ -72,6 +75,12 @@ is
                                Ver    : String    := ""; -- Boolean    := False;
                                Media  : String    := "all")
                                return Boolean;
+
+   procedure Wp_Register_Style (Handle : String;
+                                Src    : Boolean;
+                                Deps   : List_Type := Empty_List;
+                                Ver    : Boolean   := False;
+                                Media  : Boolean   := False);
 
    --
    -- Enqueue a CSS stylesheet.

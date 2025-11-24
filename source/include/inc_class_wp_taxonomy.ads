@@ -163,7 +163,7 @@ is
          -- @since 4.7.0
          -- @var string[]
          --
-         Object_Type : String_Array; -- = null;
+         Object_Type : List_Type; -- String_Array; -- = null;
 
          --
          -- Capabilities for this taxonomy.
@@ -265,7 +265,8 @@ is
          -- public sort = null;
 
          --
-         -- Array of arguments to automatically use inside `wp_get_object_terms()` for this taxonomy.
+         -- Array of arguments to automatically use inside `wp_get_object_terms()` for
+         -- this taxonomy.
          --
          -- @since 2.6.0
          -- @var array|null
@@ -345,7 +346,7 @@ is
        Publicly_Queryable => False,
        Public             => False,
        Cap                => Empty_Array,
-       Object_Type        => Empty_String_Array,
+       Object_Type        => Empty_List, -- Empty_String_Array,
        Show_In_REST       => False,
        Default_Term       => Empty_Array,
        Args               => Empty_Array,

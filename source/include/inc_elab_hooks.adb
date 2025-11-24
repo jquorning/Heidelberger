@@ -16,22 +16,23 @@ is
       use Php;
 
       -- @var WP_Hook[] normalized
-      Normalized : Hook_Maps.Map; -- Array_Type;
+      Normalized : Hook_Maps.Map;
    begin
       for A in Filters.Iterate loop
          declare
-            Hook_Name       : constant String     := Array_Maps.Key     (A);
-            Callback_Groups : constant Array_Type := Array_Maps.Element (A).Arry.all;
+            Hook_Name       : constant String     := Key (A);
+            Callback_Groups : constant Array_Type := As_Array (Arrays.Element (A));
          begin
-            if True
---            Is_Object (Callback_Groups) and then
---            Callback_Groups in Wp_Hook
---            Callback_Groups instanceof WP_Hook
-            then
---             Normalized.Include (Key      => Hook_Name,
---                                 New_Item => Callback_Groups);
-               goto Continue;
-            end if;
+--             if True
+-- --            Is_Object (Callback_Groups) and then
+-- --            Callback_Groups in Wp_Hook
+-- --            Callback_Groups instanceof WP_Hook
+--             then
+--                Hook_Maps.Include (Normalized,
+--                                   Key      => Hook_Name,
+--                                   New_Item => Callback_Groups);
+--                goto Continue;
+--             end if;
 
             declare
                use Inc_Class_Wp_Hooks;
@@ -41,17 +42,22 @@ is
                -- Loop through callback groups.
                for B in Callback_Groups.Iterate loop
                   declare
-                     Priority  : constant String := Array_Maps.Key (B);
+                     Priority  : constant String := Key (B);
 
                      Callbacks : constant Array_Type :=
-                       Array_Maps.Element (B).Arry.all;
+                       As_Array (Arrays.Element (B));
                   begin
                      -- Loop through callbacks.
-                     for CB of Callbacks loop
-                        Hook.Add_Filter (Hook_Name,
-                                         Get_Func (CB.Arry.all, "function"),
-                                         Priority_Type'Value (Priority),
-                                         Get_Integer (CB.Arry.all, "accepted_args"));
+                     for CB_2 in Callbacks.Iterate loop
+                        declare
+                           CB   : constant Multi_Type := Element (CB_2);
+                           Arry : constant Array_Type := As_Array (CB);
+                        begin
+                           Hook.Add_Filter (Hook_Name,
+                                            As_Callable (Get (Arry, "function")),
+                                            Priority_Type'Value (Priority),
+                                            As_Integer (Get (Arry, "accepted_args")));
+                        end;
                      end loop;
                   end;
                end loop;

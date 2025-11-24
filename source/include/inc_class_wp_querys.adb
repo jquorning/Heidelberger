@@ -1338,7 +1338,7 @@ is
       use Hb_Common;
    begin
       if Isset (This.Query_Vars, Query_Var) then
-         return Get (This.Query_Vars, Query_Var);
+         return As_String (Get (This.Query_Vars, Query_Var));
       end if;
 
       return Default_Value;

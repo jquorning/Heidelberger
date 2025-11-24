@@ -102,8 +102,8 @@ is
 --                  by their location. If none are registered, an empty array.
 --
    function Get_Registered_Nav_Menus
-            return String_Array
-            is (Empty_String_Array);
+            return List_Type -- String_Array
+            is (Empty_List);
 
    --
    -- Returns all navigation menu objects.

@@ -320,7 +320,6 @@ is
       use Inc_Load;
       use Inc_Plugins;
 
---    global wpdb;
       Unused_Found : Boolean;
       Alloptions   : Array_Type;
    begin
@@ -334,29 +333,33 @@ is
       if Alloptions.Is_Empty then
          declare
             Unused   : Boolean;
-            Suppress : constant Boolean := Globals.Wpdb.Suppress_Errors;
+            Suppress : constant Boolean := Globals.WpDB.Suppress_Errors;
 
             Alloptions_DB : Array_Type :=
-              Globals.Wpdb.Get_Results (
+              Globals.WpDB.Get_Results (
                 "SELECT option_name, option_value FROM wpdb->options WHERE autoload = ""yes""");
          begin
             if Alloptions_DB.Is_Empty then
-               Alloptions_DB := Globals.Wpdb.Get_Results (
+               Alloptions_DB := Globals.WpDB.Get_Results (
                  "SELECT option_name, option_value FROM wpdb->options");
             end if;
 
-            Unused := Globals.Wpdb.Suppress_Errors (Suppress);
+            Unused := Globals.WpDB.Suppress_Errors (Suppress);
 
             Alloptions := Empty_Array;
-            for A in Alloptions_DB.Iterate loop -- o
+            for A in Alloptions_DB.Iterate loop
                declare
-                  use Array_Maps;
+                  Arry : constant Array_Type := As_Array (Element (A));
+
+                  Option_Name  : constant String :=
+                    As_String (Get (Arry, "option_name"));
+
+                  Option_Value : constant String :=
+                    As_String (Get (Arry, "option_value"));
                begin
-                  Alloptions.Include (Key      => Key     (A),
-                                      New_Item => Element (A));
+                  Set (Alloptions, Option_Name,
+                       Value => From_String (Option_Value));
                end;
---             Alloptions.Include (Key      => A.Option_Name,
---                                 New_Item => A.Option_Value);
 --             Alloptions (A.Option_Name) := A.Option_Value;
             end loop;
 

@@ -163,35 +163,44 @@ is
          use Inc_Class_Wp_Terms.Term_Vectors;
          use Inc_Taxonomys;
 
-         Taxonomy             : constant String  := Get (Parsed_Args, "taxonomy");
+         Taxonomy : constant String  := As_String (Get (Parsed_Args, "taxonomy"));
+
          Descendants_And_Self : constant Integer
-            := Integer'Value (Get (Parsed_Args, "descendants_and_self"));
+            := Integer'Value (As_String (Get (Parsed_Args, "descendants_and_self")));
          Args_2 : Array_Type := To_Array (List => (1 =>
                                    Build ("taxonomy", Taxonomy)));
-         Tax        : constant Wp_Taxonomy := Inc_Taxonomys.Get_Taxonomy (Taxonomy);
-         Categories : Wp_Term_Array;  -- Array_Type;
+
+         Tax : constant Wp_Taxonomy := Inc_Taxonomys.Get_Taxonomy (Taxonomy);
+
+         Categories : Wp_Term_Array;
       begin
          Set (Args_2, "disabled",
-              Boolean'Image (not Current_User_Can (Get (Tax.Cap, "assign_terms"))));
+              From_String (
+                Boolean'Image (
+                  not Current_User_Can (As_String (Get (Tax.Cap, "assign_terms"))))));
 
          Set (Args_2, "list_only",
-              Boolean'Image (not Empty (Parsed_Args, "list_only")));
+              From_String (
+                Boolean'Image (
+                  not Empty (Parsed_Args, "list_only"))));
 
-         if Is_Array (Get_Array  (Parsed_Args, "selected_cats")) then
-            Set_Array (Args_2, "selected_cats",
-                 Array_Map ("intval", Get_Array (Parsed_Args, "selected_cats")));
+         if Is_Array (As_Array (Get (Parsed_Args, "selected_cats"))) then
+            Set (Args_2, "selected_cats",
+                 From_Array (
+                   Array_Map ("intval", As_Array (Get (Parsed_Args, "selected_cats")))));
          elsif Post_Id /= 0 then
             null;
 --                Set (Args_2, "selected_cats",
 --                     Wp_Get_Object_Terms (Empty_Term_Array & Post_Id'Image, Taxonomy,
 --                                          Array_Merge (Args, To_array (List => (1 => Build ("fields", "ids"))))));
          else
-            Set_Array (Args_2, "selected_cats", Empty_Array);
+            Set (Args_2, "selected_cats", From_Array (Empty_Array));
          end if;
 
-         if Is_Array (Get_Array (Parsed_Args, "popular_cats")) then
-            Set_Array (Args_2, "popular_cats",
-                 Array_Map ("intval", Get_Array (Parsed_Args, "popular_cats")));
+         if Is_Array (As_Array (Get (Parsed_Args, "popular_cats"))) then
+            Set (Args_2, "popular_cats",
+                 From_Array (
+                   Array_Map ("intval", As_Array (Get (Parsed_Args, "popular_cats")))));
          else
             Set (Args_2, "popular_cats",
                      Get_Terms (
@@ -241,7 +250,7 @@ is
             begin
                for K of Keys loop
                   if In_Array (Get_Term_Array (Categories, -K).Term_Id,
-                               Get_Array (Args_2, "selected_cats"), True)
+                               As_Array (Get (Args_2, "selected_cats")), True)
                   then
                      Checked_Categories := Get_Array (Categories, -K); -- ()
 --                   Unset (Categories (K));
@@ -2297,7 +2306,7 @@ is
       use Inc_Formatting;
    begin
       Echo ((if Isset (X_REQUEST, "s")
-             then ESC_Attr (Wp_Unslash (Get (X_REQUEST, "s"))) else ""));
+             then ESC_Attr (Wp_Unslash (As_String (Get (X_REQUEST, "s")))) else ""));
    end X_Admin_Search_Query;
 
 -- --
@@ -2625,7 +2634,7 @@ is
 
       use Inc_Themes;
       use Inc_Posts;
-      use Array_Maps;
+--    use Array_Maps;
       use Inc_Class_Wp_Posts;
 
       Media_States : Unbounded_String; -- Array_Type := Empty_Array;
@@ -2637,7 +2646,7 @@ is
                := Get_Post_Meta (Post.Id, "_wp_attachment_is_custom_header", True);
          begin
             if Is_Random_Header_Image then  -- ()
-               if Length (Header_Images) = 0 then -- isset
+               if Header_Images.Is_Empty then -- isset
                   Header_Images
                      := Inc_Functions.Wp_List_Pluck
                           (Get_Uploaded_Header_Images, "attachment_id");
@@ -2682,8 +2691,8 @@ is
                Mods : constant Array_Type := Get_Theme_Mods;  -- ();
             begin
                if
-                 Isset (String'(Get (Mods, "header_video"))) and then
-                 Post.Id'Image = Get (Mods, "header_video")
+                 Isset (As_String (Get (Mods, "header_video"))) and then
+                 Post.Id'Image = As_String (Get (Mods, "header_video"))
                then
                   Media_States := +abs "Current Header Video";
                end if;
@@ -2859,7 +2868,7 @@ is
          Id : Unbounded_String := +Name;
       begin
          if Is_Array (Other_Attributes) and then Isset (Other_Attributes, "id") then
-            Id := +Get (Other_Attributes, "id");
+            Id := +As_String (Get (Other_Attributes, "id"));
 --          Other_Attributes.Delete (Other_Attributes.Find (Item => "id"));
 --          Unset (Other_Attributes ("id"));
          end if;
@@ -2870,10 +2879,10 @@ is
             if Is_Array (Other_Attributes) then
                for A in Other_Attributes.Iterate loop
                   declare
-                     use Array_Maps;
+--                   use Array_Maps;
 
                      Attribute : constant String := Key (A); -- A.Key;
-                     Value     : constant String := Get (Other_Attributes, Attribute);
+                     Value     : constant String := As_String (Get (Other_Attributes, Attribute));
                      -- Element (A); -- A.Value;
                   begin
                      Append (Attributes, "=""" & ESC_Attr (Value) & """ ");

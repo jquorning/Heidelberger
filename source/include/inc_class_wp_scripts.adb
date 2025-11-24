@@ -426,7 +426,7 @@ is
       end if;
 
       declare
-         use Array_Maps;
+--       use Array_Maps;
 
          Script : Unbounded_String := +This.Get_Data (Handle, -Position_2); -- (array)
       begin
@@ -491,7 +491,7 @@ is
                       return Boolean
    is
       use Inc_Functions;
-      use Array_Maps;
+--    use Array_Maps;
 
       L10n_2   : Array_Type := L10n;
       After    : Array_Type;
@@ -503,7 +503,7 @@ is
 
       -- back compat, preserve the code in "l10n_print_after" if present.
       if Is_Array (L10n_2) and then Isset (L10n_2, "l10n_print_after") then
-         After := Get_Array (L10n_2, "l10n_print_after");
+         After := As_Array (Get (L10n_2, "l10n_print_after"));
 --         Unset (L10n_2 ("l10n_print_after"));
       end if;
 
@@ -530,15 +530,16 @@ is
 --      elsif Is_Array (L10n_2) then
          for A in L10n_2.Iterate loop --  as key => value ) loop
             declare
-               Key   : constant String := Array_Maps.Key (A); -- -A.Key;
-               Value : constant String := Get (L10n_2, Key);
+               Key   : constant String := Arrays.Key (A);
+               Value : constant String := As_String (Get (L10n_2, Key));
                -- Array_Maps.Element (A); -- -A.Value;
             begin
 --               if not Is_Scalar (Value) then
 --                  goto Continue_1;
 --               end if;
 
-               Set (L10n_2, Key, Html_Entity_Decode (Value, ENT_QUOTES, "UTF-8"));
+               Set (L10n_2, Key,
+                    From_String (Html_Entity_Decode (Value, ENT_QUOTES, "UTF-8")));
             end;
 --            << Continue_1 >>
          end loop;
@@ -575,7 +576,7 @@ is
                        return Boolean
    is
       use Ada.Containers;
-      use Array_Maps;
+--    use Array_Maps;
 
       Grp : Integer;
    begin
@@ -658,8 +659,9 @@ is
 
       declare
          use Inc_Formatting;
+         use Inc_Class_Wp_Dependency;
 
-         Regist : constant Cursor := This.Registered.Find (Handle);
+         Regist : constant Dependency_Maps.Cursor := This.Registered.Find (Handle);
          Domain : constant String := -Element (Regist).Textdomain;
 --       Domain : String   := -This.Registered (Handle).Textdomain;
 --         Path   : Unbounded_String;

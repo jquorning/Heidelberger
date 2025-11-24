@@ -83,18 +83,18 @@ is
          if
            Isset (XX_GET, "post")    and then
            Isset (X_POST, "post_ID") and then
-           Integer'Value (String'(Get (XX_GET, "post"))) /=
-           Integer'Value (String'(Get (X_POST, "post_ID")))
+           Integer'Value (As_String (Get (XX_GET, "post"))) /=
+           Integer'Value (As_String (Get (X_POST, "post_ID")))
          then
             Inc_Functions.Wp_Die
                (abs "A post ID mismatch has been detected.",
                 abs "Sorry, you are not allowed to edit this item.", 400);
 
          elsif Isset (XX_GET, "post") then
-            Id := Post_Id (Get_Integer (XX_GET, "post"));
+            Id := Post_Id (As_Integer (Get (XX_GET, "post")));
 
          elsif Isset (X_POST, "post_ID") then
-            Id := Post_Id (Get_Integer (X_POST, "post_ID"));
+            Id := Post_Id (As_Integer (Get (X_POST, "post_ID")));
 
          else
             Id := 0;
@@ -128,7 +128,7 @@ is
             if
               Isset (X_POST, "post_type") and then
    --         Post and then
-              Post_Type /= Get (X_POST, "post_type")
+              Post_Type /= As_String (Get (X_POST, "post_type"))
             then
                Inc_Functions.Wp_Die
                   (abs "A post type mismatch has been detected.",
@@ -139,7 +139,7 @@ is
                   Action := +"delete";
                elsif
                  Isset (X_POST, "wp-preview") and then
-                 "dopreview" = String'(Get (X_POST, "wp-preview"))
+                 "dopreview" = As_String (Get (X_POST, "wp-preview"))
                then
                   Action := +"preview";
                end if;
@@ -161,7 +161,7 @@ is
                   end if;
                else
                   declare
-                     use String_Vectors;
+--                   use String_Vectors;
 
                      List : constant List_Type :=
                        To_List (List => (+"trashed", +"untrashed",
@@ -175,7 +175,7 @@ is
                if "post-quickdraft-save" = Action then
                   declare
                      -- Check nonce and capabilities.
-                     Nonce     : constant String  := Get (X_REQUEST, "_wpnonce");
+                     Nonce     : constant String  := As_String (Get (X_REQUEST, "_wpnonce"));
                      Error_Msg : Unbounded_String; -- Boolean := false;
                   begin
                      -- For output of the Quick Draft dashboard widget.
@@ -186,7 +186,7 @@ is
                      end if;
 
                      if
-                       not Current_User_Can (Get (Inc_Posts.Get_Post_Type_Object ("post").Cap, "create_posts"))
+                       not Current_User_Can (As_String (Get (Inc_Posts.Get_Post_Type_Object ("post").Cap, "create_posts")))
                      then
                         goto Bailout; -- return;  -- exit;
                      end if;
@@ -197,21 +197,21 @@ is
                   end;
 
                   Post :=
-                    Inc_Posts.Get_Post (Post_Id (Get_Integer (X_REQUEST, "post_ID")));
+                    Inc_Posts.Get_Post (Post_Id (As_Integer (Get (X_REQUEST, "post_ID"))));
 
                   Inc_Pluggables.Check_Admin_Referer ("add-" & (-Post.Post_Type));
 
                   Set (X_POST, "comment_status",
-                       Get_Default_Comment_Status (-Post.Post_Type));
+                       From_String (Get_Default_Comment_Status (-Post.Post_Type)));
                   Set (X_POST, "ping_status",
-                       Get_Default_Comment_Status (-Post.Post_Type, "pingback"));
+                       From_String (Get_Default_Comment_Status (-Post.Post_Type, "pingback")));
 
                   -- Wrap Quick Draft content in the Paragraph block.
-                  if Ada.Strings.Fixed.Index (Get (X_POST, "content"),
+                  if Ada.Strings.Fixed.Index (As_String (Get (X_POST, "content")),
                                               "<!-- wp:paragraph -->") = 0
                   then
                      declare
-                        Value_2 : constant String := Get (X_POST, "content");
+                        Value_2 : constant String := As_String (Get (X_POST, "content"));
 
                         Needle  : constant List_Type := To_List (List => (
                           +"\r\n",
@@ -224,7 +224,7 @@ is
                               To_List (Str_Replace (Needle, "<br />", Value_2))
                           );
                      begin
-                        Set (X_POST, "content", Value);
+                        Set (X_POST, "content", From_String (Value));
                      end;
                   end if;
 
@@ -286,7 +286,7 @@ is
                            (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                      end if;
 
-                     if not Empty (String'(Get (XX_GET, "get-post-lock"))) then
+                     if not Empty (As_String (Get (XX_GET, "get-post-lock"))) then
                         Inc_Pluggables.Check_Admin_Referer ("lock-post_" & Id'Image);
                         declare
                            Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
@@ -368,7 +368,7 @@ is
 
                   -- Don"t let these be changed.
                   Unset (Get (X_POST, "guid"));
-                  Set (X_POST, "post_type", "attachment");
+                  Set (X_POST, "post_type", From_String ("attachment"));
 
                   -- Update the thumbnail filename.
                   declare
@@ -378,7 +378,8 @@ is
                      Newmeta : Array_Type :=
                         Wp_Get_Attachment_Metadata (Integer (Id), True);
                   begin
-                     Set (Newmeta, "thumb", Wp_Basename (Get (X_POST, "thumb")));
+                     Set (Newmeta, "thumb",
+                          From_String (Wp_Basename (As_String (Get (X_POST, "thumb")))));
 
                      Unused := Wp_Update_Attachment_Metadata (Integer (Id), Newmeta);
                   end;
@@ -391,9 +392,9 @@ is
 
                   -- Session cookie flag that the post was saved.
                   if
-                    Isset (String'(Get (X_COOKIE, "wp-saving-post"))) -- and then
+                    Isset (As_String (Get (X_COOKIE, "wp-saving-post"))) -- and then
                   then
-                     Set (X_COOKIE, "wp-saving-post", Id'Image & "-check");
+                     Set (X_COOKIE, "wp-saving-post", From_String (Id'Image & "-check"));
 --                  Setcookie ("wp-saving-post", Post_Id'Image & "-saved", time + DAY_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN, Is_Ssl); -- ssl());
                   end if;
 

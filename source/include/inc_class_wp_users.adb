@@ -1,4 +1,3 @@
-
 --
 -- User API: WP_User class
 --
@@ -6,9 +5,32 @@
 -- @subpackage Users
 -- @since 4.4.0
 --
+
+with Globals;
+with Hb_Common;
+with Php;
+
+with Inc_Caches;
+with Inc_Capabilities;
+with Inc_Class_Wp_Role;
+with Inc_Class_Wp_Roles;
+with Inc_Class_Wpdb;
+with Inc_Formatting;
+with Inc_Load;
+with Inc_Ms_Blogs;
+with Inc_Plugins;
+with Inc_Users;
+
 package body Inc_Class_Wp_Users
 is
-   procedure Dummy is null;
+
+   function Apply_Filters (Hook  : String;
+                           Value : Array_Type;
+                           Caps  : List_Type;
+                           -- Args,
+                           This  : Wp_User)
+                           return Array_Type
+                           is (Value);
 --         --
 --         -- Constructor.
 --         --
@@ -59,105 +81,121 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Sets up object properties, including capabilities.
---         --
---         -- @since 3.3.0
---         --
---         -- @param object data    User DB row object.
---         -- @param int    site_id Optional. The site ID to initialize for.
---         --
---         public function init( data, site_id = '' ) then
---                 if ( ! isset( data->ID ) ) then
---                         data->ID = 0;
---                 end;
---                 this->data = data;
---                 this->ID   = (int) data->ID;
+   ----------
+   -- Init --
+   ----------
 
---                 this->for_site( site_id );
---         end;
+   procedure Init (This    : in out Wp_User;
+                   Data    : Wp_User;
+                   Site_Id : Integer := 0) -- ''
+   is
+      Data_2 : Wp_User := Data;
+   begin
+      if Data.Id = 0 then
+--    if not Isset (Data.Id) then
+         Data_2.Id := 0;
+      end if;
+      This.Data := new Wp_User'(Data_2);
+      This.Id   := Data_2.Id; -- (int)
 
---         --
---         -- Returns only the main user fields.
---         --
---         -- @since 3.3.0
---         -- @since 4.4.0 Added 'ID' as an alias of 'id' for the `field` parameter.
---         --
---         -- @global wpdb wpdb WordPress database abstraction object.
---         --
---         -- @param string     field The field to query against: 'id', 'ID', 'slug', 'email' or 'login'.
---         -- @param string|int value The field value.
---         -- @return object|false Raw user object.
---         --
---         public static function get_data_by( field, value ) then
---                 global wpdb;
+      This.For_Site (Site_Id);
+   end Init;
 
---                 // 'ID' is an alias of 'id'.
---                 if ( 'ID' === field ) then
---                         field = 'id';
---                 end;
+   -----------------
+   -- Get_Data_By --
+   -----------------
 
---                 if ( 'id' === field ) then
---                         // Make sure the value is numeric to avoid casting objects, for example,
---                         // to int 1.
---                         if ( ! is_numeric( value ) ) then
---                                 return false;
---                         end;
---                         value = (int) value;
---                         if ( value < 1 ) then
---                                 return false;
---                         end;
---                 end; else then
---                         value = trim( value );
---                 end;
+   function Get_Data_By (Field : String;
+                         Value : Integer)
+                         return Inc_Class_Wp_Users.Wp_User
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Caches;
+      use Inc_Formatting;
+      use Inc_Users;
 
---                 if ( ! value ) then
---                         return false;
---                 end;
+      -- 'ID' is an alias of 'id'.
+      Field_2 : String :=
+        (if "ID" = Field then "id" else Field);
 
---                 switch ( field ) then
---                         case 'id':
---                                 user_id  = value;
---                                 db_field = 'ID';
---                                 break;
---                         case 'slug':
---                                 user_id  = wp_cache_get( value, 'userslugs' );
---                                 db_field = 'user_nicename';
---                                 break;
---                         case 'email':
---                                 user_id  = wp_cache_get( value, 'useremail' );
---                                 db_field = 'user_email';
---                                 break;
---                         case 'login':
---                                 value    = sanitize_user( value );
---                                 user_id  = wp_cache_get( value, 'userlogins' );
---                                 db_field = 'user_login';
---                                 break;
---                         default:
---                                 return false;
---                 end;
+      Value_2  : Unbounded_String := +Value'Image;
+      User_Id  : Integer;
+      DB_Field : Unbounded_String;
+      Unused_Found : Boolean;
+   begin
+      if "id" = Field_2 then
+         -- Make sure the value is numeric to avoid casting objects, for example,
+         -- to int 1.
+         if not Is_Numeric (Value) then
+            return Null_User; -- False;
+         end if;
+--       Value_2 := +Value'Image; -- (int)
+         if Value < 1 then
+            return Null_User; -- False;
+         end if;
+      else
+         Value_2 := +Trim (-Value_2);
+      end if;
 
---                 if ( false !== user_id ) then
---                         user = wp_cache_get( user_id, 'users' );
---                         if ( user ) then
---                                 return user;
---                         end;
---                 end;
+      if Value_2 = "" then
+         return Null_User; -- False;
+      end if;
 
---                 user = wpdb->get_row(
---                         wpdb->prepare(
---                                 "SELECT-- FROM wpdb->users WHERE db_field = %s LIMIT 1",
---                                 value
---                         )
---                 );
---                 if ( ! user ) then
---                         return false;
---                 end;
+      if Field_2 = "id" then
+         User_Id  := Value;
+         DB_Field := +"ID";
 
---                 update_user_caches( user );
+      elsif Field_2 = "slug" then
+         User_Id  := Wp_Cache_Get (-Value_2, "userslugs", Found => Unused_Found);
+         DB_Field := +"user_nicename";
 
---                 return user;
---         end;
+      elsif Field_2 = "email" then
+         User_Id  := Wp_Cache_Get (-Value_2, "useremail", Found => Unused_Found);
+         DB_Field := +"user_email";
+
+      elsif Field_2 = "login" then
+         Value_2  := +Sanitize_User (-Value_2);
+         User_Id  := Wp_Cache_Get (-Value_2, "userlogins", Found => Unused_Found);
+         DB_Field := +"user_login";
+
+      else
+         return Null_User; -- False;
+      end if;
+
+      if 0 /= User_Id then
+         declare
+            User : constant Wp_User :=
+              Wp_Cache_Get (User_Id, "users", Found => Unused_Found);
+         begin
+            if User /= Null_User then
+               return User;
+            end if;
+         end;
+      end if;
+
+      declare
+         use Globals;
+
+         Unused_Success : Boolean;
+
+         Statement : constant String :=
+           WpDB.Prepare (
+             "SELECT * FROM wpdb->users WHERE db_field = %s LIMIT 1", -Value_2);
+
+         User : constant Wp_User :=
+           WpDB.Get_Row (Statement,
+                         Success => Unused_Success);
+      begin
+         if User = Null_User then
+            return Null_User; -- False;
+         end if;
+
+         Update_User_Caches (User);
+
+         return User;
+      end;
+   end Get_Data_By;
 
 --         --
 --         -- Magic method for checking the existence of a certain custom field.
@@ -385,48 +423,64 @@ is
 --                 this->get_role_caps();
 --         end;
 
---         --
---         -- Retrieves all of the capabilities of the user's roles, and merges them with
---         -- individual user capabilities.
---         --
---         -- All of the capabilities of the user's roles are merged with the user's individual
---         -- capabilities. This means that the user can be denied specific capabilities that
---         -- their role might have, but the user is specifically denied.
---         --
---         -- @since 2.0.0
---         --
---         -- @return bool[] Array of key/value pairs where keys represent a capability name
---         --                and boolean values represent whether the user has that capability.
---         --
---         public function get_role_caps() then
---                 switch_site = false;
---                 if ( is_multisite() && get_current_blog_id() != this->site_id ) then
---                         switch_site = true;
+   -------------------
+   -- Get_Role_Caps --
+   -------------------
 
---                         switch_to_blog( this->site_id );
---                 end;
+   function Get_Role_Caps (This : in out Wp_User)
+                           return Array_Type -- Boolean_Maps.Map
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Capabilities;
+      use Inc_Class_Wp_Role;
+      use Inc_Class_Wp_Roles;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
 
---                 wp_roles = wp_roles();
+      Switch_Site : Boolean := False;
+   begin
+      if Is_Multisite and then Get_Current_Blog_Id /= This.Site_Id then -- ()
+         Switch_Site := True;
 
---                 // Filter out caps that are not role names and assign to this->roles.
---                 if ( is_array( this->caps ) ) then
---                         this->roles = array_filter( array_keys( this->caps ), array( wp_roles, 'is_role' ) );
---                 end;
+         Switch_To_Blog (This.Site_Id);
+      end if;
 
---                 // Build allcaps from role caps, overlay user's caps.
---                 this->allcaps = array();
---                 foreach ( (array) this->roles as role ) then
---                         the_role      = wp_roles->get_role( role );
---                         this->allcaps = array_merge( (array) this->allcaps, (array) the_role->capabilities );
---                 end;
---                 this->allcaps = array_merge( (array) this->allcaps, (array) this->caps );
+      declare
+         Roles : constant Wp_Roles := Wp_Roles_X; -- ();
+      begin
+         -- Filter out caps that are not role names and assign to this->roles.
+         -- if Is_Array (This.Caps) then
+         --    This.Roles :=
+         --      Array_Filter (Array_Keys (This.Caps), To_Array (Roles, "is_role"));
+         -- end if;
 
---                 if ( switch_site ) then
---                         restore_current_blog();
---                 end;
+         -- Build allcaps from role caps, overlay user's caps.
+         This.Allcaps := Empty_Array;
+         for Role of This.Roles loop -- (array)
+            declare
+               The_Role : constant Wp_Role := Roles.Get_Role (-Role);
+            begin
+               This.Allcaps :=
+                 Array_Merge (This.Allcaps, The_Role.Capabilities); -- 2x(array)
+            end;
+         end loop;
+      end;
+      This.Allcaps := Array_Merge (This.Allcaps, This.Caps); -- 2x(array)
 
---                 return this->allcaps;
---         end;
+      if Switch_Site then
+         Restore_Current_Blog; -- ();
+      end if;
+
+      return This.Allcaps;
+   end Get_Role_Caps;
+
+   procedure Get_Role_Caps (This : in out Wp_User)
+   is
+      Unused : constant Array_Type := Get_Role_Caps (This);
+   begin
+      null;
+   end Get_Role_Caps;
 
 --         --
 --         -- Adds role to user.
@@ -641,87 +695,88 @@ is
 --                 this->get_role_caps();
 --         end;
 
---         --
---         -- Returns whether the user has the specified capability.
---         --
---         -- This function also accepts an ID of an object to check against if the capability is a meta capability. Meta
---         -- capabilities such as `edit_post` and `edit_user` are capabilities used by the `map_meta_cap()` function to
---         -- map to primitive capabilities that a user or role has, such as `edit_posts` and `edit_others_posts`.
---         --
---         -- Example usage:
---         --
---         --     user->has_cap( 'edit_posts' );
---         --     user->has_cap( 'edit_post', post->ID );
---         --     user->has_cap( 'edit_post_meta', post->ID, meta_key );
---         --
---         -- While checking against a role in place of a capability is supported in part, this practice is discouraged as it
---         -- may produce unreliable results.
---         --
---         -- @since 2.0.0
---         -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
---         --              by adding it to the function signature.
---         --
---         -- @see map_meta_cap()
---         --
---         -- @param string cap     Capability name.
---         -- @param mixed  ...args Optional further parameters, typically starting with an object ID.
---         -- @return bool Whether the user has the given capability, or, if an object ID is passed, whether the user has
---         --              the given capability for that object.
---         --
---         public function has_cap( cap, ...args ) then
---                 if ( is_numeric( cap ) ) then
---                         _deprecated_argument( __FUNCTION__, '2.0.0', __( 'Usage of user levels is deprecated. Use capabilities instead.' ) );
---                         cap = this->translate_level_to_cap( cap );
---                 end;
+   -------------
+   -- Has_Cap --
+   -------------
 
---                 caps = map_meta_cap( cap, this->ID, ...args );
+   function Has_Cap (This : Wp_User;
+                     Cap  : String)
+                     -- ...args )
+                     return Boolean
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Capabilities;
+      use Inc_Load;
+      use Inc_Plugins;
+   begin
+      -- if Is_Numeric (Cap) then
+      --   X_Deprecated_Argument (
+      --     "__FUNCTION__",
+      --     "2.0.0",
+      --     abs "Usage of user levels is deprecated. Use capabilities instead.");
+      --     Cap_2 := This.Translate_Level_To_Cap (Cap);
+      -- end if;
+      declare
+         Caps : constant List_Type := Map_Meta_Cap (Cap, This.Id); -- , ...args );
+      begin
+         -- Multisite super admin has all caps by definition, Unless specifically
+         -- denied.
+         if Is_Multisite and then Is_Super_Admin (This.Id) then
+            if In_Array ("do_not_allow", Caps, True) then
+               return False;
+            end if;
+            return True;
+         end if;
 
---                 // Multisite super admin has all caps by definition, Unless specifically denied.
---                 if ( is_multisite() && is_super_admin( this->ID ) ) then
---                         if ( in_array( 'do_not_allow', caps, true ) ) then
---                                 return false;
---                         end;
---                         return true;
---                 end;
+         declare
+            -- Maintain BC for the argument passed to the "user_has_cap" filter.
+            Args : Array_Type; --  := Array_Merge (To_Array (Cap, This.Id), Args);
 
---                 // Maintain BC for the argument passed to the "user_has_cap" filter.
---                 args = array_merge( array( cap, this->ID ), args );
+            --
+            -- Dynamically filter a user's capabilities.
+            --
+            -- @since 2.0.0
+            -- @since 3.7.0 Added the `user` parameter.
+            --
+            -- @param bool[]   allcaps Array of key/value pairs where keys represent a
+            --                          capability name and boolean values represent
+            --                          whether the user has that capability.
+            -- @param string[] caps    Required primitive capabilities for the
+            --                          requested capability.
+            -- @param array    args {
+            --     Arguments that accompany the requested capability check.
+            --
+            --     @type string    0 Requested capability.
+            --     @type int       1 Concerned user ID.
+            --     @type mixed  ...2 Optional second and further parameters, typically
+            --                       object ID.
+            -- }
+            -- @param WP_User  user    The user object.
+            --
+            Capabilities : Array_Type :=
+              Apply_Filters ("user_has_cap",
+                             This.Allcaps, Caps, -- Args,
+                             This);
 
---                 --
---                 -- Dynamically filter a user's capabilities.
---                 --
---                 -- @since 2.0.0
---                 -- @since 3.7.0 Added the `user` parameter.
---                 --
---                 -- @param bool[]   allcaps Array of key/value pairs where keys represent a capability name
---                 --                          and boolean values represent whether the user has that capability.
---                 -- @param string[] caps    Required primitive capabilities for the requested capability.
---                 -- @param array    args then
---                 --     Arguments that accompany the requested capability check.
---                 --
---                 --     @type string    0 Requested capability.
---                 --     @type int       1 Concerned user ID.
---                 --     @type mixed  ...2 Optional second and further parameters, typically object ID.
---                 -- end;
---                 -- @param WP_User  user    The user object.
---                 --
---                 capabilities = apply_filters( 'user_has_cap', this->allcaps, caps, args, this );
+         begin
+            -- Everyone is allowed to exist.
+            Set (Capabilities, "exist", From_Boolean (True));
 
---                 // Everyone is allowed to exist.
---                 capabilities['exist'] = true;
+            -- Nobody is allowed to do things they are not allowed to do.
+            Delete (Ref (Capabilities, "do_not_allow"));
 
---                 // Nobody is allowed to do things they are not allowed to do.
---                 unset( capabilities['do_not_allow'] );
+            -- Must have ALL requested caps.
+            for Cap of Caps loop -- (array)
+               if Empty (As_String (Get (Capabilities, -Cap))) then
+                  return False;
+               end if;
+            end loop;
+         end;
+      end;
 
---                 // Must have ALL requested caps.
---                 foreach ( (array) caps as cap ) then
---                         if ( empty( capabilities[ cap ] ) ) then
---                                 return false;
---                         end;
---                 end;
-
---                 return true;
---         end;
+      return True;
+   end Has_Cap;
 
 --         --
 --         -- Converts numeric level to level capability name.
@@ -751,30 +806,31 @@ is
 --                 this->for_site( blog_id );
 --         end;
 
---         --
---         -- Sets the site to operate on. Defaults to the current site.
---         --
---         -- @since 4.9.0
---         --
---         -- @global wpdb wpdb WordPress database abstraction object.
---         --
---         -- @param int site_id Site ID to initialize user capabilities for. Default is the current site.
---         --
---         public function for_site( site_id = '' ) then
---                 global wpdb;
+   --------------
+   -- For_Site --
+   --------------
 
---                 if ( ! empty( site_id ) ) then
---                         this->site_id = absint( site_id );
---                 end; else then
---                         this->site_id = get_current_blog_id();
---                 end;
+   procedure For_Site (This    : in out Wp_User;
+                       Site_Id : Integer := 0) -- ''
+   is
+      use Globals;
+      use Hb_Common;
+      use Inc_Class_Wp_Users;
+      use Inc_Load;
+   begin
+      if Site_Id = 0 then
+--    if not Empty (Site_Id) then
+         This.Site_Id := Site_Id; -- abs
+      else
+         This.Site_Id := Get_Current_Blog_Id;
+      end if;
 
---                 this->cap_key = wpdb->get_blog_prefix( this->site_id ) . 'capabilities';
+      This.Cap_Key := +WpDB.Get_Blog_Prefix (This.Site_Id) & "capabilities";
 
---                 this->caps = this->get_caps_data();
+      This.Caps := This.Get_Caps_Data;
 
---                 this->get_role_caps();
---         end;
+      This.Get_Role_Caps;
+   end For_Site;
 
 --         --
 --         -- Gets the ID of the site for which the user's capabilities are currently initialized.
@@ -787,23 +843,25 @@ is
 --                 return this->site_id;
 --         end;
 
---         --
---         -- Gets the available user capabilities data.
---         --
---         -- @since 4.9.0
---         --
---         -- @return bool[] List of capabilities keyed by the capability name,
---         --                e.g. array( 'edit_posts' => true, 'delete_posts' => false ).
---         --
---         private function get_caps_data() then
---                 caps = get_user_meta( this->ID, this->cap_key, true );
+   -------------------
+   -- Get_Caps_Data --
+   -------------------
 
---                 if ( ! is_array( caps ) ) then
---                         return array();
---                 end;
+   function Get_Caps_Data (This : Wp_User)
+                           return Array_Type
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Users;
 
---                 return caps;
---         end;
--- end;
+      Caps : constant Array_Type :=
+        Get_User_Meta (This.Id, -This.Cap_Key, True);
+   begin
+      if not Is_Array (Caps) then
+         return Empty_Array;
+      end if;
+
+      return Caps;
+   end Get_Caps_Data;
 
 end Inc_Class_Wp_Users;

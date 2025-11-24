@@ -82,12 +82,9 @@ is
    is
       Hook : Wp_Hook;
    begin
-Put_Line ("#Add_Filter  " & Hook_Name);
       if not Hook_Maps.Has_Element (Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
-Put_Line ("#Add_Filter  #4-1");
          Wp_Filter.Include (Hook_Name, Hook); -- Tampering with cursor
-Put_Line ("#Add_Filter  #4-2");
 --       Wp_Filter (Hook_Name) := new WP_Hook();
       end if;
 
@@ -114,7 +111,7 @@ Put_Line ("#Add_Filter  #4-2");
                          Accepted_Args : Integer       := 1)
    is
    begin
-Put_Line ("#Add_Filter callable_2 is null");
+      null;
    end Add_Filter;
 
    procedure Add_Filter (Hook_Name     : String;
@@ -123,7 +120,16 @@ Put_Line ("#Add_Filter callable_2 is null");
                          Accepted_Args : Integer       := 1)
    is
    begin
-Put_Line ("#Add_Filter callable_3 is null");
+      null;
+   end Add_Filter;
+
+   procedure Add_Filter (Hook_Name     : String;
+                         Callback      : Callable_5;
+                         Priority      : Priority_Type := 10;
+                         Accepted_Args : Integer       := 1)
+   is
+   begin
+      null;
    end Add_Filter;
 
    -------------------
@@ -141,7 +147,6 @@ Put_Line ("#Add_Filter callable_3 is null");
 
       Args_2 : Array_Type := Args;
    begin
-Put_Line ("#Apply_Filters");
       if Natural_Maps.Has_Element (Wp_Filters.Find (Hook_Name)) then
 --    if not Isset (Wp_Filters (Hook_Name)) then
          Wp_Filters (Hook_Name) := 1;
@@ -246,33 +251,23 @@ Put_Line ("#Apply_Filters");
 --         return filtered;
 -- end;
 
--- --
--- -- Checks if any filter has been registered for a hook.
--- --
--- -- When using the `callback` argument, this function may return a non-boolean value
--- -- that evaluates to false (e.g. 0), so use the `===` operator for testing the return value.
--- --
--- -- @since 2.5.0
--- --
--- -- @global WP_Hook[] wp_filter Stores all of the filters and actions.
--- --
--- -- @param string                      hook_name The name of the filter hook.
--- -- @param callable|string|array|false callback  Optional. The callback to check for.
--- --                                               This function can be called unconditionally to speculatively check
--- --                                               a callback that may or may not exist. Default false.
--- -- @return bool|int If `callback` is omitted, returns boolean for whether the hook has
--- --                  anything registered. When checking a specific function, the priority
--- --                  of that hook is returned, or false if the function is not attached.
--- --
--- function has_filter( hook_name, callback = false ) then
---         global wp_filter;
+   ----------------
+   -- Has_Filter --
+   ----------------
 
---         if ( ! isset( wp_filter[ hook_name ] ) ) then
---                 return false;
---         end;
+   function Has_Filter (Hook_Name : String;
+                        Callback  : Boolean := False)
+                        return Boolean
+   is
+      use Inc_Elab_Hooks.Hook_Maps;
+   begin
+      if not Has_Element (Wp_Filter.Find (Hook_Name)) then
+--    if not Isset (Wp_Filter (Hook_Name)) then
+         return False;
+      end if;
 
---         return wp_filter[ hook_name ]->has_filter( hook_name, callback );
--- end;
+      return Wp_Filter (Hook_Name).Has_Filter (Hook_Name, Callback);
+   end Has_Filter;
 
 -- --
 -- -- Removes a callback function from a filter hook.
@@ -353,36 +348,25 @@ Put_Line ("#Apply_Filters");
 --         return end( wp_current_filter );
 -- end;
 
--- --
--- -- Returns whether or not a filter hook is currently being processed.
--- --
--- -- The function current_filter() only returns the most recent filter being executed.
--- -- did_filter() returns the number of times a filter has been applied during
--- -- the current request.
--- --
--- -- This function allows detection for any filter currently being executed
--- -- (regardless of whether it's the most recent filter to fire, in the case of
--- -- hooks called from hook callbacks) to be verified.
--- --
--- -- @since 3.9.0
--- --
--- -- @see current_filter()
--- -- @see did_filter()
--- -- @global string[] wp_current_filter Current filter.
--- --
--- -- @param string|null hook_name Optional. Filter hook to check. Defaults to null,
--- --                               which checks if any filter is currently being run.
--- -- @return bool Whether the filter is currently in the stack.
--- --
--- function doing_filter( hook_name = null ) then
---         global wp_current_filter;
+   -----------------
+   -- Doing_Filer --
+   -----------------
 
---         if ( null === hook_name ) then
---                 return ! empty( wp_current_filter );
---         end;
+   function Doing_Filter (Hook_Name : String := "") -- null
+                          return Boolean
+   is
+      use Php;
+      use Hb_Common;
+--    global wp_current_filter;
+   begin
+      if "" = Hook_Name then
+         return not Wp_Current_Filter.Is_Empty;
+--       return not Empty (Wp_Current_Filter);
+      end if;
 
---         return in_array( hook_name, wp_current_filter, true );
--- end;
+      return In_Array (Hook_Name, Wp_Current_Filter, True);
+
+   end Doing_Filter;
 
 -- --
 -- -- Retrieves the number of times a filter has been applied during the current request.
@@ -443,8 +427,6 @@ Put_Line ("#Apply_Filters");
 
 --    global wp_filter, wp_actions, wp_current_filter;
    begin
-Put_Line ("#Do_Action " & Hook_Name & " arg: " & Arg_2);
-
       if not Has_Element (Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
          Wp_Actions.Include (Hook_Name, 1);
@@ -482,8 +464,8 @@ Put_Line ("#Do_Action " & Hook_Name & " arg: " & Arg_2);
       declare
          Arg : Array_Type; --  := Arg_2;
       begin
-         Arg.Include (Arg_2, "");
-         Arg.Include (Arg_3, "");
+--       Arg.Include (Arg_2, "");
+--       Arg.Include (Arg_3, "");
         -- if ( empty( arg ) ) then
         --         arg[] = '';
         -- end; elseif ( is_array( arg[0] ) && 1 === count( arg[0] ) && isset( arg[0][0] ) && is_object( arg[0][0] ) ) then
@@ -566,29 +548,28 @@ Put_Line ("#Do_Action " & Hook_Name & " arg: " & Arg_2);
 --         return has_filter( hook_name, callback );
 -- end;
 
--- --
--- -- Removes a callback function from an action hook.
--- --
--- -- This can be used to remove default functions attached to a specific action
--- -- hook and possibly replace them with a substitute.
--- --
--- -- To remove a hook, the `callback` and `priority` arguments must match
--- -- when the hook was added. This goes for both filters and actions. No warning
--- -- will be given on removal failure.
--- --
--- -- @since 1.2.0
--- --
--- -- @param string                hook_name The action hook to which the function to be removed is hooked.
--- -- @param callable|string|array callback  The name of the function which should be removed.
--- --                                         This function can be called unconditionally to speculatively remove
--- --                                         a callback that may or may not exist.
--- -- @param int                   priority  Optional. The exact priority used when adding the original
--- --                                         action callback. Default 10.
--- -- @return bool Whether the function is removed.
--- --
--- function remove_action( hook_name, callback, priority = 10 ) then
---         return remove_filter( hook_name, callback, priority );
--- end;
+   -------------------
+   -- Remove_Action --
+   -------------------
+
+   function Remove_Action (Hook_Name : String;
+                           Callback  : Callable;
+                           Priority  : Integer := 10)
+                           return Boolean
+   is
+   begin
+      return Remove_Filter (Hook_Name, Callback, Priority);
+   end Remove_Action;
+
+   procedure Remove_Action (Hook_Name : String;
+                            Callback  : Callable;
+                            Priority  : Integer := 10)
+   is
+      Unused : constant Boolean :=
+        Remove_Action (Hook_Name, Callback, Priority);
+   begin
+      null;
+   end Remove_Action;
 
 -- --
 -- -- Removes all of the callback functions from an action hook.
@@ -615,29 +596,16 @@ Put_Line ("#Do_Action " & Hook_Name & " arg: " & Arg_2);
 --         return current_filter();
 -- end;
 
--- --
--- -- Returns whether or not an action hook is currently being processed.
--- --
--- -- The function current_action() only returns the most recent action being executed.
--- -- did_action() returns the number of times an action has been fired during
--- -- the current request.
--- --
--- -- This function allows detection for any action currently being executed
--- -- (regardless of whether it's the most recent action to fire, in the case of
--- -- hooks called from hook callbacks) to be verified.
--- --
--- -- @since 3.9.0
--- --
--- -- @see current_action()
--- -- @see did_action()
--- --
--- -- @param string|null hook_name Optional. Action hook to check. Defaults to null,
--- --                               which checks if any action is currently being run.
--- -- @return bool Whether the action is currently in the stack.
--- --
--- function doing_action( hook_name = null ) then
---         return doing_filter( hook_name );
--- end;
+   ------------------
+   -- Doing_Action --
+   ------------------
+
+   function Doing_Action (Hook_Name : String := "") -- null
+                          return Boolean
+   is
+   begin
+      return Doing_Filter (Hook_Name);
+   end Doing_Action;
 
 -- --
 -- -- Retrieves the number of times an action has been fired during the current request.

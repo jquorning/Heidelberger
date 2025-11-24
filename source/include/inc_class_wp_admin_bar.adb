@@ -100,7 +100,7 @@ is
 --    Add_Action ("admin_head", Wp_Admin_Bar_Header'Access);
 
       declare
-         Admin_Bar_Args  : String_Array; -- Array_Type;
+         Admin_Bar_Args  : List_Type;
          Header_Callback : Unbounded_String;
       begin
          if Current_Theme_Supports ("admin-bar") then
@@ -110,7 +110,7 @@ is
             -- add_theme_support( "admin-bar", array( "callback" => "__return_false"));
             --
             Admin_Bar_Args  := Get_Theme_Support ("admin-bar");
-            Header_Callback := +Get (Admin_Bar_Args.First_Element, "callback");
+            Header_Callback := +Get (-Admin_Bar_Args.First_Element, "callback");
          end if;
 
          if Header_Callback = "" then
@@ -457,10 +457,11 @@ is
          begin
             if Typ_Group = Node.Typ then
                if Empty (Node.Meta, "class") then
-                  Set (Node.Meta, "class", Group_Class);
+                  Set (Node.Meta, "class", From_String (Group_Class));
                else
                   Set (Node.Meta, "class",
-                       Get (Node.Meta, "class") & " " & Group_Class);
+                       From_String (
+                         As_String (Get (Node.Meta, "class")) & " " & Group_Class));
                end if;
             end if;
 
@@ -678,7 +679,7 @@ is
       end if;
 
       if not Empty (Node.Meta, "class") then
-         Class := +" class=""" & ESC_Attr (Trim (Get (Node.Meta, "class"))) & """";
+         Class := +" class=""" & ESC_Attr (Trim (As_String (Get (Node.Meta, "class")))) & """";
       else
          Class := +"";
       end if;
@@ -708,8 +709,8 @@ is
       -- value of `0` for a11y.
       Tabindex : constant Integer := (if
                                Isset (Node.Meta, "tabindex") and then
-                               Is_Numeric (Get (Node.Meta, "tabindex"))
-                             then Integer'Value (Get (Node.Meta, "tabindex")) else 0);
+                               Is_Numeric (As_String (Get (Node.Meta, "tabindex")))
+                             then Integer'Value (As_String (Get (Node.Meta, "tabindex"))) else 0);
 
       Aria_Attributes : Unbounded_String :=
          +(if 0 /= Tabindex
@@ -730,7 +731,7 @@ is
       end if;
 
       if not Empty (Node.Meta, "class") then
-         Menuclass := Menuclass & Get (Node.Meta, "class");
+         Menuclass := Menuclass & As_String (Get (Node.Meta, "class"));
       end if;
 
       -- Print the arrow icon for the menu children with children.
@@ -765,9 +766,9 @@ is
          end if;
 
          if "onclick" = Attribute then
-            Echo (" attribute=""" & ESC_JS (Get (Node.Meta, -Attribute)) & """");
+            Echo (" attribute=""" & ESC_JS (As_String (Get (Node.Meta, -Attribute))) & """");
          else
-            Echo (" attribute=""" & ESC_Attr (Get (Node.Meta, -Attribute)) & """");
+            Echo (" attribute=""" & ESC_Attr (As_String (Get (Node.Meta, -Attribute))) & """");
          end if;
          << Continue_2 >>
       end loop;
@@ -789,7 +790,7 @@ is
       end if;
 
       if not Empty (Node.Meta, "html") then
-         Echo (Get (Node.Meta, "html"));
+         Echo (As_String (Get (Node.Meta, "html")));
       end if;
 
       Echo ("</li>");

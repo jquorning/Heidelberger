@@ -105,7 +105,7 @@ is
                       return Boolean
    is
       use List_Vectors;
-      use Array_Maps;
+--    use Array_Maps;
 
       Handles_2 : constant List_Type := Handles; -- (array)
    begin
@@ -126,7 +126,7 @@ is
             declare
                use Inc_Class_Wp_Dependency;
                use Inc_Class_Wp_Dependency.Dependency_Maps;
-               use String_Vectors;
+--             use String_Vectors;
 
                Moved : constant Boolean := This.Set_Group (Handle_2, Recursion, Group);
                New_Group  : constant Integer := This.Groups (Handle_2);
@@ -211,7 +211,7 @@ is
    is
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
-      use String_Vectors;
+--    use String_Vectors;
       use List_Vectors;
    begin
       if This.Registered.Find (Handle) /= Dependency_Maps.No_Element then
@@ -229,11 +229,10 @@ is
          then
 --       if not Is_Null (This.Queued_Before_Register (Handle)) then
             This.Enqueue
-              (To_Vector (Handle & "?" &
-                          (-Element (This.Queued_Before_Register.Find (+Handle))),
-                          Length => 1));
+              (To_List (Handle & "?" &
+                        (-Element (This.Queued_Before_Register.Find (+Handle)))));
          else
-            This.Enqueue (To_Vector (Handle, Length => 1));
+            This.Enqueue (To_List (Handle));
          end if;
 
 --       Unset (This.Queued_Before_Register (Handle));
@@ -309,11 +308,11 @@ is
 
 --        public function remove( handles ) then
    procedure Remove (This    : in out Wp_Dependencies;
-                     Handles : String_Array)
+                     Handles : List_Type)
    is
    begin
-      for Handle of Handles loop -- (array)
-         This.Registered.Delete (Handle);
+      for Handle of Handles loop
+         This.Registered.Delete (-Handle);
 --       Unset (This.Registered (Handle));
       end loop;
    end Remove;
@@ -324,16 +323,16 @@ is
 
 --        public function enqueue( handles ) then
    procedure Enqueue (This    : in out Wp_Dependencies;
-                      Handles : String_Array)
+                      Handles : List_Type)
    is
-      use String_Vectors;
+--    use String_Vectors;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
       use List_Vectors;
    begin
-      for Handle of Handles loop -- (array)
+      for Handle of Handles loop
          declare
-            Handle_2 : constant List_Type := Explode ("?", Handle);
+            Handle_2 : constant List_Type := Explode ("?", -Handle);
 
             First    : constant String := -Handle_2 (Handle_2.First_Index);
             Second   : constant String := -Handle_2 (Handle_2.First_Index + 1);
@@ -383,13 +382,13 @@ is
 
 --        public function dequeue( handles ) then
    procedure Dequeue (This    : in out Wp_Dependencies;
-                      Handles : String_Array)
+                      Handles : List_Type)
    is
       use Inc_Class_Wp_Dependency;
    begin
-      for Handle of Handles loop -- (array)
+      for Handle of Handles loop
          declare
-            Handle_2 : constant List_Type := Explode ("?", Handle);
+            Handle_2 : constant List_Type := Explode ("?", -Handle);
             First    : constant String := -Handle_2 (Handle_2.First_Index);
             Key      : constant String :=
                Array_Search (First, This.Queue, True);
@@ -431,7 +430,7 @@ is
    is
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
-      use String_Vectors;
+--    use String_Vectors;
       use List_Vectors;
 
       Queue_2 : List_Type := Queue; -- String_Array := Queue;

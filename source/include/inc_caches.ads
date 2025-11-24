@@ -10,12 +10,34 @@
 with Arrays;
 
 with Inc_Class_Wp_Posts;
+with Inc_Class_Wp_Users;
 
 package Inc_Caches
 is
    use Arrays;
 
    procedure Dummy;
+
+   --
+   -- Adds a group or set of groups to the list of global groups.
+   --
+   -- @since 2.6.0
+   --
+   -- @see WP_Object_Cache::add_global_groups()
+   -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
+   --
+   -- @param string|string[] $groups A group or an array of groups to add.
+   --
+   procedure Wp_Cache_Add_Global_Groups (Groups : String);
+
+   --
+   -- Adds a group or set of groups to the list of non-persistent groups.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string|string[] $groups A group or an array of groups to add.
+   --
+   procedure Wp_Cache_Add_Non_Persistent_Groups (Groups : String);
 
    --
    -- Adds data to the cache, if the cache key doesn't already exist.
@@ -39,6 +61,12 @@ is
                           Expire : Natural := 0)
                           return Boolean
                           is (False);
+
+   procedure Wp_Cache_Add (Key    : String;
+                           Data   : Integer; -- String;
+                           Group  : String  := "";
+                           Expire : Natural := 0)
+                           is null;
 
    --
    -- Retrieves the cache contents from the cache by key and group.
@@ -79,6 +107,20 @@ is
                           Found : out Boolean) -- = null
                           return Array_Type
                           is (Empty_Array);
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean) -- = null
+                          return Integer
+                          is (99);
+
+   function Wp_Cache_Get (Key   : Integer;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean) -- = null
+                          return Inc_Class_Wp_Users.Wp_User -- Integer
+                          is (Inc_Class_Wp_Users.Null_User);
 
    --
    -- Saves the data to the cache.

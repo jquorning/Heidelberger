@@ -1,5 +1,8 @@
 with Ada.Calendar;
 
+with Inc_Class_Wp_Errors;
+with Inc_Class_Wp_Terms;
+
 package Inc_Load
 is
 
@@ -46,6 +49,32 @@ is
    -- @global WP_Locale $wp_locale WordPress date and time locale object.
    --
    procedure Wp_Load_Translations_Early;
+
+   --
+   -- Converts a shorthand byte value to an integer byte value.
+   --
+   -- @since 2.3.0
+   -- @since 4.6.0 Moved from media.php to load.php.
+   --
+   -- @link https://www.php.net/manual/en/function.ini-get.php
+   -- @link https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
+   --
+   -- @param string value A (PHP ini) byte value, either shorthand or ordinary.
+   -- @return int An integer byte value.
+   --
+   function Wp_Convert_Hr_To_Bytes (Value : String)
+                                    return Natural;
+
+   --
+   -- Determines whether file modifications are allowed.
+   --
+   -- @since 4.8.0
+   --
+   -- @param string context The usage context.
+   -- @return bool True if file modification is allowed, false otherwise.
+   --
+   function Wp_Is_File_Mod_Allowed (Context : String)
+                                    return Boolean;
 
    --
    -- Check or set whether WordPress is in "installation" mode.
@@ -308,7 +337,16 @@ is
    -- @return bool Whether the variable is an instance of WP_Error.
    --
    function Is_Wp_Error (Thing : String)
-                         return Boolean is (False);
+                         return Boolean
+                         is (False);
+
+   function Is_Wp_Error (Thing : Inc_Class_Wp_Errors.Wp_Error)
+                         return Boolean
+                         is (True);
+
+   function Is_Wp_Error (Thing : Inc_Class_Wp_Terms.Wp_Term)
+                         return Boolean
+                         is (True);
 
    --
    -- Determines whether the current request is a WordPress Ajax request.

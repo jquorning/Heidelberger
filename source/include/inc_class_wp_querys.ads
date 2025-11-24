@@ -36,7 +36,7 @@ is
         -- @since 1.5.0
         -- @var array
         --
-        Query : Array_Type;
+        M_Query : Array_Type;
 
         --
         -- Query vars, after parsing.
@@ -726,12 +726,13 @@ is
    -- @param string|array $query URL query string or array of query arguments.
    -- @return WP_Post[]|int[] Array of post objects or post IDs.
    --
-   function Query (Query : Array_Type)
+   function Query (This  : Wp_Query;
+                   Query : Array_Type)
                    return Inc_Class_Wp_Posts.Wp_Post_Array
                    is (Inc_Class_Wp_Posts.Empty_Wp_Post_Array);
 
    Null_Query : constant Wp_Query :=
-     (Query                 => Empty_Array,
+     (M_Query               => Empty_Array,
       Query_Vars            => Empty_Array,
       Queried_Object_Id     => 0,
       Request               => Null_Unbounded_String,

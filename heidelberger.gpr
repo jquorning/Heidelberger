@@ -5,6 +5,7 @@ project Heidelberger is
    for Source_Dirs use (
       "source/",
       "source/include/",
+      "source/include/block-support/",
       "source/include/pomo/",
       "source/admin/",
       "source/admin/include/",
@@ -18,6 +19,7 @@ project Heidelberger is
    package Compiler is
       for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
          "-g",
+         "-O0",
          "-gnata",
          "-gnatwaCFMUV", -- U must be removed eventually
          "-gnatef",

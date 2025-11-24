@@ -110,38 +110,42 @@ is
 --         return themes;
 -- end;
 
--- --
--- -- Gets a WP_Theme object for a theme.
--- --
--- -- @since 3.4.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @param string stylesheet Optional. Directory name for the theme. Defaults to active theme.
--- -- @param string theme_root Optional. Absolute path of the theme root to look in.
--- --                           If not specified, get_raw_theme_root() is used to calculate
--- --                           the theme root for the stylesheet provided (or active theme).
--- -- @return WP_Theme Theme object. Be sure to check the object"s exists() method
--- --                  if you need to confirm the theme"s existence.
--- --
--- function wp_get_theme( stylesheet = "", theme_root = "" ) then
---         global wp_theme_directories;
+   ------------------
+   -- Wp_Get_Theme --
+   ------------------
 
---         if ( empty( stylesheet ) ) then
---                 stylesheet = get_stylesheet();
---         end;
+   function Wp_Get_Theme (Stylesheet : String := "";
+                          Theme_Root : String := "")
+                          return Inc_Class_Wp_Themes.Wp_Theme
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
 
---         if ( empty( theme_root ) ) then
---                 theme_root = get_raw_theme_root( stylesheet );
---                 if ( false === theme_root ) then
---                         theme_root = WP_CONTENT_DIR . "/themes";
---                 end; elseif ( ! in_array( theme_root, (array) wp_theme_directories, true ) ) then
---                         theme_root = WP_CONTENT_DIR . theme_root;
---                 end;
---         end;
+      Stylesheet_2 : String := (if Empty (Stylesheet)
+                                then Get_Stylesheet
+                                else Stylesheet);
+   begin
+      if Empty (Theme_Root) then
+         declare
+            Theme_Root : Unbounded_String := +Get_Raw_Theme_Root (Stylesheet_2);
+         begin
+            if "" = Theme_Root then -- False =
+               Theme_Root := Globals.WP_CONTENT_DIR & "/themes";
+            elsif not In_Array (-Theme_Root, Wp_Theme_Directories, True) then
+               Theme_Root := Globals.WP_CONTENT_DIR & Theme_Root;
+            end if;
+         end;
+      end if;
 
---         return new WP_Theme( stylesheet, theme_root );
--- end;
+      declare
+         use Inc_Class_Wp_Themes;
+
+         T : Wp_Theme := Null_Theme;
+      begin
+         return Inc_Class_Wp_Themes.X_Construct (Stylesheet_2, Theme_Root, T);
+      end;
+   end Wp_Get_Theme;
 
 -- --
 -- -- Clears the cache held by get_theme_roots() and WP_Theme.

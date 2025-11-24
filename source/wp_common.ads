@@ -63,12 +63,12 @@ is
                           return String
                           is ("XXX-330");
 
-   function Array_Fill_Keys (Keys  : String_Array;
+   function Array_Fill_Keys (Keys  : List_Type; -- String_Array;
                              Value : Boolean)
                              return Array_Type
                              is (Empty_Array);
 
-   function To_List (List : String_Array)
+   function To_List (List : List_Type) -- String_Array)
                      return List_Type
                      is (Empty_List);
 
@@ -86,7 +86,9 @@ is
 
    function Apply_Filters (Hook_Name  : String;
                            A1         : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           A2, A3, A4 : Array_Type)
+                           A2         : List_Type; -- Array_Type;
+                           A3         : Array_Type;
+                           A4         : Array_Type)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Inc_Class_Wp_Terms.Empty_Term_Array);
 

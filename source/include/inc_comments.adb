@@ -1,10 +1,14 @@
-
 --
 -- Core Comment API
 --
 -- @package WordPress
 -- @subpackage Comment
 --
+
+with Arrays;
+with Globals;
+with Hb_Common;
+with Php;
 
 package body Inc_Comments
 is
@@ -177,58 +181,59 @@ is
 --         return query->query( parsed_args );
 -- end;
 
--- --
--- -- Retrieves comment data given a comment ID or comment object.
--- --
--- -- If an object is passed then the comment data will be cached and then returned
--- -- after being passed through a filter. If the comment is empty, then the global
--- -- comment variable will be used, if it is set.
--- --
--- -- @since 2.0.0
--- --
--- -- @global WP_Comment comment Global comment object.
--- --
--- -- @param WP_Comment|string|int comment Comment to retrieve.
--- -- @param string                output  Optional. The required return type. One of OBJECT, ARRAY_A, or ARRAY_N, which
--- --                                       correspond to a WP_Comment object, an associative array, or a numeric array,
--- --                                       respectively. Default OBJECT.
--- -- @return WP_Comment|array|null Depends on output value.
--- --
--- function get_comment( comment = null, output = OBJECT ) then
---         if ( empty( comment ) && isset( GLOBALS["comment"] ) ) then
---                 comment = GLOBALS["comment"];
---         end;
+   -----------------
+   -- Get_Comment --
+   -----------------
 
---         if ( comment instanceof WP_Comment ) then
---                 _comment = comment;
---         end; elseif ( is_object( comment ) ) then
---                 _comment = new WP_Comment( comment );
---         end; else then
---                 _comment = WP_Comment::get_instance( comment );
---         end;
+   function Get_Comment (Comment : Integer := 0; -- null
+                         Output  : String  := "OBJECT")
+                         return Inc_Class_Wp_Comments.Wp_Comment
+   is
+      use Arrays;
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Comments;
 
---         if ( ! _comment ) then
---                 return null;
---         end;
+      Comment_2 : Integer := Comment;
+      X_Comment : Wp_Comment;
+   begin
+      if
+        -- Empty (Comment) and then
+        X_Isset (Globals.GLOBALS, "comment")
+      then
+         Comment_2 := As_Integer (Get (Globals.GLOBALS, "comment"));
+      end if;
 
---         --
---         -- Fires after a comment is retrieved.
---         --
---         -- @since 2.3.0
---         --
---         -- @param WP_Comment _comment Comment data.
---         --
---         _comment = apply_filters( "get_comment", _comment );
+      -- if Comment_2 in Wp_Comment then
+      --    X_Comment = Comment_2;
+      -- elsif Is_Object (Comment_2) then
+      --    X_Comment = new Wp_Comment (Comment_2);
+      -- else
+      --    X_Comment = WP_Comment::Get_Instance (Comment_2);
+      -- end if;
 
---         if ( OBJECT === output ) then
---                 return _comment;
---         end; elseif ( ARRAY_A === output ) then
---                 return _comment->to_array();
---         end; elseif ( ARRAY_N === output ) then
---                 return array_values( _comment->to_array() );
---         end;
---         return _comment;
--- end;
+--      if not X_Comment then
+--         return null;
+--      end if;
+
+      --
+      -- Fires after a comment is retrieved.
+      --
+      -- @since 2.3.0
+      --
+      -- @param WP_Comment _comment Comment data.
+      --
+      -- X_Comment := Apply_Filters ("get_comment", X_Comment);
+
+      -- if "OBJECT" = Output then
+      --    return X_Comment;
+      -- elsif "ARRAY_A" = Output then
+      --    return X_Comment->to_array();
+      -- elsif "ARRAY_N" = Output then
+      --    return Array_Values (X_Comment->to_array() );
+      -- end if;
+      return X_Comment;
+   end Get_Comment;
 
 -- --
 -- -- Retrieves a list of comments.

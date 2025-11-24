@@ -1222,36 +1222,37 @@ is
 
       -- If it's a 404 page, use a "Page not found" title.
       if Is_404 then
-         Set (Title, "title", abs "Page not found");
+         Set (Title, "title", From_String (abs "Page not found"));
 
       -- If it's a search, use a dynamic search results title.
       elsif Is_Search then
          -- translators: %s: Search query.
-         Set (Title, "title", Sprintf (abs "Search Results for &#8220;%s&#8221;",
-                                       To_List (Get_Search_Query)));
+         Set (Title, "title", From_String (
+                Sprintf (abs "Search Results for &#8220;%s&#8221;",
+                         To_List (Get_Search_Query))));
 
       -- If on the front page, use the site title.
       elsif Is_Front_Page then
-         Set (Title, "title", Get_Bloginfo ("name", "display"));
+         Set (Title, "title", From_String (Get_Bloginfo ("name", "display")));
 
       -- If on a post type archive, use the post type archive title.
       elsif Is_Post_Type_Archive then
-         Set (Title, "title", Post_Type_Archive_Title ("", False));
+         Set (Title, "title", From_String (Post_Type_Archive_Title ("", False)));
 
       -- If on a taxonomy archive, use the term title.
       elsif Is_Tax then
-         Set (Title, "title", Single_Term_Title ("", False));
+         Set (Title, "title", From_String (Single_Term_Title ("", False)));
 
       --
       -- If we're on the blog page that is not the homepage
       -- or a single post of any post type, use the post title.
       --
       elsif Is_Home or else Is_Singular then
-         Set (Title, "title", Single_Post_Title ("", False));
+         Set (Title, "title", From_String (Single_Post_Title ("", False)));
 
       -- If on a category or tag archive, use the term title.
       elsif Is_Category or Is_Tag then
-         Set (Title, "title", Single_Term_Title ("", False));
+         Set (Title, "title", From_String (Single_Term_Title ("", False)));
 
       -- If on an author archive, use the author's display name.
       elsif
@@ -1264,20 +1265,23 @@ is
 
             Author : constant Wp_User := Get_Queried_Object;
          begin
-            Set (Title, "title", -Author.Prop.Display_Name);
+            Set (Title, "title",
+                 From_String (-Author.Prop.Display_Name));
          end;
 
       -- If it's a date archive, use the date as the title.
       elsif Is_Year then
          Set (Title, "title",
-              Get_The_Date (X_X ("Y", "yearly archives date format")));
+              From_String (
+                Get_The_Date (X_X ("Y", "yearly archives date format"))));
 
       elsif Is_Month then
          Set (Title, "title",
-              Get_The_Date (X_X ("F Y", "monthly archives date format")));
+              From_String (
+                Get_The_Date (X_X ("F Y", "monthly archives date format"))));
 
       elsif Is_Day then
-         Set (Title, "title", Get_The_Date);
+         Set (Title, "title", From_String (Get_The_Date));
       end if;
 
       -- Add a page number if necessary.
@@ -1288,15 +1292,17 @@ is
          begin
             -- translators: %s: Page number.
             Set (Title, "page",
-                 Sprintf (abs "Page %s", To_List (Page_Image)));
+                 From_String (Sprintf (abs "Page %s", To_List (Page_Image))));
          end;
       end if;
 
       -- Append the description or site title to give context.
       if Is_Front_Page then
-         Set (Title, "tagline", Get_Bloginfo ("description", "display"));
+         Set (Title, "tagline",
+              From_String (Get_Bloginfo ("description", "display")));
       else
-         Set (Title, "site", Get_Bloginfo ("name", "display"));
+         Set (Title, "site",
+              From_String (Get_Bloginfo ("name", "display")));
       end if;
 
       declare
@@ -1564,6 +1570,7 @@ is
                                      Display : Boolean := True)
                                      return String
    is
+      use Arrays;
       use Hb_Common;
       use Php;
       use Inc_Plugins;
@@ -1596,7 +1603,7 @@ is
             --
             Title : constant String :=
               Apply_Filters ("post_type_archive_title",
-                             Get (Post_Type_Obj.Labels, "name"), Post_Type);
+                             As_String (Get (Post_Type_Obj.Labels, "name")), Post_Type);
          begin
             if Display then
                Echo (Prefix & Title);

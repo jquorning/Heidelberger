@@ -5,9 +5,10 @@
 -- @since 5.2.0
 --
 
+with Hb_Common;
+
 package body Inc_Class_Wp_Recovery_Mode
 is
-   procedure Dummy is null;
 
 --         --
 --         -- WP_Recovery_Mode constructor.
@@ -66,16 +67,17 @@ is
 --                 return this.is_active;
 --         end;
 
---         --
---         -- Gets the recovery mode session ID.
---         --
---         -- @since 5.2.0
---         --
---         -- @return string The session ID if recovery mode is active, empty string otherwise.
---         --
---         public function get_session_id() then
---                 return this.session_id;
---         end;
+   ---------------------
+   -- Get_Sesstion_Id --
+   ---------------------
+
+   function Get_Session_Id (This : Wp_Recovery_Mode)
+                            return String
+   is
+      use Hb_Common;
+   begin
+      return -This.Session_Id;
+   end Get_Session_Id;
 
 --         --
 --         -- Checks whether recovery mode has been initialized.

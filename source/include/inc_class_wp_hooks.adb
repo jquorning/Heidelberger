@@ -66,7 +66,6 @@ is
 
       Map : Index_Maps.Map;
    begin
-Put_Line ("#Add_Filter method");
       Map.Include (Key => Index, New_Item => Item);
       This.Callbacks.Include (Key => Priority, New_Item => Map);
 --    This.Callbacks (Priority) (Idx) := Item;
@@ -186,58 +185,63 @@ Put_Line ("#Add_Filter method");
 --                 return exists;
 --         end;
 
---         --
---         -- Checks if a specific callback has been registered for this hook.
---         --
---         -- When using the `callback` argument, this function may return a non-boolean value
---         -- that evaluates to false (e.g. 0), so use the `===` operator for testing the return value.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string                      hook_name Optional. The name of the filter hook. Default empty.
---         -- @param callable|string|array|false callback  Optional. The callback to check for.
---         --                                               This method can be called unconditionally to speculatively check
---         --                                               a callback that may or may not exist. Default false.
---         -- @return bool|int If `callback` is omitted, returns boolean for whether the hook has
---         --                  anything registered. When checking a specific function, the priority
---         --                  of that hook is returned, or false if the function is not attached.
---         --
---         public function has_filter( hook_name = "", callback = false ) then
---                 if ( false === callback ) then
---                         return this.has_filters();
---                 end;
+   ----------------
+   -- Has_Filter --
+   ----------------
 
---                 function_key = _wp_filter_build_unique_id( hook_name, callback, false );
+   function Has_Filter (This      : Wp_Hook;
+                        Hook_Name : String := "";
+                        Callback  : Boolean := False)
+                        return Boolean
+   is
+      use Inc_Elab_Plugins;
+   begin
+      if False = Callback then
+         return This.Has_Filters; -- ()
+      end if;
 
---                 if ( ! function_key ) then
---                         return false;
---                 end;
+--       declare
+--          Function_Key : String :=
+--            X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, False);
+--       begin
 
---                 foreach ( this.callbacks as priority => callbacks ) then
---                         if ( isset( callbacks[ function_key ] ) ) then
---                                 return priority;
---                         end;
---                 end;
+--          if Function_Key = "" then
+--             return False;
+--          end if;
 
---                 return false;
---         end;
+--          for A in This.Callbacks.Iterate loop
+--             declare
+--                Priority  : Priority_Type  := Priority_Maps.Key (A);
+--                Callbacks : Index_Maps.Map := Priority_Maps.Element (A);
+--             begin
+--                if Index_Maps.Has_Element (Callbacks.Find (Function_Key)) then
+-- --             if Isset (Callbacks (Function_Key)) then
+--                   return Priority;
+--                end if;
+--             end;
+--          end loop;
+--       end;
 
---         --
---         -- Checks if any callbacks have been registered for this hook.
---         --
---         -- @since 4.7.0
---         --
---         -- @return bool True if callbacks have been registered for the current hook, otherwise false.
---         --
---         public function has_filters() then
---                 foreach ( this.callbacks as callbacks ) then
---                         if ( callbacks ) then
---                                 return true;
---                         end;
---                 end;
+      return False;
+   end Has_Filter;
 
---                 return false;
---         end;
+   -----------------
+   -- Has_Filters --
+   -----------------
+
+   function Has_Filters (This : Wp_Hook)
+                         return Boolean
+   is
+   begin
+      for Callbacks of This.Callbacks loop
+         if not Callbacks.Is_Empty then
+--       if Callbacks then
+            return True;
+         end if;
+      end loop;
+
+      return False;
+   end Has_Filters;
 
 --         --
 --         -- Removes all callbacks from the current filter.
@@ -279,7 +283,6 @@ Put_Line ("#Add_Filter method");
       Num_Args      : Natural;
       Value_2       : Unbounded_String := +Value;
    begin
-Put_Line ("#Apply_Filters method");
       if This.Callbacks.Is_Empty then
          return Value;
       end if;
@@ -326,10 +329,10 @@ Put_Line ("#Apply_Filters method");
 
                declare
                   Accepted_Args : constant Natural  :=
-                    Get_Integer (The_X, "accepted_args");
+                    As_Integer (Get (The_X, "accepted_args"));
 
                   User_Function : constant Callable :=
-                    Get_Func (The_X, "function");
+                    As_Callable (Get (The_X, "function"));
                begin
                   -- Avoid the array_slice() if possible.
                   if 0 = Accepted_Args then
@@ -377,7 +380,6 @@ Put_Line ("#Apply_Filters method");
                         Args : Array_Type)
    is
    begin
-Put_Line ("#Do_Action method");
       This.Doing_Action := True;
       This.Apply_Filters ("", Args);
 
@@ -400,7 +402,6 @@ Put_Line ("#Do_Action method");
 
       Nesting_Level : constant Nesting_Type := This.Nesting_Level;
    begin
-Put_Line ("#Do_All_Hook method");
       This.Nesting_Level := This.Nesting_Level + 1;
       This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
 
@@ -412,7 +413,7 @@ Put_Line ("#Do_All_Hook method");
             for The_X of This.Callbacks (Priority) loop
                declare
                   Unused : Unbounded_String;
-                  Func   : constant Callable := Get_Func (The_X, "function");
+                  Func   : constant Callable := As_Callable (Get (The_X, "function"));
                begin
                   Unused := +Call_User_Func_Array (Func, Args);
                end;

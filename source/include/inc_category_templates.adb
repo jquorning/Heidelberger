@@ -368,13 +368,13 @@ is
       Tab_Index_Attribute : Unbounded_String;
       Output            : Unbounded_String;
    begin
-      Set_Integer (Defaults, "selected",
-                   (if Inc_Querys.Is_Category
-                    then Inc_Querys.Get_Query_Var ("cat")
-                    else 0));
+      Set (Defaults, "selected",
+           From_Integer (if Inc_Querys.Is_Category
+                         then Inc_Querys.Get_Query_Var ("cat")
+                         else 0));
 
       -- Back compat.
-      if Isset (Args, "type") and then "link" = Get (Args, "type") then
+      if Isset (Args, "type") and then "link" = As_String (Get (Args, "type")) then
          X_Deprecated_Argument (
            "__FUNCTION__",
            "3.0.0",
@@ -392,17 +392,17 @@ is
       -- Parse incoming $args into an array and merge it with $defaults.
       Parsed_Args := Wp_Parse_Args (Args, Defaults);
 
-      Option_None_Value := +Get_Integer (Parsed_Args, "option_none_value")'Image;
+      Option_None_Value := +As_Integer (Get (Parsed_Args, "option_none_value"))'Image;
 
       if
         not Isset (Parsed_Args, "pad_counts")          and then
-        Get_Integer (Parsed_Args, "show_count")   /= 0 and then
-        Get_Integer (Parsed_Args, "hierarchical") /= 0
+        As_Integer (Get (Parsed_Args, "show_count"))   /= 0 and then
+        As_Integer (Get (Parsed_Args, "hierarchical")) /= 0
       then
-         Set_Boolean (Parsed_Args, "pad_counts", True);
+         Set (Parsed_Args, "pad_counts", From_Boolean (True));
       end if;
 
-      Tab_Index := Get_Integer (Parsed_Args, "tab_index");
+      Tab_Index := As_Integer (Get (Parsed_Args, "tab_index"));
 
       Tab_Index_Attribute := +"";
       if Tab_Index > 0 then -- (int)
@@ -429,21 +429,21 @@ is
 
          Categories : constant Wp_Term_Array := Get_Terms (Get_Terms_Args);
 
-         Name     : constant String := ESC_Attr (Get (Parsed_Args, "name"));
-         Class    : constant String := ESC_Attr (Get (Parsed_Args, "class"));
-         Id       : String := (if Get (Parsed_Args, "id") /= ""
-                               then ESC_Attr (Get (Parsed_Args, "id")) else Name);
-         Required : String := (if Get_Boolean (Parsed_Args, "required")
+         Name     : constant String := ESC_Attr (As_String (Get (Parsed_Args, "name")));
+         Class    : constant String := ESC_Attr (As_String (Get (Parsed_Args, "class")));
+         Id       : String := (if As_String (Get (Parsed_Args, "id")) /= ""
+                               then ESC_Attr (As_String (Get (Parsed_Args, "id"))) else Name);
+         Required : String := (if As_Boolean (Get (Parsed_Args, "required"))
                                then "required" else "");
 
          Aria_Describedby_Attribute : String :=
-           (if Get (Parsed_Args, "aria_describedby") /= ""
+           (if As_String (Get (Parsed_Args, "aria_describedby")) /= ""
             then " aria-describedby=""" &
-                 ESC_Attr (Get (Parsed_Args, "aria_describedby")) & """"
+                 ESC_Attr (As_String (Get (Parsed_Args, "aria_describedby"))) & """"
             else "");
       begin
          if
-           not Get_Boolean (Parsed_Args, "hide_if_empty") or else
+           not As_Boolean (Get (Parsed_Args, "hide_if_empty")) or else
            not Empty (Categories)
          then
             Output := +"<select " & Required & " name=""" & Name & """ id=""" & Id &
@@ -455,8 +455,8 @@ is
 
          if
            Empty (Categories) and then
-           not Get_Boolean (Parsed_Args, "hide_if_empty") and then
-           not Empty (Get (Parsed_Args, "show_option_none"))
+           not As_Boolean (Get (Parsed_Args, "hide_if_empty")) and then
+           not Empty (As_String (Get (Parsed_Args, "show_option_none")))
          then
             --
             -- Filters a taxonomy drop-down display element.
@@ -476,7 +476,7 @@ is
             --
             declare
                Show_Option_None : constant String :=
-                 Apply_Filters ("list_cats", Get (Parsed_Args, "show_option_none"),
+                 Apply_Filters ("list_cats", As_String (Get (Parsed_Args, "show_option_none")),
                                 "null"); -- "" added
             begin
                Append (Output,
@@ -487,13 +487,13 @@ is
          end if;
 
          if not Empty (Categories) then
-            if Get (Parsed_Args, "show_option_all") /= "" then
+            if As_String (Get (Parsed_Args, "show_option_all")) /= "" then
                declare
                   -- This filter is documented in wp-includes/category-template.php
                   Show_Option_All : constant String :=
-                    Apply_Filters ("list_cats", Get (Parsed_Args, "show_option_all"),
+                    Apply_Filters ("list_cats", As_String (Get (Parsed_Args, "show_option_all")),
                                    "null");  -- "" added
-                  Selected : String := (if "0" = Get (Parsed_Args, "selected")
+                  Selected : String := (if "0" = As_String (Get (Parsed_Args, "selected"))
                                         then " selected=""selected""" else "");
                begin
                   Append (Output,
@@ -502,17 +502,17 @@ is
                end;
             end if;
 
-            if Get (Parsed_Args, "show_option_none") /= "" then
+            if As_String (Get (Parsed_Args, "show_option_none")) /= "" then
                declare
                   use Inc_General_Templates;
 
                   -- This filter is documented in wp-includes/category-template.php
                   Show_Option_None : constant String :=
-                    Apply_Filters ("list_cats", Get (Parsed_Args, "show_option_none"),
+                    Apply_Filters ("list_cats", As_String (Get (Parsed_Args, "show_option_none")),
                                    "null");  -- "" added
                   Selectd : constant String :=
                     Selected (-Option_None_Value,
-                              Get (Parsed_Args, "selected"),
+                              As_String (Get (Parsed_Args, "selected")),
                               Echo => False);
                begin
                   Append (Output,
@@ -525,8 +525,8 @@ is
             declare
                Depth : Integer;
             begin
-               if Get_Integer (Parsed_Args, "hierarchical") /= 0 then
-                  Depth := Get_Integer (Parsed_Args, "depth");  -- Walk the full depth.
+               if As_Integer (Get (Parsed_Args, "hierarchical")) /= 0 then
+                  Depth := As_Integer (Get (Parsed_Args, "depth"));  -- Walk the full depth.
                else
                   Depth := -1; -- Flat.
                end if;
@@ -537,7 +537,7 @@ is
          end if;
 
          if
-           not Get_Boolean (Parsed_Args, "hide_if_empty") or else
+           not As_Boolean (Get (Parsed_Args, "hide_if_empty")) or else
            not Empty (Categories)
          then
             Append (Output, "</select>" & NL);
@@ -553,7 +553,7 @@ is
          --
          Output := +Apply_Filters ("wp_dropdown_cats", -Output,
                                    P => Parsed_Args); -- P => added
-         if Get_Integer (Parsed_Args, "echo") /= 0 then
+         if As_Integer (Get (Parsed_Args, "echo")) /= 0 then
             Echo (-Output);
          end if;
 

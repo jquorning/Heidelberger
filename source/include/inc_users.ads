@@ -15,7 +15,6 @@ package Inc_Users
 is
    use Arrays;
 
-   procedure Dummy;
 --
 -- Retrieves user option that can be either per Site or per Network.
 --
@@ -68,14 +67,21 @@ is
    --                        Default false.
    -- @return mixed An array of values if `single` is false.
    --               The value of meta data field if `single` is true.
-   --               False for an invalid `user_id` (non-numeric, zero, or negative value).
-   --               An empty string if a valid but non-existing user ID is passed.
+   --               False for an invalid `user_id` (non-numeric, zero, or negative
+   --               value). An empty string if a valid but non-existing user ID is
+   --               passed.
    --
    function Get_User_Meta (User_Id : Integer;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Boolean
                            is (True);
+
+   function Get_User_Meta (User_Id : Integer;
+                           Key     : String  := "";
+                           Single  : Boolean := False)
+                           return Array_Type
+                           is (Empty_Array);
 
    --
    -- Updates user meta field based on user ID.
@@ -189,5 +195,15 @@ is
 --
    function X_Wp_Get_Current_User
             return Inc_Class_Wp_Users.Wp_User;
+
+   --
+   -- Updates all user caches.
+   --
+   -- @since 3.0.0
+   --
+   -- @param object|WP_User user User object or database row to be cached
+   -- @return void|false Void on success, false on failure.
+   --
+   procedure Update_User_Caches (User : Inc_Class_Wp_Users.Wp_User);
 
 end Inc_Users;

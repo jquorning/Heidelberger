@@ -85,10 +85,6 @@ is
                     return String
    is
    begin
-Put_Line ("#substr");
-Put_Line ("  " & Str);
-Put_Line ("  " & Offset'Image);
-Put_Line ("  " & Length'Image);
       raise Debug;
       return Str;
    end Substr;
@@ -177,43 +173,11 @@ Put_Line ("  " & Length'Image);
          if not First then
             Append (Ret, Separator);
          end if;
-         Append (Ret, Array_Maps.Key (A));
+         Append (Ret, Key (A));
          First := False;
       end loop;
       return -Ret;
    end Implode;
-
-   -----------
-   -- Build --
-   -----------
-
-   function Build (Key   : String;
-                   Value : Callable)
-                   return Array_Type
-   is
-      Item : Array_Record;
-      Map  : Array_Type;
-   begin
-      Item.Kind := Is_Callable;
-      Item.Func := Value;
-      Map.Insert (Key => Key, New_Item => Item);
-      return Map;
-   end Build;
-
-   --------------
-   -- Get_Func --
-   --------------
-
-   function Get_Func (Arry : Array_Type;
-                      Key  : String)
-                      return Callable
-   is
-      use Array_Maps;
-   begin
-      pragma Assert (Arry.Find (Key) /= No_Element);
-      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Callable);
-      return Array_Maps.Element (Arry.Find (Key)).Func;
-   end Get_Func;
 
    -----------------
    -- Array_Slice --

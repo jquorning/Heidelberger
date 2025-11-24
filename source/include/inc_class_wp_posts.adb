@@ -249,7 +249,7 @@ is
                                  +"post_category", +"tags_input"))
       loop
          if X_Isset (Post_2, -Key) then
-            Set (Post_2, -Key, Value => String'(Get (Post_2, -Key))); -- x_get
+            Set (Post_2, -Key, From_String (As_String (Get (Post_2, -Key)))); -- x_get
          end if;
       end loop;
 

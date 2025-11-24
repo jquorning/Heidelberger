@@ -129,6 +129,14 @@ is
       return Styles.Add_Inline_Style (Handle, -Data_2);
    end Wp_Add_Inline_Style;
 
+   procedure Wp_Add_Inline_Style (Handle : String;
+                                  Data   : String)
+   is
+      Unused : Boolean;
+   begin
+      Unused := Wp_Add_Inline_Style (Handle, Data);
+   end Wp_Add_Inline_Style;
+
    -----------------------
    -- Wp_Register_Style --
    -----------------------
@@ -148,6 +156,21 @@ is
 
       return Styles.Add (Handle, Src, Deps, Ver, Media);
 --    return Wp_Styles_X.Add (Handle, Src, Deps, Ver, Media);
+   end Wp_Register_Style;
+
+   procedure Wp_Register_Style (Handle : String;
+                                Src    : Boolean;
+                                Deps   : List_Type := Empty_List;
+                                Ver    : Boolean   := False;
+                                Media  : Boolean   := False)
+   is
+      Unused : Boolean;
+   begin
+      Unused := Wp_Register_Style (Handle,
+                                   Boolean'Image (Src),
+                                   Deps,
+                                   Boolean'Image (Ver),
+                                   Boolean'Image (Media));
    end Wp_Register_Style;
 
 -- --
@@ -179,7 +202,7 @@ is
    is
       use Inc_Class_Wp_Dependencies;
       use Inc_Functions_Wp_Scripts;
-      use String_Vectors;
+--    use String_Vectors;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
       declare
@@ -196,8 +219,7 @@ is
             end;
          end if;
 
-         Styles.Enqueue (To_Vector (New_Item => Handle,
-                                    Length   => 1));
+         Styles.Enqueue (To_List (Handle));
       end;
    end Wp_Enqueue_Style;
 

@@ -72,6 +72,26 @@ is
                             Offset  : Integer := 0)
                             return Integer is (1);
 
+   function Preg_Split (Pattern : String;
+                        Subject : String;
+                        Limit   : Integer := -1)
+                        return List_Type
+                        is (Empty_List);
+
+   function Preg_Quote (Str       : String;
+                        Delimiter : String := "")
+                        return String
+                        is ("XXX-985");
+
+   type Callable_10 is access function (Item : List_Type)
+                              return String;
+
+   function Preg_Replace_Callback (Pattern  : String;
+                                   Callback : Callable_10;
+                                   Subject  : String)
+                                   return String
+                                   is ("XXX-001");
+
    function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (True);
    function Is_Object (Arry : Array_Type) return Boolean is (False);
    function Is_Array  (Arry : Array_Type) return Boolean is (True);
@@ -79,6 +99,10 @@ is
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);
+
+   function Array_Merge_Recursive (Left, Right : Array_Type)
+                                   return Array_Type
+                                   is (Left);
 
    function Array_Merge (Left, Right : List_Type) return List_Type
       is (Left);
@@ -93,14 +117,36 @@ is
                         Right : String) return List_Type
       is (Left);
 
+   function Array_Diff_Key (Arry : Array_Type;
+                            That : Array_Type)
+                            return Array_Type
+                            is (Empty_Array);
+
    function Strlen (Item : String)
                     return Natural
                     is (Item'Length);
 
+   function Str_Starts_With (Haystack : String;
+                             Needle   : String)
+                             return Boolean
+                             is (True);
+
+   function Str_Contains (Haystack : String;
+                          Needle   : String)
+                          return Boolean
+                          is (False);
+
    function Strtoupper (Item : String) return String is (Item);
    function Strtolower (Item : String) return String is (Item);
+   function UCfirst    (Item : String) return String is (Item);
+
+   function Strncmp (Left, Right : String;
+                     Length : Integer)
+                     return Integer
+                     is (1);
 
    function Max (Arry : Array_Type) return Integer is (1);
+   function Hexdec (Hex : String) return Integer is (99);
 
 --   type Func_Type is access function return Array_Type;
 --   procedure Array_Walk (Arry     : Array_Type;
@@ -255,15 +301,75 @@ is
                           return String
                           is ("XXX-315");
 
+   function Array_Search (Needle   : String;
+                          Haystack : Array_Type;
+                          Strict   : Boolean := False)
+                          return Integer
+                          is (99);
+
+   function Array_Intersect_Key (Arry   : Array_Type;
+                                 Arry_2 : Array_Type)
+                                 return Array_Type
+                                 is (Empty_Array);
+
+   function Array_Flip (Arry : Array_Type)
+                        return Array_Type
+                        is (Empty_Array);
+
+   function Array_Flip (Arry : List_Type)
+                        return Array_Type
+                        is (Empty_Array);
+
    function Array_Fill_Keys (Keys  : Array_Type;
                              Value : Boolean)
                              return Array_Type
                              is (Empty_Array);
 
+   ARRAY_FILTER_USE_KEY  : constant Integer := 47; -- arbitrary value
+   ARRAY_FILTER_USE_BOTH : constant Integer := 48; -- arbitrary value
+
+   type Filter_Callback_1 is access function (Item : String)
+                                              return Boolean;
+   type Filter_Callback_2 is access function (Item : Array_Type)
+                                              return Boolean;
+
    function Array_Filter (Arry     : Array_Type;
-                          Callback : Integer := 0)
+                          Callback : Filter_Callback_1 := null;
+                          Mode     : Integer           := 0)
+                          return Array_Type
+                          is (Empty_Array);
+
+   function Array_Filter (Arry     : Array_Type;
+                          Callback : Filter_Callback_1 := null;
+                          Mode     : Integer          := 0)
                           return List_Type
                           is (Empty_List);
+
+   function Array_Filter (Arry     : Array_Type;
+                          Callback : Filter_Callback_2; --  := null;
+                          Mode     : Integer           := 0)
+                          return Array_Type
+                          is (Empty_Array);
+
+   type Reduce_Callback is access function (Carry : String;
+                                            Acc   : Array_Type)
+                                            return String;
+
+   function Array_Reduce (Arry     : Array_Type;
+                          Callback : Reduce_Callback;
+                          Initial  : String)
+                          return String
+                          is ("XXX-006");
+
+   function Array_Combine (Keys   : Array_Type;
+                           Values : Array_Type)
+                           return Array_Type
+                           is (Empty_Array);
+
+   function Array_Column (Arry       : Array_Type;
+                          Column_Key : String)
+                          return Array_Type
+                          is (Empty_Array);
 
    function Array_Pop (Arry : Array_Type)
                        return Integer
@@ -290,10 +396,10 @@ is
                         return List_Type
                         is (Empty_List);
 
-   function Array_Push (Arry  : List_Type;
-                        Value : String_Array) -- Integer)
-                        return Integer
-                        is (1);
+--   function Array_Push (Arry  : List_Type;
+--                        Value : String_Array) -- Integer)
+--                        return Integer
+--                        is (1);
 
    function Array_Push (Arry  : List_Type;
                         Value : List_Type) -- Integer)
@@ -305,9 +411,19 @@ is
                          Length : Natural)
                          return Array_Type;
 
+   function Array_Splice (Arry   : in out Array_Type;
+                          Offset : Integer;
+                          Length : Integer := 0)
+                          return Array_Type
+                          is (Empty_Array);
+
    function Is_Numeric (Value : String)
                         return Boolean
                         is (False);
+
+   function Is_Numeric (Value : Integer)
+                        return Boolean
+                        is (True);
 
    function Is_File (Filename : String)
                      return Boolean
@@ -363,6 +479,10 @@ is
                          return Boolean
                          is (True);
 
+   function Stream_Get_Wrappers
+            return List_Type
+            is (Empty_List);
+
    function Stristr (Haystack      : String;
                      Needle        : String;
                      Before_Needle : Boolean := False)
@@ -378,7 +498,7 @@ is
             return Array_Type
             is (Empty_Array);
 
-   function Strip_Tags (Item :        String;
+   function Strip_Tags (Item         : String;
                         Allowed_Tags : Array_Type := Empty_Array)
                         return String
                         is ("XXX-600");
@@ -391,9 +511,30 @@ is
                      return Boolean
                      is (True);
 
-   function JSON_Decode (JSON : String)
+   function JSON_Encode (Value : Multi_Type)
+                         return String
+                         is ("XXX-007");
+
+   function JSON_Decode (JSON        : String;
+                         Associative : Boolean := False)
                          return Array_Type
                          is (Empty_Array);
+
+   JSON_ERROR_NONE : constant Integer := 0; -- Arbitrary value
+
+   function JSON_Last_Error
+            return Integer
+            is (JSON_ERROR_NONE);
+
+   function JSON_Last_Error_Msg
+            return String
+            is ("XXX-979");
+
+   E_USER_NOTICE : constant Integer := 47;  -- Arbitraty
+
+   procedure Trigger_Error (Message     : String;
+                            Error_Level : Integer := E_USER_NOTICE)
+                            is null;
 
    procedure Die (Reason : String := "")
              is null;
@@ -427,7 +568,13 @@ is
             return String
             is ("XXX-779");
 
-   function File_Get_Contents (Filename : String)
+   type Resource is access all Integer;
+
+   function File_Get_Contents (Filename         : String;
+                               Use_Include_Path : Boolean  := False;
+                               Context          : Resource := null;
+                               Offset           : Integer  := 0;
+                               Length           : Integer  := 0)
             return String
             is ("XXX-780");
 
@@ -450,14 +597,6 @@ is
                        Length : Natural := 1)
                        return Array_Type
                        is (Empty_Array);
-
-   function Build (Key   : String;
-                   Value : Callable)
-                   return Arrays.Array_Type;
-
-   function Get_Func (Arry : Array_Type;
-                      Key  : String)
-                      return Callable;
 
    function Call_User_Func (Callback : Callable;
                             Args     : String := "")
@@ -486,6 +625,19 @@ is
    function URLdecode (Item : String)
                        return String
                        is ("XXX-976");
+
+   function Round (Num       : Float;
+                   Precision : Integer)
+                   return Float
+                   is (99.99);
+
+   function Current (List : List_Type)
+                     return String
+                     is ("XXX-011");
+
+   function Function_Exists (Func : String)
+                             return Boolean
+                             is (True);
 
    -------------------
    -- Echo handling --

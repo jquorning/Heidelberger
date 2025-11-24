@@ -77,7 +77,8 @@ is
    --               no option in the database, boolean `false` is returned.
    --
 --   function get_option( option, default = false ) then
-   function Get_Option (Option : String)
+   function Get_Option (Option  : String;
+                        Default : Array_Type := Empty_Array)
                         return Array_Type
                         is (Empty_Array);
 
@@ -153,6 +154,16 @@ is
                              Deprecated : Boolean := True)
                              return Boolean
                              is (True);
+
+   function Get_Site_Option (Option  : String;
+                             Default : List_Type)
+                             return Array_Type
+                             is (Empty_Array);
+
+   function Get_Site_Option (Option  : String;
+                             Default : List_Type)
+                             return List_Type
+                             is (Empty_List);
 
    --
    -- Retrieves a network"s option value based on the option name.
@@ -273,6 +284,33 @@ is
    --
    function Get_Transient (Transient : String)
                            return String is ("XXX-302");
+
+   --
+   -- Sets/updates the value of a transient.
+   --
+   -- You do not need to serialize values. If the value needs to be serialized,
+   -- then it will be serialized before it is set.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string transient  Transient name. Expected to not be SQL-escaped.
+   --                           Must be 172 characters or fewer in length.
+   -- @param mixed  value      Transient value. Must be serializable if non-scalar.
+   --                           Expected to not be SQL-escaped.
+   -- @param int    expiration Optional. Time until expiration in seconds. Default 0
+   --                           (no expiration).
+   -- @return bool True if the value was set, false otherwise.
+   --
+   function Set_Transient (Transient  : String;
+                           Value      : String;
+                           Expiration : Integer := 0)
+                           return Boolean
+                           is (True);
+
+   procedure Set_Transient (Transient  : String;
+                            Value      : String;
+                            Expiration : Integer := 0)
+                            is null;
 
    --
    -- Retrieves the value of a site transient.

@@ -13,6 +13,7 @@ with Arrays;
 
 with Inc_Class_Wp_Textdomain_Registry;
 with POMO_MO;
+with POMO_Translations;
 
 package Inc_L10n
 is
@@ -22,6 +23,11 @@ is
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                               Element_Type => POMO_MO.MO,
                                               "="          => POMO_MO."=");
+
+   -- package String_Maps is new
+   --    Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+   --                                            Element_Type => POMO_Translations.Translations,
+   --                                            "="          => POMO_Translations."=");
 
    package String_Sets is new
       Ada.Containers.Indefinite_Ordered_Sets (Element_Type => String);
@@ -80,6 +86,29 @@ is
    --
    function Determine_Locale
             return String;
+
+   --
+   -- Retrieves the translation of text in the context defined in context.
+   --
+   -- If there is no translation, or the text domain isn"t loaded, the original text
+   -- is returned.
+   --
+   -- * Note:* Don't use translate_with_gettext_context() directly, use _x() or
+   -- related functions.
+   --
+   -- @since 2.8.0
+   -- @since 5.5.0 Introduced gettext_with_context-thendomainend; filter.
+   --
+   -- @param string text    Text to translate.
+   -- @param string context Context information for the translators.
+   -- @param string domain  Optional. Text domain. Unique identifier for retrieving
+   --                        translated strings. Default "default".
+   -- @return string Translated text on success, original text on failure.
+   --
+   function Translate_With_Gettext_Context (Text    : String;
+                                            Context : String;
+                                            Domain  : String := "default")
+                                            return String;
 
    --
    -- Retrieves the translation of text.
@@ -311,8 +340,9 @@ is
    function X_N_Noop (Singular : String;
                       Plural   : String;
                       Domain   : String := "default") -- null
-                      return String_Array
-                      is (Empty_String_Array);
+                      return List_Type -- String_Array
+                      is (Empty_List);
+--                    is (Empty_String_Array);
 
    --
    -- Loads a .mo file into the text domain domain.
@@ -348,6 +378,45 @@ is
                              Mofile : String;
                              Locale : String := "") -- null
                              return Boolean;
+
+   --
+   -- Loads plugin and theme text domains just-in-time.
+   --
+   -- When a textdomain is encountered for the first time, we try to load
+   -- the translation file from `wp-content/languages`, removing the need
+   -- to call load_plugin_textdomain() or load_theme_textdomain().
+   --
+   -- @since 4.6.0
+   -- @access private
+   --
+   -- @global MO[]                   l10n_unloaded          An array of all text
+   --                                                        domains that have been
+   --                                                        unloaded again.
+   -- @global WP_Textdomain_Registry wp_textdomain_registry WordPress Textdomain
+   --                                                        Registry.
+   --
+   -- @param string domain Text domain. Unique identifier for retrieving translated
+   --                      strings.
+   -- @return bool True when the textdomain is successfully loaded, false otherwise.
+   --
+   function X_Load_Textdomain_Just_In_Time (Domain : String)
+                                            return Boolean;
+
+   --
+   -- Returns the Translations instance for a text domain.
+   --
+   -- If there isn"t one, returns empty Translations instance.
+   --
+   -- @since 2.8.0
+   --
+   -- @global MO[] l10n An array of all currently loaded text domains.
+   --
+   -- @param string domain Text domain. Unique identifier for retrieving translated
+   --                       strings.
+   -- @return Translations|NOOP_Translations A Translations instance.
+   --
+   function Get_Translations_For_Domain (Domain : String)
+                                         return POMO_Translations.Translations;
 
    --
    -- Unloads translations for a text domain.
@@ -427,5 +496,23 @@ is
    function Is_RTL
             return Boolean
             is (False);
+
+   --
+   -- Translates the provided settings value using its i18n schema.
+   --
+   -- @since 5.9.0
+   -- @access private
+   --
+   -- @param string|string[]|array[]|object i18n_schema I18n schema for the setting.
+   -- @param string|string[]|array[]        settings    Value for the settings.
+   -- @param string                         textdomain  Textdomain to use with
+   --                                                   translations.
+   --
+   -- @return string|string[]|array[] Translated settings.
+   --
+   function Translate_Settings_Using_I18n_Schema (I18n_Schema : String; -- Array_Type;
+                                                  Settings    : Array_Type;
+                                                  Textdomain  : String)
+                                                  return Array_Type;
 
 end Inc_L10n;

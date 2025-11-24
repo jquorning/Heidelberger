@@ -1,6 +1,8 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
+with Ada.Finalization;
+with Ada.Iterator_Interfaces;
 with Ada.Strings.Unbounded;
 
 package Arrays
@@ -19,21 +21,20 @@ is
 
    type Callable is access procedure;
 
-   -- type Assoc_Type is
-   --    record
-   --       Key   : Key_Type;
-   --       Value : Value_Type;
-   --    end record;
-
    package List_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Item_Type);
 
-   subtype List_Type  is List_Vectors.Vector;
+   subtype List_Type is List_Vectors.Vector;
+
+   procedure Append (List : in out List_Type;
+                     Item : String);
+   -- Append Item to List.
+
    Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
 
-   type Array_Kind is (Is_String,  Is_Integer,  Is_Array,
-                       Is_Boolean, Is_Callable, Is_Null);
+   type Array_Kind is (Kind_String,  Kind_Integer,  Kind_Array, Kind_List,
+                       Kind_Boolean, Kind_Callable, Kind_Null);
 
    type Null_Type is null record;
 
@@ -41,30 +42,248 @@ is
 
    type Array_Type;
    type Array_Access is access all Array_Type;
+   type List_Access  is access all List_Type;
 
-   type Array_Record is
-      record
-         Kind : Array_Kind;
-         Str  : Unbounded_String;
-         Int  : Integer;
-         Arry : Array_Access;
-         Func : Callable;
-         Bool : Boolean;
-      end record;
+   type Multi_Type is private;
 
-   package Array_Maps is
-      new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                                  Element_Type => Array_Record);
+   Null_Multi_Type : constant Multi_Type;
 
-   type Array_Type is new Array_Maps.Map with null record;
+   type Array_Type is tagged private
+      with
+         Default_Iterator  => Iterate,
+--         Constant_Indexing => Constant_Reference,
+--         Variable_Indexing => Reference,
+         Iterator_Element  => Multi_Type;
 
-   procedure Include (Arry     : in out Array_Type;
-                      Key      : String;
-                      New_Item : String);
+   type Cursor is private;
 
-   function Build (Key   : String;
-                   Value : Array_Type)
+   function Has_Element (Position : Cursor)
+                         return Boolean;
+
+   package Map_Iterator_Interfaces
+     is new Ada.Iterator_Interfaces (Cursor, Has_Element);
+
+   function Key (Position : Cursor)
+                 return String;
+
+   function Element (Position : Cursor)
+                     return Multi_Type;
+
+--   type Constant_Reference_Type (Elemen : not null access constant Multi_Type)
+--     is private
+--     with Implicit_Dereference => Elemen;
+
+--   type Reference_Type (Element : not null access Multi_Type)
+--     is private
+--     with Implicit_Dereference => Element;
+
+   procedure Append (Arry  : in out Array_Type;
+                     Value : Multi_Type);
+   -- Append Value to Array_Type referenced by Cursor.
+
+   procedure Append (Arry  : in out Array_Type;
+                     Key   : String;
+                     Value : Multi_Type);
+   -- Append Value to Array_Type.
+
+   function Is_Empty (Arry : Array_Type)
+                      return Boolean;
+
+   ---------
+   -- Ref --
+   ---------
+
+   function Ref_0 (Arry : Array_Type)
                    return Array_Type;
+
+   function Ref (Arry : Array_Type;
+                 Key  : String)
+                 return Cursor;
+
+   function Ref_2 (Arry  : Array_Type;
+                   Key_1 : String;
+                   Key_2 : String)
+                   return Cursor;
+
+   function Ref_3 (Arry   : Array_Type;
+                   Key_1  : String;
+                   Key_2  : String;
+                   Key_3  : String)
+                   return Cursor;
+
+   function Ref_4 (Arry   : Array_Type;
+                   Key_1  : String;
+                   Key_2  : String;
+                   Key_3  : String;
+                   Key_4  : String)
+                   return Cursor;
+
+   function Ref_5 (Arry   : Array_Type;
+                   Key_1  : String;
+                   Key_2  : String;
+                   Key_3  : String;
+                   Key_4  : String;
+                   Key_5  : String)
+                   return Cursor;
+
+   function Kind_Of (Arry : Multi_Type)
+                     return Array_Kind;
+
+   --------
+   -- As --
+   --------
+
+   function As_Array (Arry : Multi_Type)
+                      return Array_Type;
+
+   function As_List (Arry : Multi_Type)
+                     return List_Type;
+
+   function As_String (Arry : Multi_Type)
+                      return String;
+
+   function As_Integer (Arry : Multi_Type)
+                       return Integer;
+
+   function As_Boolean (Arry : Multi_Type)
+                       return Boolean;
+
+   function As_Callable (Arry : Multi_Type)
+                         return Callable;
+
+   function Is_Null (Arry : Multi_Type)
+                      return Boolean;
+
+   ----------
+   -- From --
+   ----------
+
+   function From_Array (Value : Array_Type)
+                        return Multi_Type;
+
+   function From_List (Value : List_Type)
+                       return Multi_Type;
+
+   function From_String (Value : String)
+                         return Multi_Type;
+
+   function From_Integer (Value : Integer)
+                          return Multi_Type;
+
+   function From_Boolean (Value : Boolean)
+                          return Multi_Type;
+
+   ---------
+   -- Get --
+   ---------
+
+   function Get (Arry : Multi_Type)
+                 return String;
+
+   function Get (Position : Cursor)
+                 return Multi_Type;
+
+   function Get (Arry : Array_Type;
+                 Key  : String)
+                 return Multi_Type;
+
+   ---------
+   -- Set --
+   ---------
+
+   procedure Assign (Target : in out Array_Type; -- Cursor;
+                     Source : Cursor);
+
+   procedure Set (Arry  : in out Array_Type; -- Position : Cursor;
+                  Value : Multi_Type);
+
+   procedure Set (Arry  : in out Array_Type;
+                  Key   : String;
+                  Value : Multi_Type);
+
+   procedure Set_2 (Arry  : in out Array_Type;
+                    Key_1 : String;
+                    Key_2 : String;
+                    Value : Multi_Type);
+
+   procedure Set_3 (Arry  : in out Array_Type;
+                    Key_1 : String;
+                    Key_2 : String;
+                    Key_3 : String;
+                    Value : Multi_Type);
+
+   procedure Set_5 (Arry  : in out Array_Type;
+                    Key_1 : String;
+                    Key_2 : String;
+                    Key_3 : String;
+                    Key_4 : String;
+                    Key_5 : String;
+                    Value : Multi_Type);
+
+   -----------
+   -- Isset --
+   -----------
+
+   function Isset (Arry : Array_Type;
+                   Key  : String)
+                   return Boolean;
+
+   function Isset_2 (Arry  : Array_Type;
+                     Key_1 : String;
+                     Key_2 : String)
+                     return Boolean;
+
+   function Isset_3 (Arry  : Array_Type;
+                     Key_1 : String;
+                     Key_2 : String;
+                     Key_3 : String)
+                     return Boolean;
+
+   function Isset_4 (Arry  : Array_Type;
+                     Key_1 : String;
+                     Key_2 : String;
+                     Key_3 : String;
+                     Key_4 : String)
+                     return Boolean;
+
+   function Isset_5 (Arry  : Array_Type;
+                     Key_1 : String;
+                     Key_2 : String;
+                     Key_3 : String;
+                     Key_4 : String;
+                     Key_5 : String)
+                     return Boolean;
+
+   function Isset_6 (Arry  : Array_Type;
+                     Key_1 : String;
+                     Key_2 : String;
+                     Key_3 : String;
+                     Key_4 : String;
+                     Key_5 : String;
+                     Key_6 : String)
+                     return Boolean;
+
+   procedure Delete (Position : Cursor);
+
+   function Find (Arry : Array_Type;
+                  Key  : String)
+                  return Cursor;
+
+   function First_Key (Arry : Array_Type)
+                       return String;
+
+   function First_Element (Arry : Array_Type)
+                           return Multi_Type;
+
+   function Last_Element (Arry : Array_Type)
+                          return Multi_Type;
+
+   function Length (Arry : Array_Type)
+                    return Ada.Containers.Count_Type;
+
+   function Empty (Arry : Array_Type;
+                   Key  : String)
+                   return Boolean;
 
    type Array_List is array (Positive range <>) of Array_Type;
 
@@ -80,6 +299,18 @@ is
                    return Natural
                    is (1);
 
+   -----------
+   -- Build --
+   -----------
+
+   function Build (Key   : String;
+                   Value : Array_Type)
+                   return Array_Type;
+
+   function Build (Key   : String;
+                   Value : List_Type)
+                   return Array_Type;
+
    function Build (Key   : String;
                    Value : String)
                    return Array_Type;
@@ -93,10 +324,14 @@ is
                    return Array_Type;
 
    function Build (Key   : String;
+                   Value : Callable)
+                   return Array_Type;
+
+   function Build (Key   : String;
                    Value : Null_Type)
                    return Array_Type;
 
-   Empty_Array : Array_Type := (Array_Maps.Empty_Map with null record);
+   Empty_Array : constant Array_Type;
 
    type Item_List is array (Positive range <>) of Item_Type;
 
@@ -106,11 +341,94 @@ is
    function To_List (Item : String)
                      return List_Type;
 
-   package String_Vectors is
-      new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
-                                             Element_Type => String);
+   function First (Container : Array_Type) return Cursor;
+   function Next (Container : Array_Type;
+                  Position  : Cursor) return Cursor;
 
-   subtype String_Array is String_Vectors.Vector;
-   Empty_String_Array : constant String_Array := String_Vectors.Empty_Vector;
+--   function Constant_Reference (Container : aliased in Array_Type;
+--                                Position  : Cursor)
+--                                return Constant_Reference_Type;
+
+--   function Reference (Container : aliased in out Array_Type;
+--                       Position  : Cursor)
+--                       return Reference_Type;
+
+--   function Constant_Reference (Container : aliased in Array_Type;
+--                                Key       : Key_Type)
+--                                return Constant_Reference_Type;
+
+--   function Reference (Container : aliased in out Array_Type;
+--                       Key       : Key_Type)
+--                       return Reference_Type;
+
+   function Iterate (Container : Array_Type)
+--                   return Map_Iterator_Interfaces.Forward_Iterator'Class;
+                     return Map_Iterator_Interfaces.Forward_Iterator'Class;
+
+private
+
+   type Multi_Type is
+      record
+         Kind : Array_Kind;
+         Str  : Unbounded_String;
+         Int  : Integer;
+         Arry : Array_Access;
+         List : List_Access;
+         Func : Callable;
+         Bool : Boolean;
+      end record;
+
+   package Array_Maps is
+      new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                                  Element_Type => Multi_Type);
+
+   type Array_Type is new Array_Maps.Map with null record;
+
+   type Cursor is new Array_Maps.Cursor;
+
+--   type Constant_Reference_Type (Elemen : not null access constant Multi_Type)
+--     is new Array_Maps.Constant_Reference_Type (Elemen);
+--     -- null record;
+
+--   type Reference_Type (Element : not null access Multi_Type)
+--     is null record;
+
+   Empty_Array : constant Array_Type :=
+     (Array_Maps.Empty_Map with null record);
+
+   Null_Multi_Type : constant Multi_Type :=
+      (Kind => Kind_Null,
+       Str  => Null_Unbounded_String,
+       Int  => 0,
+       Arry => null,
+       List => null,
+       Func => null,
+       Bool => False);
+
+   type Map_Access is access all Array_Type; -- Array_Maps.Map;
+   for Map_Access'Storage_Size use 0;
+
+   type Iterator is new -- Ada.Finalization.Limited_Controlled and
+      Map_Iterator_Interfaces.Forward_Iterator with
+      record
+--       null;
+         Container : Map_Access;
+--       Position  : Cursor;
+-- --    Node      : Node_Access;
+      end record;
+--   with Disable_Controlled => not T_Check;
+
+-- overriding procedure Finalize (Object : in out Iterator);
+
+   overriding function First (Object : Iterator) return Cursor;
+--   overriding function Last  (Object : Iterator) return Cursor;
+
+   overriding function Next
+     (Object   : Iterator;
+      Position : Cursor) return Cursor;
+
+--   overriding function Previous
+--     (Object   : Iterator;
+--      Position : Cursor) return Cursor;
 
 end Arrays;

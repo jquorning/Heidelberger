@@ -34,6 +34,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
+with Inc_Global_Styles_And_Settings;
 with Inc_L10n;
 with Inc_Load;
 with Inc_Link_Templates;
@@ -94,7 +95,7 @@ is
         Static_Compress_Scripts   and then
         Static_Concatenate_Script and then
         Isset (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING") and then
-        0 /= Stripos (Get (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING"), "gzip") and then
+        0 /= Stripos (As_String (Get (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING")), "gzip") and then
         not Force_Uncompressed;
 
       -- Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in
@@ -178,10 +179,10 @@ is
       for A in Vendor_Scripts.Iterate loop
          declare
             use Ada.Strings.Unbounded;
-            use Array_Maps;
+--          use Array_Maps;
 
             Handle       : constant String := Key     (A);
-            Dependencies : constant String := Get (Vendor_Scripts, Handle);
+            Dependencies : constant String := As_String (Get (Vendor_Scripts, Handle));
             -- Element (A);
             Path    : Unbounded_String;
             Version : Unbounded_String;
@@ -192,7 +193,7 @@ is
             -- end if;
 
             Path    := +"/wp-includes/js/dist/vendor/handlesuffix.js";
-            Version := +Get (Vendor_Scripts_Versions, Handle);
+            Version := +As_String (Get (Vendor_Scripts_Versions, Handle));
 
             Scripts.Add (Handle, -Path, To_List (Dependencies), -Version, 1);
          end;
@@ -212,13 +213,13 @@ is
                 2 => +Wp_JSON_Encode (
                   To_Array ((
                   Build ("months",
-                         Php.Array_Values (Globals.Wp_Locale.Month)),
+                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Month))),
                   Build ("monthsShort",
-                         Php.Array_Values (Globals.Wp_Locale.Month_Abbrev)),
+                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Month_Abbrev))),
                   Build ("weekdays",
-                         Php.Array_Values (Globals.Wp_Locale.Weekday)),
+                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Weekday))),
                   Build ("weekdaysShort",
-                         Php.Array_Values (Globals.Wp_Locale.Weekday_Abbrev)),
+                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Weekday_Abbrev))),
                   Build ("week",           To_Array ((1 =>
                     Build ("dow", String'(Get_Option ("start_of_week", "0"))) -- (int), 0
                   ))),
@@ -329,8 +330,8 @@ is
             Scripts.Add (
               "wp-" & (-Script_Name),
               "/wp-includes/js/dist/development/" & (-Script_Name) & ".js",
-              To_List (Get (Assets, "dependencies")),
-              Get (Assets, "version")
+              As_List (Get (Assets, "dependencies")),
+              As_String (Get (Assets, "version"))
             );
          end;
       end loop;
@@ -362,7 +363,7 @@ is
    begin
       for A in Assets.Iterate loop -- as file_name => package_data ) then
          declare
-            use Array_Maps;
+--          use Array_Maps;
             use Hb_Common;
 
             File_Name    : constant String := Key     (A);
@@ -379,7 +380,7 @@ is
          begin
             if Isset (Package_Data, "dependencies") then
 --          if not Empty (Package_Data ("dependencies")) then
-               Dependencies := Get_List (Package_Data, "dependencies");
+               Dependencies := As_List (Get (Package_Data, "dependencies"));
             else
                Dependencies := Empty_List;
             end if;
@@ -399,7 +400,7 @@ is
 
             end if;
 
-            Scripts.Add (Handle, Path, Dependencies, Get (Package_Data, "version"), 1);
+            Scripts.Add (Handle, Path, Dependencies, As_String (Get (Package_Data, "version")), 1);
 
             if In_Array ("wp-i18n", Dependencies, True) then
                Scripts.Set_Translations (Handle);
@@ -483,7 +484,7 @@ is
          use Inc_Users;
 
          Meta_Key : constant String  :=
-           Globals.Wpdb.Get_Blog_Prefix & "persisted_preferences";
+           Globals.WpDB.Get_Blog_Prefix & "persisted_preferences";
 
          User_Id      : constant Integer := Get_Current_User_Id;
          Preload_Data : constant Boolean := Get_User_Meta (User_Id, Meta_Key, True);
@@ -545,10 +546,10 @@ is
                To_Array ((
                  Build ("l10n",     To_Array ((
                    Build ("locale",        Get_User_Locale),
-                   Build ("months",        Array_Values (Wp_Locale.Month)),
-                   Build ("monthsShort",   Array_Values (Wp_Locale.Month_Abbrev)),
-                   Build ("weekdays",      Array_Values (Wp_Locale.Weekday)),
-                   Build ("weekdaysShort", Array_Values (Wp_Locale.Weekday_Abbrev)),
+                   Build ("months",        List_Type'(Array_Values (Wp_Locale.Month))),
+                   Build ("monthsShort",   List_Type'(Array_Values (Wp_Locale.Month_Abbrev))),
+                   Build ("weekdays",      List_Type'(Array_Values (Wp_Locale.Weekday))),
+                   Build ("weekdaysShort", List_Type'(Array_Values (Wp_Locale.Weekday_Abbrev))),
                    Build ("meridiem",      Wp_Locale.Meridiem), -- (object)
                    Build ("relative",      To_Array ((
                       -- translators: %s: Duration.
@@ -813,10 +814,10 @@ is
       end if;
 
       if "dev" = Typ then
-         return Get (Static_Suffixes, "dev_suffix");
+         return As_String (Get (Static_Suffixes, "dev_suffix"));
       end if;
 
-      return Get (Static_Suffixes, "suffix");
+      return As_String (Get (Static_Suffixes, "suffix"));
    end Wp_Scripts_Get_Suffix;
 
    ------------------------
@@ -1373,7 +1374,7 @@ is
 
       declare
          User_Id : constant Integer :=
-           (if Isset (XX_GET, "user_id") then Get_Integer (XX_GET, "user_id") else 0);
+           (if Isset (XX_GET, "user_id") then As_Integer (Get (XX_GET, "user_id")) else 0);
       begin
          if Did_Action ("init") then
             Scripts.Localize (
@@ -1955,10 +1956,8 @@ is
 
          for P in Package_Styles.Iterate loop
             declare
-               use Array_Maps;
-
                Packag       : constant String := Key     (P);
-               Dependencies : String := Get (Package_Styles, Packag); -- Element (P);
+               Dependencies : String := As_String (Get (Package_Styles, Packag));
                Dependencies_2 : List_Type;
                Handle       : constant String := "wp-" & Packag;
 
@@ -2464,7 +2463,6 @@ is
    is
       use Inc_Plugins;
    begin
-Put_Line ("#Wp_Enqueue_Scripts");
       --
       -- Fires when scripts and styles are enqueued.
       --
@@ -2575,9 +2573,8 @@ Put_Line ("#Wp_Enqueue_Scripts");
          begin
             for A in Concat_2.Iterate loop
                declare
-                  Key   : constant String := Array_Maps.Key (A);
-                  Chunk : constant String := Get (Concat_2, Key);
-                  -- Array_Maps.Element (A);
+                  Key   : constant String := Arrays.Key (A);
+                  Chunk : constant String := As_String (Get (Concat_2, Key));
                begin
                   Append (Concatenated, "&load%5Bchunk_" & Key & "%5D=" & Chunk);
                end;
@@ -2728,74 +2725,101 @@ Put_Line ("#Wp_Enqueue_Scripts");
 
    end Wp_Common_Block_Scripts_And_Styles;
 
--- --
--- -- Applies a filter to the list of style nodes that comes from WP_Theme_JSON::get_style_nodes().
--- --
--- -- This particular filter removes all of the blocks from the array.
--- --
--- -- We want WP_Theme_JSON to be ignorant of the implementation details of how the CSS is being used.
--- -- This filter allows us to modify the output of WP_Theme_JSON depending on whether or not we are
--- -- loading separate assets, without making the class aware of that detail.
--- --
--- -- @since 6.1.0
--- --
--- -- @param array nodes The nodes to filter.
--- -- @return array A filtered array of style nodes.
--- --
--- function wp_filter_out_block_nodes( nodes ) then
---         return array_filter(
---                 nodes,
---                 function( node ) then
---                         return ! in_array( "blocks", node["path"], true);
---                 end;,
---                 ARRAY_FILTER_USE_BOTH
---        );
--- end;
+   ------------------
+   -- Filter_Block --
+   ------------------
 
--- --
--- -- Enqueues the global styles defined via theme.json.
--- --
--- -- @since 5.8.0
--- --
--- function wp_enqueue_global_styles() then
---         separate_assets  = wp_should_load_separate_core_block_assets();
---         is_block_theme   = wp_is_block_theme();
---         is_classic_theme = ! is_block_theme;
+   -- For use in Wp_Filter_Out_Block_Nodes
 
---         /*
---         -- Global styles should be printed in the head when loading all styles combined.
---         -- The footer should only be used to print global styles for classic themes with separate core assets enabled.
---         --
---         -- See https://core.trac.wordpress.org/ticket/53494.
---         --
---         if (
---                 ( is_block_theme && doing_action( "wp_footer" ) ) ||
---                 ( is_classic_theme && doing_action( "wp_footer" ) && ! separate_assets ) ||
---                 ( is_classic_theme && doing_action( "wp_enqueue_scripts" ) && separate_assets )
---         ) then
---                 return;
---         end;
+   function Filter_Blocks (Node : String) return Boolean;
 
---         /*
---         -- If loading the CSS for each block separately, then load the theme.json CSS conditionally.
---         -- This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
---         -- This filter must be registered before calling wp_get_global_stylesheet();
---         --
---         add_filter( "wp_theme_json_get_style_nodes", "wp_filter_out_block_nodes");
+   function Filter_Blocks (Node : String) return Boolean
+   is
+      use Hb_Common;
+      use Php;
+   begin
+      return
+        not In_Array ("blocks",
+                      Empty_Array, -- Node ("path"),
+                      Strict => True);
+   end Filter_Blocks;
 
---         stylesheet = wp_get_global_stylesheet();
+   -------------------------------
+   -- Wp_Filter_Out_Block_Nodes --
+   -------------------------------
 
---         if ( empty( stylesheet ) ) then
---                 return;
---         end;
+   function Wp_Filter_Out_Block_Nodes (Nodes : Array_Type)
+                                       return Array_Type
+   is
+      use Php;
+   begin
+      return
+        Array_Filter (
+          Nodes,
+          Filter_Blocks'Access,
+--          function( node ) then
+--             return ! in_array( "blocks", node["path"], true);
+--          end;,
+          ARRAY_FILTER_USE_BOTH
+        );
+   end Wp_Filter_Out_Block_Nodes;
 
---         wp_register_style( "global-styles", False, array(), true, true);
---         wp_add_inline_style( "global-styles", stylesheet);
---         wp_enqueue_style( "global-styles");
+   ------------------------------
+   -- Wp_Enqueue_Global_Styles --
+   ------------------------------
 
---         -- Add each block as an inline css.
---         wp_add_global_styles_for_blocks();
--- end;
+   procedure Wp_Enqueue_Global_Styles
+   is
+      use Hb_Common;
+      use Inc_Functions_Wp_Styles;
+      use Inc_Global_Styles_And_Settings;
+      use Inc_Plugins;
+      use Inc_Themes;
+
+      Separate_Assets  : constant Boolean := Wp_Should_Load_Separate_Core_Block_Assets;
+      Is_Block_Theme   : constant Boolean := Wp_Is_Block_Theme;
+      Is_Classic_Theme : constant Boolean := not Is_Block_Theme;
+   begin
+      --
+      -- Global styles should be printed in the head when loading all styles combined.
+      -- The footer should only be used to print global styles for classic themes with
+      -- separate core assets enabled.
+      --
+      -- See https://core.trac.wordpress.org/ticket/53494.
+      --
+      if
+        (Is_Block_Theme   and then Doing_Action ("wp_footer")) or else
+        (Is_Classic_Theme and then Doing_Action ("wp_footer") and then
+         not Separate_Assets) or else
+        (Is_Classic_Theme and then Doing_Action ("wp_enqueue_scripts") and then
+        Separate_Assets)
+      then
+         return;
+      end if;
+
+      --
+      -- If loading the CSS for each block separately, then load the theme.json CSS
+      -- conditionally. This removes the CSS from the global-styles stylesheet and
+      -- adds it to the inline CSS for each block. This filter must be registered
+      -- before calling wp_get_global_stylesheet();
+      --
+      Add_Filter ("wp_theme_json_get_style_nodes", Wp_Filter_Out_Block_Nodes'Access);
+
+      declare
+         Stylesheet : constant String := Wp_Get_Global_Stylesheet;
+      begin
+         if Empty (Stylesheet) then
+            return;
+         end if;
+
+         Wp_Register_Style ("global-styles", False, Empty_List, True, True);
+         Wp_Add_Inline_Style ("global-styles", Stylesheet);
+         Wp_Enqueue_Style ("global-styles");
+      end;
+
+      -- Add each block as an inline css.
+      Wp_Add_Global_Styles_For_Blocks;
+   end Wp_Enqueue_Global_Styles;
 
 -- --
 -- -- Renders the SVG filters supplied by theme.json.
@@ -4024,7 +4048,7 @@ Put_Line ("#Wp_Enqueue_Scripts");
       use Inc_Class_Wp_Theme_JSON_Resolver;
       use Inc_Functions_Wp_Styles;
    begin
-      if not Static.Theme_Has_Support then -- Wp_Theme_Json_Resolver::
+      if not Theme_Has_Support then
          declare
             Suffix : constant String := Wp_Scripts_Get_Suffix;
             Unused : Boolean;

@@ -1,6 +1,7 @@
 with Arrays;
 
 with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Users;
 
 package Inc_Functions
 is
@@ -302,6 +303,52 @@ is
             is ("XXX-465");
 
    --
+   -- Normalizes a filesystem path.
+   --
+   -- On windows systems, replaces backslashes with forward slashes
+   -- and forces upper-case drive letters.
+   -- Allows for two leading slashes for Windows network shares, but
+   -- ensures that all other duplicate slashes are reduced to a single.
+   --
+   -- @since 3.9.0
+   -- @since 4.4.0 Ensures upper-case drive letters on Windows systems.
+   -- @since 4.5.0 Allows for Windows network shares.
+   -- @since 4.9.7 Allows for PHP file wrappers.
+   --
+   -- @param string $path Path to normalize.
+   -- @return string Normalized path.
+   --
+   function Wp_Normalize_Path (Path : String)
+                               return String;
+
+   --
+   -- Retrieves the list of mime types and file extensions.
+   --
+   -- @since 3.5.0
+   -- @since 4.2.0 Support was added for GIMP (.xcf) files.
+   -- @since 4.9.2 Support was added for Flac (.flac) files.
+   -- @since 4.9.6 Support was added for AAC (.aac) files.
+   --
+   -- @return string[] Array of mime types keyed by the file extension regex
+   --                   corresponding to those types.
+   --
+   function Wp_Get_MIME_Types
+            return Array_Type;
+
+   --
+   -- Retrieves the list of allowed mime types and file extensions.
+   --
+   -- @since 2.8.6
+   --
+   -- @param int|WP_User user Optional. User to check. Defaults to current user.
+   -- @return string[] Array of mime types keyed by the file extension regex
+   --                  corresponding to those types.
+   --
+   function Get_Allowed_MIME_Types
+     (User : Inc_Class_Wp_Users.Wp_User := Inc_Class_Wp_Users.Null_User)
+      return Array_Type;
+
+   --
    -- Marks something as being incorrectly called.
    --
    -- There is a hook {@see 'doing_it_wrong_run'} that will be called that can be used
@@ -348,6 +395,119 @@ is
                            return Array_Type;
 
    --
+   -- Accesses an array in depth based on a path of keys.
+   --
+   -- It is the PHP equivalent of JavaScript's `lodash.get()` and mirroring it may
+   -- help other components retain some symmetry between client and server
+   -- implementations.
+   --
+   -- Example usage:
+   --
+   --     $array = array(
+   --         'a' => array(
+   --             'b' => array(
+   --                 'c' => 1,
+   --             ),
+   --         ),
+   --     );
+   --     _wp_array_get( $array, array( 'a', 'b', 'c' ) );
+   --
+   -- @internal
+   --
+   -- @since 5.6.0
+   -- @access private
+   --
+   -- @param array $array   An array from which we want to retrieve some information.
+   -- @param array $path    An array of keys describing the path with which to
+   --                       retrieve information.
+   -- @param mixed $default Optional. The return value if the path does not exist
+   --                       within the array, or if `$array` or `$path` are not
+   --                       arrays. Default null.
+   -- @return mixed The value from the path specified.
+   --
+   -- function X_Wp_Array_Get (Arry    : Array_Type;
+   --                          Path    : List_Type;
+   --                          Default : String := "") -- null
+   --                          return String;
+
+   -- function X_Wp_Array_Get (Arry    : Array_Type;
+   --                          Path    : List_Type;
+   --                          Default : String := "") -- null
+   --                          return List_Type;
+
+   -- function X_Wp_Array_Get (Arry    : Array_Type;
+   --                          Path    : List_Type;
+   --                          Default : String := "") -- null
+   --                          return Array_Type;
+
+   function X_Wp_Array_Get (Arry    : Array_Type;
+                            Path    : List_Type;
+                            Default : Multi_Type := Null_Multi_Type)
+                            return Multi_Type;
+
+   --
+   -- Sets an array in depth based on a path of keys.
+   --
+   -- It is the PHP equivalent of JavaScript's `lodash.set()` and mirroring it may help other
+   -- components retain some symmetry between client and server implementations.
+   --
+   -- Example usage:
+   --
+   --     $array = array();
+   --     _wp_array_set( $array, array( 'a', 'b', 'c', 1 ) );
+   --
+   --     $array becomes:
+   --     array(
+   --         'a' => array(
+   --             'b' => array(
+   --                 'c' => 1,
+   --             ),
+   --         ),
+   --     );
+   --
+   -- @internal
+   --
+   -- @since 5.8.0
+   -- @access private
+   --
+   -- @param array $array An array that we want to mutate to include a specific value
+   --                      in a path.
+   -- @param array $path  An array of keys describing the path that we want to mutate.
+   -- @param mixed $value The value that will be set.
+   --
+   procedure X_Wp_Array_Set (Arry  : in out Array_Type;
+                             Path  : List_Type;
+                             Value : Multi_Type);
+
+   --
+   -- This function is trying to replicate what
+   -- lodash's kebabCase (JS library) does in the client.
+   --
+   -- The reason we need this function is that we do some processing
+   -- in both the client and the server (e.g.: we generate
+   -- preset classes from preset slugs) that needs to
+   -- create the same output.
+   --
+   -- We can't remove or update the client's library due to backward compatibility
+   -- (some of the output of lodash's kebabCase is saved in the post content).
+   -- We have to make the server behave like the client.
+   --
+   -- Changes to this function should follow updates in the client
+   -- with the same logic.
+   --
+   -- @link https://github.com/lodash/lodash/blob/4.17/dist/lodash.js#L14369
+   -- @link https://github.com/lodash/lodash/blob/4.17/dist/lodash.js#L278
+   -- @link https://github.com/lodash-php/lodash-php/blob/master/src/String/kebabCase.php
+   -- @link https://github.com/lodash-php/lodash-php/blob/master/src/internal/unicodeWords.php
+   --
+   -- @param string $string The string to kebab-case.
+   --
+   -- @return string kebab-cased-string.
+   --
+   function X_Wp_To_Kebab_Case (Item : String)
+                                return String;
+
+   --
    -- Returns an array of single-use query variable names that can be removed from a
    -- URL.
    --
@@ -355,9 +515,9 @@ is
    --
    -- @return string[] An array of query variable names to remove from the URL.
    --
-   function Wp_Removable_Query_Args
-            return String_Array
-            is (Empty_String_Array);
+   -- function Wp_Removable_Query_Args
+   --          return String_Array
+   --          is (Empty_String_Array);
 
    function Wp_Removable_Query_Args
             return List_Type
@@ -496,6 +656,27 @@ is
                      Code    : Integer := 0); -- , $args = array()
 
    --
+   -- Reads and decodes a JSON file.
+   --
+   -- @since 5.9.0
+   --
+   -- @param string $filename Path to the JSON file.
+   -- @param array  $options  {
+   --     Optional. Options to be used with `json_decode()`.
+   --
+   --     @type bool $associative Optional. When `true`, JSON objects will be returned as
+   --                             associative arrays. When `false`, JSON objects will be returned
+   --                             as objects.
+   -- }
+   --
+   -- @return mixed Returns the value encoded in JSON in appropriate PHP type.
+   --               `null` is returned if the file is not found, or its content can't be decoded.
+   --
+   function Wp_JSON_File_Decode (Filename : String;
+                                 Options  : Array_Type := Empty_Array)
+                                 return Array_Type;
+
+   --
    -- Guesses the URL for the site.
    --
    -- Will remove wp-admin links to retrieve only return URLs not in the wp-admin
@@ -507,6 +688,28 @@ is
    --
    function Wp_Guess_URL
             return String;
+
+   --
+   -- Retrieves a list of protocols to allow in HTML attributes.
+   --
+   -- @since 3.3.0
+   -- @since 4.3.0 Added 'webcal' to the protocols array.
+   -- @since 4.7.0 Added 'urn' to the protocols array.
+   -- @since 5.3.0 Added 'sms' to the protocols array.
+   -- @since 5.6.0 Added 'irc6' and 'ircs' to the protocols array.
+   --
+   -- @see wp_kses()
+   -- @see esc_url()
+   --
+   -- @return string[] Array of allowed protocols. Defaults to an array containing
+   --                  'http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc',
+   --                  'irc6', 'ircs', 'gopher', 'nntp', 'feed', 'telnet', 'mms',
+   --                  'rtsp', 'sms', 'svn', 'tel', 'fax', 'xmpp', 'webcal', and 'urn'.
+   --                  This covers all common link protocols, except for 'javascript'
+   --                  which should not be allowed for untrusted users.
+   --
+   function Wp_Allowed_Protocols
+            return List_Type;
 
    --
    -- Attempts to raise the PHP memory limit for memory intensive processes.
@@ -561,5 +764,57 @@ is
    function Wp_Cache_Get_Last_Changed (Group : String)
                                        return String
                                        is ("XXX-979");
+
+   --
+   -- Tests if a given path is a stream URL
+   --
+   -- @since 3.5.0
+   --
+   -- @param string $path The resource path or URL.
+   -- @return bool True if the path is a stream URL.
+   --
+   function Wp_Is_Stream (Path : String)
+                          return Boolean;
+
+   --
+   -- Strips close comment and close php tags from file headers used by WP.
+   --
+   -- @since 2.8.0
+   -- @access private
+   --
+   -- @see https://core.trac.wordpress.org/ticket/8497
+   --
+   -- @param string $str Header comment to clean up.
+   -- @return string
+   --
+   function X_Cleanup_Header_Comment (Str : String)
+                                      return String;
+
+   --
+   -- Retrieves metadata from a file.
+   --
+   -- Searches for metadata in the first 8 KB of a file, such as a plugin or theme.
+   -- Each piece of metadata must be on its own line. Fields can not span multiple
+   -- lines, the value will get cut at the end of the first line.
+   --
+   -- If the file data is not within that first 8 KB, then the author should correct
+   -- their plugin file and move the data headers to the top.
+   --
+   -- @link https://codex.wordpress.org/File_Header
+   --
+   -- @since 2.9.0
+   --
+   -- @param string $file            Absolute path to the file.
+   -- @param array  $default_headers List of headers, in the format
+   --                                 `array( 'HeaderKey' => 'Header Name' )`.
+   -- @param string $context         Optional. If specified adds filter hook
+   --                                 {@see 'extra_$context_headers'}.
+   --                                Default empty.
+   -- @return string[] Array of file header values keyed by header name.
+   --
+   function Get_File_Data (File            : String;
+                           Default_Headers : Array_Type;
+                           Context         : String := "")
+                           return Array_Type;
 
 end Inc_Functions;

@@ -346,32 +346,25 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Adds a group or set of groups to the list of global groups.
--- --
--- -- @since 2.6.0
--- --
--- -- @see WP_Object_Cache::add_global_groups()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @param string|string[] $groups A group or an array of groups to add.
--- --
--- function wp_cache_add_global_groups( $groups ) then
---         global $wp_object_cache;
+   --------------------------------
+   -- Wp_Cache_Add_Global_Groups --
+   --------------------------------
 
---         $wp_object_cache->add_global_groups( $groups );
--- end;
+   procedure Wp_Cache_Add_Global_Groups (Groups : String)
+   is
+--    global $wp_object_cache;
+   begin
+--    Wp_Object_Cache.Add_Global_Groups (Groups);
+      null;
+   end Wp_Cache_Add_Global_Groups;
 
--- --
--- -- Adds a group or set of groups to the list of non-persistent groups.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string|string[] $groups A group or an array of groups to add.
--- --
--- function wp_cache_add_non_persistent_groups( $groups ) then
---         // Default cache doesn't persist so nothing to do here.
--- end;
+   ----------------------------------------
+   -- Wp_Cache_Add_Non_Persistent_Groups --
+   ----------------------------------------
+
+   procedure Wp_Cache_Add_Non_Persistent_Groups (Groups : String)
+   is null;
+   -- Default cache doesn't persist so nothing to do here.
 
 -- --
 -- -- Switches the internal blog ID.

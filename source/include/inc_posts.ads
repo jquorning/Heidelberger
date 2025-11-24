@@ -136,12 +136,12 @@ is
          -- Default to false.
       end record;
 
-   package Statuses_Maps is new
+   package Status_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                               Element_Type => Status_Type);
-   subtype Statuses_Map is Statuses_Maps.Map;
+   subtype Status_Map is Status_Maps.Map;
 
-   Wp_Post_Statuses : Statuses_Map;
+   Wp_Post_Statuses : Status_Map;
 
    --
    -- Registers a post status. Do not use before init.
@@ -192,6 +192,9 @@ is
    -- }
    -- @return object
    --
+   function Register_Post_Status (Post_Status : String;
+                                  Args        : Status_Type)
+                                  return Status_Type; -- Array_Type;
    procedure Register_Post_Status (Post_Status : String;
                                    Args        : Status_Type); --  = to_array ()
 
@@ -240,11 +243,11 @@ is
                             Operator : String     := "and")
                             return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array;
 
-   function Get_Post_Types (Args     : Array_Type := Empty_Array;
-                            Output   : String     := "names";
-                            Operator : String     := "and")
-                            return String_Array
-                            is (Empty_String_Array);
+   -- function Get_Post_Types (Args     : Array_Type := Empty_Array;
+   --                          Output   : String     := "names";
+   --                          Operator : String     := "and")
+   --                          return String_Array
+   --                          is (Empty_String_Array);
 
    function Get_Post_Types (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
@@ -439,7 +442,7 @@ is
          -- callback. Default null.
 
 --       @type string[]
-         Taxonomies : String_Array;
+         Taxonomies : List_Type; -- String_Array;
          -- An array of taxonomy identifiers that will be registered for the
          -- post type. Taxonomies can be registered later with register_taxonomy()
          -- or register_taxonomy_for_object_type().
@@ -843,8 +846,8 @@ is
    -- @return stdClass|null A post status object.
    --
    function Get_Post_Status_Object (Post_Status : String)
-                                    return Array_Type
-                                    is (Empty_Array);
+                                    return Status_Type; -- Array_Type
+                                    -- is (Empty_Array);
 
    --
    -- Retrieves post data given a post ID or post object.
@@ -883,6 +886,12 @@ is
                       return Wp_Post;
 
    function Get_Post (Post   : Post_Id := 0;
+                      Output : String  := "OBJECT";
+                      Filter : String  := "raw")
+                      return Array_Type
+                      is (Empty_Array);
+
+   function Get_Post (Post   : Wp_Post;
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
@@ -1038,6 +1047,112 @@ is
                              is (True);
 
    --
+   -- Inserts or update a post.
+   --
+   -- If the postarr parameter has "ID" set to a value, then post will be updated.
+   --
+   -- You can set the post date manually, by setting the values for "post_date"
+   -- and "post_date_gmt" keys. You can close the comments or open the comments by
+   -- setting the value for "comment_status" key.
+   --
+   -- @since 1.0.0
+   -- @since 2.6.0 Added the `wp_error` parameter to allow a WP_Error to be returned
+   --               on failure.
+   -- @since 4.2.0 Support was added for encoding emoji in the post title, content,
+   --               and excerpt.
+   -- @since 4.4.0 A "meta_input" array can now be passed to `postarr` to add post
+   --               meta data.
+   -- @since 5.6.0 Added the `fire_after_hooks` parameter.
+   --
+   -- @see sanitize_post()
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param array postarr {
+   --     An array of elements that make up a post to update or insert.
+   --
+   --     @type int    ID                    The post ID. If equal to something other
+   --                                         than 0, the post with that ID will be
+   --                                         updated. Default 0.
+   --     @type int    post_author           The ID of the user who added the post.
+   --                                         Default is the current user ID.
+   --     @type string post_date             The date of the post. Default is the
+   --                                         current time.
+   --     @type string post_date_gmt         The date of the post in the GMT timezone.
+   --                                         Default is the value of `post_date`.
+   --     @type string post_content          The post content. Default empty.
+   --     @type string post_content_filtered The filtered post content. Default empty.
+   --     @type string post_title            The post title. Default empty.
+   --     @type string post_excerpt          The post excerpt. Default empty.
+   --     @type string post_status           The post status. Default "draft".
+   --     @type string post_type             The post type. Default "post".
+   --     @type string comment_status        Whether the post can accept comments.
+   --                                         Accepts "open" or "closed". Default is
+   --                                         the value of "default_comment_status"
+   --                                         option.
+   --     @type string ping_status           Whether the post can accept pings.
+   --                                         Accepts "open" or "closed". Default is
+   --                                         the value of "default_ping_status"
+   --                                         option.
+   --     @type string post_password         The password to access the post. Default
+   --                                         empty.
+   --     @type string post_name             The post name. Default is the sanitized
+   --                                         post title when creating a new post.
+   --     @type string to_ping               Space or carriage return-separated list
+   --                                         of URLs to ping. Default empty.
+   --     @type string pinged                Space or carriage return-separated list
+   --                                         of URLs that have been pinged. Default
+   --                                         empty.
+   --     @type string post_modified         The date when the post was last modified.
+   --                                         Default is the current time.
+   --     @type string post_modified_gmt     The date when the post was last modified
+   --                                         in the GMT timezone. Default is the
+   --                                         current time.
+   --     @type int    post_parent           Set this for the post it belongs to, if
+   --                                         any. Default 0.
+   --     @type int    menu_order            The order the post should be displayed
+   --                                         in. Default 0.
+   --     @type string post_mime_type        The mime type of the post. Default empty.
+   --     @type string guid                  Global Unique ID for referencing the
+   --                                         post. Default empty.
+   --     @type int    import_id             The post ID to be used when inserting a
+   --                                         new post. If specified, must not match
+   --                                         any existing post ID. Default 0.
+   --     @type int[]  post_category         Array of category IDs.
+   --                                         Defaults to value of the
+   --                                         "default_category" option.
+   --     @type array  tags_input            Array of tag names, slugs, or IDs.
+   --                                         Default empty.
+   --     @type array  tax_input             An array of taxonomy terms keyed by their
+   --                                         taxonomy name. If the taxonomy is
+   --                                         hierarchical, the term list needs to be
+   --                                         either an array of term IDs or a
+   --                                         comma-separated string of IDs. If the
+   --                                         taxonomy is non-hierarchical, the term
+   --                                         list can be an array that contains term
+   --                                         names or slugs, or a comma-separated
+   --                                         string of names or slugs. This is
+   --                                         because, in hierarchical taxonomy, child
+   --                                         terms can have the same names with
+   --                                         different parent terms, so the only way
+   --                                         to connect them is using ID. Default
+   --                                         empty.
+   --     @type array  meta_input            Array of post meta values keyed by their
+   --                                         post meta key. Default empty.
+   --     @type string page_template         Page template to use.
+   -- }
+   -- @param bool  wp_error         Optional. Whether to return a WP_Error on failure.
+   --                                          Default False.
+   -- @param bool  fire_after_hooks Optional. Whether to fire the after insert hooks.
+   --                                          Default True.
+   -- @return int|WP_Error The post ID on success. The value 0 or WP_Error on failure.
+   --
+   function Wp_Insert_Post (Postarr          : Array_Type;
+                            Wp_Error         : Boolean := False;
+                            Fire_After_Hooks : Boolean := True)
+                            return Post_Id
+                            is (0);
+
+   --
    -- Retrieves a page given its path.
    --
    -- @since 2.1.0
@@ -1072,6 +1187,23 @@ is
                                 return Array_Type;  -- return Post_Id_List;
 
    --
+   -- Retrieves the post status based on the post ID.
+   --
+   -- If the post ID is of an attachment, then the parent post status will be given
+   -- instead.
+   --
+   -- @since 2.0.0
+   --
+   -- @param int|WP_Post post Optional. Post ID or post object. Defaults to global
+   --                          post.
+   -- @return string|False Post status on success, False on failure.
+   --
+   function Get_Post_Status (Post : Wp_Post := Null_Post)
+                             return String;
+   function Get_Post_Status (Post : Post_Id := 0)
+                             return String;
+
+   --
    -- Retrieves a post meta field for the given post ID.
    --
    -- @since 1.5.0
@@ -1084,13 +1216,18 @@ is
    --                        Default false.
    -- @return mixed An array of values if `$single` is false.
    --               The value of the meta field if `$single` is true.
-   --               False for an invalid `$post_id` (non-numeric, zero, or negative value).
-   --               An empty string if a valid but non-existing post ID is passed.
+   --               False for an invalid `$post_id` (non-numeric, zero, or negative
+   --               value). An empty string if a valid but non-existing post ID is
+   --               passed.
    --
    function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type; -- Post_Id_List;
+   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
+                           Key     : String  := "";
+                           Single  : Boolean := False)
+                           return String;
 
    --
    -- Updates a post meta field based on the given post ID.
@@ -1206,5 +1343,20 @@ is
    procedure Set (Post  : in out Wp_Post;
                   Field : String;
                   Value : String) is null;
+
+   Null_Status : constant Status_Type :=
+     (Label       => Null_Unbounded_String,
+      Label_Count => Empty_Array,
+      others      => False);
+         -- Exclude_From_Search : Boolean;
+         -- X_Builtin : Boolean;
+         -- Public : Boolean;
+         -- Internal : Boolean;
+         -- Protect : Boolean;
+         -- Privat : Boolean;
+         -- Publicly_Queryable : Boolean;
+         -- Show_In_Admin_All_List : Boolean;
+         -- Show_In_Admin_Status_List : Boolean;
+         -- Date_Floating : Boolean);
 
 end Inc_Posts;

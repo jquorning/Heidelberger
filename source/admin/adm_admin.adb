@@ -112,7 +112,7 @@ is
                (Inc_Link_Templates.Admin_URL
                  ("upgrade.php?_wp_http_referer=" &
                   Php.URLencode (Inc_Formatting.Wp_Unslash
-                                  (Get (X_SERVER, "REQUEST_URI")))));
+                                  (As_String (Get (X_SERVER, "REQUEST_URI"))))));
             return; -- exit;
          end if;
 
@@ -231,7 +231,7 @@ is
 
          if Isset (XX_GET, "page") then
             Plugin_Page :=
-              +Slug_Type (Inc_Formatting.Wp_Unslash (Get (XX_GET, "page")));
+              +Slug_Type (Inc_Formatting.Wp_Unslash (As_String (Get (XX_GET, "page"))));
 
             Plugin_Page :=
               +Slug_Type (Inc_Plugins.Plugin_Basename (String (-Plugin_Page)));
@@ -239,18 +239,18 @@ is
 
          if
            Isset (X_REQUEST, "post_type") and then
-           Inc_Posts.Post_Type_Exists (Get (X_REQUEST, "post_type"))
+           Inc_Posts.Post_Type_Exists (As_String (Get (X_REQUEST, "post_type")))
          then
-            Typenow := +Get (X_REQUEST, "post_type");
+            Typenow := +As_String (Get (X_REQUEST, "post_type"));
          else
             Typenow := +"";
          end if;
 
          if
            Isset (X_REQUEST, "taxonomy") and then
-           Inc_Taxonomys.Taxonomy_Exists (Get (X_REQUEST, "taxonomy"))
+           Inc_Taxonomys.Taxonomy_Exists (As_String (Get (X_REQUEST, "taxonomy")))
          then
-            Taxnow := +Get (X_REQUEST, "taxonomy");
+            Taxnow := +As_String (Get (X_REQUEST, "taxonomy"));
          else
             Taxnow := +"";
          end if;
@@ -310,8 +310,8 @@ is
                      declare
                         Query_String : Unbounded_String;
                      begin
-                        if Get (X_SERVER, "QUERY_STRING") /= "" then
-                           Query_String := +String'(Get (X_SERVER, "QUERY_STRING"));
+                        if As_String (Get (X_SERVER, "QUERY_STRING")) /= "" then
+                           Query_String := +As_String (Get (X_SERVER, "QUERY_STRING"));
                         else
                            Query_String := "page=" & Unbounded_String (Plugin_Page);
                         end if;
@@ -438,7 +438,7 @@ is
 
          elsif Isset (XX_GET, "import") then
             declare
-               Importer : constant String := Get (XX_GET, "import");
+               Importer : constant String := As_String (Get (XX_GET, "import"));
             begin
                if not Inc_Capabilities.Current_User_Can ("import") then
                   Inc_Functions.Wp_Die
@@ -565,7 +565,7 @@ is
       if Isset (X_REQUEST, "action") then
 --    if not Empty (X_REQUEST, "action") then
          declare
-            Action : constant String := Get (X_REQUEST, "action");
+            Action : constant String := As_String (Get (X_REQUEST, "action"));
          begin
             --
             -- Fires when an "action" request variable is sent.

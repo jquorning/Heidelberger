@@ -36,14 +36,13 @@ is
       use Inc_Class_Wp_Post_Type;
       use Inc_Capabilities;
       use Inc_Posts;
---    global post_type_object, wpdb;
 
       This : Wp_Posts_List_Table := (
         Adi_Class_Wp_List_Tables.X_Construct (
           To_Array ((
             Build ("plural", "posts"),
             Build ("screen", (if Isset (Args, "screen")
-                              then Get (Args, "screen") else "null"))
+                              then As_String (Get (Args, "screen")) else "null"))
           ))
         )
         with
@@ -84,7 +83,8 @@ is
         and then Empty (X_REQUEST, "author")
         and then Empty (X_REQUEST, "show_sticky")
       then
-         Set (XX_GET, "author", Value => Inc_Users.Get_Current_User_Id'Image);
+         Set (XX_GET, "author",
+              From_String (Inc_Users.Get_Current_User_Id'Image));
       end if;
 
       declare

@@ -3,185 +3,11 @@ package body Hb_Common
 is
    function To_Array (Item : String) return Array_Type is (Empty_Array);
 
-   -- function Apply_Filters (Item : String;
-   --                         S : String;
-   --                         D : String := "";
-   --                         X : String := "")
-   --    return String is ("XXX-105");
-
-   -- function Apply_Filters (Item : String; a : Array_Type; V : String; N : String)
-   --    return Array_Type is (Empty_Array);
-
    function Empty (Table : Array_Type) return Boolean is (True);
-
-   function Add_Query_Arg (Item : String; N : Natural; Sb : Unbounded_String)
-      return Unbounded_String is (Null_Unbounded_String);
-   function Add_Query_Arg (Item : String; N : String) return String is ("XXX-78");
-   function Add_Query_Arg (List : Array_Type; Sb : Unbounded_String)
-      return Unbounded_String is (Null_Unbounded_String);
-
--- function Absint (Item : Assoc_List) return String is ("1");
-
-   -- function Array_Filter (List : Array_Type) return Assoc_List is
-   --    AL : constant Assoc_List := (1 .. 0 => <>);
-   -- begin
-   --    return AL;
-   -- end Array_Filter;
-
-   procedure Add_Filter (Arg_1, Arg_2 : String; Arg_3, Arg_4 : Integer) is null;
-   procedure Remove_Filter (Arg_1, Arg_2 : String; Arg_3 : Integer) is null;
-
-   ---------
-   -- Set --
-   ---------
-
-   procedure Set (Arry  : in out Array_Type;
-                  Key   : String;
-                  Value : String)
-   is
-   begin
-      Arry.Include (Key => Key, New_Item => Value);
-   end Set;
-
-   procedure Set_Array (Arry : in out Array_Type;
-                       Key   : String;
-                       Value : Array_Type)
-   is
-      Item : Array_Record;
-   begin
-      Item.Kind := Is_Array;
-      Item.Arry := new Array_Type'(Value);
-      Arry.Include (Key => Key, New_Item => Item);
-   end Set_Array;
-
-   procedure Set_Integer (Arry  : in out Array_Type;
-                          Key   : String;
-                          Value : Integer)
-   is
-      Item : Array_Record;
-   begin
-      Item.Kind := Is_Integer;
-      Item.Int  := Value;
-      Arry.Include (Key => Key, New_Item => Item);
-   end Set_Integer;
-
-   procedure Set_Boolean (Arry  : in out Array_Type;
-                          Key   : String;
-                          Value : Boolean)
-   is
-      Item : Array_Record;
-   begin
-      Item.Kind := Is_Boolean;
-      Item.Bool := Value;
-      Arry.Include (Key => Key, New_Item => Item);
-   end Set_Boolean;
 
    function Count (Item : String) return String is ("XXX 8");
 
-   -- function Apply_Filters (Item : String; S : Assoc_List; D : Assoc_List)
-   --    return Assoc_List
-   -- is
-   --    Al : constant Assoc_List := (1 .. 0 => <>);
-   -- begin
-   --    return Al;
-   -- end Apply_Filters;
-
    function "abs" (List : Array_Type) return String is ("XXX 12");
-
--- function Count (Al : Assoc_List) return Natural is (1);
-
-   ---------
-   -- Get --
-   ---------
-
-   function Get (Arry : Array_Type;
-                 Key  : String)
-                 return String
-   is
-      use Array_Maps;
-   begin
-      pragma Assert (Arry.Find (Key) /= No_Element);
-      pragma Assert (Element (Arry.Find (Key)).Kind = Is_String);
-      return To_String (Array_Maps.Element (Arry.Find (Key)).Str);
-   end Get;
-
-   ---------------
-   -- Get_Array --
-   ---------------
-
-   function Get_Array (Arry : Array_Type;
-                       Key  : String)
-                       return Array_Type
-   is
-      use Array_Maps;
-   begin
-      pragma Assert (Arry.Find (Key) /= No_Element);
-      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Array);
-      return Array_Maps.Element (Arry.Find (Key)).Arry.all;
-   end Get_Array;
-
-   --------------
-   -- Get_List --
-   --------------
-
-   function Get_List (Arry : Array_Type;
-                      Key  : String)
-                      return List_Type
-                      is (Empty_List);
-
-   -----------------
-   -- Get_Integer --
-   -----------------
-
-   function Get_Integer (Arry : Array_Type;
-                         Key  : String)
-                         return Integer
-   is
-      use Array_Maps;
-   begin
-      pragma Assert (Arry.Find (Key) /= No_Element);
-      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Integer);
-      return Array_Maps.Element (Arry.Find (Key)).Int;
-   end Get_Integer;
-
-   -----------------
-   -- Get_Boolean --
-   -----------------
-
-   function Get_Boolean (Arry : Array_Type;
-                         Key  : String)
-                         return Boolean
-   is
-      use Array_Maps;
-   begin
-      pragma Assert (Arry.Find (Key) /= No_Element);
-      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Boolean);
-      return Array_Maps.Element (Arry.Find (Key)).Bool;
-   end Get_Boolean;
-
-   function Get_Null (Arry : Array_Type;
-                      Key  : String)
-                      return Boolean
-   is
-      use Array_Maps;
-   begin
-      pragma Assert (Arry.Find (Key) /= No_Element);
-      pragma Assert (Element (Arry.Find (Key)).Kind = Is_Null);
-      return True;
-   end Get_Null;
-
-   -----------
-   -- Empty --
-   -----------
-
-   function Empty (Arry : Array_Type;
-                   Key  : String)
-                   return Boolean
-   is
-      use Array_Maps;
-   begin
-      return not Has_Element (Arry.Find (Key));
-   end Empty;
 
    -----------
    -- Isset --
@@ -191,16 +17,16 @@ is
                    return Boolean
                    is (True);
 
+   -- function Isset (Arry : Array_Type;
+   --                 Key  : String)
+   --                 return Boolean
+   -- is
+   -- begin
+   --    return Array_Maps.Has_Element (Arry.Find (Key));
+   -- end Isset;
+
    function Isset (Item : String)
                    return Boolean
                    is (True);
-
-   function Isset (Arry : Array_Type;
-                   Key  : String)
-                   return Boolean
-   is
-   begin
-      return Array_Maps.Has_Element (Arry.Find (Key));
-   end Isset;
 
 end Hb_Common;

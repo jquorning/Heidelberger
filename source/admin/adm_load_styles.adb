@@ -59,14 +59,14 @@ is
       WPINC          := +"wp-includes";
       WP_CONTENT_DIR := +ABSPATH & "wp-content";
 
-      Protocol := +Get (X_SERVER, "SERVER_PROTOCOL");
+      Protocol := +As_String (Get (X_SERVER, "SERVER_PROTOCOL"));
       if not In_Array (-Protocol, To_List (List => (+"HTTP/1.1", +"HTTP/2",
                                                     +"HTTP/2.0", +"HTTP/3")), True)
       then
          Protocol := +"HTTP/1.0";
       end if;
 
-      Load := +Get (XX_GET, "load");
+      Load := +As_String (Get (XX_GET, "load"));
 -- if ( is_array( load ) ) then
 --         ksort( load );
 --         load := implode( "", load );
@@ -80,7 +80,7 @@ is
          return; -- exit;
       end if;
 
-      RTL            := Isset (XX_GET, "dir") and then "rtl" = Get (XX_GET, "dir");
+      RTL            := Isset (XX_GET, "dir") and then "rtl" = As_String (Get (XX_GET, "dir"));
       Expires_Offset := 31536000; -- 1 year.
       Outt           := +"";
 
@@ -88,7 +88,7 @@ is
 
       if
         Isset (X_SERVER, "HTTP_IF_NONE_MATCH") and then
-        Stripslashes (Get (X_SERVER, "HTTP_IF_NONE_MATCH")) = Inc_Versions.Wp_Version
+        Stripslashes (As_String (Get (X_SERVER, "HTTP_IF_NONE_MATCH"))) = Inc_Versions.Wp_Version
       then
          Header ((-Protocol) & " 304 Not Modified");
          return; -- exit;

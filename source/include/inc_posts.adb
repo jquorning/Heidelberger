@@ -23,7 +23,7 @@ with Inc_Plugins;
 
 package body Inc_Posts
 is
-   use Hb_Common;
+-- use Hb_Common;
    use Php;
    use Inc_L10n;
 
@@ -35,21 +35,34 @@ is
 
    subtype Post_Type_Map is Post_Type_Maps.Map;
 
-   Wp_Post_Types : Post_Type_Map; -- List_Type;
+   Wp_Post_Types           : Post_Type_Map; -- List_Type;
+   Global_Wp_Post_Statuses : Status_Maps.Map; -- Array_Type;
 
---
--- Post Type registration.
---
+   function Apply_Filters (Hook  : String;
+                           Value : String;
+                           Post  : Wp_Post)
+                           return String
+                           is (Value);
 
---
--- Creates the initial post types when "init" action is fired.
---
--- See {@see "init"}.
---
--- @since 2.9.0
---
+   function Wp_Parse_Args_2 (Args     : Status_Type;
+                             Defaults : Array_Type)
+                             return Status_Type
+                             is (Args);
+
+   --
+   -- Post Type registration.
+   --
+
+   --
+   -- Creates the initial post types when "init" action is fired.
+   --
+   -- See {@see "init"}.
+   --
+   -- @since 2.9.0
+   --
    procedure Create_Initial_Post_Types
    is
+      use Hb_Common;
 --    use String_Vectors;
    begin
       Inc_Class_Wp_Post_Type.Reset_Default_Labels; -- :: ();
@@ -97,7 +110,7 @@ is
                         REST_Namespace       => Null_Unbounded_String,
                         Capabilities         => Empty_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Can_Export           => False,
@@ -149,7 +162,7 @@ is
                         REST_Namespace       => Null_Unbounded_String,
                         Capabilities         => Empty_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -207,7 +220,7 @@ is
                         REST_Namespace       => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -260,7 +273,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
                         Capabilities         => Empty_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -332,7 +345,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -398,7 +411,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -479,7 +492,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -532,7 +545,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -585,7 +598,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -675,7 +688,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -774,7 +787,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
 --                        Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -871,7 +884,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
 --                        Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -938,7 +951,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
                         Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -1041,7 +1054,7 @@ is
                         Menu_Icon            => Null_Unbounded_String,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
-                        Taxonomies           => Empty_String_Array,
+                        Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
 --                        Has_Archive          => Null_Unbounded_String,
                         Rewrite_Bool         => False,
@@ -1696,6 +1709,8 @@ is
    function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
    is
+      use Hb_Common;
+
       Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
    begin
       if
@@ -1707,15 +1722,13 @@ is
       end if;
 
       declare
-         use Array_Maps;
-
-         Ancestors : Array_Type := Empty_Array;
+         Ancestors : Array_Type;
 
          Id        : Post_Id    := Post.Post_Parent;
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
-         Ancestors.Include (Key => Id'Image, New_Item => "");
+         Append (Ancestors, From_String (Id'Image));
          Ancestor := Inc_Posts.Get_Post (Id);
          loop -- while Ancestor loop
             -- Loop detection: If the ancestor has been seen before, break.
@@ -1728,7 +1741,7 @@ is
             end if;
 
             Id := Ancestor.Post_Parent;
-            Ancestors.Include (Key => Id'Image, New_Item => ""); -- []
+            Append (Ancestors, Value => From_String (Id'Image));
 
             Ancestor := Get_Post (Id);
          end loop;
@@ -1792,73 +1805,80 @@ is
 --         return False;
 -- end;
 
---
--- Retrieves the post status based on the post ID.
---
--- If the post ID is of an attachment, then the parent post status will be given
--- instead.
---
--- @since 2.0.0
---
--- @param int|WP_Post post Optional. Post ID or post object. Defaults to global post.
--- @return string|False Post status on success, False on failure.
---
--- function get_post_status( post = null ) then
---         post = get_post( post );
+   ---------------------
+   -- Get_Post_Status --
+   ---------------------
 
---         if ( ! is_object( post ) ) then
---                 return False;
---         end;
+   function Get_Post_Status (Post : Wp_Post := Null_Post)
+                             return String
+   is
+      use Hb_Common;
+      use Inc_Plugins;
 
---         post_status = post.post_status;
+      Post_2 : constant Wp_Post := Get_Post (Post);
 
---         if (
---                 "attachment" === post.post_type &&
---                 "inherit" === post_status
---         ) then
---                 if (
---                         0 === post.post_parent ||
---                         ! get_post( post.post_parent ) ||
---                         post.ID === post.post_parent
---                 ) then
---                         // Unattached attachments with inherit status are assumed to be published.
---                         post_status = "publish";
---                 end; elseif ( "trash" === get_post_status( post.post_parent ) ) then
---                         // Get parent status prior to trashing.
---                         post_status = get_post_meta( post.post_parent, "_wp_trash_meta_status", True );
+      Post_Status : Unbounded_String := Post_2.Post_Status;
+   begin
+--    if ( ! is_object( Post_2 ) ) then
+--       return False;
+--    end if;
 
---                         if ( ! post_status ) then
---                                 // Assume publish as above.
---                                 post_status = "publish";
---                         end;
---                 end; else then
---                         post_status = get_post_status( post.post_parent );
---                 end;
---         end; elseif (
---                 "attachment" === post.post_type &&
---                 ! in_to_array ( post_status, to_array ( "private", "trash", "auto-draft" ), True )
---         ) then
---                 --
---                 -- Ensure uninherited attachments have a permitted status either "private", "trash", "auto-draft".
---                 -- This is to match the logic in wp_insert_post().
---                 --
---                 -- Note: "inherit" is excluded from this check as it is resolved to the parent post"s
---                 -- status in the logic block above.
---                 --
---                 post_status = "publish";
---         end;
+      if
+        "attachment" = Post_2.Post_Type and then
+        "inherit" = Post_Status
+      then
+         if
+           0 = Post_2.Post_Parent or else
+           Empty_Array = Get_Post (Post_2.Post_Parent) or else
+           Post_2.Id = Post_2.Post_Parent
+         then
+            -- Unattached attachments with inherit status are assumed to be published.
+            Post_Status := +"publish";
+         elsif "trash" = Get_Post_Status (Post_2.Post_Parent) then
+            -- Get parent status prior to trashing.
+            Post_Status :=
+              +Get_Post_Meta (Post_2.Post_Parent, "_wp_trash_meta_status", True);
 
---         --
---         -- Filters the post status.
---         --
---         -- @since 4.4.0
---         -- @since 5.7.0 The attachment post type is now passed through this filter.
---         --
---         -- @param string  post_status The post status.
---         -- @param WP_Post post        The post object.
---         --
---         return apply_filters( "get_post_status", post_status, post );
--- end;
+            if "" = Post_Status then
+               -- Assume publish as above.
+               Post_Status := +"publish";
+            end if;
+         else
+            Post_Status := +Get_Post_Status (Post_2.Post_Parent);
+         end if;
+      elsif
+        "attachment" = Post_2.Post_Type and then
+        not In_Array (-Post_Status,
+                      To_List (List => (+"private", +"trash", +"auto-draft")), True)
+      then
+         --
+         -- Ensure uninherited attachments have a permitted status either "private",
+         -- "trash", "auto-draft". This is to match the logic in wp_insert_post().
+         --
+         -- Note: "inherit" is excluded from this check as it is resolved to the
+         -- parent post's status in the logic block above.
+         --
+         Post_Status := +"publish";
+      end if;
+
+      --
+      -- Filters the post status.
+      --
+      -- @since 4.4.0
+      -- @since 5.7.0 The attachment post type is now passed through this filter.
+      --
+      -- @param string  post_status The post status.
+      -- @param WP_Post post        The post object.
+      --
+      return Apply_Filters ("get_post_status", -Post_Status, Post_2);
+   end Get_Post_Status;
+
+   function Get_Post_Status (Post : Post_Id := 0)
+                             return String
+   is
+   begin
+      return "XXX-008";
+   end Get_Post_Status;
 
 --
 -- Retrieves all of the WordPress supported post statuses.
@@ -1918,161 +1938,132 @@ is
 --         );
 -- end;
 
---
--- Registers a post status. Do not use before init.
---
--- A simple function for creating or modifying a post status based on the
--- parameters given. The function will accept an array (second optional
--- parameter), along with a string for the post status name.
---
--- Arguments prefixed with an _underscore shouldn"t be used by plugins and themes.
---
--- @since 3.0.0
---
--- @global stdClass[] wp_post_statuses Inserts new post status object into the list
---
--- @param string       post_status Name of the post status.
--- @param array|string args {
---     Optional. Array or string of post status arguments.
---
---     @type bool|string label                     A descriptive name for the post status marked
---                                                  for translation. Defaults to value of post_status.
---     @type array|False label_count               Nooped plural text from _n_noop() to provide the singular
---                                                  and plural forms of the label for counts. Default False
---                                                  which means the `label` argument will be used for both
---                                                  the singular and plural forms of this label.
---     @type bool        exclude_from_search       Whether to exclude posts with this post status
---                                                  from search results. Default is value of internal.
---     @type bool        _builtin                  Whether the status is built-in. Core-use only.
---                                                  Default False.
---     @type bool        public                    Whether posts of this status should be shown
---                                                  in the front end of the site. Default False.
---     @type bool        internal                  Whether the status is for internal use only.
---                                                  Default False.
---     @type bool        protected                 Whether posts with this status should be protected.
---                                                  Default False.
---     @type bool        private                   Whether posts with this status should be private.
---                                                  Default False.
---     @type bool        publicly_queryable        Whether posts with this status should be publicly-
---                                                  queryable. Default is value of public.
---     @type bool        show_in_admin_all_list    Whether to include posts in the edit listing for
---                                                  their post type. Default is the opposite value
---                                                  of internal.
---     @type bool        show_in_admin_status_list Show in the list of statuses with post counts at
---                                                  the top of the edit listings,
---                                                  e.g. All (12) | Published (9) | My Custom Status (2)
---                                                  Default is the opposite value of internal.
---     @type bool        date_floating             Whether the post has a floating creation date.
---                                                  Default to False.
--- }
--- @return object
---
+   --------------------------
+   -- Register_Post_Status --
+   --------------------------
+
+   function Register_Post_Status (Post_Status : String;
+                                  Args        : Status_Type)
+                                  return Status_Type -- Array_Type
+   is
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+
+--         global wp_post_statuses;
+      -- Args prefixed with an underscore are reserved for internal use.
+      Defaults : constant Array_Type := To_Array (List => (
+        Build ("label",                     False),
+        Build ("label_count",               False),
+        Build ("exclude_from_search",       null),
+        Build ("_builtin",                  False),
+        Build ("public",                    null),
+        Build ("internal",                  null),
+        Build ("protected",                 null),
+        Build ("private",                   null),
+        Build ("publicly_queryable",        null),
+        Build ("show_in_admin_status_list", null),
+        Build ("show_in_admin_all_list",    null),
+        Build ("date_floating",             null)
+      ));
+
+      Args_2 : Status_Type := Wp_Parse_Args_2 (Args, Defaults);
+--    Args     := (object) args;
+      Post_Status_2 : constant String := Sanitize_Key (Post_Status);
+   begin
+--    if not Is_Array (Wp_Post_Statuses) then
+--       Wp_Post_Statuses := Empty_Array;
+--    end if;
+
+--    Args_2.Name := Post_Status_2;
+
+      -- Set various defaults.
+      if
+        False = Args_2.Public   and then
+        False = Args_2.Internal and then
+        False = Args_2.Protect  and then
+        False = Args_2.Privat
+      then
+         Args_2.Internal := True;
+      end if;
+
+      if False = Args_2.Public then
+         Args_2.Public := False;
+      end if;
+
+      if False = Args_2.Privat then
+         Args_2.Privat := False;
+      end if;
+
+      if False = Args_2.Protect then
+         Args_2.Protect := False;
+      end if;
+
+      if False = Args_2.Internal then
+         Args_2.Internal := False;
+      end if;
+
+      if False = Args_2.Publicly_Queryable then
+         Args_2.Publicly_Queryable := Args_2.Public;
+      end if;
+
+      if False = Args_2.Exclude_From_Search then
+         Args_2.Exclude_From_Search := Args_2.Internal;
+      end if;
+
+      if False = Args_2.Show_In_Admin_All_List then
+         Args_2.Show_In_Admin_All_List := not Args_2.Internal;
+      end if;
+
+      if False = Args_2.Show_In_Admin_Status_List then
+         Args_2.Show_In_Admin_Status_List := not Args_2.Internal;
+      end if;
+
+      if False = Args_2.Date_Floating then
+         Args_2.Date_Floating := False;
+      end if;
+
+      if "" = Args_2.Label then
+         Args_2.Label := +Post_Status_2;
+      end if;
+
+      if Empty_Array = Args_2.Label_Count then
+         -- phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralSingle,WordPress.WP.I18n.NonSingularStringLiteralPlural
+         Args_2.Label_Count := X_N_Noop (-Args_2.Label, -Args_2.Label);
+      end if;
+
+      Wp_Post_Statuses.Include (Key      => Post_Status_2,
+                                New_Item => Args_2);
+
+      return Args_2;
+   end Register_Post_Status;
+
    procedure Register_Post_Status (Post_Status : String;
                                    Args        : Status_Type)
    is
---         global wp_post_statuses;
-        -- Args prefixed with an underscore are reserved for internal use.
-        -- defaults = to_array (
-        --         "label"                     => False,
-        --         "label_count"               => False,
-        --         "exclude_from_search"       => null,
-        --         "_builtin"                  => False,
-        --         "public"                    => null,
-        --         "internal"                  => null,
-        --         "protected"                 => null,
-        --         "private"                   => null,
-        --         "publicly_queryable"        => null,
-        --         "show_in_admin_status_list" => null,
-        --         "show_in_admin_all_list"    => null,
-        --         "date_floating"             => null,
-        -- );
+      Unused : constant Status_Type :=
+        Register_Post_Status (Post_Status, Args);
    begin
---        if not Is_To_Array (Wp_Post_Statuses) then
---                Wp_Post_Statuses := Empty_Array);
---        end if;
-
---        args     = wp_parse_args( args, defaults );
---        args     = (object) args;
-
---        post_status = sanitize_key( post_status );
---        args.name  = post_status;
-
-        -- -- Set various defaults.
-        -- if ( null === args.public && null === args.internal && null === args.protected && null === args.private ) then
-        --         args.internal = True;
-        -- end;
-
-        -- if ( null === args.public ) then
-        --         args.public = False;
-        -- end;
-
-        -- if ( null === args.private ) then
-        --         args.private = False;
-        -- end;
-
-        -- if ( null === args.protected ) then
-        --         args.protected = False;
-        -- end;
-
-        -- if ( null === args.internal ) then
-        --         args.internal = False;
-        -- end;
-
-        -- if ( null === args.publicly_queryable ) then
-        --         args.publicly_queryable = args.public;
-        -- end;
-
-        -- if ( null === args.exclude_from_search ) then
-        --         args.exclude_from_search = args.internal;
-        -- end;
-
-        -- if ( null === args.show_in_admin_all_list ) then
-        --         args.show_in_admin_all_list = ! args.internal;
-        -- end;
-
-        -- if ( null === args.show_in_admin_status_list ) then
-        --         args.show_in_admin_status_list = ! args.internal;
-        -- end;
-
-        -- if ( null === args.date_floating ) then
-        --         args.date_floating = False;
-        -- end;
-
-        -- if ( False === args.label ) then
-        --         args.label = post_status;
-        -- end;
-
-        -- if ( False === args.label_count ) then
-        --         -- phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralSingle,WordPress.WP.I18n.NonSingularStringLiteralPlural
-        --         args.label_count = _n_noop( args.label, args.label );
-        -- end;
-
---    Wp_Post_Statuses (Post_Status) := Args;
       null;
---    return args;
    end Register_Post_Status;
 
---
--- Retrieves a post status object by name.
---
--- @since 3.0.0
---
--- @global stdClass[] wp_post_statuses List of post statuses.
---
--- @see register_post_status()
---
--- @param string post_status The name of a registered post status.
--- @return stdClass|null A post status object.
---
--- function get_post_status_object( post_status ) then
---         global wp_post_statuses;
+   ----------------------------
+   -- Get_Post_Status_Object --
+   ----------------------------
 
---         if ( empty( wp_post_statuses[ post_status ] ) ) then
---                 return null;
---         end;
+   function Get_Post_Status_Object (Post_Status : String)
+                                    return Status_Type
+   is
+      use Hb_Common;
+      use Status_Maps;
+   begin
+      if not Has_Element (Global_Wp_Post_Statuses.Find (Post_Status)) then
+--    if Empty (Global_Wp_Post_Statuses (Post_Status)) then
+         return Null_Status;
+      end if;
 
---         return wp_post_statuses[ post_status ];
--- end;
+      return Global_Wp_Post_Statuses (Post_Status);
+   end Get_Post_Status_Object;
 
 --
 -- Gets a list of post statuses.
@@ -2384,6 +2375,7 @@ is
                                  Args      : Args_Type) -- Array_Type := Empty_Array)
 --                                return Wp_Post_Type
    is
+      use Hb_Common;
       use Inc_Class_Wp_Post_Type;
       use Inc_Formatting;
 
@@ -2750,7 +2742,7 @@ is
       Nohier_Vs_Hier_Defaults : Array_Type)
       return Array_Type
    is
-      use Array_Maps;
+      use Hb_Common;
    begin
 --      object.labels = (array) object.labels;
 
@@ -2758,45 +2750,53 @@ is
         Isset (-Object.Label) and then
         not Has_Element (Object.Labels.Find ("name"))
       then
-         Object.Labels.Include ("name", -Object.Label);
+         Set (Object.Labels,
+              Key   => "name",
+              Value => From_String (-Object.Label));
       end if;
 
       if
         not Isset (Object.Labels, "singular_name") and then
-        Isset (Get (Object.Labels, "name"))
+        Isset (Object.Labels, "name")
       then
-         Object.Labels.Include ("singular_name", Get (Object.Labels, "name"));
+         Set (Object.Labels,
+              Key   => "singular_name",
+              Value => Get (Object.Labels, "name"));
       end if;
 
       if not Isset (Object.Labels, "name_admin_bar") then
-         Object.Labels.Include
-           ("name_admin_bar",
-            (if Isset (Object.Labels, "singular_name")
-             then Get (Object.Labels, "singular_name") else -Object.Name));
+         Set (Object.Labels,
+              Key   => "name_admin_bar",
+              Value => (if Isset (Object.Labels, "singular_name")
+                        then Get (Object.Labels, "singular_name")
+                        else From_String (-Object.Name)));
       end if;
 
       if
         not Isset (Object.Labels, "menu_name") and then
         Isset (Object.Labels, "name")
       then
-         Set (Object.Labels, "menu_name",
-              Get (Object.Labels, "name"));
+         Set (Object.Labels,
+              Key   => "menu_name",
+              Value => Get (Object.Labels, "name"));
       end if;
 
       if
         not Isset (Object.Labels, "all_items") and then
         Isset (Object.Labels, "menu_name")
       then
-         Set (Object.Labels, "all_items",
-              Get (Object.Labels, "menu_name"));
+         Set (Object.Labels,
+              Key   => "all_items",
+              Value => Get (Object.Labels, "menu_name"));
       end if;
 
       if
          not Isset (Object.Labels, "archives") and then
          Isset (Object.Labels, "all_items")
       then
-         Set (Object.Labels, "archives",
-              Get (Object.Labels, "all_items"));
+         Set (Object.Labels,
+              Key   => "archives",
+              Value => Get (Object.Labels, "all_items"));
       end if;
 
       declare
@@ -2804,14 +2804,15 @@ is
       begin
          for A in Nohier_Vs_Hier_Defaults.Iterate loop
             declare
-               Key   : constant String       := Array_Maps.Key (A);
-               Value : constant Array_Record := Array_Maps.Element (A);
-               Arry  : constant Array_Type   := Value.Arry.all;
+               Key   : constant String     := Arrays.Key (A);
+               Value : constant Multi_Type := Arrays.Element (A);
+               Arry  : constant Array_Type := As_Array (Value);
             begin
-               Defaults.Include (Key,
-                                 (if Object.Hierarchical
-                                  then Arry.Last_Element
-                                  else Arry.First_Element));
+               Set (Defaults,
+                    Key   => Key,
+                    Value => From_String (if Object.Hierarchical
+                                          then As_String (Arry.Last_Element)
+                                          else As_String (Arry.First_Element)));
             end;
          end loop;
 
@@ -2833,6 +2834,7 @@ is
 
    procedure X_Add_Post_Type_Submenus
    is
+      use Hb_Common;
       use Adi_Plugins;
       use Inc_Class_Wp_Post_Type;
 
@@ -2855,9 +2857,9 @@ is
 
             Add_Submenu_Page
               (Parent_Slug => -PType_Obj.Show_In_Menu,
-               Page_Title  => Get (PType_Obj.Labels, "name"),
-               Menu_Title  => Get (PType_Obj.Labels, "all_items"),
-               Capability  => Get (PType_Obj.Cap, "edit_posts"),
+               Page_Title  => As_String (Get (PType_Obj.Labels, "name")),
+               Menu_Title  => As_String (Get (PType_Obj.Labels, "all_items")),
+               Capability  => As_String (Get (PType_Obj.Cap,    "edit_posts")),
                Menu_Slug   => "edit.php?post_type=ptype");
 
          end;
@@ -3259,24 +3261,23 @@ is
 --         return delete_metadata( "post", post_id, meta_key, meta_value );
 -- end;
 
---
--- Retrieves a post meta field for the given post ID.
---
--- @since 1.5.0
---
--- @param int    post_id Post ID.
--- @param string key     Optional. The meta key to retrieve. By default,
---                        returns data for all keys. Default empty.
--- @param bool   single  Optional. Whether to return a single value.
---                        This parameter has no effect if `key` is not specified.
---                        Default False.
--- @return mixed An array of values if `single` is False.
---               The value of the meta field if `single` is True.
---               False for an invalid `post_id` (non-numeric, zero, or negative value).
---               An empty string if a valid but non-existing post ID is passed.
---
---   function get_post_meta( post_id, key = "", single = False ) then
-
+   --
+   -- Retrieves a post meta field for the given post ID.
+   --
+   -- @since 1.5.0
+   --
+   -- @param int    post_id Post ID.
+   -- @param string key     Optional. The meta key to retrieve. By default,
+   --                        returns data for all keys. Default empty.
+   -- @param bool   single  Optional. Whether to return a single value.
+   --                        This parameter has no effect if `key` is not specified.
+   --                        Default False.
+   -- @return mixed An array of values if `single` is False.
+   --               The value of the meta field if `single` is True.
+   --               False for an invalid `post_id` (non-numeric, zero, or negative
+   --               value). An empty string if a valid but non-existing post ID is
+   --               passed.
+   --
    function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
@@ -3284,6 +3285,15 @@ is
    is
    begin
       return Inc_Meta.Get_Metadata ("post", Integer (Post_Id), Key, Single);
+   end Get_Post_Meta;
+
+   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
+                           Key     : String  := "";
+                           Single  : Boolean := False)
+                           return String
+   is
+   begin
+      return "XXX-010";
    end Get_Post_Meta;
 
 --
@@ -3496,6 +3506,8 @@ is
                            Context : String := "display")
                            return Inc_Class_Wp_Posts.Wp_Post
    is
+      use Hb_Common;
+
       Post_2 : Inc_Class_Wp_Posts.Wp_Post := Post;
    begin
 --      if Is_Object (Post_2) then
@@ -3557,6 +3569,7 @@ is
                                  Context : String := "display")
                                  return Array_Type
    is
+      use Hb_Common;
       use Wp_Common;
 
       Int_Fields : List_Type  := To_List (List => (+"ID", +"post_parent",
@@ -6507,6 +6520,7 @@ is
                               return Wp_Post
    is
       use Ada.Containers;
+      use Hb_Common;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;

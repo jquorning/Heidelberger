@@ -30,6 +30,12 @@ is
    use Php;
    use Inc_L10n;
 
+   function Apply_Filters (Hook  : String;
+                           Value : Array_Type;
+                           Oi    : List_Type;
+                           Tax   : Array_Type)
+                           return Array_Type
+                           is (Value);
    --
    -- Taxonomy registration.
    --
@@ -96,7 +102,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          True),
             Build ("query_var",             "category_name"),
-            Build ("rewrite",               Get_Array (Rewrite, "category")),
+            Build ("rewrite",               As_Array (Get (Rewrite, "category"))),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
@@ -119,7 +125,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          False),
             Build ("query_var",             "tag"),
-            Build ("rewrite",               Get_Array (Rewrite, "post_tag")),
+            Build ("rewrite",               As_Array (Get (Rewrite, "post_tag"))),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
@@ -208,7 +214,7 @@ is
                Build ("singular_name", X_X ("Format", "post format"))
             ))),
             Build ("query_var",         True),
-            Build ("rewrite",           Get_Array (Rewrite, "post_format")),
+            Build ("rewrite",           As_Array (Get (Rewrite, "post_format"))),
             Build ("show_ui",           False),
             Build ("_builtin",          True),
             Build ("show_in_nav_menus",
@@ -570,30 +576,30 @@ is
                use Inc_Class_Wp_Terms;
 
                Term : Array_Type :=
-                 Term_Exists (Get (Taxonomy_Object.Default_Term, "name"),
+                 Term_Exists (As_String (Get (Taxonomy_Object.Default_Term, "name")),
                               Taxonomy);
             begin
                if Term /= Empty_Array then
 --             if Term then
                   Update_Option ("default_term_" & (-Taxonomy_Object.Name),
-                                 Get (Term, "term_id"));
+                                 As_String (Get (Term, "term_id")));
                else
                   Term :=
                     Wp_Insert_Term (
-                      Get (Taxonomy_Object.Default_Term, "name"),
+                      As_String (Get (Taxonomy_Object.Default_Term, "name")),
                       Taxonomy,
                       To_Array (List => (
                         Build ("slug",
-                               Sanitize_Title (Get (Taxonomy_Object.Default_Term, "slug"))),
+                               Sanitize_Title (As_String (Get (Taxonomy_Object.Default_Term, "slug")))),
                         Build ("description",
-                               Get (Taxonomy_Object.Default_Term, "description"))
+                               As_String (Get (Taxonomy_Object.Default_Term, "description")))
                       ))
                     );
 
                   -- Update `term_id` in options.
 --                if not Is_Wp_Error (Term) then
                      Update_Option ("default_term_" & (-Taxonomy_Object.Name),
-                                    Get (Term, "term_id"));
+                                    As_String (Get (Term, "term_id")));
 --                end if;
                end if;
             end;
@@ -711,8 +717,9 @@ is
          Default_Labels : Array_Type;
          Taxonomy       : Unbounded_String;
       begin
-         Set_Array (Nohier_Vs_Hier_Defaults, "menu_name",
-              Get_Array (Nohier_Vs_Hier_Defaults, "name"));
+         Set (Nohier_Vs_Hier_Defaults,
+              Key   => "menu_name",
+              Value => Get (Nohier_Vs_Hier_Defaults, "name"));
 
          Labels := Inc_Posts.X_Get_Custom_Object_Labels (Tax, Nohier_Vs_Hier_Defaults);
 
@@ -1569,13 +1576,13 @@ is
       if X_Wp_Suspend_Cache_Invalidation then
 --    if not Empty (X_Wp_Suspend_Cache_Invalidation) then
          -- @todo Disable caching once #52710 is merged.
-         Set (Defaults, "cache_domain", "microtime");
+         Set (Defaults, "cache_domain", From_String ("microtime"));
 --       Defaults ("cache_domain") := Microtime;
       end if;
 
       if not Empty (Taxonomy) then
-         Set (Defaults, "taxonomy", Taxonomy);
-         Set (Defaults, "fields",   "all");
+         Set (Defaults, "taxonomy", From_String (Taxonomy));
+         Set (Defaults, "fields",   From_String ("all"));
       end if;
 
       --
@@ -1619,7 +1626,7 @@ is
                end if;
 
                if not Empty (Taxonomy) then -- and then Is_Numeric (Parent) then
-                  Set_Integer (Defaults, "parent", Parent); -- (int)
+                  Set (Defaults, "parent", From_Integer (Parent)); -- (int)
                end if;
 
                Args  :=
@@ -2269,10 +2276,9 @@ is
       use Wp_Common;
       use Adi_Templates;
       use Inc_Class_Wp_Terms;
-      use Array_Maps;
       use Integer_Vectors;
 
-      Object_Ids_3 : Array_Type;
+      Object_Ids_3 : List_Type;
    begin
       if Length (Object_Ids) = 0 or else Length (Taxonomies) in 0 then
          return Empty_Term_Array;  -- )Inc_Taxonomys.Empty_Term_Array;
@@ -2284,7 +2290,7 @@ is
 
       for A in Taxonomies.Iterate loop
          declare
-            Taxonomy : constant String := Get (Taxonomies, Key (A));
+            Taxonomy : constant String := As_String (Get (Taxonomies, Key (A)));
          begin
             if not Taxonomy_Exists (Taxonomy) then
                return Empty_Term_Array;
@@ -2299,57 +2305,55 @@ is
 --        end;
 
       for Id of Object_Ids loop
-         Object_Ids_3.Include (Key => Id'Image, New_Item => "");
+         Append (Object_Ids_3, Id'Image);
       end loop;
+
       declare
+         use Inc_Functions;
          use Inc_Plugins;
 
-         Object_Ids_2 : constant Array_Type := Array_Map ("intval", Object_Ids_3);
-         Args_2       : Array_Type := Inc_Functions.Wp_Parse_Args (Args);
-         Taxonomies_2 : Array_Type;
-      begin
-         for A in Taxonomies.Iterate loop       -- By jq
-            declare
-               Tax : constant String := Get (Taxonomies, Key (A));
-            begin
-               Taxonomies_2.Include (Tax, New_Item => Tax);
-            end;
-         end loop;
+         Object_Ids_2 : constant List_Type  := Array_Map ("intval", Object_Ids_3);
+         Args_2       : constant Array_Type := Wp_Parse_Args (Args);
+         Taxonomies_2 : constant Array_Type := Taxonomies;
+
          --
          -- Filters arguments for retrieving object terms.
          --
          -- @since 4.9.0
          --
-         -- @param array    args       An array of arguments for retrieving terms for the given object(s).
+         -- @param array    args       An array of arguments for retrieving terms for
+         --                             the given object(s).
          --                             See {@see wp_get_object_terms()} for details.
          -- @param int()    object_ids Array of object IDs.
          -- @param string() taxonomies Array of taxonomy names to retrieve terms from.
          --
-         Args_2 := Apply_Filters ("wp_get_object_terms_args", Args_2,
-                                  Object_Ids_2, Taxonomies_2);
+         Args_3 : Array_Type :=
+           Apply_Filters ("wp_get_object_terms_args", Args_2,
+                          Object_Ids_2, Taxonomies_2);
 
          --
          -- When one or more queried taxonomies is registered with an "args" array,
          -- those params override the `args` passed to this function.
          --
-         declare
-            Terms : Wp_Term_Array;
-            T     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy; -- Unbounded_String;
-         begin
-            if Length (Taxonomies_2) > 1 then
-               for X in Taxonomies_2.Iterate loop
-                  declare
-                     Index    : constant String := Key (X); -- -X.Key;
-                     Taxonomy : constant String := Get (Taxonomies_2, Index);
-                     -- Element (X); -- -X.Value;
-                  begin
-                     T := Get_Taxonomy (Taxonomy);
-                     if
-                       Isset (T.Args) and then
-                       Is_Array (T.Args) and then
-                       Array_Merge (Args, T.Args) /= Args
-                     then
---                      Taxonomies.Delete (Index);
+         Terms : Wp_Term_Array;
+         T     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+      begin
+         if Taxonomies_2.Length > 1 then
+            for X in Taxonomies_2.Iterate loop
+               declare
+                  Index : constant String := Key (X);
+
+                  Taxonomy : constant String :=
+                    As_String (Get (Taxonomies_2, Index));
+               begin
+                  T := Get_Taxonomy (Taxonomy);
+                  if
+                    T.Args /= Empty_Array and then
+--                     Isset (T.Args) and then
+                    Is_Array (T.Args) and then
+                    Array_Merge (Args, T.Args) /= Args
+                  then
+                     Delete (Ref (Taxonomies, Index));
 --                      Unset (Taxonomies (Index));
 --                        Terms := Terms &
 --                                 Wp_Get_Object_Terms (Object_Ids_2, Taxonomy,
@@ -2358,77 +2362,89 @@ is
 --                                    Wp_Get_Object_Terms (Object_Ids_2, Taxonomy,
 --                                            Array_Merge (Args, T.Args)));
                         null;
-                     end if;
-                  end;
-               end loop;
-            else
-               T := Get_Taxonomy (Taxonomies_2.First_Key); --  (1).Key);    -- 0
-               if Isset (T.Args) and then Is_Array (T.Args) then
-                  Args_2 := Array_Merge (Args, T.Args);
+                  end if;
+               end;
+            end loop;
+         else
+            T := Get_Taxonomy (Taxonomies_2.First_Key); --  (1).Key);    -- 0
+            if
+              T.Args /= Empty_Array -- and then
+--               Isset (T.Args) and then
+--               Is_Array (T.Args)
+            then
+               Args_3 := Array_Merge (Args, T.Args);
+            end if;
+         end if;
+
+         Set (Args_3, "taxonomy",   From_Array (Taxonomies_2));
+         Set (Args_3, "object_ids", From_List (Object_Ids_2));
+
+         declare
+            use Inc_Class_Wp_Terms.Term_Vectors;
+
+            Terms_From_Remaining_Taxonomies : Wp_Term_Array := Get_Terms (Args);
+         begin
+            -- Taxonomies registered without an "args" param are handled here.
+            if not Empty (Taxonomies_2) then
+               Terms_From_Remaining_Taxonomies := Get_Terms (Args);
+
+               -- Array keys should be preserved for values of fields that use
+               -- term_id for keys.
+               if
+                 not Empty (As_String (Get (Args_3, "fields"))) and then
+                 0 = Strpos (As_String  (Get (Args_3, "fields")), "id=>")
+               then
+                  Terms := Terms & Terms_From_Remaining_Taxonomies;
+               else
+                  Terms := Terms & Terms_From_Remaining_Taxonomies;
                end if;
             end if;
-
-            Set_Array (Args_2, "taxonomy",   Taxonomies_2);
-            Set_Array (Args_2, "object_ids", Object_Ids_2);
-
-            declare
-               use Inc_Class_Wp_Terms.Term_Vectors;
-
-               Terms_From_Remaining_Taxonomies : Wp_Term_Array := Get_Terms (Args);
-            begin
-               -- Taxonomies registered without an "args" param are handled here.
-               if not Empty (Taxonomies_2) then
-                  Terms_From_Remaining_Taxonomies := Get_Terms (Args);
-
-                  -- Array keys should be preserved for values of fields that use
-                  -- term_id for keys.
-                  if
-                    not Empty (String'(Get (Args_2, "fields"))) and then
-                    0 = Strpos (Get (Args_2, "fields"), "id=>")
-                  then
-                     Terms := Terms & Terms_From_Remaining_Taxonomies;
-                  else
-                     Terms := Terms & Terms_From_Remaining_Taxonomies;
-                  end if;
-               end if;
-            end;
+         end;
+         --
+         -- Filters the terms for a given object or objects.
+         --
+         -- @since 4.2.0
+         --
+         -- @param WP_Term()|int()|string()|string terms
+         --                   Array of terms or a count thereof as a numeric string.
+         -- @param int()      object_ids Array of object IDs for which terms were
+         --                               retrieved.
+         -- @param string()   taxonomies Array of taxonomy names from which terms were
+         --                               retrieved.
+         -- @param array      args       Array of arguments for retrieving terms for
+         --                               the given object(s). See
+         --                               wp_get_object_terms() for details.
+         --
+         Terms := Apply_Filters ("get_object_terms", Terms,
+                                 Object_Ids_2, Taxonomies_2, Args_3);
+         declare
+            Object_Ids_3 : constant String := Implode (",", Object_Ids_2);
+            Taxonomies_3 : constant String
+               := """" &
+                  Implode (", ", Array_Type'(Array_Map ("esc_sql", Taxonomies_2))) &
+                  """";
+         begin
             --
             -- Filters the terms for a given object or objects.
             --
-            -- @since 4.2.0
+            -- The `taxonomies` parameter passed to this filter is formatted as a SQL
+            -- fragment. The {@see "get_object_terms"} filter is recommended as an
+            -- alternative.
             --
-            -- @param WP_Term()|int()|string()|string terms      Array of terms or a count thereof as a numeric string.
-            -- @param int()                           object_ids Array of object IDs for which terms were retrieved.
-            -- @param string()                        taxonomies Array of taxonomy names from which terms were retrieved.
-            -- @param array                           args       Array of arguments for retrieving terms for the given
-            --                                                    object(s). See wp_get_object_terms() for details.
+            -- @since 2.8.0
             --
-            Terms := Apply_Filters ("get_object_terms", Terms,
-                                    Object_Ids_2, Taxonomies_2, Args_2);
-            declare
-               Object_Ids_3 : constant String := Implode (",", Object_Ids_2);
-               Taxonomies_3 : constant String
-                  := """" &
-                     Implode (", ", Array_Type'(Array_Map ("esc_sql", Taxonomies_2))) &
-                     """";
-            begin
-               --
-               -- Filters the terms for a given object or objects.
-               --
-               -- The `taxonomies` parameter passed to this filter is formatted as a SQL fragment. The
-               -- {@see "get_object_terms"} filter is recommended as an alternative.
-               --
-               -- @since 2.8.0
-               --
-               -- @param WP_Term()|int()|string()|string terms      Array of terms or a count thereof as a numeric string.
-               -- @param string                          object_ids Comma separated list of object IDs for which terms were retrieved.
-               -- @param string                          taxonomies SQL fragment of taxonomy names from which terms were retrieved.
-               -- @param array                           args       Array of arguments for retrieving terms for the given
-               --                                                    object(s). See wp_get_object_terms() for details.
-               --
-               return Apply_Filters ("wp_get_object_terms", Terms,
-                                     Object_Ids_3, Taxonomies_3, Args_2);
-            end;
+            -- @param WP_Term()|int()|string()|string terms
+            --                  Array of terms or a count thereof as a numeric string.
+            -- @param string    object_ids Comma separated list of object IDs for
+            --                              which terms were retrieved.
+            -- @param string    taxonomies SQL fragment of taxonomy names from which
+            --                              terms were retrieved.
+            -- @param array     args       Array of arguments for retrieving terms for
+            --                              the given object(s). See
+            --                              wp_get_object_terms() for details.
+            --
+            return Apply_Filters ("wp_get_object_terms", Terms,
+                                  Object_Ids_3, Taxonomies_3, Args_3);
          end;
       end;
    end Wp_Get_Object_Terms;
@@ -3826,7 +3842,7 @@ is
    is
       use Adi_Caches;
       use Inc_Class_Wp_Terms;
-      use Array_Maps;
+--    use Array_Maps;
 
       Unused_Hit : Boolean;
       X_Term_Ids : Array_Type;

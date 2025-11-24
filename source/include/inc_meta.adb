@@ -1,18 +1,30 @@
 --
 -- Core Metadata API
 --
--- Functions for retrieving and manipulating metadata of various WordPress object types. Metadata
--- for an object is a represented by a simple key-value pair. Objects may contain multiple
--- metadata entries that share the same key and differ only in their value.
+-- Functions for retrieving and manipulating metadata of various WordPress object
+-- types. Metadata for an object is a represented by a simple key-value pair. Objects
+-- may contain multiple metadata entries that share the same key and differ only in
+-- their value.
 --
 -- @package WordPress
 -- @subpackage Meta
 --
 
+with Ada.Strings.Unbounded;
+
 with Hb_Common;
+with Php;
 
 with Adi_Caches;
+
+with Inc_Class_Wp_Comments;
+with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Users;
+with Inc_Comments;
+with Inc_Pluggables;
 with Inc_Plugins;
+with Inc_Posts;
+with Inc_Taxonomys;
 
 package body Inc_Meta
 is
@@ -785,10 +797,10 @@ is
          if Meta_Cache.Is_Empty then  -- not
 --       if Array_Maps.Length (Meta_Cache) in 0 then  -- not
             Meta_Cache := Update_Meta_Cache (Meta_Type, (1 => Object_Id)); -- to_array
-            Meta_Cache := Get_Array (Meta_Cache, Object_Id'Image);
+            Meta_Cache := As_Array (Get (Meta_Cache, Object_Id'Image));
          end if;
 
-         if "" /= Get (Meta_Cache, Meta_Key) then -- isset
+         if "" /= As_String (Get (Meta_Cache, Meta_Key)) then -- isset
             return True;
          end if;
       end;
@@ -1301,32 +1313,36 @@ is
 --         return $wpdb->$table_name;
 -- end;
 
---
--- Determines whether a meta key is considered protected.
---
--- @since 3.1.3
---
--- @param string $meta_key  Metadata key.
--- @param string $meta_type Optional. Type of object metadata is for. Accepts 'post', 'comment', 'term', 'user',
---                          or any other object type with an associated meta table. Default empty.
--- @return bool Whether the meta key is considered protected.
---
--- function is_protected_meta( $meta_key, $meta_type = '' ) then
---         $sanitized_key = preg_replace( "/[^\x20-\x7E\pthenLend;]/", '', $meta_key );
---         $protected     = strlen( $sanitized_key ) > 0 && ( '_' === $sanitized_key[0] );
+   -----------------------
+   -- Is_Protected_Meta --
+   -----------------------
 
---         --
---         -- Filters whether a meta key is considered protected.
---         --
---         -- @since 3.2.0
---         --
---         -- @param bool   $protected Whether the key is considered protected.
---         -- @param string $meta_key  Metadata key.
---         -- @param string $meta_type Type of object metadata is for. Accepts 'post', 'comment', 'term', 'user',
---         --                          or any other object type with an associated meta table.
---         --
---         return apply_filters( 'is_protected_meta', $protected, $meta_key, $meta_type );
--- end;
+   function Is_Protected_Meta (Meta_Key  : String;
+                               Meta_Type : String := "")
+                               return Boolean
+   is
+      use Php;
+      use Inc_Plugins;
+
+      Sanitized_Key : constant String :=
+        Preg_Replace ("/[^\x20-\x7E\p{L}]/", "", Meta_Key);
+
+      Protect : constant Boolean :=
+        Strlen (Sanitized_Key) > 0 and then ('_' = Sanitized_Key (1)); -- [0]
+   begin
+      --
+      -- Filters whether a meta key is considered protected.
+      --
+      -- @since 3.2.0
+      --
+      -- @param bool   $protected Whether the key is considered protected.
+      -- @param string $meta_key  Metadata key.
+      -- @param string $meta_type Type of object metadata is for. Accepts 'post',
+      --                          'comment', 'term', 'user', or any other object type
+      --                          with an associated meta table.
+      --
+      return Apply_Filters ("is_protected_meta", Protect, Meta_Key, Meta_Type);
+   end Is_Protected_Meta;
 
 --
 -- Sanitizes meta value.
@@ -1761,76 +1777,98 @@ is
 --         return array_intersect_key( $args, $default_args );
 -- end;
 
---
--- Returns the object subtype for a given object ID of a specific type.
---
--- @since 4.9.8
---
--- @param string $object_type Type of object metadata is for. Accepts 'post', 'comment', 'term', 'user',
---                            or any other object type with an associated meta table.
--- @param int    $object_id   ID of the object to retrieve its subtype.
--- @return string The object subtype or an empty string if unspecified subtype.
---
--- function get_object_subtype( $object_type, $object_id ) then
---         $object_id      = (int) $object_id;
---         $object_subtype = '';
+   ------------------------
+   -- Get_Object_Subtype --
+   ------------------------
 
---         switch ( $object_type ) then
---                 case 'post':
---                         $post_type = get_post_type( $object_id );
+   function Get_Object_Subtype (Object_Type : String;
+                                Object_Id   : Integer)
+                                return String
+   is
+      use Ada.Strings.Unbounded;
+      use Inc_Plugins;
 
---                         if ( ! empty( $post_type ) ) then
---                                 $object_subtype = $post_type;
---                         end;
---                         break;
+      Object_Subtype : Unbounded_String;
+   begin
+      if Object_Type = "post" then
+         declare
+            use Inc_Posts;
 
---                 case 'term':
---                         $term = get_term( $object_id );
---                         if ( ! $term instanceof WP_Term ) then
---                                 break;
---                         end;
+            Post_Type : constant String := Get_Post_Type (Object_Id);
+         begin
+            if not Empty (Post_Type) then
+               Object_Subtype := +Post_Type;
+            end if;
+         end;
 
---                         $object_subtype = $term->taxonomy;
---                         break;
+      elsif Object_Type = "term" then
+         declare
+            use Inc_Class_Wp_Terms;
+            use Inc_Taxonomys;
 
---                 case 'comment':
---                         $comment = get_comment( $object_id );
---                         if ( ! $comment ) then
---                                 break;
---                         end;
+            Term : constant Wp_Term := Get_Term (Object_Id);
+         begin
+            if Term not in Wp_Term then -- instanceof
+               goto Break_1;
+            end if;
 
---                         $object_subtype = 'comment';
---                         break;
+            Object_Subtype := Term.Taxonomy;
+         end;
+         << Break_1 >>
 
---                 case 'user':
---                         $user = get_user_by( 'id', $object_id );
---                         if ( ! $user ) then
---                                 break;
---                         end;
+      elsif Object_Type = "comment" then
+         declare
+            use Inc_Class_Wp_Comments;
+            use Inc_Comments;
 
---                         $object_subtype = 'user';
---                         break;
---         end;
+            Comment : constant Wp_Comment := Get_Comment (Object_Id);
+         begin
+            if Comment = Null_Comment then
+               goto Break_2;
+            end if;
 
---         --
---         -- Filters the object subtype identifier for a non-standard object type.
---         --
---         -- The dynamic portion of the hook name, `$object_type`, refers to the meta object type
---         -- (post, comment, term, user, or any other type with an associated meta table).
---         --
---         -- Possible hook names include:
---         --
---         --  - `get_object_subtype_post`
---         --  - `get_object_subtype_comment`
---         --  - `get_object_subtype_term`
---         --  - `get_object_subtype_user`
---         --
---         -- @since 4.9.8
---         --
---         -- @param string $object_subtype Empty string to override.
---         -- @param int    $object_id      ID of the object to get the subtype for.
---         --
---         return apply_filters( "get_object_subtype_then$object_typeend;", $object_subtype, $object_id );
--- end;
+            Object_Subtype := +"comment";
+         end;
+         << Break_2 >>
+
+      elsif Object_Type = "user" then
+         declare
+            use Inc_Class_Wp_Users;
+            use Inc_Pluggables;
+
+            User : constant Wp_User := Get_User_By ("id", Object_Id);
+         begin
+            if User = Null_User then
+               goto Break_3;
+            end if;
+
+            Object_Subtype := +"user";
+         end;
+         << Break_3 >>
+      end if;
+
+      --
+      -- Filters the object subtype identifier for a non-standard object type.
+      --
+      -- The dynamic portion of the hook name, `object_type`, refers to the meta
+      -- object type (post, comment, term, user, or any other type with an associated
+      -- meta table).
+      --
+      -- Possible hook names include:
+      --
+      --  - `get_object_subtype_post`
+      --  - `get_object_subtype_comment`
+      --  - `get_object_subtype_term`
+      --  - `get_object_subtype_user`
+      --
+      -- @since 4.9.8
+      --
+      -- @param string object_subtype Empty string to override.
+      -- @param int    object_id      ID of the object to get the subtype for.
+      --
+      return
+        Apply_Filters ("get_object_subtype_" & Object_Type,
+                       -Object_Subtype, Object_Id);
+   end Get_Object_Subtype;
 
 end Inc_Meta;

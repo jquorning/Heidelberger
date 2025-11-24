@@ -16,10 +16,19 @@ with Php;
 with Inc_Formatting;
 with Inc_Plugins;
 with Inc_Load;
+with Inc_Themes;
 
 package body Inc_L10n is
 
    function "abs" (Item : String) return String is (Item);
+
+   function Apply_Filters (Name        : String;
+                           Translation : String;
+                           Text        : String;
+                           Context     : String;
+                           Domain      : String)
+                           return String
+                           is ("XXX-001");
 
 -- --
 -- -- Retrieves the current locale.
@@ -171,7 +180,7 @@ package body Inc_L10n is
 
       if
         Isset (XX_GET, "_locale") and then
-        "user" = Get (XX_GET, "_locale") and then
+        "user" = As_String (Get (XX_GET, "_locale")) and then
         Inc_Load.Wp_Is_Json_Request
       then
          Determined_Locale := +Get_User_Locale;
@@ -181,16 +190,16 @@ package body Inc_L10n is
 
       if Isset (XX_GET, "wp_lang") then
 --    if not Empty (XX_GET, "wp_lang") then
-         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (Get (XX_GET, "wp_lang")));
+         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (As_String (Get (XX_GET, "wp_lang"))));
       elsif Isset (X_COOKIE, "wp_lang") then
 --    elsif not Empty (X_COOKIE, "wp_lang") then
-         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (Get (X_COOKIE, "wp_lang")));
+         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (As_String (Get (X_COOKIE, "wp_lang"))));
       end if;
 
       if
         not Empty (-Wp_Lang) and then
         not Empty (Globals.GLOBALS, "pagenow") and then
-        "wp-login.php" = Get (Globals.GLOBALS, "pagenow")
+        "wp-login.php" = As_String (Get (Globals.GLOBALS, "pagenow"))
       then
          Determined_Locale := Wp_Lang;
       end if;
@@ -271,54 +280,54 @@ package body Inc_L10n is
 --         end;
 -- end;
 
--- --
--- -- Retrieves the translation of text in the context defined in context.
--- --
--- -- If there is no translation, or the text domain isn"t loaded, the original text is returned.
--- --
--- ----Note:* Don"t use translate_with_gettext_context() directly, use _x() or related functions.
--- --
--- -- @since 2.8.0
--- -- @since 5.5.0 Introduced gettext_with_context-thendomainend; filter.
--- --
--- -- @param string text    Text to translate.
--- -- @param string context Context information for the translators.
--- -- @param string domain  Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                        Default "default".
--- -- @return string Translated text on success, original text on failure.
--- --
--- function translate_with_gettext_context( text, context, domain = "default" ) then
---         translations = get_translations_for_domain( domain );
---         translation  = translations.translate( text, context );
+   ------------------------------------
+   -- Translate_With_Gettext_Context --
+   ------------------------------------
 
---         --
---         -- Filters text with its translation based on context information.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string translation Translated text.
---         -- @param string text        Text to translate.
---         -- @param string context     Context information for the translators.
---         -- @param string domain      Text domain. Unique identifier for retrieving translated strings.
---         --
---         translation = apply_filters( "gettext_with_context", translation, text, context, domain );
+   function Translate_With_Gettext_Context (Text    : String;
+                                            Context : String;
+                                            Domain  : String := "default")
+                                            return String
+   is
+      use Inc_Plugins;
+      use POMO_Translations;
 
---         --
---         -- Filters text with its translation based on context information for a domain.
---         --
---         -- The dynamic portion of the hook name, `domain`, refers to the text domain.
---         --
---         -- @since 5.5.0
---         --
---         -- @param string translation Translated text.
---         -- @param string text        Text to translate.
---         -- @param string context     Context information for the translators.
---         -- @param string domain      Text domain. Unique identifier for retrieving translated strings.
---         --
---         translation = apply_filters( "gettext_with_context_thendomainend;", translation, text, context, domain );
+      Trans       : constant Translations := Get_Translations_For_Domain (Domain);
+      Translation : String       := Trans.Translate (Text, Context);
+   begin
+      --
+      -- Filters text with its translation based on context information.
+      --
+      -- @since 2.8.0
+      --
+      -- @param string translation Translated text.
+      -- @param string text        Text to translate.
+      -- @param string context     Context information for the translators.
+      -- @param string domain      Text domain. Unique identifier for retrieving
+      --                            translated strings.
+      --
+      Translation :=
+        Apply_Filters ("gettext_with_context", Translation, Text, Context, Domain);
 
---         return translation;
--- end;
+      --
+      -- Filters text with its translation based on context information for a domain.
+      --
+      -- The dynamic portion of the hook name, `domain`, refers to the text domain.
+      --
+      -- @since 5.5.0
+      --
+      -- @param string translation Translated text.
+      -- @param string text        Text to translate.
+      -- @param string context     Context information for the translators.
+      -- @param string domain      Text domain. Unique identifier for retrieving
+      --                            translated strings.
+      --
+      Translation :=
+        Apply_Filters ("gettext_with_context_" & Domain,
+                       Translation, Text, Context, Domain);
+
+      return Translation;
+   end Translate_With_Gettext_Context;
 
 -- --
 -- -- Retrieves the translation of text.
@@ -1326,79 +1335,99 @@ package body Inc_L10n is
 --         return apply_filters( "load_script_translations", translations, file, handle, domain );
 -- end;
 
--- --
--- -- Loads plugin and theme text domains just-in-time.
--- --
--- -- When a textdomain is encountered for the first time, we try to load
--- -- the translation file from `wp-content/languages`, removing the need
--- -- to call load_plugin_textdomain() or load_theme_textdomain().
--- --
--- -- @since 4.6.0
--- -- @access private
--- --
--- -- @global MO[]                   l10n_unloaded          An array of all text domains that have been unloaded again.
--- -- @global WP_Textdomain_Registry wp_textdomain_registry WordPress Textdomain Registry.
--- --
--- -- @param string domain Text domain. Unique identifier for retrieving translated strings.
--- -- @return bool True when the textdomain is successfully loaded, false otherwise.
--- --
--- function _load_textdomain_just_in_time( domain ) then
---         -- @var WP_Textdomain_Registry wp_textdomain_registry--
---         global l10n_unloaded, wp_textdomain_registry;
+   ------------------------------------
+   -- X_Load_Textdomain_Just_In_Time --
+   ------------------------------------
 
---         l10n_unloaded = (array) l10n_unloaded;
+   function X_Load_Textdomain_Just_In_Time (Domain : String)
+                                            return Boolean
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Class_Wp_Textdomain_Registry;
+      use Inc_Formatting;
+      use Inc_Themes;
+      -- @var WP_Textdomain_Registry wp_textdomain_registry
+--    global l10n_unloaded, wp_textdomain_registry;
 
---         // Short-circuit if domain is "default" which is reserved for core.
---         if ( "default" === domain || isset( l10n_unloaded[ domain ] ) ) then
---                 return false;
---         end;
+--    l10n_unloaded = (array) l10n_unloaded;
+   begin
+      -- Short-circuit if domain is "default" which is reserved for core.
+      if
+        "default" = Domain or else
+        String_Sets.Has_Element (L10n_Unloaded.Find (Domain))
+--      Isset (L10n_Unloaded (Domain))
+      then
+         return False;
+      end if;
 
---         if ( ! wp_textdomain_registry.has( domain ) ) then
---                 return false;
---         end;
+      if not Textdomain_Registry.Has (Domain) then -- wp_
+--    if not Wp_Textdomain_Registry.Has (Domain) then
+         return False;
+      end if;
 
---         locale = determine_locale();
---         path   = wp_textdomain_registry.get( domain, locale );
---         if ( ! path ) then
---                 return false;
---         end;
---         // Themes with their language directory outside of WP_LANG_DIR have a different file name.
---         template_directory   = trailingslashit( get_template_directory() );
---         stylesheet_directory = trailingslashit( get_stylesheet_directory() );
---         if ( str_starts_with( path, template_directory ) || str_starts_with( path, stylesheet_directory ) ) then
---                 mofile = "thenpathend;thenlocaleend;.mo";
---         end; else then
---                 mofile = "thenpathend;thendomainend;-thenlocaleend;.mo";
---         end;
+      declare
+         Locale : constant String := Determine_Locale; -- ();
+         Path   : constant String := Textdomain_Registry.Get (Domain, Locale); -- wp_
+      begin
+         if Path = "" then
+            return False;
+         end if;
 
---         return load_textdomain( domain, mofile, locale );
--- end;
+         -- Themes with their language directory outside of WP_LANG_DIR have a
+         -- different file name.
+         declare
+            Template_Directory : constant String :=
+              Trailingslashit (Get_Template_Directory);
 
--- --
--- -- Returns the Translations instance for a text domain.
--- --
--- -- If there isn"t one, returns empty Translations instance.
--- --
--- -- @since 2.8.0
--- --
--- -- @global MO[] l10n An array of all currently loaded text domains.
--- --
--- -- @param string domain Text domain. Unique identifier for retrieving translated strings.
--- -- @return Translations|NOOP_Translations A Translations instance.
--- --
--- function get_translations_for_domain( domain ) then
---         global l10n;
---         if ( isset( l10n[ domain ] ) || ( _load_textdomain_just_in_time( domain ) && isset( l10n[ domain ] ) ) ) then
---                 return l10n[ domain ];
---         end;
+            Stylesheet_Directory : constant String :=
+              Trailingslashit (Get_Stylesheet_Directory);
 
---         static noop_translations = null;
---         if ( null === noop_translations ) then
---                 noop_translations = new NOOP_Translations;
---         end;
+            Starts_With : constant Boolean :=
+              Str_Starts_With (Path, Template_Directory) or else
+              Str_Starts_With (Path, Stylesheet_Directory);
 
---         return noop_translations;
--- end;
+            Mofile : constant String :=
+              (if Starts_With
+               then Path & Locale & ".mo"
+               else Path & Domain & "-" & Locale & ".mo");
+         begin
+            return Load_Textdomain (Domain, Mofile, Locale);
+         end;
+      end;
+   end X_Load_Textdomain_Just_In_Time;
+
+   ---------------------------------
+   -- Get_Translations_For_Domain --
+   ---------------------------------
+
+   Static_NOOP_Translations : constant POMO_Translations.Translations :=
+     POMO_Translations.Null_Translations;
+
+   function Get_Translations_For_Domain (Domain : String)
+                                         return POMO_Translations.Translations
+   is
+      use Hb_Common;
+      use POMO_Translations;
+--    global l10n;
+   begin
+      if
+        String_Maps.Has_Element (L10n.Find (Domain)) or else
+        (X_Load_Textdomain_Just_In_Time (Domain) and then
+         String_Maps.Has_Element (L10n.Find (Domain)))
+      then
+         null;
+--       return String_Maps.Element (L10n.Find (Domain));
+--       return L10n (Domain);
+      end if;
+
+      -- if Null_Translations = Static_NOOP_Translations then
+      --    Static_NOOP_Translations := new NOOP_Translations;
+      -- end if;
+
+      return Static_NOOP_Translations;
+   end Get_Translations_For_Domain;
 
 -- --
 -- -- Determines whether there are translations for the text domain.
@@ -1803,49 +1832,84 @@ package body Inc_L10n is
 --         return wp_locale_switcher.is_switched();
 -- end;
 
--- --
--- -- Translates the provided settings value using its i18n schema.
--- --
--- -- @since 5.9.0
--- -- @access private
--- --
--- -- @param string|string[]|array[]|object i18n_schema I18n schema for the setting.
--- -- @param string|string[]|array[]        settings    Value for the settings.
--- -- @param string                         textdomain  Textdomain to use with translations.
--- --
--- -- @return string|string[]|array[] Translated settings.
--- --
--- function translate_settings_using_i18n_schema( i18n_schema, settings, textdomain ) then
---         if ( empty( i18n_schema ) || empty( settings ) || empty( textdomain ) ) then
---                 return settings;
---         end;
+   ------------------------------------------
+   -- Translate_Settings_Using_I18n_Schema --
+   ------------------------------------------
 
---         if ( is_string( i18n_schema ) && is_string( settings ) ) then
---                 return translate_with_gettext_context( settings, i18n_schema, textdomain );
---         end;
---         if ( is_array( i18n_schema ) && is_array( settings ) ) then
---                 translated_settings = array();
---                 foreach ( settings as value ) then
---                         translated_settings[] = translate_settings_using_i18n_schema( i18n_schema[0], value, textdomain );
---                 end;
---                 return translated_settings;
---         end;
---         if ( is_object( i18n_schema ) && is_array( settings ) ) then
---                 group_key           = "*";
---                 translated_settings = array();
---                 foreach ( settings as key => value ) then
---                         if ( isset( i18n_schema.key ) ) then
---                                 translated_settings[ key ] = translate_settings_using_i18n_schema( i18n_schema.key, value, textdomain );
---                         end; elseif ( isset( i18n_schema.group_key ) ) then
---                                 translated_settings[ key ] = translate_settings_using_i18n_schema( i18n_schema.group_key, value, textdomain );
---                         end; else then
---                                 translated_settings[ key ] = value;
---                         end;
---                 end;
---                 return translated_settings;
---         end;
---         return settings;
--- end;
+   function Translate_Settings_Using_I18n_Schema (I18n_Schema : String; -- Array_Type;
+                                                  Settings    : Array_Type;
+                                                  Textdomain  : String)
+                                                  return Array_Type
+   is
+      use Hb_Common;
+      use Php;
+   begin
+      if
+        Empty (I18n_Schema) or else
+        Empty (Settings)    or else
+        Empty (Textdomain)
+      then
+         return Settings;
+      end if;
+
+--       if
+--         Is_String (I18n_Schema) -- and then
+-- --      Is_String (Settings)
+--       then
+--          return
+--            Translate_With_Gettext_Context (Settings, I18n_Schema, Textdomain);
+--       end if;
+
+      -- if
+      --   Is_Array (I18n_Schema) and then
+      --   Is_Array (Settings)
+      -- then
+      --    declare
+      --       Translated_Settings : List_Type; Array_Type;
+      --    begin
+      --       for Value of Settings loop
+      --          Translated_Settings.Append (
+      --            Translate_Settings_Using_I18n_Schema (
+      --              I18n_Schema.First_Element.Arry.all, Value.Arry.all, Textdomain));
+      --           I18n_Schema (0), Value, Textdomain));
+      --       end loop;
+      --       return Translated_Settings;
+      --    end;
+      -- end if;
+
+      -- if
+      --   Is_Object (I18n_Schema) and then
+      --   Is_Array (Settings)
+      -- then
+      --    declare
+      --       Group_Key           : String := "*";
+      --       Translated_Settings : Array_Type;
+      --    begin
+      --       for A in Settings.Iterate loop
+      --          declare
+      --             Key   : String := Key (A);
+      --             Value : String := Element (A);
+      --          begin
+      --             if Isset (I18n_Schema, Key) then
+      --                Set (Translated_Settings, Key,
+      --                     Translate_Settings_Using_I18n_Schema (I18n_Schema.key,
+      --                                                           Value, Textdomain));
+      --             elsif Isset (I18n_Schema, Group_Key) then
+      --                Set (Translated_Settings, Key,
+      --                     Translate_Settings_Using_I18n_Schema (I18n_Schema.Group_Key,
+      --                                                           Value, Textdomain));
+      --             else
+      --                Set (Translated_Settings, Key, Value);
+      --             end if;
+      --          end;
+      --       end loop;
+      --       return Translated_Settings;
+      --    end;
+      -- end if;
+      -- return Settings;
+
+      return Empty_Array; -- added
+   end Translate_Settings_Using_I18n_Schema;
 
 -- --
 -- -- Retrieves the list item separator based on the locale.

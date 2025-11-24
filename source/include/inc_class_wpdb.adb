@@ -955,7 +955,7 @@ is
                      --
                      if Args_Count < Placeholders then
                         declare
-                           use Array_Maps;
+--                         use Array_Maps;
 
                            Max_Numbered_Placeholder : constant Integer :=
                              (if Matches (3) /= "" -- not in 0  -- not empty
@@ -2723,7 +2723,7 @@ is
          end;
 
          Table := Strtolower (Table);
-         if "" = Get (This.Col_Meta, Table) then
+         if "" = As_String (Get (This.Col_Meta, Table)) then
             return False;
          end if;
 

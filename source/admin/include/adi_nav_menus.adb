@@ -58,22 +58,22 @@ is
 
    procedure X_Wp_Ajax_Menu_Quick_Search (Request : Array_Type := Empty_Array)
    is
-      use Array_Maps;
+--    use Array_Maps;
 
       Args : constant Array_Type := Empty_Array;
 
       Typ         : String := (if Isset (Request, "type")
-                               then Get (Request, "type")        else "");
+                               then As_String (Get (Request, "type")) else "");
 
       Object_Type : String := (if Isset (Request, "object_type")
-                               then Get (Request, "object_type") else "");
+                               then As_String (Get (Request, "object_type")) else "");
 
       Query       : String := (if Isset (Request, "q")
-                               then Get (Request, "q")           else "");
+                               then As_String (Get (Request, "q")) else "");
 
       Response_Format : Unbounded_String :=
          +(if Isset (Request, "response-format")
-           then Get (Request, "response-format") else "");
+           then As_String (Get (Request, "response-format")) else "");
 
       Matches : List_Type;
    begin
@@ -89,7 +89,7 @@ is
          if Inc_Posts.Post_Type_Exists (Object_Type) then
             if Isset (Request, "ID") then
                declare
-                  Object_Id : constant Integer := Get_Integer (Request, "ID");
+                  Object_Id : constant Integer := As_Integer (Get (Request, "ID"));
                begin
                   if "markup" = Response_Format then
                      null;
@@ -113,7 +113,7 @@ is
          elsif Inc_Taxonomys.Taxonomy_Exists (Object_Type) then
             if Isset (Request, "ID") then
                declare
-                  Object_Id : constant Integer := Get_Integer (Request, "ID");
+                  Object_Id : constant Integer := As_Integer (Get (Request, "ID"));
                begin
                   if "markup" = Response_Format then
                      null;
@@ -327,7 +327,7 @@ is
             for Priority of Context loop -- Wp_Meta_Boxes ("nav-menus") (Context)
 --            Priority of Array_Keys (Get_2 (Wp_Meta_Boxes, "nav-menus", -Context))
 --          loop
-               for Box of Priority loop
+               for Box in Priority.Iterate loop
 --             for Box of Wp_Meta_Boxes ("nav-menus") (Context) (Priority) loop
                   null;
                   -- if In_Array (Get (Box, "id"), Initial_Meta_Boxes, True) then
@@ -359,7 +359,7 @@ is
    is
       use Inc_Class_Wp_Post_Type;
       use Inc_Posts;
-      use String_Vectors;
+--    use String_Vectors;
       use Ada.Containers;
       use Wp_Common;
 
@@ -437,7 +437,7 @@ is
                declare
                   Id : constant String := -Tax_2.Name;
                begin
-                  Add_Meta_Box ("add-" & Id, Get (Tax_2.Labels, "name"),
+                  Add_Meta_Box ("add-" & Id, As_String (Get (Tax_2.Labels, "name")),
                                 Wp_Nav_Menu_Item_Taxonomy_Meta_Box'Access,
                                 "nav-menus", "side", "default"); -- , Tax_2);
                end;
@@ -524,7 +524,7 @@ is
         (if
            Isset (X_REQUEST, Tab_Name) and then
            Isset (X_REQUEST, "paged")
-         then abs Get_Integer (X_REQUEST, "paged") else 1);
+         then abs As_Integer (Get (X_REQUEST, "paged")) else 1);
 --       then Absint (Get_Integer (X_REQUEST, "paged")) else 1);
 
       Offset : constant Natural := (if 0 < Pagenum
@@ -636,7 +636,7 @@ is
 
          -- Add suppression array to arguments for WP_Query.
          if not Empty (Suppress_Page_Ids) then
-            Set_Array (Args, "post__not_in", Suppress_Page_Ids);
+            Set (Args, "post__not_in", From_Array (Suppress_Page_Ids));
          end if;
       end if;
 
@@ -716,7 +716,7 @@ is
            Isset (X_REQUEST, Tab_Name) -- and then
 --         In_Array (X_REQUEST (Tab_Name), To_array ("all", "search"), true)
          then
-            Current_Tab := +Get (X_REQUEST, Tab_Name);
+            Current_Tab := +As_String (Get (X_REQUEST, Tab_Name));
          end if;
 
          if not Empty (X_REQUEST, "quick-search-posttype-" & Post_Type_Name) then
@@ -848,8 +848,8 @@ is
                Search_Results : Array_Type;
             begin
                if Isset (X_REQUEST, "quick-search-posttype-" & Post_Type_Name) then
-                  Searched := +ESC_Attr (Get (X_REQUEST, "quick-search-posttype-" &
-                                         Post_Type_Name));
+                  Searched := +ESC_Attr (As_String (Get (X_REQUEST, "quick-search-posttype-" &
+                                         Post_Type_Name)));
 --            Search_Results := Get_Posts (
 --               To_Array ((
 --                  Build ("s",         Searched),
@@ -1034,7 +1034,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
          (if
             Isset (X_REQUEST, Tab_Name) and then
             Isset (X_REQUEST, "paged")
-          then abs Get_Integer (X_REQUEST, "paged") else 1);
+          then abs As_Integer (Get (X_REQUEST, "paged")) else 1);
 
       Offset   : constant Natural :=
         (if 0 < Pagenum then Per_Page * (Pagenum - 1) else 0);
@@ -1114,7 +1114,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
 --      In_Array (X_REQUEST, Tab_Name,
 --                To_list ((+"all", +"most-used", +"search")), True)
       then
-         Current_Tab := +Get (X_REQUEST, Tab_Name);
+         Current_Tab := +As_String (Get (X_REQUEST, Tab_Name));
       end if;
 
       -- if not Empty (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name)) then
@@ -1302,10 +1302,10 @@ Echo ("                <ul id=""" & Taxonomy_Name &
          -- Loop through all the menu items" POST values.
          for A in Menu_Data.Iterate loop -- (array)
             declare
-               use Array_Maps;
+--             use Array_Maps;
 
-               X_Possible_Db_Id   : String := Key (A); -- -A.Key;
-               X_Item_Object_Data : String := Get (Menu_Data, Key (A));
+               X_Possible_Db_Id   : String := Key (A);
+               X_Item_Object_Data : String := As_String (Get (Menu_Data, Key (A)));
                -- Element (A); -- -A.Value;
                Args : Array_Type;
             begin
@@ -1641,17 +1641,17 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       Unused := Inc_Taxonomys.Wp_Defer_Term_Counting (True);
 
       -- Loop through all the menu items" POST variables.
-      if Get (X_POST, "menu-item-db-id") /= "" then
+      if As_String (Get (X_POST, "menu-item-db-id")) /= "" then
 --    if not Empty (Get (X_POST, "menu-item-db-id")) then
          declare
-            Arry : constant Array_Type := Get_Array (X_POST, "menu-item-db-id");
+            Arry : constant Array_Type := As_Array (Get (X_POST, "menu-item-db-id"));
          begin
             for A in Arry.Iterate loop
                declare
-                  use Array_Maps;
+--                use Array_Maps;
 
                   X_Key : constant String := Key (A);
-                  K     : constant String := Get (Arry, Key (A)); -- Element (A);
+                  K     : constant String := As_String (Get (Arry, Key (A)));
                begin
                   null;
 
@@ -1700,35 +1700,30 @@ Echo ("                <ul id=""" & Taxonomy_Name &
 
       -- Store "auto-add" pages.
       declare
-         Auto_Add        : constant Boolean := "" /= Get (X_POST, "auto-add-pages");
+         Auto_Add        : constant Boolean := "" /= As_String (Get (X_POST, "auto-add-pages"));
          Nav_Menu_Option : Array_Type       := Get_Option ("nav_menu_options");
          -- (array)
       begin
 
          if not Isset (Nav_Menu_Option, "auto_add") then
-            Set_Array (Nav_Menu_Option, "auto_add", Empty_Array);
+            Set (Nav_Menu_Option, "auto_add", From_Array (Empty_Array));
          end if;
 
          if Auto_Add then
             if
               not In_Array (Nav_Menu_Selected_Id,
-                            Get_Array (Nav_Menu_Option, "auto_add"), True)
+                            As_Array (Get (Nav_Menu_Option, "auto_add")), True)
             then
-               Set (Nav_Menu_Option, "auto_add", Nav_Menu_Selected_Id); -- ()
+               Set (Nav_Menu_Option, "auto_add", From_String (Nav_Menu_Selected_Id));
             end if;
          else
             declare
                Key : constant String :=
                   Array_Search (Nav_Menu_Selected_Id,
-                                Get_Array (Nav_Menu_Option, "auto_add"), True);
+                                As_Array (Get (Nav_Menu_Option, "auto_add")), True);
             begin
                if "" /= Key then -- False
-                  declare
-                     Arry : Array_Type;
-                     --  renames Get_Array (Nav_Menu_Option, "auto_add");
-                  begin
-                     Arry.Delete (Key);
-                  end;
+                  Delete (Ref_2 (Nav_Menu_Option, "auto_add", Key));
 --                Unset (Nav_Menu_Option ("auto_add") (key));
                end if;
             end;
@@ -1774,13 +1769,13 @@ Echo ("                <ul id=""" & Taxonomy_Name &
 
       declare
          Data : constant Array_Type :=
-            JSON_Decode (Stripslashes (Get (X_POST, "nav-menu-data")));
+            JSON_Decode (Stripslashes (As_String (Get (X_POST, "nav-menu-data"))));
       begin
 
 --       if not Is_Null (Data) and then Data then
             for Post_Input_Data in Data.Iterate loop
                declare
-                  use Array_Maps;
+--                use Array_Maps;
 
                   Matches : List_Type;
                   Unused  : Integer;
@@ -1813,7 +1808,8 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                         if I = Array_Bits.Last_Index then
 --                      if Count (Array_Bits) - 1 = I then
                            Set (New_Post_Data, -Array_Bits (I),
-                                Wp_Slash (-Element (Post_Input_Data).Str));
+                                From_String (Wp_Slash (As_String (Element (Post_Input_Data)))));
+--                              Wp_Slash (-Element (Post_Input_Data).Str));
 --                         New_Post_Data (Array_Bits (I)) :=
 --                           Wp_Slash (Post_Input_Data.Value);
                         else

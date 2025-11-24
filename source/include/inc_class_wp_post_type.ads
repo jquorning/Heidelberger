@@ -11,8 +11,6 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
--- with Inc_Posts; -- circular
-
 package Inc_Class_Wp_Post_Type
 is
    use Ada.Strings.Unbounded;
@@ -20,14 +18,14 @@ is
 
    procedure Dummy;
 
---
--- Core class used for interacting with post types.
---
--- @since 4.6.0
---
--- @see register_post_type()
---
---#[AllowDynamicProperties]
+   --
+   -- Core class used for interacting with post types.
+   --
+   -- @since 4.6.0
+   --
+   -- @see register_post_type()
+   --
+   --#[AllowDynamicProperties]
    type Wp_Post_Type is tagged
       record
         --
