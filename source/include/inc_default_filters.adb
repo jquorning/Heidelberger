@@ -703,8 +703,10 @@ is
 --    Add_Action ("wp_footer", Wp_Enqueue_Global_Styles'Access, 1);
 
       -- Block supports, and other styles parsed and stored in the Style Engine.
---    Add_Action ("wp_enqueue_scripts", Wp_Enqueue_Stored_Styles'Access);
---    Add_Action ("wp_footer", Wp_Enqueue_Stored_Styles'Access, 1);
+      Add_Action ("wp_enqueue_scripts",
+                  Inc_Script_Loader.Wp_Enqueue_Stored_Styles'Access);
+      Add_Action ("wp_footer",
+                  Inc_Script_Loader.Wp_Enqueue_Stored_Styles'Access, 1);
 
       -- SVG filters like duotone have to be loaded at the beginning of the body in
       -- both admin and the front-end.

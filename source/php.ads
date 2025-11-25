@@ -32,6 +32,11 @@ is
                          Replace : String;
                          Item    : String) return String is ("XXX-221");
 
+   function Str_Repeat (Item  : String;
+                        Times : Natural)
+                        return String
+                        is ("XXX-010");
+
    function Substr (Str    : String;
                     Offset : Integer;
                     Length : Integer := 0)
@@ -285,6 +290,12 @@ is
                         return List_Type
                         is (Empty_List);
 
+   function Array_Keys (Arry         : Array_Type;
+                        Filter_Value : String;
+                        Strict       : Boolean := False)
+                        return List_Type
+                        is (Empty_List);
+
    function Array_Key_Exists (Key  : String;
                               Arry : Array_Type)
                               return Boolean
@@ -428,6 +439,12 @@ is
    function Is_File (Filename : String)
                      return Boolean
                      is (False);
+
+   SORT_REGULAR : constant Integer := 47; -- arbitrary
+
+   procedure Ksort (Arry  : in out Array_Type;
+                    Flags : Integer := SORT_REGULAR)
+                    is null;
 
    type Unique_Flags is (Sort_String);
 

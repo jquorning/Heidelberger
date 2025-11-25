@@ -7,6 +7,7 @@ project Heidelberger is
       "source/include/",
       "source/include/block-support/",
       "source/include/pomo/",
+      "source/include/style/",
       "source/admin/",
       "source/admin/include/",
       "source/bind/",
