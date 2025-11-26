@@ -4387,21 +4387,17 @@ is
 --         return apply_filters( "tag_escape", safe_tag, tag_name );
 -- end;
 
--- --
--- -- Converts full URL paths to absolute paths.
--- --
--- -- Removes the http or https protocols and the domain. Keeps the path "/" at the
--- -- beginning, so it isn"t a true relative link, but from the web root base.
--- --
--- -- @since 2.1.0
--- -- @since 4.1.0 Support was added for relative URLs.
--- --
--- -- @param string link Full URL path.
--- -- @return string Absolute path.
--- --
--- function wp_make_link_relative( link ) then
---         return preg_replace( "|^(https?:)?//[^/]+(/?.*)|i", "2", link );
--- end;
+   ---------------------------
+   -- Wp_Make_Link_Relative --
+   ---------------------------
+
+   function Wp_Make_Link_Relative (Link : String)
+                                   return String
+   is
+      use Php;
+   begin
+      return Preg_Replace ("|^(https?:)?//[^/]+(/?.*)|i", "2", Link);
+   end Wp_Make_Link_Relative;
 
 -- --
 -- -- Sanitizes various option values based on the nature of the option.

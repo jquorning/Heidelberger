@@ -700,7 +700,8 @@ is
       -- https://core.trac.wordpress.org/ticket/53494.
       Add_Action ("wp_enqueue_scripts",
                   Inc_Script_Loader.Wp_Enqueue_Global_Styles'Access);
---    Add_Action ("wp_footer", Wp_Enqueue_Global_Styles'Access, 1);
+      Add_Action ("wp_footer",
+                  Inc_Script_Loader.Wp_Enqueue_Global_Styles'Access, 1);
 
       -- Block supports, and other styles parsed and stored in the Style Engine.
       Add_Action ("wp_enqueue_scripts",
@@ -716,10 +717,12 @@ is
 --    Add_Action ("wp_default_styles", Inc_Script_Loader.Wp_Default_Styles'Access);
 --    Add_Filter ("style_loader_src", "wp_style_loader_src", 10, 2);
 
---    Add_Action ("wp_head", Wp_Maybe_Inline_Styles'Access, 1);
+      Add_Action ("wp_head",
+                  Inc_Script_Loader.Wp_Maybe_Inline_Styles'Access, 1);
       -- Run for styles enqueued in <head>.
 
---    Add_Action ("wp_footer", Wp_Maybe_Inline_Styles'Access, 1);
+      Add_Action ("wp_footer",
+                  Inc_Script_Loader.Wp_Maybe_Inline_Styles'Access, 1);
       -- Run for late-loaded styles in the footer.
 
       --

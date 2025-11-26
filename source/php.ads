@@ -72,7 +72,7 @@ is
 
    function Preg_Match_All (Pattern : String;
                             Subject : String;
-                            Matches : out List_Type;
+                            Matches : out Array_Type;
                             Flags   : Integer := 0;
                             Offset  : Integer := 0)
                             return Integer is (1);
@@ -241,6 +241,10 @@ is
    function File_Exists (Filename : String)
                          return Boolean
                          is (True);
+
+   function Filesize (Filename : String)
+                      return Natural
+                      is (999);
 
    function Is_Dir (Filename : String)
                     return Boolean

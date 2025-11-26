@@ -12,7 +12,6 @@ with Ada.Strings.Unbounded;
 with Adm_Load_Styles;
 
 with Inc_Class_Wp_Dependencies;
-with Inc_Class_Wp_Styles;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
@@ -22,22 +21,8 @@ with Php;
 
 package body Inc_Functions_Wp_Styles
 is
-   use Inc_Class_Wp_Styles;
    use Hb_Common;
    use Php;
-
--- --
--- -- Initialize wp_styles if it has not been set.
--- --
--- -- @global WP_Styles wp_styles
--- --
--- -- @since 4.2.0
--- --
--- -- @return WP_Styles WP_Styles instance.
--- --
-
-   function Wp_Styles_X
-            return Wp_Styles;
 
    function Wp_Styles_X
             return Wp_Styles

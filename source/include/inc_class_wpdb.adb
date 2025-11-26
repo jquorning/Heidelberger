@@ -913,7 +913,7 @@ is
             -- Escape any unescaped percents.
             declare
                -- Count the number of valid placeholders in the query.
-               Matches : List_Type;
+               Matches : Array_Type;
                Placeholders : constant Integer :=
                   Preg_Match_All ("/(^|[^%]|(%%)+)%(allowed_format)?[sdF]/",
                                   -Query_2, Matches);
@@ -958,7 +958,7 @@ is
 --                         use Array_Maps;
 
                            Max_Numbered_Placeholder : constant Integer :=
-                             (if Matches (3) /= "" -- not in 0  -- not empty
+                             (if True -- Matches (3) /= "" -- not in 0  -- not empty
                               then 99 -- Max (Array_Map
                                        -- ("intval",
                                        --  Empty_Array & Matches (3)))

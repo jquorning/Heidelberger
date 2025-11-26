@@ -302,6 +302,37 @@ is
             return Boolean;
 
    --
+   -- Allows small styles to be inlined.
+   --
+   -- This improves performance and sustainability, and is opt-in. Stylesheets can
+   -- opt in by adding `path` data using `wp_style_add_data`, and defining the file's
+   -- absolute path:
+   --
+   --     wp_style_add_data( style_handle, "path", file_path);
+   --
+   -- @since 5.8.0
+   --
+   -- @global WP_Styles wp_styles
+   --
+   procedure Wp_Maybe_Inline_Styles;
+
+   --
+   -- Makes URLs relative to the WordPress installation.
+   --
+   -- @since 5.9.0
+   -- @access private
+   --
+   -- @param string css            The CSS to make URLs relative to the WordPress
+   --                               installation.
+   -- @param string stylesheet_url The URL to the stylesheet.
+   --
+   -- @return string The CSS with URLs made relative to the WordPress installation.
+   --
+   function X_Wp_Normalize_Relative_CSS_Links (CSS            : String;
+                                               Stylesheet_URL : String)
+                                               return String;
+
+   --
    -- Fetches, processes and compiles stored core styles, then combines and renders
    -- them to the page. Styles are stored via the style engine API.
    --

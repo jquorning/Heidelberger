@@ -355,7 +355,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Integer;
-                           B         : Integer)
+                           B         : Integer := 0)
                            return Integer
                            is (Value);
 

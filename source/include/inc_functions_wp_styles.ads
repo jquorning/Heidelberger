@@ -9,9 +9,24 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Styles;
+
 package Inc_Functions_Wp_Styles
 is
    use Arrays;
+   use Inc_Class_Wp_Styles;
+
+   --
+   -- Initialize wp_styles if it has not been set.
+   --
+   -- @global WP_Styles wp_styles
+   --
+   -- @since 4.2.0
+   --
+   -- @return WP_Styles WP_Styles instance.
+   --
+   function Wp_Styles_X
+            return Wp_Styles;
 
    --
    -- Add extra CSS styles to a registered stylesheet.

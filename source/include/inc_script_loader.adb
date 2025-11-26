@@ -18,6 +18,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Array_Vectors;
 with Binder;
 with Hb_Common;
 with Globals;
@@ -3189,138 +3190,207 @@ is
 --         echo wp_get_inline_script_tag( javascript, attributes);
 -- end;
 
--- --
--- -- Allows small styles to be inlined.
--- --
--- -- This improves performance and sustainability, and is opt-in. Stylesheets can opt in
--- -- by adding `path` data using `wp_style_add_data`, and defining the file"s absolute path:
--- --
--- --     wp_style_add_data( style_handle, "path", file_path);
--- --
--- -- @since 5.8.0
--- --
--- -- @global WP_Styles wp_styles
--- --
--- function wp_maybe_inline_styles() then
---         global wp_styles;
+   ----------------------------
+   -- Wp_Maybe_Inline_Styles --
+   ----------------------------
 
---         total_inline_limit = 20000;
---         --
---         -- The maximum size of inlined styles in bytes.
---         --
---         -- @since 5.8.0
---         --
---         -- @param int total_inline_limit The file-size threshold, in bytes. Default 20000.
---         --
---         total_inline_limit = apply_filters( "styles_inline_size_limit", total_inline_limit);
+   procedure Wp_Maybe_Inline_Styles
+   is
+      use Array_Vectors;
+      use Hb_Common;
+      use Php;
+      use Inc_Plugins;
+      use Inc_Class_Wp_Dependency;
+      use Inc_Functions_Wp_Styles;
+      use Adm_Load_Styles;
 
---         styles = array();
+--    global wp_styles;
 
---         -- Build an array of styles that have a path defined.
---         foreach ( wp_styles.queue as handle ) then
---                 if ( wp_styles().get_data( handle, "path" ) && file_exists( wp_styles.registered[ handle ].extra["path"] ) ) then
---                         styles[] = array(
---                                 "handle" => handle,
---                                 "src"    => wp_styles.registered[ handle ].src,
---                                 "path"   => wp_styles.registered[ handle ].extra["path"],
---                                 "size"   => filesize( wp_styles.registered[ handle ].extra["path"]),
---                        );
---                 end;
---         end;
+      Total_Inline_Limit_2 : constant Natural := 20_000;
+      --
+      -- The maximum size of inlined styles in bytes.
+      --
+      -- @since 5.8.0
+      --
+      -- @param int total_inline_limit The file-size threshold, in bytes. Default
+      --                                20000.
+      --
+      Total_Inline_Limit : constant Natural :=
+        Apply_Filters ("styles_inline_size_limit", Total_Inline_Limit_2);
 
---         if ( ! empty( styles ) ) then
---                 -- Reorder styles array based on size.
---                 usort(
---                         styles,
---                         static function( a, b ) then
---                                 return ( a["size"] <= b["size"] ) ? -1 : 1;
---                         end;
---                );
+      --
+      -- The total inlined size.
+      --
+      -- On each iteration of the loop, if a style gets added inline the value of
+      -- this var increases to reflect the total size of inlined styles.
+      --
+      Total_Inline_Size : Natural := 0;
 
---                 /*
---                 -- The total inlined size.
---                 --
---                 -- On each iteration of the loop, if a style gets added inline the value of this var increases
---                 -- to reflect the total size of inlined styles.
---                 --
---                 total_inline_size = 0;
+      Styles_2 : Array_Vector;
+   begin
+      -- Build an array of styles that have a path defined.
+      for Handle of Styles.Queue loop -- wp_ removed
+         declare
+            Registered : constant X_Wp_Dependency :=
+              Dependency_Maps.Element (Styles.Registered.Find (-Handle));
+         begin
+            if
+              "" /= Wp_Styles_X.Get_Data (-Handle, "path") and then -- ()
+              File_Exists (Registered.Extra ("path"))
+            then
+               Styles_2.Append (To_Array (List => (
+                 Build ("handle", -Handle),
+                 Build ("src",    -Registered.Src),
+                 Build ("path",   Registered.Extra ("path")),
+                 Build ("size",   Filesize (Registered.Extra ("path")))
+               )));
+            end if;
+         end;
+      end loop;
 
---                 -- Loop styles.
---                 foreach ( styles as style ) then
+      if Styles_2.Is_Empty then
+         return;
+      end if;
 
---                         -- Size check. Since styles are ordered by size, we can break the loop.
---                         if ( total_inline_size + style["size"] > total_inline_limit ) then
---                                 break;
---                         end;
+      -- Reorder styles array based on size.
+      -- Usort (
+      --   Styles,
+      --   static function( a, b ) then
+      --     return ( a["size"] <= b["size"] ) ? -1 : 1;
+      --   end;
+      -- );
 
---                         -- Get the styles if we don"t already have them.
---                         style["css"] = file_get_contents( style["path"]);
+      -- Loop styles.
+      for Style of Styles_2 loop
+         declare
+            Size : constant Natural := As_Integer (Get (Style, "size"));
+            Path : constant String  := As_String  (Get (Style, "path"));
+            Src  : constant String  := As_String  (Get (Style, "src"));
 
---                         -- Check if the style contains relative URLs that need to be modified.
---                         -- URLs relative to the stylesheet"s path should be converted to relative to the site"s root.
---                         style["css"] = _wp_normalize_relative_css_links( style["css"], style["src"]);
+            Contents_2 : constant String := File_Get_Contents (Path);
 
---                         -- Set `src` to `False` and add styles inline.
---                         wp_styles.registered[ style["handle"] ].src = False;
---                         if ( empty( wp_styles.registered[ style["handle"] ].extra["after"] ) ) then
---                                 wp_styles.registered[ style["handle"] ].extra["after"] = array();
---                         end;
---                         array_unshift( wp_styles.registered[ style["handle"] ].extra["after"], style["css"]);
+            Contents : constant String :=
+              X_Wp_Normalize_Relative_CSS_Links (Contents_2, Src);
+         begin
+            -- Size check. Since styles are ordered by size, we can break the loop.
+            if Total_Inline_Size + Size > Total_Inline_Limit then
+               exit;
+            end if;
 
---                         -- Add the styles size to the total_inline_size var.
---                         total_inline_size += (int) style["size"];
---                 end;
---         end;
--- end;
+            -- Get the styles if we don't already have them.
+            Set (Style, "css", From_String (Contents));
+--          Style ("css") := File_Get_Contents (Style ("path"));
 
--- --
--- -- Makes URLs relative to the WordPress installation.
--- --
--- -- @since 5.9.0
--- -- @access private
--- --
--- -- @param string css            The CSS to make URLs relative to the WordPress installation.
--- -- @param string stylesheet_url The URL to the stylesheet.
--- --
--- -- @return string The CSS with URLs made relative to the WordPress installation.
--- --
--- function _wp_normalize_relative_css_links( css, stylesheet_url ) then
---         has_src_results = preg_match_all( "#url\s*\(\s*[\""]?\s*([^\""\)]+)#", css, src_results);
---         if ( has_src_results ) then
---                 -- Loop through the URLs to find relative ones.
---                 foreach ( src_results[1] as src_index => src_result ) then
---                         -- Skip if this is an absolute URL.
---                         if ( 0 === strpos( src_result, "http" ) || 0 === strpos( src_result, "--" ) ) then
---                                 continue;
---                         end;
+         -- Check if the style contains relative URLs that need to be modified.
+         -- URLs relative to the stylesheet's path should be converted to relative
+         -- to the site's root.
+--         Style ("css") :=
+--           X_Wp_Normalize_Relative_CSS_Links (Style ("css"), Style ("src"));
 
---                         -- Skip if the URL is an HTML ID.
---                         if ( str_starts_with( src_result, "#" ) ) then
---                                 continue;
---                         end;
+            -- Set `src` to `False` and add styles inline.
+            declare
+               Handle     : constant String := As_String (Get (Style, "handle"));
+               Registered : Dependency_Maps.Cursor := -- X_Wp_Dependency :=
+                 Styles.Registered.Find (Handle);
+--             Registered :  := Styles.Registered (Handle);
+            begin
+               Styles.Registered (Handle).Src := +""; -- False;
+               if Empty (Styles.Registered (Handle).Extra ("after")) then
+                  null;
+--             Dependency_Maps.Element (Registered).Extra ("after") := Empty_Array;
+--             Styles.Registered (Handle).Extra ("after") := Empty_Array;
+               end if;
 
---                         -- Skip if the URL is a data URI.
---                         if ( str_starts_with( src_result, "data:" ) ) then
---                                 continue;
---                         end;
+--             Array_Unshift (
+--               Styles.Registered (Handle).Extra ("after"), Style ("css"));
 
---                         -- Build the absolute URL.
---                         absolute_url = dirname( stylesheet_url ) . "/" . src_result;
---                         absolute_url = str_replace( "/./", "/", absolute_url);
---                         -- Convert to URL related to the site root.
---                         relative_url = wp_make_link_relative( absolute_url);
+               -- Add the styles size to the total_inline_size var.
+               Total_Inline_Size := Total_Inline_Size + Size;
+            end;
+         end;
+      end loop;
+   end Wp_Maybe_Inline_Styles;
 
---                         -- Replace the URL in the CSS.
---                         css = str_replace(
---                                 src_results[0][ src_index ],
---                                 str_replace( src_result, relative_url, src_results[0][ src_index ]),
---                                 css
---                        );
---                 end;
---         end;
+   ---------------------------------------
+   -- X_Wp_Normalize_Relative_CSS_Links --
+   ---------------------------------------
 
---         return css;
--- end;
+   function X_Wp_Normalize_Relative_CSS_Links (CSS            : String;
+                                               Stylesheet_URL : String)
+                                               return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_Formatting;
+
+      CSS_2 : Unbounded_String := +CSS;
+
+      Src_Results     : Array_Type;
+      Src_Results_1   : Array_Type;
+      Has_Src_Results : Natural;
+   begin
+      Has_Src_Results :=
+        Preg_Match_All ("#url\s*\(\s*[\""]?\s*([^\""\)]+)#", CSS, Src_Results);
+
+      if Has_Src_Results = 0 then
+         return CSS;
+      end if;
+
+      -- Loop through the URLs to find relative ones.
+      Src_Results_1 := As_Array (Get (Src_Results, "2")); -- Src_Results (2);
+      for A in Src_Results_1.Iterate loop -- [1]
+--    for A in Src_Results (2).Iterate loop -- [1]
+         declare
+            Src_Index  : String := Key (A);
+            Src_Result : constant String := As_String (Element (A));
+         begin
+            -- Skip if this is an absolute URL.
+            if
+              0 = Strpos (Src_Result, "http") or else
+              0 = Strpos (Src_Result, "//")
+            then
+               goto Continue;
+            end if;
+
+            -- Skip if the URL is an HTML ID.
+            if Str_Starts_With (Src_Result, "#") then
+               goto Continue;
+            end if;
+
+            -- Skip if the URL is a data URI.
+            if Str_Starts_With (Src_Result, "data:") then
+               goto Continue;
+            end if;
+
+            -- Build the absolute URL.
+            declare
+               Absolute_URL_2 : constant String :=
+                 Dirname (Stylesheet_URL) & "/" & Src_Result;
+
+               Absolute_URL : constant String :=
+                 Str_Replace ("/./", "/", Absolute_URL_2);
+
+               -- Convert to URL related to the site root.
+               Relative_URL : constant String :=
+                 Wp_Make_Link_Relative (Absolute_URL);
+
+               Aaa : constant String := "XXX-011"; -- Src_Results (0) (Src_Index);
+            begin
+               -- Replace the URL in the CSS.
+               CSS_2 := +
+                 Str_Replace (
+                   Aaa,
+                   Str_Replace (Src_Result, Relative_URL, Aaa),
+                   -CSS_2
+                 );
+            end;
+            << Continue >>
+         end;
+      end loop;
+
+      return -CSS_2;
+   end X_Wp_Normalize_Relative_CSS_Links;
 
 -- --
 -- -- Function that enqueues the CSS Custom Properties coming from theme.json.

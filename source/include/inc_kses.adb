@@ -2532,20 +2532,21 @@ is
             if Found and URL_Attr then
                -- Simplified: matches the sequence `url(*)`.
                declare
-                  URL_Matches : List_Type;
+                  URL_Matches : Array_Type;
                   Unused      : Integer;
                begin
                   Unused :=
                     Preg_Match_All ("/url\([^)]+\)/", -Parts (2), URL_Matches); -- (1)
 
                   Match_Loop :
-                  for URL_Match of URL_Matches loop -- (1) loop -- (0)
+                  for A in URL_Matches.Iterate loop -- (1) loop -- (0)
                      declare
+                        URL_Match  : constant String := Key (A);
                         URL_Pieces : List_Type;
                      begin
                         -- Clean up the URL from each of the matches above.
                         Unused := Preg_Match ("/^url\(\s*([\""\""]?)(.*)(\g1)\s*\)$/",
-                                              -URL_Match, URL_Pieces);
+                                              URL_Match, URL_Pieces);
 
                         if Empty (-URL_Pieces (3)) then -- (2)
                            Found := False;
@@ -2564,7 +2565,7 @@ is
                            else
                               -- Remove the whole `url(*)` bit that was matched above
                               -- from the CSS.
-                              CSS_Test_String := +Str_Replace (-URL_Match, "",
+                              CSS_Test_String := +Str_Replace (URL_Match, "",
                                                                -CSS_Test_String);
                            end if;
                         end;

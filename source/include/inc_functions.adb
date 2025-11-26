@@ -5145,11 +5145,11 @@ is
                 ))
       ) & "/u";
 
-      Matches : List_Type;
+      Matches : Array_Type;
       Unused  : Integer;
    begin
       Unused := Preg_Match_All (Regexp, Str_Replace ("'", "", Item), Matches);
-      return Strtolower (Implode ("-", -Matches.First_Element));
+      return Strtolower (Implode ("-", As_String (Matches.First_Element)));
       -- phpcs:enable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
    end X_Wp_To_Kebab_Case;
 
