@@ -6,9 +6,11 @@
 -- @since 4.4.0
 --
 
+with Arrays;
+
 package Inc_REST_API
 is
-   procedure Dummy;
+   use Arrays;
 
    --
    -- Retrieves the URL to a REST endpoint on a site.
@@ -31,5 +33,19 @@ is
                           Scheme  : String  := "rest")
                           return String
                           is ("XXX-781");
+
+   --
+   -- Sets the "additionalProperties" to false by default for all object definitions
+   -- in the schema.
+   --
+   -- @since 5.5.0
+   -- @since 5.6.0 Support the "patternProperties" keyword.
+   --
+   -- @param array $schema The schema to modify.
+   -- @return array The modified schema.
+   --
+   function REST_Default_Additional_Properties_To_False
+              (Schema : Array_Type)
+               return Array_Type;
 
 end Inc_REST_API;

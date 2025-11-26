@@ -177,7 +177,7 @@ is
    function In_Array (Needle   : String;
                       Haystack : List_Type;
                       Strict   : Boolean := False)
-                      return Boolean is (False);
+                      return Boolean;
 
    function Ltrim (Item       : String;
                    Characters : String := "")

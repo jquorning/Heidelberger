@@ -8,12 +8,16 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Arrays.IO;
 with Globals;
 with Php;
 
 with Inc_Formatting;
+with Inc_Functions;
+with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
+with Inc_REST_API;
 
 package body Inc_Themes
 is
@@ -3203,153 +3207,178 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Registers a theme feature for use in add_theme_support().
--- --
--- -- This does not indicate that the active theme supports the feature, it only describes
--- -- the feature"s supported options.
--- --
--- -- @since 5.5.0
--- --
--- -- @see add_theme_support()
--- --
--- -- @global array _wp_registered_theme_features
--- --
--- -- @param string feature The name uniquely identifying the feature. See add_theme_support()
--- --                        for the list of possible values.
--- -- @param array  args then
--- --     Data used to describe the theme.
--- --
--- --     @type string     type         The type of data associated with this feature.
--- --                                    Valid values are "string", "boolean", "integer",
--- --                                    "number", "array", and "object". Defaults to "boolean".
--- --     @type bool       variadic     Does this feature utilize the variadic support
--- --                                    of add_theme_support(), or are all arguments specified
--- --                                    as the second parameter. Must be used with the "array" type.
--- --     @type string     description  A short description of the feature. Included in
--- --                                    the Themes REST API schema. Intended for developers.
--- --     @type bool|array show_in_rest then
--- --         Whether this feature should be included in the Themes REST API endpoint.
--- --         Defaults to not being included. When registering an "array" or "object" type,
--- --         this argument must be an array with the "schema" key.
--- --
--- --         @type array    schema           Specifies the JSON Schema definition describing
--- --                                          the feature. If any objects in the schema do not include
--- --                                          the "additionalProperties" keyword, it is set to false.
--- --         @type string   name             An alternate name to be used as the property name
--- --                                          in the REST API.
--- --         @type callable prepare_callback A function used to format the theme support in the REST API.
--- --                                          Receives the raw theme support value.
--- --      end;
--- -- end;
--- -- @return true|WP_Error True if the theme feature was successfully registered, a WP_Error object if not.
--- --
--- function register_theme_feature( feature, args = array() ) then
---         global _wp_registered_theme_features;
+   Global_Wp_Registered_Theme_Features : Array_Type;
 
---         if ( ! is_array( _wp_registered_theme_features ) ) then
---                 _wp_registered_theme_features = array();
---         end;
+   ----------------------------
+   -- Register_Theme_Feature --
+   ----------------------------
 
---         defaults = array(
---                 "type"         => "boolean",
---                 "variadic"     => false,
---                 "description"  => "",
---                 "show_in_rest" => false,
---         );
+   procedure Register_Theme_Feature (Feature : String;
+                                     Args    : Array_Type)
+   is
+      use Hb_Common;
+      use Php;
+      use Inc_Functions;
+      use Inc_REST_API;
 
---         args = wp_parse_args( args, defaults );
+      Defaults : constant Array_Type := To_Array (List => (
+                Build ("type",         "boolean"),
+                Build ("variadic",     False),
+                Build ("description",  ""),
+                Build ("show_in_rest", False)
+      ));
 
---         if ( true === args["show_in_rest"] ) then
---                 args["show_in_rest"] = array();
---         end;
+      Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
+   begin
+      -- if ( ! is_array( _wp_registered_theme_features ) ) then
+      --    _wp_registered_theme_features = array();
+      -- end if;
 
---         if ( is_array( args["show_in_rest"] ) ) then
---                 args["show_in_rest"] = wp_parse_args(
---                         args["show_in_rest"],
---                         array(
---                                 "schema"           => array(),
---                                 "name"             => feature,
---                                 "prepare_callback" => null,
---                         )
---                 );
---         end;
+      if True = As_Boolean (Get (Args_2, "show_in_rest")) then
+         Set (Args_2, "show_in_rest", From_Array (Empty_Array));
+      end if;
 
---         if ( ! in_array( args["type"], array( "string", "boolean", "integer", "number", "array", "object" ), true ) ) then
---                 return new WP_Error(
---                         "invalid_type",
---                         __( "The feature "type" is not valid JSON Schema type." )
---                 );
---         end;
+      if Kind_Of (Get (Args_2, "show_in_rest")) in Kind_Array then
+         Set (Args_2,
+              "show_in_rest",
+              From_Array (
+                Wp_Parse_Args (
+                  As_Array (Get (Args_2, "show_in_rest")),
+                  To_Array (List => (
+                    Build ("schema",           Empty_Array),
+                    Build ("name",             Feature),
+                    Build ("prepare_callback", Null_Value)
+                  ))
+              )));
+      end if;
 
---         if ( true === args["variadic"] && "array" !== args["type"] ) then
---                 return new WP_Error(
---                         "variadic_must_be_array",
---                         __( "When registering a "variadic" theme feature, the "type" must be an "array"." )
---                 );
---         end;
+      if
+        not In_Array (As_String (Get (Args_2, "type")),
+                      To_List (List => (+"string", +"boolean", +"integer",
+                                        +"number", +"array", +"object")), True)
+      then
+Arrays.Io.Dump (Args_2);
+         raise Feature_Error with "invalid_type";
+         -- return new WP_Error(
+         --   "invalid_type",
+         --   __( "The feature "type" is not valid JSON Schema type." )
+         -- );
+      end if;
 
---         if ( false !== args["show_in_rest"] && in_array( args["type"], array( "array", "object" ), true ) ) then
---                 if ( ! is_array( args["show_in_rest"] ) || empty( args["show_in_rest"]["schema"] ) ) then
---                         return new WP_Error(
---                                 "missing_schema",
---                                 __( "When registering an "array" or "object" feature to show in the REST API, the feature\"s schema must also be defined." )
---                         );
---                 end;
+      if
+        True = As_Boolean (Get (Args_2, "variadic")) and then
+        "array" /= As_String (Get (Args_2, "type"))
+      then
+         raise Feature_Error with "variadic_must_be_array";
+         -- return new WP_Error(
+         --   "variadic_must_be_array",
+         --   __( "When registering a "variadic" theme feature, the "type" must be an "array"." )
+         -- );
+      end if;
 
---                 if ( "array" === args["type"] && ! isset( args["show_in_rest"]["schema"]["items"] ) ) then
---                         return new WP_Error(
---                                 "missing_schema_items",
---                                 __( "When registering an "array" feature, the feature\"s schema must include the "items" keyword." )
---                         );
---                 end;
+      if
+        False /= As_Boolean (Get (Args_2, "show_in_rest")) and then
+        In_Array (As_String (Get (Args_2, "type")),
+                             To_List (List => (+"array", +"object")), True)
+      then
+         if
+           Kind_Of (Get (Args_2, "show_in_rest")) not in Kind_Array or else
+           Empty (As_String (Get (Ref_2 (Args_2, "show_in_rest", "schema"))))
+         then
+            raise Feature_Error with "missing_schema";
+            -- return new WP_Error(
+            --   "missing_schema",
+            --   __( "When registering an 'array' or 'object' feature to show in the REST API, the feature\'s schema must also be defined." )
+            -- );
+         end if;
 
---                 if ( "object" === args["type"] && ! isset( args["show_in_rest"]["schema"]["properties"] ) ) then
---                         return new WP_Error(
---                                 "missing_schema_properties",
---                                 __( "When registering an "object" feature, the feature\"s schema must include the "properties" keyword." )
---                         );
---                 end;
---         end;
+         if
+           "array" = As_String (Get (Args_2, "type")) and then
+           not Isset_3 (Args_2, "show_in_rest", "schema", "items")
+         then
+            raise Feature_Error with "missing_schema_items";
+            -- return new WP_Error(
+            --   "missing_schema_items",
+            --   __( "When registering an 'array' feature, the feature\'s schema must include the 'items' keyword." )
+            -- );
+         end if;
 
---         if ( is_array( args["show_in_rest"] ) ) then
---                 if ( isset( args["show_in_rest"]["prepare_callback"] )
---                         && ! is_callable( args["show_in_rest"]["prepare_callback"] )
---                 ) then
---                         return new WP_Error(
---                                 "invalid_rest_prepare_callback",
---                                 sprintf(
---                                         /* translators: %s: prepare_callback--
---                                         __( "The "%s" must be a callable function." ),
---                                         "prepare_callback"
---                                 )
---                         );
---                 end;
+         if
+           "object" = As_String (Get (Args_2, "type")) and then
+           not Isset_3 (Args_2, "show_in_rest", "schema", "properties")
+         then
+            raise Feature_Error with "missing_schema_properties";
+            -- return new WP_Error(
+            --   "missing_schema_properties",
+            --   __( "When registering an 'object' feature, the feature\'s schema must include the 'properties' keyword." )
+            -- );
+         end if;
+      end if;
 
---                 args["show_in_rest"]["schema"] = wp_parse_args(
---                         args["show_in_rest"]["schema"],
---                         array(
---                                 "description" => args["description"],
---                                 "type"        => args["type"],
---                                 "default"     => false,
---                         )
---                 );
+      if Kind_Of (Get (Args_2, "show_in_rest")) in Kind_Array then
+         if
+           Isset_2 (Args_2, "show_in_rest", "prepare_callback") and then
+           Kind_Of (Get (Ref_2 (Args_2, "show_in_rest", "prepare_callback")))
+             not in Kind_Callable
+         then
+            raise Feature_Error with "invalid_rest_prepare_callback";
+            -- return new WP_Error(
+            --   "invalid_rest_prepare_callback",
+            --   sprintf(
+            --     /* translators: %s: prepare_callback--
+            --     __( "The "%s" must be a callable function." ),
+            --     "prepare_callback"
+            --   )
+            -- );
+         end if;
 
---                 if ( is_bool( args["show_in_rest"]["schema"]["default"] )
---                         && ! in_array( "boolean", (array) args["show_in_rest"]["schema"]["type"], true )
---                 ) then
---                         // Automatically include the "boolean" type when the default value is a boolean.
---                         args["show_in_rest"]["schema"]["type"] = (array) args["show_in_rest"]["schema"]["type"];
---                         array_unshift( args["show_in_rest"]["schema"]["type"], "boolean" );
---                 end;
+         Set_2 (Args_2,
+                Key_1 => "show_in_rest",
+                Key_2 => "schema",
+                Value =>
+                  From_Array (Wp_Parse_Args (
+                    As_Array (Get (Ref_2 (Args_2, "show_in_rest", "schema"))),
+                    To_Array (List => (
+                      Build ("description", As_String (Get (Args_2, "description"))),
+                      Build ("type",        As_String (Get (Args_2, "type"))),
+                      Build ("default",     False)
+                    ))
+                  )));
 
---                 args["show_in_rest"]["schema"] = rest_default_additional_properties_to_false( args["show_in_rest"]["schema"] );
---         end;
+         if
+           Kind_Of (Get (Ref_3 (Args_2, "show_in_rest", "schema", "default")))
+             in Kind_Boolean and then
+           not In_Array ("boolean",
+                         As_Array (Get (Ref_3 (Args_2, Key_1 => "show_in_rest",
+                                                       Key_2 => "schema",
+                                                       Key_3 => "type"))), True)
+         then
+            -- Automatically include the "boolean" type when the default value is
+            -- a boolean.
+            Set_3 (Args_2,
+                   Key_1 => "show_in_rest",
+                   Key_2 => "schema",
+                   Key_3 => "type",
+                   Value =>
+                     Get (Ref_3 (Args_2, "show_in_rest", "schema", "type")));
 
---         _wp_registered_theme_features[ feature ] = args;
+--          Array_Unshift (Ref_3 (Args_2, "show_in_rest", "schema", "type"),
+--                         "boolean");
+         end if;
 
---         return true;
--- end;
+         Set_2 (Args_2,
+                Key_1 => "show_in_rest",
+                Key_2 => "schema",
+                Value => From_Array (
+                  REST_Default_Additional_Properties_To_False (
+                    As_Array (Get (Ref_2 (Args_2,
+                                          Key_1 => "show_in_rest",
+                                          Key_2 => "schema"))))));
+      end if;
+
+      Set (Global_Wp_Registered_Theme_Features, Feature, From_Array (Args_2));
+
+   end Register_Theme_Feature;
 
 -- --
 -- -- Gets the list of registered theme features.
@@ -3880,398 +3909,398 @@ is
 --         end;
 -- end;
 
--- --
--- -- Creates the initial theme features when the "setup_theme" action is fired.
--- --
--- -- See {@see "setup_theme"}.
--- --
--- -- @since 5.5.0
--- -- @since 6.0.1 The `block-templates` feature was added.
--- --
--- function create_initial_theme_features() then
---         register_theme_feature(
---                 "align-wide",
---                 array(
---                         "description"  => __( "Whether theme opts in to wide alignment CSS class." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "automatic-feed-links",
---                 array(
---                         "description"  => __( "Whether posts and comments RSS feed links are added to head." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "block-templates",
---                 array(
---                         "description"  => __( "Whether a theme uses block-based templates." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "block-template-parts",
---                 array(
---                         "description"  => __( "Whether a theme uses block-based template parts." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "custom-background",
---                 array(
---                         "description"  => __( "Custom background if defined by the theme." ),
---                         "type"         => "object",
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "properties" => array(
---                                                 "default-image"      => array(
---                                                         "type"   => "string",
---                                                         "format" => "uri",
---                                                 ),
---                                                 "default-preset"     => array(
---                                                         "type" => "string",
---                                                         "enum" => array(
---                                                                 "default",
---                                                                 "fill",
---                                                                 "fit",
---                                                                 "repeat",
---                                                                 "custom",
---                                                         ),
---                                                 ),
---                                                 "default-position-x" => array(
---                                                         "type" => "string",
---                                                         "enum" => array(
---                                                                 "left",
---                                                                 "center",
---                                                                 "right",
---                                                         ),
---                                                 ),
---                                                 "default-position-y" => array(
---                                                         "type" => "string",
---                                                         "enum" => array(
---                                                                 "left",
---                                                                 "center",
---                                                                 "right",
---                                                         ),
---                                                 ),
---                                                 "default-size"       => array(
---                                                         "type" => "string",
---                                                         "enum" => array(
---                                                                 "auto",
---                                                                 "contain",
---                                                                 "cover",
---                                                         ),
---                                                 ),
---                                                 "default-repeat"     => array(
---                                                         "type" => "string",
---                                                         "enum" => array(
---                                                                 "repeat-x",
---                                                                 "repeat-y",
---                                                                 "repeat",
---                                                                 "no-repeat",
---                                                         ),
---                                                 ),
---                                                 "default-attachment" => array(
---                                                         "type" => "string",
---                                                         "enum" => array(
---                                                                 "scroll",
---                                                                 "fixed",
---                                                         ),
---                                                 ),
---                                                 "default-color"      => array(
---                                                         "type" => "string",
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "custom-header",
---                 array(
---                         "description"  => __( "Custom header if defined by the theme." ),
---                         "type"         => "object",
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "properties" => array(
---                                                 "default-image"      => array(
---                                                         "type"   => "string",
---                                                         "format" => "uri",
---                                                 ),
---                                                 "random-default"     => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "width"              => array(
---                                                         "type" => "integer",
---                                                 ),
---                                                 "height"             => array(
---                                                         "type" => "integer",
---                                                 ),
---                                                 "flex-height"        => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "flex-width"         => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "default-text-color" => array(
---                                                         "type" => "string",
---                                                 ),
---                                                 "header-text"        => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "uploads"            => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "video"              => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "custom-logo",
---                 array(
---                         "type"         => "object",
---                         "description"  => __( "Custom logo if defined by the theme." ),
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "properties" => array(
---                                                 "width"                => array(
---                                                         "type" => "integer",
---                                                 ),
---                                                 "height"               => array(
---                                                         "type" => "integer",
---                                                 ),
---                                                 "flex-width"           => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "flex-height"          => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                                 "header-text"          => array(
---                                                         "type"  => "array",
---                                                         "items" => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                 ),
---                                                 "unlink-homepage-logo" => array(
---                                                         "type" => "boolean",
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "customize-selective-refresh-widgets",
---                 array(
---                         "description"  => __( "Whether the theme enables Selective Refresh for Widgets being managed with the Customizer." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "dark-editor-style",
---                 array(
---                         "description"  => __( "Whether theme opts in to the dark editor style UI." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "disable-custom-colors",
---                 array(
---                         "description"  => __( "Whether the theme disables custom colors." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "disable-custom-font-sizes",
---                 array(
---                         "description"  => __( "Whether the theme disables custom font sizes." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "disable-custom-gradients",
---                 array(
---                         "description"  => __( "Whether the theme disables custom gradients." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "disable-layout-styles",
---                 array(
---                         "description"  => __( "Whether the theme disables generated layout styles." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "editor-color-palette",
---                 array(
---                         "type"         => "array",
---                         "description"  => __( "Custom color palette if defined by the theme." ),
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "items" => array(
---                                                 "type"       => "object",
---                                                 "properties" => array(
---                                                         "name"  => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                         "slug"  => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                         "color" => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "editor-font-sizes",
---                 array(
---                         "type"         => "array",
---                         "description"  => __( "Custom font sizes if defined by the theme." ),
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "items" => array(
---                                                 "type"       => "object",
---                                                 "properties" => array(
---                                                         "name" => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                         "size" => array(
---                                                                 "type" => "number",
---                                                         ),
---                                                         "slug" => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "editor-gradient-presets",
---                 array(
---                         "type"         => "array",
---                         "description"  => __( "Custom gradient presets if defined by the theme." ),
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "items" => array(
---                                                 "type"       => "object",
---                                                 "properties" => array(
---                                                         "name"     => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                         "gradient" => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                         "slug"     => array(
---                                                                 "type" => "string",
---                                                         ),
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "editor-styles",
---                 array(
---                         "description"  => __( "Whether theme opts in to the editor styles CSS wrapper." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "html5",
---                 array(
---                         "type"         => "array",
---                         "description"  => __( "Allows use of HTML5 markup for search forms, comment forms, comment lists, gallery, and caption." ),
---                         "show_in_rest" => array(
---                                 "schema" => array(
---                                         "items" => array(
---                                                 "type" => "string",
---                                                 "enum" => array(
---                                                         "search-form",
---                                                         "comment-form",
---                                                         "comment-list",
---                                                         "gallery",
---                                                         "caption",
---                                                         "script",
---                                                         "style",
---                                                 ),
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "post-formats",
---                 array(
---                         "type"         => "array",
---                         "description"  => __( "Post formats supported." ),
---                         "show_in_rest" => array(
---                                 "name"             => "formats",
---                                 "schema"           => array(
---                                         "items"   => array(
---                                                 "type" => "string",
---                                                 "enum" => get_post_format_slugs(),
---                                         ),
---                                         "default" => array( "standard" ),
---                                 ),
---                                 "prepare_callback" => static function ( formats ) then
---                                         formats = is_array( formats ) ? array_values( formats[0] ) : array();
---                                         formats = array_merge( array( "standard" ), formats );
+   -----------------------------------
+   -- Create_Initial_Theme_Features --
+   -----------------------------------
 
---                                         return formats;
---                                 end;,
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "post-thumbnails",
---                 array(
---                         "type"         => "array",
---                         "description"  => __( "The post types that support thumbnails or true if all post types are supported." ),
---                         "show_in_rest" => array(
---                                 "type"   => array( "boolean", "array" ),
---                                 "schema" => array(
---                                         "items" => array(
---                                                 "type" => "string",
---                                         ),
---                                 ),
---                         ),
---                 )
---         );
---         register_theme_feature(
---                 "responsive-embeds",
---                 array(
---                         "description"  => __( "Whether the theme supports responsive embedded content." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "title-tag",
---                 array(
---                         "description"  => __( "Whether the theme can manage the document title tag." ),
---                         "show_in_rest" => true,
---                 )
---         );
---         register_theme_feature(
---                 "wp-block-styles",
---                 array(
---                         "description"  => __( "Whether theme opts in to default WordPress block styles for viewing." ),
---                         "show_in_rest" => true,
---                 )
---         );
--- end;
+   procedure Create_Initial_Theme_Features
+   is
+      use Hb_Common;
+      use Inc_L10n;
+   begin
+      Register_Theme_Feature (
+                "align-wide",
+                To_Array (List => (
+                        Build ("description",  abs "Whether theme opts in to wide alignment CSS class."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "automatic-feed-links",
+                To_Array (List => (
+                        Build ("description",  abs "Whether posts and comments RSS feed links are added to head."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "block-templates",
+                To_Array (List => (
+                        Build ("description",  abs "Whether a theme uses block-based templates."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "block-template-parts",
+                To_Array (List => (
+                        Build ("description",  abs "Whether a theme uses block-based template parts."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "custom-background",
+                To_Array (List => (
+                        Build ("description",  abs "Custom background if defined by the theme."),
+                        Build ("type",         "object"),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("properties", To_Array (List => (
+                                                Build ("default-image",      To_Array (List => (
+                                                        Build ("type",   "string"),
+                                                        Build ("format", "uri")
+                                                ))),
+                                                Build ("default-preset",     To_Array (List => (
+                                                        Build ("type", "string"),
+                                                        Build ("enum", To_List (List => (
+                                                                +"default",
+                                                                +"fill",
+                                                                +"fit",
+                                                                +"repeat",
+                                                                +"custom"
+                                                        )))
+                                                ))),
+                                                Build ("default-position-x", To_Array (List => (
+                                                        Build ("type", "string"),
+                                                        Build ("enum", To_List (List => (
+                                                                +"left",
+                                                                +"center",
+                                                                +"right"
+                                                        )))
+                                                ))),
+                                                Build ("default-position-y", To_Array (List => (
+                                                        Build ("type", "string"),
+                                                        Build ("enum", To_List (List => (
+                                                                +"left",
+                                                                +"center",
+                                                                +"right"
+                                                        )))
+                                                ))),
+                                                Build ("default-size",       To_Array (List => (
+                                                        Build ("type", "string"),
+                                                        Build ("enum", To_List (List => (
+                                                                +"auto",
+                                                                +"contain",
+                                                                +"cover"
+                                                        )))
+                                                ))),
+                                                Build ("default-repeat",     To_Array (List => (
+                                                        Build ("type", "string"),
+                                                        Build ("enum", To_List (List => (
+                                                                +"repeat-x",
+                                                                +"repeat-y",
+                                                                +"repeat",
+                                                                +"no-repeat"
+                                                        )))
+                                                ))),
+                                                Build ("default-attachment", To_Array (List => (
+                                                        Build ("type", "string"),
+                                                        Build ("enum", To_List (List => (
+                                                                +"scroll",
+                                                                +"fixed"
+                                                        )))
+                                                ))),
+                                                Build ("default-color",      To_Array (List => (1 =>
+                                                        Build ("type", "string")
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "custom-header",
+                To_Array (List => (
+                        Build ("description",  abs "Custom header if defined by the theme."),
+                        Build ("type",         "object"),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("properties", To_Array (List => (
+                                                Build ("default-image",      To_Array (List => (
+                                                        Build ("type",   "string"),
+                                                        Build ("format", "uri")
+                                                ))),
+                                                Build ("random-default",     To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("width",              To_Array (List => (1 =>
+                                                        Build ("type", "integer")
+                                                ))),
+                                                Build ("height",             To_Array (List => (1 =>
+                                                        Build ("type", "integer")
+                                                ))),
+                                                Build ("flex-height",        To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("flex-width",         To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("default-text-color", To_Array (List => (1 =>
+                                                        Build ("type", "string")
+                                                ))),
+                                                Build ("header-text",        To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("uploads",            To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("video",              To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "custom-logo",
+                To_Array (List => (
+                        Build ("type",         "object"),
+                        Build ("description",  abs "Custom logo if defined by the theme."),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("properties", To_Array (List => (
+                                                Build ("width",                To_Array (List => (1 =>
+                                                        Build ("type", "integer")
+                                                ))),
+                                                Build ("height",               To_Array (List => (1 =>
+                                                        Build ("type", "integer")
+                                                ))),
+                                                Build ("flex-width",           To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("flex-height",          To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                ))),
+                                                Build ("header-text",          To_Array (List => (
+                                                        Build ("type",  "array"),
+                                                        Build ("items", To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        )))
+                                                ))),
+                                                Build ("unlink-homepage-logo", To_Array (List => (1 =>
+                                                        Build ("type", "boolean")
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "customize-selective-refresh-widgets",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme enables Selective Refresh for Widgets being managed with the Customizer."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "dark-editor-style",
+                To_Array (List => (
+                        Build ("description",  abs "Whether theme opts in to the dark editor style UI."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "disable-custom-colors",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme disables custom colors."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "disable-custom-font-sizes",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme disables custom font sizes."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "disable-custom-gradients",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme disables custom gradients."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "disable-layout-styles",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme disables generated layout styles."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "editor-color-palette",
+                To_Array (List => (
+                        Build ("type",         "array"),
+                        Build ("description",  abs "Custom color palette if defined by the theme."),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("items", To_Array (List => (
+                                                Build ("type",       "object"),
+                                                Build ("properties", To_Array (List => (
+                                                        Build ("name",  To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        ))),
+                                                        Build ("slug",  To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        ))),
+                                                        Build ("color", To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        )))
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "editor-font-sizes",
+                To_Array (List => (
+                        Build ("type",         "array"),
+                        Build ("description",  abs "Custom font sizes if defined by the theme."),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("items", To_Array (List => (
+                                                Build ("type",       "object"),
+                                                Build ("properties", To_Array (List => (
+                                                        Build ("name", To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        ))),
+                                                        Build ("size", To_Array (List => (1 =>
+                                                                Build ("type", "number")
+                                                        ))),
+                                                        Build ("slug", To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        )))
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "editor-gradient-presets",
+                To_Array (List => (
+                        Build ("type",         "array"),
+                        Build ("description",  abs "Custom gradient presets if defined by the theme."),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("items", To_Array (List => (
+                                                Build ("type",       "object"),
+                                                Build ("properties", To_Array (List => (
+                                                        Build ("name",     To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        ))),
+                                                        Build ("gradient", To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        ))),
+                                                        Build ("slug",     To_Array (List => (1 =>
+                                                                Build ("type", "string")
+                                                        )))
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "editor-styles",
+                To_Array (List => (
+                        Build ("description",  abs "Whether theme opts in to the editor styles CSS wrapper."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "html5",
+                To_Array (List => (
+                        Build ("type",         "array"),
+                        Build ("description",  abs "Allows use of HTML5 markup for search forms, comment forms, comment lists, gallery, and caption."),
+                        Build ("show_in_rest", To_Array (List => (1 =>
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("items", To_Array (List => (
+                                                Build ("type", "string"),
+                                                Build ("enum", To_List (List => (
+                                                        +"search-form",
+                                                        +"comment-form",
+                                                        +"comment-list",
+                                                        +"gallery",
+                                                        +"caption",
+                                                        +"script",
+                                                        +"style"
+                                                )))
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "post-formats",
+                To_Array (List => (
+                        Build ("type",         "array"),
+                        Build ("description",  abs "Post formats supported."),
+                        Build ("show_in_rest", To_Array (List => (
+                                Build ("name",             "formats"),
+                                Build ("schema",           To_Array (List => (
+                                        Build ("items",   To_Array (List => (1 =>
+                                                Build ("type", "string")
+--                                              Build ("enum", Get_Post_Format_Slugs) -- ()
+                                        ))),
+                                        Build ("default", To_List ("standard"))
+                                )))
+                                -- Build ("prepare_callback", static function ( formats ) then
+                                --         formats = is_Array (List => ( formats ) ? array_values( formats[0] ) : To_Array (List => ();
+                                --         formats = array_merge( To_Array (List => ( "standard" ), formats );
+
+                                --         return formats;
+                                -- end;,
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "post-thumbnails",
+                To_Array (List => (
+                        Build ("type",         "array"),
+                        Build ("description",  abs "The post types that support thumbnails or true if all post types are supported."),
+                        Build ("show_in_rest", To_Array (List => (
+                                Build ("type",   To_List (List => (+"boolean", +"array"))),
+                                Build ("schema", To_Array (List => (1 =>
+                                        Build ("items", To_Array (List => (1 =>
+                                                Build ("type", "string")
+                                        )))
+                                )))
+                        )))
+                ))
+        );
+      Register_Theme_Feature (
+                "responsive-embeds",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme supports responsive embedded content."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "title-tag",
+                To_Array (List => (
+                        Build ("description",  abs "Whether the theme can manage the document title tag."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+      Register_Theme_Feature (
+                "wp-block-styles",
+                To_Array (List => (
+                        Build ("description",  abs "Whether theme opts in to default WordPress block styles for viewing."),
+                        Build ("show_in_rest", True)
+                ))
+        );
+   end Create_Initial_Theme_Features;
 
 -- --
 -- -- Returns whether the active theme is a block-based theme or not.
@@ -4320,7 +4349,7 @@ is
 --         -- (which use default template functions) and `[caption]` and `[gallery]` shortcodes.
 --         -- Other blocks contain their own HTML5 markup.
 --         --
---         add_theme_support( "html5", array( "comment-form", "comment-list", "search-form", "gallery", "caption", "style", "script" ) );
+--         add_theme_support( "html5", To_Array (List => ( "comment-form", "comment-list", "search-form", "gallery", "caption", "style", "script" ) );
 --         add_theme_support( "automatic-feed-links" );
 
 --         add_filter( "should_load_separate_core_block_assets", "__return_true" );

@@ -30,6 +30,7 @@ with Inc_Plugins;
 with Inc_Posts;
 with Inc_Script_Loader;
 with Inc_Taxonomys;
+with Inc_Themes;
 
 package body Inc_Default_Filters
 is
@@ -626,7 +627,8 @@ is
       -- Filters formerly mixed into wp-includes.
       --
       -- Theme.
---    Add_Action ("setup_theme", Create_Initial_Theme_Features'Access, 0);
+      Add_Action ("setup_theme",
+                  Inc_Themes.Create_Initial_Theme_Features'Access, 0);
 --    Add_Action ("setup_theme", X_Add_Default_Theme_Supports'Access, 1);
 --    Add_Action ("wp_loaded", X_Custom_Header_Background_Just_In_Time'Access);
 --    Add_Action ("wp_head", X_Custom_Logo_Header_Styles'Access);
@@ -666,8 +668,10 @@ is
 --    Add_Action ("set_current_user", Kses_Init'Access);
 
       -- Script Loader.
---    Add_Action ("wp_default_scripts", Inc_Script_Loader.Wp_Default_Scripts'Access);
---    Add_Action ("wp_default_scripts", Inc_Script_Loader.Wp_Default_Packages'Access);
+--    Add_Action ("wp_default_scripts",
+--                Inc_Script_Loader.Wp_Default_Scripts'Access);
+--    Add_Action ("wp_default_scripts",
+--                Inc_Script_Loader.Wp_Default_Packages'Access);
 
 --    Add_Action ("wp_enqueue_scripts", Wp_Localize_Jquery_Ui_Datepicker'Access, 1000);
       Add_Action ("wp_enqueue_scripts",
@@ -714,8 +718,10 @@ is
 --    Add_Action ("wp_body_open", Wp_Global_Styles_Render_Svg_Filters'Access);
 --    Add_Action ("in_admin_header", Wp_Global_Styles_Render_Svg_Filters'Access);
 
---    Add_Action ("wp_default_styles", Inc_Script_Loader.Wp_Default_Styles'Access);
---    Add_Filter ("style_loader_src", "wp_style_loader_src", 10, 2);
+--    Add_Action ("wp_default_styles",
+--                Inc_Script_Loader.Wp_Default_Styles'Access);
+--    Add_Filter ("style_loader_src",
+--                Inc_Script_Loader.Wp_Style_Loader_Src'Access, 10, 2);
 
       Add_Action ("wp_head",
                   Inc_Script_Loader.Wp_Maybe_Inline_Styles'Access, 1);
