@@ -2949,33 +2949,44 @@ is
 --         end;
 -- end;
 
--- --
--- -- Adds CSS to hide header text for custom logo, based on Customizer setting.
--- --
--- -- @since 4.5.0
--- -- @access private
--- --
--- function _custom_logo_header_styles() then
---         if ( ! current_theme_supports( "custom-header", "header-text" )
---                 && get_theme_support( "custom-logo", "header-text" )
---                 && ! get_theme_mod( "header_text", true )
---         ) then
---                 classes = (array) get_theme_support( "custom-logo", "header-text" );
---                 classes = array_map( "sanitize_html_class", classes );
---                 classes = "." . implode( ", .", classes );
+   ---------------------------------
+   -- X_Custom_Logo_Header_Styles --
+   ---------------------------------
 
---                 type_attr = current_theme_supports( "html5", "style" ) ? "" : " type="text/css"";
---                 ?>
---                 <!-- Custom Logo: hide header text -.
---                 <style id="custom-logo-css"<?php echo type_attr; ?>>
---                         <?php echo classes; ?> then
---                                 position: absolute;
---                                 clip: rect(1px, 1px, 1px, 1px);
---                         end;
---                 </style>
---                 <?php
---         end;
--- end;
+   procedure X_Custom_Logo_Header_Styles
+   is
+      use List_Vectors;
+      use Hb_Common;
+      use Php;
+   begin
+      if
+        not Current_Theme_Supports ("custom-header", "header-text")    and then
+        Empty_List /= Get_Theme_Support ("custom-logo", "header-text") and then
+        0 = Get_Theme_Mod ("header_text", True)
+      then
+         declare
+            Classes_3 : constant List_Type :=
+              Get_Theme_Support ("custom-logo", "header-text"); -- (array)
+
+            Classes_2 : constant List_Type :=
+              Array_Map ("sanitize_html_class", Classes_3);
+
+            Classes : constant String := "." & Implode (", .", Classes_2);
+
+            Type_Attr : constant String :=
+              (if Current_Theme_Supports ("html5", "style")
+               then "" else " type=""text/css""");
+         begin
+            Echo ("<!-- Custom Logo: hide header text -->" & NL);
+            Echo ("<style id=""custom-logo-css""" & Type_Attr & ">" & NL);
+            Echo ("    " & Classes & " {" & NL);
+            Echo ("        position: absolute;" & NL);
+            Echo ("        clip: rect(1px, 1px, 1px, 1px);" & NL);
+            Echo ("    }"    & NL);
+            Echo ("</style>" & NL);
+         end;
+      end if;
+   end X_Custom_Logo_Header_Styles;
 
 -- --
 -- -- Gets the theme support arguments passed when registering that support.

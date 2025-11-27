@@ -521,6 +521,15 @@ is
    procedure Add_Theme_Support (Feature : String;
                                 List    : List_Type  := Empty_List;
                                 Arry    : Array_Type := Empty_Array); -- ...args
+
+   --
+   -- Adds CSS to hide header text for custom logo, based on Customizer setting.
+   --
+   -- @since 4.5.0
+   -- @access private
+   --
+   procedure X_Custom_Logo_Header_Styles;
+
    --
    -- Creates the initial theme features when the "setup_theme" action is fired.
    --

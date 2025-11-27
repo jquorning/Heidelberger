@@ -632,7 +632,8 @@ is
       Add_Action ("setup_theme",
                   Inc_Themes.X_Add_Default_Theme_Supports'Access, 1);
 --    Add_Action ("wp_loaded", X_Custom_Header_Background_Just_In_Time'Access);
---    Add_Action ("wp_head", X_Custom_Logo_Header_Styles'Access);
+      Add_Action ("wp_head",
+                  Inc_Themes.X_Custom_Logo_Header_Styles'Access);
 --    Add_Action ("plugins_loaded", X_Wp_Customize_Include'Access);
 --    Add_Action ("transition_post_status", X_Wp_Customize_Publish_Changeset'Access, 10, 3);
 --    Add_Action ("admin_enqueue_scripts", X_Wp_Customize_Loader_Settings'Access);
