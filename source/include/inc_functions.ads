@@ -817,4 +817,56 @@ is
                            Context         : String := "")
                            return Array_Type;
 
+   --
+   -- Returns true.
+   --
+   -- Useful for returning true to filters easily.
+   --
+   -- @since 3.0.0
+   --
+   -- @see __return_false()
+   --
+   -- @return true True.
+   --
+   function X_Return_True
+            return Boolean;
+
+   --
+   -- Returns false.
+   --
+   -- Useful for returning false to filters easily.
+   --
+   -- @since 3.0.0
+   --
+   -- @see __return_true()
+   --
+   -- @return false False.
+   --
+   function X_Return_False
+            return Boolean;
+
+   --
+   -- Returns 0.
+   --
+   -- Useful for returning 0 to filters easily.
+   --
+   -- @since 3.0.0
+   --
+   -- @return int 0.
+   --
+   function X_Return_Zero
+            return Integer;
+
+   --
+   -- Returns an empty array.
+   --
+   -- Useful for returning an empty array to filters easily.
+   --
+   -- @since 3.0.0
+   --
+   -- @return array Empty array.
+   --
+   function X_Return_Empty_Array
+            return Array_Type;
+
 end Inc_Functions;

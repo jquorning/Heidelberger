@@ -381,6 +381,11 @@ is
                            return Array_Type
                            is (Empty_Array);
 
+   function Array_Combine (Keys   : List_Type;
+                           Values : List_Type)
+                           return Array_Type
+                           is (Empty_Array);
+
    function Array_Column (Arry       : Array_Type;
                           Column_Key : String)
                           return Array_Type

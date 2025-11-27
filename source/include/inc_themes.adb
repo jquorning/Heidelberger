@@ -8,7 +8,6 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Arrays.IO;
 with Globals;
 with Php;
 
@@ -17,10 +16,14 @@ with Inc_Functions;
 with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
+with Inc_Post_Formats;
 with Inc_REST_API;
 
 package body Inc_Themes
 is
+   use Ada.Strings.Unbounded;
+
+   Global_Wp_Theme_Features : Array_Type;
 
 -- --
 -- -- Returns an array of WP_Theme objects based on the arguments.
@@ -122,7 +125,6 @@ is
                           Theme_Root : String := "")
                           return Inc_Class_Wp_Themes.Wp_Theme
    is
-      use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
 
@@ -441,7 +443,6 @@ is
    function Register_Theme_Directory (Directory : String)
                                       return Boolean
    is
-      use Ada.Strings.Unbounded;
       use Globals;
       use Hb_Common;
       use Php;
@@ -625,7 +626,6 @@ is
    function Get_Theme_Root (Stylesheet_Or_Template : String := "")
                             return String
    is
-      use Ada.Strings.Unbounded;
       use Globals;
       use Hb_Common;
       use Php;
@@ -732,7 +732,6 @@ is
                                 return String
    is
       use Ada.Containers;
-      use Ada.Strings.Unbounded;
       use Inc_Options;
       use Hb_Common;
       use Php;
@@ -2591,322 +2590,323 @@ is
 --         return apply_filters( "get_theme_starter_content", content, config );
 -- end;
 
--- --
--- -- Registers theme support for a given feature.
--- --
--- -- Must be called in the theme"s functions.php file to work.
--- -- If attached to a hook, it must be {@see "after_setup_theme"}.
--- -- The {@see "init"} hook may be too late for some features.
--- --
--- -- Example usage:
--- --
--- --     add_theme_support( "title-tag" );
--- --     add_theme_support( "custom-logo", array(
--- --         "height" => 480,
--- --         "width"  => 720,
--- --     ) );
--- --
--- -- @since 2.9.0
--- -- @since 3.4.0 The `custom-header-uploads` feature was deprecated.
--- -- @since 3.6.0 The `html5` feature was added.
--- -- @since 3.6.1 The `html5` feature requires an array of types to be passed. Defaults to
--- --              "comment-list", "comment-form", "search-form" for backward compatibility.
--- -- @since 3.9.0 The `html5` feature now also accepts "gallery" and "caption".
--- -- @since 4.1.0 The `title-tag` feature was added.
--- -- @since 4.5.0 The `customize-selective-refresh-widgets` feature was added.
--- -- @since 4.7.0 The `starter-content` feature was added.
--- -- @since 5.0.0 The `responsive-embeds`, `align-wide`, `dark-editor-style`, `disable-custom-colors`,
--- --              `disable-custom-font-sizes`, `editor-color-palette`, `editor-font-sizes`,
--- --              `editor-styles`, and `wp-block-styles` features were added.
--- -- @since 5.3.0 The `html5` feature now also accepts "script" and "style".
--- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
--- --              by adding it to the function signature.
--- -- @since 5.5.0 The `core-block-patterns` feature was added and is enabled by default.
--- -- @since 5.5.0 The `custom-logo` feature now also accepts "unlink-homepage-logo".
--- -- @since 5.6.0 The `post-formats` feature warns if no array is passed as the second parameter.
--- -- @since 5.8.0 The `widgets-block-editor` feature enables the Widgets block editor.
--- -- @since 6.0.0 The `html5` feature warns if no array is passed as the second parameter.
--- --
--- -- @global array _wp_theme_features
--- --
--- -- @param string feature The feature being added. Likely core values include:
--- --                          - "admin-bar"
--- --                          - "align-wide"
--- --                          - "automatic-feed-links"
--- --                          - "core-block-patterns"
--- --                          - "custom-background"
--- --                          - "custom-header"
--- --                          - "custom-line-height"
--- --                          - "custom-logo"
--- --                          - "customize-selective-refresh-widgets"
--- --                          - "custom-spacing"
--- --                          - "custom-units"
--- --                          - "dark-editor-style"
--- --                          - "disable-custom-colors"
--- --                          - "disable-custom-font-sizes"
--- --                          - "editor-color-palette"
--- --                          - "editor-gradient-presets"
--- --                          - "editor-font-sizes"
--- --                          - "editor-styles"
--- --                          - "featured-content"
--- --                          - "html5"
--- --                          - "menus"
--- --                          - "post-formats"
--- --                          - "post-thumbnails"
--- --                          - "responsive-embeds"
--- --                          - "starter-content"
--- --                          - "title-tag"
--- --                          - "wp-block-styles"
--- --                          - "widgets"
--- --                          - "widgets-block-editor"
--- -- @param mixed  ...args Optional extra arguments to pass along with certain features.
--- -- @return void|false Void on success, false on failure.
--- --
--- function add_theme_support( feature, ...args ) then
---         global _wp_theme_features;
+   -----------------------
+   -- Add_Theme_Support --
+   -----------------------
 
---         if ( ! args ) then
---                 args = true;
---         end;
+   -- Compatibility
+   NO_HEADER_TEXT      : Boolean;
+   HEADER_IMAGE_WIDTH  : Natural;
+   HEADER_IMAGE_HEIGHT : Natural;
+   HEADER_TEXTCOLOR    : Unbounded_String;
+   HEADER_IMAGE        : Unbounded_String;
+   BACKGROUND_COLOR    : Unbounded_String;
+   BACKGROUND_IMAGE    : Unbounded_String;
 
---         switch ( feature ) then
---                 case "post-thumbnails":
---                         // All post types are already supported.
---                         if ( true === get_theme_support( "post-thumbnails" ) ) then
---                                 return;
---                         end;
+   procedure Add_Theme_Support (Feature : String;
+                                List    : List_Type  := Empty_List;
+                                Arry    : Array_Type := Empty_Array) -- ...args
+   is
+      use Hb_Common;
+      use Php;
+      use List_Vectors;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Plugins;
+      use Inc_Post_Formats;
 
---                         /*
---                         -- Merge post types with any that already declared their support
---                         -- for post thumbnails.
---                         --
---                         if ( isset( args[0] ) && is_array( args[0] ) && isset( _wp_theme_features["post-thumbnails"] ) ) then
---                                 args[0] = array_unique( array_merge( _wp_theme_features["post-thumbnails"][0], args[0] ) );
---                         end;
+      Arry_2 : Array_Type;
+      List_2 : List_Type;
+      Args_2 : Boolean := False;
+   begin
+      if List = Empty_List and Arry = Empty_Array then
+         Args_2 := True;
+      end if;
 
---                         break;
+      if Feature = "post-thumbnails" then
+         -- All post types are already supported.
+         if Empty_List /= Get_Theme_Support ("post-thumbnails") then
+            return;
+         end if;
 
---                 case "post-formats":
---                         if ( isset( args[0] ) && is_array( args[0] ) ) then
---                                 post_formats = get_post_format_slugs();
---                                 unset( post_formats["standard"] );
+         --
+         -- Merge post types with any that already declared their support
+         -- for post thumbnails.
+         --
+         if
+           Arry /= Empty_Array and then
+--         Isset ( args[0]) and then
+--         Is_Array (args[0]) and then
+           Isset (Global_Wp_Theme_Features, "post-thumbnails")
+         then
+            Arry_2 :=
+              Array_Unique (
+                Array_Merge (As_Array (Get (
+                  Global_Wp_Theme_Features, "post-thumbnails")), -- [0],
+                  Arry));
+--          args[0] := Array_Unique (Array_Merge (x_wp_theme_features["post-thumbnails"][0], args[0] ) );
+         end if;
 
---                                 args[0] = array_intersect( args[0], array_keys( post_formats ) );
---                         end; else then
---                                 _doing_it_wrong(
---                                         "add_theme_support( "post-formats" )",
---                                         __( "You need to pass an array of post formats." ),
---                                         "5.6.0"
---                                 );
---                                 return false;
---                         end;
---                         break;
+      elsif Feature = "post-formats" then
+         if Arry /= Empty_Array then
+--       if Isset ( args[0] ) and then is_array( args[0] ) ) then
+            declare
+               Post_Formats : constant List_Type := Get_Post_Format_Slugs;
+            begin
+--             Post_Formats.Delete ("standard");
 
---                 case "html5":
---                         // You can"t just pass "html5", you need to pass an array of types.
---                         if ( empty( args[0] ) || ! is_array( args[0] ) ) then
---                                 _doing_it_wrong(
---                                         "add_theme_support( "html5" )",
---                                         __( "You need to pass an array of types." ),
---                                         "3.6.1"
---                                 );
+               List_2 := Array_Intersect (List, Array_Keys (Post_Formats));
+--             args[0] = array_intersect( args[0], array_keys( post_formats ) );
+            end;
+         else
+            X_Doing_It_Wrong (
+              "add_theme_support('post-formats')",
+              abs "You need to pass an array of post formats.",
+              "5.6.0"
+            );
+            raise Support_Error;
+         end if;
 
---                                 if ( ! empty( args[0] ) && ! is_array( args[0] ) ) then
---                                         return false;
---                                 end;
+      elsif Feature = "html5" then
+         -- You can't just pass "html5", you need to pass an array of types.
+         if List = Empty_List then
+--       if ( empty( args[0] ) || ! is_array( args[0] ) ) then
+            X_Doing_It_Wrong (
+              "add_theme_support('html5')",
+              abs "You need to pass an array of types.",
+              "3.6.1"
+            );
 
---                                 // Build an array of types for back-compat.
---                                 args = array( 0 => array( "comment-list", "comment-form", "search-form" ) );
---                         end;
+            if List = Empty then
+--          if ( ! empty( args[0] ) && ! is_array( args[0] ) ) then
+               raise Support_Error;
+            end if;
 
---                         // Calling "html5" again merges, rather than overwrites.
---                         if ( isset( _wp_theme_features["html5"] ) ) then
---                                 args[0] = array_merge( _wp_theme_features["html5"][0], args[0] );
---                         end;
---                         break;
+            -- Build an array of types for back-compat.
+--          args = array( 0 => array("comment-list", "comment-form", "search-form"));
+         end if;
 
---                 case "custom-logo":
---                         if ( true === args ) then
---                                 args = array( 0 => array() );
---                         end;
---                         defaults = array(
---                                 "width"                => null,
---                                 "height"               => null,
---                                 "flex-width"           => false,
---                                 "flex-height"          => false,
---                                 "header-text"          => "",
---                                 "unlink-homepage-logo" => false,
---                         );
---                         args[0]  = wp_parse_args( array_intersect_key( args[0], defaults ), defaults );
+         -- Calling "html5" again merges, rather than overwrites.
+         if Isset (Global_Wp_Theme_Features, "html5") then
+            Arry_2 :=
+              Array_Merge (As_Array (Get (Global_Wp_Theme_Features, "html5")), -- [0],
+                           Arry);
+--          args[0] = array_merge( _wp_theme_features["html5"][0], args[0] );
+         end if;
 
---                         // Allow full flexibility if no size is specified.
---                         if ( is_null( args[0]["width"] ) && is_null( args[0]["height"] ) ) then
---                                 args[0]["flex-width"]  = true;
---                                 args[0]["flex-height"] = true;
---                         end;
---                         break;
+      elsif Feature = "custom-logo" then
+         declare
+            Defaults : constant Array_Type := To_Array (List => (
+              Build ("width",                Null_Value),
+              Build ("height",               Null_Value),
+              Build ("flex-width",           False),
+              Build ("flex-height",          False),
+              Build ("header-text",          ""),
+              Build ("unlink-homepage-logo", False)
+            ));
+            Args : constant Array_Type :=
+              (if Args_2
+               then Empty_Array
+               else Arry);
+         begin
+            Arry_2 :=
+              Wp_Parse_Args (Array_Intersect_Key (Args, Defaults), Defaults);
+         end;
 
---                 case "custom-header-uploads":
---                         return add_theme_support( "custom-header", array( "uploads" => true ) );
+         -- Allow full flexibility if no size is specified.
+         if
+           not Isset (Arry_2, "width") and then -- is_null( args[0]["width"] )
+           not Isset (Arry_2, "height") -- is_null( args[0]["height"] )
+         then
+            Set (Arry_2, "flex-width",  From_Boolean (True));
+            Set (Arry_2, "flex-height", From_Boolean (True));
+         end if;
 
---                 case "custom-header":
---                         if ( true === args ) then
---                                 args = array( 0 => array() );
---                         end;
+      elsif Feature = "custom-header-uploads" then
+         Add_Theme_Support ("custom-header",
+                            Arry => To_Array (List => (1 =>
+                              Build ("uploads", True))));
+         return;
 
---                         defaults = array(
---                                 "default-image"          => "",
---                                 "random-default"         => false,
---                                 "width"                  => 0,
---                                 "height"                 => 0,
---                                 "flex-height"            => false,
---                                 "flex-width"             => false,
---                                 "default-text-color"     => "",
---                                 "header-text"            => true,
---                                 "uploads"                => true,
---                                 "wp-head-callback"       => "",
---                                 "admin-head-callback"    => "",
---                                 "admin-preview-callback" => "",
---                                 "video"                  => false,
---                                 "video-active-callback"  => "is_front_page",
---                         );
+      elsif Feature = "custom-header" then
+         declare
+            Args : constant Array_Type :=
+              (if Args_2
+               then Empty_Array
+               else Arry);
 
---                         jit = isset( args[0]["__jit"] );
---                         unset( args[0]["__jit"] );
+            Defaults : constant Array_Type := To_Array (List => (
+              Build ("default-image",          ""),
+              Build ("random-default",         False),
+              Build ("width",                  0),
+              Build ("height",                 0),
+              Build ("flex-height",            False),
+              Build ("flex-width",             False),
+              Build ("default-text-color",     ""),
+              Build ("header-text",            True),
+              Build ("uploads",                True),
+              Build ("wp-head-callback",       ""),
+              Build ("admin-head-callback",    ""),
+              Build ("admin-preview-callback", ""),
+              Build ("video",                  False),
+              Build ("video-active-callback",  "is_front_page")
+            ));
 
---                         // Merge in data from previous add_theme_support() calls.
---                         // The first value registered wins. (A child theme is set up first.)
---                         if ( isset( _wp_theme_features["custom-header"] ) ) then
---                                 args[0] = wp_parse_args( _wp_theme_features["custom-header"][0], args[0] );
---                         end;
+            JIT : constant Boolean := Isset (Arry, "__jit");
+         begin
+--          unset( args[0]["__jit"] );
 
---                         // Load in the defaults at the end, as we need to insure first one wins.
---                         // This will cause all constants to be defined, as each arg will then be set to the default.
---                         if ( jit ) then
---                                 args[0] = wp_parse_args( args[0], defaults );
---                         end;
+            -- Merge in data from previous add_theme_support() calls.
+            -- The first value registered wins. (A child theme is set up first.)
+            if Isset (Global_Wp_Theme_Features, "custom-header") then
+               Arry_2 :=
+                 Wp_Parse_Args (As_Array (Get (
+                   Global_Wp_Theme_Features, "custom-header")), -- [0],
+                   Arry);
+            end if;
 
---                         /*
---                         -- If a constant was defined, use that value. Otherwise, define the constant to ensure
---                         -- the constant is always accurate (and is not defined later,  overriding our value).
---                         -- As stated above, the first value wins.
---                         -- Once we get to wp_loaded (just-in-time), define any constants we haven"t already.
---                         -- Constants are lame. Don"t reference them. This is just for backward compatibility.
---                         --
+            -- Load in the defaults at the end, as we need to insure first one wins.
+            -- This will cause all constants to be defined, as each arg will then be
+            -- set to the default.
+            if JIT then
+               Arry_2 := Wp_Parse_Args (Arry_2, Defaults);
+            end if;
 
---                         if ( defined( "NO_HEADER_TEXT" ) ) then
---                                 args[0]["header-text"] = ! NO_HEADER_TEXT;
---                         end; elseif ( isset( args[0]["header-text"] ) ) then
---                                 define( "NO_HEADER_TEXT", empty( args[0]["header-text"] ) );
---                         end;
+            --
+            -- If a constant was defined, use that value. Otherwise, define the
+            -- constant to ensure the constant is always accurate (and is not defined
+            -- later,  overriding our value).
+            -- As stated above, the first value wins.
+            -- Once we get to wp_loaded (just-in-time), define any constants we
+            -- haven't already.
+            -- Constants are lame. Don't reference them. This is just for backward
+            -- compatibility.
+            --
+            if True then
+               Set (Arry_2, "header-text", From_Boolean (not NO_HEADER_TEXT));
+            elsif Isset (Arry, "header-text") then
+               NO_HEADER_TEXT := Isset (Arry, "header-test");
+               -- empty( args[0]["header-text"] );
+            end if;
 
---                         if ( defined( "HEADER_IMAGE_WIDTH" ) ) then
---                                 args[0]["width"] = (int) HEADER_IMAGE_WIDTH;
---                         end; elseif ( isset( args[0]["width"] ) ) then
---                                 define( "HEADER_IMAGE_WIDTH", (int) args[0]["width"] );
---                         end;
+            if True then
+               Set (Arry_2, "width", From_Integer (HEADER_IMAGE_WIDTH));
+            elsif Isset (Arry, "width") then
+               HEADER_IMAGE_WIDTH := As_Integer (Get (Arry, "width"));
+            end if;
 
---                         if ( defined( "HEADER_IMAGE_HEIGHT" ) ) then
---                                 args[0]["height"] = (int) HEADER_IMAGE_HEIGHT;
---                         end; elseif ( isset( args[0]["height"] ) ) then
---                                 define( "HEADER_IMAGE_HEIGHT", (int) args[0]["height"] );
---                         end;
+            if True then
+               Set (Arry_2, "height", From_Integer (HEADER_IMAGE_HEIGHT));
+            elsif Isset (Arry, "height") then
+               HEADER_IMAGE_HEIGHT := As_Integer (Get (Arry, "height"));
+            end if;
 
---                         if ( defined( "HEADER_TEXTCOLOR" ) ) then
---                                 args[0]["default-text-color"] = HEADER_TEXTCOLOR;
---                         end; elseif ( isset( args[0]["default-text-color"] ) ) then
---                                 define( "HEADER_TEXTCOLOR", args[0]["default-text-color"] );
---                         end;
+            if True then
+               Set (Arry_2, "default-text-color", From_String (-HEADER_TEXTCOLOR));
+            elsif Isset (Arry, "default-text-color") then
+               HEADER_TEXTCOLOR := +As_String (Get (Arry, "default-text-color"));
+            end if;
 
---                         if ( defined( "HEADER_IMAGE" ) ) then
---                                 args[0]["default-image"] = HEADER_IMAGE;
---                         end; elseif ( isset( args[0]["default-image"] ) ) then
---                                 define( "HEADER_IMAGE", args[0]["default-image"] );
---                         end;
+            if True then
+               Set (Arry_2, "default-image", From_String (-HEADER_IMAGE));
+            elsif Isset (Arry, "default-image") then
+               HEADER_IMAGE := +As_String (Get (Arry, "default-image"));
+            end if;
 
---                         if ( jit && ! empty( args[0]["default-image"] ) ) then
---                                 args[0]["random-default"] = false;
---                         end;
+            if JIT and then not Empty (Arry, "default-image") then
+               Set (Arry_2, "random-default", From_Boolean (False));
+            end if;
 
---                         // If headers are supported, and we still don"t have a defined width or height,
---                         // we have implicit flex sizes.
---                         if ( jit ) then
---                                 if ( empty( args[0]["width"] ) && empty( args[0]["flex-width"] ) ) then
---                                         args[0]["flex-width"] = true;
---                                 end;
---                                 if ( empty( args[0]["height"] ) && empty( args[0]["flex-height"] ) ) then
---                                         args[0]["flex-height"] = true;
---                                 end;
---                         end;
+            -- If headers are supported, and we still don't have a defined width or
+            -- height, we have implicit flex sizes.
+            if JIT then
+               if
+                 not Isset (Arry_2, "width") and then
+                 not Isset (Arry_2, "flex-width")
+               then
+                  Set (Arry_2, "flex-width", From_Boolean (True));
+               end if;
 
---                         break;
+               if
+                 not Isset (Arry_2, "height") and then
+                 not Isset (Arry_2, "flex-height")
+               then
+                  Set (Arry_2, "flex-height", From_Boolean (True));
+               end if;
+            end if;
+         end;
 
---                 case "custom-background":
---                         if ( true === args ) then
---                                 args = array( 0 => array() );
---                         end;
+      elsif Feature = "custom-background" then
+         declare
+            Args : constant Array_Type :=
+              (if Args_2 then Empty_Array else Arry);
 
---                         defaults = array(
---                                 "default-image"          => "",
---                                 "default-preset"         => "default",
---                                 "default-position-x"     => "left",
---                                 "default-position-y"     => "top",
---                                 "default-size"           => "auto",
---                                 "default-repeat"         => "repeat",
---                                 "default-attachment"     => "scroll",
---                                 "default-color"          => "",
---                                 "wp-head-callback"       => "_custom_background_cb",
---                                 "admin-head-callback"    => "",
---                                 "admin-preview-callback" => "",
---                         );
+            Defaults : constant Array_Type := To_Array (List => (
+              Build ("default-image",          ""),
+              Build ("default-preset",         "default"),
+              Build ("default-position-x",     "left"),
+              Build ("default-position-y",     "top"),
+              Build ("default-size",           "auto"),
+              Build ("default-repeat",         "repeat"),
+              Build ("default-attachment",     "scroll"),
+              Build ("default-color",          ""),
+              Build ("wp-head-callback",       "_custom_background_cb"),
+              Build ("admin-head-callback",    ""),
+              Build ("admin-preview-callback", "")
+            ));
 
---                         jit = isset( args[0]["__jit"] );
---                         unset( args[0]["__jit"] );
+            JIT : constant Boolean := Isset (Arry, "__jit");
+         begin
+--          unset( args[0]["__jit"] );
 
---                         // Merge in data from previous add_theme_support() calls. The first value registered wins.
---                         if ( isset( _wp_theme_features["custom-background"] ) ) then
---                                 args[0] = wp_parse_args( _wp_theme_features["custom-background"][0], args[0] );
---                         end;
+            -- Merge in data from previous add_theme_support() calls. The first
+            -- value registered wins.
+            if Isset (Global_Wp_Theme_Features, "custom-background") then
+               Arry_2 :=
+                 Wp_Parse_Args (As_Array (Get (
+                   Global_Wp_Theme_Features, "custom-background")),
+                   Arry);
+            end if;
 
---                         if ( jit ) then
---                                 args[0] = wp_parse_args( args[0], defaults );
---                         end;
+            if JIT then
+               Arry_2 := Wp_Parse_Args (Arry_2, Defaults);
+            end if;
 
---                         if ( defined( "BACKGROUND_COLOR" ) ) then
---                                 args[0]["default-color"] = BACKGROUND_COLOR;
---                         end; elseif ( isset( args[0]["default-color"] ) || jit ) then
---                                 define( "BACKGROUND_COLOR", args[0]["default-color"] );
---                         end;
+            if True then
+               Set (Arry_2, "default-color", From_String (-BACKGROUND_COLOR));
+            elsif Isset (Arry, "default-color") or JIT then
+               BACKGROUND_COLOR := +As_String (Get (Arry, "default-color"));
+            end if;
 
---                         if ( defined( "BACKGROUND_IMAGE" ) ) then
---                                 args[0]["default-image"] = BACKGROUND_IMAGE;
---                         end; elseif ( isset( args[0]["default-image"] ) || jit ) then
---                                 define( "BACKGROUND_IMAGE", args[0]["default-image"] );
---                         end;
+            if True then
+               Set (Arry_2, "default-image", From_String (-BACKGROUND_IMAGE));
+            elsif Isset (Arry, "default-image") or JIT then
+               BACKGROUND_IMAGE := +As_String (Get (Arry, "default-image"));
+            end if;
+         end;
 
---                         break;
+      -- Ensure that "title-tag" is accessible in the admin.
+      elsif Feature = "title-tag" then
+         -- Can be called in functions.php but must happen before wp_loaded, i.e.
+         -- not in header.php.
+         if Did_Action ("wp_loaded") then
+            X_Doing_It_Wrong (
+              "add_theme_support('title-tag')",
+              Sprintf (
+                -- translators: 1: title-tag, 2: wp_loaded
+                abs "Theme support for %1s should be registered before the %2s hook.",
+                To_List (List => (
+                  1 => +"<code>title-tag</code>",
+                  2 => +"<code>wp_loaded</code>"
+                ))),
+                "4.1.0"
+            );
+            raise Support_Error;
+         end if;
+      end if;
 
---                 // Ensure that "title-tag" is accessible in the admin.
---                 case "title-tag":
---                         // Can be called in functions.php but must happen before wp_loaded, i.e. not in header.php.
---                         if ( did_action( "wp_loaded" ) ) then
---                                 _doing_it_wrong(
---                                         "add_theme_support( "title-tag" )",
---                                         sprintf(
---                                                 /* translators: 1: title-tag, 2: wp_loaded--
---                                                 __( "Theme support for %1s should be registered before the %2s hook." ),
---                                                 "<code>title-tag</code>",
---                                                 "<code>wp_loaded</code>"
---                                         ),
---                                         "4.1.0"
---                                 );
-
---                                 return false;
---                         end;
---         end;
-
---         _wp_theme_features[ feature ] = args;
--- end;
+      Set (Global_Wp_Theme_Features, Feature, From_Array (Arry_2));
+   end Add_Theme_Support;
 
 -- --
 -- -- Registers the internal custom header and background routines.
@@ -2921,7 +2921,7 @@ is
 --         global custom_image_header, custom_background;
 
 --         if ( current_theme_supports( "custom-header" ) ) then
---                 // In case any constants were defined after an add_custom_image_header() call, re-run.
+--                 // In elsif Feature = any constants were defined after an add_custom_image_header() call, re-run.
 --                 add_theme_support( "custom-header", array( "__jit" => true ) );
 
 --                 args = get_theme_support( "custom-header" );
@@ -2936,7 +2936,7 @@ is
 --         end;
 
 --         if ( current_theme_supports( "custom-background" ) ) then
---                 // In case any constants were defined after an add_custom_background() call, re-run.
+--                 // In elsif Feature = any constants were defined after an add_custom_background() call, re-run.
 --                 add_theme_support( "custom-background", array( "__jit" => true ) );
 
 --                 args = get_theme_support( "custom-background" );
@@ -3008,9 +3008,9 @@ is
 --         end;
 
 --         switch ( feature ) then
---                 case "custom-logo":
---                 case "custom-header":
---                 case "custom-background":
+--                 elsif Feature = "custom-logo":
+--                 elsif Feature = "custom-header":
+--                 elsif Feature = "custom-background":
 --                         if ( isset( _wp_theme_features[ feature ][0][ args[0] ] ) ) then
 --                                 return _wp_theme_features[ feature ][0][ args[0] ];
 --                         end;
@@ -3062,7 +3062,7 @@ is
 --         global _wp_theme_features;
 
 --         switch ( feature ) then
---                 case "custom-header-uploads":
+--                 elsif Feature = "custom-header-uploads":
 --                         if ( ! isset( _wp_theme_features["custom-header"] ) ) then
 --                                 return false;
 --                         end;
@@ -3075,7 +3075,7 @@ is
 --         end;
 
 --         switch ( feature ) then
---                 case "custom-header":
+--                 elsif Feature = "custom-header":
 --                         if ( ! did_action( "wp_loaded" ) ) then
 --                                 break;
 --                         end;
@@ -3089,7 +3089,7 @@ is
 --                         end;
 --                         break;
 
---                 case "custom-background":
+--                 elsif Feature = "custom-background":
 --                         if ( ! did_action( "wp_loaded" ) ) then
 --                                 break;
 --                         end;
@@ -3144,7 +3144,7 @@ is
 --         end;
 
 --         switch ( feature ) then
---                 case "post-thumbnails":
+--                 elsif Feature = "post-thumbnails":
 --                         /*
 --                         -- post-thumbnails can be registered for only certain content/post types
 --                         -- by passing an array of types to add_theme_support().
@@ -3156,8 +3156,8 @@ is
 --                         content_type = args[0];
 --                         return in_array( content_type, _wp_theme_features[ feature ][0], true );
 
---                 case "html5":
---                 case "post-formats":
+--                 elsif Feature = "html5":
+--                 elsif Feature = "post-formats":
 --                         /*
 --                         -- Specific post formats can be registered by passing an array of types
 --                         -- to add_theme_support().
@@ -3167,9 +3167,9 @@ is
 --                         type = args[0];
 --                         return in_array( type, _wp_theme_features[ feature ][0], true );
 
---                 case "custom-logo":
---                 case "custom-header":
---                 case "custom-background":
+--                 elsif Feature = "custom-logo":
+--                 elsif Feature = "custom-header":
+--                 elsif Feature = "custom-background":
 --                         // Specific capabilities can be registered by passing an array to add_theme_support().
 --                         return ( isset( _wp_theme_features[ feature ][0][ args[0] ] ) && _wp_theme_features[ feature ][0][ args[0] ] );
 --         end;
@@ -3257,7 +3257,6 @@ is
                       To_List (List => (+"string", +"boolean", +"integer",
                                         +"number", +"array", +"object")), True)
       then
-Arrays.Io.Dump (Args_2);
          raise Feature_Error with "invalid_type";
          -- return new WP_Error(
          --   "invalid_type",
@@ -4328,50 +4327,54 @@ Arrays.Io.Dump (Args_2);
 --         return WP_Theme_JSON::get_element_class_name( element );
 -- end;
 
--- --
--- -- Adds default theme supports for block themes when the "setup_theme" action fires.
--- --
--- -- See {@see "setup_theme"}.
--- --
--- -- @since 5.9.0
--- -- @access private
--- --
--- function _add_default_theme_supports() then
---         if ( ! wp_is_block_theme() ) then
---                 return;
---         end;
+   ----------------------------------
+   -- X_Add_Default_Theme_Supports --
+   ----------------------------------
 
---         add_theme_support( "post-thumbnails" );
---         add_theme_support( "responsive-embeds" );
---         add_theme_support( "editor-styles" );
---         --
---         -- Makes block themes support HTML5 by default for the comment block and search form
---         -- (which use default template functions) and `[caption]` and `[gallery]` shortcodes.
---         -- Other blocks contain their own HTML5 markup.
---         --
---         add_theme_support( "html5", To_Array (List => ( "comment-form", "comment-list", "search-form", "gallery", "caption", "style", "script" ) );
---         add_theme_support( "automatic-feed-links" );
+   procedure X_Add_Default_Theme_Supports
+   is
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_Plugins;
+   begin
+      if not Wp_Is_Block_Theme then
+         return;
+      end if;
 
---         add_filter( "should_load_separate_core_block_assets", "__return_true" );
+      Add_Theme_Support ("post-thumbnails");
+      Add_Theme_Support ("responsive-embeds");
+      Add_Theme_Support ("editor-styles");
 
---         --
---         -- Remove the Customizer"s Menus panel when block theme is active.
---         --
---         add_filter(
---                 "customize_panel_active",
---                 static function ( active, WP_Customize_Panel panel ) then
---                         if (
---                                 "nav_menus" === panel.id &&
---                                 ! current_theme_supports( "menus" ) &&
---                                 ! current_theme_supports( "widgets" )
---                         ) then
---                                 active = false;
---                         end;
---                         return active;
---                 end;,
---                 10,
---                 2
---         );
--- end;
+      --
+      -- Makes block themes support HTML5 by default for the comment block and search
+      -- form (which use default template functions) and `[caption]` and `[gallery]`
+      -- shortcodes. Other blocks contain their own HTML5 markup.
+      --
+      Add_Theme_Support ("html5", To_List (List => (+"comment-form", +"comment-list",
+                                  +"search-form", +"gallery", +"caption",
+                                  +"style", +"script")));
+      Add_Theme_Support ("automatic-feed-links");
+
+--    Add_Filter ("should_load_separate_core_block_assets", X_Return_True'Access);
+
+      --
+      -- Remove the Customizer"s Menus panel when block theme is active.
+      --
+      -- Add_Filter (
+      --   "customize_panel_active",
+      --           static function ( active, WP_Customize_Panel panel ) then
+      --                   if (
+      --                           "nav_menus" === panel.id &&
+      --                           ! current_theme_supports( "menus" ) &&
+      --                           ! current_theme_supports( "widgets" )
+      --                   ) then
+      --                           active = false;
+      --                   end;
+      --                   return active;
+      --           end;,
+      --           10,
+      --           2
+      --   );
+   end X_Add_Default_Theme_Supports;
 
 end Inc_Themes;

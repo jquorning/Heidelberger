@@ -6780,61 +6780,41 @@ is
       return All_Headers;
    end Get_File_Data;
 
---
--- Returns true.
---
--- Useful for returning true to filters easily.
---
--- @since 3.0.0
---
--- @see __return_false()
---
--- @return true True.
---
--- function __return_true() then // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
---         return true;
--- end;
+   -------------------
+   -- X_Return_True --
+   -------------------
 
---
--- Returns false.
---
--- Useful for returning false to filters easily.
---
--- @since 3.0.0
---
--- @see __return_true()
---
--- @return false False.
---
--- function __return_false() then // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
---         return false;
--- end;
+   function X_Return_True
+            return Boolean
+            is (True);
+   -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
 
---
--- Returns 0.
---
--- Useful for returning 0 to filters easily.
---
--- @since 3.0.0
---
--- @return int 0.
---
--- function __return_zero() then // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
---         return 0;
--- end;
+   --------------------
+   -- X_Return_False --
+   --------------------
 
---
--- Returns an empty array.
---
--- Useful for returning an empty array to filters easily.
---
--- @since 3.0.0
---
--- @return array Empty array.
---
--- function __return_empty_array() then // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
---         return array();
--- end;
+   function X_Return_False
+            return Boolean
+            is (False);
+   -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
+
+   --------------------
+   -- X_Returns_Zero --
+   --------------------
+
+   function X_Return_Zero
+            return Integer
+            is (0);
+   -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
+
+   --------------------------
+   -- X_Return_Empty_Array --
+   --------------------------
+
+   function X_Return_Empty_Array
+            return Array_Type
+            is (Empty_Array);
+   -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
 
 --
 -- Returns null.

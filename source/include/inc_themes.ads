@@ -440,6 +440,88 @@ is
                                      Args    : Array_Type);
 
    --
+   -- Registers theme support for a given feature.
+   --
+   -- Must be called in the theme"s functions.php file to work.
+   -- If attached to a hook, it must be {@see "after_setup_theme"}.
+   -- The {@see "init"} hook may be too late for some features.
+   --
+   -- Example usage:
+   --
+   --     add_theme_support( "title-tag" );
+   --     add_theme_support( "custom-logo", array(
+   --         "height" => 480,
+   --         "width"  => 720,
+   --     ) );
+   --
+   -- @since 2.9.0
+   -- @since 3.4.0 The `custom-header-uploads` feature was deprecated.
+   -- @since 3.6.0 The `html5` feature was added.
+   -- @since 3.6.1 The `html5` feature requires an array of types to be passed.
+   --               Defaults to "comment-list", "comment-form", "search-form" for
+   --               backward compatibility.
+   -- @since 3.9.0 The `html5` feature now also accepts "gallery" and "caption".
+   -- @since 4.1.0 The `title-tag` feature was added.
+   -- @since 4.5.0 The `customize-selective-refresh-widgets` feature was added.
+   -- @since 4.7.0 The `starter-content` feature was added.
+   -- @since 5.0.0 The `responsive-embeds`, `align-wide`, `dark-editor-style`,
+   --               `disable-custom-colors`, `disable-custom-font-sizes`,
+   --               `editor-color-palette`, `editor-font-sizes`, `editor-styles`, and
+   --               `wp-block-styles` features were added.
+   -- @since 5.3.0 The `html5` feature now also accepts "script" and "style".
+   -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
+   --              by adding it to the function signature.
+   -- @since 5.5.0 The `core-block-patterns` feature was added and is enabled by
+   --               default.
+   -- @since 5.5.0 The `custom-logo` feature now also accepts "unlink-homepage-logo".
+   -- @since 5.6.0 The `post-formats` feature warns if no array is passed as the
+   --               second parameter.
+   -- @since 5.8.0 The `widgets-block-editor` feature enables the Widgets block editor.
+   -- @since 6.0.0 The `html5` feature warns if no array is passed as the second
+   --               parameter.
+   --
+   -- @global array _wp_theme_features
+   --
+   -- @param string feature The feature being added. Likely core values include:
+   --                          - "admin-bar"
+   --                          - "align-wide"
+   --                          - "automatic-feed-links"
+   --                          - "core-block-patterns"
+   --                          - "custom-background"
+   --                          - "custom-header"
+   --                          - "custom-line-height"
+   --                          - "custom-logo"
+   --                          - "customize-selective-refresh-widgets"
+   --                          - "custom-spacing"
+   --                          - "custom-units"
+   --                          - "dark-editor-style"
+   --                          - "disable-custom-colors"
+   --                          - "disable-custom-font-sizes"
+   --                          - "editor-color-palette"
+   --                          - "editor-gradient-presets"
+   --                          - "editor-font-sizes"
+   --                          - "editor-styles"
+   --                          - "featured-content"
+   --                          - "html5"
+   --                          - "menus"
+   --                          - "post-formats"
+   --                          - "post-thumbnails"
+   --                          - "responsive-embeds"
+   --                          - "starter-content"
+   --                          - "title-tag"
+   --                          - "wp-block-styles"
+   --                          - "widgets"
+   --                          - "widgets-block-editor"
+   -- @param mixed  ...args Optional extra arguments to pass along with certain
+   --                        features.
+   -- @return void|false Void on success, false on failure.
+   --
+   Support_Error : exception;
+
+   procedure Add_Theme_Support (Feature : String;
+                                List    : List_Type  := Empty_List;
+                                Arry    : Array_Type := Empty_Array); -- ...args
+   --
    -- Creates the initial theme features when the "setup_theme" action is fired.
    --
    -- See {@see "setup_theme"}.
@@ -448,5 +530,15 @@ is
    -- @since 6.0.1 The `block-templates` feature was added.
    --
    procedure Create_Initial_Theme_Features;
+
+   --
+   -- Adds default theme supports for block themes when the "setup_theme" action fires.
+   --
+   -- See {@see "setup_theme"}.
+   --
+   -- @since 5.9.0
+   -- @access private
+   --
+   procedure X_Add_Default_Theme_Supports;
 
 end Inc_Themes;

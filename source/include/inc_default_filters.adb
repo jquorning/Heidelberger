@@ -629,7 +629,8 @@ is
       -- Theme.
       Add_Action ("setup_theme",
                   Inc_Themes.Create_Initial_Theme_Features'Access, 0);
---    Add_Action ("setup_theme", X_Add_Default_Theme_Supports'Access, 1);
+      Add_Action ("setup_theme",
+                  Inc_Themes.X_Add_Default_Theme_Supports'Access, 1);
 --    Add_Action ("wp_loaded", X_Custom_Header_Background_Just_In_Time'Access);
 --    Add_Action ("wp_head", X_Custom_Logo_Header_Styles'Access);
 --    Add_Action ("plugins_loaded", X_Wp_Customize_Include'Access);
