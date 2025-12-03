@@ -7,7 +7,7 @@
 --
 
 with Hb_Common;
-with Php;
+-- with Php;
 
 package body Inc_Class_Wp_Customize_Sections
 is
@@ -23,7 +23,7 @@ is
               return Wp_Customize_Section
    is
       use Hb_Common;
-      use Php;
+--    use Php;
 
       This : Wp_Customize_Section;
 --    Keys : List_Type := Array_Keys (Get_Object_Vars (This));

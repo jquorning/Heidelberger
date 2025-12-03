@@ -17,7 +17,7 @@ is
                      return Array_Type
    is
    begin
-      return This.Id_Data;
+      return This.M_Id_Data;
    end Id_Data;
 
 end Cust_Class_Wp_Customize_Partials;

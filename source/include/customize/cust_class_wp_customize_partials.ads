@@ -52,7 +52,8 @@ is
          --     @type array  keys Keys for multidimensional.
          -- end;
          --
---         protected id_data = array();
+         -- protected
+         M_Id_Data : Array_Type;
 
          --
          -- Type of this partial.
@@ -134,7 +135,6 @@ is
          --
 --         public fallback_refresh = true;
 
-         null;
       end record;
 
         -- --

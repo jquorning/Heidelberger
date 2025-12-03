@@ -426,7 +426,7 @@ is
                       return Multi_Type
    is
       use Hb_Common;
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       --
       -- Filters a Customize setting value in un-slashed form.
@@ -451,7 +451,7 @@ is
       use Inc_L10n;
       use Inc_Load;
       use Inc_Class_Wp_Errors;
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       -- if Is_Wp_Error (Value) then
       --    return Value;
@@ -503,7 +503,7 @@ is
                    return String
    is
       use Hb_Common;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Id_Base      : constant String := Get_As_String (This.Id_Data, "base");
       Is_Core_Type : constant Boolean := -This.Typ in "option" | "theme_mod";
@@ -667,7 +667,7 @@ is
                                       return Array_Type -- String
    is
       use Hb_Common;
-      use List_Vectors;
+--    use List_Vectors;
 
       Root_2 : Array_Type := Root;
    begin

@@ -118,7 +118,7 @@ is
    is
       use Inc_Class_Wp_Block_Editor_Contexts;
       use Inc_Class_Wp_Posts;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Block_Categories     : Array_Type := Get_Default_Block_Categories;
       Block_Editor_Context : constant Wp_Block_Editor_Context :=
@@ -178,7 +178,7 @@ is
                return List_Type
    is
       use Inc_Class_Wp_Posts;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Allowed_Block_Types : List_Type; -- Boolean := True;
    begin

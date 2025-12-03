@@ -702,7 +702,7 @@ is
    -- @param WP_Customize_Manager wp_customize    Manager instance.
    --
    is
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       This.M_Branching :=
         Apply_Filters ("customize_changeset_branching", This.M_Branching, This);
@@ -1806,7 +1806,7 @@ is
                              Setting_Id : String;
                              Value      : Array_Type)
    is
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       This.Unsanitized_Post_Values; -- Populate _post_values from _POST["customized"].
       Set (This.X_Post_Values, Setting_Id, From_Array (Value));

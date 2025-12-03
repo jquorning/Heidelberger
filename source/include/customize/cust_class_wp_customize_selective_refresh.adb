@@ -8,8 +8,8 @@
 
 with Arrays;
 with Binder;
-with Hb_Common;
-with Php;
+-- with Hb_Common;
+-- with Php;
 
 with Inc_Class_Wp_Customize_Managers;
 
@@ -44,8 +44,8 @@ is
                                         return Boolean
    is
       use Binder;
-      use Hb_Common;
-      use Php;
+--    use Hb_Common;
+--    use Php;
    begin
       return not Isset (X_POST, RENDER_QUERY_VAR);
 --    return not Empty (X_POST, RENDER_QUERY_VAR);
