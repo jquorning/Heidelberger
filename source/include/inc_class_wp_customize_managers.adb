@@ -9,6 +9,7 @@
 with Binder;
 with Globals;
 with Helpers;
+with Php.JSON;
 with Php.Preg;
 
 with Inc_Caches;
@@ -1655,6 +1656,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.JSON;
       use Php.Preg;
       use Inc_Capabilities;
       use Inc_Formatting;

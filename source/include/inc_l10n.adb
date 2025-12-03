@@ -961,7 +961,6 @@ package body Inc_L10n is
                                      return Boolean
    is
       use Globals;
-      use Php.Files;
       use Inc_Load;
 
       Locale_2 : constant String := (if Locale = ""

@@ -12,6 +12,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Helpers;
+with Php.JSON;
 with Php.Files;
 with Php.Preg;
 
@@ -4599,6 +4600,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.JSON;
       use Php.Files;
       use Inc_L10n;
 

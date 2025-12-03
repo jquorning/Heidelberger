@@ -6,9 +6,10 @@
 -- @since 5.8.0
 --
 
-with Php.Files;
 with Globals;
 with Hb_Common;
+with Php.Files;
+with Php.JSON;
 
 with Inc_Block_Editors;
 -- with Inc_Class_Wp_Block_Type;
@@ -579,6 +580,7 @@ is
             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
    is
 --    use Hb_Common;
+      use Php.JSON;
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Class_Wp_Theme_JSON_Data;
       use Inc_Themes;

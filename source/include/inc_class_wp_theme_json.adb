@@ -8,6 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.JSON;
 with Php.Preg;
 
 with Block_Typography;
@@ -2083,6 +2084,7 @@ is
                                 return Multi_Type
    is
       use Php;
+      use Php.JSON;
       use Inc_Functions;
       use Inc_L10n;
 
