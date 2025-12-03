@@ -8,14 +8,10 @@
 
 with Ada.Containers.Vectors;
 
-with Arrays;
-
 with Inc_Class_Wp_Widgets;
 
 package Inc_Class_Wp_Widget_Factories
 is
-   use Arrays;
-
    subtype Widget_Index is Positive;
 
    package Widget_Vectors is new

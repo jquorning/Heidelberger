@@ -20,7 +20,7 @@ is
 
    procedure Wp_Initial_Constants
    is
-      use Globals;
+--    use Globals;
    begin
 --         global $blog_id, $wp_version;
 

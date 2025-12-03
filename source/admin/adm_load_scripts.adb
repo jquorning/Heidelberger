@@ -95,8 +95,7 @@ is
 
       for Handle of Load_2 loop
          declare
-            use Inc_Class_Wp_Dependency;
-            use Dependency_Maps;
+            use Inc_Class_Wp_Dependency.Dependency_Maps;
 
             Path : Unbounded_String;
          begin

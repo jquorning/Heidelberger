@@ -42,7 +42,7 @@ is
    procedure Top
    is
       use Binder;
-      use Adm_Menu;
+--    use Adm_Menu;
 
 --    Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
       Unused : Unbounded_String;

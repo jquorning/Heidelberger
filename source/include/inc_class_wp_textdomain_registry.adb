@@ -7,17 +7,19 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
+with Arrays;
 with Globals;
 with Hb_Common;
-with Php;
+-- with Php;
 
 with Inc_Formatting;
 
 package body Inc_Class_Wp_Textdomain_Registry
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
    use Hb_Common;
    use Inc_Formatting;
 

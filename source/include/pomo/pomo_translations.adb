@@ -97,7 +97,7 @@ is
                              Entri : POMO_Entries.Translation_Entry)
                              return POMO_Entries.Translation_Entry -- String
    is
-      use Hb_Common;
+--    use Hb_Common;
 
       Key : constant String := Entri.Key; -- ();
    begin

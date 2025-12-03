@@ -1,13 +1,13 @@
 
 package body Hb_Common
 is
-   function To_Array (Item : String) return Array_Type is (Empty_Array);
+-- function To_Array (Item : String) return Array_Type is (Empty_Array);
 
    function Empty (Table : Array_Type) return Boolean is (True);
 
-   function Count (Item : String) return String is ("XXX 8");
+-- function Count (Item : String) return String is ("XXX 8");
 
-   function "abs" (List : Array_Type) return String is ("XXX 12");
+-- function "abs" (List : Array_Type) return String is ("XXX 12");
 
    -----------
    -- Isset --

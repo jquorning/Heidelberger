@@ -906,7 +906,7 @@ is
             return Array_Type
    is
       use Hb_Common;
-      use Php;
+--    use Php;
       use Inc_Options;
 
       Additional_Sizes : constant Array_Type :=
@@ -3882,7 +3882,7 @@ is
    is
       use Php;
       use Inc_Load;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       U_Bytes : constant Natural :=
         Wp_Convert_Hr_To_Bytes (Ini_Get ("upload_max_filesize"));

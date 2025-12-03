@@ -11,14 +11,14 @@ with Globals;
 with Hb_Common;
 
 with Inc_Block_Editors;
-with Inc_Class_Wp_Block_Type;
+-- with Inc_Class_Wp_Block_Type;
 with Inc_Class_Wp_Block_Type_Registry;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Querys;
 with Inc_Class_Wp_Theme_JSON_Data;
 with Inc_Functions;
 with Inc_L10n;
-with Inc_Plugins;
+-- with Inc_Plugins;
 with Inc_Posts;
 with Inc_Themes;
 
@@ -40,7 +40,7 @@ is
    function Read_JSON_File (File_Path : String)
                             return Array_Type
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Functions;
    begin
       if File_Path /= "" then
@@ -114,7 +114,7 @@ is
    is
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Class_Wp_Theme_JSON_Data;
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       if
         Null_Theme_JSON /= Static_Core and then
@@ -158,7 +158,7 @@ is
                                         return Boolean
    is
       use Hb_Common;
-      use Inc_Class_Wp_Block_Type;
+--    use Inc_Class_Wp_Block_Type;
       use Inc_Class_Wp_Block_Type_Registry;
    begin
       -- Bail out if the origin is invalid.
@@ -202,7 +202,7 @@ is
                             Options    : Array_Type := Empty_Array)
                             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Functions;
       use Inc_Class_Wp_Themes;
       use Inc_Class_Wp_Theme_JSON;
@@ -453,7 +453,7 @@ is
    function Remove_JSON_Comments (Arry : Array_Type)
                                   return Array_Type
    is
-      use Hb_Common;
+--    use Hb_Common;
 
       Arry_2 : Array_Type := Arry;
    begin
@@ -578,7 +578,7 @@ is
    function Get_User_Data
             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Class_Wp_Theme_JSON_Data;
       use Inc_Themes;
@@ -716,7 +716,7 @@ is
    function Theme_Has_Support
             return Boolean
    is
-      use Hb_Common;
+--    use Hb_Common;
    begin
       if not Theme_Has_Support then -- static::
          Static_Theme_Has_Support :=

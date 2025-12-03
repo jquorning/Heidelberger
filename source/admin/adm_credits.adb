@@ -6,7 +6,6 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Globals;
@@ -22,13 +21,9 @@ with Inc_L10n;
 
 package body Adm_Credits
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
-   use Inc_L10n;
-   use Php;
 
-   subtype Json_Value is GNATCOLL.JSON.JSON_Value;
+   subtype JSON_Value is GNATCOLL.JSON.JSON_Value;
 
    function Translation
       return Templates_Parser.Translate_Table;
@@ -39,11 +34,16 @@ is
 
    procedure Render
    is
-      List            : constant List_Type :=
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Php;
+      use Inc_L10n;
+
+      List : constant List_Type :=
          Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
 
-      Display_Version : constant String     := "XXX-512"; -- -List.First_Element;
-      Credits         : constant Json_Value := Adi_Credits.Wp_Credits; -- ()
+      Display_Version : constant String     := -List.First_Element;
+      Credits         : constant JSON_Value := Adi_Credits.Wp_Credits; -- ()
    begin
       Globals.Title := +abs "Credits";
 
@@ -129,8 +129,8 @@ is
             elsif Var_Name = "VAR_credits_core_developers" then
                Clear_Echo;
                declare
-                  Groups    : constant Json_Value := Credits.Get ("groups");
-                  Core_Devs : constant Json_Value := Groups. Get ("core-developers");
+                  Groups    : constant JSON_Value := Credits.Get ("groups");
+                  Core_Devs : constant JSON_Value := Groups. Get ("core-developers");
                begin
                   Wp_Credits_Section_Title (Core_Devs);
                   Wp_Credits_Section_List  (Credits, "core-developers");
@@ -142,8 +142,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups : constant Json_Value := Credits.Get ("groups");
-                  Props  : constant Json_Value := Groups. Get ("props");
+                  Groups : constant JSON_Value := Credits.Get ("groups");
+                  Props  : constant JSON_Value := Groups. Get ("props");
                begin
                   Wp_Credits_Section_Title (Props);
                   Wp_Credits_Section_List  (Credits, "props");
@@ -154,8 +154,8 @@ is
                Clear_Echo;
 
                declare
-                  Groups     : constant Json_Value := Credits.Get ("groups");
-                  Validators : constant Json_Value := Groups. Get ("validators");
+                  Groups     : constant JSON_Value := Credits.Get ("groups");
+                  Validators : constant JSON_Value := Groups. Get ("validators");
                begin
                   Wp_Credits_Section_Title (Validators);
                   Wp_Credits_Section_List  (Credits, "validators");
@@ -167,8 +167,8 @@ is
                Clear_Echo;
 
                declare
-                  Group     : constant Json_Value := Credits.Get ("groups");
-                  Libraries : constant Json_Value := Group.Get ("libraries");
+                  Group     : constant JSON_Value := Credits.Get ("groups");
+                  Libraries : constant JSON_Value := Group.Get ("libraries");
                begin
                   Wp_Credits_Section_Title (Libraries);
                   Wp_Credits_Section_List  (Credits, "libraries");

@@ -5,7 +5,6 @@ with Hb_Common;
 
 with Adi_Class_Wp_Screens;
 
-with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
 
 package Adi_Templates

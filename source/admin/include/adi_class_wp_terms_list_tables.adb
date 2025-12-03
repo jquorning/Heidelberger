@@ -29,9 +29,9 @@ is
                          return Wp_Terms_List_Table
    is
       use Hb_Common;
-      use Php;
+--    use Php;
       use Inc_L10n;
-      use Inc_Posts;
+--    use Inc_Posts;
 
 --    global post_type, taxonomy, action, tax;
       This : constant Wp_Terms_List_Table := (

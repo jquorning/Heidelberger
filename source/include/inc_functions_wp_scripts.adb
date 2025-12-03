@@ -10,7 +10,7 @@
 with Hb_Common;
 with Php;
 
-with Inc_Class_Wp_Dependency;
+-- with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
 with Inc_L10n;

@@ -6,9 +6,9 @@
 -- @since 4.4.0
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
-with Hb_Common;
+-- with Hb_Common;
 with Php;
 
 package body Adi_Class_Wp_Screens
@@ -1165,7 +1165,7 @@ is
                                            Key  : String := "";
                                            Tag  : String := "h2")
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
    begin
       if not Isset (This.X_Screen_Reader_Content, Key) then

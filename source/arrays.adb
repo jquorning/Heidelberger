@@ -783,14 +783,14 @@ is
       return Array_Maps.Length (Array_Maps.Map (Arry));
    end Length;
 
-   --------------
-   -- Get_List --
-   --------------
+   -- --------------
+   -- -- Get_List --
+   -- --------------
 
-   function Get_List (Arry : Array_Type;
-                      Key  : String)
-                      return List_Type
-                      is (Empty_List);
+   -- function Get_List (Arry : Array_Type;
+   --                    Key  : String)
+   --                    return List_Type
+   --                    is (Empty_List);
 
    -----------
    -- Empty --

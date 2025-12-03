@@ -8,11 +8,11 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
-with Arrays;
+-- with Arrays;
 
 package Inc_Class_Wp_Textdomain_Registry
 is
-   use Arrays;
+-- use Arrays;
 
    package String_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,

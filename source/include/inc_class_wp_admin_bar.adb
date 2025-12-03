@@ -818,7 +818,7 @@ is
 
    procedure Add_Menus (This : Wp_Admin_Bar)
    is
-      use Inc_Admin_Bar;
+--    use Inc_Admin_Bar;
       use Inc_Load;
       use Inc_Plugins;
    begin

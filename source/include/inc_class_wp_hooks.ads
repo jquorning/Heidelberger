@@ -11,7 +11,7 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Php;
+-- with Php;
 
 package Inc_Class_Wp_Hooks
 is

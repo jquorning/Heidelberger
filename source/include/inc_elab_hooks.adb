@@ -1,5 +1,5 @@
-with Hb_Common;
-with Php;
+-- with Hb_Common;
+-- with Php;
 
 package body Inc_Elab_Hooks
 is
@@ -12,8 +12,8 @@ is
    function Build_Preinitialized_Hooks (Filters : Array_Type)
                                         return Hook_Maps.Map
    is
-      use Hb_Common;
-      use Php;
+--    use Hb_Common;
+--    use Php;
 
       -- @var WP_Hook[] normalized
       Normalized : Hook_Maps.Map;
@@ -65,7 +65,7 @@ is
                Normalized.Include (Key      => Hook_Name,
                                    New_Item => Hook);
             end;
-            << Continue >>
+--          << Continue >>
          end;
       end loop;
 

@@ -6,10 +6,10 @@
 --
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
 with Adi_Caches;
-with Adi_Templates;
+-- with Adi_Templates;
 
 with Inc_Formatting;
 with Inc_Functions;
@@ -573,7 +573,7 @@ is
          -- Add default term.
          if not Empty (Taxonomy_Object.Default_Term) then
             declare
-               use Inc_Class_Wp_Terms;
+--             use Inc_Class_Wp_Terms;
 
                Term : Array_Type :=
                  Term_Exists (As_String (Get (Taxonomy_Object.Default_Term, "name")),
@@ -2274,7 +2274,7 @@ is
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
       use Wp_Common;
-      use Adi_Templates;
+--    use Adi_Templates;
       use Inc_Class_Wp_Terms;
       use Integer_Vectors;
 
@@ -2310,7 +2310,7 @@ is
 
       declare
          use Inc_Functions;
-         use Inc_Plugins;
+--       use Inc_Plugins;
 
          Object_Ids_2 : constant List_Type  := Array_Map ("intval", Object_Ids_3);
          Args_2       : constant Array_Type := Wp_Parse_Args (Args);
@@ -3877,7 +3877,7 @@ is
       X_Prime_Term_Caches (Term_Ids);
 
       declare
-         use Inc_Taxonomys;
+--       use Inc_Taxonomys;
 
          Terms : Wp_Term_Array;
       begin

@@ -912,7 +912,7 @@ is
                           Allowed_Protocols : List_Type)
                           return String
    is
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       --
       -- Filters content to be run through KSES.
@@ -1116,7 +1116,7 @@ is
    function Filter_Limits (Required_Attr_Limits : Array_Type)
                            return Boolean
    is
-      use Hb_Common;
+--    use Hb_Common;
    begin
       return
          Isset (Required_Attr_Limits, "required") and then
@@ -1720,7 +1720,7 @@ is
                              Options : Array_Type := Empty_Array) -- null
                              return String
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
 
       Options_2 : constant Array_Type :=
@@ -1732,7 +1732,7 @@ is
         Preg_Replace ("/[\x00-\x08\x0B\x0C\x0E-\x1F]/", "", Item);
 
       String_3 : constant String :=
-        (if "remove" = As_String (Get (Options, "slash_zero"))
+        (if "remove" = As_String (Get (Options_2, "slash_zero"))
          then Preg_Replace ("/\\\\+0+/", "", String_2)
          else String_2);
    begin

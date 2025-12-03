@@ -16,7 +16,7 @@ with Php;
 with Inc_Class_Wp_Post_Type;
 with Inc_Options;
 with Inc_Posts;
-with Inc_Capabilities;
+-- with Inc_Capabilities;
 with Inc_Users;
 
 package body Adi_Class_Wp_Posts_List_Tables
@@ -34,7 +34,7 @@ is
       use Globals;
       use Php;
       use Inc_Class_Wp_Post_Type;
-      use Inc_Capabilities;
+--    use Inc_Capabilities;
       use Inc_Posts;
 
       This : Wp_Posts_List_Table := (

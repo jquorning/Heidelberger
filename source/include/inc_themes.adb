@@ -12,7 +12,7 @@ with Binder;
 with Globals;
 with Php;
 
-with Inc_Class_Wp_Customize_Managers;
+-- with Inc_Class_Wp_Customize_Managers;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -190,7 +190,7 @@ is
    function Get_Stylesheet
             return String
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Options;
       use Inc_Plugins;
    begin
@@ -211,7 +211,7 @@ is
    function Get_Stylesheet_Directory
             return String
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Plugins;
 
       Stylesheet     : constant String := Get_Stylesheet; -- ();
@@ -330,7 +330,7 @@ is
    function Get_Template
             return String
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Options;
       use Inc_Plugins;
    begin
@@ -351,7 +351,7 @@ is
    function Get_Template_Directory
             return String
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Plugins;
 
       Template     : constant String := Get_Template; -- ();
@@ -4366,8 +4366,8 @@ is
    procedure X_Add_Default_Theme_Supports
    is
       use Hb_Common;
-      use Inc_Functions;
-      use Inc_Plugins;
+--    use Inc_Functions;
+--    use Inc_Plugins;
    begin
       if not Wp_Is_Block_Theme then
          return;

@@ -23,7 +23,7 @@ project Heidelberger is
          "-g",
          "-O0",
          "-gnata",
-         "-gnatwaCFMUV", -- U must be removed eventually
+         "-gnatwaCFMV",
          "-gnatef",
          "-gnatf",
          "-gnatyyduxCM0S"); -- 0-r

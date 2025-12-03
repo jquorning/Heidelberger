@@ -7,9 +7,9 @@
 --
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
-with Arrays.Io;
+with Arrays; -- .Io;
 with Binder;
 with Hb_Common;
 with Php;
@@ -41,7 +41,7 @@ is
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_L10n;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       This : Wp_List_Table;
 
@@ -252,7 +252,7 @@ is
 
    procedure No_Items (This : Wp_List_Table)
    is
-      use Php;
+--    use Php;
       use Inc_L10n;
    begin
       X_E ("No items found.");
@@ -1217,9 +1217,9 @@ is
    function Get_Column_Info (This : in out Wp_List_Table)
                              return Columns_Type
    is
-      use type Ada.Containers.Count_Type;
+--    use type Ada.Containers.Count_Type;
       use Hb_Common;
-      use Php;
+--    use Php;
       use Inc_Plugins;
    begin
       -- _column_headers is already set / cached.
@@ -1322,7 +1322,7 @@ is
                               return Natural
    is
       use type Ada.Containers.Count_Type;
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
@@ -1639,7 +1639,7 @@ is
    procedure Display_Rows (This : in out Wp_List_Table)
    is
 --    use Array_Maps;
-      use Hb_Common;
+--    use Hb_Common;
    begin
       for Item in This.Items.Iterate loop
          declare

@@ -1,7 +1,7 @@
-with Ada.Containers.Indefinite_Vectors;
+-- with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
-with Ada.Finalization;
+-- with Ada.Finalization;
 with Ada.Iterator_Interfaces;
 with Ada.Strings.Unbounded;
 

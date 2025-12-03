@@ -19,7 +19,7 @@ with Inc_Class_Wp_Textdomain_Registry;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
-with Inc_Versions;
+-- with Inc_Versions;
 
 package body Inc_Load
 is
@@ -321,7 +321,7 @@ is
             return Boolean
 --         global upgrading;
    is
-      use Hb_Common;
+--    use Hb_Common;
    begin
       if
         not Php.File_Exists (Globals.ABSPATH & ".maintenance") -- or else
@@ -1338,7 +1338,7 @@ is
       use Hb_Common;
       use Php;
       use Inc_L10n;
-      use Inc_Class_Wpdb;
+--    use Inc_Class_Wpdb;
       use Inc_Class_Wp_Textdomain_Registry;
 
 --    global (wp_locale, Wp_Textdomain_Registry);

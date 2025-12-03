@@ -8,9 +8,9 @@ with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Less_Case_Insensitive;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
-with GNAT.Regexp;
+-- with GNAT.Regexp;
 with GNAT.Regpat;
 
 with Hb_Common;
@@ -112,7 +112,7 @@ is
                         Offset  : Integer := 0)
                         return Integer
    is
-      use GNAT.Regexp;
+--    use GNAT.Regexp;
       use GNAT.Regpat;
       use Hb_Common;
 
@@ -437,7 +437,7 @@ is
    procedure Printf (Format : String;
                      Args   : List_Type)
    is
-      use Hb_Common;
+--    use Hb_Common;
 
       Item : constant String := Printf (Format, Args);
    begin

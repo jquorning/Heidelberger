@@ -14,10 +14,10 @@
 -- @package WordPress
 --
 
-with Arrays.Io;
+-- with Arrays; -- .Io;
 with Arrays;
 with Binder;
-with Globals;
+-- with Globals;
 with Hb_Common;
 with Php;
 
@@ -26,7 +26,7 @@ with Inc_Plugins;
 
 package body Inc_Vars
 is
-   use Globals;
+-- use Globals;
    use Hb_Common;
 
    ---------

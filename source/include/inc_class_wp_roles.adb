@@ -11,6 +11,7 @@ with Hb_Common;
 with Php;
 
 with Inc_Load;
+with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
 
@@ -25,7 +26,7 @@ is
    function X_Construct (Site_Id : Integer := 0)
                          return Wp_Roles
    is
-      use Hb_Common;
+--    use Hb_Common;
 
       This : Wp_Roles;
    begin
@@ -44,7 +45,7 @@ is
                       Role : String)
                       return Inc_Class_Wp_Role.Wp_Role
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Class_Wp_Role;
       use Inc_Class_Wp_Roles.Role_Maps;
    begin
@@ -142,7 +143,7 @@ is
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       if not Global_Wp_User_Roles.Is_Empty then
          return Global_Wp_User_Roles;

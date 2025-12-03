@@ -4690,7 +4690,7 @@ is
                       Callback : Callable)
                       return Array_Type
    is
-      use Hb_Common;
+--    use Hb_Common;
 
       Value_2 : Array_Type;
    begin

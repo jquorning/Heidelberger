@@ -7,7 +7,7 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Binder;
@@ -559,11 +559,11 @@ is
       use Binder;
       use Inc_Functions;
       use Inc_Load;
-      use Inc_Pluggables;
+--    use Inc_Pluggables;
       use Inc_Plugins;
       use Inc_Posts;
       use Inc_Themes;
-      use Globals;
+--    use Globals;
 
 --    global wp_customize;
       Current_URL   : Unbounded_String;

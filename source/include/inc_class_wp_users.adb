@@ -18,7 +18,7 @@ with Inc_Class_Wpdb;
 with Inc_Formatting;
 with Inc_Load;
 with Inc_Ms_Blogs;
-with Inc_Plugins;
+-- with Inc_Plugins;
 with Inc_Users;
 
 package body Inc_Class_Wp_Users
@@ -708,7 +708,7 @@ is
       use Php;
       use Inc_Capabilities;
       use Inc_Load;
-      use Inc_Plugins;
+--    use Inc_Plugins;
    begin
       -- if Is_Numeric (Cap) then
       --   X_Deprecated_Argument (
@@ -815,7 +815,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wp_Users;
+--    use Inc_Class_Wp_Users;
       use Inc_Load;
    begin
       if Site_Id = 0 then

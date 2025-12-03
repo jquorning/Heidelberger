@@ -12,7 +12,6 @@ with Ada.Strings.Unbounded;
 with Arrays;
 
 with Inc_Class_Wp_Role;
-with Inc_Ms_Blogs;
 
 package Inc_Class_Wp_Roles
 is

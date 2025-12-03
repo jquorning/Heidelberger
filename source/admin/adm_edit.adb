@@ -7,7 +7,7 @@
 
 with Ada.Containers;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+-- with Ada.Text_IO;
 with Templates_Parser;
 
 with Arrays;
@@ -636,7 +636,7 @@ is
                Bulk_Counts   := Array_Filter  (Bulk_Counts);
 
                declare
-                  use Ada.Text_IO;
+--                use Ada.Text_IO;
                   use Templates_Parser;
 
                   type My_Lazy is new Dynamic.Lazy_Tag with null record;

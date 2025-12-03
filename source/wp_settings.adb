@@ -7,20 +7,20 @@
 -- @package WordPress
 --
 
-with Globals;
-with Php;
+-- with Globals;
+-- with Php;
 
 with Inc_Default_Filters;
 with Inc_Default_Constants;
 with Inc_L10n;
 with Inc_Load;
 with Inc_Plugins;
-with Inc_Pluggables;
+-- with Inc_Pluggables;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
 with Inc_Vars;
-with Inc_Versions;
+-- with Inc_Versions;
 
 package body Wp_Settings
 is

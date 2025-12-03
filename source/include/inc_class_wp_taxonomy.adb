@@ -6,9 +6,9 @@
 -- @since 4.7.0
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
-with Arrays.Io;
+-- with Arrays; -- .Io;
 with Globals;
 with Hb_Common;
 with Php;
@@ -335,7 +335,7 @@ is
    is
       use Hb_Common;
       use Inc_Options;
-      use Inc_Plugins;
+--    use Inc_Plugins;
       use Inc_Rewrites;
 --                 /* @var WP wp--
 --                 global wp;
@@ -405,8 +405,8 @@ is
 
    procedure Add_Hooks (This : Wp_Taxonomy)
    is
-      use Hb_Common;
-      use Inc_Plugins;
+--    use Hb_Common;
+--    use Inc_Plugins;
    begin
 --    Add_Filter ("wp_ajax_add-" & (-This.Name), "_wp_ajax_add_hierarchical_term");
       null;

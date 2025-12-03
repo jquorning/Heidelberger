@@ -163,7 +163,7 @@ package body Inc_L10n is
    is
       use Ada.Strings.Unbounded;
       use Binder;
-      use Globals;
+--    use Globals;
       use Hb_Common;
       use Inc_Formatting;
       use Inc_Plugins;
@@ -309,7 +309,7 @@ package body Inc_L10n is
                                             Domain  : String := "default")
                                             return String
    is
-      use Inc_Plugins;
+--    use Inc_Plugins;
       use POMO_Translations;
 
       Trans       : constant Translations := Get_Translations_For_Domain (Domain);
@@ -882,7 +882,7 @@ package body Inc_L10n is
                                Reloadable : Boolean := False)
                                return Boolean
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Plugins;
 
 --         global l10n, l10n_unloaded;
@@ -1369,8 +1369,8 @@ package body Inc_L10n is
    function X_Load_Textdomain_Just_In_Time (Domain : String)
                                             return Boolean
    is
-      use Ada.Strings.Unbounded;
-      use Hb_Common;
+--    use Ada.Strings.Unbounded;
+--    use Hb_Common;
       use Php;
       use Inc_Class_Wp_Textdomain_Registry;
       use Inc_Formatting;
@@ -1435,7 +1435,7 @@ package body Inc_L10n is
    function Get_Translations_For_Domain (Domain : String)
                                          return POMO_Translations.Translations
    is
-      use Hb_Common;
+--    use Hb_Common;
       use POMO_Translations;
 --    global l10n;
    begin
@@ -1877,7 +1877,7 @@ package body Inc_L10n is
                                                   return Array_Type
    is
       use Hb_Common;
-      use Php;
+--    use Php;
    begin
       if
         Empty (I18n_Schema) or else

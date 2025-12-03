@@ -2,7 +2,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Adm_Menu;
+-- with Adm_Menu;
 
 with Adi_Class_Wp_Screens;
 

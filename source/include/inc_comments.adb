@@ -8,7 +8,7 @@
 with Arrays;
 with Globals;
 with Hb_Common;
-with Php;
+-- with Php;
 
 package body Inc_Comments
 is
@@ -191,7 +191,7 @@ is
    is
       use Arrays;
       use Hb_Common;
-      use Php;
+--    use Php;
       use Inc_Class_Wp_Comments;
 
       Comment_2 : Integer := Comment;

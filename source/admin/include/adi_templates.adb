@@ -7,7 +7,8 @@
 -- @package WordPress
 -- @subpackage Administration
 --
-with Ada.Containers;
+
+-- with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Binder;
@@ -17,6 +18,7 @@ with Php;
 with Inc_Admin_Bar;
 with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
+with Inc_Class_Wp_Terms;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -30,7 +32,7 @@ with Inc_Vars;
 
 package body Adi_Templates
 is
-   use Ada.Containers;
+-- use Ada.Containers;
    use Ada.Strings.Unbounded;
    use Inc_L10n;
    use Php;
@@ -2962,7 +2964,7 @@ is
    function Convert_To_Screen (Hook_Name : String)
                                return Adi_Class_Wp_Screens.Wp_Screen
    is
-      use Adi_Class_Wp_Screens;
+--    use Adi_Class_Wp_Screens;
       use Inc_Functions;
    begin
       if False then -- not Class_Exists ("WP_Screen") then

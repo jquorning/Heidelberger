@@ -495,7 +495,7 @@ is
       use Hb_Common;
       use Php;
       use Inc_Class_Wp_Customize_Widgets;
-      use Inc_Themes;
+--    use Inc_Themes;
 
 --    global wp_registered_sidebars, sidebars_widgets, wp_registered_widgets;
       Registered_Sidebars_Keys : List_Type :=

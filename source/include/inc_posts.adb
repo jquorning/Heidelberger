@@ -1710,7 +1710,7 @@ is
    function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
    is
-      use Hb_Common;
+--    use Hb_Common;
 
       Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
    begin
@@ -1814,7 +1814,7 @@ is
                              return String
    is
       use Hb_Common;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
 
@@ -1949,7 +1949,7 @@ is
    is
       use Hb_Common;
       use Inc_Formatting;
-      use Inc_Functions;
+--    use Inc_Functions;
 
 --         global wp_post_statuses;
       -- Args prefixed with an underscore are reserved for internal use.
@@ -2055,7 +2055,7 @@ is
    function Get_Post_Status_Object (Post_Status : String)
                                     return Status_Type
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Status_Maps;
    begin
       if not Has_Element (Global_Wp_Post_Statuses.Find (Post_Status)) then
@@ -6524,7 +6524,7 @@ is
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;
-      use type Inc_Class_Wp_Posts.Post_Id;
+--    use type Inc_Class_Wp_Posts.Post_Id;
 
       Last_Changed : constant String := Wp_Cache_Get_Last_Changed ("posts");
 

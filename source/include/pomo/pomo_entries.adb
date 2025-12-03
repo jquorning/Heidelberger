@@ -24,7 +24,7 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Translation_Entry
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
 
       This : Translation_Entry;

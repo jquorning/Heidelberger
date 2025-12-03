@@ -8,7 +8,7 @@
 
 with Ada.Containers;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 with Php;

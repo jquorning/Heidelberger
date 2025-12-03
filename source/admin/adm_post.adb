@@ -9,9 +9,9 @@
 
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
-with Ada.Text_IO;
+-- with Ada.Text_IO;
 
---  with Templates_Parser;
+-- with Templates_Parser;
 
 with Arrays;
 with Binder;
@@ -48,7 +48,7 @@ with Inc_Users;
 package body Adm_Post
 is
    use Ada.Strings.Unbounded;
-   use Ada.Text_IO;
+-- use Ada.Text_IO;
    use Arrays;
    use Inc_L10n;
    use Hb_Common;

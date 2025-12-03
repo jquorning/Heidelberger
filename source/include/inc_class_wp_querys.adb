@@ -10,7 +10,7 @@ with Ada.Containers;
 
 with Hb_Common;
 with Php;
-with Wp_Common;
+-- with Wp_Common;
 
 with Inc_Class_Wp_Post_Type;
 with Inc_Options;
@@ -1335,7 +1335,7 @@ is
                  Default_Value : String := "")
                  return String
    is
-      use Hb_Common;
+--    use Hb_Common;
    begin
       if Isset (This.Query_Vars, Query_Var) then
          return As_String (Get (This.Query_Vars, Query_Var));

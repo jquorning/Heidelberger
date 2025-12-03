@@ -11,14 +11,14 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
-with Arrays;
+-- with Arrays;
 
 with Style_Class_Wp_Style_Engine_CSS_Rules;
 
 package Style_Class_Wp_Style_Engine_CSS_Rules_Stores
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
+-- use Arrays;
 
    --
    -- Class WP_Style_Engine_CSS_Rules_Store.

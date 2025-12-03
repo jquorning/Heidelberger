@@ -24,7 +24,7 @@ is
                            Post    : out Wp_Post;
                            Success : out Boolean)
    is
-      use Hb_Common;
+--    use Hb_Common;
 --           Success : Boolean;
 --           Post    : Post_Type;
    begin

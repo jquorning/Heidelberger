@@ -26,7 +26,7 @@ is
                                 return Array_Type
    is
       use Hb_Common;
-      use Wp_Common;
+--    use Wp_Common;
       use Inc_Plugins;
 --    static column_headers = array();
    begin
@@ -65,7 +65,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Php;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Hidden : Array_Type :=
         Inc_Users.Get_User_Option ("manage" & (-Screen.Id) & "columnshidden");

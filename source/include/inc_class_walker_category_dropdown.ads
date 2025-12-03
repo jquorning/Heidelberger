@@ -8,14 +8,14 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
+-- with Arrays;
 
 with Inc_Class_Wp_Walker;
 
 package Inc_Class_Walker_Category_Dropdown
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
+-- use Arrays;
 
    --
    -- Core class used to create an HTML dropdown list of Categories.

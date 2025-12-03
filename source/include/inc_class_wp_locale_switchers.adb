@@ -109,7 +109,7 @@ is
                                 Locale : String)
    is
       use Hb_Common;
-      use Php;
+--    use Php;
       use Inc_L10n;
 
       Domains : constant List_Type := (if L10n.Is_Empty

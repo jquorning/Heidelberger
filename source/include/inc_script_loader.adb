@@ -16,7 +16,7 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
 with Array_Vectors;
 with Binder;
@@ -28,7 +28,7 @@ with Adm_Load_Styles;
 
 with Adi_Class_Wp_Screens;
 
-with Inc_Class_Wp_Admin_Bar;
+-- with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Theme_JSON_Resolver;
 with Inc_Formatting;
@@ -81,7 +81,7 @@ is
      (Scripts            : in out Inc_Class_Wp_Scripts.Wp_Scripts;
       Force_Uncompressed : Boolean := False)
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
       use Inc_Link_Templates;
       use Inc_Versions;
@@ -368,7 +368,7 @@ is
       for A in Assets.Iterate loop -- as file_name => package_data ) then
          declare
 --          use Array_Maps;
-            use Hb_Common;
+--          use Hb_Common;
 
             File_Name    : constant String := Key     (A);
             Package_Data : Array_Type;
@@ -789,7 +789,7 @@ is
                                    return String
    is
       use Globals;
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Versions;
 --         static suffixes;
    begin
@@ -2613,7 +2613,7 @@ is
    procedure Script_Concat_Settings
    is
       use Php;
-      use Hb_Common;
+--    use Hb_Common;
 --    global concatenate_scripts, compress_scripts, compress_css;
 
       Compressed_Output : constant Boolean :=
@@ -2739,7 +2739,7 @@ is
 
    function Filter_Blocks (Node : String) return Boolean
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
    begin
       return
@@ -3440,7 +3440,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
-      use Inc_Functions;
+--    use Inc_Functions;
       use Inc_Functions_Wp_Styles;
       use Inc_Style_Engines;
       use Inc_Themes;

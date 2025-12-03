@@ -7,14 +7,15 @@
 --
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
-with Arrays.Io;
+-- with Arrays; -- .Io;
 with Hb_Common;
+with Php;
 
-with Inc_Elab_Hooks;
+-- with Inc_Elab_Hooks;
 with Inc_Elab_Plugins;
-with Inc_Plugins;
+-- with Inc_Plugins;
 
 package body Inc_Class_Wp_Hooks
 is
@@ -48,10 +49,10 @@ is
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
-      use Hb_Common;
-      use Php;
+--    use Hb_Common;
+--    use Php;
       use Inc_Elab_Plugins;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Index : constant String :=
         X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, Integer (Priority));
@@ -194,7 +195,7 @@ is
                         Callback  : Boolean := False)
                         return Boolean
    is
-      use Inc_Elab_Plugins;
+--    use Inc_Elab_Plugins;
    begin
       if False = Callback then
          return This.Has_Filters; -- ()

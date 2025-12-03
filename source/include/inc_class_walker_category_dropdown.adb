@@ -6,12 +6,16 @@
 -- @since 4.4.0
 --
 
+with Arrays;
+
 package body Inc_Class_Walker_Category_Dropdown
 is
 
    function X_Construct
             return Walker_CategoryDropdown
    is
+      use Arrays;
+
       This : Walker_CategoryDropdown;
    begin
       This.Tree_Type := To_Unbounded_String ("category");

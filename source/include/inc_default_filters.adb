@@ -16,7 +16,7 @@
 -- @package WordPress
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Binder;

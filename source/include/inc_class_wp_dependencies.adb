@@ -384,7 +384,7 @@ is
    procedure Dequeue (This    : in out Wp_Dependencies;
                       Handles : List_Type)
    is
-      use Inc_Class_Wp_Dependency;
+--    use Inc_Class_Wp_Dependency;
    begin
       for Handle of Handles loop
          declare
@@ -539,7 +539,7 @@ is
                        Group     : Integer)
                        return Boolean
    is
-      use Inc_Class_Wp_Dependencies;
+--    use Inc_Class_Wp_Dependencies;
       use Inc_Class_Wp_Dependencies.Integer_Maps;
 
       Group_2 : Integer := Group; -- (int)

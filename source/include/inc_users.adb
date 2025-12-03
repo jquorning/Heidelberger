@@ -3457,7 +3457,7 @@ is
    function Wp_Get_Session_Token
             return String
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Inc_Pluggables;
 
       Cookie : constant Array_Type := Wp_Parse_Auth_Cookie ("", "logged_in");

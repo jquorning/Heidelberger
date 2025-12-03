@@ -1326,7 +1326,7 @@ is
    function Add_Magic_Quotes (Arry : Array_Type)
             return Array_Type
    is
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
 
       Array_2 : Array_Type := Arry;
@@ -1348,7 +1348,7 @@ is
             --    goto Continue;
             -- end if;
          end;
-         << Continue >>
+--       << Continue >>
       end loop;
 
       return Array_2;
@@ -3583,7 +3583,7 @@ is
       use Php;
       use Inc_Capabilities;
       use Inc_Class_Wp_Users;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       T : constant Array_Type := Wp_Get_MIME_Types; -- ()
 

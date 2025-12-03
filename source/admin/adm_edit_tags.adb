@@ -6,11 +6,11 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+-- with Ada.Text_IO; use Ada.Text_IO;
 
 with Templates_Parser;
 
-with Arrays.Io;
+with Arrays; -- .Io;
 with Binder;
 with Globals;
 with Hb_Common;
@@ -30,7 +30,7 @@ with Adi_Templates;
 with Inc_Capabilities;
 with Inc_Categories;
 with Inc_Category_Templates;
-with Inc_Class_Wp_Taxonomy;
+-- with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Formatting;
 with Inc_Functions;
@@ -76,7 +76,7 @@ is
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_Taxonomys;
-      use Inc_Class_Wp_Taxonomy;
+--    use Inc_Class_Wp_Taxonomy;
       use Inc_Class_Wp_Terms;
    begin
       Adm_Admin.Run;
@@ -354,12 +354,12 @@ is
             declare
                use Inc_Plugins;
 
-               Screen : String := -Get_Current_Screen.Id;
+               Screen : constant String := -Get_Current_Screen.Id;
                Tags   : constant List_Type :=
                  To_List (Item => As_String (Get (X_REQUEST, "delete_tags")));
             begin
                -- This action is documented in wp-admin/edit.php
-               Location := +Apply_Filters ("handle_bulk_actions-{screen}",
+               Location := +Apply_Filters ("handle_bulk_actions-" & Screen,
                                            -Location, X_Wp_List_Table.Current_Action,
                                            Tags);
                -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores

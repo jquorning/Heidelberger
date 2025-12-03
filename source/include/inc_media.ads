@@ -8,7 +8,7 @@
 with Arrays;
 
 with Inc_Class_Wp_Taxonomy;
-with Inc_Taxonomys;
+-- with Inc_Taxonomys;
 
 package Inc_Media
 is

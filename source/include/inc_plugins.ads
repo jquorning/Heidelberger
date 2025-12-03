@@ -20,7 +20,7 @@
 --
 
 with Arrays;
-with Php;
+-- with Php;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Errors;
@@ -252,6 +252,11 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
+                           Args      : Array_Type)
+                           return String;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
                            D         : String := "";
                            X         : String := "")
                            return String
@@ -327,11 +332,6 @@ is
                            P         : List_Type)
                            return String
                            is (Value);
-
-   -- function Apply_Filters (Hook_Name : String;
-   --                         Value     : List_Type)
-   --                         return List_Type
-   --                         is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean)

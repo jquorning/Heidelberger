@@ -2462,7 +2462,7 @@ is
                   Set (Static_Duplicated_Keys, Key => Value,
                        Value => From_Boolean (Isset (Static_Duplicated_Keys, Value)));
                end;
-               << Continue >>
+--             << Continue >>
             end loop;
          end loop;
       end if;

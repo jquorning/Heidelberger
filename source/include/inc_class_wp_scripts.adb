@@ -445,7 +445,7 @@ is
                                  Display  : Boolean := True)
                                  return String
    is
-      use Inc_Functions;
+--    use Inc_Functions;
       use Inc_Formatting;
 
       Output : Unbounded_String := +This.Get_Data (Handle, Position);
@@ -647,7 +647,7 @@ is
                                 Display : Boolean := True)
                                 return String
    is
-      use Inc_Functions;
+--    use Inc_Functions;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
    begin
       if

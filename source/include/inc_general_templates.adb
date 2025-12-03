@@ -14,7 +14,7 @@ with Wp_Common;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Post_Type;
-with Inc_Class_Wp_Querys;
+-- with Inc_Class_Wp_Querys;
 with Inc_Querys;
 with Inc_Options;
 with Inc_Plugins;
@@ -1190,7 +1190,7 @@ is
       use Php;
       use Hb_Common;
       use Inc_Class_Wp_Terms;
-      use Inc_Class_Wp_Querys;
+--    use Inc_Class_Wp_Querys;
       use Inc_L10n;
       use Inc_Plugins;
       use Inc_Querys;
@@ -1531,7 +1531,7 @@ is
    is
       use Hb_Common;
       use Wp_Common;
-      use Inc_Plugins;
+--    use Inc_Plugins;
       use Inc_Querys;
 
       X_Post : constant Inc_Class_Wp_Posts.Wp_Post :=
@@ -1571,7 +1571,7 @@ is
                                      return String
    is
       use Arrays;
-      use Hb_Common;
+--    use Hb_Common;
       use Php;
       use Inc_Plugins;
       use Inc_Posts;
@@ -2648,7 +2648,7 @@ is
       use Wp_Common;
       use Inc_Class_Wp_Posts;
       use Inc_Options;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       Post_2 : constant Wp_Post := Inc_Posts.Get_Post (Post_Id (Post));
    begin
