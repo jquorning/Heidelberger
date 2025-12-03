@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Binder;
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Files;
 
 with Inc_Class_Wp_Locale_Switchers;
 with Inc_Formatting;
@@ -781,6 +781,7 @@ package body Inc_L10n is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Plugins;
 
 -- @var WP_Textdomain_Registry wp_textdomain_registry
@@ -860,7 +861,7 @@ package body Inc_L10n is
          L10n (Domain) := MO; -- &mo;
       end;
 
-      Textdomain_Registry.Set (Domain, -Locale_2, Php.Dirname (-Mofile_2));
+      Textdomain_Registry.Set (Domain, -Locale_2, Php.Files.Dirname (-Mofile_2));
 
       return True;
    end Load_Textdomain;
@@ -960,6 +961,7 @@ package body Inc_L10n is
                                      return Boolean
    is
       use Globals;
+      use Php.Files;
       use Inc_Load;
 
       Locale_2 : constant String := (if Locale = ""
@@ -976,7 +978,7 @@ package body Inc_L10n is
          if
            (Is_Multisite or else
             WP_INSTALLING_NETWORK) and then
-            not Php.File_Exists (WP_LANG_DIR & "/admin-locale.mo")
+            not Php.Files.File_Exists (WP_LANG_DIR & "/admin-locale.mo")
          then
             Load_Textdomain ("default",
                              WP_LANG_DIR & "/ms-locale.mo", Locale_2);

@@ -225,18 +225,6 @@ is
                           return Array_Type
                           is (Empty_Array);
 
-   function File_Exists (Filename : String)
-                         return Boolean
-                         is (True);
-
-   function Filesize (Filename : String)
-                      return Natural
-                      is (999);
-
-   function Is_Dir (Filename : String)
-                    return Boolean
-                    is (False);
-
    function Stripslashes (Item : String)
                           return String
                           is (Item);
@@ -447,10 +435,6 @@ is
                         return Boolean
                         is (True);
 
-   function Is_File (Filename : String)
-                     return Boolean
-                     is (False);
-
    function Key (Arry : Array_Type)
                  return String
                  is ("XXX-024");
@@ -510,15 +494,6 @@ is
                                      Array_2 : Array_Type)
                                      return Array_Type
                                      is (Empty_Array);
-
-   function Basename (Path : String;
-                      Suffix : String := "")
-                      return String
-                      is ("XXX-521");
-
-   function Is_Readable (Filename : String)
-                         return Boolean
-                         is (True);
 
    function Stream_Get_Wrappers
             return List_Type
@@ -580,11 +555,6 @@ is
    procedure Die (Reason : String := "")
              is null;
 
-   function Dirname (Path   : String;
-                     Levels : Positive := 1)
-                     return String
-                     is ("XXX-702");
-
    function Glob (Pattern : String;
                   Flags   : Integer := 0)
                   return List_Type
@@ -604,10 +574,6 @@ is
    function Vsprintf (Format : String;
                       Args   : List_Type)
                       return String;
-
-   function Realpath (Path : String)
-            return String
-            is ("XXX-779");
 
    type Resource is access all Integer;
 

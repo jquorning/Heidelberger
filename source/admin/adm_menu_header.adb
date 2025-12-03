@@ -13,6 +13,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.Files;
 with Php.Preg;
 
 with Adi_Plugins;
@@ -104,6 +105,7 @@ is
       Submenu_As_Parent : Boolean := True)
    is
       use Ada.Strings.Unbounded;
+      use Php.Files;
       use Php.Preg;
       use Inc_Capabilities;
       use Inc_Functions;

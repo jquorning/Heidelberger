@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-with Php;
+with Php.Files;
 
 package body Adi_Noop
 is
@@ -102,6 +102,7 @@ is
             return String
    is
       use Php;
+      use Php.Files;
 
       Path_2 : constant String := Realpath (Path);
    begin

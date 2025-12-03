@@ -6,7 +6,7 @@
 -- @since 5.8.0
 --
 
-with Php;
+with Php.Files;
 with Globals;
 with Hb_Common;
 
@@ -735,6 +735,7 @@ is
                                       Template  : Boolean := False)
                                       return String
    is
+      use Php.Files;
       use Inc_Themes;
 
       Path : constant String :=

@@ -11,7 +11,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Files;
 
 with Wp_Config;
 
@@ -298,7 +298,7 @@ is
          return;
       end if;
 
-      if Php.File_Exists (-Globals.WP_CONTENT_DIR & "/maintenance.php") then
+      if Php.Files.File_Exists (-Globals.WP_CONTENT_DIR & "/maintenance.php") then
 --       Require_Once (Globals.WP_CONTENT_DIR & "/maintenance.php");
          Php.Die;
       end if;
@@ -326,7 +326,7 @@ is
 --    use Hb_Common;
    begin
       if
-        not Php.File_Exists (Globals.ABSPATH & ".maintenance") -- or else
+        not Php.Files.File_Exists (Globals.ABSPATH & ".maintenance") -- or else
 --      Wp_Installing
       then
          return False;
@@ -1339,6 +1339,7 @@ is
       use Arrays;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_L10n;
 --    use Inc_Class_Wpdb;
       use Inc_Class_Wp_Textdomain_Registry;

@@ -21,6 +21,7 @@ with Array_Vectors;
 with Binder;
 with Hb_Common;
 with Globals;
+with Php.Files;
 with Php.Preg;
 
 with Adm_Load_Styles;
@@ -350,6 +351,7 @@ is
      (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
    is
       use Php;
+      use Php.Files;
 
       Suffix : String := (if Globals.WP_RUN_CORE_TESTS then ".min"
                           else Wp_Scripts_Get_Suffix);
@@ -371,8 +373,10 @@ is
             File_Name    : constant String := Key     (A);
             Package_Data : Array_Type;
 --          Package_Data : String := Element (A);
-            Basename     : constant String := Str_Replace (Suffix & ".js", "",
-                                                           Php.Basename (File_Name));
+            Basename     : constant String :=
+              Str_Replace (Suffix & ".js", "",
+                           Php.Files.Basename (File_Name));
+
             Handle       : constant String := "wp-" & Basename;
             Path         : constant String :=
               "/wp-includes/js/dist/" & Basename & Suffix & ".js";
@@ -2666,6 +2670,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Functions_Wp_Styles;
       use Inc_L10n;
       use Inc_Plugins;
@@ -3197,6 +3202,7 @@ is
       use Array_Vectors;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Plugins;
       use Inc_Class_Wp_Dependency;
       use Inc_Functions_Wp_Styles;
@@ -3320,6 +3326,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Php.Preg;
       use Inc_Formatting;
 

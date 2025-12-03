@@ -7,7 +7,7 @@
 
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Files;
 
 with Inc_Caches;
 with Inc_Error_Protection;
@@ -41,6 +41,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Caches;
       use Inc_Class_Wp_Errors;
       use Inc_Error_Protection;

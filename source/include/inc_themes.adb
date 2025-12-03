@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Binder;
 with Globals;
-with Php;
+with Php.Files;
 
 -- with Inc_Class_Wp_Customize_Managers;
 with Inc_Formatting;
@@ -449,6 +449,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Formatting;
 
       Directory_2 : Unbounded_String;
@@ -3522,6 +3523,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

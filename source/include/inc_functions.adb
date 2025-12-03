@@ -12,6 +12,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Helpers;
+with Php.Files;
 with Php.Preg;
 
 with Inc_Capabilities;
@@ -4598,6 +4599,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_L10n;
 
       Result     : Array_Type;

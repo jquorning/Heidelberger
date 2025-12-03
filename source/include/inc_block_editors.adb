@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Files;
 
 with Inc_Class_Wp_Posts;
 with Inc_Functions;
@@ -238,6 +238,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Media;
