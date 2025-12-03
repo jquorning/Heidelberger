@@ -5,7 +5,7 @@
 -- @subpackage Users
 --
 
-with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Posts;
@@ -13,7 +13,7 @@ with Inc_Class_Wp_Users;
 
 package Inc_Capabilities
 is
-   use Arrays;
+   use Lists;
 
    --
    -- Maps a capability to the primitive capabilities required of the given user to

@@ -1,9 +1,13 @@
+--
+--
+--
 
 with Ada.Strings.Unbounded;
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Adi_Noop;
@@ -20,6 +24,8 @@ with Inc_Versions;
 
 package body Adm_Load_Styles
 is
+   use Lists;
+
    ---------
    -- Run --
    ---------

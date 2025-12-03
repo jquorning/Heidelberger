@@ -9,6 +9,8 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
+
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Users;
 
@@ -16,6 +18,7 @@ package Inc_Class_Wpdb
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    package String_Vectors is new
       Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,

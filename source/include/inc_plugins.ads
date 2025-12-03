@@ -20,7 +20,7 @@
 --
 
 with Arrays;
--- with Php;
+with Lists;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Errors;
@@ -32,6 +32,7 @@ with Inc_Class_Wp_Taxonomy;
 package Inc_Plugins
 is
    use Arrays;
+   use Lists;
    use Inc_Class_Wp_Hooks;
 
    type Callable_2 is access function return Array_Type;

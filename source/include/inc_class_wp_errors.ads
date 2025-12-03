@@ -5,10 +5,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Inc_Class_Wp_Errors
 is
    use Arrays;
+   use Lists;
 
    --
    -- WordPress Error class.

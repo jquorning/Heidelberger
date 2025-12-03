@@ -1,4 +1,9 @@
+--
+--
+--
+
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
@@ -6,6 +11,7 @@ with Inc_Class_Wp_Users;
 package Inc_Functions
 is
    use Arrays;
+   use Lists;
 
    Program_Die : exception;
 

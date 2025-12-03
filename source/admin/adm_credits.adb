@@ -7,9 +7,9 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with GNATCOLL.JSON;
@@ -21,7 +21,7 @@ with Inc_L10n;
 
 package body Adm_Credits
 is
-   use Arrays;
+   use Lists;
 
    subtype JSON_Value is GNATCOLL.JSON.JSON_Value;
 

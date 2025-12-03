@@ -10,6 +10,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Role;
 
@@ -17,6 +18,7 @@ package Inc_Class_Wp_Roles
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    package Role_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps

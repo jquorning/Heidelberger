@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Hb_Common;
+with Lists;
 
 with Inc_Class_Wp_Customize_Controls;
 with Inc_Class_Wp_Customize_Nav_Menus;
@@ -28,6 +29,7 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
    use Hb_Common;
+   use Lists;
 
    subtype Wp_Customize_Setting
      is Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting;

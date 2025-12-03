@@ -18,10 +18,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Inc_Widgets
 is
    use Arrays;
+   use Lists;
 
    ----------------------
    -- Global Variables --

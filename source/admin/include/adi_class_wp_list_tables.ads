@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
 
 with Adi_Class_Wp_Screens;
 
@@ -16,6 +17,7 @@ package Adi_Class_Wp_List_Tables
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    type Columns_Type is
       record

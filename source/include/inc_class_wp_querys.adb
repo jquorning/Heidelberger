@@ -9,8 +9,8 @@
 with Ada.Containers;
 
 with Hb_Common;
+with Lists;
 with Php;
--- with Wp_Common;
 
 with Inc_Class_Wp_Post_Type;
 with Inc_Options;
@@ -18,6 +18,7 @@ with Inc_Posts;
 
 package body Inc_Class_Wp_Querys
 is
+   use Lists;
 
 --         --
 --         -- Resets query flags to false.

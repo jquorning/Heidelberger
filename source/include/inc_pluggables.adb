@@ -13,6 +13,7 @@ with Ada.Numerics.Discrete_Random;
 with Hb_Common;
 with Binder;
 with Globals;
+with Lists;
 with Php;
 
 with Inc_Compat;
@@ -25,6 +26,7 @@ with Inc_Users;
 
 package body Inc_Pluggables
 is
+   use Lists;
 
 -- if ( ! function_exists( 'wp_set_current_user' ) ) :
 --         --

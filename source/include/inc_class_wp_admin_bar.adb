@@ -7,6 +7,7 @@
 --
 
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Admin_Bar;
@@ -28,6 +29,7 @@ package body Inc_Class_Wp_Admin_Bar
 is
    use Hb_Common;
    use Inc_L10n;
+   use Lists;
    use Php;
 
    -----------

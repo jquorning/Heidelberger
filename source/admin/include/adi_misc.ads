@@ -6,10 +6,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Adi_Misc
 is
    use Arrays;
+   use Lists;
 
    procedure Dummy;
 

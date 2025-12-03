@@ -11,11 +11,13 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
 
 package Inc_Class_Wp_Users
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    -- By jq
    type Property_Type is

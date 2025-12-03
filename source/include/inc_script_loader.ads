@@ -20,6 +20,7 @@
 --
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Scripts;
 with Inc_Class_Wp_Styles;
@@ -27,6 +28,7 @@ with Inc_Class_Wp_Styles;
 package Inc_Script_Loader
 is
    use Arrays;
+   use Lists;
 
    Global_Wp_Scripts : Inc_Class_Wp_Scripts.Wp_Scripts; -- arbitrary position (jq)
 

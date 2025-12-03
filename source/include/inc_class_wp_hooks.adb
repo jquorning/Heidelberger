@@ -7,15 +7,12 @@
 --
 
 with Ada.Containers;
--- with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded;
 
--- with Arrays; -- .Io;
 with Hb_Common;
 with Php;
 
--- with Inc_Elab_Hooks;
 with Inc_Elab_Plugins;
--- with Inc_Plugins;
 
 package body Inc_Class_Wp_Hooks
 is
@@ -276,6 +273,7 @@ is
                            Args  : Array_Type) -- Args_Type) -- Array_Type)
                            return String
    is
+      use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
 
@@ -398,6 +396,7 @@ is
    procedure Do_All_Hook (This : in out Wp_Hook;
                           Args : Array_Type)
    is
+      use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
 

@@ -1,12 +1,14 @@
 
 with Arrays;
 with Hb_Common;
+with Lists;
 
 with Inc_Class_Wp_Themes;
 
 package Inc_Themes
 is
    use Arrays;
+   use Lists;
 
    Wp_Theme_Directories : List_Type;
 

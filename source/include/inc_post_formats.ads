@@ -6,10 +6,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Inc_Post_Formats
 is
    use Arrays;
+   use Lists;
 
 -- --
 -- -- Retrieve the format slug for a post

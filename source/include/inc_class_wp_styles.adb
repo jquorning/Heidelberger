@@ -216,7 +216,7 @@ is
                               Code   : String)
                               return Boolean
    is
-      use Arrays.List_Vectors;
+      use Lists.List_Vectors;
 
       After : List_Type;
    begin

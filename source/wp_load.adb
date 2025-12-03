@@ -24,6 +24,7 @@ with Inc_Load;
 with Arrays;
 with Binder;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Wp_Config;
@@ -31,6 +32,7 @@ with Wp_Config;
 package body Wp_Load
 is
    use Arrays;
+   use Lists;
 
    ---------
    -- Run --

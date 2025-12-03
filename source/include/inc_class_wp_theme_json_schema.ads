@@ -7,10 +7,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Inc_Class_Wp_Theme_JSON_Schema
 is
    use Arrays;
+   use Lists;
 
    --
    -- Class that migrates a given theme.json structure to the latest schema.

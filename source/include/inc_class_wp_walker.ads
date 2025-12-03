@@ -2,7 +2,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Terms;
+-- with Inc_Class_Wp_Terms;
 
 package Inc_Class_Wp_Walker
 is

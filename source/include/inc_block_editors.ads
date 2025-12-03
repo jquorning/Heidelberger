@@ -7,12 +7,14 @@
 --
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Block_Editor_Contexts;
 
 package Inc_Block_Editors
 is
    use Arrays;
+   use Lists;
 
    --
    -- Returns the list of default categories for block types.

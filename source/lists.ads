@@ -1,0 +1,33 @@
+--
+--
+--
+
+with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded;
+
+package Lists is
+
+   subtype Item_Type is Ada.Strings.Unbounded.Unbounded_String;
+
+   package List_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Item_Type,
+                                  "="          => Ada.Strings.Unbounded."=");
+
+   subtype List_Type is List_Vectors.Vector;
+
+   procedure Append (List : in out List_Type;
+                     Item : String);
+   -- Append Item to List.
+
+   Empty_List : List_Type renames List_Vectors.Empty_Vector;
+
+   type Item_List is array (Positive range <>) of Lists.Item_Type;
+
+   function To_List (List : Item_List)
+                     return Lists.List_Type;
+
+   function To_List (Item : String)
+                     return Lists.List_Type;
+
+end Lists;

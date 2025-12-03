@@ -5,10 +5,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Inc_Global_Styles_And_Settings
 is
    use Arrays;
+   use Lists;
 
    --
    -- Gets the settings resulting of merging core, theme, and user data.

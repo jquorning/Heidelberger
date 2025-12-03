@@ -8,11 +8,13 @@
 
 with Arrays;
 with Hb_Common;
+with Lists;
 
 package Inc_Class_Wp_Theme_JSON
 is
    use Arrays;
    use Hb_Common;
+   use Lists;
 
    --
    -- Class that encapsulates the processing of structures that adhere to the theme.json spec.

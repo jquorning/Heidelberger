@@ -6,10 +6,10 @@
 --
 
 with Binder;
--- with Globals;
 with Hb_Common;
 with Php;
 with Wp_Common;
+with Lists;
 
 with Adi_Plugins;
 
@@ -34,8 +34,8 @@ is
    use Hb_Common;
    use Arrays;
    use Php;
--- use Globals;
    use Inc_Functions;
+   use Lists;
 
    function To_Menu (Menu_Title : String;
                      Capability : String;

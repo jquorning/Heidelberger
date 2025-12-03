@@ -10,6 +10,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Textdomain_Registry;
 with POMO_MO;
@@ -18,6 +19,7 @@ with POMO_Translations;
 package Inc_L10n
 is
    use Arrays;
+   use Lists;
 
    package String_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,

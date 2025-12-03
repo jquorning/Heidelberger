@@ -7,14 +7,14 @@
 -- @subpackage Dependencies
 --
 
-with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Scripts;
 with Inc_Script_Loader;
 
 package Inc_Functions_Wp_Scripts
 is
-   use Arrays;
+   use Lists;
 
    --
    -- Initialize wp_scripts if it has not been set.

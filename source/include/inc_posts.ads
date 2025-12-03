@@ -9,6 +9,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
@@ -18,6 +19,7 @@ package Inc_Posts
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
    use Inc_Class_Wp_Posts;
 
    --

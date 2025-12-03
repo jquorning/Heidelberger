@@ -7,12 +7,15 @@
 --
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Block_Type;
 
 package Inc_Blocks
 is
    use Arrays;
+   use Lists;
+
 -- --
 -- -- Removes the block asset"s path prefix if provided.
 -- --

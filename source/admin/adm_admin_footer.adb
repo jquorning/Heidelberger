@@ -7,9 +7,9 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
 with Hb_Common;
 with Globals;
+with Lists;
 with Php;
 
 with Inc_L10n;
@@ -23,8 +23,8 @@ with Inc_Plugins;
 package body Adm_Admin_Footer
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
    use Hb_Common;
+   use Lists;
    use Php;
 
    ---------

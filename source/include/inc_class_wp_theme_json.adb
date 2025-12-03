@@ -35,7 +35,7 @@ is
                          return Wp_Theme_JSON
    is
       use Php;
-      use Inc_Class_Wp_Theme_JSON;
+--    use Inc_Class_Wp_Theme_JSON;
       use Inc_Functions;
 
       This : Wp_Theme_JSON;
@@ -1218,7 +1218,7 @@ is
                                          return Array_Type
    is
       use Ada.Strings.Unbounded;
-      use Php;
+--    use Php;
       use Inc_Functions;
 
       Preset_Per_Origin : constant Multi_Type :=
@@ -1318,7 +1318,7 @@ is
    function Compute_Theme_Vars (Settings : Array_Type)
                                 return Array_Type
    is
-      use Php;
+--    use Php;
       use Inc_Functions;
 
       Declarations  : Array_Type;

@@ -13,6 +13,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Adi_Plugins;
@@ -44,6 +45,7 @@ is
    use Arrays;
    use Hb_Common;
    use Inc_L10n;
+   use Lists;
 
    ---------
    -- Run --

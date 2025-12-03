@@ -13,6 +13,7 @@ with Ada.Strings.Unbounded;
 
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Functions;
@@ -22,6 +23,7 @@ with Style_Class_Wp_Style_Engine_CSS_Rules_Stores;
 
 package body Style_Class_Wp_Style_Engine_Processors
 is
+  use Lists;
 
    ---------------
    -- Add_Rules --

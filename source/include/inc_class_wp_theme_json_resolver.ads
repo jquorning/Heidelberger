@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Themes;
 with Inc_Class_Wp_Theme_JSON;
@@ -14,6 +15,7 @@ with Inc_Class_Wp_Theme_JSON;
 package Inc_Class_Wp_Theme_JSON_Resolver
 is
    use Arrays;
+   use Lists;
 
    --
    -- Class that abstracts the processing of the different data sources

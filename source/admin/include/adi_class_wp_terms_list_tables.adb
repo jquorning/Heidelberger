@@ -6,8 +6,6 @@
 -- @since 3.1.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Globals;
 with Hb_Common;
 with Php;
@@ -19,7 +17,6 @@ with Inc_Posts;
 
 package body Adi_Class_Wp_Terms_List_Tables
 is
-   use Ada.Strings.Unbounded;
 
    -----------------
    -- X_Construct --

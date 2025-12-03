@@ -8,14 +8,14 @@
 --
 with Ada.Strings.Unbounded;
 
-with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Dependencies;
 
 package Inc_Class_Wp_Styles
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
+   use Lists;
 
    --
    -- Core class used to register styles.

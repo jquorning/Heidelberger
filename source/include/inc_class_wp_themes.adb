@@ -6,6 +6,7 @@
 -- @since 3.4.0
 
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Caches;
@@ -19,6 +20,7 @@ with Inc_Themes;
 
 package body Inc_Class_Wp_Themes
 is
+   use Lists;
 
    function Apply_Filters (Name  : String;
                            Value : Boolean;

@@ -18,6 +18,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Php;
+with Lists;
 with Wp_Common;
 
 with Adm_Menu;
@@ -54,6 +55,7 @@ is
    use Hb_Common;
    use Php;
    use Globals;
+   use Lists;
 
    ------------
    -- Render --

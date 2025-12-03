@@ -8,15 +8,14 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
--- with Php;
+with Lists;
 
 package Inc_Class_Wp_Hooks
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    type Nesting_Type  is new Natural;
    type Priority_Type is new Natural;

@@ -12,17 +12,6 @@ is
    -- Append --
    ------------
 
-   procedure Append (List : in out List_Type;
-                     Item : String)
-   is
-   begin
-      List.Append (+Item);
-   end Append;
-
-   ------------
-   -- Append --
-   ------------
-
    procedure Append (Arry  : in out Array_Type;
                      Value : Multi_Type)
    is
@@ -219,7 +208,7 @@ is
    -------------
 
    function As_List (Arry : Multi_Type)
-                     return List_Type
+                     return Lists.List_Type
    is
    begin
       pragma Assert (Arry.Kind = Kind_List);
@@ -310,7 +299,7 @@ is
    -- From_List --
    ---------------
 
-   function From_List (Value : List_Type)
+   function From_List (Value : Lists.List_Type)
                        return Multi_Type
    is
       M : Multi_Type;
@@ -822,14 +811,14 @@ is
    end Build;
 
    function Build (Key   : String;
-                   Value : List_Type)
+                   Value : Lists.List_Type)
                    return Array_Type
    is
       Item : Multi_Type;
       Map  : Array_Type;
    begin
       Item.Kind := Kind_List;
-      Item.List := new List_Type'(Value);
+      Item.List := new Lists.List_Type'(Value);
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
@@ -917,25 +906,6 @@ is
       end loop;
       return Result;
    end To_Array;
-
-   -------------
-   -- To_List --
-   -------------
-
-   function To_List (List : Item_List)
-                     return List_Type
-   is
-      Result : List_Type;
-   begin
-      for A of List loop
-         Result.Append (A);
-      end loop;
-      return Result;
-   end To_List;
-
-   function To_List (Item : String)
-                     return List_Type
-   is (To_List (List => (1 => To_Unbounded_String (Item))));
 
    -----------
    -- First --

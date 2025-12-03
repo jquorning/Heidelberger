@@ -8,6 +8,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Functions;
@@ -16,6 +17,7 @@ with Inc_L10n;
 
 package body Block_Typography
 is
+   use Lists;
 
    --------------------------------------
    -- Wp_Get_Typography_Value_And_Unit --

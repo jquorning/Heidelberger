@@ -6,10 +6,9 @@
 --
 
 with Ada.Containers;
--- with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Strings.Unbounded;
 
 with Adi_Caches;
--- with Adi_Templates;
 
 with Inc_Formatting;
 with Inc_Functions;
@@ -46,6 +45,7 @@ is
 
    procedure Create_Initial_Taxonomies
    is
+      use Ada.Strings.Unbounded;
       use Inc_Class_Wp_Taxonomy;
       use Inc_Options;
       use Inc_Plugins;
@@ -691,6 +691,7 @@ is
    function Get_Taxonomy_Labels (Tax : in out Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
                                  return Array_Type
    is
+      use Ada.Strings.Unbounded;
       use Inc_Plugins;
    begin
 --    tax.labels = (array) tax.labels;

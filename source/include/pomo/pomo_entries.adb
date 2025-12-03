@@ -7,10 +7,12 @@
 --
 
 with Hb_Common;
+with Lists;
 with Php;
 
 package body POMO_Entries
 is
+   use Lists;
 
    procedure Set (Item  : in out Translation_Entry;
                   Key   : String;

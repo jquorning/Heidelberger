@@ -5,13 +5,10 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Adm_Menu;
 
 package Adm_Menu_Header
 is
-   use Ada.Strings.Unbounded;
 
    --
    -- Display menu.

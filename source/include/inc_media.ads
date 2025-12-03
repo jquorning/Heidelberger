@@ -6,13 +6,14 @@
 --
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Taxonomy;
--- with Inc_Taxonomys;
 
 package Inc_Media
 is
    use Arrays;
+   use Lists;
 
    --
    -- Retrieves additional image sizes.

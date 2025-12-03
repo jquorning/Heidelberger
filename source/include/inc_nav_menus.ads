@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Terms;
 
@@ -16,6 +17,7 @@ package Inc_Nav_Menus
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    --
    -- Returns a navigation menu object.

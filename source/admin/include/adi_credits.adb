@@ -12,6 +12,7 @@ with Ada.Text_IO;
 with Arrays;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Formatting;
@@ -28,6 +29,7 @@ is
    use Arrays;
    use Hb_Common;
    use Inc_L10n;
+   use Lists;
    use Php;
 
    function Get_File (Filename : String)

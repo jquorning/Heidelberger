@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Errors;
 
@@ -18,6 +19,7 @@ package Inc_Class_Wp_Customize_Settings
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    --
    -- Customize Setting class.

@@ -9,12 +9,14 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Hb_Common;
+with Lists;
 
 package Inc_Class_Wp
 is
    use Ada.Strings.Unbounded;
    use Arrays;
    use Hb_Common;
+   use Lists;
 
    procedure Dummy;
 

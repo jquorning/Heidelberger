@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Class_Wp_Post_Type;
@@ -21,6 +22,7 @@ with Inc_Users;
 
 package body Adi_Class_Wp_Posts_List_Tables
 is
+   use Lists;
 
    -----------------
    -- X_Construct --

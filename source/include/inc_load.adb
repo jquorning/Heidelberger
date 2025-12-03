@@ -10,6 +10,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Wp_Config;
@@ -23,6 +24,7 @@ with Inc_Plugins;
 
 package body Inc_Load
 is
+   use Lists;
 
    X_Wp_Using_Ext_Object_Cache : Boolean := False;
 

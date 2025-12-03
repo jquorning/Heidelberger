@@ -8,6 +8,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Lists;
 with Php;
 with Wp_Common;
 
@@ -25,6 +26,7 @@ with Inc_Versions;
 
 package body Inc_General_Templates
 is
+   use Lists;
 
 -- --
 -- -- Loads header template.

@@ -6,15 +6,15 @@
 --
 
 with Ada.Strings.Unbounded;
--- with Ada.Text_IO; use Ada.Text_IO;
 
 with Templates_Parser;
 
-with Arrays; -- .Io;
+with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
 with Php;
+with Lists;
 with Wp_Common;
 
 with Adm_Admin;
@@ -51,6 +51,7 @@ is
    use Globals;
    use Hb_Common;
    use Php;
+   use Lists;
 
 -- /** WordPress Administration Bootstrap */
 -- require_once __DIR__ . '/admin.php';

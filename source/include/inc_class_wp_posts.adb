@@ -1,7 +1,11 @@
-with Php;
+--
+--
+--
 
 with Globals;
 with Hb_Common;
+with Lists;
+with Php;
 
 with Adi_Caches;
 
@@ -15,6 +19,8 @@ with Inc_Taxonomys;
 
 package body Inc_Class_Wp_Posts
 is
+   use Lists;
+
    function "-" (Item : Unbounded_String) return String
       renames To_String;
 

@@ -11,12 +11,12 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
-with Arrays;
+with Lists;
 
 package Inc_Class_Wp_Dependency
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
+   use Lists;
 
    package String_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,

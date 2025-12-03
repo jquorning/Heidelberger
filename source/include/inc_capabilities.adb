@@ -7,6 +7,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Arrays;
 with Globals;
 with Hb_Common;
 with Php;
@@ -28,6 +29,8 @@ with Inc_Posts;
 
 package body Inc_Capabilities
 is
+   use Arrays;
+
    Global_Super_Admins        : List_Type;
    Global_Post_Type_Meta_Caps : Array_Type;
 

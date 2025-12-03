@@ -14,11 +14,10 @@
 -- @package WordPress
 --
 
--- with Arrays; -- .Io;
 with Arrays;
 with Binder;
--- with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Inc_Load;
@@ -26,7 +25,6 @@ with Inc_Plugins;
 
 package body Inc_Vars
 is
--- use Globals;
    use Hb_Common;
 
    ---------
@@ -41,7 +39,7 @@ is
       use Inc_Load;
 
       Php_Self : constant String := As_String (Get (X_SERVER, "PHP_SELF"));
-      Self_Matches : Arrays.List_Type;
+      Self_Matches : Lists.List_Type;
       Unused : Integer;
    begin
       -- On which page are we?

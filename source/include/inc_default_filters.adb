@@ -22,6 +22,7 @@ with Arrays;
 with Binder;
 with Hb_Common;
 with Globals;
+with Lists;
 
 with Inc_Admin_Bar;
 with Inc_General_Templates;
@@ -34,6 +35,8 @@ with Inc_Themes;
 
 package body Inc_Default_Filters
 is
+   use Lists;
+
    ---------
    -- Run --
    ---------

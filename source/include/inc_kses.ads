@@ -30,10 +30,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Inc_KSES
 is
    use Arrays;
+   use Lists;
 
    --
    -- Filters text content and strips out disallowed HTML.

@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Adm_Menu;
@@ -39,6 +40,7 @@ with Inc_Vars;
 
 package body Adm_Admin_Header
 is
+   use Lists;
 
    ---------
    -- Run --
@@ -286,7 +288,7 @@ is
       end if;
 
       Append (Admin_Body_Class, " branch-" &
-        Str_Replace (Arrays.To_List (List => (+".", +",")), "-",
+        Str_Replace (Lists.To_List (List => (+".", +",")), "-",
                      Inc_General_Templates.Get_Bloginfo ("version")));
 
       Append (Admin_Body_Class, " version-" & Str_Replace (".", "-",

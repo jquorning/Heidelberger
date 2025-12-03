@@ -6,11 +6,13 @@
 --
 
 with Ada.Containers;
+with Ada.Strings.Unbounded;
 
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Adi_Plugins;
@@ -27,12 +29,13 @@ is
    use Php;
    use Inc_L10n;
    use Hb_Common;
+   use Lists;
 
    -------------
    -- Globals --
    -------------
 
-   Self : Unbounded_String; -- Adm_Menu.Unbounded_Slug;
+   Self : Ada.Strings.Unbounded.Unbounded_String;
 
    --
    -- The current page.
@@ -41,6 +44,7 @@ is
    --
    procedure Top
    is
+      use Ada.Strings.Unbounded;
       use Binder;
 --    use Adm_Menu;
 
@@ -98,6 +102,7 @@ is
       Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True)
    is
+      use Ada.Strings.Unbounded;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Formatting;

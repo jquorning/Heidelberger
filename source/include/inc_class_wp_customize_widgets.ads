@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Hb_Common;
+with Lists;
 
 with Cust_Class_Wp_Customize_Partials;
 
@@ -22,6 +23,7 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
    use Hb_Common;
+   use Lists;
 
    Capability_Error : exception;
 

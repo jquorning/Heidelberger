@@ -7,9 +7,9 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 
 with Templates_Parser;
@@ -28,10 +28,7 @@ with Inc_Link_Templates;
 package body Adm_Privacy
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
-   use Hb_Common;
-   use Php;
-   use Inc_L10n;
+   use Lists;
 
    ---------
    -- Run --
@@ -39,6 +36,10 @@ is
 
    procedure Run
    is
+      use Hb_Common;
+      use Php;
+      use Inc_L10n;
+
       Display_Version : List_Type;
    begin
       Adm_Admin.Run;

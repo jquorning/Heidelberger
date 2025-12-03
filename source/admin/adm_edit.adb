@@ -7,13 +7,13 @@
 
 with Ada.Containers;
 with Ada.Strings.Unbounded;
--- with Ada.Text_IO;
 with Templates_Parser;
 
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 with Wp_Common;
 
@@ -45,11 +45,8 @@ package body Adm_Edit
 is
    use Ada.Containers;
    use Ada.Strings.Unbounded;
-   use Inc_L10n;
-   use Hb_Common;
    use Arrays;
---   use Globals;
-   use Php;
+   use Lists;
 
    function Var_Bulk (Bulk_Messages : Array_Type;
                       Bulk_Counts   : Array_Type;
@@ -64,15 +61,18 @@ is
 
    procedure Render
    is
+      use Binder;
+      use Hb_Common;
+      use Php;
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Link_Templates;
+      use Inc_L10n;
       use Inc_Plugins;
       use Inc_Posts;
-      use Binder;
 --
 --  @global string       $post_type
 --  @global WP_Post_Type $post_type_object
@@ -163,12 +163,12 @@ is
 --                   use String_Vectors;
                      use Inc_Functions;
 
-                     List : constant List_Type :=
+                     List_2 : constant List_Type :=
                        To_List (List => (+"trashed", +"untrashed", +"deleted",
                                          +"locked",  +"ids"));
 
                      Sendback : Unbounded_String
-                       := +Remove_Query_Arg (List, Wp_Get_Referer);
+                       := +Remove_Query_Arg (List_2, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
                         Sendback := +Admin_URL (String (-Parent_File));
@@ -810,7 +810,10 @@ is
                       Post_Type     : String) return String
    is
       use Binder;
+      use Hb_Common;
+      use Php;
       use Inc_Capabilities;
+      use Inc_L10n;
 
       Messages : Unbounded_String;
       -- Messages := array();

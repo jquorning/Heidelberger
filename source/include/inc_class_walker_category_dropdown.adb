@@ -6,6 +6,8 @@
 -- @since 4.4.0
 --
 
+with Ada.Strings.Unbounded;
+
 with Arrays;
 
 package body Inc_Class_Walker_Category_Dropdown
@@ -14,6 +16,7 @@ is
    function X_Construct
             return Walker_CategoryDropdown
    is
+      use Ada.Strings.Unbounded;
       use Arrays;
 
       This : Walker_CategoryDropdown;

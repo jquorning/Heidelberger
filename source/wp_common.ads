@@ -1,4 +1,9 @@
+--
+--
+--
+
 with Arrays;
+with Lists;
 
 with Adi_Class_Wp_Screens;
 
@@ -12,6 +17,7 @@ with Inc_Taxonomys;
 package Wp_Common
 is
    use Arrays;
+   use Lists;
 
    procedure Set (Item : Array_Type; -- Inc_Taxonomys.Wp_Term_Array;
                   Key  : String;

@@ -10,6 +10,7 @@ with Arrays;
 with Binder;
 with Hb_Common;
 with Globals;
+with Lists;
 with Php;
 
 with Adi_Noop;
@@ -24,7 +25,7 @@ with Inc_Versions;
 
 package body Adm_Load_Scripts
 is
-   use Hb_Common;
+   use Lists;
 
    ---------
    -- Run --
@@ -36,6 +37,7 @@ is
       use Arrays;
       use Binder;
       use Globals;
+      use Hb_Common;
       use Php;
       use Inc_Script_Loader;
 

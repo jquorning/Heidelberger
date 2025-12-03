@@ -8,17 +8,16 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Taxonomy;
 
 package Inc_Taxonomys
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
+   use Lists;
 
    Taxonomy_Does_Not_Exist : exception;
 

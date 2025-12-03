@@ -1,6 +1,8 @@
+--
+--
+--
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 with Php;
@@ -63,7 +65,7 @@ is
                               Args              : Array_Type;
                               Output            : in out Unbounded_String)
    is
-      use Hb_Common;
+--    use Hb_Common;
    begin
       if Element = Empty_Array then
          return;
@@ -133,7 +135,7 @@ is
    is
       use Ada.Containers;
       use Hb_Common;
-      use Inc_Class_Wp_Terms;
+--    use Inc_Class_Wp_Terms;
 
       Output : Unbounded_String;
    begin

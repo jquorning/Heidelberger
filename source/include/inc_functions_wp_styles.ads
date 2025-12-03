@@ -7,13 +7,13 @@
 -- @subpackage Dependencies
 --
 
-with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Styles;
 
 package Inc_Functions_Wp_Styles
 is
-   use Arrays;
+   use Lists;
    use Inc_Class_Wp_Styles;
 
    --

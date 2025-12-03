@@ -8,12 +8,12 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
+with Lists;
 
 package Inc_Class_Wp_Locale_Switchers
 is
    use Ada.Strings.Unbounded;
-   use Arrays;
+   use Lists;
 
    --
    -- Core class used for switching locales.

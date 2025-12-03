@@ -1,9 +1,9 @@
--- with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
--- with Ada.Finalization;
 with Ada.Iterator_Interfaces;
 with Ada.Strings.Unbounded;
+
+with Lists;
 
 package Arrays
 is
@@ -17,21 +17,8 @@ is
 
    subtype Key_Type   is Unbounded_String;
    subtype Value_Type is Unbounded_String;
-   subtype Item_Type  is Unbounded_String;
 
    type Callable is access procedure;
-
-   package List_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Positive,
-                                  Element_Type => Item_Type);
-
-   subtype List_Type is List_Vectors.Vector;
-
-   procedure Append (List : in out List_Type;
-                     Item : String);
-   -- Append Item to List.
-
-   Empty_List  : List_Type  renames List_Vectors.Empty_Vector;
 
    type Array_Kind is (Kind_String,  Kind_Integer,  Kind_Array, Kind_List,
                        Kind_Boolean, Kind_Callable, Kind_Null);
@@ -42,7 +29,7 @@ is
 
    type Array_Type;
    type Array_Access is access all Array_Type;
-   type List_Access  is access all List_Type;
+   type List_Access  is access all Lists.List_Type;
 
    type Multi_Type is private;
 
@@ -132,7 +119,7 @@ is
                       return Array_Type;
 
    function As_List (Arry : Multi_Type)
-                     return List_Type;
+                     return Lists.List_Type;
 
    function As_String (Arry : Multi_Type)
                       return String;
@@ -156,7 +143,7 @@ is
    function From_Array (Value : Array_Type)
                         return Multi_Type;
 
-   function From_List (Value : List_Type)
+   function From_List (Value : Lists.List_Type)
                        return Multi_Type;
 
    function From_String (Value : String)
@@ -319,7 +306,7 @@ is
                    return Array_Type;
 
    function Build (Key   : String;
-                   Value : List_Type)
+                   Value : Lists.List_Type)
                    return Array_Type;
 
    function Build (Key   : String;
@@ -343,14 +330,6 @@ is
                    return Array_Type;
 
    Empty_Array : constant Array_Type;
-
-   type Item_List is array (Positive range <>) of Item_Type;
-
-   function To_List (List : Item_List)
-                     return List_Type;
-
-   function To_List (Item : String)
-                     return List_Type;
 
    function First (Container : Array_Type) return Cursor;
    function Next (Container : Array_Type;

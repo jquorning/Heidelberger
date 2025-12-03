@@ -8,10 +8,10 @@
 
 with Ada.Containers;
 with Ada.Strings.Unbounded;
--- with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 with Php;
+with Lists;
 with Wp_Common;
 
 with Adi_Caches;
@@ -31,6 +31,7 @@ package body Inc_Category_Templates
 is
    use Ada.Containers;
    use Hb_Common;
+   use Lists;
 
 --
 -- Retrieves category link URL.

@@ -7,12 +7,14 @@
 
 with Hb_Common;
 with Helpers;
+with Lists;
 with Php;
 
 with Inc_Class_Wp_Customize_Widgets;
 
 package body Adi_Widgets
 is
+   use Lists;
 
    -------------
    -- Globals --

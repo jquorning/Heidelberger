@@ -7,12 +7,12 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
--- with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Lists;
 with Php;
 with Wp_Common;
 
@@ -51,6 +51,7 @@ is
    use Hb_Common;
    use Inc_L10n;
    use Wp_Common;
+   use Lists;
    use Php;
    use Inc_Capabilities;
 

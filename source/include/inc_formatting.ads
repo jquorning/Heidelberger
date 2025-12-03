@@ -7,11 +7,13 @@
 --
 
 with Arrays;
+with Lists;
 with Php;
 
 package Inc_Formatting
 is
    use Arrays;
+   use Lists;
 
    --
    -- Replaces common plain text characters with formatted entities.
