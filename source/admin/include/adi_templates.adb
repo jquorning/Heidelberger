@@ -8,12 +8,11 @@
 -- @subpackage Administration
 --
 
--- with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Binder;
 with Wp_Common;
-with Php;
+with Php.HTML;
 
 with Inc_Admin_Bar;
 with Inc_Capabilities;
@@ -32,11 +31,11 @@ with Inc_Vars;
 
 package body Adi_Templates
 is
--- use Ada.Containers;
    use Ada.Strings.Unbounded;
    use Inc_L10n;
    use Php;
    use Wp_Common;
+
 -- -- Walker_Category_Checklist class
 -- -- require_once ABSPATH . 'wp-admin/includes/class-walker-category-checklist.php';
 
@@ -2927,6 +2926,7 @@ is
 
    procedure X_Wp_Admin_Html_Begin
    is
+      use Php.HTML;
       use Inc_Options;
 
       Admin_Html_Class : constant String :=

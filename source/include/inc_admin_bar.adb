@@ -13,6 +13,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.HTML;
 with Php.Preg;
 with Wp_Common;
 
@@ -559,6 +560,7 @@ is
    procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Binder;
+      use Php.HTML;
       use Inc_Functions;
       use Inc_Load;
 --    use Inc_Pluggables;

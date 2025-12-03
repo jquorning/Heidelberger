@@ -8,6 +8,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.HTML;
 with Php.Preg;
 
 with Adi_Noop;
@@ -38,6 +39,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.HTML;
       use Php.Preg;
       use Inc_Class_Wp_Dependency;
 

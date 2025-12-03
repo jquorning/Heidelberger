@@ -8,6 +8,7 @@
 
 with Binder;
 with Globals;
+with Php.HTML;
 with Php.Preg;
 
 with Adi_Posts;
@@ -833,6 +834,7 @@ is
    procedure Enqueue_Scripts (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.HTML;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Functions;

@@ -18,6 +18,7 @@ with Arrays;
 with Binder;
 with Hb_Common;
 with Lists;
+with Php.HTML;
 with Php.Preg;
 
 with Inc_Load;
@@ -36,6 +37,7 @@ is
       use Arrays;
       use Binder;
       use Php;
+      use Php.HTML;
       use Php.Preg;
       use Inc_Load;
 

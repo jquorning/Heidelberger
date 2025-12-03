@@ -12,6 +12,7 @@ with Globals;
 with Hb_Common;
 with Lists;
 with Php.Files;
+with Php.HTML;
 
 with Wp_Config;
 
@@ -306,7 +307,7 @@ is
 --    require_once ABSPATH . WPINC . "/functions.php";
       Wp_Load_Translations_Early;
 
-      Php.Header ("Retry-After: 600");
+      Php.HTML.Header ("Retry-After: 600");
 
       Wp_Die
         (abs "Briefly unavailable for scheduled maintenance. Check back in a minute.",

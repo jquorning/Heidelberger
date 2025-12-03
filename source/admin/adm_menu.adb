@@ -7,7 +7,7 @@
 
 with Binder;
 with Hb_Common;
-with Php;
+with Php.HTML;
 with Wp_Common;
 with Lists;
 
@@ -62,6 +62,7 @@ is
    procedure Run
    is
       use Binder;
+      use Php.HTML;
       use Wp_Common;
       use Inc_Capabilities;
       use Inc_Formatting;

@@ -25,7 +25,7 @@ with Arrays;
 with Binder;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.HTML;
 
 with Wp_Config;
 
@@ -41,8 +41,9 @@ is
    procedure Run
    is
       use Hb_Common;
-      use Inc_L10n;
       use Php;
+      use Php.HTML;
+      use Inc_L10n;
    begin
 
 -- -- Define ABSPATH as this file"s directory

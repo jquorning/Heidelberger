@@ -212,8 +212,6 @@ is
    function Time return Natural
    is (9999);
 
-   function URLencode (Item : String) return String is ("XXX-301");
-
    function Is_Int (A : Integer)   return Boolean is (True);
    function Is_String (A : String) return Boolean is (True);
 
@@ -228,38 +226,6 @@ is
    function Stripslashes (Item : String)
                           return String
                           is (Item);
-
-   type Flag_Type is new Natural;
-
-   ENT_QUOTES     : constant Flag_Type := 16#0001#;
-   ENT_SUBSTITUTE : constant Flag_Type := 16#0002#;
-   ENT_HTML404    : constant Flag_Type := 16#0004#;
-   ENT_NOQUOTES   : constant Flag_Type := 16#0008#;
-   ENT_XML1       : constant Flag_Type := 16#0010#;
-   ENT_HTML401    : constant Flag_Type := 16#0020#;
-   -- Shold be or'ed together instead
-
-   function HTML_Entity_Decode (Item     : String;
-                                Flags    : Flag_Type;
-                                Encoding : String := "")
-                                return String
-                                is ("XXX-312");
-
-   function HTMLentities (Item          : String;
-                          Flags         : Flag_Type := ENT_QUOTES;
-                          Encoding      : String  := "";
-                          Double_Encode : Boolean := True)
-                          return String
-                          is ("XXX-462");
-
-   function HTMLspecialchars (Item          : String;
-                              Flags         : Flag_Type := ENT_QUOTES +
-                                                           ENT_SUBSTITUTE +
-                                                           ENT_HTML401;
-                              Encoding      : String := "";
-                              Double_Encode : Boolean := True)
-                              return String
-                              is (Item);
 
    function Array_Keys (Arry : Array_Type)
                         return Array_Type
@@ -504,11 +470,6 @@ is
                      Before_Needle : Boolean := False)
                      return Boolean  -- string|false
                      is (False);
-
-   procedure Header (Header        : String;
-                     Replace       : Boolean := True;
-                     Response_Code : Integer := 0)
-                     is null;
 
    function Error_Get_Last
             return Array_Type

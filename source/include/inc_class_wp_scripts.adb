@@ -11,6 +11,7 @@ with Ada.Containers;
 
 with Globals;
 with Hb_Common;
+with Php.HTML;
 with Php.Preg;
 
 with Inc_Class_Wp_Dependency;
@@ -491,6 +492,7 @@ is
                       L10n        : Array_Type)
                       return Boolean
    is
+      use Php.HTML;
       use Inc_Functions;
 --    use Array_Maps;
 

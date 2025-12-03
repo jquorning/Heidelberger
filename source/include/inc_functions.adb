@@ -14,6 +14,7 @@ with Hb_Common;
 with Helpers;
 with Php.JSON;
 with Php.Files;
+with Php.HTML;
 with Php.Preg;
 
 with Inc_Capabilities;
@@ -1082,7 +1083,7 @@ is
             V_2 : Unbounded_String    := +As_String (V);
          begin
             if URLencode then
-               K := +Php.URLencode (-K);
+               K := +Php.HTML.URLencode (-K);
             end if;
 
 --          if K.Is_Integer and then "" /= Prefix then
@@ -1108,7 +1109,7 @@ is
                   (As_Array (V), "", Sep, -K, URLencode));
 
             elsif URLencode then
-               Array_Push (Ret, -(K & "=" & Php.URLencode (-V_2)));
+               Array_Push (Ret, -(K & "=" & Php.HTML.URLencode (-V_2)));
 
             else
                Array_Push (Ret, -(K & "=" & (-V_2)));

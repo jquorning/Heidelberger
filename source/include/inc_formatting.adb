@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php.HTML;
 with Php.Preg;
 
 with Inc_KSES;
@@ -925,15 +926,17 @@ is
    -- X_Wp_Specialchars --
    -----------------------
 
-   function X_Wp_Specialchars (Item          : String;
-                               Quote_Style   : Php.Flag_Type := Php.ENT_NOQUOTES;
---                             Quote_Style   : Integer := ENT_NOQUOTES;
-                               Charset       : String  := "";
-                               Double_Encode : Boolean := False)
-                               return String
+   function X_Wp_Specialchars
+              (Item          : String;
+               Quote_Style   : Php.HTML.Flag_Type := Php.HTML.ENT_NOQUOTES;
+--             Quote_Style   : Integer := ENT_NOQUOTES;
+               Charset       : String  := "";
+               Double_Encode : Boolean := False)
+               return String
    is
       use Hb_Common;
       use Php;
+      use Php.HTML;
       use Php.Preg;
 
 --    string = (string) string;
@@ -2511,7 +2514,7 @@ is
 
    function URLencode_Deep (Value : Array_Type)
                             return Array_Type
-   is (Map_Deep (Value, Php.URLencode'Access));
+   is (Map_Deep (Value, Php.HTML.URLencode'Access));
 
 -- --
 -- -- Navigates through an array, object, or scalar, and raw-encodes the values to be used in a URL.
@@ -4275,7 +4278,9 @@ is
       use Inc_Plugins;
 
       Safe_Text_2 : constant String := Wp_Check_Invalid_UTF8 (Text);
-      Safe_Text   : constant String := X_Wp_Specialchars (Safe_Text_2, Php.ENT_QUOTES);
+
+      Safe_Text   : constant String :=
+        X_Wp_Specialchars (Safe_Text_2, Php.HTML.ENT_QUOTES);
    begin
       --
       -- Filters a string cleaned and escaped for output in an HTML attribute.

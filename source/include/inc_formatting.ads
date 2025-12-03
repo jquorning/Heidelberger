@@ -9,6 +9,7 @@
 with Arrays;
 with Lists;
 with Php;
+with Php.HTML;
 
 package Inc_Formatting
 is
@@ -91,12 +92,13 @@ is
    --                                   entities. Default false.
    -- @return string The encoded text with HTML entities.
    --
-   function X_Wp_Specialchars (Item          : String;
-                               Quote_Style   : Php.Flag_Type := Php.ENT_NOQUOTES;
---                             Quote_Style   : Integer := Php.ENT_NOQUOTES;
-                               Charset       : String  := ""; -- Boolean := False;
-                               Double_Encode : Boolean := False)
-                               return String;
+   function X_Wp_Specialchars
+              (Item          : String;
+               Quote_Style   : Php.HTML.Flag_Type := Php.HTML.ENT_NOQUOTES;
+--             Quote_Style   : Integer := Php.ENT_NOQUOTES;
+               Charset       : String  := ""; -- Boolean := False;
+               Double_Encode : Boolean := False)
+               return String;
 
    --
    -- Sanitizes an HTML classname to ensure it only contains valid characters.

@@ -22,6 +22,7 @@ with Binder;
 with Hb_Common;
 with Globals;
 with Php.Files;
+with Php.HTML;
 with Php.Preg;
 
 with Adm_Load_Styles;
@@ -1849,7 +1850,7 @@ is
                            "Google Font Name and Variants");
       if "off" /= Font_Family then
          Fonts_URL := +"https://fonts.googleapis.com/css?family=" &
-                      Php.URLencode (-Font_Family);
+                      Php.HTML.URLencode (-Font_Family);
       end if;
       Styles.Add ("wp-editor-font", -Fonts_URL); -- No longer used in core as of 5.7.
 

@@ -9,6 +9,7 @@
 with Globals;
 with Hb_Common;
 with Php.Files;
+with Php.HTML;
 with Php.JSON;
 
 with Inc_Block_Editors;
@@ -485,6 +486,7 @@ is
       return Array_Type
    is
       use Hb_Common;
+      use Php.HTML;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Themes;
       use Inc_Class_Wp_Querys;

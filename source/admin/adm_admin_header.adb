@@ -11,6 +11,7 @@ with Arrays;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.HTML;
 with Php.Preg;
 
 with Adm_Menu;
@@ -52,6 +53,7 @@ is
       use Arrays;
       use Hb_Common;
       use Php;
+      use Php.HTML;
       use Php.Preg;
       use Inc_Formatting;
       use Inc_L10n;
