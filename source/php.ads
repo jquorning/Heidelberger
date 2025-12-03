@@ -530,13 +530,6 @@ is
    procedure Error_Reporting (Error_Level : Integer := 0)
              is null;
 
-   PHP_URL_SCHEME : constant Integer := 1; -- XXX guess
-
-   function Parse_URL (URL       : String;
-                       Component : Integer := -1)
-            return String
-            is ("XXX-781");
-
    function Strtok (Item  : String;
                     Token : String)
                     return String

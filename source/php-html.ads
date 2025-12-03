@@ -46,4 +46,11 @@ is
                      Response_Code : Integer := 0)
                      is null;
 
+   PHP_URL_SCHEME : constant Integer := 1; -- XXX guess
+
+   function Parse_URL (URL       : String;
+                       Component : Integer := -1)
+            return String
+            is ("XXX-781");
+
 end Php.HTML;

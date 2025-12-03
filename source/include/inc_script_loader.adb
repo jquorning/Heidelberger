@@ -868,7 +868,7 @@ is
                         Build ("url",    -Globals.SITECOOKIEPATH), -- (string)
                         Build ("uid",    Inc_Users.Get_Current_User_Id), -- (string)
 --                      Build ("time",   (string) time(),
-                        Build ("secure", Boolean'Image ("https" = Php.Parse_URL (Site_URL, Php.PHP_URL_SCHEME)))
+                        Build ("secure", Boolean'Image ("https" = Php.HTML.Parse_URL (Site_URL, Php.HTML.PHP_URL_SCHEME)))
                 ))
          );
       end if;
