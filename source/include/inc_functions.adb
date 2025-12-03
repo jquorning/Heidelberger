@@ -6724,6 +6724,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Files;
       use Php.Preg;
       use Inc_Plugins;
 

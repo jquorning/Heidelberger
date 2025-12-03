@@ -39,4 +39,14 @@ is
             return String
             is ("XXX-779");
 
+   type Resource is access all Integer;
+
+   function File_Get_Contents (Filename         : String;
+                               Use_Include_Path : Boolean  := False;
+                               Context          : Resource := null;
+                               Offset           : Integer  := 0;
+                               Length           : Integer  := 0)
+            return String
+            is ("XXX-780");
+
 end Php.Files;

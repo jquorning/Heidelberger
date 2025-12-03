@@ -9,7 +9,6 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php.HTML;
 with Php.Preg;
 
 with Inc_KSES;
