@@ -8,7 +8,7 @@
 with Hb_Common;
 with Helpers;
 with Lists;
-with Php;
+with Php.Preg;
 
 with Inc_Class_Wp_Customize_Widgets;
 
@@ -93,6 +93,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
 --    global wp_registered_widgets;
       Number : Natural := 1;

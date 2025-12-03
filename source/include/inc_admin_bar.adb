@@ -13,7 +13,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Preg;
 with Wp_Common;
 
 with Adi_Class_Wp_Screens;
@@ -419,6 +419,7 @@ is
 
    procedure Wp_Admin_Bar_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use Php.Preg;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_Link_Templates;
@@ -635,6 +636,7 @@ is
    procedure Wp_Admin_Bar_My_Sites_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Ada.Containers;
+      use Php.Preg;
       use Inc_Class_Wp_Sites;
       use Inc_Link_Templates;
       use Inc_Load;

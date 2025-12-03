@@ -9,15 +9,15 @@
 
 with Ada.Strings.Unbounded;
 
+with Hb_Common;
+with Php.Preg;
+
 with Adm_Load_Styles;
 
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
-
-with Hb_Common;
-with Php;
 
 package body Inc_Functions_Wp_Styles
 is
@@ -86,6 +86,7 @@ is
                                  return Boolean
    is
       use Ada.Strings.Unbounded;
+      use Php.Preg;
       use Adm_Load_Styles;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;

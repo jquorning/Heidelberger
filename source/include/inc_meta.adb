@@ -13,7 +13,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php;
+with Php.Preg;
 
 with Adi_Caches;
 
@@ -1323,6 +1323,7 @@ is
                                return Boolean
    is
       use Php;
+      use Php.Preg;
       use Inc_Plugins;
 
       Sanitized_Key : constant String :=

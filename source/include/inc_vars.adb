@@ -18,7 +18,7 @@ with Arrays;
 with Binder;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Preg;
 
 with Inc_Load;
 with Inc_Plugins;
@@ -36,6 +36,7 @@ is
       use Arrays;
       use Binder;
       use Php;
+      use Php.Preg;
       use Inc_Load;
 
       Php_Self : constant String := As_String (Get (X_SERVER, "PHP_SELF"));

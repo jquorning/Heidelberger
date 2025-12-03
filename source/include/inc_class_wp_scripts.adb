@@ -11,7 +11,7 @@ with Ada.Containers;
 
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Preg;
 
 with Inc_Class_Wp_Dependency;
 with Inc_Formatting;
@@ -152,6 +152,7 @@ is
                      Group  : Boolean := False)
                      return Boolean
    is
+      use Php.Preg;
       use Inc_Functions;
       use Inc_Formatting;
       use Inc_Class_Wp_Dependency;

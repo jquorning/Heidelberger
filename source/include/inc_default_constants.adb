@@ -6,7 +6,7 @@
 
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Preg;
 
 with Inc_Themes;
 with Inc_Options;
@@ -243,6 +243,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Options;
    begin
       --

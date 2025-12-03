@@ -9,7 +9,7 @@
 with Binder;
 with Globals;
 with Helpers;
-with Php;
+with Php.Preg;
 
 with Inc_Caches;
 with Inc_Class_Wp_Querys;
@@ -1655,6 +1655,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.Preg;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;

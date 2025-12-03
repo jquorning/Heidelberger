@@ -8,9 +8,7 @@
 -- @since 0.71
 --
 
--- with Ada.Strings.Unbounded;
-
-with Php;
+with Php.Preg;
 
 with Hb_Common;
 
@@ -20,7 +18,6 @@ with Inc_Load;
 
 package body Inc_Class_Wpdb
 is
---   use Ada.Strings.Unbounded;
    use Php;
    use Hb_Common;
    use Inc_L10n;
@@ -364,6 +361,8 @@ is
                         Set_Table_Names : Boolean := True)
                         return String
    is
+      use Php.Preg;
+
       Old_Prefix   : Unbounded_String;
       Unused_Match : List_Type;
    begin
@@ -820,6 +819,7 @@ is
                      Args  : List_Type) --, ...args)
                      return String
    is
+      use Php.Preg;
       use Inc_Functions;
 
       function Func return Array_Type;
@@ -2683,6 +2683,8 @@ is
                                   Query : String)
                                   return Boolean
    is
+      use Php.Preg;
+
       Query_2        : constant String := Ltrim (Query, "\r\n\t (");
       Unused_Matches : List_Type;
    begin

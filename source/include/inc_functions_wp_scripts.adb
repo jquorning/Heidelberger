@@ -8,9 +8,8 @@
 --
 
 with Hb_Common;
-with Php;
+with Php.Preg;
 
--- with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
 with Inc_L10n;
@@ -132,6 +131,7 @@ is
                                   Position : String := "after")
                                   return Boolean
    is
+      use Php.Preg;
       use Inc_Class_Wp_Scripts;
       use Inc_Functions;
       use Inc_L10n;

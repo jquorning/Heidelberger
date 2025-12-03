@@ -14,7 +14,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Preg;
 with Wp_Common;
 
 with Adm_Admin;
@@ -64,6 +64,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;
@@ -812,6 +813,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Capabilities;
       use Inc_L10n;
 

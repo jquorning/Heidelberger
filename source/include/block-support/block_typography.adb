@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Preg;
 
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
@@ -31,6 +31,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Functions;
       use Inc_L10n;
 

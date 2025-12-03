@@ -8,7 +8,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Preg;
 
 with Adi_Noop;
 -- with Inc_Class_Wp_Styles;
@@ -38,6 +38,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Class_Wp_Dependency;
 
       Protocol : Unbounded_String;

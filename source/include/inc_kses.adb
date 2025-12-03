@@ -32,7 +32,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php;
+with Php.Preg;
 
 with Inc_Functions;
 with Inc_Plugins;
@@ -954,6 +954,7 @@ is
                            return String
    is
       use Php;
+      use Php.Preg;
    begin
       Pass_Allowed_HTML      := Allowed_HTML;
       Pass_Allowed_Protocols := Allowed_Protocols;
@@ -1037,6 +1038,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       String_2  : Unbounded_String := +Wp_KSES_Stripslashes (Item);
       Newstring : Unbounded_String;
@@ -1136,6 +1138,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Allowed_HTML_2 : constant Array_Type :=
         (if not Is_Array (Allowed_HTML)
@@ -1241,6 +1244,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Name_Low    : constant String := Strtolower (Name);
       Element_Low : constant String := Strtolower (Element);
@@ -1347,6 +1351,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Attr_2   : Unbounded_String := +Attr;
       Attrarr  : Array_Type;
@@ -1597,6 +1602,7 @@ is
                                     return Boolean
    is
       use Php;
+      use Php.Preg;
 
       Ok : Boolean := True;
       Check_Low : constant String := Strtolower (Checkname);
@@ -1722,6 +1728,7 @@ is
    is
 --    use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Options_2 : constant Array_Type :=
         (if not Isset (Options, "slash_zero")
@@ -1747,6 +1754,7 @@ is
                                   return String
    is
       use Php;
+      use Php.Preg;
    begin
       return Preg_Replace ("%\\\\'%", """", Item);
    end Wp_KSES_Stripslashes;
@@ -1783,6 +1791,7 @@ is
                                 return String
    is
       use Php;
+      use Php.Preg;
    begin
       return Preg_Replace ("/^(""[^""]*(""|$)|\""[^\""]*(\""|$)|\S)*\s*/",
                            "", Item);
@@ -1800,6 +1809,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Count_2 : Natural := Count;
 
@@ -1849,6 +1859,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       String_5 : constant String := Wp_KSES_Decode_Entities (Item);
       String_4 : constant String := Preg_Replace ("/\s/", "", String_5);
@@ -2035,6 +2046,7 @@ is
                                      return String
    is
       use Php;
+      use Php.Preg;
 
       String_3 : constant String :=
         Preg_Replace_Callback ("/&#([0-9]+);/",
@@ -2282,6 +2294,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Functions;
       use Inc_Plugins;
 

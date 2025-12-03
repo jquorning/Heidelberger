@@ -8,7 +8,7 @@
 
 with Binder;
 with Globals;
-with Php;
+with Php.Preg;
 
 with Adi_Posts;
 with Adi_Widgets;
@@ -182,6 +182,7 @@ is
                               return String
    is
       use Php;
+      use Php.Preg;
    begin
       if Isset (Static_Cache, Setting_Id) then
          return As_String (Get (Static_Cache, Setting_Id));
@@ -775,6 +776,7 @@ is
                              return Array_Type
    is
       use Php;
+      use Php.Preg;
 
       Parsed : Array_Type := To_Array (List => (
         Build ("number",  Null_Value),
@@ -1169,6 +1171,7 @@ is
                               return Array_Type
    is
       use Php;
+      use Php.Preg;
       use Inc_Plugins;
       use Inc_Themes;
 
@@ -1238,6 +1241,7 @@ is
                                       return List_Type
    is
       use Php;
+      use Php.Preg;
 
       Widget_Ids_2 : constant List_Type :=
         Array_Map ("strval", Widget_Ids); -- (arrays)
@@ -1721,6 +1725,7 @@ is
                                             return Array_Type
    is
       use Php;
+      use Php.Preg;
       use Inc_Themes;
 
       Matches : List_Type;
@@ -1792,6 +1797,7 @@ is
                                            return Array_Type
    is
       use Php;
+      use Php.Preg;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Widgets;

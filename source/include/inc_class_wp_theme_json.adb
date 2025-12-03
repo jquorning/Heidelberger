@@ -8,7 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Php;
+with Php.Preg;
 
 with Block_Typography;
 
@@ -597,6 +597,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Preg;
       use Inc_Functions;
       use Inc_Themes;
 

@@ -13,7 +13,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Preg;
 
 with Adi_Plugins;
 with Inc_Capabilities;
@@ -46,6 +46,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Binder;
+      use Php.Preg;
 --    use Adm_Menu;
 
 --    Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
@@ -103,6 +104,7 @@ is
       Submenu_As_Parent : Boolean := True)
    is
       use Ada.Strings.Unbounded;
+      use Php.Preg;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Formatting;

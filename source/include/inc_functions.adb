@@ -12,7 +12,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Helpers;
-with Php;
+with Php.Preg;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_List_Util;
@@ -1134,6 +1134,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Formatting;
 
       Protocol : Unbounded_String;
@@ -2198,6 +2199,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Path_2  : Unbounded_String := +Path;
       Wrapper : Unbounded_String;
@@ -5095,6 +5097,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       -- phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
       -- ignore the camelCase names for variables so the names are the same as lodash
@@ -6648,6 +6651,7 @@ is
                                       return String
    is
       use Php;
+      use Php.Preg;
    begin
       return Trim (Preg_Replace ("/\s*(?:\*\/|\?>).*/", "", Str));
    end X_Cleanup_Header_Comment;
@@ -6715,6 +6719,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Plugins;
 
       -- Pull only the first 8 KB of the file in.
@@ -7661,6 +7666,7 @@ is
                         return Boolean
    is
       use Php;
+      use Php.Preg;
       use Inc_L10n;
    begin
       if not Is_String (UUID) then

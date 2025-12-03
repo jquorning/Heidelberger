@@ -20,7 +20,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php;
+with Php.Preg;
 
 with Inc_Class_Wp_Customize_Widgets;
 with Inc_Formatting;
@@ -480,6 +480,7 @@ is
                                   return String
    is
       use Php;
+      use Php.Preg;
    begin
       return Preg_Replace ("/-[0-9]+/", "", Id);
    end X_Get_Widget_Id_Base;
@@ -494,6 +495,7 @@ is
       use List_Vectors;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Class_Wp_Customize_Widgets;
 --    use Inc_Themes;
 

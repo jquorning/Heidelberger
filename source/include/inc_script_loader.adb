@@ -16,19 +16,17 @@
 --
 
 with Ada.Strings.Unbounded;
--- with Ada.Text_IO; use Ada.Text_IO;
 
 with Array_Vectors;
 with Binder;
 with Hb_Common;
 with Globals;
-with Php;
+with Php.Preg;
 
 with Adm_Load_Styles;
 
 with Adi_Class_Wp_Screens;
 
--- with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Theme_JSON_Resolver;
 with Inc_Formatting;
@@ -3322,6 +3320,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Preg;
       use Inc_Formatting;
 
       CSS_2 : Unbounded_String := +CSS;

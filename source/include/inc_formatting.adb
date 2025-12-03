@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php.Preg;
 
 with Inc_KSES;
 with Inc_Options;
@@ -933,6 +934,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
 --    string = (string) string;
       Quote_Style_2 : Flag_Type := Quote_Style;
@@ -945,7 +947,7 @@ is
       end if;
 
       -- Don't bother if there are no specialchars - saves some processing.
-      if not Php.Preg_Match ("/[&<>'\']/", Item) then
+      if not Preg_Match ("/[&<>'\']/", Item) then
          return Item;
       end if;
 
@@ -1768,6 +1770,7 @@ is
                            return String
    is
       use Php;
+      use Php.Preg;
       use Inc_Plugins;
 
       Raw_Username : constant String := Username;
@@ -4394,7 +4397,7 @@ is
    function Wp_Make_Link_Relative (Link : String)
                                    return String
    is
-      use Php;
+      use Php.Preg;
    begin
       return Preg_Replace ("|^(https?:)?//[^/]+(/?.*)|i", "2", Link);
    end Wp_Make_Link_Relative;
@@ -5113,6 +5116,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Preg;
 
       Item_3 : constant String :=
         Preg_Replace ("@<(script|style)[^>]*?>.*?</\\1>@si", "", Item);
