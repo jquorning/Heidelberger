@@ -20,8 +20,10 @@ is
                     Pattern : String)
                     return Natural;
 
-   function Stripos (Heystack : String; Needle : String) return Natural
-      is (1);
+   function Stripos (Heystack : String;
+                     Needle   : String)
+                     return Natural
+                     is (999);
 
    function Str_Replace (Search  : String;
                          Replace : String;
@@ -29,8 +31,16 @@ is
                          return String;
 
    function Str_Replace (Search  : List_Type;
+                         Replace : List_Type;
+                         Subject : String)
+                         return String
+                         is ("XXX-020");
+
+   function Str_Replace (Search  : List_Type;
                          Replace : String;
-                         Item    : String) return String is ("XXX-221");
+                         Subject : String)
+                         return String
+                         is ("XXX-221");
 
    function Str_Repeat (Item  : String;
                         Times : Natural)
@@ -55,11 +65,20 @@ is
 
    function Preg_Replace (Pattern     : String;
                           Replacement : String;
-                          Subject     : String) return String is (Subject);
+                          Subject     : String)
+                          return String
+                          is (Subject);
 
    function Preg_Match (Pattern : String;
                         Subject : String;
                         Matches : out List_Type;
+                        Flags   : Integer := 0;
+                        Offset  : Integer := 0)
+                        return Integer;
+
+   function Preg_Match (Pattern : String;
+                        Subject : String;
+                        Matches : out Array_Type;
                         Flags   : Integer := 0;
                         Offset  : Integer := 0)
                         return Integer;
@@ -104,6 +123,10 @@ is
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);
+
+   function Array_Merge (Arry_1, Arry_2, Arry_3 : Array_Type)
+            return Array_Type
+   is (Array_Merge (Array_Merge (Arry_1, Arry_2), Arry_3));
 
    function Array_Merge_Recursive (Left, Right : Array_Type)
                                    return Array_Type
@@ -150,8 +173,15 @@ is
                      return Integer
                      is (1);
 
+   function Strnatcasecmp (Left, Right : String)
+                           return Integer;
+
    function Max (Arry : Array_Type) return Integer is (1);
    function Hexdec (Hex : String) return Integer is (99);
+
+   function MT_Rand (Min : Natural;
+                     Max : Natural)
+                     return Natural;
 
 --   type Func_Type is access function return Array_Type;
 --   procedure Array_Walk (Arry     : Array_Type;
@@ -222,8 +252,22 @@ is
                      return Array_Type
                      is (Empty_Array);
 
+   procedure Array_Shift (List : in out List_Type);
+   function Array_Shift (List : in out List_Type)
+                         return String;
+
+-- function Array_Shift (Arry : in out Array_Type)
+--                       return Multi_Type;
+
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
+
+   procedure Array_Unshift (List : in out List_Type;
+                            Item : String)
+                            is null;
+
+   function Time return Natural
+   is (9999);
 
    function URLencode (Item : String) return String is ("XXX-301");
 
@@ -264,20 +308,20 @@ is
    ENT_HTML401    : constant Flag_Type := 16#0020#;
    -- Shold be or'ed together instead
 
-   function Html_Entity_Decode (Item     : String;
+   function HTML_Entity_Decode (Item     : String;
                                 Flags    : Flag_Type;
                                 Encoding : String := "")
                                 return String
                                 is ("XXX-312");
 
-   function Htmlentities (Item          : String;
+   function HTMLentities (Item          : String;
                           Flags         : Flag_Type := ENT_QUOTES;
                           Encoding      : String  := "";
                           Double_Encode : Boolean := True)
                           return String
                           is ("XXX-462");
 
-   function Htmlspecialchars (Item          : String;
+   function HTMLspecialchars (Item          : String;
                               Flags         : Flag_Type := ENT_QUOTES +
                                                            ENT_SUBSTITUTE +
                                                            ENT_HTML401;
@@ -285,6 +329,10 @@ is
                               Double_Encode : Boolean := True)
                               return String
                               is (Item);
+
+   function Array_Keys (Arry : Array_Type)
+                        return Array_Type
+                        is (Empty_Array);
 
    function Array_Keys (Arry : Array_Type)
                         return List_Type
@@ -322,6 +370,12 @@ is
                           return Integer
                           is (99);
 
+   function Array_Search (Needle   : String;
+                          Haystack : List_Type;
+                          Strict   : Boolean := False)
+                          return String
+                          is ("XXX-012");
+
    function Array_Intersect_Key (Arry   : Array_Type;
                                  Arry_2 : Array_Type)
                                  return Array_Type
@@ -337,6 +391,11 @@ is
 
    function Array_Fill_Keys (Keys  : Array_Type;
                              Value : Boolean)
+                             return Array_Type
+                             is (Empty_Array);
+
+   function Array_Fill_Keys (Keys  : List_Type;
+                             Value : Multi_Type)
                              return Array_Type
                              is (Empty_Array);
 
@@ -448,6 +507,19 @@ is
    function Is_File (Filename : String)
                      return Boolean
                      is (False);
+
+   function Key (Arry : Array_Type)
+                 return String
+                 is ("XXX-024");
+
+   procedure Sort (List : in out List_Type)
+   is null;
+
+   type USort_Comparator is access function (A, B : Multi_Type)
+                                             return Integer;
+
+   procedure USort (Arry     : in out Array_Type;
+                    Callback : USort_Comparator);
 
    SORT_REGULAR : constant Integer := 47; -- arbitrary
 
@@ -661,6 +733,10 @@ is
                      return String
                      is ("XXX-011");
 
+   function Endd (List : List_Type)
+                  return String
+                  is ("XXX-018");
+
    function Function_Exists (Func : String)
                              return Boolean
                              is (True);
@@ -677,5 +753,12 @@ is
    procedure Clear_Echo;
    function Get_Echo
             return String;
+
+   procedure OB_Start
+   is null;
+
+   function OB_Get_Clean
+            return String
+            is ("XXX-015");
 
 end Php;

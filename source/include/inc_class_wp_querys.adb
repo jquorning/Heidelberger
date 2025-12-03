@@ -3419,22 +3419,21 @@ is
 --                 return 0;
 --         end;
 
---         --
---         -- Constructor.
---         --
---         -- Sets up the WordPress query, if parameter is not empty.
---         --
---         -- @since 1.5.0
---         --
---         -- @see WP_Query::parse_query() for all available arguments.
---         --
---         -- @param string|array $query URL query string or array of vars.
---         --
---         public function __construct( $query = '' ) then
---                 if ( ! empty( $query ) ) then
---                         $this->query( $query );
---                 end;
---         end;
+   -------------
+   -- X_Query --
+   -------------
+
+   function X_Construct (Query : Array_Type) -- ''
+                         return Wp_Query
+   is
+      This : Wp_Query;
+   begin
+      if Query /= Empty_Array then
+--    if not Empty (Query) then
+         This.Query (Query);
+      end if;
+      return This; -- added
+   end X_Construct;
 
 --         --
 --         -- Make private properties readable for backward compatibility.

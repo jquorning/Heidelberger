@@ -34,7 +34,6 @@ is
    use Arrays;
    use Inc_Class_Wp_Hooks;
 
-   subtype Callable is Arrays.Callable;
    type Callable_2 is access function return Array_Type;
    type Callable_3 is access function (New_Status      : String;
                                        Post_Id         : Integer;
@@ -65,8 +64,8 @@ is
    --                  the priority of that hook is returned, or false if the function
    --                  is not attached.
    --
-   function Has_Action (Hook_Name : String)
-                        --, callback = false )
+   function Has_Action (Hook_Name : String;
+                        Callback  : Callable := null) -- false
                         return Boolean
                         is (True);
 
@@ -268,7 +267,7 @@ is
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            V         : String;
-                           N         : String)
+                           N         : String := "")
                            return Array_Type
                            is (Value);
 
@@ -464,6 +463,10 @@ is
    -- function remove_filter( hook_name, callback, priority = 10 ) then
    procedure Remove_Filter (Hook_Name : String;
                             Callback  : String;
+                            Priority  : Integer := 10)
+                            is null;
+   procedure Remove_Filter (Hook_Name : String;
+                            Callback  : Callable;
                             Priority  : Integer := 10)
                             is null;
    function Remove_Filter (Hook_Name : String;

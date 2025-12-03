@@ -395,6 +395,42 @@ is
                            return Array_Type;
 
    --
+   -- Converts a comma- or space-separated list of scalar values to an array.
+   --
+   -- @since 5.1.0
+   --
+   -- @param array|string list List of values.
+   -- @return array Array of values.
+   --
+   function Wp_Parse_List (List : List_Type)
+                           return List_Type;
+
+   --
+   -- Cleans up an array, comma- or space-separated list of IDs.
+   --
+   -- @since 3.0.0
+   -- @since 5.1.0 Refactored to use wp_parse_list().
+   --
+   -- @param array|string list List of IDs.
+   -- @return int[] Sanitized array of IDs.
+   --
+   function Wp_Parse_Id_List (List : List_Type)
+                              return List_Type;
+
+   --
+   -- Extracts a slice of an array, given a list of keys.
+   --
+   -- @since 3.1.0
+   --
+   -- @param array array The original array.
+   -- @param array keys  The list of keys.
+   -- @return array The array slice.
+   --
+   function Wp_Array_Slice_Assoc (Arry : Array_Type;
+                                  Keys : List_Type)
+                                  return Array_Type;
+
+   --
    -- Accesses an array in depth based on a path of keys.
    --
    -- It is the PHP equivalent of JavaScript's `lodash.get()` and mirroring it may
@@ -775,6 +811,31 @@ is
    --
    function Wp_Is_Stream (Path : String)
                           return Boolean;
+
+   --
+   -- Generates a random UUID (version 4).
+   --
+   -- @since 4.7.0
+   --
+   -- @return string UUID.
+   --
+   function Wp_Generate_UUID4
+            return String;
+
+   --
+   -- Validates that a UUID is valid.
+   --
+   -- @since 4.9.0
+   --
+   -- @param mixed uuid    UUID to check.
+   -- @param int   version Specify which version of UUID to check against. Default is
+   --                       none, to accept any UUID version. Otherwise, only version
+   --                       allowed is `4`.
+   -- @return bool The string is a valid UUID or false on failure.
+   --
+   function Wp_Is_UUID (UUID    : String;
+                        Version : Integer := 0) -- null
+                        return Boolean;
 
    --
    -- Strips close comment and close php tags from file headers used by WP.

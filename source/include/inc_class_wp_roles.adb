@@ -74,7 +74,7 @@ is
       This.Role_Objects := Role_Maps.Empty_Map; -- Empty_Array;
       This.Role_Names   := Empty_List;
 
-      for Role_2 of Array_Keys (This.Roles) loop
+      for Role_2 of List_Type'(Array_Keys (This.Roles)) loop
          declare
             Role : constant String := -Role_2;
          begin

@@ -15,6 +15,7 @@ with Wp_Common;
 with Adi_Plugins;
 
 with Inc_Caches;
+with Inc_Class_Wp_Querys;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
@@ -3136,80 +3137,79 @@ is
 --         return is_post_type_viewable( post_type ) && is_post_status_viewable( post_status );
 -- end;
 
---
--- Retrieves an array of the latest posts, or posts matching the given criteria.
---
--- For more information on the accepted arguments, see the
--- {@link https://developer.wordpress.org/reference/classes/wp_query/
--- WP_Query} documentation in the Developer Handbook.
---
--- The `ignore_sticky_posts` and `no_found_rows` arguments are ignored by
--- this function and both are set to `True`.
---
--- The defaults are as follows:
---
--- @since 1.2.0
---
--- @see WP_Query
--- @see WP_Query::parse_query()
---
--- @param array args then
---     Optional. Arguments to retrieve posts. See WP_Query::parse_query() for all available arguments.
---
---     @type int        numberposts      Total number of posts to retrieve. Is an alias of `posts_per_page`
---                                        in WP_Query. Accepts -1 for all. Default 5.
---     @type int|string category         Category ID or comma-separated list of IDs (this or any children).
---                                        Is an alias of `cat` in WP_Query. Default 0.
---     @type int[]      include          An array of post IDs to retrieve, sticky posts will be included.
---                                        Is an alias of `postabsin` in WP_Query. Default empty array.
---     @type int[]      exclude          An array of post IDs not to retrieve. Default empty array.
---     @type bool       suppress_filters Whether to suppress filters. Default True.
--- end;
--- @return WP_Post[]|int[] Array of post objects or post IDs.
---
--- function get_posts( args = null ) then
---         defaults = to_array (
---                 "numberposts"      => 5,
---                 "category"         => 0,
---                 "orderby"          => "date",
---                 "order"            => "DESC",
---                 "include"          => to_array (),
---                 "exclude"          => to_array (),
---                 "meta_key"         => "",
---                 "meta_value"       => "",
---                 "post_type"        => "post",
---                 "suppress_filters" => True,
---         );
+   ---------------
+   -- Get_Posts --
+   ---------------
 
---         parsed_args = wp_parse_args( args, defaults );
---         if ( empty( parsed_args["post_status"] ) ) then
---                 parsed_args["post_status"] = ( "attachment" === parsed_args["post_type"] ) ? "inherit" : "publish";
---         end;
---         if ( ! empty( parsed_args["numberposts"] ) && empty( parsed_args["posts_per_page"] ) ) then
---                 parsed_args["posts_per_page"] = parsed_args["numberposts"];
---         end;
---         if ( ! empty( parsed_args["category"] ) ) then
---                 parsed_args["cat"] = parsed_args["category"];
---         end;
---         if ( ! empty( parsed_args["include"] ) ) then
---                 incposts                      = wp_parse_id_list( parsed_args["include"] );
---                 parsed_args["posts_per_page"] = count( incposts );  // Only the number of posts included.
---                 parsed_args["postabsin"]       = incposts;
---         end; elseif ( ! empty( parsed_args["exclude"] ) ) then
---                 parsed_args["postabsnot_in"] = wp_parse_id_list( parsed_args["exclude"] );
---         end;
+   function Get_Posts (Args : Array_Type := Empty_Array) -- null
+                       return Inc_Class_Wp_Posts.Post_Array
+   is
+      use Inc_Class_Wp_Querys;
+      use Inc_Functions;
 
---         parsed_args["ignore_sticky_posts"] = True;
---         parsed_args["no_found_rows"]       = True;
+      Defaults : constant Array_Type := To_Array (List => (
+        Build ("numberposts",      5),
+        Build ("category",         0),
+        Build ("orderby",          "date"),
+        Build ("order",            "DESC"),
+        Build ("include",          Empty_Array),
+        Build ("exclude",          Empty_Array),
+        Build ("meta_key",         ""),
+        Build ("meta_value",       ""),
+        Build ("post_type",        "post"),
+        Build ("suppress_filters", True)
+      ));
 
---         get_posts = new WP_Query;
---         return get_posts.query( parsed_args );
+      Parsed_Args : Array_Type := Wp_Parse_Args (Args, Defaults);
+   begin
+      if Empty (Parsed_Args, "post_status") then
+         Set (Parsed_Args, "post_status", From_String (
+               (if "attachment" = Get_As_String (Parsed_Args, "post_type")
+                then "inherit" else "publish")));
+      end if;
 
--- end;
+      if
+        not Empty (Parsed_Args, "numberposts") and then
+        Empty (Parsed_Args, "posts_per_page")
+      then
+         Set (Parsed_Args, "posts_per_page", From_String (
+              Get_As_String (Parsed_Args, "numberposts")));
+      end if;
 
---
--- Post meta functions.
---
+      if not Empty (Parsed_Args, "category") then
+         Set (Parsed_Args, "cat", From_String (
+              Get_As_String (Parsed_Args, "category")));
+      end if;
+
+      if not Empty (Parsed_Args, "include") then
+         declare
+            Incposts : constant List_Type :=
+              Wp_Parse_Id_List (As_List (Get (Parsed_Args, "include")));
+         begin
+            Set (Parsed_Args, "posts_per_page",
+                 From_Integer (Integer (Incposts.Length)));
+            -- Only the number of posts included.
+            Set (Parsed_Args, "postabsin",
+                 From_List (Incposts));
+         end;
+      elsif not Empty (Parsed_Args, "exclude") then
+         Set (Parsed_Args, "postabsnot_in", From_List (
+              Wp_Parse_Id_List (As_List (Get (Parsed_Args, "exclude")))));
+      end if;
+
+      Set (Parsed_Args, "ignore_sticky_posts", From_Boolean (True));
+      Set (Parsed_Args, "no_found_rows",       From_Boolean (True));
+
+      declare
+         Get_Posts : Wp_Query;
+      begin
+         return Get_Posts.Query (Parsed_Args);
+      end;
+   end Get_Posts;
+
+   ------------------------------
+   ---- Post meta functions. ----
+   ------------------------------
 
 --
 -- Adds a meta field to the given post.
@@ -3518,7 +3518,7 @@ is
          if Post_2.Id = 0 then
             Post_2.Id := 0;
          end if;
-         for Field of Array_Keys (Get_Object_Vars (Post_2)) loop
+         for Field of List_Type'(Array_Keys (Get_Object_Vars (Post_2))) loop
             -- field selecting jq
             Set (Post_2, -Field,
                  Sanitize_Post_Field (-Field, Get (Post_2, -Field),

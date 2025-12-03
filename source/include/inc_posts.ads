@@ -42,7 +42,7 @@ is
    --                               global $post.
    -- @return string|false          Post type on success, false on failure.
    --
-   function Get_Post_Type (Post : Integer := 0) -- := null )
+   function Get_Post_Type (Post : Post_Id := 0) -- Integer := 0) -- := null )
                            return String is ("XXX-250");
    function Get_Post_Type (Post : Wp_Post) -- := null )
                            return String is ("XXX-251");
@@ -792,6 +792,47 @@ is
 --                                  ...args ) then
 
    --
+   -- Retrieves an array of the latest posts, or posts matching the given criteria.
+   --
+   -- For more information on the accepted arguments, see the
+   -- {@link https://developer.wordpress.org/reference/classes/wp_query/
+   -- WP_Query} documentation in the Developer Handbook.
+   --
+   -- The `ignore_sticky_posts` and `no_found_rows` arguments are ignored by
+   -- this function and both are set to `True`.
+   --
+   -- The defaults are as follows:
+   --
+   -- @since 1.2.0
+   --
+   -- @see WP_Query
+   -- @see WP_Query::parse_query()
+   --
+   -- @param array args {
+   --     Optional. Arguments to retrieve posts. See WP_Query::parse_query() for all
+   --     available arguments.
+   --
+   --     @type int        numberposts      Total number of posts to retrieve. Is an
+   --                                        alias of `posts_per_page` in WP_Query.
+   --                                        Accepts -1 for all. Default 5.
+   --
+   --     @type int|string category         Category ID or comma-separated list of IDs
+   --                                        (this or any children). Is an alias of
+   --                                        `cat` in WP_Query. Default 0.
+   --     @type int[]      include          An array of post IDs to retrieve, sticky
+   --                                        posts will be included. Is an alias of
+   --                                        `postabsin` in WP_Query. Default empty
+   --                                        array.
+   --     @type int[]      exclude          An array of post IDs not to retrieve.
+   --                                        Default empty array.
+   --     @type bool       suppress_filters Whether to suppress filters. Default True.
+   -- }
+   -- @return WP_Post[]|int[] Array of post objects or post IDs.
+   --
+   function Get_Posts (Args : Array_Type := Empty_Array) -- null
+                       return Inc_Class_Wp_Posts.Post_Array;
+
+   --
    -- Checks a post type"s support for a given feature.
    --
    -- @since 3.0.0
@@ -1251,12 +1292,18 @@ is
    --                  false on failure or if the value passed to the function
    --                  is the same as the one that is already in the database.
    --
-   function Update_Post_Meta (Post_Id    : Integer;
+   function Update_Post_Meta (Post_Id    : Inc_Class_Wp_Posts.Post_Id; -- Integer;
                               Meta_Key   : String;
                               Meta_Value : Array_Type;
                               Prev_Value : Array_Type := Empty_Array) -- = '' )
                               return Integer
                               is (1);
+
+   procedure Update_Post_Meta (Post_Id    : Inc_Class_Wp_Posts.Post_Id;
+                               Meta_Key   : String;
+                               Meta_Value : String;
+                               Prev_Value : Array_Type := Empty_Array) -- = '' )
+   is null;
 
    --
    -- Retrieves the URL for an attachment.

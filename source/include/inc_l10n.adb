@@ -13,12 +13,15 @@ with Globals;
 with Hb_Common;
 with Php;
 
+with Inc_Class_Wp_Locale_Switchers;
 with Inc_Formatting;
 with Inc_Plugins;
 with Inc_Load;
 with Inc_Themes;
 
 package body Inc_L10n is
+
+   Global_Wp_Locale_Switcher : Inc_Class_Wp_Locale_Switchers.Wp_Locale_Switcher;
 
    function "abs" (Item : String) return String is (Item);
 
@@ -29,6 +32,23 @@ package body Inc_L10n is
                            Domain      : String)
                            return String
                            is ("XXX-001");
+
+   ----------------
+   -- Array_Keys --
+   ----------------
+
+   function Array_Keys (Map : String_Maps.Map)
+                        return List_Type
+   is
+      use Hb_Common;
+
+      List : List_Type;
+   begin
+      for A in Map.Iterate loop
+         List.Append (+String_Maps.Key (A));
+      end loop;
+      return List;
+   end Array_Keys;
 
 -- --
 -- -- Retrieves the current locale.
@@ -181,7 +201,7 @@ package body Inc_L10n is
       if
         Isset (XX_GET, "_locale") and then
         "user" = As_String (Get (XX_GET, "_locale")) and then
-        Inc_Load.Wp_Is_Json_Request
+        Inc_Load.Wp_Is_JSON_Request
       then
          Determined_Locale := +Get_User_Locale;
       end if;
@@ -984,6 +1004,13 @@ package body Inc_L10n is
       end;
    end Load_Default_Textdomain;
 
+   procedure Load_Default_Textdomain (Locale : String := "")
+   is
+      Unused : constant Boolean := Load_Default_Textdomain (Locale);
+   begin
+      null;
+   end Load_Default_Textdomain;
+
 -- --
 -- -- Loads a plugin"s translated strings.
 -- --
@@ -1429,6 +1456,14 @@ package body Inc_L10n is
       return Static_NOOP_Translations;
    end Get_Translations_For_Domain;
 
+   procedure Get_Translations_For_Domain (Domain : String)
+   is
+      Unused : constant POMO_Translations.Translations :=
+        Get_Translations_For_Domain (Domain);
+   begin
+      null;
+   end Get_Translations_For_Domain;
+
 -- --
 -- -- Determines whether there are translations for the text domain.
 -- --
@@ -1767,38 +1802,38 @@ package body Inc_L10n is
 --         return wp_locale.is_rtl();
 -- end;
 
--- --
--- -- Switches the translations according to the given locale.
--- --
--- -- @since 4.7.0
--- --
--- -- @global WP_Locale_Switcher wp_locale_switcher WordPress locale switcher object.
--- --
--- -- @param string locale The locale.
--- -- @return bool True on success, false on failure.
--- --
--- function switch_to_locale( locale ) then
---         /* @var WP_Locale_Switcher wp_locale_switcher--
---         global wp_locale_switcher;
+   ----------------------
+   -- Switch_To_Locale --
+   ----------------------
 
---         return wp_locale_switcher.switch_to_locale( locale );
--- end;
+   function Switch_To_Locale (Locale : String)
+                              return Boolean
+   is
+      -- @var WP_Locale_Switcher wp_locale_switcher
+--        global wp_locale_switcher;
+   begin
+      return Global_Wp_Locale_Switcher.Switch_To_Locale (Locale);
+   end Switch_To_Locale;
 
--- --
--- -- Restores the translations according to the previous locale.
--- --
--- -- @since 4.7.0
--- --
--- -- @global WP_Locale_Switcher wp_locale_switcher WordPress locale switcher object.
--- --
--- -- @return string|false Locale on success, false on error.
--- --
--- function restore_previous_locale() then
---         /* @var WP_Locale_Switcher wp_locale_switcher--
---         global wp_locale_switcher;
+   -----------------------------
+   -- Restore_Previous_Locale --
+   -----------------------------
 
---         return wp_locale_switcher.restore_previous_locale();
--- end;
+   function Restore_Previous_Locale
+            return String
+   is
+      -- @var WP_Locale_Switcher wp_locale_switcher
+--        global wp_locale_switcher;
+   begin
+      return Global_Wp_Locale_Switcher.Restore_Previous_Locale; -- ()
+   end Restore_Previous_Locale;
+
+   procedure Restore_Previous_Locale
+   is
+      Unused : constant String := Restore_Previous_Locale;
+   begin
+      null;
+   end Restore_Previous_Locale;
 
 -- --
 -- -- Restores the translations according to the original locale.

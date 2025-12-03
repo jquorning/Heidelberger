@@ -488,7 +488,7 @@ is
       -- If themes are a persistent group, sanitize everything and cache it. One
       -- cache add is better than many cache sets.
       if Static_Persistently_Cache then -- self::
-         for X_Header of Array_Keys (This.Headers) loop
+         for X_Header of List_Type'(Array_Keys (This.Headers)) loop
             Set (This.Headers_Sanitized, -X_Header,
                  From_String (
                    This.Sanitize_Header (-X_Header, As_String (Get (This.Headers, -X_Header)))));

@@ -8,17 +8,18 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
+with Binder;
+with Globals;
+with Hb_Common;
+with Helpers;
+with Php;
+
 with Inc_Capabilities;
 with Inc_Class_Wp_List_Util;
 with Inc_Formatting;
 with Inc_L10n;
 with Inc_Plugins;
 with Inc_Pluggables;
-
-with Binder;
-with Globals;
-with Hb_Common;
-with Php;
 
 package body Inc_Functions
 is
@@ -4921,39 +4922,37 @@ is
       return Array_Merge (Defaults, Parsed_Args);
    end Wp_Parse_Args;
 
---
--- Converts a comma- or space-separated list of scalar values to an array.
---
--- @since 5.1.0
---
--- @param array|string list List of values.
--- @return array Array of values.
---
--- function wp_parse_list( list ) then
---         if ( ! is_array( list ) ) then
---                 return preg_split( "/[\s,]+/", list, -1, PREG_SPLIT_NO_EMPTY );
---         end;
+   -------------------
+   -- Wp_Parse_List --
+   -------------------
 
---         // Validate all entries of the list are scalar.
---         list = array_filter( list, "is_scalar" );
+   function Wp_Parse_List (List : List_Type)
+                           return List_Type
+   is
+   begin
+--    if not Is_Array (List) then
+--       return Preg_Split ("/[\s,]+/", list, -1, PREG_SPLIT_NO_EMPTY);
+--    end if;
 
---         return list;
--- end;
+      -- Validate all entries of the list are scalar.
+--    list := Array_Filter (list, "is_scalar");
 
---
--- Cleans up an array, comma- or space-separated list of IDs.
---
--- @since 3.0.0
--- @since 5.1.0 Refactored to use wp_parse_list().
---
--- @param array|string list List of IDs.
--- @return int[] Sanitized array of IDs.
---
--- function wp_parse_id_list( list ) then
---         list = wp_parse_list( list );
+      return List;
+   end Wp_Parse_List;
 
---         return array_unique( array_map( "absint", list ) );
--- end;
+   ----------------------
+   -- Wp_Parse_Id_List --
+   ----------------------
+
+   function Wp_Parse_Id_List (List : List_Type)
+                              return List_Type
+   is
+      use Php;
+
+      List_2 : constant List_Type := Wp_Parse_List (List);
+   begin
+      return Array_Unique (Array_Map ("absint", List_2));
+   end Wp_Parse_Id_List;
 
 --
 -- Cleans up an array, comma- or space-separated list of slugs.
@@ -4970,26 +4969,26 @@ is
 --         return array_unique( array_map( "sanitize_title", list ) );
 -- end;
 
---
--- Extracts a slice of an array, given a list of keys.
---
--- @since 3.1.0
---
--- @param array array The original array.
--- @param array keys  The list of keys.
--- @return array The array slice.
---
--- function wp_array_slice_assoc( array, keys ) then
---         slice = array();
+   --------------------------
+   -- Wp_Array_Slize_Assoc --
+   --------------------------
 
---         foreach ( keys as key ) then
---                 if ( isset( array[ key ] ) ) then
---                         slice[ key ] = array[ key ];
---                 end;
---         end;
+   function Wp_Array_Slice_Assoc (Arry : Array_Type;
+                                  Keys : List_Type)
+                                  return Array_Type
+   is
+      use Hb_Common;
 
---         return slice;
--- end;
+      Slice : Array_Type;
+   begin
+      for Key of Keys loop
+         if Isset (Arry, -Key) then
+            Set (Slice, -Key, Get (Arry, -Key));
+         end if;
+      end loop;
+
+      return Slice;
+   end Wp_Array_Slice_Assoc;
 
    --------------------
    -- X_Wp_Array_Get --
@@ -7627,55 +7626,69 @@ is
 --         return false;
 -- end;
 
---
--- Generates a random UUID (version 4).
---
--- @since 4.7.0
---
--- @return string UUID.
---
--- function wp_generate_uuid4() then
---         return sprintf(
---                 "%04x%04x-%04x-%04x-%04x-%04x%04x%04x",
---                 mt_rand( 0, 0xffff ),
---                 mt_rand( 0, 0xffff ),
---                 mt_rand( 0, 0xffff ),
---                 mt_rand( 0, 0x0fff ) | 0x4000,
---                 mt_rand( 0, 0x3fff ) | 0x8000,
---                 mt_rand( 0, 0xffff ),
---                 mt_rand( 0, 0xffff ),
---                 mt_rand( 0, 0xffff )
---         );
--- end;
+   -----------------------
+   -- Wp_Generate_UUID4 --
+   -----------------------
 
---
--- Validates that a UUID is valid.
---
--- @since 4.9.0
---
--- @param mixed uuid    UUID to check.
--- @param int   version Specify which version of UUID to check against. Default is none,
---                       to accept any UUID version. Otherwise, only version allowed is `4`.
--- @return bool The string is a valid UUID or false on failure.
---
--- function wp_is_uuid( uuid, version = null ) then
+   function Wp_Generate_UUID4
+            return String
+   is
+      use Helpers;
+      use Hb_Common;
+      use Php;
+   begin
+      return
+        Sprintf (
+          "%04x%04x-%04x-%04x-%04x-%04x%04x%04x",
+          To_List (List => (
+            1 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            2 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            3 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            4 => +Image_Hex_4 (MT_Rand (0, 16#0FFF#) + 16#4000#),
+            5 => +Image_Hex_4 (MT_Rand (0, 16#3FFF#) + 16#8000#),
+            6 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            7 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            8 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#))
+        )));
+   end Wp_Generate_UUID4;
 
---         if ( ! is_string( uuid ) ) then
---                 return false;
---         end;
+   ----------------
+   -- Wp_Is_UUID --
+   ----------------
 
---         if ( is_numeric( version ) ) then
---                 if ( 4 !== (int) version ) then
---                         _doing_it_wrong( __FUNCTION__, __( "Only UUID V4 is supported at this time." ), "4.9.0" );
---                         return false;
---                 end;
---                 regex = "/^[0-9a-f]then8end;-[0-9a-f]then4end;-4[0-9a-f]then3end;-[89ab][0-9a-f]then3end;-[0-9a-f]then12end;/";
---         end; else then
---                 regex = "/^[0-9a-f]then8end;-[0-9a-f]then4end;-[0-9a-f]then4end;-[0-9a-f]then4end;-[0-9a-f]then12end;/";
---         end;
+   function Wp_Is_UUID (UUID    : String;
+                        Version : Integer := 0) -- null
+                        return Boolean
+   is
+      use Php;
+      use Inc_L10n;
+   begin
+      if not Is_String (UUID) then
+         return False;
+      end if;
 
---         return (bool) preg_match( regex, uuid );
--- end;
+      if Is_Numeric (Version) then
+         if 4 /= Version then -- (int)
+            X_Doing_It_Wrong (
+              "__FUNCTION__",
+              abs "Only UUID V4 is supported at this time.",
+              "4.9.0");
+            return False;
+         end if;
+
+         return
+           Preg_Match (
+             "/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/",
+             UUID);
+      else
+         return
+           Preg_Match (
+             "/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/",
+             UUID);
+      end if;
+
+--      return (bool) preg_match( regex, uuid );
+   end Wp_Is_UUID;
 
 --
 -- Gets unique ID.

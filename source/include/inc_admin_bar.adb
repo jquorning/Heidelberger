@@ -566,8 +566,8 @@ is
       use Globals;
 
 --    global wp_customize;
-      Current_Url   : Unbounded_String;
-      Customize_Url : Unbounded_String;
+      Current_URL   : Unbounded_String;
+      Customize_URL : Unbounded_String;
    begin
       -- Don't show if a block theme is activated and no plugins use the customizer.
       if Wp_Is_Block_Theme and then not Has_Action ("customize_register") then
@@ -583,31 +583,33 @@ is
       -- currently being previewed.
       if
         Is_Customize_Preview and then
-        Wp_Customize.Changeset_Post_Id /= 0 and then
-        not Current_User_Can (As_String (Get (Get_Post_Type_Object ("customize_changeset").Cap,
-                                   "edit_post")), Wp_Customize.Changeset_Post_Id)
+        Wp_Customize.Changeset_Post_Id not in 0 and then
+        not Current_User_Can
+             (Get_As_String (Get_Post_Type_Object ("customize_changeset").Cap,
+                                                   "edit_post"),
+              Integer (Wp_Customize.Changeset_Post_Id))
       then
          return;
       end if;
 
-      Current_Url := +(if Is_SSL then "https://" else "http://") &
+      Current_URL := +(if Is_SSL then "https://" else "http://") &
                        As_String (Get (X_SERVER, "HTTP_HOST")) &
                        As_String (Get (X_SERVER, "REQUEST_URI"));
 
       if
         Is_Customize_Preview and then
-        Wp_Customize.Changeset_Uuid /= ""
+        Wp_Customize.X_Changeset_UUID /= ""
       then
-         Current_Url := +Remove_Query_Arg ("customize_changeset_uuid", -Current_Url);
+         Current_URL := +Remove_Query_Arg ("customize_changeset_uuid", -Current_URL);
       end if;
 
-      Customize_Url := +Add_Query_Arg ("url", URLencode (-Current_Url),
+      Customize_URL := +Add_Query_Arg ("url", URLencode (-Current_URL),
                                        Wp_Customize_Url);
       if Is_Customize_Preview then
-         Customize_Url :=
+         Customize_URL :=
             +Add_Query_Arg (Arrays.To_Array ((1 =>
-               Build ("changeset_uuid", -Wp_Customize.Changeset_Uuid))),
-                           -Customize_Url);
+               Build ("changeset_uuid", -Wp_Customize.X_Changeset_UUID))),
+                           -Customize_URL);
       end if;
 
       declare
@@ -615,7 +617,7 @@ is
       begin
          Node.Id    := +"customize";
          Node.Title := +abs "Customize";
-         Node.Href  := Customize_Url;
+         Node.Href  := Customize_URL;
          Node.Meta  := Arrays.To_Array ((1 =>
                           Build ("class", "hide-if-no-customize")));
 
@@ -1689,7 +1691,7 @@ is
       -- For all these types of requests, we never want an admin bar.
       if
         XMLRPC_REQUEST or else DOING_AJAX or else
-        IFRAME_REQUEST or else Wp_Is_Json_Request
+        IFRAME_REQUEST or else Wp_Is_JSON_Request
       then
          return False;
       end if;

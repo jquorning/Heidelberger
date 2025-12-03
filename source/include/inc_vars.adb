@@ -14,7 +14,7 @@
 -- @package WordPress
 --
 
-with Arrays.IO;
+with Arrays.Io;
 with Arrays;
 with Binder;
 with Globals;

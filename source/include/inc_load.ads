@@ -355,7 +355,7 @@ is
    --
    -- @return bool True if it"s a WordPress Ajax request, false otherwise.
    --
-   function Wp_Doing_Ajax
+   function Wp_Doing_AJAX
             return Boolean
             is (True);
 
@@ -365,7 +365,7 @@ is
    -- @return bool True if `Accepts` or `Content-Type` headers contain
    --              `application/json`. False otherwise.
    --
-   function Wp_Is_Json_Request
+   function Wp_Is_JSON_Request
             return Boolean
             is (False);
 

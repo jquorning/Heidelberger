@@ -163,14 +163,14 @@ is
       -- hence, the schema for blocks & elements should not have them.
       --
 --      Styles_Non_Top_Level := VALID_STYLES;
-      for Section of Array_Keys (Styles_Non_Top_Level) loop
+      for Section of List_Type'(Array_Keys (Styles_Non_Top_Level)) loop
          -- array_key_exists() needs to be used instead of isset() because the value can be null.
          if
            Array_Key_Exists (-Section, Styles_Non_Top_Level) and then
            Kind_Of (Get (Styles_Non_Top_Level, -Section)) = Kind_Array
 --         Is_Array (Styles_Non_Top_Level (Section))
          then
-            for Prop of Array_Keys (As_Array (Get (Styles_Non_Top_Level, -Section))) loop
+            for Prop of List_Type'(Array_Keys (As_Array (Get (Styles_Non_Top_Level, -Section)))) loop
 --          for Prof of Array_Keys (Styles_Non_Top_Level (Section)) loop
                if "top" = As_String (Get (Ref_2 (Styles_Non_Top_Level, -Section, -Prop))) then
 --             if "top" = Styles_Non_Top_Level (Section) (Prop) then

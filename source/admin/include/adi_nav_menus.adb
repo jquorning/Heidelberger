@@ -102,7 +102,7 @@ is
                            Build ("post_title",
                                   Inc_Post_Templates.Get_The_Title (Object_Id)),
                            Build ("post_type",
-                                  Inc_Posts.Get_Post_Type (Object_Id))
+                                  Inc_Posts.Get_Post_Type (Post_Id (Object_Id)))
                            ))
                         ));
                         Echo ("\n");
@@ -1687,7 +1687,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
 
       -- Remove menu items from the menu that weren"t in _POST.
       if not Empty (Menu_Items) then
-         for Menu_Item_Id of Array_Keys (Menu_Items) loop
+         for Menu_Item_Id of List_Type'(Array_Keys (Menu_Items)) loop
             declare
                Unused : Wp_Post;
             begin

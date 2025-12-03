@@ -69,14 +69,6 @@ is
    function Element (Position : Cursor)
                      return Multi_Type;
 
---   type Constant_Reference_Type (Elemen : not null access constant Multi_Type)
---     is private
---     with Implicit_Dereference => Elemen;
-
---   type Reference_Type (Element : not null access Multi_Type)
---     is private
---     with Implicit_Dereference => Element;
-
    procedure Append (Arry  : in out Array_Type;
                      Value : Multi_Type);
    -- Append Value to Array_Type referenced by Cursor.
@@ -129,6 +121,9 @@ is
    function Kind_Of (Arry : Multi_Type)
                      return Array_Kind;
 
+   function Empty (Obj : Cursor)
+                   return Boolean;
+
    --------
    -- As --
    --------
@@ -170,8 +165,13 @@ is
    function From_Integer (Value : Integer)
                           return Multi_Type;
 
+   function From_Callable (Value : Callable)
+                           return Multi_Type;
+
    function From_Boolean (Value : Boolean)
                           return Multi_Type;
+
+   function From_Null return Multi_Type;
 
    ---------
    -- Get --
@@ -186,6 +186,10 @@ is
    function Get (Arry : Array_Type;
                  Key  : String)
                  return Multi_Type;
+
+   function Get_As_String (Arry : Array_Type;
+                           Key  : String)
+                           return String;
 
    ---------
    -- Set --
@@ -210,6 +214,13 @@ is
                     Key_1 : String;
                     Key_2 : String;
                     Key_3 : String;
+                    Value : Multi_Type);
+
+   procedure Set_4 (Arry  : in out Array_Type;
+                    Key_1 : String;
+                    Key_2 : String;
+                    Key_3 : String;
+                    Key_4 : String;
                     Value : Multi_Type);
 
    procedure Set_5 (Arry  : in out Array_Type;
@@ -345,24 +356,7 @@ is
    function Next (Container : Array_Type;
                   Position  : Cursor) return Cursor;
 
---   function Constant_Reference (Container : aliased in Array_Type;
---                                Position  : Cursor)
---                                return Constant_Reference_Type;
-
---   function Reference (Container : aliased in out Array_Type;
---                       Position  : Cursor)
---                       return Reference_Type;
-
---   function Constant_Reference (Container : aliased in Array_Type;
---                                Key       : Key_Type)
---                                return Constant_Reference_Type;
-
---   function Reference (Container : aliased in out Array_Type;
---                       Key       : Key_Type)
---                       return Reference_Type;
-
    function Iterate (Container : Array_Type)
---                   return Map_Iterator_Interfaces.Forward_Iterator'Class;
                      return Map_Iterator_Interfaces.Forward_Iterator'Class;
 
 private
@@ -386,13 +380,6 @@ private
 
    type Cursor is new Array_Maps.Cursor;
 
---   type Constant_Reference_Type (Elemen : not null access constant Multi_Type)
---     is new Array_Maps.Constant_Reference_Type (Elemen);
---     -- null record;
-
---   type Reference_Type (Element : not null access Multi_Type)
---     is null record;
-
    Empty_Array : constant Array_Type :=
      (Array_Maps.Empty_Map with null record);
 
@@ -411,24 +398,13 @@ private
    type Iterator is new -- Ada.Finalization.Limited_Controlled and
       Map_Iterator_Interfaces.Forward_Iterator with
       record
---       null;
          Container : Map_Access;
---       Position  : Cursor;
--- --    Node      : Node_Access;
       end record;
---   with Disable_Controlled => not T_Check;
-
--- overriding procedure Finalize (Object : in out Iterator);
 
    overriding function First (Object : Iterator) return Cursor;
---   overriding function Last  (Object : Iterator) return Cursor;
 
    overriding function Next
      (Object   : Iterator;
       Position : Cursor) return Cursor;
-
---   overriding function Previous
---     (Object   : Iterator;
---      Position : Cursor) return Cursor;
 
 end Arrays;

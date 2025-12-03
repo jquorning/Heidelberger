@@ -876,10 +876,11 @@ is
                      declare
                         use Inc_Formatting;
                         use Inc_Link_Templates;
+                        use Inc_Class_Wp_Posts;
 
-                        Id   : constant Integer := Integer'Value (-Ids.First_Element);
+                        Id   : constant Post_Id := Post_Id'Value (-Ids.First_Element);
                         URL  : constant String  :=
-                           ESC_URL (Get_Edit_Post_Link (Id));
+                           ESC_URL (Get_Edit_Post_Link (Integer (Id)));
                         Post : constant String  := -- Inc_Class_Posts.Wp_Post :=
                            Inc_Posts.Get_Post_Type (Id);
                         HTML : constant String := "XXX-251";

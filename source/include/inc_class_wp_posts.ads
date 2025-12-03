@@ -326,9 +326,9 @@ is
       Props       => Null_Property_Type,
       others      => Null_Unbounded_String);
 
-   type Wp_Post_Array is array (Positive range <>) of Wp_Post;
+-- type Wp_Post_Array is array (Positive range <>) of Wp_Post;
 
-   Empty_Wp_Post_Array : constant Wp_Post_Array := (1 .. 0 => Null_Post);
+-- Empty_Wp_Post_Array : constant Wp_Post_Array := (1 .. 0 => Null_Post);
 
    ----------------
    -- Post_Array --

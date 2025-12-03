@@ -57,11 +57,11 @@ is
                         return List_Type
                         is (Empty_List);
 
-   function Array_Search (Needle   : String;
-                          Haystack : List_Type;
-                          Strict   : Boolean := False)
-                          return String
-                          is ("XXX-330");
+   -- function Array_Search (Needle   : String;
+   --                        Haystack : List_Type;
+   --                        Strict   : Boolean := False)
+   --                        return String
+   --                        is ("XXX-330");
 
    function Array_Fill_Keys (Keys  : List_Type; -- String_Array;
                              Value : Boolean)

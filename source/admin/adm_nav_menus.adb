@@ -298,7 +298,7 @@ is
                                                      True)));
                                  Unused :=
                                    Inc_Posts.Update_Post_Meta (
-                                     As_Integer (Get (Menu_Item_Data, "ID")),
+                                     Post_Id (As_Integer (Get (Menu_Item_Data, "ID"))),
                                                   "_menu_item_menu_item_parent",
                                      As_Array (Menu_Item_Parent)); -- (int)
                               end;

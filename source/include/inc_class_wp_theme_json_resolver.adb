@@ -532,11 +532,11 @@ is
          ));
 
          Global_Style_Query : Wp_Query; -- new ()
-         Recent_Posts       : constant Wp_Post_Array := Global_Style_Query.Query (Args);
+         Recent_Posts       : constant Post_Array := Global_Style_Query.Query (Args);
       begin
-         if Recent_Posts'Length = 1 then
+         if Recent_Posts.Length in 1 then
             User_CPT :=
-              Get_Post (Recent_Posts (Recent_Posts'First), "ARRAY_A");
+              Get_Post (Recent_Posts (Recent_Posts.First_Index), "ARRAY_A");
          elsif Create_Post then
             declare
                CPT_Post_Id : Post_Id;

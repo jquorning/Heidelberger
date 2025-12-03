@@ -1005,7 +1005,7 @@ is
                                          then "xml" else "html"));
       end if;
 
-      Item_2 := +Htmlspecialchars (-Item_2, Quote_Style, Charset, Double_Encode);
+      Item_2 := +HTMLspecialchars (-Item_2, Quote_Style, Charset, Double_Encode);
 
       -- -- Back-compat.
       -- if "single" = X_Quote_Style then

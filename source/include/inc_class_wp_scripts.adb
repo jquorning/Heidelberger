@@ -539,7 +539,7 @@ is
 --               end if;
 
                Set (L10n_2, Key,
-                    From_String (Html_Entity_Decode (Value, ENT_QUOTES, "UTF-8")));
+                    From_String (HTML_Entity_Decode (Value, ENT_QUOTES, "UTF-8")));
             end;
 --            << Continue_1 >>
          end loop;

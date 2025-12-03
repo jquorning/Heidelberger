@@ -18,6 +18,7 @@ with Php;
 with Adi_Caches;
 
 with Inc_Class_Wp_Comments;
+with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Comments;
@@ -1786,15 +1787,15 @@ is
                                 return String
    is
       use Ada.Strings.Unbounded;
+      use Inc_Class_Wp_Posts;
+      use Inc_Posts;
       use Inc_Plugins;
 
       Object_Subtype : Unbounded_String;
    begin
       if Object_Type = "post" then
          declare
-            use Inc_Posts;
-
-            Post_Type : constant String := Get_Post_Type (Object_Id);
+            Post_Type : constant String := Get_Post_Type (Post_Id (Object_Id));
          begin
             if not Empty (Post_Type) then
                Object_Subtype := +Post_Type;

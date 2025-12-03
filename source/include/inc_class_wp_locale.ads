@@ -15,7 +15,6 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
 
-   procedure Dummy;
    --
    -- Core class used to store translated data for a locale.
    --
@@ -117,5 +116,44 @@ is
          List_Item_Separator : Unbounded_String;
 
       end record;
+
+   --
+   -- Constructor which calls helper methods to set up object variables.
+   --
+   -- @since 2.1.0
+   --
+   function X_Construct
+            return Wp_Locale;
+
+   --
+   -- Sets up the translated strings and object properties.
+   --
+   -- The method creates the translatable strings for various
+   -- calendar elements. Which allows for specifying locale
+   -- specific calendar names and text direction.
+   --
+   -- @since 2.1.0
+   --
+   -- @global string text_direction
+   -- @global string wp_version     The WordPress version string.
+   --
+   procedure Init (This : Wp_Locale);
+
+   --
+   -- Global variables are deprecated.
+   --
+   -- For backward compatibility only.
+   --
+   -- @deprecated For backward compatibility only.
+   --
+   -- @global array weekday
+   -- @global array weekday_initial
+   -- @global array weekday_abbrev
+   -- @global array month
+   -- @global array month_abbrev
+   --
+   -- @since 2.1.0
+   --
+   procedure Register_Globals (This : Wp_Locale);
 
 end Inc_Class_Wp_Locale;

@@ -10,32 +10,31 @@
 with Hb_Common;
 with Php;
 
-with Inc_Class_Wp_Dependencies;
 with Inc_Class_Wp_Dependency;
-with Inc_Class_Wp_Scripts;
+with Inc_Class_Wp_Dependencies;
+with Inc_Functions;
+with Inc_L10n;
 
 package body Inc_Functions_Wp_Scripts
 is
    use Hb_Common;
    use Php;
--- --
--- -- Initialize wp_scripts if it has not been set.
--- --
--- -- @global WP_Scripts wp_scripts
--- --
--- -- @since 4.2.0
--- --
--- -- @return WP_Scripts WP_Scripts instance.
--- --
--- function wp_scripts() then
---         global wp_scripts;
 
---         if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
---                 wp_scripts = new WP_Scripts();
---         end;
+--    ------------------
+--    -- Wp_Scripts_X --
+--    ------------------
 
---         return wp_scripts;
--- end;
+--    function Wp_Scripts_X
+--             return Inc_Class_Wp_Scripts.Wp_Scripts
+--    is
+-- --    global wp_scripts;
+--    begin
+--       -- if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
+--       --           wp_scripts = new WP_Scripts();
+--       -- end if;
+
+--       return Inc_Class_Wp_Scripts.Wp_Scripts;
+--    end Wp_Scripts_X;
 
 --
 -- Helper function to output a _doing_it_wrong message when applicable.
@@ -124,43 +123,56 @@ is
 --         return wp_scripts().do_items( handles );
 -- end;
 
--- --
--- -- Adds extra code to a registered script.
--- --
--- -- Code will only be added if the script is already in the queue.
--- -- Accepts a string data containing the Code. If two or more code blocks
--- -- are added to the same script handle, they will be printed in the order
--- -- they were added, i.e. the latter added code can redeclare the previous.
--- --
--- -- @since 4.5.0
--- --
--- -- @see WP_Scripts::add_inline_script()
--- --
--- -- @param string handle   Name of the script to add the inline script to.
--- -- @param string data     String containing the JavaScript to be added.
--- -- @param string position Optional. Whether to add the inline script before the handle
--- --                         or after. Default "after".
--- -- @return bool True on success, false on failure.
--- --
--- function wp_add_inline_script( handle, data, position = "after" ) then
---         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__, handle );
+   --------------------------
+   -- Wp_Add_Inline_Script --
+   --------------------------
 
---         if ( false !== stripos( data, "</script>" ) ) then
---                 _doing_it_wrong(
---                         __FUNCTION__,
---                         sprintf(
---                                 /* translators: 1: <script>, 2: wp_add_inline_script()--
---                                 __( "Do not pass %1s tags to %2s." ),
---                                 "<code>&lt;script&gt;</code>",
---                                 "<code>wp_add_inline_script()</code>"
---                         ),
---                         "4.5.0"
---                 );
---                 data = trim( preg_replace( "#<script[^>]*>(.*)</script>#is", "1", data ) );
---         end;
+   function Wp_Add_Inline_Script (Handle   : String;
+                                  Data     : String;
+                                  Position : String := "after")
+                                  return Boolean
+   is
+      use Inc_Class_Wp_Scripts;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 
---         return wp_scripts().add_inline_script( handle, data, position );
--- end;
+      if 0 /= Stripos (Data, "</script>") then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           Sprintf (
+             -- translators: 1: <script>, 2: wp_add_inline_script()
+             abs "Do not pass %1s tags to %2s.",
+             To_List (List => (
+               1 => +"<code>&lt;script&gt;</code>",
+               2 => +"<code>wp_add_inline_script()</code>"
+             ))
+           ),
+           "4.5.0"
+         );
+         declare
+            Data_2 : constant String :=
+              Trim (Preg_Replace ("#<script[^>]*>(.*)</script>#is",
+                                  "1", Data));
+         begin
+            return
+              Wp_Scripts_X.Add_Inline_Script (Handle, Data_2, Position);
+         end;
+      end if;
+
+      return Wp_Scripts_X.Add_Inline_Script (Handle, Data, Position);
+   end Wp_Add_Inline_Script;
+
+   procedure Wp_Add_Inline_Script (Handle   : String;
+                                   Data     : String;
+                                   Position : String := "after")
+   is
+      Unused : constant Boolean :=
+        Wp_Add_Inline_Script (Handle, Data, Position);
+   begin
+      null;
+   end Wp_Add_Inline_Script;
 
 -- --
 -- -- Register a new script.

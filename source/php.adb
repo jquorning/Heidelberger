@@ -1,6 +1,13 @@
+--
+--
+--
+
+with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Equal_Case_Insensitive;
+with Ada.Strings.Less_Case_Insensitive;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.Regexp;
@@ -11,6 +18,11 @@ with Hb_Common;
 package body Php
 is
    use Ada.Strings.Unbounded;
+
+   package Natural_Random
+   is new Ada.Numerics.Discrete_Random (Natural);
+
+   Generator : Natural_Random.Generator;
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type is (Empty_Array);
 
@@ -122,6 +134,26 @@ is
       end if;
    end Preg_Match;
 
+   ----------------
+   -- Preg_Match --
+   ----------------
+
+   function Preg_Match (Pattern : String;
+                        Subject : String;
+                        Matches : out Array_Type;
+                        Flags   : Integer := 0;
+                        Offset  : Integer := 0)
+                        return Integer
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return 999;
+   end Preg_Match;
+
+   ----------------
+   -- Preg_Match --
+   ----------------
+
    function Preg_Match (Pattern : String;
                         Subject : String;
                         Flags   : Integer := 0;
@@ -134,6 +166,48 @@ is
    begin
       return Count /= 0;
    end Preg_Match;
+
+   -------------------
+   -- Strnatcasecmp --
+   -------------------
+
+   function Strnatcasecmp (Left, Right : String)
+                           return Integer
+   is
+      use Ada.Strings;
+
+      EQ : constant Boolean := Equal_Case_Insensitive (Left, Right);
+      LT : constant Boolean := Less_Case_Insensitive (Left, Right);
+   begin
+      return (case LT is
+              when False => (case EQ is
+                             when False => 1,
+                             when True  => 0),
+              when True  => -1);
+   end Strnatcasecmp;
+
+   -----------
+   -- USort --
+   -----------
+
+   procedure USort (Arry     : in out Array_Type;
+                    Callback : USort_Comparator)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end USort;
+
+   -------------
+   -- MT_Rand --
+   -------------
+
+   function MT_Rand (Min : Natural;
+                     Max : Natural)
+                     return Natural
+   is
+   begin
+      return Natural_Random.Random (Generator, Min, Max);
+   end MT_Rand;
 
    --------------
    -- In_Array --
@@ -196,6 +270,31 @@ is
       end loop;
       return -Ret;
    end Implode;
+
+   -----------------
+   -- Array_Shift --
+   -----------------
+
+   procedure Array_Shift (List : in out List_Type)
+   is
+   begin
+      List.Delete_Last;
+   end Array_Shift;
+
+   -----------------
+   -- Array_Shift --
+   -----------------
+
+   function Array_Shift (List : in out List_Type)
+                         return String
+   is
+      use Hb_Common;
+
+      First : constant String := -List.First_Element;
+   begin
+      Array_Shift (List);
+      return First;
+   end Array_Shift;
 
    -----------------
    -- Array_Slice --
@@ -367,4 +466,6 @@ is
       return -Echo_Buffer;
    end Get_Echo;
 
+begin
+   Natural_Random.Reset (Generator, 0);
 end Php;

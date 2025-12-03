@@ -28,6 +28,8 @@ package Inc_Script_Loader
 is
    use Arrays;
 
+   Global_Wp_Scripts : Inc_Class_Wp_Scripts.Wp_Scripts; -- arbitrary position (jq)
+
    --
    -- Registers TinyMCE scripts.
    --

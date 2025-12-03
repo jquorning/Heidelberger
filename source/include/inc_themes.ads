@@ -249,6 +249,16 @@ is
                            Default : Boolean := False)
                            return Integer is (1);
 
+   function Get_Theme_Mod (Name    : String;
+                           Default : Boolean := False)
+                           return Array_Type
+                           is (Empty_Array);
+
+   function Get_Theme_Mod (Name    : String;
+                           Default : String := "")
+                           return String
+                           is ("XXX-023");
+
    --
    -- Updates theme modification value for the active theme.
    --
@@ -326,6 +336,11 @@ is
                                return List_Type -- String_Array
                                is (Empty_List);
 --                             is (Empty_String_Array);
+
+   function Get_Theme_Support (Feature : String;
+                               T       : String := "")
+                               return Boolean
+                               is (True);
 
    --
    -- Whether the site is being previewed in the Customizer.
@@ -438,6 +453,21 @@ is
 
    procedure Register_Theme_Feature (Feature : String;
                                      Args    : Array_Type);
+
+   --
+   -- Includes and instantiates the WP_Customize_Manager class.
+   --
+   -- Loads the Customizer at plugins_loaded when accessing the customize.php admin
+   -- page or when any request includes a wp_customize=on param or a
+   -- customize_changeset param (a UUID). This param is a signal for whether to
+   -- bootstrap the Customizer when WordPress is loading, especially in the Customizer
+   -- preview or when making Customizer Ajax requests for widgets or menus.
+   --
+   -- @since 3.4.0
+   --
+   -- @global WP_Customize_Manager wp_customize
+   --
+   procedure X_Wp_Customize_Include;
 
    --
    -- Registers theme support for a given feature.

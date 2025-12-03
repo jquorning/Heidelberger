@@ -36,6 +36,9 @@ is
    L10n                : String_Maps.Map;
    L10n_Unloaded       : String_Sets.Set;
 
+   function Array_Keys (Map : String_Maps.Map)
+                        return List_Type;
+
    --
    -- Retrieves the current locale.
    --
@@ -418,6 +421,8 @@ is
    function Get_Translations_For_Domain (Domain : String)
                                          return POMO_Translations.Translations;
 
+   procedure Get_Translations_For_Domain (Domain : String);
+
    --
    -- Unloads translations for a text domain.
    --
@@ -457,6 +462,7 @@ is
    --
    function Load_Default_Textdomain (Locale : String := "") -- null
                                      return Boolean;
+   procedure Load_Default_Textdomain (Locale : String := ""); -- null
 
    --
    -- Loads the script translated strings.
@@ -496,6 +502,33 @@ is
    function Is_RTL
             return Boolean
             is (False);
+
+   --
+   -- Switches the translations according to the given locale.
+   --
+   -- @since 4.7.0
+   --
+   -- @global WP_Locale_Switcher wp_locale_switcher WordPress locale switcher object.
+   --
+   -- @param string locale The locale.
+   -- @return bool True on success, false on failure.
+   --
+   function Switch_To_Locale (Locale : String)
+                              return Boolean;
+
+   --
+   -- Restores the translations according to the previous locale.
+   --
+   -- @since 4.7.0
+   --
+   -- @global WP_Locale_Switcher wp_locale_switcher WordPress locale switcher object.
+   --
+   -- @return string|false Locale on success, false on error.
+   --
+   function Restore_Previous_Locale
+            return String;
+
+   procedure Restore_Previous_Locale;
 
    --
    -- Translates the provided settings value using its i18n schema.

@@ -8,31 +8,30 @@
 
 package body Inc_Class_Wp_Locale
 is
-   procedure Dummy is null;
 
---         --
---         -- Constructor which calls helper methods to set up object variables.
---         --
---         -- @since 2.1.0
---         --
---         public function __construct() then
---                 this.init();
---                 this.register_globals();
---         end;
+   -----------------
+   -- X_Construct --
+   -----------------
 
---         --
---         -- Sets up the translated strings and object properties.
---         --
---         -- The method creates the translatable strings for various
---         -- calendar elements. Which allows for specifying locale
---         -- specific calendar names and text direction.
---         --
---         -- @since 2.1.0
---         --
---         -- @global string text_direction
---         -- @global string wp_version     The WordPress version string.
---         --
---         public function init() then
+   function X_Construct
+            return Wp_Locale
+   is
+      This : Wp_Locale;
+   begin
+      This.Init; -- ();
+      This.Register_Globals; -- ();
+      return This;
+   end X_Construct;
+
+   ----------
+   -- Init --
+   ----------
+
+   procedure Init (This : Wp_Locale)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Init;
 --                 // The weekdays.
 --                 this.weekday[0] = -- translators: Weekday.-- __( 'Sunday' );
 --                 this.weekday[1] = -- translators: Weekday.-- __( 'Monday' );
@@ -234,28 +233,20 @@ is
 --                 return this.meridiem[ meridiem ];
 --         end;
 
---         --
---         -- Global variables are deprecated.
---         --
---         -- For backward compatibility only.
---         --
---         -- @deprecated For backward compatibility only.
---         --
---         -- @global array weekday
---         -- @global array weekday_initial
---         -- @global array weekday_abbrev
---         -- @global array month
---         -- @global array month_abbrev
---         --
---         -- @since 2.1.0
---         --
---         public function register_globals() then
---                 GLOBALS['weekday']         = this.weekday;
---                 GLOBALS['weekday_initial'] = this.weekday_initial;
---                 GLOBALS['weekday_abbrev']  = this.weekday_abbrev;
---                 GLOBALS['month']           = this.month;
---                 GLOBALS['month_abbrev']    = this.month_abbrev;
---         end;
+   ----------------------
+   -- Register_Globals --
+   ----------------------
+
+   procedure Register_Globals (This : Wp_Locale)
+   is
+   begin
+      raise Program_Error with "not implemented";
+                -- GLOBALS['weekday']         = this.weekday;
+                -- GLOBALS['weekday_initial'] = this.weekday_initial;
+                -- GLOBALS['weekday_abbrev']  = this.weekday_abbrev;
+                -- GLOBALS['month']           = this.month;
+                -- GLOBALS['month_abbrev']    = this.month_abbrev;
+   end Register_Globals;
 
 --         --
 --         -- Checks if current locale is RTL.

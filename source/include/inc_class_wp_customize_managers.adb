@@ -6,204 +6,324 @@
 -- @since 3.4.0
 --
 
+with Binder;
+with Globals;
+with Helpers;
+with Php;
+
+with Inc_Caches;
+with Inc_Class_Wp_Querys;
+with Inc_Capabilities;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Load;
+with Inc_Options;
+with Inc_Plugins;
+with Inc_Posts;
+with Inc_Themes;
+with Inc_Users;
+
+-- require_once ABSPATH . WPINC . "/class-wp-customize-setting.php";
+-- require_once ABSPATH . WPINC . "/class-wp-customize-panel.php";
+-- require_once ABSPATH . WPINC . "/class-wp-customize-section.php";
+-- require_once ABSPATH . WPINC . "/class-wp-customize-control.php";
+
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-color-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-media-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-upload-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-image-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-background-image-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-background-position-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-cropped-image-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-site-icon-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-header-image-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-theme-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-code-editor-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-widget-area-customize-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-widget-form-customize-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-item-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-location-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-name-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-locations-control.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-auto-add-control.php";
+
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menus-panel.php";
+
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-themes-panel.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-themes-section.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-sidebar-section.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-section.php";
+
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-custom-css-setting.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-filter-setting.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-header-image-setting.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-background-image-setting.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-item-setting.php";
+-- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-setting.php";
+
+-- with Cust_Class_Wp_Customize_Selective_Refresh;
+-- with Inc_Class_Wp_Customize_Widgets;
+-- with Inc_Class_Wp_Customize_Nav_Menus;
+-- require_once ABSPATH . "wp-admin/includes/update.php";
+
 package body Inc_Class_Wp_Customize_Managers
 is
-   procedure Dummy is null;
 
---         --
---         -- Constructor.
---         --
---         -- @since 3.4.0
---         -- @since 4.7.0 Added `args` parameter.
---         --
---         -- @param array args then
---         --     Args.
---         --
---         --     @type null|string|false changeset_uuid     Changeset UUID, the `post_name` for the customize_changeset post containing the customized state.
---         --                                                 Defaults to `null` resulting in a UUID to be immediately generated. If `false` is provided, then
---         --                                                 then the changeset UUID will be determined during `after_setup_theme`: when the
---         --                                                 `customize_changeset_branching` filter returns false, then the default UUID will be that
---         --                                                 of the most recent `customize_changeset` post that has a status other than "auto-draft",
---         --                                                 "publish", or "trash". Otherwise, if changeset branching is enabled, then a random UUID will be used.
---         --     @type string            theme              Theme to be previewed (for theme switch). Defaults to customize_theme or theme query params.
---         --     @type string            messenger_channel  Messenger channel. Defaults to customize_messenger_channel query param.
---         --     @type bool              settings_previewed If settings should be previewed. Defaults to true.
---         --     @type bool              branching          If changeset branching is allowed; otherwise, changesets are linear. Defaults to true.
---         --     @type bool              autosaved          If data from a changeset"s autosaved revision should be loaded if it exists. Defaults to false.
---         -- end;
---         --
---         public function __construct( args = array() ) then
+   function Apply_Filters (Hook  : String;
+                           Value : List_Type;
+                           T     : Wp_Customize_Manager)
+                           return List_Type
+                           is (Value);
 
---                 args = array_merge(
---                         array_fill_keys( array( "changeset_uuid", "theme", "messenger_channel", "settings_previewed", "autosaved", "branching" ), null ),
---                         args
---                 );
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Wp_Customize_Setting;
+                           Id        : String;
+                           A         : Array_Type)
+                           return Wp_Customize_Setting
+                           is (Value);
 
---                 -- Note that the UUID format will be validated in the setup_theme() method.
---                 if ( ! isset( args["changeset_uuid"] ) ) then
---                         args["changeset_uuid"] = wp_generate_uuid4();
---                 end;
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Wp_Customize_Setting;
+                           Id        : String;
+                           Setting   : Boolean)
+                           return Wp_Customize_Setting
+                           is (Value);
 
---                 -- The theme and messenger_channel should be supplied via args,
---                 -- but they are also looked at in the _REQUEST global here for back-compat.
---                 if ( ! isset( args["theme"] ) ) then
---                         if ( isset( _REQUEST["customize_theme"] ) ) then
---                                 args["theme"] = wp_unslash( _REQUEST["customize_theme"] );
---                         end; elseif ( isset( _REQUEST["theme"] ) ) then -- Deprecated.
---                                 args["theme"] = wp_unslash( _REQUEST["theme"] );
---                         end;
---                 end;
---                 if ( ! isset( args["messenger_channel"] ) && isset( _REQUEST["customize_messenger_channel"] ) ) then
---                         args["messenger_channel"] = sanitize_key( wp_unslash( _REQUEST["customize_messenger_channel"] ) );
---                 end;
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           T         : Wp_Customize_Manager)
+                           return Boolean
+                           is (Value);
 
---                 this->original_stylesheet = get_stylesheet();
---                 this->theme               = wp_get_theme( 0 === validate_file( args["theme"] ) ? args["theme"] : null );
---                 this->messenger_channel   = args["messenger_channel"];
---                 this->_changeset_uuid     = args["changeset_uuid"];
+   procedure Do_Action (Hook_Name : String;
+                        Value     : Array_Type;
+                        This      : Wp_Customize_Manager)
+   is null;
 
---                 foreach ( array( "settings_previewed", "autosaved", "branching" ) as key ) then
---                         if ( isset( args[ key ] ) ) then
---                                 this->key = (bool) args[ key ];
---                         end;
---                 end;
+   procedure Do_Action (Hook_Name : String;
+                        Value     : String;
+                        Value_2   : Array_Type;
+                        This      : Wp_Customize_Manager)
+   is null;
 
---                 require_once ABSPATH . WPINC . "/class-wp-customize-setting.php";
---                 require_once ABSPATH . WPINC . "/class-wp-customize-panel.php";
---                 require_once ABSPATH . WPINC . "/class-wp-customize-section.php";
---                 require_once ABSPATH . WPINC . "/class-wp-customize-control.php";
+   type Proc_Access is access procedure (This : in out Wp_Customize_Manager);
 
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-color-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-media-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-upload-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-image-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-background-image-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-background-position-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-cropped-image-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-site-icon-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-header-image-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-theme-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-code-editor-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-widget-area-customize-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-widget-form-customize-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-item-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-location-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-name-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-locations-control.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-auto-add-control.php";
+   function To_Array (This : Wp_Customize_Manager;
+                      CB   : Proc_Access)
+                      return Callable;
 
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menus-panel.php";
+   function To_Array (This : Wp_Customize_Manager;
+                      CB   : Proc_Access)
+                      return Callable
+   is
+   begin
+      return null;
+   end To_Array;
 
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-themes-panel.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-themes-section.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-sidebar-section.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-section.php";
+   -----------------
+   -- X_Construct --
+   -----------------
 
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-custom-css-setting.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-filter-setting.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-header-image-setting.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-background-image-setting.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-item-setting.php";
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-setting.php";
+   function X_Construct (Args : Array_Type)
+                         return Wp_Customize_Manager
+   is
+      use Binder;
+      use Php;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Plugins;
+      use Inc_Themes;
 
---                 --
---                 -- Filters the core Customizer components to load.
---                 --
---                 -- This allows Core components to be excluded from being instantiated by
---                 -- filtering them out of the array. Note that this filter generally runs
---                 -- during the {@see "plugins_loaded"} action, so it cannot be added
---                 -- in a theme.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @see WP_Customize_Manager::__construct()
---                 --
---                 -- @param string[]             components Array of core components to load.
---                 -- @param WP_Customize_Manager manager    WP_Customize_Manager instance.
---                 --
---                 components = apply_filters( "customize_loaded_components", this->components, this );
+      This_Ref : constant Manager_Ref := -- not null access Wp_Customize_Manager
+        new Wp_Customize_Manager; -- XXX
 
---                 require_once ABSPATH . WPINC . "/customize/class-wp-customize-selective-refresh.php";
---                 this->selective_refresh = new WP_Customize_Selective_Refresh( this );
+      This : Wp_Customize_Manager renames This_Ref.all;
 
---                 if ( in_array( "widgets", components, true ) ) then
---                         require_once ABSPATH . WPINC . "/class-wp-customize-widgets.php";
---                         this->widgets = new WP_Customize_Widgets( this );
---                 end;
+      Args_2 : Array_Type :=
+        Array_Merge (
+          Array_Fill_Keys (To_List (List => (
+            +"changeset_uuid", +"theme", +"messenger_channel", +"settings_previewed",
+            +"autosaved", +"branching")), From_Null),
+          Args
+        );
+      Components : List_Type;
+   begin
+      -- Note that the UUID format will be validated in the setup_theme() method.
+      if not Isset (Args, "changeset_uuid") then
+         Set (Args_2, "changeset_uuid", From_String (Wp_Generate_UUID4));
+      end if;
 
---                 if ( in_array( "nav_menus", components, true ) ) then
---                         require_once ABSPATH . WPINC . "/class-wp-customize-nav-menus.php";
---                         this->nav_menus = new WP_Customize_Nav_Menus( this );
---                 end;
+      -- The theme and messenger_channel should be supplied via args,
+      -- but they are also looked at in the _REQUEST global here for back-compat.
+      if not Isset (Args_2, "theme") then
+         if Isset (X_REQUEST, "customize_theme") then
+            Set (Args_2, "theme", From_String (
+                 Wp_Unslash (As_String (Get (X_REQUEST, "customize_theme")))));
+         elsif Isset (X_REQUEST, "theme") then -- Deprecated.
+            Set (Args_2, "theme", From_String (
+                 Wp_Unslash (As_String (Get (X_REQUEST, "theme")))));
+         end if;
+      end if;
 
---                 add_action( "setup_theme", array( this, "setup_theme" ) );
---                 add_action( "wp_loaded", array( this, "wp_loaded" ) );
+      if
+        not Isset (Args_2, "messenger_channel") and then
+        Isset (X_REQUEST, "customize_messenger_channel")
+      then
+         Set (Args_2, "messenger_channel", From_String (
+              Sanitize_Key (
+                Wp_Unslash (As_String (Get (X_REQUEST, "customize_messenger_channel")))
+              )));
+      end if;
 
---                 -- Do not spawn cron (especially the alternate cron) while running the Customizer.
---                 remove_action( "init", "wp_cron" );
+      This.Original_Stylesheet := +Get_Stylesheet;
 
---                 -- Do not run update checks when rendering the controls.
---                 remove_action( "admin_init", "_maybe_update_core" );
---                 remove_action( "admin_init", "_maybe_update_plugins" );
---                 remove_action( "admin_init", "_maybe_update_themes" );
+      This.Theme :=
+        Wp_Get_Theme (if 0 = Validate_File (As_String (Get (Args_2, "theme")))
+                      then As_String (Get (Args, "theme")) else ""); -- null
 
---                 add_action( "wp_ajax_customize_save", array( this, "save" ) );
---                 add_action( "wp_ajax_customize_trash", array( this, "handle_changeset_trash_request" ) );
---                 add_action( "wp_ajax_customize_refresh_nonces", array( this, "refresh_nonces" ) );
---                 add_action( "wp_ajax_customize_load_themes", array( this, "handle_load_themes_request" ) );
---                 add_filter( "heartbeat_settings", array( this, "add_customize_screen_to_heartbeat_settings" ) );
---                 add_filter( "heartbeat_received", array( this, "check_changeset_lock_with_heartbeat" ), 10, 3 );
---                 add_action( "wp_ajax_customize_override_changeset_lock", array( this, "handle_override_changeset_lock_request" ) );
---                 add_action( "wp_ajax_customize_dismiss_autosave_or_lock", array( this, "handle_dismiss_autosave_or_lock_request" ) );
+      This.Messenger_Channel   := +As_String (Get (Args_2, "messenger_channel"));
+      This.X_Changeset_UUID    := +As_String (Get (Args_2, "changeset_uuid"));
 
---                 add_action( "customize_register", array( this, "register_controls" ) );
---                 add_action( "customize_register", array( this, "register_dynamic_settings" ), 11 ); -- Allow code to create settings first.
---                 add_action( "customize_controls_init", array( this, "prepare_controls" ) );
---                 add_action( "customize_controls_enqueue_scripts", array( this, "enqueue_control_scripts" ) );
+      for
+        Key of To_List (List => (+"settings_previewed", +"autosaved", +"branching"))
+      loop
+         if In_Array (-Key, Args_2) then -- Isset (Args_2, Key) then
+            null;
+--          This.Key := As_Boolean (Get (Args_2, Key)); -- (bool)
+         end if;
+      end loop;
 
---                 -- Render Common, Panel, Section, and Control templates.
---                 add_action( "customize_controls_print_footer_scripts", array( this, "render_panel_templates" ), 1 );
---                 add_action( "customize_controls_print_footer_scripts", array( this, "render_section_templates" ), 1 );
---                 add_action( "customize_controls_print_footer_scripts", array( this, "render_control_templates" ), 1 );
+      --
+      -- Filters the core Customizer components to load.
+      --
+      -- This allows Core components to be excluded from being instantiated by
+      -- filtering them out of the array. Note that this filter generally runs
+      -- during the {@see "plugins_loaded"} action, so it cannot be added
+      -- in a theme.
+      --
+      -- @since 4.4.0
+      --
+      -- @see WP_Customize_Manager::__construct()
+      --
+      -- @param string[]             components Array of core components to load.
+      -- @param WP_Customize_Manager manager    WP_Customize_Manager instance.
+      --
+      Components :=
+        Apply_Filters ("customize_loaded_components", This.Components, This);
 
---                 -- Export header video settings with the partial response.
---                 add_filter( "customize_render_partials_response", array( this, "export_header_video_settings" ), 10, 3 );
+      This.Selective_Refresh :=
+        Cust_Class_Wp_Customize_Selective_Refresh.X_Construct (This_Ref);
 
---                 -- Export the settings to JS via the _wpCustomizeSettings variable.
---                 add_action( "customize_controls_print_footer_scripts", array( this, "customize_pane_settings" ), 1000 );
+      if In_Array ("widgets", Components, True) then
+         This.Widgets :=
+           Inc_Class_Wp_Customize_Widgets.X_Construct (This_Ref);
+      end if;
 
---                 -- Add theme update notices.
---                 if ( current_user_can( "install_themes" ) || current_user_can( "update_themes" ) ) then
---                         require_once ABSPATH . "wp-admin/includes/update.php";
---                         add_action( "customize_controls_print_footer_scripts", "wp_print_admin_notice_templates" );
---                 end;
---         end;
+      if In_Array ("nav_menus", Components, True) then
+         This.Nav_Menus :=
+           Inc_Class_Wp_Customize_Nav_Menus.X_Construct (This_Ref);
+      end if;
 
---         --
---         -- Returns true if it"s an Ajax request.
---         --
---         -- @since 3.4.0
---         -- @since 4.2.0 Added `action` param.
---         --
---         -- @param string|null action Whether the supplied Ajax action is being run.
---         -- @return bool True if it"s an Ajax request, false otherwise.
---         --
---         public function doing_ajax( action = null ) then
---                 if ( ! wp_doing_ajax() ) then
---                         return false;
---                 end;
+      Add_Action ("setup_theme", To_Array (This, Setup_Theme'Access));
+      Add_Action ("wp_loaded",   To_Array (This, Wp_Loaded'Access));
+      raise Program_Error with "not implemented";
+      -- -- Do not spawn cron (especially the alternate cron) while running the
+      -- -- Customizer.
+      -- Remove_Action ("init", Wp_Cron'Access);
 
---                 if ( ! action ) then
---                         return true;
---                 end; else then
---                         /*
---                         -- Note: we can"t just use doing_action( "wp_ajax_thenactionend;" ) because we need
---                         -- to check before admin-ajax.php gets to that point.
---                         --
---                         return isset( _REQUEST["action"] ) && wp_unslash( _REQUEST["action"] ) === action;
---                 end;
---         end;
+      -- -- Do not run update checks when rendering the controls.
+      -- Remove_Action ("admin_init", X_Maybe_Update_Core'Access);
+      -- Remove_Action ("admin_init", X_Maybe_Update_Plugins'Access);
+      -- Remove_Action ("admin_init", X_Maybe_Update_Themes'Access);
+
+      -- Add_Action ("wp_ajax_customize_save",
+      --             To_Array (This, Save'Access));
+      -- Add_Action ("wp_ajax_customize_trash",
+      --             To_Array (This, Handle_Changeset_Trash_Request'Access));
+      -- Add_Action ("wp_ajax_customize_refresh_nonces",
+      --             To_Array (This, Refresh_Nonces'Access));
+      -- Add_Action ("wp_ajax_customize_load_themes",
+      --             To_Array (This, Handle_Load_Themes_Request'Access));
+      -- Add_Filter ("heartbeat_settings",
+      --             To_Array (This, Add_Customize_Screen_To_Heartbeat_Settings'Access));
+      -- Add_Filter ("heartbeat_received",
+      --             To_Array (This, Check_Changeset_Lock_With_Heartbeat'Access), 10, 3);
+      -- Add_Action ("wp_ajax_customize_override_changeset_lock",
+      --             To_Array (This, Handle_Override_Changeset_Lock_Request'Access));
+      -- Add_Action ("wp_ajax_customize_dismiss_autosave_or_lock",
+      --             To_Array (This, Handle_Dismiss_Autosave_Or_Lock_Request'Access));
+
+      -- Add_Action ("customize_register",
+      --             To_Array (This, Register_Controls'Access));
+      -- Add_Action ("customize_register",
+      --             To_Array (This, Register_Dynamic_Settings'Access), 11);
+
+      -- -- Allow code to create settings first.
+      -- Add_Action ("customize_controls_init",
+      --             To_Array (This, Prepare_Controls'Access));
+      -- Add_Action ("customize_controls_enqueue_scripts",
+      --             To_Array (This, Enqueue_Control_Scripts'Access));
+
+      -- -- Render Common, Panel, Section, and Control templates.
+      -- Add_Action ("customize_controls_print_footer_scripts",
+      --             To_Array (This, Render_Panel_Templates'Access), 1);
+      -- Add_Action ("customize_controls_print_footer_scripts",
+      --             To_Array (This, Render_Section_Templates'Access), 1);
+      -- Add_Action ("customize_controls_print_footer_scripts",
+      --             To_Array (This, Render_Control_Templates'Access), 1);
+
+      -- -- Export header video settings with the partial response.
+      -- Add_Filter ("customize_render_partials_response",
+      --             To_Array (This, Export_Header_Video_Settings'Access), 10, 3);
+
+      -- -- Export the settings to JS via the _wpCustomizeSettings variable.
+      -- Add_Action ("customize_controls_print_footer_scripts",
+      --             To_Array (This, Customize_Pane_Settings'Access), 1000);
+
+      -- Add theme update notices.
+      if
+        Current_User_Can ("install_themes") or else
+        Current_User_Can ("update_themes")
+      then
+         null;
+--       require_once ABSPATH . "wp-admin/includes/update.php";
+--       Add_Action ("customize_controls_print_footer_scripts",
+--                   Wp_Print_Admin_Notice_Templates'Access);
+      end if;
+
+      return This;
+   end X_Construct;
+
+   ----------------
+   -- Doing_AJAX --
+   ----------------
+
+   function Doing_AJAX (This   : Wp_Customize_Manager;
+                        Action : String := "") -- null
+                        return Boolean
+   is
+      use Binder;
+      use Inc_Formatting;
+      use Inc_Load;
+   begin
+      if not Wp_Doing_AJAX then
+         return False;
+      end if;
+
+      if Action = "" then
+         return True;
+      else
+         --
+         -- Note: we can't just use doing_action( "wp_ajax_{action}" ) because
+         -- we need to check before admin-ajax.php gets to that point.
+         --
+         return
+           Isset (X_REQUEST, "action") and then
+           Wp_Unslash (As_String (Get (X_REQUEST, "action"))) = Action;
+      end if;
+   end Doing_AJAX;
 
 --         --
 --         -- Custom wp_die wrapper. Returns either the standard message for UI
@@ -267,16 +387,15 @@ is
 --                 return "_default_wp_die_handler";
 --         end;
 
---         --
---         -- Starts preview and customize theme.
---         --
---         -- Check if customize query variable exist. Init filters to filter the active theme.
---         --
---         -- @since 3.4.0
---         --
---         -- @global string pagenow The filename of the current screen.
---         --
---         public function setup_theme() then
+   -----------------
+   -- Setup_Theme --
+   -----------------
+
+   procedure Setup_Theme (This : in out Wp_Customize_Manager)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Setup_Theme;
 --                 global pagenow;
 
 --                 -- Check permissions for customize.php access since this method is called before customize.php can run any code.
@@ -370,54 +489,70 @@ is
 --                 this->start_previewing_theme();
 --         end;
 
---         --
---         -- Establishes the loaded changeset.
---         --
---         -- This method runs right at after_setup_theme and applies the "customize_changeset_branching" filter to determine
---         -- whether concurrent changesets are allowed. Then if the Customizer is not initialized with a `changeset_uuid` param,
---         -- this method will determine which UUID should be used. If changeset branching is disabled, then the most saved
---         -- changeset will be loaded by default. Otherwise, if there are no existing saved changesets or if changeset branching is
---         -- enabled, then a new UUID will be generated.
---         --
---         -- @since 4.9.0
---         --
---         -- @global string pagenow The filename of the current screen.
---         --
---         public function establish_loaded_changeset() then
---                 global pagenow;
+   --------------------------------
+   -- Establish_Loaded_Changeset --
+   --------------------------------
 
---                 if ( empty( this->_changeset_uuid ) ) then
---                         changeset_uuid = null;
+   procedure Establish_Loaded_Changeset (This : in out Wp_Customize_Manager)
+   is
+      use Php;
+      use Inc_Class_Wp_Posts;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Posts;
+   begin
+      if Empty (-This.X_Changeset_UUID) then
+         declare
+            Changeset_UUID : Unbounded_String; -- null
+         begin
+            if not This.Branching and then This.Is_Theme_Active then
+               declare
+                  Unpublished_Changeset_Posts : constant Post_Array :=
+                    This.Get_Changeset_Posts (
+                      To_Array (List => (
+                        Build ("post_status",
+                               Array_Diff (Get_Post_Stati, To_List (List => (
+                                 +"auto-draft", +"publish", +"trash",
+                                 +"inherit", +"private")))),
+                        Build ("exclude_restore_dismissed", False),
+                        Build ("author",                    "any"),
+                        Build ("posts_per_page",            1),
+                        Build ("order",                     "DESC"),
+                        Build ("orderby",                   "date")
+                      ))
+                    );
+               begin
+                  if Unpublished_Changeset_Posts.Length not in 0 then
+                     declare
+                        Unpublished_Changeset_Post : constant Wp_Post :=
+                          Unpublished_Changeset_Posts
+                            (Unpublished_Changeset_Posts.First_Index);
+--                          Array_Shift (Unpublished_Changeset_Posts);
+                     begin
+                        if
+--                        not Empty (Unpublished_Changeset_Post) and then
+                          Wp_Is_UUID (-Unpublished_Changeset_Post.Post_Name)
+                        then
+                           Changeset_UUID := Unpublished_Changeset_Post.Post_Name;
+                        end if;
+                     end;
+                  end if;
+               end;
+            end if;
 
---                         if ( ! this->branching() && this->is_theme_active() ) then
---                                 unpublished_changeset_posts = this->get_changeset_posts(
---                                         array(
---                                                 "post_status"               => array_diff( get_post_stati(), array( "auto-draft", "publish", "trash", "inherit", "private" ) ),
---                                                 "exclude_restore_dismissed" => false,
---                                                 "author"                    => "any",
---                                                 "posts_per_page"            => 1,
---                                                 "order"                     => "DESC",
---                                                 "orderby"                   => "date",
---                                         )
---                                 );
---                                 unpublished_changeset_post  = array_shift( unpublished_changeset_posts );
---                                 if ( ! empty( unpublished_changeset_post ) && wp_is_uuid( unpublished_changeset_post->post_name ) ) then
---                                         changeset_uuid = unpublished_changeset_post->post_name;
---                                 end;
---                         end;
+            -- If no changeset UUID has been set yet, then generate a new one.
+            if Empty (-Changeset_UUID) then
+               Changeset_UUID := +Wp_Generate_UUID4;
+            end if;
 
---                         -- If no changeset UUID has been set yet, then generate a new one.
---                         if ( empty( changeset_uuid ) ) then
---                                 changeset_uuid = wp_generate_uuid4();
---                         end;
+            This.X_Changeset_UUID := Changeset_UUID;
+         end;
+      end if;
 
---                         this->_changeset_uuid = changeset_uuid;
---                 end;
-
---                 if ( is_admin() && "customize.php" === pagenow ) then
---                         this->set_changeset_lock( this->changeset_post_id() );
---                 end;
---         end;
+      if Is_Admin and then "customize.php" = Globals.Pagenow then
+         This.Set_Changeset_Lock (This.Changeset_Post_Id);
+      end if;
+   end Establish_Loaded_Changeset;
 
 --         --
 --         -- Callback to validate a theme once it is loaded
@@ -508,18 +643,16 @@ is
 --                 do_action( "stop_previewing_theme", this );
 --         end;
 
---         --
---         -- Gets whether settings are or will be previewed.
---         --
---         -- @since 4.9.0
---         --
---         -- @see WP_Customize_Setting::preview()
---         --
---         -- @return bool
---         --
---         public function settings_previewed() then
---                 return this->settings_previewed;
---         end;
+   ------------------------
+   -- Settings_Previewed --
+   ------------------------
+
+   function Settings_Previewed (This : Wp_Customize_Manager)
+                                return Boolean
+   is
+   begin
+      return This.M_Settings_Previewed;
+   end Settings_Previewed;
 
 --         --
 --         -- Gets whether data from a changeset"s autosaved revision should be loaded if it exists.
@@ -534,62 +667,62 @@ is
 --                 return this->autosaved;
 --         end;
 
---         --
---         -- Whether the changeset branching is allowed.
---         --
---         -- @since 4.9.0
---         --
---         -- @see WP_Customize_Manager::establish_loaded_changeset()
---         --
---         -- @return bool Is changeset branching.
---         --
---         public function branching() then
+   ---------------
+   -- Branching --
+   ---------------
 
---                 --
---                 -- Filters whether or not changeset branching is allowed.
---                 --
---                 -- By default in core, when changeset branching is not allowed, changesets will operate
---                 -- linearly in that only one saved changeset will exist at a time (with a "draft" or
---                 -- "future" status). This makes the Customizer operate in a way that is similar to going to
---                 -- "edit" to one existing post: all users will be making changes to the same post, and autosave
---                 -- revisions will be made for that post.
---                 --
---                 -- By contrast, when changeset branching is allowed, then the model is like users going
---                 -- to "add new" for a page and each user makes changes independently of each other since
---                 -- they are all operating on their own separate pages, each getting their own separate
---                 -- initial auto-drafts and then once initially saved, autosave revisions on top of that
---                 -- user"s specific post.
---                 --
---                 -- Since linear changesets are deemed to be more suitable for the majority of WordPress users,
---                 -- they are the default. For WordPress sites that have heavy site management in the Customizer
---                 -- by multiple users then branching changesets should be enabled by means of this filter.
---                 --
---                 -- @since 4.9.0
---                 --
---                 -- @param bool                 allow_branching Whether branching is allowed. If `false`, the default,
---                 --                                              then only one saved changeset exists at a time.
---                 -- @param WP_Customize_Manager wp_customize    Manager instance.
---                 --
---                 this->branching = apply_filters( "customize_changeset_branching", this->branching, this );
+   function Branching (This : in out Wp_Customize_Manager)
+                       return Boolean
+   --
+   -- Filters whether or not changeset branching is allowed.
+   --
+   -- By default in core, when changeset branching is not allowed, changesets will
+   -- operate linearly in that only one saved changeset will exist at a time (with a
+   -- "draft" or "future" status). This makes the Customizer operate in a way that is
+   -- similar to going to "edit" to one existing post: all users will be making
+   -- changes to the same post, and autosave revisions will be made for that post.
+   --
+   -- By contrast, when changeset branching is allowed, then the model is like users
+   -- going to "add new" for a page and each user makes changes independently of each
+   -- other since they are all operating on their own separate pages, each getting
+   -- their own separate initial auto-drafts and then once initially saved, autosave
+   -- revisions on top of that user's specific post.
+   --
+   -- Since linear changesets are deemed to be more suitable for the majority of
+   -- WordPress users, they are the default. For WordPress sites that have heavy site
+   -- management in the Customizer by multiple users then branching changesets should
+   -- be enabled by means of this filter.
+   --
+   -- @since 4.9.0
+   --
+   -- @param bool                 allow_branching Whether branching is allowed. If
+   --                                              `false`, the default, then only
+   --                                              one saved changeset exists at a
+   --                                              time.
+   -- @param WP_Customize_Manager wp_customize    Manager instance.
+   --
+   is
+      use Inc_Plugins;
+   begin
+      This.M_Branching :=
+        Apply_Filters ("customize_changeset_branching", This.M_Branching, This);
 
---                 return this->branching;
---         end;
+      return This.M_Branching;
+   end Branching;
 
---         --
---         -- Gets the changeset UUID.
---         --
---         -- @since 4.7.0
---         --
---         -- @see WP_Customize_Manager::establish_loaded_changeset()
---         --
---         -- @return string UUID.
---         --
---         public function changeset_uuid() then
---                 if ( empty( this->_changeset_uuid ) ) then
---                         this->establish_loaded_changeset();
---                 end;
---                 return this->_changeset_uuid;
---         end;
+   --------------------
+   -- Changeset_UUID --
+   --------------------
+
+   function Changeset_UUID (This : in out Wp_Customize_Manager)
+                            return String
+   is
+   begin
+      if Empty (-This.X_Changeset_UUID) then
+         This.Establish_Loaded_Changeset;
+      end if;
+      return -This.X_Changeset_UUID;
+   end Changeset_UUID;
 
 --         --
 --         -- Gets the theme being customized.
@@ -660,22 +793,26 @@ is
 --                 return this->panels;
 --         end;
 
---         --
---         -- Checks if the current theme is active.
---         --
---         -- @since 3.4.0
---         --
---         -- @return bool
---         --
---         public function is_theme_active() then
---                 return this->get_stylesheet() === this->original_stylesheet;
---         end;
+   ---------------------
+   -- Is_Theme_Active --
+   ---------------------
 
---         --
---         -- Registers styles/scripts and initialize the preview of each setting
---         --
---         -- @since 3.4.0
---         --
+   function Is_Theme_Active (This : Wp_Customize_Manager)
+                             return Boolean
+   is
+   begin
+      return This.Get_Stylesheet = This.Original_Stylesheet;
+   end Is_Theme_Active;
+
+   ---------------
+   -- Wp_Loaded --
+   ---------------
+
+   procedure Wp_Loaded (This : in out Wp_Customize_Manager)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Wp_Loaded;
 --         public function wp_loaded() then
 
 --                 -- Unconditionally register core types for panels, sections, and controls
@@ -739,90 +876,104 @@ is
 --                 return status;
 --         end;
 
---         --
---         -- Finds the changeset post ID for a given changeset UUID.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string uuid Changeset UUID.
---         -- @return int|null Returns post ID on success and null on failure.
---         --
---         public function find_changeset_post_id( uuid ) then
---                 cache_group       = "customize_changeset_post";
---                 changeset_post_id = wp_cache_get( uuid, cache_group );
---                 if ( changeset_post_id && "customize_changeset" === get_post_type( changeset_post_id ) ) then
---                         return changeset_post_id;
---                 end;
+   ----------------------------
+   -- Find_Changeset_Post_Id --
+   ----------------------------
 
---                 changeset_post_query = new WP_Query(
---                         array(
---                                 "post_type"              => "customize_changeset",
---                                 "post_status"            => get_post_stati(),
---                                 "name"                   => uuid,
---                                 "posts_per_page"         => 1,
---                                 "no_found_rows"          => true,
---                                 "cache_results"          => true,
---                                 "update_post_meta_cache" => false,
---                                 "update_post_term_cache" => false,
---                                 "lazy_load_term_meta"    => false,
---                         )
---                 );
---                 if ( ! empty( changeset_post_query->posts ) ) then
---                         -- Note: "fields"=>"ids" is not being used in order to cache the post object as it will be needed.
---                         changeset_post_id = changeset_post_query->posts[0]->ID;
---                         wp_cache_set( uuid, changeset_post_id, cache_group );
---                         return changeset_post_id;
---                 end;
+   function Find_Changeset_Post_Id (This : Wp_Customize_Manager;
+                                    UUID : String)
+                                    return Post_Id -- Natural
+   is
+      use Inc_Caches;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Querys;
+      use Inc_Posts;
 
---                 return null;
---         end;
+      Cache_Group       : constant String  := "customize_changeset_post";
+      Found             : Boolean;
+      Changeset_Post_Id : Post_Id := Post_Id (Integer'(
+        Wp_Cache_Get (UUID, Cache_Group, Found => Found)));
+   begin
+      if
+        Changeset_Post_Id not in 0 and then
+        "customize_changeset" = Get_Post_Type (Changeset_Post_Id)
+      then
+         return Changeset_Post_Id;
+      end if;
 
---         --
---         -- Gets changeset posts.
---         --
---         -- @since 4.9.0
---         --
---         -- @param array args then
---         --     Args to pass into `get_posts()` to query changesets.
---         --
---         --     @type int    posts_per_page             Number of posts to return. Defaults to -1 (all posts).
---         --     @type int    author                     Post author. Defaults to current user.
---         --     @type string post_status                Status of changeset. Defaults to "auto-draft".
---         --     @type bool   exclude_restore_dismissed  Whether to exclude changeset auto-drafts that have been dismissed. Defaults to true.
---         -- end;
---         -- @return WP_Post[] Auto-draft changesets.
---         --
---         protected function get_changeset_posts( args = array() ) then
---                 default_args = array(
---                         "exclude_restore_dismissed" => true,
---                         "posts_per_page"            => -1,
---                         "post_type"                 => "customize_changeset",
---                         "post_status"               => "auto-draft",
---                         "order"                     => "DESC",
---                         "orderby"                   => "date",
---                         "no_found_rows"             => true,
---                         "cache_results"             => true,
---                         "update_post_meta_cache"    => false,
---                         "update_post_term_cache"    => false,
---                         "lazy_load_term_meta"       => false,
---                 );
---                 if ( get_current_user_id() ) then
---                         default_args["author"] = get_current_user_id();
---                 end;
---                 args = array_merge( default_args, args );
+      declare
+         Changeset_Post_Query : constant Wp_Query := X_Construct (
+           To_Array (List => (
+             Build ("post_type",              "customize_changeset"),
+             Build ("post_status",            Get_Post_Stati),
+             Build ("name",                   UUID),
+             Build ("posts_per_page",         1),
+             Build ("no_found_rows",          True),
+             Build ("cache_results",          True),
+             Build ("update_post_meta_cache", False),
+             Build ("update_post_term_cache", False),
+             Build ("lazy_load_term_meta",    False)
+           ))
+         );
+      begin
+         if Changeset_Post_Query.Posts not in Empty_Post_Array then
+--       if not Empty (Changeset_Post_Query.Posts) then
+            -- Note: "fields"=>"ids" is not being used in order to cache the post
+            -- object as it will be needed.
+            Changeset_Post_Id := Changeset_Post_Query.Posts (0).Id;
+            Wp_Cache_Set (UUID, Integer (Changeset_Post_Id), Cache_Group);
+            return Changeset_Post_Id;
+         end if;
+      end;
+      return 0; -- null;
+   end Find_Changeset_Post_Id;
 
---                 if ( ! empty( args["exclude_restore_dismissed"] ) ) then
---                         unset( args["exclude_restore_dismissed"] );
---                         args["meta_query"] = array(
---                                 array(
---                                         "key"     => "_customize_restore_dismissed",
---                                         "compare" => "NOT EXISTS",
---                                 ),
---                         );
---                 end;
+   -------------------------
+   -- Get_Changeset_Posts --
+   -------------------------
 
---                 return get_posts( args );
---         end;
+   function Get_Changeset_Posts (This : Wp_Customize_Manager;
+                                 Args : Array_Type)
+                                 return Inc_Class_Wp_Posts.Post_Array
+   is
+      use Php;
+      use Inc_Posts;
+      use Inc_Users;
+
+      Default_Args : Array_Type := To_Array (List => (
+        Build ("exclude_restore_dismissed", True),
+        Build ("posts_per_page",            -1),
+        Build ("post_type",                 "customize_changeset"),
+        Build ("post_status",               "auto-draft"),
+        Build ("order",                     "DESC"),
+        Build ("orderby",                   "date"),
+        Build ("no_found_rows",             True),
+        Build ("cache_results",             True),
+        Build ("update_post_meta_cache",    False),
+        Build ("update_post_term_cache",    False),
+        Build ("lazy_load_term_meta",       False)
+      ));
+
+      Args_2 : Array_Type;
+   begin
+      if Get_Current_User_Id /= 0 then
+         Set (Default_Args, "author", From_Integer (Get_Current_User_Id));
+      end if;
+
+      Args_2 := Array_Merge (Default_Args, Args);
+
+      if not Empty (Args_2, "exclude_restore_dismissed") then
+         Delete (Ref (Args_2, "exclude_restore_dismissed"));
+         Set (Args_2, "meta_query", From_Array (To_Array (List => (1 =>
+              To_Array (List => (
+                Build ("key",     "_customize_restore_dismissed"),
+                Build ("compare", "NOT EXISTS")
+              ))
+             ))));
+      end if;
+
+      return Get_Posts (Args_2);
+   end Get_Changeset_Posts;
 
 --         --
 --         -- Dismisses all of the current user"s auto-drafts (other than the present one).
@@ -850,26 +1001,31 @@ is
 --                 return dismissed;
 --         end;
 
---         --
---         -- Gets the changeset post ID for the loaded changeset.
---         --
---         -- @since 4.7.0
---         --
---         -- @return int|null Post ID on success or null if there is no post yet saved.
---         --
---         public function changeset_post_id() then
---                 if ( ! isset( this->_changeset_post_id ) ) then
---                         post_id = this->find_changeset_post_id( this->changeset_uuid() );
---                         if ( ! post_id ) then
---                                 post_id = false;
---                         end;
---                         this->_changeset_post_id = post_id;
---                 end;
---                 if ( false === this->_changeset_post_id ) then
---                         return null;
---                 end;
---                 return this->_changeset_post_id;
---         end;
+   -----------------------
+   -- Changeset_Post_Id --
+   -----------------------
+
+   function Changeset_Post_Id (This : in out Wp_Customize_Manager)
+                               return Post_Id -- Natural
+   is
+      Post : Post_Id;
+   begin
+      if not This.X_Changeset_Post_Id_Set then
+--    if not Isset (This.X_Changeset_Post_Id) then
+         Post := This.Find_Changeset_Post_Id (This.Changeset_UUID);
+         if Post in 0 then
+--       if not Post_Id then
+--          Post_Id := False;
+            This.X_Changeset_Post_Id_Set := False;
+         end if;
+         This.X_Changeset_Post_Id := Post;
+      end if;
+
+      if not This.X_Changeset_Post_Id_Set then
+         return 0; -- null
+      end if;
+      return This.X_Changeset_Post_Id;
+   end Changeset_Post_Id;
 
 --         --
 --         -- Gets the data stored in a changeset post.
@@ -1489,174 +1645,202 @@ is
 --                 this->pending_starter_content_settings_ids = array();
 --         end;
 
---         --
---         -- Gets dirty pre-sanitized setting values in the current customized state.
---         --
---         -- The returned array consists of a merge of three sources:
---         -- 1. If the theme is not currently active, then the base array is any stashed
---         --    theme mods that were modified previously but never published.
---         -- 2. The values from the current changeset, if it exists.
---         -- 3. If the user can customize, the values parsed from the incoming
---         --    `_POST["customized"]` JSON data.
---         -- 4. Any programmatically-set post values via `WP_Customize_Manager::set_post_value()`.
---         --
---         -- The name "unsanitized_post_values" is a carry-over from when the customized
---         -- state was exclusively sourced from `_POST["customized"]`. Nevertheless,
---         -- the value returned will come from the current changeset post and from the
---         -- incoming post data.
---         --
---         -- @since 4.1.1
---         -- @since 4.7.0 Added `args` parameter and merging with changeset values and stashed theme mods.
---         --
---         -- @param array args then
---         --     Args.
---         --
---         --     @type bool exclude_changeset Whether the changeset values should also be excluded. Defaults to false.
---         --     @type bool exclude_post_data Whether the post input values should also be excluded. Defaults to false when lacking the customize capability.
---         -- end;
---         -- @return array
---         --
---         public function unsanitized_post_values( args = array() ) then
---                 args = array_merge(
---                         array(
---                                 "exclude_changeset" => false,
---                                 "exclude_post_data" => ! current_user_can( "customize" ),
---                         ),
---                         args
---                 );
+   -----------------------------
+   -- Unsanitized_Post_Values --
+   -----------------------------
 
---                 values = array();
+   function Unsanitized_Post_Values (This : in out Wp_Customize_Manager;
+                                     Args : Array_Type := Empty_Array)
+                                     return Array_Type
+   is
+      use Binder;
+      use Php;
+      use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Options;
 
---                 -- Let default values be from the stashed theme mods if doing a theme switch and if no changeset is present.
---                 if ( ! this->is_theme_active() ) then
---                         stashed_theme_mods = get_option( "customize_stashed_theme_mods" );
---                         stylesheet         = this->get_stylesheet();
---                         if ( isset( stashed_theme_mods[ stylesheet ] ) ) then
---                                 values = array_merge( values, wp_list_pluck( stashed_theme_mods[ stylesheet ], "value" ) );
---                         end;
---                 end;
+      Args_2 : constant Array_Type := Array_Merge (
+        To_Array (List => (
+          Build ("exclude_changeset", False),
+          Build ("exclude_post_data", not Current_User_Can ("customize"))
+        )),
+        Args
+      );
 
---                 if ( ! args["exclude_changeset"] ) then
---                         foreach ( this->changeset_data() as setting_id => setting_params ) then
---                                 if ( ! array_key_exists( "value", setting_params ) ) then
---                                         continue;
---                                 end;
---                                 if ( isset( setting_params["type"] ) && "theme_mod" === setting_params["type"] ) then
+      Values : Array_Type;
+   begin
+      -- Let default values be from the stashed theme mods if doing a theme switch
+      -- and if no changeset is present.
+      if not This.Is_Theme_Active then
+         declare
+            Stashed_Theme_Mods : constant Array_Type :=
+              Get_Option ("customize_stashed_theme_mods");
+            Stylesheet : constant String := This.Get_Stylesheet;
+         begin
+            if Isset (Stashed_Theme_Mods, Stylesheet) then
+               Values :=
+                 Array_Merge
+                   (Values,
+                    Wp_List_Pluck (As_Array (Get (
+                      Stashed_Theme_Mods, Stylesheet)), "value"));
+            end if;
+         end;
+      end if;
 
---                                         -- Ensure that theme mods values are only used if they were saved under the active theme.
---                                         namespace_pattern = "/^(?P<stylesheet>.+?)::(?P<setting_id>.+)/";
---                                         if ( preg_match( namespace_pattern, setting_id, matches ) && this->get_stylesheet() === matches["stylesheet"] ) then
---                                                 values[ matches["setting_id"] ] = setting_params["value"];
---                                         end;
---                                 end; else then
---                                         values[ setting_id ] = setting_params["value"];
---                                 end;
---                         end;
---                 end;
+      if "" = Get_As_String (Args_2, "exclude_changeset") then
+--    if not Get (Args_2, "exclude_changeset") then
+         for A in This.X_Changeset_Data.Iterate loop
+            declare
+               Setting_Id     : constant String     := Key (A);
+               Setting_Params : constant Array_Type := As_Array (Element (A));
+            begin
+               if not Array_Key_Exists ("value", Setting_Params) then
+                  goto Continue;
+               end if;
 
---                 if ( ! args["exclude_post_data"] ) then
---                         if ( ! isset( this->_post_values ) ) then
---                                 if ( isset( _POST["customized"] ) ) then
---                                         post_values = json_decode( wp_unslash( _POST["customized"] ), true );
---                                 end; else then
---                                         post_values = array();
---                                 end;
---                                 if ( is_array( post_values ) ) then
---                                         this->_post_values = post_values;
---                                 end; else then
---                                         this->_post_values = array();
---                                 end;
---                         end;
---                         values = array_merge( values, this->_post_values );
---                 end;
---                 return values;
---         end;
+               if
+                 Isset (Setting_Params, "type") and then
+                 "theme_mod" = As_String (Get (Setting_Params, "type"))
+               then
+                  -- Ensure that theme mods values are only used if they were saved
+                  -- under the active theme.
+                  declare
+                     Namespace_Pattern : constant String :=
+                       "/^(?P<stylesheet>.+?)::(?P<setting_id>.+)/";
+                     Matches : Array_Type;
+                  begin
+                     if
+                       Preg_Match (Namespace_Pattern, Setting_Id, Matches) /= 0 and then
+                       This.Get_Stylesheet = Get_As_String (Matches, "stylesheet")
+                     then
+                        Set (Values,
+                             Key   => Get_As_String (Matches, "setting_id"),
+                             Value => Get (Setting_Params, "value"));
+                     end if;
+                  end;
+               else
+                  Set (Values, Setting_Id, Get (Setting_Params, "value"));
+               end if;
+            end;
+            << Continue >>
+         end loop;
+      end if;
 
---         --
---         -- Returns the sanitized value for a given setting from the current customized state.
---         --
---         -- The name "post_value" is a carry-over from when the customized state was exclusively
---         -- sourced from `_POST["customized"]`. Nevertheless, the value returned will come
---         -- from the current changeset post and from the incoming post data.
---         --
---         -- @since 3.4.0
---         -- @since 4.1.1 Introduced the `default_value` parameter.
---         -- @since 4.6.0 `default_value` is now returned early when the setting post value is invalid.
---         --
---         -- @see WP_REST_Server::dispatch()
---         -- @see WP_REST_Request::sanitize_params()
---         -- @see WP_REST_Request::has_valid_params()
---         --
---         -- @param WP_Customize_Setting setting       A WP_Customize_Setting derived object.
---         -- @param mixed                default_value Value returned if `setting` has no post value (added in 4.2.0)
---         --                                            or the post value is invalid (added in 4.6.0).
---         -- @return string|mixed Sanitized value or the `default_value` provided.
---         --
---         public function post_value( setting, default_value = null ) then
---                 post_values = this->unsanitized_post_values();
---                 if ( ! array_key_exists( setting->id, post_values ) ) then
---                         return default_value;
---                 end;
+      if "" = Get_As_String (Args_2, "exclude_post_data") then -- not
+         if not Isset (This.X_Post_Values) then
+            declare
+               Post_Values : Array_Type;
+            begin
+               if Isset (X_POST, "customized") then
+                  Post_Values :=
+                    JSON_Decode (
+                      Wp_Unslash (Get_As_String (X_POST, "customized")), True);
+               else
+                  Post_Values := Empty_Array;
+               end if;
 
---                 value = post_values[ setting->id ];
---                 valid = setting->validate( value );
---                 if ( is_wp_error( valid ) ) then
---                         return default_value;
---                 end;
+               if Is_Array (Post_Values) then
+                  This.X_Post_Values := Post_Values;
+               else
+                  This.X_Post_Values := Empty_Array;
+               end if;
+            end;
+         end if;
+         Values := Array_Merge (Values, This.X_Post_Values);
+      end if;
+      return Values;
+   end Unsanitized_Post_Values;
 
---                 value = setting->sanitize( value );
---                 if ( is_null( value ) || is_wp_error( value ) ) then
---                         return default_value;
---                 end;
+   procedure Unsanitized_Post_Values (This : in out Wp_Customize_Manager;
+                                      Args : Array_Type := Empty_Array)
+   is
+      Unused : constant Array_Type :=
+        Unsanitized_Post_Values (This, Args);
+   begin
+      null;
+   end Unsanitized_Post_Values;
 
---                 return value;
---         end;
+   ----------------
+   -- Post_Value --
+   ----------------
 
---         --
---         -- Overrides a setting"s value in the current customized state.
---         --
---         -- The name "post_value" is a carry-over from when the customized state was
---         -- exclusively sourced from `_POST["customized"]`.
---         --
---         -- @since 4.2.0
---         --
---         -- @param string setting_id ID for the WP_Customize_Setting instance.
---         -- @param mixed  value      Post value.
---         --
---         public function set_post_value( setting_id, value ) then
---                 this->unsanitized_post_values(); -- Populate _post_values from _POST["customized"].
---                 this->_post_values[ setting_id ] = value;
+   function Post_Value (This          : in out Wp_Customize_Manager;
+                        Setting       : Wp_Customize_Setting;
+                        Default_Value : String := "") -- null
+                        return String
+   is
+      use Php;
+      use Inc_Class_Wp_Customize_Settings;
+      use Inc_Load;
 
---                 --
---                 -- Announces when a specific setting"s unsanitized post value has been set.
---                 --
---                 -- Fires when the WP_Customize_Manager::set_post_value() method is called.
---                 --
---                 -- The dynamic portion of the hook name, `setting_id`, refers to the setting ID.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @param mixed                value   Unsanitized setting post value.
---                 -- @param WP_Customize_Manager manager WP_Customize_Manager instance.
---                 --
---                 do_action( "customize_post_value_set_thensetting_idend;", value, this );
+      Post_Values : constant Array_Type :=
+        This.Unsanitized_Post_Values;
+   begin
+      if not Array_Key_Exists (-Setting.Id, Post_Values) then
+         return Default_Value;
+      end if;
 
---                 --
---                 -- Announces when any setting"s unsanitized post value has been set.
---                 --
---                 -- Fires when the WP_Customize_Manager::set_post_value() method is called.
---                 --
---                 -- This is useful for `WP_Customize_Setting` instances to watch
---                 -- in order to update a cached previewed value.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @param string               setting_id Setting ID.
---                 -- @param mixed                value      Unsanitized setting post value.
---                 -- @param WP_Customize_Manager manager    WP_Customize_Manager instance.
---                 --
---                 do_action( "customize_post_value_set", setting_id, value, this );
---         end;
+      declare
+         Value : Multi_Type := Get (Post_Values, -Setting.Id);
+         Valid : constant Validate_Result := Setting.Validate (Value);
+      begin
+         if Is_Wp_Error (Valid.Error) then
+            return Default_Value;
+         end if;
+
+         Value := Setting.Sanitize (Value);
+         if Is_Null (Value) then -- or else Is_Wp_Error (Value) then
+            return Default_Value;
+         end if;
+
+         return As_String (Value);
+      end;
+   end Post_Value;
+
+   --------------------
+   -- Set_Post_Value --
+   --------------------
+
+   procedure Set_Post_Value (This       : in out Wp_Customize_Manager;
+                             Setting_Id : String;
+                             Value      : Array_Type)
+   is
+      use Inc_Plugins;
+   begin
+      This.Unsanitized_Post_Values; -- Populate _post_values from _POST["customized"].
+      Set (This.X_Post_Values, Setting_Id, From_Array (Value));
+
+      --
+      -- Announces when a specific setting's unsanitized post value has been set.
+      --
+      -- Fires when the WP_Customize_Manager::set_post_value() method is called.
+      --
+      -- The dynamic portion of the hook name, `setting_id`, refers to the setting ID.
+      --
+      -- @since 4.4.0
+      --
+      -- @param mixed                value   Unsanitized setting post value.
+      -- @param WP_Customize_Manager manager WP_Customize_Manager instance.
+      --
+      Do_Action ("customize_post_value_set_" & Setting_Id, Value, This);
+
+      --
+      -- Announces when any setting's unsanitized post value has been set.
+      --
+      -- Fires when the WP_Customize_Manager::set_post_value() method is called.
+      --
+      -- This is useful for `WP_Customize_Setting` instances to watch
+      -- in order to update a cached previewed value.
+      --
+      -- @since 4.4.0
+      --
+      -- @param string               setting_id Setting ID.
+      -- @param mixed                value      Unsanitized setting post value.
+      -- @param WP_Customize_Manager manager    WP_Customize_Manager instance.
+      --
+      Do_Action ("customize_post_value_set", Setting_Id, Value, This);
+   end Set_Post_Value;
 
 --         --
 --         -- Prints JavaScript settings.
@@ -2041,16 +2225,16 @@ is
 --                 return this->theme()->get_template();
 --         end;
 
---         --
---         -- Retrieves the stylesheet name of the previewed theme.
---         --
---         -- @since 3.4.0
---         --
---         -- @return string Stylesheet name.
---         --
---         public function get_stylesheet() then
---                 return this->theme()->get_stylesheet();
---         end;
+   --------------------
+   -- Get_Stylesheet --
+   --------------------
+
+   function Get_Stylesheet (This : Wp_Customize_Manager)
+                            return String
+   is
+   begin
+      return This.Theme.Get_Stylesheet; -- ()
+   end Get_Stylesheet;
 
 --         --
 --         -- Retrieves the template root of the previewed theme.
@@ -3008,55 +3192,91 @@ is
 --                 return caps;
 --         end;
 
---         --
---         -- Marks the changeset post as being currently edited by the current user.
---         --
---         -- @since 4.9.0
---         --
---         -- @param int  changeset_post_id Changeset post ID.
---         -- @param bool take_over Whether to take over the changeset. Default false.
---         --
---         public function set_changeset_lock( changeset_post_id, take_over = false ) then
---                 if ( changeset_post_id ) then
---                         can_override = ! (bool) get_post_meta( changeset_post_id, "_edit_lock", true );
+   ------------------------
+   -- Set_Changeset_Lock --
+   ------------------------
 
---                         if ( take_over ) then
---                                 can_override = true;
---                         end;
+   procedure Set_Changeset_Lock (This              : Wp_Customize_Manager;
+                                 Changeset_Post_Id : Post_Id; -- Integer;
+                                 Take_Over         : Boolean := False)
+   is
+      use Php;
+      use Inc_Posts;
+      use Inc_Users;
+   begin
+      if Changeset_Post_Id not in 0 then
+         declare
+            Can_Override : Boolean :=
+              "" = Get_Post_Meta (Changeset_Post_Id, "_edit_lock", True); -- (bool)
+         begin
+            if Take_Over then
+               Can_Override := True;
+            end if;
 
---                         if ( can_override ) then
---                                 lock = sprintf( "%s:%s", time(), get_current_user_id() );
---                                 update_post_meta( changeset_post_id, "_edit_lock", lock );
---                         end; else then
---                                 this->refresh_changeset_lock( changeset_post_id );
---                         end;
---                 end;
---         end;
+            if Can_Override then
+               declare
+                  Lock : constant String :=
+                    Sprintf ("%s:%s",
+                             To_List (List => (
+                               1 => +Helpers.Image (Time),        -- time()
+                               2 => +Helpers.Image (Get_Current_User_Id)
+                            )));
+               begin
+                  Update_Post_Meta (Changeset_Post_Id, "_edit_lock", Lock);
+               end;
+            else
+               This.Refresh_Changeset_Lock (Changeset_Post_Id);
+            end if;
+         end;
+      end if;
+   end Set_Changeset_Lock;
 
---         --
---         -- Refreshes changeset lock with the current time if current user edited the changeset before.
---         --
---         -- @since 4.9.0
---         --
---         -- @param int changeset_post_id Changeset post ID.
---         --
---         public function refresh_changeset_lock( changeset_post_id ) then
---                 if ( ! changeset_post_id ) then
---                         return;
---                 end;
+   ----------------------------
+   -- Refresh_Changeset_Lock --
+   ----------------------------
 
---                 lock = get_post_meta( changeset_post_id, "_edit_lock", true );
---                 lock = explode( ":", lock );
+   procedure Refresh_Changeset_Lock (This              : Wp_Customize_Manager;
+                                     Changeset_Post_Id : Post_Id) -- Integer)
+   is
+      use Php;
+      use Inc_Posts;
+      use Inc_Users;
+   begin
+      if Changeset_Post_Id in 0 then
+         return;
+      end if;
 
---                 if ( lock && ! empty( lock[1] ) ) then
---                         user_id         = (int) lock[1];
---                         current_user_id = get_current_user_id();
---                         if ( user_id === current_user_id ) then
---                                 lock = sprintf( "%s:%s", time(), user_id );
---                                 update_post_meta( changeset_post_id, "_edit_lock", lock );
---                         end;
---                 end;
---         end;
+      declare
+         Lock_0 : constant String :=
+           Get_Post_Meta (Changeset_Post_Id, "_edit_lock", True);
+
+         Lock : constant List_Type := Explode (":", Lock_0);
+      begin
+         if
+           Lock not in Empty_List and then
+           not Empty (-Lock (1))        -- [1]
+         then
+            declare
+               User_Id : constant Integer :=
+                 Integer'Value (-Lock (1));  -- (int) [1]
+
+               Current_User_Id : constant Integer := Get_Current_User_Id;
+            begin
+               if User_Id = Current_User_Id then
+                  declare
+                     Lock_2 : constant String :=
+                       Sprintf ("%s:%s", To_List (List => (
+                         1 => +Helpers.Image (Time),
+                         2 => +Helpers.Image (User_Id))));
+                  begin
+                     Update_Post_Meta (Changeset_Post_Id,
+                                       "_edit_lock", Lock_2);
+                  end;
+               end if;
+            end;
+         end if;
+      end;
+   end Refresh_Changeset_Lock;
 
 --         --
 --         -- Filters heartbeat settings for the Customizer.
@@ -3521,114 +3741,145 @@ is
 --                 wp_send_json_error( "unknown_error", 500 );
 --         end;
 
---         --
---         -- Adds a customize setting.
---         --
---         -- @since 3.4.0
---         -- @since 4.5.0 Return added WP_Customize_Setting instance.
---         --
---         -- @see WP_Customize_Setting::__construct()
---         -- @link https://developer.wordpress.org/themes/customize-api
---         --
---         -- @param WP_Customize_Setting|string id   Customize Setting object, or ID.
---         -- @param array                       args Optional. Array of properties for the new Setting object.
---         --                                          See WP_Customize_Setting::__construct() for information
---         --                                          on accepted arguments. Default empty array.
---         -- @return WP_Customize_Setting The instance of the setting that was added.
---         --
---         public function add_setting( id, args = array() ) then
---                 if ( id instanceof WP_Customize_Setting ) then
---                         setting = id;
---                 end; else then
---                         class = "WP_Customize_Setting";
+   -----------------
+   -- Add_Setting --
+   -----------------
 
---                         -- This filter is documented in wp-includes/class-wp-customize-manager.php--
---                         args = apply_filters( "customize_dynamic_setting_args", args, id );
+   function Add_Setting (This : Wp_Customize_Manager;
+                         Id   : String;
+                         Args : Array_Type := Empty_Array)
+                         return Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting
+   is
+      use Inc_Class_Wp_Customize_Settings;
+      use Inc_Plugins;
 
---                         -- This filter is documented in wp-includes/class-wp-customize-manager.php--
---                         class = apply_filters( "customize_dynamic_setting_class", class, id, args );
+      Args_2 : Array_Type := Args;
+      Setting : Wp_Customize_Setting;
+   begin
+--    if Id in WP_Customize_Setting then -- instanceof
+--       Setting := Id;
+--    else
+         declare
+            Class   : Wp_Customize_Setting;
+         begin
+            -- This filter is documented in wp-includes/class-wp-customize-manager.php
+            Args_2 := Apply_Filters ("customize_dynamic_setting_args", Args_2, Id);
 
---                         setting = new class( this, id, args );
---                 end;
+            -- This filter is documented in wp-includes/class-wp-customize-manager.php
+            Class := Apply_Filters ("customize_dynamic_setting_class",
+                                    Class, Id, Args_2);
 
---                 this->settings[ setting->id ] = setting;
---                 return setting;
---         end;
+--          Setting := new Class (This, Id, Args_2);
+         end;
+--    end if;
 
---         --
---         -- Registers any dynamically-created settings, such as those from _POST["customized"]
---         -- that have no corresponding setting created.
---         --
---         -- This is a mechanism to "wake up" settings that have been dynamically created
---         -- on the front end and have been sent to WordPress in `_POST["customized"]`. When WP
---         -- loads, the dynamically-created settings then will get created and previewed
---         -- even though they are not directly created statically with code.
---         --
---         -- @since 4.2.0
---         --
---         -- @param array setting_ids The setting IDs to add.
---         -- @return array The WP_Customize_Setting objects added.
---         --
---         public function add_dynamic_settings( setting_ids ) then
---                 new_settings = array();
---                 foreach ( setting_ids as setting_id ) then
---                         -- Skip settings already created.
---                         if ( this->get_setting( setting_id ) ) then
---                                 continue;
---                         end;
+--    Set (This.Settings, -Setting.Id, Setting);
+      return Setting;
+   end Add_Setting;
 
---                         setting_args  = false;
---                         setting_class = "WP_Customize_Setting";
+   procedure Add_Setting (This : Wp_Customize_Manager;
+                          Id   : String;
+                          Args : Array_Type := Empty_Array)
+   is
+      use Inc_Class_Wp_Customize_Settings;
+      Unused : constant Wp_Customize_Setting :=
+        Add_Setting (This, Id, Args);
+   begin
+      null;
+   end Add_Setting;
 
---                         --
---                         -- Filters a dynamic setting"s constructor args.
---                         --
---                         -- For a dynamic setting to be registered, this filter must be employed
---                         -- to override the default false value with an array of args to pass to
---                         -- the WP_Customize_Setting constructor.
---                         --
---                         -- @since 4.2.0
---                         --
---                         -- @param false|array setting_args The arguments to the WP_Customize_Setting constructor.
---                         -- @param string      setting_id   ID for dynamic setting, usually coming from `_POST["customized"]`.
---                         --
---                         setting_args = apply_filters( "customize_dynamic_setting_args", setting_args, setting_id );
---                         if ( false === setting_args ) then
---                                 continue;
---                         end;
+   procedure Add_Setting (This : Wp_Customize_Manager;
+                          Id   : Wp_Customize_Setting;
+                          Args : Array_Type := Empty_Array)
+   is null;
 
---                         --
---                         -- Allow non-statically created settings to be constructed with custom WP_Customize_Setting subclass.
---                         --
---                         -- @since 4.2.0
---                         --
---                         -- @param string setting_class WP_Customize_Setting or a subclass.
---                         -- @param string setting_id    ID for dynamic setting, usually coming from `_POST["customized"]`.
---                         -- @param array  setting_args  WP_Customize_Setting or a subclass.
---                         --
---                         setting_class = apply_filters( "customize_dynamic_setting_class", setting_class, setting_id, setting_args );
+   --------------------------
+   -- Add_Dynamic_Settings --
+   --------------------------
 
---                         setting = new setting_class( this, setting_id, setting_args );
+   function Add_Dynamic_Settings (This : Wp_Customize_Manager;
+                                  Setting_Ids : List_Type)
+                                  return Setting_Lists.Vector -- Array_Type;
+   is
+      use Inc_Class_Wp_Customize_Settings;
+      use Inc_Plugins;
 
---                         this->add_setting( setting );
---                         new_settings[] = setting;
---                 end;
---                 return new_settings;
---         end;
+      New_Settings : Setting_Lists.Vector; -- Array_Type;
+   begin
+      for Setting_Id of Setting_Ids loop
+         -- Skip settings already created.
+         if This.Get_Setting (-Setting_Id) /= Null_Setting then
+--       if This.Get_Setting (-Setting_Id) then
+            goto Continue;
+         end if;
 
---         --
---         -- Retrieves a customize setting.
---         --
---         -- @since 3.4.0
---         --
---         -- @param string id Customize Setting ID.
---         -- @return WP_Customize_Setting|void The setting, if set.
---         --
---         public function get_setting( id ) then
---                 if ( isset( this->settings[ id ] ) ) then
---                         return this->settings[ id ];
---                 end;
---         end;
+         declare
+            Setting_Args  : Boolean := False;
+            Setting_Class : Wp_Customize_Setting;
+            Setting       : Wp_Customize_Setting;
+         begin
+            --
+            -- Filters a dynamic setting"s constructor args.
+            --
+            -- For a dynamic setting to be registered, this filter must be employed
+            -- to override the default false value with an array of args to pass to
+            -- the WP_Customize_Setting constructor.
+            --
+            -- @since 4.2.0
+            --
+            -- @param false|array setting_args The arguments to the
+            --                                  WP_Customize_Setting constructor.
+            -- @param string      setting_id   ID for dynamic setting, usually coming
+            --                                  from `_POST["customized"]`.
+            --
+            Setting_Args :=
+              Apply_Filters ("customize_dynamic_setting_args",
+                             Setting_Args, -Setting_Id);
+
+            if False = Setting_Args then
+               goto Continue;
+            end if;
+
+            --
+            -- Allow non-statically created settings to be constructed with custom
+            -- WP_Customize_Setting subclass.
+            --
+            -- @since 4.2.0
+            --
+            -- @param string setting_class WP_Customize_Setting or a subclass.
+            -- @param string setting_id    ID for dynamic setting, usually coming
+            --                              from `_POST["customized"]`.
+            -- @param array  setting_args  WP_Customize_Setting or a subclass.
+            --
+            Setting_Class :=
+              Apply_Filters ("customize_dynamic_setting_class",
+                             Setting_Class, -Setting_Id, Setting_Args);
+
+--          Setting := new Setting_Class (This, Setting_Id, Setting_Args);
+
+            This.Add_Setting (Setting);
+            New_Settings.Append (Setting);
+         end;
+         << Continue >>
+      end loop;
+      return New_Settings;
+   end Add_Dynamic_Settings;
+
+   -----------------
+   -- Get_Setting --
+   -----------------
+
+   function Get_Setting (This : Wp_Customize_Manager;
+                         Id   : String)
+                         return Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting
+   is
+      use Inc_Class_Wp_Customize_Settings;
+   begin
+      if Isset (This.Settings, Id) then
+         return Null_Setting; -- This.Settings (Id);
+      end if;
+      return Null_Setting; -- added
+   end Get_Setting;
 
 --         --
 --         -- Removes a customize setting.
@@ -3643,44 +3894,56 @@ is
 --                 unset( this->settings[ id ] );
 --         end;
 
---         --
---         -- Adds a customize panel.
---         --
---         -- @since 4.0.0
---         -- @since 4.5.0 Return added WP_Customize_Panel instance.
---         --
---         -- @see WP_Customize_Panel::__construct()
---         --
---         -- @param WP_Customize_Panel|string id   Customize Panel object, or ID.
---         -- @param array                     args Optional. Array of properties for the new Panel object.
---         --                                        See WP_Customize_Panel::__construct() for information
---         --                                        on accepted arguments. Default empty array.
---         -- @return WP_Customize_Panel The instance of the panel that was added.
---         --
---         public function add_panel( id, args = array() ) then
---                 if ( id instanceof WP_Customize_Panel ) then
---                         panel = id;
---                 end; else then
---                         panel = new WP_Customize_Panel( this, id, args );
---                 end;
+   ---------------
+   -- Add_Panel --
+   ---------------
 
---                 this->panels[ panel->id ] = panel;
---                 return panel;
---         end;
+   function Add_Panel (This : aliased Wp_Customize_Manager;
+                       Id   : String;
+                       Args : Array_Type := Empty_Array)
+                       return Inc_Class_Wp_Customize_Panels.Wp_Customize_Panel
+   is
+      use Inc_Class_Wp_Customize_Panels;
 
---         --
---         -- Retrieves a customize panel.
---         --
---         -- @since 4.0.0
---         --
---         -- @param string id Panel ID to get.
---         -- @return WP_Customize_Panel|void Requested panel instance, if set.
---         --
---         public function get_panel( id ) then
---                 if ( isset( this->panels[ id ] ) ) then
---                         return this->panels[ id ];
---                 end;
---         end;
+      Panel : Wp_Customize_Panel;
+   begin
+--      if Id in WP_Customize_Panel then -- instanceof
+--         Panel := Id;
+--      else
+         Panel := X_Construct (This'Unrestricted_Access, Id, Args);
+         -- new Wp_Customize_Panel (This, Id, Args);
+--      end if;
+
+--    This.Panels (Panel.Id) := Panel;
+      return Panel;
+   end Add_Panel;
+
+   procedure Add_Panel (This : Wp_Customize_Manager;
+                        Id   : String;
+                        Args : Array_Type := Empty_Array)
+   is
+      use Inc_Class_Wp_Customize_Panels;
+
+      Unused : constant Wp_Customize_Panel := Add_Panel (This, Id, Args);
+   begin
+      null;
+   end Add_Panel;
+
+   ---------------
+   -- Get_Panel --
+   ---------------
+
+   function Get_Panel (This : Wp_Customize_Manager;
+                       Id   : String)
+                       return Inc_Class_Wp_Customize_Panels.Wp_Customize_Panel
+   is
+      use Inc_Class_Wp_Customize_Panels;
+   begin
+      if Isset (This.Panels, Id) then
+         return Null_Panel; -- This.Panels (Id);
+      end if;
+      raise Program_Error with "no return";
+   end Get_Panel;
 
 --         --
 --         -- Removes a customize panel.
@@ -3739,30 +4002,71 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Adds a customize section.
---         --
---         -- @since 3.4.0
---         -- @since 4.5.0 Return added WP_Customize_Section instance.
---         --
---         -- @see WP_Customize_Section::__construct()
---         --
---         -- @param WP_Customize_Section|string id   Customize Section object, or ID.
---         -- @param array                       args Optional. Array of properties for the new Section object.
---         --                                          See WP_Customize_Section::__construct() for information
---         --                                          on accepted arguments. Default empty array.
---         -- @return WP_Customize_Section The instance of the section that was added.
---         --
---         public function add_section( id, args = array() ) then
---                 if ( id instanceof WP_Customize_Section ) then
---                         section = id;
---                 end; else then
---                         section = new WP_Customize_Section( this, id, args );
---                 end;
+   -----------------
+   -- Add_Section --
+   -----------------
 
---                 this->sections[ section->id ] = section;
---                 return section;
---         end;
+   function Add_Section (This : aliased Wp_Customize_Manager;
+                         Id   : String;
+                         Args : Array_Type := Empty_Array)
+                         return Inc_Class_Wp_Customize_Sections.Wp_Customize_Section
+   is
+      use Inc_Class_Wp_Customize_Sections;
+
+      Section : Wp_Customize_Section;
+   begin
+--    if Id in Wp_Customize_Section then -- instanceof
+--       Section := Id;
+--    else
+         Section := X_Construct (This'Unrestricted_Access, Id, Args);
+         -- new Wp_Customize_Section (This, Id, Args);
+--    end if;
+
+--    This.Sections (-Section.Id) := Section;
+      return Section;
+   end Add_Section;
+
+   function Add_Section (This : aliased Wp_Customize_Manager;
+                         Id   : Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                         Args : Array_Type := Empty_Array)
+                         return Inc_Class_Wp_Customize_Sections.Wp_Customize_Section
+   is
+      use Inc_Class_Wp_Customize_Sections;
+
+      Section : Wp_Customize_Section;
+   begin
+      if Id in Wp_Customize_Section then -- instanceof
+         Section := Id;
+--    else
+--         Section := X_Construct (This'Unrestricted_Access, Id, Args);
+         -- new Wp_Customize_Section (This, Id, Args);
+      end if;
+
+--    This.Sections (-Section.Id) := Section;
+      return Section;
+   end Add_Section;
+
+   procedure Add_Section (This : Wp_Customize_Manager;
+                          Id   : String;
+                          Args : Array_Type := Empty_Array)
+   is
+      use Inc_Class_Wp_Customize_Sections;
+
+      Unused : constant Wp_Customize_Section := Add_Section (This, Id, Args);
+   begin
+      null;
+   end Add_Section;
+
+   procedure Add_Section (This : Wp_Customize_Manager;
+                          Id   : Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                          Args : Array_Type := Empty_Array)
+   is
+      use Inc_Class_Wp_Customize_Sections;
+
+      Unused : constant Wp_Customize_Section := Add_Section (This, Id, Args);
+   begin
+      null;
+   end Add_Section;
 
 --         --
 --         -- Retrieves a customize section.
@@ -3818,30 +4122,60 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Adds a customize control.
---         --
---         -- @since 3.4.0
---         -- @since 4.5.0 Return added WP_Customize_Control instance.
---         --
---         -- @see WP_Customize_Control::__construct()
---         --
---         -- @param WP_Customize_Control|string id   Customize Control object, or ID.
---         -- @param array                       args Optional. Array of properties for the new Control object.
---         --                                          See WP_Customize_Control::__construct() for information
---         --                                          on accepted arguments. Default empty array.
---         -- @return WP_Customize_Control The instance of the control that was added.
---         --
---         public function add_control( id, args = array() ) then
---                 if ( id instanceof WP_Customize_Control ) then
---                         control = id;
---                 end; else then
---                         control = new WP_Customize_Control( this, id, args );
---                 end;
+   -----------------
+   -- Add_Control --
+   -----------------
 
---                 this->controls[ control->id ] = control;
---                 return control;
---         end;
+   function Add_Control (This : aliased Wp_Customize_Manager;
+                         Id   : String;
+                         Args : Array_Type := Empty_Array)
+                         return Inc_Class_Wp_Customize_Controls.Wp_Customize_Control
+   is
+      use Inc_Class_Wp_Customize_Controls;
+
+      Control : Wp_Customize_Control;
+   begin
+--    if Id in WP_Customize_Control then -- instanceof
+--       Control := Id;
+--    else
+         Control := X_Construct (This'Unrestricted_Access, Id, Args);
+         -- new Wp_Customize_Control (This, Id, Args);
+--    end if;
+
+--    This.Controls (-Control.Id) := Control;
+      return Control;
+   end Add_Control;
+
+   function Add_Control (This : aliased Wp_Customize_Manager;
+                         Id   : Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                         Args : Array_Type := Empty_Array)
+                         return Inc_Class_Wp_Customize_Controls.Wp_Customize_Control
+   is
+      use Inc_Class_Wp_Customize_Controls;
+
+      Control : Wp_Customize_Control;
+   begin
+--    if Id in WP_Customize_Control then -- instanceof
+      Control := Id;
+--    else
+--         Control := X_Construct (This'Unrestricted_Access, Id, Args);
+         -- new Wp_Customize_Control (This, Id, Args);
+--    end if;
+
+--    This.Controls (-Control.Id) := Control;
+      return Control;
+   end Add_Control;
+
+   procedure Add_Control (This : Wp_Customize_Manager;
+                          Id   : Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                          Args : Array_Type := Empty_Array)
+   is
+      use Inc_Class_Wp_Customize_Controls;
+
+      Unused : constant Wp_Customize_Control := Add_Control (This, Id, Args);
+   begin
+      null;
+   end Add_Control;
 
 --         --
 --         -- Retrieves a customize control.

@@ -102,7 +102,7 @@ is
         -- @since 1.5.0
         -- @var WP_Post[]|int[]
         --
---        public $posts;
+        Posts : Inc_Class_Wp_Posts.Post_Array;
 
         --
         -- The number of posts for the current query.
@@ -520,6 +520,34 @@ is
                  return String;
 
    --
+   -- Sets up the WordPress query by parsing query string.
+   --
+   -- @since 1.5.0
+   --
+   -- @see WP_Query::parse_query() for all available arguments.
+   --
+   -- @param string|array $query URL query string or array of query arguments.
+   -- @return WP_Post[]|int[] Array of post objects or post IDs.
+   --
+   procedure Query (This  : Wp_Query;
+                    Query : Array_Type)
+   is null;
+
+   --
+   -- Constructor.
+   --
+   -- Sets up the WordPress query, if parameter is not empty.
+   --
+   -- @since 1.5.0
+   --
+   -- @see WP_Query::parse_query() for all available arguments.
+   --
+   -- @param string|array $query URL query string or array of vars.
+   --
+   function X_Construct (Query : Array_Type) -- ''
+                         return Wp_Query;
+
+   --
    -- Retrieves the currently queried object.
    --
    -- If queried object is not set, then the queried object will be set from
@@ -728,8 +756,8 @@ is
    --
    function Query (This  : Wp_Query;
                    Query : Array_Type)
-                   return Inc_Class_Wp_Posts.Wp_Post_Array
-                   is (Inc_Class_Wp_Posts.Empty_Wp_Post_Array);
+                   return Inc_Class_Wp_Posts.Post_Array -- Wp_Post_Array
+                   is (Inc_Class_Wp_Posts.Empty_Post_Array); -- Empty_Wp_Post_Array);
 
    Null_Query : constant Wp_Query :=
      (M_Query               => Empty_Array,
@@ -743,6 +771,7 @@ is
       Found_Posts           => 0,
       Max_Num_Pages         => 0,
       Max_Num_Comment_Pages => 0,
+      Posts                 => Inc_Class_Wp_Posts.Post_Arrays.Empty_Vector,
       others                => False);
 
 end Inc_Class_Wp_Querys;

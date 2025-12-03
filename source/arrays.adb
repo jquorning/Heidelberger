@@ -189,6 +189,17 @@ is
       return Arry.Kind;
    end Kind_Of;
 
+   -----------
+   -- Empty --
+   -----------
+
+   function Empty (Obj : Cursor)
+                   return Boolean
+   is
+   begin
+      return Kind_Of (Get (Obj)) = Kind_Null;
+   end Empty;
+
    --------------
    -- As_Array --
    --------------
@@ -337,6 +348,20 @@ is
       return M;
    end From_Integer;
 
+   -------------------
+   -- From_Callable --
+   -------------------
+
+   function From_Callable (Value : Callable)
+                           return Multi_Type
+   is
+      M : Multi_Type;
+   begin
+      M.Kind := Kind_Callable;
+      M.Func := Value;
+      return M;
+   end From_Callable;
+
    ------------------
    -- From_Boolean --
    ------------------
@@ -350,6 +375,18 @@ is
       M.Bool := Value;
       return M;
    end From_Boolean;
+
+   ---------------
+   -- From_Null --
+   ---------------
+
+   function From_Null return Multi_Type
+   is
+      M : Multi_Type;
+   begin
+      M.Kind := Kind_Null;
+      return M;
+   end From_Null;
 
    ---------
    -- Get --
@@ -377,6 +414,18 @@ is
    begin
       return Get (Source);
    end Get;
+
+   -------------------
+   -- Get_As_String --
+   -------------------
+
+   function Get_As_String (Arry : Array_Type;
+                           Key  : String)
+                           return String
+   is
+   begin
+      return As_String (Get (Arry, Key));
+   end Get_As_String;
 
    ------------
    -- Assign --
@@ -464,6 +513,39 @@ is
          end;
       end;
    end Set_3;
+
+   -----------
+   -- Set_4 --
+   -----------
+
+   procedure Set_4 (Arry  : in out Array_Type;
+                    Key_1 : String;
+                    Key_2 : String;
+                    Key_3 : String;
+                    Key_4 : String;
+                    Value : Multi_Type)
+   is
+      Array_2 : constant Array_Access := Element (Arry.Find (Key_1)).Arry;
+   begin
+      pragma Assert (Array_2 /= null);
+      declare
+         Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
+      begin
+         pragma Assert (Array_3 /= null);
+         declare
+            Array_4 : constant Array_Access := Element (Array_3.Find (Key_3)).Arry;
+         begin
+            pragma Assert (Array_4 /= null);
+            declare
+               Array_5 : constant Array_Access :=
+                 Element (Array_4.Find (Key_4)).Arry;
+            begin
+               pragma Assert (Array_5 /= null);
+               Set (Array_5.all, Value);
+            end;
+         end;
+      end;
+   end Set_4;
 
    -----------
    -- Set_5 --

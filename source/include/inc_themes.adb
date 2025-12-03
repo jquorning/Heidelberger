@@ -8,11 +8,14 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Binder;
 with Globals;
 with Php;
 
+with Inc_Class_Wp_Customize_Managers;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
@@ -3510,113 +3513,131 @@ is
 --         end;
 -- end;
 
--- --
--- -- Includes and instantiates the WP_Customize_Manager class.
--- --
--- -- Loads the Customizer at plugins_loaded when accessing the customize.php admin
--- -- page or when any request includes a wp_customize=on param or a customize_changeset
--- -- param (a UUID). This param is a signal for whether to bootstrap the Customizer when
--- -- WordPress is loading, especially in the Customizer preview
--- -- or when making Customizer Ajax requests for widgets or menus.
--- --
--- -- @since 3.4.0
--- --
--- -- @global WP_Customize_Manager wp_customize
--- --
--- function _wp_customize_include() then
+   ----------------------------
+   -- X_Wp_Customize_Include --
+   ----------------------------
 
---         is_customize_admin_page = ( is_admin() && "customize.php" === basename( _SERVER["PHP_SELF"] ) );
---         should_include          = (
---                 is_customize_admin_page
---                 ||
---                 ( isset( _REQUEST["wp_customize"] ) && "on" === _REQUEST["wp_customize"] )
---                 ||
---                 ( ! empty( _GET["customize_changeset_uuid"] ) || ! empty( _POST["customize_changeset_uuid"] ) )
---         );
+   procedure X_Wp_Customize_Include
+   is
+      use Binder;
+      use Hb_Common;
+      use Php;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
 
---         if ( ! should_include ) then
---                 return;
---         end;
+      Is_Customize_Admin_Page : constant Boolean :=
+        Is_Admin and then
+        "customize.php" = Basename (As_String (Get (X_SERVER, "PHP_SELF")));
 
---         /*
---         -- Note that wp_unslash() is not being used on the input vars because it is
---         -- called before wp_magic_quotes() gets called. Besides this fact, none of
---         -- the values should contain any characters needing slashes anyway.
---         --
---         keys       = array(
---                 "changeset_uuid",
---                 "customize_changeset_uuid",
---                 "customize_theme",
---                 "theme",
---                 "customize_messenger_channel",
---                 "customize_autosaved",
---         );
---         input_vars = array_merge(
---                 wp_array_slice_assoc( _GET, keys ),
---                 wp_array_slice_assoc( _POST, keys )
---         );
+      Should_Include : constant Boolean :=
+        Is_Customize_Admin_Page or else
+        (Isset (X_REQUEST, "wp_customize") and then
+         "on" = As_String (Get (X_REQUEST, "wp_customize"))) or else
+        (not Empty (XX_GET, "customize_changeset_uuid") or else
+--      (not Empty (As_String (Get (X_GET, "customize_changeset_uuid"))) or else
+         not Empty (X_POST, "customize_changeset_uuid"));
+--       not Empty (As_String (Get (X_POST, "customize_changeset_uuid"))));
+   begin
+      if not Should_Include then
+         return;
+      end if;
 
---         theme             = null;
---         autosaved         = null;
---         messenger_channel = null;
+      --
+      -- Note that wp_unslash() is not being used on the input vars because it is
+      -- called before wp_magic_quotes() gets called. Besides this fact, none of
+      -- the values should contain any characters needing slashes anyway.
+      --
+      declare
+         Keys : constant List_Type := To_List (List => (
+           +"changeset_uuid",
+           +"customize_changeset_uuid",
+           +"customize_theme",
+           +"theme",
+           +"customize_messenger_channel",
+           +"customize_autosaved"
+         ));
 
---         // Value false indicates UUID should be determined after_setup_theme
---         // to either re-use existing saved changeset or else generate a new UUID if none exists.
---         changeset_uuid = false;
+         Input_Vars : constant Array_Type :=
+           Array_Merge (
+             Wp_Array_Slice_Assoc (XX_GET, Keys),
+             Wp_Array_Slice_Assoc (X_POST, Keys)
+           );
 
---         // Set initially fo false since defaults to true for back-compat;
---         // can be overridden via the customize_changeset_branching filter.
---         branching = false;
+         -- Value false indicates UUID should be determined after_setup_theme
+         -- to either re-use existing saved changeset or else generate a new UUID
+         -- if none exists.
+         Changeset_UUID : constant String :=
+           (if
+             Is_Customize_Admin_Page and then
+             Isset (Input_Vars, "changeset_uuid")
+           then
+              Sanitize_Key (As_String (Get (Input_Vars, "changeset_uuid")))
+           elsif
+             not Empty (As_String (Get (Input_Vars, "customize_changeset_uuid")))
+           then
+              Sanitize_Key (As_String (Get (Input_Vars, "customize_changeset_uuid")))
+           else "");
 
---         if ( is_customize_admin_page && isset( input_vars["changeset_uuid"] ) ) then
---                 changeset_uuid = sanitize_key( input_vars["changeset_uuid"] );
---         end; elseif ( ! empty( input_vars["customize_changeset_uuid"] ) ) then
---                 changeset_uuid = sanitize_key( input_vars["customize_changeset_uuid"] );
---         end;
+         -- Note that theme will be sanitized via WP_Theme.
+         Theme : constant String :=
+           (if
+              Is_Customize_Admin_Page and then
+              Isset (Input_Vars, "theme")
+            then
+               As_String (Get (Input_Vars, "theme"))
+            elsif Isset (Input_Vars, "customize_theme") then
+               As_String (Get (Input_Vars, "customize_theme"))
+            else "");
 
---         // Note that theme will be sanitized via WP_Theme.
---         if ( is_customize_admin_page && isset( input_vars["theme"] ) ) then
---                 theme = input_vars["theme"];
---         end; elseif ( isset( input_vars["customize_theme"] ) ) then
---                 theme = input_vars["customize_theme"];
---         end;
+         Autosaved : constant Boolean :=
+           (if not Empty (Input_Vars, "customize_autosaved")
+            then True
+            else False);
 
---         if ( ! empty( input_vars["customize_autosaved"] ) ) then
---                 autosaved = true;
---         end;
+         Messenger_Channel : constant String :=
+           (if Isset (Input_Vars, "customize_messenger_channel")
+            then Sanitize_Key
+                    (As_String (Get (Input_Vars, "customize_messenger_channel")))
+            else "");
 
---         if ( isset( input_vars["customize_messenger_channel"] ) ) then
---                 messenger_channel = sanitize_key( input_vars["customize_messenger_channel"] );
---         end;
+         -- Set initially fo false since defaults to true for back-compat;
+         -- can be overridden via the customize_changeset_branching filter.
+         Branching : constant Boolean := False;
 
---         /*
---         -- Note that settings must be previewed even outside the customizer preview
---         -- and also in the customizer pane itself. This is to enable loading an existing
---         -- changeset into the customizer. Previewing the settings only has to be prevented
---         -- here in the case of a customize_save action because this will cause WP to think
---         -- there is nothing changed that needs to be saved.
---         --
---         is_customize_save_action = (
---                 wp_doing_ajax()
---                 &&
---                 isset( _REQUEST["action"] )
---                 &&
---                 "customize_save" === wp_unslash( _REQUEST["action"] )
---         );
---         settings_previewed       = ! is_customize_save_action;
+         --
+         -- Note that settings must be previewed even outside the customizer preview
+         -- and also in the customizer pane itself. This is to enable loading an
+         -- existing changeset into the customizer. Previewing the settings only has
+         -- to be prevented here in the case of a customize_save action because this
+         -- will cause WP to think there is nothing changed that needs to be saved.
+         --
+         Is_Customize_Save_Action : constant Boolean := (
+            Wp_Doing_AJAX
+            and then
+            Isset (X_REQUEST, "action")
+            and then
+            "customize_save" = Wp_Unslash (As_String (Get (X_REQUEST, "action")))
+         );
 
---         require_once ABSPATH . WPINC . "/class-wp-customize-manager.php";
---         GLOBALS["wp_customize"] = new WP_Customize_Manager(
---                 compact(
---                         "changeset_uuid",
---                         "theme",
---                         "messenger_channel",
---                         "settings_previewed",
---                         "autosaved",
---                         "branching"
---                 )
---         );
--- end;
+         Settings_Previewed : constant Boolean := not Is_Customize_Save_Action;
+
+         Comp : constant Array_Type := To_Array (List => (
+--         Compact (
+           Build ("changeset_uuid",     Changeset_UUID),
+           Build ("theme",              Theme),
+           Build ("messenger_channel",  Messenger_Channel),
+           Build ("settings_previewed", Settings_Previewed),
+           Build ("autosaved",          Autosaved),
+           Build ("branching",          Branching)
+         ));
+      begin
+--       require_once ABSPATH . WPINC . "/class-wp-customize-manager.php";
+         null;
+--       Set (Globals.GLOBALS, "wp_customize",
+--            Inc_Class_Wp_Customize_Managers.X_Construct (Comp));
+      end;
+   end X_Wp_Customize_Include;
 
 -- --
 -- -- Publishes a snapshot"s changes.

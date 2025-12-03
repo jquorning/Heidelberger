@@ -8,6 +8,8 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Block_Editor_Contexts;
+
 package Inc_Block_Editors
 is
    use Arrays;
@@ -60,18 +62,22 @@ is
 --         );
 -- end;
 
--- --
--- -- Returns all the categories for block types that will be shown in the block editor.
--- --
--- -- @since 5.0.0
--- -- @since 5.8.0 It is possible to pass the block editor context as param.
--- --
--- -- @param WP_Post|WP_Block_Editor_Context post_or_block_editor_context The current post object or
--- --                                                                      the block editor context.
--- --
--- -- @return array[] Array of categories for block types.
--- --
--- function get_block_categories( post_or_block_editor_context ) then
+   --
+   -- Returns all the categories for block types that will be shown in the block
+   -- editor.
+   --
+   -- @since 5.0.0
+   -- @since 5.8.0 It is possible to pass the block editor context as param.
+   --
+   -- @param WP_Post|WP_Block_Editor_Context post_or_block_editor_context
+   --           The current post object or the block editor context.
+   --
+   -- @return array[] Array of categories for block types.
+   --
+   function Get_Block_Categories
+              (Post_Or_Block_Editor_Context :
+                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return Array_Type;
 --         block_categories     = get_default_block_categories();
 --         block_editor_context = post_or_block_editor_context instanceof WP_Post ?
 --                 new WP_Block_Editor_Context(
@@ -108,47 +114,21 @@ is
 --         return block_categories;
 -- end;
 
--- --
--- -- Gets the list of allowed block types to use in the block editor.
--- --
--- -- @since 5.8.0
--- --
--- -- @param WP_Block_Editor_Context block_editor_context The current block editor context.
--- --
--- -- @return bool|string[] Array of block type slugs, or boolean to enable/disable all.
--- --
--- function get_allowed_block_types( block_editor_context ) then
---         allowed_block_types = true;
-
---         --
---         -- Filters the allowed block types for all editor types.
---         --
---         -- @since 5.8.0
---         --
---         -- @param bool|string[]           allowed_block_types  Array of block type slugs, or boolean to enable/disable all.
---         --                                                      Default true (all registered block types supported).
---         -- @param WP_Block_Editor_Context block_editor_context The current block editor context.
---         --
---         allowed_block_types = apply_filters( "allowed_block_types_all", allowed_block_types, block_editor_context );
-
---         if ( ! empty( block_editor_context->post ) ) then
---                 post = block_editor_context->post;
-
---                 --
---                 -- Filters the allowed block types for the editor.
---                 --
---                 -- @since 5.0.0
---                 -- @deprecated 5.8.0 Use the then@see "allowed_block_types_all"end; filter instead.
---                 --
---                 -- @param bool|string[] allowed_block_types Array of block type slugs, or boolean to enable/disable all.
---                 --                                           Default true (all registered block types supported)
---                 -- @param WP_Post       post                The post resource data.
---                 --
---                 allowed_block_types = apply_filters_deprecated( "allowed_block_types", array( allowed_block_types, post ), "5.8.0", "allowed_block_types_all" );
---         end;
-
---         return allowed_block_types;
--- end;
+   --
+   -- Gets the list of allowed block types to use in the block editor.
+   --
+   -- @since 5.8.0
+   --
+   -- @param WP_Block_Editor_Context block_editor_context The current block editor
+   --                                                      context.
+   --
+   -- @return bool|string[] Array of block type slugs, or boolean to enable/disable
+   --                        all.
+   --
+   function Get_Allowed_Block_Types
+              (Block_Editor_Context :
+                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return List_Type;
 
    --
    -- Returns the default block editor settings.
@@ -259,51 +239,17 @@ is
 --         return editor_settings;
 -- end;
 
--- --
--- -- Returns the block editor settings needed to use the Legacy Widget block which
--- -- is not registered by default.
--- --
--- -- @since 5.8.0
--- --
--- -- @return array Settings to be used with get_block_editor_settings().
--- --
--- function get_legacy_widget_block_editor_settings() then
---         editor_settings = array();
+   --
+   -- Returns the block editor settings needed to use the Legacy Widget block which
+   -- is not registered by default.
+   --
+   -- @since 5.8.0
+   --
+   -- @return array Settings to be used with get_block_editor_settings().
+   --
 
---         --
---         -- Filters the list of widget-type IDs that should--*not** be offered by the
---         -- Legacy Widget block.
---         --
---         -- Returning an empty array will make all widgets available.
---         --
---         -- @since 5.8.0
---         --
---         -- @param string[] widgets An array of excluded widget-type IDs.
---         --
---         editor_settings["widgetTypesToHideFromLegacyWidgetBlock"] = apply_filters(
---                 "widget_types_to_hide_from_legacy_widget_block",
---                 array(
---                         "pages",
---                         "calendar",
---                         "archives",
---                         "media_audio",
---                         "media_image",
---                         "media_gallery",
---                         "media_video",
---                         "search",
---                         "text",
---                         "categories",
---                         "recent-posts",
---                         "recent-comments",
---                         "rss",
---                         "tag_cloud",
---                         "custom_html",
---                         "block",
---                 )
---         );
-
---         return editor_settings;
--- end;
+   function Get_Legacy_Widget_Block_Editor_Settings
+            return Array_Type;
 
 -- --
 -- -- Collect the block editor assets that need to be loaded into the editor"s iframe.
@@ -383,190 +329,23 @@ is
 --         );
 -- end;
 
--- --
--- -- Returns the contextualized block editor settings for a selected editor context.
--- --
--- -- @since 5.8.0
--- --
--- -- @param array                   custom_settings      Custom settings to use with the given editor type.
--- -- @param WP_Block_Editor_Context block_editor_context The current block editor context.
--- --
--- -- @return array The contextualized block editor settings.
--- --
--- function get_block_editor_settings( array custom_settings, block_editor_context ) then
---         editor_settings = array_merge(
---                 get_default_block_editor_settings(),
---                 array(
---                         "allowedBlockTypes" => get_allowed_block_types( block_editor_context ),
---                         "blockCategories"   => get_block_categories( block_editor_context ),
---                 ),
---                 custom_settings
---         );
-
---         global_styles = array();
---         presets       = array(
---                 array(
---                         "css"            => "variables",
---                         "__unstableType" => "presets",
---                         "isGlobalStyles" => true,
---                 ),
---                 array(
---                         "css"            => "presets",
---                         "__unstableType" => "presets",
---                         "isGlobalStyles" => true,
---                 ),
---         );
---         foreach ( presets as preset_style ) then
---                 actual_css = wp_get_global_stylesheet( array( preset_style["css"] ) );
---                 if ( "" !== actual_css ) then
---                         preset_style["css"] = actual_css;
---                         global_styles[]     = preset_style;
---                 end;
---         end;
-
---         if ( WP_Theme_JSON_Resolver::theme_has_support() ) then
---                 block_classes = array(
---                         "css"            => "styles",
---                         "__unstableType" => "theme",
---                         "isGlobalStyles" => true,
---                 );
---                 actual_css    = wp_get_global_stylesheet( array( block_classes["css"] ) );
---                 if ( "" !== actual_css ) then
---                         block_classes["css"] = actual_css;
---                         global_styles[]      = block_classes;
---                 end;
---         end; else then
---                 // If there is no `theme.json` file, ensure base layout styles are still available.
---                 block_classes = array(
---                         "css"            => "base-layout-styles",
---                         "__unstableType" => "base-layout",
---                         "isGlobalStyles" => true,
---                 );
---                 actual_css    = wp_get_global_stylesheet( array( block_classes["css"] ) );
---                 if ( "" !== actual_css ) then
---                         block_classes["css"] = actual_css;
---                         global_styles[]      = block_classes;
---                 end;
---         end;
-
---         editor_settings["styles"] = array_merge( global_styles, get_block_editor_theme_styles() );
-
---         editor_settings["__experimentalFeatures"] = wp_get_global_settings();
---         // These settings may need to be updated based on data coming from theme.json sources.
---         if ( isset( editor_settings["__experimentalFeatures"]["color"]["palette"] ) ) then
---                 colors_by_origin          = editor_settings["__experimentalFeatures"]["color"]["palette"];
---                 editor_settings["colors"] = isset( colors_by_origin["custom"] ) ?
---                         colors_by_origin["custom"] : (
---                                 isset( colors_by_origin["theme"] ) ?
---                                         colors_by_origin["theme"] :
---                                         colors_by_origin["default"]
---                         );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["color"]["gradients"] ) ) then
---                 gradients_by_origin          = editor_settings["__experimentalFeatures"]["color"]["gradients"];
---                 editor_settings["gradients"] = isset( gradients_by_origin["custom"] ) ?
---                         gradients_by_origin["custom"] : (
---                                 isset( gradients_by_origin["theme"] ) ?
---                                         gradients_by_origin["theme"] :
---                                         gradients_by_origin["default"]
---                         );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["typography"]["fontSizes"] ) ) then
---                 font_sizes_by_origin         = editor_settings["__experimentalFeatures"]["typography"]["fontSizes"];
---                 editor_settings["fontSizes"] = isset( font_sizes_by_origin["custom"] ) ?
---                         font_sizes_by_origin["custom"] : (
---                                 isset( font_sizes_by_origin["theme"] ) ?
---                                         font_sizes_by_origin["theme"] :
---                                         font_sizes_by_origin["default"]
---                         );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["color"]["custom"] ) ) then
---                 editor_settings["disableCustomColors"] = ! editor_settings["__experimentalFeatures"]["color"]["custom"];
---                 unset( editor_settings["__experimentalFeatures"]["color"]["custom"] );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["color"]["customGradient"] ) ) then
---                 editor_settings["disableCustomGradients"] = ! editor_settings["__experimentalFeatures"]["color"]["customGradient"];
---                 unset( editor_settings["__experimentalFeatures"]["color"]["customGradient"] );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["typography"]["customFontSize"] ) ) then
---                 editor_settings["disableCustomFontSizes"] = ! editor_settings["__experimentalFeatures"]["typography"]["customFontSize"];
---                 unset( editor_settings["__experimentalFeatures"]["typography"]["customFontSize"] );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["typography"]["lineHeight"] ) ) then
---                 editor_settings["enableCustomLineHeight"] = editor_settings["__experimentalFeatures"]["typography"]["lineHeight"];
---                 unset( editor_settings["__experimentalFeatures"]["typography"]["lineHeight"] );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["units"] ) ) then
---                 editor_settings["enableCustomUnits"] = editor_settings["__experimentalFeatures"]["spacing"]["units"];
---                 unset( editor_settings["__experimentalFeatures"]["spacing"]["units"] );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["padding"] ) ) then
---                 editor_settings["enableCustomSpacing"] = editor_settings["__experimentalFeatures"]["spacing"]["padding"];
---                 unset( editor_settings["__experimentalFeatures"]["spacing"]["padding"] );
---         end;
---         if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["customSpacingSize"] ) ) then
---                 editor_settings["disableCustomSpacingSizes"] = ! editor_settings["__experimentalFeatures"]["spacing"]["customSpacingSize"];
---                 unset( editor_settings["__experimentalFeatures"]["spacing"]["customSpacingSize"] );
---         end;
-
---         if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["spacingSizes"] ) ) then
---                 spacing_sizes_by_origin         = editor_settings["__experimentalFeatures"]["spacing"]["spacingSizes"];
---                 editor_settings["spacingSizes"] = isset( spacing_sizes_by_origin["custom"] ) ?
---                         spacing_sizes_by_origin["custom"] : (
---                                 isset( spacing_sizes_by_origin["theme"] ) ?
---                                         spacing_sizes_by_origin["theme"] :
---                                         spacing_sizes_by_origin["default"]
---                         );
---         end;
-
---         editor_settings["__unstableResolvedAssets"]         = _wp_get_iframed_editor_assets();
---         editor_settings["localAutosaveInterval"]            = 15;
---         editor_settings["disableLayoutStyles"]              = current_theme_supports( "disable-layout-styles" );
---         editor_settings["__experimentalDiscussionSettings"] = array(
---                 "commentOrder"         => get_option( "comment_order" ),
---                 "commentsPerPage"      => get_option( "comments_per_page" ),
---                 "defaultCommentsPage"  => get_option( "default_comments_page" ),
---                 "pageComments"         => get_option( "page_comments" ),
---                 "threadComments"       => get_option( "thread_comments" ),
---                 "threadCommentsDepth"  => get_option( "thread_comments_depth" ),
---                 "defaultCommentStatus" => get_option( "default_comment_status" ),
---                 "avatarURL"            => get_avatar_url(
---                         "",
---                         array(
---                                 "size"          => 96,
---                                 "force_default" => true,
---                                 "default"       => get_option( "avatar_default" ),
---                         )
---                 ),
---         );
-
---         --
---         -- Filters the settings to pass to the block editor for all editor type.
---         --
---         -- @since 5.8.0
---         --
---         -- @param array                   editor_settings      Default editor settings.
---         -- @param WP_Block_Editor_Context block_editor_context The current block editor context.
---         --
---         editor_settings = apply_filters( "block_editor_settings_all", editor_settings, block_editor_context );
-
---         if ( ! empty( block_editor_context->post ) ) then
---                 post = block_editor_context->post;
-
---                 --
---                 -- Filters the settings to pass to the block editor.
---                 --
---                 -- @since 5.0.0
---                 -- @deprecated 5.8.0 Use the then@see "block_editor_settings_all"end; filter instead.
---                 --
---                 -- @param array   editor_settings Default editor settings.
---                 -- @param WP_Post post            Post being edited.
---                 --
---                 editor_settings = apply_filters_deprecated( "block_editor_settings", array( editor_settings, post ), "5.8.0", "block_editor_settings_all" );
---         end;
-
---         return editor_settings;
--- end;
+   --
+   -- Returns the contextualized block editor settings for a selected editor context.
+   --
+   -- @since 5.8.0
+   --
+   -- @param array                   custom_settings      Custom settings to use with
+   --                                                      the given editor type.
+   -- @param WP_Block_Editor_Context block_editor_context The current block editor
+   --                                                      context.
+   --
+   -- @return array The contextualized block editor settings.
+   --
+   function Get_Block_Editor_Settings
+              (Custom_Settings      : Array_Type;
+               Block_Editor_Context :
+                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return Array_Type;
 
 -- --
 -- -- Preloads common data used with the block editor by specifying an array of
