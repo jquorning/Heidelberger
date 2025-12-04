@@ -8,12 +8,14 @@
 
 with Ada.Strings.Unbounded;
 
-with Binder;
-with Globals;
-with Hb_Common;
 with Php.Echoing;
 with Php.Files;
 with Php.Strings;
+with Php.Types;
+
+with Binder;
+with Globals;
+with Hb_Common;
 
 with Inc_Class_Wp_Locale_Switchers;
 with Inc_Formatting;
@@ -189,7 +191,7 @@ package body Inc_L10n is
 
       if
         not Empty (-Determined_Locale) and then
-        Php.Is_String (-Determined_Locale)
+        Php.Types.Is_String (-Determined_Locale)
       then
          return -Determined_Locale;
       end if;

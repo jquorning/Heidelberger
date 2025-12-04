@@ -8,12 +8,14 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Binder;
-with Globals;
 with Php.Echoing;
 with Php.Files;
 with Php.Lists;
 with Php.Strings;
+with Php.Types;
+
+with Binder;
+with Globals;
 
 -- with Inc_Class_Wp_Customize_Managers;
 with Inc_Formatting;
@@ -414,6 +416,7 @@ is
    is
       use Ada.Containers;
       use Php;
+      use Php.Types;
       use Inc_Options;
 
 --         global wp_theme_directories;
@@ -742,6 +745,7 @@ is
       use Inc_Options;
       use Hb_Common;
       use Php;
+      use Php.Types;
 
 --    global wp_theme_directories;
       Theme_Root : Unbounded_String;

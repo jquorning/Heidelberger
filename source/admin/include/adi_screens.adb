@@ -5,9 +5,10 @@
 -- @subpackage Administration
 --
 
+with Php.Types;
+
 with Hb_Common;
 with Wp_Common;
-with Php;
 
 with Inc_Plugins;
 with Inc_Users;
@@ -65,6 +66,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Php;
+      use Php.Types;
 --    use Inc_Plugins;
 
       Hidden : Array_Type :=

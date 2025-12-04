@@ -8,10 +8,6 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
-with Binder;
-with Globals;
-with Hb_Common;
-with Helpers;
 with Php.Echoing;
 with Php.Errors;
 with Php.Files;
@@ -22,6 +18,12 @@ with Php.Lists;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
+
+with Binder;
+with Globals;
+with Hb_Common;
+with Helpers;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_List_Util;
@@ -4910,6 +4912,7 @@ is
                            return Array_Type
    is
       use Php;
+      use Php.Types;
       use Inc_Formatting;
 
       Parsed_Args : Array_Type;
@@ -5022,6 +5025,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php;
+      use Php.Types;
 
       Arry_2 : Array_Type := Arry;
    begin
@@ -7693,6 +7697,7 @@ is
    is
       use Php;
       use Php.Preg;
+      use Php.Types;
       use Inc_L10n;
    begin
       if not Is_String (UUID) then

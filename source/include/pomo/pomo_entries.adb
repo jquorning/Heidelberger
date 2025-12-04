@@ -6,9 +6,11 @@
 -- @subpackage entry
 --
 
+with Php.Strings;
+with Php.Types;
+
 with Hb_Common;
 with Lists;
-with Php.Strings;
 
 package body POMO_Entries
 is
@@ -28,6 +30,7 @@ is
    is
 --    use Hb_Common;
       use Php;
+      use Php.Types;
 
       This : Translation_Entry;
    begin

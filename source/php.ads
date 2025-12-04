@@ -14,10 +14,6 @@ is
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type;
 
-   function Is_Object (Arry : Array_Type) return Boolean is (False);
-   function Is_Array  (Arry : Array_Type) return Boolean is (True);
-   function Is_Array  (List : List_Type) return Boolean is (True);
-
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);
 
@@ -92,9 +88,6 @@ is
 
    function Time return Natural
    is (9999);
-
-   function Is_Int (A : Integer)   return Boolean is (True);
-   function Is_String (A : String) return Boolean is (True);
 
    function Array_Values (Arry : Array_Type)
                           return List_Type
@@ -231,14 +224,6 @@ is
                           Length : Integer := 0)
                           return Array_Type
                           is (Empty_Array);
-
-   function Is_Numeric (Value : String)
-                        return Boolean
-                        is (False);
-
-   function Is_Numeric (Value : Integer)
-                        return Boolean
-                        is (True);
 
    function Key (Arry : Array_Type)
                  return String

@@ -9,13 +9,15 @@
 
 with Ada.Containers;
 
-with Globals;
-with Hb_Common;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
+
+with Globals;
+with Hb_Common;
 
 with Inc_Class_Wp_Dependency;
 with Inc_Formatting;
@@ -503,6 +505,7 @@ is
    is
       use Php.HTML;
       use Php.Strings;
+      use Php.Types;
       use Inc_Functions;
 --    use Array_Maps;
 

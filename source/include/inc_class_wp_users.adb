@@ -6,9 +6,11 @@
 -- @since 4.4.0
 --
 
+with Php.Strings;
+with Php.Types;
+
 with Globals;
 with Hb_Common;
-with Php.Strings;
 
 with Inc_Caches;
 with Inc_Capabilities;
@@ -112,6 +114,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Strings;
+      use Php.Types;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Users;
@@ -853,6 +856,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Types;
       use Inc_Users;
 
       Caps : constant Array_Type :=

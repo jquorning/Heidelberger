@@ -6,13 +6,15 @@
 -- @since 5.8.0
 --
 
-with Globals;
-with Hb_Common;
 with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.JSON;
 with Php.Strings;
+with Php.Types;
+
+with Globals;
+with Hb_Common;
 
 with Inc_Block_Editors;
 -- with Inc_Class_Wp_Block_Type;
@@ -44,6 +46,7 @@ is
    function Read_JSON_File (File_Path : String)
                             return Array_Type
    is
+      use Php.Types;
 --    use Hb_Common;
       use Inc_Functions;
    begin
@@ -587,6 +590,7 @@ is
 --    use Hb_Common;
       use Php.Errors;
       use Php.JSON;
+      use Php.Types;
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Class_Wp_Theme_JSON_Data;
       use Inc_Themes;

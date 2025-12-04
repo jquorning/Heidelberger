@@ -31,10 +31,12 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
+
+with Hb_Common;
 
 with Inc_Functions;
 with Inc_Plugins;
@@ -830,6 +832,7 @@ is
                                   return Array_Type
    is
       use Php;
+      use Php.Types;
 --        global $allowedposttags, $allowedtags, $allowedentitynames;
    begin
       if Is_Array (Context) then
@@ -1042,6 +1045,7 @@ is
       use Php;
       use Php.Preg;
       use Php.Strings;
+      use Php.Types;
 
       String_2  : Unbounded_String := +Wp_KSES_Stripslashes (Item);
       Newstring : Unbounded_String;
@@ -1143,6 +1147,7 @@ is
       use Php;
       use Php.Preg;
       use Php.Strings;
+      use Php.Types;
 
       Allowed_HTML_2 : constant Array_Type :=
         (if not Is_Array (Allowed_HTML)

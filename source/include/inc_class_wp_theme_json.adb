@@ -13,6 +13,7 @@ with Php.JSON;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
 
 with Block_Typography;
 
@@ -296,6 +297,7 @@ is
       use Ada.Strings.Unbounded;
       use Php;
       use Php.Strings;
+      use Php.Types;
       use Inc_Class_Wp_Block_Type_Registry;
 
       Registry : constant Wp_Block_Type_Registry :=
@@ -1963,6 +1965,7 @@ is
       use Ada.Strings.Unbounded;
       use Php;
       use Php.Strings;
+      use Php.Types;
       use Inc_Functions;
 
       Properties_2 : Array_Type :=
@@ -2626,6 +2629,7 @@ is
                                       return Array_Type
    is
       use Php;
+      use Php.Types;
 
       Theme_Settings : Array_Type := To_Array (List => (
         Build ("version",  LATEST_SCHEMA),
@@ -2798,6 +2802,7 @@ is
       use Php.Errors;
       use Php.Numerics;
       use Php.Strings;
+      use Php.Types;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

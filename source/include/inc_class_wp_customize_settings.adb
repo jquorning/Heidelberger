@@ -6,8 +6,10 @@
 -- @since 3.4.0
 --
 
-with Hb_Common;
 with Php.Lists;
+with Php.Types;
+
+with Hb_Common;
 
 with Inc_Load;
 with Inc_L10n;
@@ -609,6 +611,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Lists;
+      use Php.Types;
    begin
       if Create and Empty (Root) then
          Root := Empty_Array;

@@ -5,11 +5,13 @@
 -- @subpackage Theme
 -- @since 3.4.0
 
-with Hb_Common;
-with Lists;
 with Php.Files;
 with Php.Lists;
 with Php.Strings;
+with Php.Types;
+
+with Hb_Common;
+with Lists;
 
 with Inc_Caches;
 with Inc_Error_Protection;
@@ -45,6 +47,7 @@ is
       use Php;
       use Php.Files;
       use Php.Strings;
+      use Php.Types;
       use Inc_Caches;
       use Inc_Class_Wp_Errors;
       use Inc_Error_Protection;
@@ -474,6 +477,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Types;
    begin
       if not Isset (This.Headers, Header) then
          return ""; -- False;

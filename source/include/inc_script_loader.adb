@@ -17,10 +17,6 @@
 
 with Ada.Strings.Unbounded;
 
-with Array_Vectors;
-with Binder;
-with Hb_Common;
-with Globals;
 with Php.Echoing;
 with Php.Files;
 with Php.HTML;
@@ -28,6 +24,12 @@ with Php.Ini;
 with Php.Lists;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
+
+with Array_Vectors;
+with Binder;
+with Hb_Common;
+with Globals;
 
 with Adm_Load_Styles;
 
@@ -1906,7 +1908,7 @@ is
          end if;
 
          if
-           not Php.Is_Array (Editor_Styles) or else
+           not Php.Types.Is_Array (Editor_Styles) or else
            Arrays.Count (Editor_Styles) = 0
          then
             -- Include opinionated block styles if no editor_styles are declared,

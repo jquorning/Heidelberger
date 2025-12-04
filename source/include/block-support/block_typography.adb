@@ -7,10 +7,12 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
-with Lists;
 with Php.Numerics;
 with Php.Preg;
+with Php.Types;
+
+with Hb_Common;
+with Lists;
 
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
@@ -34,6 +36,7 @@ is
       use Php;
       use Php.Numerics;
       use Php.Preg;
+      use Php.Types;
       use Inc_Functions;
       use Inc_L10n;
 

@@ -10,11 +10,13 @@
 
 with Ada.Strings.Unbounded;
 
-with Binder;
-with Wp_Common;
 with Php.Echoing;
 with Php.HTML;
 with Php.Strings;
+with Php.Types;
+
+with Binder;
+with Wp_Common;
 
 with Inc_Admin_Bar;
 with Inc_Capabilities;
@@ -120,6 +122,7 @@ is
                                 Args    : Array_Type) return String
    is
       use Php.Echoing;
+      use Php.Types;
       use Inc_Plugins;
 
       Output : Unbounded_String;
@@ -2840,6 +2843,7 @@ is
                                Other_Attributes : Array_Type := Empty_Array)
                                 return String
    is
+      use Php.Types;
       use Inc_Formatting;
 
       Typ_2            : List_Type;

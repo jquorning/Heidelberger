@@ -7,6 +7,12 @@
 
 with Ada.Containers;
 with Ada.Strings.Unbounded;
+
+with Php.Echoing;
+with Php.Preg;
+with Php.Strings;
+with Php.Types;
+
 with Templates_Parser;
 
 with Arrays;
@@ -14,9 +20,6 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php.Echoing;
-with Php.Preg;
-with Php.Strings;
 with Wp_Common;
 
 with Adm_Admin;
@@ -69,6 +72,7 @@ is
       use Php.Echoing;
       use Php.Preg;
       use Php.Strings;
+      use Php.Types;
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;

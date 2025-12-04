@@ -6,10 +6,12 @@
 -- @since 3.1.0
 --
 
-with Hb_Common;
-with Lists;
 with Php.Echoing;
 with Php.Strings;
+with Php.Types;
+
+with Hb_Common;
+with Lists;
 
 with Inc_Admin_Bar;
 with Inc_Ms_Functions;
@@ -707,6 +709,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Php.Types;
       use Inc_Formatting;
 
       Is_Parent             : constant Boolean := Node.Children /= null;

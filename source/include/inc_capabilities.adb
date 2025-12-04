@@ -7,11 +7,13 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Lists;
+with Php.Strings;
+with Php.Types;
+
 with Arrays;
 with Globals;
 with Hb_Common;
-with Php.Lists;
-with Php.Strings;
 
 with Inc_Class_Wp_Comments;
 with Inc_Class_Wp_Post_Type;
@@ -1287,6 +1289,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Types;
       use Inc_Class_Wp_Users;
       use Inc_Load;
       use Inc_Pluggables;

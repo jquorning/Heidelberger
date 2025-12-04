@@ -7,7 +7,7 @@
 --
 
 with Hb_Common;
-with Php;
+with Php.Types;
 
 with Inc_Class_Wp_Customize_Managers;
 
@@ -26,6 +26,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Types;
 
       This : Wp_Customize_Control;
 --    Keys : List_Type := Array_Keys (Get_Object_Vars (This));

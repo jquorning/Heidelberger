@@ -6,13 +6,15 @@
 -- @since 3.4.0
 --
 
-with Binder;
-with Globals;
-with Helpers;
 with Php.JSON;
 with Php.Lists;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
+
+with Binder;
+with Globals;
+with Helpers;
 
 with Inc_Caches;
 with Inc_Class_Wp_Querys;
@@ -1661,6 +1663,7 @@ is
       use Php;
       use Php.JSON;
       use Php.Preg;
+      use Php.Types;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;

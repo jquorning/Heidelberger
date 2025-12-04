@@ -19,12 +19,14 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
 with Php.Echoing;
 with Php.Lists;
 with Php.Preg;
 with Php.Sorting;
 with Php.Strings;
+with Php.Types;
+
+with Hb_Common;
 
 with Inc_Class_Wp_Customize_Widgets;
 with Inc_Formatting;
@@ -350,6 +352,7 @@ is
    is
       use Php;
       use Php.Strings;
+      use Php.Types;
       use Inc_Class_Wp_Customize_Widgets;
 
       Sidebars_Widgets : constant Array_Type := Wp_Get_Sidebars_Widgets;
@@ -414,6 +417,7 @@ is
                                      return Array_Type
    is
       use Php;
+      use Php.Types;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Functions;
       use Inc_Load;
@@ -504,6 +508,7 @@ is
       use Php;
       use Php.Preg;
       use Php.Sorting;
+      use Php.Types;
       use Inc_Class_Wp_Customize_Widgets;
 --    use Inc_Themes;
 
@@ -595,6 +600,7 @@ is
       use Php;
       use Php.Lists;
       use Php.Strings;
+      use Php.Types;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Themes;
 --        global wp_registered_sidebars;

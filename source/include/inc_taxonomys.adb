@@ -8,9 +8,11 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
 with Php.Lists;
 with Php.Strings;
+with Php.Types;
+
+with Hb_Common;
 with Wp_Common;
 
 with Adi_Caches;
@@ -357,6 +359,7 @@ is
    function Taxonomy_Exists (Taxonomy : String)
                                 return Boolean
    is
+      use Php.Types;
       use Taxonomy_Maps;
    begin
       return
@@ -2278,6 +2281,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use Php.Types;
       use Wp_Common;
 --    use Adi_Templates;
       use Inc_Class_Wp_Terms;

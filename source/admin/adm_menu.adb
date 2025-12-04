@@ -5,10 +5,12 @@
 -- @subpackage Administration
 --
 
-with Binder;
-with Hb_Common;
 with Php.HTML;
 with Php.Strings;
+with Php.Types;
+
+with Binder;
+with Hb_Common;
 with Wp_Common;
 with Lists;
 
@@ -65,6 +67,7 @@ is
       use Binder;
       use Php.HTML;
       use Php.Strings;
+      use Php.Types;
       use Wp_Common;
       use Inc_Capabilities;
       use Inc_Formatting;
