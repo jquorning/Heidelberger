@@ -2843,6 +2843,7 @@ is
                                Other_Attributes : Array_Type := Empty_Array)
                                 return String
    is
+      use Php.Strings;
       use Php.Types;
       use Inc_Formatting;
 

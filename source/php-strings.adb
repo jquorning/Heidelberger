@@ -8,6 +8,8 @@ with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
 
+with Hb_Common;
+
 package body Php.Strings
 is
 
@@ -184,5 +186,50 @@ is
                       Args   : List_Type)
                       return String
    is (Printf (Format, Args));
+
+   -------------
+   -- Explode --
+   -------------
+
+   function Explode (Separator : String;
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
+                     return List_Type
+   is
+      use Ada.Strings.Fixed;
+      use Hb_Common;
+
+      Pos : constant Natural := Index (Item, Separator);
+      Res : List_Type;
+   begin
+      Res.Append (+Item (Item'First .. Pos - 1));
+      Res.Append (+Item (Pos + Separator'Length .. Item'Last));
+
+      return Res;
+   end Explode;
+
+   -------------
+   -- Implode --
+   -------------
+
+   function Implode (Separator : String;
+                     Arry      : Array_Type)
+                     return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+
+      Ret   : Unbounded_String;
+      First : Boolean := True;
+   begin
+      for A in Arry.Iterate loop
+         if not First then
+            Append (Ret, Separator);
+         end if;
+         Append (Ret, Key (A));
+         First := False;
+      end loop;
+      return -Ret;
+   end Implode;
 
 end Php.Strings;

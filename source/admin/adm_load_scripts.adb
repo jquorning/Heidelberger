@@ -6,15 +6,17 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Echoing;
+with Php.Errors;
+with Php.HTML;
+with Php.Preg;
+with Php.Strings;
+
 with Arrays;
 with Binder;
 with Hb_Common;
 with Globals;
 with Lists;
-with Php.Echoing;
-with Php.Errors;
-with Php.HTML;
-with Php.Preg;
 
 with Adi_Noop;
 
@@ -46,6 +48,7 @@ is
       use Php.Errors;
       use Php.HTML;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Script_Loader;
 
       Protocol : Unbounded_String;

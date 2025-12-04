@@ -408,6 +408,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Plugins;
 
       Views : Array_Type := This.Get_Views;
@@ -1359,6 +1360,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -1512,6 +1514,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
 
       Singular : constant String := As_String (Get (This.X_Args, "singular"));
    begin

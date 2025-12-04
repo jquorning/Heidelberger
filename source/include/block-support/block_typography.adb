@@ -9,6 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Numerics;
 with Php.Preg;
+with Php.Strings;
 with Php.Types;
 
 with Hb_Common;
@@ -36,6 +37,7 @@ is
       use Php;
       use Php.Numerics;
       use Php.Preg;
+      use Php.Strings;
       use Php.Types;
       use Inc_Functions;
       use Inc_L10n;
@@ -148,6 +150,7 @@ is
    is
       use Php;
       use Php.Numerics;
+      use Php.Strings;
 
       Maximum_Viewport_Width_Raw : constant Multi_Type :=
         (if Isset (Args, "maximum_viewport_width")

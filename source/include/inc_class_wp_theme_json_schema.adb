@@ -6,8 +6,10 @@
 -- @since 5.9.0
 --
 
-with Hb_Common;
 with Php.Lists;
+with Php.Strings;
+
+with Hb_Common;
 
 with Inc_Class_Wp_Theme_JSON;
 with Inc_Functions;
@@ -101,6 +103,7 @@ is
                               Paths_To_Rename : Array_Type)
    is
       use Php;
+      use Php.Strings;
       use Inc_Functions;
    begin
       for A in Paths_To_Rename.Iterate loop

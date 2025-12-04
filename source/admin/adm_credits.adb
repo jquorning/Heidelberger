@@ -7,10 +7,12 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Echoing;
+with Php.Strings;
+
 with Globals;
 with Hb_Common;
 with Lists;
-with Php.Echoing;
 
 with GNATCOLL.JSON;
 with Templates_Parser;
@@ -38,6 +40,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_L10n;
 
       List : constant List_Type :=

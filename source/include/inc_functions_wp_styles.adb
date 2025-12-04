@@ -188,6 +188,7 @@ is
                                Ver    : String    := ""; -- Boolean      := False;
                                Media  : String    := "all")
    is
+      use Php.Strings;
       use Inc_Class_Wp_Dependencies;
       use Inc_Functions_Wp_Scripts;
 --    use String_Vectors;

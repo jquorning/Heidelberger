@@ -11,10 +11,12 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Sorting;
+with Php.Strings;
+
 with Globals;
 with Hb_Common;
 with Lists;
-with Php.Sorting;
 
 with Inc_Functions;
 
@@ -126,6 +128,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Sorting;
+      use Php.Strings;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Declarations;
 

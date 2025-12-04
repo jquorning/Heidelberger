@@ -275,6 +275,7 @@ is
                                 return String
    is
       use Php;
+      use Php.Strings;
 
       New_Selectors : List_Type;
       Selectors     : constant List_Type := Explode (",", Selector);

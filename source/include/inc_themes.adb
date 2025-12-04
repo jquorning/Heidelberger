@@ -2973,6 +2973,7 @@ is
       use Php;
       use Php.Echoing;
       use Php.Lists;
+      use Php.Strings;
    begin
       if
         not Current_Theme_Supports ("custom-header", "header-text")    and then

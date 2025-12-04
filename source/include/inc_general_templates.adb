@@ -1338,7 +1338,7 @@ is
            Apply_Filters ("document_title_parts", Title);
 
          Title_3 : constant String :=
-           Php.Implode (" " & Sep & " ", Array_Type'(Array_Filter (Title_2)));
+           Php.Strings.Implode (" " & Sep & " ", Array_Type'(Array_Filter (Title_2)));
 
          --
          -- Filters the document title.

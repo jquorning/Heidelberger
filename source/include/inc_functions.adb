@@ -1082,6 +1082,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Ini;
+      use Php.Strings;
 
       Ret : Array_Type;
    begin

@@ -124,4 +124,31 @@ is
                     Args   : List_Type)
                     return String;
 
+   function Explode (Item  : String;
+                     Table : Array_Type)
+                     return Array_Type
+                     is (Empty_Array);
+
+   function Explode (Item : String;
+                     List : List_Type)
+                     return List_Type
+                     is (Empty_List);
+
+   function Explode (Separator : String;
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
+                     return List_Type;
+
+   function Implode (Separator : String;
+                     Arry      : Array_Type)
+                     return String;
+
+   function Implode (Separator : String;
+                     Arry      : String)
+                     return String is ("XXX-208");
+
+   function Implode (Separator : String;
+                     List      : List_Type)
+                     return String is ("XXX-307");
+
 end Php.Strings;

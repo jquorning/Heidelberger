@@ -7,9 +7,10 @@
 -- @subpackage Dependencies
 --
 
-with Hb_Common;
 with Php.Preg;
 with Php.Strings;
+
+with Hb_Common;
 
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
@@ -385,6 +386,7 @@ is
                                 Ver       : String       := ""; -- Boolean    := False;
                                 In_Footer : Boolean      := False)
    is
+      use Php.Strings;
       use Inc_Class_Wp_Scripts;
       use Inc_Class_Wp_Dependencies;
 --    use String_Vectors;

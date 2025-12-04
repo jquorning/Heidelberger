@@ -960,7 +960,7 @@ is
       declare
          use Ada.Containers;
 
-         Cookie_Elements : constant List_Type := Php.Explode ("|", -Cookie_2);
+         Cookie_Elements : constant List_Type := Php.Strings.Explode ("|", -Cookie_2);
       begin
          if Cookie_Elements.Length /= 4 then
             return Empty_Array; -- false;

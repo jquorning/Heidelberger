@@ -9,8 +9,10 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
 with Php.Lists;
+with Php.Strings;
+
+with Hb_Common;
 with Wp_Common;
 
 package body Inc_Class_Wp_Dependencies
@@ -105,6 +107,7 @@ is
                       return Boolean
    is
       use Php.Lists;
+      use Php.Strings;
       use List_Vectors;
 --    use Array_Maps;
 
@@ -327,6 +330,7 @@ is
    procedure Enqueue (This    : in out Wp_Dependencies;
                       Handles : List_Type)
    is
+      use Php.Strings;
 --    use String_Vectors;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
@@ -387,6 +391,7 @@ is
                       Handles : List_Type)
    is
       use Php.Lists;
+      use Php.Strings;
 --    use Inc_Class_Wp_Dependency;
    begin
       for Handle of Handles loop
