@@ -2,7 +2,6 @@
 --
 --
 
-with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
@@ -14,11 +13,6 @@ with Hb_Common;
 package body Php
 is
    use Ada.Strings.Unbounded;
-
-   package Natural_Random
-   is new Ada.Numerics.Discrete_Random (Natural);
-
-   Generator : Natural_Random.Generator;
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type is (Empty_Array);
 
@@ -115,18 +109,6 @@ is
                              when True  => 0),
               when True  => -1);
    end Strnatcasecmp;
-
-   -------------
-   -- MT_Rand --
-   -------------
-
-   function MT_Rand (Min : Natural;
-                     Max : Natural)
-                     return Natural
-   is
-   begin
-      return Natural_Random.Random (Generator, Min, Max);
-   end MT_Rand;
 
    --------------
    -- In_Array --
@@ -335,6 +317,4 @@ is
                       return String
    is (Printf (Format, Args));
 
-begin
-   Natural_Random.Reset (Generator, 0);
 end Php;

@@ -32,6 +32,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php.Numerics;
 with Php.Preg;
 
 with Inc_Functions;
@@ -2082,6 +2083,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Numerics;
    begin
       return Integer'Image (Hexdec (-Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr_Hexdec;

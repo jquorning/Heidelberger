@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Errors;
 with Php.JSON;
+with Php.Numerics;
 with Php.Preg;
 
 with Block_Typography;
@@ -2786,6 +2787,7 @@ is
    is
       use Php;
       use Php.Errors;
+      use Php.Numerics;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

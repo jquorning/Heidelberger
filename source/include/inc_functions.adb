@@ -15,9 +15,10 @@ with Helpers;
 with Php.Echoing;
 with Php.Errors;
 with Php.Files;
-with Php.JSON;
 with Php.HTML;
 with Php.Ini;
+with Php.JSON;
+with Php.Numerics;
 with Php.Preg;
 
 with Inc_Capabilities;
@@ -7652,6 +7653,7 @@ is
       use Helpers;
       use Hb_Common;
       use Php;
+      use Php.Numerics;
    begin
       return
         Sprintf (

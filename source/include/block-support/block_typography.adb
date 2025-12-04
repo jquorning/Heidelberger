@@ -9,6 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Lists;
+with Php.Numerics;
 with Php.Preg;
 
 with Inc_Functions;
@@ -31,6 +32,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Numerics;
       use Php.Preg;
       use Inc_Functions;
       use Inc_L10n;
@@ -142,6 +144,7 @@ is
                return String
    is
       use Php;
+      use Php.Numerics;
 
       Maximum_Viewport_Width_Raw : constant Multi_Type :=
         (if Isset (Args, "maximum_viewport_width")
@@ -275,6 +278,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Numerics;
       use Inc_Global_Styles_And_Settings;
    begin
       if not Isset (Preset, "size") then
