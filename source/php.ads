@@ -449,12 +449,6 @@ is
                         return String
                         is ("XXX-600");
 
-   E_USER_NOTICE : constant Integer := 47;  -- Arbitraty
-
-   procedure Trigger_Error (Message     : String;
-                            Error_Level : Integer := E_USER_NOTICE)
-                            is null;
-
    function Glob (Pattern : String;
                   Flags   : Integer := 0)
                   return List_Type

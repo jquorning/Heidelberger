@@ -13,8 +13,9 @@ with Globals;
 with Hb_Common;
 with Helpers;
 with Php.Echoing;
-with Php.JSON;
+with Php.Errors;
 with Php.Files;
+with Php.JSON;
 with Php.HTML;
 with Php.Ini;
 with Php.Preg;
@@ -4604,8 +4605,9 @@ is
    is
       use Hb_Common;
       use Php;
-      use Php.JSON;
+      use Php.Errors;
       use Php.Files;
+      use Php.JSON;
       use Inc_L10n;
 
       Result     : Array_Type;

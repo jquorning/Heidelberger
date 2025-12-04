@@ -8,6 +8,7 @@
 
 with Globals;
 with Hb_Common;
+with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.JSON;
@@ -582,6 +583,7 @@ is
             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
    is
 --    use Hb_Common;
+      use Php.Errors;
       use Php.JSON;
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Class_Wp_Theme_JSON_Data;

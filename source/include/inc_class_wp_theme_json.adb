@@ -8,6 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Errors;
 with Php.JSON;
 with Php.Preg;
 
@@ -2784,6 +2785,7 @@ is
    procedure Set_Spacing_Sizes (This : in out Wp_Theme_JSON)
    is
       use Php;
+      use Php.Errors;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
