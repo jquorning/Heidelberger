@@ -11,6 +11,7 @@ with Globals;
 with Php.Echoing;
 with Php.HTML;
 with Php.Preg;
+with Php.Sorting;
 
 with Adi_Posts;
 with Adi_Widgets;
@@ -1272,6 +1273,7 @@ is
                                    return Array_Type
    is
       use Php;
+      use Php.Sorting;
       use Adi_Widgets;
       use Inc_Widgets;
 

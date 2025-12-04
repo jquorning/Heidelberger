@@ -116,17 +116,6 @@ is
               when True  => -1);
    end Strnatcasecmp;
 
-   -----------
-   -- USort --
-   -----------
-
-   procedure USort (Arry     : in out Array_Type;
-                    Callback : USort_Comparator)
-   is
-   begin
-      raise Program_Error with "not implemented";
-   end USort;
-
    -------------
    -- MT_Rand --
    -------------

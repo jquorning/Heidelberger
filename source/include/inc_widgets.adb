@@ -22,6 +22,7 @@ with Ada.Strings.Unbounded;
 with Hb_Common;
 with Php.Echoing;
 with Php.Preg;
+with Php.Sorting;
 
 with Inc_Class_Wp_Customize_Widgets;
 with Inc_Formatting;
@@ -498,6 +499,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Preg;
+      use Php.Sorting;
       use Inc_Class_Wp_Customize_Widgets;
 --    use Inc_Themes;
 

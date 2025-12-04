@@ -14,7 +14,7 @@ with Ada.Strings.Unbounded;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Sorting;
 
 with Inc_Functions;
 
@@ -125,6 +125,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php;
+      use Php.Sorting;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Declarations;
 
