@@ -9,6 +9,7 @@ with Hb_Common;
 with Helpers;
 with Lists;
 with Php.Preg;
+with Php.Strings;
 
 with Inc_Class_Wp_Customize_Widgets;
 
@@ -31,6 +32,7 @@ is
                                   return Integer
    is
       use Php;
+      use Php.Strings;
 
       Left  : constant String := As_String (Get (As_Array (A), "name"));
       Right : constant String := As_String (Get (As_Array (B), "name"));

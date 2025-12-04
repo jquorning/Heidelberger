@@ -5,6 +5,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php.Strings;
 
 package body Php.Echoing
 is
@@ -30,6 +31,7 @@ is
                      Args   : List_Type)
    is
       use Ada.Strings.Unbounded;
+      use Php.Strings;
 
       Item : constant String := Printf (Format, Args);
    begin

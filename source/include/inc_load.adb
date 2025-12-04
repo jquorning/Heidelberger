@@ -14,6 +14,7 @@ with Lists;
 with Php.Errors;
 with Php.Files;
 with Php.HTML;
+with Php.Strings;
 
 with Wp_Config;
 
@@ -640,7 +641,7 @@ is
       if Is_Wp_Error (-Prefix) then
          Wp_Load_Translations_Early;
          Wp_Die (
-            Php.Sprintf (
+            Php.Strings.Sprintf (
               -- translators: 1: table_prefix, 2: wp-config.php
               abs "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores.",
               To_List (List => (1 => +"<code>table_prefix</code>",
@@ -1515,6 +1516,7 @@ is
    is
       use Globals;
       use Php;
+      use Php.Strings;
 
       Value_2 : constant String := Strtolower (Trim (Value));
       Bytes   : Natural := Natural'Value (Value_2);

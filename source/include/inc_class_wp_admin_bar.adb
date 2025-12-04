@@ -9,6 +9,7 @@
 with Hb_Common;
 with Lists;
 with Php.Echoing;
+with Php.Strings;
 
 with Inc_Admin_Bar;
 with Inc_Ms_Functions;
@@ -162,6 +163,7 @@ is
    procedure Add_Node (This : in out Wp_Admin_Bar;
                        Args : Node_Args) -- Array_Type)
    is
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
 
@@ -669,6 +671,7 @@ is
                              Node : Node_Args) -- Array_Type)
    is
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
 
       Class : Unbounded_String;
@@ -703,6 +706,7 @@ is
                             Node : Node_Args) -- Array_Type)
    is
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
 
       Is_Parent             : constant Boolean := Node.Children /= null;

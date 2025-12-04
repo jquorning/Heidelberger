@@ -8,7 +8,7 @@
 
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Strings;
 
 with Inc_Caches;
 with Inc_Capabilities;
@@ -111,6 +111,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Users;

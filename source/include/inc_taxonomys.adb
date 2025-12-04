@@ -8,6 +8,10 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Hb_Common;
+with Php.Strings;
+with Wp_Common;
+
 with Adi_Caches;
 
 with Inc_Formatting;
@@ -17,10 +21,6 @@ with Inc_Options;
 with Inc_Plugins;
 with Inc_Posts;
 with Inc_Themes;
-
-with Hb_Common;
-with Php;
-with Wp_Common;
 
 package body Inc_Taxonomys
 is
@@ -1554,6 +1554,7 @@ is
                          Parent   : Integer := 0) -- null
                          return Array_Type -- Integer
    is
+      use Php.Strings;
       use Inc_Functions;
       use Inc_Plugins;
 
@@ -2274,6 +2275,7 @@ is
                                  Args       : Array_Type := Empty_Array)
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Php.Strings;
       use Wp_Common;
 --    use Adi_Templates;
       use Inc_Class_Wp_Terms;

@@ -11,7 +11,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php;
+with Php.Strings;
 
 with Inc_Formatting;
 with Inc_KSES;
@@ -43,6 +43,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
 
       -- Sanitizes the property.
       Property_2 : String := This.Sanitize_Property (Property);
@@ -157,6 +158,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Strings;
 
       Declarations_Array  : constant Array_Type := This.Get_Declarations;
       Declarations_Output : Unbounded_String;

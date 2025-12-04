@@ -20,6 +20,7 @@ with Php.Ini;
 with Php.JSON;
 with Php.Numerics;
 with Php.Preg;
+with Php.Strings;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_List_Util;
@@ -1143,6 +1144,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Formatting;
 
       Protocol : Unbounded_String;
@@ -1337,6 +1339,7 @@ is
    is
 --    use Hb_Common;
       use Php;
+      use Php.Strings;
 
       Array_2 : Array_Type := Arry;
    begin
@@ -2208,6 +2211,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Preg;
+      use Php.Strings;
 
       Path_2  : Unbounded_String := +Path;
       Wrapper : Unbounded_String;
@@ -4609,6 +4613,7 @@ is
       use Php.Errors;
       use Php.Files;
       use Php.JSON;
+      use Php.Strings;
       use Inc_L10n;
 
       Result     : Array_Type;
@@ -5109,6 +5114,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Preg;
+      use Php.Strings;
 
       -- phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
       -- ignore the camelCase names for variables so the names are the same as lodash
@@ -6150,6 +6156,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
 
       URL : Unbounded_String;
    begin
@@ -6663,6 +6670,7 @@ is
    is
       use Php;
       use Php.Preg;
+      use Php.Strings;
    begin
       return Trim (Preg_Replace ("/\s*(?:\*\/|\?>).*/", "", Str));
    end X_Cleanup_Header_Comment;
@@ -6732,6 +6740,7 @@ is
       use Php;
       use Php.Files;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Plugins;
 
       -- Pull only the first 8 KB of the file in.
@@ -7138,6 +7147,7 @@ is
                           return Boolean
    is
       use Php;
+      use Php.Strings;
 
       Scheme_Separator : constant Integer := Strpos (Path, "://");
    begin
@@ -7654,6 +7664,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Numerics;
+      use Php.Strings;
    begin
       return
         Sprintf (

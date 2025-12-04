@@ -10,7 +10,7 @@ with Ada.Containers;
 
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Strings;
 
 with Inc_Class_Wp_Post_Type;
 with Inc_Options;
@@ -3930,6 +3930,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Posts;
    begin
@@ -4050,6 +4051,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Posts;
    begin

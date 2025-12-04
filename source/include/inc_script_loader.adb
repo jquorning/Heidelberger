@@ -26,6 +26,7 @@ with Php.Files;
 with Php.HTML;
 with Php.Ini;
 with Php.Preg;
+with Php.Strings;
 
 with Adm_Load_Styles;
 
@@ -85,6 +86,7 @@ is
    is
 --    use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Link_Templates;
       use Inc_Versions;
 
@@ -212,7 +214,7 @@ is
       if Did_Action ("init") then
          Scripts.Add_Inline_Script (
             "moment",
-            Php.Sprintf (
+            Php.Strings.Sprintf (
               "moment.updateLocale( ""%s"", %s );",
               To_List (List => (
                 1 => +Get_User_Locale,
@@ -355,6 +357,7 @@ is
    is
       use Php;
       use Php.Files;
+      use Php.Strings;
 
       Suffix : String := (if Globals.WP_RUN_CORE_TESTS then ".min"
                           else Wp_Scripts_Get_Suffix);
@@ -447,6 +450,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
       use Inc_Formatting;
       use Inc_Link_Templates;
@@ -803,7 +807,8 @@ is
             -- Include an unmodified wp_version.
 --          require ABSPATH . WPINC . "/version.php";
 
-            Develop_Src : constant Boolean := 0 /= Php.Strpos (Wp_Version, "-src");
+            Develop_Src : constant Boolean :=
+              0 /= Php.Strings.Strpos (Wp_Version, "-src");
          begin
 --          if ( ! defined( "SCRIPT_DEBUG" ) ) then
                SCRIPT_DEBUG := Develop_Src;
@@ -1215,11 +1220,12 @@ is
       if Did_Action ("init") then
          Scripts.Add_Inline_Script (
            "mediaelement-core",
-           Php.Sprintf (
+           Php.Strings.Sprintf (
              "var mejsL10n = %s;",
              To_List (Wp_JSON_Encode (
                To_Array ((
-                 Build ("language", Php.Strtolower (Php.Strtok (Determine_Locale, "_-"))),
+                 Build ("language",
+                        Php.Strings.Strtolower (Php.Strings.Strtok (Determine_Locale, "_-"))),
                  Build ("strings",  To_Array ((
                  Build ("mejs.download-file",       abs "Download File"),
                  Build ("mejs.install-flash",       abs "You are using a browser that does not have Flash player enabled or installed. Please turn on your Flash player plugin or download the latest version from https://get.adobe.com/flashplayer/"),
@@ -1500,7 +1506,7 @@ is
                         ))),
                         Build ("scheduleDescription",     abs "Schedule your customization changes to publish ('go live') at a future date."),
                         Build ("themePreviewUnavailable", abs "Sorry, you cannot preview new themes when you have changes scheduled or saved as a draft. Please publish your changes, or wait until they publish to preview new themes."),
-                        Build ("themeInstallUnavailable", Php.Sprintf (
+                        Build ("themeInstallUnavailable", Php.Strings.Sprintf (
                                 -- translators: %s: URL to Add Themes admin screen.
                                 abs "You will not be able to install new themes from here yet since your install requires SFTP credentials. For now, please <a href=""%s"">add themes in the admin</a>.",
                                 To_List (ESC_URL (Admin_URL ("theme-install.php"))))
@@ -1509,12 +1515,12 @@ is
                         Build ("invalidDate",             abs "Invalid date."),
                         Build ("invalidValue",            abs "Invalid value."),
                         Build ("blockThemeNotification",
-                          Php.Sprintf (
+                          Php.Strings.Sprintf (
                             -- translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
                             abs "Hurray! Your theme supports site editing with blocks. <a href=""%1s"">Tell me more</a>. %2s",
                             To_List (List => (
                               1 => +abs "https://wordpress.org/support/article/site-editor/",
-                              2 => +Php.Sprintf (
+                              2 => +Php.Strings.Sprintf (
                                         "<button type=""button"" data-action=""%1s"" class=""button switch-to-editor"">%2s</button>",
                                       To_List (List => (
                                           1 => +ESC_URL (Admin_URL ("site-editor.php")),
@@ -2558,6 +2564,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Themes;
 --      global compress_css;
@@ -2567,7 +2574,7 @@ is
       Zip : constant String :=
         (if Compress_CSS and then Globals.ENFORCE_GZIP then "gzip" else "");
 
-      Concat : constant String := Php.Trim (-Wp_Styles.Concat, ", ");
+      Concat : constant String := Php.Strings.Trim (-Wp_Styles.Concat, ", ");
 
       Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
                               then "" else " type=""text/css""");
@@ -2676,6 +2683,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Files;
+      use Php.Strings;
       use Inc_Functions_Wp_Styles;
       use Inc_L10n;
       use Inc_Plugins;
@@ -3333,6 +3341,7 @@ is
       use Php;
       use Php.Files;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Formatting;
 
       CSS_2 : Unbounded_String := +CSS;

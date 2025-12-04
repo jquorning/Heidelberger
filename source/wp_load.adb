@@ -17,17 +17,17 @@
 
 with Ada.Strings.Unbounded;
 
-with Inc_Functions;
-with Inc_L10n;
-with Inc_Load;
-
 with Arrays;
 with Binder;
 with Hb_Common;
 with Lists;
 with Php.HTML;
-
+with Php.Strings;
 with Wp_Config;
+
+with Inc_Functions;
+with Inc_L10n;
+with Inc_Load;
 
 package body Wp_Load
 is
@@ -43,6 +43,7 @@ is
       use Hb_Common;
       use Php;
       use Php.HTML;
+      use Php.Strings;
       use Inc_L10n;
    begin
 

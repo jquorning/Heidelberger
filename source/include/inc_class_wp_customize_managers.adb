@@ -11,6 +11,7 @@ with Globals;
 with Helpers;
 with Php.JSON;
 with Php.Preg;
+with Php.Strings;
 
 with Inc_Caches;
 with Inc_Class_Wp_Querys;
@@ -3204,6 +3205,7 @@ is
                                  Take_Over         : Boolean := False)
    is
       use Php;
+      use Php.Strings;
       use Inc_Posts;
       use Inc_Users;
    begin
@@ -3242,6 +3244,7 @@ is
                                      Changeset_Post_Id : Post_Id) -- Integer)
    is
       use Php;
+      use Php.Strings;
       use Inc_Posts;
       use Inc_Users;
    begin

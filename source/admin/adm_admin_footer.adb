@@ -11,6 +11,7 @@ with Hb_Common;
 with Globals;
 with Lists;
 with Php.Echoing;
+with Php.Strings;
 
 with Inc_L10n;
 with Inc_Plugins;
@@ -34,6 +35,7 @@ is
    procedure Run
    is
       use Php.Echoing;
+      use Php.Strings;
       use Inc_L10n;
       use Inc_Plugins;
       --

@@ -12,6 +12,7 @@ with Binder;
 with Hb_Common;
 with Php.Echoing;
 with Php.Errors;
+with Php.Strings;
 
 with Adi_Screens;
 with Adi_Templates;
@@ -919,6 +920,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -1456,7 +1458,7 @@ is
                      Class.Append (+"sorted");
                      Class.Append (Current_Order);
                   else
-                     Order := +Php.Strtolower (Desc_First);
+                     Order := +Php.Strings.Strtolower (Desc_First);
 
                      if
                        not In_Array (-Order, To_List (List => (+"desc",
@@ -1469,7 +1471,7 @@ is
                      Class.Append (+(if "desc" = Order then "asc" else "desc"));
                   end if;
 
-                  Column_Display_Name := Php.Sprintf (
+                  Column_Display_Name := Php.Strings.Sprintf (
                     "<a href=""%s""><span>%s</span><span class=""sorting-indicator""></span></a>",
                     To_List (List => (
                       1 => +ESC_URL (Add_Query_Arg (Compact ("orderby", "order"),

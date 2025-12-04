@@ -13,6 +13,7 @@ with Globals;
 with Hb_Common;
 with Php.Echoing;
 with Php.Files;
+with Php.Strings;
 
 with Inc_Class_Wp_Locale_Switchers;
 with Inc_Formatting;
@@ -1375,6 +1376,7 @@ package body Inc_L10n is
 --    use Ada.Strings.Unbounded;
 --    use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Textdomain_Registry;
       use Inc_Formatting;
       use Inc_Themes;

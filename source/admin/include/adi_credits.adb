@@ -14,6 +14,7 @@ with Globals;
 with Hb_Common;
 with Lists;
 with Php.Echoing;
+with Php.Strings;
 
 with Inc_Formatting;
 with Inc_Options;
@@ -131,6 +132,7 @@ is
                                             Username     : String;
                                             Profiles     : String)
    is
+      use Php.Strings;
       use Inc_Formatting;
    begin
       Display_Name := "<a href=""" & ESC_URL (Sprintf (Profiles, To_List (Username))) &
@@ -169,6 +171,7 @@ is
    procedure Wp_Credits_Section_Title (Group_Data : JSON_Value)
    is
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
    begin
 --      if 0 = Count (Group_Data) then
@@ -212,6 +215,7 @@ is
                                       Slug    : String     := "")
    is
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
 
       Group : constant JSON_Value := Get (Credits, "groups");

@@ -14,6 +14,7 @@ with Binder;
 with Wp_Common;
 with Php.Echoing;
 with Php.HTML;
+with Php.Strings;
 
 with Inc_Admin_Bar;
 with Inc_Capabilities;
@@ -2969,6 +2970,7 @@ is
    function Convert_To_Screen (Hook_Name : String)
                                return Adi_Class_Wp_Screens.Wp_Screen
    is
+      use Php.Strings;
 --    use Adi_Class_Wp_Screens;
       use Inc_Functions;
    begin

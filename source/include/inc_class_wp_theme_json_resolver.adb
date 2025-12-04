@@ -12,6 +12,7 @@ with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.JSON;
+with Php.Strings;
 
 with Inc_Block_Editors;
 -- with Inc_Class_Wp_Block_Type;
@@ -488,6 +489,7 @@ is
    is
       use Hb_Common;
       use Php.HTML;
+      use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Themes;
       use Inc_Class_Wp_Querys;

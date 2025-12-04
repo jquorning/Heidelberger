@@ -12,6 +12,7 @@ with Php.Echoing;
 with Php.HTML;
 with Php.Preg;
 with Php.Sorting;
+with Php.Strings;
 
 with Adi_Posts;
 with Adi_Widgets;
@@ -394,6 +395,7 @@ is
    procedure Customize_Register (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Strings;
       use Inc_Plugins;
       use Inc_L10n;
       use Inc_Widgets;
@@ -723,6 +725,7 @@ is
                             return String
    is
       use Php;
+      use Php.Strings;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
 
@@ -837,6 +840,7 @@ is
    is
       use Php;
       use Php.HTML;
+      use Php.Strings;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Functions;
@@ -1806,6 +1810,7 @@ is
    is
       use Php;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Widgets;

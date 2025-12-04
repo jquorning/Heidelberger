@@ -14,6 +14,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Php.Preg;
+with Php.Strings;
 
 with Adi_Caches;
 
@@ -1324,6 +1325,7 @@ is
    is
       use Php;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Plugins;
 
       Sanitized_Key : constant String :=

@@ -12,6 +12,7 @@ with Binder;
 with Globals;
 with Php.Echoing;
 with Php.Files;
+with Php.Strings;
 
 -- with Inc_Class_Wp_Customize_Managers;
 with Inc_Formatting;
@@ -2614,6 +2615,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use List_Vectors;
       use Inc_Functions;
       use Inc_L10n;

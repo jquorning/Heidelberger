@@ -10,6 +10,7 @@ with Ada.Containers;
 with Globals;
 with Hb_Common;
 with Php.HTML;
+with Php.Strings;
 with Wp_Common;
 
 with Adi_Plugins;
@@ -3573,6 +3574,7 @@ is
                                  return Array_Type
    is
       use Hb_Common;
+      use Php.Strings;
       use Wp_Common;
 
       Int_Fields : List_Type  := To_List (List => (+"ID", +"post_parent",
@@ -6525,6 +6527,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php.HTML;
+      use Php.Strings;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;

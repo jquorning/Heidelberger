@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Php.Preg;
+with Php.Strings;
 
 with Adm_Load_Styles;
 
@@ -87,6 +88,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Preg;
+      use Php.Strings;
       use Adm_Load_Styles;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;

@@ -23,6 +23,7 @@ with Hb_Common;
 with Php.Echoing;
 with Php.Preg;
 with Php.Sorting;
+with Php.Strings;
 
 with Inc_Class_Wp_Customize_Widgets;
 with Inc_Formatting;
@@ -58,6 +59,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Formatting;
       use Inc_Load;
@@ -346,6 +348,7 @@ is
                               return String
    is
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Customize_Widgets;
 
       Sidebars_Widgets : constant Array_Type := Wp_Get_Sidebars_Widgets;
@@ -589,6 +592,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Themes;
 --        global wp_registered_sidebars;

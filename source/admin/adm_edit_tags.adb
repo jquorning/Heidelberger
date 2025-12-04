@@ -14,6 +14,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Php.Echoing;
+with Php.Strings;
 with Lists;
 with Wp_Common;
 
@@ -71,6 +72,7 @@ is
    is
       use Binder;
       use Php.Echoing;
+      use Php.Strings;
       use Wp_Common;
       use Adi_Screens;
       use Inc_Capabilities;

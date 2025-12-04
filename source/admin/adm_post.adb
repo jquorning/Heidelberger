@@ -9,15 +9,12 @@
 
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
--- with Ada.Text_IO;
-
--- with Templates_Parser;
 
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Strings;
 with Lists;
 with Wp_Common;
 
@@ -64,6 +61,7 @@ is
    procedure Render
    is
       use Binder;
+      use Php.Strings;
       use Wp_Common;
       use Adm_Menu;
       use Adi_Posts;

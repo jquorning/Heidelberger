@@ -14,7 +14,7 @@ with Hb_Common;
 with Binder;
 with Globals;
 with Lists;
-with Php;
+with Php.Strings;
 
 with Inc_Compat;
 with Inc_Default_Constants;
@@ -2395,7 +2395,7 @@ is
          Token : constant String := Wp_Get_Session_Token;
          I     : constant Float  := Wp_Nonce_Tick (Action);
       begin
-         return Php.Substr
+         return Php.Strings.Substr
            (Wp_Hash (Float'Image (I) & '|' & Integer'Image (Action) & '|' &
                      Integer'Image (Uid) & '|' & Token, "nonce"),
                     -12, 10);
@@ -2498,7 +2498,8 @@ is
          then
             for Typ of To_List (List => (+"key", +"salt")) loop
                declare
-                  Const : constant String := Php.Strtoupper (Scheme & "_" & (-Typ));
+                  Const : constant String :=
+                    Php.Strings.Strtoupper (Scheme & "_" & (-Typ));
                begin
                   if
 --                  Defined (const) and then
@@ -2670,6 +2671,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Plugins;
 
       Chars : Unbounded_String :=

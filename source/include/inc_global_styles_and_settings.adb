@@ -8,7 +8,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Globals;
-with Php;
+with Php.Strings;
 
 with Inc_Class_Wp_Theme_JSON;
 with Inc_Class_Wp_Theme_JSON_Resolver;
@@ -251,7 +251,7 @@ is
    function Filter_Core (Item : String) return Boolean
    is
    begin
-      if Php.Strpos (Item, "core/") /= 0 then
+      if Php.Strings.Strpos (Item, "core/") /= 0 then
          return True;
       end if;
       return False;
@@ -266,6 +266,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Functions_Wp_Styles;
       use Inc_Script_Loader;

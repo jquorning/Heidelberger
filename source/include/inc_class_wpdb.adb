@@ -9,6 +9,7 @@
 --
 
 with Php.Preg;
+with Php.Strings;
 
 with Hb_Common;
 
@@ -820,6 +821,7 @@ is
                      return String
    is
       use Php.Preg;
+      use Php.Strings;
       use Inc_Functions;
 
       function Func return Array_Type;
@@ -2244,6 +2246,8 @@ is
                      Success : out Boolean)
                      return String
    is
+      use Php.Strings;
+
       Unused_Result : Integer;
    begin
       Success := True;
@@ -2684,6 +2688,7 @@ is
                                   return Boolean
    is
       use Php.Preg;
+      use Php.Strings;
 
       Query_2        : constant String := Ltrim (Query, "\r\n\t (");
       Unused_Matches : List_Type;

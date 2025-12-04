@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Php.Echoing;
+with Php.Strings;
 with Lists;
 with Wp_Common;
 
@@ -333,6 +334,7 @@ is
       use Ada.Strings.Unbounded;
       use Php;
       use Php.Echoing;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

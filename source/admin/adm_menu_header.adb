@@ -16,6 +16,7 @@ with Lists;
 with Php.Echoing;
 with Php.Files;
 with Php.Preg;
+with Php.Strings;
 
 with Adi_Plugins;
 with Inc_Capabilities;
@@ -109,6 +110,7 @@ is
       use Php.Echoing;
       use Php.Files;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Formatting;

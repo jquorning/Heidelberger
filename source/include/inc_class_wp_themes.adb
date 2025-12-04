@@ -8,6 +8,7 @@
 with Hb_Common;
 with Lists;
 with Php.Files;
+with Php.Strings;
 
 with Inc_Caches;
 with Inc_Error_Protection;
@@ -42,6 +43,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Files;
+      use Php.Strings;
       use Inc_Caches;
       use Inc_Class_Wp_Errors;
       use Inc_Error_Protection;
@@ -516,6 +518,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_KSES;
 

@@ -16,6 +16,7 @@ with Hb_Common;
 with Lists;
 with Php.Echoing;
 with Php.Preg;
+with Php.Strings;
 with Wp_Common;
 
 with Adm_Admin;
@@ -67,6 +68,7 @@ is
       use Php;
       use Php.Echoing;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;
@@ -816,6 +818,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Capabilities;
       use Inc_L10n;
 

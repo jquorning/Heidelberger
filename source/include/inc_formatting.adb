@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Php.Preg;
+with Php.Strings;
 
 with Inc_KSES;
 with Inc_Options;
@@ -1773,6 +1774,7 @@ is
    is
       use Php;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Plugins;
 
       Raw_Username : constant String := Username;
@@ -5121,6 +5123,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Preg;
+      use Php.Strings;
 
       Item_3 : constant String :=
         Preg_Replace ("@<(script|style)[^>]*?>.*?</\\1>@si", "", Item);

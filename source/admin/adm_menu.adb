@@ -8,6 +8,7 @@
 with Binder;
 with Hb_Common;
 with Php.HTML;
+with Php.Strings;
 with Wp_Common;
 with Lists;
 
@@ -63,6 +64,7 @@ is
    is
       use Binder;
       use Php.HTML;
+      use Php.Strings;
       use Wp_Common;
       use Inc_Capabilities;
       use Inc_Formatting;

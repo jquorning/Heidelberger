@@ -20,6 +20,7 @@ with Hb_Common;
 with Lists;
 with Php.HTML;
 with Php.Preg;
+with Php.Strings;
 
 with Inc_Load;
 with Inc_Plugins;
@@ -39,6 +40,7 @@ is
       use Php;
       use Php.HTML;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Load;
 
       Php_Self : constant String := As_String (Get (X_SERVER, "PHP_SELF"));
@@ -214,6 +216,7 @@ is
    is
       use Arrays;
       use Php;
+      use Php.Strings;
 
       Http_User_Agent : constant String := As_String (Get (Binder.X_SERVER, "HTTP_USER_AGENT"));
       Is_Mobile : Boolean;

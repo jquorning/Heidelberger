@@ -9,7 +9,7 @@
 --
 
 with Hb_Common;
-with Php;
+with Php.Strings;
 
 package body Style_Class_Wp_Style_Engine_CSS_Rules
 is
@@ -128,6 +128,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
 
       Rule_Indent : constant String :=
         (if Should_Prettify then Str_Repeat ("\t", Indent_Count) else "");

@@ -8,7 +8,7 @@
 
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Strings;
 
 package body POMO_Entries
 is
@@ -77,6 +77,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Strings;
    begin
       if Null_Unbounded_String = This.Singular then
          return ""; -- False;

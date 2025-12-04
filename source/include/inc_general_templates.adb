@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Hb_Common;
 with Lists;
 with Php.Echoing;
+with Php.Strings;
 with Wp_Common;
 
 with Inc_Class_Wp_Terms;
@@ -1190,6 +1191,7 @@ is
    is
       use Arrays;
       use Php;
+      use Php.Strings;
       use Hb_Common;
       use Inc_Class_Wp_Terms;
 --    use Inc_Class_Wp_Querys;

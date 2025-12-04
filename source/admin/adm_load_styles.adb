@@ -11,6 +11,7 @@ with Lists;
 with Php.Echoing;
 with Php.HTML;
 with Php.Preg;
+with Php.Strings;
 
 with Adi_Noop;
 -- with Inc_Class_Wp_Styles;
@@ -43,6 +44,7 @@ is
       use Php.Echoing;
       use Php.HTML;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Class_Wp_Dependency;
 
       Protocol : Unbounded_String;

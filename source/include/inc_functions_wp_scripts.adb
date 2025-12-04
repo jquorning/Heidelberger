@@ -9,6 +9,7 @@
 
 with Hb_Common;
 with Php.Preg;
+with Php.Strings;
 
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
@@ -132,6 +133,7 @@ is
                                   return Boolean
    is
       use Php.Preg;
+      use Php.Strings;
       use Inc_Class_Wp_Scripts;
       use Inc_Functions;
       use Inc_L10n;

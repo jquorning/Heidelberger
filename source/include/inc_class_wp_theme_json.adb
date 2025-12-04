@@ -12,6 +12,7 @@ with Php.Errors;
 with Php.JSON;
 with Php.Numerics;
 with Php.Preg;
+with Php.Strings;
 
 with Block_Typography;
 
@@ -294,6 +295,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Strings;
       use Inc_Class_Wp_Block_Type_Registry;
 
       Registry : constant Wp_Block_Type_Registry :=
@@ -601,6 +603,7 @@ is
       use Ada.Strings.Unbounded;
       use Php;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Functions;
       use Inc_Themes;
 
@@ -1143,6 +1146,7 @@ is
                             return String
    is
       use Php;
+      use Php.Strings;
 
       Scopes    : constant List_Type := Explode (",", Scope);
       Selectors : constant List_Type := Explode (",", Selector);
@@ -1358,6 +1362,7 @@ is
                           return Array_Type
    is
       use Php;
+      use Php.Strings;
       use Inc_Functions;
 
       Result : Array_Type;
@@ -1728,6 +1733,7 @@ is
                                     return Boolean --  use ( selector )
    is
       use Php;
+      use Php.Strings;
 
       Selector : constant String := "XXX-002";
    begin
@@ -1956,6 +1962,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Strings;
       use Inc_Functions;
 
       Properties_2 : Array_Type :=
@@ -2087,6 +2094,7 @@ is
    is
       use Php;
       use Php.JSON;
+      use Php.Strings;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -2589,6 +2597,7 @@ is
                                      return Boolean
    is
       use Php;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_KSES;
 
@@ -2788,6 +2797,7 @@ is
       use Php;
       use Php.Errors;
       use Php.Numerics;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

@@ -16,6 +16,7 @@ with Php.Errors;
 with Php.HTML;
 with Php.Ini;
 with Php.Preg;
+with Php.Strings;
 
 with Adm_Menu;
 with Adm_Menu_Header;
@@ -60,6 +61,7 @@ is
       use Php.Ini;
       use Php.HTML;
       use Php.Preg;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Load;
