@@ -120,6 +120,10 @@ is
    function Addslashes (Item : String)
             return String;
 
+   function Stripslashes (Item : String)
+                          return String
+                          is (Item);
+
    function Printf (Format : String;
                     Args   : List_Type)
                     return String;

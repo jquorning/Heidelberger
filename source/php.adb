@@ -2,10 +2,7 @@
 --
 --
 
-with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
-
-with Hb_Common;
 
 package body Php
 is

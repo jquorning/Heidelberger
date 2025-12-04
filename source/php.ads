@@ -70,10 +70,6 @@ is
                           return Array_Type
                           is (Empty_Array);
 
-   function Stripslashes (Item : String)
-                          return String
-                          is (Item);
-
    function Array_Keys (Arry : Array_Type)
                         return Array_Type
                         is (Empty_Array);
