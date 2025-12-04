@@ -4,8 +4,9 @@
 
 with Ada.Containers;
 
+with Php.Arrays;
+
 with Hb_Common;
-with Php;
 
 package body Inc_Class_Wp_Walker
 is
@@ -194,7 +195,7 @@ is
          --
          if Empty (Top_Level_Elements) then
             declare
-               First : constant Array_Type := Php.Array_Slice (Elements, 0, 1);
+               First : constant Array_Type := Php.Arrays.Array_Slice (Elements, 0, 1);
                Root  : constant String     := As_String (First.First_Element); -- [0];
 
                Top_Level_Elements : Array_Type;

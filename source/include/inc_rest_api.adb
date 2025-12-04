@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-with Php;
+with Php.Arrays;
 
 package body Inc_REST_API
 is
@@ -3049,6 +3049,7 @@ is
                return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Schema_2 : Array_Type := Schema;
       Typ : constant Array_Type := As_Array (Get (Schema, "type"));

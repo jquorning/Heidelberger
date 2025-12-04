@@ -8,6 +8,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
 with Php.Lists;
@@ -2623,6 +2624,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use List_Vectors;
@@ -3248,6 +3250,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Inc_Functions;
       use Inc_REST_API;
@@ -3539,6 +3542,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Files;
       use Inc_Formatting;
       use Inc_Functions;

@@ -8,6 +8,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
 with Php.Types;
@@ -696,6 +697,7 @@ is
                                  return Array_Type
    is
       use Ada.Strings.Unbounded;
+      use Php.Arrays;
       use Inc_Plugins;
    begin
 --    tax.labels = (array) tax.labels;
@@ -2279,6 +2281,7 @@ is
                                  Args       : Array_Type := Empty_Array)
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;

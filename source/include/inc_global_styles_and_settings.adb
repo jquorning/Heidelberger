@@ -6,10 +6,12 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
-with Globals;
+with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
+
+with Hb_Common;
+with Globals;
 
 with Inc_Class_Wp_Theme_JSON;
 with Inc_Class_Wp_Theme_JSON_Resolver;
@@ -269,6 +271,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Strings;
       use Inc_Class_Wp_Theme_JSON;
       use Inc_Functions_Wp_Styles;

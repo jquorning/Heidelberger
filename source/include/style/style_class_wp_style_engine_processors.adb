@@ -11,6 +11,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Sorting;
 with Php.Strings;
 
@@ -127,6 +128,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Sorting;
       use Php.Strings;
       use Inc_Functions;

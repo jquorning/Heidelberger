@@ -6,6 +6,7 @@
 -- @since 4.4.0
 --
 
+with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
 with Php.Types;
@@ -437,6 +438,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Inc_Capabilities;
       use Inc_Class_Wp_Role;
       use Inc_Class_Wp_Roles;

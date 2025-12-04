@@ -8,6 +8,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.Files;
@@ -1082,6 +1083,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Ini;
       use Php.Strings;
 
@@ -4902,6 +4904,7 @@ is
                            return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Parsed_Args : Array_Type;
    begin
@@ -4915,6 +4918,7 @@ is
                            return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Php.Misc;
       use Php.Types;
       use Inc_Formatting;
@@ -4940,6 +4944,7 @@ is
                            return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Parsed_Args : Array_Type;
    begin
@@ -4974,6 +4979,7 @@ is
                               return List_Type
    is
       use Php;
+      use Php.Arrays;
       use Php.Lists;
 
       List_2 : constant List_Type := Wp_Parse_List (List);
@@ -5029,6 +5035,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Types;
 
       Arry_2 : Array_Type := Arry;
@@ -5066,6 +5073,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
 
       Arry_2 : Array_Type := Arry;
 
@@ -6748,6 +6756,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
@@ -7016,6 +7025,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Inc_Plugins;
    begin
       if Static_Protocols.Is_Empty then

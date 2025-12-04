@@ -6,6 +6,7 @@
 -- @since 5.8.0
 --
 
+with Php.Arrays;
 with Php.Errors;
 with Php.Files;
 with Php.HTML;
@@ -46,6 +47,7 @@ is
    function Read_JSON_File (File_Path : String)
                             return Array_Type
    is
+      use Php.Arrays;
       use Php.Types;
 --    use Hb_Common;
       use Inc_Functions;
@@ -164,6 +166,7 @@ is
    function Has_Same_Registered_Blocks (Origin : String)
                                         return Boolean
    is
+      use Php.Arrays;
       use Hb_Common;
 --    use Inc_Class_Wp_Block_Type;
       use Inc_Class_Wp_Block_Type_Registry;
@@ -588,6 +591,7 @@ is
             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
    is
 --    use Hb_Common;
+      use Php.Arrays;
       use Php.Errors;
       use Php.JSON;
       use Php.Types;

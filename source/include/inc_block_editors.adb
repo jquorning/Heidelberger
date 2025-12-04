@@ -8,6 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Files;
 with Php.Lists;
 with Php.Misc;
@@ -241,6 +242,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Files;
       use Php.Lists;
       use Php.Misc;
@@ -457,6 +459,7 @@ is
                return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Inc_Global_Styles_And_Settings;
 
       Editor_Settings : constant Array_Type := Array_Merge (

@@ -6,6 +6,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
@@ -45,6 +46,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Php.Errors;
       use Php.HTML;

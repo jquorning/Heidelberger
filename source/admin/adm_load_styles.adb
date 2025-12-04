@@ -4,6 +4,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
@@ -44,6 +45,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Php.HTML;
       use Php.Lists;

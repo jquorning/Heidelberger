@@ -2,13 +2,15 @@
 --
 --
 
+with Lists;
+
 package Php.Echoing
 is
 
    procedure Echo (Item : String);
 
    procedure Printf (Format : String;
-                     Args   : List_Type);
+                     Args   : Lists.List_Type);
 
    procedure Clear_Echo;
    function Get_Echo

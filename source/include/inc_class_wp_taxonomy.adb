@@ -6,12 +6,10 @@
 -- @since 4.7.0
 --
 
--- with Ada.Text_IO; use Ada.Text_IO;
+with Php.Arrays;
 
--- with Arrays; -- .Io;
 with Globals;
 with Hb_Common;
-with Php;
 
 with Inc_Class_Wp;
 with Inc_Formatting;
@@ -55,6 +53,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Plugins;

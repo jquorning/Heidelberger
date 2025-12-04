@@ -6,14 +6,16 @@
 -- @since 3.9.0
 --
 
-with Binder;
-with Globals;
+with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
 with Php.Preg;
 with Php.Sorting;
 with Php.Strings;
+
+with Binder;
+with Globals;
 
 with Adi_Posts;
 with Adi_Widgets;
@@ -215,6 +217,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.Arrays;
       use Inc_Formatting;
 
       Widget_Setting_Ids   : List_Type;
@@ -396,6 +399,7 @@ is
    procedure Customize_Register (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Inc_Plugins;
@@ -842,6 +846,7 @@ is
    procedure Enqueue_Scripts (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
       use Inc_Functions_Wp_Scripts;
@@ -1183,6 +1188,7 @@ is
                               return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Php.Preg;
       use Inc_Plugins;
       use Inc_Themes;
@@ -1281,6 +1287,7 @@ is
                                    return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Php.Sorting;
       use Adi_Widgets;
       use Inc_Widgets;
@@ -1578,6 +1585,7 @@ is
    procedure Export_Preview_Data (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Inc_Functions;
       use Inc_L10n;
@@ -1718,6 +1726,7 @@ is
                                                   return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Widget_Ids_2 : constant Array_Type :=
         Array_Values (
@@ -1741,6 +1750,7 @@ is
                                             return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Php.Preg;
       use Inc_Themes;
 
@@ -1813,6 +1823,7 @@ is
                                            return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Php.Preg;
       use Php.Strings;
       use Inc_Formatting;
@@ -1915,6 +1926,7 @@ is
                return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Allowed_HTML_2 : Array_Type := Allowed_HTML;
    begin

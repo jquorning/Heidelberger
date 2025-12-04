@@ -9,6 +9,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Misc;
 
 with Hb_Common;
@@ -277,6 +278,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Misc;
 
       Args_2        : constant Array_Type := Args;

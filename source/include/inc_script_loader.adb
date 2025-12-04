@@ -17,6 +17,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
 with Php.HTML;
@@ -224,13 +225,13 @@ is
                 2 => +Wp_JSON_Encode (
                   To_Array ((
                   Build ("months",
-                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Month))),
+                         List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Month))),
                   Build ("monthsShort",
-                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Month_Abbrev))),
+                         List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Month_Abbrev))),
                   Build ("weekdays",
-                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Weekday))),
+                         List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Weekday))),
                   Build ("weekdaysShort",
-                         List_Type'(Php.Array_Values (Globals.Wp_Locale.Weekday_Abbrev))),
+                         List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Weekday_Abbrev))),
                   Build ("week",           To_Array ((1 =>
                     Build ("dow", String'(Get_Option ("start_of_week", "0"))) -- (int), 0
                   ))),
@@ -454,6 +455,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Strings;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
       use Inc_Formatting;
@@ -2761,6 +2763,7 @@ is
    is
 --    use Hb_Common;
       use Php;
+      use Php.Arrays;
    begin
       return
         not In_Array ("blocks",
@@ -2776,6 +2779,7 @@ is
                                        return Array_Type
    is
       use Php;
+      use Php.Arrays;
    begin
       return
         Array_Filter (

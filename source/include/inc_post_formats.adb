@@ -5,7 +5,7 @@
 -- @subpackage Post
 --
 
-with Php;
+with Php.Arrays;
 
 with Inc_L10n;
 
@@ -46,6 +46,7 @@ is
             return List_Type
    is
       use Php;
+      use Php.Arrays;
 
       Slugs : constant List_Type :=
         Array_Keys (Get_Post_Format_Strings);

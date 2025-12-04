@@ -19,6 +19,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Lists;
 with Php.Misc;
@@ -62,6 +63,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Php.Misc;
       use Php.Strings;
@@ -508,6 +510,7 @@ is
       use List_Vectors;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Preg;
       use Php.Sorting;
       use Php.Types;
@@ -600,6 +603,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;

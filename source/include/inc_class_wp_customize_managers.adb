@@ -6,6 +6,7 @@
 -- @since 3.4.0
 --
 
+with Php.Arrays;
 with Php.JSON;
 with Php.Lists;
 with Php.Misc;
@@ -136,6 +137,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Inc_Capabilities;
       use Inc_Formatting;
@@ -945,6 +947,7 @@ is
                                  return Inc_Class_Wp_Posts.Post_Array
    is
       use Php;
+      use Php.Arrays;
       use Inc_Posts;
       use Inc_Users;
 
@@ -1663,6 +1666,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.Arrays;
       use Php.JSON;
       use Php.Preg;
       use Php.Types;
@@ -1782,6 +1786,7 @@ is
                         return String
    is
       use Php;
+      use Php.Arrays;
       use Inc_Class_Wp_Customize_Settings;
       use Inc_Load;
 

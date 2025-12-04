@@ -4,8 +4,9 @@
 -- @package WordPress
 --
 
+with Php.Arrays;
+
 with Hb_Common;
-with Php;
 
 with Inc_Plugins;
 
@@ -41,6 +42,7 @@ is
                              return List_Type
    is
       use Php;
+      use Php.Arrays;
    begin
       if not This.Has_Errors then
          return Empty_List;

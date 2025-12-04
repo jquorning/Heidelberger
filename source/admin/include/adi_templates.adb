@@ -10,6 +10,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
@@ -122,6 +123,7 @@ is
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String
    is
+      use Php.Arrays;
       use Php.Echoing;
       use Php.Types;
       use Inc_Plugins;
@@ -2844,6 +2846,7 @@ is
                                Other_Attributes : Array_Type := Empty_Array)
                                 return String
    is
+      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;

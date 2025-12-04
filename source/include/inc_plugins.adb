@@ -7,6 +7,7 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Lists;
 with Php.Misc;
 
@@ -146,6 +147,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
 

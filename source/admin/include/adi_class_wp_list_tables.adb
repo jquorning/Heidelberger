@@ -8,6 +8,7 @@
 
 with Ada.Containers;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.Lists;
@@ -1334,6 +1335,7 @@ is
       use type Ada.Containers.Count_Type;
 --    use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
@@ -1361,6 +1363,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Php.Lists;
       use Php.Misc;
@@ -1720,6 +1723,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Inc_Formatting;
 

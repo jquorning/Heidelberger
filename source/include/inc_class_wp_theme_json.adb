@@ -8,6 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Errors;
 with Php.JSON;
 with Php.Lists;
@@ -41,6 +42,7 @@ is
                          return Wp_Theme_JSON
    is
       use Php;
+      use Php.Arrays;
       use Php.Lists;
 --    use Inc_Class_Wp_Theme_JSON;
       use Inc_Functions;
@@ -150,6 +152,7 @@ is
                       return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Output : Array_Type;
       Styles_Non_Top_Level   : constant Array_Type := VALID_STYLES;
@@ -299,6 +302,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Arrays;
       use Php.Strings;
       use Php.Types;
       use Inc_Class_Wp_Block_Type_Registry;
@@ -427,6 +431,7 @@ is
                                        return Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       Tree_2 : Array_Type := Array_Intersect_Key (Tree, Schema);
    begin
@@ -493,6 +498,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use List_Vectors;
 
@@ -1067,6 +1073,7 @@ is
                         return String
    is
       use Php;
+      use Php.Arrays;
    begin
       if Empty (Declarations) then
          return "";
@@ -1472,6 +1479,7 @@ is
                              return Array_Type
    is
       use Php;
+      use Php.Arrays;
       use Inc_Plugins;
 
       Nodes : Array_Type;
@@ -1635,6 +1643,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Arrays;
 
       Selectors : constant Array_Type := Get_Blocks_Metadata;
       Nodes     : Array_Type;
@@ -1757,6 +1766,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Inc_Functions;
 
@@ -1970,6 +1980,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Arrays;
       use Php.Strings;
       use Php.Types;
       use Inc_Functions;
@@ -2336,6 +2347,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Arrays;
       use Inc_Functions;
 
       Incoming_Data : constant Array_Type := Incoming.Get_Raw_Data;
@@ -2574,6 +2586,7 @@ is
                           return List_Type -- Array_Type
    is
       use Php;
+      use Php.Arrays;
 
       New_Node : List_Type;
    begin
@@ -2805,6 +2818,7 @@ is
    procedure Set_Spacing_Sizes (This : in out Wp_Theme_JSON)
    is
       use Php;
+      use Php.Arrays;
       use Php.Errors;
       use Php.Numerics;
       use Php.Strings;

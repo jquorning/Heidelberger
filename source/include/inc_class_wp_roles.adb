@@ -6,9 +6,10 @@
 -- @since 4.4.0
 --
 
+with Php.Arrays;
+
 with Globals;
 with Hb_Common;
-with Php;
 
 with Inc_Load;
 with Inc_Ms_Blogs;
@@ -65,6 +66,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Inc_Class_Wp_Role;
       use Inc_Plugins;
    begin

@@ -6,9 +6,11 @@
 -- @subpackage Media
 --
 
-with Hb_Common;
+with Php.Arrays;
 with Php.Ini;
 with Php.Lists;
+
+with Hb_Common;
 
 with Inc_Load;
 with Inc_Options;
@@ -874,6 +876,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Inc_Plugins;
 

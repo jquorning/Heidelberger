@@ -5,6 +5,7 @@
 -- @subpackage Theme
 -- @since 3.4.0
 
+with Php.Arrays;
 with Php.Files;
 with Php.Lists;
 with Php.Misc;
@@ -46,6 +47,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Files;
       use Php.Misc;
       use Php.Strings;
@@ -479,6 +481,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Types;
    begin
       if not Isset (This.Headers, Header) then

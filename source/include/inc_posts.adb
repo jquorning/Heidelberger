@@ -7,6 +7,7 @@
 
 with Ada.Containers;
 
+with Php.Arrays;
 with Php.HTML;
 with Php.Lists;
 with Php.Misc;
@@ -1716,6 +1717,7 @@ is
    function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
    is
+      use Php.Arrays;
 --    use Hb_Common;
 
       Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
@@ -2750,6 +2752,7 @@ is
       Nohier_Vs_Hier_Defaults : Array_Type)
       return Array_Type
    is
+      use Php.Arrays;
       use Hb_Common;
    begin
 --      object.labels = (array) object.labels;
@@ -3513,6 +3516,7 @@ is
                            Context : String := "display")
                            return Inc_Class_Wp_Posts.Wp_Post
    is
+      use Php.Arrays;
       use Hb_Common;
       use Wp_Common;
 
@@ -3578,6 +3582,7 @@ is
                                  return Array_Type
    is
       use Hb_Common;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Wp_Common;

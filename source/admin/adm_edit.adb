@@ -8,6 +8,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Preg;
 with Php.Strings;
@@ -69,6 +70,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Php.Preg;
       use Php.Strings;

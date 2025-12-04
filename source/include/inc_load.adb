@@ -6,15 +6,17 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
+with Php.Errors;
+with Php.Files;
+with Php.HTML;
+with Php.Strings;
+
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php.Errors;
-with Php.Files;
-with Php.HTML;
-with Php.Strings;
 
 with Wp_Config;
 
@@ -1110,6 +1112,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.Arrays;
       use Inc_Functions;
    begin
       -- Escape with wpdb.
@@ -1341,6 +1344,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Arrays;
       use Php.Files;
       use Inc_L10n;
 --    use Inc_Class_Wpdb;
