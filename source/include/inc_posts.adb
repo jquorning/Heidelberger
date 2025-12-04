@@ -9,7 +9,7 @@ with Ada.Containers;
 
 with Globals;
 with Hb_Common;
-with Php;
+with Php.HTML;
 with Wp_Common;
 
 with Adi_Plugins;
@@ -6521,6 +6521,7 @@ is
    is
       use Ada.Containers;
       use Hb_Common;
+      use Php.HTML;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;

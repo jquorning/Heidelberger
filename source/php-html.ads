@@ -53,4 +53,12 @@ is
             return String
             is ("XXX-781");
 
+   function RawURLencode (Item : String)
+                          return String
+                          is ("XXX-977");
+
+   function URLdecode (Item : String)
+                       return String
+                       is ("XXX-976");
+
 end Php.HTML;

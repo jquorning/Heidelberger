@@ -550,14 +550,6 @@ is
                        return String
                        is ("XXX-978");
 
-   function RawURLencode (Item : String)
-                          return String
-                          is ("XXX-977");
-
-   function URLdecode (Item : String)
-                       return String
-                       is ("XXX-976");
-
    function Round (Num       : Float;
                    Precision : Integer)
                    return Float
