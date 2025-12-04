@@ -6,14 +6,12 @@
 -- @since 5.0.0
 --
 
-with Arrays;
 with Lists;
 
 with Inc_Class_Wp_Block_Type;
 
 package Inc_Blocks
 is
-   use Arrays;
    use Lists;
 
 -- --

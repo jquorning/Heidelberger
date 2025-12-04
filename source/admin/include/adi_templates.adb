@@ -12,6 +12,7 @@ with Ada.Strings.Unbounded;
 
 with Binder;
 with Wp_Common;
+with Php.Echoing;
 with Php.HTML;
 
 with Inc_Admin_Bar;
@@ -117,6 +118,7 @@ is
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String
    is
+      use Php.Echoing;
       use Inc_Plugins;
 
       Output : Unbounded_String;
@@ -2304,6 +2306,7 @@ is
    procedure X_Admin_Search_Query
    is
       use Binder;
+      use Php.Echoing;
       use Inc_Formatting;
    begin
       Echo ((if Isset (X_REQUEST, "s")
@@ -2820,6 +2823,7 @@ is
                             Wrap             : Boolean    := True;
                             Other_Attributes : Array_Type := Empty_Array)
    is
+      use Php.Echoing;
    begin
       Echo (Get_Submit_Button (Text, Typ, Name, Wrap, Other_Attributes));
    end Submit_Button;
@@ -2926,6 +2930,7 @@ is
 
    procedure X_Wp_Admin_Html_Begin
    is
+      use Php.Echoing;
       use Php.HTML;
       use Inc_Options;
 

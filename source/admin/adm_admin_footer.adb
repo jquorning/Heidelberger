@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 with Hb_Common;
 with Globals;
 with Lists;
-with Php;
+with Php.Echoing;
 
 with Inc_L10n;
 with Inc_Plugins;
@@ -33,6 +33,7 @@ is
 
    procedure Run
    is
+      use Php.Echoing;
       use Inc_L10n;
       use Inc_Plugins;
       --

@@ -10,7 +10,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php;
+with Php.Echoing;
 with Lists;
 with Wp_Common;
 
@@ -332,6 +332,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

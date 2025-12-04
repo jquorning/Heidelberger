@@ -1337,7 +1337,6 @@ is
    procedure Wp_Load_Translations_Early
    is
       use Ada.Strings.Unbounded;
-      use Arrays;
       use Hb_Common;
       use Php;
       use Php.Files;

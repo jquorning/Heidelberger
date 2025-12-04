@@ -13,7 +13,7 @@ with Arrays;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Echoing;
 
 with Inc_Formatting;
 with Inc_Options;
@@ -168,6 +168,7 @@ is
    --
    procedure Wp_Credits_Section_Title (Group_Data : JSON_Value)
    is
+      use Php.Echoing;
       use Inc_Formatting;
    begin
 --      if 0 = Count (Group_Data) then
@@ -210,6 +211,7 @@ is
    procedure Wp_Credits_Section_List (Credits : JSON_Value;
                                       Slug    : String     := "")
    is
+      use Php.Echoing;
       use Inc_Formatting;
 
       Group : constant JSON_Value := Get (Credits, "groups");

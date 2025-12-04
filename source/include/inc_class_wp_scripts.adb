@@ -11,6 +11,7 @@ with Ada.Containers;
 
 with Globals;
 with Hb_Common;
+with Php.Echoing;
 with Php.HTML;
 with Php.Preg;
 
@@ -110,6 +111,7 @@ is
                                 Display : Boolean := True)
                                 return String
    is
+      use Php.Echoing;
       use Inc_Formatting;
 
       Output : constant Unbounded_String := +This.Get_Data (Handle, "data");
@@ -154,6 +156,7 @@ is
                      return Boolean
    is
       use Php.Preg;
+      use Php.Echoing;
       use Inc_Functions;
       use Inc_Formatting;
       use Inc_Class_Wp_Dependency;

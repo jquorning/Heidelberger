@@ -412,7 +412,6 @@ is
    function Parent (This : Wp_Theme)
                     return Wp_Theme
    is
-      use Hb_Common;
    begin
       return (if This.M_Parent /= null
               then This.M_Parent.all

@@ -7,12 +7,10 @@
 --
 
 with Ada.Containers;
--- with Ada.Text_IO; use Ada.Text_IO;
 
-with Arrays; -- .Io;
 with Binder;
 with Hb_Common;
-with Php;
+with Php.Echoing;
 
 with Adi_Screens;
 with Adi_Templates;
@@ -269,6 +267,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Adi_Templates;
       use Inc_Formatting;
 
@@ -405,6 +404,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Plugins;
 
       Views : Array_Type := This.Get_Views;
@@ -462,6 +462,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Plugins;
@@ -916,6 +917,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -1350,6 +1352,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -1502,6 +1505,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
 
       Singular : constant String := As_String (Get (This.X_Args, "singular"));
    begin
@@ -1569,6 +1573,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Functions;
       use Inc_Formatting;
 
@@ -1621,6 +1626,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
    begin
       if This.Has_Items then
          This.Display_Rows;
@@ -1662,6 +1668,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
    begin
       Echo ("<tr>" & NL);
       This.Single_Row_Columns (Item);
@@ -1700,6 +1707,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;

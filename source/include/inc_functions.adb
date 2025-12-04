@@ -12,6 +12,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Helpers;
+with Php.Echoing;
 with Php.JSON;
 with Php.Files;
 with Php.HTML;
@@ -1942,7 +1943,7 @@ is
       end if;
 
       if Echo then
-         Php.Echo (-Nonce_Field);
+         Php.Echoing.Echo (-Nonce_Field);
       end if;
 
       return -Nonce_Field;
@@ -1963,7 +1964,7 @@ is
         ESC_URL (Request_URL) & """ />";
    begin
       if Echo then
-         Php.Echo (Referer_Field);
+         Php.Echoing.Echo (Referer_Field);
       end if;
 
       return Referer_Field;

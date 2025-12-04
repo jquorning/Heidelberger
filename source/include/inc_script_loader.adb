@@ -21,6 +21,7 @@ with Array_Vectors;
 with Binder;
 with Hb_Common;
 with Globals;
+with Php.Echoing;
 with Php.Files;
 with Php.HTML;
 with Php.Preg;
@@ -2555,6 +2556,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
       use Inc_Themes;
 --      global compress_css;

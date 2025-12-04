@@ -8,7 +8,7 @@
 
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Echoing;
 
 with Inc_Admin_Bar;
 with Inc_Ms_Functions;
@@ -644,6 +644,7 @@ is
    procedure X_Render_Container (This : Wp_Admin_Bar;
                                  Node : Node_Args) -- Array_Type)
    is
+      use Php.Echoing;
       use Inc_Formatting;
    begin
       if Typ_Container /= Node.Typ or else Node.Children = null then
@@ -667,6 +668,7 @@ is
    procedure X_Render_Group (This : Wp_Admin_Bar;
                              Node : Node_Args) -- Array_Type)
    is
+      use Php.Echoing;
       use Inc_Formatting;
 
       Class : Unbounded_String;
@@ -700,6 +702,7 @@ is
    procedure X_Render_Item (This : Wp_Admin_Bar;
                             Node : Node_Args) -- Array_Type)
    is
+      use Php.Echoing;
       use Inc_Formatting;
 
       Is_Parent             : constant Boolean := Node.Children /= null;

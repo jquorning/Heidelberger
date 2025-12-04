@@ -1,7 +1,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
-with Php;
+with Php.Echoing;
 with Hb_Common;
 
 -- with Adm_Admin;
@@ -85,7 +85,7 @@ is
 
       PHP_To_Web_Server;
 
-      Payload := +Php.Get_Echo;
+      Payload := +Php.Echoing.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);
    end Render;
 

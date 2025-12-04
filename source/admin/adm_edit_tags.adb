@@ -13,7 +13,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
-with Php;
+with Php.Echoing;
 with Lists;
 with Wp_Common;
 
@@ -70,6 +70,7 @@ is
    procedure Render
    is
       use Binder;
+      use Php.Echoing;
       use Wp_Common;
       use Adi_Screens;
       use Inc_Capabilities;

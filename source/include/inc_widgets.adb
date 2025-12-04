@@ -20,6 +20,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php.Echoing;
 with Php.Preg;
 
 with Inc_Class_Wp_Customize_Widgets;
@@ -55,6 +56,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Formatting;
       use Inc_Load;

@@ -6,10 +6,7 @@
 -- @since 4.4.0
 --
 
--- with Ada.Text_IO; use Ada.Text_IO;
-
--- with Hb_Common;
-with Php;
+with Php.Echoing;
 
 package body Adi_Class_Wp_Screens
 is
@@ -1167,6 +1164,7 @@ is
    is
 --    use Hb_Common;
       use Php;
+      use Php.Echoing;
    begin
       if not Isset (This.X_Screen_Reader_Content, Key) then
          return;

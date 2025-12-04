@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 with Binder;
 with Globals;
 with Hb_Common;
+with Php.Echoing;
 with Php.Files;
 
 with Inc_Class_Wp_Locale_Switchers;
@@ -406,6 +407,7 @@ package body Inc_L10n is
                   Domain : String := "default")
    is
       use Php;
+      use Php.Echoing;
    begin
       Echo (Translate (Text, Domain));
    end X_E;

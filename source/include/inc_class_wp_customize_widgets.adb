@@ -8,6 +8,7 @@
 
 with Binder;
 with Globals;
+with Php.Echoing;
 with Php.HTML;
 with Php.Preg;
 
@@ -1079,6 +1080,7 @@ is
    procedure Output_Widget_Control_Templates (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
       use Inc_L10n;
    begin
@@ -1546,6 +1548,7 @@ is
    procedure Print_Preview_CSS (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Echoing;
    begin
       Echo ("<style>" & NL);
       Echo (".widget-customizer-highlighted-widget {" & NL);
@@ -1565,6 +1568,7 @@ is
    procedure Export_Preview_Data (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Echoing;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -1939,6 +1943,7 @@ is
                                     Index : String)
    is
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
    begin
       Array_Unshift (This.Current_Dynamic_Sidebar_Id_Stack, Index);
@@ -1970,6 +1975,7 @@ is
                                   Index : String)
    is
       use Php;
+      use Php.Echoing;
       use Inc_Formatting;
    begin
       Array_Shift (This.Current_Dynamic_Sidebar_Id_Stack);
@@ -2021,6 +2027,7 @@ is
                return String
    is
       use Php;
+      use Php.Echoing;
       use Inc_Plugins;
       use Inc_Widgets;
 

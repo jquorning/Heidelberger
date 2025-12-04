@@ -6,10 +6,13 @@
 -- @since 5.0.0
 --
 
+with Arrays;
+
 with Inc_Functions;
 
 package body Inc_Blocks
 is
+   use Arrays;
 
    -----------------------
    -- Block_Has_Support --

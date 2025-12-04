@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Binder;
 with Globals;
+with Php.Echoing;
 with Php.Files;
 
 -- with Inc_Class_Wp_Customize_Managers;
@@ -2962,6 +2963,7 @@ is
       use List_Vectors;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
    begin
       if
         not Current_Theme_Supports ("custom-header", "header-text")    and then

@@ -11,6 +11,7 @@ with Binder;
 with Hb_Common;
 with Globals;
 with Lists;
+with Php.Echoing;
 with Php.HTML;
 with Php.Preg;
 
@@ -40,6 +41,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Php.HTML;
       use Php.Preg;
       use Inc_Script_Loader;

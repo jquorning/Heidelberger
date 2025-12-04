@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Echoing;
 with Wp_Common;
 
 with Inc_Class_Wp_Terms;
@@ -1360,6 +1360,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Themes;
    begin
       if not Current_Theme_Supports ("title-tag") then
@@ -1556,7 +1557,7 @@ is
            Apply_Filters ("single_post_title", -X_Post.Post_Title, X_Post);
       begin
          if Display then
-            Php.Echo (Prefix & Title);
+            Php.Echoing.Echo (Prefix & Title);
             return ""; -- added
          else
             return Prefix & Title;
@@ -1575,6 +1576,7 @@ is
       use Arrays;
 --    use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Inc_Plugins;
       use Inc_Posts;
       use Inc_Querys;
@@ -1707,7 +1709,7 @@ is
       end if;
 
       if Display then
-         Php.Echo (Prefix & (-Term_Name));
+         Php.Echoing.Echo (Prefix & (-Term_Name));
          return ""; -- added
       else
          return Prefix & (-Term_Name);

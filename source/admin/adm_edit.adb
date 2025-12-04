@@ -14,6 +14,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.Echoing;
 with Php.Preg;
 with Wp_Common;
 
@@ -64,6 +65,7 @@ is
       use Binder;
       use Hb_Common;
       use Php;
+      use Php.Echoing;
       use Php.Preg;
       use Inc_Capabilities;
       use Inc_Class_Wp_Posts;

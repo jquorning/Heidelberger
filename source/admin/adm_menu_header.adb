@@ -13,6 +13,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.Echoing;
 with Php.Files;
 with Php.Preg;
 
@@ -105,6 +106,7 @@ is
       Submenu_As_Parent : Boolean := True)
    is
       use Ada.Strings.Unbounded;
+      use Php.Echoing;
       use Php.Files;
       use Php.Preg;
       use Inc_Capabilities;
@@ -482,6 +484,7 @@ is
 
    procedure Bottom
    is
+      use Php.Echoing;
       use Adm_Menu;
       use Inc_Plugins;
    begin

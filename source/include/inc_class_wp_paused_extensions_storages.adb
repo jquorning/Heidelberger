@@ -36,7 +36,6 @@ is
                  Extension : String)
             return Array_Type
    is
-      use Hb_Common;
    begin
       if not This.Is_API_Loaded then
          return Empty_Array; -- null;
