@@ -11,6 +11,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
+with Php.Errors;
 with Php.Files;
 with Php.HTML;
 
@@ -301,7 +302,7 @@ is
 
       if Php.Files.File_Exists (-Globals.WP_CONTENT_DIR & "/maintenance.php") then
 --       Require_Once (Globals.WP_CONTENT_DIR & "/maintenance.php");
-         Php.Die;
+         Php.Errors.Die;
       end if;
 
 --    require_once ABSPATH . WPINC . "/functions.php";

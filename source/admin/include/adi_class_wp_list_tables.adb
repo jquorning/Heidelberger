@@ -11,6 +11,7 @@ with Ada.Containers;
 with Binder;
 with Hb_Common;
 with Php.Echoing;
+with Php.Errors;
 
 with Adi_Screens;
 with Adi_Templates;
@@ -1107,6 +1108,7 @@ is
                          return Array_Type
    is
       use Php;
+      use Php.Errors;
    begin
       Die ("function WP_List_Table::get_columns() must be overridden in a subclass.");
       return Empty_Array;

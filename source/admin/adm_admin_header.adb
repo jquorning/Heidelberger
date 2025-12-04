@@ -12,7 +12,9 @@ with Globals;
 with Hb_Common;
 with Lists;
 with Php.Echoing;
+with Php.Errors;
 with Php.HTML;
+with Php.Ini;
 with Php.Preg;
 
 with Adm_Menu;
@@ -55,6 +57,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Ini;
       use Php.HTML;
       use Php.Preg;
       use Inc_Formatting;
@@ -325,7 +328,7 @@ is
       end if;
 
       declare
-         Error_Get_Last : constant Array_Type := Php.Error_Get_Last; --()
+         Error_Get_Last : constant Array_Type := Php.Errors.Error_Get_Last; --()
       begin
          -- Print a CSS class to make PHP errors visible.
          if

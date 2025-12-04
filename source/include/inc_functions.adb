@@ -16,6 +16,7 @@ with Php.Echoing;
 with Php.JSON;
 with Php.Files;
 with Php.HTML;
+with Php.Ini;
 with Php.Preg;
 
 with Inc_Capabilities;
@@ -1074,6 +1075,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Ini;
 
       Ret : Array_Type;
    begin

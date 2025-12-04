@@ -126,10 +126,6 @@ is
                      Max : Natural)
                      return Natural;
 
---   type Func_Type is access function return Array_Type;
---   procedure Array_Walk (Arry     : Array_Type;
---                         Callback : Func_Type;
---                         Arg      : Array_Type := Empty_Array);
    function Array_Map (Item  : String;
                        Table : Array_Type)
                        return Array_Type is (Empty_Array);
@@ -198,9 +194,6 @@ is
    procedure Array_Shift (List : in out List_Type);
    function Array_Shift (List : in out List_Type)
                          return String;
-
--- function Array_Shift (Arry : in out Array_Type)
---                       return Multi_Type;
 
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
@@ -372,13 +365,8 @@ is
                         return List_Type
                         is (Empty_List);
 
---   function Array_Push (Arry  : List_Type;
---                        Value : String_Array) -- Integer)
---                        return Integer
---                        is (1);
-
    function Array_Push (Arry  : List_Type;
-                        Value : List_Type) -- Integer)
+                        Value : List_Type)
                         return Integer
                         is (1);
 
@@ -471,31 +459,16 @@ is
                      return Boolean  -- string|false
                      is (False);
 
-   function Error_Get_Last
-            return Array_Type
-            is (Empty_Array);
-
    function Strip_Tags (Item         : String;
                         Allowed_Tags : Array_Type := Empty_Array)
                         return String
                         is ("XXX-600");
-
-   function Ini_Get (Option : String)
-                     return String
-                     is ("XXX-602");
-
-   function Ini_Get (Option : String)
-                     return Boolean
-                     is (True);
 
    E_USER_NOTICE : constant Integer := 47;  -- Arbitraty
 
    procedure Trigger_Error (Message     : String;
                             Error_Level : Integer := E_USER_NOTICE)
                             is null;
-
-   procedure Die (Reason : String := "")
-             is null;
 
    function Glob (Pattern : String;
                   Flags   : Integer := 0)
@@ -516,9 +489,6 @@ is
    function Vsprintf (Format : String;
                       Args   : List_Type)
                       return String;
-
-   procedure Error_Reporting (Error_Level : Integer := 0)
-             is null;
 
    function Strtok (Item  : String;
                     Token : String)

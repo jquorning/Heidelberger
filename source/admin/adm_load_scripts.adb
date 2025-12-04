@@ -12,6 +12,7 @@ with Hb_Common;
 with Globals;
 with Lists;
 with Php.Echoing;
+with Php.Errors;
 with Php.HTML;
 with Php.Preg;
 
@@ -42,6 +43,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Errors;
       use Php.HTML;
       use Php.Preg;
       use Inc_Script_Loader;

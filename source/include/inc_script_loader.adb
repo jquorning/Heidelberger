@@ -24,6 +24,7 @@ with Globals;
 with Php.Echoing;
 with Php.Files;
 with Php.HTML;
+with Php.Ini;
 with Php.Preg;
 
 with Adm_Load_Styles;
@@ -2618,6 +2619,7 @@ is
    procedure Script_Concat_Settings
    is
       use Php;
+      use Php.Ini;
 --    use Hb_Common;
 --    global concatenate_scripts, compress_scripts, compress_css;
 

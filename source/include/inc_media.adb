@@ -7,7 +7,7 @@
 --
 
 with Hb_Common;
-with Php;
+with Php.Ini;
 
 with Inc_Load;
 with Inc_Options;
@@ -3881,6 +3881,7 @@ is
             return Natural
    is
       use Php;
+      use Php.Ini;
       use Inc_Load;
 --    use Inc_Plugins;
 
