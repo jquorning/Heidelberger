@@ -18,6 +18,7 @@ with Php.Files;
 with Php.HTML;
 with Php.Ini;
 with Php.JSON;
+with Php.Lists;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -4966,6 +4967,7 @@ is
                               return List_Type
    is
       use Php;
+      use Php.Lists;
 
       List_2 : constant List_Type := Wp_Parse_List (List);
    begin

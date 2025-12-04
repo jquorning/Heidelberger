@@ -7,7 +7,7 @@
 --
 
 with Hb_Common;
-with Php;
+with Php.Lists;
 
 with Inc_Class_Wp_Theme_JSON;
 with Inc_Functions;
@@ -131,6 +131,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
 
       Tmp_Settings : Array_Type := Settings;
       -- phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable

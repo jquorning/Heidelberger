@@ -7,7 +7,7 @@
 --
 
 with Hb_Common;
-with Php;
+with Php.Lists;
 
 with Inc_Load;
 with Inc_L10n;
@@ -608,6 +608,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
    begin
       if Create and Empty (Root) then
          Root := Empty_Array;

@@ -29,17 +29,7 @@ is
                                    return Array_Type
                                    is (Left);
 
-   function Array_Merge (Left, Right : List_Type) return List_Type
-      is (Left);
-
    function Array_Diff (Left, Right : Array_Type) return Array_Type
-      is (Left);
-
-   function Array_Diff (Left, Right : List_Type) return List_Type
-      is (Left);
-
-   function Array_Diff (Left  : List_Type;
-                        Right : String) return List_Type
       is (Left);
 
    function Array_Diff_Key (Arry : Array_Type;
@@ -53,10 +43,6 @@ is
 
    function Array_Map (Item  : String;
                        Table : Array_Type)
-                       return List_Type is (Empty_List);
-
-   function Array_Map (Item : String;
-                       List : List_Type)
                        return List_Type is (Empty_List);
 
    function In_Array (Needle   : String;
@@ -101,16 +87,8 @@ is
                      return Array_Type
                      is (Empty_Array);
 
-   procedure Array_Shift (List : in out List_Type);
-   function Array_Shift (List : in out List_Type)
-                         return String;
-
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
-
-   procedure Array_Unshift (List : in out List_Type;
-                            Item : String)
-                            is null;
 
    function Time return Natural
    is (9999);
@@ -138,10 +116,6 @@ is
                         return List_Type
                         is (Empty_List);
 
-   function Array_Keys (List : List_Type)
-                        return List_Type
-                        is (Empty_List);
-
    function Array_Keys (Arry         : Array_Type;
                         Filter_Value : String;
                         Strict       : Boolean := False)
@@ -150,11 +124,6 @@ is
 
    function Array_Key_Exists (Key  : String;
                               Arry : Array_Type)
-                              return Boolean
-                              is (False);
-
-   function Array_Key_Exists (Key  : String;
-                              Arry : List_Type)
                               return Boolean
                               is (False);
 
@@ -169,12 +138,6 @@ is
                           Strict   : Boolean := False)
                           return Integer
                           is (99);
-
-   function Array_Search (Needle   : String;
-                          Haystack : List_Type;
-                          Strict   : Boolean := False)
-                          return String
-                          is ("XXX-012");
 
    function Array_Intersect_Key (Arry   : Array_Type;
                                  Arry_2 : Array_Type)
@@ -240,11 +203,6 @@ is
                            return Array_Type
                            is (Empty_Array);
 
-   function Array_Combine (Keys   : List_Type;
-                           Values : List_Type)
-                           return Array_Type
-                           is (Empty_Array);
-
    function Array_Column (Arry       : Array_Type;
                           Column_Key : String)
                           return Array_Type
@@ -254,13 +212,6 @@ is
                        return Integer
                        is (1);
 
-   function Array_Pop (Arry : List_Type)
-                       return String
-                       is ("XXX-332");
-
-   procedure Array_Pop (Arry : List_Type)
-                        is null;
-
    function Array_Push (Arry  : Array_Type;
                         Value : Integer)
                         return Integer
@@ -269,16 +220,6 @@ is
    procedure Array_Push (Arry  : Array_Type;
                          Value : String)
                          is null;
-
-   function Array_Push (Arry  : List_Type;
-                        Value : String)
-                        return List_Type
-                        is (Empty_List);
-
-   function Array_Push (Arry  : List_Type;
-                        Value : List_Type)
-                        return Integer
-                        is (1);
 
    function Array_Slice (Arry   : Array_Type;
                          Offset : Natural;
@@ -325,19 +266,10 @@ is
                              return Array_Type
                              is (Empty_Array);
 
-   function Array_Intersect (List   : List_Type;
-                             List_2 : List_Type)
-                             return List_Type
-                             is (Empty_List);
-
    function Array_Reverse (Arry          : Array_Type;
                            Preserve_Keys : Boolean := False)
                            return Array_Type
                            is (Empty_Array);
-
-   function Array_Reverse (List : List_Type)
-                           return List_Type
-                           is (Empty_List);
 
    function Array_Replace_Recursive (Arry    : Array_Type;
                                      Array_2 : Array_Type)

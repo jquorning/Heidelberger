@@ -10,6 +10,7 @@ with Ada.Containers;
 with Globals;
 with Hb_Common;
 with Php.HTML;
+with Php.Lists;
 with Php.Strings;
 with Wp_Common;
 
@@ -6528,6 +6529,7 @@ is
       use Hb_Common;
       use Php.HTML;
       use Php.Strings;
+      use Php.Lists;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;

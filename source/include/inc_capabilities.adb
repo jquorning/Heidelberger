@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Globals;
 with Hb_Common;
+with Php.Lists;
 with Php.Strings;
 
 with Inc_Class_Wp_Comments;
@@ -66,6 +67,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Class_Wp_Post_Type;

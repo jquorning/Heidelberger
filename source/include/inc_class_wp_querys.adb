@@ -10,6 +10,7 @@ with Ada.Containers;
 
 with Hb_Common;
 with Lists;
+with Php.Lists;
 with Php.Strings;
 
 with Inc_Class_Wp_Post_Type;
@@ -3582,6 +3583,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Users;
    begin
       if not This.Is_Author then
@@ -3671,6 +3673,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Terms;
    begin
       if not This.Is_Tag then
@@ -3720,6 +3723,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Terms;
    begin
       if not This.Is_Tax then
@@ -3930,6 +3934,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Posts;
@@ -4051,6 +4056,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Posts;

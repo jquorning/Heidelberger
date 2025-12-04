@@ -10,7 +10,7 @@
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
-with Php;
+with Php.Lists;
 with Wp_Common;
 
 package body Inc_Class_Wp_Dependencies
@@ -104,6 +104,7 @@ is
                       Group     : Integer := 0) -- = false
                       return Boolean
    is
+      use Php.Lists;
       use List_Vectors;
 --    use Array_Maps;
 
@@ -209,6 +210,7 @@ is
 --               Args   : Array_Type   := Empty_Array) -- = null
                  return Boolean
    is
+      use Php.Lists;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
 --    use String_Vectors;
@@ -384,6 +386,7 @@ is
    procedure Dequeue (This    : in out Wp_Dependencies;
                       Handles : List_Type)
    is
+      use Php.Lists;
 --    use Inc_Class_Wp_Dependency;
    begin
       for Handle of Handles loop
@@ -428,6 +431,7 @@ is
                           Handle : String)
                           return Boolean
    is
+      use Php.Lists;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
 --    use String_Vectors;

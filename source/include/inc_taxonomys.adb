@@ -9,6 +9,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Hb_Common;
+with Php.Lists;
 with Php.Strings;
 with Wp_Common;
 
@@ -2275,6 +2276,7 @@ is
                                  Args       : Array_Type := Empty_Array)
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Php.Lists;
       use Php.Strings;
       use Wp_Common;
 --    use Adi_Templates;

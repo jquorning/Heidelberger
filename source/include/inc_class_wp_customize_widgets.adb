@@ -10,6 +10,7 @@ with Binder;
 with Globals;
 with Php.Echoing;
 with Php.HTML;
+with Php.Lists;
 with Php.Preg;
 with Php.Sorting;
 with Php.Strings;
@@ -395,6 +396,7 @@ is
    procedure Customize_Register (This : in out Wp_Customize_Widgets)
    is
       use Php;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Plugins;
       use Inc_L10n;
@@ -1250,6 +1252,7 @@ is
                                       return List_Type
    is
       use Php;
+      use Php.Lists;
       use Php.Preg;
 
       Widget_Ids_2 : constant List_Type :=
@@ -1951,6 +1954,7 @@ is
    is
       use Php;
       use Php.Echoing;
+      use Php.Lists;
       use Inc_Formatting;
    begin
       Array_Unshift (This.Current_Dynamic_Sidebar_Id_Stack, Index);
@@ -1983,6 +1987,7 @@ is
    is
       use Php;
       use Php.Echoing;
+      use Php.Lists;
       use Inc_Formatting;
    begin
       Array_Shift (This.Current_Dynamic_Sidebar_Id_Stack);
@@ -2035,6 +2040,7 @@ is
    is
       use Php;
       use Php.Echoing;
+      use Php.Lists;
       use Inc_Plugins;
       use Inc_Widgets;
 

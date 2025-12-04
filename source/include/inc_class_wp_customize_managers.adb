@@ -10,6 +10,7 @@ with Binder;
 with Globals;
 with Helpers;
 with Php.JSON;
+with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
@@ -498,6 +499,7 @@ is
    procedure Establish_Loaded_Changeset (This : in out Wp_Customize_Manager)
    is
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Posts;
       use Inc_Functions;
       use Inc_Load;

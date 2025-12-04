@@ -13,6 +13,7 @@ with Globals;
 with Hb_Common;
 with Php.Echoing;
 with Php.HTML;
+with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
@@ -159,6 +160,7 @@ is
    is
       use Php.Preg;
       use Php.Echoing;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Functions;
       use Inc_Formatting;

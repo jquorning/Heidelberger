@@ -8,6 +8,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Globals;
+with Php.Lists;
 with Php.Strings;
 
 with Inc_Class_Wp_Theme_JSON;
@@ -32,6 +33,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Functions;
 
       Path_2 : constant List_Type :=
@@ -97,6 +99,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Lists;
       use Hb_Common;
       use Inc_Class_Wp_Theme_JSON;
 

@@ -8,6 +8,7 @@
 
 with Hb_Common;
 with Php.Ini;
+with Php.Lists;
 
 with Inc_Load;
 with Inc_Options;
@@ -873,6 +874,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Plugins;
 
       Default_Sizes_2 : constant List_Type := To_List (List => (

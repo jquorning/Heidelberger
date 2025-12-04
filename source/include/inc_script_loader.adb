@@ -25,6 +25,7 @@ with Php.Echoing;
 with Php.Files;
 with Php.HTML;
 with Php.Ini;
+with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
@@ -357,6 +358,7 @@ is
    is
       use Php;
       use Php.Files;
+      use Php.Lists;
       use Php.Strings;
 
       Suffix : String := (if Globals.WP_RUN_CORE_TESTS then ".min"

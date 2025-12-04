@@ -21,6 +21,7 @@ with Ada.Strings.Unbounded;
 
 with Hb_Common;
 with Php.Echoing;
+with Php.Lists;
 with Php.Preg;
 with Php.Sorting;
 with Php.Strings;
@@ -592,6 +593,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Themes;
@@ -882,6 +884,7 @@ is
                return Array_Type
    is
       use Php;
+      use Php.Lists;
 
       Sidebars_Widgets_2 : Array_Type := Sidebars_Widgets;
    begin

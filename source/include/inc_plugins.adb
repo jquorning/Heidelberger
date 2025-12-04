@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 -- with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
-with Php;
+with Php.Lists;
 
 with Inc_Elab_Hooks;
 
@@ -145,6 +145,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Lists;
 
       Args_2 : Array_Type := Args;
    begin
@@ -423,6 +424,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Count_Maps;
       use Hook_Maps;
 

@@ -12,7 +12,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php;
+with Php.Lists;
 
 with Inc_Class_Wp_Post_Type;
 with Inc_Options;
@@ -35,6 +35,7 @@ is
       use Binder;
       use Globals;
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Post_Type;
 --    use Inc_Capabilities;
       use Inc_Posts;

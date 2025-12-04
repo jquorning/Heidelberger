@@ -12,6 +12,7 @@ with Binder;
 with Hb_Common;
 with Php.Echoing;
 with Php.Errors;
+with Php.Lists;
 with Php.Strings;
 
 with Adi_Screens;
@@ -1330,6 +1331,7 @@ is
       use type Ada.Containers.Count_Type;
 --    use Hb_Common;
       use Php;
+      use Php.Lists;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
 --    Columns  : constant List_Type  := Column_Info.Columns;

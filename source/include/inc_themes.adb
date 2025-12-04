@@ -12,6 +12,7 @@ with Binder;
 with Globals;
 with Php.Echoing;
 with Php.Files;
+with Php.Lists;
 with Php.Strings;
 
 -- with Inc_Class_Wp_Customize_Managers;
@@ -2615,6 +2616,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Strings;
       use List_Vectors;
       use Inc_Functions;
@@ -2966,6 +2968,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Lists;
    begin
       if
         not Current_Theme_Supports ("custom-header", "header-text")    and then
