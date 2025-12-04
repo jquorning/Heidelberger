@@ -27,7 +27,6 @@ is
                          return Wp_Terms_List_Table
    is
       use Hb_Common;
-      use Php.Lists;
 --    use Php;
       use Inc_L10n;
 --    use Inc_Posts;

@@ -6,8 +6,10 @@
 -- @since 4.7.0
 --
 
-with Hb_Common;
 with Php.Lists;
+with Php.Misc;
+
+with Hb_Common;
 
 with Inc_Class_Wp_Locale;
 with Inc_L10n;
@@ -68,6 +70,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Lists;
+      use Php.Misc;
       use Inc_Plugins;
 
       Previous_Locale : constant String := Array_Pop (This.Locales);

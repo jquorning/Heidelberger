@@ -7,6 +7,7 @@
 
 with Php.Files;
 with Php.Lists;
+with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
@@ -46,6 +47,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Files;
+      use Php.Misc;
       use Php.Strings;
       use Php.Types;
       use Inc_Caches;

@@ -63,7 +63,6 @@ is
    procedure Render
    is
       use Binder;
-      use Php.Lists;
       use Php.Strings;
       use Wp_Common;
       use Adm_Menu;

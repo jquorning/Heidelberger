@@ -21,6 +21,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Echoing;
 with Php.Lists;
+with Php.Misc;
 with Php.Preg;
 with Php.Sorting;
 with Php.Strings;
@@ -62,6 +63,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Misc;
       use Php.Strings;
       use Inc_Class_Wp_Customize_Widgets;
       use Inc_Formatting;
@@ -641,7 +643,7 @@ is
         1 = Count (Existing_Sidebars_Widgets) and then
         1 = Count (Global_Wp_Registered_Sidebars)
       then
-         Set (New_Sidebars_Widgets, Php.Key (Global_Wp_Registered_Sidebars),
+         Set (New_Sidebars_Widgets, Php.Misc.Key (Global_Wp_Registered_Sidebars),
               From_Integer (Array_Pop (Existing_Sidebars_Widgets)));
 
          return New_Sidebars_Widgets;

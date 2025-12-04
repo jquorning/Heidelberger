@@ -4,9 +4,11 @@
 -- @package WordPress
 --
 
+with Php.Preg;
+with Php.Misc;
+
 with Globals;
 with Hb_Common;
-with Php.Preg;
 
 with Inc_Themes;
 with Inc_Options;
@@ -243,6 +245,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Misc;
       use Php.Preg;
       use Inc_Options;
    begin

@@ -15,6 +15,7 @@ with Php.HTML;
 with Php.Ini;
 with Php.JSON;
 with Php.Lists;
+with Php.Misc;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -3599,6 +3600,7 @@ is
       return Array_Type
    is
       use Php;
+      use Php.Misc;
       use Inc_Capabilities;
       use Inc_Class_Wp_Users;
 --    use Inc_Plugins;
@@ -4913,6 +4915,7 @@ is
                            return Array_Type
    is
       use Php;
+      use Php.Misc;
       use Php.Types;
       use Inc_Formatting;
 
@@ -7155,6 +7158,7 @@ is
    is
       use Php;
       use Php.Lists;
+      use Php.Misc;
       use Php.Strings;
 
       Scheme_Separator : constant Integer := Strpos (Path, "://");

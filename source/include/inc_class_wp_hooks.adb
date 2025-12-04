@@ -9,8 +9,9 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
+with Php.Misc;
+
 with Hb_Common;
-with Php;
 
 with Inc_Elab_Plugins;
 
@@ -276,6 +277,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Misc;
 
       Args_2        : constant Array_Type := Args;
       Nesting_Level : Nesting_Type;
@@ -399,6 +401,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Misc;
 
       Nesting_Level : constant Nesting_Type := This.Nesting_Level;
    begin

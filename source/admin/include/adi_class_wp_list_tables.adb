@@ -8,12 +8,14 @@
 
 with Ada.Containers;
 
-with Binder;
-with Hb_Common;
 with Php.Echoing;
 with Php.Errors;
 with Php.Lists;
+with Php.Misc;
 with Php.Strings;
+
+with Binder;
+with Hb_Common;
 
 with Adi_Screens;
 with Adi_Templates;
@@ -1361,6 +1363,7 @@ is
       use Php;
       use Php.Echoing;
       use Php.Lists;
+      use Php.Misc;
       use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;

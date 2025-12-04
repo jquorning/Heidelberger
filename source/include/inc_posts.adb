@@ -9,6 +9,7 @@ with Ada.Containers;
 
 with Php.HTML;
 with Php.Lists;
+with Php.Misc;
 with Php.Strings;
 
 with Globals;
@@ -6533,6 +6534,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use Php.Lists;
+      use Php.Misc;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;

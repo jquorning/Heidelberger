@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Files;
 with Php.Lists;
+with Php.Misc;
 
 with Globals;
 with Hb_Common;
@@ -242,6 +243,7 @@ is
       use Php;
       use Php.Files;
       use Php.Lists;
+      use Php.Misc;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Media;

@@ -8,6 +8,7 @@
 
 with Php.JSON;
 with Php.Lists;
+with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 with Php.Types;
@@ -3211,6 +3212,7 @@ is
                                  Take_Over         : Boolean := False)
    is
       use Php;
+      use Php.Misc;
       use Php.Strings;
       use Inc_Posts;
       use Inc_Users;
@@ -3250,6 +3252,7 @@ is
                                      Changeset_Post_Id : Post_Id) -- Integer)
    is
       use Php;
+      use Php.Misc;
       use Php.Strings;
       use Inc_Posts;
       use Inc_Users;
