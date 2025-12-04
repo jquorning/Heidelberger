@@ -6,6 +6,7 @@ with Globals;
 with Hb_Common;
 with Lists;
 with Php;
+with Wp_Common;
 
 with Adi_Caches;
 
@@ -247,8 +248,9 @@ is
    function To_Array (Post : Wp_Post) return Array_Type
    is
       use Hb_Common;
+      use Wp_Common;
 
-      Post_2 : Array_Type := Php.Get_Object_Vars (Post);
+      Post_2 : Array_Type := Get_Object_Vars (Post);
    begin
       for
         Key of To_List (List => (+"ancestors", +"page_template",

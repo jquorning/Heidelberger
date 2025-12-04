@@ -5,8 +5,6 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Posts;
-
 package Php
 is
    use Arrays;
@@ -15,8 +13,6 @@ is
    Debug : exception;
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type;
-   function Get_Object_Vars (Object : Inc_Class_Wp_Posts.Wp_Post)
-                             return Array_Type is (Empty_Array);
 
    function Strstr (Haystack      : String;
                     Needle        : String;
@@ -59,7 +55,6 @@ is
                     Length : Integer := 0)
                     return String;
 
-   function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post) return Boolean is (True);
    function Is_Object (Arry : Array_Type) return Boolean is (False);
    function Is_Array  (Arry : Array_Type) return Boolean is (True);
    function Is_Array  (List : List_Type) return Boolean is (True);

@@ -1645,6 +1645,8 @@ is
                       Filter : String := "raw")
                       return Wp_Post
    is
+      use Wp_Common;
+
       Post_2 : constant Wp_Post := Post;
       X_Post : Wp_Post;
       Unused_Success : Boolean;
@@ -3507,6 +3509,7 @@ is
                            return Inc_Class_Wp_Posts.Wp_Post
    is
       use Hb_Common;
+      use Wp_Common;
 
       Post_2 : Inc_Class_Wp_Posts.Wp_Post := Post;
    begin
