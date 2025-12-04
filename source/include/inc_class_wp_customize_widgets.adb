@@ -751,6 +751,7 @@ is
                             return Boolean
    is
       use Php;
+      use Php.Lists;
       use Inc_Plugins;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);

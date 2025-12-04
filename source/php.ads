@@ -46,11 +46,6 @@ is
                       Strict   : Boolean := False)
                       return Boolean is (False);
 
-   function In_Array (Needle   : String;
-                      Haystack : List_Type;
-                      Strict   : Boolean := False)
-                      return Boolean;
-
    function Compact (Var_Name  : String;
                      Var_Names : String)
                      return Array_Type

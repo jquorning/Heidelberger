@@ -6,6 +6,7 @@
 -- @since 4.4.0
 --
 
+with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
@@ -710,6 +711,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Capabilities;
       use Inc_Load;
 --    use Inc_Plugins;

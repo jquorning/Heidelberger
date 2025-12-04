@@ -3512,6 +3512,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Post_Type;
 
       Post_Type : Unbounded_String;
@@ -3629,6 +3630,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
    begin
       if not This.M_Is_Category then
          return False;
@@ -4121,6 +4123,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Class_Wp_Posts;
    begin
       if

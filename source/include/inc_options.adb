@@ -7,8 +7,10 @@
 --
 
 with Ada.Strings.Unbounded;
+
+with Php.Lists;
+
 with Globals;
-with Php;
 
 with Inc_Caches;
 with Inc_Load;
@@ -1986,6 +1988,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Caches;
       use Inc_Load;
 

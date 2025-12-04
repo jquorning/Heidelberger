@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Errors;
 with Php.JSON;
+with Php.Lists;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -40,6 +41,7 @@ is
                          return Wp_Theme_JSON
    is
       use Php;
+      use Php.Lists;
 --    use Inc_Class_Wp_Theme_JSON;
       use Inc_Functions;
 
@@ -491,6 +493,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Lists;
       use List_Vectors;
 
       Origins_2 : List_Type :=
@@ -605,6 +608,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Lists;
       use Php.Preg;
       use Php.Strings;
       use Inc_Functions;
@@ -1753,6 +1757,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php;
+      use Php.Lists;
       use Inc_Functions;
 
       Node : constant Array_Type :=

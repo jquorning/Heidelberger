@@ -5,6 +5,11 @@
 package Php.Lists
 is
 
+   function In_Array (Needle   : String;
+                      Haystack : List_Type;
+                      Strict   : Boolean := False)
+                      return Boolean;
+
    function Array_Merge (Left, Right : List_Type) return List_Type
       is (Left);
 

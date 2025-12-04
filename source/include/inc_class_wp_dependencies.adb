@@ -41,6 +41,7 @@ is
                       Group   : Integer   := 0) --  = false
                       return List_Type
    is
+      use Php.Lists;
       use List_Vectors;
                 --
                 -- If nothing is passed, print the queue. If a string is passed,
@@ -330,6 +331,7 @@ is
    procedure Enqueue (This    : in out Wp_Dependencies;
                       Handles : List_Type)
    is
+      use Php.Lists;
       use Php.Strings;
 --    use String_Vectors;
       use Inc_Class_Wp_Dependency;
@@ -501,6 +503,7 @@ is
                    Status : String := "registered")
                    return Query_Result -- Boolean
    is
+      use Php.Lists;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
 

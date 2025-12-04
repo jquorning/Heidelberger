@@ -633,6 +633,7 @@ is
                               Path   : String := "")
                               return Boolean
    is
+      use Php.Lists;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
    begin
 --      if not Isset (This.Registered (Handle)) then

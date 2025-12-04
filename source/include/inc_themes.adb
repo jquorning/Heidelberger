@@ -135,6 +135,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
 
       Stylesheet_2 : String := (if Empty (Stylesheet)
                                 then Get_Stylesheet
@@ -456,6 +457,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Files;
+      use Php.Lists;
       use Inc_Formatting;
 
       Directory_2 : Unbounded_String;
@@ -639,6 +641,7 @@ is
       use Globals;
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Plugins;
 
 --      global wp_theme_directories;
@@ -3245,6 +3248,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Functions;
       use Inc_REST_API;
 

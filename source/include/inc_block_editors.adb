@@ -8,9 +8,11 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Files;
+with Php.Lists;
+
 with Globals;
 with Hb_Common;
-with Php.Files;
 
 with Inc_Class_Wp_Posts;
 with Inc_Functions;
@@ -239,6 +241,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Files;
+      use Php.Lists;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Media;

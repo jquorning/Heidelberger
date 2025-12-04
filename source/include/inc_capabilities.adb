@@ -1289,6 +1289,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Types;
       use Inc_Class_Wp_Users;
       use Inc_Load;

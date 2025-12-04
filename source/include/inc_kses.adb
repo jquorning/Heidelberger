@@ -31,6 +31,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Lists;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -1361,6 +1362,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Preg;
       use Php.Strings;
 
@@ -2309,6 +2311,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Php.Preg;
       use Php.Strings;
       use Inc_Functions;

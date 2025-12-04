@@ -10,11 +10,13 @@
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
+with Php.Lists;
+with Php.Strings;
+
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
-with Php.Strings;
 with Lists;
 with Wp_Common;
 
@@ -61,6 +63,7 @@ is
    procedure Render
    is
       use Binder;
+      use Php.Lists;
       use Php.Strings;
       use Wp_Common;
       use Adm_Menu;
@@ -267,7 +270,7 @@ is
                      end if;
 
                      if
-                       not Php.In_Array (-Globals.Typenow,
+                       not Php.Lists.In_Array (-Globals.Typenow,
                                      Inc_Posts.Get_Post_Types
                                        (To_Array (List => (1 => Build ("show_ui", "true")))),
                                      True)

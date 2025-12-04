@@ -10,11 +10,13 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Ada.Numerics.Discrete_Random;
 
+with Php.Lists;
+with Php.Strings;
+
 with Hb_Common;
 with Binder;
 with Globals;
 with Lists;
-with Php.Strings;
 
 with Inc_Compat;
 with Inc_Default_Constants;
@@ -2420,6 +2422,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_L10n;
       use Inc_Options;
       use Inc_Plugins;

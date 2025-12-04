@@ -135,6 +135,7 @@ is
    is
       use Binder;
       use Php;
+      use Php.Lists;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;

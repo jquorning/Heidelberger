@@ -7154,6 +7154,7 @@ is
                           return Boolean
    is
       use Php;
+      use Php.Lists;
       use Php.Strings;
 
       Scheme_Separator : constant Integer := Strpos (Path, "://");

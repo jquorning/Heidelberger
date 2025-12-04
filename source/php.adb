@@ -10,24 +10,6 @@ is
 
    function Get_Object_Vars (Arry : Array_Type) return Array_Type is (Empty_Array);
 
-   --------------
-   -- In_Array --
-   --------------
-
-   function In_Array (Needle   : String;
-                      Haystack : List_Type;
-                      Strict   : Boolean := False)
-                      return Boolean
-   is
-   begin
-      for A of Haystack loop
-         if Needle = A then
-            return True;
-         end if;
-      end loop;
-      return False;
-   end In_Array;
-
    -----------------
    -- Array_Slice --
    -----------------

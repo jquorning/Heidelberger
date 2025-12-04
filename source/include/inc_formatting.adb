@@ -8,9 +8,11 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
 with Php.Preg;
+with Php.Lists;
 with Php.Strings;
+
+with Hb_Common;
 
 with Inc_KSES;
 with Inc_Options;
@@ -937,6 +939,7 @@ is
       use Hb_Common;
       use Php;
       use Php.HTML;
+      use Php.Lists;
       use Php.Preg;
 
 --    string = (string) string;
@@ -1127,6 +1130,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_Options;
 
 --    string = (string) string;

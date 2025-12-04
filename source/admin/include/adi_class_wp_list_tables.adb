@@ -1360,6 +1360,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
+      use Php.Lists;
       use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;

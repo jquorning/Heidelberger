@@ -7,11 +7,12 @@
 
 with Ada.Containers;
 
-with Globals;
-with Hb_Common;
 with Php.HTML;
 with Php.Lists;
 with Php.Strings;
+
+with Globals;
+with Hb_Common;
 with Wp_Common;
 
 with Adi_Plugins;
@@ -1818,6 +1819,7 @@ is
                              return String
    is
       use Hb_Common;
+      use Php.Lists;
 --    use Inc_Plugins;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
@@ -3575,6 +3577,7 @@ is
                                  return Array_Type
    is
       use Hb_Common;
+      use Php.Lists;
       use Php.Strings;
       use Wp_Common;
 

@@ -6,6 +6,7 @@
 --
 
 with Php.HTML;
+with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
@@ -66,6 +67,7 @@ is
    is
       use Binder;
       use Php.HTML;
+      use Php.Lists;
       use Php.Strings;
       use Php.Types;
       use Wp_Common;

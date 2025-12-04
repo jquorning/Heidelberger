@@ -28,6 +28,7 @@ is
    is
       use Hb_Common;
       use Php;
+      use Php.Lists;
       use Inc_L10n;
       use Inc_Plugins;
 

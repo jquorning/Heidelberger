@@ -12,6 +12,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Echoing;
 with Php.HTML;
+with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
@@ -2843,6 +2844,7 @@ is
                                Other_Attributes : Array_Type := Empty_Array)
                                 return String
    is
+      use Php.Lists;
       use Php.Strings;
       use Php.Types;
       use Inc_Formatting;
