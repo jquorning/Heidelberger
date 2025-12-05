@@ -2,11 +2,11 @@
 --
 --
 
-with Arrays;
+-- with Arrays;
 
 package Php.Arrays
 is
-   use Arrays;
+-- use Arrays;
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);

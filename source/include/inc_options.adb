@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Php.Lists;
+with Php.Misc;
 
 with Globals;
 
@@ -1405,20 +1406,23 @@ is
 --         return add_network_option( null, option, value );
 -- end;
 
--- --
--- -- Removes a option by name for the current network.
--- --
--- -- @since 2.8.0
--- -- @since 4.4.0 Modified into wrapper for delete_network_option()
--- --
--- -- @see delete_network_option()
--- --
--- -- @param string option Name of the option to delete. Expected to not be SQL-escaped.
--- -- @return bool True if the option was deleted, false otherwise.
--- --
--- function delete_site_option( option ) then
---         return delete_network_option( null, option );
--- end;
+   ------------------------
+   -- Delete_Site_Option --
+   ------------------------
+
+   function Delete_Site_Option (Option : String)
+                                return Boolean
+   is
+   begin
+      return Delete_Network_Option (0, Option); -- null
+   end Delete_Site_Option;
+
+   procedure Delete_Site_Option (Option : String)
+   is
+      Unused : constant Boolean := Delete_Site_Option (Option);
+   begin
+      null;
+   end Delete_Site_Option;
 
 -- --
 -- -- Updates the value of an option that was already added for the current network.
@@ -1989,6 +1993,7 @@ is
       use Hb_Common;
       use Php;
       use Php.Lists;
+      use Php.Misc;
       use Inc_Caches;
       use Inc_Load;
 
@@ -2036,17 +2041,16 @@ is
          begin
             if not In_Array (Transient, No_Timeout, True) then
                declare
-                  Transient_Timeout : String :=
+                  Transient_Timeout : constant String :=
                     "_site_transient_timeout_" & Transient;
 
---                Timeout := Get_Site_Option (Transient_Timeout);
+                  Timeout : constant Natural := Get_Site_Option (Transient_Timeout);
                begin
-                  null;
-                  -- if false /= timeout and then Timeout < Time() ) then
-                  --    Delete_Site_Option (Transient_Option);
-                  --    Delete_Site_Option (Transient_Timeout);
-                  --    Value := False;
-                  -- end if;
+                  if 0 /= Timeout and then Timeout < Time then -- false =
+                     Delete_Site_Option (Transient_Option);
+                     Delete_Site_Option (Transient_Timeout);
+                     Value := +""; -- False;
+                  end if;
                end;
             end if;
 

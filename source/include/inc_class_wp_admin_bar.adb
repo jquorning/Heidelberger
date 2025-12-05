@@ -688,12 +688,19 @@ is
       end if;
 
       if not Empty (Node.Meta, "class") then
-         Class := +" class=""" & ESC_Attr (Trim (As_String (Get (Node.Meta, "class")))) & """";
+         Class :=
+           +" class=""" &
+           ESC_Attr (Trim (As_String (Get (Node.Meta, "class")))) &
+           """";
       else
          Class := +"";
       end if;
 
-      Echo ("<ul id=""" & ESC_Attr ("wp-admin-bar-" & (-Node.Id)) & """class>");
+      Echo ("<ul id=""" &
+            ESC_Attr ("wp-admin-bar-" &
+            (-Node.Id)) & "" &
+            (-Class) & ">");
+
       for Item of Node.Children.all loop
          This.X_Render_Item (Item);
       end loop;

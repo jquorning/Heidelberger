@@ -173,7 +173,7 @@ is
                            ))
                         );
                      -- This action is documented in wp-admin/network/upgrade.php
---                     Do_Action ("after_mu_upgrade", Response);
+                     Do_Action ("after_mu_upgrade", Response);
 --                     Unset (Response);
                   end;
                end if;

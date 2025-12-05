@@ -520,18 +520,26 @@ is
                         Arg_2     : String := "";
                         Arg_3     : String := "");
    --                  , ...arg )
+
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;
                         Arg_3     : Boolean)
                         is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Args      : Array_Type)
+                        is null;
+
    procedure Do_Action (Hook_Name : String;
                         Tax       : String;
                         Arg_3     : List_Type;
                         Tax_2     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
                         is null;
+
    procedure Do_Action (Hook_Name : String;
                         Role      : Inc_Class_Wp_Roles.Wp_Roles)
                         is null;
+
    procedure Do_Action (Hook_Name : String;
                         Code      : String;
                         Message   : String;

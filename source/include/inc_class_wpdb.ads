@@ -11,6 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
+with Inc_Class_Wp_Comments;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Users;
 
@@ -934,6 +935,15 @@ is
                      Success : out Boolean)
                      return Inc_Class_Wp_Users.Wp_User
                      is (Inc_Class_Wp_Users.Null_User);
+
+   function Get_Row (Db      : in out Wpdb_Class;
+--                   User    : Integer;
+                     Query   : String  := ""; -- = null,
+                     Output  : String  := ""; -- = OBJECT,
+                     Y       : Natural := 0;
+                     Success : out Boolean)
+                     return Inc_Class_Wp_Comments.Wp_Comment
+                     is (Inc_Class_Wp_Comments.Null_Comment);
 
    --
    -- Retrieves one column from the database.

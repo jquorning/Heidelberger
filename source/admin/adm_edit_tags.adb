@@ -286,12 +286,13 @@ is
                use Inc_Link_Templates;
 
                Taxonomy : Unbounded_String;
-               Term_Id  : constant Integer := Integer'Value (As_String (Get (X_REQUEST, "tag_ID")));
-               Term     : Wp_Term          := Get_Term (Term_Id);
+
+               Term_Id  : constant Integer :=
+                 Integer'Value (As_String (Get (X_REQUEST, "tag_ID")));
+
+               Term : constant Wp_Term := Get_Term (Term_Id);
             begin
-               if False then
---             if Term not in Wp_Term then
---             if not term instanceof WP_Term then
+               if Term not in Wp_Term then  -- instanceof
                   Inc_Functions.Wp_Die
                     (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                end if;

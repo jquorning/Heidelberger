@@ -3515,7 +3515,6 @@ is
       use Php.Lists;
       use Inc_Class_Wp_Post_Type;
 
-      Post_Type : Unbounded_String;
    begin
       if Empty (Post_Types) or else not This.Is_Post_Type_Archive then
          return This.Is_Post_Type_Archive; -- (bool)

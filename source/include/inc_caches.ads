@@ -9,8 +9,10 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Comments;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Users;
+with Inc_Comments;
 
 package Inc_Caches
 is
@@ -68,6 +70,12 @@ is
                            Expire : Natural := 0)
                            is null;
 
+   procedure Wp_Cache_Add (Key    : String;
+                           Data   : Inc_Class_Wp_Comments.Wp_Comment; -- String;
+                           Group  : String  := "";
+                           Expire : Natural := 0)
+                           is null;
+
    --
    -- Retrieves the cache contents from the cache by key and group.
    --
@@ -101,6 +109,13 @@ is
                           return Inc_Class_Wp_Posts.Wp_Post
                           is (Inc_Class_Wp_Posts.Null_Post);
 
+   function Wp_Cache_Get (Key   : Integer; -- String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Comments.Wp_Comment
+                          is (Inc_Class_Wp_Comments.Null_Comment);
+
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
@@ -121,6 +136,13 @@ is
                           Found : out Boolean) -- = null
                           return Inc_Class_Wp_Users.Wp_User -- Integer
                           is (Inc_Class_Wp_Users.Null_User);
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean) -- = null
+                          return Inc_Comments.Comment_Counts
+                          is (Inc_Comments.Null_Comment_Counts);
 
    --
    -- Saves the data to the cache.
@@ -148,6 +170,12 @@ is
 
    procedure Wp_Cache_Set (Key    : String;
                            Data   : Integer;
+                           Group  : String  := "";
+                           Expire : Integer := 0)
+                           is null;
+
+   procedure Wp_Cache_Set (Key    : String;
+                           Data   : Inc_Comments.Comment_Counts;
                            Group  : String  := "";
                            Expire : Integer := 0)
                            is null;

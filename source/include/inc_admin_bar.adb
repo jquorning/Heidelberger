@@ -8,14 +8,17 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
+with Php.Echoing;
+with Php.HTML;
+with Php.Misc;
+with Php.Preg;
+with Php.Strings;
+
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php.HTML;
-with Php.Preg;
-with Php.Strings;
 with Wp_Common;
 
 with Adi_Class_Wp_Screens;
@@ -1318,20 +1321,21 @@ is
       end if;
 
       declare
+         use Php.Misc;
+
          Title : constant String :=
             "<span class=""ab-icon"" aria-hidden=""true""></span><span class=""ab-label"">" & X_X ("New", "admin bar menu group label") & "</span>";
 
          Node  : Node_Args;
 
-         Arry  : constant Array_Type :=
-            Action_Maps.Element (Actions.Find ("user-new.php"));
+--       Arry  : constant Array_Type :=
+--          Action_Maps.Element (Actions.Find ("user-new.php"));
 
-         Value : constant String := Arry.First_Key;
+--       Value : constant String := Arry.First_Key;
       begin
          Node.Id    := +"new-content";
          Node.Title := +Title;
-         Node.Href  := +Admin_URL (Value);
---       Node.Href  := +Admin_Url (Current (Array_Keys (Actions)));
+         Node.Href  := +Admin_URL (Current (Array_Keys (Actions)));
 
          Admin_Bar.Add_Node (Node);
 
@@ -1641,15 +1645,15 @@ is
 
    procedure Wp_Admin_Bar_Header
    is
+      use Php.Echoing;
       use Inc_Themes;
 
-      Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
-                             then "" else " type=""text/css""");
+      Type_Attr : constant String :=
+        (if Current_Theme_Supports ("html5", "style")
+         then "" else " type=""text/css""");
    begin
-      null;
---        ?>
--- <style<?php echo type_attr; ?> media="print">#wpadminbar { display:none; }</style>
---        <?php
+      Echo ("<style" & Type_Attr &
+            " media=""print"">#wpadminbar { display:none; }</style>");
    end Wp_Admin_Bar_Header;
 
    -------------------------
@@ -1658,20 +1662,19 @@ is
 
    procedure X_Admin_Bar_Bump_Cb
    is
+      use Php.Echoing;
       use Inc_Themes;
 
-      Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
-                            then "" else " type=""text/css""");
+      Type_Attr : constant String :=
+        (if Current_Theme_Supports ("html5", "style")
+         then "" else " type=""text/css""");
    begin
-      null;
---        ?>
--- <style<?php echo type_attr; ?> media="screen">
---        html then margin-top: 32px !important; end;
---        @media screen and (max-width: 782px) then
---                html then margin-top: 46px !important; end;
---        end;
--- </style>
---        <?php
+      Echo ("<style" & Type_Attr & " media=""screen"">" & NL);
+      Echo ("   html { margin-top: 32px !important; }" & NL);
+      Echo ("   @media screen and (max-width: 782px) {" & NL);
+      Echo ("       html { margin-top: 46px !important; }" & NL);
+      Echo ("   }" & NL);
+      Echo ("</style>" & NL);
    end X_Admin_Bar_Bump_Cb;
 
    --------------------

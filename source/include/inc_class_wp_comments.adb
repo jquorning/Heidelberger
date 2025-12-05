@@ -6,56 +6,73 @@
 -- @since 4.4.0
 --
 
+with Globals;
+with Hb_Common;
+
+with Inc_Caches;
+with Inc_Class_Wpdb;
+
 package body Inc_Class_Wp_Comments
 is
-   procedure Dummy is null;
 
---         -- Retrieves a WP_Comment instance.
---         --
---         -- @since 4.4.0
---         --
---         -- @global wpdb wpdb WordPress database abstraction object.
---         --
---         -- @param int id Comment ID.
---         -- @return WP_Comment|false Comment object, otherwise false.
---         --
---         public static function get_instance( id ) then
---                 global wpdb;
+   ------------------
+   -- Get_Instance --
+   ------------------
 
---                 comment_id = (int) id;
---                 if ( ! comment_id ) then
---                         return false;
---                 end;
+   function Get_Instance (Id : Integer)
+                          return Wp_Comment
+   is
+      use Globals;
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Class_Wpdb;
 
---                 _comment = wp_cache_get( comment_id, 'comment' );
+      Comment_Id : constant Integer := Id; -- (int)
+   begin
+      if Comment_Id in 0 then
+         return Null_Comment; -- False;
+      end if;
 
---                 if ( ! _comment ) then
---                         _comment = wpdb.get_row( wpdb.prepare( "SELECT-- FROM wpdb.comments WHERE comment_ID = %d LIMIT 1", comment_id ) );
+      declare
+         Found   : Boolean;
+         Success : Boolean;
 
---                         if ( ! _comment ) then
---                                 return false;
---                         end;
+         X_Comment : Wp_Comment :=
+           Wp_Cache_Get (Comment_Id, "comment", Found => Found);
+      begin
+         if X_Comment = Null_Comment then -- not
+            X_Comment :=
+              WpDB.Get_Row (
+                WpDB.Prepare (
+                  "SELECT * FROM wpdb.comments WHERE comment_ID = %d LIMIT 1",
+                  Integer'Image (Comment_Id)),
+                  Success => Success);
 
---                         wp_cache_add( _comment.comment_ID, _comment, 'comment' );
---                 end;
+            if X_Comment = Null_Comment then -- not
+               return Null_Comment; -- False;
+            end if;
 
---                 return new WP_Comment( _comment );
---         end;
+            Wp_Cache_Add (-X_Comment.Comment_Id, X_Comment, "comment");
+         end if;
 
---         --
---         -- Constructor.
---         --
---         -- Populates properties with object vars.
---         --
---         -- @since 4.4.0
---         --
---         -- @param WP_Comment comment Comment object.
---         --
---         public function __construct( comment ) then
---                 foreach ( get_object_vars( comment ) as key => value ) then
---                         this.key = value;
---                 end;
---         end;
+         return X_Construct (X_Comment);
+      end;
+   end Get_Instance;
+
+   -----------------
+   -- X_Construct --
+   -----------------
+
+   function X_Construct (Comment : Wp_Comment)
+                         return Wp_Comment
+   is
+      This : Wp_Comment;
+   begin
+      -- for ( get_object_vars( comment ) as key => value ) loop
+      --                   this.key = value;
+      -- end loop;
+      return This;
+   end X_Construct;
 
 --         --
 --         -- Convert object to array.

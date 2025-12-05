@@ -437,7 +437,7 @@ is
                            Inc_Functions.Wp_Die (
                              Sprintf (
                                abs "You cannot move this item to the Trash. %s is currently editing.",
-                               To_List ("XXX-362"))); -- -User.Display_Name));
+                               To_List (-User.Prop.Display_Name)));
                         end;
                      end if;
 

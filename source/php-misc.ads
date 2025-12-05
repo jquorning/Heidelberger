@@ -13,6 +13,11 @@ is
    function Time return Natural
    is (9999);
 
+   function GMdate (Format    : String;
+                    Timestamp : Integer)
+                    return String
+                    is ("XXX-025");
+
    function Get_Object_Vars (Arry : Array_Type) return Array_Type;
 
    function Key (Arry : Array_Type)

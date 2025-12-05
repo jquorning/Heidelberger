@@ -171,8 +171,30 @@ is
                              return List_Type
                              is (Empty_List);
 
+   function Get_Site_Option (Option  : String;
+                             Default : List_Type := Empty_List)
+                             return Natural
+                             is (999);
+
    --
-   -- Retrieves a network"s option value based on the option name.
+   -- Removes a option by name for the current network.
+   --
+   -- @since 2.8.0
+   -- @since 4.4.0 Modified into wrapper for delete_network_option()
+   --
+   -- @see delete_network_option()
+   --
+   -- @param string option Name of the option to delete. Expected to not be
+   --                       SQL-escaped.
+   -- @return bool True if the option was deleted, false otherwise.
+   --
+   function Delete_Site_Option (Option : String)
+                                return Boolean;
+
+   procedure Delete_Site_Option (Option : String);
+
+   --
+   -- Retrieves a network's option value based on the option name.
    --
    -- @since 4.4.0
    --
@@ -193,6 +215,26 @@ is
                                 Default    : Boolean := False)
                                 return String
                                 is ("XXX-667");
+
+   --
+   -- Removes a network option by name.
+   --
+   -- @since 4.4.0
+   --
+   -- @see delete_option()
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param int    network_id ID of the network. Can be null to default to the
+   --                           current network ID.
+   -- @param string option     Name of the option to delete. Expected to not be
+   --                           SQL-escaped.
+   -- @return bool True if the option was deleted, false otherwise.
+   --
+   function Delete_Network_Option (Network_Id : Integer;
+                                   Option     : String)
+                                   return Boolean
+                                   is (False);
 
    --
    -- Updates the value of an option that was already added.

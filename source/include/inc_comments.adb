@@ -8,10 +8,20 @@
 with Arrays;
 with Globals;
 with Hb_Common;
--- with Php;
+
+with Inc_Caches;
+-- with Inc_Plugins;
 
 package body Inc_Comments
 is
+   use Arrays;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Comment_Counts;
+                           Post_Id   : Integer)
+                           return Comment_Counts
+                           is (Value);
+
 -- --
 -- -- Checks whether a comment passes internal checks to be allowed to add.
 -- --
@@ -189,9 +199,7 @@ is
                          Output  : String  := "OBJECT")
                          return Inc_Class_Wp_Comments.Wp_Comment
    is
-      use Arrays;
       use Hb_Common;
---    use Php;
       use Inc_Class_Wp_Comments;
 
       Comment_2 : Integer := Comment;
@@ -209,7 +217,7 @@ is
       -- elsif Is_Object (Comment_2) then
       --    X_Comment = new Wp_Comment (Comment_2);
       -- else
-      --    X_Comment = WP_Comment::Get_Instance (Comment_2);
+      X_Comment := Get_Instance (Comment_2); -- WP_Comment::
       -- end if;
 
 --      if not X_Comment then
@@ -362,62 +370,52 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Retrieves the total comment counts for the whole site or a single post.
--- --
--- -- @since 2.0.0
--- --
--- -- @param int post_id Optional. Restrict the comment counts to the given post. Default 0, which indicates that
--- --                     comment counts for the whole site will be retrieved.
--- -- @return int[] then
--- --     The number of comments keyed by their status.
--- --
--- --     @type int approved            The number of approved comments.
--- --     @type int awaiting_moderation The number of comments awaiting moderation (a.k.a. pending).
--- --     @type int spam                The number of spam comments.
--- --     @type int trash               The number of trashed comments.
--- --     @type int post-trashed        The number of comments for posts that are in the trash.
--- --     @type int total_comments      The total number of non-trashed comments, including spam.
--- --     @type int all                 The total number of pending or approved comments.
--- -- end;
--- --
--- function get_comment_count( post_id = 0 ) then
---         post_id = (int) post_id;
+   ------------------------
+   -- Get_Comment_Counts --
+   ------------------------
 
---         comment_count = array(
---                 "approved"            => 0,
---                 "awaiting_moderation" => 0,
---                 "spam"                => 0,
---                 "trash"               => 0,
---                 "post-trashed"        => 0,
---                 "total_comments"      => 0,
---                 "all"                 => 0,
---         );
+   function Get_Comment_Count (Post_Id : Integer := 0)
+                               return Comment_Counts
+   is
+--    post_id = (int) post_id;
 
---         args = array(
---                 "count"                     => true,
---                 "update_comment_meta_cache" => false,
---         );
---         if ( post_id > 0 ) then
---                 args["post_id"] = post_id;
---         end;
---         mapping       = array(
---                 "approved"            => "approve",
---                 "awaiting_moderation" => "hold",
---                 "spam"                => "spam",
---                 "trash"               => "trash",
---                 "post-trashed"        => "post-trashed",
---         );
---         comment_count = array();
---         foreach ( mapping as key => value ) then
---                 comment_count[ key ] = get_comments( array_merge( args, array( "status" => value ) ) );
---         end;
+      Comment_Count : constant Comment_Counts := (others => 0);
+        --  = array(
+        --         "approved"            => 0,
+        --         "awaiting_moderation" => 0,
+        --         "spam"                => 0,
+        --         "trash"               => 0,
+        --         "post-trashed"        => 0,
+        --         "total_comments"      => 0,
+        --         "all"                 => 0,
+        -- );
 
---         comment_count["all"]            = comment_count["approved"] + comment_count["awaiting_moderation"];
---         comment_count["total_comments"] = comment_count["all"] + comment_count["spam"];
+      -- args = array(
+      --           "count"                     => true,
+      --           "update_comment_meta_cache" => false,
+      --   );
+   begin
+        -- if ( post_id > 0 ) then
+        --         args["post_id"] = post_id;
+        -- end;
+        -- mapping       = array(
+        --         "approved"            => "approve",
+        --         "awaiting_moderation" => "hold",
+        --         "spam"                => "spam",
+        --         "trash"               => "trash",
+        --         "post-trashed"        => "post-trashed",
+        -- );
+        -- comment_count = array();
+        -- foreach ( mapping as key => value ) then
+        --         comment_count[ key ] = get_comments( array_merge( args, array( "status" => value ) ) );
+        -- end;
 
---         return array_map( "intval", comment_count );
--- end;
+        -- comment_count["all"]            = comment_count["approved"] + comment_count["awaiting_moderation"];
+        -- comment_count["total_comments"] = comment_count["all"] + comment_count["spam"];
+
+      -- return array_map( "intval", comment_count );
+      return Comment_Count;
+   end Get_Comment_Count;
 
 -- --
 -- -- Comment meta functions.
@@ -1379,69 +1377,90 @@ is
 --         return false;
 -- end;
 
---
--- Retrieves the total comment counts for the whole site or a single post.
---
--- The comment stats are cached and then retrieved, if they already exist in the
--- cache.
---
--- @see get_comment_count() Which handles fetching the live comment counts.
---
--- @since 2.5.0
---
--- @param int post_id Optional. Restrict the comment counts to the given post. Default 0, which indicates that
---                     comment counts for the whole site will be retrieved.
--- @return stdClass then
---     The number of comments keyed by their status.
---
---     @type int approved       The number of approved comments.
---     @type int moderated      The number of comments awaiting moderation (a.k.a. pending).
---     @type int spam           The number of spam comments.
---     @type int trash          The number of trashed comments.
---     @type int post-trashed   The number of comments for posts that are in the trash.
---     @type int total_comments The total number of non-trashed comments, including spam.
---     @type int all            The total number of pending or approved comments.
--- end;
---
--- function wp_count_comments( post_id = 0 ) then
-
+   --
+   -- Retrieves the total comment counts for the whole site or a single post.
+   --
+   -- The comment stats are cached and then retrieved, if they already exist in the
+   -- cache.
+   --
+   -- @see get_comment_count() Which handles fetching the live comment counts.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int post_id Optional. Restrict the comment counts to the given post.
+   --                     Default 0, which indicates that comment counts for the
+   --                     whole site will be retrieved.
+   -- @return stdClass {
+   --     The number of comments keyed by their status.
+   --
+   --     @type int approved       The number of approved comments.
+   --     @type int moderated      The number of comments awaiting moderation
+   --                               (a.k.a. pending).
+   --     @type int spam           The number of spam comments.
+   --     @type int trash          The number of trashed comments.
+   --     @type int post-trashed   The number of comments for posts that are in the
+   --                               trash.
+   --     @type int total_comments The total number of non-trashed comments, including
+   --                               spam.
+   --     @type int all            The total number of pending or approved comments.
+   -- }
+   --
    function Wp_Count_Comments (Post_Id : Integer := 0)
                                return Comment_Counts
    is
-      C : Comment_Counts;
+      use Inc_Caches;
+--    use Inc_Plugins;
+
+--    post_id = (int) post_id;
+
+      --
+      -- Filters the comments count for a given post or the whole site.
+      --
+      -- @since 2.7.0
+      --
+      -- @param array|stdClass count   An empty array or an object containing comment
+      --                                counts.
+      -- @param int            post_id The post ID. Can be 0 to represent the whole
+      --                                site.
+      --
+      Filtered : constant Comment_Counts :=
+        Apply_Filters ("wp_count_comments",
+                       Null_Comment_Counts,
+                       Post_Id);
    begin
-      return C;
+      if Filtered /= Null_Comment_Counts then
+--    if not Empty (Filtered) then
+         return Filtered;
+      end if;
+
+      declare
+         Found : Boolean;
+         Count : constant Comment_Counts :=
+           Wp_Cache_Get ("comments-" & Natural'Image (Post_Id),
+                         "counts", Found => Found);
+      begin
+         if Count /= Null_Comment_Counts then
+--       if False /= Count then
+            return Count;
+         end if;
+      end;
+
+      declare
+         Stats : Comment_Counts := Get_Comment_Count (Post_Id);
+      begin
+         Stats.Moderated := Stats.Awaiting_Moderation;
+--       Delete (Ref (Stats, "awaiting_moderation"));
+
+         declare
+            Stats_Object : constant Comment_Counts := Stats; -- (object) Stats;
+         begin
+            Wp_Cache_Set ("comments-" & (Natural'Image (Post_Id)),
+                          Stats_Object, "counts");
+
+            return Stats_Object;
+         end;
+      end;
    end Wp_Count_Comments;
-
---         post_id = (int) post_id;
-
---         --
---         -- Filters the comments count for a given post or the whole site.
---         --
---         -- @since 2.7.0
---         --
---         -- @param array|stdClass count   An empty array or an object containing comment counts.
---         -- @param int            post_id The post ID. Can be 0 to represent the whole site.
---         --
---         filtered = apply_filters( "wp_count_comments", array(), post_id );
---         if ( ! empty( filtered ) ) then
---                 return filtered;
---         end;
-
---         count = wp_cache_get( "comments-thenpost_idend;", "counts" );
---         if ( false !== count ) then
---                 return count;
---         end;
-
---         stats              = get_comment_count( post_id );
---         stats["moderated"] = stats["awaiting_moderation"];
---         unset( stats["awaiting_moderation"] );
-
---         stats_object = (object) stats;
---         wp_cache_set( "comments-thenpost_idend;", stats_object, "counts" );
-
---         return stats_object;
--- end;
 
 -- --
 -- -- Trashes or deletes a comment.

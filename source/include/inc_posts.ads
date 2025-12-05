@@ -213,12 +213,12 @@ is
    -- @param string $post_type The name of a registered post type.
    -- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
    --
-   --  function Get_Post_Type_Object (Post_Type : String) return Wp_Post;
    function Get_Post_Type_Object (Post_Type : String)
                                   return Inc_Class_Wp_Post_Type.Wp_Post_Type;
-   function Get_Post_Type_Object (Post_Type : String)
-                                  return Boolean
-                                  is (True);
+--   function Get_Post_Type_Object (Post_Type : String)
+--                                  return Boolean
+--                                  is (True);
+
    --
    -- Gets a list of all registered post type objects.
    --

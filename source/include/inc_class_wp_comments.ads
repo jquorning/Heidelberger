@@ -6,11 +6,13 @@
 -- @since 4.4.0
 --
 
+with Ada.Strings.Unbounded;
+
 with Inc_Class_Wp_Posts;
 
 package Inc_Class_Wp_Comments
 is
-   procedure Dummy;
+   use Ada.Strings.Unbounded;
 
    --
    -- Core class used to organize comments as instantiated objects with defined
@@ -21,16 +23,15 @@ is
    -- #[AllowDynamicProperties]
    type Wp_Comment is tagged
       record
-
---         --
---         -- Comment ID.
---         --
---         -- A numeric string, for compatibility reasons.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_ID;
+         --
+         -- Comment ID.
+         --
+         -- A numeric string, for compatibility reasons.
+         --
+         -- @since 4.4.0
+         -- @var string
+         --
+         Comment_Id : Unbounded_String;
 
 --         --
 --         -- ID of the post the comment is associated with.
@@ -177,53 +178,32 @@ is
 --         --
 --         protected post_fields = array( 'post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_title', 'post_excerpt', 'post_status', 'comment_status', 'ping_status', 'post_name', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_content_filtered', 'post_parent', 'guid', 'menu_order', 'post_type', 'post_mime_type', 'comment_count' );
       end record;
---         --
---         -- Retrieves a WP_Comment instance.
---         --
---         -- @since 4.4.0
---         --
---         -- @global wpdb wpdb WordPress database abstraction object.
---         --
---         -- @param int id Comment ID.
---         -- @return WP_Comment|false Comment object, otherwise false.
---         --
---         public static function get_instance( id ) then
---                 global wpdb;
 
---                 comment_id = (int) id;
---                 if ( ! comment_id ) then
---                         return false;
---                 end;
+   --
+   -- Retrieves a WP_Comment instance.
+   --
+   -- @since 4.4.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param int id Comment ID.
+   -- @return WP_Comment|false Comment object, otherwise false.
+   --
+   -- public static
+   function Get_Instance (Id : Integer)
+                          return Wp_Comment;
 
---                 _comment = wp_cache_get( comment_id, 'comment' );
-
---                 if ( ! _comment ) then
---                         _comment = wpdb.get_row( wpdb.prepare( "SELECT-- FROM wpdb.comments WHERE comment_ID = %d LIMIT 1", comment_id ) );
-
---                         if ( ! _comment ) then
---                                 return false;
---                         end;
-
---                         wp_cache_add( _comment.comment_ID, _comment, 'comment' );
---                 end;
-
---                 return new WP_Comment( _comment );
---         end;
-
---         --
---         -- Constructor.
---         --
---         -- Populates properties with object vars.
---         --
---         -- @since 4.4.0
---         --
---         -- @param WP_Comment comment Comment object.
---         --
---         public function __construct( comment ) then
---                 foreach ( get_object_vars( comment ) as key => value ) then
---                         this.key = value;
---                 end;
---         end;
+   --
+   -- Constructor.
+   --
+   -- Populates properties with object vars.
+   --
+   -- @since 4.4.0
+   --
+   -- @param WP_Comment comment Comment object.
+   --
+   function X_Construct (Comment : Wp_Comment)
+                         return Wp_Comment;
 
 --         --
 --         -- Convert object to array.
@@ -386,6 +366,7 @@ is
 --         end;
 
    Null_Comment : constant Wp_Comment :=
-     (Comment_Post_Id => 0);
+     (Comment_Id      => Null_Unbounded_String,
+      Comment_Post_Id => 0);
 
 end Inc_Class_Wp_Comments;

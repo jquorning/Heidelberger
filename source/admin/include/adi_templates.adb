@@ -263,7 +263,7 @@ is
                                As_Array (Get (Args_2, "selected_cats")), True)
                   then
                      Checked_Categories := Get_Array (Categories, -K); -- ()
---                   Unset (Categories (K));
+                     Delete (Ref (Checked_Categories, -K)); -- checked_ added
                   end if;
                end loop;
             end;

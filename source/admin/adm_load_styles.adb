@@ -8,12 +8,14 @@ with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
+with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
 with Arrays;
 with Binder;
 with Globals;
+with Helpers;
 with Hb_Common;
 with Lists;
 
@@ -43,12 +45,14 @@ is
       use Arrays;
       use Binder;
       use Globals;
+      use Helpers;
       use Hb_Common;
       use Php;
       use Php.Arrays;
       use Php.Echoing;
       use Php.HTML;
       use Php.Lists;
+      use Php.Misc;
       use Php.Preg;
       use Php.Strings;
       use Inc_Class_Wp_Dependency;
@@ -163,9 +167,10 @@ is
 
       Header ("Etag: " & Inc_Versions.Wp_Version);
       Header ("Content-Type: text/css; charset=UTF-8");
---    Header ("Expires: " & Gmdate ("D, d M Y H:i:s", Time () + Expires_Offset) &
---            " GMT");
-      Header ("Cache-Control: public, max-age=expires_offset");
+      Header ("Expires: " &
+              GMdate ("D, d M Y H:i:s", Time + Expires_Offset) &
+              " GMT");
+      Header ("Cache-Control: public, max-age=" & Image (Expires_Offset));
 
       Echo (-Outt);
    end Run;

@@ -895,16 +895,23 @@ is
                         use Inc_Class_Wp_Posts;
 
                         Id   : constant Post_Id := Post_Id'Value (-Ids.First_Element);
+
                         URL  : constant String  :=
                            ESC_URL (Get_Edit_Post_Link (Integer (Id)));
+
                         Post : constant String  := -- Inc_Class_Posts.Wp_Post :=
                            Inc_Posts.Get_Post_Type (Id);
+
                         HTML : constant String := "XXX-251";
---                        := ESC_HTML (Inc_Posts.Get_Post_Type_Object
---                                      (Get (A => Post, Key => "labels.edit_item")));
+--                        ESC_HTML (Inc_Posts.Get_Post_Type_Object
+--                                   (Get (A => Post, Key => "labels.edit_item")));
                      begin
-                        Append (Messages, "<a href=""" & URL & "$s"">" & HTML &
-                                          "$s</a>");
+                        Append (Messages,
+                                Sprintf ("<a href=""%1$s"">%2$s</a>",
+                                  To_List (List => (
+                                    1 => +URL,
+                                    2 => +HTML
+                                  ))));
                      end;
                      -- Messages [] := Sprintf (
                      --               "<a href=""%1$s"">%2$s</a>",
