@@ -348,6 +348,7 @@ is
                         declare
                            Active_Post_Lock : Array_Type :=
                               Wp_Set_Post_Lock (Integer (Post.Id));
+                           pragma Unreferenced (Active_Post_Lock);
                         begin
                            if "attachment" /= Post_Type then
                               Wp_Enqueue_Script ("autosave");

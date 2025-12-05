@@ -8,7 +8,6 @@
 with Ada.Strings.Unbounded;
 
 with Php.Echoing;
-with Php.Strings;
 
 with Globals;
 with Hb_Common;
@@ -21,7 +20,6 @@ with Adm_Admin_Footer;
 with Adm_Admin_Header;
 
 with Inc_Formatting;
-with Inc_General_Templates;
 with Inc_L10n;
 with Inc_Link_Templates;
 
@@ -41,7 +39,6 @@ is
       use Hb_Common;
       use Php;
       use Php.Echoing;
-      use Php.Strings;
       use Inc_L10n;
 
 --    Display_Version : List_Type;
