@@ -97,8 +97,8 @@ is
 --        global tinymce_version
 --        global concatenate_scripts
 --        global compress_scripts
-      Suffix     : String := Wp_Scripts_Get_Suffix;
-      Dev_Suffix : String := Wp_Scripts_Get_Suffix ("dev");
+      Suffix     : constant String := Wp_Scripts_Get_Suffix;
+      Dev_Suffix : constant String := Wp_Scripts_Get_Suffix ("dev");
       Compressed : Boolean;
    begin
       Script_Concat_Settings;
@@ -121,20 +121,21 @@ is
       else
          Scripts.Add
            ("wp-tinymce-root",
-            Includes_URL ("js/tinymce/") & "tinymcedev_suffix.js",
+            Includes_URL ("js/tinymce/") & "tinymce" & Dev_Suffix & ".js",
             Empty_List,
             Tinymce_Version);
 
          Scripts.Add
            ("wp-tinymce",
-            Includes_URL ("js/tinymce/") & "plugins/compat3x/plugindev_suffix.js",
+            Includes_URL ("js/tinymce/") &
+                          "plugins/compat3x/plugin" & Dev_Suffix & ".js",
             To_List ("wp-tinymce-root"),
             Tinymce_Version);
       end if;
 
       Scripts.Add
         ("wp-tinymce-lists",
-         Includes_URL ("js/tinymce/plugins/lists/pluginsuffix.js"),
+         Includes_URL ("js/tinymce/plugins/lists/plugin" & Suffix & ".js"),
          To_List ("wp-tinymce"),
          Tinymce_Version);
 
@@ -154,7 +155,7 @@ is
       use Inc_Plugins;
 --    global wp_locale;
 
-      Suffix : String := Wp_Scripts_Get_Suffix;
+      Suffix : constant String := Wp_Scripts_Get_Suffix;
 
       Vendor_Scripts : constant Array_Type := To_Array ((
         Build ("react",       To_Array ((1 => Build ("wp-polyfill", "")))),
@@ -204,7 +205,7 @@ is
             --         dependencies = array();
             -- end if;
 
-            Path    := +"/wp-includes/js/dist/vendor/handlesuffix.js";
+            Path    := +"/wp-includes/js/dist/vendor/handle" & Suffix & " .js";
             Version := +As_String (Get (Vendor_Scripts_Versions, Handle));
 
             Scripts.Add (Handle, -Path, To_List (Dependencies), -Version, 1);
@@ -360,7 +361,7 @@ is
      (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
    is
       use Php;
-      use Php.Files;
+--    use Php.Files;
       use Php.Lists;
       use Php.Strings;
 
@@ -857,8 +858,8 @@ is
       use Inc_Load;
       use Inc_Plugins;
 
-      Suffix      : String := Wp_Scripts_Get_Suffix;
-      Dev_Suffix  : String := Wp_Scripts_Get_Suffix ("dev");
+      Suffix      : constant String := Wp_Scripts_Get_Suffix;
+      Dev_Suffix  : constant String := Wp_Scripts_Get_Suffix ("dev");
       GuessURL    : Unbounded_String := +Site_URL;
       Guessed_URL : Boolean := False;
    begin
@@ -870,19 +871,20 @@ is
       Scripts.Base_URL        := GuessURL;
       Scripts.Content_URL     := Globals.WP_CONTENT_URL; -- defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
       Scripts.Default_Version := +Get_Bloginfo ("version");
-      Scripts.Default_Dirs    := To_List (List => (+"/wp-admin/js/", +"/wp-includes/js/"));
+      Scripts.Default_Dirs    :=
+        To_List (List => (+"/wp-admin/js/", +"/wp-includes/js/"));
 
-      Scripts.Add ("utils", "/wp-includes/js/utilssuffix.js");
+      Scripts.Add ("utils", "/wp-includes/js/utils" & Suffix & ".js");
       if Did_Action ("init") then
          Scripts.Localize (
-                "utils",
-                "userSettings",
-                To_Array ((
-                        Build ("url",    -Globals.SITECOOKIEPATH), -- (string)
-                        Build ("uid",    Inc_Users.Get_Current_User_Id), -- (string)
---                      Build ("time",   (string) time(),
-                        Build ("secure", Boolean'Image ("https" = Php.HTML.Parse_URL (Site_URL, Php.HTML.PHP_URL_SCHEME)))
-                ))
+           "utils",
+           "userSettings",
+           To_Array ((
+             Build ("url",    -Globals.SITECOOKIEPATH), -- (string)
+             Build ("uid",    Inc_Users.Get_Current_User_Id), -- (string)
+--           Build ("time",   (string) time(),
+             Build ("secure", Boolean'Image ("https" = Php.HTML.Parse_URL (Site_URL, Php.HTML.PHP_URL_SCHEME)))
+           ))
          );
       end if;
 
@@ -1197,31 +1199,57 @@ is
          Scripts.Add_Data ("json2", "conditional", "lt IE 8");
       end if;
 
-      Scripts.Add ("underscore", "/wp-includes/js/underscoredev_suffix.js", Empty_List, "1.13.4", 1);
-      Scripts.Add ("backbone", "/wp-includes/js/backbonedev_suffix.js", To_List (List => (+"underscore", +"jquery")), "1.4.1", 1);
+      Scripts.Add ("underscore",
+                   "/wp-includes/js/underscore" & Dev_Suffix & ".js",
+                   Empty_List, "1.13.4", 1);
 
-      Scripts.Add ("wp-util", "/wp-includes/js/wp-utilsuffix.js", To_List (List => (+"underscore", +"jquery")), False, 1);
+      Scripts.Add ("backbone",
+                   "/wp-includes/js/backbone" & Dev_Suffix & ".js",
+                   To_List (List => (+"underscore", +"jquery")), "1.4.1", 1);
+
+      Scripts.Add ("wp-util",
+                   "/wp-includes/js/wp-util" & Suffix & ".js",
+                   To_List (List => (+"underscore", +"jquery")), False, 1);
+
       if Did_Action ("init") then
          Scripts.Localize (
-                "wp-util",
-                "_wpUtilSettings",
-                To_Array ((1 =>
-                        Build ("ajax", To_Array ((1 =>
-                                Build ("url", Admin_URL ("admin-ajax.php", "relative"))
-                       )))
-                ))
+           "wp-util",
+           "_wpUtilSettings",
+           To_Array ((1 =>
+             Build ("ajax", To_Array ((1 =>
+               Build ("url", Admin_URL ("admin-ajax.php", "relative"))
+           )))
+          ))
          );
       end if;
 
-      Scripts.Add ("wp-backbone", "/wp-includes/js/wp-backbonesuffix.js", To_List (List => (+"backbone", +"wp-util")), False, 1);
+      Scripts.Add ("wp-backbone",
+                   "/wp-includes/js/wp-backbone" & Suffix & ".js",
+                   To_List (List => (+"backbone", +"wp-util")), False, 1);
 
-      Scripts.Add ("revisions", "/wp-admin/js/revisionssuffix.js", To_List (List => (+"wp-backbone", +"jquery-ui-slider", +"hoverIntent")), False, 1);
+      Scripts.Add ("revisions",
+                   "/wp-admin/js/revisions" & Suffix & ".js",
+                   To_List (List => (+"wp-backbone", +"jquery-ui-slider",
+                                     +"hoverIntent")), False, 1);
 
-      Scripts.Add ("imgareaselect", "/wp-includes/js/imgareaselect/jquery.imgareaselectsuffix.js", To_List ("jquery"), False, 1);
+      Scripts.Add ("imgareaselect",
+                   "/wp-includes/js/imgareaselect/jquery.imgareaselect" &
+                   Suffix & ".js",
+                   To_List ("jquery"), False, 1);
 
-      Scripts.Add ("mediaelement", False, To_List (List => (+"jquery", +"mediaelement-core", +"mediaelement-migrate")), "4.2.17", 1);
-      Scripts.Add ("mediaelement-core", "/wp-includes/js/mediaelement/mediaelement-and-playersuffix.js", Empty_List, "4.2.17", 1);
-      Scripts.Add ("mediaelement-migrate", "/wp-includes/js/mediaelement/mediaelement-migratesuffix.js", Empty_List, False, 1);
+      Scripts.Add ("mediaelement", False,
+                   To_List (List => (+"jquery", +"mediaelement-core",
+                                                +"mediaelement-migrate")),
+                   "4.2.17", 1);
+
+      Scripts.Add ("mediaelement-core",
+                   "/wp-includes/js/mediaelement/mediaelement-and-player" &
+                   Suffix & ".js",
+                   Empty_List, "4.2.17", 1);
+
+      Scripts.Add ("mediaelement-migrate",
+                   "/wp-includes/js/mediaelement/mediaelement-migrate" &
+                   Suffix & ".js", Empty_List, False, 1);
 
       if Did_Action ("init") then
          Scripts.Add_Inline_Script (
@@ -1985,13 +2013,13 @@ is
                Path   : Unbounded_String;
             begin
 
-               Path := +"/wp-includes/css/dist/package/stylesuffix.css";
+               Path := +"/wp-includes/css/dist/package/style" & Suffix & ".css";
 
                if
                  "block-library" = Packag and then
                  Wp_Should_Load_Separate_Core_Block_Assets
                then
-                  Path := +"/wp-includes/css/dist/package/commonsuffix.css";
+                  Path := +"/wp-includes/css/dist/package/common" & Suffix & ".css";
                end if;
 
                Styles.Add (Handle, -Path, Dependencies_2);

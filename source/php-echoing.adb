@@ -7,7 +7,6 @@ with Ada.Strings.Unbounded;
 with Php.Strings;
 
 with Hb_Common;
-with Lists;
 
 package body Php.Echoing
 is

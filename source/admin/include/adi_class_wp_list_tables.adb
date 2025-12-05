@@ -1153,7 +1153,7 @@ is
       for A in Columns.Iterate loop
          declare
             Col         : constant String := Key (A);
-            Column_Name :          String := As_String (Get (Columns, Col));
+--          Column_Name :          String := As_String (Get (Columns, Col));
             -- Array_Maps.Element (A);
          begin
             if "cb" = Col then
@@ -1660,18 +1660,11 @@ is
 
    procedure Display_Rows (This : in out Wp_List_Table)
    is
---    use Array_Maps;
---    use Hb_Common;
    begin
       for Item in This.Items.Iterate loop
-         declare
-            K : constant String := Key (Item);
-            V : constant String := As_String (Get (This.Items, K));
-         begin
-            This.Single_Row (To_Array ((1 =>
-                            Build (Key (Item), As_String (Get (This.Items, Key (Item)))) -- Element (Item))
-                         )));
-         end;
+         This.Single_Row (To_Array ((1 =>
+                          Build (Key (Item), As_String (Get (This.Items, Key (Item)))) -- Element (Item))
+                          )));
       end loop;
    end Display_Rows;
 
@@ -1731,7 +1724,7 @@ is
 
       Columns  : constant Array_Type := Column_Info.Columns; -- Get_Array (Column_Info, "columns");
       Hidden   : constant Array_Type := Column_Info.Hidden; -- Get_Array (Column_Info, "hidden");
-      Sortable : Array_Type := Column_Info.Sortable; -- Get_Array (Column_Info, "sortable");
+--    Sortable : Array_Type := Column_Info.Sortable; -- Get_Array (Column_Info, "sortable");
       Primary  : constant String     := -Column_Info.Primary; -- Get       (Column_Info, "primary");
    begin
       for A in Columns.Iterate loop
@@ -1773,12 +1766,12 @@ is
             --            Primary
             --         ) & NL);
             elsif True then -- Method_Exists (This, "column_" & Column_Name) then
-               Echo ("<td attributes>" & NL);
+               Echo ("<td " & (-Attributes) & ">" & NL);
 --             Echo (Call_User_Func (To_Array (This, "column_" & Column_Name), Item) & NL);
                Echo (This.Handle_Row_Actions (Item, Column_Name, Primary) & NL);
                Echo ("</td>" & NL);
             else
-               Echo ("<td attributes>" & NL);
+               Echo ("<td " & (-Attributes) & ">" & NL);
                This.Column_Default (Item, Column_Name);
                Echo (This.Handle_Row_Actions (Item, Column_Name, Primary) & NL);
                Echo ("</td>" & NL);
