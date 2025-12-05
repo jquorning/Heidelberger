@@ -44,15 +44,15 @@ is
       use Php.Strings;
       use Inc_L10n;
 
-      Display_Version : List_Type;
+--    Display_Version : List_Type;
    begin
       Adm_Admin.Run;
 
       -- Used in the HTML title tag.
       Globals.Title := +abs "Privacy";
 
-      Display_Version :=
-        Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
+--    Display_Version :=
+--      Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
 
       Adm_Admin_Header.Run;
 -- require_once ABSPATH . 'wp-admin/admin-header.php';
