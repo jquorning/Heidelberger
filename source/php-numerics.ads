@@ -2,8 +2,11 @@
 --
 --
 
+with Arrays;
+
 package Php.Numerics
 is
+   use Arrays;
 
    function Max (Arry : Array_Type) return Integer is (1);
    function Hexdec (Hex : String) return Integer is (99);

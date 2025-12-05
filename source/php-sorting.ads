@@ -2,8 +2,13 @@
 --
 --
 
+with Arrays;
+with Lists;
+
 package Php.Sorting
 is
+   use Arrays;
+   use Lists;
 
    procedure Sort (List : in out List_Type)
    is null;

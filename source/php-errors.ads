@@ -2,8 +2,11 @@
 --
 --
 
+with Arrays;
+
 package Php.Errors
 is
+   use Arrays;
 
    function Error_Get_Last
             return Array_Type

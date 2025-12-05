@@ -2,8 +2,13 @@
 --
 --
 
+with Arrays;
+with Lists;
+
 package Php.Misc
 is
+   use Arrays;
+   use Lists;
 
    function Compact (Var_Name  : String;
                      Var_Names : String)

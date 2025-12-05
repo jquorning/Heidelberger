@@ -2,13 +2,13 @@
 --
 --
 
--- with Arrays;
--- with Lists;
+with Arrays;
+with Lists;
 
 package Php.Strings
 is
--- use Arrays;
--- use Lists;
+   use Arrays;
+   use Lists;
 
    function Strstr (Haystack      : String;
                     Needle        : String;

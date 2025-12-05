@@ -2,8 +2,13 @@
 --
 --
 
+with Arrays;
+with Lists;
+
 package Php.Preg
 is
+   use Arrays;
+   use Lists;
 
    function Preg_Replace (Left  : String;
                           Right : String)

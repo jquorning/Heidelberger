@@ -2,11 +2,13 @@
 --
 --
 
--- with Arrays;
+with Arrays;
+with Lists;
 
 package Php.Arrays
 is
--- use Arrays;
+   use Standard.Arrays;
+   use Lists;
 
    function Array_Merge (Left, Right : Array_Type) return Array_Type
       is (Left);

@@ -4,11 +4,14 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
 with Php.Strings;
+
+with Hb_Common;
+with Lists;
 
 package body Php.Echoing
 is
+   use Lists;
 
    Echo_Buffer : Ada.Strings.Unbounded.Unbounded_String;
 

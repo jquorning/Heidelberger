@@ -2,8 +2,11 @@
 --
 --
 
+with Arrays;
+
 package Php.JSON
 is
+   use Arrays;
 
    function JSON_Encode (Value : Multi_Type)
                          return String

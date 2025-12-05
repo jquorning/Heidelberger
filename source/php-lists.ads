@@ -2,8 +2,13 @@
 --
 --
 
+with Arrays;
+with Lists;
+
 package Php.Lists
 is
+   use Arrays;
+   use Standard.Lists;
 
    function In_Array (Needle   : String;
                       Haystack : List_Type;

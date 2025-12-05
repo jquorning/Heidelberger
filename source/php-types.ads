@@ -2,8 +2,13 @@
 --
 --
 
+with Arrays;
+with Lists;
+
 package Php.Types
 is
+   use Arrays;
+   use Lists;
 
    function Is_Object (Arry : Array_Type) return Boolean is (False);
    function Is_Array  (Arry : Array_Type) return Boolean is (True);
