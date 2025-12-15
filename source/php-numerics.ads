@@ -20,4 +20,9 @@ is
                    return Float
                    is (99.99);
 
+   function Rand (Min : Integer;
+                  Max : Integer)
+                  return Natural
+                  is (99);
+
 end Php.Numerics;

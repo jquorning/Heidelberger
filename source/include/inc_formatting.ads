@@ -240,6 +240,18 @@ is
                             return Array_Type;
 
    --
+   -- Navigates through an array, object, or scalar, and raw-encodes the values to be
+   -- used in a URL.
+   --
+   -- @since 3.4.0
+   --
+   -- @param mixed value The array or string to be encoded.
+   -- @return mixed The encoded value.
+   --
+   function Raw_URL_Encode_Deep (Value : Array_Type)
+                                 return Array_Type; -- String;
+
+   --
    -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
    --
    -- Escapes text strings for echoing in JS. It is intended to be used for inline JS

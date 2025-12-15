@@ -76,22 +76,22 @@ is
 --                 Strpos (-Version_2, Results ("data") ("version")) /= 0)
       then
          declare
-            Url : constant Unbounded_String :=
+            URL : constant Unbounded_String :=
                +"http://api.wordpress.org/core/credits/1.1/?version=" &
                (-Version_2) & "&locale=" & (-Locale_2) & """";
 
             Options : constant Array_Type :=
                Arrays.To_Array ((1 => Build ("user-agent", "WordPress/" &
-                          (-Version_2) & "; " & Inc_Link_Templates.Home_Url ("/"))));
+                          (-Version_2) & "; " & Inc_Link_Templates.Home_URL ("/"))));
 
             Response : Array_Type;
-            Json     : JSON_Value;
+            JSON     : JSON_Value;
          begin
 --            if Wp_Http_Supports (To_Array ("ssl")) then
 --               url := Set_Url_Scheme (Url, "https");
 --            end if;
 
-            Response := Inc_Http.Wp_Remote_Get (-Url, Options);
+            Response := Inc_Http.Wp_Remote_Get (-URL, Options);
 
 --            if
 --              Is_Wp_Error (Response) or else
@@ -101,7 +101,7 @@ is
 --            end if;
 
             -- Added for dev jq
-            Json := Read (Get_File ("dev.json"));
+            JSON := Read (Get_File ("dev.json"));
 
 --            Json := Json_Decode (Wp_Remote_Retrieve_Body (Response), True);
 --          Results := Json_Decode (Wp_Remote_Retrieve_Body (Response), True);
@@ -111,7 +111,7 @@ is
 
 --            Set_Site_Transient ("wordpress_credits_" & Locale_2,
 --                                Results, DAY_IN_SECONDS);
-            return Json;
+            return JSON;
          end;
       end if;
 
@@ -296,8 +296,8 @@ is
                                          Build ("size", Size * 2)))); -- (1)
                begin
                   Echo ("<span class=""wp-person-avatar""><img src=""" &
---                      ESC_URL (Get (Data,   "url")) & """ srcset=""" &
---                      ESC_URL (Get (Data2x, "url")) &
+                        ESC_URL (Get_As_String (Data,   "url")) & """ srcset=""" &
+                        ESC_URL (Get_As_String (Data2x, "url")) &
                         " 2x"" class=""gravatar"" alt="""" /></span>" & NL);
                   Echo (ESC_HTML (Get (Person_Data, 1).Get) & "</a>" & NL_TAB); -- (0)
                end;

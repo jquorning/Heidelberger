@@ -1,3 +1,4 @@
+with Helpers;
 
 package body Arrays
 is
@@ -412,8 +413,18 @@ is
                            Key  : String)
                            return String
    is
+      M : constant Multi_Type := Get (Arry, Key);
    begin
-      return As_String (Get (Arry, Key));
+      case Kind_Of (M) is
+      when Kind_String =>
+         return As_String (M);
+      when Kind_Integer =>
+         return Helpers.Image (As_Integer (M));
+      when Kind_Null =>
+         return "";
+      when others =>
+         pragma Assert (False);
+      end case;
    end Get_As_String;
 
    ------------

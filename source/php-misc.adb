@@ -16,6 +16,7 @@ is
                             return String
    is
    begin
+      Callback.all;
       return ""; -- Callback.all (Args);
    end Call_User_Func;
 

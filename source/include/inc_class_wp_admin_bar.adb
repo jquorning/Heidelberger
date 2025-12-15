@@ -89,14 +89,14 @@ is
 
             This.User.Domain         :=
               +(if This.User.Active_Blog = Null_Site
-                then User_Admin_Url
+                then User_Admin_URL
                 else Trailingslashit (
-                        Get_Home_Url (-This.User.Active_Blog.Blog_Id)));
+                        Get_Home_URL (-This.User.Active_Blog.Blog_Id)));
 
             This.User.Account_Domain := This.User.Domain;
          else
 --          this.user.Active_Blog    := This.User.Blogs (Get_Current_Blog_Id);
-            This.User.Domain         := +Trailingslashit (Home_Url);
+            This.User.Domain         := +Trailingslashit (Home_URL);
             This.User.Account_Domain := This.User.Domain;
          end if;
       end if;

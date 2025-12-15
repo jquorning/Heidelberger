@@ -5,9 +5,28 @@
 -- @subpackage Template
 --
 
+with Ada.Strings.Unbounded;
+
+with Php.Arrays;
+with Php.Misc;
+with Php.Numerics;
+with Php.Strings;
+with Php.Types;
+
+with Hb_Common;
+with Helpers;
+with Lists;
+
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Load;
+with Inc_Options;
+with Inc_Plugins;
+
 package body Inc_Link_Templates
 is
-   procedure Dummy is null;
+   use Lists;
+
 -- --
 -- -- Displays the permalink for the current post.
 -- --
@@ -4223,224 +4242,240 @@ is
 --         return in_array( comment_type, (array) allowed_comment_types, true );
 -- end;
 
--- --
--- -- Retrieves default data about the avatar.
--- --
--- -- @since 4.2.0
--- --
--- -- @param mixed id_or_email The avatar to retrieve. Accepts a user ID, Gravatar MD5 hash,
--- --                           user email, WP_User object, WP_Post object, or WP_Comment object.
--- -- @param array args then
--- --     Optional. Arguments to use instead of the default arguments.
--- --
--- --     @type int    size           Height and width of the avatar image file in pixels. Default 96.
--- --     @type int    height         Display height of the avatar in pixels. Defaults to size.
--- --     @type int    width          Display width of the avatar in pixels. Defaults to size.
--- --     @type string default        URL for the default image or a default type. Accepts "404" (return
--- --                                  a 404 instead of a default image), "retro" (8bit), "monsterid" (monster),
--- --                                  "wavatar" (cartoon face), "indenticon" (the "quilt"), "mystery", "mm",
--- --                                  or "mysteryman" (The Oyster Man), "blank" (transparent GIF), or
--- --                                  "gravatar_default" (the Gravatar logo). Default is the value of the
--- --                                  "avatar_default" option, with a fallback of "mystery".
--- --     @type bool   force_default  Whether to always show the default image, never the Gravatar. Default false.
--- --     @type string rating         What rating to display avatars up to. Accepts "G", "PG", "R", "X", and are
--- --                                  judged in that order. Default is the value of the "avatar_rating" option.
--- --     @type string scheme         URL scheme to use. See set_url_scheme() for accepted values.
--- --                                  Default null.
--- --     @type array  processed_args When the function returns, the value will be the processed/sanitized args
--- --                                  plus a "found_avatar" guess. Pass as a reference. Default null.
--- --     @type string extra_attr     HTML attributes to insert in the IMG element. Is not sanitized. Default empty.
--- -- end;
--- -- @return array then
--- --     Along with the arguments passed in `args`, this will contain a couple of extra arguments.
--- --
--- --     @type bool         found_avatar True if an avatar was found for this user,
--- --                                      false or not set if none was found.
--- --     @type string|false url          The URL of the avatar that was found, or false.
--- -- end;
--- --
--- function get_avatar_data( id_or_email, args = null ) then
---         args = wp_parse_args(
---                 args,
---                 array(
---                         "size"           => 96,
---                         "height"         => null,
---                         "width"          => null,
---                         "default"        => get_option( "avatar_default", "mystery" ),
---                         "force_default"  => false,
---                         "rating"         => get_option( "avatar_rating" ),
---                         "scheme"         => null,
---                         "processed_args" => null, // If used, should be a reference.
---                         "extra_attr"     => "",
---                 )
---         );
+   ---------------------
+   -- Get_Avatar_Data --
+   ---------------------
 
---         if ( is_numeric( args["size"] ) ) then
---                 args["size"] = absint( args["size"] );
---                 if ( ! args["size"] ) then
---                         args["size"] = 96;
---                 end;
---         end; else then
---                 args["size"] = 96;
---         end;
+   function Get_Avatar_Data (Id_Or_Email : String;
+                             Args        : Array_Type) -- = null
+                             return Array_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Arrays;
+      use Php.Misc;
+      use Php.Numerics;
+      use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Options;
+      use Inc_Plugins;
 
---         if ( is_numeric( args["height"] ) ) then
---                 args["height"] = absint( args["height"] );
---                 if ( ! args["height"] ) then
---                         args["height"] = args["size"];
---                 end;
---         end; else then
---                 args["height"] = args["size"];
---         end;
+      Args_2 : Array_Type :=
+        Wp_Parse_Args (
+          Args,
+          To_Array (List => (
+            Build ("size",           96),
+            Build ("height",         Null_Value),
+            Build ("width",          Null_Value),
+            Build ("default",
+                   String'(Get_Option ("avatar_default", "mystery"))),
+            Build ("force_default",  False),
+            Build ("rating",
+                   String'(Get_Option ("avatar_rating"))),
+            Build ("scheme",         Null_Value),
+            Build ("processed_args", Null_Value), -- If used, should be a reference.
+            Build ("extra_attr",     "")
+          ))
+        );
+   begin
 
---         if ( is_numeric( args["width"] ) ) then
---                 args["width"] = absint( args["width"] );
---                 if ( ! args["width"] ) then
---                         args["width"] = args["size"];
---                 end;
---         end; else then
---                 args["width"] = args["size"];
---         end;
+      if Is_Numeric (Get_As_String (Args_2, "size")) then
+         Set (Args_2, "size", From_Integer (abs As_Integer (Get (Args_2, "size"))));
+         if Kind_Of (Get (Args_2, "size")) in Kind_Null then
+            Set (Args_2, "size", From_Integer (96));
+         end if;
+      else
+         Set (Args_2, "size", From_Integer (96));
+      end if;
 
---         if ( empty( args["default"] ) ) then
---                 args["default"] = get_option( "avatar_default", "mystery" );
---         end;
+      if Is_Numeric (Get_As_String (Args_2, "height")) then
+         Set (Args_2, "height",
+              From_Integer (abs As_Integer (Get (Args_2, "height"))));
+         if Kind_Of (Get (Args_2, "height")) in Kind_Null then
+            Set (Args_2, "height", Get (Args_2, "size"));
+         end if;
+      else
+         Set (Args_2, "height", Get (Args_2, "size"));
+      end if;
 
---         switch ( args["default"] ) then
---                 case "mm":
---                 case "mystery":
---                 case "mysteryman":
---                         args["default"] = "mm";
---                         break;
---                 case "gravatar_default":
---                         args["default"] = false;
---                         break;
---         end;
+      if Is_Numeric (Get_As_String (Args_2, "width")) then
+         Set (Args_2, "width",
+              From_Integer (abs As_Integer (Get (Args_2, "width"))));
+         if Kind_Of (Get (Args_2, "width")) in Kind_Null then
+            Set (Args_2, "width", Get (Args_2, "size"));
+         end if;
+      else
+         Set (Args_2, "width", Get (Args_2, "size"));
+      end if;
 
---         args["force_default"] = (bool) args["force_default"];
+      if Empty (Args_2, "default") then
+         Set (Args_2, "default",
+              From_String (Get_Option ("avatar_default", "mystery")));
+      end if;
 
---         args["rating"] = strtolower( args["rating"] );
+      declare
+         Default : constant String := Get_As_String (Args_2, "default");
+      begin
+         if Default in "mm" | "mystery" | "mysteryman" then
+            Set (Args_2, "default", From_String ("mm"));
+         elsif Default in "gravatar_default" then
+            Set (Args_2, "default", From_Boolean (False));
+         end if;
+      end;
 
---         args["found_avatar"] = false;
+      Set (Args_2, "force_default",
+           From_Boolean (As_Boolean (Get (Args_2, "force_default"))));
 
---         --
---         -- Filters whether to retrieve the avatar URL early.
---         --
---         -- Passing a non-null value in the "url" member of the return array will
---         -- effectively short circuit get_avatar_data(), passing the value through
---         -- the {@see "get_avatar_data"} filter and returning early.
---         --
---         -- @since 4.2.0
---         --
---         -- @param array args        Arguments passed to get_avatar_data(), after processing.
---         -- @param mixed id_or_email The avatar to retrieve. Accepts a user ID, Gravatar MD5 hash,
---         --                           user email, WP_User object, WP_Post object, or WP_Comment object.
---         --
---         args = apply_filters( "pre_get_avatar_data", args, id_or_email );
+      Set (Args_2, "rating",
+           From_String (Strtolower (Get_As_String (Args_2, "rating"))));
 
---         if ( isset( args["url"] ) ) then
---                 -- This filter is documented in wp-includes/link-template.php--
---                 return apply_filters( "get_avatar_data", args, id_or_email );
---         end;
+      Set (Args_2, "found_avatar", From_Boolean (False));
 
---         email_hash = "";
---         user       = false;
---         email      = false;
+      --
+      -- Filters whether to retrieve the avatar URL early.
+      --
+      -- Passing a non-null value in the "url" member of the return array will
+      -- effectively short circuit get_avatar_data(), passing the value through
+      -- the {@see "get_avatar_data"} filter and returning early.
+      --
+      -- @since 4.2.0
+      --
+      -- @param array args        Arguments passed to get_avatar_data(), after
+      --                           processing.
+      -- @param mixed id_or_email The avatar to retrieve. Accepts a user ID, Gravatar
+      --                           MD5 hash, user email, WP_User object,
+      --                           WP_Post object, or WP_Comment object.
+      --
+      Args_2 := Apply_Filters ("pre_get_avatar_data", Args_2, Id_Or_Email);
 
---         if ( is_object( id_or_email ) && isset( id_or_email->comment_ID ) ) then
---                 id_or_email = get_comment( id_or_email );
---         end;
+      if Isset (Args_2, "url") then
+         -- This filter is documented in wp-includes/link-template.php
+         return Apply_Filters ("get_avatar_data", Args_2, Id_Or_Email);
+      end if;
 
---         // Process the user identifier.
---         if ( is_numeric( id_or_email ) ) then
---                 user = get_user_by( "id", absint( id_or_email ) );
---         end; elseif ( is_string( id_or_email ) ) then
---                 if ( strpos( id_or_email, "@md5.gravatar.com" ) ) then
---                         // MD5 hash.
---                         list( email_hash ) = explode( "@", id_or_email );
---                 end; else then
---                         // Email address.
---                         email = id_or_email;
---                 end;
---         end; elseif ( id_or_email instanceof WP_User ) then
---                 // User object.
---                 user = id_or_email;
---         end; elseif ( id_or_email instanceof WP_Post ) then
---                 // Post object.
---                 user = get_user_by( "id", (int) id_or_email->post_author );
---         end; elseif ( id_or_email instanceof WP_Comment ) then
---                 if ( ! is_avatar_comment_type( get_comment_type( id_or_email ) ) ) then
---                         args["url"] = false;
---                         -- This filter is documented in wp-includes/link-template.php--
---                         return apply_filters( "get_avatar_data", args, id_or_email );
---                 end;
+      declare
+         Id_Or_Email_2 : constant Unbounded_String := +Id_Or_Email;
+         Email_Hash    : Unbounded_String;
+         User       : Unbounded_String; -- Boolean := False;
+         Email      : Unbounded_String; -- Boolean := False;
+         Gravatar_Server : Natural;
+      begin
+--       if Is_Object (Id_Or_Email) and then Isset (Id_Or_Email.Comment_Id) then
+--          Id_Or_Email := Get_Comment (Id_Or_Email);
+--       end if;
 
---                 if ( ! empty( id_or_email->user_id ) ) then
---                         user = get_user_by( "id", (int) id_or_email->user_id );
---                 end;
---                 if ( ( ! user || is_wp_error( user ) ) && ! empty( id_or_email->comment_author_email ) ) then
---                         email = id_or_email->comment_author_email;
---                 end;
---         end;
+         -- Process the user identifier.
+--       if Is_Numeric (Id_Or_Email) then
+--          User := Get_User_By ("id", abs Id_Or_Email);
+--       elsif Is_String (Id_Or_Email) then
+            if 0 /= Strpos (-Id_Or_Email_2, "@md5.gravatar.com") then
+               -- MD5 hash.
+               declare
+                  L : constant List_Type := Explode ("@", -Id_Or_Email_2);
+               begin
+                  Email_Hash := L.First_Element;
+               end;
+            else
+               -- Email address.
+               Email := Id_Or_Email_2;
+            end if;
+         -- elsif id_or_email instanceof WP_User then
+         --         -- User object.
+         --         user = id_or_email;
+         -- elsif id_or_email instanceof WP_Post then
+         --         -- Post object.
+         --         user = get_user_by( "id", (int) id_or_email->post_author );
+         -- elsif id_or_email instanceof WP_Comment then
+         --         if ( ! is_avatar_comment_type( get_comment_type( id_or_email ) ) ) then
+         --                 args["url"] = false;
+         --                 -- This filter is documented in wp-includes/link-template.php--
+         --                 return apply_filters( "get_avatar_data", args, id_or_email );
+         --         end if;
 
---         if ( ! email_hash ) then
---                 if ( user ) then
---                         email = user->user_email;
---                 end;
+         --         if ( ! empty( id_or_email->user_id ) ) then
+         --                 user = get_user_by( "id", (int) id_or_email->user_id );
+         --         end if;
+         --         if ( ( ! user || is_wp_error( user ) ) && ! empty( id_or_email->comment_author_email ) ) then
+         --                 email = id_or_email->comment_author_email;
+         --         end if;
+--       end if;
 
---                 if ( email ) then
---                         email_hash = md5( strtolower( trim( email ) ) );
---                 end;
---         end;
+         if Email_Hash = "" then -- not
+--          if User /= "" then
+--             Email := User.User_Email;
+--          end if;
 
---         if ( email_hash ) then
---                 args["found_avatar"] = true;
---                 gravatar_server      = hexdec( email_hash[0] ) % 3;
---         end; else then
---                 gravatar_server = rand( 0, 2 );
---         end;
+            if Email /= "" then
+               Email_Hash := +MD5 (Strtolower (Trim (-Email)));
+            end if;
+         end if;
 
---         url_args = array(
---                 "s" => args["size"],
---                 "d" => args["default"],
---                 "f" => args["force_default"] ? "y" : false,
---                 "r" => args["rating"],
---         );
+         if Email_Hash /= "" then
+            Set (Args_2, "found_avatar", From_Boolean (True));
+            Gravatar_Server := Hexdec ("" & Element (Email_Hash, 1)) mod 3;
+         else
+            Gravatar_Server := Rand (0, 2);
+         end if;
 
---         if ( is_ssl() ) then
---                 url = "https://secure.gravatar.com/avatar/" . email_hash;
---         end; else then
---                 url = sprintf( "http://%d.gravatar.com/avatar/%s", gravatar_server, email_hash );
---         end;
+         declare
+            URL_Args : constant Array_Type := To_Array (List => (
+                Build ("s", As_Integer (Get (Args_2, "size"))),
+                Build ("d", Get_As_String (Args_2, "default")),
+                Build ("f", (if As_Boolean (Get (Args_2, "force_default"))
+                             then "y" else "False")),
+                Build ("r", Get_As_String (Args_2, "rating"))
+            ));
 
---         url = add_query_arg(
---                 rawurlencode_deep( array_filter( url_args ) ),
---                 set_url_scheme( url, args["scheme"] )
---         );
+            URL : Unbounded_String;
+         begin
+            if Is_SSL then
+               URL := +"https://secure.gravatar.com/avatar/" & Email_Hash;
+            else
+               URL := +Sprintf ("http://%d.gravatar.com/avatar/%s",
+                                To_List (List => (
+                                  +Helpers.Image (Gravatar_Server),
+                                  Email_Hash)));
+            end if;
 
---         --
---         -- Filters the avatar URL.
---         --
---         -- @since 4.2.0
---         --
---         -- @param string url         The URL of the avatar.
---         -- @param mixed  id_or_email The avatar to retrieve. Accepts a user ID, Gravatar MD5 hash,
---         --                            user email, WP_User object, WP_Post object, or WP_Comment object.
---         -- @param array  args        Arguments passed to get_avatar_data(), after processing.
---         --
---         args["url"] = apply_filters( "get_avatar_url", url, id_or_email, args );
+            URL := +Add_Query_Arg (
+                Raw_URL_Encode_Deep (Array_Filter (URL_Args)),
+                Set_URL_Scheme (-URL, Get_As_String (Args_2, "scheme"))
+            );
 
---         --
---         -- Filters the avatar data.
---         --
---         -- @since 4.2.0
---         --
---         -- @param array args        Arguments passed to get_avatar_data(), after processing.
---         -- @param mixed id_or_email The avatar to retrieve. Accepts a user ID, Gravatar MD5 hash,
---         --                           user email, WP_User object, WP_Post object, or WP_Comment object.
---         --
---         return apply_filters( "get_avatar_data", args, id_or_email );
--- end;
+            --
+            -- Filters the avatar URL.
+            --
+            -- @since 4.2.0
+            --
+            -- @param string url         The URL of the avatar.
+            -- @param mixed  id_or_email The avatar to retrieve. Accepts a user ID,
+            --                            Gravatar MD5 hash, user email, WP_User
+            --                            object, WP_Post object, or WP_Comment object.
+            -- @param array  args        Arguments passed to get_avatar_data(), after
+            --                            processing.
+            --
+            Set (Args_2, "url", From_String (
+                 Apply_Filters ("get_avatar_url", -URL, -Id_Or_Email_2, Args_2)));
+
+            --
+            -- Filters the avatar data.
+            --
+            -- @since 4.2.0
+            --
+            -- @param array args        Arguments passed to get_avatar_data(), after
+            --                           processing.
+            -- @param mixed id_or_email The avatar to retrieve. Accepts a user ID,
+            --                           Gravatar MD5 hash, user email, WP_User
+            --                           object, WP_Post object, or WP_Comment object.
+            --
+            --
+            return Apply_Filters ("get_avatar_data", Args_2, Id_Or_Email);
+         end;
+      end;
+   end Get_Avatar_Data;
 
 -- --
 -- -- Retrieves the URL of a file in the theme.

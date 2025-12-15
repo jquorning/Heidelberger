@@ -27,6 +27,12 @@ Function return values can not be ignored.
 - Procedure version of function call.
 - Exceptions.
 
+#### Bad toes
+- `Do_Action` -
+- `Apply_Filters` -
+- Cache stuff
+- Options
+
 ### To Do
 
 - Fix XXX-000 and 100 others

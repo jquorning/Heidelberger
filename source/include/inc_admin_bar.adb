@@ -171,9 +171,9 @@ is
       About_URL : Unbounded_String;
    begin
       if Current_User_Can ("read") then
-         About_URL := +Self_Admin_Url ("about.php");
+         About_URL := +Self_Admin_URL ("about.php");
       elsif Is_Multisite then
-         About_URL := +Get_Dashboard_Url (Get_Current_User_Id, "about.php");
+         About_URL := +Get_Dashboard_URL (Get_Current_User_Id, "about.php");
       else
          About_URL := +""; -- false;
       end if;
@@ -304,9 +304,9 @@ is
       end if;
 
       if Current_User_Can ("read") then
-         Profile_Url := +Get_Edit_Profile_Url (User_Id);
+         Profile_Url := +Get_Edit_Profile_URL (User_Id);
       elsif Is_Multisite then
-         Profile_Url := +Get_Dashboard_Url (User_Id, "profile.php");
+         Profile_Url := +Get_Dashboard_URL (User_Id, "profile.php");
       else
          Profile_Url := +""; -- false;
       end if;
@@ -357,9 +357,9 @@ is
       end if;
 
       if Current_User_Can ("read") then
-         Profile_Url := +Get_Edit_Profile_Url (User_Id);
+         Profile_Url := +Get_Edit_Profile_URL (User_Id);
       elsif Is_Multisite then
-         Profile_Url := +Get_Dashboard_Url (User_Id, "profile.php");
+         Profile_Url := +Get_Dashboard_URL (User_Id, "profile.php");
       else
          Profile_Url := +""; -- false;
       end if;
@@ -453,7 +453,7 @@ is
       Blogname := +Get_Bloginfo ("name");
 
       if Blogname = "" then
-         Blogname := +Preg_Replace ("#^(https?://)?(www.)?#", "", Get_Home_Url);
+         Blogname := +Preg_Replace ("#^(https?://)?(www.)?#", "", Get_Home_URL);
       end if;
 
       if Is_Network_Admin then
@@ -473,7 +473,7 @@ is
          Node.Id    := +"site-name";
          Node.Title := +Title;
          Node.Href  := +(if Is_Admin or else not Current_User_Can ("read")
-                         then Home_Url ("/") else Admin_URL);
+                         then Home_URL ("/") else Admin_URL);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -487,7 +487,7 @@ is
             Node.Parent := +"site-name";
             Node.Id     := +"view-site";
             Node.Title  := +abs "Visit Site";
-            Node.Href   := +Home_Url ("/");
+            Node.Href   := +Home_URL ("/");
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -503,7 +503,7 @@ is
                Node.Parent := +"site-name";
                Node.Id     := +"edit-site";
                Node.Title  := +abs "Edit Site";
-               Node.Href   := +Network_Admin_Url
+               Node.Href   := +Network_Admin_URL
                                  ("site-info.php?id=" &
                                   Integer'Image (Get_Current_Blog_Id));
                Admin_Bar.Add_Node (Node);
@@ -670,7 +670,7 @@ is
       end if;
 
       if Admin_Bar.User.Active_Blog /= Null_Site then -- "" then
-         My_Sites_Url := +Get_Admin_Url (Admin_Bar.User.Active_Blog.Blog_Id,
+         My_Sites_Url := +Get_Admin_URL (Admin_Bar.User.Active_Blog.Blog_Id,
                                          "my-sites.php");
       else
          My_Sites_Url := +Admin_URL ("my-sites.php");
@@ -702,7 +702,7 @@ is
             Node.Parent := +"my-sites-super-admin";
             Node.Id     := +"network-admin";
             Node.Title  := +abs "Network Admin";
-            Node.Href   := +Network_Admin_Url;
+            Node.Href   := +Network_Admin_URL;
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -713,7 +713,7 @@ is
             Node.Parent := +"network-admin";
             Node.Id     := +"network-admin-d";
             Node.Title  := +abs "Dashboard";
-            Node.Href   := +Network_Admin_Url;
+            Node.Href   := +Network_Admin_URL;
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -725,7 +725,7 @@ is
                Node.Parent := +"network-admin";
                Node.Id     := +"network-admin-s";
                Node.Title  := +abs "Sites";
-               Node.Href   := +Network_Admin_Url ("sites.php");
+               Node.Href   := +Network_Admin_URL ("sites.php");
 
                Admin_Bar.Add_Node (Node);
             end;
@@ -738,7 +738,7 @@ is
                Node.Parent := +"network-admin";
                Node.Id     := +"network-admin-u";
                Node.Title  := +abs "Users";
-               Node.Href   := +Network_Admin_Url ("users.php");
+               Node.Href   := +Network_Admin_URL ("users.php");
 
                Admin_Bar.Add_Node (Node);
             end;
@@ -751,7 +751,7 @@ is
                Node.Parent := +"network-admin";
                Node.Id     := +"network-admin-t";
                Node.Title  := +abs "Themes";
-               Node.Href   := +Network_Admin_Url ("themes.php");
+               Node.Href   := +Network_Admin_URL ("themes.php");
 
                Admin_Bar.Add_Node (Node);
             end;
@@ -764,7 +764,7 @@ is
                Node.Parent := +"network-admin";
                Node.Id     := +"network-admin-p";
                Node.Title  := +abs "Plugins";
-               Node.Href   := +Network_Admin_Url ("plugins.php");
+               Node.Href   := +Network_Admin_URL ("plugins.php");
 
                Admin_Bar.Add_Node (Node);
             end;
@@ -777,7 +777,7 @@ is
                Node.Parent := +"network-admin";
                Node.Id     := +"network-admin-o";
                Node.Title  := +abs "Settings";
-               Node.Href   := +Network_Admin_Url ("settings.php");
+               Node.Href   := +Network_Admin_URL ("settings.php");
 
                Admin_Bar.Add_Node (Node);
             end;
@@ -846,7 +846,7 @@ is
 
                if Blogname = "" then
                   Blogname := +Preg_Replace ("#^(https?:--)?(www.)?#", "",
-                                             Get_Home_Url);
+                                             Get_Home_URL);
                end if;
 
                declare
@@ -882,7 +882,7 @@ is
                         Node.Parent := +"my-sites-list";
                         Node.Id     := +Menu_Id;
                         Node.Title  := Blavatar & Blogname;
-                        Node.Href   := +Home_Url;
+                        Node.Href   := +Home_URL;
 
                         Admin_Bar.Add_Node (Node);
                      end;
@@ -924,7 +924,7 @@ is
                      Node.Parent := +Menu_Id;
                      Node.Id     := +Menu_Id & "-v";
                      Node.Title  := +abs "Visit Site";
-                     Node.Href   := +Home_Url ("/");
+                     Node.Href   := +Home_URL ("/");
 
                      Admin_Bar.Add_Node (Node);
                   end;
@@ -1537,7 +1537,7 @@ is
       begin
          Node.Id    := +"updates";
          Node.Title := Icon & Title;
-         Node.Href  := +Network_Admin_Url ("update-core.php");
+         Node.Href  := +Network_Admin_URL ("update-core.php");
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1559,7 +1559,7 @@ is
          return;
       end if;
 
-      Form := +"<form action=""" & ESC_URL (Home_Url ("/")) & """ method=""get"" id=""adminbarsearch"">";
+      Form := +"<form action=""" & ESC_URL (Home_URL ("/")) & """ method=""get"" id=""adminbarsearch"">";
       Form := Form & "<input class=""adminbar-input"" name=""s"" id=""adminbar-search"" type=""text"" value="""" maxlength=""150"" />";
       Form := Form & "<label for=""adminbar-search"" class=""screen-reader-text"">" & abs "Search" & "</label>";
       Form := Form & "<input type=""submit"" class=""adminbar-button"" value=""" & abs "Search" & """ />";

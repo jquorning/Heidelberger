@@ -2521,17 +2521,17 @@ is
                             return Array_Type
    is (Map_Deep (Value, Php.HTML.URLencode'Access));
 
--- --
--- -- Navigates through an array, object, or scalar, and raw-encodes the values to be used in a URL.
--- --
--- -- @since 3.4.0
--- --
--- -- @param mixed value The array or string to be encoded.
--- -- @return mixed The encoded value.
--- --
--- function rawurlencode_deep( value ) then
---         return map_deep( value, "rawurlencode" );
--- end;
+   -------------------------
+   -- Raw_URL_Encode_Deep --
+   -------------------------
+
+   function Raw_URL_Encode_Deep (Value : Array_Type) -- String)
+                                 return Array_Type -- String
+   is
+      use Php.HTML;
+   begin
+      return Map_Deep (Value, RawURLencode'Access);
+   end Raw_URL_Encode_Deep;
 
 -- --
 -- -- Navigates through an array, object, or scalar, and decodes URL-encoded values
