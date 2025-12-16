@@ -19,12 +19,15 @@ with Hb_Common;
 with Helpers;
 with Lists;
 
+with Inc_Class_Wp_Post_Type;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
+with Inc_Posts;
+with Inc_Querys;
 
 package body Inc_Link_Templates
 is
@@ -4042,82 +4045,95 @@ is
 --         end;
 -- end;
 
--- --
--- -- Returns a shortlink for a post, page, attachment, or site.
--- --
--- -- This function exists to provide a shortlink tag that all themes and plugins can target.
--- -- A plugin must hook in to provide the actual shortlinks. Default shortlink support is
--- -- limited to providing ?p= style links for posts. Plugins can short-circuit this function
--- -- via the {@see "pre_get_shortlink"} filter or filter the output via the {@see "get_shortlink"}
--- -- filter.
--- --
--- -- @since 3.0.0
--- --
--- -- @param int    id          Optional. A post or site ID. Default is 0, which means the current post or site.
--- -- @param string context     Optional. Whether the ID is a "site" ID, "post" ID, or "media" ID. If "post",
--- --                            the post_type of the post is consulted. If "query", the current query is consulted
--- --                            to determine the ID and context. Default "post".
--- -- @param bool   allow_slugs Optional. Whether to allow post slugs in the shortlink. It is up to the plugin how
--- --                            and whether to honor this. Default true.
--- -- @return string A shortlink or an empty string if no shortlink exists for the requested resource or if shortlinks
--- --                are not enabled.
--- --
--- function wp_get_shortlink( id = 0, context = "post", allow_slugs = true ) then
---         --
---         -- Filters whether to preempt generating a shortlink for the given post.
---         --
---         -- Returning a value other than false from the filter will short-circuit
---         -- the shortlink generation process, returning that value instead.
---         --
---         -- @since 3.0.0
---         --
---         -- @param false|string return      Short-circuit return value. Either false or a URL string.
---         -- @param int          id          Post ID, or 0 for the current post.
---         -- @param string       context     The context for the link. One of "post" or "query",
---         -- @param bool         allow_slugs Whether to allow post slugs in the shortlink.
---         --
---         shortlink = apply_filters( "pre_get_shortlink", false, id, context, allow_slugs );
+   ----------------------
+   -- Wp_Get_Shortlink --
+   ----------------------
 
---         if ( false !== shortlink ) then
---                 return shortlink;
---         end;
+   function Wp_Get_Shortlink (Id          : Integer := 0;
+                              Context     : String  := "post";
+                              Allow_Slugs : Boolean := True)
+                              return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Options;
+      use Inc_Plugins;
+      use Inc_Posts;
+      use Inc_Querys;
 
---         post_id = 0;
---         if ( "query" === context && is_singular() ) then
---                 post_id = get_queried_object_id();
---                 post    = get_post( post_id );
---         end; elseif ( "post" === context ) then
---                 post = get_post( id );
---                 if ( ! empty( post->ID ) ) then
---                         post_id = post->ID;
---                 end;
---         end;
+      --
+      -- Filters whether to preempt generating a shortlink for the given post.
+      --
+      -- Returning a value other than false from the filter will short-circuit
+      -- the shortlink generation process, returning that value instead.
+      --
+      -- @since 3.0.0
+      --
+      -- @param false|string return      Short-circuit return value. Either false or
+      --                                  a URL string.
+      -- @param int          id          Post ID, or 0 for the current post.
+      -- @param string       context     The context for the link. One of "post" or
+      --                                  "query",
+      -- @param bool         allow_slugs Whether to allow post slugs in the shortlink.
+      --
+      Shortlink : Unbounded_String :=
+        +Apply_Filters ("pre_get_shortlink", "False", Id, Context, Allow_Slugs);
 
---         shortlink = "";
+      Post_Id : Inc_Class_Wp_Posts.Post_Id := 0;
+      Post    : Wp_Post;
+   begin
 
---         // Return `?p=` link for all public post types.
---         if ( ! empty( post_id ) ) then
---                 post_type = get_post_type_object( post->post_type );
+      if "" /= Shortlink then -- false
+         return -Shortlink;
+      end if;
 
---                 if ( "page" === post->post_type && get_option( "page_on_front" ) == post->ID && "page" === get_option( "show_on_front" ) ) then
---                         shortlink = home_url( "/" );
---                 end; elseif ( post_type && post_type->public ) then
---                         shortlink = home_url( "?p=" . post_id );
---                 end;
---         end;
+      if "query" = Context and then Is_Singular then
+         Post_Id := Get_Queried_Object_Id;
+         Post    := Get_Post (Post_Id);
+      elsif "post" = Context then
+         Post := Get_Post (Inc_Class_Wp_Posts.Post_Id (Id));
+         if Post.Id /= 0 then
+--       if not Empty (Post.Id) then
+            Post_Id := Post.Id;
+         end if;
+      end if;
 
---         --
---         -- Filters the shortlink for a post.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string shortlink   Shortlink URL.
---         -- @param int    id          Post ID, or 0 for the current post.
---         -- @param string context     The context for the link. One of "post" or "query",
---         -- @param bool   allow_slugs Whether to allow post slugs in the shortlink. Not used by default.
---         --
---         return apply_filters( "get_shortlink", shortlink, id, context, allow_slugs );
--- end;
+      Shortlink := +"";
+
+      -- Return `?p=` link for all public post types.
+      if Post_Id /= 0 then
+--    if not Empty (Post_Id) then
+         declare
+            Post_Type : constant Wp_Post_Type :=
+              Get_Post_Type_Object (-Post.Post_Type);
+         begin
+            if
+              "page" = Post.Post_Type and then
+              Get_Option ("page_on_front") = Helpers.Image (Integer (Post.Id)) and then
+              "page" = Get_Option ("show_on_front")
+            then
+               Shortlink := +Home_URL ("/");
+            elsif Post_Type /= Null_Post_Type and then Post_Type.Public then
+               Shortlink := +Home_URL ("?p=" & Helpers.Image (Integer (Post_Id)));
+            end if;
+         end;
+      end if;
+
+      --
+      -- Filters the shortlink for a post.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string shortlink   Shortlink URL.
+      -- @param int    id          Post ID, or 0 for the current post.
+      -- @param string context     The context for the link. One of "post" or "query",
+      -- @param bool   allow_slugs Whether to allow post slugs in the shortlink. Not
+      --                            used by default.
+      --
+      return Apply_Filters ("get_shortlink", -Shortlink, Id, Context, Allow_Slugs);
+   end Wp_Get_Shortlink;
 
 -- --
 -- -- Injects rel=shortlink into the head if a shortlink is defined for the current page.

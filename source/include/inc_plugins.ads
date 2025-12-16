@@ -394,6 +394,14 @@ is
                            return String
                            is (Value);
 
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Id        : Integer;
+                           Context   : String;
+                           Allow     : Boolean)
+                           return String
+                           is (Value);
+
    --
    -- Checks if any filter has been registered for a hook.
    --

@@ -69,21 +69,17 @@ is
             return Inc_Class_Wp_Users.Wp_User
             is (Inc_Class_Wp_Users.Null_User);
 
--- --
--- -- Retrieves the ID of the currently queried object.
--- --
--- -- Wrapper for WP_Query::get_queried_object_id().
--- --
--- -- @since 3.1.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return int ID of the queried object.
--- --
--- function get_queried_object_id() then
---         global wp_query;
---         return wp_query->get_queried_object_id();
--- end;
+   ---------------------------
+   -- Get_Queried_Object_Id --
+   ---------------------------
+
+   function Get_Queried_Object_Id
+            return Inc_Class_Wp_Posts.Post_Id
+   is
+--    global wp_query;
+   begin
+      return Wp_Query.Get_Queried_Object_Id;
+   end Get_Queried_Object_Id;
 
 -- --
 -- -- Sets the value of a query variable in the WP_Query class.

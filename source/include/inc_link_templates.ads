@@ -291,8 +291,7 @@ is
    function Wp_Get_Shortlink (Id          : Integer := 0;
                               Context     : String  := "post";
                               Allow_Slugs : Boolean := True)
-                              return String
-                              is ("XXX-356");
+                              return String;
 
    --
    -- Retrieves the URL for the current site where WordPress application files

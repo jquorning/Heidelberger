@@ -3404,26 +3404,27 @@ is
 --                 return $this->queried_object;
 --         end;
 
---         --
---         -- Retrieves the ID of the currently queried object.
---         --
---         -- @since 1.5.0
---         --
---         -- @return int
---         --
---         public function get_queried_object_id() then
---                 $this->get_queried_object();
+   ---------------------------
+   -- Get_Queried_Object_Id --
+   ---------------------------
 
---                 if ( isset( $this->queried_object_id ) ) then
---                         return $this->queried_object_id;
---                 end;
+   function Get_Queried_Object_Id (This : Wp_Query)
+                                   return Inc_Class_Wp_Posts.Post_Id -- Integer
+   is
+      use Inc_Class_Wp_Posts;
 
---                 return 0;
---         end;
+      Unused : constant Wp_Post := This.Get_Queried_Object;
+   begin
+      if This.Queried_Object_Id /= 0 then -- isset
+         return Inc_Class_Wp_Posts.Post_Id (This.Queried_Object_Id);
+      end if;
 
-   -------------
-   -- X_Query --
-   -------------
+      return 0;
+   end Get_Queried_Object_Id;
+
+   -----------------
+   -- X_Construct --
+   -----------------
 
    function X_Construct (Query : Array_Type) -- ''
                          return Wp_Query

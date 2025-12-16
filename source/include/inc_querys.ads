@@ -58,6 +58,20 @@ is
             return Inc_Class_Wp_Users.Wp_User;
 
    --
+   -- Retrieves the ID of the currently queried object.
+   --
+   -- Wrapper for WP_Query::get_queried_object_id().
+   --
+   -- @since 3.1.0
+   --
+   -- @global WP_Query wp_query WordPress Query object.
+   --
+   -- @return int ID of the queried object.
+   --
+   function Get_Queried_Object_Id
+            return Inc_Class_Wp_Posts.Post_Id; -- Integer;
+
+   --
    -- Determines whether the query is for an existing post type archive page.
    --
    -- For more information on this and similar theme functions, check out

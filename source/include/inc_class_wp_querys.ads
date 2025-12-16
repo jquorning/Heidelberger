@@ -534,6 +534,16 @@ is
    is null;
 
    --
+   -- Retrieves the ID of the currently queried object.
+   --
+   -- @since 1.5.0
+   --
+   -- @return int
+   --
+   function Get_Queried_Object_Id (This : Wp_Query)
+                                   return Inc_Class_Wp_Posts.Post_Id; -- Integer;
+
+   --
    -- Constructor.
    --
    -- Sets up the WordPress query, if parameter is not empty.
