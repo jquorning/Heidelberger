@@ -22,6 +22,7 @@ with Lists;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
+with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
 
@@ -3397,69 +3398,66 @@ is
 --         return apply_filters( "home_url", url, path, orig_scheme, blog_id );
 -- end;
 
--- --
--- -- Retrieves the URL for the current site where WordPress application files
--- -- (e.g. wp-blog-header.php or the wp-admin/ folder) are accessible.
--- --
--- -- Returns the "site_url" option with the appropriate protocol, "https" if
--- -- is_ssl() and "http" otherwise. If scheme is "http" or "https", is_ssl() is
--- -- overridden.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string      path   Optional. Path relative to the site URL. Default empty.
--- -- @param string|null scheme Optional. Scheme to give the site URL context. See set_url_scheme().
--- -- @return string Site URL link with optional path appended.
--- --
--- function site_url( path = "", scheme = null ) then
---         return get_site_url( null, path, scheme );
--- end;
+   --------------
+   -- Site_URL --
+   --------------
 
--- --
--- -- Retrieves the URL for a given site where WordPress application files
--- -- (e.g. wp-blog-header.php or the wp-admin/ folder) are accessible.
--- --
--- -- Returns the "site_url" option with the appropriate protocol, "https" if
--- -- is_ssl() and "http" otherwise. If `scheme` is "http" or "https",
--- -- `is_ssl()` is overridden.
--- --
--- -- @since 3.0.0
--- --
--- -- @param int|null    blog_id Optional. Site ID. Default null (current site).
--- -- @param string      path    Optional. Path relative to the site URL. Default empty.
--- -- @param string|null scheme  Optional. Scheme to give the site URL context. Accepts
--- --                             "http", "https", "login", "login_post", "admin", or
--- --                             "relative". Default null.
--- -- @return string Site URL link with optional path appended.
--- --
--- function get_site_url( blog_id = null, path = "", scheme = null ) then
---         if ( empty( blog_id ) || ! is_multisite() ) then
---                 url = get_option( "siteurl" );
---         end; else then
---                 switch_to_blog( blog_id );
---                 url = get_option( "siteurl" );
---                 restore_current_blog();
---         end;
+   function Site_URL (Path   : String := "";
+                      Scheme : String := "") --  = null
+                      return String
+   is
+   begin
+      return Get_Site_URL (0, Path, Scheme); -- null
+   end Site_URL;
 
---         url = set_url_scheme( url, scheme );
+   ------------------
+   -- Get_Site_URL --
+   ------------------
 
---         if ( path && is_string( path ) ) then
---                 url .= "/" . ltrim( path, "/" );
---         end;
+   function Get_Site_URL (Blog_Id : Integer := 0; -- null
+                          Path    : String  := "";
+                          Scheme  : String  := "") -- null
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
+      use Inc_Options;
+      use Inc_Plugins;
 
---         --
---         -- Filters the site URL.
---         --
---         -- @since 2.7.0
---         --
---         -- @param string      url     The complete site URL including scheme and path.
---         -- @param string      path    Path relative to the site URL. Blank string if no path is specified.
---         -- @param string|null scheme  Scheme to give the site URL context. Accepts "http", "https", "login",
---         --                             "login_post", "admin", "relative" or null.
---         -- @param int|null    blog_id Site ID, or null for the current site.
---         --
---         return apply_filters( "site_url", url, path, scheme, blog_id );
--- end;
+      URL : Unbounded_String;
+   begin
+      if Blog_Id = 0 or else not Is_Multisite then
+         URL := +Get_Option ("siteurl");
+      else
+         Switch_To_Blog (Blog_Id);
+         URL := +Get_Option ("siteurl");
+         Restore_Current_Blog;
+      end if;
+
+      URL := +Set_URL_Scheme (-URL, Scheme);
+
+      if Path /= "" then --  && is_string( path ) ) then
+         Append (URL, "/" & Ltrim (Path, "/"));
+      end if;
+
+      --
+      -- Filters the site URL.
+      --
+      -- @since 2.7.0
+      --
+      -- @param string      url     The complete site URL including scheme and path.
+      -- @param string      path    Path relative to the site URL. Blank string if no
+      --                             path is specified.
+      -- @param string|null scheme  Scheme to give the site URL context. Accepts
+      --                             "http", "https", "login", "login_post", "admin",
+      --                             "relative" or null.
+      -- @param int|null    blog_id Site ID, or null for the current site.
+      --
+      return Apply_Filters ("site_url", -URL, Path, Scheme, Blog_Id);
+   end Get_Site_URL;
 
 -- --
 -- -- Retrieves the URL to the admin area for the current site.

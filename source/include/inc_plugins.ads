@@ -385,6 +385,15 @@ is
                            Strict    : Boolean)
                            return String
                            is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Path      : String;
+                           Scheme    : String;
+                           Blog      : Integer)
+                           return String
+                           is (Value);
+
    --
    -- Checks if any filter has been registered for a hook.
    --
