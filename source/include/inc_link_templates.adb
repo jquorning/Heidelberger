@@ -14,6 +14,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Globals;
 with Hb_Common;
 with Helpers;
 with Lists;
@@ -3508,37 +3509,41 @@ is
 --         return apply_filters( "admin_url", url, path, blog_id, scheme );
 -- end;
 
--- --
--- -- Retrieves the URL to the includes directory.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string      path   Optional. Path relative to the includes URL. Default empty.
--- -- @param string|null scheme Optional. Scheme to give the includes URL context. Accepts
--- --                            "http", "https", or "relative". Default null.
--- -- @return string Includes URL link with optional path appended.
--- --
--- function includes_url( path = "", scheme = null ) then
---         url = site_url( "/" . WPINC . "/", scheme );
+   ------------------
+   -- Includes_URL --
+   ------------------
 
---         if ( path && is_string( path ) ) then
---                 url .= ltrim( path, "/" );
---         end;
+   function Includes_URL (Path   : String := "";
+                          Scheme : String := "") -- null
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Globals;
+      use Hb_Common;
+      use Inc_Plugins;
 
---         --
---         -- Filters the URL to the includes directory.
---         --
---         -- @since 2.8.0
---         -- @since 5.8.0 The `scheme` parameter was added.
---         --
---         -- @param string      url    The complete URL to the includes directory including scheme and path.
---         -- @param string      path   Path relative to the URL to the wp-includes directory. Blank string
---         --                            if no path is specified.
---         -- @param string|null scheme Scheme to give the includes URL context. Accepts
---         --                            "http", "https", "relative", or null. Default null.
---         --
---         return apply_filters( "includes_url", url, path, scheme );
--- end;
+      URL : Unbounded_String := +Site_URL ("/" & (-WPINC) & "/", Scheme);
+   begin
+      if Path /= "" then -- and then is_string( path ) ) then
+         Append (URL, Ltrim (Path, "/"));
+      end if;
+
+      --
+      -- Filters the URL to the includes directory.
+      --
+      -- @since 2.8.0
+      -- @since 5.8.0 The `scheme` parameter was added.
+      --
+      -- @param string      url    The complete URL to the includes directory
+      --                            including scheme and path.
+      -- @param string      path   Path relative to the URL to the wp-includes
+      --                            directory. Blank string if no path is specified.
+      -- @param string|null scheme Scheme to give the includes URL context. Accepts
+      --                            "http", "https", "relative", or null. Default null.
+      --
+      return Apply_Filters ("includes_url", -URL, Path, Scheme);
+   end Includes_URL;
 
 -- --
 -- -- Retrieves the URL to the content directory.

@@ -327,8 +327,7 @@ is
    --
    function Includes_URL (Path   : String := "";
                           Scheme : String := "") -- null
-                          return String
-                          is ("XXX-782");
+                          return String;
 
    --
    -- Retrieves default data about the avatar.
