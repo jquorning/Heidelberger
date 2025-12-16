@@ -14,6 +14,29 @@ is
    use Arrays;
 
    --
+   -- Retrieves a trailing-slashed string if the site is set for adding trailing
+   -- slashes.
+   --
+   -- Conditionally adds a trailing slash if the permalink structure has a trailing
+   -- slash, strips the trailing slash if not. The string is passed through the
+   -- {@see "user_trailingslashit"} filter. Will remove trailing slash from string, if
+   -- site is not set to have them.
+   --
+   -- @since 2.2.0
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param string string      URL with or without a trailing slash.
+   -- @param string type_of_url Optional. The type of URL being considered (e.g.
+   --                            single, category, etc) for use in the filter.
+   --                            Default empty string.
+   -- @return string The URL with the trailing slash appended or stripped.
+   --
+   function User_Trailing_Slash_It (Item        : String;
+                                    Type_Of_URL : String := "")
+                                    return String;
+
+   --
    -- Retrieves the permalink for a post type archive.
    --
    -- @since 3.1.0
@@ -26,8 +49,7 @@ is
    --                      does not exist or does not have an archive.
    --
    function Get_Post_Type_Archive_Link (Post_Type : String)
-                                        return String
-                                        is ("XXX-357");
+                                        return String;
 
    --
    -- Retrieves the full permalink for the current post or post ID.

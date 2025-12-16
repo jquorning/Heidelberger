@@ -359,7 +359,7 @@ is
         -- @since 4.6.0
         -- @var array|false rewrite
         --
-        -- public rewrite;
+        Rewrite : Array_Type;
 
         --
         -- The features supported by the post type.
@@ -493,6 +493,7 @@ is
       Can_Export        => False,
       Map_Meta_Cap      => False,
       Has_Archive       => False,
+      Rewrite           => Empty_Array,
       others            => Null_Unbounded_String);
 
    package Post_Type_Maps is new

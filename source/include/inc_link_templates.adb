@@ -20,6 +20,7 @@ with Helpers;
 with Lists;
 
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Rewrites;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -32,6 +33,8 @@ with Inc_Querys;
 package body Inc_Link_Templates
 is
    use Lists;
+
+   Global_Wp_Rewrite : Inc_Class_Wp_Rewrites.Wp_Rewrite;
 
 -- --
 -- -- Displays the permalink for the current post.
@@ -54,43 +57,42 @@ is
 --         echo esc_url( apply_filters( "the_permalink", get_permalink( post ), post ) );
 -- end;
 
--- --
--- -- Retrieves a trailing-slashed string if the site is set for adding trailing slashes.
--- --
--- -- Conditionally adds a trailing slash if the permalink structure has a trailing
--- -- slash, strips the trailing slash if not. The string is passed through the
--- -- {@see "user_trailingslashit"} filter. Will remove trailing slash from string, if
--- -- site is not set to have them.
--- --
--- -- @since 2.2.0
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param string string      URL with or without a trailing slash.
--- -- @param string type_of_url Optional. The type of URL being considered (e.g. single, category, etc)
--- --                            for use in the filter. Default empty string.
--- -- @return string The URL with the trailing slash appended or stripped.
--- --
--- function user_trailingslashit( string, type_of_url = "" ) then
---         global wp_rewrite;
---         if ( wp_rewrite->use_trailing_slashes ) then
---                 string = trailingslashit( string );
---         end; else then
---                 string = untrailingslashit( string );
---         end;
+   ----------------------------
+   -- User_Trailing_Slash_It --
+   ----------------------------
 
---         --
---         -- Filters the trailing-slashed string, depending on whether the site is set to use trailing slashes.
---         --
---         -- @since 2.2.0
---         --
---         -- @param string string      URL with or without a trailing slash.
---         -- @param string type_of_url The type of URL being considered. Accepts "single", "single_trackback",
---         --                            "single_feed", "single_paged", "commentpaged", "paged", "home", "feed",
---         --                            "category", "page", "year", "month", "day", "post_type_archive".
---         --
---         return apply_filters( "user_trailingslashit", string, type_of_url );
--- end;
+   function User_Trailing_Slash_It (Item        : String;
+                                    Type_Of_URL : String := "")
+                                    return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Plugins;
+
+      Item_2 : Unbounded_String;
+   begin
+      if Global_Wp_Rewrite.Use_Trailing_Slashes then
+         Item_2 := +Trailingslashit (Item);
+      else
+         Item_2 := +Untrailingslashit (Item);
+      end if;
+
+      --
+      -- Filters the trailing-slashed string, depending on whether the site is set to
+      -- use trailing slashes.
+      --
+      -- @since 2.2.0
+      --
+      -- @param string string      URL with or without a trailing slash.
+      -- @param string type_of_url The type of URL being considered. Accepts "single",
+      --                            "single_trackback", "single_feed", "single_paged",
+      --                            "commentpaged", "paged", "home", "feed",
+      --                            "category", "page", "year", "month", "day",
+      --                            "post_type_archive".
+      --
+      return Apply_Filters ("user_trailingslashit", -Item_2, Type_Of_URL);
+   end User_Trailing_Slash_It;
 
 -- --
 -- -- Displays the permalink anchor for the current post.
@@ -1310,66 +1312,78 @@ is
 --         return apply_filters( "search_feed_link", link, feed, "comments" );
 -- end;
 
--- --
--- -- Retrieves the permalink for a post type archive.
--- --
--- -- @since 3.1.0
--- -- @since 4.5.0 Support for posts was added.
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param string post_type Post type.
--- -- @return string|false The post type archive permalink. False if the post type
--- --                      does not exist or does not have an archive.
--- --
--- function get_post_type_archive_link( post_type ) then
---         global wp_rewrite;
+   --------------------------------
+   -- Get_Post_Type_Archive_Link --
+   --------------------------------
 
---         post_type_obj = get_post_type_object( post_type );
+   function Get_Post_Type_Archive_Link (Post_Type : String)
+                                        return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Plugins;
+      use Inc_Options;
+      use Inc_Posts;
 
---         if ( ! post_type_obj ) then
---                 return false;
---         end;
+      Post_Type_Obj : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
+      Link          : Unbounded_String;
+   begin
+      if Post_Type_Obj = Null_Post_Type then -- !
+         return ""; -- false;
+      end if;
 
---         if ( "post" === post_type ) then
---                 show_on_front  = get_option( "show_on_front" );
---                 page_for_posts = get_option( "page_for_posts" );
+      if "post" = Post_Type then
+         declare
+            Show_On_Front  : constant String  := Get_Option ("show_on_front");
+            Page_For_Posts : constant Integer := Get_Option ("page_for_posts");
+         begin
+            if "page" = Show_On_Front and then Page_For_Posts /= 0 then
+               Link := +Get_Permalink (Page_For_Posts);
+            else
+               Link := +Get_Home_URL;
+            end if;
+            -- This filter is documented in wp-includes/link-template.php
+            return Apply_Filters ("post_type_archive_link", -Link, Post_Type);
+         end;
+      end if;
 
---                 if ( "page" === show_on_front && page_for_posts ) then
---                         link = get_permalink( page_for_posts );
---                 end; else then
---                         link = get_home_url();
---                 end;
---                 -- This filter is documented in wp-includes/link-template.php--
---                 return apply_filters( "post_type_archive_link", link, post_type );
---         end;
+      if not Post_Type_Obj.Has_Archive then
+         return ""; -- False;
+      end if;
 
---         if ( ! post_type_obj->has_archive ) then
---                 return false;
---         end;
+      if
+        Get_Option ("permalink_structure") and then
+        Is_Array (Post_Type_Obj.Rewrite)
+      then
+         declare
+            Struct : String :=
+              (if Post_Type_Obj.Has_Archive
+               then Get_As_String (Post_Type_Obj.Rewrite, "slug")
+               else Post_Type_Obj.Has_Archive'Image); -- 'image added
+         begin
+            if Get_As_String (Post_Type_Obj.Rewrite, "with_front") /= "" then
+               Struct := (-Global_Wp_Rewrite.Front) & Struct;
+            else
+               Struct := (-Global_Wp_Rewrite.Root) & Struct;
+            end if;
+            Link := +Home_URL (User_Trailing_Slash_It (Struct, "post_type_archive"));
+         end;
+      else
+         Link := +Home_URL ("?post_type=" & Post_Type);
+      end if;
 
---         if ( get_option( "permalink_structure" ) && is_array( post_type_obj->rewrite ) ) then
---                 struct = ( true === post_type_obj->has_archive ) ? post_type_obj->rewrite["slug"] : post_type_obj->has_archive;
---                 if ( post_type_obj->rewrite["with_front"] ) then
---                         struct = wp_rewrite->front . struct;
---                 end; else then
---                         struct = wp_rewrite->root . struct;
---                 end;
---                 link = home_url( user_trailingslashit( struct, "post_type_archive" ) );
---         end; else then
---                 link = home_url( "?post_type=" . post_type );
---         end;
-
---         --
---         -- Filters the post type archive permalink.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string link      The post type archive permalink.
---         -- @param string post_type Post type name.
---         --
---         return apply_filters( "post_type_archive_link", link, post_type );
--- end;
+      --
+      -- Filters the post type archive permalink.
+      --
+      -- @since 3.1.0
+      --
+      -- @param string link      The post type archive permalink.
+      -- @param string post_type Post type name.
+      --
+      return Apply_Filters ("post_type_archive_link", -Link, Post_Type);
+   end Get_Post_Type_Archive_Link;
 
 -- --
 -- -- Retrieves the permalink for a post type archive feed.
