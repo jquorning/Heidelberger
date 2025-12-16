@@ -6145,25 +6145,26 @@ is
 --         return 0;
 -- end;
 
---
--- Determines whether to force SSL used for the Administration Screens.
---
--- @since 2.6.0
---
--- @param string|bool force Optional. Whether to force SSL in admin screens. Default null.
--- @return bool True if forced, false if not forced.
---
--- function force_ssl_admin( force = null ) then
---         static forced = false;
+   ---------------------
+   -- Force_SSL_Admin --
+   ---------------------
+   Static_Forced : Boolean := False;
 
---         if ( ! is_null( force ) ) then
---                 old_forced = forced;
---                 forced     = force;
---                 return old_forced;
---         end;
+   function Force_SSL_Admin (Force : Boolean := False) -- = null )
+                             return Boolean
+   is
+   begin
+      if Force then -- not Is_Null (Force) then
+         declare
+            Old_Forced : constant Boolean := Static_Forced;
+         begin
+            Static_Forced := Force;
+            return Old_Forced;
+         end;
+      end if;
 
---         return forced;
--- end;
+      return Static_Forced;
+   end Force_SSL_Admin;
 
    ------------------
    -- Wp_Guess_URL --

@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 with Php.Arrays;
 with Php.Misc;
 with Php.Numerics;
+with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
@@ -3815,54 +3816,63 @@ is
 --         return apply_filters( "self_admin_url", url, path, scheme );
 -- end;
 
--- --
--- -- Sets the scheme for a URL.
--- --
--- -- @since 3.4.0
--- -- @since 4.4.0 The "rest" scheme was added.
--- --
--- -- @param string      url    Absolute URL that includes a scheme
--- -- @param string|null scheme Optional. Scheme to give url. Currently "http", "https", "login",
--- --                            "login_post", "admin", "relative", "rest", "rpc", or null. Default null.
--- -- @return string URL with chosen scheme.
--- --
--- function set_url_scheme( url, scheme = null ) then
---         orig_scheme = scheme;
+   --------------------
+   -- Set_URL_Scheme --
+   --------------------
 
---         if ( ! scheme ) then
---                 scheme = is_ssl() ? "https" : "http";
---         end; elseif ( "admin" === scheme || "login" === scheme || "login_post" === scheme || "rpc" === scheme ) then
---                 scheme = is_ssl() || force_ssl_admin() ? "https" : "http";
---         end; elseif ( "http" !== scheme && "https" !== scheme && "relative" !== scheme ) then
---                 scheme = is_ssl() ? "https" : "http";
---         end;
+   function Set_URL_Scheme (URL    : String;
+                            Scheme : String := "") -- null
+                            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Plugins;
 
---         url = trim( url );
---         if ( substr( url, 0, 2 ) === "//" ) then
---                 url = "http:" . url;
---         end;
+      Orig_Scheme : constant String := Scheme;
 
---         if ( "relative" === scheme ) then
---                 url = ltrim( preg_replace( "#^\w+://[^/]*#", "", url ) );
---                 if ( "" !== url && "/" === url[0] ) then
---                         url = "/" . ltrim( url, "/ \t\n\r\0\x0B" );
---                 end;
---         end; else then
---                 url = preg_replace( "#^\w+://#", scheme . "://", url );
---         end;
+      Scheme_2 : Unbounded_String := +Scheme;
+      URL_2    : Unbounded_String := +Trim (URL);
+   begin
+      if -Scheme_2 = "" then
+         Scheme_2 := +(if Is_SSL then "https" else "http");
+      elsif -Scheme_2 in "admin" | "login" | "login_post" | "rpc" then
+         Scheme_2 := +(if Is_SSL or else Force_SSL_Admin then "https" else "http");
+      elsif -Scheme_2 not in "http" | "https" | "relative" then
+         Scheme_2 := +(if Is_SSL then "https" else "http");
+      end if;
 
---         --
---         -- Filters the resulting URL after setting the scheme.
---         --
---         -- @since 3.4.0
---         --
---         -- @param string      url         The complete URL including scheme and path.
---         -- @param string      scheme      Scheme applied to the URL. One of "http", "https", or "relative".
---         -- @param string|null orig_scheme Scheme requested for the URL. One of "http", "https", "login",
---         --                                 "login_post", "admin", "relative", "rest", "rpc", or null.
---         --
---         return apply_filters( "set_url_scheme", url, scheme, orig_scheme );
--- end;
+      if Substr (-URL_2, 0, 2) = "//" then
+         URL_2 := "http:" & URL_2;
+      end if;
+
+      if "relative" = Scheme_2 then
+         URL_2 := +Ltrim (Preg_Replace ("#^\w+://[^/]*#", "", -URL_2));
+         if "" /= URL_2 and then '/' = Element (URL_2, 1) then -- [0]
+            URL_2 := +"/" & Ltrim (-URL_2, "/ \t\n\r\0\x0B");
+         end if;
+      else
+         URL_2 := +Preg_Replace ("#^\w+://#", -Scheme_2 & "://", -URL_2);
+      end if;
+
+      --
+      -- Filters the resulting URL after setting the scheme.
+      --
+      -- @since 3.4.0
+      --
+      -- @param string      url         The complete URL including scheme and path.
+      -- @param string      scheme      Scheme applied to the URL. One of "http",
+      --                                 "https", or "relative".
+      -- @param string|null orig_scheme Scheme requested for the URL. One of "http",
+      --                                 "https", "login", "login_post", "admin",
+      --                                 "relative", "rest", "rpc", or null.
+      --
+      --
+      return Apply_Filters ("set_url_scheme", -URL_2, -Scheme_2, Orig_Scheme);
+   end Set_URL_Scheme;
 
 -- --
 -- -- Retrieves the URL to the user"s dashboard.

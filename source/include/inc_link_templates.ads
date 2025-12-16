@@ -400,8 +400,7 @@ is
    --
    function Set_URL_Scheme (URL    : String;
                             Scheme : String := "") -- null
-                            return String
-                            is ("XXX-801");
+                            return String;
 
    --
    -- Retrieves the URL used for the post preview.
