@@ -787,11 +787,27 @@ is
    -- @param string       post_type The post type for which to add the feature.
    -- @param string|array feature   The feature being added, accepts an array of
    --                                feature strings or a single string.
-   -- @param mixed        ...args   Optional extra arguments to pass along with certain features.
+   -- @param mixed        ...args   Optional extra arguments to pass along with
+   --                                certain features.
    --
    procedure Add_Post_Type_Support (Post_Type : String;
                                     Feature   : String);
 --                                  ...args ) then
+
+   --
+   -- Determines whether a post status is considered "viewable".
+   --
+   -- For built-in post statuses such as publish and private, the "public" value will
+   -- be evaluated. For all others, the "publicly_queryable" value will be used.
+   --
+   -- @since 5.7.0
+   -- @since 5.9.0 Added `is_post_status_viewable` hook to filter the result.
+   --
+   -- @param string|stdClass post_status Post status name or object.
+   -- @return bool Whether the post status should be considered viewable.
+   --
+   function Is_Post_Status_Viewable (Post_Status : Status_Type)
+                                     return Boolean;
 
    --
    -- Retrieves an array of the latest posts, or posts matching the given criteria.
@@ -939,6 +955,40 @@ is
                       Filter : String  := "raw")
                       return Array_Type
                       is (Empty_Array);
+
+   --
+   -- Builds the URI path for a page.
+   --
+   -- Sub pages will be in the "directory" under the parent page post name.
+   --
+   -- @since 1.5.0
+   -- @since 4.6.0 The `page` parameter was made optional.
+   --
+   -- @param WP_Post|object|int page Optional. Page ID or WP_Post object. Default is
+   --                                 global post.
+   -- @return string|False Page URI, False on error.
+   --
+   function Get_Page_URI (Page : Wp_Post) -- Integer := 0)
+                          return String;
+
+   --
+   -- Determines whether a post type is considered "viewable".
+   --
+   -- For built-in post types such as posts and pages, the "public" value will be
+   -- evaluated. For all others, the "publicly_queryable" value will be used.
+   --
+   -- @since 4.4.0
+   -- @since 4.5.0 Added the ability to pass a post type name in addition to object.
+   -- @since 4.6.0 Converted the `post_type` parameter to accept a `WP_Post_Type`
+   --               object.
+   -- @since 5.9.0 Added `is_post_type_viewable` hook to filter the result.
+   --
+   -- @param string|WP_Post_Type post_type Post type name or object.
+   -- @return bool Whether the post type should be considered viewable.
+   --
+   function Is_Post_Type_Viewable (Post_Type : String)
+   -- Inc_Class_Wp_Post_Type.Wp_Post_Type)
+                                   return Boolean;
 
    --
    -- Trashes or deletes an attachment.
@@ -1224,10 +1274,12 @@ is
    -- @param int|WP_Post $post Post ID or post object.
    -- @return int[] Array of ancestor IDs or empty array if there are none.
    --
-   -- type Post_Id_List is array (Positive range <>) of Inc_Class_Posts.Post_Id;
-
    function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
-                                return Array_Type;  -- return Post_Id_List;
+                                return Array_Type;
+
+   function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Post_Id)
+                                return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
+                                is (raise Program_Error with "not implemented");
 
    --
    -- Retrieves the post status based on the post ID.

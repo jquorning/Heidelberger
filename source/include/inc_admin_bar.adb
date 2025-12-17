@@ -1042,7 +1042,7 @@ is
                   begin
                      Node.Id    := +"view";
                      Node.Title := +As_String (Get (Post_Type_Object.Labels, "view_item"));
-                     Node.Href  := +Get_Permalink (Integer (Post.Id));
+                     Node.Href  := +Get_Permalink (Post.Id);
 
                      Admin_Bar.Add_Node (Node);
                   end;

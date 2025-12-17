@@ -1719,13 +1719,14 @@ is
    is
       use Php.Arrays;
 --    use Hb_Common;
+--    use Inc_Class_Wp_Posts;
 
-      Post_2 : Inc_Class_Wp_Posts.Wp_Post := Get_Post (Post);
+      Post_2 : constant Wp_Post := Get_Post (Post);
    begin
       if
 --        not Post or else
-        Post.Post_Parent = 0 or else -- empty
-        Post.Post_Parent = Post.Id
+        Post_2.Post_Parent = 0 or else -- empty
+        Post_2.Post_Parent = Post_2.Id
       then
          return Empty_Array;
       end if;
@@ -1733,7 +1734,7 @@ is
       declare
          Ancestors : Array_Type;
 
-         Id        : Post_Id    := Post.Post_Parent;
+         Id        : Post_Id    := Post_2.Post_Parent;
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
@@ -1743,7 +1744,7 @@ is
             -- Loop detection: If the ancestor has been seen before, break.
             if
               Ancestor.Post_Parent /= 0      or else -- empty
-              Ancestor.Post_Parent = Post.Id or else
+              Ancestor.Post_Parent = Post_2.Id or else
               In_Array (Ancestor.Post_Parent'Image, Ancestors, True)
             then
                exit;
@@ -2412,14 +2413,14 @@ is
 
          -- Sanitize post type name.
       declare
-         Post_Type_2 : String := Sanitize_Key (Post_Type);
+         Post_Type_2 : constant String := Sanitize_Key (Post_Type);
 
 --         if ( empty( post_type ) || strlen( post_type ) > 20 ) then
 --                 _doing_it_wrong( absFUNCTIONabs, abs( "Post type names must be between 1 and 20 characters in length." ), "4.2.0" );
 --                 return new WP_Error( "post_type_length_invalid", abs( "Post type names must be between 1 and 20 characters in length." ) );
 --         end;
 
-         Post_Type_Object : Wp_Post_Type := Construct (Post_Type, Args); -- new Wp_Post_Type (Post_Type, Args);
+         Post_Type_Object : Wp_Post_Type := Construct (Post_Type_2, Args); -- new Wp_Post_Type (Post_Type, Args);
       begin
          Post_Type_Object.Add_Supports;
          Post_Type_Object.Add_Rewrite_Rules;
@@ -3029,99 +3030,105 @@ is
 --         return return;
 -- end;
 
---
--- Determines whether a post type is considered "viewable".
---
--- For built-in post types such as posts and pages, the "public" value will be evaluated.
--- For all others, the "publicly_queryable" value will be used.
---
--- @since 4.4.0
--- @since 4.5.0 Added the ability to pass a post type name in addition to object.
--- @since 4.6.0 Converted the `post_type` parameter to accept a `WP_Post_Type` object.
--- @since 5.9.0 Added `is_post_type_viewable` hook to filter the result.
---
--- @param string|WP_Post_Type post_type Post type name or object.
--- @return bool Whether the post type should be considered viewable.
---
--- function is_post_type_viewable( post_type ) then
---         if ( is_scalar( post_type ) ) then
---                 post_type = get_post_type_object( post_type );
+   ---------------------------
+   -- Is_Post_Type_Viewable --
+   ---------------------------
 
---                 if ( ! post_type ) then
---                         return False;
---                 end;
---         end;
+   function Is_Post_Type_Viewable (Post_Type : String)
+                                   return Boolean
+   is
+      use Wp_Common;
+      use Inc_Class_Wp_Post_Type;
 
---         if ( ! is_object( post_type ) ) then
---                 return False;
---         end;
+      Post_Type_2 : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
+   begin
+      -- if Is_Scalar (Post_Type) then
+      --    Post_Type_2 := Get_Post_Type_Object (Post_Type);
+      --    if not post_type then
+      --       return False;
+      --    end if;
+      -- end if;
 
---         is_viewable = post_type.publicly_queryable || ( post_type._builtin && post_type.public );
+      -- if not Is_Object (Post_Type) then
+      --    return False;
+      -- end if;
 
---         --
---         -- Filters whether a post type is considered "viewable".
---         --
---         -- The returned filtered value must be a boolean type to ensure
---         -- `is_post_type_viewable()` only returns a boolean. This strictness
---         -- is by design to maintain backwards-compatibility and guard against
---         -- potential type errors in PHP 8.1+. Non-boolean values (even Falsey
---         -- and truthy values) will result in the function returning False.
---         --
---         -- @since 5.9.0
---         --
---         -- @param bool         is_viewable Whether the post type is "viewable" (strict type).
---         -- @param WP_Post_Type post_type   Post type object.
---         --
---         return True === apply_filters( "is_post_type_viewable", is_viewable, post_type );
--- end;
+      declare
+         Is_Viewable : constant Boolean :=
+           Post_Type_2.Publicly_Queryable or else
+           (Post_Type_2.X_Builtin and then Post_Type_2.Public);
+      begin
+         --
+         -- Filters whether a post type is considered "viewable".
+         --
+         -- The returned filtered value must be a boolean type to ensure
+         -- `is_post_type_viewable()` only returns a boolean. This strictness
+         -- is by design to maintain backwards-compatibility and guard against
+         -- potential type errors in PHP 8.1+. Non-boolean values (even Falsey
+         -- and truthy values) will result in the function returning False.
+         --
+         -- @since 5.9.0
+         --
+         -- @param bool         is_viewable Whether the post type is "viewable"
+         --                                  (strict type).
+         -- @param WP_Post_Type post_type   Post type object.
+         --
+         return True = Apply_Filters ("is_post_type_viewable",
+                                      Is_Viewable, Post_Type_2);
+      end;
+   end Is_Post_Type_Viewable;
 
---
--- Determines whether a post status is considered "viewable".
---
--- For built-in post statuses such as publish and private, the "public" value will be evaluated.
--- For all others, the "publicly_queryable" value will be used.
---
--- @since 5.7.0
--- @since 5.9.0 Added `is_post_status_viewable` hook to filter the result.
---
--- @param string|stdClass post_status Post status name or object.
--- @return bool Whether the post status should be considered viewable.
---
--- function is_post_status_viewable( post_status ) then
---         if ( is_scalar( post_status ) ) then
---                 post_status = get_post_status_object( post_status );
+   -----------------------------
+   -- Is_Post_Status_Viewable --
+   -----------------------------
 
---                 if ( ! post_status ) then
---                         return False;
---                 end;
---         end;
+   function Is_Post_Status_Viewable (Post_Status : Status_Type)
+                                     return Boolean
+   is
+      use Wp_Common;
+   begin
+      -- if Is_Scalar (Post_Status) then
+      --    declare
+      --       Post_Status_2 : Duration := Get_Post_Status_Object (Post_Status);
+      --    begin
+      --       if not Post_Status_2 then
+      --          return False;
+      --       end if;
+      --    end;
+      -- end if;
 
---         if (
---                 ! is_object( post_status ) ||
---                 post_status.internal ||
---                 post_status.protected
---         ) then
---                 return False;
---         end;
+      if
+--      not Is_Object (Post_Status) or else
+        Post_Status.Internal or else
+        Post_Status.Protect
+      then
+         return False;
+      end if;
 
---         is_viewable = post_status.publicly_queryable || ( post_status._builtin && post_status.public );
-
---         --
---         -- Filters whether a post status is considered "viewable".
---         --
---         -- The returned filtered value must be a boolean type to ensure
---         -- `is_post_status_viewable()` only returns a boolean. This strictness
---         -- is by design to maintain backwards-compatibility and guard against
---         -- potential type errors in PHP 8.1+. Non-boolean values (even Falsey
---         -- and truthy values) will result in the function returning False.
---         --
---         -- @since 5.9.0
---         --
---         -- @param bool     is_viewable Whether the post status is "viewable" (strict type).
---         -- @param stdClass post_status Post status object.
---         --
---         return True === apply_filters( "is_post_status_viewable", is_viewable, post_status );
--- end;
+      declare
+         Is_Viewable : constant Boolean :=
+           Post_Status.Publicly_Queryable or else
+           (Post_Status.X_Builtin and then Post_Status.Public);
+      begin
+         --
+         -- Filters whether a post status is considered "viewable".
+         --
+         -- The returned filtered value must be a boolean type to ensure
+         -- `is_post_status_viewable()` only returns a boolean. This strictness
+         -- is by design to maintain backwards-compatibility and guard against
+         -- potential type errors in PHP 8.1+. Non-boolean values (even Falsey
+         -- and truthy values) will result in the function returning False.
+         --
+         -- @since 5.9.0
+         --
+         -- @param bool     is_viewable Whether the post status is "viewable" (strict
+         --                              type).
+         -- @param stdClass post_status Post status object.
+         --
+         return True = Apply_Filters ("is_post_status_viewable",
+                                      Is_Viewable, Post_Status);
+      end;
+   end Is_Post_Status_Viewable;
 
 --
 -- Determines whether a post is publicly viewable.
@@ -3581,21 +3588,23 @@ is
                                  Context : String := "display")
                                  return Array_Type
    is
-      use Hb_Common;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Hb_Common;
       use Wp_Common;
+--    use Inc_Formatting;
 
-      Int_Fields : List_Type  := To_List (List => (+"ID", +"post_parent",
-                                                   +"menu_order"));
+      Int_Fields : constant List_Type := To_List (List => (+"ID", +"post_parent",
+                                                           +"menu_order"));
       Value_2    : Array_Type := Value;
       pragma Unreferenced (Value);
       Array_Int_Fields : constant List_Type := To_List ("ancestors");
    begin
---      if In_Array (Field, Int_Fields, True) then
---         Value_2 := Integer (Value_2);
---      end if;
+      if In_Array (Field, Int_Fields, True) then
+         null;
+--       Value_2 := Integer (Value_2);
+      end if;
 
       -- Fields which contain arrays of integers.
       if In_Array (Field, Array_Int_Fields, True) then
@@ -3656,15 +3665,19 @@ is
                                          Value_2, Post_Id);
             end if;
 
-                -- if In_Array (Field, Format_To_Edit, True) then
-                --         if "post_content" = Field then
-                --                 Value_2 := Format_To_Edit (Value_2, User_Can_Richedit); -- ()
-                --         else
-                --                 Value_2 := Format_To_Edit (Value_2);
-                --         end if;
-                -- else
-                --         Value_2 := Esc_Attr (Value_2);
-                -- end if;
+            if In_Array (Field, Format_To_Edit, True) then
+               if "post_content" = Field then
+                  null;
+--                Value_2 := Format_To_Edit (Value_2, User_Can_Richedit); -- ()
+               else
+                  null;
+--                Value_2 := Format_To_Edit (Value_2);
+               end if;
+            else
+               null;
+--             Value_2 := ESC_Attr (Value_2);
+            end if;
+
          elsif "db" = Context then
             if Prefixed then
 
@@ -6801,45 +6814,51 @@ is
 --         end;
 -- end;
 
---
--- Builds the URI path for a page.
---
--- Sub pages will be in the "directory" under the parent page post name.
---
--- @since 1.5.0
--- @since 4.6.0 The `page` parameter was made optional.
---
--- @param WP_Post|object|int page Optional. Page ID or WP_Post object. Default is global post.
--- @return string|False Page URI, False on error.
---
--- function get_page_uri( page = 0 ) then
---         if ( ! page instanceof WP_Post ) then
---                 page = get_post( page );
---         end;
+   ------------------
+   -- Get_Page_URI --
+   ------------------
 
---         if ( ! page ) then
---                 return False;
---         end;
+   function Get_Page_URI (Page : Wp_Post) -- Integer := 0)
+                          return String
+   is
+      use Hb_Common;
+   begin
+      -- if Page not in Wp_Post then instanceof
+      --    Page := Get_Post (Page);
+      -- end if;
 
---         uri = page.post_name;
+      if Page = Null_Post then
+         return ""; -- False;
+      end if;
 
---         foreach ( page.ancestors as parent ) then
---                 parent = get_post( parent );
---                 if ( parent && parent.post_name ) then
---                         uri = parent.post_name . "/" . uri;
---                 end;
---         end;
+      declare
+         URI : Unbounded_String := Page.Post_Name;
+      begin
+         raise Program_Error with "not implemented";
+--       for Parent of Page.Ancestors loop
+            declare
+               Parent_2 : Wp_Post; --  := Get_Post (Parent);
+            begin
+               if
+                 Parent_2 /= Null_Post and then
+                 Parent_2.Post_Name /= ""
+               then
+                  URI := Parent_2.Post_Name & "/" & URI;
+               end if;
+            end;
+--       end loop;
 
---         --
---         -- Filters the URI for a page.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string  uri  Page URI.
---         -- @param WP_Post page Page object.
---         --
---         return apply_filters( "get_page_uri", uri, page );
--- end;
+         --
+         -- Filters the URI for a page.
+         --
+         -- @since 4.4.0
+         --
+         -- @param string  uri  Page URI.
+         -- @param WP_Post page Page object.
+         --
+         return Apply_Filters ("get_page_uri", -URI, Page);
+      end;
+   end Get_Page_URI;
 
 --
 -- Retrieves an array of pages (or hierarchical post type items).

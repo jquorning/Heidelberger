@@ -8,6 +8,7 @@
 with Ada.Strings.Unbounded;
 
 with Php.Arrays;
+with Php.Lists;
 with Php.Misc;
 with Php.Numerics;
 with Php.Preg;
@@ -18,16 +19,23 @@ with Globals;
 with Hb_Common;
 with Helpers;
 with Lists;
+with Wp_Common;
 
+with Inc_Capabilities;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Rewrites;
+with Inc_Class_Wp_Terms;
+with Inc_Class_Wp_Users;
+with Inc_Category_Templates;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
+with Inc_Pluggables;
 with Inc_Posts;
+with Inc_Taxonomys;
 with Inc_Querys;
 
 package body Inc_Link_Templates
@@ -118,57 +126,68 @@ is
 --         end;
 -- end;
 
--- --
--- -- Determine whether post should always use a plain permalink structure.
--- --
--- -- @since 5.7.0
--- --
--- -- @param WP_Post|int|null post   Optional. Post ID or post object. Defaults to global post.
--- -- @param bool|null        sample Optional. Whether to force consideration based on sample links.
--- --                                 If omitted, a sample link is generated if a post object is passed
--- --                                 with the filter property set to "sample".
--- -- @return bool Whether to use a plain permalink structure.
--- --
--- function wp_force_plain_post_permalink( post = null, sample = null ) then
---         if (
---                 null === sample &&
---                 is_object( post ) &&
---                 isset( post->filter ) &&
---                 "sample" === post->filter
---         ) then
---                 sample = true;
---         end; else then
---                 post   = get_post( post );
---                 sample = null !== sample ? sample : false;
---         end;
+   -----------------------------------
+   -- Wp_Force_Plain_Post_Permalink --
+   -----------------------------------
 
---         if ( ! post ) then
---                 return true;
---         end;
+   function Wp_Force_Plain_Post_Permalink
+              (Post   : Inc_Class_Wp_Posts.Wp_Post; -- null
+               Sample : Boolean := False) -- null
+               return Boolean
+   is
+      use Inc_Capabilities;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Posts;
 
---         post_status_obj = get_post_status_object( get_post_status( post ) );
---         post_type_obj   = get_post_type_object( get_post_type( post ) );
+      Sample_2 : Boolean := Sample;
+   begin
+--      if
+--        not Sample and then -- null
+--        Is_Object (Post) and then
+--        Isset (Post.filter) and then
+--        "sample" = Post.Filter
+--      then
+         Sample_2 := True;
+--      else
+--         Post   := Get_Post (Post);
+--         Sample := null !== sample ? sample : false;
+--      end if;
 
---         if ( ! post_status_obj || ! post_type_obj ) then
---                 return true;
---         end;
+      if Post = Null_Post then
+         return True;
+      end if;
 
---         if (
---                 // Publicly viewable links never have plain permalinks.
---                 is_post_status_viewable( post_status_obj ) ||
---                 (
---                         // Private posts don"t have plain permalinks if the user can read them.
---                         post_status_obj->private &&
---                         current_user_can( "read_post", post->ID )
---                 ) ||
---                 // Protected posts don"t have plain links if getting a sample URL.
---                 ( post_status_obj->protected && sample )
---         ) then
---                 return false;
---         end;
+      declare
+         Post_Status_Obj : constant Status_Type :=
+           Get_Post_Status_Object (Get_Post_Status (Post));
 
---         return true;
--- end;
+         Post_Type_Obj : constant Wp_Post_Type :=
+           Get_Post_Type_Object (Get_Post_Type (Post));
+      begin
+         if
+           Post_Status_Obj = Null_Status or else -- not
+           Post_Type_Obj = Null_Post_Type -- not
+         then
+            return True;
+         end if;
+
+         if
+           -- Publicly viewable links never have plain permalinks.
+           Is_Post_Status_Viewable (Post_Status_Obj) or else
+           (
+            -- Private posts don't have plain permalinks if the user can read them.
+            Post_Status_Obj.Privat and then
+            Current_User_Can ("read_post", Integer (Post.Id))
+           ) or else
+           -- Protected posts don't have plain links if getting a sample URL.
+           (Post_Status_Obj.Protect and then Sample_2)
+         then
+            return False;
+         end if;
+      end;
+      return True;
+   end Wp_Force_Plain_Post_Permalink;
 
 -- --
 -- -- Retrieves the full permalink for the current post or post ID.
@@ -187,377 +206,491 @@ is
 --         return get_permalink( post, leavename );
 -- end;
 
--- --
--- -- Retrieves the full permalink for the current post or post ID.
--- --
--- -- @since 1.0.0
--- --
--- -- @param int|WP_Post post      Optional. Post ID or post object. Default is the global `post`.
--- -- @param bool        leavename Optional. Whether to keep post name or page name. Default false.
--- -- @return string|false The permalink URL. False if the post does not exist.
--- --
--- function get_permalink( post = 0, leavename = false ) then
---         rewritecode = array(
---                 "%year%",
---                 "%monthnum%",
---                 "%day%",
---                 "%hour%",
---                 "%minute%",
---                 "%second%",
---                 leavename ? "" : "%postname%",
---                 "%post_id%",
---                 "%category%",
---                 "%author%",
---                 leavename ? "" : "%pagename%",
---         );
+   -------------------
+   -- Get_Permalink --
+   -------------------
 
---         if ( is_object( post ) && isset( post->filter ) && "sample" === post->filter ) then
---                 sample = true;
---         end; else then
---                 post   = get_post( post );
---                 sample = false;
---         end;
+   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+                           Leavename : Boolean := False)
+                           return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Lists;
+      use Php.Strings;
+--    use Php.Types;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Terms;
+      use Inc_Class_Wp_Users;
+      use Inc_Class_Wp_Terms.Term_Vectors;
+      use Inc_Category_Templates;
+--    use Inc_Functions;
+      use Inc_Load;
+      use Inc_Options;
+--    use Inc_Plugins;
+      use Inc_Pluggables;
+      use Inc_Posts;
+      use Inc_Taxonomys;
+      use List_Vectors;
 
---         if ( empty( post->ID ) ) then
---                 return false;
---         end;
+      Rewrite_Code : constant List_Type := To_List (List => (
+        +"%year%",
+        +"%monthnum%",
+        +"%day%",
+        +"%hour%",
+        +"%minute%",
+        +"%second%",
+        +(if Leavename then "" else "%postname%"),
+        +"%post_id%",
+        +"%category%",
+        +"%author%",
+        +(if Leavename then "" else "%pagename%")
+      ));
 
---         if ( "page" === post->post_type ) then
---                 return get_page_link( post, leavename, sample );
---         end; elseif ( "attachment" === post->post_type ) then
---                 return get_attachment_link( post, leavename );
---         end; elseif ( in_array( post->post_type, get_post_types( array( "_builtin" => false ) ), true ) ) then
---                 return get_post_permalink( post, leavename, sample );
---         end;
+      Sample : Boolean;
+      Post   : Wp_Post;
+      Permalink : Unbounded_String;
+   begin
+--      if
+--        Is_Object (Post)    and then
+--        Isset (Post.Filter) and then
+--        "sample" = Post.Filter
+--      then
+--         Sample := True;
+--      else
+         Post   := Get_Post (Id); -- Post);
+         Sample := False;
+--      end if;
 
---         permalink = get_option( "permalink_structure" );
+      if Post.Id = 0 then
+--    if Empty (Post.Id) then
+         return ""; -- False;
+      end if;
 
---         --
---         -- Filters the permalink structure for a post before token replacement occurs.
---         --
---         -- Only applies to posts with post_type of "post".
---         --
---         -- @since 3.0.0
---         --
---         -- @param string  permalink The site"s permalink structure.
---         -- @param WP_Post post      The post in question.
---         -- @param bool    leavename Whether to keep the post name.
---         --
---         permalink = apply_filters( "pre_post_link", permalink, post, leavename );
+      if "page" = Post.Post_Type then
+         return Get_Page_Link (Post, Leavename, Sample);
+      elsif "attachment" = Post.Post_Type then
+         return Get_Attachment_Link (Post, Leavename);
+      elsif
+        In_Array (-Post.Post_Type,
+                  Get_Post_Types (To_Array (List => (1 =>
+                    Build ("_builtin", False)))), True)
+      then
+         return Get_Post_Permalink (Post, Leavename, Sample);
+      end if;
 
---         if (
---                 permalink &&
---                 ! wp_force_plain_post_permalink( post )
---         ) then
+      Permalink := +Get_Option ("permalink_structure");
 
---                 category = "";
---                 if ( strpos( permalink, "%category%" ) !== false ) then
---                         cats = get_the_category( post->ID );
---                         if ( cats ) then
---                                 cats = wp_list_sort(
---                                         cats,
---                                         array(
---                                                 "term_id" => "ASC",
---                                         )
---                                 );
+      --
+      -- Filters the permalink structure for a post before token replacement occurs.
+      --
+      -- Only applies to posts with post_type of "post".
+      --
+      -- @since 3.0.0
+      --
+      -- @param string  permalink The site"s permalink structure.
+      -- @param WP_Post post      The post in question.
+      -- @param bool    leavename Whether to keep the post name.
+      --
+      Permalink := +Apply_Filters ("pre_post_link", -Permalink, Post, Leavename);
 
---                                 --
---                                 -- Filters the category that gets used in the %category% permalink token.
---                                 --
---                                 -- @since 3.5.0
---                                 --
---                                 -- @param WP_Term  cat  The category to use in the permalink.
---                                 -- @param array    cats Array of all categories (WP_Term objects) associated with the post.
---                                 -- @param WP_Post  post The post in question.
---                                 --
---                                 category_object = apply_filters( "post_link_category", cats[0], cats, post );
+      if
+        Permalink /= "" and then
+        not Wp_Force_Plain_Post_Permalink (Post)
+      then
+         declare
+            Category : List_Type; -- Unbounded_String;
+         begin
+            if Strpos (-Permalink, "%category%") /= 0 then
+               declare
+                  Cats : constant Wp_Term_Array := Get_The_Category (Post.Id);
+               begin
+                  if Cats /= Empty_Term_Array then
+--                     Cats :=
+--                       Wp_List_Sort (
+--                         Cats,
+--                         To_Array (List => (1 =>
+--                           Build ("term_id", "ASC")
+--                         ))
+--                       );
 
---                                 category_object = get_term( category_object, "category" );
---                                 category        = category_object->slug;
---                                 if ( category_object->parent ) then
---                                         category = get_category_parents( category_object->parent, false, "/", true ) . category;
---                                 end;
---                         end;
---                         // Show default category in permalinks,
---                         // without having to assign it explicitly.
---                         if ( empty( category ) ) then
---                                 default_category = get_term( get_option( "default_category" ), "category" );
---                                 if ( default_category && ! is_wp_error( default_category ) ) then
---                                         category = default_category->slug;
---                                 end;
---                         end;
---                 end;
+                     --
+                     -- Filters the category that gets used in the %category%
+                     -- permalink token.
+                     --
+                     -- @since 3.5.0
+                     --
+                     -- @param WP_Term  cat  The category to use in the permalink.
+                     -- @param array    cats Array of all categories (WP_Term objects)
+                     --                       associated with the post.
+                     -- @param WP_Post  post The post in question.
+                     --
+                     declare
+                        Category_Object : Wp_Term :=
+                          Apply_Filters ("post_link_category",
+                                         Cats.First_Element, Cats, Post); -- [0]
+                     begin
+                        Category_Object := Get_Term (Category_Object, "category");
+                        Category.Append (Category_Object.Slug);
+                        if Category_Object.Parent /= 0 then
+                           Category.Prepend (
+                             +Get_Category_Parents (Category_Object.Parent,
+                                                   False, "/", True));
+                           -- Category :=
+                           --   Get_Category_Parents (Category_Object.Parent,
+                           --                         False, "/", True) & Category;
+                        end if;
+                     end;
+                  end if;
 
---                 author = "";
---                 if ( strpos( permalink, "%author%" ) !== false ) then
---                         authordata = get_userdata( post->post_author );
---                         author     = authordata->user_nicename;
---                 end;
+                  -- Show default category in permalinks,
+                  -- without having to assign it explicitly.
+                  if Category.Is_Empty then
+--                if Empty (Category) then
+                     declare
+                        Default_Category : constant Wp_Term :=
+                          Get_Term (Get_Option ("default_category"), "category");
+                     begin
+                        if
+                          Default_Category /= Null_Term and then
+                          not Is_Wp_Error (Default_Category)
+                        then
+                           Category := Empty_List & Default_Category.Slug;
+                        end if;
+                     end;
+                  end if;
+               end;
 
---                 // This is not an API call because the permalink is based on the stored post_date value,
---                 // which should be parsed as local time regardless of the default PHP timezone.
---                 date = explode( " ", str_replace( array( "-", ":" ), " ", post->post_date ) );
+               declare
+                  Author : Unbounded_String;
+               begin
+                  if Strpos (-Permalink, "%author%") /= 0 then
+                     declare
+                        Authordata : constant Wp_User :=
+                          Get_Userdata (Post.Post_Author);
+                     begin
+                        Author := Authordata.Prop.User_Nicename;
+                     end;
+                  end if;
 
---                 rewritereplace = array(
---                         date[0],
---                         date[1],
---                         date[2],
---                         date[3],
---                         date[4],
---                         date[5],
---                         post->post_name,
---                         post->ID,
---                         category,
---                         author,
---                         post->post_name,
---                 );
+                  -- This is not an API call because the permalink is based on the
+                  -- stored post_date value, which should be parsed as local time
+                  -- regardless of the default PHP timezone.
+                  declare
+                     L : constant List_Type := To_List (List => (+"-", +":"));
 
---                 permalink = home_url( str_replace( rewritecode, rewritereplace, permalink ) );
---                 permalink = user_trailingslashit( permalink, "single" );
+                     Date : constant List_Type :=
+                       Explode (" ", Str_Replace (L, " ", -Post.Post_Date));
 
---         end; else then // If they"re not using the fancy permalink option.
---                 permalink = home_url( "?p=" . post->ID );
---         end;
+                     Rewrite_Replace : constant List_Type := To_List (List => (
+                        Date (1),
+                        Date (2),
+                        Date (3),
+                        Date (4),
+                        Date (5),
+                        Date (6),
+                        Post.Post_Name,
+                        +Helpers.Image (Integer (Post.Id)),
+                        Category.First_Element, -- First_Element added
+                        Author,
+                        Post.Post_Name
+                     ));
+                  begin
+                     Permalink :=
+                       +Home_URL (Str_Replace (Rewrite_Code,
+                                               Rewrite_Replace,
+                                               -Permalink));
 
---         --
---         -- Filters the permalink for a post.
---         --
---         -- Only applies to posts with post_type of "post".
---         --
---         -- @since 1.5.0
---         --
---         -- @param string  permalink The post"s permalink.
---         -- @param WP_Post post      The post in question.
---         -- @param bool    leavename Whether to keep the post name.
---         --
---         return apply_filters( "post_link", permalink, post, leavename );
--- end;
+                     Permalink := +User_Trailing_Slash_It (-Permalink, "single");
+                  end;
+               end;
+            end if;
+         end;
+      else  -- If they're not using the fancy permalink option.
+         Permalink := +Home_URL ("?p=" & Helpers.Image (Integer (Post.Id)));
+      end if;
+--      end;
+      --
+      -- Filters the permalink for a post.
+      --
+      -- Only applies to posts with post_type of "post".
+      --
+      -- @since 1.5.0
+      --
+      -- @param string  permalink The post"s permalink.
+      -- @param WP_Post post      The post in question.
+      -- @param bool    leavename Whether to keep the post name.
+      --
+      return Apply_Filters ("post_link", -Permalink, Post, Leavename);
+   end Get_Permalink;
 
--- --
--- -- Retrieves the permalink for a post of a custom post type.
--- --
--- -- @since 3.0.0
--- -- @since 6.1.0 Returns false if the post does not exist.
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param int|WP_Post post      Optional. Post ID or post object. Default is the global `post`.
--- -- @param bool        leavename Optional. Whether to keep post name. Default false.
--- -- @param bool        sample    Optional. Is it a sample permalink. Default false.
--- -- @return string|false The post permalink URL. False if the post does not exist.
--- --
--- function get_post_permalink( post = 0, leavename = false, sample = false ) then
---         global wp_rewrite;
+   ------------------------
+   -- Get_Post_Permalink --
+   ------------------------
 
---         post = get_post( post );
+   function Get_Post_Permalink (Id        : Inc_Class_Wp_Posts.Wp_Post; -- = 0,
+                                Leavename : Boolean := False;
+                                Sample    : Boolean := False)
+                                return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Functions;
+      use Inc_Posts;
+--    use Inc_Plugins;
 
---         if ( ! post ) then
---                 return false;
---         end;
+      Post : constant Wp_Post := Get_Post (Id);
+   begin
+      if Post = Null_Post then
+         return ""; -- false;
+      end if;
 
---         post_link = wp_rewrite->get_extra_permastruct( post->post_type );
+      declare
+         Post_Link : Unbounded_String :=
+           +Global_Wp_Rewrite.Get_Extra_Permastruct (-Post.Post_Type);
 
---         slug = post->post_name;
+         Slug : String := -Post.Post_Name;
 
---         force_plain_link = wp_force_plain_post_permalink( post );
+         Force_Plain_Link : constant Boolean := Wp_Force_Plain_Post_Permalink (Post);
 
---         post_type = get_post_type_object( post->post_type );
+         Post_Type : constant Wp_Post_Type := Get_Post_Type_Object (-Post.Post_Type);
+      begin
+         if Post_Type.Hierarchical then
+            Slug := Get_Page_URI (Post);
+         end if;
 
---         if ( post_type->hierarchical ) then
---                 slug = get_page_uri( post );
---         end;
+         if
+           not Empty (-Post_Link) and then
+           (not Force_Plain_Link or Sample)
+         then
+            if not Leavename then
+               Post_Link := +Str_Replace ("%post->post_type%", Slug, -Post_Link);
+            end if;
+            Post_Link := +Home_URL (User_Trailing_Slash_It (-Post_Link));
+         else
+            if
+              Post_Type.Query_Var /= "" and then
+              (Isset (-Post.Post_Status) and then not Force_Plain_Link)
+            then
+               Post_Link := +Add_Query_Arg (-Post_Type.Query_Var, Slug, "");
+            else
+               Post_Link :=
+                 +Add_Query_Arg (
+                   To_Array (List => (
+                     Build ("post_type", -Post.Post_Type),
+                     Build ("p",         Helpers.Image (Integer (Post.Id)))
+                   )),
+                   ""
+                 );
+            end if;
+            Post_Link := +Home_URL (-Post_Link);
+         end if;
 
---         if ( ! empty( post_link ) && ( ! force_plain_link || sample ) ) then
---                 if ( ! leavename ) then
---                         post_link = str_replace( "%post->post_type%", slug, post_link );
---                 end;
---                 post_link = home_url( user_trailingslashit( post_link ) );
---         end; else then
---                 if ( post_type->query_var && ( isset( post->post_status ) && ! force_plain_link ) ) then
---                         post_link = add_query_arg( post_type->query_var, slug, "" );
---                 end; else then
---                         post_link = add_query_arg(
---                                 array(
---                                         "post_type" => post->post_type,
---                                         "p"         => post->ID,
---                                 ),
---                                 ""
---                         );
---                 end;
---                 post_link = home_url( post_link );
---         end;
+         --
+         -- Filters the permalink for a post of a custom post type.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string  post_link The post"s permalink.
+         -- @param WP_Post post      The post in question.
+         -- @param bool    leavename Whether to keep the post name.
+         -- @param bool    sample    Is it a sample permalink.
+         --
+         return Apply_Filters ("post_type_link", -Post_Link, Post, Leavename, Sample);
+      end;
+   end Get_Post_Permalink;
 
---         --
---         -- Filters the permalink for a post of a custom post type.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string  post_link The post"s permalink.
---         -- @param WP_Post post      The post in question.
---         -- @param bool    leavename Whether to keep the post name.
---         -- @param bool    sample    Is it a sample permalink.
---         --
---         return apply_filters( "post_type_link", post_link, post, leavename, sample );
--- end;
+   -------------------
+   -- Get_Page_Link --
+   -------------------
 
--- --
--- -- Retrieves the permalink for the current page or page ID.
--- --
--- -- Respects page_on_front. Use this one.
--- --
--- -- @since 1.5.0
--- --
--- -- @param int|WP_Post post      Optional. Post ID or object. Default uses the global `post`.
--- -- @param bool        leavename Optional. Whether to keep the page name. Default false.
--- -- @param bool        sample    Optional. Whether it should be treated as a sample permalink.
--- --                               Default false.
--- -- @return string The page permalink.
--- --
--- function get_page_link( post = false, leavename = false, sample = false ) then
---         post = get_post( post );
+   function Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Leavename : Boolean := False;
+                           Sample    : Boolean := False)
+                           return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Posts;
+--    use Inc_Plugins;
+      use Inc_Options;
 
---         if ( "page" === get_option( "show_on_front" ) && get_option( "page_on_front" ) == post->ID ) then
---                 link = home_url( "/" );
---         end; else then
---                 link = _get_page_link( post, leavename, sample );
---         end;
+      Post_2 : constant Wp_Post := Get_Post (Post);
+      Link   : Unbounded_String;
+   begin
+      if
+        "page" = Get_Option ("show_on_front") and then
+         Get_Option ("page_on_front") = Integer (Post_2.Id)
+      then
+         Link := +Home_URL ("/");
+      else
+         Link := +X_Get_Page_Link (Post_2, Leavename, Sample);
+      end if;
 
---         --
---         -- Filters the permalink for a page.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string link    The page"s permalink.
---         -- @param int    post_id The ID of the page.
---         -- @param bool   sample  Is it a sample permalink.
---         --
---         return apply_filters( "page_link", link, post->ID, sample );
--- end;
+      --
+      -- Filters the permalink for a page.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string link    The page"s permalink.
+      -- @param int    post_id The ID of the page.
+      -- @param bool   sample  Is it a sample permalink.
+      --
+      return Apply_Filters ("page_link", -Link, Post_2.Id, Sample);
+   end Get_Page_Link;
 
--- --
--- -- Retrieves the page permalink.
--- --
--- -- Ignores page_on_front. Internal use only.
--- --
--- -- @since 2.1.0
--- -- @access private
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param int|WP_Post post      Optional. Post ID or object. Default uses the global `post`.
--- -- @param bool        leavename Optional. Whether to keep the page name. Default false.
--- -- @param bool        sample    Optional. Whether it should be treated as a sample permalink.
--- --                               Default false.
--- -- @return string The page permalink.
--- --
--- function _get_page_link( post = false, leavename = false, sample = false ) then
---         global wp_rewrite;
+   ---------------------
+   -- X_Get_Page_Link --
+   ---------------------
 
---         post = get_post( post );
+   function X_Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- = false,
+                             Leavename : Boolean := False;
+                             Sample    : Boolean := False)
+                             return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Posts;
+      use Inc_Plugins;
 
---         force_plain_link = wp_force_plain_post_permalink( post );
+--        global wp_rewrite;
 
---         link = wp_rewrite->get_page_permastruct();
+      Post_2 : constant Wp_Post := Get_Post (Post);
 
---         if ( ! empty( link ) && ( ( isset( post->post_status ) && ! force_plain_link ) || sample ) ) then
---                 if ( ! leavename ) then
---                         link = str_replace( "%pagename%", get_page_uri( post ), link );
---                 end;
+      Force_Plain_Link : constant Boolean := Wp_Force_Plain_Post_Permalink (Post_2);
 
---                 link = home_url( link );
---                 link = user_trailingslashit( link, "page" );
---         end; else then
---                 link = home_url( "?page_id=" . post->ID );
---         end;
+      Link : Unbounded_String := +Global_Wp_Rewrite.Get_Page_Permastruct;
+   begin
+      if
+        not Empty (-Link) and then
+        ((Isset (-Post_2.Post_Status) and then
+          not Force_Plain_Link) or else Sample)
+      then
+         if not Leavename then
+            Link := +Str_Replace ("%pagename%", Get_Page_URI (Post_2), -Link);
+         end if;
 
---         --
---         -- Filters the permalink for a non-page_on_front page.
---         --
---         -- @since 2.1.0
---         --
---         -- @param string link    The page"s permalink.
---         -- @param int    post_id The ID of the page.
---         --
---         return apply_filters( "_get_page_link", link, post->ID );
--- end;
+         Link := +Home_URL (-Link);
+         Link := +User_Trailing_Slash_It (-Link, "page");
+      else
+         Link := +Home_URL ("?page_id=" & Helpers.Image (Integer (Post_2.Id)));
+      end if;
 
--- --
--- -- Retrieves the permalink for an attachment.
--- --
--- -- This can be used in the WordPress Loop or outside of it.
--- --
--- -- @since 2.0.0
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param int|object post      Optional. Post ID or object. Default uses the global `post`.
--- -- @param bool       leavename Optional. Whether to keep the page name. Default false.
--- -- @return string The attachment permalink.
--- --
--- function get_attachment_link( post = null, leavename = false ) then
---         global wp_rewrite;
+      --
+      -- Filters the permalink for a non-page_on_front page.
+      --
+      -- @since 2.1.0
+      --
+      -- @param string link    The page"s permalink.
+      -- @param int    post_id The ID of the page.
+      --
+      return Apply_Filters ("_get_page_link",
+                            -Link, Helpers.Image (Integer (Post_2.Id)));
+   end X_Get_Page_Link;
 
---         link = false;
+   -------------------------
+   -- Get_Attachment_Link --
+   -------------------------
 
---         post             = get_post( post );
---         force_plain_link = wp_force_plain_post_permalink( post );
---         parent_id        = post->post_parent;
---         parent           = parent_id ? get_post( parent_id ) : false;
---         parent_valid     = true; // Default for no parent.
---         if (
---                 parent_id &&
---                 (
---                         post->post_parent === post->ID ||
---                         ! parent ||
---                         ! is_post_type_viewable( get_post_type( parent ) )
---                 )
---         ) then
---                 // Post is either its own parent or parent post unavailable.
---                 parent_valid = false;
---         end;
+   function Get_Attachment_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- null
+                                 Leavename : Boolean := False)
+                                 return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Formatting;
+      use Inc_Options;
+      use Inc_Posts;
+      use Inc_Plugins;
 
---         if ( force_plain_link || ! parent_valid ) then
---                 link = false;
---         end; elseif ( wp_rewrite->using_permalinks() && parent ) then
---                 if ( "page" === parent->post_type ) then
---                         parentlink = _get_page_link( post->post_parent ); // Ignores page_on_front.
---                 end; else then
---                         parentlink = get_permalink( post->post_parent );
---                 end;
+      Link : Unbounded_String; -- Boolean := false;
 
---                 if ( is_numeric( post->post_name ) || false !== strpos( get_option( "permalink_structure" ), "%category%" ) ) then
---                         name = "attachment/" . post->post_name; // <permalink>/<int>/ is paged so we use the explicit attachment marker.
---                 end; else then
---                         name = post->post_name;
---                 end;
+      Post_2           : constant Wp_Post := Get_Post (Post);
+      Force_Plain_Link : constant Boolean := Wp_Force_Plain_Post_Permalink (Post_2);
+      Parent_Id        : constant Post_Id := Post_2.Post_Parent;
+      Parent           : Wp_Post := (if Parent_Id /= 0
+                                     then Get_Post (Parent_Id)
+                                     else Null_Post); -- False);
+      Parent_Valid     : Boolean := True; -- Default for no parent.
+      Parentlink       : Unbounded_String;
+      Name             : Unbounded_String;
+   begin
+      if
+        Parent_Id /= 0 and then
+        (
+          Post.Post_Parent = Post.Id or else
+          Parent = Null_Post or else -- not
+          not Is_Post_Type_Viewable (Get_Post_Type (Parent))
+        )
+      then
+         -- Post is either its own parent or parent post unavailable.
+         Parent_Valid := False;
+      end if;
 
---                 if ( strpos( parentlink, "?" ) === false ) then
---                         link = user_trailingslashit( trailingslashit( parentlink ) . "%postname%" );
---                 end;
+      if Force_Plain_Link or else not Parent_Valid then
+         Link := +""; -- False;
+      elsif
+        Global_Wp_Rewrite.Using_Permalinks and then
+        Parent /= Null_Post
+      then
+         if "page" = Parent.Post_Type then
+            Parentlink := +X_Get_Page_Link (Post.Post_Parent);
+            -- Ignores page_on_front.
+         else
+            Parentlink := +Get_Permalink (Post.Post_Parent);
+         end if;
 
---                 if ( ! leavename ) then
---                         link = str_replace( "%postname%", name, link );
---                 end;
---         end; elseif ( wp_rewrite->using_permalinks() && ! leavename ) then
---                 link = home_url( user_trailingslashit( post->post_name ) );
---         end;
+         if
+           Is_Numeric (-Post.Post_Name) or else
+           0 /= Strpos (Get_Option ("permalink_structure"), "%category%")
+         then
+            Name := +"attachment/" & Post.Post_Name;
+            -- <permalink>/<int>/ is paged so we use the explicit attachment marker.
+         else
+            Name := Post.Post_Name;
+         end if;
 
---         if ( ! link ) then
---                 link = home_url( "/?attachment_id=" . post->ID );
---         end;
+         if Strpos (-Parentlink, "?") = 0 then
+            Link := +User_Trailing_Slash_It (
+                       Trailingslashit (-Parentlink) & "%postname%");
+         end if;
 
---         --
---         -- Filters the permalink for an attachment.
---         --
---         -- @since 2.0.0
---         -- @since 5.6.0 Providing an empty string will now disable
---         --              the view attachment page link on the media modal.
---         --
---         -- @param string link    The attachment"s permalink.
---         -- @param int    post_id Attachment ID.
---         --
---         return apply_filters( "attachment_link", link, post->ID );
--- end;
+         if not Leavename then
+            Link := +Str_Replace ("%postname%", -Name, -Link);
+         end if;
+
+      elsif Global_Wp_Rewrite.Using_Permalinks and then not Leavename then
+         Link := +Home_URL (User_Trailing_Slash_It (-Post.Post_Name));
+      end if;
+
+      if Link = "" then -- not
+         Link := +Home_URL ("/?attachment_id=" & Helpers.Image (Integer (Post.Id)));
+      end if;
+
+      --
+      -- Filters the permalink for an attachment.
+      --
+      -- @since 2.0.0
+      -- @since 5.6.0 Providing an empty string will now disable
+      --              the view attachment page link on the media modal.
+      --
+      -- @param string link    The attachment"s permalink.
+      -- @param int    post_id Attachment ID.
+      --
+      return Apply_Filters ("attachment_link", -Link, Integer (Post.Id));
+   end Get_Attachment_Link;
 
 -- --
 -- -- Retrieves the permalink for the year archives.
@@ -1323,6 +1456,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Class_Wp_Post_Type;
+      use Inc_Class_Wp_Posts;
       use Inc_Plugins;
       use Inc_Options;
       use Inc_Posts;
@@ -1337,7 +1471,9 @@ is
       if "post" = Post_Type then
          declare
             Show_On_Front  : constant String  := Get_Option ("show_on_front");
-            Page_For_Posts : constant Integer := Get_Option ("page_for_posts");
+
+            Page_For_Posts : constant Inc_Class_Wp_Posts.Post_Id :=
+              Inc_Class_Wp_Posts.Post_Id (Integer'(Get_Option ("page_for_posts")));
          begin
             if "page" = Show_On_Front and then Page_For_Posts /= 0 then
                Link := +Get_Permalink (Page_For_Posts);

@@ -259,13 +259,15 @@ is
         --
         -- Sets the query_var key for this post type.
         --
-        -- Defaults to post_type key. If false, a post type cannot be loaded at `?thenquery_varend;=thenpost_slugend;`.
-        -- If specified as a string, the query `?thenquery_var_stringend;=thenpost_slugend;` will be valid.
+        -- Defaults to post_type key. If false, a post type cannot be loaded at
+        -- `?{query_var}={post_slug}`.
+        -- If specified as a string, the query `?{query_var_string}={post_slug}`
+        -- will be valid.
         --
         -- @since 4.6.0
         -- @var string|bool query_var
         --
-        -- public query_var;
+        Query_Var : Unbounded_String;
 
         --
         -- Whether to allow this post type to be exported.
@@ -331,7 +333,7 @@ is
         -- @since 4.6.0
         -- @var bool _builtin
         --
-        -- public _builtin = false;
+        X_Builtin : Boolean := False;
 
         --
         -- URL segment to use for edit link of this post type.
@@ -494,6 +496,7 @@ is
       Map_Meta_Cap      => False,
       Has_Archive       => False,
       Rewrite           => Empty_Array,
+      X_Builtin         => False,
       others            => Null_Unbounded_String);
 
    package Post_Type_Maps is new

@@ -6,6 +6,7 @@
 -- @since 4.7.0
 --
 
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Arrays;
@@ -383,5 +384,9 @@ is
    --
    -- static
    procedure Reset_Default_Labels;
+
+   package Int_Arrays
+     is new Ada.Containers.Vectors (Index_Type   => Positive,
+                                    Element_Type => Integer);
 
 end Inc_Class_Wp_Taxonomy;

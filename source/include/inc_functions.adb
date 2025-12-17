@@ -7437,27 +7437,40 @@ is
 --         mbstring_binary_safe_encoding( true );
 -- end;
 
---
--- Filters/validates a variable as a boolean.
---
--- Alternative to `filter_var( var, FILTER_VALIDATE_BOOLEAN )`.
---
--- @since 4.0.0
---
--- @param mixed var Boolean value to validate.
--- @return bool Whether the value is validated.
---
--- function wp_validate_boolean( var ) then
---         if ( is_bool( var ) ) then
---                 return var;
---         end;
+   -------------------------
+   -- Wp_Validate_Boolean --
+   -------------------------
 
---         if ( is_string( var ) && "false" === strtolower( var ) ) then
---                 return false;
---         end;
+   function Wp_Validate_Boolean (Var : Multi_Type)
+                                 return Boolean
+   is
+      use Php.Strings;
+   begin
+      -- if Is_Bool (Var) then
+      --    return Var;
+      -- end if;
 
---         return (bool) var;
--- end;
+      -- if Is_String (Var) and then "false" = Strtolower (Var) then
+      --    return False;
+      -- end if;
+
+      -- return (bool) var;
+      case Kind_Of (Var) is
+
+      when Kind_Boolean =>
+         return As_Boolean (Var);
+
+      when Kind_String =>
+         if Strtolower (As_String (Var)) = "false" then
+            return False;
+         end if;
+
+      when others => null;
+
+      end case;
+
+      return As_Boolean (Var);
+   end Wp_Validate_Boolean;
 
 --
 -- Deletes a file.

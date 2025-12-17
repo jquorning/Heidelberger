@@ -45,6 +45,41 @@ is
                            return Array_Type is (Empty_Array);
 
    --
+   -- Sorts an array of objects or arrays based on one or more orderby arguments.
+   --
+   -- @since 4.7.0
+   --
+   -- @param array        list          An array of objects or arrays to sort.
+   -- @param string|array orderby       Optional. Either the field name to order by or
+   --                                    an array of multiple orderby fields as
+   --                                    orderby => order.
+   -- @param string       order         Optional. Either "ASC" or "DESC". Only used
+   --                                    if orderby is a string.
+   -- @param bool         preserve_keys Optional. Whether to preserve keys. Default
+   --                                    false.
+   -- @return array The sorted array.
+   --
+   function Wp_List_Sort (List          : List_Type;
+                          Orderby       : String := ""; -- = array(),
+                          Order         : String := "ASC";
+                          Preserve_Keys : Boolean := False)
+                          return List_Type
+                          is (raise Program_Error with "not implemented");
+
+   --
+   -- Filters/validates a variable as a boolean.
+   --
+   -- Alternative to `filter_var( var, FILTER_VALIDATE_BOOLEAN )`.
+   --
+   -- @since 4.0.0
+   --
+   -- @param mixed var Boolean value to validate.
+   -- @return bool Whether the value is validated.
+   --
+   function Wp_Validate_Boolean (Var : Multi_Type)
+                                 return Boolean;
+
+   --
    -- Builds URL query based on an associative and, or indexed array.
    --
    -- This is a convenient function for easily building url queries. It sets the

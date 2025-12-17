@@ -18,6 +18,7 @@ with Wp_Common;
 with Adi_Caches;
 
 with Inc_Class_Walker_Category_Dropdown;
+with Inc_Class_Wp_Taxonomy;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -59,74 +60,72 @@ is
 --         return $category;
 -- end;
 
---
--- Retrieves category parents with separator.
---
--- @since 1.2.0
--- @since 4.8.0 The `$visited` parameter was deprecated and renamed to `$deprecated`.
---
--- @param int    $category_id Category ID.
--- @param bool   $link        Optional. Whether to format with link. Default false.
--- @param string $separator   Optional. How to separate categories. Default '/'.
--- @param bool   $nicename    Optional. Whether to use nice name for display. Default false.
--- @param array  $deprecated  Not used.
--- @return string|WP_Error A list of category parents on success, WP_Error on failure.
---
+   --------------------------
+   -- Get_Category_Parents --
+   --------------------------
 
--- function get_category_parents( $category_id, $link = false, $separator = '/', $nicename = false, $deprecated = array() ) then
+   function Get_Category_Parents (Category_Id : Integer;
+                                  Link        : Boolean := False;
+                                  Separator   : String  := "/";
+                                  Nicename    : Boolean := False)
+                                  -- , $deprecated = array() ) then
+                                  return String -- List_Type -- String;
+   is
+--        if ( ! empty( $deprecated ) ) then
+--                _deprecated_argument( __FUNCTION__, '4.8.0' );
+--        end;
 
---         if ( ! empty( $deprecated ) ) then
---                 _deprecated_argument( __FUNCTION__, '4.8.0' );
---         end;
+      Format : String := (if Nicename then "slug" else "name");
 
---         $format = $nicename ? 'slug' : 'name';
+      Args : constant Array_Type := To_Array (List => (
+        Build ("separator", Separator),
+        Build ("link",      Link),
+        Build ("format",    Format)
+      ));
+   begin
+      return Get_Term_Parents_List (Category_Id, "category", Args);
+   end Get_Category_Parents;
 
---         $args = array(
---                 'separator' => $separator,
---                 'link'      => $link,
---                 'format'    => $format,
---         );
+   ----------------------
+   -- Get_The_Category --
+   ----------------------
 
---         return get_term_parents_list( $category_id, 'category', $args );
--- end;
+   function Get_The_Category (Post_Id : Inc_Class_Wp_Posts.Post_Id := 0) -- false
+                              return Inc_Class_Wp_Terms.Wp_Term_Array
+   is
+      use Wp_Common;
+      use Inc_Class_Wp_Terms;
+      use Inc_Class_Wp_Terms.Term_Vectors;
+--    use Inc_Load;
+--    use Inc_Plugins;
 
---
--- Retrieves post categories.
---
--- This tag may be used outside The Loop by passing a post ID as the parameter.
---
--- Note: This function only returns results from the default "category" taxonomy.
--- For custom taxonomies use get_the_terms().
---
--- @since 0.71
---
--- @param int $post_id Optional. The post ID. Defaults to current post ID.
--- @return WP_Term[] Array of WP_Term objects, one for each category assigned to the post.
---
+      Categories : Wp_Term_Array := Get_The_Terms (Post_Id, "category");
+   begin
+      if
+        Categories = Empty_Term_Array -- or else
+--      not Categories or else
+--      Is_Wp_Error (Categories)
+      then
+         Categories := Empty_Term_Array; -- Empty_Array;
+      end if;
 
--- function get_the_category( $post_id = false ) then
---         $categories = get_the_terms( $post_id, 'category' );
---         if ( ! $categories || is_wp_error( $categories ) ) then
---                 $categories = array();
---         end;
+--    Categories := Array_Values (Categories);
 
---         $categories = array_values( $categories );
+--    for Key of Array_Keys (Categories) loop
+--       X_Make_Cat_Compat (Get (Categories, Key));
+--    end loop;
 
---         foreach ( array_keys( $categories ) as $key ) then
---                 _make_cat_compat( $categories[ $key ] );
---         end;
-
---         --
---         -- Filters the array of categories to return for a post.
---         --
---         -- @since 3.1.0
---         -- @since 4.4.0 Added the `$post_id` parameter.
---         --
---         -- @param WP_Term[] $categories An array of categories to return for the post.
---         -- @param int|false $post_id    The post ID.
---         --
---         return apply_filters( 'get_the_categories', $categories, $post_id );
--- end;
+      --
+      -- Filters the array of categories to return for a post.
+      --
+      -- @since 3.1.0
+      -- @since 4.4.0 Added the `$post_id` parameter.
+      --
+      -- @param WP_Term[] $categories An array of categories to return for the post.
+      -- @param int|false $post_id    The post ID.
+      --
+      return Apply_Filters ("get_the_categories", Categories, Post_Id);
+   end Get_The_Category;
 
 --
 -- Retrieves category name based on category ID.
@@ -1367,17 +1366,9 @@ is
 --         return is_wp_error( $description ) ? "" : $description;
 -- end;
 
---
--- Retrieves the terms of the taxonomy that are attached to the post.
---
--- @since 2.5.0
---
--- @param int|WP_Post $post     Post ID or object.
--- @param string      $taxonomy Taxonomy name.
--- @return WP_Term[]|false|WP_Error Array of WP_Term objects on success, false if there are no terms
---                                  or the post does not exist, WP_Error on failure.
---
--- function get_the_terms( $post, $taxonomy ) then
+   -------------------
+   -- Get_The_Terms --
+   -------------------
 
    function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Wp_Post;
                            Taxonomy : String)
@@ -1441,6 +1432,11 @@ is
       end;
    end Get_The_Terms;
 
+   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Post_Id;
+                           Taxonomy : String)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (raise Program_Error with "not implemented");
+
 --
 -- Retrieves a post's terms as a list with specified format.
 --
@@ -1499,89 +1495,103 @@ is
 --         return $before . implode( $sep, $term_links ) . $after;
 -- end;
 
---
--- Retrieves term parents with separator.
---
--- @since 4.8.0
---
--- @param int          $term_id  Term ID.
--- @param string       $taxonomy Taxonomy name.
--- @param string|array $args then
---     Array of optional arguments.
---
---     @type string $format    Use term names or slugs for display. Accepts "name" or "slug".
---                             Default "name".
---     @type string $separator Separator for between the terms. Default "/".
---     @type bool   $link      Whether to format as a link. Default true.
---     @type bool   $inclusive Include the term to get the parents for. Default true.
--- end;
--- @return string|WP_Error A list of term parents on success, WP_Error or empty string on failure.
---
+   ---------------------------
+   -- Get_Term_Parents_List --
+   ---------------------------
 
--- function get_term_parents_list( $term_id, $taxonomy, $args = array() ) then
---         $list = "";
---         $term = get_term( $term_id, $taxonomy );
+   function Get_Term_Parents_List (Term_Id  : Integer;
+                                   Taxonomy : String;
+                                   Args     : Array_Type := Empty_Array)
+                                   return String -- List_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Inc_Class_Wp_Taxonomy;
+      use Inc_Class_Wp_Terms;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Taxonomys;
 
---         if ( is_wp_error( $term ) ) then
---                 return $term;
---         end;
+      List : Unbounded_String;
+      Term : constant Wp_Term := Get_Term (Term_Id, Taxonomy);
+   begin
+      if Is_Wp_Error (Term) then
+         return "TERM"; -- Term;
+      end if;
 
---         if ( ! $term ) then
---                 return $list;
---         end;
+      if Term = Null_Term then
+--    if not Term then
+         return -List;
+      end if;
 
---         $term_id = $term->term_id;
+      declare
+         Term_Id_2 : constant Integer := Term.Term_Id;
 
---         $defaults = array(
---                 "format"    => "name",
---                 "separator" => "/",
---                 "link"      => true,
---                 "inclusive" => true,
---         );
+         Defaults : constant Array_Type := To_Array (List => (
+                Build ("format",    "name"),
+                Build ("separator", "/"),
+                Build ("link",      True),
+                Build ("inclusive", True)
+         ));
 
---         $args = wp_parse_args( $args, $defaults );
+         Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
+      begin
+         for Bool of To_List (List => (+"link", +"inclusive")) loop
+            Set (Args_2, -Bool,
+                 From_Boolean (Wp_Validate_Boolean (Get (Args_2, -Bool))));
+         end loop;
 
---         foreach ( array( "link", "inclusive" ) as $bool ) then
---                 $args[ $bool ] = wp_validate_boolean( $args[ $bool ] );
---         end;
+         declare
+            Parents : constant Int_Arrays.Vector :=
+              Get_Ancestors (Term_Id_2, Taxonomy, "taxonomy");
+         begin
+            if As_Boolean (Get (Args_2, "inclusive")) then
+               null;
+--             Parents := Parents & Term_Id_2;
+--             Array_Unshift (Parents, Term_Id_2);
+            end if;
 
---         $parents = get_ancestors( $term_id, $taxonomy, "taxonomy" );
+            for Term_Id of reverse Parents loop -- Array_Reverse (Parents) loop
+               declare
+                  Parent : Wp_Term := Get_Term (Term_Id, Taxonomy);
 
---         if ( $args["inclusive"] ) then
---                 array_unshift( $parents, $term_id );
---         end;
-
---         foreach ( array_reverse( $parents ) as $term_id ) then
---                 $parent = get_term( $term_id, $taxonomy );
---                 $name   = ( "slug" === $args["format"] ) ? $parent->slug : $parent->name;
-
---                 if ( $args["link"] ) then
---                         $list .= "<a href="" . esc_url( get_term_link( $parent->term_id, $taxonomy ) ) . "">" . $name . "</a>" . $args["separator"];
---                 end; else then
---                         $list .= $name . $args["separator"];
---                 end;
---         end;
-
---         return $list;
--- end;
+                  Name : constant String :=
+                    -(if "slug" = Get_As_String (Args_2, "format")
+                      then Parent.Slug else Parent.Name);
+               begin
+                  if Get_As_String (Args_2, "link") /= "" then
+                     Append (List,
+                             "<a href=""" &
+                             ESC_URL (Get_Term_Link (Parent.Term_Id, Taxonomy)) &
+                             """>" & Name & "</a>" &
+                             Get_As_String (Args_2, "separator"));
+                  else
+                     Append (List, Name & Get_As_String (Args_2, "separator"));
+                  end if;
+               end;
+            end loop;
+         end;
+      end;
+      return -List;
+   end Get_Term_Parents_List;
 
 --
 -- Displays the terms for a post in a list.
 --
 -- @since 2.5.0
 --
--- @param int    $post_id  Post ID.
--- @param string $taxonomy Taxonomy name.
--- @param string $before   Optional. String to use before the terms. Default empty.
--- @param string $sep      Optional. String to use between the terms. Default ", ".
--- @param string $after    Optional. String to use after the terms. Default empty.
+-- @param int    post_id  Post ID.
+-- @param string taxonomy Taxonomy name.
+-- @param string before   Optional. String to use before the terms. Default empty.
+-- @param string sep      Optional. String to use between the terms. Default ", ".
+-- @param string after    Optional. String to use after the terms. Default empty.
 -- @return void|false Void on success, false on failure.
 --
 
--- function the_terms( $post_id, $taxonomy, $before = "", $sep = ", ", $after = "" ) then
---         $term_list = get_the_term_list( $post_id, $taxonomy, $before, $sep, $after );
+-- function the_terms( post_id, taxonomy, before = "", sep = ", ", after = "" ) then
+--         term_list = get_the_term_list( post_id, taxonomy, before, sep, after );
 
---         if ( is_wp_error( $term_list ) ) then
+--         if ( is_wp_error( term_list ) ) then
 --                 return false;
 --         end;
 
@@ -1590,13 +1600,13 @@ is
 --         --
 --         -- @since 2.9.0
 --         --
---         -- @param string $term_list List of terms to display.
---         -- @param string $taxonomy  The taxonomy name.
---         -- @param string $before    String to use before the terms.
---         -- @param string $sep       String to use between the terms.
---         -- @param string $after     String to use after the terms.
+--         -- @param string term_list List of terms to display.
+--         -- @param string taxonomy  The taxonomy name.
+--         -- @param string before    String to use before the terms.
+--         -- @param string sep       String to use between the terms.
+--         -- @param string after     String to use after the terms.
 --         --
---         echo apply_filters( "the_terms", $term_list, $taxonomy, $before, $sep, $after );
+--         echo apply_filters( "the_terms", term_list, taxonomy, before, sep, after );
 -- end;
 
 --
@@ -1609,15 +1619,15 @@ is
 --
 -- @since 3.1.0
 --
--- @param string|int|array $category Optional. The category name/term_id/slug,
+-- @param string|int|array category Optional. The category name/term_id/slug,
 --                                   or an array of them to check for. Default empty.
--- @param int|WP_Post      $post     Optional. Post to check. Defaults to the current post.
+-- @param int|WP_Post      post     Optional. Post to check. Defaults to the current post.
 -- @return bool True if the current post has any of the given categories
 --              (or any category, if no category specified). False otherwise.
 --
 
--- function has_category( $category = "", $post = null ) then
---         return has_term( $category, "category", $post );
+-- function has_category( category = "", post = null ) then
+--         return has_term( category, "category", post );
 -- end;
 
 --
@@ -1635,17 +1645,17 @@ is
 -- @since 2.6.0
 -- @since 2.7.0 Tags given as integers are only checked against
 --              the post"s tags" term_ids, not names or slugs.
--- @since 2.7.0 Can be used outside of the WordPress Loop if `$post` is provided.
+-- @since 2.7.0 Can be used outside of the WordPress Loop if `post` is provided.
 --
--- @param string|int|array $tag  Optional. The tag name/term_id/slug,
+-- @param string|int|array tag  Optional. The tag name/term_id/slug,
 --                               or an array of them to check for. Default empty.
--- @param int|WP_Post      $post Optional. Post to check. Defaults to the current post.
+-- @param int|WP_Post      post Optional. Post to check. Defaults to the current post.
 -- @return bool True if the current post has any of the given tags
 --              (or any tag, if no tag specified). False otherwise.
 --
 
--- function has_tag( $tag = "", $post = null ) then
---         return has_term( $tag, "post_tag", $post );
+-- function has_tag( tag = "", post = null ) then
+--         return has_term( tag, "post_tag", post );
 -- end;
 
 --
@@ -1658,27 +1668,27 @@ is
 --
 -- @since 3.1.0
 --
--- @param string|int|array $term     Optional. The term name/term_id/slug,
+-- @param string|int|array term     Optional. The term name/term_id/slug,
 --                                   or an array of them to check for. Default empty.
--- @param string           $taxonomy Optional. Taxonomy name. Default empty.
--- @param int|WP_Post      $post     Optional. Post to check. Defaults to the current post.
+-- @param string           taxonomy Optional. Taxonomy name. Default empty.
+-- @param int|WP_Post      post     Optional. Post to check. Defaults to the current post.
 -- @return bool True if the current post has any of the given terms
 --              (or any term, if no term specified). False otherwise.
 --
 
--- function has_term( $term = "", $taxonomy = "", $post = null ) then
---         $post = get_post( $post );
+-- function has_term( term = "", taxonomy = "", post = null ) then
+--         post = get_post( post );
 
---         if ( ! $post ) then
+--         if ( ! post ) then
 --                 return false;
 --         end;
 
---         $r = is_object_in_term( $post->ID, $taxonomy, $term );
---         if ( is_wp_error( $r ) ) then
+--         r = is_object_in_term( post->ID, taxonomy, term );
+--         if ( is_wp_error( r ) ) then
 --                 return false;
 --         end;
 
---         return $r;
+--         return r;
 -- end;
 
 end Inc_Category_Templates;

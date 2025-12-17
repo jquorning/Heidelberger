@@ -18,8 +18,10 @@ with Wp_Common;
 
 with Adi_Caches;
 
+with Inc_Class_Wp_Posts;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
@@ -28,10 +30,6 @@ with Inc_Themes;
 
 package body Inc_Taxonomys
 is
-   use Ada.Containers;
-   use Hb_Common;
-   use Php;
-   use Inc_L10n;
 
    function Apply_Filters (Hook  : String;
                            Value : Array_Type;
@@ -50,7 +48,9 @@ is
    procedure Create_Initial_Taxonomies
    is
       use Ada.Strings.Unbounded;
+      use Hb_Common;
       use Inc_Class_Wp_Taxonomy;
+      use Inc_L10n;
       use Inc_Options;
       use Inc_Plugins;
 --         global wp_rewrite;
@@ -537,9 +537,11 @@ is
                                Args        : Array_Type)
                                return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
    is
+      use Hb_Common;
       use Inc_Class_Wp_Taxonomy;
       use Inc_Formatting;
       use Inc_Functions;
+      use Inc_L10n;
       use Inc_Options;
       use Inc_Plugins;
 
@@ -697,6 +699,7 @@ is
                                  return Array_Type
    is
       use Ada.Strings.Unbounded;
+      use Hb_Common;
       use Php.Arrays;
       use Inc_Plugins;
    begin
@@ -1560,6 +1563,7 @@ is
                          Parent   : Integer := 0) -- null
                          return Array_Type -- Integer
    is
+      use Hb_Common;
       use Php.Strings;
       use Inc_Functions;
       use Inc_Plugins;
@@ -2281,10 +2285,12 @@ is
                                  Args       : Array_Type := Empty_Array)
                                  return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Ada.Containers;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Hb_Common;
       use Wp_Common;
 --    use Adi_Templates;
       use Inc_Class_Wp_Terms;
@@ -3852,6 +3858,7 @@ is
                                    Taxonomy : String)
                                    return Inc_Class_Wp_Terms.Wp_Term_Array
    is
+      use Ada.Containers;
       use Adi_Caches;
       use Inc_Class_Wp_Terms;
 --    use Array_Maps;
@@ -5077,61 +5084,76 @@ is
       return In_Array (Taxonomy, Taxonomies, True);
    end Is_Object_In_Taxonomy;
 
---
--- Gets an array of ancestor IDs for a given object.
---
--- @since 3.1.0
--- @since 4.1.0 Introduced the `resource_type` argument.
---
--- @param int    object_id     Optional. The ID of the object. Default 0.
--- @param string object_type   Optional. The type of object for which we"ll be retrieving
---                              ancestors. Accepts a post type or a taxonomy name. Default empty.
--- @param string resource_type Optional. Type of resource object_type is. Accepts "post_type"
---                              or "taxonomy". Default empty.
--- @return int() An array of IDs of ancestors from lowest to highest in the hierarchy.
---
--- function get_ancestors (object_id = 0, object_type = "", resource_type = "") then
---         object_id = (int) object_id;
+   -------------------
+   -- Get_Ancestors --
+   -------------------
 
---         ancestors = array();
+   function Get_Ancestors (Object_Id     : Integer := 0;
+                           Object_Type   : String  := "";
+                           Resource_Type : String  := "")
+                           return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
+--                            return Int_Arrays.Vector -- ;Int_Array
+   is
+      use Ada.Strings.Unbounded;
+--    use Php.Arrays;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Taxonomy;
+      use Inc_Class_Wp_Terms;
+      use Inc_Load;
+      use Inc_Posts;
 
---         if  (empty (object_id)) then
+--        object_id = (int) object_id;
+      Ancestors       : Int_Arrays.Vector; -- Array_Type; -- array();
+      Resource_Type_2 : Unbounded_String := +Resource_Type;
+   begin
+      if Object_Id = 0 then
+--    if Empty (Object_Id) then
+         -- This filter is documented in wp-includes/taxonomy.php
+         return Apply_Filters ("get_ancestors", Ancestors, Object_Id,
+                               Object_Type, -Resource_Type_2);
+      end if;
 
---                 -- This filter is documented in wp-includes/taxonomy.php--
---                 return apply_filters ("get_ancestors", ancestors, object_id, object_type, resource_type);
---         end;
+      if Resource_Type_2 = "" then
+         if  Is_Taxonomy_Hierarchical (Object_Type) then
+            Resource_Type_2 := +"taxonomy";
+         elsif Post_Type_Exists (Object_Type) then
+            Resource_Type_2 := +"post_type";
+         end if;
+      end if;
 
---         if  (! resource_type) then
---                 if  (is_taxonomy_hierarchical (object_type)) then
---                         resource_type = "taxonomy";
---                 end; elseif  (post_type_exists (object_type)) then
---                         resource_type = "post_type";
---                 end;
---         end;
+      if "taxonomy" = Resource_Type_2 then
+         declare
+            Term : Wp_Term := Get_Term (Object_Id, Object_Type);
+         begin
+            while
+              not Is_Wp_Error (Term) and then
+              Term.Parent /= 0 and then
+--            not Empty (Term.Parent) and then
+              not In_Array (Term.Parent, Ancestors, True)
+            loop
+               Ancestors.Append (Term.Parent); -- (int)
+               Term := Get_Term (Term.Parent, Object_Type);
+            end loop;
+         end;
+      elsif "post_type" = Resource_Type_2 then
+         Ancestors := Get_Post_Ancestors (Inc_Class_Wp_Posts.Post_Id (Object_Id));
+      end if;
 
---         if  ("taxonomy" === resource_type) then
---                 term = get_term (object_id, object_type);
---                 while  (! is_wp_error (term) && ! empty (term.parent) && ! in_array (term.parent, ancestors, true)) then
---                         ancestors() = (int) term.parent;
---                         term        = get_term (term.parent, object_type);
---                 end;
---         end; elseif  ("post_type" === resource_type) then
---                 ancestors = get_post_ancestors (object_id);
---         end;
-
---         --
---         -- Filters a given object"s ancestors.
---         --
---         -- @since 3.1.0
---         -- @since 4.1.1 Introduced the `resource_type` parameter.
---         --
---         -- @param int()  ancestors     An array of IDs of object ancestors.
---         -- @param int    object_id     Object ID.
---         -- @param string object_type   Type of object.
---         -- @param string resource_type Type of resource object_type is.
---         --
---         return apply_filters ("get_ancestors", ancestors, object_id, object_type, resource_type);
--- end;
+      --
+      -- Filters a given object's ancestors.
+      --
+      -- @since 3.1.0
+      -- @since 4.1.1 Introduced the `resource_type` parameter.
+      --
+      -- @param int()  ancestors     An array of IDs of object ancestors.
+      -- @param int    object_id     Object ID.
+      -- @param string object_type   Type of object.
+      -- @param string resource_type Type of resource object_type is.
+      --
+      return Apply_Filters ("get_ancestors", Ancestors,
+                            Object_Id, Object_Type, -Resource_Type_2);
+   end Get_Ancestors;
 
 --
 -- Returns the term"s parent"s term ID.

@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+-- with Lists;
 
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
@@ -14,9 +15,50 @@ with Inc_Class_Wp_Posts;
 package Inc_Category_Templates
 is
    use Arrays;
+-- use Lists;
 
    No_Terms : exception;
    Error    : exception;
+
+   --
+   -- Retrieves category parents with separator.
+   --
+   -- @since 1.2.0
+   -- @since 4.8.0 The `$visited` parameter was deprecated and renamed to
+   --               `$deprecated`.
+   --
+   -- @param int    $category_id Category ID.
+   -- @param bool   $link        Optional. Whether to format with link. Default false.
+   -- @param string $separator   Optional. How to separate categories. Default '/'.
+   -- @param bool   $nicename    Optional. Whether to use nice name for display.
+   --                            Default false.
+   -- @param array  $deprecated  Not used.
+   -- @return string|WP_Error A list of category parents on success, WP_Error on
+   --                          failure.
+   --
+   function Get_Category_Parents (Category_Id : Integer;
+                                  Link        : Boolean := False;
+                                  Separator   : String  := "/";
+                                  Nicename    : Boolean := False)
+                                  -- , $deprecated = array() ) then
+                                  return String; -- List_Type; -- String;
+
+   --
+   -- Retrieves post categories.
+   --
+   -- This tag may be used outside The Loop by passing a post ID as the parameter.
+   --
+   -- Note: This function only returns results from the default "category" taxonomy.
+   -- For custom taxonomies use get_the_terms().
+   --
+   -- @since 0.71
+   --
+   -- @param int $post_id Optional. The post ID. Defaults to current post ID.
+   -- @return WP_Term[] Array of WP_Term objects, one for each category assigned to
+   --                    the post.
+   --
+   function Get_The_Category (Post_Id : Inc_Class_Wp_Posts.Post_Id := 0) -- false
+                              return Inc_Class_Wp_Terms.Wp_Term_Array;
 
    --
    -- Displays or retrieves the HTML dropdown list of categories.
@@ -113,6 +155,35 @@ is
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array;
                            -- Inc_Class_Posts.Wp_Post;
+
+   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Post_Id;
+                           Taxonomy : String)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array;
+
+   --
+   -- Retrieves term parents with separator.
+   --
+   -- @since 4.8.0
+   --
+   -- @param int          $term_id  Term ID.
+   -- @param string       $taxonomy Taxonomy name.
+   -- @param string|array $args {
+   --     Array of optional arguments.
+   --
+   --     @type string $format    Use term names or slugs for display. Accepts "name"
+   --                              or "slug". Default "name".
+   --     @type string $separator Separator for between the terms. Default "/".
+   --     @type bool   $link      Whether to format as a link. Default true.
+   --     @type bool   $inclusive Include the term to get the parents for. Default
+   --                              true.
+   -- }
+   -- @return string|WP_Error A list of term parents on success, WP_Error or empty
+   --                          string on failure.
+   --
+   function Get_Term_Parents_List (Term_Id  : Integer;
+                                   Taxonomy : String;
+                                   Args     : Array_Type := Empty_Array)
+                                   return String; -- List_Type;
 
    --
    -- Retrieves HTML dropdown (select) content for category list.

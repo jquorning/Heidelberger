@@ -9,15 +9,23 @@ with Adi_Class_Wp_Screens;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
+with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Posts;
 with Inc_Taxonomys;
 
 package Wp_Common
 is
    use Arrays;
    use Lists;
+
+   function In_Array (T : Integer;
+                      A : Inc_Class_Wp_Taxonomy.Int_Arrays.Vector;
+                      S : Boolean)
+                      return Boolean
+                      is (raise Program_Error with "not implemented");
 
    function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post)
                        return Boolean
@@ -115,6 +123,13 @@ is
                            is (Empty_List);
 
    function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           B         : Boolean)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
                            B         : String;
                            C         : Inc_Class_Wp_Posts.Wp_Post)
                            return String
@@ -133,5 +148,53 @@ is
                            Arg_4     : Boolean := False)
                            return Array_Type
                            is (Empty_Array);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Inc_Class_Wp_Terms.Wp_Term;
+                           Cats      : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Post      : Inc_Class_Wp_Posts.Wp_Post)
+                           return Inc_Class_Wp_Terms.Wp_Term
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           A         : Boolean;
+                           B         : Boolean)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Post      : Inc_Class_Wp_Posts.Post_Id;
+                           B         : Boolean)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Post      : Inc_Class_Wp_Posts.Post_Id)
+                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Inc_Class_Wp_Taxonomy.Int_Arrays.Vector;
+                           Id        : Integer;
+                           Obj       : String;
+                           Res       : String)
+                           return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           Status    : Inc_Posts.Status_Type)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           Status    : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+                           return Boolean
+                           is (Value);
 
 end Wp_Common;

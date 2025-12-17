@@ -8,9 +8,12 @@
 
 with Ada.Strings.Unbounded;
 
+with Arrays;
+
 package Inc_Class_Wp_Rewrites
 is
    use Ada.Strings.Unbounded;
+   use Arrays;
 
    --
    -- Core class used to implement a rewrite component API.
@@ -36,7 +39,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public permalink_structure;
+         Permalink_Structure : Unbounded_String;
 
          --
          -- Whether to add trailing slashes.
@@ -77,7 +80,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public page_structure;
+         Page_Structure : Unbounded_String;
 
          --
          -- Base of the search permalink structure (example.com/search_base/query).
@@ -233,7 +236,7 @@ is
          -- @since 2.1.0
          -- @var array[]
          --
-         -- public extra_permastructs = array();
+         Extra_Permastructs : Array_Type;
 
          --
          -- Endpoints (like /trackback/) added by add_rewrite_endpoint().
@@ -350,18 +353,17 @@ is
 --         --
 --         public feeds = array( "feed", "rdf", "rss", "rss2", "atom" );
 
---         --
---         -- Determines whether permalinks are being used.
---         --
---         -- This can be either rewrite module or permalink in the HTTP query string.
---         --
---         -- @since 1.5.0
---         --
---         -- @return bool True, if permalinks are enabled.
---         --
---         public function using_permalinks() then
---                 return ! empty( this.permalink_structure );
---         end;
+   --
+   -- Determines whether permalinks are being used.
+   --
+   -- This can be either rewrite module or permalink in the HTTP query string.
+   --
+   -- @since 1.5.0
+   --
+   -- @return bool True, if permalinks are enabled.
+   --
+   function Using_Permalinks (This : Wp_Rewrite)
+                              return Boolean;
 
 --         --
 --         -- Determines whether permalinks are being used and rewrite module is not enabled.
@@ -640,25 +642,17 @@ is
 --                 return this.get_extra_permastruct( "post_tag" );
 --         end;
 
---         --
---         -- Retrieves an extra permalink structure by name.
---         --
---         -- @since 2.5.0
---         --
---         -- @param string name Permalink structure name.
---         -- @return string|false Permalink structure string on success, false on failure.
---         --
---         public function get_extra_permastruct( name ) then
---                 if ( empty( this.permalink_structure ) ) then
---                         return false;
---                 end;
-
---                 if ( isset( this.extra_permastructs[ name ] ) ) then
---                         return this.extra_permastructs[ name ]["struct"];
---                 end;
-
---                 return false;
---         end;
+   --
+   -- Retrieves an extra permalink structure by name.
+   --
+   -- @since 2.5.0
+   --
+   -- @param string name Permalink structure name.
+   -- @return string|false Permalink structure string on success, false on failure.
+   --
+   function Get_Extra_Permastruct (This : Wp_Rewrite;
+                                   Name : String)
+                                   return String;
 
 --         --
 --         -- Retrieves the author permalink structure.
@@ -712,18 +706,19 @@ is
 --                 return this.search_structure;
 --         end;
 
---         --
---         -- Retrieves the page permalink structure.
---         --
---         -- The permalink structure is root property, and "%pagename%". Will set the
---         -- page_structure property and then return it without attempting to set the
---         -- value again.
---         --
---         -- @since 1.5.0
---         --
---         -- @return string|false Page permalink structure on success, false on failure.
---         --
---         public function get_page_permastruct() then
+   --
+   -- Retrieves the page permalink structure.
+   --
+   -- The permalink structure is root property, and "%pagename%". Will set the
+   -- page_structure property and then return it without attempting to set the
+   -- value again.
+   --
+   -- @since 1.5.0
+   --
+   -- @return string|false Page permalink structure on success, false on failure.
+   --
+   function Get_Page_Permastruct (This : in out Wp_Rewrite)
+                                  return String;
 --                 if ( isset( this.page_structure ) ) then
 --                         return this.page_structure;
 --                 end;

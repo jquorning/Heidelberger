@@ -37,6 +37,24 @@ is
                                     return String;
 
    --
+   -- Determine whether post should always use a plain permalink structure.
+   --
+   -- @since 5.7.0
+   --
+   -- @param WP_Post|int|null post   Optional. Post ID or post object. Defaults to
+   --                                 global post.
+   -- @param bool|null        sample Optional. Whether to force consideration based on
+   --                                 sample links. If omitted, a sample link is
+   --                                 generated if a post object is passed
+   --                                 with the filter property set to "sample".
+   -- @return bool Whether to use a plain permalink structure.
+   --
+   function Wp_Force_Plain_Post_Permalink
+              (Post   : Inc_Class_Wp_Posts.Wp_Post; -- null
+               Sample : Boolean := False) -- null
+               return Boolean;
+
+   --
    -- Retrieves the permalink for a post type archive.
    --
    -- @since 3.1.0
@@ -62,10 +80,101 @@ is
    --                               Default false.
    -- @return string|false The permalink URL. False if the post does not exist.
    --
-   function Get_Permalink (Post      : Integer := 0;
+   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
                            Leavename : Boolean := False)
-                           return String
-                           is ("XXX-358");
+                           return String;
+
+   --
+   -- Retrieves the permalink for a post of a custom post type.
+   --
+   -- @since 3.0.0
+   -- @since 6.1.0 Returns false if the post does not exist.
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param int|WP_Post post      Optional. Post ID or post object. Default is the
+   --                               global `post`.
+   -- @param bool        leavename Optional. Whether to keep post name. Default false.
+   -- @param bool        sample    Optional. Is it a sample permalink. Default false.
+   -- @return string|false The post permalink URL. False if the post does not exist.
+   --
+   function Get_Post_Permalink (Id        : Inc_Class_Wp_Posts.Wp_Post; -- Post, 0,
+                                Leavename : Boolean := False;
+                                Sample    : Boolean := False)
+                                return String;
+
+   --
+   -- Retrieves the permalink for the current page or page ID.
+   --
+   -- Respects page_on_front. Use this one.
+   --
+   -- @since 1.5.0
+   --
+   -- @param int|WP_Post post      Optional. Post ID or object. Default uses the
+   --                               global `post`.
+   -- @param bool        leavename Optional. Whether to keep the page name. Default
+   --                               false.
+   -- @param bool        sample    Optional. Whether it should be treated as a sample
+   --                               permalink. Default false.
+   -- @return string The page permalink.
+   --
+--   function Get_Page_Link (Post      : Inc_Class_Wp_Posts.Post_Id := 0; -- false
+--                           Leavename : Boolean := False;
+--                           Sample    : Boolean := False)
+--                           return String;
+
+   function Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Leavename : Boolean := False;
+                           Sample    : Boolean := False)
+                           return String;
+
+   --
+   -- Retrieves the page permalink.
+   --
+   -- Ignores page_on_front. Internal use only.
+   --
+   -- @since 2.1.0
+   -- @access private
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param int|WP_Post post      Optional. Post ID or object. Default uses the
+   --                               global `post`.
+   -- @param bool        leavename Optional. Whether to keep the page name. Default
+   --                               false.
+   -- @param bool        sample    Optional. Whether it should be treated as a sample
+   --                               permalink. Default false.
+   -- @return string The page permalink.
+   --
+   function X_Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- = false,
+                             Leavename : Boolean := False;
+                             Sample    : Boolean := False)
+                             return String;
+
+   function X_Get_Page_Link (Post      : Inc_Class_Wp_Posts.Post_Id; -- = false,
+                             Leavename : Boolean := False;
+                             Sample    : Boolean := False)
+                             return String
+                             is (raise Program_Error with "not implemented");
+
+   --
+   -- Retrieves the permalink for an attachment.
+   --
+   -- This can be used in the WordPress Loop or outside of it.
+   --
+   -- @since 2.0.0
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param int|object post      Optional. Post ID or object. Default uses the global
+   --                              `post`.
+   -- @param bool       leavename Optional. Whether to keep the page name. Default
+   --                              false.
+   -- @return string The attachment permalink.
+   --
+   function Get_Attachment_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- null
+                                 Leavename : Boolean := False)
+                                 return String;
 
    --
    -- Retrieves the URL for a given site where the front end is accessible.
