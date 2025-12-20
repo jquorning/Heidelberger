@@ -143,6 +143,16 @@ is
                           return String
                           is ("XXX-006");
 
+   type Reduce_Callback_2 is not null access function (Carry : Integer;
+                                                       Item  : String)
+                                                       return Integer;
+
+   function Array_Reduce (Arry     : Array_Type;
+                          Callback : Reduce_Callback_2;
+                          Initial  : Integer)
+                          return Integer
+                          is (raise Program_Error with "not implemented");
+
    function Array_Combine (Keys   : Array_Type;
                            Values : Array_Type)
                            return Array_Type

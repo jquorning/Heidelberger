@@ -60,6 +60,11 @@ is
                          Value : Integer)
                          return Inc_Class_Wp_Users.Wp_User;
 
+   function Get_User_By (Field : String;
+                         Value : String)
+                         return Inc_Class_Wp_Users.Wp_User
+                         is (raise Program_Error with "not implemented");
+
    --
    -- Redirects to another page.
    --

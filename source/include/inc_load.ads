@@ -1,10 +1,13 @@
 with Ada.Calendar;
 
+with Arrays;
+
 with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Terms;
 
 package Inc_Load
 is
+   use Arrays;
 
    --
    -- Fix `_SERVER` variables for various setups.
@@ -30,6 +33,16 @@ is
    -- @global string wp_version           The WordPress version string.
    --
    procedure Wp_Check_Php_Mysql_Versions;
+
+   --
+   -- Retrieves the current network ID.
+   --
+   -- @since 4.6.0
+   --
+   -- @return int The ID of the current network.
+   --
+   function Get_Current_Network_Id
+            return Integer;
 
    --
    -- Attempt an early load of translations.
@@ -336,7 +349,15 @@ is
    -- @param mixed $thing The variable to check.
    -- @return bool Whether the variable is an instance of WP_Error.
    --
+   function Is_Wp_Error (Thing : Array_Type)
+                         return Boolean
+                         is (False);
+
    function Is_Wp_Error (Thing : String)
+                         return Boolean
+                         is (False);
+
+   function Is_Wp_Error (Thing : Boolean)
                          return Boolean
                          is (False);
 

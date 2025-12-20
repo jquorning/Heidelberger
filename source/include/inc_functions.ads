@@ -45,6 +45,26 @@ is
                            return Array_Type is (Empty_Array);
 
    --
+   -- Loads custom DB error or display WordPress DB error.
+   --
+   -- If a file exists in the wp-content directory named db-error.php, then it will
+   -- be loaded instead of displaying the WordPress DB error. If it is not found,
+   -- then the WordPress DB error will be displayed instead.
+   --
+   -- The WordPress DB error sets the HTTP status header to 500 to try to prevent
+   -- search engines from caching the message. Custom DB messages should do the
+   -- same.
+   --
+   -- This function was backported to WordPress 2.3.2, but originally was added
+   -- in WordPress 2.5.0.
+   --
+   -- @since 2.3.2
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Dead_DB;
+
+   --
    -- Sorts an array of objects or arrays based on one or more orderby arguments.
    --
    -- @since 4.7.0
@@ -79,6 +99,29 @@ is
    function Wp_Validate_Boolean (Var : Multi_Type)
                                  return Boolean;
 
+   --
+   -- Serializes data, if needed.
+   --
+   -- @since 2.0.5
+   --
+   -- @param string|array|object data Data that might be serialized.
+   -- @return mixed A scalar data.
+   --
+   function Maybe_Serialize (Data : String)
+                             return Multi_Type
+                             is (raise Program_Error with "not implemented");
+
+   --
+   -- Unserializes data only if it was serialized.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string data Data that might be unserialized.
+   -- @return mixed Unserialized data can be any type.
+   --
+   function Maybe_Unserialize (Data : String)
+                               return Multi_Type
+                               is (raise Program_Error with "not implemented");
    --
    -- Builds URL query based on an associative and, or indexed array.
    --
@@ -192,6 +235,44 @@ is
    --
    function Add_Magic_Quotes (Arry : Array_Type)
             return Array_Type;
+
+   --
+   -- Retrieves the description for the HTTP status.
+   --
+   -- @since 2.3.0
+   -- @since 3.9.0 Added status codes 418, 428, 429, 431, and 511.
+   -- @since 4.5.0 Added status codes 308, 421, and 451.
+   -- @since 5.1.0 Added status code 103.
+   --
+   -- @global array wp_header_to_desc
+   --
+   -- @param int code HTTP status code.
+   -- @return string Status description if found, an empty string otherwise.
+   --
+   function Get_Status_Header_Desc (Code : Integer)
+                                    return String;
+
+   --
+   -- Determines whether WordPress is already installed.
+   --
+   -- The cache will be checked first. If you have a cache plugin, which saves
+   -- the cache values, then this will work. If you use the default WordPress
+   -- cache, and the database goes away, then you might have problems.
+   --
+   -- Checks for the "siteurl" option for whether WordPress is installed.
+   --
+   -- For more information on this and similar theme functions, check out
+   -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
+   -- Conditional Tags} article in the Theme Developer Handbook.
+   --
+   -- @since 2.1.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @return bool Whether the site is already installed.
+   --
+   function Is_Blog_Installed
+            return Boolean;
 
    --
    -- Marks a function as deprecated and inform when it has been used.
@@ -361,6 +442,39 @@ is
    --
    function Wp_Normalize_Path (Path : String)
                                return String;
+
+   --
+   -- Determines a writable directory for temporary files.
+   --
+   -- Function's preference is the return value of sys_get_temp_dir(),
+   -- followed by your PHP temporary upload directory, followed by WP_CONTENT_DIR,
+   -- before finally defaulting to /tmp/
+   --
+   -- In the event that this function does not find a writable location,
+   -- It may be overridden by the WP_TEMP_DIR constant in your wp-config.php file.
+   --
+   -- @since 2.5.0
+   --
+   -- @return string Writable temporary directory.
+   --
+   function Get_Temp_Dir
+            return String;
+
+   --
+   -- Determines if a directory is writable.
+   --
+   -- This function is used to work around certain ACL issues in PHP primarily
+   -- affecting Windows Servers.
+   --
+   -- @since 3.6.0
+   --
+   -- @see win_is_writable()
+   --
+   -- @param string path Path to check for write-ability.
+   -- @return bool Whether the path is writable.
+   --
+   function Wp_Is_Writable (Path : String)
+                            return Boolean;
 
    --
    -- Retrieves the list of mime types and file extensions.
@@ -779,6 +893,16 @@ is
             return String;
 
    --
+   -- Gets the main network ID.
+   --
+   -- @since 4.3.0
+   --
+   -- @return int The ID of the main network.
+   --
+   function Get_Main_Network_Id
+            return Integer;
+
+   --
    -- Retrieves a list of protocols to allow in HTML attributes.
    --
    -- @since 3.3.0
@@ -866,6 +990,40 @@ is
                           return Boolean;
 
    --
+   -- Sets the mbstring internal encoding to a binary safe encoding when func_overload
+   -- is enabled.
+   --
+   -- When mbstring.func_overload is in use for multi-byte encodings, the results from
+   -- strlen() and similar functions respect the utf8 characters, causing binary data
+   -- to return incorrect lengths.
+   --
+   -- This function overrides the mbstring encoding to a binary-safe encoding, and
+   -- resets it to the users expected encoding afterwards through the
+   -- `reset_mbstring_encoding` function.
+   --
+   -- It is safe to recursively call this function, however each
+   -- `mbstring_binary_safe_encoding()` call must be followed up with an equal number
+   -- of `reset_mbstring_encoding()` calls.
+   --
+   -- @since 3.7.0
+   --
+   -- @see reset_mbstring_encoding()
+   --
+   -- @param bool reset Optional. Whether to reset the encoding back to a
+   --                    previously-set encoding. Default false.
+   --
+   procedure MB_String_Binary_Safe_Encoding (Reset : Boolean := False);
+
+   --
+   -- Resets the mbstring internal encoding to a users previously set encoding.
+   --
+   -- @see mbstring_binary_safe_encoding()
+   --
+   -- @since 3.7.0
+   --
+   procedure Reset_MB_String_Encoding;
+
+   --
    -- Generates a random UUID (version 4).
    --
    -- @since 4.7.0
@@ -930,6 +1088,55 @@ is
                            Default_Headers : Array_Type;
                            Context         : String := "")
                            return Array_Type;
+
+   --
+   -- Gets the URL to learn more about updating the PHP version the site is running on.
+   --
+   -- This URL can be overridden by specifying an environment variable
+   -- `WP_UPDATE_PHP_URL` or by using the {@see "wp_update_php_url"} filter. Providing
+   -- an empty string is not allowed and will result in the default URL being used.
+   -- Furthermore the page the URL links to should preferably be localized in the site
+   -- language.
+   --
+   -- @since 5.1.0
+   --
+   -- @return string URL to learn more about updating PHP.
+   --
+   function Wp_Get_Update_PHP_URL
+            return String;
+
+   --
+   -- Gets the default URL to learn more about updating the PHP version the site is
+   -- running on.
+   --
+   -- Do not use this function to retrieve this URL. Instead, use
+   -- {@see wp_get_update_php_url()} when relying on the URL. This function does not
+   -- allow modifying the returned URL, and is only used to compare the actually
+   -- used URL with the default one.
+   --
+   -- @since 5.1.0
+   -- @access private
+   --
+   -- @return string Default URL to learn more about updating PHP.
+   --
+   function Wp_Get_Default_Update_PHP_URL
+            return String;
+
+   --
+   -- Returns the default annotation for the web hosting altering the "Update PHP"
+   -- page URL.
+   --
+   -- This function is to be used after {@see wp_get_update_php_url()} to return a
+   -- consistent annotation if the web host has altered the default "Update PHP"
+   -- page URL.
+   --
+   -- @since 5.2.0
+   --
+   -- @return string Update PHP page annotation. An empty string if no custom URLs
+   --                 are provided.
+   --
+   function Wp_Get_Update_PHP_Annotation
+            return String;
 
    --
    -- Returns true.

@@ -589,7 +589,7 @@ is
                if Term /= Empty_Array then
 --             if Term then
                   Update_Option ("default_term_" & (-Taxonomy_Object.Name),
-                                 As_String (Get (Term, "term_id")));
+                                 Get (Term, "term_id"));
                else
                   Term :=
                     Wp_Insert_Term (
@@ -606,7 +606,7 @@ is
                   -- Update `term_id` in options.
 --                if not Is_Wp_Error (Term) then
                      Update_Option ("default_term_" & (-Taxonomy_Object.Name),
-                                    As_String (Get (Term, "term_id")));
+                                    Get (Term, "term_id"));
 --                end if;
                end if;
             end;

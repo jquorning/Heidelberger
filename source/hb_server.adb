@@ -29,6 +29,7 @@ package body HB_Server is
       Register (Dispatcher, "/wp-admin/privacy.php",      Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/edit.php",         Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/edit-tags.php",    Binder.Render'Access);
+      Register (Dispatcher, "/wp-admin/install.php",      Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/load-scripts.php", Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/load-styles.php",  Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/post.php",         Binder.Render'Access);

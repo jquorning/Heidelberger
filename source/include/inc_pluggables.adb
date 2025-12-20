@@ -2512,11 +2512,12 @@ is
                      Set (Values, -Typ, From_String (Const)); -- constant( const ));
                   elsif not Isset (Values, -Typ) then
 --                elsif not Values (Typ) then
-                     Set (Values, -Typ, From_String (Get_Site_Option (Scheme & "_" & (-Typ))));
+                     Set (Values, -Typ, Get_Site_Option (Scheme & "_" & (-Typ)));
                      if not Isset (Values, -Typ) then
 --                   if not Values (Typ) then
-                        Set (Values, -Typ, From_String (Wp_Generate_Password (64, True, True)));
-                        Update_Site_Option (Scheme & "_" & (-Typ), As_String (Get (Values, -Typ)));
+                        Set (Values, -Typ,
+                             From_String (Wp_Generate_Password (64, True, True)));
+                        Update_Site_Option (Scheme & "_" & (-Typ), Get (Values, -Typ));
                      end if;
                   end if;
                end;
@@ -2526,7 +2527,7 @@ is
 --          if not Values ("key") then
 
                Set (Values, "key",
-                    From_String (Get_Site_Option ("secret_key")));
+                    Get_Site_Option ("secret_key"));
 
                if not Isset (Values, "key") then
 --             if not Values ("key") then
@@ -2534,7 +2535,7 @@ is
                   Set (Values, "key",
                        From_String (Wp_Generate_Password (64, True, True)));
 
-                  Update_Site_Option ("secret_key", As_String (Get (Values, "key")));
+                  Update_Site_Option ("secret_key", Get (Values, "key"));
                end if;
             end if;
             Set (Values, "salt",

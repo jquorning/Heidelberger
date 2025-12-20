@@ -8,11 +8,13 @@
 
 with Php.Arrays;
 with Php.Lists;
+with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
 with Globals;
 with Hb_Common;
+with Wp_Common;
 
 with Inc_Caches;
 with Inc_Capabilities;
@@ -35,55 +37,64 @@ is
                            This  : Wp_User)
                            return Array_Type
                            is (Value);
---         --
---         -- Constructor.
---         --
---         -- Retrieves the userdata and passes it to WP_User::init().
---         --
---         -- @since 2.0.0
---         --
---         -- @param int|string|stdClass|WP_User id      User's ID, a WP_User object, or a user object from the DB.
---         -- @param string                      name    Optional. User's username
---         -- @param int                         site_id Optional Site ID, defaults to current site.
---         --
---         public function __construct( id = 0, name = '', site_id = '' ) then
---                 if ( ! isset( self::back_compat_keys ) ) then
---                         prefix                 = GLOBALS['wpdb']->prefix;
---                         self::back_compat_keys = array(
---                                 'user_firstname'             => 'first_name',
---                                 'user_lastname'              => 'last_name',
---                                 'user_description'           => 'description',
---                                 'user_level'                 => prefix . 'user_level',
---                                 prefix . 'usersettings'     => prefix . 'user-settings',
---                                 prefix . 'usersettingstime' => prefix . 'user-settings-time',
---                         );
---                 end;
+   -----------------
+   -- X_Construct --
+   -----------------
 
---                 if ( id instanceof WP_User ) then
---                         this->init( id->data, site_id );
---                         return;
---                 end; elseif ( is_object( id ) ) then
---                         this->init( id, site_id );
---                         return;
---                 end;
+   function X_Construct (Id      : Integer := 0;
+                         Name    : String  := "";
+                         Site_Id : Integer := 0) -- ""
+                         return Wp_User
+   is
+      use Hb_Common;
 
---                 if ( ! empty( id ) && ! is_numeric( id ) ) then
---                         name = id;
---                         id   = 0;
---                 end;
+      This : Wp_User;
+   begin
+      if not Isset (Back_Compat_Keys) then -- self::
+         declare
+            Prefix : constant String := -Globals.WpDB.Prefix;
+            -- Globals.GLOBALS['wpdb'].prefix;
+         begin
+            Back_Compat_Keys := To_Array (List => ( -- self::
+              Build ("user_firstname",             "first_name"),
+              Build ("user_lastname",              "last_name"),
+              Build ("user_description",           "description"),
+              Build ("user_level",                 Prefix & "user_level"),
+              Build (Prefix & "usersettings",      Prefix & "user-settings"),
+              Build (Prefix & "usersettingstime",  Prefix & "user-settings-time")
+            ));
+         end;
+      end if;
 
---                 if ( id ) then
---                         data = self::get_data_by( 'id', id );
---                 end; else then
---                         data = self::get_data_by( 'login', name );
---                 end;
+--      if Id instanceof WP_User then
+--         This.Init (Id.Data, Site_Id);
+--         return;
+--      elsif Is_Object (Id) then
+--         This.Init (Id, Site_Id);
+--         return;
+--      end if;
 
---                 if ( data ) then
---                         this->init( data, site_id );
---                 end; else then
---                         this->data = new stdClass;
---                 end;
---         end;
+--      if not Empty (Id) and then not Is_Numeric (Id) then
+--         Name := Id;
+--         Id   := 0;
+--      end if;
+
+      declare
+         Data : Wp_User :=
+           (if Id /= 0
+            then Get_Data_By ("id",    Id)     -- self::
+            else Get_Data_By ("login", Name));  -- self::
+      begin
+         if Data /= Null_User then
+            This.Init (Data, Site_Id);
+         else
+            null;
+--          This.Data := new stdClass;
+         end if;
+      end;
+
+      return This;
+   end X_Construct;
 
    ----------
    -- Init --
@@ -116,7 +127,6 @@ is
       use Hb_Common;
       use Php;
       use Php.Strings;
-      use Php.Types;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Users;
@@ -133,7 +143,7 @@ is
       if "id" = Field_2 then
          -- Make sure the value is numeric to avoid casting objects, for example,
          -- to int 1.
-         if not Is_Numeric (Value) then
+         if not True then -- Is_Numeric (Value) then
             return Null_User; -- False;
          end if;
 --       Value_2 := +Value'Image; -- (int)
@@ -187,7 +197,8 @@ is
 
          Statement : constant String :=
            WpDB.Prepare (
-             "SELECT * FROM wpdb->users WHERE db_field = %s LIMIT 1", -Value_2);
+             "SELECT * FROM wpdb->users " &
+             "WHERE " & (-DB_Field) & " = %s LIMIT 1", -Value_2);
 
          User : constant Wp_User :=
            WpDB.Get_Row (Statement,
@@ -551,109 +562,125 @@ is
 --                 do_action( 'remove_user_role', this->ID, role );
 --         end;
 
---         --
---         -- Sets the role of the user.
---         --
---         -- This will remove the previous roles of the user and assign the user the
---         -- new one. You can set the role to an empty string and it will remove all
---         -- of the roles from the user.
---         --
---         -- @since 2.0.0
---         --
---         -- @param string role Role name.
---         --
---         public function set_role( role ) then
---                 if ( 1 === count( this->roles ) && current( this->roles ) == role ) then
---                         return;
---                 end;
+   --------------
+   -- Set_Role --
+   --------------
 
---                 foreach ( (array) this->roles as oldrole ) then
---                         unset( this->caps[ oldrole ] );
---                 end;
+   procedure Set_Role (This : in out Wp_User;
+                       Role : String)
+   is
+      use Php.Lists;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Users;
+   begin
+      if
+        This.Roles.Length in 1 and then
+--      1 = Count (This.Roles) and then
+        This.Roles.First_Element = Role
+--      Current (This.Roles) = Role
+      then
+         return;
+      end if;
 
---                 old_roles = this->roles;
+      for Old_Role of This.Roles loop -- (array)
+         Delete (Ref (This.Caps, -Old_Role));
+      end loop;
 
---                 if ( ! empty( role ) ) then
---                         this->caps[ role ] = true;
---                         this->roles         = array( role => true );
---                 end; else then
---                         this->roles = array();
---                 end;
+      declare
+         Old_Roles : constant List_Type := This.Roles;
+      begin
+         if not Empty (Role) then
+            Set (This.Caps, Role, From_Boolean (True));
+            This.Roles := To_List (Role);
+--          This.Roles := To_Array (List => (1 => Build (Role, True)));
+         else
+            This.Roles := Empty_List; -- Array;
+         end if;
 
---                 update_user_meta( this->ID, this->cap_key, this->caps );
---                 this->get_role_caps();
---                 this->update_user_level_from_caps();
+         Update_User_Meta (This.Id, -This.Cap_Key, This.Caps);
+         This.Get_Role_Caps;
+         This.Update_User_Level_From_Caps;
 
---                 foreach ( old_roles as old_role ) then
---                         if ( ! old_role || old_role === role ) then
---                                 continue;
---                         end;
+         for Old_Role of Old_Roles loop
+            if
+              Old_Role = "" or else
+--            not Old_Role or else
+              Old_Role = Role
+            then
+               goto Continue;
+            end if;
 
---                         -- This action is documented in wp-includes/class-wp-user.php--
---                         do_action( 'remove_user_role', this->ID, old_role );
---                 end;
+            -- This action is documented in wp-includes/class-wp-user.php
+            Do_Action ("remove_user_role", This.Id, -Old_Role);
+            << Continue >>
+         end loop;
 
---                 if ( role && ! in_array( role, old_roles, true ) ) then
---                         -- This action is documented in wp-includes/class-wp-user.php--
---                         do_action( 'add_user_role', this->ID, role );
---                 end;
+         if Role /= "" and then not In_Array (Role, Old_Roles, True) then
+            -- This action is documented in wp-includes/class-wp-user.php
+            Do_Action ("add_user_role", This.Id, Role);
+         end if;
 
---                 --
---                 -- Fires after the user's role has changed.
---                 --
---                 -- @since 2.9.0
---                 -- @since 3.6.0 Added old_roles to include an array of the user's previous roles.
---                 --
---                 -- @param int      user_id   The user ID.
---                 -- @param string   role      The new role.
---                 -- @param string[] old_roles An array of the user's previous roles.
---                 --
---                 do_action( 'set_user_role', this->ID, role, old_roles );
---         end;
+         --
+         -- Fires after the user's role has changed.
+         --
+         -- @since 2.9.0
+         -- @since 3.6.0 Added old_roles to include an array of the user's
+         --              previous roles.
+         --
+         -- @param int      user_id   The user ID.
+         -- @param string   role      The new role.
+         -- @param string[] old_roles An array of the user's previous roles.
+         --
+         Do_Action ("set_user_role", This.Id, Role, Old_Roles);
+      end;
+   end Set_Role;
 
---         --
---         -- Chooses the maximum level the user has.
---         --
---         -- Will compare the level from the item parameter against the max
---         -- parameter. If the item is incorrect, then just the max parameter value
---         -- will be returned.
---         --
---         -- Used to get the max level based on the capabilities the user has. This
---         -- is also based on roles, so if the user is assigned the Administrator role
---         -- then the capability 'level_10' will exist and the user will get that
---         -- value.
---         --
---         -- @since 2.0.0
---         --
---         -- @param int    max  Max level of user.
---         -- @param string item Level capability name.
---         -- @return int Max Level.
---         --
---         public function level_reduction( max, item ) then
---                 if ( preg_match( '/^level_(10|[0-9])/i', item, matches ) ) then
---                         level = (int) matches[1];
---                         return max( max, level );
---                 end; else then
---                         return max;
---                 end;
---         end;
+   ---------------------
+   -- Level_Reduction --
+   ---------------------
 
---         --
---         -- Updates the maximum user level for the user.
---         --
---         -- Updates the 'user_level' user metadata (includes prefix that is the
---         -- database table prefix) with the maximum user level. Gets the value from
---         -- the all of the capabilities that the user has.
---         --
---         -- @since 2.0.0
---         --
---         -- @global wpdb wpdb WordPress database abstraction object.
---         --
---         public function update_user_level_from_caps() then
---                 global wpdb;
---                 this->user_level = array_reduce( array_keys( this->allcaps ), array( this, 'level_reduction' ), 0 );
---                 update_user_meta( this->ID, wpdb->get_blog_prefix() . 'user_level', this->user_level );
---         end;
+   function Level_Reduction (Max  : Integer;
+                             Item : String)
+                             return Integer
+   is
+      use Php.Preg;
+      use Hb_Common;
+
+      Matches : List_Type;
+   begin
+      if Preg_Match ("/^level_(10|[0-9])/i", Item, Matches) /= 0 then
+         declare
+            Level : constant Integer := Integer'Value (-Matches (1));
+         begin
+            return Integer'Max (Max, Level);
+         end;
+      else
+         return Max;
+      end if;
+   end Level_Reduction;
+
+   ---------------------------------
+   -- Update_User_Level_From_Caps --
+   ---------------------------------
+
+   procedure Update_User_Level_From_Caps (This : in out Wp_User)
+   is
+      use Php.Arrays;
+      use Inc_Users;
+--    global wpdb;
+   begin
+
+      This.Prop.User_Level :=
+        Array_Reduce (Array_Keys (This.Allcaps),
+                      Level_Reduction'Access,
+--                    To_array (This, "level_reduction"),
+                      0);
+
+      Update_User_Meta (This.Id, Globals.WpDB.Get_Blog_Prefix & "user_level",
+                        This.Prop.User_Level);
+
+   end Update_User_Level_From_Caps;
 
 --         --
 --         -- Adds capability and grant or deny access to capability.
@@ -716,7 +743,6 @@ is
       use Php.Lists;
       use Inc_Capabilities;
       use Inc_Load;
---    use Inc_Plugins;
    begin
       -- if Is_Numeric (Cap) then
       --   X_Deprecated_Argument (

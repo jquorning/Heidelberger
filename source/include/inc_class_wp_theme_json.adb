@@ -2094,7 +2094,7 @@ is
 
             Unused : Array_Type;
          begin
-            if Is_Numeric (Discard) then
+            if Is_Number (Discard) then
                Unused := Array_Splice (Declarations, Discard, 1);
             end if;
          end;

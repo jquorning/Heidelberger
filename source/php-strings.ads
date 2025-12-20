@@ -67,7 +67,7 @@ is
 
    function Strtoupper (Item : String) return String is (Item);
    function Strtolower (Item : String) return String is (Item);
-   function UCfirst    (Item : String) return String is (Item);
+   function UC_First   (Item : String) return String is (Item);
 
    function Strncmp (Left, Right : String;
                      Length : Integer)
@@ -124,6 +124,11 @@ is
 
    function Addslashes (Item : String)
             return String;
+
+   function Add_C_Slashes (Item       : String;
+                           Characters : String)
+                           return String
+                           is ("XXX-989");
 
    function Stripslashes (Item : String)
                           return String

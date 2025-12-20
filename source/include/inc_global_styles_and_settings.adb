@@ -120,7 +120,7 @@ is
       if Can_Use_Cached then
          declare
             Cached : constant String :=
-              Inc_Options.Get_Transient (Transient_Name);
+              As_String (Inc_Options.Get_Transient (Transient_Name));
          begin
             if Cached /= "" then
                return Cached;
@@ -200,7 +200,7 @@ is
                -- Cache for a minute.
                -- This cache doesn't need to be any longer, we only want to avoid
                -- spikes on high-traffic sites.
-               Inc_Options.Set_Transient (Transient_Name, Stylesheet,
+               Inc_Options.Set_Transient (Transient_Name, From_String (Stylesheet),
                                           Globals.MINUTE_IN_SECONDS);
             end if;
 

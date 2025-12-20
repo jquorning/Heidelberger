@@ -98,7 +98,7 @@ is
       if "" /= Inc_Options.Get_Option ("db_upgraded") then
 
          Inc_Rewrites.Flush_Rewrite_Rules; -- ();
-         Unused := Inc_Options.Update_Option ("db_upgraded", False);
+         Unused := Inc_Options.Update_Option ("db_upgraded", From_Boolean (False));
 
          --
          -- Fires on the next page load after a successful DB upgrade.

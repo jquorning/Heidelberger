@@ -305,6 +305,25 @@ is
                                    return String;
 
    --
+   -- Sanitizes various option values based on the nature of the option.
+   --
+   -- This is basically a switch statement which will pass value through a number
+   -- of functions depending on the option.
+   --
+   -- @since 2.0.5
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string option The name of the option.
+   -- @param string value  The unsanitised value.
+   -- @return string Sanitized value.
+   --
+   function Sanitize_Option (Option : String;
+                             Value  : String)
+                             return String
+                             is (raise Program_Error with "not implemented");
+
+   --
    -- Escapes data for use in a MySQL query.
    --
    -- Usually you should prepare queries using wpdb::prepare().
@@ -742,6 +761,21 @@ is
                             return String;
 
    --
+   -- Verifies that an email is valid.
+   --
+   -- Does not grok i18n domains. Not RFC compliant.
+   --
+   -- @since 0.71
+   --
+   -- @param string email      Email address to verify.
+   -- @param bool   deprecated Deprecated.
+   -- @return string|false Valid email address on success, false on failure.
+   --
+   function Is_Email (Email      : String;
+                      Deprecated : Boolean := False)
+                      return String;
+
+   --
    -- Appends a trailing slash.
    --
    -- Will remove trailing forward and backslashes if it exists already before adding
@@ -770,9 +804,9 @@ is
    -- @param string string What to remove the trailing slashes from.
    -- @return string String without the trailing slashes.
    --
-   function Untrailingslashit (Item : String)
-                               return String
-                               is ("XXX-707");
+   function Un_Trailing_Slash_It (Item : String)
+                                  return String
+                                  is ("XXX-707");
 
    --
    -- Safely extracts not more than the first count characters from HTML string.

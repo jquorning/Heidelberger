@@ -2,6 +2,8 @@
 --
 --
 
+with Arrays;
+
 package Php.HTML
 is
 
@@ -46,12 +48,26 @@ is
                      Response_Code : Integer := 0)
                      is null;
 
+   function Headers_Sent (Filename : String  := "";
+                          Line     : Integer := 0)
+                          return Boolean
+                          is (False);
+
    PHP_URL_SCHEME : constant Integer := 1; -- XXX guess
+
+   procedure Parse_Str (Item   : String;
+                        Result : in out Arrays.Array_Type)
+                        is null;
 
    function Parse_URL (URL       : String;
                        Component : Integer := -1)
             return String
             is ("XXX-781");
+
+   function Parse_URL (URL       : String;
+                       Component : Integer := -1)
+                       return Arrays.Array_Type
+                       is (Arrays.Empty_Array);
 
    function RawURLencode (Item : String)
                           return String
@@ -60,5 +76,14 @@ is
    function URLdecode (Item : String)
                        return String
                        is ("XXX-976");
+
+   procedure Set_Cookie (Name      : String;
+                         Value     : String  := "";
+                         Expires   : Natural := 0;
+                         Path      : String  := "";
+                         Domain    : String  := "";
+                         Secure    : Boolean := False;
+                         HTTP_Only : Boolean := False)
+                         is null;
 
 end Php.HTML;

@@ -1510,42 +1510,49 @@ package body Inc_L10n is
 --         return translate_with_gettext_context( before_last_bar( name ), "User role", domain );
 -- end;
 
--- --
--- -- Gets all available languages based on the presence of--.mo files in a given directory.
--- --
--- -- The default directory is WP_LANG_DIR.
--- --
--- -- @since 3.0.0
--- -- @since 4.7.0 The results are now filterable with the {@see "get_available_languages"} filter.
--- --
--- -- @param string dir A directory to search for language files.
--- --                    Default WP_LANG_DIR.
--- -- @return string[] An array of language codes or an empty array if no languages are present. Language codes are formed by stripping the .mo extension from the language file names.
--- --
--- function get_available_languages( dir = null ) then
---         languages = array();
+   -----------------------------
+   -- Get_Available_Languages --
+   -----------------------------
 
---         lang_files = glob( ( is_null( dir ) ? WP_LANG_DIR : dir ) . "/*.mo" );
---         if ( lang_files ) then
---                 foreach ( lang_files as lang_file ) then
---                         lang_file = basename( lang_file, ".mo" );
---                         if ( 0 !== strpos( lang_file, "continents-cities" ) && 0 !== strpos( lang_file, "ms-" ) &&
---                                 0 !== strpos( lang_file, "admin-" ) ) then
---                                 languages[] = lang_file;
---                         end;
---                 end;
---         end;
+   function Get_Available_Languages (Dir : String := "") -- null
+                                     return Array_Type
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Plugins;
 
---         --
---         -- Filters the list of available language codes.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string[] languages An array of available language codes.
---         -- @param string   dir       The directory where the language files were found.
---         --
---         return apply_filters( "get_available_languages", languages, dir );
--- end;
+      Languages  : Array_Type;
+      Lang_Files : constant List_Type := Glob ((if Dir = "" -- Is_Null (Dir)
+                                                then Globals.WP_LANG_DIR
+                                                else Dir) & "/*.mo");
+   begin
+      if not Lang_Files.Is_Empty then
+         for Lang_File of Lang_Files loop
+            declare
+               Lang_File_2 : constant String := Basename (-Lang_File, ".mo");
+            begin
+               if
+                 0 /= Strpos (Lang_File_2, "continents-cities") and then
+                 0 /= Strpos (Lang_File_2, "ms-") and then
+                 0 /= Strpos (Lang_File_2, "admin-")
+               then
+                  Languages.Append (From_String (Lang_File_2));
+               end if;
+            end;
+         end loop;
+      end if;
+
+      --
+      -- Filters the list of available language codes.
+      --
+      -- @since 4.7.0
+      --
+      -- @param string[] languages An array of available language codes.
+      -- @param string   dir       The directory where the language files were found.
+      --
+      return Apply_Filters ("get_available_languages", Languages, Dir);
+   end Get_Available_Languages;
 
 -- --
 -- -- Gets installed translations.

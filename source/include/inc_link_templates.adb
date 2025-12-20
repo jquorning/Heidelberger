@@ -83,7 +83,7 @@ is
       if Global_Wp_Rewrite.Use_Trailing_Slashes then
          Item_2 := +Trailingslashit (Item);
       else
-         Item_2 := +Untrailingslashit (Item);
+         Item_2 := +Un_Trailing_Slash_It (Item);
       end if;
 
       --

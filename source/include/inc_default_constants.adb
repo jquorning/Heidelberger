@@ -7,6 +7,7 @@
 with Php.Preg;
 with Php.Misc;
 
+with Arrays;
 with Globals;
 with Hb_Common;
 
@@ -244,7 +245,6 @@ is
    procedure Wp_Cookie_Constants
    is
       use Hb_Common;
-      use Php;
       use Php.Misc;
       use Php.Preg;
       use Inc_Options;
@@ -256,10 +256,11 @@ is
       --
       if COOKIEHASH = "undefined" then
          declare
-            SiteURL : constant String := Get_Site_Option ("siteurl");
+            Site_URL : constant String :=
+              Arrays.As_String (Get_Site_Option ("siteurl"));
          begin
-            if SiteURL /= "" then
-               COOKIEHASH := +MD5 (SiteURL);
+            if Site_URL /= "" then
+               COOKIEHASH := +MD5 (Site_URL);
             else
                COOKIEHASH := +"";
             end if;

@@ -273,11 +273,11 @@ is
       --
       Do_Action ("admin_head");
 
-      if "f" = Inc_Options.Get_User_Setting ("mfold") then
+      if "f" = As_String (Inc_Options.Get_User_Setting ("mfold")) then
          Append (Admin_Body_Class, " folded");
       end if;
 
-      if "" = Inc_Options.Get_User_Setting ("unfold") then -- not
+      if "" = As_String (Inc_Options.Get_User_Setting ("unfold")) then -- not
          Append (Admin_Body_Class, " auto-fold");
       end if;
 

@@ -85,7 +85,7 @@ is
                               Path   : String)
    is
    begin
-      This.Custom_Paths (Domain) := Untrailingslashit (Path);
+      This.Custom_Paths (Domain) := Un_Trailing_Slash_It (Path);
    end Set_Custom_Path;
 
    ----------------------------

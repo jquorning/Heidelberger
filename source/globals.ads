@@ -29,6 +29,7 @@ is
    WP_CONTENT_DIR  : Unbounded_String;
    WP_SITEURL      : constant String := "";
    WP_LANG_DIR     : constant String := "";
+   WP_TEMP_DIR     : Unbounded_String;
 
    WP_CONTENT_URL  : Unbounded_String;
    WP_PLUGIN_URL   : Unbounded_String;
@@ -53,6 +54,7 @@ is
    MINUTE_IN_SECONDS : constant Natural := 60;
    HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
    DAY_IN_SECONDS    : constant Natural := 24 * HOUR_IN_SECONDS;
+   YEAR_IN_SECONDS   : constant Natural := 365 * DAY_IN_SECONDS;
 
    SITECOOKIEPATH : Unbounded_String;
 
@@ -83,6 +85,12 @@ is
    WP_INSTALLING         : Boolean := False;
    WP_REPAIRING          : Boolean := False;
    WP_INSTALLING_NETWORK : Boolean := False;
+
+   WP_HTTP_BLOCK_EXTERNAL : Boolean := False;
+   WP_ACCESSIBLE_HOSTS : Unbounded_String;
+
+   WP_PROXY_HOST : Unbounded_String;
+   WP_PROXY_PORT : Unbounded_String;
 
    Wp_Importers : Array_Type;
 
@@ -120,5 +128,10 @@ is
    DISALLOW_UNFILTERED_HTML : constant Boolean := True;
    DISALLOW_FILE_EDIT       : constant Boolean := True;
    DISALLOW_FILE_MODS       : constant Boolean := True;
+
+   DO_NOT_UPGRADE_GLOBAL_TABLES : constant Boolean := False;
+
+   CUSTOM_USER_TABLE      : constant String := "USER_TABLE";
+   CUSTOM_USER_META_TABLE : constant String := "USER_META_TABLE";
 
 end Globals;

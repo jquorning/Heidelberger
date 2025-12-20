@@ -10,6 +10,22 @@ is
    use Arrays;
    use Lists;
 
+   PHP_VERSION : constant String := "8.2.29";
+
+   function Version_Compare (Version1 : String;
+                             Version2 : String;
+                             Operator : String)
+                             return Boolean
+                             is (True);
+
+   function Env_Exists (Name : String)
+                        return Boolean
+                        is (False);
+
+   function Get_Env  (Name : String)
+                      return String
+                      is ("XXX-995");
+
    function Compact (Var_Name  : String;
                      Var_Names : String)
                      return Array_Type

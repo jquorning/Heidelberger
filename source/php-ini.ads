@@ -10,6 +10,10 @@ is
                      is ("XXX-602");
 
    function Ini_Get (Option : String)
+                     return Integer
+                     is (997);
+
+   function Ini_Get (Option : String)
                      return Boolean
                      is (True);
 

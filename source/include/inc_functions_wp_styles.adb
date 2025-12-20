@@ -13,8 +13,6 @@ with Hb_Common;
 with Php.Preg;
 with Php.Strings;
 
-with Adm_Load_Styles;
-
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -25,58 +23,58 @@ is
    use Hb_Common;
    use Php;
 
-   function Wp_Styles_X
-            return Wp_Styles
+--    function Wp_Styles_X
+--             return Wp_Styles
+--    is
+-- --    global wp_styles;
+--    begin
+--       -- if ( ! ( wp_styles instanceof WP_Styles ) ) then
+--       --         wp_styles = new WP_Styles();
+--       -- end if;
+
+--       return Adm_Load_Styles.Styles; -- Wp_styles
+--    end Wp_Styles_X;
+
+   ---------------------
+   -- Wp_Print_Styles --
+   ---------------------
+
+   function Wp_Print_Styles (Handles : String)  -- = false
+                             return List_Type
    is
+      use Inc_Functions_Wp_Scripts;
 --    global wp_styles;
    begin
-      -- if ( ! ( wp_styles instanceof WP_Styles ) ) then
-      --         wp_styles = new WP_Styles();
+      -- if "" = handles then -- For 'wp_head'.
+      --    Handles := False;
       -- end if;
 
-      return Adm_Load_Styles.Styles; -- Wp_styles
-   end Wp_Styles_X;
+      -- if not Handles then
+      --    --
+      --    -- Fires before styles in the handles queue are printed.
+      --    --
+      --    -- @since 2.6.0
+      --    --
+      --    Do_Action ("wp_print_styles");
+      -- end if;
 
--- --
--- -- Display styles that are in the handles queue.
--- --
--- -- Passing an empty array to handles prints the queue,
--- -- passing an array with one string prints that style,
--- -- and passing an array of strings prints those styles.
--- --
--- -- @global WP_Styles wp_styles The WP_Styles object for printing styles.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string|bool|array handles Styles to be printed. Default 'false'.
--- -- @return string[] On success, an array of handles of processed WP_Dependencies items; otherwise, an empty array.
--- --
--- function wp_print_styles( handles = false ) then
---         global wp_styles;
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__");
 
---         if ( '' === handles ) then // For 'wp_head'.
---                 handles = false;
---         end;
+      -- if not ( wp_styles instanceof WP_Styles ) then -- instanceof
+      --    if ( ! handles ) then
+      --       return array(); -- No need to instantiate if nothing is there.
+      --    end if;
+      -- end if;
 
---         if ( ! handles ) then
---                 --
---                 -- Fires before styles in the handles queue are printed.
---                 --
---                 -- @since 2.6.0
---                 --
---                 do_action( 'wp_print_styles' );
---         end;
+      return Wp_Styles_X.Do_Items (To_List (Handles)); -- to_list added
+   end Wp_Print_Styles;
 
---         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
-
---         if ( ! ( wp_styles instanceof WP_Styles ) ) then
---                 if ( ! handles ) then
---                         return array(); // No need to instantiate if nothing is there.
---                 end;
---         end;
-
---         return wp_styles().do_items( handles );
--- end;
+   procedure Wp_Print_Styles (Handles : String)
+   is
+      Unused : constant List_Type := Wp_Print_Styles (Handles);
+   begin
+      null;
+   end Wp_Print_Styles;
 
    -------------------------
    -- Wp_Add_Inline_Style --

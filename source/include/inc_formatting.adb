@@ -944,7 +944,7 @@ is
 
 --    string = (string) string;
       Quote_Style_2 : Flag_Type := Quote_Style;
-      X_Quote_Style : Flag_Type := Quote_Style;
+      X_Quote_Style : Flag_Type := Quote_Style_2;
       Charset_2     : Unbounded_String := +Charset;
       Item_2        : Unbounded_String := +Item;
    begin
@@ -961,7 +961,7 @@ is
       -- not an accepted value.
       if False then -- Empty (Quote_Style) then
          Quote_Style_2 := ENT_NOQUOTES;
-      elsif ENT_XML1 = Quote_Style then
+      elsif ENT_XML1 = Quote_Style_2 then
          Quote_Style_2 := ENT_QUOTES + ENT_XML1; -- or
       elsif True
 --      not In_Array (Quote_Style,
@@ -990,7 +990,7 @@ is
       end if;
 
       if
-        In_Array (Charset, To_List (List => (+"utf8", +"utf-8", +"UTF8")), True)
+        In_Array (-Charset_2, To_List (List => (+"utf8", +"utf-8", +"UTF8")), True)
       then
          Charset_2 := +"UTF-8";
       end if;
@@ -3143,18 +3143,14 @@ is
 --         return output;
 -- end;
 
--- --
--- -- Verifies that an email is valid.
--- --
--- -- Does not grok i18n domains. Not RFC compliant.
--- --
--- -- @since 0.71
--- --
--- -- @param string email      Email address to verify.
--- -- @param bool   deprecated Deprecated.
--- -- @return string|false Valid email address on success, false on failure.
--- --
--- function is_email( email, deprecated = false ) then
+   --------------
+   -- Is_Email --
+   --------------
+
+   function Is_Email (Email      : String;
+                      Deprecated : Boolean := False)
+                      return String
+                      is (raise Program_Error with "not implemented");
 --         if ( ! empty( deprecated ) ) then
 --                 _deprecated_argument( __FUNCTION__, "3.0.0" );
 --         end;

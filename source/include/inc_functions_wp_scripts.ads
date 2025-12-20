@@ -31,6 +31,30 @@ is
 --          return Inc_Class_Wp_Scripts.Wp_Scripts;
 
    --
+   -- Prints scripts in document head that are in the handles queue.
+   --
+   -- Called by admin-header.php and {@see "wp_head"} hook. Since it is called by
+   -- wp_head on every page load, the function does not instantiate the WP_Scripts
+   -- object unless script names are explicitly passed. Makes use of
+   -- already-instantiated wp_scripts global if present. Use provided
+   -- {@see "wp_print_scripts"} hook to register/enqueue new scripts.
+   --
+   -- @see WP_Scripts::do_item()
+   -- @global WP_Scripts wp_scripts The WP_Scripts object for printing scripts.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string|bool|array handles Optional. Scripts to be printed. Default
+   --                                   "false".
+   -- @return string[] On success, an array of handles of processed WP_Dependencies
+   --                   items; otherwise, an empty array.
+   --
+   function Wp_Print_Scripts (Handles : List_Type := Empty_List)
+                              return List_Type;
+
+   procedure Wp_Print_Scripts (Handles : List_Type := Empty_List); -- false
+
+   --
    -- Helper function to output a _doing_it_wrong message when applicable.
    --
    -- @ignore

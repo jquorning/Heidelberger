@@ -1,4 +1,3 @@
-
 --
 -- Option API
 --
@@ -7,299 +6,321 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
+with Php.HTML;
 with Php.Lists;
 with Php.Misc;
+with Php.Preg;
+with Php.Strings;
+with Php.Types;
 
+with Binder;
 with Globals;
+with Helpers;
+with Wp_Common;
 
 with Inc_Caches;
+with Inc_Formatting;
+with Inc_Functions;
 with Inc_Load;
+with Inc_Link_Templates;
+with Inc_L10n;
 with Inc_Plugins;
+with Inc_Users;
 
 package body Inc_Options
 is
 
--- --
--- -- Retrieves an option value based on an option name.
--- --
--- -- If the option does not exist, and a default value is not provided,
--- -- boolean false is returned. This could be used to check whether you need
--- -- to initialize an option during installation of a plugin, however that
--- -- can be done better by using add_option() which will not overwrite
--- -- existing options.
--- --
--- -- Not initializing an option and using boolean `false` as a return value
--- -- is a bad practice as it triggers an additional database query.
--- --
--- -- The type of the returned value can be different from the type that was passed
--- -- when saving or updating the option. If the option value was serialized,
--- -- then it will be unserialized when it is returned. In this case the type will
--- -- be the same. For example, storing a non-scalar value like an array will
--- -- return the same array.
--- --
--- -- In most cases non-string scalar and null values will be converted and returned
--- -- as string equivalents.
--- --
--- -- Exceptions:
--- --
--- -- 1. When the option has not been saved in the database, the `default` value
--- --    is returned if provided. If not, boolean `false` is returned.
--- -- 2. When one of the Options API filters is used: {@see "pre_option_option"},
--- --    {@see "default_option_option"}, or {@see "option_option"}, the returned
--- --    value may not match the expected type.
--- -- 3. When the option has just been saved in the database, and get_option()
--- --    is used right after, non-string scalar and null values are not converted to
--- --    string equivalents and the original type is returned.
--- --
--- -- Examples:
--- --
--- -- When adding options like this: `add_option( "my_option_name", "value" )`
--- -- and then retrieving them with `get_option( "my_option_name" )`, the returned
--- -- values will be:
--- --
--- --   - `false` returns `string(0) ""`
--- --   - `true`  returns `string(1) "1"`
--- --   - `0`     returns `string(1) "0"`
--- --   - `1`     returns `string(1) "1"`
--- --   - `"0"`   returns `string(1) "0"`
--- --   - `"1"`   returns `string(1) "1"`
--- --   - `null`  returns `string(0) ""`
--- --
--- -- When adding options with non-scalar values like
--- -- `add_option( "my_array", array( false, "str", null ) )`, the returned value
--- -- will be identical to the original as it is serialized before saving
--- -- it in the database:
--- --
--- --     array(3) then
--- --         [0] => bool(false)
--- --         [1] => string(3) "str"
--- --         [2] => NULL
--- --     end;
--- --
--- -- @since 1.5.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string option  Name of the option to retrieve. Expected to not be SQL-escaped.
--- -- @param mixed  default Optional. Default value to return if the option does not exist.
--- -- @return mixed Value of the option. A value of any type may be returned, including
--- --               scalar (string, boolean, float, integer), null, array, object.
--- --               Scalar and null values will be returned as strings as long as they originate
--- --               from a database stored option value. If there is no option in the database,
--- --               boolean `false` is returned.
--- --
--- function get_option( option, default = false ) then
+   ----------------
+   -- Get_Option --
+   ----------------
+
    function Get_Option (Option  : String;
                         Default : String := "")
-                        return String
+                        return Multi_Type -- String
    is
+      use Php.Lists;
+      use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Load;
+      use Inc_Plugins;
+
+      -- Distinguish between `false` as a default, and not passing one.
+      Passed_Default : constant Boolean := Default /= "";
+      -- Func_Num_Args > 1; -- ()
+
+      Value : Multi_Type;
    begin
-      if Option = "html_type" then
-         return "text/html";
-      elsif Option = "blog_charset" then
-         return "UTF-8";
+      Ada.Text_IO.Put_Line ("Get_Option: " & Option);
+      -- if Option = "html_type" then
+      --    return "text/html";
+      -- elsif Option = "blog_charset" then
+      --    return "UTF-8";
+      -- else
+      --    return "XXX-222";
+      -- end if;
+
+      -- if ( is_scalar( option ) ) then
+      --    option = trim( option );
+      -- end if;
+
+      -- if ( empty( option ) ) then
+      --    return ""; -- False;
+      -- end if;
+
+      --
+      -- Until a proper _deprecated_option() function can be introduced,
+      -- redirect requests to deprecated keys to the new, correct ones.
+      --
+      declare
+         Deprecated_Keys : constant Array_Type := To_Array (List => (
+           Build ("blacklist_keys",    "disallowed_keys"),
+           Build ("comment_whitelist", "comment_previously_approved")
+         ));
+      begin
+         if
+           Isset (Deprecated_Keys, Option) and then
+           not Wp_Installing
+         then
+            X_Deprecated_Argument (
+              "__FUNCTION__",
+              "5.5.0",
+              Sprintf (
+                -- translators: 1: Deprecated option key, 2: New option key.
+                abs "The ""%1s"" option key has been renamed to ""%2s"".",
+                To_List (List => (
+                  1 => +Option,
+                  2 => +Get_As_String (Deprecated_Keys, Option)
+                ))
+              )
+            );
+            return Get_Option (Get_As_String (Deprecated_Keys, Option), Default);
+         end if;
+      end;
+
+      --
+      -- Filters the value of an existing option before it is retrieved.
+      --
+      -- The dynamic portion of the hook name, `option`, refers to the option name.
+      --
+      -- Returning a value other than false from the filter will short-circuit
+      -- retrieval and return that value instead.
+      --
+      -- @since 1.5.0
+      -- @since 4.4.0 The `option` parameter was added.
+      -- @since 4.9.0 The `default` parameter was added.
+      --
+      -- @param mixed  pre_option The value to return instead of the option value.
+      --                           This differs from `default`, which is used as the
+      --                           fallback value in the event the option doesn"t
+      --                           exist elsewhere in get_option().
+      --                           Default false (to skip past the short-circuit).
+      -- @param string option     Option name.
+      -- @param mixed  default    The fallback value to return if the option does not
+      --                           exist. Default false.
+      --
+      declare
+         Pre : Boolean :=
+           Apply_Filters ("pre_option_" & Option, False, Option, Default);
+      begin
+         --
+         -- Filters the value of all existing options before it is retrieved.
+         --
+         -- Returning a truthy value from the filter will effectively short-circuit
+         -- retrieval and return the passed value instead.
+         --
+         -- @since 6.1.0
+         --
+         -- @param mixed  pre_option  The value to return instead of the option value.
+         --                            This differs from `default`, which is used as
+         --                            the fallback value in the event the option
+         --                            doesn't exist elsewhere in get_option().
+         --                            Default false (to skip past the short-circuit).
+         -- @param string option      Name of the option.
+         -- @param mixed  default     The fallback value to return if the option does
+         --                            not exist. Default false.
+         --
+         Pre := Apply_Filters ("pre_option", Pre, Option, Default);
+
+         if False /= Pre then
+            return From_Boolean (Pre);
+         end if;
+      end;
+
+      -- if Defined ("WP_SETUP_CONFIG") then
+      --    return false;
+      -- end if;
+
+      if not Wp_Installing then
+         declare
+            Found : Boolean;
+            -- Prevent non-existent options from triggering multiple queries.
+            Notoptions : Array_Type := Wp_Cache_Get ("notoptions", "options",
+                                                     Found => Found);
+         begin
+            -- Prevent non-existent `notoptions` key from triggering multiple
+            -- key lookups.
+            if not Is_Array (Notoptions) then
+               Notoptions := Empty_Array;
+               Wp_Cache_Set ("notoptions", Notoptions, "options");
+            end if;
+
+            if Isset (Notoptions, Option) then
+               --
+               -- Filters the default value for an option.
+               --
+               -- The dynamic portion of the hook name, `option`, refers to the
+               -- option name.
+               --
+               -- @since 3.4.0
+               -- @since 4.4.0 The `option` parameter was added.
+               -- @since 4.7.0 The `passed_default` parameter was added to distinguish
+               --              between a `false` value and the default parameter value.
+               --
+               -- @param mixed  default The default value to return if the option does
+               --                        not exist in the database.
+               -- @param string option  Option name.
+               -- @param bool   passed_default Was `get_option()` passed a default
+               --                               value?
+               --
+               return From_String (
+                 Apply_Filters ("default_option_" & Option,
+                                Default, Option, Passed_Default));
+            end if;
+
+            declare
+               Alloptions : constant Array_Type := Wp_Load_Alloptions;
+               Found      : Boolean;
+            begin
+               if Isset (Alloptions, Option) then
+                  Value := Get (Alloptions, Option);
+               else
+                  Value := Wp_Cache_Get (Option, "options", Found => Found);
+
+                  if From_Boolean (False) = Value then
+                     declare
+                        Success : Boolean;
+
+                        Statement : constant String :=
+                          Globals.WpDB.Prepare (
+                            "SELECT option_value FROM wpdb->options " &
+                            "WHERE option_name = %s LIMIT 1", Option);
+
+                        Row : constant Array_Type :=
+                          Globals.WpDB.Get_Row (Statement, Success => Success);
+                     begin
+                        -- Has to be get_row() instead of get_var() because of
+                        -- funkiness with 0, false, null values.
+                        if Is_Object (Row) then
+--                         Value := Row.Option_Value;
+                           Wp_Cache_Add (Option, Value, "options");
+
+                        else
+                           -- Option does not exist, so we must cache its
+                           -- non-existence.
+                           if not Is_Array (Notoptions) then
+                              Notoptions := Empty_Array;
+                           end if;
+
+                           Set (Notoptions, Option, From_Boolean (True));
+                           Wp_Cache_Set ("notoptions", Notoptions, "options");
+
+                           -- This filter is documented in wp-includes/option.php
+                           return From_String (
+                             Apply_Filters ("default_option_" & Option,
+                                            Default, Option, Passed_Default));
+                        end if;
+                     end;
+                  end if;
+               end if;
+            end;
+         end; --  if;
+
       else
-         return "XXX-222";
+         declare
+            Success  : Boolean;
+            Suppress : constant Boolean := Globals.WpDB.Suppress_Errors; -- ();
+
+            Statement : constant String :=
+              Globals.WpDB.Prepare (
+                "SELECT option_value FROM wpdb->options " &
+                "WHERE option_name = %s LIMIT 1", Option);
+
+            Row : constant Array_Type :=
+              Globals.WpDB.Get_Row (Statement, Success => Success);
+
+         begin
+            Globals.WpDB.Suppress_Errors (Suppress);
+
+            if Is_Object (Row) then
+               null;
+--             Value := Row.Option_Value;
+            else
+               -- This filter is documented in wp-includes/option.php
+               return From_String (
+                 Apply_Filters ("default_option_" & Option,
+                                Default, Option, Passed_Default));
+            end if;
+         end;
       end if;
---         global wpdb;
 
---         if ( is_scalar( option ) ) then
---                 option = trim( option );
---         end;
+      -- If home is not set, use siteurl.
+      if "home" = Option and "" = As_String (Value) then
+         return Get_Option ("siteurl");
+      end if;
 
---         if ( empty( option ) ) then
---                 return false;
---         end;
+      if
+        In_Array (Option, To_List (List => (+"siteurl", +"home", +"category_base",
+                                            +"tag_base")), True)
+      then
+         Value := From_String (Un_Trailing_Slash_It (As_String (Value)));
+      end if;
 
---         /*
---         -- Until a proper _deprecated_option() function can be introduced,
---         -- redirect requests to deprecated keys to the new, correct ones.
---         --
---         deprecated_keys = array(
---                 "blacklist_keys"    => "disallowed_keys",
---                 "comment_whitelist" => "comment_previously_approved",
---         );
-
---         if ( isset( deprecated_keys[ option ] ) && ! wp_installing() ) then
---                 _deprecated_argument(
---                         __FUNCTION__,
---                         "5.5.0",
---                         sprintf(
---                                 /* translators: 1: Deprecated option key, 2: New option key.--
---                                 __( "The "%1s" option key has been renamed to "%2s"." ),
---                                 option,
---                                 deprecated_keys[ option ]
---                         )
---                 );
---                 return get_option( deprecated_keys[ option ], default );
---         end;
-
---         --
---         -- Filters the value of an existing option before it is retrieved.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- Returning a value other than false from the filter will short-circuit retrieval
---         -- and return that value instead.
---         --
---         -- @since 1.5.0
---         -- @since 4.4.0 The `option` parameter was added.
---         -- @since 4.9.0 The `default` parameter was added.
---         --
---         -- @param mixed  pre_option The value to return instead of the option value. This differs
---         --                           from `default`, which is used as the fallback value in the event
---         --                           the option doesn"t exist elsewhere in get_option().
---         --                           Default false (to skip past the short-circuit).
---         -- @param string option     Option name.
---         -- @param mixed  default    The fallback value to return if the option does not exist.
---         --                           Default false.
---         --
---         pre = apply_filters( "pre_option_thenoptionend;", false, option, default );
-
---         --
---         -- Filters the value of all existing options before it is retrieved.
---         --
---         -- Returning a truthy value from the filter will effectively short-circuit retrieval
---         -- and return the passed value instead.
---         --
---         -- @since 6.1.0
---         --
---         -- @param mixed  pre_option  The value to return instead of the option value. This differs
---         --                            from `default`, which is used as the fallback value in the event
---         --                            the option doesn"t exist elsewhere in get_option().
---         --                            Default false (to skip past the short-circuit).
---         -- @param string option      Name of the option.
---         -- @param mixed  default     The fallback value to return if the option does not exist.
---         --                            Default false.
---         --
---         pre = apply_filters( "pre_option", pre, option, default );
-
---         if ( false !== pre ) then
---                 return pre;
---         end;
-
---         if ( defined( "WP_SETUP_CONFIG" ) ) then
---                 return false;
---         end;
-
---         // Distinguish between `false` as a default, and not passing one.
---         passed_default = func_num_args() > 1;
-
---         if ( ! wp_installing() ) then
---                 // Prevent non-existent options from triggering multiple queries.
---                 notoptions = wp_cache_get( "notoptions", "options" );
-
---                 // Prevent non-existent `notoptions` key from triggering multiple key lookups.
---                 if ( ! is_array( notoptions ) ) then
---                         notoptions = array();
---                         wp_cache_set( "notoptions", notoptions, "options" );
---                 end;
-
---                 if ( isset( notoptions[ option ] ) ) then
---                         --
---                         -- Filters the default value for an option.
---                         --
---                         -- The dynamic portion of the hook name, `option`, refers to the option name.
---                         --
---                         -- @since 3.4.0
---                         -- @since 4.4.0 The `option` parameter was added.
---                         -- @since 4.7.0 The `passed_default` parameter was added to distinguish between a `false` value and the default parameter value.
---                         --
---                         -- @param mixed  default The default value to return if the option does not exist
---                         --                        in the database.
---                         -- @param string option  Option name.
---                         -- @param bool   passed_default Was `get_option()` passed a default value?
---                         --
---                         return apply_filters( "default_option_thenoptionend;", default, option, passed_default );
---                 end;
-
---                 alloptions = wp_load_alloptions();
-
---                 if ( isset( alloptions[ option ] ) ) then
---                         value = alloptions[ option ];
---                 end; else then
---                         value = wp_cache_get( option, "options" );
-
---                         if ( false === value ) then
---                                 row = wpdb->get_row( wpdb->prepare( "SELECT option_value FROM wpdb->options WHERE option_name = %s LIMIT 1", option ) );
-
---                                 // Has to be get_row() instead of get_var() because of funkiness with 0, false, null values.
---                                 if ( is_object( row ) ) then
---                                         value = row->option_value;
---                                         wp_cache_add( option, value, "options" );
---                                 end; else then // Option does not exist, so we must cache its non-existence.
---                                         if ( ! is_array( notoptions ) ) then
---                                                 notoptions = array();
---                                         end;
-
---                                         notoptions[ option ] = true;
---                                         wp_cache_set( "notoptions", notoptions, "options" );
-
---                                         -- This filter is documented in wp-includes/option.php--
---                                         return apply_filters( "default_option_thenoptionend;", default, option, passed_default );
---                                 end;
---                         end;
---                 end;
---         end; else then
---                 suppress = wpdb->suppress_errors();
---                 row      = wpdb->get_row( wpdb->prepare( "SELECT option_value FROM wpdb->options WHERE option_name = %s LIMIT 1", option ) );
---                 wpdb->suppress_errors( suppress );
-
---                 if ( is_object( row ) ) then
---                         value = row->option_value;
---                 end; else then
---                         -- This filter is documented in wp-includes/option.php--
---                         return apply_filters( "default_option_thenoptionend;", default, option, passed_default );
---                 end;
---         end;
-
---         // If home is not set, use siteurl.
---         if ( "home" === option && "" === value ) then
---                 return get_option( "siteurl" );
---         end;
-
---         if ( in_array( option, array( "siteurl", "home", "category_base", "tag_base" ), true ) ) then
---                 value = untrailingslashit( value );
---         end;
-
---         --
---         -- Filters the value of an existing option.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 1.5.0 As "option_" . setting
---         -- @since 3.0.0
---         -- @since 4.4.0 The `option` parameter was added.
---         --
---         -- @param mixed  value  Value of the option. If stored serialized, it will be
---         --                       unserialized prior to being returned.
---         -- @param string option Option name.
---         --
---         return apply_filters( "option_thenoptionend;", maybe_unserialize( value ), option );
+      --
+      -- Filters the value of an existing option.
+      --
+      -- The dynamic portion of the hook name, `option`, refers to the option name.
+      --
+      -- @since 1.5.0 As "option_" . setting
+      -- @since 3.0.0
+      -- @since 4.4.0 The `option` parameter was added.
+      --
+      -- @param mixed  value  Value of the option. If stored serialized, it will be
+      --                       unserialized prior to being returned.
+      -- @param string option Option name.
+      --
+      return Apply_Filters ("option_" & Option,
+                            Maybe_Unserialize (As_String (Value)), Option);
    end Get_Option;
 
--- --
--- -- Protects WordPress special option from being modified.
--- --
--- -- Will die if option is in protected list. Protected options are "alloptions"
--- -- and "notoptions" options.
--- --
--- -- @since 2.2.0
--- --
--- -- @param string option Option name.
--- --
--- function wp_protect_special_option( option ) then
---         if ( "alloptions" === option || "notoptions" === option ) then
---                 wp_die(
---                         sprintf(
---                                 /* translators: %s: Option name.--
---                                 __( "%s is a protected WP option and may not be modified" ),
---                                 esc_html( option )
---                         )
---                 );
---         end;
--- end;
+   -------------------------------
+   -- Wp_Protect_Special_Option --
+   -------------------------------
+
+   procedure Wp_Protect_Special_Option (Option : String)
+   is
+      use Php.Strings;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_L10n;
+   begin
+      if Option in "alloptions" | "notoptions" then
+         Wp_Die (
+           Sprintf (
+             -- translators: %s: Option name.
+             abs "%s is a protected WP option and may not be modified",
+             To_List (ESC_HTML (Option))
+           )
+         );
+      end if;
+   end Wp_Protect_Special_Option;
 
 -- --
 -- -- Prints option value after sanitizing for forms.
@@ -428,415 +449,528 @@ is
 --         wp_cache_set_multiple( data, "site-options" );
 -- end;
 
--- --
--- -- Updates the value of an option that was already added.
--- --
--- -- You do not need to serialize values. If the value needs to be serialized,
--- -- then it will be serialized before it is inserted into the database.
--- -- Remember, resources cannot be serialized or added as an option.
--- --
--- -- If the option does not exist, it will be created.
+   -------------------
+   -- Update_Option --
+   -------------------
 
--- -- This function is designed to work with or without a logged-in user. In terms of security,
--- -- plugin developers should check the current user"s capabilities before updating any options.
--- --
--- -- @since 1.0.0
--- -- @since 4.2.0 The `autoload` parameter was added.
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string      option   Name of the option to update. Expected to not be SQL-escaped.
--- -- @param mixed       value    Option value. Must be serializable if non-scalar. Expected to not be SQL-escaped.
--- -- @param string|bool autoload Optional. Whether to load the option when WordPress starts up. For existing options,
--- --                              `autoload` can only be updated using `update_option()` if `value` is also changed.
--- --                              Accepts "yes"|true to enable or "no"|false to disable. For non-existent options,
--- --                              the default value is "yes". Default null.
--- -- @return bool True if the value was updated, false otherwise.
--- --
--- function update_option( option, value, autoload = null ) then
---         global wpdb;
+   function Update_Option (Option   : String;
+                           Value    : Multi_Type;
+                           Autoload : Boolean := False)
+                           return Boolean
+   is
+      use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Functions;
+      use Inc_Formatting;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
+   begin
+      -- if Is_Scalar (Option) then
+      --    Option := Trim (Option);
+      -- end if;
 
---         if ( is_scalar( option ) ) then
---                 option = trim( option );
---         end;
+      -- if Empty (Option) then
+      --    return False;
+      -- end if;
 
---         if ( empty( option ) ) then
---                 return false;
---         end;
+      --
+      -- Until a proper _deprecated_option() function can be introduced,
+      -- redirect requests to deprecated keys to the new, correct ones.
+      --
+      declare
+         Deprecated_Keys : constant Array_Type := To_Array (List => (
+           Build ("blacklist_keys",    "disallowed_keys"),
+           Build ("comment_whitelist", "comment_previously_approved")
+         ));
+      begin
+         if Isset (Deprecated_Keys, Option) and then not Wp_Installing then
+            X_Deprecated_Argument (
+              "__FUNCTION__",
+              "5.5.0",
+              Sprintf (
+                -- translators: 1: Deprecated option key, 2: New option key.
+                abs "The ""%1s"" option key has been renamed to ""%2s"".",
+                To_List (List => (
+                  1 => +Option,
+                  2 => +Get_As_String (Deprecated_Keys, Option)
+                ))
+              )
+            );
+            return Update_Option
+              (Get_As_String (Deprecated_Keys, Option), Value, Autoload);
+         end if;
+      end;
 
---         /*
---         -- Until a proper _deprecated_option() function can be introduced,
---         -- redirect requests to deprecated keys to the new, correct ones.
---         --
---         deprecated_keys = array(
---                 "blacklist_keys"    => "disallowed_keys",
---                 "comment_whitelist" => "comment_previously_approved",
---         );
+      Wp_Protect_Special_Option (Option);
 
---         if ( isset( deprecated_keys[ option ] ) && ! wp_installing() ) then
---                 _deprecated_argument(
---                         __FUNCTION__,
---                         "5.5.0",
---                         sprintf(
---                                 /* translators: 1: Deprecated option key, 2: New option key.--
---                                 __( "The "%1s" option key has been renamed to "%2s"." ),
---                                 option,
---                                 deprecated_keys[ option ]
---                         )
---                 );
---                 return update_option( deprecated_keys[ option ], value, autoload );
---         end;
+--      if Is_Object (Value) then
+--         Value := clone value;
+--      end if;
 
---         wp_protect_special_option( option );
+      declare
+         Value_2   : Multi_Type :=
+           From_String (Sanitize_Option (Option, As_String (Value)));
 
---         if ( is_object( value ) ) then
---                 value = clone value;
---         end;
+         Old_Value : constant Multi_Type := Get_Option (Option);
 
---         value     = sanitize_option( option, value );
---         old_value = get_option( option );
+         Serialized_Value : Multi_Type;
+      begin
+         --
+         -- Filters a specific option before its value is (maybe) serialized and
+         -- updated.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the option name.
+         --
+         -- @since 2.6.0
+         -- @since 4.4.0 The `option` parameter was added.
+         --
+         -- @param mixed  value     The new, unserialized option value.
+         -- @param mixed  old_value The old option value.
+         -- @param string option    Option name.
+         --
+         Value_2 :=
+           Apply_Filters ("pre_update_option_" & Option, Value_2, Old_Value, Option);
 
---         --
---         -- Filters a specific option before its value is (maybe) serialized and updated.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 2.6.0
---         -- @since 4.4.0 The `option` parameter was added.
---         --
---         -- @param mixed  value     The new, unserialized option value.
---         -- @param mixed  old_value The old option value.
---         -- @param string option    Option name.
---         --
---         value = apply_filters( "pre_update_option_thenoptionend;", value, old_value, option );
+         --
+         -- Filters an option before its value is (maybe) serialized and updated.
+         --
+         -- @since 3.9.0
+         --
+         -- @param mixed  value     The new, unserialized option value.
+         -- @param string option    Name of the option.
+         -- @param mixed  old_value The old option value.
+         --
+         Value_2 := Apply_Filters ("pre_update_option", Value_2, Option, Old_Value);
 
---         --
---         -- Filters an option before its value is (maybe) serialized and updated.
---         --
---         -- @since 3.9.0
---         --
---         -- @param mixed  value     The new, unserialized option value.
---         -- @param string option    Name of the option.
---         -- @param mixed  old_value The old option value.
---         --
---         value = apply_filters( "pre_update_option", value, option, old_value );
+         --
+         -- If the new and old values are the same, no need to update.
+         --
+         -- Unserialized values will be adequate in most cases. If the unserialized
+         -- data differs, the (maybe) serialized data is checked to avoid
+         -- unnecessary database calls for otherwise identical object instances.
+         --
+         -- See https://core.trac.wordpress.org/ticket/38903
+         --
+         if
+           Value_2 = Old_Value or else
+           Maybe_Serialize (As_String (Value_2)) =
+           Maybe_Serialize (As_String (Old_Value))
+         then
+            return False;
+         end if;
 
---         /*
---         -- If the new and old values are the same, no need to update.
---         --
---         -- Unserialized values will be adequate in most cases. If the unserialized
---         -- data differs, the (maybe) serialized data is checked to avoid
---         -- unnecessary database calls for otherwise identical object instances.
---         --
---         -- See https://core.trac.wordpress.org/ticket/38903
---         --
---         if ( value === old_value || maybe_serialize( value ) === maybe_serialize( old_value ) ) then
---                 return false;
---         end;
+         -- This filter is documented in wp-includes/option.php
+         if
+           Apply_Filters ("default_option_" & Option, From_Boolean (False),
+                          Option, From_Boolean (False)) = Old_Value
+         then
+            -- Default setting for new options is "yes".
+            -- if ( null === autoload ) then
+            --    autoload = "yes";
+            -- end if;
 
---         -- This filter is documented in wp-includes/option.php--
---         if ( apply_filters( "default_option_thenoptionend;", false, option, false ) === old_value ) then
---                 // Default setting for new options is "yes".
---                 if ( null === autoload ) then
---                         autoload = "yes";
---                 end;
+            return Add_Option (Option, Value_2, "", Autoload);
+         end if;
 
---                 return add_option( option, value, "", autoload );
---         end;
+         Serialized_Value := Maybe_Serialize (As_String (Value_2));
 
---         serialized_value = maybe_serialize( value );
+         --
+         -- Fires immediately before an option value is updated.
+         --
+         -- @since 2.9.0
+         --
+         -- @param string option    Name of the option to update.
+         -- @param mixed  old_value The old option value.
+         -- @param mixed  value     The new option value.
+         --
+         Do_Action ("update_option", Option, Old_Value, Value_2);
 
---         --
---         -- Fires immediately before an option value is updated.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string option    Name of the option to update.
---         -- @param mixed  old_value The old option value.
---         -- @param mixed  value     The new option value.
---         --
---         do_action( "update_option", option, old_value, value );
+         declare
+            Update_Args : Array_Type := To_Array (List => (1 =>
+              Build ("option_value", As_String (Serialized_Value))
+            ));
+            Result : Boolean;
+         begin
+            if not Autoload then -- ( null !== autoload ) then
+               Set (Update_Args, "autoload", From_Boolean (Autoload));
+               -- ( "no" === autoload || false === autoload ) ? "no" : "yes";
+            end if;
 
---         update_args = array(
---                 "option_value" => serialized_value,
---         );
+            Result :=
+              Globals.WpDB.Update (-Globals.WpDB.Options,
+                                   Update_Args,
+                                   To_Array (List => (1 =>
+                                     Build ("option_name", Option)
+                                  ))) /= 0;
+            if not Result then
+               return False;
+            end if;
+         end;
 
---         if ( null !== autoload ) then
---                 update_args["autoload"] = ( "no" === autoload || false === autoload ) ? "no" : "yes";
---         end;
+         declare
+            Found : Boolean;
 
---         result = wpdb->update( wpdb->options, update_args, array( "option_name" => option ) );
---         if ( ! result ) then
---                 return false;
---         end;
+            Notoptions : constant Array_Type :=
+              Wp_Cache_Get ("notoptions", "options", Found => Found);
+         begin
+            if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
+               Delete (Ref (Notoptions, Option));
+               Wp_Cache_Set ("notoptions", Notoptions, "options");
+            end if;
+         end;
 
---         notoptions = wp_cache_get( "notoptions", "options" );
+         if not Wp_Installing then
+            declare
+               Alloptions : Array_Type := Wp_Load_Alloptions (True);
+            begin
+               if Isset (Alloptions, Option) then
+                  Set (Alloptions, Option, Serialized_Value);
+                  Wp_Cache_Set ("alloptions", Alloptions, "options");
+               else
+                  Wp_Cache_Set (Option, As_Array (Serialized_Value), "options");
+               end if;
+            end;
+         end if;
 
---         if ( is_array( notoptions ) && isset( notoptions[ option ] ) ) then
---                 unset( notoptions[ option ] );
---                 wp_cache_set( "notoptions", notoptions, "options" );
---         end;
+         --
+         -- Fires after the value of a specific option has been successfully updated.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the option name.
+         --
+         -- @since 2.0.1
+         -- @since 4.4.0 The `option` parameter was added.
+         --
+         -- @param mixed  old_value The old option value.
+         -- @param mixed  value     The new option value.
+         -- @param string option    Option name.
+         --
+         Do_Action ("update_option_" & Option, Old_Value, Value_2, Option);
 
---         if ( ! wp_installing() ) then
---                 alloptions = wp_load_alloptions( true );
---                 if ( isset( alloptions[ option ] ) ) then
---                         alloptions[ option ] = serialized_value;
---                         wp_cache_set( "alloptions", alloptions, "options" );
---                 end; else then
---                         wp_cache_set( option, serialized_value, "options" );
---                 end;
---         end;
+         --
+         -- Fires after the value of an option has been successfully updated.
+         --
+         -- @since 2.9.0
+         --
+         -- @param string option    Name of the updated option.
+         -- @param mixed  old_value The old option value.
+         -- @param mixed  value     The new option value.
+         --
+         Do_Action ("updated_option", Option, Old_Value, Value_2);
+      end;
+      return True;
+   end Update_Option;
 
---         --
---         -- Fires after the value of a specific option has been successfully updated.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 2.0.1
---         -- @since 4.4.0 The `option` parameter was added.
---         --
---         -- @param mixed  old_value The old option value.
---         -- @param mixed  value     The new option value.
---         -- @param string option    Option name.
---         --
---         do_action( "update_option_thenoptionend;", old_value, value, option );
+   procedure Update_Option (Option   : String;
+                            Value    : Multi_Type;
+                            Autoload : Boolean := False)
+   is
+      Unused : constant Boolean :=
+        Update_Option (Option, Value, Autoload);
+   begin
+      null;
+   end Update_Option;
 
---         --
---         -- Fires after the value of an option has been successfully updated.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string option    Name of the updated option.
---         -- @param mixed  old_value The old option value.
---         -- @param mixed  value     The new option value.
---         --
---         do_action( "updated_option", option, old_value, value );
+   ----------------
+   -- Add_Option --
+   ----------------
 
---         return true;
--- end;
+   function Add_Option (Option     : String;
+                        Value      : Multi_Type := From_String ("");
+                        Deprecated : String     := "";
+                        Autoload   : Boolean    := True)
+                        return Boolean
+   is
+      use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
 
--- --
--- -- Adds a new option.
--- --
--- -- You do not need to serialize values. If the value needs to be serialized,
--- -- then it will be serialized before it is inserted into the database.
--- -- Remember, resources cannot be serialized or added as an option.
--- --
--- -- You can create options without values and then update the values later.
--- -- Existing options will not be updated and checks are performed to ensure that you
--- -- aren"t adding a protected WordPress option. Care should be taken to not name
--- -- options the same as the ones which are protected.
--- --
--- -- @since 1.0.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string      option     Name of the option to add. Expected to not be SQL-escaped.
--- -- @param mixed       value      Optional. Option value. Must be serializable if non-scalar.
--- --                                Expected to not be SQL-escaped.
--- -- @param string      deprecated Optional. Description. Not used anymore.
--- -- @param string|bool autoload   Optional. Whether to load the option when WordPress starts up.
--- --                                Default is enabled. Accepts "no" to disable for legacy reasons.
--- -- @return bool True if the option was added, false otherwise.
--- --
--- function add_option( option, value = "", deprecated = "", autoload = "yes" ) then
---         global wpdb;
+      Value_2 : Multi_Type;
+   begin
+      -- if ( ! empty( deprecated ) ) then
+      --    x_deprecated_argument( __FUNCTION__, "2.3.0" );
+      -- end if;
 
---         if ( ! empty( deprecated ) ) then
---                 _deprecated_argument( __FUNCTION__, "2.3.0" );
---         end;
+      -- if ( is_scalar( option ) ) then
+      --    option = trim( option );
+      -- end if;
 
---         if ( is_scalar( option ) ) then
---                 option = trim( option );
---         end;
+      -- if ( empty( option ) ) then
+      --    return false;
+      -- end if;
 
---         if ( empty( option ) ) then
---                 return false;
---         end;
+      --
+      -- Until a proper _deprecated_option() function can be introduced,
+      -- redirect requests to deprecated keys to the new, correct ones.
+      --
+      declare
+         Deprecated_Keys : constant Array_Type := To_Array (List => (
+           Build ("blacklist_keys",    "disallowed_keys"),
+           Build ("comment_whitelist", "comment_previously_approved")
+         ));
+      begin
+         if Isset (Deprecated_Keys, Option) and then not Wp_Installing then
+            X_Deprecated_Argument (
+              "__FUNCTION__",
+              "5.5.0",
+              Sprintf (
+                -- translators: 1: Deprecated option key, 2: New option key.
+                abs "The ""%1s"" option key has been renamed to ""%2s"".",
+                To_List (List => (
+                  1 => +Option,
+                  2 => +Get_As_String (Deprecated_Keys, Option)
+                ))
+              )
+            );
+            return Add_Option (Get_As_String (Deprecated_Keys, Option),
+                               Value, Deprecated, Autoload);
+         end if;
+      end;
 
---         /*
---         -- Until a proper _deprecated_option() function can be introduced,
---         -- redirect requests to deprecated keys to the new, correct ones.
---         --
---         deprecated_keys = array(
---                 "blacklist_keys"    => "disallowed_keys",
---                 "comment_whitelist" => "comment_previously_approved",
---         );
+      Wp_Protect_Special_Option (Option);
 
---         if ( isset( deprecated_keys[ option ] ) && ! wp_installing() ) then
---                 _deprecated_argument(
---                         __FUNCTION__,
---                         "5.5.0",
---                         sprintf(
---                                 /* translators: 1: Deprecated option key, 2: New option key.--
---                                 __( "The "%1s" option key has been renamed to "%2s"." ),
---                                 option,
---                                 deprecated_keys[ option ]
---                         )
---                 );
---                 return add_option( deprecated_keys[ option ], value, deprecated, autoload );
---         end;
+      -- if ( is_object( value ) ) then
+      --    value = clone value;
+      -- end if;
 
---         wp_protect_special_option( option );
+      Value_2 := From_String (Sanitize_Option (Option, As_String (Value)));
 
---         if ( is_object( value ) ) then
---                 value = clone value;
---         end;
+      -- Make sure the option doesn't already exist.
+      -- We can check the "notoptions" cache before we ask for a DB query.
+      declare
+         Found : Boolean;
 
---         value = sanitize_option( option, value );
+         Notoptions : constant Array_Type :=
+           Wp_Cache_Get ("notoptions", "options", Found => Found);
+      begin
+         if not Is_Array (Notoptions) or else not Isset (Notoptions, Option) then
+            -- This filter is documented in wp-includes/option.php
+            if
+              Apply_Filters ("default_option_" & Option, False, Option, False)
+              /= Get_Option (Option)
+            then
+               return False;
+            end if;
+         end if;
+      end;
 
---         // Make sure the option doesn"t already exist.
---         // We can check the "notoptions" cache before we ask for a DB query.
---         notoptions = wp_cache_get( "notoptions", "options" );
+      declare
+         Serialized_Value : constant Multi_Type :=
+           Maybe_Serialize (As_String (Value_2));
+--       Autoload         = ( "no" === autoload || false === autoload ) ? "no" : "yes";
+      begin
+         --
+         -- Fires before an option is added.
+         --
+         -- @since 2.9.0
+         --
+         -- @param string option Name of the option to add.
+         -- @param mixed  value  Value of the option.
+         --
+         Do_Action ("add_option", Option, Value_2);
 
---         if ( ! is_array( notoptions ) || ! isset( notoptions[ option ] ) ) then
---                 -- This filter is documented in wp-includes/option.php--
---                 if ( apply_filters( "default_option_thenoptionend;", false, option, false ) !== get_option( option ) ) then
---                         return false;
---                 end;
---         end;
+         declare
+            Statement : constant String :=
+              Globals.WpDB.Prepare (
+                "INSERT INTO `wpdb->options` (`option_name`, `option_value`, " &
+                "`autoload`) " &
+                "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = " &
+                "VALUES(`option_name`), `option_value` = " &
+                "VALUES(`option_value`), `autoload` = VALUES(`autoload`)",
+                To_List (List => (
+                  1 => +Option,
+                  2 => +As_String (Serialized_Value),
+                  3 => +Boolean'Image (Autoload))));
 
---         serialized_value = maybe_serialize( value );
---         autoload         = ( "no" === autoload || false === autoload ) ? "no" : "yes";
+            Result : constant Boolean :=
+              Globals.WpDB.Query (Statement) /= 0;
+         begin
+            if not Result then
+               return False;
+            end if;
+         end;
 
---         --
---         -- Fires before an option is added.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string option Name of the option to add.
---         -- @param mixed  value  Value of the option.
---         --
---         do_action( "add_option", option, value );
+         if Wp_Installing then
+            if Autoload then
+               declare
+                  Alloptions : Array_Type := Wp_Load_Alloptions (True);
+               begin
+                  Set (Alloptions, Option, Serialized_Value);
+                  Wp_Cache_Set ("alloptions", Alloptions, "options");
+               end;
+            else
+               Wp_Cache_Set (Option, As_Array (Serialized_Value), "options");
+            end if;
+         end if;
 
---         result = wpdb->query( wpdb->prepare( "INSERT INTO `wpdb->options` (`option_name`, `option_value`, `autoload`) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)", option, serialized_value, autoload ) );
---         if ( ! result ) then
---                 return false;
---         end;
+         -- This option exists now.
+         declare
+            Found : Boolean;
 
---         if ( ! wp_installing() ) then
---                 if ( "yes" === autoload ) then
---                         alloptions            = wp_load_alloptions( true );
---                         alloptions[ option ] = serialized_value;
---                         wp_cache_set( "alloptions", alloptions, "options" );
---                 end; else then
---                         wp_cache_set( option, serialized_value, "options" );
---                 end;
---         end;
+            Notoptions : constant Array_Type :=
+              Wp_Cache_Get ("notoptions", "options", Found => Found);
+              -- Yes, again... we need it to be fresh.
+         begin
+            if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
+               Delete (Ref (Notoptions, Option));
+               Wp_Cache_Set ("notoptions", Notoptions, "options");
+            end if;
+         end;
 
---         // This option exists now.
---         notoptions = wp_cache_get( "notoptions", "options" ); // Yes, again... we need it to be fresh.
+         --
+         -- Fires after a specific option has been added.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the option name.
+         --
+         -- @since 2.5.0 As "add_option_thennameend;"
+         -- @since 3.0.0
+         --
+         -- @param string option Name of the option to add.
+         -- @param mixed  value  Value of the option.
+         --
+         Do_Action ("add_option_" & Option, Option, Value);
 
---         if ( is_array( notoptions ) && isset( notoptions[ option ] ) ) then
---                 unset( notoptions[ option ] );
---                 wp_cache_set( "notoptions", notoptions, "options" );
---         end;
+         --
+         -- Fires after an option has been added.
+         --
+         -- @since 2.9.0
+         --
+         -- @param string option Name of the added option.
+         -- @param mixed  value  Value of the option.
+         --
+         Do_Action ("added_option", Option, Value);
+      end;
+      return True;
+   end Add_Option;
 
---         --
---         -- Fires after a specific option has been added.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 2.5.0 As "add_option_thennameend;"
---         -- @since 3.0.0
---         --
---         -- @param string option Name of the option to add.
---         -- @param mixed  value  Value of the option.
---         --
---         do_action( "add_option_thenoptionend;", option, value );
+   procedure Add_Option (Option     : String;
+                         Value      : Multi_Type := From_String ("");
+                         Deprecated : String     := "";
+                         Autoload   : Boolean    := True) -- "yes"
+   is
+      Unused : constant Boolean :=
+        Add_Option (Option, Value, Deprecated, Autoload);
+   begin
+      null;
+   end Add_Option;
 
---         --
---         -- Fires after an option has been added.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string option Name of the added option.
---         -- @param mixed  value  Value of the option.
---         --
---         do_action( "added_option", option, value );
+   -------------------
+   -- Delete_Option --
+   -------------------
 
---         return true;
--- end;
+   function Delete_Option (Option : String)
+                           return Boolean
+   is
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Load;
+      use Inc_Plugins;
+--    global wpdb;
+   begin
+      -- if Is_Scalar (Option) then
+      --    Option := Trim (Option);
+      -- end if;
 
--- --
--- -- Removes option by name. Prevents removal of protected WordPress options.
--- --
--- -- @since 1.2.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string option Name of the option to delete. Expected to not be SQL-escaped.
--- -- @return bool True if the option was deleted, false otherwise.
--- --
--- function delete_option( option ) then
---         global wpdb;
+      -- if Empty (Option) then
+      --    return False;
+      -- end if;
 
---         if ( is_scalar( option ) ) then
---                 option = trim( option );
---         end;
+      Wp_Protect_Special_Option (Option);
 
---         if ( empty( option ) ) then
---                 return false;
---         end;
+      -- Get the ID, if no ID then return.
+      declare
+         Success : Boolean;
 
---         wp_protect_special_option( option );
+         Statement : constant String :=
+           Globals.WpDB.Prepare (
+             "SELECT autoload FROM wpdb->options " &
+             "WHERE option_name = %s", Option);
 
---         // Get the ID, if no ID then return.
---         row = wpdb->get_row( wpdb->prepare( "SELECT autoload FROM wpdb->options WHERE option_name = %s", option ) );
---         if ( is_null( row ) ) then
---                 return false;
---         end;
+         Row : constant Boolean :=
+           Globals.WpDB.Get_Row (Statement, Success => Success) /= 0;
 
---         --
---         -- Fires immediately before an option is deleted.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string option Name of the option to delete.
---         --
---         do_action( "delete_option", option );
+         Result : Boolean;
+      begin
+         if not Row then -- Is_Null (Row) then
+            return False;
+         end if;
 
---         result = wpdb->delete( wpdb->options, array( "option_name" => option ) );
+         --
+         -- Fires immediately before an option is deleted.
+         --
+         -- @since 2.9.0
+         --
+         -- @param string option Name of the option to delete.
+         --
+         Do_Action ("delete_option", Option);
 
---         if ( ! wp_installing() ) then
---                 if ( "yes" === row->autoload ) then
---                         alloptions = wp_load_alloptions( true );
---                         if ( is_array( alloptions ) && isset( alloptions[ option ] ) ) then
---                                 unset( alloptions[ option ] );
---                                 wp_cache_set( "alloptions", alloptions, "options" );
---                         end;
---                 end; else then
---                         wp_cache_delete( option, "options" );
---                 end;
---         end;
+         Result :=
+           Globals.WpDB.Delete (
+             -Globals.WpDB.Options,
+             To_Array (List => (1 =>
+               Build ("option_name", Option)))
+           ) /= 0;
 
---         if ( result ) then
+         if not Wp_Installing then
+            if False then -- Row.Autoload then -- "yes"
+               declare
+                  Alloptions : constant Array_Type := Wp_Load_Alloptions (True);
+               begin
+                  if Is_Array (Alloptions) and then Isset (Alloptions, Option) then
+                     Delete (Ref (Alloptions, Option));
+                     Wp_Cache_Set ("alloptions", Alloptions, "options");
+                  end if;
+               end;
+            else
+               Wp_Cache_Delete (Option, "options");
+            end if;
+         end if;
 
---                 --
---                 -- Fires after a specific option has been deleted.
---                 --
---                 -- The dynamic portion of the hook name, `option`, refers to the option name.
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string option Name of the deleted option.
---                 --
---                 do_action( "delete_option_thenoptionend;", option );
+         if Result then
+            --
+            -- Fires after a specific option has been deleted.
+            --
+            -- The dynamic portion of the hook name, `option`, refers to the option
+            -- name.
+            --
+            -- @since 3.0.0
+            --
+            -- @param string option Name of the deleted option.
+            --
+            Do_Action ("delete_option_" & Option, Option);
 
---                 --
---                 -- Fires after an option has been deleted.
---                 --
---                 -- @since 2.9.0
---                 --
---                 -- @param string option Name of the deleted option.
---                 --
---                 do_action( "deleted_option", option );
+            --
+            -- Fires after an option has been deleted.
+            --
+            -- @since 2.9.0
+            --
+            -- @param string option Name of the deleted option.
+            --
+            Do_Action ("deleted_option", Option);
 
---                 return true;
---         end;
+            return True;
+         end if;
+      end;
 
---         return false;
--- end;
+      return False;
+   end Delete_Option;
+
+   procedure Delete_Option (Option : String)
+   is
+      Unused : constant Boolean := Delete_Option (Option);
+   begin
+      null;
+   end Delete_Option;
 
 -- --
 -- -- Deletes a transient.
@@ -886,192 +1020,244 @@ is
 --         return result;
 -- end;
 
--- --
--- -- Retrieves the value of a transient.
--- --
--- -- If the transient does not exist, does not have a value, or has expired,
--- -- then the return value will be false.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string transient Transient name. Expected to not be SQL-escaped.
--- -- @return mixed Value of transient.
--- --
--- function get_transient( transient ) then
+   -------------------
+   -- Get_Transient --
+   -------------------
 
---         --
---         -- Filters the value of an existing transient before it is retrieved.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- Returning a value other than false from the filter will short-circuit retrieval
---         -- and return that value instead.
---         --
---         -- @since 2.8.0
---         -- @since 4.4.0 The `transient` parameter was added
---         --
---         -- @param mixed  pre_transient The default value to return if the transient does not exist.
---         --                              Any value other than false will short-circuit the retrieval
---         --                              of the transient, and return that value.
---         -- @param string transient     Transient name.
---         --
---         pre = apply_filters( "pre_transient_thentransientend;", false, transient );
+   function Get_Transient (Transient : String)
+                           return Multi_Type
+   is
+      use Php.Misc;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Load;
+--    use Inc_Plugins;
 
---         if ( false !== pre ) then
---                 return pre;
---         end;
+      --
+      -- Filters the value of an existing transient before it is retrieved.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      -- name.
+      --
+      -- Returning a value other than false from the filter will short-circuit
+      -- retrieval and return that value instead.
+      --
+      -- @since 2.8.0
+      -- @since 4.4.0 The `transient` parameter was added
+      --
+      -- @param mixed  pre_transient The default value to return if the transient does
+      --                              not exist. Any value other than false will
+      --                              short-circuit the retrieval of the transient,
+      --                              and return that value.
+      -- @param string transient     Transient name.
+      --
+      Pre : constant Multi_Type :=
+        Apply_Filters ("pre_transient_" & Transient,
+                       From_Boolean (False), Transient);
 
---         if ( wp_using_ext_object_cache() || wp_installing() ) then
---                 value = wp_cache_get( transient, "transient" );
---         end; else then
---                 transient_option = "_transient_" . transient;
---                 if ( ! wp_installing() ) then
---                         // If option is not in alloptions, it is not autoloaded and thus has a timeout.
---                         alloptions = wp_load_alloptions();
---                         if ( ! isset( alloptions[ transient_option ] ) ) then
---                                 transient_timeout = "_transient_timeout_" . transient;
---                                 timeout           = get_option( transient_timeout );
---                                 if ( false !== timeout && timeout < time() ) then
---                                         delete_option( transient_option );
---                                         delete_option( transient_timeout );
---                                         value = false;
---                                 end;
---                         end;
---                 end;
+      Value : Multi_Type;
+      Value_Bool : Boolean := True;
+      Found : Boolean;
+   begin
+      if From_Boolean (False) /= Pre then
+         return Pre;
+      end if;
 
---                 if ( ! isset( value ) ) then
---                         value = get_option( transient_option );
---                 end;
---         end;
+      if Wp_Using_Ext_Object_Cache or else Wp_Installing  then
+         Value := Wp_Cache_Get (Transient, "transient", Found => Found);
+      else
+         declare
+            Transient_Option : constant String := "_transient_" & Transient;
+         begin
+            if not Wp_Installing then
+               -- If option is not in alloptions, it is not autoloaded and thus has
+               -- a timeout.
+               declare
+                  Alloptions : constant Array_Type := Wp_Load_Alloptions;
+               begin
+                  if not Isset (Alloptions, Transient_Option) then
+                     declare
+                        Transient_Timeout : constant String :=
+                          "_transient_timeout_" & Transient;
 
---         --
---         -- Filters an existing transient"s value.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 2.8.0
---         -- @since 4.4.0 The `transient` parameter was added
---         --
---         -- @param mixed  value     Value of transient.
---         -- @param string transient Transient name.
---         --
---         return apply_filters( "transient_thentransientend;", value, transient );
--- end;
+                        Timeout : constant Natural :=
+                          Get_Option (Transient_Timeout);
+                     begin
+                        if 0 /= Timeout and then Timeout < Time then -- false
+                           Delete_Option (Transient_Option);
+                           Delete_Option (Transient_Timeout);
+                           Value_Bool := False;
+                        end if;
+                     end;
+                  end if;
+               end;
+            end if;
 
--- --
--- -- Sets/updates the value of a transient.
--- --
--- -- You do not need to serialize values. If the value needs to be serialized,
--- -- then it will be serialized before it is set.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string transient  Transient name. Expected to not be SQL-escaped.
--- --                           Must be 172 characters or fewer in length.
--- -- @param mixed  value      Transient value. Must be serializable if non-scalar.
--- --                           Expected to not be SQL-escaped.
--- -- @param int    expiration Optional. Time until expiration in seconds. Default 0 (no expiration).
--- -- @return bool True if the value was set, false otherwise.
--- --
--- function set_transient( transient, value, expiration = 0 ) then
+            if not Value_Bool then
+               Value := Get_Option (Transient_Option);
+            end if;
+         end;
+      end if;
 
---         expiration = (int) expiration;
+      --
+      -- Filters an existing transient"s value.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      -- name.
+      --
+      -- @since 2.8.0
+      -- @since 4.4.0 The `transient` parameter was added
+      --
+      -- @param mixed  value     Value of transient.
+      -- @param string transient Transient name.
+      --
+      return Apply_Filters ("transient_" & Transient, Value, Transient);
+   end Get_Transient;
 
---         --
---         -- Filters a specific transient before its value is set.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 3.0.0
---         -- @since 4.2.0 The `expiration` parameter was added.
---         -- @since 4.4.0 The `transient` parameter was added.
---         --
---         -- @param mixed  value      New value of transient.
---         -- @param int    expiration Time until expiration in seconds.
---         -- @param string transient  Transient name.
---         --
---         value = apply_filters( "pre_set_transient_thentransientend;", value, expiration, transient );
+   -------------------
+   -- Set_Transient --
+   -------------------
 
---         --
---         -- Filters the expiration for a transient before its value is set.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 4.4.0
---         --
---         -- @param int    expiration Time until expiration in seconds. Use 0 for no expiration.
---         -- @param mixed  value      New value of transient.
---         -- @param string transient  Transient name.
---         --
---         expiration = apply_filters( "expiration_of_transient_thentransientend;", expiration, value, transient );
+   function Set_Transient (Transient  : String;
+                           Value      : Multi_Type;
+                           Expiration : Integer := 0)
+                           return Boolean
+   is
+      use Php.Misc;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Load;
+      use Inc_Plugins;
 
---         if ( wp_using_ext_object_cache() || wp_installing() ) then
---                 result = wp_cache_set( transient, value, "transient", expiration );
---         end; else then
---                 transient_timeout = "_transient_timeout_" . transient;
---                 transient_option  = "_transient_" . transient;
+--    expiration = (int) expiration;
 
---                 if ( false === get_option( transient_option ) ) then
---                         autoload = "yes";
---                         if ( expiration ) then
---                                 autoload = "no";
---                                 add_option( transient_timeout, time() + expiration, "", "no" );
---                         end;
---                         result = add_option( transient_option, value, "", autoload );
---                 end; else then
---                         // If expiration is requested, but the transient has no timeout option,
---                         // delete, then re-create transient rather than update.
---                         update = true;
+      --
+      -- Filters a specific transient before its value is set.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      -- name.
+      --
+      -- @since 3.0.0
+      -- @since 4.2.0 The `expiration` parameter was added.
+      -- @since 4.4.0 The `transient` parameter was added.
+      --
+      -- @param mixed  value      New value of transient.
+      -- @param int    expiration Time until expiration in seconds.
+      -- @param string transient  Transient name.
+      --
+      Value_2 : constant Multi_Type :=
+        Apply_Filters ("pre_set_transient_" & Transient, Value,
+                       Expiration, Transient);
 
---                         if ( expiration ) then
---                                 if ( false === get_option( transient_timeout ) ) then
---                                         delete_option( transient_option );
---                                         add_option( transient_timeout, time() + expiration, "", "no" );
---                                         result = add_option( transient_option, value, "", "no" );
---                                         update = false;
---                                 end; else then
---                                         update_option( transient_timeout, time() + expiration );
---                                 end;
---                         end;
+      --
+      -- Filters the expiration for a transient before its value is set.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      -- name.
+      --
+      -- @since 4.4.0
+      --
+      -- @param int    expiration Time until expiration in seconds. Use 0 for no
+      --                           expiration.
+      -- @param mixed  value      New value of transient.
+      -- @param string transient  Transient name.
+      --
+      Expiration_2 : constant Integer :=
+        Apply_Filters ("expiration_of_transient_" & Transient, Expiration,
+                       Value_2, Transient);
 
---                         if ( update ) then
---                                 result = update_option( transient_option, value );
---                         end;
---                 end;
---         end;
+      Result : Boolean;
+   begin
+      if Wp_Using_Ext_Object_Cache or else Wp_Installing then
+         Result := Wp_Cache_Set (Transient, Value_2, "transient", Expiration);
+      else
+         declare
+            Transient_Timeout : constant String := "_transient_timeout_" & Transient;
+            Transient_Option  : constant String := "_transient_" & Transient;
+         begin
+            if False = Get_Option (Transient_Option) then
+               declare
+                  Autoload : Boolean := True; -- "yes";
+               begin
+                  if Expiration_2 /= 0 then
+                     Autoload := False; -- "no";
+                     Add_Option (Transient_Timeout,
+                                 From_Integer (Time + Expiration_2), "",
+                                 Autoload => False); -- "no"
+                  end if;
+                  Result := Add_Option (Transient_Option, Value_2, "", Autoload);
+               end;
+            else
+               -- If expiration is requested, but the transient has no timeout option,
+               -- delete, then re-create transient rather than update.
+               declare
+                  Update : Boolean := True;
+               begin
+                  if Expiration_2 /= 0 then
+                     if False = Get_Option (Transient_Timeout) then
+                        Delete_Option (Transient_Option);
+                        Add_Option (Transient_Timeout,
+                                    From_Integer (Time + Expiration_2), "",
+                                    Autoload => False); -- "no"
+                        Result := Add_Option (Transient_Option, Value_2, "",
+                                              Autoload => False); -- "no"
+                        Update := False;
+                     else
+                        Update_Option (Transient_Timeout,
+                                       From_Integer (Time + Expiration_2));
+                     end if;
+                  end if;
 
---         if ( result ) then
+                  if Update then
+                     Result := Update_Option (Transient_Option, Value_2);
+                  end if;
+               end;
+            end if;
+         end;
+      end if;
 
---                 --
---                 -- Fires after the value for a specific transient has been set.
---                 --
---                 -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---                 --
---                 -- @since 3.0.0
---                 -- @since 3.6.0 The `value` and `expiration` parameters were added.
---                 -- @since 4.4.0 The `transient` parameter was added.
---                 --
---                 -- @param mixed  value      Transient value.
---                 -- @param int    expiration Time until expiration in seconds.
---                 -- @param string transient  The name of the transient.
---                 --
---                 do_action( "set_transient_thentransientend;", value, expiration, transient );
+      if Result then
+         --
+         -- Fires after the value for a specific transient has been set.
+         --
+         -- The dynamic portion of the hook name, `transient`, refers to the transient
+         -- name.
+         --
+         -- @since 3.0.0
+         -- @since 3.6.0 The `value` and `expiration` parameters were added.
+         -- @since 4.4.0 The `transient` parameter was added.
+         --
+         -- @param mixed  value      Transient value.
+         -- @param int    expiration Time until expiration in seconds.
+         -- @param string transient  The name of the transient.
+         --
+         Do_Action ("set_transient_" & Transient, Value_2,
+                    Expiration_2, Transient);
 
---                 --
---                 -- Fires after the value for a transient has been set.
---                 --
---                 -- @since 3.0.0
---                 -- @since 3.6.0 The `value` and `expiration` parameters were added.
---                 --
---                 -- @param string transient  The name of the transient.
---                 -- @param mixed  value      Transient value.
---                 -- @param int    expiration Time until expiration in seconds.
---                 --
---                 do_action( "setted_transient", transient, value, expiration );
---         end;
+         --
+         -- Fires after the value for a transient has been set.
+         --
+         -- @since 3.0.0
+         -- @since 3.6.0 The `value` and `expiration` parameters were added.
+         --
+         -- @param string transient  The name of the transient.
+         -- @param mixed  value      Transient value.
+         -- @param int    expiration Time until expiration in seconds.
+         --
+         Do_Action ("setted_transient", Transient, Value_2, Expiration_2);
+      end if;
 
---         return result;
--- end;
+      return Result;
+   end Set_Transient;
+
+   procedure Set_Transient (Transient  : String;
+                            Value      : Multi_Type;
+                            Expiration : Integer := 0)
+   is
+      Unused : constant Boolean := Set_Transient (Transient, Value, Expiration);
+   begin
+      null;
+   end Set_Transient;
 
 -- --
 -- -- Deletes all expired transients.
@@ -1136,72 +1322,107 @@ is
 --         end;
 -- end;
 
--- --
--- -- Saves and restores user interface settings stored in a cookie.
--- --
--- -- Checks if the current user-settings cookie is updated and stores it. When no
--- -- cookie exists (different browser used), adds the last saved cookie restoring
--- -- the settings.
--- --
--- -- @since 2.7.0
--- --
--- function wp_user_settings() then
+   ----------------------
+   -- Wp_User_Settings --
+   ----------------------
 
---         if ( ! is_admin() || wp_doing_ajax() ) then
---                 return;
---         end;
+   procedure Wp_User_Settings
+   is
+      use Php.HTML;
+      use Php.Misc;
+      use Php.Preg;
+      use Binder;
+      use Globals;
+      use Hb_Common;
+      use Inc_Load;
+      use Inc_Link_Templates;
+      use Inc_Users;
+   begin
+      if not Is_Admin or else Wp_Doing_AJAX then
+         return;
+      end if;
 
---         user_id = get_current_user_id();
---         if ( ! user_id ) then
---                 return;
---         end;
+      declare
+         User_Id : constant Integer := Get_Current_User_Id;
+         User    : constant String  := Helpers.Image (User_Id);
+      begin
+         if User_Id = 0 then -- not
+            return;
+         end if;
 
---         if ( ! is_user_member_of_blog() ) then
---                 return;
---         end;
+         if not Is_User_Member_Of_Blog then
+            return;
+         end if;
 
---         settings = (string) get_user_option( "user-settings", user_id );
+         declare
+            Settings : constant String :=
+              Get_User_Option ("user-settings", User_Id); -- (string)
+         begin
+            if Isset (X_COOKIE, "wp-settings-" & User) then
+               declare
+                  Cookie : constant String :=
+                    Preg_Replace ("/[^A-Za-z0-9=&_]/", "",
+                                  Get_As_String (X_COOKIE, "wp-settings-" & User));
+               begin
+                  -- No change or both empty.
+                  if Cookie = Settings then
+                     return;
+                  end if;
 
---         if ( isset( _COOKIE[ "wp-settings-" . user_id ] ) ) then
---                 cookie = preg_replace( "/[^A-Za-z0-9=&_]/", "", _COOKIE[ "wp-settings-" . user_id ] );
+                  declare
+                     Last_Saved : constant Natural :=
+                       Get_User_Option ("user-settings-time", User_Id); -- (int)
 
---                 // No change or both empty.
---                 if ( cookie == settings ) then
---                         return;
---                 end;
+                     Current : constant Natural :=
+                        (if Isset (X_COOKIE, "wp-settings-time-" & User)
+                         then Natural'Value (Preg_Replace ("/[^0-9]/", "",
+                              Get_As_String (X_COOKIE,  "wp-settings-time-" & User)))
+                         else 0);
+                  begin
+                     -- The cookie is newer than the saved value. Update the
+                     -- user_option and leave the cookie as-is.
+                     if Current > Last_Saved then
+                        Update_User_Option (User_Id, "user-settings",
+                                            From_String (Cookie), False);
+                        Update_User_Option (User_Id, "user-settings-time",
+                                            From_Integer (Time - 5), False);
+                        return;
+                     end if;
+                  end;
+               end;
+            end if;
 
---                 last_saved = (int) get_user_option( "user-settings-time", user_id );
---                 current    = isset( _COOKIE[ "wp-settings-time-" . user_id ] ) ? preg_replace( "/[^0-9]/", "", _COOKIE[ "wp-settings-time-" . user_id ] ) : 0;
+            -- The cookie is not set in the current browser or the saved value
+            -- is newer.
+            declare
+               Secure : constant Boolean :=
+                 ("https" = Parse_URL (Admin_URL, PHP_URL_SCHEME));
+            begin
+               Set_Cookie ("wp-settings-" & User, Settings,
+                           Time + YEAR_IN_SECONDS, -SITECOOKIEPATH, "", Secure);
+               Set_Cookie ("wp-settings-time-" & User, Helpers.Image (Time),
+                           Time + YEAR_IN_SECONDS, -SITECOOKIEPATH, "", Secure);
+            end;
+            Set (X_COOKIE, "wp-settings-" & User, From_String (Settings));
+         end;
+      end;
+   end Wp_User_Settings;
 
---                 // The cookie is newer than the saved value. Update the user_option and leave the cookie as-is.
---                 if ( current > last_saved ) then
---                         update_user_option( user_id, "user-settings", cookie, false );
---                         update_user_option( user_id, "user-settings-time", time() - 5, false );
---                         return;
---                 end;
---         end;
+   ----------------------
+   -- Get_User_Setting --
+   ----------------------
 
---         // The cookie is not set in the current browser or the saved value is newer.
---         secure = ( "https" === parse_url( admin_url(), PHP_URL_SCHEME ) );
---         setcookie( "wp-settings-" . user_id, settings, time() + YEAR_IN_SECONDS, SITECOOKIEPATH, "", secure );
---         setcookie( "wp-settings-time-" . user_id, time(), time() + YEAR_IN_SECONDS, SITECOOKIEPATH, "", secure );
---         _COOKIE[ "wp-settings-" . user_id ] = settings;
--- end;
-
--- --
--- -- Retrieves user interface setting value based on setting name.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string       name    The name of the setting.
--- -- @param string|false default Optional. Default value to return when name is not set. Default false.
--- -- @return mixed The last saved user setting or the default value/false if it doesn"t exist.
--- --
--- function get_user_setting( name, default = false ) then
---         all_user_settings = get_all_user_settings();
-
---         return isset( all_user_settings[ name ] ) ? all_user_settings[ name ] : default;
--- end;
+   function Get_User_Setting (Name    : String;
+                              Default : String := "")
+                              return Multi_Type
+   is
+      All_User_Settings : constant Array_Type := Get_All_User_Settings;
+   begin
+      return
+        (if Isset (All_User_Settings, Name)
+         then Get (All_User_Settings, Name)
+         else From_String (Default));
+   end Get_User_Setting;
 
 -- --
 -- -- Adds or updates user interface setting.
@@ -1264,46 +1485,63 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Retrieves all user interface settings.
--- --
--- -- @since 2.7.0
--- --
--- -- @global array _updated_user_settings
--- --
--- -- @return array The last saved user settings or empty array.
--- --
--- function get_all_user_settings() then
---         global _updated_user_settings;
+   ---------------------------
+   -- Get_All_User_Settings --
+   ---------------------------
+   Global_X_Updated_User_Settings : Array_Type;
 
---         user_id = get_current_user_id();
---         if ( ! user_id ) then
---                 return array();
---         end;
+   function Get_All_User_Settings
+            return Array_Type
+   is
+      use Php.HTML;
+      use Php.Preg;
+      use Php.Types;
+      use Php.Strings;
+      use Binder;
+      use Inc_Users;
 
---         if ( isset( _updated_user_settings ) && is_array( _updated_user_settings ) ) then
---                 return _updated_user_settings;
---         end;
+      User_Id : constant Natural := Get_Current_User_Id;
+      User    : constant String  := Helpers.Image (User_Id);
+   begin
+      if User_Id = 0 then
+         return Empty_Array;
+      end if;
 
---         user_settings = array();
+      if
+--      Isset (Global_X_Updated_User_Settings) and then
+        Is_Array (Global_X_Updated_User_Settings)
+      then
+         return Global_X_Updated_User_Settings;
+      end if;
 
---         if ( isset( _COOKIE[ "wp-settings-" . user_id ] ) ) then
---                 cookie = preg_replace( "/[^A-Za-z0-9=&_-]/", "", _COOKIE[ "wp-settings-" . user_id ] );
+      declare
+         User_Settings : Array_Type;
+      begin
+         if Isset (X_COOKIE, "wp-settings-" & User) then
+            declare
+               Cookie : constant String :=
+                 Preg_Replace ("/[^A-Za-z0-9=&_-]/", "",
+                               Get_As_String (X_COOKIE, "wp-settings-" & User));
+            begin
+               if Strpos (Cookie, "=") /= 0 then -- "=" cannot be 1st char.
+                  Parse_Str (Cookie, User_Settings);
+               end if;
+            end;
+         else
+            declare
+               Option : constant String :=
+                 Get_User_Option ("user-settings", User_Id);
+            begin
+--             if Option and then Is_String (Option) then
+               Parse_Str (Option, User_Settings);
+--             end if;
+            end;
+         end if;
 
---                 if ( strpos( cookie, "=" ) ) then // "=" cannot be 1st char.
---                         parse_str( cookie, user_settings );
---                 end;
---         end; else then
---                 option = get_user_option( "user-settings", user_id );
-
---                 if ( option && is_string( option ) ) then
---                         parse_str( option, user_settings );
---                 end;
---         end;
-
---         _updated_user_settings = user_settings;
---         return user_settings;
--- end;
+         Global_X_Updated_User_Settings := User_Settings;
+         return User_Settings;
+      end;
+   end Get_All_User_Settings;
 
 -- --
 -- -- Private. Sets all user interface settings.
@@ -1363,48 +1601,39 @@ is
 --         setcookie( "wp-settings-" . user_id, " ", time() - YEAR_IN_SECONDS, SITECOOKIEPATH );
 -- end;
 
--- --
--- -- Retrieve an option value for the current network based on name of option.
--- --
--- -- @since 2.8.0
--- -- @since 4.4.0 The `use_cache` parameter was deprecated.
--- -- @since 4.4.0 Modified into wrapper for get_network_option()
--- --
--- -- @see get_network_option()
--- --
--- -- @param string option     Name of the option to retrieve. Expected to not be SQL-escaped.
--- -- @param mixed  default    Optional. Value to return if the option doesn"t exist. Default false.
--- -- @param bool   deprecated Whether to use cache. Multisite only. Always set to true.
--- -- @return mixed Value set for the option.
--- --
--- function get_site_option( option, default = false, deprecated = true ) then
+   ---------------------
+   -- Get_Site_Option --
+   ---------------------
+
    function Get_Site_Option (Option     : String;
-                             Default    : Boolean := False;
+                             Default    : Multi_Type := From_Boolean (False);
                              Deprecated : Boolean := True)
-                             return String
+                             return Multi_Type
    is
    begin
       return Get_Network_Option (0, -- null,
                                  Option, Default);
    end Get_Site_Option;
 
--- --
--- -- Adds a new option for the current network.
--- --
--- -- Existing options will not be updated. Note that prior to 3.3 this wasn"t the case.
--- --
--- -- @since 2.8.0
--- -- @since 4.4.0 Modified into wrapper for add_network_option()
--- --
--- -- @see add_network_option()
--- --
--- -- @param string option Name of the option to add. Expected to not be SQL-escaped.
--- -- @param mixed  value  Option value, can be anything. Expected to not be SQL-escaped.
--- -- @return bool True if the option was added, false otherwise.
--- --
--- function add_site_option( option, value ) then
---         return add_network_option( null, option, value );
--- end;
+   ---------------------
+   -- Add_Site_Option --
+   ---------------------
+
+   function Add_Site_Option (Option : String;
+                             Value  : Multi_Type)
+                             return Boolean
+   is
+   begin
+      return Add_Network_Option (0, Option, Value); -- null
+   end Add_Site_Option;
+
+   procedure Add_Site_Option (Option : String;
+                              Value  : Multi_Type)
+   is
+      Unused : constant Boolean := Add_Site_Option (Option, Value);
+   begin
+      null;
+   end Add_Site_Option;
 
    ------------------------
    -- Delete_Site_Option --
@@ -1424,505 +1653,628 @@ is
       null;
    end Delete_Site_Option;
 
--- --
--- -- Updates the value of an option that was already added for the current network.
--- --
--- -- @since 2.8.0
--- -- @since 4.4.0 Modified into wrapper for update_network_option()
--- --
--- -- @see update_network_option()
--- --
--- -- @param string option Name of the option. Expected to not be SQL-escaped.
--- -- @param mixed  value  Option value. Expected to not be SQL-escaped.
--- -- @return bool True if the value was updated, false otherwise.
--- --
--- function update_site_option( option, value ) then
---         return update_network_option( null, option, value );
--- end;
-
--- --
--- -- Retrieves a network"s option value based on the option name.
--- --
--- -- @since 4.4.0
--- --
--- -- @see get_option()
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param int    network_id ID of the network. Can be null to default to the current network ID.
--- -- @param string option     Name of the option to retrieve. Expected to not be SQL-escaped.
--- -- @param mixed  default    Optional. Value to return if the option doesn"t exist. Default false.
--- -- @return mixed Value set for the option.
--- --
--- function get_network_option( network_id, option, default = false ) then
---         global wpdb;
-
---         if ( network_id && ! is_numeric( network_id ) ) then
---                 return false;
---         end;
-
---         network_id = (int) network_id;
-
---         // Fallback to the current network if a network ID is not specified.
---         if ( ! network_id ) then
---                 network_id = get_current_network_id();
---         end;
-
---         --
---         -- Filters the value of an existing network option before it is retrieved.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- Returning a value other than false from the filter will short-circuit retrieval
---         -- and return that value instead.
---         --
---         -- @since 2.9.0 As "pre_site_option_" . key
---         -- @since 3.0.0
---         -- @since 4.4.0 The `option` parameter was added.
---         -- @since 4.7.0 The `network_id` parameter was added.
---         -- @since 4.9.0 The `default` parameter was added.
---         --
---         -- @param mixed  pre_option The value to return instead of the option value. This differs
---         --                           from `default`, which is used as the fallback value in the event
---         --                           the option doesn"t exist elsewhere in get_network_option().
---         --                           Default false (to skip past the short-circuit).
---         -- @param string option     Option name.
---         -- @param int    network_id ID of the network.
---         -- @param mixed  default    The fallback value to return if the option does not exist.
---         --                           Default false.
---         --
---         pre = apply_filters( "pre_site_option_thenoptionend;", false, option, network_id, default );
-
---         if ( false !== pre ) then
---                 return pre;
---         end;
-
---         // Prevent non-existent options from triggering multiple queries.
---         notoptions_key = "network_id:notoptions";
---         notoptions     = wp_cache_get( notoptions_key, "site-options" );
-
---         if ( is_array( notoptions ) && isset( notoptions[ option ] ) ) then
-
---                 --
---                 -- Filters the value of a specific default network option.
---                 --
---                 -- The dynamic portion of the hook name, `option`, refers to the option name.
---                 --
---                 -- @since 3.4.0
---                 -- @since 4.4.0 The `option` parameter was added.
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param mixed  default    The value to return if the site option does not exist
---                 --                           in the database.
---                 -- @param string option     Option name.
---                 -- @param int    network_id ID of the network.
---                 --
---                 return apply_filters( "default_site_option_thenoptionend;", default, option, network_id );
---         end;
-
---         if ( ! is_multisite() ) then
---                 -- This filter is documented in wp-includes/option.php--
---                 default = apply_filters( "default_site_option_" . option, default, option, network_id );
---                 value   = get_option( option, default );
---         end; else then
---                 cache_key = "network_id:option";
---                 value     = wp_cache_get( cache_key, "site-options" );
-
---                 if ( ! isset( value ) || false === value ) then
---                         row = wpdb->get_row( wpdb->prepare( "SELECT meta_value FROM wpdb->sitemeta WHERE meta_key = %s AND site_id = %d", option, network_id ) );
-
---                         // Has to be get_row() instead of get_var() because of funkiness with 0, false, null values.
---                         if ( is_object( row ) ) then
---                                 value = row->meta_value;
---                                 value = maybe_unserialize( value );
---                                 wp_cache_set( cache_key, value, "site-options" );
---                         end; else then
---                                 if ( ! is_array( notoptions ) ) then
---                                         notoptions = array();
---                                 end;
-
---                                 notoptions[ option ] = true;
---                                 wp_cache_set( notoptions_key, notoptions, "site-options" );
-
---                                 -- This filter is documented in wp-includes/option.php--
---                                 value = apply_filters( "default_site_option_" . option, default, option, network_id );
---                         end;
---                 end;
---         end;
-
---         if ( ! is_array( notoptions ) ) then
---                 notoptions = array();
---                 wp_cache_set( notoptions_key, notoptions, "site-options" );
---         end;
-
---         --
---         -- Filters the value of an existing network option.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 2.9.0 As "site_option_" . key
---         -- @since 3.0.0
---         -- @since 4.4.0 The `option` parameter was added.
---         -- @since 4.7.0 The `network_id` parameter was added.
---         --
---         -- @param mixed  value      Value of network option.
---         -- @param string option     Option name.
---         -- @param int    network_id ID of the network.
---         --
---         return apply_filters( "site_option_thenoptionend;", value, option, network_id );
--- end;
-
--- --
--- -- Adds a new network option.
--- --
--- -- Existing options will not be updated.
--- --
--- -- @since 4.4.0
--- --
--- -- @see add_option()
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param int    network_id ID of the network. Can be null to default to the current network ID.
--- -- @param string option     Name of the option to add. Expected to not be SQL-escaped.
--- -- @param mixed  value      Option value, can be anything. Expected to not be SQL-escaped.
--- -- @return bool True if the option was added, false otherwise.
--- --
--- function add_network_option( network_id, option, value ) then
---         global wpdb;
-
---         if ( network_id && ! is_numeric( network_id ) ) then
---                 return false;
---         end;
-
---         network_id = (int) network_id;
-
---         // Fallback to the current network if a network ID is not specified.
---         if ( ! network_id ) then
---                 network_id = get_current_network_id();
---         end;
-
---         wp_protect_special_option( option );
-
---         --
---         -- Filters the value of a specific network option before it is added.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 2.9.0 As "pre_add_site_option_" . key
---         -- @since 3.0.0
---         -- @since 4.4.0 The `option` parameter was added.
---         -- @since 4.7.0 The `network_id` parameter was added.
---         --
---         -- @param mixed  value      Value of network option.
---         -- @param string option     Option name.
---         -- @param int    network_id ID of the network.
---         --
---         value = apply_filters( "pre_add_site_option_thenoptionend;", value, option, network_id );
-
---         notoptions_key = "network_id:notoptions";
-
---         if ( ! is_multisite() ) then
---                 result = add_option( option, value, "", "no" );
---         end; else then
---                 cache_key = "network_id:option";
-
---                 // Make sure the option doesn"t already exist.
---                 // We can check the "notoptions" cache before we ask for a DB query.
---                 notoptions = wp_cache_get( notoptions_key, "site-options" );
-
---                 if ( ! is_array( notoptions ) || ! isset( notoptions[ option ] ) ) then
---                         if ( false !== get_network_option( network_id, option, false ) ) then
---                                 return false;
---                         end;
---                 end;
-
---                 value = sanitize_option( option, value );
-
---                 serialized_value = maybe_serialize( value );
---                 result           = wpdb->insert(
---                         wpdb->sitemeta,
---                         array(
---                                 "site_id"    => network_id,
---                                 "meta_key"   => option,
---                                 "meta_value" => serialized_value,
---                         )
---                 );
-
---                 if ( ! result ) then
---                         return false;
---                 end;
-
---                 wp_cache_set( cache_key, value, "site-options" );
-
---                 // This option exists now.
---                 notoptions = wp_cache_get( notoptions_key, "site-options" ); // Yes, again... we need it to be fresh.
-
---                 if ( is_array( notoptions ) && isset( notoptions[ option ] ) ) then
---                         unset( notoptions[ option ] );
---                         wp_cache_set( notoptions_key, notoptions, "site-options" );
---                 end;
---         end;
-
---         if ( result ) then
-
---                 --
---                 -- Fires after a specific network option has been successfully added.
---                 --
---                 -- The dynamic portion of the hook name, `option`, refers to the option name.
---                 --
---                 -- @since 2.9.0 As "add_site_option_thenkeyend;"
---                 -- @since 3.0.0
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param string option     Name of the network option.
---                 -- @param mixed  value      Value of the network option.
---                 -- @param int    network_id ID of the network.
---                 --
---                 do_action( "add_site_option_thenoptionend;", option, value, network_id );
-
---                 --
---                 -- Fires after a network option has been successfully added.
---                 --
---                 -- @since 3.0.0
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param string option     Name of the network option.
---                 -- @param mixed  value      Value of the network option.
---                 -- @param int    network_id ID of the network.
---                 --
---                 do_action( "add_site_option", option, value, network_id );
-
---                 return true;
---         end;
-
---         return false;
--- end;
-
--- --
--- -- Removes a network option by name.
--- --
--- -- @since 4.4.0
--- --
--- -- @see delete_option()
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param int    network_id ID of the network. Can be null to default to the current network ID.
--- -- @param string option     Name of the option to delete. Expected to not be SQL-escaped.
--- -- @return bool True if the option was deleted, false otherwise.
--- --
--- function delete_network_option( network_id, option ) then
---         global wpdb;
-
---         if ( network_id && ! is_numeric( network_id ) ) then
---                 return false;
---         end;
-
---         network_id = (int) network_id;
-
---         // Fallback to the current network if a network ID is not specified.
---         if ( ! network_id ) then
---                 network_id = get_current_network_id();
---         end;
-
---         --
---         -- Fires immediately before a specific network option is deleted.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 3.0.0
---         -- @since 4.4.0 The `option` parameter was added.
---         -- @since 4.7.0 The `network_id` parameter was added.
---         --
---         -- @param string option     Option name.
---         -- @param int    network_id ID of the network.
---         --
---         do_action( "pre_delete_site_option_thenoptionend;", option, network_id );
-
---         if ( ! is_multisite() ) then
---                 result = delete_option( option );
---         end; else then
---                 row = wpdb->get_row( wpdb->prepare( "SELECT meta_id FROM thenwpdb->sitemetaend; WHERE meta_key = %s AND site_id = %d", option, network_id ) );
---                 if ( is_null( row ) || ! row->meta_id ) then
---                         return false;
---                 end;
---                 cache_key = "network_id:option";
---                 wp_cache_delete( cache_key, "site-options" );
-
---                 result = wpdb->delete(
---                         wpdb->sitemeta,
---                         array(
---                                 "meta_key" => option,
---                                 "site_id"  => network_id,
---                         )
---                 );
---         end;
-
---         if ( result ) then
-
---                 --
---                 -- Fires after a specific network option has been deleted.
---                 --
---                 -- The dynamic portion of the hook name, `option`, refers to the option name.
---                 --
---                 -- @since 2.9.0 As "delete_site_option_thenkeyend;"
---                 -- @since 3.0.0
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param string option     Name of the network option.
---                 -- @param int    network_id ID of the network.
---                 --
---                 do_action( "delete_site_option_thenoptionend;", option, network_id );
-
---                 --
---                 -- Fires after a network option has been deleted.
---                 --
---                 -- @since 3.0.0
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param string option     Name of the network option.
---                 -- @param int    network_id ID of the network.
---                 --
---                 do_action( "delete_site_option", option, network_id );
-
---                 return true;
---         end;
-
---         return false;
--- end;
-
--- --
--- -- Updates the value of a network option that was already added.
--- --
--- -- @since 4.4.0
--- --
--- -- @see update_option()
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param int    network_id ID of the network. Can be null to default to the current network ID.
--- -- @param string option     Name of the option. Expected to not be SQL-escaped.
--- -- @param mixed  value      Option value. Expected to not be SQL-escaped.
--- -- @return bool True if the value was updated, false otherwise.
--- --
--- function update_network_option( network_id, option, value ) then
---         global wpdb;
-
---         if ( network_id && ! is_numeric( network_id ) ) then
---                 return false;
---         end;
-
---         network_id = (int) network_id;
-
---         // Fallback to the current network if a network ID is not specified.
---         if ( ! network_id ) then
---                 network_id = get_current_network_id();
---         end;
-
---         wp_protect_special_option( option );
-
---         old_value = get_network_option( network_id, option, false );
-
---         --
---         -- Filters a specific network option before its value is updated.
---         --
---         -- The dynamic portion of the hook name, `option`, refers to the option name.
---         --
---         -- @since 2.9.0 As "pre_update_site_option_" . key
---         -- @since 3.0.0
---         -- @since 4.4.0 The `option` parameter was added.
---         -- @since 4.7.0 The `network_id` parameter was added.
---         --
---         -- @param mixed  value      New value of the network option.
---         -- @param mixed  old_value  Old value of the network option.
---         -- @param string option     Option name.
---         -- @param int    network_id ID of the network.
---         --
---         value = apply_filters( "pre_update_site_option_thenoptionend;", value, old_value, option, network_id );
-
---         /*
---         -- If the new and old values are the same, no need to update.
---         --
---         -- Unserialized values will be adequate in most cases. If the unserialized
---         -- data differs, the (maybe) serialized data is checked to avoid
---         -- unnecessary database calls for otherwise identical object instances.
---         --
---         -- See https://core.trac.wordpress.org/ticket/44956
---         --
---         if ( value === old_value || maybe_serialize( value ) === maybe_serialize( old_value ) ) then
---                 return false;
---         end;
-
---         if ( false === old_value ) then
---                 return add_network_option( network_id, option, value );
---         end;
-
---         notoptions_key = "network_id:notoptions";
---         notoptions     = wp_cache_get( notoptions_key, "site-options" );
-
---         if ( is_array( notoptions ) && isset( notoptions[ option ] ) ) then
---                 unset( notoptions[ option ] );
---                 wp_cache_set( notoptions_key, notoptions, "site-options" );
---         end;
-
---         if ( ! is_multisite() ) then
---                 result = update_option( option, value, "no" );
---         end; else then
---                 value = sanitize_option( option, value );
-
---                 serialized_value = maybe_serialize( value );
---                 result           = wpdb->update(
---                         wpdb->sitemeta,
---                         array( "meta_value" => serialized_value ),
---                         array(
---                                 "site_id"  => network_id,
---                                 "meta_key" => option,
---                         )
---                 );
-
---                 if ( result ) then
---                         cache_key = "network_id:option";
---                         wp_cache_set( cache_key, value, "site-options" );
---                 end;
---         end;
-
---         if ( result ) then
-
---                 --
---                 -- Fires after the value of a specific network option has been successfully updated.
---                 --
---                 -- The dynamic portion of the hook name, `option`, refers to the option name.
---                 --
---                 -- @since 2.9.0 As "update_site_option_thenkeyend;"
---                 -- @since 3.0.0
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param string option     Name of the network option.
---                 -- @param mixed  value      Current value of the network option.
---                 -- @param mixed  old_value  Old value of the network option.
---                 -- @param int    network_id ID of the network.
---                 --
---                 do_action( "update_site_option_thenoptionend;", option, value, old_value, network_id );
-
---                 --
---                 -- Fires after the value of a network option has been successfully updated.
---                 --
---                 -- @since 3.0.0
---                 -- @since 4.7.0 The `network_id` parameter was added.
---                 --
---                 -- @param string option     Name of the network option.
---                 -- @param mixed  value      Current value of the network option.
---                 -- @param mixed  old_value  Old value of the network option.
---                 -- @param int    network_id ID of the network.
---                 --
---                 do_action( "update_site_option", option, value, old_value, network_id );
-
---                 return true;
---         end;
-
---         return false;
--- end;
+   ------------------------
+   -- Update_Site_Option --
+   ------------------------
+
+   function Update_Site_Option (Option : String;
+                                Value  : Multi_Type)
+                                return Boolean
+   is
+   begin
+      return Update_Network_Option (0, Option, Value); -- null
+   end Update_Site_Option;
+
+   procedure Update_Site_Option (Option : String;
+                                 Value  : Multi_Type)
+   is
+      Unused : constant Boolean := Update_Site_Option (Option, Value);
+   begin
+      null;
+   end Update_Site_Option;
+
+   ------------------------
+   -- Get_Network_Option --
+   ------------------------
+
+   function Get_Network_Option (Network_Id : Integer;
+                                Option     : String;
+                                Default    : Multi_Type := From_Boolean (False))
+                                return Multi_Type
+   is
+      use Php.Types;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Functions;
+      use Inc_Load;
+--    use Inc_Plugins;
+
+      Network_Id_2 : Integer;
+      Pre : Multi_Type;
+   begin
+      if Network_Id /= 0 and then not Is_Number (Network_Id) then
+         return From_Boolean (False);
+      end if;
+
+--    network_id = (int) network_id;
+
+      -- Fallback to the current network if a network ID is not specified.
+      if Network_Id = 0 then
+         Network_Id_2 := Get_Current_Network_Id;
+      end if;
+
+      --
+      -- Filters the value of an existing network option before it is retrieved.
+      --
+      -- The dynamic portion of the hook name, `option`, refers to the option name.
+      --
+      -- Returning a value other than false from the filter will short-circuit
+      -- retrieval and return that value instead.
+      --
+      -- @since 2.9.0 As "pre_site_option_" . key
+      -- @since 3.0.0
+      -- @since 4.4.0 The `option` parameter was added.
+      -- @since 4.7.0 The `network_id` parameter was added.
+      -- @since 4.9.0 The `default` parameter was added.
+      --
+      -- @param mixed  pre_option The value to return instead of the option value.
+      --                           This differs from `default`, which is used as the
+      --                           fallback value in the event the option doesn't
+      --                           exist elsewhere in get_network_option(). Default
+      --                           false (to skip past the short-circuit).
+      -- @param string option     Option name.
+      -- @param int    network_id ID of the network.
+      -- @param mixed  default    The fallback value to return if the option does not
+      --                           exist. Default false.
+      --
+      Pre := Apply_Filters ("pre_site_option_" & Option, From_Boolean (False),
+                            Option, Network_Id_2, Default);
+
+      if From_Boolean (False) /= Pre then
+         return Pre;
+      end if;
+
+      declare
+         Found : Boolean;
+         -- Prevent non-existent options from triggering multiple queries.
+         Notoptions_Key : constant String := "network_id:notoptions";
+         Notoptions     : Array_Type :=
+           Wp_Cache_Get (Notoptions_Key, "site-options", Found => Found);
+         Value : Multi_Type;
+      begin
+         if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
+            --
+            -- Filters the value of a specific default network option.
+            --
+            -- The dynamic portion of the hook name, `option`, refers to the option
+            -- name.
+            --
+            -- @since 3.4.0
+            -- @since 4.4.0 The `option` parameter was added.
+            -- @since 4.7.0 The `network_id` parameter was added.
+            --
+            -- @param mixed  default    The value to return if the site option does
+            --                           not exist in the database.
+            -- @param string option     Option name.
+            -- @param int    network_id ID of the network.
+            --
+            return Apply_Filters ("default_site_option_" & Option, Default,
+                                  Option, Network_Id_2);
+         end if;
+
+         if not Is_Multisite then
+            -- This filter is documented in wp-includes/option.php
+            declare
+               Default_2 : constant Multi_Type :=
+                 Apply_Filters ("default_site_option_" & Option,
+                                Default, Option, Network_Id);
+            begin
+               Value := Get_Option (Option, As_String (Default_2));
+            end;
+         else
+            declare
+               Cache_Key : constant String := "network_id:option";
+               Found : Boolean;
+            begin
+               Value := Wp_Cache_Get (Cache_Key, "site-options", Found => Found);
+
+               if
+                 Kind_Of (Value) in Kind_Null or else -- not Isset (Value) or else
+                 From_Boolean (False) = Value
+               then
+                  declare
+                     Success : Boolean;
+
+                     Statement : constant String :=
+                       Globals.WpDB.Prepare (
+                         "SELECT meta_value FROM wpdb->sitemeta " &
+                         "WHERE meta_key = %s AND site_id = %d",
+                         To_List (List => (
+                           1 => +Option,
+                           2 => +Helpers.Image (Network_Id_2)
+                         ))
+                       );
+
+                     Row : constant Array_Type :=
+                       Globals.WpDB.Get_Row (Statement, Success => Success);
+                  begin
+                     -- Has to be get_row() instead of get_var() because of
+                     -- funkiness with 0, false, null values.
+                     if Is_Object (Row) then
+--                      Value := Row.Meta_Value;
+                        Value := Maybe_Unserialize (As_String (Value));
+                        Wp_Cache_Set (Cache_Key, As_Array (Value), "site-options");
+                     else
+                        if not Is_Array (Notoptions) then
+                           Notoptions := Empty_Array;
+                        end if;
+
+                        Set (Notoptions, Option, From_Boolean (True));
+                        Wp_Cache_Set (Notoptions_Key, Notoptions, "site-options");
+
+                        -- This filter is documented in wp-includes/option.php
+                        Value := Apply_Filters ("default_site_option_" & Option,
+                                                Default, Option, Network_Id_2);
+                     end if;
+                  end;
+               end if;
+            end;
+         end if;
+
+         if not Is_Array (Notoptions) then
+            Notoptions := Empty_Array;
+            Wp_Cache_Set (Notoptions_Key, Notoptions, "site-options");
+         end if;
+
+         --
+         -- Filters the value of an existing network option.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the option name.
+         --
+         -- @since 2.9.0 As "site_option_" . key
+         -- @since 3.0.0
+         -- @since 4.4.0 The `option` parameter was added.
+         -- @since 4.7.0 The `network_id` parameter was added.
+         --
+         -- @param mixed  value      Value of network option.
+         -- @param string option     Option name.
+         -- @param int    network_id ID of the network.
+         --
+         return Apply_Filters ("site_option_" & Option, Value, Option, Network_Id_2);
+      end;
+   end Get_Network_Option;
+
+   ------------------------
+   -- Add_Network_Option --
+   ------------------------
+
+   function Add_Network_Option (Network_Id : Integer;
+                                Option     : String;
+                                Value      : Multi_Type)
+                                return Boolean
+   is
+      use Php.Types;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Plugins;
+
+      Network_Id_2 : Natural    := Network_Id;
+      Value_2      : Multi_Type := Value;
+   begin
+      if Network_Id_2 = 0 and then not Is_Number (Network_Id_2) then
+         return False;
+      end if;
+
+--    network_id = (int) network_id;
+
+      -- Fallback to the current network if a network ID is not specified.
+      if Network_Id_2 = 0 then
+         Network_Id_2 := Get_Current_Network_Id;
+      end if;
+
+      Wp_Protect_Special_Option (Option);
+
+      --
+      -- Filters the value of a specific network option before it is added.
+      --
+      -- The dynamic portion of the hook name, `option`, refers to the option name.
+      --
+      -- @since 2.9.0 As "pre_add_site_option_" . key
+      -- @since 3.0.0
+      -- @since 4.4.0 The `option` parameter was added.
+      -- @since 4.7.0 The `network_id` parameter was added.
+      --
+      -- @param mixed  value      Value of network option.
+      -- @param string option     Option name.
+      -- @param int    network_id ID of the network.
+      --
+      Value_2 := Apply_Filters ("pre_add_site_option_" & Option, Value_2,
+                                Option, Network_Id_2);
+      declare
+         Notoptions_Key : constant String := "network_id:notoptions";
+         Cache_Key      : constant String := "network_id:option";
+
+         Result : Boolean;
+      begin
+         if not Is_Multisite then
+            Result := Add_Option (Option, Value_2, "", Autoload => False); -- "no"
+         else
+            declare
+               Found : Boolean;
+
+               -- Make sure the option doesn't already exist.
+               -- We can check the "notoptions" cache before we ask for a DB query.
+               Notoptions : constant Array_Type :=
+                 Wp_Cache_Get (Notoptions_Key, "site-options", Found => Found);
+            begin
+               if
+                 not Is_Array (Notoptions) or else
+                 not Isset (Notoptions, Option)
+               then
+                  if
+                    From_Boolean (False) /=
+                    Get_Network_Option (Network_Id_2, Option, From_Boolean (False))
+                  then
+                     return False;
+                  end if;
+               end if;
+            end;
+
+            Value_2 := From_String (Sanitize_Option (Option, As_String (Value_2)));
+
+            declare
+               Serialized_Value : constant Multi_Type :=
+                 Maybe_Serialize (As_String (Value_2));
+            begin
+               Result :=
+                 Globals.WpDB.Insert (
+                   -Globals.WpDB.Sitemeta,
+                   To_Array (List => (
+                     Build ("site_id",    Network_Id_2),
+                     Build ("meta_key",   Option),
+                     Build ("meta_value", As_String (Serialized_Value))
+                   ))
+                 ) /= 0;
+            end;
+
+            if not Result then
+               return False;
+            end if;
+
+            Wp_Cache_Set (Cache_Key, As_Array (Value_2), "site-options");
+
+            declare
+               Found : Boolean;
+
+               -- This option exists now.
+               Notoptions : constant Array_Type :=
+                 Wp_Cache_Get (Notoptions_Key, "site-options", Found => Found);
+               -- Yes, again... we need it to be fresh.
+            begin
+               if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
+                  Delete (Ref (Notoptions, Option));
+                  Wp_Cache_Set (Notoptions_Key, Notoptions, "site-options");
+               end if;
+            end;
+         end if;
+
+         if Result then
+            --
+            -- Fires after a specific network option has been successfully added.
+            --
+            -- The dynamic portion of the hook name, `option`, refers to the option name.
+            --
+            -- @since 2.9.0 As "add_site_option_thenkeyend;"
+            -- @since 3.0.0
+            -- @since 4.7.0 The `network_id` parameter was added.
+            --
+            -- @param string option     Name of the network option.
+            -- @param mixed  value      Value of the network option.
+            -- @param int    network_id ID of the network.
+            --
+            Do_Action ("add_site_option_" & Option, Option, Value_2, Network_Id_2);
+
+            --
+            -- Fires after a network option has been successfully added.
+            --
+            -- @since 3.0.0
+            -- @since 4.7.0 The `network_id` parameter was added.
+            --
+            -- @param string option     Name of the network option.
+            -- @param mixed  value      Value of the network option.
+            -- @param int    network_id ID of the network.
+            --
+            Do_Action ("add_site_option", Option, Value_2, Network_Id_2);
+
+            return True;
+         end if;
+      end;
+      return False;
+   end Add_Network_Option;
+
+   ---------------------------
+   -- Delete_Network_Option --
+   ---------------------------
+
+   function Delete_Network_Option (Network_Id : Integer;
+                                   Option     : String)
+                                   return Boolean
+   is
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Load;
+      use Inc_Plugins;
+
+      Network_Id_2 : Integer := Network_Id;
+      Result : Boolean;
+   begin
+      if Network_Id /= 0 and then not Is_Number (Network_Id) then
+         return False;
+      end if;
+
+--    network_id = (int) network_id;
+
+      -- Fallback to the current network if a network ID is not specified.
+      if Network_Id = 0 then
+         Network_Id_2 := Get_Current_Network_Id;
+      end if;
+
+      --
+      -- Fires immediately before a specific network option is deleted.
+      --
+      -- The dynamic portion of the hook name, `option`, refers to the option name.
+      --
+      -- @since 3.0.0
+      -- @since 4.4.0 The `option` parameter was added.
+      -- @since 4.7.0 The `network_id` parameter was added.
+      --
+      -- @param string option     Option name.
+      -- @param int    network_id ID of the network.
+      --
+      Do_Action ("pre_delete_site_option_" & Option, Option, Network_Id_2);
+
+      if not Is_Multisite then
+         Result := Delete_Option (Option);
+      else
+         declare
+            Success : Boolean;
+
+            Statement : constant String :=
+              Globals.WpDB.Prepare (
+                "SELECT meta_id FROM {wpdb->sitemeta} " &
+                "WHERE meta_key = %s AND site_id = %d",
+                To_List (List => (
+                  1 => +Option,
+                  2 => +Helpers.Image (Network_Id_2)
+                ))
+              );
+
+            Row : constant Array_Type :=
+              Globals.WpDB.Get_Row (Statement, Success => Success);
+
+            Cache_Key : constant String := "network_id:option";
+         begin
+            if
+              Row = Empty_Array -- or else -- Is_Null (Row) or else
+--            not Row.Meta_Id
+            then
+               return False;
+            end if;
+            Wp_Cache_Delete (Cache_Key, "site-options");
+
+            Result :=
+              Globals.WpDB.Delete (
+                -Globals.WpDB.Sitemeta,
+                To_Array (List => (
+                  Build ("meta_key", Option),
+                  Build ("site_id",  Network_Id_2)
+                ))
+              ) /= 0;
+         end;
+      end if;
+
+      if Result then
+         --
+         -- Fires after a specific network option has been deleted.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the option name.
+         --
+         -- @since 2.9.0 As "delete_site_option_thenkeyend;"
+         -- @since 3.0.0
+         -- @since 4.7.0 The `network_id` parameter was added.
+         --
+         -- @param string option     Name of the network option.
+         -- @param int    network_id ID of the network.
+         --
+         Do_Action ("delete_site_option_" & Option, Option, Network_Id_2);
+
+         --
+         -- Fires after a network option has been deleted.
+         --
+         -- @since 3.0.0
+         -- @since 4.7.0 The `network_id` parameter was added.
+         --
+         -- @param string option     Name of the network option.
+         -- @param int    network_id ID of the network.
+         --
+         Do_Action ("delete_site_option", Option, Network_Id_2);
+
+         return True;
+      end if;
+
+      return False;
+   end Delete_Network_Option;
+
+   ---------------------------
+   -- Update_Network_Option --
+   ---------------------------
+
+   function Update_Network_Option (Network_Id : Integer;
+                                   Option     : String;
+                                   Value      : Multi_Type)
+                                   return Boolean
+   is
+      use Php.Types;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Plugins;
+
+      Network_Id_2 : Natural := Network_Id;
+   begin
+      if Network_Id /= 0 and then not Is_Number (Network_Id) then
+         return False;
+      end if;
+
+--    network_id = (int) network_id;
+
+      -- Fallback to the current network if a network ID is not specified.
+      if Network_Id = 0 then
+         Network_Id_2 := Get_Current_Network_Id;
+      end if;
+
+      Wp_Protect_Special_Option (Option);
+
+      declare
+         Old_Value : constant Multi_Type :=
+           Get_Network_Option (Network_Id_2, Option, From_Boolean (False));
+
+         Value_2 : Multi_Type;
+      begin
+         --
+         -- Filters a specific network option before its value is updated.
+         --
+         -- The dynamic portion of the hook name, `option`, refers to the option name.
+         --
+         -- @since 2.9.0 As "pre_update_site_option_" . key
+         -- @since 3.0.0
+         -- @since 4.4.0 The `option` parameter was added.
+         -- @since 4.7.0 The `network_id` parameter was added.
+         --
+         -- @param mixed  value      New value of the network option.
+         -- @param mixed  old_value  Old value of the network option.
+         -- @param string option     Option name.
+         -- @param int    network_id ID of the network.
+         --
+         Value_2 := Apply_Filters ("pre_update_site_option_" & Option,
+                                   Value_2, Old_Value, Option, Network_Id_2);
+
+         --
+         -- If the new and old values are the same, no need to update.
+         --
+         -- Unserialized values will be adequate in most cases. If the unserialized
+         -- data differs, the (maybe) serialized data is checked to avoid
+         -- unnecessary database calls for otherwise identical object instances.
+         --
+         -- See https://core.trac.wordpress.org/ticket/44956
+         --
+         if
+           Value_2 = Old_Value or else
+           Maybe_Serialize (As_String (Value_2)) =
+           Maybe_Serialize (As_String (Old_Value))
+         then
+            return False;
+         end if;
+
+         if From_Boolean (False) = Old_Value then
+            return Add_Network_Option (Network_Id_2, Option, Value_2);
+         end if;
+
+         declare
+            Found : Boolean;
+
+            Notoptions_Key : constant String := "network_id:notoptions";
+
+            Notoptions     : constant Array_Type :=
+              Wp_Cache_Get (Notoptions_Key, "site-options", Found => Found);
+
+            Result : Boolean;
+         begin
+            if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
+               Delete (Ref (Notoptions, Option));
+               Wp_Cache_Set (Notoptions_Key, Notoptions, "site-options");
+            end if;
+
+            if not Is_Multisite then
+               Result := Update_Option (Option, Value_2, Autoload => False); -- "no"
+            else
+               Value_2 := From_String (Sanitize_Option (Option, As_String (Value_2)));
+
+               declare
+                  Serialized_Value : constant Multi_Type :=
+                    Maybe_Serialize (As_String (Value_2));
+               begin
+                  Result :=
+                    Globals.WpDB.Update (
+                      -Globals.WpDB.Sitemeta,
+                      To_Array (List => (1 => Build ("meta_value",
+                                                     As_String (Serialized_Value)))),
+                      To_Array (List => (
+                        Build ("site_id",  Network_Id_2),
+                        Build ("meta_key", Option)
+                      ))
+                    ) /= 0;
+               end;
+
+               if Result then
+                  declare
+                     Cache_Key : constant String := "network_id:option";
+                  begin
+                     Wp_Cache_Set (Cache_Key, As_Array (Value_2), "site-options");
+                  end;
+               end if;
+            end if;
+
+            if Result then
+               --
+               -- Fires after the value of a specific network option has been
+               -- successfully updated.
+               --
+               -- The dynamic portion of the hook name, `option`, refers to the
+               -- option name.
+               --
+               -- @since 2.9.0 As "update_site_option_thenkeyend;"
+               -- @since 3.0.0
+               -- @since 4.7.0 The `network_id` parameter was added.
+               --
+               -- @param string option     Name of the network option.
+               -- @param mixed  value      Current value of the network option.
+               -- @param mixed  old_value  Old value of the network option.
+               -- @param int    network_id ID of the network.
+               --
+               Do_Action ("update_site_option_" & Option, Option,
+                          Value_2, Old_Value, Network_Id_2);
+
+               --
+               -- Fires after the value of a network option has been successfully
+               -- updated.
+               --
+               -- @since 3.0.0
+               -- @since 4.7.0 The `network_id` parameter was added.
+               --
+               -- @param string option     Name of the network option.
+               -- @param mixed  value      Current value of the network option.
+               -- @param mixed  old_value  Old value of the network option.
+               -- @param int    network_id ID of the network.
+               --
+               Do_Action ("update_site_option", Option,
+                          Value_2, Old_Value, Network_Id_2);
+
+               return True;
+            end if;
+         end;
+      end;
+      return False;
+   end Update_Network_Option;
 
 -- --
 -- -- Deletes a site transient.
@@ -2044,7 +2396,8 @@ is
                   Transient_Timeout : constant String :=
                     "_site_transient_timeout_" & Transient;
 
-                  Timeout : constant Natural := Get_Site_Option (Transient_Timeout);
+                  Timeout : constant Natural :=
+                    As_Integer (Get_Site_Option (Transient_Timeout));
                begin
                   if 0 /= Timeout and then Timeout < Time then -- false =
                      Delete_Site_Option (Transient_Option);
@@ -2055,7 +2408,7 @@ is
             end if;
 
             if not Isset (-Value) then
-               Value := +Get_Site_Option (Transient_Option);
+               Value := +As_String (Get_Site_Option (Transient_Option));
             end if;
          end;
       end if;
@@ -2084,101 +2437,124 @@ is
       end;
    end Get_Site_Transient;
 
--- --
--- -- Sets/updates the value of a site transient.
--- --
--- -- You do not need to serialize values. If the value needs to be serialized,
--- -- then it will be serialized before it is set.
--- --
--- -- @since 2.9.0
--- --
--- -- @see set_transient()
--- --
--- -- @param string transient  Transient name. Expected to not be SQL-escaped. Must be
--- --                           167 characters or fewer in length.
--- -- @param mixed  value      Transient value. Expected to not be SQL-escaped.
--- -- @param int    expiration Optional. Time until expiration in seconds. Default 0 (no expiration).
--- -- @return bool True if the value was set, false otherwise.
--- --
--- function set_site_transient( transient, value, expiration = 0 ) then
+   ------------------------
+   -- Set_Site_Transient --
+   ------------------------
 
---         --
---         -- Filters the value of a specific site transient before it is set.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 3.0.0
---         -- @since 4.4.0 The `transient` parameter was added.
---         --
---         -- @param mixed  value     New value of site transient.
---         -- @param string transient Transient name.
---         --
---         value = apply_filters( "pre_set_site_transient_thentransientend;", value, transient );
+   function Set_Site_Transient (Transient  : String;
+                                Value      : Array_Type;
+                                Expiration : Integer := 0)
+                                return Boolean
+   is
+      use Php.Misc;
+      use Inc_Caches;
+      use Inc_Load;
+      use Inc_Plugins;
 
---         expiration = (int) expiration;
+      --
+      -- Filters the value of a specific site transient before it is set.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the
+      -- transient name.
+      --
+      -- @since 3.0.0
+      -- @since 4.4.0 The `transient` parameter was added.
+      --
+      -- @param mixed  value     New value of site transient.
+      -- @param string transient Transient name.
+      --
+      Value_2 : constant Array_Type :=
+        Apply_Filters ("pre_set_site_transient_" & Transient, Value, Transient);
 
---         --
---         -- Filters the expiration for a site transient before its value is set.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 4.4.0
---         --
---         -- @param int    expiration Time until expiration in seconds. Use 0 for no expiration.
---         -- @param mixed  value      New value of site transient.
---         -- @param string transient  Transient name.
---         --
---         expiration = apply_filters( "expiration_of_site_transient_thentransientend;", expiration, value, transient );
+--    expiration = (int) expiration;
 
---         if ( wp_using_ext_object_cache() || wp_installing() ) then
---                 result = wp_cache_set( transient, value, "site-transient", expiration );
---         end; else then
---                 transient_timeout = "_site_transient_timeout_" . transient;
---                 option            = "_site_transient_" . transient;
+      --
+      -- Filters the expiration for a site transient before its value is set.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      -- name.
+      --
+      -- @since 4.4.0
+      --
+      -- @param int    expiration Time until expiration in seconds. Use 0 for no
+      --                           expiration.
+      -- @param mixed  value      New value of site transient.
+      -- @param string transient  Transient name.
+      --
+      Expiration_2 : constant Integer :=
+        Apply_Filters ("expiration_of_site_transient_" & Transient,
+                       Expiration, Value_2, Transient);
 
---                 if ( false === get_site_option( option ) ) then
---                         if ( expiration ) then
---                                 add_site_option( transient_timeout, time() + expiration );
---                         end;
---                         result = add_site_option( option, value );
---                 end; else then
---                         if ( expiration ) then
---                                 update_site_option( transient_timeout, time() + expiration );
---                         end;
---                         result = update_site_option( option, value );
---                 end;
---         end;
+      Result : Boolean;
+   begin
+      if Wp_Using_Ext_Object_Cache or else Wp_Installing then
+         Result := Wp_Cache_Set (Transient, From_Array (Value_2),
+                                 "site-transient", Expiration_2);
+      else
+         declare
+            Transient_Timeout : constant String :=
+              "_site_transient_timeout_" & Transient;
 
---         if ( result ) then
+            Option : constant String := "_site_transient_" & Transient;
+         begin
+            if From_Boolean (False) = Get_Site_Option (Option) then
+               if Expiration_2 /= 0 then
+                  Add_Site_Option (Transient_Timeout,
+                                   From_Integer (Time + Expiration_2));
+               end if;
+               Result := Add_Site_Option (Option, From_Array (Value_2));
+            else
+               if Expiration_2 /= 0 then
+                  Update_Site_Option (Transient_Timeout,
+                                      From_Integer (Time + Expiration_2));
+               end if;
+               Result := Update_Site_Option (Option, From_Array (Value_2));
+            end if;
+         end;
+      end if;
 
---                 --
---                 -- Fires after the value for a specific site transient has been set.
---                 --
---                 -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---                 --
---                 -- @since 3.0.0
---                 -- @since 4.4.0 The `transient` parameter was added
---                 --
---                 -- @param mixed  value      Site transient value.
---                 -- @param int    expiration Time until expiration in seconds.
---                 -- @param string transient  Transient name.
---                 --
---                 do_action( "set_site_transient_thentransientend;", value, expiration, transient );
+      if Result then
+         --
+         -- Fires after the value for a specific site transient has been set.
+         --
+         -- The dynamic portion of the hook name, `transient`, refers to the
+         -- transient name.
+         --
+         -- @since 3.0.0
+         -- @since 4.4.0 The `transient` parameter was added
+         --
+         -- @param mixed  value      Site transient value.
+         -- @param int    expiration Time until expiration in seconds.
+         -- @param string transient  Transient name.
+         --
+         Do_Action ("set_site_transient_" & Transient,
+                    Value_2, Expiration_2, Transient);
 
---                 --
---                 -- Fires after the value for a site transient has been set.
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string transient  The name of the site transient.
---                 -- @param mixed  value      Site transient value.
---                 -- @param int    expiration Time until expiration in seconds.
---                 --
---                 do_action( "setted_site_transient", transient, value, expiration );
---         end;
+         --
+         -- Fires after the value for a site transient has been set.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string transient  The name of the site transient.
+         -- @param mixed  value      Site transient value.
+         -- @param int    expiration Time until expiration in seconds.
+         --
+         Do_Action ("setted_site_transient", Transient,
+                    Value_2, Expiration_2);
+      end if;
 
---         return result;
--- end;
+      return Result;
+   end Set_Site_Transient;
+
+   procedure Set_Site_Transient (Transient  : String;
+                                 Value      : Array_Type;
+                                 Expiration : Integer := 0)
+   is
+      Unused : constant Boolean :=
+        Set_Site_Transient (Transient, Value, Expiration);
+   begin
+      null;
+   end Set_Site_Transient;
 
 -- --
 -- -- Registers default settings available in WordPress.

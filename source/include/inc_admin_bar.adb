@@ -413,7 +413,7 @@ is
          Node.Parent := +"user-actions";
          Node.Id     := +"logout";
          Node.Title  := +abs "Log Out";
-         Node.Href   := +Wp_Logout_Url;
+         Node.Href   := +Wp_Logout_URL;
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1596,7 +1596,7 @@ is
          return;
       end if;
 
-      URL := +Wp_Login_Url;
+      URL := +Wp_Login_URL;
       URL := +Add_Query_Arg ("action", EXIT_ACTION, -URL); -- ::
       URL := +Wp_Nonce_Url (-URL, EXIT_ACTION); -- ::
 

@@ -42,7 +42,7 @@ is
          --
          -- @var bool
          --
---        public $show_errors = false;
+         M_Show_Errors : Boolean := False;
 
          --
          -- Whether to suppress errors during the DB bootstrapping. Default false.
@@ -61,7 +61,7 @@ is
          --
          -- @var string
          --
---        public $last_error = '';
+         Last_Error : Unbounded_String;
 
          --
          -- The number of queries made.
@@ -98,7 +98,7 @@ is
          --
          -- @var int
          --
---        public $insert_id = 0;
+         Insert_Id : Integer := 0;
 
          --
          -- The last query made.
@@ -154,7 +154,8 @@ is
          --
          -- @var string[]
          --
---        protected $table_charset = array();
+         -- protected
+         Table_Charset : Array_Type;
 
          --
          -- Whether text fields in the current query need to be sanity checked.
@@ -376,7 +377,7 @@ is
          --
          -- @var string
          --
---        public $options;
+         Options : Unbounded_String;
 
          --
          -- WordPress Post Metadata table.
@@ -452,7 +453,7 @@ is
          --
          -- @var string
          --
---        public $users;
+         Users : Unbounded_String;
 
          --
          -- Multisite Blogs table.
@@ -515,7 +516,7 @@ is
          --
          -- @var string
          --
---        public $sitemeta;
+         Sitemeta : Unbounded_String;
 
          --
          -- Format specifiers for DB columns.
@@ -541,7 +542,7 @@ is
          --
          -- @var string
          --
---        public $charset;
+         Charset : Unbounded_String;
 
          --
          -- Database table columns collate.
@@ -606,7 +607,7 @@ is
          --
          -- @var mysqli|resource|false|null
          --
---        protected $dbh;
+         -- protected $dbh;
 
          --
          -- A textual description of the last query/get_row/get_var call.
@@ -629,7 +630,7 @@ is
          --
          -- @var bool
          --
---        public $is_mysql = null;
+         Is_MySQL : Boolean := False; --  = null;
 
          --
          -- A list of incompatible SQL modes.
@@ -654,7 +655,8 @@ is
          --
          -- @var bool
          --
---        private $use_mysqli = false;
+         -- private
+         Use_Mysqli : Boolean := False;
 
          --
          -- Whether we've managed to successfully connect at some point.
@@ -683,7 +685,7 @@ is
          --
          -- @var WP_Error|string
          --
---        public $error = null;
+         Error : Unbounded_String; --  = null;
 
       end record;
 
@@ -732,7 +734,7 @@ is
    -- @return bool True if ASCII, false if not.
    --
    -- protected function check_ascii(string) then
-   function Check_Ascii (This : Wpdb_Class;
+   function Check_ASCII (This : Wpdb_Class;
                          Item : String)
                          return Boolean is (False);
 
@@ -748,7 +750,7 @@ is
    -- @param bool allow_bail Optional. Allows the function to bail. Default true.
    -- @return bool True with a successful connection, false on failure.
    --
-   function Db_Connect (This       : in out Wpdb_Class;
+   function DB_Connect (This       : in out Wpdb_Class;
                         Allow_Bail : Boolean := True)
                         return Boolean;
 
@@ -765,6 +767,264 @@ is
    function Check_Safe_Collation (This  : in out Wpdb_Class;
                                   Query : String)
                                   return Boolean;
+
+   --
+   -- Strips any invalid characters based on value/charset pairs.
+   --
+   -- @since 4.2.0
+   --
+   -- @param array data Array of value arrays. Each value array has the keys "value"
+   --                    and "charset". An optional "ascii" key can be set to false
+   --                    to avoid redundant ASCII checks.
+   -- @return array|WP_Error The data parameter, with invalid characters removed from
+   --                        each value. This works as a passthrough: any additional
+   --                        keys such as "field" are retained in each value array. If
+   --                        we cannot remove invalid characters, a WP_Error object is
+   --                        returned.
+   --
+   -- protected
+   function Strip_Invalid_Text (This : in out Wpdb_Class;
+                                Data : Array_Type)
+                                return Array_Type;
+
+   --
+   -- Deletes a row in the table.
+   --
+   -- Examples:
+   --
+   --     wpdb::delete("table", array("ID" => 1))
+   --     wpdb::delete("table", array("ID" => 1), array("%d"))
+   --
+   -- @since 3.4.0
+   --
+   -- @see wpdb::prepare()
+   -- @see wpdb::field_types
+   -- @see wp_set_wpdb_vars()
+   --
+   -- @param string       table        Table name.
+   -- @param array        where        A named array of WHERE clauses
+   --                                   (in column => value pairs).
+   --                                   Multiple clauses will be joined with ANDs.
+   --                                   Both where columns and where values should be
+   --                                   "raw". Sending a null value will create an
+   --                                   IS NULL comparison - the corresponding
+   --                                   format will be ignored in this case.
+   -- @param array|string where_format Optional. An array of formats to be mapped to
+   --                                   each of the values in where. If string, that
+   --                                   format will be used for all of the items in
+   --                                   where. A format is one of "%d", "%f", "%s"
+   --                                   (integer, float, string). If omitted, all
+   --                                   values in data will be treated as strings
+   --                                   unless otherwise specified in
+   --                                   wpdb::field_types.
+   -- @return int|false The number of rows deleted, or false on error.
+   --
+   function Delete (This         : in out Wpdb_Class;
+                    Table        : String;
+                    Where        : Array_Type;
+                    Where_Format : String := "") -- null
+                    return Integer;
+
+   --
+   -- Processes arrays of field/value pairs and field formats.
+   --
+   -- This is a helper method for wpdb"s CRUD methods, which take field/value pairs
+   -- for inserts, updates, and where clauses. This method first pairs each value
+   -- with a format. Then it determines the charset of that field, using that
+   -- to determine if any invalid text would be stripped. If text is stripped,
+   -- then field processing is rejected and the query fails.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string table  Table name.
+   -- @param array  data   Field/value pair.
+   -- @param mixed  format Format for each field.
+   -- @return array|false An array of fields that contain paired value and formats.
+   --                     False for invalid values.
+   --
+   -- protected
+   function Process_Fields (This   : in out Wpdb_Class;
+                            Table  : String;
+                            Data   : Array_Type;
+                            Format : String) -- Multi_Type
+                            return Array_Type;
+
+   --
+   -- Prepares arrays of value/format pairs as passed to wpdb CRUD methods.
+   --
+   -- @since 4.2.0
+   --
+   -- @param array data   Array of fields to values.
+   -- @param mixed format Formats to be mapped to the values in data.
+   -- @return array Array, keyed by field names with values being an array
+   --               of "value" and "format" keys.
+   --
+   -- protected
+   function Process_Field_Formats (This   : Wpdb_Class;
+                                   Data   : Array_Type;
+                                   Format : String)
+                                   return Array_Type;
+
+   --
+   -- Adds field charsets to field/value/format arrays generated by
+   -- wpdb::process_field_formats().
+   --
+   -- @since 4.2.0
+   --
+   -- @param array  data  As it comes from the wpdb::process_field_formats() method.
+   -- @param string table Table name.
+   -- @return array|false The same array as data with additional "charset" keys.
+   --                     False on failure.
+   --
+   -- protected
+   function Process_Field_Charsets (This  : Wpdb_Class;
+                                    Data  : Array_Type;
+                                    Table : String)
+                                    return Array_Type;
+
+   --
+   -- For string fields, records the maximum string length that field can safely save.
+   --
+   -- @since 4.2.1
+   --
+   -- @param array  data  As it comes from the wpdb::process_field_charsets() method.
+   -- @param string table Table name.
+   -- @return array|false The same array as data with additional "length" keys, or
+   --                     false if any of the values were too long for their
+   --                     corresponding field.
+   --
+   -- protected
+   function Process_Field_Lengths (This  : Wpdb_Class;
+                                   Data  : Array_Type;
+                                   Table : String)
+                                   return Array_Type;
+
+   --
+   -- Updates a row in the table.
+   --
+   -- Examples:
+   --
+   --     wpdb::update("table", array("column" => "foo", "field" => "bar"),
+   --                           array("ID" => 1))
+   --     wpdb::update("table", array("column" => "foo", "field" => 1337),
+   --                           array("ID" => 1), array("%s", "%d"), array("%d"))
+   --
+   -- @since 2.5.0
+   --
+   -- @see wpdb::prepare()
+   -- @see wpdb::field_types
+   -- @see wp_set_wpdb_vars()
+   --
+   -- @param string       table        Table name.
+   -- @param array        data         Data to update (in column => value pairs).
+   --                                   Both data columns and data values should be
+   --                                   "raw" (neither should be SQL escaped).
+   --                                   Sending a null value will cause the column to
+   --                                   be set to NULL - the corresponding
+   --                                   format is ignored in this case.
+   -- @param array        where        A named array of WHERE clauses
+   --                                   (in column => value pairs).
+   --                                   Multiple clauses will be joined with ANDs.
+   --                                   Both where columns and where values should be
+   --                                   "raw". Sending a null value will create an
+   --                                   IS NULL comparison - the corresponding
+   --                                   format will be ignored in this case.
+   -- @param array|string format       Optional. An array of formats to be mapped to
+   --                                   each of the values in data. If string, that
+   --                                   format will be used for all of the values in
+   --                                   data. A format is one of "%d", "%f", "%s"
+   --                                   (integer, float, string). If omitted, all
+   --                                   values in data will be treated as strings
+   --                                   unless otherwise specified in
+   --                                   wpdb::field_types.
+   -- @param array|string where_format Optional. An array of formats to be mapped to
+   --                                   each of the values in where. If string, that
+   --                                   format will be used for all of the items in
+   --                                   where. A format is one of "%d", "%f", "%s"
+   --                                   (integer, float, string). If omitted, all
+   --                                   values in where will be treated as strings.
+   --
+   -- @return int|false The number of rows updated, or false on error.
+   --
+   function Update (This         : in out Wpdb_Class;
+                    Table        : String;
+                    Data         : Array_Type;
+                    Where        : Array_Type;
+                    Format       : String := ""; -- null
+                    Where_Format : String := "") -- null
+                    return Natural;
+
+   --
+   -- Inserts a row into the table.
+   --
+   -- Examples:
+   --
+   --     wpdb::insert("table", array("column" => "foo", "field" => "bar"))
+   --     wpdb::insert("table", array("column" => "foo", "field" => 1337),
+   --                           array("%s", "%d"))
+   --
+   -- @since 2.5.0
+   --
+   -- @see wpdb::prepare()
+   -- @see wpdb::field_types
+   -- @see wp_set_wpdb_vars()
+   --
+   -- @param string       table  Table name.
+   -- @param array        data   Data to insert (in column => value pairs).
+   --                             Both data columns and data values should be "raw"
+   --                             (neither should be SQL escaped). Sending a null
+   --                             value will cause the column to be set to NULL - the
+   --                             corresponding format is ignored in this case.
+   -- @param array|string format Optional. An array of formats to be mapped to each of
+   --                             the value in data. If string, that format will be
+   --                             used for all of the values in data. A format is one
+   --                             of "%d", "%f", "%s" (integer, float, string).
+   --                             If omitted, all values in data will be treated as
+   --                             strings unless otherwise specified in
+   --                             wpdb::field_types.
+   -- @return int|false The number of rows inserted, or false on error.
+   --
+   function Insert (This   : in out Wpdb_Class;
+                    Table  : String;
+                    Data   : Array_Type;
+                    Format : String := "") -- null
+                    return Natural;
+
+   --
+   -- Helper function for insert and replace.
+   --
+   -- Runs an insert or replace query based on type argument.
+   --
+   -- @since 3.0.0
+   --
+   -- @see wpdb::prepare()
+   -- @see wpdb::field_types
+   -- @see wp_set_wpdb_vars()
+   --
+   -- @param string       table  Table name.
+   -- @param array        data   Data to insert (in column => value pairs).
+   --                             Both data columns and data values should be "raw"
+   --                             (neither should be SQL escaped). Sending a null
+   --                             value will cause the column to be set to NULL - the
+   --                             corresponding format is ignored in this case.
+   -- @param array|string format Optional. An array of formats to be mapped to each of
+   --                             the value in data. If string, that format will be
+   --                             used for all of the values in data. A format is one
+   --                             of "%d", "%f", "%s" (integer, float, string). If
+   --                             omitted, all values in data will be treated as
+   --                             strings unless otherwise specified in
+   --                             wpdb::field_types.
+   -- @param string       type   Optional. Type of operation. Possible values include
+   --                             "INSERT" or "REPLACE". Default "INSERT".
+   -- @return int|false The number of rows affected, or false on error.
+   --
+   function X_Insert_Replace_Helper (This   : in out Wpdb_Class;
+                                     Table  : String;
+                                     Data   : Array_Type;
+                                     Format : String := ""; -- null
+                                     Typ    : String := "INSERT")
+                                     return Natural;
+
    --
    -- Performs a database query, using current database connection.
    --
@@ -783,6 +1043,10 @@ is
                    Query : String)
                    return Integer
                    is (0);
+
+   procedure Query (Db    : Wpdb_Class;
+                    Query : String)
+                    is null;
 
    --
    -- Adds a placeholder escape string, to escape anything that resembles a printf()
@@ -859,12 +1123,63 @@ is
                      Query : String;
                      Args  : List_Type) --, ...$args )
                      return String;
+
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
                      Arg_1 : String;
                      Arg_2 : String := "") --, ...$args )
                      return String
                      is ("XXX-212");
+
+   --
+   -- Enables showing of database errors.
+   --
+   -- This function should be used only to enable showing of errors.
+   -- wpdb::hide_errors() should be used instead for hiding errors.
+   --
+   -- @since 0.71
+   --
+   -- @see wpdb::hide_errors()
+   --
+   -- @param bool show Optional. Whether to show errors. Default true.
+   -- @return bool Whether showing of errors was previously active.
+   --
+   function Show_Errors (This : in out Wpdb_Class;
+                         Show : Boolean := True)
+                         return Boolean;
+
+   procedure Show_Errors (This : in out Wpdb_Class;
+                          Show : Boolean := True);
+
+   --
+   -- First half of escaping for `LIKE` special characters `%` and `_` before
+   -- preparing for SQL.
+   --
+   -- Use this only before wpdb::prepare() or esc_sql(). Reversing the order is
+   -- very bad for security.
+   --
+   -- Example Prepared Statement:
+   --
+   --     wild = "%";
+   --     find = "only 43% of planets";
+   --     like = wild . wpdb.esc_like(find) . wild;
+   --     sql  = wpdb.prepare("SELECT * FROM wpdb.posts
+   --                          WHERE post_content LIKE %s", like);
+   --
+   -- Example Escape Chain:
+   --
+   --     sql  = esc_sql(wpdb.esc_like(input));
+   --
+   -- @since 4.0.0
+   --
+   -- @param string text The raw text to be escaped. The input typed by the user
+   --                     should have no extra or deleted slashes.
+   -- @return string Text in the form of a LIKE phrase. The output is not SQL safe.
+   --                Call wpdb::prepare() or wpdb::_real_escape() next.
+   --
+   function ESC_Like (This : Wpdb_Class;
+                      Text : String)
+                      return String;
 
    --
    -- Prints SQL/DB error.
@@ -894,6 +1209,9 @@ is
    function Suppress_Errors (This     : in out Wpdb_Class;
                              Suppress : Boolean := True)
                              return Boolean;
+
+   procedure Suppress_Errors (This     : in out Wpdb_Class;
+                              Suppress : Boolean := True);
 
    --
    -- Retrieves one row from the database.
@@ -936,6 +1254,22 @@ is
                      return Inc_Class_Wp_Users.Wp_User
                      is (Inc_Class_Wp_Users.Null_User);
 
+   function Get_Row (DB      : in out Wpdb_Class;
+                     Query   : String  := ""; -- = null,
+                     Output  : String  := ""; -- = OBJECT,
+                     Y       : Natural := 0;
+                     Success : out Boolean)
+                     return Array_Type
+                     is (raise Program_Error with "not implemented");
+
+   function Get_Row (DB      : in out Wpdb_Class;
+                     Query   : String  := ""; -- = null,
+                     Output  : String  := ""; -- = OBJECT,
+                     Y       : Natural := 0;
+                     Success : out Boolean)
+                     return Natural
+                     is (raise Program_Error with "not implemented");
+
    function Get_Row (Db      : in out Wpdb_Class;
 --                   User    : Integer;
                      Query   : String  := ""; -- = null,
@@ -944,6 +1278,44 @@ is
                      Success : out Boolean)
                      return Inc_Class_Wp_Comments.Wp_Comment
                      is (Inc_Class_Wp_Comments.Null_Comment);
+
+   --
+   -- Retrieves the character set for the given column.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string table  Table name.
+   -- @param string column Column name.
+   -- @return string|false|WP_Error Column character set as a string. False if the
+   --                               column has no character set. WP_Error object if
+   --                               there was an error.
+   --
+   function Get_Col_Charset (This   : Wpdb_Class;
+                             Table  : String;
+                             Column : String)
+                             return String;
+
+   --
+   -- Retrieves the maximum string length allowed in a given column.
+   --
+   -- The length may either be specified as a byte length or a character length.
+   --
+   -- @since 4.2.1
+   --
+   -- @param string table  Table name.
+   -- @param string column Column name.
+   -- @return array|false|WP_Error {
+   --     Array of column length information, false if the column has no length (for
+   --     example, numeric column), WP_Error object if there was an error.
+   --
+   --     @type int    length The column length.
+   --     @type string type   One of "byte" or "char".
+   -- }
+   --
+   function Get_Col_Length (This   : Wpdb_Class;
+                            Table  : String;
+                            Column : String)
+                            return Array_Type;
 
    --
    -- Retrieves one column from the database.
@@ -1064,6 +1436,26 @@ is
                      Y     : Integer := 0)
                      return String
                      is ("1"); -- "XXX-887"
+
+   --
+   -- Retrieves the database server version.
+   --
+   -- @since 2.7.0
+   --
+   -- @return string|null Version number on success, null on failure.
+   --
+   function DB_Version (This : Wpdb_Class)
+                        return String;
+
+   --
+   -- Retrieves full database server information.
+   --
+   -- @since 5.5.0
+   --
+   -- @return string|false Server info on success, false on failure.
+   --
+   function DB_Server_Info (This : Wpdb_Class)
+            return String;
 
    --
    -- To_Array

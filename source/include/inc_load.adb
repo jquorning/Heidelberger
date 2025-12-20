@@ -12,7 +12,6 @@ with Php.Files;
 with Php.HTML;
 with Php.Strings;
 
-with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
@@ -21,11 +20,12 @@ with Lists;
 with Wp_Config;
 
 with Inc_Class_Wpdb;
+with Inc_Class_Wp_Networks;
 with Inc_Class_Wp_Textdomain_Registry;
 with Inc_Functions;
 with Inc_L10n;
+with Inc_Ms_Networks;
 with Inc_Plugins;
--- with Inc_Versions;
 
 package body Inc_Load
 is
@@ -588,7 +588,6 @@ is
    procedure Wp_Set_Wpdb_Vars
    is
       use Ada.Strings.Unbounded;
-      use Arrays;
       use Hb_Common;
       use Inc_Functions;
       use Inc_L10n;
@@ -1310,26 +1309,32 @@ is
 --         return absint( blog_id );
 -- end;
 
--- --
--- -- Retrieves the current network ID.
--- --
--- -- @since 4.6.0
--- --
--- -- @return int The ID of the current network.
--- --
--- function get_current_network_id() then
---         if ( ! is_multisite() ) then
---                 return 1;
---         end;
+   ----------------------------
+   -- Get_Current_Network_Id --
+   ----------------------------
 
---         current_network = get_network();
+   function Get_Current_Network_Id
+            return Integer
+   is
+      use Inc_Class_Wp_Networks;
+      use Inc_Functions;
+      use Inc_Ms_Networks;
+   begin
+      if not Is_Multisite then
+         return 1;
+      end if;
 
---         if ( ! isset( current_network->id ) ) then
---                 return get_main_network_id();
---         end;
+      declare
+         Current_Network : constant Wp_Network := Get_Network;
+      begin
+         if Current_Network.Id = 0 then
+--       if not Isset (Current_Network.Id) then
+            return Get_Main_Network_Id;
+         end if;
 
---         return absint( current_network->id );
--- end;
+         return abs Current_Network.Id;
+      end;
+   end Get_Current_Network_Id;
 
    Static_Loaded : Boolean := False;
 

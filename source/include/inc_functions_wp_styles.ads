@@ -9,6 +9,8 @@
 
 with Lists;
 
+with Adm_Load_Styles;
+
 with Inc_Class_Wp_Styles;
 
 package Inc_Functions_Wp_Styles
@@ -25,8 +27,30 @@ is
    --
    -- @return WP_Styles WP_Styles instance.
    --
-   function Wp_Styles_X
-            return Wp_Styles;
+--   function Wp_Styles_X
+--            return Wp_Styles;
+   Wp_Styles_X : Inc_Class_Wp_Styles.Wp_Styles
+     renames Adm_Load_Styles.Styles; -- Wp_styles
+
+   --
+   -- Display styles that are in the handles queue.
+   --
+   -- Passing an empty array to handles prints the queue,
+   -- passing an array with one string prints that style,
+   -- and passing an array of strings prints those styles.
+   --
+   -- @global WP_Styles wp_styles The WP_Styles object for printing styles.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string|bool|array handles Styles to be printed. Default 'false'.
+   -- @return string[] On success, an array of handles of processed WP_Dependencies
+   --                   items; otherwise, an empty array.
+   --
+   function Wp_Print_Styles (Handles : String)  -- = false
+                             return List_Type;
+
+   procedure Wp_Print_Styles (Handles : String); -- = false
 
    --
    -- Add extra CSS styles to a registered stylesheet.

@@ -577,7 +577,8 @@ is
 --                use Array_Maps;
 
                   Get_Issues   : String :=
-                     Inc_Options.Get_Transient ("health-check-site-status-result");
+                     As_String (
+                       Inc_Options.Get_Transient ("health-check-site-status-result"));
                   Issue_Counts : Array_Type := Empty_Array;
                begin
                   -- if False /= Get_Issues then

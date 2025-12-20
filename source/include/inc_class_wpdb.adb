@@ -8,14 +8,21 @@
 -- @since 0.71
 --
 
+with Ada.Text_IO;
+
+with Php.Arrays;
+with Php.Lists;
+with Php.Multibyte;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
 
 with Hb_Common;
 
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
+with Inc_Plugins;
 
 package body Inc_Class_Wpdb
 is
@@ -102,7 +109,7 @@ is
       --    return;
       -- end if;
 
-      Unused := This.Db_Connect; -- ()
+      Unused := This.DB_Connect; -- ()
 
       return This;
    end X_Construct;
@@ -833,6 +840,8 @@ is
       end Func;
 
    begin
+      Ada.Text_IO.Put_Line ("inc_class_wpdb.prepare: " & Query);
+
       if Query = "" then
          return "";  -- "" added jq
       end if;
@@ -989,32 +998,18 @@ is
       end;
    end Prepare;
 
-        --
-        -- First half of escaping for `LIKE` special characters `%` and `_` before preparing for SQL.
-        --
-        -- Use this only before wpdb::prepare() or esc_sql(). Reversing the order is very bad for security.
-        --
-        -- Example Prepared Statement:
-        --
-        --     wild = "%";
-        --     find = "only 43% of planets";
-        --     like = wild . wpdb.esc_like(find) . wild;
-        --     sql  = wpdb.prepare("SELECT-- FROM wpdb.posts WHERE post_content LIKE %s", like);
-        --
-        -- Example Escape Chain:
-        --
-        --     sql  = esc_sql(wpdb.esc_like(input));
-        --
-        -- @since 4.0.0
-        --
-        -- @param string text The raw text to be escaped. The input typed by the user
-        --                     should have no extra or deleted slashes.
-        -- @return string Text in the form of a LIKE phrase. The output is not SQL safe.
-        --                Call wpdb::prepare() or wpdb::_real_escape() next.
-        --
-        -- public function esc_like(text) then
-        --         return addcslashes(text, "_%\\");
-        -- end;
+   --------------
+   -- ESC_Like --
+   --------------
+
+   function ESC_Like (This : Wpdb_Class;
+                      Text : String)
+                      return String
+   is
+      use Php.Strings;
+   begin
+      return Add_C_Slashes (Text, "_%\\");
+   end ESC_Like;
 
         --
         -- Prints SQL/DB error.
@@ -1090,24 +1085,27 @@ is
         --         end;
         -- end;
 
-        --
-        -- Enables showing of database errors.
-        --
-        -- This function should be used only to enable showing of errors.
-        -- wpdb::hide_errors() should be used instead for hiding errors.
-        --
-        -- @since 0.71
-        --
-        -- @see wpdb::hide_errors()
-        --
-        -- @param bool show Optional. Whether to show errors. Default true.
-        -- @return bool Whether showing of errors was previously active.
-        --
-        -- public function show_errors(show = true) then
-        --         errors            = this.show_errors;
-        --         this.show_errors = show;
-        --         return errors;
-        -- end;
+   -----------------
+   -- Show_Errors --
+   -----------------
+
+   function Show_Errors (This : in out Wpdb_Class;
+                         Show : Boolean := True)
+                         return Boolean
+   is
+      Errors : constant Boolean := This.M_Show_Errors;
+   begin
+      This.M_Show_Errors := Show;
+      return Errors;
+   end Show_Errors;
+
+   procedure Show_Errors (This : in out Wpdb_Class;
+                          Show : Boolean := True)
+   is
+      Unused : constant Boolean := Show_Errors (This, Show);
+   begin
+      null;
+   end Show_Errors;
 
         --
         -- Disables showing of database errors.
@@ -1138,6 +1136,14 @@ is
    begin
       This.X_Suppress_Errors := Suppress; -- (bool)
       return Errors;
+   end Suppress_Errors;
+
+   procedure Suppress_Errors (This     : in out Wpdb_Class;
+                              Suppress : Boolean := True)
+   is
+      Unused : constant Boolean := Suppress_Errors (This, Suppress);
+   begin
+      null;
    end Suppress_Errors;
 
         --
@@ -1183,7 +1189,7 @@ is
         -- @return bool True with a successful connection, false on failure.
         --
         -- public function db_connect(allow_bail = true) then
-   function Db_Connect (This       : in out Wpdb_Class;
+   function DB_Connect (This       : in out Wpdb_Class;
                         Allow_Bail : Boolean := True)
                         return Boolean
                         is (False);
@@ -1752,35 +1758,19 @@ is
         --         return str_replace(this.placeholder_escape(), "%", query);
         -- end;
 
-        --
-        -- Inserts a row into the table.
-        --
-        -- Examples:
-        --
-        --     wpdb::insert("table", array("column" => "foo", "field" => "bar"))
-        --     wpdb::insert("table", array("column" => "foo", "field" => 1337), array("%s", "%d"))
-        --
-        -- @since 2.5.0
-        --
-        -- @see wpdb::prepare()
-        -- @see wpdb::field_types
-        -- @see wp_set_wpdb_vars()
-        --
-        -- @param string       table  Table name.
-        -- @param array        data   Data to insert (in column => value pairs).
-        --                             Both data columns and data values should be "raw" (neither should be SQL escaped).
-        --                             Sending a null value will cause the column to be set to NULL - the corresponding
-        --                             format is ignored in this case.
-        -- @param array|string format Optional. An array of formats to be mapped to each of the value in data.
-        --                             If string, that format will be used for all of the values in data.
-        --                             A format is one of "%d", "%f", "%s" (integer, float, string).
-        --                             If omitted, all values in data will be treated as strings unless otherwise
-        --                             specified in wpdb::field_types.
-        -- @return int|false The number of rows inserted, or false on error.
-        --
-        -- public function insert(table, data, format = null) then
-        --         return this._insert_replace_helper(table, data, format, "INSERT");
-        -- end;
+   ------------
+   -- Insert --
+   ------------
+
+   function Insert (This   : in out Wpdb_Class;
+                    Table  : String;
+                    Data   : Array_Type;
+                    Format : String := "") -- null
+                    return Natural
+   is
+   begin
+      return This.X_Insert_Replace_Helper (Table, Data, Format, "INSERT");
+   end Insert;
 
         --
         -- Replaces a row in the table.
@@ -1812,363 +1802,408 @@ is
         --         return this._insert_replace_helper(table, data, format, "REPLACE");
         -- end;
 
-        --
-        -- Helper function for insert and replace.
-        --
-        -- Runs an insert or replace query based on type argument.
-        --
-        -- @since 3.0.0
-        --
-        -- @see wpdb::prepare()
-        -- @see wpdb::field_types
-        -- @see wp_set_wpdb_vars()
-        --
-        -- @param string       table  Table name.
-        -- @param array        data   Data to insert (in column => value pairs).
-        --                             Both data columns and data values should be "raw" (neither should be SQL escaped).
-        --                             Sending a null value will cause the column to be set to NULL - the corresponding
-        --                             format is ignored in this case.
-        -- @param array|string format Optional. An array of formats to be mapped to each of the value in data.
-        --                             If string, that format will be used for all of the values in data.
-        --                             A format is one of "%d", "%f", "%s" (integer, float, string).
-        --                             If omitted, all values in data will be treated as strings unless otherwise
-        --                             specified in wpdb::field_types.
-        -- @param string       type   Optional. Type of operation. Possible values include "INSERT" or "REPLACE".
-        --                             Default "INSERT".
-        -- @return int|false The number of rows affected, or false on error.
-        --
-        -- public function _insert_replace_helper(table, data, format = null, type = "INSERT") then
-        --         this.insert_id = 0;
+   -----------------------------
+   -- X_Insert_Replace_Helper --
+   -----------------------------
 
-        --         if (! in_array(strtoupper(type), array("REPLACE", "INSERT"), true)) then
-        --                 return false;
-        --         end;
+   function X_Insert_Replace_Helper (This   : in out Wpdb_Class;
+                                     Table  : String;
+                                     Data   : Array_Type;
+                                     Format : String := ""; -- null
+                                     Typ    : String := "INSERT")
+                                     return Natural
+   is
+      use Php.Arrays;
+      use Php.Lists;
+      use Php.Strings;
 
-        --         data = this.process_fields(table, data, format);
-        --         if (false === data) then
-        --                 return false;
-        --         end;
+      Data_2 : Array_Type;
+   begin
+      This.Insert_Id := 0;
 
-        --         formats = array();
-        --         values  = array();
-        --         foreach (data as value) then
-        --                 if (is_null(value["value"])) then
-        --                         formats[] = "NULL";
-        --                         continue;
-        --                 end;
+      if
+        not In_Array (Strtoupper (Typ),
+                      To_List (List => (+"REPLACE", +"INSERT")), True)
+      then
+         return 0; -- false;
+      end if;
 
-        --                 formats[] = value["format"];
-        --                 values[]  = value["value"];
-        --         end;
+      Data_2 := This.Process_Fields (Table, Data, Format);
+      if Empty_Array = Data_2 then -- false
+         return 0; -- false;
+      end if;
 
-        --         fields  = "`" . implode("`, `", array_keys(data)) . "`";
-        --         formats = implode(", ", formats);
+      declare
+         Formats : List_Type;
+         Values  : List_Type;
+      begin
+         for A in Data_2.Iterate loop
+            declare
+               Value : constant Array_Type := As_Array (Element (A));
+            begin
+               if Kind_Of (Get (Value, "value")) = Kind_Null then
+                  Formats.Append (+"NULL");
+                  goto Continue;
+               end if;
 
-        --         sql = "type INTO `table` (fields) VALUES (formats)";
+               Formats.Append (+Get_As_String (Value, "format"));
+               Values.Append  (+Get_As_String (Value, "value"));
+            end;
+            << Continue >>
+         end loop;
 
-        --         this.check_current_query = false;
-        --         return this.query(this.prepare(sql, values));
-        -- end;
+         declare
+            Fields_2 : constant String :=
+              "`" & Implode ("`, `", List_Type'(Array_Keys (Data_2))) & "`";
 
-        --
-        -- Updates a row in the table.
-        --
-        -- Examples:
-        --
-        --     wpdb::update("table", array("column" => "foo", "field" => "bar"), array("ID" => 1))
-        --     wpdb::update("table", array("column" => "foo", "field" => 1337), array("ID" => 1), array("%s", "%d"), array("%d"))
-        --
-        -- @since 2.5.0
-        --
-        -- @see wpdb::prepare()
-        -- @see wpdb::field_types
-        -- @see wp_set_wpdb_vars()
-        --
-        -- @param string       table        Table name.
-        -- @param array        data         Data to update (in column => value pairs).
-        --                                   Both data columns and data values should be "raw" (neither should be SQL escaped).
-        --                                   Sending a null value will cause the column to be set to NULL - the corresponding
-        --                                   format is ignored in this case.
-        -- @param array        where        A named array of WHERE clauses (in column => value pairs).
-        --                                   Multiple clauses will be joined with ANDs.
-        --                                   Both where columns and where values should be "raw".
-        --                                   Sending a null value will create an IS NULL comparison - the corresponding
-        --                                   format will be ignored in this case.
-        -- @param array|string format       Optional. An array of formats to be mapped to each of the values in data.
-        --                                   If string, that format will be used for all of the values in data.
-        --                                   A format is one of "%d", "%f", "%s" (integer, float, string).
-        --                                   If omitted, all values in data will be treated as strings unless otherwise
-        --                                   specified in wpdb::field_types.
-        -- @param array|string where_format Optional. An array of formats to be mapped to each of the values in where.
-        --                                   If string, that format will be used for all of the items in where.
-        --                                   A format is one of "%d", "%f", "%s" (integer, float, string).
-        --                                   If omitted, all values in where will be treated as strings.
-        -- @return int|false The number of rows updated, or false on error.
-        --
-        -- public function update(table, data, where, format = null, where_format = null) then
-        --         if (! is_array(data) || ! is_array(where)) then
-        --                 return false;
-        --         end;
+            Formats_2 : constant String := Implode (", ", Formats);
 
-        --         data = this.process_fields(table, data, format);
-        --         if (false === data) then
-        --                 return false;
-        --         end;
-        --         where = this.process_fields(table, where, where_format);
-        --         if (false === where) then
-        --                 return false;
-        --         end;
+            SQL : constant String :=
+              Typ & " INTO `" & Table & "` (" & Fields_2 &
+              ") VALUES (" & Formats_2 & ")";
+         begin
+            This.Check_Current_Query := False;
+            return This.Query (This.Prepare (SQL, Values));
+         end;
+      end;
+   end X_Insert_Replace_Helper;
 
-        --         fields     = array();
-        --         conditions = array();
-        --         values     = array();
-        --         foreach (data as field => value) then
-        --                 if (is_null(value["value"])) then
-        --                         fields[] = "`field` = NULL";
-        --                         continue;
-        --                 end;
+   ------------
+   -- Update --
+   ------------
 
-        --                 fields[] = "`field` = " . value["format"];
-        --                 values[] = value["value"];
-        --         end;
-        --         foreach (where as field => value) then
-        --                 if (is_null(value["value"])) then
-        --                         conditions[] = "`field` IS NULL";
-        --                         continue;
-        --                 end;
+   function Update (This         : in out Wpdb_Class;
+                    Table        : String;
+                    Data         : Array_Type;
+                    Where        : Array_Type;
+                    Format       : String := ""; -- null
+                    Where_Format : String := "") -- null
+                    return Natural
+   is
+      use Php.Strings;
+      use Php.Types;
 
-        --                 conditions[] = "`field` = " . value["format"];
-        --                 values[]     = value["value"];
-        --         end;
+      Data_2  : Array_Type;
+      Where_2 : Array_Type;
+   begin
+      if not Is_Array (Data) or not Is_Array (Where) then
+         return 0; -- False;
+      end if;
 
-        --         fields     = implode(", ", fields);
-        --         conditions = implode(" AND ", conditions);
+      Data_2 := This.Process_Fields (Table, Data, Format);
+      if Empty_Array = Data_2 then -- false
+         return 0; -- False;
+      end if;
 
-        --         sql = "UPDATE `table` SET fields WHERE conditions";
+      Where_2 := This.Process_Fields (Table, Where, Where_Format);
+      if Empty_Array = Where_2 then -- false
+         return 0; -- false;
+      end if;
 
-        --         this.check_current_query = false;
-        --         return this.query(this.prepare(sql, values));
-        -- end;
+      declare
+         Fields     : List_Type; -- = array();
+         Conditions : List_Type; -- = array();
+         Values     : List_Type; -- = array();
+      begin
+         for A in Data.Iterate loop
+            declare
+               Field : constant String := Key (A);
+               Value : constant Array_Type := As_Array (Element (A));
+            begin
+               if Kind_Of (Get (Value, "value")) = Kind_Null then
+                  Fields.Append (+"`" & Field & "` = NULL");
+                  goto Continue_1;
+               end if;
 
-        --
-        -- Deletes a row in the table.
-        --
-        -- Examples:
-        --
-        --     wpdb::delete("table", array("ID" => 1))
-        --     wpdb::delete("table", array("ID" => 1), array("%d"))
-        --
-        -- @since 3.4.0
-        --
-        -- @see wpdb::prepare()
-        -- @see wpdb::field_types
-        -- @see wp_set_wpdb_vars()
-        --
-        -- @param string       table        Table name.
-        -- @param array        where        A named array of WHERE clauses (in column => value pairs).
-        --                                   Multiple clauses will be joined with ANDs.
-        --                                   Both where columns and where values should be "raw".
-        --                                   Sending a null value will create an IS NULL comparison - the corresponding
-        --                                   format will be ignored in this case.
-        -- @param array|string where_format Optional. An array of formats to be mapped to each of the values in where.
-        --                                   If string, that format will be used for all of the items in where.
-        --                                   A format is one of "%d", "%f", "%s" (integer, float, string).
-        --                                   If omitted, all values in data will be treated as strings unless otherwise
-        --                                   specified in wpdb::field_types.
-        -- @return int|false The number of rows deleted, or false on error.
-        --
-        -- public function delete(table, where, where_format = null) then
-        --         if (! is_array(where)) then
-        --                 return false;
-        --         end;
+               Fields.Append
+                 (+"`" & Field & "` = " & Get_As_String (Value, "format"));
 
-        --         where = this.process_fields(table, where, where_format);
-        --         if (false === where) then
-        --                 return false;
-        --         end;
+               Values.Append (+Get_As_String (Value, "value"));
+            end;
+            << Continue_1 >>
+         end loop;
 
-        --         conditions = array();
-        --         values     = array();
-        --         foreach (where as field => value) then
-        --                 if (is_null(value["value"])) then
-        --                         conditions[] = "`field` IS NULL";
-        --                         continue;
-        --                 end;
+         for B in Where_2.Iterate loop
+            declare
+               Field : constant String := Key (B);
+               Value : constant Array_Type := As_Array (Element (B));
+            begin
+               if Kind_Of (Get (Value, "value")) = Kind_Null then
+                  Conditions.Append (+"`" & Field & "` IS NULL");
+                  goto Continue_2;
+               end if;
 
-        --                 conditions[] = "`field` = " . value["format"];
-        --                 values[]     = value["value"];
-        --         end;
+               Conditions.Append
+                 (+"`" & Field & "` = " & Get_As_String (Value, "format"));
 
-        --         conditions = implode(" AND ", conditions);
+               Values.Append (+Get_As_String (Value, "value"));
+            end;
+            << Continue_2 >>
+         end loop;
 
-        --         sql = "DELETE FROM `table` WHERE conditions";
+         declare
+            Fields_2     : constant String := Implode (", ", Fields);
+            Conditions_2 : constant String := Implode (" AND ", Conditions);
 
-        --         this.check_current_query = false;
-        --         return this.query(this.prepare(sql, values));
-        -- end;
+            SQL : constant String :=
+              "UPDATE `" & Table & "` SET " & Fields_2 & " WHERE " & Conditions_2;
+         begin
+            This.Check_Current_Query := False;
+            return This.Query (This.Prepare (SQL, Values));
+         end;
+      end;
+   end Update;
 
-        --
-        -- Processes arrays of field/value pairs and field formats.
-        --
-        -- This is a helper method for wpdb"s CRUD methods, which take field/value pairs
-        -- for inserts, updates, and where clauses. This method first pairs each value
-        -- with a format. Then it determines the charset of that field, using that
-        -- to determine if any invalid text would be stripped. If text is stripped,
-        -- then field processing is rejected and the query fails.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string table  Table name.
-        -- @param array  data   Field/value pair.
-        -- @param mixed  format Format for each field.
-        -- @return array|false An array of fields that contain paired value and formats.
-        --                     False for invalid values.
-        --
-        -- protected function process_fields(table, data, format) then
-        --         data = this.process_field_formats(data, format);
-        --         if (false === data) then
-        --                 return false;
-        --         end;
+   ------------
+   -- Delete --
+   ------------
 
-        --         data = this.process_field_charsets(data, table);
-        --         if (false === data) then
-        --                 return false;
-        --         end;
+   function Delete (This         : in out Wpdb_Class;
+                    Table        : String;
+                    Where        : Array_Type;
+                    Where_Format : String := "") -- null
+                    return Integer
+   is
+      use Php.Strings;
+      use Php.Types;
+   begin
+      if not Is_Array (Where) then
+         return 0; -- False;
+      end if;
 
-        --         data = this.process_field_lengths(data, table);
-        --         if (false === data) then
-        --                 return false;
-        --         end;
+      declare
+         Where_2 : constant Array_Type :=
+           This.Process_Fields (Table, Where, Where_Format);
+      begin
+         if Empty_Array = Where_2 then -- false
+            return 0; -- False;
+         end if;
 
-        --         converted_data = this.strip_invalid_text(data);
+         declare
+            Conditions : List_Type; -- Array_Type;
+            Values     : List_Type; -- Array_Type;
+         begin
+            for A in Where_2.Iterate loop
+               declare
+                  Field  : constant String     := Key (A);
+                  Value  : constant Array_Type := As_Array (Element (A));
+               begin
+                  if Kind_Of (Get (Value, "value")) = Kind_Null then
+                     Conditions.Append (+"`" & Field & "` IS NULL");
+                     goto Continue;
+                  end if;
+                  Conditions.Append (+"`" & Field & "` = " &
+                                     Get_As_String (Value, "format"));
+                  Values.Append (+Get_As_String (Value, "value"));
+               end;
+               << Continue >>
+            end loop;
 
-        --         if (data !== converted_data) then
+            declare
+               Conditions_2 : constant String := Implode (" AND ", Conditions);
 
-        --                 problem_fields = array();
-        --                 foreach (data as field => value) then
-        --                         if (value !== converted_data[ field ]) then
-        --                                 problem_fields[] = field;
-        --                         end;
-        --                 end;
+               SQL : constant String :=
+                 "DELETE FROM `" & Table & "` WHERE " & Conditions_2;
+            begin
+               This.Check_Current_Query := False;
+               return This.Query (This.Prepare (SQL, Values));
+            end;
+         end;
+      end;
+   end Delete;
 
-        --                 wp_load_translations_early();
+   --------------------
+   -- Process_Fields --
+   --------------------
 
-        --                 if (1 === count(problem_fields)) then
-        --                         this.last_error = sprintf(
-        --                                 /* translators: %s: Database field where the error occurred.--
-        --                                 __("WordPress database error: Processing the value for the following field failed: %s. The supplied value may be too long or contains invalid data."),
-        --                                 reset(problem_fields)
-        --                        );
-        --                 end; else then
-        --                         this.last_error = sprintf(
-        --                                 /* translators: %s: Database fields where the error occurred.--
-        --                                 __("WordPress database error: Processing the values for the following fields failed: %s. The supplied values may be too long or contain invalid data."),
-        --                                 implode(", ", problem_fields)
-        --                        );
-        --                 end;
+   function Process_Fields (This   : in out Wpdb_Class;
+                            Table  : String;
+                            Data   : Array_Type;
+                            Format : String) -- Multi_Type
+                            return Array_Type
+   is
+      use Php.Strings;
+      use Inc_Load;
 
-        --                 return false;
-        --         end;
+      Data_2 : Array_Type := Data;
+   begin
+      Data_2 := This.Process_Field_Formats (Data_2, Format);
+      if Empty_Array = Data_2 then -- false
+         return Empty_Array; -- False;
+      end if;
 
-        --         return data;
-        -- end;
+      Data_2 := This.Process_Field_Charsets (Data_2, Table);
+      if Empty_Array = Data_2 then -- false
+         return Empty_Array; -- False;
+      end if;
 
-        --
-        -- Prepares arrays of value/format pairs as passed to wpdb CRUD methods.
-        --
-        -- @since 4.2.0
-        --
-        -- @param array data   Array of fields to values.
-        -- @param mixed format Formats to be mapped to the values in data.
-        -- @return array Array, keyed by field names with values being an array
-        --               of "value" and "format" keys.
-        --
-        -- protected function process_field_formats(data, format) then
-        --         formats          = (array) format;
-        --         original_formats = formats;
+      Data_2 := This.Process_Field_Lengths (Data_2, Table);
+      if Empty_Array = Data_2 then -- false
+         return Empty_Array; -- False;
+      end if;
 
-        --         foreach (data as field => value) then
-        --                 value = array(
-        --                         "value"  => value,
-        --                         "format" => "%s",
-        --                );
+      declare
+         Converted_Data : constant Array_Type :=
+           This.Strip_Invalid_Text (Data_2);
+      begin
+         if Data_2 /= Converted_Data then
+            declare
+               Problem_Fields : List_Type;
+            begin
+               for A in Data_2.Iterate loop
+                  declare
+                     Field : constant String     := Key (A);
+                     Value : constant Multi_Type := Element (A);
+                  begin
+                     if Value /= Get (Converted_Data, Field) then
+                        Problem_Fields.Append (+Field);
+                     end if;
+                  end;
+               end loop;
 
-        --                 if (! empty(format)) then
-        --                         value["format"] = array_shift(formats);
-        --                         if (! value["format"]) then
-        --                                 value["format"] = reset(original_formats);
-        --                         end;
-        --                 end; elseif (isset(this.field_types[ field ])) then
-        --                         value["format"] = this.field_types[ field ];
-        --                 end;
+               Wp_Load_Translations_Early;
 
-        --                 data[ field ] = value;
-        --         end;
+               if Problem_Fields.Length in 1 then
+                  This.Last_Error := +Sprintf (
+                    -- translators: %s: Database field where the error occurred.
+                    abs "WordPress database error: Processing the value for the following field failed: %s. The supplied value may be too long or contains invalid data.",
+                    To_List (-Problem_Fields.First_Element) -- Reset (Problem_Fields)
+                  );
+               else
+                  This.Last_Error := +Sprintf (
+                    -- translators: %s: Database fields where the error occurred.
+                    abs "WordPress database error: Processing the values for the following fields failed: %s. The supplied values may be too long or contain invalid data.",
+                    To_List (Implode (", ", Problem_Fields))
+                  );
+               end if;
+            end;
+            return Empty_Array; -- False;
+         end if;
+      end;
+      return Data_2;
+   end Process_Fields;
 
-        --         return data;
-        -- end;
+   ---------------------------
+   -- Process_Field_Formats --
+   ---------------------------
 
-        --
-        -- Adds field charsets to field/value/format arrays generated by wpdb::process_field_formats().
-        --
-        -- @since 4.2.0
-        --
-        -- @param array  data  As it comes from the wpdb::process_field_formats() method.
-        -- @param string table Table name.
-        -- @return array|false The same array as data with additional "charset" keys.
-        --                     False on failure.
-        --
-        -- protected function process_field_charsets(data, table) then
-        --         foreach (data as field => value) then
-        --                 if ("%d" === value["format"] || "%f" === value["format"]) then
-        --                         /*
-        --                         -- We can skip this field if we know it isn"t a string.
-        --                         -- This checks %d/%f versus ! %s because its sprintf() could take more.
-        --                         --
-        --                         value["charset"] = false;
-        --                 end; else then
-        --                         value["charset"] = this.get_col_charset(table, field);
-        --                         if (is_wp_error(value["charset"])) then
-        --                                 return false;
-        --                         end;
-        --                 end;
+   function Process_Field_Formats (This   : Wpdb_Class;
+                                   Data   : Array_Type;
+                                   Format : String)
+                                   return Array_Type
+   is
+      use Php.Lists;
 
-        --                 data[ field ] = value;
-        --         end;
+      Data_2           : Array_Type := Data;
+      Formats          : List_Type  := To_List (Format); -- (array)
+      Original_Formats : constant List_Type  := Formats;
+   begin
+      for A in Data_2.Iterate loop
+         declare
+            Field : constant String := Key (A);
+            Value : constant String := As_String (Element (A));
 
-        --         return data;
-        -- end;
+            Value_2 : Array_Type := To_Array (List => (
+              Build ("value",  Value),
+              Build ("format", "%s")
+            ));
+         begin
+            if not Empty (Format) then
+               Set (Value_2, "format", From_String (Array_Shift (Formats)));
+               if Kind_Of (Get (Value_2, "format")) in Kind_Null then -- not
+                  Set (Value_2, "format",
+                       From_String (-Original_Formats.First_Element)); -- Reset
+               end if;
+            elsif Isset (This.Field_Types, Field) then
+               Set (Value_2, "format", Get (This.Field_Types, Field));
+            end if;
 
-        --
-        -- For string fields, records the maximum string length that field can safely save.
-        --
-        -- @since 4.2.1
-        --
-        -- @param array  data  As it comes from the wpdb::process_field_charsets() method.
-        -- @param string table Table name.
-        -- @return array|false The same array as data with additional "length" keys, or false if
-        --                     any of the values were too long for their corresponding field.
-        --
-        -- protected function process_field_lengths(data, table) then
-        --         foreach (data as field => value) then
-        --                 if ("%d" === value["format"] || "%f" === value["format"]) then
-        --                         /*
-        --                         -- We can skip this field if we know it isn"t a string.
-        --                         -- This checks %d/%f versus ! %s because its sprintf() could take more.
-        --                         --
-        --                         value["length"] = false;
-        --                 end; else then
-        --                         value["length"] = this.get_col_length(table, field);
-        --                         if (is_wp_error(value["length"])) then
-        --                                 return false;
-        --                         end;
-        --                 end;
+            Set (Data_2, Field, From_Array (Value_2));
+         end;
+      end loop;
 
-        --                 data[ field ] = value;
-        --         end;
+      return Data_2;
+   end Process_Field_Formats;
 
-        --         return data;
-        -- end;
+   ----------------------------
+   -- Process_Field_Charsets --
+   ----------------------------
+
+   function Process_Field_Charsets (This  : Wpdb_Class;
+                                    Data  : Array_Type;
+                                    Table : String)
+                                    return Array_Type
+   is
+      use Inc_Load;
+
+      Data_2 : Array_Type := Data;
+   begin
+      for A in Data_2.Iterate loop
+         declare
+            Field : constant String := Key (A);
+            Value : Array_Type      := As_Array (Element (A));
+         begin
+            if Get_As_String (Value, "format") in "%d" | "%f" then
+               --
+               -- We can skip this field if we know it isn"t a string.
+               -- This checks %d/%f versus ! %s because its sprintf() could take more.
+               --
+               Set (Value, "charset", From_Boolean (False));
+            else
+               Set (Value, "charset",
+                    From_String (This.Get_Col_Charset (Table, Field)));
+
+               if Is_Wp_Error (Get_As_String (Value, "charset")) then
+                  return Empty_Array; -- False;
+               end if;
+            end if;
+
+            Set (Data_2, Field, From_Array (Value));
+         end;
+      end loop;
+
+      return Data_2;
+   end Process_Field_Charsets;
+
+   ---------------------------
+   -- Process_Field_Lengths --
+   ---------------------------
+
+   function Process_Field_Lengths (This  : Wpdb_Class;
+                                   Data  : Array_Type;
+                                   Table : String)
+                                   return Array_Type
+   is
+      use Inc_Load;
+
+      Data_2 : Array_Type := Data;
+   begin
+      for A in Data_2.Iterate loop
+         declare
+            Field : constant String := Key (A);
+            Value : Array_Type      := As_Array (Element (A));
+         begin
+            if Get_As_String (Value, "format") in "%d" | "%f" then
+               --
+               -- We can skip this field if we know it isn"t a string.
+               -- This checks %d/%f versus ! %s because its sprintf() could take more.
+               --
+               Set (Value, "length", From_Boolean (False));
+            else
+               Set (Value, "length",
+                    From_Array (This.Get_Col_Length (Table, Field)));
+
+               if Is_Wp_Error (Get_As_String (Value, "length")) then
+                  return Empty_Array; -- false;
+               end if;
+            end if;
+
+            Set (Data_2, Field, From_Array (Value));
+         end;
+      end loop;
+
+      return Data_2;
+   end Process_Field_Lengths;
 
         --
         -- Retrieves one variable from the database.
@@ -2227,7 +2262,7 @@ is
                       Y       : Natural := 0;
                       Success : out Boolean)
    is
-      Result : constant String :=
+      Unused : constant String :=
         Get_Row (Db      => Db,
                  Post    => Post,
                  Query   => Query,
@@ -2493,162 +2528,179 @@ is
         --         return charset;
         -- end;
 
-        --
-        -- Retrieves the character set for the given column.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string table  Table name.
-        -- @param string column Column name.
-        -- @return string|false|WP_Error Column character set as a string. False if the column has
-        --                               no character set. WP_Error object if there was an error.
-        --
-        -- public function get_col_charset(table, column) then
-        --         tablekey  = strtolower(table);
-        --         columnkey = strtolower(column);
+   ---------------------
+   -- Get_Col_Charset --
+   ---------------------
 
-        --         --
-        --         -- Filters the column charset value before the DB is checked.
-        --         --
-        --         -- Passing a non-null value to the filter will short-circuit
-        --         -- checking the DB for the charset, returning that value instead.
-        --         --
-        --         -- @since 4.2.0
-        --         --
-        --         -- @param string|null charset The character set to use. Default null.
-        --         -- @param string      table   The name of the table being checked.
-        --         -- @param string      column  The name of the column being checked.
-        --         --
-        --         charset = apply_filters("pre_get_col_charset", null, table, column);
-        --         if (null !== charset) then
-        --                 return charset;
-        --         end;
+   function Get_Col_Charset (This   : Wpdb_Class;
+                             Table  : String;
+                             Column : String)
+                             return String
+   is
+      use Php.Strings;
+      use Inc_Load;
+      use Inc_Plugins;
 
-        --         // Skip this entirely if this isn"t a MySQL database.
-        --         if (empty(this.is_mysql)) then
-        --                 return false;
-        --         end;
+      Tablekey  : constant String := Strtolower (Table);
+      Columnkey : constant String := Strtolower (Column);
 
-        --         if (empty(this.table_charset[ tablekey ])) then
-        --                 // This primes column information for us.
-        --                 table_charset = this.get_table_charset(table);
-        --                 if (is_wp_error(table_charset)) then
-        --                         return table_charset;
-        --                 end;
-        --         end;
+      --
+      -- Filters the column charset value before the DB is checked.
+      --
+      -- Passing a non-null value to the filter will short-circuit
+      -- checking the DB for the charset, returning that value instead.
+      --
+      -- @since 4.2.0
+      --
+      -- @param string|null charset The character set to use. Default null.
+      -- @param string      table   The name of the table being checked.
+      -- @param string      column  The name of the column being checked.
+      --
+      Charset : constant String :=
+        Apply_Filters ("pre_get_col_charset", "", Table, Column);     -- null
+   begin
+      if "" /= Charset then
+         return Charset;
+      end if;
 
-        --         // If still no column information, return the table charset.
-        --         if (empty(this.col_meta[ tablekey ])) then
-        --                 return this.table_charset[ tablekey ];
-        --         end;
+      -- Skip this entirely if this isn't a MySQL database.
+      if not This.Is_MySQL then
+--    if Empty (This.Is_MySQL) then
+         return ""; -- False;
+      end if;
 
-        --         // If this column doesn"t exist, return the table charset.
-        --         if (empty(this.col_meta[ tablekey ][ columnkey ])) then
-        --                 return this.table_charset[ tablekey ];
-        --         end;
+      if Empty (This.Table_Charset, Tablekey) then
+         -- This primes column information for us.
+         declare
+            Table_Charset : constant String := This.Get_Table_Charset (Table);
+         begin
+            if Is_Wp_Error (Table_Charset) then
+               return Table_Charset;
+            end if;
+         end;
+      end if;
 
-        --         // Return false when it"s not a string column.
-        --         if (empty(this.col_meta[ tablekey ][ columnkey ].Collation)) then
-        --                 return false;
-        --         end;
+      -- If still no column information, return the table charset.
+      if Empty (This.Col_Meta, Tablekey) then
+         return Get_As_String (This.Table_Charset, Tablekey);
+      end if;
 
-        --         list(charset) = explode("_", this.col_meta[ tablekey ][ columnkey ].Collation);
-        --         return charset;
-        -- end;
+      -- If this column Doesn't exist, return the table charset.
+      if
+        Empty (As_String (Get (Ref_2 (This.Col_Meta,
+                                      Key_1 => Tablekey,
+                                      Key_2 => Columnkey))))
+      then
+         return Get_As_String (This.Table_Charset, Tablekey);
+      end if;
 
-        --
-        -- Retrieves the maximum string length allowed in a given column.
-        --
-        -- The length may either be specified as a byte length or a character length.
-        --
-        -- @since 4.2.1
-        --
-        -- @param string table  Table name.
-        -- @param string column Column name.
-        -- @return array|false|WP_Error then
-        --     Array of column length information, false if the column has no length (for
-        --     example, numeric column), WP_Error object if there was an error.
-        --
-        --     @type int    length The column length.
-        --     @type string type   One of "byte" or "char".
-        --
-        -- public function get_col_length(table, column) then
-        --         tablekey  = strtolower(table);
-        --         columnkey = strtolower(column);
+      -- -- Return false when It's not a string column.
+      -- if
+      --   Empty (Ref_2 (This.Col_Meta, Key_1 => Tablekey, Key_2 => Columnkey).Collation)
+      -- then
+      --    return ""; -- false;
+      -- end if;
 
-        --         // Skip this entirely if this isn"t a MySQL database.
-        --         if (empty(this.is_mysql)) then
-        --                 return false;
-        --         end;
+      declare
+         L : List_Type; --  :=
+--           Explode ("_", As_String (Ref_2 (This.Col_Meta, Tablekey, Columnkey).Collation));
+         Charset : constant String := -L.First_Element;
+      begin
+         return Charset;
+      end;
+   end Get_Col_Charset;
 
-        --         if (empty(this.col_meta[ tablekey ])) then
-        --                 // This primes column information for us.
-        --                 table_charset = this.get_table_charset(table);
-        --                 if (is_wp_error(table_charset)) then
-        --                         return table_charset;
-        --                 end;
-        --         end;
+   --------------------
+   -- Get_Col_Length --
+   --------------------
 
-        --         if (empty(this.col_meta[ tablekey ][ columnkey ])) then
-        --                 return false;
-        --         end;
+   function Get_Col_Length (This   : Wpdb_Class;
+                            Table  : String;
+                            Column : String)
+                            return Array_Type
+   is
+      use Php.Strings;
+      use Inc_Load;
 
-        --         typeinfo = explode("(", this.col_meta[ tablekey ][ columnkey ].Type);
+      Tablekey  : constant String := Strtolower (Table);
+      Columnkey : constant String := Strtolower (Column);
+   begin
+      -- Skip this entirely if this isn't a MySQL database.
+      if not This.Is_MySQL then
+--    if Empty (This.Is_MySQL) then
+         return Empty_Array; -- False;
+      end if;
 
-        --         type = strtolower(typeinfo[0]);
-        --         if (! empty(typeinfo[1])) then
-        --                 length = trim(typeinfo[1], ")");
-        --         end; else then
-        --                 length = false;
-        --         end;
+      if Empty (Get_As_String (This.Col_Meta, Tablekey)) then
+         -- This primes column information for us.
+         declare
+            Table_Charset : constant String := This.Get_Table_Charset (Table);
+         begin
+            if Is_Wp_Error (Table_Charset) then
+               return Empty_Array; -- Table_Charset;
+            end if;
+         end;
+      end if;
 
-        --         switch (type) then
-        --                 case "char":
-        --                 case "varchar":
-        --                         return array(
-        --                                 "type"   => "char",
-        --                                 "length" => (int) length,
-        --                        );
+      if Empty (As_String (Get (Ref_2 (This.Col_Meta, Tablekey, Columnkey)))) then
+         return Empty_Array; -- false;
+      end if;
 
-        --                 case "binary":
-        --                 case "varbinary":
-        --                         return array(
-        --                                 "type"   => "byte",
-        --                                 "length" => (int) length,
-        --                        );
+      declare
+         Typeinfo : List_Type; --  :=
+--           Explode ("(", As_String (Get (Ref_2 (This.Col_Meta,
+--                                                Key_1 => Tablekey,
+--                                                Key_2 => Columnkey))).Typ);
+         Typ : constant String := Strtolower (-Typeinfo.First_Element); -- [0]
+         Length : Natural;
+      begin
+         if not Empty (-Typeinfo (2)) then -- [1]
+            Length := Natural'Value (Trim (-Typeinfo (2), ")")); -- [1]
+         else
+            Length := 0; -- False;
+         end if;
 
-        --                 case "tinyblob":
-        --                 case "tinytext":
-        --                         return array(
-        --                                 "type"   => "byte",
-        --                                 "length" => 255,        // 2^8 - 1
-        --                        );
+         if Typ in "char" | "varchar" then
+            return To_Array (List => (
+              Build ("type",   "char"),
+              Build ("length", Length) -- (int)
+            ));
 
-        --                 case "blob":
-        --                 case "text":
-        --                         return array(
-        --                                 "type"   => "byte",
-        --                                 "length" => 65535,      // 2^16 - 1
-        --                        );
+         elsif Typ in "binary" | "varbinary" then
+            return To_Array (List => (
+              Build ("type",   "byte"),
+              Build ("length", Length) -- (int)
+            ));
 
-        --                 case "mediumblob":
-        --                 case "mediumtext":
-        --                         return array(
-        --                                 "type"   => "byte",
-        --                                 "length" => 16777215,   // 2^24 - 1
-        --                        );
+         elsif Typ in "tinyblob" | "tinytext" then
+            return To_Array (List => (
+              Build ("type",   "byte"),
+              Build ("length", 255)        -- 2^8 - 1
+            ));
 
-        --                 case "longblob":
-        --                 case "longtext":
-        --                         return array(
-        --                                 "type"   => "byte",
-        --                                 "length" => 4294967295, // 2^32 - 1
-        --                        );
+         elsif Typ in "blob" | "text" then
+            return To_Array (List => (
+              Build ("type",   "byte"),
+              Build ("length", 65535)      -- 2^16 - 1
+            ));
 
-        --                 default:
-        --                         return false;
-        --         end;
-        -- end;
+         elsif Typ in "mediumblob" | "mediumtext" then
+            return To_Array (List => (
+              Build ("type",   "byte"),
+              Build ("length", 16777215)   -- 2^24 - 1
+            ));
+
+         elsif Typ in "longblob" | "longtext" then
+            return To_Array (List => (
+              Build ("type",   "byte"),
+              Build ("length", Integer'Last) -- 4294967295) -- 2^32 - 1
+            ));
+
+         else
+            return Empty_Array; -- false;
+         end if;
+      end;
+   end Get_Col_Length;
 
         --
         -- Checks if a string is ASCII.
@@ -2706,7 +2758,7 @@ is
       end if;
 
       -- All-ASCII queries don"t need extra checking.
-      if This.Check_Ascii (Query_2) then
+      if This.Check_ASCII (Query_2) then
          return True;
       end if;
 
@@ -2762,163 +2814,261 @@ is
       return True;
    end Check_Safe_Collation;
 
-        --
-        -- Strips any invalid characters based on value/charset pairs.
-        --
-        -- @since 4.2.0
-        --
-        -- @param array data Array of value arrays. Each value array has the keys "value" and "charset".
-        --                    An optional "ascii" key can be set to false to avoid redundant ASCII checks.
-        -- @return array|WP_Error The data parameter, with invalid characters removed from each value.
-        --                        This works as a passthrough: any additional keys such as "field" are
-        --                        retained in each value array. If we cannot remove invalid characters,
-        --                        a WP_Error object is returned.
-        --
-        -- protected function strip_invalid_text(data) then
-        --         db_check_string = false;
+   ------------------------
+   -- Strip_Invalid_Text --
+   ------------------------
 
-        --         foreach (data as &value) then
-        --                 charset = value["charset"];
+   function Strip_Invalid_Text (This : in out Wpdb_Class;
+                                Data : Array_Type)
+                                return Array_Type
+   is
+      use Php.Arrays;
+      use Php.Multibyte;
+      use Php.Preg;
+      use Php.Strings;
+      use Php.Types;
+      use Inc_Functions;
 
-        --                 if (is_array(value["length"])) then
-        --                         length                  = value["length"]["length"];
-        --                         truncate_by_byte_length = "byte" === value["length"]["type"];
-        --                 end; else then
-        --                         length = false;
-        --                         // Since we have no length, we"ll never truncate. Initialize the variable to false.
-        --                         // True would take us through an unnecessary (for this case) codepath below.
-        --                         truncate_by_byte_length = false;
-        --                 end;
+      Data_2          : Array_Type := Data;
+      DB_Check_String : Boolean    := False;
+   begin
+      for B in Data_2.Iterate loop -- &value
+         declare
+            Value   : Array_Type := As_Array (Element (B));
+            Charset : constant String := Get_As_String (Value, "charset");
+            Length  : Natural;
+            Truncate_By_Byte_Length : Boolean;
+         begin
+            if Kind_Of (Get (Value, "length")) = Kind_Array then
+               Length := As_Integer (Get (Ref_2 (Value,
+                                                 Key_1 => "length",
+                                                 Key_2 => "length")));
+               Truncate_By_Byte_Length :=
+                 "byte" = As_String (Get (Ref_2 (Value,
+                                                 Key_1 => "length",
+                                                 Key_2 => "type")));
+            else
+               Length := 0; -- False;
+               -- Since we have no length, we'll never truncate. Initialize the
+               -- variable to false. True would take us through an unnecessary
+               -- (for this case) codepath below.
+               Truncate_By_Byte_Length := False;
+            end if;
 
-        --                 // There"s no charset to work with.
-        --                 if (false === charset) then
-        --                         continue;
-        --                 end;
+            -- There's no charset to work with.
+            if "" = Charset then -- false
+               goto Continue;
+            end if;
 
-        --                 // Column isn"t a string.
-        --                 if (! is_string(value["value"])) then
-        --                         continue;
-        --                 end;
+            -- Column isn't a string.
+            if not Is_String (Get_As_String (Value, "value")) then
+               goto Continue;
+            end if;
 
-        --                 needs_validation = true;
-        --                 if (
-        --                         // latin1 can store any byte sequence.
-        --                         "latin1" === charset
-        --                 ||
-        --                         // ASCII is always OK.
-        --                         (! isset(value["ascii"]) && this.check_ascii(value["value"]))
-        --                ) then
-        --                         truncate_by_byte_length = true;
-        --                         needs_validation        = false;
-        --                 end;
+            declare
+               Needs_Validation : Boolean := True;
+            begin
+               if
+                 -- latin1 can store any byte sequence.
+                 "latin1" = Charset or else
+                 -- ASCII is always OK.
+                 (not Isset (Value, "ascii") and then
+                  This.Check_ASCII (Get_As_String (Value, "value")))
+               then
+                  Truncate_By_Byte_Length := True;
+                  Needs_Validation        := False;
+               end if;
 
-        --                 if (truncate_by_byte_length) then
-        --                         mbstring_binary_safe_encoding();
-        --                         if (false !== length && strlen(value["value"]) > length) then
-        --                                 value["value"] = substr(value["value"], 0, length);
-        --                         end;
-        --                         reset_mbstring_encoding();
+               if Truncate_By_Byte_Length then
+                  MB_String_Binary_Safe_Encoding;
+                  if
+                    0 /= Length and then -- false
+                    Strlen (Get_As_String (Value, "value")) > Length
+                  then
+                     Set (Value, "value",
+                          From_String (
+                            Substr (Get_As_String (Value, "value"), 0, Length)));
+                  end if;
+                  Reset_MB_String_Encoding;
 
-        --                         if (! needs_validation) then
-        --                                 continue;
-        --                         end;
-        --                 end;
+                  if not Needs_Validation then
+                     goto Continue;
+                  end if;
+               end if;
+            end;
 
-        --                 // utf8 can be handled by regex, which is a bunch faster than a DB lookup.
-        --                 if (("utf8" === charset || "utf8mb3" === charset || "utf8mb4" === charset) && function_exists("mb_strlen")) then
-        --                         regex = "/
-        --                                 (
-        --                                         (?: [\x00-\x7F]                  # single-byte sequences   0xxxxxxx
-        --                                         |   [\xC2-\xDF][\x80-\xBF]       # double-byte sequences   110xxxxx 10xxxxxx
-        --                                         |   \xE0[\xA0-\xBF][\x80-\xBF]   # triple-byte sequences   1110xxxx 10xxxxxx-- 2
-        --                                         |   [\xE1-\xEC][\x80-\xBF]then2end;
-        --                                         |   \xED[\x80-\x9F][\x80-\xBF]
-        --                                         |   [\xEE-\xEF][\x80-\xBF]then2end;";
+            -- utf8 can be handled by regex, which is a bunch faster than a DB lookup.
+            if
+              Charset in "utf8" | "utf8mb3" | "utf8mb4" -- and then
+--            Function_Exists ("mb_strlen")
+            then
+               declare
+                  Regex : Unbounded_String := -- +"/
+                   +"(" &
+                    "        (?: [\x00-\x7F]                  # single-byte sequences   0xxxxxxx " &
+                    "        |   [\xC2-\xDF][\x80-\xBF]       # double-byte sequences   110xxxxx 10xxxxxx " &
+                    "        |   \xE0[\xA0-\xBF][\x80-\xBF]   # triple-byte sequences   1110xxxx 10xxxxxx-- 2 " &
+                    "        |   [\xE1-\xEC][\x80-\xBF]{2} "  &
+                    "        |   \xED[\x80-\x9F][\x80-\xBF] " &
+                    "        |   [\xEE-\xEF][\x80-\xBF]{2}";
+               begin
+                  if "utf8mb4" = Charset then
+                     Append (Regex,
+                       "        |    \xF0[\x90-\xBF][\x80-\xBF]{2} # four-byte sequences   11110xxx 10xxxxxx-- 3 " &
+                       "        |    [\xF1-\xF3][\x80-\xBF]{3} " &
+                       "        |    \xF4[\x80-\x8F][\x80-\xBF]{2} ");
+                  end if;
 
-        --                         if ("utf8mb4" === charset) then
-        --                                 regex .= "
-        --                                         |    \xF0[\x90-\xBF][\x80-\xBF]then2end; # four-byte sequences   11110xxx 10xxxxxx-- 3
-        --                                         |    [\xF1-\xF3][\x80-\xBF]then3end;
-        --                                         |    \xF4[\x80-\x8F][\x80-\xBF]then2end;
-        --                                 ";
-        --                         end;
+                  Append (Regex,
+                    "){1,40}                          # ...one or more times " &
+                    ") " &
+                    " | .                                  # anything else " &
+                    "/x");
+                  Set (Value, "value", From_String (
+                       Preg_Replace (-Regex, "1", Get_As_String (Value, "value"))));
+               end;
 
-        --                         regex         .= ")then1,40end;                          # ...one or more times
-        --                                )
-        --                                 | .                                  # anything else
-        --                                 /x";
-        --                         value["value"] = preg_replace(regex, "1", value["value"]);
+               if
+                 0 /= Length and then -- false
+                 MB_Strlen (Get_As_String (Value, "value"), "UTF-8") > Length
+               then
+                  Set (Value, "value", From_String (
+                       MB_Substr (Get_As_String (Value, "value"),
+                                  0, Length, "UTF-8")));
+               end if;
+               goto Continue;
+            end if;
 
-        --                         if (false !== length && mb_strlen(value["value"], "UTF-8") > length) then
-        --                                 value["value"] = mb_substr(value["value"], 0, length, "UTF-8");
-        --                         end;
-        --                         continue;
-        --                 end;
+            -- We couldn't use any local conversions, send it to the DB.
+            Set (Value, "db", From_Boolean (True));
+            DB_Check_String := True;
+         end;
+         << Continue >>
+      end loop;
+--    Unset (Value); -- Remove by reference.
 
-        --                 // We couldn"t use any local conversions, send it to the DB.
-        --                 value["db"]     = true;
-        --                 db_check_string = true;
-        --         end;
-        --         unset(value); // Remove by reference.
+      if DB_Check_String then
+         declare
+            Queries : Array_Type;
+         begin
+            for A in Data_2.Iterate loop
+               declare
+                  Col   : constant String     := Key (A);
+                  Value : constant Array_Type := As_Array (Element (A));
+               begin
+                  if Kind_Of (Get (Value, "db")) not in Kind_Null then
+--                if not Empty (Value, "db") then
+                     declare
+                        Charset            : Unbounded_String;
+                        Connection_Charset : Unbounded_String;
+                     begin
+                        -- We're going to need to truncate by characters or bytes,
+                        -- depending on the length value we have.
+                        if
+                          Isset_2 (Value, "length", "type") and then
+                          "byte" = As_String (Get (Ref_2 (Value,
+                                                          Key_1 => "length",
+                                                          Key_2 => "type")))
+                        then
+                           -- Using binary causes LEFT() to truncate by bytes.
+                           Charset := +"binary";
+                        else
+                           Charset := +Get_As_String (Value, "charset");
+                        end if;
 
-        --         if (db_check_string) then
-        --                 queries = array();
-        --                 foreach (data as col => value) then
-        --                         if (! empty(value["db"])) then
-        --                                 // We"re going to need to truncate by characters or bytes, depending on the length value we have.
-        --                                 if (isset(value["length"]["type"]) && "byte" === value["length"]["type"]) then
-        --                                         // Using binary causes LEFT() to truncate by bytes.
-        --                                         charset = "binary";
-        --                                 end; else then
-        --                                         charset = value["charset"];
-        --                                 end;
+                        if This.Charset /= "" then
+                           Connection_Charset := This.Charset;
+                        else
+                           if This.Use_Mysqli then
+                              Connection_Charset := +"XXX-998";
+--                              Mysqli_Character_Set_Name (This.Dbh);
+                           else
+                              Connection_Charset := +"XXX-999";
+--                              Mysql_Client_Encoding;
+                           end if;
+                        end if;
 
-        --                                 if (this.charset) then
-        --                                         connection_charset = this.charset;
-        --                                 end; else then
-        --                                         if (this.use_mysqli) then
-        --                                                 connection_charset = mysqli_character_set_name(this.dbh);
-        --                                         end; else then
-        --                                                 connection_charset = mysql_client_encoding();
-        --                                         end;
-        --                                 end;
+                        if Kind_Of (Get (Value, "length")) = Kind_Array then
+                           declare
+                              Length : constant String :=
+                                Sprintf ("%.0f",
+                                         To_List (As_String (Get (Ref_2 (Value,
+                                                                Key_1 => "length",
+                                                                Key_2 => "length")))));
+                           begin
+                              Set (Queries, Col, From_String (
+                                   This.Prepare ("CONVERT(LEFT(CONVERT(%s USING " &
+                                                 (-Charset) & "), " & Length &
+                                                 ") USING " & (-Connection_Charset) &
+                                                 ")",
+                                                 Get_As_String (Value, "value"))));
+                           end;
+                        elsif "binary" /= Charset then
+                           -- If we don't have a length, there's no need to convert
+                           -- binary - it will always return the same result.
+                           Set (Queries, Col, From_String (
+                                This.Prepare ("CONVERT(CONVERT(%s USING " &
+                                              (-Charset) & ") USING " &
+                                              (-Connection_Charset) & ")",
+                                              Get_As_String (Value, "value"))));
+                        end if;
+                     end;
+                     Delete (Ref_2 (Data_2, Key_1 => Col, Key_2 => "db"));
+                  end if;
+               end;
+            end loop;
 
-        --                                 if (is_array(value["length"])) then
-        --                                         length          = sprintf("%.0f", value["length"]["length"]);
-        --                                         queries[ col ] = this.prepare("CONVERT(LEFT(CONVERT(%s USING charset), length) USING connection_charset)", value["value"]);
-        --                                 end; elseif ("binary" !== charset) then
-        --                                         // If we don"t have a length, there"s no need to convert binary - it will always return the same result.
-        --                                         queries[ col ] = this.prepare("CONVERT(CONVERT(%s USING charset) USING connection_charset)", value["value"]);
-        --                                 end;
+            declare
+               SQL : List_Type; -- = array();
+            begin
+               for A in Queries.Iterate loop
+                  declare
+--                   Column : constant String := Key (A);
+                     Query  : constant String := As_String (Element (A));
+                  begin
+                     if Query = "" then -- not
+                        goto Continue_2;
+                     end if;
 
-        --                                 unset(data[ col ]["db"]);
-        --                         end;
-        --                 end;
+                     SQL.Append (+Query & " AS x_column");
+                  end;
+                  << Continue_2 >>
+               end loop;
 
-        --                 sql = array();
-        --                 foreach (queries as column => query) then
-        --                         if (! query) then
-        --                                 continue;
-        --                         end;
+               This.Check_Current_Query := False;
+               declare
+                  Success : Boolean;
 
-        --                         sql[] = query . " AS x_column";
-        --                 end;
+                  Row : constant Array_Type :=
+                    This.Get_Row ("SELECT " & Implode (", ", SQL), "ARRAY_A",
+                                  Success => Success);
+               begin
+                  if Row = Empty_Array then -- not
+                     raise Constraint_Error with "wpdb_strip_invalid_text_failure";
+--                   return Wp_Error ("wpdb_strip_invalid_text_failure",
+--                                    abs "Could not strip invalid text.");
+                  end if;
 
-        --                 this.check_current_query = false;
-        --                 row                       = this.get_row("SELECT " . implode(", ", sql), ARRAY_A);
-        --                 if (! row) then
-        --                         return new WP_Error("wpdb_strip_invalid_text_failure", __("Could not strip invalid text."));
-        --                 end;
+                  for E in Array_Keys (Data_2).Iterate loop
+                     declare
+                        Column : constant String := Key (E);
+                     begin
+                        if Isset (Row, "x_column") then
+                           Set_2 (Data_2,
+                                  Key_1 => Column,
+                                  Key_2 => "value",
+                                  Value => From_String (
+                                             Get_As_String (Row, "x_column")));
+                        end if;
+                     end;
+                  end loop;
+               end;
+            end;
+         end;
+      end if;
 
-        --                 foreach (array_keys(data) as column) then
-        --                         if (isset(row[ "x_column" ])) then
-        --                                 data[ column ]["value"] = row[ "x_column" ];
-        --                         end;
-        --                 end;
-        --         end;
-
-        --         return data;
-        -- end;
+      return Data_2;
+   end Strip_Invalid_Text;
 
         --
         -- Strips any invalid characters from the query.
@@ -2929,7 +3079,7 @@ is
         -- @return string|WP_Error The converted query, or a WP_Error object if the conversion fails.
         --
         -- protected function strip_invalid_text_from_query(query) then
-        --         // We don"t need to check the collation for queries that don"t read data.
+        --         -- We don"t need to check the collation for queries that don"t read data.
         --         trimmed_query = ltrim(query, "\r\n\t (");
         --         if (preg_match("/^(?:SHOW|DESCRIBE|DESC|EXPLAIN|CREATE)\s/i", trimmed_query)) then
         --                 return query;
@@ -2942,7 +3092,7 @@ is
         --                         return charset;
         --                 end;
 
-        --                 // We can"t reliably strip text from tables containing binary/blob columns.
+        --                 -- We can"t reliably strip text from tables containing binary/blob columns.
         --                 if ("binary" === charset) then
         --                         return query;
         --                 end;
@@ -2982,10 +3132,10 @@ is
 
         --         charset = this.get_col_charset(table, column);
         --         if (! charset) then
-        --                 // Not a string column.
+        --                 -- Not a string column.
         --                 return value;
         --         end; elseif (is_wp_error(charset)) then
-        --                 // Bail on real errors.
+        --                 -- Bail on real errors.
         --                 return charset;
         --         end;
 
@@ -3014,16 +3164,16 @@ is
         -- @return string|false The table name found, or false if a table couldn"t be found.
         --
         -- protected function get_table_from_query(query) then
-        --         // Remove characters that can legally trail the table name.
+        --         -- Remove characters that can legally trail the table name.
         --         query = rtrim(query, ";/-#");
 
-        --         // Allow (select...) union [...] style queries. Use the first query"s table name.
+        --         -- Allow (select...) union [...] style queries. Use the first query"s table name.
         --         query = ltrim(query, "\r\n\t (");
 
-        --         // Strip everything between parentheses except nested selects.
+        --         -- Strip everything between parentheses except nested selects.
         --         query = preg_replace("/\((?!\s*select)[^(]*?\)/is", "()", query);
 
-        --         // Quickly match most common queries.
+        --         -- Quickly match most common queries.
         --         if (preg_match(
         --                 "/^\s*(?:"
         --                         . "SELECT.*?\s+FROM"
@@ -3038,7 +3188,7 @@ is
         --                 return str_replace("`", "", maybe[1]);
         --         end;
 
-        --         // SHOW TABLE STATUS and SHOW TABLES WHERE Name = "wp_posts"
+        --         -- SHOW TABLE STATUS and SHOW TABLES WHERE Name = "wp_posts"
         --         if (preg_match("/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES).+WHERE\s+Name\s*=\s*("|\")((?:[0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)\\1/is", query, maybe)) then
         --                 return maybe[2];
         --         end;
@@ -3054,7 +3204,7 @@ is
         --                 return str_replace("\\_", "_", maybe[2]);
         --         end;
 
-        --         // Big pattern for the rest of the table-related queries.
+        --         -- Big pattern for the rest of the table-related queries.
         --         if (preg_match(
         --                 "/^\s*(?:"
         --                         . "(?:EXPLAIN\s+(?:EXTENDED\s+)?)?SELECT.*?\s+FROM"
@@ -3241,7 +3391,7 @@ is
         --
         -- public function check_database_version() then
         --         global wp_version, required_mysql_version;
-        --         // Make sure the server has the required MySQL version.
+        --         -- Make sure the server has the required MySQL version.
         --         if (version_compare(this.db_version(), required_mysql_version, "<")) then
         --                 /* translators: 1: WordPress version number, 2: Minimum required MySQL version number.--
         --                 return new WP_Error("database_version", sprintf(__("<strong>Error:</strong> WordPress %1s requires MySQL %2s or higher"), wp_version, required_mysql_version));
@@ -3310,23 +3460,23 @@ is
         --         db_version     = this.db_version();
         --         db_server_info = this.db_server_info();
 
-        --         // Account for MariaDB version being prefixed with "5.5.5-" on older PHP versions.
+        --         -- Account for MariaDB version being prefixed with "5.5.5-" on older PHP versions.
         --         if ("5.5.5" === db_version && str_contains(db_server_info, "MariaDB")
-        --                 && PHP_VERSION_ID < 80016 // PHP 8.0.15 or older.
+        --                 && PHP_VERSION_ID < 80016 -- PHP 8.0.15 or older.
         --        ) then
-        --                 // Strip the "5.5.5-" prefix and set the version to the correct value.
+        --                 -- Strip the "5.5.5-" prefix and set the version to the correct value.
         --                 db_server_info = preg_replace("/^5\.5\.5-(.*)/", "1", db_server_info);
         --                 db_version     = preg_replace("/[^0-9.].*/", "", db_server_info);
         --         end;
 
         --         switch (strtolower(db_cap)) then
-        --                 case "collation":    // @since 2.5.0
-        --                 case "group_concat": // @since 2.7.0
-        --                 case "subqueries":   // @since 2.7.0
+        --                 case "collation":    -- @since 2.5.0
+        --                 case "group_concat": -- @since 2.7.0
+        --                 case "subqueries":   -- @since 2.7.0
         --                         return version_compare(db_version, "4.1", ">=");
         --                 case "set_charset":
         --                         return version_compare(db_version, "5.0.7", ">=");
-        --                 case "utf8mb4":      // @since 4.1.0
+        --                 case "utf8mb4":      -- @since 4.1.0
         --                         if (version_compare(db_version, "5.5.3", "<")) then
         --                                 return false;
         --                         end;
@@ -3346,7 +3496,7 @@ is
         --                         end; else then
         --                                 return version_compare(client_version, "5.5.3", ">=");
         --                         end;
-        --                 case "utf8mb4_520": // @since 4.6.0
+        --                 case "utf8mb4_520": -- @since 4.6.0
         --                         return version_compare(db_version, "5.6", ">=");
         --         end;
 
@@ -3364,32 +3514,33 @@ is
         --         return wp_debug_backtrace_summary(__CLASS__);
         -- end;
 
-        --
-        -- Retrieves the database server version.
-        --
-        -- @since 2.7.0
-        --
-        -- @return string|null Version number on success, null on failure.
-        --
-        -- public function db_version() then
-        --         return preg_replace("/[^0-9.].*/", "", this.db_server_info());
-        -- end;
+   ----------------
+   -- DB_Version --
+   ----------------
 
-        --
-        -- Retrieves full database server information.
-        --
-        -- @since 5.5.0
-        --
-        -- @return string|false Server info on success, false on failure.
-        --
-        -- public function db_server_info() then
-        --         if (this.use_mysqli) then
-        --                 server_info = mysqli_get_server_info(this.dbh);
-        --         end; else then
-        --                 server_info = mysql_get_server_info(this.dbh);
-        --         end;
+   function DB_Version (This : Wpdb_Class)
+                        return String
+   is
+      use Php.Preg;
+   begin
+      return Preg_Replace ("/[^0-9.].*/", "", This.DB_Server_Info);
+   end DB_Version;
 
-        --         return server_info;
-        -- end;
+   --------------------
+   -- DB_Server_Info --
+   --------------------
+
+   function DB_Server_Info (This : Wpdb_Class)
+            return String
+   is
+   begin
+      -- if This.Use_MySQLi then
+      --    Server_Info := MySQLi_Get_Server_Info (This.Dbh);
+      -- end; else then
+      --    Server_Info := MySQL_Get_Server_Info (This.Dbh);
+      -- end if;
+
+      return "XXX-990"; -- Server_Info;
+   end DB_Server_Info;
 
 end Inc_Class_Wpdb;

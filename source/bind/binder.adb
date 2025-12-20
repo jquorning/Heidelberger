@@ -9,6 +9,7 @@ with Hb_Common;
 with Adm_Credits;
 with Adm_Edit;
 with Adm_Edit_Tags;
+with Adm_Install;
 with Adm_Load_Scripts;
 with Adm_Load_Styles;
 -- with Adm_Menu_Header;
@@ -71,6 +72,9 @@ is
 
       elsif Index (URL, "/wp-admin/edit-tags.php") /= 0 then
          Adm_Edit_Tags.Render;
+
+      elsif Index (URL, "/wp-admin/install.php") /= 0 then
+         Adm_Install.Run;
 
       elsif Index (URL, "/wp-admin/post.php") /= 0 then
          Adm_Post.Render;

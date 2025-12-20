@@ -479,7 +479,7 @@ is
 --              wp_theme_directories = array();
 --      end;
 
-      Untrailed := +Untrailingslashit (-Directory_2);
+      Untrailed := +Un_Trailing_Slash_It (-Directory_2);
       if
         not Empty (-Untrailed) and then
         not In_Array (-Untrailed, Wp_Theme_Directories, True)

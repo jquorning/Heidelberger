@@ -484,7 +484,7 @@ is
          Set (Sidebars_Widgets_2, "array_version", From_Integer (3));
       end if;
 
-      Update_Option ("sidebars_widgets", Sidebars_Widgets_2);
+      Update_Option ("sidebars_widgets", From_Array (Sidebars_Widgets_2));
    end Wp_Set_Sidebars_Widgets;
 
    --------------------------

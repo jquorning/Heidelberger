@@ -25,6 +25,20 @@ is
                         Right : String) return List_Type
       is (Left);
 
+   type Filter_Callback is not null access function (Value : String)
+                                                     return Boolean;
+
+   function List_Filter (List     : List_Type;
+                         Callback : Filter_Callback)
+                         return List_Type
+                         is (Empty_List);
+
+   function List_Fill (Start_Index : Integer;
+                       Count       : Integer;
+                       Value       : Multi_Type)
+                       return List_Type
+                       is (Empty_List);
+
    function Array_Map (Item : String;
                        List : List_Type)
                        return List_Type is (Empty_List);

@@ -21,8 +21,8 @@ is
                         return Boolean
                         is (False);
 
-   function Is_Numeric (Value : Integer)
-                        return Boolean
-                        is (True);
+   function Is_Number (Value : Integer)
+                       return Boolean
+                       is (True);
 
 end Php.Types;

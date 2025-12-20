@@ -26,7 +26,9 @@ is
          User_Login    : Unbounded_String;
          User_Nicename : Unbounded_String;
          User_Email    : Unbounded_String;
+         User_URL      : Unbounded_String;
          Display_Name  : Unbounded_String;
+         User_Level    : Natural;
       end record;
 
    package Boolean_Maps is new
@@ -137,16 +139,28 @@ is
          -- private
          Site_Id : Integer := 0;
 
-         --
-         -- @since 3.3.0
-         -- @var array
-         --
---        private static back_compat_keys;
-
          -- Added by jq
          Prop : Property_Type;
 
       end record;
+
+   --
+   -- Constructor.
+   --
+   -- Retrieves the userdata and passes it to WP_User::init().
+   --
+   -- @since 2.0.0
+   --
+   -- @param int|string|stdClass|WP_User id      User's ID, a WP_User object, or a
+   --                                             user object from the DB.
+   -- @param string                      name    Optional. User's username
+   -- @param int                         site_id Optional Site ID, defaults to
+   --                                             current site.
+   --
+   function X_Construct (Id      : Integer := 0;
+                         Name    : String  := "";
+                         Site_Id : Integer := 0) -- ""
+                         return Wp_User;
 
    --
    -- Sets up object properties, including capabilities.
@@ -178,6 +192,11 @@ is
                          Value : Integer)
                          return Wp_User;
 
+   function Get_Data_By (Field : String;
+                         Value : String)
+                         return Wp_User
+                         is (raise Program_Error with "not implemented");
+
    --
    -- Determines whether the user exists in the database.
    --
@@ -206,6 +225,55 @@ is
                            return Array_Type; -- Boolean_Maps.Map;
 
    procedure Get_Role_Caps (This : in out Wp_User);
+
+   --
+   -- Sets the role of the user.
+   --
+   -- This will remove the previous roles of the user and assign the user the
+   -- new one. You can set the role to an empty string and it will remove all
+   -- of the roles from the user.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string role Role name.
+   --
+   procedure Set_Role (This : in out Wp_User;
+                       Role : String);
+
+   --
+   -- Chooses the maximum level the user has.
+   --
+   -- Will compare the level from the item parameter against the max
+   -- parameter. If the item is incorrect, then just the max parameter value
+   -- will be returned.
+   --
+   -- Used to get the max level based on the capabilities the user has. This
+   -- is also based on roles, so if the user is assigned the Administrator role
+   -- then the capability 'level_10' will exist and the user will get that
+   -- value.
+   --
+   -- @since 2.0.0
+   --
+   -- @param int    max  Max level of user.
+   -- @param string item Level capability name.
+   -- @return int Max Level.
+   --
+   function Level_Reduction (Max  : Integer;
+                             Item : String)
+                             return Integer;
+
+   --
+   -- Updates the maximum user level for the user.
+   --
+   -- Updates the 'user_level' user metadata (includes prefix that is the
+   -- database table prefix) with the maximum user level. Gets the value from
+   -- the all of the capabilities that the user has.
+   --
+   -- @since 2.0.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Update_User_Level_From_Caps (This : in out Wp_User);
 
    --
    -- Returns whether the user has the specified capability.
@@ -275,6 +343,15 @@ is
       Roles   => Empty_List,
       Allcaps => Empty_Array,
       Site_Id => 0,
-      Prop    => (others => Null_Unbounded_String));
+      Prop    => (User_Level => 0,
+                  others     => Null_Unbounded_String));
+
+private
+   --
+   -- @since 3.3.0
+   -- @var array
+   --
+   -- private static
+   Back_Compat_Keys : Array_Type;
 
 end Inc_Class_Wp_Users;

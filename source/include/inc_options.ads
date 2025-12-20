@@ -1,5 +1,8 @@
 --
+-- Option API
 --
+-- @package WordPress
+-- @subpackage Option
 --
 
 with Arrays;
@@ -62,11 +65,11 @@ is
    -- will be identical to the original as it is serialized before saving
    -- it in the database:
    --
-   --     array(3) then
+   --     array(3) {
    --         [0] => bool(false)
    --         [1] => string(3) "str"
    --         [2] => NULL
-   --     end;
+   --     }
    --
    -- @since 1.5.0
    --
@@ -82,7 +85,6 @@ is
    --               they originate from a database stored option value. If there is
    --               no option in the database, boolean `false` is returned.
    --
---   function get_option( option, default = false ) then
    function Get_Option (Option  : String;
                         Default : Array_Type := Empty_Array)
                         return Array_Type
@@ -99,12 +101,29 @@ is
 
    function Get_Option (Option  : String;
                         Default : String := "")
-                        return String;
+                        return String
+                        is ("XXX-219");
+
+   function Get_Option (Option  : String;
+                        Default : String := "")
+                        return Multi_Type;
 
    function Get_Option (Option  : String;
                         Default : String := "")
                         return Boolean
                         is (True);
+
+   --
+   -- Protects WordPress special option from being modified.
+   --
+   -- Will die if option is in protected list. Protected options are "alloptions"
+   -- and "notoptions" options.
+   --
+   -- @since 2.2.0
+   --
+   -- @param string option Option name.
+   --
+   procedure Wp_Protect_Special_Option (Option : String);
 
    --
    -- Loads and caches all autoloaded options, if available or all options.
@@ -119,7 +138,23 @@ is
    -- @return array List of all options.
    --
    function Wp_Load_Alloptions (Force_Cache : Boolean := False)
-            return Array_Type;
+                                return Array_Type;
+
+   --
+   -- Removes option by name. Prevents removal of protected WordPress options.
+   --
+   -- @since 1.2.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string option Name of the option to delete. Expected to not be
+   --                       SQL-escaped.
+   -- @return bool True if the option was deleted, false otherwise.
+   --
+   function Delete_Option (Option : String)
+                           return Boolean;
+
+   procedure Delete_Option (Option : String);
 
    --
    -- Saves and restores user interface settings stored in a cookie.
@@ -130,8 +165,7 @@ is
    --
    -- @since 2.7.0
    --
-   procedure Wp_User_Settings
-             is null;
+   procedure Wp_User_Settings;
 
    --
    -- Retrieve an option value for the current network based on name of option.
@@ -151,30 +185,53 @@ is
    -- @return mixed Value set for the option.
    --
    function Get_Site_Option (Option     : String;
-                             Default    : Boolean := False;
-                             Deprecated : Boolean := True)
-                             return String;
+                             Default    : Multi_Type := From_Boolean (False);
+                             Deprecated : Boolean    := True)
+                             return Multi_Type;
 
-   function Get_Site_Option (Option     : String;
-                             Default    : Boolean := False;
-                             Deprecated : Boolean := True)
-                             return Boolean
-                             is (True);
+   -- function Get_Site_Option (Option     : String;
+   --                           Default    : Boolean := False;
+   --                           Deprecated : Boolean := True)
+   --                           return Boolean
+   --                           is (True);
 
-   function Get_Site_Option (Option  : String;
-                             Default : List_Type)
-                             return Array_Type
-                             is (Empty_Array);
+   -- function Get_Site_Option (Option  : String;
+   --                           Default : List_Type)
+   --                           return Array_Type
+   --                           is (Empty_Array);
 
-   function Get_Site_Option (Option  : String;
-                             Default : List_Type)
-                             return List_Type
-                             is (Empty_List);
+   -- function Get_Site_Option (Option  : String;
+   --                           Default : List_Type)
+   --                           return List_Type
+   --                           is (Empty_List);
 
-   function Get_Site_Option (Option  : String;
-                             Default : List_Type := Empty_List)
-                             return Natural
-                             is (999);
+   -- function Get_Site_Option (Option  : String;
+   --                           Default : List_Type := Empty_List)
+   --                           return Natural
+   --                           is (999);
+
+   --
+   -- Adds a new option for the current network.
+   --
+   -- Existing options will not be updated. Note that prior to 3.3 this wasn't the
+   -- case.
+   --
+   -- @since 2.8.0
+   -- @since 4.4.0 Modified into wrapper for add_network_option()
+   --
+   -- @see add_network_option()
+   --
+   -- @param string option Name of the option to add. Expected to not be SQL-escaped.
+   -- @param mixed  value  Option value, can be anything. Expected to not be
+   --                       SQL-escaped.
+   -- @return bool True if the option was added, false otherwise.
+   --
+   function Add_Site_Option (Option : String;
+                             Value  : Multi_Type)
+                             return Boolean;
+
+   procedure Add_Site_Option (Option : String;
+                              Value  : Multi_Type);
 
    --
    -- Removes a option by name for the current network.
@@ -206,15 +263,38 @@ is
    --                          current network ID.
    -- @param string option     Name of the option to retrieve. Expected to not be
    --                          SQL-escaped.
-   -- @param mixed  default    Optional. Value to return if the option doesn"t exist.
+   -- @param mixed  default    Optional. Value to return if the option doesn't exist.
    --                          Default false.
    -- @return mixed Value set for the option.
    --
    function Get_Network_Option (Network_Id : Integer;
                                 Option     : String;
-                                Default    : Boolean := False)
-                                return String
-                                is ("XXX-667");
+                                Default    : Multi_Type := From_Boolean (False))
+                                return Multi_Type;
+
+   --
+   -- Adds a new network option.
+   --
+   -- Existing options will not be updated.
+   --
+   -- @since 4.4.0
+   --
+   -- @see add_option()
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param int    network_id ID of the network. Can be null to default to the
+   --                           current network ID.
+   -- @param string option     Name of the option to add. Expected to not be
+   --                           SQL-escaped.
+   -- @param mixed  value      Option value, can be anything. Expected to not be
+   --                           SQL-escaped.
+   -- @return bool True if the option was added, false otherwise.
+   --
+   function Add_Network_Option (Network_Id : Integer;
+                                Option     : String;
+                                Value      : Multi_Type)
+                                return Boolean;
 
    --
    -- Removes a network option by name.
@@ -233,8 +313,27 @@ is
    --
    function Delete_Network_Option (Network_Id : Integer;
                                    Option     : String)
-                                   return Boolean
-                                   is (False);
+                                   return Boolean;
+
+   --
+   -- Updates the value of a network option that was already added.
+   --
+   -- @since 4.4.0
+   --
+   -- @see update_option()
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param int    network_id ID of the network. Can be null to default to the
+   --                           current network ID.
+   -- @param string option     Name of the option. Expected to not be SQL-escaped.
+   -- @param mixed  value      Option value. Expected to not be SQL-escaped.
+   -- @return bool True if the value was updated, false otherwise.
+   --
+   function Update_Network_Option (Network_Id : Integer;
+                                   Option     : String;
+                                   Value      : Multi_Type)
+                                   return Boolean;
 
    --
    -- Updates the value of an option that was already added.
@@ -267,20 +366,66 @@ is
    -- @return bool True if the value was updated, false otherwise.
    --
    function Update_Option (Option   : String;
-                           Value    : Boolean;
-                           Autoload : Boolean := False) -- = null
-                           return Boolean
-                           is (False);
+                           Value    : Multi_Type;
+                           Autoload : Boolean := False)
+                           return Boolean;
 
    procedure Update_Option (Option   : String;
-                            Value    : Array_Type;
-                            Autoload : Boolean := False) -- = null
-                            is null;
+                            Value    : Multi_Type;
+                            Autoload : Boolean := False);
 
-   procedure Update_Option (Option   : String;
-                            Value    : String;
-                            Autoload : Boolean := False) -- = null
-                            is null;
+   -- function Update_Option (Option   : String;
+   --                         Value    : Boolean;
+   --                         Autoload : Boolean := False) -- = null
+   --                         return Boolean
+   --                         is (False);
+
+   -- procedure Update_Option (Option   : String;
+   --                          Value    : Array_Type;
+   --                          Autoload : Boolean := False) -- = null
+   --                          is null;
+
+   -- procedure Update_Option (Option   : String;
+   --                          Value    : String;
+   --                          Autoload : Boolean := False) -- = null
+   --                          is null;
+
+   --
+   -- Adds a new option.
+   --
+   -- You do not need to serialize values. If the value needs to be serialized,
+   -- then it will be serialized before it is inserted into the database.
+   -- Remember, resources cannot be serialized or added as an option.
+   --
+   -- You can create options without values and then update the values later.
+   -- Existing options will not be updated and checks are performed to ensure that you
+   -- aren't adding a protected WordPress option. Care should be taken to not name
+   -- options the same as the ones which are protected.
+   --
+   -- @since 1.0.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string      option     Name of the option to add. Expected to not be
+   --                                SQL-escaped.
+   -- @param mixed       value      Optional. Option value. Must be serializable if
+   --                                non-scalar. Expected to not be SQL-escaped.
+   -- @param string      deprecated Optional. Description. Not used anymore.
+   -- @param string|bool autoload   Optional. Whether to load the option when
+   --                                WordPress starts up. Default is enabled. Accepts
+   --                                "no" to disable for legacy reasons.
+   -- @return bool True if the option was added, false otherwise.
+   --
+   function Add_Option (Option     : String;
+                        Value      : Multi_Type := From_String ("");
+                        Deprecated : String     := "";
+                        Autoload   : Boolean    := True) -- "yes"
+                        return Boolean;
+
+   procedure Add_Option (Option     : String;
+                         Value      : Multi_Type := From_String ("");
+                         Deprecated : String     := "";
+                         Autoload   : Boolean    := True); -- "yes"
 
    --
    -- Updates the value of an option that was already added for the current network.
@@ -295,13 +440,11 @@ is
    -- @return bool True if the value was updated, false otherwise.
    --
    function Update_Site_Option (Option : String;
-                                Value  : String)
-                                return Boolean
-                                is (True);
+                                Value  : Multi_Type)
+                                return Boolean;
 
    procedure Update_Site_Option (Option : String;
-                                 Value  : String)
-                                 is null;
+                                 Value  : Multi_Type);
 
    --
    -- Retrieves user interface setting value based on setting name.
@@ -315,9 +458,20 @@ is
    --               doesn't exist.
    --
    function Get_User_Setting (Name    : String;
-                              Default : String := "") -- Boolean := False)
-                              return String
-                              is ("XXX-601");
+                              Default : String := "")
+                              return Multi_Type;
+
+   --
+   -- Retrieves all user interface settings.
+   --
+   -- @since 2.7.0
+   --
+   -- @global array _updated_user_settings
+   --
+   -- @return array The last saved user settings or empty array.
+   --
+   function Get_All_User_Settings
+            return Array_Type;
 
    --
    -- Retrieves the value of a transient.
@@ -331,7 +485,7 @@ is
    -- @return mixed Value of transient.
    --
    function Get_Transient (Transient : String)
-                           return String is ("XXX-302");
+                           return Multi_Type;
 
    --
    -- Sets/updates the value of a transient.
@@ -350,15 +504,13 @@ is
    -- @return bool True if the value was set, false otherwise.
    --
    function Set_Transient (Transient  : String;
-                           Value      : String;
+                           Value      : Multi_Type;
                            Expiration : Integer := 0)
-                           return Boolean
-                           is (True);
+                           return Boolean;
 
    procedure Set_Transient (Transient  : String;
-                            Value      : String;
-                            Expiration : Integer := 0)
-                            is null;
+                            Value      : Multi_Type;
+                            Expiration : Integer := 0);
 
    --
    -- Retrieves the value of a site transient.
@@ -375,5 +527,31 @@ is
    --
    function Get_Site_Transient (Transient : String)
                                 return Hb_Common.String_Maps.Map;
+
+   --
+   -- Sets/updates the value of a site transient.
+   --
+   -- You do not need to serialize values. If the value needs to be serialized,
+   -- then it will be serialized before it is set.
+   --
+   -- @since 2.9.0
+   --
+   -- @see set_transient()
+   --
+   -- @param string transient  Transient name. Expected to not be SQL-escaped. Must be
+   --                           167 characters or fewer in length.
+   -- @param mixed  value      Transient value. Expected to not be SQL-escaped.
+   -- @param int    expiration Optional. Time until expiration in seconds. Default
+   --                           0 (no expiration).
+   -- @return bool True if the value was set, false otherwise.
+   --
+   function Set_Site_Transient (Transient  : String;
+                                Value      : Array_Type;
+                                Expiration : Integer := 0)
+                                return Boolean;
+
+   procedure Set_Site_Transient (Transient  : String;
+                                 Value      : Array_Type;
+                                 Expiration : Integer := 0);
 
 end Inc_Options;

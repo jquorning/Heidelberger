@@ -1,33 +1,48 @@
 --
 -- Core HTTP Request API
 --
--- Standardizes the HTTP requests for WordPress. Handles cookies, gzip encoding and decoding, chunk
--- decoding, if HTTP 1.1 and various other difficult HTTP protocol implementations.
+-- Standardizes the HTTP requests for WordPress. Handles cookies, gzip encoding
+-- and decoding, chunk decoding, if HTTP 1.1 and various other difficult HTTP
+-- protocol implementations.
 --
 -- @package WordPress
 -- @subpackage HTTP
 --
 
+with Ada.Containers;
+
+with Php.Arrays;
+with Php.HTML;
+with Php.Lists;
+with Php.Types;
+
+with Inc_Class_Wp_Http;
+with Inc_Functions;
+with Inc_Load;
+
 package body Inc_Http
 is
-   procedure Dummy is null;
 
--- --
--- -- Returns the initialized WP_Http Object
--- --
--- -- @since 2.7.0
--- -- @access private
--- --
--- -- @return WP_Http HTTP Transport object.
--- --
--- function _wp_http_get_object() then
---         static http = null;
+   subtype Wp_Http is Inc_Class_Wp_Http.Wp_Http;
 
---         if ( is_null( http ) ) then
---                 http = new WP_Http();
---         end;
---         return http;
--- end;
+   Static_HTTP : Wp_Http; -- = null;
+
+   --------------------------
+   -- X_Wp_HTTP_Get_Object --
+   --------------------------
+
+   -- function X_Wp_HTTP_Get_Object
+   --          return Wp_Http
+   -- is
+   --      static http = null;
+   -- begin
+   --      if ( is_null( http ) ) then
+   --              http = new WP_Http();
+   --      end;
+   --      return http;
+   -- end X_Wp_HTTP_Get_Object;
+   X_Wp_HTTP_Get_Object : Wp_Http
+     renames Static_HTTP;
 
 -- --
 -- -- Retrieve the raw response from a safe HTTP request.
@@ -165,22 +180,18 @@ is
 --         return http.get( url, args );
 -- end;
 
--- --
--- -- Performs an HTTP request using the POST method and returns its response.
--- --
--- -- @since 2.7.0
--- --
--- -- @see wp_remote_request() For more information on the response array format.
--- -- @see WP_Http::request() For default arguments information.
--- --
--- -- @param string url  URL to retrieve.
--- -- @param array  args Optional. Request arguments. Default empty array.
--- -- @return array|WP_Error The response or WP_Error on failure.
--- --
--- function wp_remote_post( url, args = array() ) then
---         http = _wp_http_get_object();
---         return http.post( url, args );
--- end;
+   --------------------
+   -- Wp_Remove_Post --
+   --------------------
+
+   function Wp_Remote_Post (URL  : String;
+                            Args : Array_Type := Empty_Array)
+                            return Array_Type
+   is
+      HTTP : constant Wp_Http := X_Wp_HTTP_Get_Object;
+   begin
+      return HTTP.Post (URL, Args);
+   end Wp_Remote_Post;
 
 -- --
 -- -- Performs an HTTP request using the HEAD method and returns its response.
@@ -277,21 +288,24 @@ is
 --         return response["response"]["message"];
 -- end;
 
--- --
--- -- Retrieve only the body from the raw response.
--- --
--- -- @since 2.7.0
--- --
--- -- @param array|WP_Error response HTTP response.
--- -- @return string The body of the response. Empty string if no body or incorrect parameter given.
--- --
--- function wp_remote_retrieve_body( response ) then
---         if ( is_wp_error( response ) || ! isset( response["body"] ) ) then
---                 return "";
---         end;
+   -----------------------------
+   -- Wp_Remote_Retrieve_Body --
+   -----------------------------
 
---         return response["body"];
--- end;
+   function Wp_Remote_Retrieve_Body (Response : Array_Type)
+                                     return String
+   is
+      use Inc_Load;
+   begin
+      if
+        Is_Wp_Error (Response) or else
+        not Isset (Response, "body")
+      then
+         return "";
+      end if;
+
+      return Get_As_String (Response, "body");
+   end Wp_Remote_Retrieve_Body;
 
 -- --
 -- -- Retrieve only the cookies from the raw response.
@@ -356,38 +370,55 @@ is
 --         return cookie.value;
 -- end;
 
--- --
--- -- Determines if there is an HTTP Transport that can process this request.
--- --
--- -- @since 3.2.0
--- --
--- -- @param array  capabilities Array of capabilities to test or a wp_remote_request() args array.
--- -- @param string url          Optional. If given, will check if the URL requires SSL and adds
--- --                             that requirement to the capabilities array.
--- --
--- -- @return bool
--- --
--- function wp_http_supports( capabilities = array(), url = null ) then
---         http = _wp_http_get_object();
+   ----------------------
+   -- Wp_HTTP_Supports --
+   ----------------------
 
---         capabilities = wp_parse_args( capabilities );
+   function Wp_HTTP_Supports (Capabilities : Array_Type := Empty_Array;
+   -- List_Type := Empty_List;
+                              URL          : String    := "")
+                              return Boolean
+   is
+      use Ada.Containers;
+      use Php.Arrays;
+      use Php.HTML;
+      use Php.Lists;
+      use Php.Types;
+      use Inc_Functions;
 
---         count = count( capabilities );
+      HTTP : constant Wp_Http := X_Wp_HTTP_Get_Object;
 
---         // If we have a numeric capabilities array, spoof a wp_remote_request() associative args array.
---         if ( count && count( array_filter( array_keys( capabilities ), "is_numeric" ) ) == count ) then
---                 capabilities = array_combine( array_values( capabilities ), array_fill( 0, count, true ) );
---         end;
+      Capabilities_2 : Array_Type := Wp_Parse_Args (Capabilities);
 
---         if ( url && ! isset( capabilities["ssl"] ) ) then
---                 scheme = parse_url( url, PHP_URL_SCHEME );
---                 if ( "https" === scheme || "ssl" === scheme ) then
---                         capabilities["ssl"] = true;
---                 end;
---         end;
+      Count : constant Count_Type := Capabilities_2.Length;
+   begin
+      -- If we have a numeric capabilities array, spoof a wp_remote_request()
+      -- associative args array.
+      if
+        Count not in 0 and then
+        List_Filter (Array_Keys (Capabilities_2),
+                     Is_Numeric'Access).Length = Count
+      then
+         Capabilities_2 :=
+           Array_Combine (Array_Values (Capabilities_2),
+                          List_Fill (0, Integer (Count), From_Boolean (True)));
+      end if;
 
---         return (bool) http._get_first_available_transport( capabilities );
--- end;
+      if
+        URL /= "" and then
+        not Isset (Capabilities_2, "ssl")
+      then
+         declare
+            Scheme : constant String := Parse_URL (URL, PHP_URL_SCHEME);
+         begin
+            if Scheme in "https" | "ssl" then
+               Set (Capabilities_2, "ssl", From_Boolean (True));
+            end if;
+         end;
+      end if;
+
+      return HTTP.X_Get_First_Available_Transport (Capabilities_2) /= ""; -- (bool)
+   end Wp_HTTP_Supports;
 
 -- --
 -- -- Get the HTTP Origin of the current request.

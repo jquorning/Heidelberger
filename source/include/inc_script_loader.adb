@@ -2670,7 +2670,7 @@ is
 
       Can_Compress_Scripts : constant Boolean :=
         not Inc_Load.Wp_Installing and then
-        Inc_Options.Get_Site_Option ("can_compress_scripts");
+        As_Boolean (Inc_Options.Get_Site_Option ("can_compress_scripts"));
 
    begin
       if not Concatenate_Scripts then

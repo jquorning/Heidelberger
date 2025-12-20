@@ -402,6 +402,13 @@ is
                            return String
                            is (Value);
 
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Integer;
+                           V         : Array_Type;
+                           Trans     : String)
+                           return Integer
+                           is (Value);
+
    --
    -- Checks if any filter has been registered for a hook.
    --
@@ -544,6 +551,47 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
+                        Arg_2     : String;
+                        Arg_3     : Integer)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Option    : String;
+                        Arg_3     : Multi_Type;
+                        Arg_4     : Multi_Type)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Option    : String;
+                        Arg_3     : Multi_Type)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Option    : String;
+                        Arg_3     : Multi_Type;
+                        Net       : Natural)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Arg_3     : Multi_Type;
+                        Arg_4     : Multi_Type;
+                        Option    : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Arg_3     : Multi_Type;
+                        Arg_4     : Natural;
+                        Option    : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Option    : String;
+                        Arg_3     : Multi_Type;
+                        Arg_4     : Multi_Type;
+                        Net       : Natural)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
                         Args      : Array_Type)
                         is null;
 
@@ -562,6 +610,18 @@ is
                         Message   : String;
                         Data      : String;
                         Error     : Inc_Class_Wp_Errors.Wp_Error)
+                        is null;
+
+   procedure Do_Action (Hook_Name  : String;
+                        Value      : Array_Type;
+                        Expiration : Integer;
+                        Transient  : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name  : String;
+                        Transient  : String;
+                        Value      : Array_Type;
+                        Expiration : Integer)
                         is null;
 
    --

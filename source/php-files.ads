@@ -30,6 +30,10 @@ is
                          return Boolean
                          is (True);
 
+   function Is_Writable (Filename : String)
+                         return Boolean
+                         is (False);
+
    function Dirname (Path   : String;
                      Levels : Positive := 1)
                      return String
@@ -48,5 +52,9 @@ is
                                Length           : Integer  := 0)
             return String
             is ("XXX-780");
+
+   function Sys_Get_Temp_Dir
+            return String
+            is ("XXX-977");
 
 end Php.Files;

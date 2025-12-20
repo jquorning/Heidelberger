@@ -15,6 +15,7 @@ with Hb_Common;
 with Inc_Class_Wp_Dependencies;
 with Inc_Functions;
 with Inc_L10n;
+with Inc_Plugins;
 
 package body Inc_Functions_Wp_Scripts
 is
@@ -83,46 +84,46 @@ is
 --         );
 -- end;
 
--- --
--- -- Prints scripts in document head that are in the handles queue.
--- --
--- -- Called by admin-header.php and {@see "wp_head"} hook. Since it is called by wp_head on every page load,
--- -- the function does not instantiate the WP_Scripts object unless script names are explicitly passed.
--- -- Makes use of already-instantiated wp_scripts global if present. Use provided {@see "wp_print_scripts"}
--- -- hook to register/enqueue new scripts.
--- --
--- -- @see WP_Scripts::do_item()
--- -- @global WP_Scripts wp_scripts The WP_Scripts object for printing scripts.
--- --
--- -- @since 2.1.0
--- --
--- -- @param string|bool|array handles Optional. Scripts to be printed. Default "false".
--- -- @return string[] On success, an array of handles of processed WP_Dependencies items; otherwise, an empty array.
--- --
--- function wp_print_scripts( handles = false ) then
---         global wp_scripts;
+   ----------------------
+   -- Wp_Print_Scripts --
+   ----------------------
 
---         --
---         -- Fires before scripts in the handles queue are printed.
---         --
---         -- @since 2.1.0
---         --
---         do_action( "wp_print_scripts" );
+   function Wp_Print_Scripts (Handles : List_Type := Empty_List)
+                              return List_Type
+   is
+--    global wp_scripts;
+      use Inc_Class_Wp_Scripts;
+      use Inc_Plugins;
+   begin
+      --
+      -- Fires before scripts in the handles queue are printed.
+      --
+      -- @since 2.1.0
+      --
+      Do_Action ("wp_print_scripts");
 
---         if ( "" === handles ) then // For "wp_head".
---                 handles = false;
---         end;
+--    if "" = Handles then  -- For "wp_head".
+--       Handles := False;
+--    end if;
 
---         _wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
+      X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__");
 
---         if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
---                 if ( ! handles ) then
---                         return array(); // No need to instantiate if nothing is there.
---                 end;
---         end;
+--    if Wp_Scripts not in Inc_Class_Wp_Scripts.Wp_Scripts then -- instanceof
+--       if not Handles then
+--          return array(); -- No need to instantiate if nothing is there.
+--       end if;
+--    end if;
 
---         return wp_scripts().do_items( handles );
--- end;
+      return Wp_Scripts_X.Do_Items (Handles); -- ()
+   end Wp_Print_Scripts;
+
+   procedure Wp_Print_Scripts (Handles : List_Type := Empty_List)
+   is
+      Unused : constant List_Type :=
+        Wp_Print_Scripts (Handles);
+   begin
+      null;
+   end Wp_Print_Scripts;
 
    --------------------------
    -- Wp_Add_Inline_Script --

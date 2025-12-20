@@ -1573,7 +1573,9 @@ is
       use Inc_Formatting;
       use Inc_Options;
 
-      Mode       : constant String := Get_User_Setting ("posts_list_mode", "list");
+      Mode       : constant String :=
+        As_String (Get_User_Setting ("posts_list_mode", "list"));
+
       Mode_Class : constant String := ESC_Attr ("table-view-" & Mode);
    begin
       return To_List (List => (+"widefat", +"fixed", +"striped",

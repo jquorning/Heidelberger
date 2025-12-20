@@ -17,6 +17,7 @@ with Php.Ini;
 with Php.JSON;
 with Php.Lists;
 with Php.Misc;
+with Php.Multibyte;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -27,10 +28,16 @@ with Globals;
 with Hb_Common;
 with Helpers;
 
+with Inc_Caches;
 with Inc_Capabilities;
+with Inc_Class_Wpdb;
 with Inc_Class_Wp_List_Util;
+with Inc_Class_Wp_Networks;
 with Inc_Formatting;
+with Inc_Load;
 with Inc_L10n;
+with Inc_Ms_Networks;
+with Inc_Options;
 with Inc_Plugins;
 with Inc_Pluggables;
 
@@ -1423,99 +1430,106 @@ is
 --         end;
 -- end;
 
---
--- Retrieves the description for the HTTP status.
---
--- @since 2.3.0
--- @since 3.9.0 Added status codes 418, 428, 429, 431, and 511.
--- @since 4.5.0 Added status codes 308, 421, and 451.
--- @since 5.1.0 Added status code 103.
---
--- @global array wp_header_to_desc
---
--- @param int code HTTP status code.
--- @return string Status description if found, an empty string otherwise.
---
--- function get_status_header_desc( code ) then
---         global wp_header_to_desc;
+   ----------------------------
+   -- Get_Status_Header_Desc --
+   ----------------------------
 
---         code = absint( code );
+   function Get_Status_Header_Desc (Code : Integer)
+                                    return String
+   is
+      use Hb_Common;
+--        global wp_header_to_desc;
 
---         if ( ! isset( wp_header_to_desc ) ) then
---                 wp_header_to_desc = array(
---                         100 => "Continue",
---                         101 => "Switching Protocols",
---                         102 => "Processing",
---                         103 => "Early Hints",
+--        code = absint( code );
 
---                         200 => "OK",
---                         201 => "Created",
---                         202 => "Accepted",
---                         203 => "Non-Authoritative Information",
---                         204 => "No Content",
---                         205 => "Reset Content",
---                         206 => "Partial Content",
---                         207 => "Multi-Status",
---                         226 => "IM Used",
+--        if ( ! isset( wp_header_to_desc ) ) then
+      type List_Entry is record
+         Code : Integer;
+         Desc : Unbounded_String;
+      end record;
 
---                         300 => "Multiple Choices",
---                         301 => "Moved Permanently",
---                         302 => "Found",
---                         303 => "See Other",
---                         304 => "Not Modified",
---                         305 => "Use Proxy",
---                         306 => "Reserved",
---                         307 => "Temporary Redirect",
---                         308 => "Permanent Redirect",
+--    Array_Type := To_Array (List => (
+      Wp_Header_To_Desc : constant array (Positive range <>) of List_Entry :=
+        (
+          (100, +"Continue"),
+          (101, +"Switching Protocols"),
+          (102, +"Processing"),
+          (103, +"Early Hints"),
 
---                         400 => "Bad Request",
---                         401 => "Unauthorized",
---                         402 => "Payment Required",
---                         403 => "Forbidden",
---                         404 => "Not Found",
---                         405 => "Method Not Allowed",
---                         406 => "Not Acceptable",
---                         407 => "Proxy Authentication Required",
---                         408 => "Request Timeout",
---                         409 => "Conflict",
---                         410 => "Gone",
---                         411 => "Length Required",
---                         412 => "Precondition Failed",
---                         413 => "Request Entity Too Large",
---                         414 => "Request-URI Too Long",
---                         415 => "Unsupported Media Type",
---                         416 => "Requested Range Not Satisfiable",
---                         417 => "Expectation Failed",
---                         418 => "I\"m a teapot",
---                         421 => "Misdirected Request",
---                         422 => "Unprocessable Entity",
---                         423 => "Locked",
---                         424 => "Failed Dependency",
---                         426 => "Upgrade Required",
---                         428 => "Precondition Required",
---                         429 => "Too Many Requests",
---                         431 => "Request Header Fields Too Large",
---                         451 => "Unavailable For Legal Reasons",
+          (200, +"OK"),
+          (201, +"Created"),
+          (202, +"Accepted"),
+          (203, +"Non-Authoritative Information"),
+          (204, +"No Content"),
+          (205, +"Reset Content"),
+          (206, +"Partial Content"),
+          (207, +"Multi-Status"),
+          (226, +"IM Used"),
 
---                         500 => "Internal Server Error",
---                         501 => "Not Implemented",
---                         502 => "Bad Gateway",
---                         503 => "Service Unavailable",
---                         504 => "Gateway Timeout",
---                         505 => "HTTP Version Not Supported",
---                         506 => "Variant Also Negotiates",
---                         507 => "Insufficient Storage",
---                         510 => "Not Extended",
---                         511 => "Network Authentication Required",
---                 );
---         end;
+          (300, +"Multiple Choices"),
+          (301, +"Moved Permanently"),
+          (302, +"Found"),
+          (303, +"See Other"),
+          (304, +"Not Modified"),
+          (305, +"Use Proxy"),
+          (306, +"Reserved"),
+          (307, +"Temporary Redirect"),
+          (308, +"Permanent Redirect"),
 
---         if ( isset( wp_header_to_desc[ code ] ) ) then
---                 return wp_header_to_desc[ code ];
---         end; else then
---                 return "";
---         end;
--- end;
+          (400, +"Bad Request"),
+          (401, +"Unauthorized"),
+          (402, +"Payment Required"),
+          (403, +"Forbidden"),
+          (404, +"Not Found"),
+          (405, +"Method Not Allowed"),
+          (406, +"Not Acceptable"),
+          (407, +"Proxy Authentication Required"),
+          (408, +"Request Timeout"),
+          (409, +"Conflict"),
+          (410, +"Gone"),
+          (411, +"Length Required"),
+          (412, +"Precondition Failed"),
+          (413, +"Request Entity Too Large"),
+          (414, +"Request-URI Too Long"),
+          (415, +"Unsupported Media Type"),
+          (416, +"Requested Range Not Satisfiable"),
+          (417, +"Expectation Failed"),
+          (418, +"I\'m a teapot"),
+          (421, +"Misdirected Request"),
+          (422, +"Unprocessable Entity"),
+          (423, +"Locked"),
+          (424, +"Failed Dependency"),
+          (426, +"Upgrade Required"),
+          (428, +"Precondition Required"),
+          (429, +"Too Many Requests"),
+          (431, +"Request Header Fields Too Large"),
+          (451, +"Unavailable For Legal Reasons"),
+
+          (500, +"Internal Server Error"),
+          (501, +"Not Implemented"),
+          (502, +"Bad Gateway"),
+          (503, +"Service Unavailable"),
+          (504, +"Gateway Timeout"),
+          (505, +"HTTP Version Not Supported"),
+          (506, +"Variant Also Negotiates"),
+          (507, +"Insufficient Storage"),
+          (510, +"Not Extended"),
+          (511, +"Network Authentication Required")
+        );
+--        end;
+   begin
+      for A of Wp_Header_To_Desc loop
+         if Code = A.Code then
+            return -A.Desc;
+         end if;
+      end loop;
+      return "";
+        -- if ( isset( wp_header_to_desc[ code ] ) ) then
+        --         return wp_header_to_desc[ code ];
+        -- end; else then
+        --         return "";
+        -- end;
+   end Get_Status_Header_Desc;
 
 --
 -- Sets HTTP status header.
@@ -1818,105 +1832,123 @@ is
 --         exit;
 -- end;
 
---
--- Determines whether WordPress is already installed.
---
--- The cache will be checked first. If you have a cache plugin, which saves
--- the cache values, then this will work. If you use the default WordPress
--- cache, and the database goes away, then you might have problems.
---
--- Checks for the "siteurl" option for whether WordPress is installed.
---
--- For more information on this and similar theme functions, check out
--- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tags} article in the Theme Developer Handbook.
---
--- @since 2.1.0
---
--- @global wpdb wpdb WordPress database abstraction object.
---
--- @return bool Whether the site is already installed.
---
--- function is_blog_installed() then
---         global wpdb;
+   -----------------------
+   -- Is_Blog_Installed --
+   -----------------------
 
---         /*
---         -- Check cache first. If options table goes away and we have true
---         -- cached, oh well.
---         --
---         if ( wp_cache_get( "is_blog_installed" ) ) then
---                 return true;
---         end;
+   function Is_Blog_Installed
+            return Boolean
+   is
+      use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Class_Wpdb;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Options;
 
---         suppress = wpdb->suppress_errors();
---         if ( ! wp_installing() ) then
---                 alloptions = wp_load_alloptions();
---         end;
---         // If siteurl is not set to autoload, check it specifically.
---         if ( ! isset( alloptions["siteurl"] ) ) then
---                 installed = wpdb->get_var( "SELECT option_value FROM wpdb->options WHERE option_name = "siteurl"" );
---         end; else then
---                 installed = alloptions["siteurl"];
---         end;
---         wpdb->suppress_errors( suppress );
+      Found : Boolean;
+   begin
+      --
+      -- Check cache first. If options table goes away and we have true
+      -- cached, oh well.
+      --
+      if Wp_Cache_Get ("is_blog_installed", Found => Found) then
+         return True;
+      end if;
 
---         installed = ! empty( installed );
---         wp_cache_set( "is_blog_installed", installed );
+      declare
+         Suppress       : constant Boolean := Globals.WpDB.Suppress_Errors;
+         All_Options    : Array_Type;
+         Installed_Site : Unbounded_String;
+         Installed      : Boolean;
+      begin
+         if not Wp_Installing then
+            All_Options := Wp_Load_Alloptions;
+         end if;
 
---         if ( installed ) then
---                 return true;
---         end;
+         -- If siteurl is not set to autoload, check it specifically.
+         if not Isset (All_Options, "siteurl") then
+            Installed_Site := +Globals.WpDB.Get_Var
+              ("SELECT option_value FROM wpdb->options " &
+               "WHERE option_name = ""siteurl""");
+         else
+            Installed_Site := +Get_As_String (All_Options, "siteurl");
+         end if;
+         Globals.WpDB.Suppress_Errors (Suppress);
 
---         // If visiting repair.php, return true and let it take over.
---         if ( defined( "WP_REPAIRING" ) ) then
---                 return true;
---         end;
+         Installed := not Empty (-Installed_Site);
+         Wp_Cache_Set ("is_blog_installed", Installed);
 
---         suppress = wpdb->suppress_errors();
+         if Installed then
+            return True;
+         end if;
+      end;
 
---         /*
---         -- Loop over the WP tables. If none exist, then scratch installation is allowed.
---         -- If one or more exist, suggest table repair since we got here because the
---         -- options table could not be accessed.
---         --
---         wp_tables = wpdb->tables();
---         foreach ( wp_tables as table ) then
---                 // The existence of custom user tables shouldn"t suggest an unwise state or prevent a clean installation.
---                 if ( defined( "CUSTOM_USER_TABLE" ) && CUSTOM_USER_TABLE == table ) then
---                         continue;
---                 end;
---                 if ( defined( "CUSTOM_USER_META_TABLE" ) && CUSTOM_USER_META_TABLE == table ) then
---                         continue;
---                 end;
+      -- If visiting repair.php, return true and let it take over.
+      if Globals.WP_REPAIRING then
+         return True;
+      end if;
 
---                 described_table = wpdb->get_results( "DESCRIBE table;" );
---                 if (
---                         ( ! described_table && empty( wpdb->last_error ) ) ||
---                         ( is_array( described_table ) && 0 === count( described_table ) )
---                 ) then
---                         continue;
---                 end;
+      declare
+         Suppress  : constant Boolean := Globals.WpDB.Suppress_Errors;
+         Wp_Tables : constant Inc_Class_Wpdb.String_Maps.Map :=
+           Globals.WpDB.Tables;
+      begin
+         --
+         -- Loop over the WP tables. If none exist, then scratch installation is
+         -- allowed. If one or more exist, suggest table repair since we got here
+         -- because the options table could not be accessed.
+         --
+         for Table of Wp_Tables loop
+            -- The existence of custom user tables Shouldn't suggest an unwise
+            -- state or prevent a clean installation.
+            if Globals.CUSTOM_USER_TABLE = Table then
+               goto Continue;
+            end if;
 
---                 // One or more tables exist. This is not good.
+            if Globals.CUSTOM_USER_META_TABLE = Table then
+               goto Continue;
+            end if;
 
---                 wp_load_translations_early();
+            declare
+               Described_Table : constant Array_Type :=
+                 Globals.WpDB.Get_Results ("DESCRIBE table;");
+            begin
+               if
+                 (Described_Table = Empty_Array and then
+                  Empty (-Globals.WpDB.Last_Error))
+                 or else
+                 (Is_Array (Described_Table) and then
+                  0 = Count (Described_Table))
+               then
+                  goto Continue;
+               end if;
+            end;
 
---                 // Die with a DB error.
---                 wpdb->error = sprintf(
---                         /* translators: %s: Database repair URL.--
---                         __( "One or more database tables are unavailable. The database may need to be <a href="%s">repaired</a>." ),
---                         "maint/repair.php?referrer=is_blog_installed"
---                 );
+            -- One or more tables exist. This is not good.
+            Wp_Load_Translations_Early;
 
---                 dead_db();
---         end;
+            -- Die with a DB error.
+            Globals.WpDB.Error :=
+              +Sprintf (
+                 -- translators: %s: Database repair URL.
+                 abs "One or more database tables are unavailable. The database may need to be <a href=""%s"">repaired</a>.",
+                 To_List ("maint/repair.php?referrer=is_blog_installed")
+               );
 
---         wpdb->suppress_errors( suppress );
+            Dead_DB;
+            << Continue >>
+         end loop;
 
---         wp_cache_set( "is_blog_installed", false );
+         Globals.WpDB.Suppress_Errors (Suppress);
+      end;
 
---         return false;
--- end;
+      Wp_Cache_Set ("is_blog_installed", False);
+
+      return False;
+   end Is_Blog_Installed;
 
 --
 -- Retrieves URL with nonce added to URL query.
@@ -2243,77 +2275,72 @@ is
 
          -- Windows paths should uppercase the drive letter.
          Path_5 : constant String := (if ":" = Substr (Path_4, 1, 1)
-                                      then UCfirst (Path_4)
+                                      then UC_First (Path_4)
                                       else Path_4);
       begin
          return (-Wrapper) & Path_5;
       end;
    end Wp_Normalize_Path;
 
---
--- Determines a writable directory for temporary files.
---
--- Function"s preference is the return value of sys_get_temp_dir(),
--- followed by your PHP temporary upload directory, followed by WP_CONTENT_DIR,
--- before finally defaulting to /tmp/
---
--- In the event that this function does not find a writable location,
--- It may be overridden by the WP_TEMP_DIR constant in your wp-config.php file.
---
--- @since 2.5.0
---
--- @return string Writable temporary directory.
---
--- function get_temp_dir() then
---         static temp = "";
---         if ( defined( "WP_TEMP_DIR" ) ) then
---                 return trailingslashit( WP_TEMP_DIR );
---         end;
+   ------------------
+   -- Get_Temp_Dir --
+   ------------------
 
---         if ( temp ) then
---                 return trailingslashit( temp );
---         end;
+   Static_Temp : Unbounded_String;
 
---         if ( function_exists( "sys_get_temp_dir" ) ) then
---                 temp = sys_get_temp_dir();
---                 if ( @is_dir( temp ) && wp_is_writable( temp ) ) then
---                         return trailingslashit( temp );
---                 end;
---         end;
+   function Get_Temp_Dir
+            return String
+   is
+      use Php.Files;
+      use Php.Ini;
+      use Php.Misc;
+      use Hb_Common;
+      use Inc_Formatting;
+   begin
+      if Globals.WP_TEMP_DIR /= "" then
+--    if Defined ("WP_TEMP_DIR") then
+         return Trailingslashit (-Globals.WP_TEMP_DIR);
+      end if;
 
---         temp = ini_get( "upload_tmp_dir" );
---         if ( @is_dir( temp ) && wp_is_writable( temp ) ) then
---                 return trailingslashit( temp );
---         end;
+      if Static_Temp /= "" then
+         return Trailingslashit (-Static_Temp);
+      end if;
 
---         temp = WP_CONTENT_DIR . "/";
---         if ( is_dir( temp ) && wp_is_writable( temp ) ) then
---                 return temp;
---         end;
+      if Function_Exists ("sys_get_temp_dir") then
+         Static_Temp := +Sys_Get_Temp_Dir;
+         if Is_Dir (-Static_Temp) and then Wp_Is_Writable (-Static_Temp) then -- @
+            return Trailingslashit (-Static_Temp);
+         end if;
+      end if;
 
---         return "/tmp/";
--- end;
+      Static_Temp := +Ini_Get ("upload_tmp_dir");
+      if Is_Dir (-Static_Temp) and then Wp_Is_Writable (-Static_Temp) then -- @
+         return Trailingslashit (-Static_Temp);
+      end if;
 
---
--- Determines if a directory is writable.
---
--- This function is used to work around certain ACL issues in PHP primarily
--- affecting Windows Servers.
---
--- @since 3.6.0
---
--- @see win_is_writable()
---
--- @param string path Path to check for write-ability.
--- @return bool Whether the path is writable.
---
--- function wp_is_writable( path ) then
---         if ( "WIN" === strtoupper( substr( PHP_OS, 0, 3 ) ) ) then
---                 return win_is_writable( path );
---         end; else then
---                 return @is_writable( path );
---         end;
--- end;
+      Static_Temp := Globals.WP_CONTENT_DIR & "/";
+      if Is_Dir (-Static_Temp) and then Wp_Is_Writable (-Static_Temp) then
+         return -Static_Temp;
+      end if;
+
+      return "/tmp/";
+   end Get_Temp_Dir;
+
+   --------------------
+   -- Wp_Is_Writable --
+   --------------------
+
+   function Wp_Is_Writable (Path : String)
+                            return Boolean
+   is
+      use Php.Files;
+   begin
+--    if ( "WIN" === strtoupper( substr( PHP_OS, 0, 3 ) ) ) then
+--       return win_is_writable( path );
+--    else
+         return Is_Writable (Path); -- @
+--    end if;
+   end Wp_Is_Writable;
 
 --
 -- Workaround for Windows bug in is_writable() function
@@ -5414,25 +5441,12 @@ is
 --         end;
 -- end;
 
---
--- Loads custom DB error or display WordPress DB error.
---
--- If a file exists in the wp-content directory named db-error.php, then it will
--- be loaded instead of displaying the WordPress DB error. If it is not found,
--- then the WordPress DB error will be displayed instead.
---
--- The WordPress DB error sets the HTTP status header to 500 to try to prevent
--- search engines from caching the message. Custom DB messages should do the
--- same.
---
--- This function was backported to WordPress 2.3.2, but originally was added
--- in WordPress 2.5.0.
---
--- @since 2.3.2
---
--- @global wpdb wpdb WordPress database abstraction object.
---
--- function dead_db() then
+   -------------
+   -- Dead_DB --
+   -------------
+
+   procedure Dead_Db
+   is null;
 --         global wpdb;
 
 --         wp_load_translations_early();
@@ -6337,44 +6351,62 @@ is
 --         return ( get_main_network_id() === network_id );
 -- end;
 
---
--- Gets the main network ID.
---
--- @since 4.3.0
---
--- @return int The ID of the main network.
---
--- function get_main_network_id() then
---         if ( ! is_multisite() ) then
---                 return 1;
---         end;
+   -------------------------
+   -- Get_Main_Network_Id --
+   -------------------------
 
---         current_network = get_network();
+   function Get_Main_Network_Id
+            return Integer
+   is
+      use Inc_Ms_Networks;
+      use Inc_Class_Wp_Networks;
+      use Inc_Load;
+      use Inc_Plugins;
 
---         if ( defined( "PRIMARY_NETWORK_ID" ) ) then
---                 main_network_id = PRIMARY_NETWORK_ID;
---         end; elseif ( isset( current_network->id ) && 1 === (int) current_network->id ) then
---                 // If the current network has an ID of 1, assume it is the main network.
---                 main_network_id = 1;
---         end; else then
---                 _networks       = get_networks(
---                         array(
---                                 "fields" => "ids",
---                                 "number" => 1,
---                         )
---                 );
---                 main_network_id = array_shift( _networks );
---         end;
+      Main_Network_Id : Integer;
+   begin
+      if not Is_Multisite then
+         return 1;
+      end if;
 
---         --
---         -- Filters the main network ID.
---         --
---         -- @since 4.3.0
---         --
---         -- @param int main_network_id The ID of the main network.
---         --
---         return (int) apply_filters( "get_main_network_id", main_network_id );
--- end;
+      declare
+         Current_Network : constant Wp_Network := Get_Network;
+      begin
+--       if ( defined( "PRIMARY_NETWORK_ID" ) ) then
+--          Main_Network_Id := PRIMARY_NETWORK_ID;
+--       elsif
+         if
+           Current_Network.Id /= 0 and then
+--         Isset (Current_Network.Id) and then
+           1 = Current_Network.Id   -- (int)
+         then
+            -- If the current network has an ID of 1, assume it is the main network.
+            Main_Network_Id := 1;
+         else
+            declare
+               X_Networks : constant Network_List :=
+                 Get_Networks (
+                   To_Array (List => (
+                     Build ("fields", "ids"),
+                     Build ("number", 1)
+                   ))
+                 );
+            begin
+               Main_Network_Id := X_Networks.First_Element.Id;
+--             Main_Network_Id := Array_Shift (X_Networks);
+            end;
+         end if;
+
+         --
+         -- Filters the main network ID.
+         --
+         -- @since 4.3.0
+         --
+         -- @param int main_network_id The ID of the main network.
+         --
+         return Apply_Filters ("get_main_network_id", Main_Network_Id); -- (int)
+      end;
+   end Get_Main_Network_Id;
 
 --
 -- Determines whether site meta is enabled.
@@ -7373,69 +7405,65 @@ is
 --         return charset;
 -- end;
 
---
--- Sets the mbstring internal encoding to a binary safe encoding when func_overload
--- is enabled.
---
--- When mbstring.func_overload is in use for multi-byte encodings, the results from
--- strlen() and similar functions respect the utf8 characters, causing binary data
--- to return incorrect lengths.
---
--- This function overrides the mbstring encoding to a binary-safe encoding, and
--- resets it to the users expected encoding afterwards through the
--- `reset_mbstring_encoding` function.
---
--- It is safe to recursively call this function, however each
--- `mbstring_binary_safe_encoding()` call must be followed up with an equal number
--- of `reset_mbstring_encoding()` calls.
---
--- @since 3.7.0
---
--- @see reset_mbstring_encoding()
---
--- @param bool reset Optional. Whether to reset the encoding back to a previously-set encoding.
---                    Default false.
---
--- function mbstring_binary_safe_encoding( reset = false ) then
---         static encodings  = array();
---         static overloaded = null;
+   ------------------------------------
+   -- MB_String_Binary_Safe_Encoding --
+   ------------------------------------
+   Static_Encodings       : List_Type; -- Array_Type;
+   Static_Overloaded_Bool : Boolean := False;
+   Static_Overloaded      : Boolean := False; -- null;
 
---         if ( is_null( overloaded ) ) then
---                 if ( function_exists( "mb_internal_encoding" )
---                         && ( (int) ini_get( "mbstring.func_overload" ) & 2 ) // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.mbstring_func_overloadDeprecated
---                 ) then
---                         overloaded = true;
---                 end; else then
---                         overloaded = false;
---                 end;
---         end;
+   procedure MB_String_Binary_Safe_Encoding (Reset : Boolean := False)
+   is
+      use Php.Ini;
+      use Php.Lists;
+      use Php.Multibyte;
+      use Hb_Common;
+   begin
+      if not Static_Overloaded_Bool then -- is_null
+         Static_Overloaded_Bool := True;
+         if
+--         Function_Exists ("mb_internal_encoding") and then
+           Integer'(Ini_Get ("mbstring.func_overload")) mod 2 = 1
+           -- phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.mbstring_func_overloadDeprecated
+         then
+            Static_Overloaded := True;
+         else
+            Static_Overloaded := False;
+         end if;
+      end if;
 
---         if ( false === overloaded ) then
---                 return;
---         end;
+      if False = Static_Overloaded then
+         return;
+      end if;
 
---         if ( ! reset ) then
---                 encoding = mb_internal_encoding();
---                 array_push( encodings, encoding );
---                 mb_internal_encoding( "ISO-8859-1" );
---         end;
+      if not Reset then
+         declare
+            Encoding : constant String := MB_Internal_Encoding;
+         begin
+            Static_Encodings.Append (+Encoding);
+--          Array_Push (Static_Encodings, Encoding);
+            MB_Internal_Encoding ("ISO-8859-1");
+         end;
+      end if;
 
---         if ( reset && encodings ) then
---                 encoding = array_pop( encodings );
---                 mb_internal_encoding( encoding );
---         end;
--- end;
+      if Reset and then not Static_Encodings.Is_Empty then
+         declare
+            Encoding : constant String := Array_Pop (Static_Encodings);
+         begin
+            MB_Internal_Encoding (Encoding);
+         end;
+      end if;
+   end MB_String_Binary_Safe_Encoding;
 
---
--- Resets the mbstring internal encoding to a users previously set encoding.
---
--- @see mbstring_binary_safe_encoding()
---
--- @since 3.7.0
---
--- function reset_mbstring_encoding() then
---         mbstring_binary_safe_encoding( true );
--- end;
+   ------------------------------
+   -- Reset_MB_String_Encoding --
+   ------------------------------
+
+   procedure Reset_MB_String_Encoding
+   is
+   begin
+      MB_String_Binary_Safe_Encoding (True);
+   end Reset_MB_String_Encoding;
 
    -------------------------
    -- Wp_Validate_Boolean --
@@ -7734,7 +7762,7 @@ is
          return False;
       end if;
 
-      if Is_Numeric (Version) then
+      if True then -- Is_Numeric (Version) then
          if 4 /= Version then -- (int)
             X_Doing_It_Wrong (
               "__FUNCTION__",
@@ -8120,60 +8148,57 @@ is
 --         end;
 -- end;
 
---
--- Gets the URL to learn more about updating the PHP version the site is running on.
---
--- This URL can be overridden by specifying an environment variable `WP_UPDATE_PHP_URL` or by using the
--- {@see "wp_update_php_url"} filter. Providing an empty string is not allowed and will result in the
--- default URL being used. Furthermore the page the URL links to should preferably be localized in the
--- site language.
---
--- @since 5.1.0
---
--- @return string URL to learn more about updating PHP.
---
--- function wp_get_update_php_url() then
---         default_url = wp_get_default_update_php_url();
+   ---------------------------
+   -- Wp_Get_Update_PHP_URL --
+   ---------------------------
 
---         update_url = default_url;
---         if ( false !== getenv( "WP_UPDATE_PHP_URL" ) ) then
---                 update_url = getenv( "WP_UPDATE_PHP_URL" );
---         end;
+   function Wp_Get_Update_PHP_URL
+            return String
+   is
+      use Php.Misc;
+      use Hb_Common;
+      use Inc_Plugins;
 
---         --
---         -- Filters the URL to learn more about updating the PHP version the site is running on.
---         --
---         -- Providing an empty string is not allowed and will result in the default URL being used. Furthermore
---         -- the page the URL links to should preferably be localized in the site language.
---         --
---         -- @since 5.1.0
---         --
---         -- @param string update_url URL to learn more about updating PHP.
---         --
---         update_url = apply_filters( "wp_update_php_url", update_url );
+      Default_URL : constant String := Wp_Get_Default_Update_PHP_URL;
+      Update_URL  : Unbounded_String := +Default_URL;
+   begin
+      if Env_Exists ("WP_UPDATE_PHP_URL") then
+         Update_URL := +Get_Env ("WP_UPDATE_PHP_URL");
+      end if;
 
---         if ( empty( update_url ) ) then
---                 update_url = default_url;
---         end;
+      --
+      -- Filters the URL to learn more about updating the PHP version the site is
+      -- running on.
+      --
+      -- Providing an empty string is not allowed and will result in the default
+      -- URL being used. Furthermorethe page the URL links to should preferably be
+      -- localized in the site language.
+      --
+      -- @since 5.1.0
+      --
+      -- @param string update_url URL to learn more about updating PHP.
+      --
+      Update_URL := +Apply_Filters ("wp_update_php_url", -Update_URL);
 
---         return update_url;
--- end;
+      if Empty (-Update_URL) then
+         Update_URL := +Default_URL;
+      end if;
 
---
--- Gets the default URL to learn more about updating the PHP version the site is running on.
---
--- Do not use this function to retrieve this URL. Instead, use {@see wp_get_update_php_url()} when relying on the URL.
--- This function does not allow modifying the returned URL, and is only used to compare the actually used URL with the
--- default one.
---
--- @since 5.1.0
--- @access private
---
--- @return string Default URL to learn more about updating PHP.
---
--- function wp_get_default_update_php_url() then
---         return _x( "https://wordpress.org/support/update-php/", "localized PHP upgrade information page" );
--- end;
+      return -Update_URL;
+   end Wp_Get_Update_PHP_URL;
+
+   -----------------------------------
+   -- Wp_Get_Default_Update_PHP_URL --
+   -----------------------------------
+
+   function Wp_Get_Default_Update_PHP_URL
+            return String
+   is
+      use Inc_L10n;
+   begin
+      return X_X ("https://wordpress.org/support/update-php/",
+                  "localized PHP upgrade information page");
+   end Wp_Get_Default_Update_PHP_URL;
 
 --
 -- Prints the default annotation for the web host altering the "Update PHP" page URL.
@@ -8195,32 +8220,35 @@ is
 --         end;
 -- end;
 
---
--- Returns the default annotation for the web hosting altering the "Update PHP" page URL.
---
--- This function is to be used after {@see wp_get_update_php_url()} to return a consistent
--- annotation if the web host has altered the default "Update PHP" page URL.
---
--- @since 5.2.0
---
--- @return string Update PHP page annotation. An empty string if no custom URLs are provided.
---
--- function wp_get_update_php_annotation() then
---         update_url  = wp_get_update_php_url();
---         default_url = wp_get_default_update_php_url();
+   ----------------------------------
+   -- Wp_Get_Update_PHP_Annotation --
+   ----------------------------------
 
---         if ( update_url === default_url ) then
---                 return "";
---         end;
+   function Wp_Get_Update_PHP_Annotation
+            return String
+   is
+      use Php.Strings;
+      use Inc_Formatting;
+      use Inc_L10n;
 
---         annotation = sprintf(
---                 /* translators: %s: Default Update PHP page URL.--
---                 __( "This resource is provided by your web host, and is specific to your site. For more information, <a href="%s" target="_blank">see the official WordPress documentation</a>." ),
---                 esc_url( default_url )
---         );
+      Update_URL  : constant String := Wp_Get_Update_PHP_URL;
+      Default_URL : constant String := Wp_Get_Default_Update_PHP_URL;
+   begin
+      if Update_URL = Default_URL then
+         return "";
+      end if;
 
---         return annotation;
--- end;
+      declare
+         Annotation : constant String :=
+           Sprintf (
+             -- translators: %s: Default Update PHP page URL.
+             abs "This resource is provided by your web host, and is specific to your site. For more information, <a href=""%s"" target=""_blank"">see the official WordPress documentation</a>.",
+             To_List (ESC_URL (Default_URL))
+           );
+      begin
+         return Annotation;
+      end;
+   end Wp_Get_Update_PHP_Annotation;
 
 --
 -- Gets the URL for directly updating the PHP version the site is running on.

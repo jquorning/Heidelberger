@@ -6,10 +6,15 @@
 -- @subpackage Users
 --
 
+-- with Php.Arrays;
+
 with Hb_Common;
+with Wp_Common;
 
 with Inc_Caches;
+with Inc_Formatting;
 with Inc_Pluggables;
+-- with Inc_Plugins;
 
 package body Inc_Users
 is
@@ -1915,37 +1920,38 @@ is
 --         do_action( "clean_user_cache", user->ID, user );
 -- end;
 
--- --
--- -- Determines whether the given username exists.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tags} article in the Theme Developer Handbook.
--- --
--- -- @since 2.0.0
--- --
--- -- @param string username The username to check for existence.
--- -- @return int|false The user ID on success, false on failure.
--- --
--- function username_exists( username ) then
---         user = get_user_by( "login", username );
---         if ( user ) then
---                 user_id = user->ID;
---         end; else then
---                 user_id = false;
---         end;
+   ---------------------
+   -- Username_Exists --
+   ---------------------
 
---         --
---         -- Filters whether the given username exists.
---         --
---         -- @since 4.9.0
---         --
---         -- @param int|false user_id  The user ID associated with the username,
---         --                            or false if the username does not exist.
---         -- @param string    username The username to check for existence.
---         --
---         return apply_filters( "username_exists", user_id, username );
--- end;
+   function Username_Exists (Username : String)
+                             return Integer
+   is
+      use Wp_Common;
+      use Inc_Class_Wp_Users;
+      use Inc_Pluggables;
+--    use Inc_Plugins;
+
+      User    : constant Wp_User := Get_User_By ("login", Username);
+      User_Id : Integer;
+   begin
+      if User /= Null_User then
+         User_Id := User.Id;
+      else
+         User_Id := 0; -- False;
+      end if;
+
+      --
+      -- Filters whether the given username exists.
+      --
+      -- @since 4.9.0
+      --
+      -- @param int|false user_id  The user ID associated with the username,
+      --                            or false if the username does not exist.
+      -- @param string    username The username to check for existence.
+      --
+      return Apply_Filters ("username_exists", User_Id, Username);
+   end Username_Exists;
 
 -- --
 -- -- Determines whether the given email exists.
@@ -2733,30 +2739,30 @@ is
 --         return user_id;
 -- end;
 
--- --
--- -- Provides a simpler way of inserting a user into the database.
--- --
--- -- Creates a new user with just the username, password, and email. For more
--- -- complex user creation use wp_insert_user() to specify more information.
--- --
--- -- @since 2.0.0
--- --
--- -- @see wp_insert_user() More complete way to create a new user.
--- --
--- -- @param string username The user"s username.
--- -- @param string password The user"s password.
--- -- @param string email    Optional. The user"s email. Default empty.
--- -- @return int|WP_Error The newly created user"s ID or a WP_Error object if the user could not
--- --                      be created.
--- --
--- function wp_create_user( username, password, email = "" ) then
---         user_login = wp_slash( username );
---         user_email = wp_slash( email );
---         user_pass  = password;
+   --------------------
+   -- Wp_Create_User --
+   --------------------
 
---         userdata = compact( "user_login", "user_email", "user_pass" );
---         return wp_insert_user( userdata );
--- end;
+   function Wp_Create_User (Username : String;
+                            Password : String;
+                            Email    : String := "")
+                            return Integer
+   is
+      use Inc_Formatting;
+
+      User_Login : constant String := Wp_Slash (Username);
+      User_Email : constant String := Wp_Slash (Email);
+      User_Pass  : constant String := Password;
+
+      Userdata : constant Array_Type := To_Array (List => (
+        Build ("user_login", User_Login),
+        Build ("user_email", User_Email),
+        Build ("user_pass",  User_Pass)
+      ));
+--    Userdata   : Array_Type := Compact ("user_login", "user_email", "user_pass");
+   begin
+      return Wp_Insert_User (Userdata);
+   end Wp_Create_User;
 
 -- --
 -- -- Returns a list of meta keys to be (maybe) populated in wp_update_user().

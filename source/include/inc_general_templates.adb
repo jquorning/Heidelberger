@@ -11,6 +11,7 @@ with Php.Arrays;
 with Php.Echoing;
 with Php.Strings;
 
+with Globals;
 with Hb_Common;
 with Lists;
 with Wp_Common;
@@ -18,13 +19,17 @@ with Wp_Common;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Post_Type;
--- with Inc_Class_Wp_Querys;
-with Inc_Querys;
+with Inc_Class_Wp_Styles;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Functions_Wp_Styles;
+with Inc_Link_Templates;
+with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Posts;
+with Inc_Querys;
 with Inc_Themes;
-with Inc_L10n;
 with Inc_Versions;
 
 package body Inc_General_Templates
@@ -4919,98 +4924,104 @@ is
 
 -- end;
 
--- --
--- -- Displays the URL of a WordPress admin CSS file.
--- --
--- -- @see WP_Styles::_css_href() and its {@see "style_loader_src"} filter.
--- --
--- -- @since 2.3.0
--- --
--- -- @param string file file relative to wp-admin/ without its ".css" extension.
--- -- @return string
--- --
--- function wp_admin_css_uri( file = "wp-admin" ) then
---         if ( defined( "WP_INSTALLING" ) ) then
---                 _file = "./file.css";
---         end; else then
---                 _file = admin_url( "file.css" );
---         end;
---         _file = add_query_arg( "version", get_bloginfo( "version" ), _file );
+   ----------------------
+   -- Wp_Admin_CSS_URI --
+   ----------------------
 
---         --
---         -- Filters the URI of a WordPress admin CSS file.
---         --
---         -- @since 2.3.0
---         --
---         -- @param string _file Relative path to the file with query arguments attached.
---         -- @param string file  Relative path to the file, minus its ".css" extension.
---         --
---         return apply_filters( "wp_admin_css_uri", _file, file );
--- end;
+   function Wp_Admin_CSS_URI (File : String := "wp-admin")
+                              return String
+   is
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Plugins;
 
--- --
--- -- Enqueues or directly prints a stylesheet link to the specified CSS file.
--- --
--- -- "Intelligently" decides to enqueue or to print the CSS file. If the
--- -- {@see "wp_print_styles"} action has--not* yet been called, the CSS file will be
--- -- enqueued. If the {@see "wp_print_styles"} action has been called, the CSS link will
--- -- be printed. Printing may be forced by passing true as the force_echo
--- -- (second) parameter.
--- --
--- -- For backward compatibility with WordPress 2.3 calling method: If the file
--- -- (first) parameter does not correspond to a registered CSS file, we assume
--- -- file is a file relative to wp-admin/ without its ".css" extension. A
--- -- stylesheet link to that generated URL is printed.
--- --
--- -- @since 2.3.0
--- --
--- -- @param string file       Optional. Style handle name or file name (without ".css" extension) relative
--- --                           to wp-admin/. Defaults to "wp-admin".
--- -- @param bool   force_echo Optional. Force the stylesheet link to be printed rather than enqueued.
--- --
--- function wp_admin_css( file = "wp-admin", force_echo = false ) then
---         // For backward compatibility.
---         handle = 0 === strpos( file, "css/" ) ? substr( file, 4 ) : file;
+      X_File_1 : constant String := (if Globals.WP_INSTALLING
+                                     then "./file.css"
+                                     else Admin_URL ("file.css"));
 
---         if ( wp_styles()->query( handle ) ) then
---                 if ( force_echo || did_action( "wp_print_styles" ) ) then
---                         // We already printed the style queue. Print this one immediately.
---                         wp_print_styles( handle );
---                 end; else then
---                         // Add to style queue.
---                         wp_enqueue_style( handle );
---                 end;
---                 return;
---         end;
+      X_File_2 : constant String :=
+        Add_Query_Arg ("version", Get_Bloginfo ("version"), X_File_1);
+   begin
+      --
+      -- Filters the URI of a WordPress admin CSS file.
+      --
+      -- @since 2.3.0
+      --
+      -- @param string _file Relative path to the file with query arguments attached.
+      -- @param string file  Relative path to the file, minus its ".css" extension.
+      --
+      return Apply_Filters ("wp_admin_css_uri", X_File_2, File);
+   end Wp_Admin_CSS_URI;
 
---         stylesheet_link = sprintf(
---                 "<link rel="stylesheet" href="%s" type="text/css" />\n",
---                 esc_url( wp_admin_css_uri( file ) )
---         );
+   ------------------
+   -- Wp_Admin_CSS --
+   ------------------
 
---         --
---         -- Filters the stylesheet link to the specified CSS file.
---         --
---         -- If the site is set to display right-to-left, the RTL stylesheet link
---         -- will be used instead.
---         --
---         -- @since 2.3.0
---         -- @param string stylesheet_link HTML link element for the stylesheet.
---         -- @param string file            Style handle name or filename (without ".css" extension)
---         --                                relative to wp-admin/. Defaults to "wp-admin".
---         --
---         echo apply_filters( "wp_admin_css", stylesheet_link, file );
+   procedure Wp_Admin_CSS (File       : String := "wp-admin";
+                           Force_Echo : Boolean := False)
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Inc_Class_Wp_Styles;
+      use Inc_Functions_Wp_Styles;
+      use Inc_Plugins;
+      use Inc_L10n;
+      use Inc_Formatting;
 
---         if ( function_exists( "is_rtl" ) && is_rtl() ) then
---                 rtl_stylesheet_link = sprintf(
---                         "<link rel="stylesheet" href="%s" type="text/css" />\n",
---                         esc_url( wp_admin_css_uri( "file-rtl" ) )
---                 );
+      -- For backward compatibility.
+      Handle : constant String := (if 0 = Strpos (File, "css/")
+                                   then Substr (File, 4)
+                                   else File);
+   begin
+      if Wp_Styles_X.Query (Handle).Success then -- ()
+         if Force_Echo or else Did_Action ("wp_print_styles") then
+            -- We already printed the style queue. Print this one immediately.
+            Wp_Print_Styles (Handle);
+         else
+            -- Add to style queue.
+            Wp_Enqueue_Style (Handle);
+         end if;
+         return;
+      end if;
 
---                 -- This filter is documented in wp-includes/general-template.php--
---                 echo apply_filters( "wp_admin_css", rtl_stylesheet_link, "file-rtl" );
---         end;
--- end;
+      declare
+         Stylesheet_Link : constant String :=
+           Sprintf (
+             "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />\n",
+             To_List (ESC_URL (Wp_Admin_CSS_URI (File)))
+          );
+      begin
+         --
+         -- Filters the stylesheet link to the specified CSS file.
+         --
+         -- If the site is set to display right-to-left, the RTL stylesheet link
+         -- will be used instead.
+         --
+         -- @since 2.3.0
+         -- @param string stylesheet_link HTML link element for the stylesheet.
+         -- @param string file            Style handle name or filename (without
+         --                               ".css" extension) relative to wp-admin/.
+         --                               Defaults to "wp-admin".
+         --
+         Echo (Apply_Filters ("wp_admin_css", Stylesheet_Link, File));
+
+         if
+--         Function_Exists ("is_rtl") and then
+           Is_RTL
+         then
+            declare
+               RTL_Stylesheet_Link : constant String :=
+                 Sprintf (
+                   "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />\n",
+                   To_List (ESC_URL (Wp_Admin_CSS_URI ("file-rtl")))
+                );
+            begin
+               -- This filter is documented in wp-includes/general-template.php--
+               Echo (Apply_Filters ("wp_admin_css", RTL_Stylesheet_Link, "file-rtl"));
+            end;
+         end if;
+      end;
+   end Wp_Admin_CSS;
 
 -- --
 -- -- Enqueues the default ThickBox js and css.
@@ -5159,23 +5170,18 @@ is
 --         return apply_filters( "get_the_generator_thentypeend;", gen, type );
 -- end;
 
--- --
--- -- Outputs the HTML checked attribute.
--- --
--- -- Compares the first two arguments and if identical marks as checked.
--- --
--- -- @since 1.0.0
--- --
--- -- @param mixed checked One of the values to compare.
--- -- @param mixed current Optional. The other value to compare if not just true.
--- --                       Default true.
--- -- @param bool  echo    Optional. Whether to echo or just return the string.
--- --                       Default true.
--- -- @return string HTML attribute or empty string.
--- --
--- function checked( checked, current = true, echo = true ) then
---         return __checked_selected_helper( checked, current, echo, "checked" );
--- end;
+   -------------
+   -- Checked --
+   -------------
+
+   function Checked (Checkd  : Integer; -- Multi_Type;
+                     Current : Integer; -- Multi_Type := True;
+                     Echo    : Boolean := True)
+                     return String
+   is
+   begin
+      return X_Checked_Selected_Helper (Checkd, Current, Echo, "checked");
+   end Checked;
 
 -- --
 -- -- Outputs the HTML selected attribute.
@@ -5241,33 +5247,34 @@ is
 --         require_once __DIR__ . "/php-compat/readonly.php";
 -- end;
 
--- --
--- -- Private helper function for checked, selected, disabled and readonly.
--- --
--- -- Compares the first two arguments and if identical marks as `type`.
--- --
--- -- @since 2.8.0
--- -- @access private
--- --
--- -- @param mixed  helper  One of the values to compare.
--- -- @param mixed  current The other value to compare if not just true.
--- -- @param bool   echo    Whether to echo or just return the string.
--- -- @param string type    The type of checked|selected|disabled|readonly we are doing.
--- -- @return string HTML attribute or empty string.
--- --
--- function __checked_selected_helper( helper, current, echo, type ) then -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
---         if ( (string) helper === (string) current ) then
---                 result = " type="type"";
---         end; else then
---                 result = "";
---         end;
+   -------------------------------
+   -- X_Checked_Selected_Helper --
+   -------------------------------
 
---         if ( echo ) then
---                 echo result;
---         end;
+   function X_Checked_Selected_Helper (Helper  : Integer;
+                                       Current : Integer;
+                                       Echo    : Boolean;
+                                       Typ     : String)
+                                       return String
+   is
+      use Ada.Strings.Unbounded;
+--    use Php.Echoing;
+      use Hb_Common;
 
---         return result;
--- end;
+      Result : Unbounded_String;
+   begin
+      if Helper'Image = Current'Image then -- 2x (string)
+         Result := +" type=""" & Typ & """";
+      else
+         Result := +"";
+      end if;
+
+      if Echo then
+         Php.Echoing.Echo (-Result);
+      end if;
+
+      return -Result;
+   end X_Checked_Selected_Helper;
 
 -- --
 -- -- Assigns a visual indicator for required form fields.

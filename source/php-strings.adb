@@ -83,9 +83,10 @@ is
                     Length : Integer := 0)
                     return String
    is
+      First : constant Natural := Str'First + Offset;
+      Last  : constant Natural := Str'First + Offset + Length - 1;
    begin
-      raise Debug;
-      return Str;
+      return Str (First .. Last);
    end Substr;
 
    -------------------

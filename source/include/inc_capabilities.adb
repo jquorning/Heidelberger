@@ -840,7 +840,7 @@ is
                -- update_, install_, and delete_ are handled above with
                -- is_super_admin().
                Menu_Perms : constant Array_Type :=
-                 Get_Site_Option ("menu_items", Empty_List);
+                 As_Array (Get_Site_Option ("menu_items", From_List (Empty_List)));
             begin
                if Empty (Menu_Perms, "plugins") then
                   Append (Caps, "manage_network_plugins");
@@ -867,7 +867,10 @@ is
       elsif Cap in "create_users" then
          if not Is_Multisite  then
             Append (Caps, Cap);
-         elsif Is_Super_Admin (User_Id) or else Get_Site_Option ("add_new_users") then
+         elsif
+           Is_Super_Admin (User_Id) or else
+           As_Boolean (Get_Site_Option ("add_new_users"))
+         then
             Append (Caps, Cap);
          else
             Append (Caps, "do_not_allow");
@@ -1276,7 +1279,8 @@ is
 --    if Isset (Global_Super_Admins) then
          return Global_Super_Admins;
       else
-         return Get_Site_Option ("site_admins", To_List ("admin"));
+         return As_List (
+           Get_Site_Option ("site_admins", From_List (To_List ("admin"))));
       end if;
    end Get_Super_Admins;
 

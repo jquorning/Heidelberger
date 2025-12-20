@@ -6,13 +6,17 @@ with Arrays;
 with Lists;
 
 with Adi_Class_Wp_Screens;
+with Adi_Translation_Install;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
+with Inc_Class_Wp_Errors;
+with Inc_Class_Wp_Http;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Users;
 with Inc_Posts;
 with Inc_Taxonomys;
 
@@ -196,5 +200,144 @@ is
                            Status    : Inc_Class_Wp_Post_Type.Wp_Post_Type)
                            return Boolean
                            is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Option    : String)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Option    : String;
+                           Id        : Integer;
+                           Default   : Multi_Type)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Option    : String;
+                           Id        : Integer)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Old       : Multi_Type;
+                           Option    : String)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Old       : Multi_Type;
+                           Option    : String;
+                           Net       : Natural)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Option    : String;
+                           Old       : Multi_Type)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Multi_Type;
+                           Expiration : Natural;
+                           Trans      : String)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Natural;
+                           Value_2    : Multi_Type;
+                           Trans      : String)
+                           return Natural
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Boolean;
+                           Typ        : String;
+                           Args       : Array_Type)
+                           return Adi_Translation_Install.Trans_Result
+                           is ((Success => True,
+                                Arry    => Empty_Array,
+                                Error   => Inc_Class_Wp_Errors.Null_Wp_Error));
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Adi_Translation_Install.Trans_Result;
+                           Typ        : String;
+                           Args       : Array_Type)
+                           return Adi_Translation_Install.Trans_Result
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : List_Type;
+                           Args       : Array_Type;
+                           URL        : String)
+                           return List_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Boolean;
+                           Args       : Array_Type;
+                           URL        : String)
+                           return Array_Type
+                           is (Empty_Array);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Integer;
+                           URL        : String)
+                           return String
+                           is ("XXX-987");
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Integer;
+                           Name       : String)
+                           return Integer
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Boolean;
+                           Args       : Array_Type;
+                           Typ        : String)
+                           return Inc_Class_Wp_Http.Response_Result
+                           is ((Success => Value,
+                                Arry    => Empty_Array,
+                                Error   => Inc_Class_Wp_Errors.Null_Wp_Error));
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Inc_Class_Wp_Http.Response_Result;
+                           Args       : Array_Type;
+                           Typ        : String)
+                           return Inc_Class_Wp_Http.Response_Result
+                           is (Value);
+
+   procedure Do_Action (Hook_Name : String;
+                        A1        : Inc_Class_Wp_Http.Response_Result;
+                        -- Inc_Class_Wp_Errors.Wp_Error;
+                        A2        : String;
+                        A3        : String;
+                        Args      : Array_Type;
+                        Url       : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        User      : Inc_Class_Wp_Users.Wp_User)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        User      : Integer;
+                        Role      : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        User      : Integer;
+                        Role      : String;
+                        Roles     : List_Type)
+                        is null;
 
 end Wp_Common;

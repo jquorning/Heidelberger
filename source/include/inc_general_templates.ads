@@ -97,7 +97,7 @@ is
 --                             Default false.
 -- @return string The login URL. Not HTML-encoded.
 --
-   function Wp_Login_Url (Redirect     : String  := "";
+   function Wp_Login_URL (Redirect     : String  := "";
                           Force_Reauth : Boolean := False)
                           return String
                           is ("XXX-411");
@@ -112,7 +112,7 @@ is
 -- @param string redirect Path to redirect to on logout.
 -- @return string The logout URL. Note: HTML-encoded via esc_html() in wp_nonce_url().
 --
-   function Wp_Logout_Url (Redirect : String := "")
+   function Wp_Logout_URL (Redirect : String := "")
                            return String
                            is ("XXX-351");
 
@@ -437,5 +437,83 @@ is
                            Translate : Boolean := False)
                            return String
                            is ("XXX-982");
+
+   --
+   -- Displays the URL of a WordPress admin CSS file.
+   --
+   -- @see WP_Styles::_css_href() and its {@see "style_loader_src"} filter.
+   --
+   -- @since 2.3.0
+   --
+   -- @param string file file relative to wp-admin/ without its ".css" extension.
+   -- @return string
+   --
+   function Wp_Admin_CSS_URI (File : String := "wp-admin")
+                              return String;
+
+   --
+   -- Enqueues or directly prints a stylesheet link to the specified CSS file.
+   --
+   -- "Intelligently" decides to enqueue or to print the CSS file. If the
+   -- {@see "wp_print_styles"} action has--not* yet been called, the CSS file will be
+   -- enqueued. If the {@see "wp_print_styles"} action has been called, the CSS link
+   -- will be printed. Printing may be forced by passing true as the force_echo
+   -- (second) parameter.
+   --
+   -- For backward compatibility with WordPress 2.3 calling method: If the file
+   -- (first) parameter does not correspond to a registered CSS file, we assume
+   -- file is a file relative to wp-admin/ without its ".css" extension. A
+   -- stylesheet link to that generated URL is printed.
+   --
+   -- @since 2.3.0
+   --
+   -- @param string file       Optional. Style handle name or file name (without
+   --                           ".css" extension) relative to wp-admin/. Defaults to
+   --                           "wp-admin".
+   -- @param bool   force_echo Optional. Force the stylesheet link to be printed
+   --                           rather than enqueued.
+   --
+   procedure Wp_Admin_CSS (File       : String := "wp-admin";
+                           Force_Echo : Boolean := False);
+
+   --
+   -- Outputs the HTML checked attribute.
+   --
+   -- Compares the first two arguments and if identical marks as checked.
+   --
+   -- @since 1.0.0
+   --
+   -- @param mixed checked One of the values to compare.
+   -- @param mixed current Optional. The other value to compare if not just true.
+   --                       Default true.
+   -- @param bool  echo    Optional. Whether to echo or just return the string.
+   --                       Default true.
+   -- @return string HTML attribute or empty string.
+   --
+   function Checked (Checkd  : Integer; -- Multi_Type;
+                     Current : Integer; -- Multi_Type := True;
+                     Echo    : Boolean := True)
+                     return String;
+
+   --
+   -- Private helper function for checked, selected, disabled and readonly.
+   --
+   -- Compares the first two arguments and if identical marks as `type`.
+   --
+   -- @since 2.8.0
+   -- @access private
+   --
+   -- @param mixed  helper  One of the values to compare.
+   -- @param mixed  current The other value to compare if not just true.
+   -- @param bool   echo    Whether to echo or just return the string.
+   -- @param string type    The type of checked|selected|disabled|readonly we are
+   --                        doing.
+   -- @return string HTML attribute or empty string.
+   --
+   function X_Checked_Selected_Helper (Helper  : Integer;
+                                       Current : Integer;
+                                       Echo    : Boolean;
+                                       Typ     : String)
+                                       return String;
 
 end Inc_General_Templates;

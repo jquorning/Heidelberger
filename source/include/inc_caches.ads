@@ -21,6 +21,36 @@ is
    procedure Dummy;
 
    --
+   -- Removes the cache contents matching key and group.
+   --
+   -- @since 2.0.0
+   --
+   -- @see WP_Object_Cache::delete()
+   -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
+   --
+   -- @param int|string $key   What the contents in the cache are called.
+   -- @param string     $group Optional. Where the cache contents are grouped.
+   --                           Default empty.
+   -- @return bool True on successful removal, false on failure.
+   --
+   procedure Wp_Cache_Delete (Key   : String;
+                              Group : String := "")
+                              is null;
+
+   --
+   -- Removes all cache items.
+   --
+   -- @since 2.0.0
+   --
+   -- @see WP_Object_Cache::flush()
+   -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
+   --
+   -- @return bool True on success, false on failure.
+   --
+   procedure Wp_Cache_Flush
+   is null;
+
+   --
    -- Adds a group or set of groups to the list of global groups.
    --
    -- @since 2.6.0
@@ -65,6 +95,12 @@ is
                           is (False);
 
    procedure Wp_Cache_Add (Key    : String;
+                           Data   : Multi_Type;
+                           Group  : String  := "";
+                           Expire : Natural := 0)
+                           is null;
+
+   procedure Wp_Cache_Add (Key    : String;
                            Data   : Integer; -- String;
                            Group  : String  := "";
                            Expire : Natural := 0)
@@ -101,6 +137,13 @@ is
                           Found : out Boolean) -- = null
                           return String
                           is ("XXX-628");
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean) -- = null
+                          return Boolean
+                          is (True);
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
@@ -144,6 +187,13 @@ is
                           return Inc_Comments.Comment_Counts
                           is (Inc_Comments.Null_Comment_Counts);
 
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean) -- = null
+                          return Multi_Type
+                          is (raise Program_Error with "not implemented");
+
    --
    -- Saves the data to the cache.
    --
@@ -170,6 +220,25 @@ is
 
    procedure Wp_Cache_Set (Key    : String;
                            Data   : Integer;
+                           Group  : String  := "";
+                           Expire : Integer := 0)
+                           is null;
+
+   function Wp_Cache_Set (Key    : String;
+                          Data   : Multi_Type;
+                          Group  : String  := "";
+                          Expire : Integer := 0)
+                          return Boolean
+                          is (False);
+
+   procedure Wp_Cache_Set (Key    : String;
+                           Data   : Array_Type;
+                           Group  : String  := "";
+                           Expire : Integer := 0)
+                           is null;
+
+   procedure Wp_Cache_Set (Key    : String;
+                           Data   : Boolean;
                            Group  : String  := "";
                            Expire : Integer := 0)
                            is null;
