@@ -1,4 +1,9 @@
+--
+--
+--
+
 with "config/heidelberger_config.gpr";
+with "components-sqlite.gpr";
 
 project Heidelberger is
 
@@ -20,12 +25,18 @@ project Heidelberger is
    for Main use ("heidelberger.adb");
 
    package Compiler is
-      for Default_Switches ("Ada") use Heidelberger_Config.Ada_Compiler_Switches & (
+
+      for Local_Configuration_Pragmas
+        use "source/heidelberger.adc";
+
+      for Default_Switches ("Ada") use
+         Heidelberger_Config.Ada_Compiler_Switches & (
+         "-gnat2022",
          "-g",
          "-O0",
          "-Og",
          "-gnata",
-         "-gnatwaCF",
+         "-gnatwaCJ",
          "-gnatef",
          "-gnatf",
          "-gnatyyduxCM0S"); -- 0-r
