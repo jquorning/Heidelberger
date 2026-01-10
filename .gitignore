@@ -4,6 +4,7 @@
 /lib/
 /obj/
 
+*.sqlite
 *.a
 *.ali
 *.o
