@@ -5,6 +5,7 @@
 --
 
 with Php.Arrays;
+with Php.Strings;
 
 with Hb_Common;
 
@@ -22,7 +23,7 @@ is
                          Data    : String := "")
                          return Wp_Error
    is
-      use Hb_Common;
+      use Php.Strings;
 
       This : Wp_Error;
    begin
@@ -92,7 +93,7 @@ is
                   Message : String;
                   Data    : String := "")
    is
-      use Hb_Common;
+      use Php.Strings;
       use Inc_Plugins;
    begin
       Set (This.Errors, Code, From_String (Message));
@@ -123,7 +124,7 @@ is
                        Data : String;
                        Code : String := "")
    is
-      use Hb_Common;
+      use Php.Strings;
 
       Code_2 : constant String := (if Empty (Code)
                                    then This.Get_Error_Code -- ();

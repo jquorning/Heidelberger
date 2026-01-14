@@ -431,8 +431,11 @@ is
    --                  priority of that hook is returned, or false if the function is
    --                  not attached.
    --
+   -- function Has_Filter (Hook_Name : String;
+   --                      Callback  : Boolean := False)
+   --                      return Boolean;
    function Has_Filter (Hook_Name : String;
-                        Callback  : Boolean := False)
+                        Callback  : Callable := null)
                         return Boolean;
 
    --

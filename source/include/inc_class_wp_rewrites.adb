@@ -6,6 +6,8 @@
 -- @since 1.5.0
 --
 
+with Php.Strings;
+
 with Hb_Common;
 
 package body Inc_Class_Wp_Rewrites
@@ -18,6 +20,7 @@ is
    function Using_Permalinks (This : Wp_Rewrite)
                               return Boolean
    is
+      use Php.Strings;
       use Hb_Common;
    begin
       return not Empty (-This.Permalink_Structure);
@@ -31,6 +34,7 @@ is
                                    Name : String)
                                    return String
    is
+      use Php.Strings;
       use Hb_Common;
    begin
       if Empty (-This.Permalink_Structure) then
@@ -53,6 +57,7 @@ is
    function Get_Page_Permastruct (This : in out Wp_Rewrite)
                                   return String
    is
+      use Php.Strings;
       use Hb_Common;
    begin
       if Isset (-This.Page_Structure) then

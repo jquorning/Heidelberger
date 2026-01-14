@@ -27,6 +27,7 @@ with Binder;
 with Globals;
 with Hb_Common;
 with Helpers;
+with Wp_Common;
 
 with Inc_Caches;
 with Inc_Capabilities;
@@ -44,15 +45,6 @@ with Inc_Pluggables;
 package body Inc_Functions
 is
    use Ada.Strings.Unbounded;
--- use Php;
-
--- require ABSPATH . WPINC . "/option.php";
-
-   function Apply_Filters (Hook  : String;
-                           Value : Array_Type;
-                           User  : Inc_Class_Wp_Users.Wp_User)
-                           return Array_Type
-                           is (Value);
 
 --
 -- Converts given MySQL date string into a different format.
@@ -454,38 +446,39 @@ is
 --         return date;
 -- end;
 
---
--- Converts float number to format based on the locale.
---
--- @since 2.3.0
---
--- @global WP_Locale wp_locale WordPress date and time locale object.
---
--- @param float number   The number to convert based on locale.
--- @param int   decimals Optional. Precision of the number of decimal places. Default 0.
--- @return string Converted number in string format.
---
--- function number_format_i18n( number, decimals = 0 ) then
---         global wp_locale;
+   ------------------------
+   -- Number_Format_I18n --
+   ------------------------
 
---         if ( isset( wp_locale ) ) then
---                 formatted = number_format( number, absint( decimals ), wp_locale->number_format["decimal_point"], wp_locale->number_format["thousands_sep"] );
---         end; else then
---                 formatted = number_format( number, absint( decimals ) );
---         end;
+   function Number_Format_I18n (Number   : Float;
+                                Decimals : Integer := 0)
+                                return String
+   is
+      use Php.Numerics;
+      use Wp_Common;
+--    use Inc_Plugins;
+--    global wp_locale;
 
---         --
---         -- Filters the number formatted based on the locale.
---         --
---         -- @since 2.8.0
---         -- @since 4.9.0 The `number` and `decimals` parameters were added.
---         --
---         -- @param string formatted Converted number in string format.
---         -- @param float  number    The number to convert based on locale.
---         -- @param int    decimals  Precision of the number of decimal places.
---         --
---         return apply_filters( "number_format_i18n", formatted, number, decimals );
--- end;
+      Formatted : constant String :=
+        (if True -- Isset (Globals.Wp_Locale)
+         then Number_Format
+                (Number, abs Decimals,
+                 Get_As_String (Globals.Wp_Locale.Number_Format, "decimal_point"),
+                 Get_As_String (Globals.Wp_Locale.Number_Format, "thousands_sep"))
+         else Number_Format (Number, abs Decimals));
+   begin
+      --
+      -- Filters the number formatted based on the locale.
+      --
+      -- @since 2.8.0
+      -- @since 4.9.0 The `number` and `decimals` parameters were added.
+      --
+      -- @param string formatted Converted number in string format.
+      -- @param float  number    The number to convert based on locale.
+      -- @param int    decimals  Precision of the number of decimal places.
+      --
+      return Apply_Filters ("number_format_i18n", Formatted, Number, Decimals);
+   end Number_Format_I18n;
 
 --
 -- Converts a number of bytes to the largest unit the bytes will fit into.
@@ -660,118 +653,151 @@ is
 --         return compact( "start", "end" );
 -- end;
 
---
--- Serializes data, if needed.
---
--- @since 2.0.5
---
--- @param string|array|object data Data that might be serialized.
--- @return mixed A scalar data.
---
--- function maybe_serialize( data ) then
---         if ( is_array( data ) || is_object( data ) ) then
---                 return serialize( data );
---         end;
+   ---------------------
+   -- Maybe_Serialize --
+   ---------------------
 
---         /*
---         -- Double serialization is required for backward compatibility.
---         -- See https://core.trac.wordpress.org/ticket/12930
---         -- Also the world will end. See WP 3.6.1.
---         --
---         if ( is_serialized( data, false ) ) then
---                 return serialize( data );
---         end;
+   function Maybe_Serialize (Data : String)
+                             return Multi_Type
+   is
+      use Php.JSON;
+   begin
+      -- if Is_Array (Data) or else Is_Object (Data) then
+      --    return Serialize (Data);
+      -- end if;
 
---         return data;
--- end;
+      --
+      -- Double serialization is required for backward compatibility.
+      -- See https://core.trac.wordpress.org/ticket/12930
+      -- Also the world will end. See WP 3.6.1.
+      --
+      if Is_Serialized (Data, False) then
+         return From_String (Serialize (From_String (Data)));
+      end if;
 
---
--- Unserializes data only if it was serialized.
---
--- @since 2.0.0
---
--- @param string data Data that might be unserialized.
--- @return mixed Unserialized data can be any type.
---
--- function maybe_unserialize( data ) then
---         if ( is_serialized( data ) ) then // Don"t attempt to unserialize data that wasn"t serialized going in.
---                 return @unserialize( trim( data ) );
---         end;
+      return From_String (Data);
+   end Maybe_Serialize;
 
---         return data;
--- end;
+   -----------------------
+   -- Maybe_Unserialize --
+   -----------------------
 
---
--- Checks value to find if it was serialized.
---
--- If data is not a string, then returned value will always be false.
--- Serialized data is always a string.
---
--- @since 2.0.5
--- @since 6.1.0 Added Enum support.
---
--- @param string data   Value to check to see if was serialized.
--- @param bool   strict Optional. Whether to be strict about the end of the string. Default true.
--- @return bool False if not serialized and true if it was.
---
--- function is_serialized( data, strict = true ) then
---         // If it isn"t a string, it isn"t serialized.
---         if ( ! is_string( data ) ) then
---                 return false;
---         end;
---         data = trim( data );
---         if ( "N;" === data ) then
---                 return true;
---         end;
---         if ( strlen( data ) < 4 ) then
---                 return false;
---         end;
---         if ( ":" !== data[1] ) then
---                 return false;
---         end;
---         if ( strict ) then
---                 lastc = substr( data, -1 );
---                 if ( ";" !== lastc && "end;" !== lastc ) then
---                         return false;
---                 end;
---         end; else then
---                 semicolon = strpos( data, ";" );
---                 brace     = strpos( data, "end;" );
---                 // Either ; or end; must exist.
---                 if ( false === semicolon && false === brace ) then
---                         return false;
---                 end;
---                 // But neither must be in the first X characters.
---                 if ( false !== semicolon && semicolon < 3 ) then
---                         return false;
---                 end;
---                 if ( false !== brace && brace < 4 ) then
---                         return false;
---                 end;
---         end;
---         token = data[0];
---         switch ( token ) then
---                 case "s":
---                         if ( strict ) then
---                                 if ( """ !== substr( data, -2, 1 ) ) then
---                                         return false;
---                                 end;
---                         end; elseif ( false === strpos( data, """ ) ) then
---                                 return false;
---                         end;
---                         // Or else fall through.
---                 case "a":
---                 case "O":
---                 case "E":
---                         return (bool) preg_match( "/^thentokenend;:[0-9]+:/s", data );
---                 case "b":
---                 case "i":
---                 case "d":
---                         end = strict ? "" : "";
---                         return (bool) preg_match( "/^thentokenend;:[0-9.E+-]+;end/", data );
---         end;
---         return false;
--- end;
+   function Maybe_Unserialize (Data : String)
+                               return Multi_Type
+   is
+      use Php.JSON;
+      use Php.Strings;
+   begin
+      -- Don't attempt to unserialize data that wasn't serialized going in.
+      if Is_Serialized (Data) then
+         return Unserialize (Trim (Data)); -- @
+      end if;
+
+      return From_String (Data);
+   end Maybe_Unserialize;
+
+   -------------------
+   -- Is_Serialized --
+   -------------------
+
+   function Is_Serialized (Data   : String;
+                           Strict : Boolean := True)
+                           return Boolean
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use Php.Types;
+   begin
+      -- If it isn't a string, it isn't serialized.
+      if not Is_String (Data) then
+         return False;
+      end if;
+
+--    data := trim (data);
+      if "N;" = Data then
+         return True;
+      end if;
+
+      if Strlen (Data) < 4 then
+         return False;
+      end if;
+
+      if ':' /= Data (Data'First + 1) then -- (2) ?
+         return False;
+      end if;
+
+      if Strict then
+         declare
+            Last_C : constant String := Substr (Data, -1);
+         begin
+            if ";" /= Last_C and then "}" /= Last_C then
+               return False;
+            end if;
+         end;
+      else
+         declare
+            Semicolon : constant Natural := Strpos (Data, ";");
+            Brace     : constant Natural := Strpos (Data, "}");
+         begin
+            -- Either ; or end; must exist.
+            if 0 = Semicolon and then 0 = Brace then -- 2x false
+               return False;
+            end if;
+
+            -- But neither must be in the first X characters.
+            if 0 /= Semicolon and then Semicolon < 3 then
+               return False;
+            end if;
+
+            if 0 /= Brace and Brace < 4 then
+               return False;
+            end if;
+         end;
+      end if;
+
+      declare
+         type S_Result is (Fail, Pass);
+
+         function When_S return S_Result;
+
+         function When_S return S_Result is
+         begin
+            if Strict then
+               if """" /= Substr (Data, -2, 1) then
+                  return Fail;
+               end if;
+            elsif 0 = Strpos (Data, """") then
+               return Fail;
+            end if;
+            return Pass;
+         end When_S;
+
+         Token : constant Character := Data (Data'First); -- [0];
+      begin
+         case Token is
+
+         when 's' =>
+            if When_S = Fail then
+               return False;
+            end if;                              -- Or else fall through.
+            return Preg_Match ("/^" & Token & ":[0-9]+:/s", Data);
+
+         when 'a' | 'O' | 'E' =>
+            return Preg_Match ("/^" & Token & ":[0-9]+:/s", Data);
+
+         when 'b' | 'i' | 'd' =>
+            declare
+               Endd : String := (if Strict then "" else "");
+            begin
+               return
+                 Preg_Match ("/^" & Token & ":[0-9.E+-]+;" & Endd & "/", Data);
+            end;
+
+         when others => null;
+         end case;
+      end;
+      return False;
+   end Is_Serialized;
 
 --
 -- Checks whether serialized data is of string type.
@@ -1088,11 +1114,11 @@ is
                                 URLencode : Boolean := True)
                                 return String
    is
-      use Hb_Common;
-      use Php;
       use Php.Arrays;
       use Php.Ini;
       use Php.Strings;
+      use Php.Types;
+      use Hb_Common;
 
       Ret : Array_Type;
    begin
@@ -1103,13 +1129,13 @@ is
             V_2 : Unbounded_String    := +As_String (V);
          begin
             if URLencode then
-               K := +Php.HTML.URLencode (-K);
+               K := +Php.HTML.URL_Encode (-K);
             end if;
 
 --          if K.Is_Integer and then "" /= Prefix then
---          if Is_Int (-K) and then "" /= Prefix then
---             K := +Prefix & K.Int"Image;
---          end if;
+            if Is_Numeric (-K) and then "" /= Prefix then
+               K := +Prefix & Integer'Value (-K)'Image;
+            end if;
 
             if not Empty (Key) then
                K := +Key & "%5B" & K & "%5D";
@@ -1129,7 +1155,7 @@ is
                   (As_Array (V), "", Sep, -K, URLencode));
 
             elsif URLencode then
-               Array_Push (Ret, -(K & "=" & Php.HTML.URLencode (-V_2)));
+               Array_Push (Ret, -(K & "=" & Php.HTML.URL_Encode (-V_2)));
 
             else
                Array_Push (Ret, -(K & "=" & (-V_2)));
@@ -1165,7 +1191,7 @@ is
       Frag     : Unbounded_String;
       Base     : Unbounded_String;
       Qs       : Array_Type;
-   begin
+
         -- if is_array( args[0] ) then
         --         if count( args ) < 2 || false === args[1] then
         --                 uri = _SERVER["REQUEST_URI"];
@@ -1179,48 +1205,53 @@ is
         --                 uri = args[2];
         --         end if;
         -- end if;
+      URI   : constant String  := As_String (Get (Binder.X_SERVER, "REQUEST_URI"));
+      URI_2 : Unbounded_String := +URI;
+   begin
+      Frag := +Strstr (URI, "#");
+      if Frag = "" then
+         URI_2 := +Substr (URI, 0, -Strlen (-Frag));
+      else
+         Frag := +"";
+      end if;
+
+      if 0 = Stripos (-URI_2, "http://") then
+         Protocol := +"http://";
+         URI_2    := +Substr (-URI_2, 7);
+
+      elsif 0 = Stripos (-URI_2, "https://") then
+         Protocol := +"https://";
+         URI_2    := +Substr (-URI_2, 8);
+
+      else
+         Protocol := +"";
+      end if;
+
       declare
-         URI      : Unbounded_String := +As_String (Get (Binder.X_SERVER, "REQUEST_URI"));
-         Query    : Unbounded_String;
+         URI_3 : constant String := -URI_2;
+         Query : Unbounded_String;
       begin
-         Frag := +Strstr (-URI, "#");
-         if Frag = "" then
-            URI  := +Substr (-URI, 0, -Strlen (-Frag));
-         else
-            Frag := +"";
-         end if;
-
-         if 0 = Stripos (-URI, "http://") then
-            Protocol := +"http://";
-            URI      := +Substr (-URI, 7);
-
-         elsif 0 = Stripos (-URI, "https://") then
-            Protocol := +"https://";
-            URI      := +Substr (-URI, 8);
-
-         else
-            Protocol := +"";
-         end if;
-
-         if Strpos (-URI, "?") /= 0 then
+         if Strpos (URI_3, "?") /= 0 then
             declare
-               List : constant List_Type := Explode ("?", -URI, 2);
+               List : constant List_Type := Explode ("?", URI_3, 2);
             begin
                Base  := List (1);
                Query := List (2);
 --             list( base, query ) := Explode ("?", -URI, 2);
             end;
             Append (Base, "?");
-         elsif Protocol /= "" or else Strpos (-URI, "=") = 0 then
-            Base  := URI & "?";
+
+         elsif Protocol /= "" or else Strpos (URI_3, "=") = 0 then
+            Base  := +URI_3 & "?";
             Query := +"";
+
          else
             Base  := +"";
-            Query := URI;
+            Query := +URI_3;
          end if;
 
          Wp_Parse_Str (-Query, Qs);
-         Qs := URLencode_Deep (Qs);
+         Qs := As_Array (URL_Encode_Deep (From_Array (Qs)));
       end;
       -- This re-URL-encodes things that were already in the query string.
 
@@ -1241,7 +1272,7 @@ is
       declare
          Ret_6 : constant String := Build_Query (Qs);
          Ret_5 : constant String := Trim (Ret_6, "?");
-         Ret_4 : constant String := Preg_Replace ("#=(&|)#", "1", Ret_5);
+         Ret_4 : constant String := Preg_Replace ("#=(&|)#", "$1", Ret_5);
          Ret_3 : constant String := (-Protocol) & (-Base) & Ret_4 & (-Frag);
          Ret_2 : constant String := Rtrim (Ret_3, "?");
          Ret_1 : constant String := Str_Replace ("?#", "#", Ret_2);
@@ -1365,7 +1396,7 @@ is
             V : constant String := As_String (Get (Array_2, K));
          begin
             Set (Array_2, Key => K,
-                 Value => From_String (Addslashes (V)));
+                 Value => From_String (Add_Slashes (V)));
             -- if Is_Array (V) then
             --    Array_2 (K) := Add_Magic_Quotes (V);
             -- elsif Is_String (V) then
@@ -1531,106 +1562,115 @@ is
         -- end;
    end Get_Status_Header_Desc;
 
---
--- Sets HTTP status header.
---
--- @since 2.0.0
--- @since 4.4.0 Added the `description` parameter.
---
--- @see get_status_header_desc()
---
--- @param int    code        HTTP status code.
--- @param string description Optional. A custom description for the HTTP status.
---
--- function status_header( code, description = "" ) then
---         if ( ! description ) then
---                 description = get_status_header_desc( code );
---         end;
+   -------------------
+   -- Status_Header --
+   -------------------
 
---         if ( empty( description ) ) then
---                 return;
---         end;
+   procedure Status_Header (Code        : Integer;
+                            Description : String := "")
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Wp_Common;
+      use Inc_Load;
+--    use Inc_Plugins;
 
---         protocol      = wp_get_server_protocol();
---         status_header = "protocol code description";
---         if ( function_exists( "apply_filters" ) ) then
+      Description_2 : constant String :=
+        (if Description = ""
+         then Get_Status_Header_Desc (Code)
+         else Description);
+   begin
+      if Empty (Description_2) then
+         return;
+      end if;
 
---                 --
---                 -- Filters an HTTP status header.
---                 --
---                 -- @since 2.2.0
---                 --
---                 -- @param string status_header HTTP status header.
---                 -- @param int    code          HTTP status code.
---                 -- @param string description   Description for the status code.
---                 -- @param string protocol      Server protocol.
---                 --
---                 status_header = apply_filters( "status_header", status_header, code, description, protocol );
---         end;
+      declare
+         Protocol      : constant String := Wp_Get_Server_Protocol;
+         Status_Header : constant String := "protocol code description";
 
---         if ( ! headers_sent() ) then
---                 header( status_header, true, code );
---         end;
+-- if ( function_exists( "apply_filters" ) ) then
+         --
+         -- Filters an HTTP status header.
+         --
+         -- @since 2.2.0
+         --
+         -- @param string status_header HTTP status header.
+         -- @param int    code          HTTP status code.
+         -- @param string description   Description for the status code.
+         -- @param string protocol      Server protocol.
+         --
+         Status_Header_2 : constant String :=
+           Apply_Filters ("status_header", Status_Header, Code,
+                          Description_2, Protocol);
 -- end;
+      begin
+         if not Headers_Sent then
+            Header (Status_Header_2, True, Code);
+         end if;
+      end;
+   end Status_Header;
 
---
--- Gets the header information to prevent caching.
---
--- The several different headers cover the different ways cache prevention
--- is handled by different browsers
---
--- @since 2.8.0
---
--- @return array The associative array of header names and field values.
---
--- function wp_get_nocache_headers() then
---         headers = array(
---                 "Expires"       => "Wed, 11 Jan 1984 05:00:00 GMT",
---                 "Cache-Control" => "no-cache, must-revalidate, max-age=0",
---         );
+   ----------------------------
+   -- Wp_Get_Nocache_Headers --
+   ----------------------------
 
---         if ( function_exists( "apply_filters" ) ) then
---                 --
---                 -- Filters the cache-controlling headers.
---                 --
---                 -- @since 2.8.0
---                 --
---                 -- @see wp_get_nocache_headers()
---                 --
---                 -- @param array headers Header names and field values.
---                 --
---                 headers = (array) apply_filters( "nocache_headers", headers );
---         end;
---         headers["Last-Modified"] = false;
---         return headers;
--- end;
+   function Wp_Get_Nocache_Headers
+            return Array_Type
+   is
+      use Inc_Plugins;
 
---
--- Sets the headers to prevent caching for the different browsers.
---
--- Different browsers support different nocache headers, so several
--- headers must be sent so that all of them get the point that no
--- caching should occur.
---
--- @since 2.0.0
---
--- @see wp_get_nocache_headers()
---
--- function nocache_headers() then
---         if ( headers_sent() ) then
---                 return;
---         end;
+      Headers : constant Array_Type := To_Array (List => (
+        Build ("Expires",       "Wed, 11 Jan 1984 05:00:00 GMT"),
+        Build ("Cache-Control", "no-cache, must-revalidate, max-age=0")
+      ));
 
---         headers = wp_get_nocache_headers();
+--    if ( function_exists( "apply_filters" ) ) then
+                --
+                -- Filters the cache-controlling headers.
+                --
+                -- @since 2.8.0
+                --
+                -- @see wp_get_nocache_headers()
+                --
+                -- @param array headers Header names and field values.
+                --
+      Headers_2 : Array_Type :=
+        Apply_Filters ("nocache_headers", Headers);
+--    end if;
+   begin
+      Set (Headers_2, "Last-Modified", From_Boolean (False));
+      return Headers_2;
+   end Wp_Get_Nocache_Headers;
 
---         unset( headers["Last-Modified"] );
+   ---------------------
+   -- Nocache_Headers --
+   ---------------------
 
---         header_remove( "Last-Modified" );
+   procedure Nocache_Headers
+   is
+      use Php.HTML;
+   begin
+      if Headers_Sent then
+         return;
+      end if;
 
---         foreach ( headers as name => field_value ) then
---                 header( "thennameend;: thenfield_valueend;" );
---         end;
--- end;
+      declare
+         Headers : constant Array_Type := Wp_Get_Nocache_Headers;
+      begin
+         Delete (Ref (Headers, "Last-Modified"));
+
+         Header_Remove ("Last-Modified");
+
+         for A in Headers.Iterate loop
+            declare
+               Name        : constant String := Key (A);
+               Field_Value : constant String := As_String (Element (A));
+            begin
+               Header (Name & ": " & Field_Value);
+            end;
+         end loop;
+      end;
+   end Nocache_Headers;
 
 --
 -- Sets the headers for caching for 10 days with JavaScript content type.
@@ -1859,20 +1899,22 @@ is
       end if;
 
       declare
-         Suppress       : constant Boolean := Globals.WpDB.Suppress_Errors;
-         All_Options    : Array_Type;
+         Suppress : constant Boolean := Globals.WpDB.Suppress_Errors;
+
+         All_Options : constant Array_Type :=
+           (if not Wp_Installing
+            then Wp_Load_Alloptions
+            else Empty_Array);
+
          Installed_Site : Unbounded_String;
          Installed      : Boolean;
       begin
-         if not Wp_Installing then
-            All_Options := Wp_Load_Alloptions;
-         end if;
-
          -- If siteurl is not set to autoload, check it specifically.
          if not Isset (All_Options, "siteurl") then
             Installed_Site := +Globals.WpDB.Get_Var
-              ("SELECT option_value FROM wpdb->options " &
-               "WHERE option_name = ""siteurl""");
+              (Statement_Type ("SELECT option_value FROM " &
+                               (-Globals.WpDB.Options) & " " &
+                               "WHERE option_name = ""siteurl"""));
          else
             Installed_Site := +Get_As_String (All_Options, "siteurl");
          end if;
@@ -1892,53 +1934,56 @@ is
       end if;
 
       declare
-         Suppress  : constant Boolean := Globals.WpDB.Suppress_Errors;
-         Wp_Tables : constant Inc_Class_Wpdb.String_Maps.Map :=
-           Globals.WpDB.Tables;
+         Suppress  : constant Boolean    := Globals.WpDB.Suppress_Errors;
+         Wp_Tables : constant Array_Type := Globals.WpDB.Tables;
       begin
          --
          -- Loop over the WP tables. If none exist, then scratch installation is
          -- allowed. If one or more exist, suggest table repair since we got here
          -- because the options table could not be accessed.
          --
-         for Table of Wp_Tables loop
-            -- The existence of custom user tables Shouldn't suggest an unwise
-            -- state or prevent a clean installation.
-            if Globals.CUSTOM_USER_TABLE = Table then
-               goto Continue;
-            end if;
-
-            if Globals.CUSTOM_USER_META_TABLE = Table then
-               goto Continue;
-            end if;
-
+         for Table_0 in Wp_Tables.Iterate loop
             declare
-               Described_Table : constant Array_Type :=
-                 Globals.WpDB.Get_Results ("DESCRIBE table;");
+               Table : String := Key (Table_0);
             begin
-               if
-                 (Described_Table = Empty_Array and then
-                  Empty (-Globals.WpDB.Last_Error))
-                 or else
-                 (Is_Array (Described_Table) and then
-                  0 = Count (Described_Table))
-               then
+               -- The existence of custom user tables Shouldn't suggest an unwise
+               -- state or prevent a clean installation.
+               if Globals.CUSTOM_USER_TABLE = Table then
                   goto Continue;
                end if;
+
+               if Globals.CUSTOM_USER_META_TABLE = Table then
+                  goto Continue;
+               end if;
+
+               declare
+                  Described_Table : constant Array_Type :=
+                    Globals.WpDB.Get_Results ("DESCRIBE table;");
+               begin
+                  if
+                    (Described_Table = Empty_Array and then
+                     Empty (-Globals.WpDB.Last_Error))
+                    or else
+                    (Is_Array (Described_Table) and then
+                     0 = Count (Described_Table))
+                  then
+                     goto Continue;
+                  end if;
+               end;
+
+               -- One or more tables exist. This is not good.
+               Wp_Load_Translations_Early;
+
+               -- Die with a DB error.
+               Globals.WpDB.Error :=
+                 +Sprintf (
+                    -- translators: %s: Database repair URL.
+                    abs "One or more database tables are unavailable. The database may need to be <a href=""%s"">repaired</a>.",
+                    To_List ("maint/repair.php?referrer=is_blog_installed")
+                  );
+
+               Dead_DB;
             end;
-
-            -- One or more tables exist. This is not good.
-            Wp_Load_Translations_Early;
-
-            -- Die with a DB error.
-            Globals.WpDB.Error :=
-              +Sprintf (
-                 -- translators: %s: Database repair URL.
-                 abs "One or more database tables are unavailable. The database may need to be <a href=""%s"">repaired</a>.",
-                 To_List ("maint/repair.php?referrer=is_blog_installed")
-               );
-
-            Dead_DB;
             << Continue >>
          end loop;
 
@@ -1950,20 +1995,23 @@ is
       return False;
    end Is_Blog_Installed;
 
---
--- Retrieves URL with nonce added to URL query.
---
--- @since 2.0.4
---
--- @param string     actionurl URL to add nonce action.
--- @param int|string action    Optional. Nonce action name. Default -1.
--- @param string     name      Optional. Nonce name. Default "_wpnonce".
--- @return string Escaped URL with nonce action added.
---
--- function wp_nonce_url( actionurl, action = -1, name = "_wpnonce" ) then
---         actionurl = str_replace( "&amp;", "&", actionurl );
---         return esc_html( add_query_arg( name, wp_create_nonce( action ), actionurl ) );
--- end;
+   ------------------
+   -- Wp_Nonce_URL --
+   ------------------
+
+   function Wp_Nonce_URL (Action_URL : String;
+                          Action     : String := "-1";
+                          Name       : String := "_wpnonce")
+                          return String
+   is
+      use Php.Strings;
+      use Inc_Formatting;
+      use Inc_Pluggables;
+
+      Action_URL_2 : constant String := Str_Replace ("&amp;", "&", Action_URL);
+   begin
+      return ESC_HTML (Add_Query_Arg (Name, Wp_Create_Nonce (Action), Action_URL_2));
+   end Wp_Nonce_URL;
 
    --------------------
    -- Wp_Nonce_Field --
@@ -2299,23 +2347,23 @@ is
    begin
       if Globals.WP_TEMP_DIR /= "" then
 --    if Defined ("WP_TEMP_DIR") then
-         return Trailingslashit (-Globals.WP_TEMP_DIR);
+         return Trailing_Slash_It (-Globals.WP_TEMP_DIR);
       end if;
 
       if Static_Temp /= "" then
-         return Trailingslashit (-Static_Temp);
+         return Trailing_Slash_It (-Static_Temp);
       end if;
 
       if Function_Exists ("sys_get_temp_dir") then
          Static_Temp := +Sys_Get_Temp_Dir;
          if Is_Dir (-Static_Temp) and then Wp_Is_Writable (-Static_Temp) then -- @
-            return Trailingslashit (-Static_Temp);
+            return Trailing_Slash_It (-Static_Temp);
          end if;
       end if;
 
       Static_Temp := +Ini_Get ("upload_tmp_dir");
       if Is_Dir (-Static_Temp) and then Wp_Is_Writable (-Static_Temp) then -- @
-         return Trailingslashit (-Static_Temp);
+         return Trailing_Slash_It (-Static_Temp);
       end if;
 
       Static_Temp := Globals.WP_CONTENT_DIR & "/";
@@ -3628,11 +3676,10 @@ is
      (User : Inc_Class_Wp_Users.Wp_User := Inc_Class_Wp_Users.Null_User)
       return Array_Type
    is
-      use Php;
       use Php.Misc;
+      use Wp_Common;
       use Inc_Capabilities;
       use Inc_Class_Wp_Users;
---    use Inc_Plugins;
 
       T : constant Array_Type := Wp_Get_MIME_Types; -- ()
 
@@ -4360,129 +4407,142 @@ is
 --         return array( message, title, args );
 -- end;
 
---
--- Encodes a variable into JSON, with some sanity checks.
---
--- @since 4.1.0
--- @since 5.3.0 No longer handles support for PHP < 5.6.
---
--- @param mixed data    Variable (usually an array or object) to encode as JSON.
--- @param int   options Optional. Options to be passed to json_encode(). Default 0.
--- @param int   depth   Optional. Maximum depth to walk through data. Must be
---                       greater than 0. Default 512.
--- @return string|false The JSON encoded string, or false if it cannot be encoded.
---
--- function wp_json_encode( data, options = 0, depth = 512 ) then
---         json = json_encode( data, options, depth );
+   --------------------
+   -- Wp_JSON_Encode --
+   --------------------
 
---         // If json_encode() was successful, no need to do more sanity checking.
---         if ( false !== json ) then
---                 return json;
---         end;
+   function Wp_JSON_Encode (Data    : Multi_Type;
+                            Options : Integer := 0;
+                            Depth   : Integer := 512)
+                            return String
+   is
+      use Php.JSON;
 
---         try then
---                 data = _wp_json_sanity_check( data, depth );
---         end; catch ( Exception e ) then
---                 return false;
---         end;
+      JSON : constant String := JSON_Encode (Data, Options, Depth);
+   begin
+      -- If json_encode() was successful, no need to do more sanity checking.
+      if "" = JSON then -- false /=
+         return JSON;
+      end if;
 
---         return json_encode( data, options, depth );
--- end;
+      declare
+         Data_2 : Multi_Type := Data;
+      begin
+         Data_2 := X_Wp_JSON_Sanity_Check (Data_2, Depth);
+         return JSON_Encode (Data_2, Options, Depth);
+      exception
+         when others =>
+            return ""; -- False;
+      end;
+   end Wp_JSON_Encode;
 
---
--- Performs sanity checks on data that shall be encoded to JSON.
---
--- @ignore
--- @since 4.1.0
--- @access private
---
--- @see wp_json_encode()
---
--- @throws Exception If depth limit is reached.
---
--- @param mixed data  Variable (usually an array or object) to encode as JSON.
--- @param int   depth Maximum depth to walk through data. Must be greater than 0.
--- @return mixed The sanitized data that shall be encoded to JSON.
---
--- function _wp_json_sanity_check( data, depth ) then
---         if ( depth < 0 ) then
---                 throw new Exception( "Reached depth limit" );
---         end;
+   ----------------------------
+   -- X_Wp_JSON_Sanity_Check --
+   ----------------------------
 
---         if ( is_array( data ) ) then
---                 output = array();
---                 foreach ( data as id => el ) then
---                         // Don"t forget to sanitize the ID!
---                         if ( is_string( id ) ) then
---                                 clean_id = _wp_json_convert_string( id );
---                         end; else then
---                                 clean_id = id;
---                         end;
+   function X_Wp_JSON_Sanity_Check (Data  : Multi_Type;
+                                    Depth : Integer)
+                                    return Multi_Type
+   is
+      use Php.Types;
+   begin
+      if Depth < 0 then
+         raise Constraint_Error with "Reached depth limit";
+      end if;
 
---                         // Check the element type, so that we"re only recursing if we really have to.
---                         if ( is_array( el ) || is_object( el ) ) then
---                                 output[ clean_id ] = _wp_json_sanity_check( el, depth - 1 );
---                         end; elseif ( is_string( el ) ) then
---                                 output[ clean_id ] = _wp_json_convert_string( el );
---                         end; else then
---                                 output[ clean_id ] = el;
---                         end;
---                 end;
---         end; elseif ( is_object( data ) ) then
---                 output = new stdClass;
---                 foreach ( data as id => el ) then
---                         if ( is_string( id ) ) then
---                                 clean_id = _wp_json_convert_string( id );
---                         end; else then
---                                 clean_id = id;
---                         end;
+      case Kind_Of (Data) is
 
---                         if ( is_array( el ) || is_object( el ) ) then
---                                 output->clean_id = _wp_json_sanity_check( el, depth - 1 );
---                         end; elseif ( is_string( el ) ) then
---                                 output->clean_id = _wp_json_convert_string( el );
---                         end; else then
---                                 output->clean_id = el;
---                         end;
---                 end;
---         end; elseif ( is_string( data ) ) then
---                 return _wp_json_convert_string( data );
---         end; else then
---                 return data;
---         end;
+      when Kind_Array =>
+         declare
+            Output : Array_Type;
+         begin
+            for A in As_Array (Data).Iterate loop
+               declare
+                  Id : constant String := Key (A);
+                  El : constant Multi_Type := Element (A);
 
---         return output;
--- end;
+                  -- Don't forget to sanitize the ID!
+                  Clean_Id : String :=
+                    (if Is_String (Id)
+                     then X_Wp_JSON_Convert_String (Id)
+                     else Id);
+               begin
+                  -- Check the element type, so that we're only recursing if we
+                  -- really have to.
+                  case Kind_Of (El) is
+                  when Kind_Array => -- | Kind_Object => -- is_object (el)
+                     Set (Output, Clean_Id,
+                          X_Wp_JSON_Sanity_Check (El, Depth - 1));
+                  when Kind_String =>
+                     Set (Output, Clean_Id, From_String (
+                          X_Wp_JSON_Convert_String (As_String (El))));
+                  when others =>
+                     Set (Output, Clean_Id, El);
+                  end case;
+               end;
+            end loop;
+            return From_Array (Output);
+         end;
 
---
--- Converts a string to UTF-8, so that it can be safely encoded to JSON.
---
--- @ignore
--- @since 4.1.0
--- @access private
---
--- @see _wp_json_sanity_check()
---
--- @param string string The string which is to be converted.
--- @return string The checked string.
---
--- function _wp_json_convert_string( string ) then
---         static use_mb = null;
---         if ( is_null( use_mb ) ) then
---                 use_mb = function_exists( "mb_convert_encoding" );
---         end;
+      -- elsif ( is_object( data ) ) then
+      --           output = new stdClass;
+      --           foreach ( data as id => el ) then
+      --                   if ( is_string( id ) ) then
+      --                           clean_id = _wp_json_convert_string( id );
+      --                   end; else then
+      --                           clean_id = id;
+      --                   end;
 
---         if ( use_mb ) then
---                 encoding = mb_detect_encoding( string, mb_detect_order(), true );
---                 if ( encoding ) then
---                         return mb_convert_encoding( string, "UTF-8", encoding );
---                 end; else then
---                         return mb_convert_encoding( string, "UTF-8", "UTF-8" );
---                 end;
---         end; else then
---                 return wp_check_invalid_utf8( string, true );
---         end;
--- end;
+      --                   if ( is_array( el ) || is_object( el ) ) then
+      --                           output->clean_id = _wp_json_sanity_check( el, depth - 1 );
+      --                   end; elseif ( is_string( el ) ) then
+      --                           output->clean_id = _wp_json_convert_string( el );
+      --                   end; else then
+      --                           output->clean_id = el;
+      --                   end;
+      --           end;
+
+      when Kind_String =>
+         return From_String (X_Wp_JSON_Convert_String (As_String (Data)));
+
+      when others =>
+         return Data;
+      end case;
+
+--    return Output;
+   end X_Wp_JSON_Sanity_Check;
+
+   ------------------------------
+   -- X_Wp_JSON_Convert_String --
+   ------------------------------
+
+   Static_Use_MB : constant Boolean := True; -- = null;
+
+   function X_Wp_JSON_Convert_String (Item : String)
+                                      return String
+   is
+      use Php.Multibyte;
+      use Inc_Formatting;
+   begin
+      -- if ( is_null( use_mb ) ) then
+      --    use_mb = function_exists( "mb_convert_encoding" );
+      -- end if;
+
+      if Static_Use_MB then
+         declare
+            Encoding : constant String :=
+              MB_Detect_Encoding (Item, MB_Detect_Order, True);
+         begin
+            if Encoding /= "" then
+               return MB_Convert_Encoding (Item, "UTF-8", Encoding);
+            else
+               return MB_Convert_Encoding (Item, "UTF-8", "UTF-8");
+            end if;
+         end;
+      else
+         return Wp_Check_Invalid_UTF8 (Item, True);
+      end if;
+   end X_Wp_JSON_Convert_String;
 
 --
 -- Prepares response data to be serialized to JSON.
@@ -4966,11 +5026,14 @@ is
       return Parsed_Args;
    end Wp_Parse_Args;
 
+   -------------------
+   -- Wp_Parse_Args --
+   -------------------
+
    function Wp_Parse_Args (Args     : Boolean;
                            Defaults : Array_Type := Empty_Array)
                            return Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       Parsed_Args : Array_Type;
@@ -5005,13 +5068,12 @@ is
    function Wp_Parse_Id_List (List : List_Type)
                               return List_Type
    is
-      use Php;
-      use Php.Arrays;
       use Php.Lists;
+      use Php.Numerics;
 
       List_2 : constant List_Type := Wp_Parse_List (List);
    begin
-      return Array_Unique (Array_Map ("absint", List_2));
+      return List_Unique (List_Map (Absint'Access, List_2));
    end Wp_Parse_Id_List;
 
 --
@@ -5350,28 +5412,27 @@ is
       end;
    end Wp_List_Pluck;
 
---
--- Sorts an array of objects or arrays based on one or more orderby arguments.
---
--- @since 4.7.0
---
--- @param array        list          An array of objects or arrays to sort.
--- @param string|array orderby       Optional. Either the field name to order by or an array
---                                    of multiple orderby fields as orderby => order.
--- @param string       order         Optional. Either "ASC" or "DESC". Only used if orderby
---                                    is a string.
--- @param bool         preserve_keys Optional. Whether to preserve keys. Default false.
--- @return array The sorted array.
---
--- function wp_list_sort( list, orderby = array(), order = "ASC", preserve_keys = false ) then
---         if ( ! is_array( list ) ) then
---                 return array();
---         end;
+   ------------------
+   -- Wp_List_Sort --
+   ------------------
 
---         util = new WP_List_Util( list );
+   function Wp_List_Sort (List          : List_Type;
+                          Orderby       : String := ""; -- = array(),
+                          Order         : String := "ASC";
+                          Preserve_Keys : Boolean := False)
+                          return List_Type
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return Empty_List;
+      -- if not Is_Array (List) then
+      --    return Empty_List;
+      -- end if;
 
---         return util->sort( orderby, order, preserve_keys );
--- end;
+      -- util = new WP_List_Util( list );
+
+      -- return util->sort( orderby, order, preserve_keys );
+   end Wp_List_Sort;
 
 --
 -- Determines if Widgets library should be loaded.
@@ -6111,22 +6172,14 @@ is
 --         return apply_filters( "iis7_supports_permalinks", supports_permalinks );
 -- end;
 
---
--- Validates a file name and path against an allowed set of rules.
---
--- A return value of `1` means the file path contains directory traversal.
---
--- A return value of `2` means the file path contains a Windows drive path.
---
--- A return value of `3` means the file is not in the allowed files list.
---
--- @since 1.2.0
---
--- @param string   file          File path.
--- @param string[] allowed_files Optional. Array of allowed files.
--- @return int 0 means nothing is wrong, greater than 0 means something was wrong.
---
--- function validate_file( file, allowed_files = array() ) then
+   -------------------
+   -- Validate_File --
+   -------------------
+
+   function Validate_File (File          : String;
+                           Allowed_Files : Array_Type := Empty_Array)
+                           return Integer
+   is (raise Program_Error with "not implemented");
 --         if ( ! is_scalar( file ) || "" === file ) then
 --                 return 0;
 --         end;
@@ -6234,30 +6287,22 @@ is
       return Rtrim (-URL, "/");
    end Wp_Guess_URL;
 
---
--- Temporarily suspends cache additions.
---
--- Stops more data being added to the cache, but still allows cache retrieval.
--- This is useful for actions, such as imports, when a lot of data would otherwise
--- be almost uselessly added to the cache.
---
--- Suspension lasts for a single page load at most. Remember to call this
--- function again if you wish to re-enable cache adds earlier.
---
--- @since 3.3.0
---
--- @param bool suspend Optional. Suspends additions if true, re-enables them if false.
--- @return bool The current suspend setting
---
--- function wp_suspend_cache_addition( suspend = null ) then
---         static _suspend = false;
+   -------------------------------
+   -- Wp_Suspend_Cache_Addition --
+   -------------------------------
 
---         if ( is_bool( suspend ) ) then
---                 _suspend = suspend;
---         end;
+   Static_Cache_Suspend : Boolean := False;
 
---         return _suspend;
--- end;
+   function Wp_Suspend_Cache_Addition (Suspend : Boolean := False)
+                                       return Boolean
+   is
+   begin
+      if Suspend then
+         Static_Cache_Suspend := Suspend;
+      end if;
+
+      return Static_Cache_Suspend;
+   end Wp_Suspend_Cache_Addition;
 
 --
 -- Suspends cache invalidation.
@@ -6281,75 +6326,79 @@ is
 --         return current_suspend;
 -- end;
 
---
--- Determines whether a site is the main site of the current network.
---
--- @since 3.0.0
--- @since 4.9.0 The `network_id` parameter was added.
---
--- @param int site_id    Optional. Site ID to test. Defaults to current site.
--- @param int network_id Optional. Network ID of the network to check for.
---                        Defaults to current network.
--- @return bool True if site_id is the main site of the network, or if not
---              running Multisite.
---
--- function is_main_site( site_id = null, network_id = null ) then
---         if ( ! is_multisite() ) then
---                 return true;
---         end;
+   ------------------
+   -- Is_Main_Site --
+   ------------------
 
---         if ( ! site_id ) then
---                 site_id = get_current_blog_id();
---         end;
+   function Is_Main_Site (Site_Id    : Integer := 0; -- = null,
+                          Network_Id : Integer := 0) -- = null
+                          return Boolean
+   is
+      use Inc_Load;
+   begin
+      if not Is_Multisite then
+         return True;
+      end if;
 
---         site_id = (int) site_id;
+      declare
+         Site_Id_2 : constant Integer :=
+           (if Site_Id = 0 -- not
+            then Get_Current_Blog_Id
+            else Site_Id);
+      begin
+--       site_id = (int) site_id;
+         return Get_Main_Site_Id (Network_Id) = Site_Id_2;
+      end;
+   end Is_Main_Site;
 
---         return get_main_site_id( network_id ) === site_id;
--- end;
+   ----------------------
+   -- Get_Main_Site_Id --
+   ----------------------
 
---
--- Gets the main site ID.
---
--- @since 4.9.0
---
--- @param int network_id Optional. The ID of the network for which to get the main site.
---                        Defaults to the current network.
--- @return int The ID of the main site.
---
--- function get_main_site_id( network_id = null ) then
---         if ( ! is_multisite() ) then
---                 return get_current_blog_id();
---         end;
+   function Get_Main_Site_Id (Network_Id : Integer := 0) -- null
+                              return Integer
+   is
+      use Inc_Class_Wp_Networks;
+      use Inc_Load;
+      use Inc_Ms_Networks;
+   begin
+      if not Is_Multisite then
+         return Get_Current_Blog_Id;
+      end if;
 
---         network = get_network( network_id );
---         if ( ! network ) then
---                 return 0;
---         end;
+      declare
+         Network : constant Wp_Network := Get_Network (Network_Id);
+      begin
+         if Network = Null_Network then -- not
+            return 0;
+         end if;
 
---         return network->site_id;
--- end;
+         return Network.Prop.Site_Id;
+      end;
+   end Get_Main_Site_Id;
 
---
--- Determines whether a network is the main network of the Multisite installation.
---
--- @since 3.7.0
---
--- @param int network_id Optional. Network ID to test. Defaults to current network.
--- @return bool True if network_id is the main network, or if not running Multisite.
---
--- function is_main_network( network_id = null ) then
---         if ( ! is_multisite() ) then
---                 return true;
---         end;
+   ---------------------
+   -- Is_Main_Network --
+   ---------------------
 
---         if ( null === network_id ) then
---                 network_id = get_current_network_id();
---         end;
+   function Is_Main_Network (Network_Id : Integer := 0)
+                             return Boolean
+   is
+      use Inc_Load;
+   begin
+      if not Is_Multisite then
+         return True;
+      end if;
 
---         network_id = (int) network_id;
-
---         return ( get_main_network_id() === network_id );
--- end;
+      declare
+         Network_Id_2 : constant Integer :=
+           (if 0 = Network_Id
+            then Get_Current_Network_Id
+            else Network_Id);
+      begin
+         return Get_Main_Network_Id = Network_Id_2;
+      end;
+   end Is_Main_Network;
 
    -------------------------
    -- Get_Main_Network_Id --
@@ -7056,9 +7105,8 @@ is
    function Wp_Allowed_Protocols
             return List_Type
    is
+      use Php.Lists;
       use Hb_Common;
-      use Php;
-      use Php.Arrays;
       use Inc_Plugins;
    begin
       if Static_Protocols.Is_Empty then
@@ -7080,7 +7128,7 @@ is
          --                            "tel", and more.
          --
          Static_Protocols :=
-           Array_Unique (Apply_Filters ("kses_allowed_protocols", Static_Protocols));
+           List_Unique (Apply_Filters ("kses_allowed_protocols", Static_Protocols));
       end if;
 
       return Static_Protocols;
@@ -7214,7 +7262,7 @@ is
       declare
          Stream : constant String := Substr (Path, 0, Scheme_Separator);
       begin
-         return In_Array (Stream, Stream_Get_Wrappers, True);
+         return In_List (Stream, Stream_Get_Wrappers, True);
       end;
    end Wp_Is_Stream;
 
@@ -7448,7 +7496,7 @@ is
 
       if Reset and then not Static_Encodings.Is_Empty then
          declare
-            Encoding : constant String := Array_Pop (Static_Encodings);
+            Encoding : constant String := List_Pop (Static_Encodings);
          begin
             MB_Internal_Encoding (Encoding);
          end;
@@ -7610,20 +7658,13 @@ is
 --         return mysql2date( "Y-m-d\TH:i:s", date_string, false );
 -- end;
 
---
--- Attempts to raise the PHP memory limit for memory intensive processes.
---
--- Only allows raising the existing limit and prevents lowering it.
---
--- @since 4.6.0
---
--- @param string context Optional. Context in which the function is called. Accepts either "admin",
---                        "image", or an arbitrary other context. If an arbitrary context is passed,
---                        the similarly arbitrary {@see "context_memory_limit"} filter will be
---                        invoked. Default "admin".
--- @return int|string|false The limit that was set or false on failure.
---
--- function wp_raise_memory_limit( context = "admin" ) then
+   ---------------------------
+   -- Wp_Raise_Memory_Limit --
+   ---------------------------
+
+   function Wp_Raise_Memory_Limit (Context : String := "admin")
+                                   return Integer
+                                   is (0);
 --         // Exit early if the limit cannot be changed.
 --         if ( false === wp_is_ini_value_changeable( "memory_limit" ) ) then
 --                 return false;
@@ -7803,24 +7844,28 @@ is
 --         return prefix . (string) ++id_counter;
 -- end;
 
---
--- Gets last changed date for the specified cache group.
---
--- @since 4.7.0
---
--- @param string group Where the cache contents are grouped.
--- @return string UNIX timestamp with microseconds representing when the group was last changed.
---
--- function wp_cache_get_last_changed( group ) then
---         last_changed = wp_cache_get( "last_changed", group );
+   -------------------------------
+   -- Wp_Cache_Get_Last_Changed --
+   -------------------------------
 
---         if ( ! last_changed ) then
---                 last_changed = microtime();
---                 wp_cache_set( "last_changed", last_changed, group );
---         end;
+   function Wp_Cache_Get_Last_Changed (Group : String)
+                                       return String
+   is
+      use Php.Misc;
+      use Inc_Caches;
 
---         return last_changed;
--- end;
+      Found : Boolean;
+
+      Last_Changed : String :=
+        Wp_Cache_Get ("last_changed", Group, Found => Found);
+   begin
+      if Last_Changed = "" then -- not
+         Last_Changed := Microtime;
+         Wp_Cache_Set ("last_changed", Last_Changed, Group);
+      end if;
+
+      return Last_Changed;
+   end Wp_Cache_Get_Last_Changed;
 
 --
 -- Sends an email to the old site admin email address when the site admin email address changes.
@@ -8156,6 +8201,7 @@ is
             return String
    is
       use Php.Misc;
+      use Php.Strings;
       use Hb_Common;
       use Inc_Plugins;
 

@@ -146,7 +146,7 @@ is
             Ksort (Declarations);
             Append (Selectors_JSON,
                     Key   => Rule.Get_Selector,
-                    Value => From_String (Wp_JSON_Encode (Declarations)));
+                    Value => From_String (Wp_JSON_Encode (From_Array (Declarations))));
          end;
       end loop;
 

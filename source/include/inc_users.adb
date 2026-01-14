@@ -6,7 +6,7 @@
 -- @subpackage Users
 --
 
--- with Php.Arrays;
+with Php.Strings;
 
 with Hb_Common;
 with Wp_Common;
@@ -1861,6 +1861,7 @@ is
 
    procedure Update_User_Caches (User : Inc_Class_Wp_Users.Wp_User)
    is
+      use Php.Strings;
       use Hb_Common;
       use Inc_Caches;
       use Inc_Class_Wp_Users;

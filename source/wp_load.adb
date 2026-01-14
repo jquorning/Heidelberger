@@ -113,7 +113,10 @@ is
             -- in an infinite loop, that's a silly thing to assume, don't you think? If
             -- we"re traveling in circles, our last-ditch effort is "Need more help?"
             --
-            if 0 = Strpos (As_String (Get (Binder.X_SERVER, "REQUEST_URI")), "setup-config") then
+            if
+              0 = Strpos (Get_As_String (Binder.X_SERVER, "REQUEST_URI"),
+                          "setup-config")
+            then
                Header ("Location: " & (-Path));
                return; -- exit;
             end if;

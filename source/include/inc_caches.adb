@@ -7,12 +7,14 @@
 -- @subpackage Cache
 --
 
+with Helpers;
+
+with Inc_Class_Wp_Object_Caches;
+
 package body Inc_Caches
 is
-   procedure Dummy is null;
 
--- -- WP_Object_Cache class--
--- require_once ABSPATH . WPINC . '/class-wp-object-cache.php';
+   Global_Wp_Object_Cache : Inc_Class_Wp_Object_Caches.Wp_Object_Cache;
 
 -- --
 -- -- Sets up Object Cache Global and assigns it.
@@ -25,27 +27,19 @@ is
 --         $GLOBALS['wp_object_cache'] = new WP_Object_Cache();
 -- end;
 
--- --
--- -- Adds data to the cache, if the cache key doesn't already exist.
--- --
--- -- @since 2.0.0
--- --
--- -- @see WP_Object_Cache::add()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @param int|string $key    The cache key to use for retrieval later.
--- -- @param mixed      $data   The data to add to the cache.
--- -- @param string     $group  Optional. The group to add the cache to. Enables the same key
--- --                           to be used across groups. Default empty.
--- -- @param int        $expire Optional. When the cache data should expire, in seconds.
--- --                           Default 0 (no expiration).
--- -- @return bool True on success, false if cache key and group already exist.
--- --
--- function wp_cache_add( $key, $data, $group = '', $expire = 0 ) then
---         global $wp_object_cache;
+   ------------------
+   -- Wp_Cache_Add --
+   ------------------
 
---         return $wp_object_cache->add( $key, $data, $group, (int) $expire );
--- end;
+   procedure Wp_Cache_Add (Key     : String;
+                           Data    : Multi_Type;
+                           Group   : String  := "";
+                           Expire  : Natural := 0;
+                           Success : out Boolean)
+   is
+   begin
+      Global_Wp_Object_Cache.Add (Key, Data, Group, Expire, Success => Success);
+   end Wp_Cache_Add;
 
 -- --
 -- -- Adds multiple values to the cache in one call.
@@ -90,29 +84,19 @@ is
 --         return $wp_object_cache->replace( $key, $data, $group, (int) $expire );
 -- end;
 
--- --
--- -- Saves the data to the cache.
--- --
--- -- Differs from wp_cache_add() and wp_cache_replace() in that it will always write data.
--- --
--- -- @since 2.0.0
--- --
--- -- @see WP_Object_Cache::set()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @param int|string $key    The cache key to use for retrieval later.
--- -- @param mixed      $data   The contents to store in the cache.
--- -- @param string     $group  Optional. Where to group the cache contents. Enables the same key
--- --                           to be used across groups. Default empty.
--- -- @param int        $expire Optional. When to expire the cache contents, in seconds.
--- --                           Default 0 (no expiration).
--- -- @return bool True on success, false on failure.
--- --
--- function wp_cache_set( $key, $data, $group = '', $expire = 0 ) then
---         global $wp_object_cache;
+   ------------------
+   -- Wp_Cache_Set --
+   ------------------
 
---         return $wp_object_cache->set( $key, $data, $group, (int) $expire );
--- end;
+   procedure Wp_Cache_Set (Key     : String;
+                           Data    : Multi_Type;
+                           Group   : String  := "";
+                           Expire  : Integer := 0;
+                           Success : out Boolean)
+   is
+   begin
+      Global_Wp_Object_Cache.Set (Key, Data, Group, Expire, Success);
+   end Wp_Cache_Set;
 
 -- --
 -- -- Sets multiple values to the cache in one call.
@@ -135,27 +119,183 @@ is
 --         return $wp_object_cache->set_multiple( $data, $group, $expire );
 -- end;
 
--- --
--- -- Retrieves the cache contents from the cache by key and group.
--- --
--- -- @since 2.0.0
--- --
--- -- @see WP_Object_Cache::get()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @param int|string $key   The key under which the cache contents are stored.
--- -- @param string     $group Optional. Where the cache contents are grouped. Default empty.
--- -- @param bool       $force Optional. Whether to force an update of the local cache
--- --                          from the persistent cache. Default false.
--- -- @param bool       $found Optional. Whether the key was found in the cache (passed by reference).
--- --                          Disambiguates a return of false, a storable value. Default null.
--- -- @return mixed|false The cache contents on success, false on failure to retrieve contents.
--- --
--- function wp_cache_get( $key, $group = '', $force = false, &$found = null ) then
---         global $wp_object_cache;
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
 
---         return $wp_object_cache->get( $key, $group, $force, $found );
--- end;
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Multi_Type
+   is
+   begin
+      return Global_Wp_Object_Cache.Get (Key, Group, Force, Found);
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Array_Type
+   is
+      Result : constant Multi_Type :=
+        Wp_Cache_Get (Key, Group, Force, Found);
+   begin
+      case Kind_Of (Result) is
+      when Kind_Null =>
+         return Empty_Array;
+      when others =>
+         return As_Array (Result);
+      end case;
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Boolean
+   is
+   begin
+      return As_Boolean (Wp_Cache_Get (Key, Group, Force, Found));
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return String
+   is
+   begin
+      return As_String (Wp_Cache_Get (Key, Group, Force, Found));
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Posts.Wp_Post
+   is
+      Result : constant Multi_Type := Wp_Cache_Get (Key, Group, Force, Found);
+   begin
+      if Result = From_Null then
+         return Inc_Class_Wp_Posts.Null_Post;
+      else
+         return Inc_Class_Wp_Posts.Null_Post;
+      end if;
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Integer
+   is
+   begin
+      return As_Integer (Wp_Cache_Get (Key, Group, Force, Found));
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Comments.Comment_Counts
+   is
+      Result : constant Multi_Type :=
+        Wp_Cache_Get (Key, Group, Force, Found);
+   begin
+      if Result = From_Null then
+         return Inc_Comments.Null_Comment_Counts;
+      else
+         return Inc_Comments.Null_Comment_Counts; -- Comment_Counts (Result);
+      end if;
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : Integer;         -- Comment_Id
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Comments.Wp_Comment
+   is
+      Result : constant Multi_Type :=
+        Wp_Cache_Get (Helpers.Image (Key),
+                      Group, Force, Found);
+   begin
+      if Result = From_Null then
+         return Inc_Class_Wp_Comments.Null_Comment;
+      else
+         return Inc_Class_Wp_Comments.Null_Comment; -- Wp_Comment (Result);
+      end if;
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : Integer;         -- User_Id
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Users.Wp_User
+   is
+      Result : constant Multi_Type :=
+        Wp_Cache_Get (Helpers.Image (Key),
+                      Group, Force, Found);
+   begin
+      if Result = From_Null then
+         return Inc_Class_Wp_Users.Null_User;
+      else
+         return Inc_Class_Wp_Users.Null_User; -- Wp_Comment (Result);
+      end if;
+   end Wp_Cache_Get;
+
+   ------------------
+   -- Wp_Cache_Get --
+   ------------------
+
+   function Wp_Cache_Get (Key   : String;
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Users.Wp_User
+   is
+      Result : constant Multi_Type :=
+        Wp_Cache_Get (Key, Group, Force, Found);
+   begin
+      if Result = From_Null then
+         return Inc_Class_Wp_Users.Null_User;
+      else
+         return Inc_Class_Wp_Users.Null_User; -- Wp_User (Result);
+      end if;
+   end Wp_Cache_Get;
 
 -- --
 -- -- Retrieves multiple values from the cache in one call.
@@ -178,23 +318,17 @@ is
 --         return $wp_object_cache->get_multiple( $keys, $group, $force );
 -- end;
 
--- --
--- -- Removes the cache contents matching key and group.
--- --
--- -- @since 2.0.0
--- --
--- -- @see WP_Object_Cache::delete()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @param int|string $key   What the contents in the cache are called.
--- -- @param string     $group Optional. Where the cache contents are grouped. Default empty.
--- -- @return bool True on successful removal, false on failure.
--- --
--- function wp_cache_delete( $key, $group = '' ) then
---         global $wp_object_cache;
+   ---------------------
+   -- Wp_Cache_Delete --
+   ---------------------
 
---         return $wp_object_cache->delete( $key, $group );
--- end;
+   procedure Wp_Cache_Delete (Key   : String;
+                              Group : String := "")
+   is
+      Unused_Done : Boolean;
+   begin
+      Global_Wp_Object_Cache.Delete (Key, Group, Done => Unused_Done);
+   end Wp_Cache_Delete;
 
 -- --
 -- -- Deletes multiple values from the cache in one call.
@@ -255,21 +389,16 @@ is
 --         return $wp_object_cache->decr( $key, $offset, $group );
 -- end;
 
--- --
--- -- Removes all cache items.
--- --
--- -- @since 2.0.0
--- --
--- -- @see WP_Object_Cache::flush()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @return bool True on success, false on failure.
--- --
--- function wp_cache_flush() then
---         global $wp_object_cache;
+   --------------------
+   -- Wp_Cache_Flush --
+   --------------------
 
---         return $wp_object_cache->flush();
--- end;
+   procedure Wp_Cache_Flush
+   is
+   begin
+--         return $
+      Global_Wp_Object_Cache.Flush;
+   end Wp_Cache_Flush;
 
 -- --
 -- -- Removes all cache items from the in-memory runtime cache.

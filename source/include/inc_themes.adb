@@ -23,7 +23,6 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_L10n;
-with Inc_Options;
 with Inc_Plugins;
 with Inc_Post_Formats;
 with Inc_REST_API;
@@ -134,9 +133,9 @@ is
                           Theme_Root : String := "")
                           return Inc_Class_Wp_Themes.Wp_Theme
    is
-      use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
 
       Stylesheet_2 : String := (if Empty (Stylesheet)
                                 then Get_Stylesheet
@@ -148,7 +147,7 @@ is
          begin
             if "" = Theme_Root then -- False =
                Theme_Root := Globals.WP_CONTENT_DIR & "/themes";
-            elsif not In_Array (-Theme_Root, Wp_Theme_Directories, True) then
+            elsif not In_List (-Theme_Root, Wp_Theme_Directories, True) then
                Theme_Root := Globals.WP_CONTENT_DIR & Theme_Root;
             end if;
          end;
@@ -414,7 +413,7 @@ is
 -- --
 -- function get_theme_roots() then
    function Get_Theme_Roots
-            return Hb_Common.String_Maps.Map
+            return Inc_Options.String_Maps.Map
    is
       use Ada.Containers;
       use Php;
@@ -422,7 +421,7 @@ is
       use Inc_Options;
 
 --         global wp_theme_directories;
-      Theme_Roots : Hb_Common.String_Maps.Map;
+      Theme_Roots : String_Maps.Map;
       Unused      : Array_Type;
    begin
       if
@@ -430,7 +429,7 @@ is
         Wp_Theme_Directories.Length <= 1
       then
          declare
-            M : Hb_Common.String_Maps.Map;
+            M : String_Maps.Map;
          begin
             M.Include ("/themes", "/themes");
             return M; -- "/themes";
@@ -459,6 +458,7 @@ is
       use Php;
       use Php.Files;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Formatting;
 
       Directory_2 : Unbounded_String;
@@ -482,7 +482,7 @@ is
       Untrailed := +Un_Trailing_Slash_It (-Directory_2);
       if
         not Empty (-Untrailed) and then
-        not In_Array (-Untrailed, Wp_Theme_Directories, True)
+        not In_List (-Untrailed, Wp_Theme_Directories, True)
       then
          Wp_Theme_Directories.Append (Untrailed);
       end if;
@@ -655,7 +655,7 @@ is
             -- Always prepend WP_CONTENT_DIR unless the root currently registered as
             -- a theme directory. This gives relative theme roots the benefit of the
             -- doubt when things go haywire.
-            if not In_Array (-Theme_Root, Wp_Theme_Directories, True) then -- (array)
+            if not In_List (-Theme_Root, Wp_Theme_Directories, True) then -- (array)
                Theme_Root := WP_CONTENT_DIR & Theme_Root;
             end if;
          end if;
@@ -746,10 +746,10 @@ is
                                 return String
    is
       use Ada.Containers;
+      use Php.Strings;
+      use Php.Types;
       use Inc_Options;
       use Hb_Common;
-      use Php;
-      use Php.Types;
 
 --    global wp_theme_directories;
       Theme_Root : Unbounded_String;
@@ -2673,7 +2673,7 @@ is
             begin
 --             Post_Formats.Delete ("standard");
 
-               List_2 := Array_Intersect (List, Array_Keys (Post_Formats));
+               List_2 := List_Intersect (List, List_Keys (Post_Formats));
 --             args[0] = array_intersect( args[0], array_keys( post_formats ) );
             end;
          else
@@ -2973,12 +2973,12 @@ is
 
    procedure X_Custom_Logo_Header_Styles
    is
-      use List_Vectors;
-      use Hb_Common;
-      use Php;
       use Php.Echoing;
       use Php.Lists;
       use Php.Strings;
+      use List_Vectors;
+      use Hb_Common;
+      use Inc_Formatting;
    begin
       if
         not Current_Theme_Supports ("custom-header", "header-text")    and then
@@ -2990,7 +2990,7 @@ is
               Get_Theme_Support ("custom-logo", "header-text"); -- (array)
 
             Classes_2 : constant List_Type :=
-              Array_Map ("sanitize_html_class", Classes_3);
+              List_Map (Sanitize_HTML_Class'Access, Classes_3);
 
             Classes : constant String := "." & Implode (", .", Classes_2);
 
@@ -3252,6 +3252,7 @@ is
       use Php;
       use Php.Arrays;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Functions;
       use Inc_REST_API;
 
@@ -3287,9 +3288,9 @@ is
       end if;
 
       if
-        not In_Array (As_String (Get (Args_2, "type")),
-                      To_List (List => (+"string", +"boolean", +"integer",
-                                        +"number", +"array", +"object")), True)
+        not In_List (As_String (Get (Args_2, "type")),
+                     To_List (List => (+"string", +"boolean", +"integer",
+                                       +"number", +"array", +"object")), True)
       then
          raise Feature_Error with "invalid_type";
          -- return new WP_Error(
@@ -3311,8 +3312,8 @@ is
 
       if
         False /= As_Boolean (Get (Args_2, "show_in_rest")) and then
-        In_Array (As_String (Get (Args_2, "type")),
-                             To_List (List => (+"array", +"object")), True)
+        In_List (As_String (Get (Args_2, "type")),
+                            To_List (List => (+"array", +"object")), True)
       then
          if
            Kind_Of (Get (Args_2, "show_in_rest")) not in Kind_Array or else
@@ -3544,6 +3545,7 @@ is
       use Php;
       use Php.Arrays;
       use Php.Files;
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

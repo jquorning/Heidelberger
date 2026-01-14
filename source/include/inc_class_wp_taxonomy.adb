@@ -7,6 +7,7 @@
 --
 
 with Php.Arrays;
+with Php.Lists;
 
 with Globals;
 with Hb_Common;
@@ -52,8 +53,8 @@ is
                         Args        : Array_Type)
    is
       use Hb_Common;
-      use Php;
       use Php.Arrays;
+      use Php.Lists;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Plugins;
@@ -237,7 +238,7 @@ is
 
       Set (Args_2,
            Key   => "object_type",
-           Value => From_Array (Array_Unique (Object_Type)));
+           Value => From_List (List_Unique (Object_Type)));
 
       -- If not set, use the default meta box.
       if Is_Null (Get (Args_2, "meta_box_cb")) then

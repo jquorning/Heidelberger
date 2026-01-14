@@ -40,7 +40,7 @@ is
          return False;
       end if;
 
-      if not In_Array (Locale, This.Available_Languages, True) then
+      if not In_List (Locale, This.Available_Languages, True) then
          return False;
       end if;
 
@@ -64,7 +64,7 @@ is
    -- Restore_Previous_Locale --
    -----------------------------
 
-   function Restore_Previous_Locale (This : Wp_Locale_Switcher)
+   function Restore_Previous_Locale (This : in out Wp_Locale_Switcher)
                                      return String
    is
       use Hb_Common;
@@ -73,7 +73,7 @@ is
       use Php.Misc;
       use Inc_Plugins;
 
-      Previous_Locale : constant String := Array_Pop (This.Locales);
+      Previous_Locale : constant String := List_Pop (This.Locales);
    begin
       if "" = Previous_Locale then -- null
          -- The stack is empty, bail.

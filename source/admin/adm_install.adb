@@ -23,29 +23,6 @@
 --         <?php
 -- }
 
---
--- We are installing WordPress.
---
--- @since 1.5.1
--- @var bool
---
--- define( 'WP_INSTALLING', true );
-
--- Load WordPress Bootstrap
--- require_once dirname( __DIR__ ) . '/wp-load.php';
-
--- Load WordPress Administration Upgrade API
--- require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-
--- Load WordPress Translation Install API
--- require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-
--- Load wpdb
--- require_once ABSPATH . WPINC . '/class-wpdb.php';
-
--- nocache_headers();
-
--- $step = isset( $_GET['step'] ) ? (int) $_GET['step'] : 0;
 with Ada.Strings.Unbounded;
 
 with Php.Echoing;
@@ -68,6 +45,7 @@ with Adi_Translation_Install;
 with Adi_Upgrade;
 
 -- with Inc_Class_Wp_Locale;
+with Inc_Class_Wpdb;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -77,6 +55,8 @@ with Inc_Plugins;
 with Inc_Pluggables;
 with Inc_Vars;
 with Inc_Versions;
+
+with Wp_Load;
 
 package body Adm_Install
 is
@@ -124,7 +104,9 @@ is
       end if;
 
       Echo ("<!DOCTYPE html>" & NL);
-      Echo ("<html <?php language_attributes(); ?>>" & NL);
+      Echo ("<html ");
+      Language_Attributes;
+      Echo (">" & NL);
       Echo ("<head>" & NL);
       Echo ("    <meta name=""viewport"" content=""width=device-width"" />" & NL);
       Echo ("    <meta http-equiv=""Content-Type"" content=""text/html; charset=utf-8"" />" & NL);
@@ -153,17 +135,19 @@ is
       use Arrays;
       use Binder;
       use Hb_Common;
+      use Lists;
       use Adi_Templates;
+      use Inc_Class_Wpdb;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_L10n;
       use Inc_Plugins;
       use Inc_Pluggables;
 
---    global $wpdb;
-      Statement : constant String :=
+      Statement : constant Statement_Type :=
         Globals.WpDB.Prepare ("SHOW TABLES LIKE %s",
-                              Globals.WpDB.ESC_Like (-Globals.WpDB.Users));
+                              To_List (Globals.WpDB.ESC_Like (-Globals.WpDB.Users)));
+
       User_Table : constant Boolean :=
         (Globals.WpDB.Get_Var (Statement) /= ""); -- null);
 
@@ -171,13 +155,23 @@ is
       Blog_Public : Integer := 1;
    begin
       if Isset (X_POST, "weblog_title") then
-         Blog_Public := (if Isset (X_POST, "blog_public") then As_Integer (Get (X_POST, "blog_public")) else Blog_Public);
+         Blog_Public := (if Isset (X_POST, "blog_public")
+                         then As_Integer (Get (X_POST, "blog_public"))
+                         else Blog_Public);
       end if;
 
       declare
-         Weblog_Title : String := (if Isset (X_POST, "weblog_title") then Trim (Wp_Unslash (Get_As_String (X_POST, "weblog_title"))) else "");
-         User_Name    : String := (if Isset (X_POST, "user_name")    then Trim (Wp_Unslash (Get_As_String (X_POST, "user_name")))    else "");
-         Admin_Email  : String := (if Isset (X_POST, "admin_email")  then Trim (Wp_Unslash (Get_As_String (X_POST, "admin_email")))  else "");
+         Weblog_Title : constant String :=
+           (if Isset (X_POST, "weblog_title")
+            then Trim (Wp_Unslash (Get_As_String (X_POST, "weblog_title"))) else "");
+
+         User_Name : constant String :=
+           (if Isset (X_POST, "user_name")
+            then Trim (Wp_Unslash (Get_As_String (X_POST, "user_name")))    else "");
+
+         Admin_Email : constant String :=
+           (if Isset (X_POST, "admin_email")
+            then Trim (Wp_Unslash (Get_As_String (X_POST, "admin_email")))  else "");
       begin
          if Error /= "" then
 --       if not Is_Null (Error) then
@@ -227,7 +221,7 @@ is
             declare
                Initial_Password : String :=
                  (if Isset (X_POST, "admin_password")
-                  then Stripslashes (Get_As_String (X_POST, "admin_password"))
+                  then Strip_Slashes (Get_As_String (X_POST, "admin_password"))
                   else Wp_Generate_Password (18));
             begin
                Echo ("                                        <input type=""password"" name=""admin_password"" id=""pass1"" class=""regular-text"" autocomplete=""new-password"" data-reveal=""1"" data-pw=""" & ESC_Attr (Initial_Password) & """ aria-describedby=""pass-strength-result"" />" & NL);
@@ -370,6 +364,32 @@ is
       use Inc_Vars;
       use Inc_Versions;
    begin
+      --
+      -- We are installing WordPress.
+      --
+      -- @since 1.5.1
+      -- @var bool
+      --
+      Globals.WP_INSTALLING := True;
+-- define( 'WP_INSTALLING', true );
+
+-- Load WordPress Bootstrap
+-- require_once dirname( __DIR__ ) . '/wp-load.php';
+      Wp_Load.Run;
+
+-- Load WordPress Administration Upgrade API
+-- require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+-- Load WordPress Translation Install API
+-- require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+
+-- Load wpdb
+-- require_once ABSPATH . WPINC . '/class-wpdb.php';
+
+-- nocache_headers();
+
+-- $step = isset( $_GET['step'] ) ? (int) $_GET['step'] : 0;
+
       -- Let's check to make sure WP isn't already installed.
       if Is_Blog_Installed then
          Display_Header;
@@ -522,10 +542,11 @@ is
             when 0 =>  -- Step 0.
                Step_0 (Language => -Language,
                        Scripts  => Scripts_To_Print);
+               -- Dropthrough
+               Step_1 (Language => -Language,
+                       Scripts  => Scripts_To_Print);
 
             when 1 => -- Step 1, direct link or from language chooser.
-               Step_0 (Language => -Language,       -- Dropthrough
-                       Scripts  => Scripts_To_Print);
                Step_1 (Language => -Language,
                        Scripts  => Scripts_To_Print);
 
@@ -552,6 +573,7 @@ is
             Echo ("</html>" & NL);
          end;
       end;
+
    end Run;
 
    ------------
@@ -562,6 +584,7 @@ is
                      Scripts  : in out Lists.List_Type)
    is
       use Php.Echoing;
+      use Php.Strings;
       use Arrays;
       use Hb_Common;
       use Adi_Translation_Install;
@@ -591,6 +614,7 @@ is
                      Scripts  : in out Lists.List_Type)
    is
       use Php.Echoing;
+      use Php.Strings;
       use Hb_Common;
       use Lists;
       use Adi_Translation_Install;

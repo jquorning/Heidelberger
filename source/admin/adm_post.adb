@@ -269,7 +269,7 @@ is
                      end if;
 
                      if
-                       not Php.Lists.In_Array (-Globals.Typenow,
+                       not Php.Lists.In_List (-Globals.Typenow,
                                      Inc_Posts.Get_Post_Types
                                        (To_Array (List => (1 => Build ("show_ui", "true")))),
                                      True)
@@ -369,8 +369,8 @@ is
                elsif Action = "editattachment" then
                   Inc_Pluggables.Check_Admin_Referer ("update-post_" & Id'Image);
 
-                  -- Don"t let these be changed.
-                  Unset (Get (X_POST, "guid"));
+                  -- Don't let these be changed.
+                  Delete (Ref (X_POST, "guid"));
                   Set (X_POST, "post_type", From_String ("attachment"));
 
                   -- Update the thumbnail filename.

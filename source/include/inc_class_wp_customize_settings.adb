@@ -6,6 +6,7 @@
 -- @since 3.4.0
 --
 
+with Php.Arrays;
 with Php.Lists;
 with Php.Types;
 
@@ -609,23 +610,25 @@ is
                               return Array_Type
    is
       use Hb_Common;
-      use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Types;
+
+      Keys_2 : List_Type := Keys;
    begin
       if Create and Empty (Root) then
          Root := Empty_Array;
       end if;
 
-      if not Isset (Root) or else Keys.Is_Empty then
+      if not Isset (Root) or else Keys_2.Is_Empty then
          return Empty_Array;
       end if;
 
       declare
-         Last : constant String := Array_Pop (Keys);
+         Last : constant String := List_Pop (Keys_2);
          Node : Array_Type := Root; -- &
       begin
-         for Key of Keys loop
+         for Key of Keys_2 loop
             if Create and then not Isset (Node, -Key) then
                Set (Node, -Key, From_Array (Empty_Array));
             end if;
@@ -670,8 +673,7 @@ is
                                       Value : Multi_Type) -- String)
                                       return Array_Type -- String
    is
-      use Hb_Common;
---    use List_Vectors;
+      use Php.Arrays;
 
       Root_2 : Array_Type := Root;
    begin
@@ -712,7 +714,7 @@ is
                Default_Value : Multi_Type := From_Null) -- String := "") -- null
                return Multi_Type -- String
    is
-      use Hb_Common;
+      use Php.Arrays;
    begin
       if Keys.Length in 0 then -- If there are no keys, test the root.
          return

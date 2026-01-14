@@ -6,9 +6,11 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Echoing;
+with Php.Preg;
 with Php.Strings;
 
 with Globals;
@@ -825,10 +827,16 @@ is
                           return String
    is
       use Ada.Strings.Unbounded;
+      use Ada.Text_IO;
+      use Php.Preg;
+      use Php.Strings;
       use Hb_Common;
+      use Inc_L10n;
 
-      Output : Unbounded_String;
+      Output : Unbounded_String := +"XXX-970";
    begin
+      Put_Line ("get_bloginfo: " & Show);
+
 --         switch ( show ) then
 --                 case "home":    // Deprecated.
 --                 case "siteurl": // Deprecated.
@@ -904,18 +912,21 @@ is
 --                         global wp_version;
 --                         output = wp_version;
 --                         break;
---                 case "language":
---                         /*
---                         -- translators: Translate this to the correct language tag for your locale,
---                         -- see https://www.w3.org/International/articles/language-tags/ for reference.
---                         -- Do not translate into your own language.
---                         --
---                         output = __( "html_lang_attribute" );
---                         if ( "html_lang_attribute" === output || preg_match( "/[^a-zA-Z0-9-]/", output ) ) then
---                                 output = determine_locale();
---                                 output = str_replace( "_", "-", output );
---                         end;
---                         break;
+      elsif Show = "language" then
+         --
+         -- translators: Translate this to the correct language tag for your locale,
+         -- see https://www.w3.org/International/articles/language-tags/ for reference.
+         -- Do not translate into your own language.
+         --
+         Output := +abs "html_lang_attribute";
+         if
+           "html_lang_attribute" = Output or else
+           Preg_Match ("/[^a-zA-Z0-9-]/", -Output)
+         then
+            Output := +Determine_Locale;
+            Output := +Str_Replace ("_", "-", -Output);
+         end if;
+
 --                 case "text_direction":
 --                         _deprecated_argument(
 --                                 __FUNCTION__,
@@ -1542,6 +1553,7 @@ is
                                Display : Boolean := True)
                                return String
    is
+      use Php.Strings;
       use Hb_Common;
       use Wp_Common;
 --    use Inc_Plugins;
@@ -1667,6 +1679,7 @@ is
                                return String
    is
       use Ada.Strings.Unbounded;
+      use Php.Strings;
       use Hb_Common;
       use Inc_Class_Wp_Terms;
       use Inc_Plugins;
@@ -2658,7 +2671,7 @@ is
                           Post   : Integer := 0) -- null
                           return String
    is
-      use Hb_Common;
+      use Php.Strings;
       use Wp_Common;
       use Inc_Class_Wp_Posts;
       use Inc_Options;
@@ -4440,63 +4453,66 @@ is
 --         echo esc_attr( apply_filters( "the_search_query", get_search_query( false ) ) );
 -- end;
 
--- --
--- -- Gets the language attributes for the "html" tag.
--- --
--- -- Builds up a set of HTML attributes containing the text direction and language
--- -- information for the page.
--- --
--- -- @since 4.3.0
--- --
--- -- @param string doctype Optional. The type of HTML document. Accepts "xhtml" or "html". Default "html".
--- -- @return string A space-separated list of language attributes.
--- --
--- function get_language_attributes( doctype = "html" ) then
---         attributes = array();
+   -----------------------------
+   -- Get_Language_Attributes --
+   -----------------------------
 
---         if ( function_exists( "is_rtl" ) && is_rtl() ) then
---                 attributes[] = "dir="rtl"";
---         end;
+   function Get_Language_Attributes (Doctype : String := "html")
+                                     return String
+   is
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_L10n;
+      use Inc_Options;
+      use Inc_Plugins;
 
---         lang = get_bloginfo( "language" );
---         if ( lang ) then
---                 if ( "text/html" === get_option( "html_type" ) || "html" === doctype ) then
---                         attributes[] = "lang="" . esc_attr( lang ) . """;
---                 end;
+      Attributes : List_Type;
+      Lang : constant String := Get_Bloginfo ("language");
+   begin
+      if
+--      function_exists( "is_rtl" ) and then
+        Is_RTL
+      then
+         Attributes.Append (+"dir=""rtl""");
+      end if;
 
---                 if ( "text/html" !== get_option( "html_type" ) || "xhtml" === doctype ) then
---                         attributes[] = "xml:lang="" . esc_attr( lang ) . """;
---                 end;
---         end;
+      if Lang /= "" then
+         if "text/html" = Get_Option ("html_type") or else "html" = Doctype then
+            Attributes.Append (+("lang=""" & ESC_Attr (Lang) & """"));
+         end if;
 
---         output = implode( " ", attributes );
+         if "text/html" /= Get_Option ("html_type") or else "xhtml" = Doctype then
+            Attributes.Append (+("xml:lang=""" & ESC_Attr (Lang) & """"));
+         end if;
+      end if;
 
---         --
---         -- Filters the language attributes for display in the "html" tag.
---         --
---         -- @since 2.5.0
---         -- @since 4.3.0 Added the `doctype` parameter.
---         --
---         -- @param string output A space-separated list of language attributes.
---         -- @param string doctype The type of HTML document (xhtml|html).
---         --
---         return apply_filters( "language_attributes", output, doctype );
--- end;
+      declare
+         Output : constant String := Implode (" ", Attributes);
+      begin
+         --
+         -- Filters the language attributes for display in the "html" tag.
+         --
+         -- @since 2.5.0
+         -- @since 4.3.0 Added the `doctype` parameter.
+         --
+         -- @param string output A space-separated list of language attributes.
+         -- @param string doctype The type of HTML document (xhtml|html).
+         --
+         return Apply_Filters ("language_attributes", Output, Doctype);
+      end;
+   end Get_Language_Attributes;
 
--- --
--- -- Displays the language attributes for the "html" tag.
--- --
--- -- Builds up a set of HTML attributes containing the text direction and language
--- -- information for the page.
--- --
--- -- @since 2.1.0
--- -- @since 4.3.0 Converted into a wrapper for get_language_attributes().
--- --
--- -- @param string doctype Optional. The type of HTML document. Accepts "xhtml" or "html". Default "html".
--- --
--- function language_attributes( doctype = "html" ) then
---         echo get_language_attributes( doctype );
--- end;
+   -------------------------
+   -- Language_Attributes --
+   -------------------------
+
+   procedure Language_Attributes (Doctype : String := "html")
+   is
+      use Php.Echoing;
+   begin
+      Echo (Get_Language_Attributes (Doctype));
+   end Language_Attributes;
 
 -- --
 -- -- Retrieves paginated links for archive post pages.
@@ -4936,8 +4952,8 @@ is
       use Inc_Plugins;
 
       X_File_1 : constant String := (if Globals.WP_INSTALLING
-                                     then "./file.css"
-                                     else Admin_URL ("file.css"));
+                                     then "./" & File & ".css"
+                                     else Admin_URL (File & ".css"));
 
       X_File_2 : constant String :=
         Add_Query_Arg ("version", Get_Bloginfo ("version"), X_File_1);
@@ -4962,6 +4978,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Hb_Common;
       use Inc_Class_Wp_Styles;
       use Inc_Functions_Wp_Styles;
       use Inc_Plugins;
@@ -4987,7 +5004,7 @@ is
       declare
          Stylesheet_Link : constant String :=
            Sprintf (
-             "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />\n",
+             "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />" & NL,
              To_List (ESC_URL (Wp_Admin_CSS_URI (File)))
           );
       begin
@@ -5012,11 +5029,11 @@ is
             declare
                RTL_Stylesheet_Link : constant String :=
                  Sprintf (
-                   "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />\n",
+                   "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />" & NL,
                    To_List (ESC_URL (Wp_Admin_CSS_URI ("file-rtl")))
                 );
             begin
-               -- This filter is documented in wp-includes/general-template.php--
+               -- This filter is documented in wp-includes/general-template.php
                Echo (Apply_Filters ("wp_admin_css", RTL_Stylesheet_Link, "file-rtl"));
             end;
          end if;

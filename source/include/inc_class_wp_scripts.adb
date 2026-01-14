@@ -9,6 +9,7 @@
 
 with Ada.Containers;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
@@ -178,8 +179,8 @@ is
          return False;
       end if;
 
-      if False = Group and then In_Array (Handle, This.In_Footer, True) then
-         This.In_Footer := Array_Diff (This.In_Footer, Handle); -- (array)
+      if False = Group and then In_List (Handle, This.In_Footer, True) then
+         This.In_Footer := List_Diff (This.In_Footer, Handle); -- (array)
       end if;
 
       declare
@@ -503,11 +504,11 @@ is
                       L10n        : Array_Type)
                       return Boolean
    is
+      use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
       use Php.Types;
       use Inc_Functions;
---    use Array_Maps;
 
       L10n_2   : Array_Type := L10n;
       After    : Array_Type;
@@ -563,7 +564,7 @@ is
 
       declare
          Script : Unbounded_String :=
-            +"var object_name = " & Wp_JSON_Encode (L10n_2) & ";";
+            +"var object_name = " & Wp_JSON_Encode (From_Array (L10n_2)) & ";";
       begin
          if not Empty (After) then
             Append (Script, "\nafter;");
@@ -647,7 +648,7 @@ is
 --         use String_
          Obj : X_Wp_Dependency := This.Registered (Handle);
       begin
-         if not In_Array ("wp-i18n", Obj.Deps, True) then
+         if not In_List ("wp-i18n", Obj.Deps, True) then
             Obj.Deps.Append (+"wp-i18n");  -- ()
          end if;
 

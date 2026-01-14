@@ -9,26 +9,32 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 with Ada.Numerics.Discrete_Random;
+-- with Ada.Text_IO;
 
+with Php.HTML;
 with Php.Lists;
+with Php.Preg;
 with Php.Strings;
 
 with Hb_Common;
 with Binder;
 with Globals;
-with Lists;
+with Wp_Common;
 
 with Inc_Compat;
 with Inc_Default_Constants;
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_KSES;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Users;
+with Inc_Vars;
 
 package body Inc_Pluggables
 is
-   use Lists;
 
 -- if ( ! function_exists( 'wp_set_current_user' ) ) :
 --         --
@@ -1379,141 +1385,153 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_redirect' ) ) :
---         --
---         -- Redirects to another page.
---         --
---         -- Note: wp_redirect() does not exit automatically, and should almost always be
---         -- followed by a call to `exit;`:
---         --
---         --     wp_redirect( url );
---         --     exit;
---         --
---         -- Exiting can also be selectively manipulated by using wp_redirect() as a conditional
---         -- in conjunction with the {@see 'wp_redirect'} and {@see 'wp_redirect_location'} filters:
---         --
---         --     if ( wp_redirect( url ) ) then
---         --         exit;
---         --     end;
---         --
---         -- @since 1.5.1
---         -- @since 5.1.0 The `x_redirect_by` parameter was added.
---         -- @since 5.4.0 On invalid status codes, wp_die() is called.
---         --
---         -- @global bool is_IIS
---         --
---         -- @param string location      The path or URL to redirect to.
---         -- @param int    status        Optional. HTTP response status code to use. Default '302' (Moved Temporarily).
---         -- @param string x_redirect_by Optional. The application doing the redirect. Default 'WordPress'.
---         -- @return bool False if the redirect was cancelled, true otherwise.
---         --
---         function wp_redirect( location, status = 302, x_redirect_by = 'WordPress' ) then
---                 global is_IIS;
 
---                 --
---                 -- Filters the redirect location.
---                 --
---                 -- @since 2.1.0
---                 --
---                 -- @param string location The path or URL to redirect to.
---                 -- @param int    status   The HTTP response status code to use.
---                 --
---                 location = apply_filters( 'wp_redirect', location, status );
+   -----------------
+   -- Wp_Redirect --
+   -----------------
 
---                 --
---                 -- Filters the redirect HTTP response status code to use.
---                 --
---                 -- @since 2.3.0
---                 --
---                 -- @param int    status   The HTTP response status code to use.
---                 -- @param string location The path or URL to redirect to.
---                 --
---                 status = apply_filters( 'wp_redirect_status', status, location );
+   procedure Wp_Redirect (Location      : String;
+                          Status        : Integer := 302;
+                          X_Redirect_By : String  := "WordPress")
+   is
+      use Php.HTML;
+      use Wp_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Plugins;
+      use Inc_Vars;
+--    global is_IIS;
 
---                 if ( ! location ) then
---                         return false;
---                 end;
+      --
+      -- Filters the redirect location.
+      --
+      -- @since 2.1.0
+      --
+      -- @param string location The path or URL to redirect to.
+      -- @param int    status   The HTTP response status code to use.
+      --
+      Location_2 : constant String :=
+        Apply_Filters ("wp_redirect", Location, Status);
 
---                 if ( status < 300 || 399 < status ) then
---                         wp_die( __( 'HTTP redirect status code must be a redirection code, 3xx.' ) );
---                 end;
+      --
+      -- Filters the redirect HTTP response status code to use.
+      --
+      -- @since 2.3.0
+      --
+      -- @param int    status   The HTTP response status code to use.
+      -- @param string location The path or URL to redirect to.
+      --
+      Status_2 : constant Integer :=
+        Apply_Filters ("wp_redirect_status", Status, Location_2);
+   begin
+      if Location_2 = "" then
+         return; --  False;
+      end if;
 
---                 location = wp_sanitize_redirect( location );
+      if Status_2 not in 300 .. 399 then
+         Wp_Die (abs "HTTP redirect status code must be a redirection code, 3xx.");
+      end if;
 
---                 if ( ! is_IIS && 'cgi-fcgi' !== PHP_SAPI ) then
---                         status_header( status ); -- This causes problems on IIS and some FastCGI setups.
---                 end;
+      declare
+         Location_3 : constant String := Wp_Sanitize_Redirect (Location_2);
+      begin
+         if not Is_IIS and then "cgi-fcgi" /= PHP_SAPI then
+            Status_Header (Status_2);
+            -- This causes problems on IIS and some FastCGI setups.
+         end if;
 
---                 --
---                 -- Filters the X-Redirect-By header.
---                 --
---                 -- Allows applications to identify themselves when they're doing a redirect.
---                 --
---                 -- @since 5.1.0
---                 --
---                 -- @param string x_redirect_by The application doing the redirect.
---                 -- @param int    status        Status code to use.
---                 -- @param string location      The path to redirect to.
---                 --
---                 x_redirect_by = apply_filters( 'x_redirect_by', x_redirect_by, status, location );
---                 if ( is_string( x_redirect_by ) ) then
---                         header( "X-Redirect-By: x_redirect_by" );
---                 end;
+         --
+         -- Filters the X-Redirect-By header.
+         --
+         -- Allows applications to identify themselves when they're doing a redirect.
+         --
+         -- @since 5.1.0
+         --
+         -- @param string x_redirect_by The application doing the redirect.
+         -- @param int    status        Status code to use.
+         -- @param string location      The path to redirect to.
+         --
+         declare
+            X_Redirect_By_2 : constant String :=
+              Apply_Filters ("x_redirect_by", X_Redirect_By, Status_2, Location_3);
+         begin
+            if True then -- Is_String (X_Redirect_By_2) then
+               Header ("X-Redirect-By: " & X_Redirect_By_2);
+            end if;
 
---                 header( "Location: location", true, status );
+            Header ("Location: " & Location_3, True, Status_2);
 
---                 return true;
---         end;
+            return; --  true;
+         end;
+      end;
+   end Wp_Redirect;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_sanitize_redirect' ) ) :
---         --
---         -- Sanitizes a URL for use in a redirect.
---         --
---         -- @since 2.3.0
---         --
---         -- @param string location The path to redirect to.
---         -- @return string Redirect-sanitized URL.
---         --
---         function wp_sanitize_redirect( location ) then
---                 -- Encode spaces.
---                 location = str_replace( ' ', '%20', location );
 
---                 regex    = '/
---                 (
---                         (?: [\xC2-\xDF][\x80-\xBF]        # double-byte sequences   110xxxxx 10xxxxxx
---                         |   \xE0[\xA0-\xBF][\x80-\xBF]    # triple-byte sequences   1110xxxx 10xxxxxx-- 2
---                         |   [\xE1-\xEC][\x80-\xBF]then2end;
---                         |   \xED[\x80-\x9F][\x80-\xBF]
---                         |   [\xEE-\xEF][\x80-\xBF]then2end;
---                         |   \xF0[\x90-\xBF][\x80-\xBF]then2end; # four-byte sequences   11110xxx 10xxxxxx-- 3
---                         |   [\xF1-\xF3][\x80-\xBF]then3end;
---                         |   \xF4[\x80-\x8F][\x80-\xBF]then2end;
---                 )then1,40end;                              # ...one or more times
---                 )/x';
---                 location = preg_replace_callback( regex, '_wp_sanitize_utf8_in_redirect', location );
---                 location = preg_replace( '|[^a-z0-9-~+_.?#=&;,/:%!*\[\]()@]|i', '', location );
---                 location = wp_kses_no_null( location );
+   --------------------------
+   -- Wp_Sanitize_Redirect --
+   --------------------------
 
---                 -- Remove %0D and %0A from location.
---                 strip = array( '%0d', '%0a', '%0D', '%0A' );
---                 return _deep_replace( strip, location );
---         end;
+   function Wp_Sanitize_Redirect (Location : String)
+                                  return String
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_KSES;
 
---         --
---         -- URL encodes UTF-8 characters in a URL.
---         --
---         -- @ignore
---         -- @since 4.2.0
---         -- @access private
---         --
---         -- @see wp_sanitize_redirect()
---         --
---         -- @param array matches RegEx matches against the redirect location.
---         -- @return string URL-encoded version of the first RegEx match.
---         --
---         function _wp_sanitize_utf8_in_redirect( matches ) then
---                 return urlencode( matches[0] );
---         end;
+      -- Encode spaces.
+      Location_2 : constant String := Str_Replace (" ", "%20", Location);
+
+      Regex : constant String :=
+        "/("
+          & "(?: [\xC2-\xDF][\x80-\xBF]"
+          -- double-byte sequences   110xxxxx 10xxxxxx
+          & "|   \xE0[\xA0-\xBF][\x80-\xBF]"
+          -- triple-byte sequences   1110xxxx 10xxxxxx-- 2
+          & "|   [\xE1-\xEC][\x80-\xBF]{2}"
+          & "|   \xED[\x80-\x9F][\x80-\xBF]"
+          & "|   [\xEE-\xEF][\x80-\xBF]{2}"
+          & "|   \xF0[\x90-\xBF][\x80-\xBF]{2}"
+          -- four-byte sequences   11110xxx 10xxxxxx-- 3
+          & "|   [\xF1-\xF3][\x80-\xBF]{3}"
+          & "|   \xF4[\x80-\x8F][\x80-\xBF]{2}"
+        & "){1,40}"              -- ...one or more times
+        & ")/x";
+
+      Location_3 : constant String :=
+        Preg_Replace_Callback (Regex,
+                               X_Wp_Sanitize_UTF8_In_Redirect'Access,
+                               Location_2);
+
+      Location_4 : constant String :=
+        Preg_Replace ("|[^a-z0-9-~+_.?#=&;,/:%!*\[\]()@]|i", "", Location_3);
+
+      Location_5 : constant String := Wp_KSES_No_Null (Location_4);
+
+      -- Remove %0D and %0A from location.
+      Strip : constant List_Type :=
+        To_List (List => (+"%0d", +"%0a", +"%0D", +"%0A"));
+   begin
+      return X_Deep_Replace (Strip, Location_5);
+   end Wp_Sanitize_Redirect;
+
+   ------------------------------------
+   -- X_Wp_Sanitize_UTF8_In_Redirect --
+   ------------------------------------
+
+   function X_Wp_Sanitize_UTF8_In_Redirect (Matches : List_Type)
+                                            return String
+   is
+      use Php.HTML;
+      use Hb_Common;
+   begin
+      return URL_Encode (-Matches.First_Element); -- [0]
+   end X_Wp_Sanitize_UTF8_In_Redirect;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_safe_redirect' ) ) :
@@ -2496,8 +2514,8 @@ is
          end if;
 
          if
-           In_Array (Scheme, To_List (List => (+"auth", +"secure_auth",
-                                               +"logged_in", +"nonce")), True)
+           In_List (Scheme, To_List (List => (+"auth", +"secure_auth",
+                                              +"logged_in", +"nonce")), True)
          then
             for Typ of To_List (List => (+"key", +"salt")) loop
                declare

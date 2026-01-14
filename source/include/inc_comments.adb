@@ -207,7 +207,7 @@ is
    begin
       if
         -- Empty (Comment) and then
-        X_Isset (Globals.GLOBALS, "comment")
+        Isset (Globals.GLOBALS, "comment")
       then
          Comment_2 := As_Integer (Get (Globals.GLOBALS, "comment"));
       end if;

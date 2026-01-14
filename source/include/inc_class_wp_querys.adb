@@ -3511,9 +3511,9 @@ is
                                   Post_Types : String := "")
                                   return Boolean
    is
-      use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
       use Inc_Class_Wp_Post_Type;
 
    begin
@@ -3534,7 +3534,7 @@ is
             return False;
          end if;
 
-         return In_Array (-Post_Type_Object.Name, To_List (Post_Types), True);
+         return In_List (-Post_Type_Object.Name, To_List (Post_Types), True);
 --       return In_Array (-Post_Type_Object.Name, Post_Types, True); -- (array)
       end;
    end Is_Post_Type_Archive;
@@ -3583,8 +3583,8 @@ is
                        return Boolean
    is
       use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Class_Wp_Users;
    begin
       if not This.Is_Author then
@@ -3606,13 +3606,13 @@ is
 
          declare
             Author_2 : constant List_Type :=
-              Array_Map ("strval", To_List (Author)); -- (array)
+              List_Map (Strval'Access, To_List (Author)); -- (array)
          begin
-            if In_Array (Author_Obj.Id'Image, Author_2, True) then -- (string)
+            if In_List (Author_Obj.Id'Image, Author_2, True) then -- (string)
                return True;
-            elsif In_Array (-Author_Obj.Prop.Nickname, Author_2, True) then
+            elsif In_List (-Author_Obj.Prop.Nickname, Author_2, True) then
                return True;
-            elsif In_Array (-Author_Obj.Prop.User_Nicename, Author_2, True) then
+            elsif In_List (-Author_Obj.Prop.User_Nicename, Author_2, True) then
                return True;
             end if;
          end;
@@ -3628,9 +3628,9 @@ is
                          Category : String := "")
                          return Boolean
    is
-      use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
    begin
       if not This.M_Is_Category then
          return False;
@@ -3653,11 +3653,11 @@ is
          declare
             Category_2 : List_Type; --  := Category; -- Array_Map ("strval", (array) Category);
          begin
-            if In_Array (Integer'Image (Cat_Obj.Term_Id), Category_2, True) then -- (string)
+            if In_List (Integer'Image (Cat_Obj.Term_Id), Category_2, True) then -- (string)
                return True;
-            elsif In_Array (-Cat_Obj.Name, Category_2, True) then
+            elsif In_List (-Cat_Obj.Name, Category_2, True) then
                return True;
-            elsif In_Array (-Cat_Obj.Slug, Category_2, True) then
+            elsif In_List (-Cat_Obj.Slug, Category_2, True) then
                return True;
             end if;
          end;
@@ -3673,9 +3673,9 @@ is
                     Tag  : String := "")
                     return Boolean
    is
-      use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
       use Inc_Class_Wp_Terms;
    begin
       if not This.Is_Tag then
@@ -3697,13 +3697,13 @@ is
 
          declare
             Tag_2 : constant List_Type :=
-              Array_Map ("strval", To_List (Tag)); -- (array)
+              List_Map (Strval'Access, To_List (Tag)); -- (array)
          begin
-            if In_Array (Tag_Obj.Term_Id'Image, Tag_2, True) then -- (string)
+            if In_List (Tag_Obj.Term_Id'Image, Tag_2, True) then -- (string)
                return True;
-            elsif In_Array (-Tag_Obj.Name, Tag_2, True) then
+            elsif In_List (-Tag_Obj.Name, Tag_2, True) then
                return True;
-            elsif In_Array (-Tag_Obj.Slug, Tag_2, True) then
+            elsif In_List (-Tag_Obj.Slug, Tag_2, True) then
                return True;
             end if;
          end;
@@ -3723,9 +3723,9 @@ is
                     return Boolean
    is
       use Ada.Containers;
-      use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
       use Inc_Class_Wp_Terms;
    begin
       if not This.Is_Tax then
@@ -3741,7 +3741,7 @@ is
            This.Get_Queried_Object;
 
          Tax_Array : constant List_Type :=
-           Array_Intersect (Array_Keys (Wp_Taxonomies), To_List (Taxonomy));
+           List_Intersect (List_Keys (Wp_Taxonomies), To_List (Taxonomy));
 
          Term_Array : constant List_Type := To_List (Term); -- (array)
       begin
@@ -3750,7 +3750,7 @@ is
            Isset (-Queried_Object.Taxonomy) and then
            Tax_Array.Length /= 0            and then
 --         Count (Tax_Array)                and then
-           In_Array (-Queried_Object.Taxonomy, Tax_Array, True)
+           In_List (-Queried_Object.Taxonomy, Tax_Array, True)
          then
             null;
          else
@@ -3766,7 +3766,7 @@ is
            Queried_Object.Term_Id /= 0 and then
 --         Isset (Queried_Object.Term_Id) and then
 --         Count (
-             Array_Intersect (
+             List_Intersect (
                To_List (List => (+Queried_Object.Term_Id'Image,
                                  Queried_Object.Name,
                                  Queried_Object.Slug)),
@@ -3960,13 +3960,13 @@ is
 
          declare
             Page_2 : constant List_Type :=
-              Array_Map ("strval", To_List (Page)); -- (array)
+              List_Map (Strval'Access, To_List (Page)); -- (array)
          begin
-            if In_Array (Page_Obj.Id'Image, Page_2, True) then -- (string)
+            if In_List (Page_Obj.Id'Image, Page_2, True) then -- (string)
                return True;
-            elsif In_Array (-Page_Obj.Post_Title, Page_2, True) then
+            elsif In_List (-Page_Obj.Post_Title, Page_2, True) then
                return True;
-            elsif In_Array (-Page_Obj.Post_Name, Page_2, True) then
+            elsif In_List (-Page_Obj.Post_Name, Page_2, True) then
                return True;
             else
                for Pagepath of Page_2 loop
@@ -4080,13 +4080,13 @@ is
          end if;
 
          declare
-            Post_2 : constant List_Type := Array_Map ("strval", To_List (Post));
+            Post_2 : constant List_Type := List_Map (Strval'Access, To_List (Post));
          begin
-            if In_Array (Post_Obj.Id'Image, Post_2, True) then
+            if In_List (Post_Obj.Id'Image, Post_2, True) then
                return True;
-            elsif In_Array (-Post_Obj.Post_Title, Post_2, True) then
+            elsif In_List (-Post_Obj.Post_Title, Post_2, True) then
                return True;
-            elsif In_Array (-Post_Obj.Post_Name, Post_2, True) then
+            elsif In_List (-Post_Obj.Post_Name, Post_2, True) then
                return True;
             else
                for Postpath of Post_2 loop
@@ -4122,8 +4122,8 @@ is
                          return Boolean
    is
       use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Class_Wp_Posts;
    begin
       if
@@ -4141,7 +4141,7 @@ is
             return False;
          end if;
 
-         return In_Array (-Post_Obj.Post_Type, To_List (Post_Types), True);
+         return In_List (-Post_Obj.Post_Type, To_List (Post_Types), True);
       end;
    end Is_Singular;
 

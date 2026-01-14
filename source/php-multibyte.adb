@@ -8,7 +8,7 @@ is
    function MB_Substr (Item     : String;
                        Start    : Natural;
                        Length   : Natural;
-                       Encoding : String)
+                       Encoding : String := "")
                        return String
                        is (raise Program_Error with "not implemented");
 

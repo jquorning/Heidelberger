@@ -1,7 +1,8 @@
 --
 -- WordPress database access abstraction class.
 --
--- Original code from {@link http://php.justinvincent.com Justin Vincent (justin@visunet.ie)end;
+-- Original code from {@link http://php.justinvincent.com Justin Vincent
+-- (justin@visunet.ie)}
 --
 -- @package WordPress
 -- @subpackage Database
@@ -11,24 +12,42 @@
 with Ada.Text_IO;
 
 with Php.Arrays;
+with Php.Errors;
+with Php.Files;
+with Php.HTML;
 with Php.Lists;
+with Php.Misc;
 with Php.Multibyte;
+with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with MySQL_Bind;
+with MySQLi_Bind;
+
+with Arrays.IO;
+with Globals;
+with Helpers;
 
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
 with Inc_Plugins;
+with Inc_Versions;
 
 package body Inc_Class_Wpdb
 is
-   use Php;
-   use Hb_Common;
-   use Inc_L10n;
+
+   type Cb_Func is access function (This : Wpdb_Class;
+                                    Query : String)
+                                    return String;
+
+   function To_Array (This : Wpdb_Class;
+                      Cb   : Cb_Func)
+                      return Arrays.Callable
+                      is (null);
+
 --
 -- @since 0.71
 --
@@ -173,53 +192,61 @@ is
         --         unset(this.name);
         -- end;
 
-        --
-        -- Sets this.charset and this.collate.
-        --
-        -- @since 3.1.0
-        --
-        -- public function init_charset() then
-        --         charset = "";
-        --         collate = "";
+   ------------------
+   -- Init_Charset --
+   ------------------
 
-        --         if (function_exists("is_multisite") && is_multisite()) then
-        --                 charset = "utf8";
-        --                 if (defined("DB_COLLATE") && DB_COLLATE) then
-        --                         collate = DB_COLLATE;
-        --                 end; else then
-        --                         collate = "utf8_general_ci";
-        --                 end;
-        --         end; elseif (defined("DB_COLLATE")) then
-        --                 collate = DB_COLLATE;
-        --         end;
+   procedure Init_Charset (This : in out Wpdb_Class)
+   is
+      use Inc_Load;
 
-        --         if (defined("DB_CHARSET")) then
-        --                 charset = DB_CHARSET;
-        --         end;
+      Charset : Unbounded_String;
+      Collate : Unbounded_String;
+   begin
+      if
+--      Function_Exists ("is_multisite") and then
+        Is_Multisite
+      then
+         Charset := +"utf8";
+         if Globals.DB_COLLATE /= "" then
+            Collate := +Globals.DB_COLLATE;
+         else
+            Collate := +"utf8_general_ci";
+         end if;
+      elsif True then -- Defined ("DB_COLLATE") then
+         Collate := +Globals.DB_COLLATE;
+      end if;
 
-        --         charset_collate = this.determine_charset(charset, collate);
+      if Globals.DB_CHARSET /= "" then
+--    if Defined ("DB_CHARSET") then
+         Charset := +Globals.DB_CHARSET;
+      end if;
 
-        --         this.charset = charset_collate["charset"];
-        --         this.collate = charset_collate["collate"];
-        -- end;
+      declare
+         Charset_Collate : constant Array_Type :=
+           This.Determine_Charset (-Charset, -Collate);
+      begin
+         This.Charset := +Get_As_String (Charset_Collate, "charset");
+         This.Collate := +Get_As_String (Charset_Collate, "collate");
+      end;
+   end Init_Charset;
 
-        --
-        -- Determines the best charset and collation to use given a charset and collation.
-        --
-        -- For example, when able, utf8mb4 should be used instead of utf8.
-        --
-        -- @since 4.6.0
-        --
-        -- @param string charset The character set to check.
-        -- @param string collate The collation to check.
-        -- @return array then
-        --     The most appropriate character set and collation to use.
-        --
-        --     @type string charset Character set.
-        --     @type string collate Collation.
-        -- end;
-        --
-        -- public function determine_charset(charset, collate) then
+   -----------------------
+   -- Determine_Charset --
+   -----------------------
+
+   function Determine_Charset (This    : Wpdb_Class;
+                               Charset : String;
+                               Collate : String)
+                               return Array_Type
+   is
+   begin
+      return
+        To_Array (List => (
+          Build ("charset", Charset),
+          Build ("collate", Collate)
+       ));
+   end Determine_Charset;
         --         if ((this.use_mysqli && ! (this.dbh instanceof mysqli)) || empty(this.dbh)) then
         --                 return compact("charset", "collate");
         --         end;
@@ -250,16 +277,19 @@ is
         --         return compact("charset", "collate");
         -- end;
 
-        --
-        -- Sets the connection"s character set.
-        --
-        -- @since 3.1.0
-        --
-        -- @param mysqli|resource dbh     The connection returned by `mysqli_connect()` or `mysql_connect()`.
-        -- @param string          charset Optional. The character set. Default null.
-        -- @param string          collate Optional. The collation. Default null.
-        --
-        -- public function set_charset(dbh, charset = null, collate = null) then
+   -----------------
+   -- Set_Charset --
+   -----------------
+
+   procedure Set_Charset (This    : Wpdb_Class;
+                          Dbh     : Integer;
+                          Charset : String := "";  -- = null
+                          Collate : String := "") -- = null
+   is
+   begin
+      null; -- raise Program_Error with "not implemented";
+   end Set_Charset;
+
         --         if (! isset(charset)) then
         --                 charset = this.charset;
         --         end;
@@ -296,16 +326,17 @@ is
         --         end;
         -- end;
 
-        --
-        -- Changes the current SQL mode, and ensures its WordPress compatibility.
-        --
-        -- If no modes are passed, it will ensure the current MySQL server modes are compatible.
-        --
-        -- @since 3.9.0
-        --
-        -- @param array modes Optional. A list of SQL modes to set. Default empty array.
-        --
-        -- public function set_sql_mode(modes = array()) then
+   ------------------
+   -- Set_SQL_Mode --
+   ------------------
+
+   procedure Set_SQL_Mode (This  : Wpdb_Class;
+                           Modes : Array_Type := Empty_Array)
+   is
+   begin
+      null; -- raise Program_Error with "not implemented";
+   end Set_SQL_Mode;
+
         --         if (empty(modes)) then
         --                 if (this.use_mysqli) then
         --                         res = mysqli_query(this.dbh, "SELECT @@SESSION.sql_mode");
@@ -370,6 +401,7 @@ is
                         return String
    is
       use Php.Preg;
+      use Php.Strings;
 
       Old_Prefix   : Unbounded_String;
       Unused_Match : List_Type;
@@ -432,163 +464,195 @@ is
       return -Old_Prefix;
    end Set_Prefix;
 
-        --
-        -- Sets blog ID.
-        --
-        -- @since 3.0.0
-        --
-        -- @param int blog_id
-        -- @param int network_id Optional.
-        -- @return int Previous blog ID.
-        --
-        -- public function set_blog_id(blog_id, network_id = 0) then
-        --         if (! empty(network_id)) then
-        --                 this.siteid = network_id;
-        --         end;
+   -----------------
+   -- Set_Blog_Id --
+   -----------------
 
-        --         old_blog_id  = this.blogid;
-        --         this.blogid = blog_id;
+   function Set_Blog_Id (This       : in out Wpdb_Class;
+                         Blog_Id    : Integer;
+                         Network_Id : Integer := 0)
+                         return Integer
+   is
+   begin
+      if Network_Id /= 0 then
+--    if not Empty (Network_Id) then
+         This.Siteid := Network_Id;
+      end if;
 
-        --         this.prefix = this.get_blog_prefix();
+      declare
+         Old_Blog_Id : constant Integer := This.Blogid;
+      begin
+         This.Blogid := Blog_Id;
 
-        --         foreach (this.tables("blog") as table => prefixed_table) then
-        --                 this.table = prefixed_table;
-        --         end;
+         This.Prefix := +This.Get_Blog_Prefix;
 
-        --         foreach (this.tables("old") as table => prefixed_table) then
-        --                 this.table = prefixed_table;
-        --         end;
+         for A in This.Tables ("blog").Iterate loop
+            declare
+               Table          : constant String := Key (A);
+               Prefixed_Table : constant String := As_String (Element (A));
+            begin
+--             This.M_Tables := Prefixed_Table;
+               Set_Table (This, Table, Prefixed_Table);
+            end;
+         end loop;
 
-        --         return old_blog_id;
-        -- end;
+         for A in This.Tables ("old").Iterate loop
+            declare
+               Table          : constant String := Key (A);
+               Prefixed_Table : constant String := As_String (Element (A));
+            begin
+--             This.M_Tables := Prefixed_Table;
+               Set_Table (This, Table, Prefixed_Table);
+            end;
+         end loop;
 
-        --
-        -- Gets blog prefix.
-        --
-        -- @since 3.0.0
-        --
-        -- @param int blog_id Optional.
-        -- @return string Blog prefix.
-        --
-        -- public function get_blog_prefix(blog_id = null) then
-        --         if (is_multisite()) then
-        --                 if (null === blog_id) then
-        --                         blog_id = this.blogid;
-        --                 end;
+         return Old_Blog_Id;
+      end;
+   end Set_Blog_Id;
 
-        --                 blog_id = (int) blog_id;
+   ---------------------
+   -- Get_Blog_Prefix --
+   ---------------------
 
-        --                 if (defined("MULTISITE") && (0 === blog_id || 1 === blog_id)) then
-        --                         return this.base_prefix;
-        --                 end; else then
-        --                         return this.base_prefix . blog_id . "_";
-        --                 end;
-        --         end; else then
-        --                 return this.base_prefix;
-        --         end;
-        -- end;
+   function Get_Blog_Prefix (This    : Wpdb_Class;
+                             Blog_Id : Integer := 0)
+                             return String
+   is
+      use Inc_Load;
+   begin
+      if Is_Multisite then
+         declare
+            Blog_Id_2 : constant Integer := (if Blog_Id = 0
+                                             then This.Blogid
+                                             else 0);
+         begin
+            if
+              Globals.MULTISITE and then
+              Blog_Id_2 in 0 | 1
+            then
+               return -This.Base_Prefix;
+            else
+               return -This.Base_Prefix & Helpers.Image (Blog_Id_2) & "_";
+            end if;
+         end;
+      else
+         return -This.Base_Prefix;
+      end if;
+   end Get_Blog_Prefix;
 
-        --
-        -- Returns an array of WordPress tables.
-        --
-        -- Also allows for the `CUSTOM_USER_TABLE` and `CUSTOM_USER_META_TABLE` to override the WordPress users
-        -- and usermeta tables that would otherwise be determined by the prefix.
-        --
-        -- The `scope` argument can take one of the following:
-        --
-        -- - "all" - returns "all" and "global" tables. No old tables are returned.
-        -- - "blog" - returns the blog-level tables for the queried blog.
-        -- - "global" - returns the global tables for the installation, returning multisite tables only on multisite.
-        -- - "ms_global" - returns the multisite global tables, regardless if current installation is multisite.
-        -- - "old" - returns tables which are deprecated.
-        --
-        -- @since 3.0.0
-        -- @since 6.1.0 `old` now includes deprecated multisite global tables only on multisite.
-        --
-        -- @uses wpdb::tables
-        -- @uses wpdb::old_tables
-        -- @uses wpdb::global_tables
-        -- @uses wpdb::ms_global_tables
-        -- @uses wpdb::old_ms_global_tables
-        --
-        -- @param string scope   Optional. Possible values include "all", "global", "ms_global", "blog",
-        --                        or "old" tables. Default "all".
-        -- @param bool   prefix  Optional. Whether to include table prefixes. If blog prefix is requested,
-        --                        then the custom users and usermeta tables will be mapped. Default true.
-        -- @param int    blog_id Optional. The blog_id to prefix. Used only when prefix is requested.
-        --                        Defaults to `wpdb::blogid`.
-        -- @return string[] Table names. When a prefix is requested, the key is the unprefixed table name.
-        --
-        -- public function tables(scope = "all", prefix = true, blog_id = 0) then
-        --         switch (scope) then
-        --                 case "all":
-        --                         tables = array_merge(this.global_tables, this.tables);
-        --                         if (is_multisite()) then
-        --                                 tables = array_merge(tables, this.ms_global_tables);
-        --                         end;
-        --                         break;
-        --                 case "blog":
-        --                         tables = this.tables;
-        --                         break;
-        --                 case "global":
-        --                         tables = this.global_tables;
-        --                         if (is_multisite()) then
-        --                                 tables = array_merge(tables, this.ms_global_tables);
-        --                         end;
-        --                         break;
-        --                 case "ms_global":
-        --                         tables = this.ms_global_tables;
-        --                         break;
-        --                 case "old":
-        --                         tables = this.old_tables;
-        --                         if (is_multisite()) then
-        --                                 tables = array_merge(tables, this.old_ms_global_tables);
-        --                         end;
-        --                         break;
-        --                 default:
-        --                         return array();
-        --         end;
+   ------------
+   -- Tables --
+   ------------
 
-        --         if (prefix) then
-        --                 if (! blog_id) then
-        --                         blog_id = this.blogid;
-        --                 end;
-        --                 blog_prefix   = this.get_blog_prefix(blog_id);
-        --                 base_prefix   = this.base_prefix;
-        --                 global_tables = array_merge(this.global_tables, this.ms_global_tables);
-        --                 foreach (tables as k => table) then
-        --                         if (in_array(table, global_tables, true)) then
-        --                                 tables[ table ] = base_prefix . table;
-        --                         end; else then
-        --                                 tables[ table ] = blog_prefix . table;
-        --                         end;
-        --                         unset(tables[ k ]);
-        --                 end;
+   function Tables (This    : Wpdb_Class;
+                    Scope   : String  := "all";
+                    Prefix  : Boolean := True;
+                    Blog_Id : Integer := 0)
+                    return Array_Type
+   is
+      use Php.Arrays;
+      use Php.Lists;
+      use Inc_Load;
 
-        --                 if (isset(tables["users"]) && defined("CUSTOM_USER_TABLE")) then
-        --                         tables["users"] = CUSTOM_USER_TABLE;
-        --                 end;
+      function To_Array (List : List_Type)
+                         return Array_Type
+                         is (raise Program_Error with "not implemented");
 
-        --                 if (isset(tables["usermeta"]) && defined("CUSTOM_USER_META_TABLE")) then
-        --                         tables["usermeta"] = CUSTOM_USER_META_TABLE;
-        --                 end;
-        --         end;
+      Tables_2 : Array_Type;
+   begin
+      if Scope in "all" then
+         Tables_2 := Array_Merge (To_Array (This.Global_Tables),
+                                  To_Array (This.M_Tables));
+         if Is_Multisite then
+            Tables_2 := Array_Merge (Tables_2,
+                                     To_Array (This.MS_Global_Tables));
+         end if;
 
-        --         return tables;
-        -- end;
+      elsif Scope in "blog" then
+         Tables_2 := To_Array (This.M_Tables);
 
-        --
-        -- Selects a database using the current or provided database connection.
-        --
-        -- The database name will be changed based on the current database connection.
-        -- On failure, the execution will bail and display a DB error.
-        --
-        -- @since 0.71
-        --
-        -- @param string          db  Database name.
-        -- @param mysqli|resource dbh Optional database connection.
-        --
-        -- public function select(db, dbh = null) then
+      elsif Scope in "global" then
+         Tables_2 := To_Array (This.Global_Tables);
+         if Is_Multisite then
+            Tables_2 := Array_Merge (Tables_2,
+                                     To_Array (This.MS_Global_Tables));
+         end if;
+
+      elsif Scope in "ms_global" then
+         Tables_2 := To_Array (This.MS_Global_Tables);
+
+      elsif Scope in "old" then
+         Tables_2 := To_Array (This.Old_Tables);
+         if Is_Multisite then
+            Tables_2 := Array_Merge (Tables_2,
+                                     To_Array (This.Old_MS_Global_Tables));
+         end if;
+
+      else
+         return Empty_Array;
+      end if; -- case
+
+      if Prefix then
+         declare
+            Blog_Id_2 : constant Integer :=
+              (if Blog_Id = 0
+               then This.Blogid
+               else Blog_Id);
+
+            Blog_Prefix : String    := This.Get_Blog_Prefix (Blog_Id_2);
+            Base_Prefix : String    := -This.Base_Prefix;
+
+            Global_Tables : List_Type :=
+              List_Merge (This.Global_Tables, This.MS_Global_Tables);
+         begin
+            for A in Tables_2.Iterate loop
+               declare
+--                K     : String     := Key (A);
+                  Table : String := Key (A);
+--                Table : Array_Type := As_Array (Element (A));
+               begin
+                  if In_List (Table, Global_Tables, True) then
+                     Set (Tables_2, Table, From_String (Base_Prefix & Table));
+                  else
+                     Set (Tables_2, Table, From_String (
+                          Get_As_String (Tables_2, Table) & Blog_Prefix & Table));
+                  end if;
+--                Delete (Ref (Tables_2, K));
+               end;
+            end loop;
+
+            if
+              Isset (Tables_2, "users") and then
+              Globals.CUSTOM_USER_TABLE /= ""
+            then
+               Set (Tables_2, "users",
+                    From_String (Globals.CUSTOM_USER_TABLE));
+            end if;
+
+            if
+              Isset (Tables_2, "usermeta") and then
+              Globals.CUSTOM_USER_META_TABLE /= ""
+            then
+               Set (Tables_2, "usermeta",
+                    From_String (Globals.CUSTOM_USER_META_TABLE));
+            end if;
+         end;
+      end if;
+
+      return Tables_2;
+   end Tables;
+
+   -------------
+   -- Selectt --
+   -------------
+
+   procedure Selectt (This : Wpdb_Class;
+                      Db   : String;
+                      Dbh  : Integer) --  = null
+   is
+   begin
+      null; -- raise Program_Error with "not implemented";
+   end Selectt;
         --         if (is_null(dbh)) then
         --                 dbh = this.dbh;
         --         end;
@@ -660,66 +724,80 @@ is
         --         return addslashes(string);
         -- end;
 
-        --
-        -- Real escape, using mysqli_real_escape_string() or mysql_real_escape_string().
-        --
-        -- @since 2.8.0
-        --
-        -- @see mysqli_real_escape_string()
-        -- @see mysql_real_escape_string()
-        --
-        -- @param string string String to escape.
-        -- @return string Escaped string.
-        --
-        -- public function _real_escape(string) then
-        --         if (! is_scalar(string)) then
-        --                 return "";
-        --         end;
+   -------------------
+   -- X_Real_Escape --
+   -------------------
 
-        --         if (this.dbh) then
-        --                 if (this.use_mysqli) then
-        --                         escaped = mysqli_real_escape_string(this.dbh, string);
-        --                 end; else then
-        --                         escaped = mysql_real_escape_string(string, this.dbh);
-        --                 end;
-        --         end; else then
-        --                 class = get_class(this);
+   function X_Real_Escape (This : Wpdb_Class;
+                           Item : String)
+                           return String
+   is
+      use Php.Strings;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Inc_Class_Wpdb;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
 
-        --                 wp_load_translations_early();
-        --                 /* translators: %s: Database access abstraction class, usually wpdb or a class extending wpdb.--
-        --                 _doing_it_wrong(class, sprintf(__("%s must set a database connection for use with escaping."), class), "3.6.0");
+      Escaped : Unbounded_String;
+   begin
+--    if not Is_Scalar (Item) then
+--       return "";
+--    end;
 
-        --                 escaped = addslashes(string);
-        --         end;
+      if This.Dbh /= 0 then
+         case This.Engine is
+         when Engine_MySQLi =>
+            Escaped := +MySQLi_Real_Escape_String (This.Dbh, Item);
+         when Engine_MySQL =>
+            Escaped := +MySQL_Real_Escape_String (Item, This.Dbh);
+         when Engine_SQLite =>
+            pragma Assert (False);
+         end case;
+      else
+         declare
+            Class : constant String := "XXX-898"; -- := Get_Class (This);
+         begin
+            Wp_Load_Translations_Early;
+            -- translators: %s: Database access abstraction class, usually wpdb or a class extending wpdb.
+            X_Doing_It_Wrong (
+              Class,
+              Sprintf (abs "%s must set a database connection for use with escaping.",
+                       To_List (Class)),
+              "3.6.0");
+         end;
+         Escaped := +Add_Slashes (Item);
+      end if;
 
-        --         return this.add_placeholder_escape(escaped);
-        -- end;
+      return String (This.Add_Placeholder_Escape (Statement_Type (-Escaped)));
+   end X_Real_Escape;
 
-        --
-        -- Escapes data. Works on arrays.
-        --
-        -- @since 2.8.0
-        --
-        -- @uses wpdb::_real_escape()
-        --
-        -- @param string|array data Data to escape.
-        -- @return string|array Escaped data, in the same type as supplied.
-        --
-        -- public function _escape(data) then
-        --         if (is_array(data)) then
-        --                 foreach (data as k => v) then
-        --                         if (is_array(v)) then
-        --                                 data[ k ] = this._escape(v);
-        --                         end; else then
-        --                                 data[ k ] = this._real_escape(v);
-        --                         end;
-        --                 end;
-        --         end; else then
-        --                 data = this._real_escape(data);
-        --         end;
+   --------------
+   -- X_Escape --
+   --------------
 
-        --         return data;
-        -- end;
+   function X_Escape (This : Wpdb_Class;
+                      Data : String)
+                      return String
+   is
+   begin
+      -- if (is_array(data)) then
+      --    for (data as k => v) loop
+      --       if (is_array(v)) then
+      --          data[ k ] = this._escape(v);
+      --       else
+      --          data[ k ] = this._real_escape(v);
+      --       end if;
+      --    end loop;
+      -- else
+      --    data = this._real_escape(data);
+      return This.X_Real_Escape (Data);
+      -- end if;
+
+      -- return data;
+   end X_Escape;
 
         --
         -- Do not use, deprecated.
@@ -825,11 +903,12 @@ is
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
                      Args  : List_Type) --, ...args)
-                     return String
+                     return Statement_Type
    is
       use Php.Preg;
       use Php.Strings;
       use Inc_Functions;
+      use Inc_L10n;
 
       function Func return Array_Type;
 
@@ -894,10 +973,9 @@ is
       -- - Precision specifier, e.g. %.2f
       --
          declare
-            Allowed_Format : String :=
+            Allowed_Format : constant String :=
                "(?:[1-9][0-9]*[])?[-+0-9]*(?: |0|\'.)?[-+0-9]*(?:\.[0-9]+)?";
-            Query_2 : Unbounded_String;
-         begin
+
             --
             -- If a %s placeholder already has quotes around it, removing the
             -- existing quotes and re-inserting them ensures the quotes are consistent.
@@ -906,93 +984,105 @@ is
             -- placeholders like %1s, which are frequently used in the middle of
             -- longer strings, or as table name placeholders.
             --
-            Query_2 := +Str_Replace ("'%s'", "%s", Query);
+            Query_3 : constant String := Str_Replace ("'%s'", "%s", Query);
             -- Strip any existing single quotes.
 
-            Query_2 := +Str_Replace ("""%s""", "%s", -Query_2);
+            Query_4 : constant String := Str_Replace ("""%s""", "%s", Query_3);
             -- Strip any existing double quotes.
 
-            Query_2 := +Preg_Replace ("/(?<!%)%s/", "'%s'", -Query_2);
+            Query_5 : constant String := Preg_Replace ("/(?<!%)%s/", "'%s'", Query_4);
             -- Quote the strings, avoiding escaped strings like %%s.
 
-            Query_2 := +Preg_Replace ("/(?<!%)(%(allowed_format)?f)/", "%\\2F",
-                                      -Query_2);
+            Query_6 : constant String :=
+              Preg_Replace ("/(?<!%)(%(" & Allowed_Format & ")?f)/", "%\\2F",
+                            Query_5);
+
             -- Force floats to be locale-unaware.
-
-            Query_2 := +Preg_Replace ("/%(?:%||(?!(allowed_format)?[sdF]))/",
-                                      "%%\\1", -Query_2);
+            Query_7 : constant String :=
+              Preg_Replace ("/%(?:%||(?!(" & Allowed_Format & ")?[sdF]))/",
+                            "%%\\1", Query_6);
             -- Escape any unescaped percents.
-            declare
-               -- Count the number of valid placeholders in the query.
-               Matches : Array_Type;
-               Placeholders : constant Integer :=
-                  Preg_Match_All ("/(^|[^%]|(%%)+)%(allowed_format)?[sdF]/",
-                                  -Query_2, Matches);
-               Args_Count : constant Natural := Natural (List_Vectors.Length (Args));
-            begin
-               if Args_Count /= Placeholders then
-                  if 1 = Placeholders and then Passed_As_Array then
-                     -- If the passed query only expected one argument, but the wrong
-                     -- number of arguments were sent as an array, bail.
-                     Inc_Load.Wp_Load_Translations_Early; -- ();
-                     X_Doing_It_Wrong (
-                        "wpdb::prepare",
-                        abs "The query only expected one placeholder, but an array of multiple placeholders was sent.",
-                        "4.9.0");
 
-                     return "";
-                  else
-                     --
-                     -- If we don"t have the right number of placeholders,
-                     -- but they were passed as individual arguments,
-                     -- or we were expecting multiple arguments in an array, throw
-                     -- a warning.
-                     --
-                     Inc_Load.Wp_Load_Translations_Early; -- ();
-                     X_Doing_It_Wrong (
-                        "wpdb::prepare",
-                        Sprintf (
-                           -- translators: 1: Number of placeholders, 2: Number of
-                           -- arguments passed.
-                           abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
-                           To_List (List => (
-                             1 => +Placeholders'Image,
-                             2 => +Args_Count'Image))),
-                        "4.8.3");
+            -- Count the number of valid placeholders in the query.
+            Matches : Array_Type;
 
-                     --
-                     -- If we don"t have enough arguments to match the placeholders,
-                     -- return an empty string to avoid a fatal error on PHP 8.
-                     --
-                     if Args_Count < Placeholders then
-                        declare
---                         use Array_Maps;
+            Placeholders : constant Integer :=
+              Preg_Match_All ("/(^|[^%]|(%%)+)%(" & Allowed_Format & ")?[sdF]/",
+                              Query_7, Matches);
 
-                           Max_Numbered_Placeholder : constant Integer :=
-                             (if True -- Matches (3) /= "" -- not in 0  -- not empty
-                              then 99 -- Max (Array_Map
-                                       -- ("intval",
-                                       --  Empty_Array & Matches (3)))
+            Args_Count : constant Natural := Natural (List_Vectors.Length (Args));
+         begin
+            if Args_Count /= Placeholders then
+               if 1 = Placeholders and then Passed_As_Array then
+                  -- If the passed query only expected one argument, but the wrong
+                  -- number of arguments were sent as an array, bail.
+                  Inc_Load.Wp_Load_Translations_Early; -- ();
+                  X_Doing_It_Wrong (
+                    "wpdb::prepare",
+                    abs "The query only expected one placeholder, but an array of multiple placeholders was sent.",
+                    "4.9.0");
+
+                  return "";
+               else
+                  --
+                  -- If we don"t have the right number of placeholders,
+                  -- but they were passed as individual arguments,
+                  -- or we were expecting multiple arguments in an array, throw
+                  -- a warning.
+                  --
+                  Inc_Load.Wp_Load_Translations_Early; -- ();
+                  X_Doing_It_Wrong (
+                    "wpdb::prepare",
+                    Sprintf (
+                      -- translators: 1: Number of placeholders, 2: Number of
+                      -- arguments passed.
+                      abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
+                      To_List (List => (
+                        1 => +Placeholders'Image,
+                        2 => +Args_Count'Image))),
+                      "4.8.3");
+
+                  --
+                  -- If we don"t have enough arguments to match the placeholders,
+                  -- return an empty string to avoid a fatal error on PHP 8.
+                  --
+                  if Args_Count < Placeholders then
+                     declare
+--                      use Array_Maps;
+
+                        Max_Numbered_Placeholder : constant Integer :=
+                          (if True -- Matches (3) /= "" -- not in 0  -- not empty
+                           then 99 -- Max (Array_Map
+                                   -- ("intval",
+                                   --  Empty_Array & Matches (3)))
 --              Table => To_Array (List => (1 => Build (Element (Matches, 3)))))
-                              else 0);
-                        begin
-                           if
-                             Max_Numbered_Placeholder = 0 or else -- not
-                             Args_Count < Max_Numbered_Placeholder
-                           then
-                              return "";
-                           end if;
-                        end;
-                     end if;
+                           else 0);
+                     begin
+                        if
+                          Max_Numbered_Placeholder = 0 or else -- not
+                            Args_Count < Max_Numbered_Placeholder
+                        then
+                           return "";
+                        end if;
+                     end;
                   end if;
                end if;
+            end if;
 
---             Array_Walk (Args, Func"Access);
---             To_Array (Db, "escape_by_ref"));
+--          Array_Walk (Args, Func"Access);
+--          To_Array (Db, "escape_by_ref"));
 
-               Query_2 := +Vsprintf (-Query_2, Args);
+            declare
+               Query_8 : constant Statement_Type :=
+                 Statement_Type (Vsprintf (Query_7, Args));
 
-               return Db.Add_Placeholder_Escape (-Query_2);
+               Query_9 : constant Statement_Type :=
+                 Db.Add_Placeholder_Escape (Query_8);
+            begin
+               Ada.Text_IO.Put_Line (
+                 "inc_class_wpdb.prepare: " & String (Query_9));
+
+               return Query_9;
             end;
          end;
       end;
@@ -1146,207 +1236,258 @@ is
       null;
    end Suppress_Errors;
 
-        --
-        -- Kills cached query results.
-        --
-        -- @since 0.71
-        --
-        -- public function flush() then
-        --         this.last_result   = array();
-        --         this.col_info      = null;
-        --         this.last_query    = null;
-        --         this.rows_affected = 0;
-        --         this.num_rows      = 0;
-        --         this.last_error    = "";
+   -----------
+   -- Flush --
+   -----------
 
-        --         if (this.use_mysqli && this.result instanceof mysqli_result) then
-        --                 mysqli_free_result(this.result);
-        --                 this.result = null;
+   procedure Flush (This : in out Wpdb_Class)
+   is
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+   begin
+      This.Last_Result   := String_Vectors.Empty_Vector;
+--      This.Col_Info      := null;
+      This.Last_Query    := +""; -- null;
+      This.Rows_Affected := 0;
+      This.Num_Rows      := 0;
+      This.Last_Error    := +"";
 
-        --                 // Sanity check before using the handle.
-        --                 if (empty(this.dbh) || ! (this.dbh instanceof mysqli)) then
-        --                         return;
-        --                 end;
+--      if
+--        This.Use_Mysqli and then
+--        This.Result in Mysqli_Result     -- instanceof
+--      then
+      case This.Engine is
 
-        --                 // Clear out any results from a multi-query.
-        --                 while (mysqli_more_results(this.dbh)) then
-        --                         mysqli_next_result(this.dbh);
-        --                 end;
-        --         end; elseif (is_resource(this.result)) then
-        --                 mysql_free_result(this.result);
-        --         end;
-        -- end;
+      when Engine_MySQLi =>
+         Mysqli_Free_Result (This.Result);
+         This.Result := Databases.None; -- null;
 
-        --
-        -- Connects to and selects database.
-        --
-        -- If `allow_bail` is false, the lack of database connection will need to be handled manually.
-        --
-        -- @since 3.0.0
-        -- @since 3.9.0 allow_bail parameter added.
-        --
-        -- @param bool allow_bail Optional. Allows the function to bail. Default true.
-        -- @return bool True with a successful connection, false on failure.
-        --
-        -- public function db_connect(allow_bail = true) then
+         -- Sanity check before using the handle.
+         if
+           This.Dbh = 0 -- or else
+--         Empty (This.Dbh) or else
+--         not (This.Dbh in Mysqli)      -- instanceof
+         then
+            return;
+         end if;
+
+         -- Clear out any results from a multi-query.
+         while Mysqli_More_Results (This.Dbh) loop
+            Mysqli_Next_Result (This.Dbh);
+         end loop;
+
+      when Engine_MySQL =>
+--      elsif Is_Resource (This.Result) then
+         Mysql_Free_Result (This.Result);
+      when Engine_SQLite =>
+         null;
+--       raise Program_Error with "not implemented";
+
+      end case;
+--    end if;
+   end Flush;
+
+   ----------------
+   -- DB_Connect --
+   ----------------
+
    function DB_Connect (This       : in out Wpdb_Class;
                         Allow_Bail : Boolean := True)
                         return Boolean
-                        is (False);
---   is
---   begin
-        --         this.is_mysql = true;
+   is
+      use Php.Errors;
+      use Php.Files;
+      use Php.HTML;
+      use Php.Strings;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Inc_Load;
+      use Inc_L10n;
+   begin
+      This.Engine := Databases.Engine_SQLite; -- Engine_MySQL;
+--    This.Is_MySQL := True;
 
-        --         /*
-        --         -- Deprecated in 3.9+ when using MySQLi. No equivalent
-        --         -- new_link parameter exists for mysqli_* functions.
-        --         --
-        --         new_link     = defined("MYSQL_NEW_LINK") ? MYSQL_NEW_LINK : true;
-        --         client_flags = defined("MYSQL_CLIENT_FLAGS") ? MYSQL_CLIENT_FLAGS : 0;
+      --
+      -- Deprecated in 3.9+ when using MySQLi. No equivalent
+      -- new_link parameter exists for mysqli_* functions.
+      --
+      declare
+         New_Link     : constant Boolean := False;
+         -- defined("MYSQL_NEW_LINK") ? MYSQL_NEW_LINK : true;
+         Client_Flags : constant Integer := 0;
+         -- defined("MYSQL_CLIENT_FLAGS") ? MYSQL_CLIENT_FLAGS : 0;
+      begin
+--       if This.Use_Mysqli then
+         case This.Engine is
 
-        --         if (this.use_mysqli) then
-        --                 /*
-        --                 -- Set the MySQLi error reporting off because WordPress handles its own.
-        --                 -- This is due to the default value change from `MYSQLI_REPORT_OFF`
-        --                 -- to `MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT` in PHP 8.1.
-        --                 --
-        --                 mysqli_report(MYSQLI_REPORT_OFF);
+         when Engine_MySQLi =>
+            --
+            -- Set the MySQLi error reporting off because WordPress handles its own.
+            -- This is due to the default value change from `MYSQLI_REPORT_OFF`
+            -- to `MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT` in PHP 8.1.
+            --
+            Mysqli_Report (MYSQLI_REPORT_OFF);
 
-        --                 this.dbh = mysqli_init();
+            This.Dbh := Mysqli_Init; -- ();
 
-        --                 host    = this.dbhost;
-        --                 port    = null;
-        --                 socket  = null;
-        --                 is_ipv6 = false;
+            declare
+               Host    : Unbounded_String := This.Dbhost;
+               Port    : constant Natural  := 0;   -- Duration := null;
+               Socket  : constant String   := ""; -- Duration := null;
+               Is_IPv6 : constant Boolean  := False;
+               Host_Data : constant Array_Type := This.Parse_DB_Host (-This.Dbhost);
+            begin
+               -- if Host_Data then
+               --    List : List_Type;
+               --    (Host, Port, Socket, Is_IPv6) := Host_Data;
+               -- end if;
 
-        --                 host_data = this.parse_db_host(this.dbhost);
-        --                 if (host_data) then
-        --                         list(host, port, socket, is_ipv6) = host_data;
-        --                 end;
+               --
+               -- If using the `mysqlnd` library, the IPv6 address needs to be enclosed
+               -- in square brackets, whereas it doesn't while using the `libmysqlclient`
+               -- library.
+               -- @see https://bugs.php.net/bug.php?id=67563
+               --
+               if Is_IPv6 then -- and then Extension_Loaded ("mysqlnd") then
+                  Host := +"[host]";
+               end if;
 
-        --                 /*
-        --                 -- If using the `mysqlnd` library, the IPv6 address needs to be enclosed
-        --                 -- in square brackets, whereas it doesn"t while using the `libmysqlclient` library.
-        --                 -- @see https://bugs.php.net/bug.php?id=67563
-        --                 --
-        --                 if (is_ipv6 && extension_loaded("mysqlnd")) then
-        --                         host = "[host]";
-        --                 end;
+               if Globals.WP_DEBUG then
+                  Mysqli_Real_Connect
+                    (This.Dbh, -Host, -This.Dbuser, -This.Dbpassword,
+                     "", -- null,
+                     Port, Socket, Client_Flags);
+               else
+                  -- phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                  -- @
+                  Mysqli_Real_Connect
+                    (This.Dbh, -Host, -This.Dbuser, -This.Dbpassword,
+                     "", -- null,
+                     Port, Socket, Client_Flags);
+               end if;
+            end;
 
-        --                 if (WP_DEBUG) then
-        --                         mysqli_real_connect(this.dbh, host, this.dbuser, this.dbpassword, null, port, socket, client_flags);
-        --                 end; else then
-        --                         // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-        --                         @mysqli_real_connect(this.dbh, host, this.dbuser, this.dbpassword, null, port, socket, client_flags);
-        --                 end;
+            if False then -- if This.Dbh.Connect_Errno then
+               This.Dbh := 0; -- null;
 
-        --                 if (this.dbh.connect_errno) then
-        --                         this.dbh = null;
+               --
+               -- It's possible ext/mysqli is misconfigured. Fall back to ext/mysql if:
+               --  - We haven't previously connected, and
+               --  - WP_USE_EXT_MYSQL isn"t set to false, and
+               --  - ext/mysql is loaded.
+               --
+               declare
+                  Attempt_Fallback : Boolean := True;
+               begin
+                  if This.Has_Connected then
+                     Attempt_Fallback := False;
 
-        --                         /*
-        --                         -- It"s possible ext/mysqli is misconfigured. Fall back to ext/mysql if:
-        --                         --  - We haven"t previously connected, and
-        --                         --  - WP_USE_EXT_MYSQL isn"t set to false, and
-        --                         --  - ext/mysql is loaded.
-        --                         --
-        --                         attempt_fallback = true;
+                  elsif False then -- Defined ("WP_USE_EXT_MYSQL") and then not WP_USE_EXT_MYSQL then
+                     Attempt_Fallback := False;
 
-        --                         if (this.has_connected) then
-        --                                 attempt_fallback = false;
-        --                         end; elseif (defined("WP_USE_EXT_MYSQL") && ! WP_USE_EXT_MYSQL) then
-        --                                 attempt_fallback = false;
-        --                         end; elseif (! function_exists("mysql_connect")) then
-        --                                 attempt_fallback = false;
-        --                         end;
+                  elsif True then -- not Function_Exists ("mysql_connect") then
+                     Attempt_Fallback := False;
+                  end if;
 
-        --                         if (attempt_fallback) then
-        --                                 this.use_mysqli = false;
-        --                                 return this.db_connect(allow_bail);
-        --                         end;
-        --                 end;
-        --         end; else then
-        --                 if (WP_DEBUG) then
-        --                         this.dbh = mysql_connect(this.dbhost, this.dbuser, this.dbpassword, new_link, client_flags);
-        --                 end; else then
-        --                         // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-        --                         this.dbh = @mysql_connect(this.dbhost, this.dbuser, this.dbpassword, new_link, client_flags);
-        --                 end;
-        --         end;
+                  if Attempt_Fallback then
+--                   This.Use_Mysqli := False;
+                     return This.DB_Connect (Allow_Bail);
+                  end if;
+               end;
+            end if;
 
-        --         if (! this.dbh && allow_bail) then
-        --                 wp_load_translations_early();
+         when Engine_MySQL =>
+--       else
+            if Globals.WP_DEBUG then
+               This.Dbh :=
+                 Mysql_Connect (-This.Dbhost, -This.Dbuser, -This.Dbpassword,
+                                New_Link, Client_Flags);
+            else
+               -- phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+               This.Dbh := -- @
+                 Mysql_Connect (-This.Dbhost, -This.Dbuser, -This.Dbpassword,
+                                New_Link, Client_Flags);
+            end if;
 
-        --                 // Load custom DB error template, if present.
-        --                 if (file_exists(WP_CONTENT_DIR . "/db-error.php")) then
-        --                         require_once WP_CONTENT_DIR . "/db-error.php";
-        --                         die();
-        --                 end;
+         when Engine_SQLite =>
+            This.Handle := SQLite.Open (File_Name => "heidelberger.sqlite");
+            This.Dbh    := -1;
 
-        --                 message = "<h1>" . __("Error establishing a database connection") . "</h1>\n";
+         end case;
+      end;
 
-        --                 message .= "<p>" . sprintf(
-        --                         /* translators: 1: wp-config.php, 2: Database host.--
-        --                         __("This either means that the username and password information in your %1s file is incorrect or that contact with the database server at %2s could not be established. This could mean your host&#8217;s database server is down."),
-        --                         "<code>wp-config.php</code>",
-        --                         "<code>" . htmlspecialchars(this.dbhost, ENT_QUOTES) . "</code>"
-        --                ) . "</p>\n";
+      if This.Dbh = 0 and then Allow_Bail then -- not
+         Wp_Load_Translations_Early;
 
-        --                 message .= "<ul>\n";
-        --                 message .= "<li>" . __("Are you sure you have the correct username and password?") . "</li>\n";
-        --                 message .= "<li>" . __("Are you sure you have typed the correct hostname?") . "</li>\n";
-        --                 message .= "<li>" . __("Are you sure the database server is running?") . "</li>\n";
-        --                 message .= "</ul>\n";
+         -- Load custom DB error template, if present.
+         if File_Exists ((-Globals.WP_CONTENT_DIR) & "/db-error.php") then
+--          require_once WP_CONTENT_DIR & "/db-error.php";
+            Die; -- ();
+         end if;
 
-        --                 message .= "<p>" . sprintf(
-        --                         /* translators: %s: Support forums URL.--
-        --                         __("If you are unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href="%s">WordPress Support Forums</a>."),
-        --                         __("https://wordpress.org/support/forums/")
-        --                ) . "</p>\n";
+         declare
+            Message : constant String :=
+              "<h1>" & abs "Error establishing a database connection" & "</h1>\n" &
 
-        --                 this.bail(message, "db_connect_fail");
+              "<p>" & Sprintf (
+                -- translators: 1: wp-config.php, 2: Database host.
+                abs "This either means that the username and password information in your %1s file is incorrect or that contact with the database server at %2s could not be established. This could mean your host&#8217;s database server is down.",
+                To_List (List => (
+                  1 => +"<code>wp-config.php</code>",
+                  2 => +"<code>" & HTML_Special_Chars (-This.Dbhost, ENT_QUOTES) & "</code>"
+                ))
+              ) & "</p>\n" &
 
-        --                 return false;
-        --         end; elseif (this.dbh) then
-        --                 if (! this.has_connected) then
-        --                         this.init_charset();
-        --                 end;
+              "<ul>\n" &
+              "<li>" & abs "Are you sure you have the correct username and password?" & "</li>\n" &
+              "<li>" & abs "Are you sure you have typed the correct hostname?" & "</li>\n" &
+              "<li>" & abs "Are you sure the database server is running?" & "</li>\n" &
+              "</ul>\n" &
 
-        --                 this.has_connected = true;
+              "<p>" & Sprintf (
+                 -- translators: %s: Support forums URL.
+                 abs "If you are unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href=""%s"">WordPress Support Forums</a>.",
+                 To_List (abs "https://wordpress.org/support/forums/")
+               ) & "</p>\n";
+         begin
+            This.Bail (Message, "db_connect_fail");
+         end;
 
-        --                 this.set_charset(this.dbh);
+         return False;
 
-        --                 this.ready = true;
-        --                 this.set_sql_mode();
-        --                 this.select(this.dbname, this.dbh);
+      elsif This.Dbh /= 0 then
+         if not This.Has_Connected then
+            This.Init_Charset;
+         end if;
 
-        --                 return true;
-        --         end;
+         This.Has_Connected := True;
 
-        --         return false;
-        -- end;
+         This.Set_Charset (This.Dbh);
 
-        --
-        -- Parses the DB_HOST setting to interpret it for mysqli_real_connect().
-        --
-        -- mysqli_real_connect() doesn"t support the host param including a port or socket
-        -- like mysql_connect() does. This duplicates how mysql_connect() detects a port
-        -- and/or socket file.
-        --
-        -- @since 4.9.0
-        --
-        -- @param string host The DB_HOST setting to parse.
-        -- @return array|false then
-        --     Array containing the host, the port, the socket and
-        --     whether it is an IPv6 address, in that order.
-        --     False if the host couldn"t be parsed.
-        --
-        --     @type string      0 Host name.
-        --     @type string|null 1 Port.
-        --     @type string|null 2 Socket.
-        --     @type bool        3 Whether it is an IPv6 address.
-        -- end;
-        --
-        -- public function parse_db_host(host) then
+         This.Ready := True;
+         This.Set_SQL_Mode;
+         This.Selectt (-This.Dbname, This.Dbh);
+
+         return True;
+      end if;
+
+      return False;
+   end DB_Connect;
+
+   -------------------
+   -- Parse_DB_Host --
+   -------------------
+
+   function Parse_DB_Host (This : Wpdb_Class;
+                           Host : String)
+                           return Array_Type
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return Empty_Array;
+   end Parse_DB_Host;
         --         socket  = null;
         --         is_ipv6 = false;
 
@@ -1382,20 +1523,18 @@ is
         --         return array(host, port, socket, is_ipv6);
         -- end;
 
-        --
-        -- Checks that the connection to the database is still up. If not, try to reconnect.
-        --
-        -- If this function is unable to reconnect, it will forcibly die, or if called
-        -- after the {@see "template_redirect"} hook has been fired, return false instead.
-        --
-        -- If `allow_bail` is false, the lack of database connection will need to be handled manually.
-        --
-        -- @since 3.9.0
-        --
-        -- @param bool allow_bail Optional. Allows the function to bail. Default true.
-        -- @return bool|void True if the connection is up.
-        --
-        -- public function check_connection(allow_bail = true) then
+   ----------------------
+   -- Check_Connection --
+   ----------------------
+
+   function Check_Connection (This       : Wpdb_Class;
+                              Allow_Bail : Boolean := True)
+                              return Boolean
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return False;
+   end Check_Connection;
         --         if (this.use_mysqli) then
         --                 if (! empty(this.dbh) && mysqli_ping(this.dbh)) then
         --                         return true;
@@ -1471,197 +1610,298 @@ is
         --         dead_db();
         -- end;
 
-        --
-        -- Performs a database query, using current database connection.
-        --
-        -- More information can be found on the documentation page.
-        --
-        -- @since 0.71
-        --
-        -- @link https://developer.wordpress.org/reference/classes/wpdb/
-        --
-        -- @param string query Database query.
-        -- @return int|bool Boolean true for CREATE, ALTER, TRUNCATE and DROP queries. Number of rows
-        --                  affected/selected for all other queries. Boolean false on error.
-        --
-        -- public function query(query) then
-        --         if (! this.ready) then
-        --                 this.check_current_query = true;
-        --                 return false;
-        --         end;
+   -----------
+   -- Query --
+   -----------
 
-        --         --
-        --         -- Filters the database query.
-        --         --
-        --         -- Some queries are made before the plugins have been loaded,
-        --         -- and thus cannot be filtered with this method.
-        --         --
-        --         -- @since 2.1.0
-        --         --
-        --         -- @param string query Database query.
-        --         --
-        --         query = apply_filters("query", query);
+   function Query (This  : in out Wpdb_Class;
+                   Query : Statement_Type)
+                   return Integer
+   is
+      use Php.Preg;
+--    use Php.Types;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
+   begin
+      if not This.Ready then
+         This.Check_Current_Query := True;
+         return -1; -- false;
+      end if;
 
-        --         if (! query) then
-        --                 this.insert_id = 0;
-        --                 return false;
-        --         end;
+      --
+      -- Filters the database query.
+      --
+      -- Some queries are made before the plugins have been loaded,
+      -- and thus cannot be filtered with this method.
+      --
+      -- @since 2.1.0
+      --
+      -- @param string query Database query.
+      --
+      declare
+         Query_2 : constant String := Apply_Filters ("query", String (Query));
+      begin
+         if Query_2 = "" then -- not
+            This.Insert_Id := 0;
+            return -1; -- false;
+         end if;
 
-        --         this.flush();
+         This.Flush;
 
-        --         // Log how the function was called.
-        --         this.func_call = "\db.query(\"query\")";
+         -- Log how the function was called.
+         This.Func_Call := +"\db.query(""" & Query_2 & """)";
 
-        --         // If we"re writing to the database, make sure the query will write safely.
-        --         if (this.check_current_query && ! this.check_ascii(query)) then
-        --                 stripped_query = this.strip_invalid_text_from_query(query);
-        --                 // strip_invalid_text_from_query() can perform queries, so we need
-        --                 // to flush again, just to make sure everything is clear.
-        --                 this.flush();
-        --                 if (stripped_query !== query) then
-        --                         this.insert_id  = 0;
-        --                         this.last_query = query;
+         -- If we're writing to the database, make sure the query will write safely.
+         if This.Check_Current_Query and then not This.Check_ASCII (Query_2) then
+            declare
+               Stripped_Query : constant String :=
+                 This.Strip_Invalid_Text_From_Query (Query_2);
+            begin
+               -- strip_invalid_text_from_query() can perform queries, so we need
+               -- to flush again, just to make sure everything is clear.
+               This.Flush;
+               if Stripped_Query /= Query_2 then
+                  This.Insert_Id  := 0;
+                  This.Last_Query := +Query_2;
 
-        --                         wp_load_translations_early();
+                  Wp_Load_Translations_Early;
 
-        --                         this.last_error = __("WordPress database error: Could not perform query because it contains invalid data.");
+                  This.Last_Error :=
+                    +abs "WordPress database error: Could not perform query because it contains invalid data.";
 
-        --                         return false;
-        --                 end;
-        --         end;
+                  return -1; -- false;
+               end if;
+            end;
+         end if;
 
-        --         this.check_current_query = true;
+         This.Check_Current_Query := True;
 
-        --         // Keep track of the last query for debug.
-        --         this.last_query = query;
+         -- Keep track of the last query for debug.
+         This.Last_Query := +Query_2;
 
-        --         this._do_query(query);
+         This.X_Do_Query (Query_2);
 
-        --         // Database server has gone away, try to reconnect.
-        --         mysql_errno = 0;
-        --         if (! empty(this.dbh)) then
-        --                 if (this.use_mysqli) then
-        --                         if (this.dbh instanceof mysqli) then
-        --                                 mysql_errno = mysqli_errno(this.dbh);
-        --                         end; else then
-        --                                 // dbh is defined, but isn"t a real connection.
-        --                                 // Something has gone horribly wrong, let"s try a reconnect.
-        --                                 mysql_errno = 2006;
-        --                         end;
-        --                 end; else then
-        --                         if (is_resource(this.dbh)) then
-        --                                 mysql_errno = mysql_errno(this.dbh);
-        --                         end; else then
-        --                                 mysql_errno = 2006;
-        --                         end;
-        --                 end;
-        --         end;
+         -- Database server has gone away, try to reconnect.
+         declare
+            Mysql_Errno : Integer := 0;
+            Ret_Val     : Integer;
+            Return_Val  : Natural;
+         begin
+            if This.Dbh = 0 then
+--          if not Empty (This.Dbh) then
+--             if This.Use_Mysqli then
+               case This.Engine is
 
-        --         if (empty(this.dbh) || 2006 === mysql_errno) then
-        --                 if (this.check_connection()) then
-        --                         this._do_query(query);
-        --                 end; else then
-        --                         this.insert_id = 0;
-        --                         return false;
-        --                 end;
-        --         end;
+               when Engine_MySQLi =>
+--                  if This.Dbh in Mysqli then -- instanceof
+                     Mysql_Errno := Mysqli_Errno (This.Dbh);
+--                  else
+                     -- dbh is defined, but isn't a real connection.
+                     -- Something has gone horribly wrong, let's try a reconnect.
+                     Mysql_Errno := 2006;
+--                  end if;
 
-        --         // If there is an error then take note of it.
-        --         if (this.use_mysqli) then
-        --                 if (this.dbh instanceof mysqli) then
-        --                         this.last_error = mysqli_error(this.dbh);
-        --                 end; else then
-        --                         this.last_error = __("Unable to retrieve the error message from MySQL");
-        --                 end;
-        --         end; else then
-        --                 if (is_resource(this.dbh)) then
-        --                         this.last_error = mysql_error(this.dbh);
-        --                 end; else then
-        --                         this.last_error = __("Unable to retrieve the error message from MySQL");
-        --                 end;
-        --         end;
+               when Engine_MySQL =>
+--                if Is_Resource (This.Dbh) then
+                     Mysql_Errno := MySQL_Bind.Mysql_Errno (This.Dbh);
+--                else
+--                   Mysql_Errno := 2006;
+--                end if;
 
-        --         if (this.last_error) then
-        --                 // Clear insert_id on a subsequent failed insert.
-        --                 if (this.insert_id && preg_match("/^\s*(insert|replace)\s/i", query)) then
-        --                         this.insert_id = 0;
-        --                 end;
+               when Engine_SQLite =>
+                  raise Program_Error with "not implemented";
 
-        --                 this.print_error();
-        --                 return false;
-        --         end;
+               end case;
+            end if;
 
-        --         if (preg_match("/^\s*(create|alter|truncate|drop)\s/i", query)) then
-        --                 return_val = this.result;
-        --         end; elseif (preg_match("/^\s*(insert|delete|update|replace)\s/i", query)) then
-        --                 if (this.use_mysqli) then
-        --                         this.rows_affected = mysqli_affected_rows(this.dbh);
-        --                 end; else then
-        --                         this.rows_affected = mysql_affected_rows(this.dbh);
-        --                 end;
-        --                 // Take note of the insert_id.
-        --                 if (preg_match("/^\s*(insert|replace)\s/i", query)) then
-        --                         if (this.use_mysqli) then
-        --                                 this.insert_id = mysqli_insert_id(this.dbh);
-        --                         end; else then
-        --                                 this.insert_id = mysql_insert_id(this.dbh);
-        --                         end;
-        --                 end;
-        --                 // Return number of rows affected.
-        --                 return_val = this.rows_affected;
-        --         end; else then
-        --                 num_rows = 0;
-        --                 if (this.use_mysqli && this.result instanceof mysqli_result) then
-        --                         while (row = mysqli_fetch_object(this.result)) then
-        --                                 this.last_result[ num_rows ] = row;
-        --                                 num_rows++;
-        --                         end;
-        --                 end; elseif (is_resource(this.result)) then
-        --                         while (row = mysql_fetch_object(this.result)) then
-        --                                 this.last_result[ num_rows ] = row;
-        --                                 num_rows++;
-        --                         end;
-        --                 end;
+            if This.Dbh /= 0 or else 2006 = Mysql_Errno then
+--          if Empty (This.Dbh) or else 2006 = Mysql_Errno then
+               if This.Check_Connection then -- ()
+                  This.X_Do_Query (Query_2);
+               else
+                  This.Insert_Id := 0;
+                  return -1; --  false;
+               end if;
+            end if;
 
-        --                 // Log and return the number of rows selected.
-        --                 this.num_rows = num_rows;
-        --                 return_val     = num_rows;
-        --         end;
+            -- If there is an error then take note of it.
+--          if This.Use_Mysqli then
+            case This.Engine is
 
-        --         return return_val;
-        -- end;
+            when Engine_MySQLi =>
+--               if This.Dbh in mysqli then -- instanceof
+                  This.Last_Error := +Mysqli_Error (This.Dbh);
+--               else
+--                  This.Last_Error :=
+--                    +abs "Unable to retrieve the error message from MySQL";
+--               end if;
 
-        --
-        -- Internal function to perform the mysql_query() call.
-        --
-        -- @since 3.9.0
-        --
-        -- @see wpdb::query()
-        --
-        -- @param string query The query to run.
-        --
-        -- private function _do_query(query) then
-        --         if (defined("SAVEQUERIES") && SAVEQUERIES) then
-        --                 this.timer_start();
-        --         end;
+            when Engine_MySQL =>
+--               if Is_Resource (This.Dbh) then
+                  This.Last_Error := +Mysql_Error (This.Dbh);
+--               else
+--                  This.Last_Error :=
+--                    +abs "Unable to retrieve the error message from MySQL";
+--               end if;
 
-        --         if (! empty(this.dbh) && this.use_mysqli) then
-        --                 this.result = mysqli_query(this.dbh, query);
-        --         end; elseif (! empty(this.dbh)) then
-        --                 this.result = mysql_query(query, this.dbh);
-        --         end;
-        --         this.num_queries++;
+            when Engine_SQLite =>
+               raise Program_Error with "not implemented";
 
-        --         if (defined("SAVEQUERIES") && SAVEQUERIES) then
-        --                 this.log_query(
-        --                         query,
-        --                         this.timer_stop(),
-        --                         this.get_caller(),
-        --                         this.time_start,
-        --                         array()
-        --                );
-        --         end;
-        -- end;
+            end case;
+
+            if This.Last_Error /= "" then
+--          if This.Last_Error then
+               -- Clear insert_id on a subsequent failed insert.
+               if
+                 This.Insert_Id /= 0 and then
+                 Preg_Match ("/^\s*(insert|replace)\s/i", Query_2)
+               then
+                  This.Insert_Id := 0;
+               end if;
+
+               This.Print_Error;
+               return -1; -- false;
+            end if;
+
+            if Preg_Match ("/^\s*(create|alter|truncate|drop)\s/i", Query_2) then
+               Return_Val := 999; -- This.Result;
+
+            elsif Preg_Match ("/^\s*(insert|delete|update|replace)\s/i", Query_2) then
+               case This.Engine is
+               when Engine_MySQLi =>
+                  This.Rows_Affected := Mysqli_Affected_Rows (This.Dbh);
+               when Engine_MySQL =>
+                  This.Rows_Affected := Mysql_Affected_Rows (This.Dbh);
+               when Engine_SQLite =>
+                  raise Program_Error with "not implemented";
+               end case;
+
+               -- Take note of the insert_id.
+               if Preg_Match ("/^\s*(insert|replace)\s/i", Query_2) then
+                  case This.Engine is
+                  when Engine_MySQLi =>
+                     This.Insert_Id := Mysqli_Insert_Id (This.Dbh);
+                  when Engine_MySQL =>
+                     This.Insert_Id := Mysql_Insert_Id (This.Dbh);
+                  when Engine_SQLite =>
+                     raise Program_Error with "not implemented";
+                  end case;
+               end if;
+
+               -- Return number of rows affected.
+               Return_Val := This.Rows_Affected;
+            else
+               declare
+                  Num_Rows : Natural := 0;
+               begin
+                  case This.Engine is
+
+                  when Engine_MySQLi =>
+--                  if
+--                    This.Use_Mysqli and then
+--                    This.Result in Mysqli_Result    -- instanceof
+--                  then
+                     declare
+                        Row : Natural;
+                     begin
+                        while Row = Mysqli_Fetch_Object (This.Result) loop
+--                         This.Last_Result (Num_Rows) := Row;
+                           Num_Rows := Num_Rows + 1;
+                        end loop;
+                     end;
+
+                  when Engine_MySQL =>
+--                  elsif Is_Resource (This.Result) then
+                     declare
+                        Row : Natural;
+                     begin
+                        while Row = Mysql_Fetch_Object (This.Result) loop
+--                         This.Last_Result (Num_Rows) := Row;
+                           Num_Rows := Num_Rows + 1;
+                        end loop;
+                     end;
+
+                  when Engine_SQLite =>
+                     raise Program_Error with "not implemented";
+                  end case;
+
+                  -- Log and return the number of rows selected.
+                  This.Num_Rows := Num_Rows;
+                  Return_Val    := Num_Rows;
+               end;
+            end if;
+            return Return_Val;
+         end;
+      end;
+   end Query;
+
+   -----------
+   -- Query --
+   -----------
+
+   procedure Query (Db    : in out Wpdb_Class;
+                    Query : Statement_Type)
+   is
+      Unused : constant Integer := Db.Query (Query);
+   begin
+      null;
+   end Query;
+
+   ----------------
+   -- X_Do_Query --
+   ----------------
+
+   procedure X_Do_Query (This  : in out Wpdb_Class;
+                         Query : String)
+   is
+      use Ada.Text_IO;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+   begin
+      Put_Line ("x_do_query:");
+      Put_Line ("  query: " & Query);
+      -- if (defined("SAVEQUERIES") && SAVEQUERIES) then
+      --    this.timer_start();
+      -- end if;
+
+      if This.Dbh /= 0 then
+         case This.Engine is
+         when Engine_MySQLi =>
+--    if not Empty (This.Dbh) and then This.Use_Mysqli then
+            This.Result := Mysqli_Query (This.Dbh, Query);
+         when Engine_MySQL => --  This.Dbh /= 0 then
+--    elsif not Empty (This.Dbh) then
+            This.Result := Mysql_Query (This.Dbh, Query);
+
+         when Engine_SQLite =>
+            declare
+               use SQLite;
+
+               Command : constant Statement :=
+                 Prepare (This.Handle, Query); --  & ";"); -- ";" added
+            begin
+               Step (Command);
+            end;
+
+         end case;
+      end if;
+      This.Num_Queries := This.Num_Queries + 1;
+
+      -- if (defined("SAVEQUERIES") && SAVEQUERIES) then
+      --    this.Log_Query (
+      --       query,
+      --       this.timer_stop(),
+      --       this.get_caller(),
+      --       this.time_start,
+      --       array()
+      --    );
+      -- end if;
+   end X_Do_Query;
 
         --
         -- Logs query data.
@@ -1700,63 +1940,83 @@ is
         --        );
         -- end;
 
-        --
-        -- Generates and returns a placeholder escape string for use in queries returned by ::prepare().
-        --
-        -- @since 4.8.3
-        --
-        -- @return string String to escape placeholders.
-        --
-        -- public function placeholder_escape() then
-        --         static placeholder;
+   ------------------------
+   -- Placeholder_Escape --
+   ------------------------
 
-        --         if (! placeholder) then
-        --                 // If ext/hash is not present, compat.php"s hash_hmac() does not support sha256.
-        --                 algo = function_exists("hash") ? "sha256" : "sha1";
-        --                 // Old WP installs may not have AUTH_SALT defined.
-        --                 salt = defined("AUTH_SALT") && AUTH_SALT ? AUTH_SALT : (string) rand();
+   Static_Placeholder : Unbounded_String;
 
-        --                 placeholder = "then" . hash_hmac(algo, uniqid(salt, true), salt) . "end;";
-        --         end;
+   function Placeholder_Escape (This : Wpdb_Class)
+                                return String
+   is
+      use Php.Numerics;
+      use Inc_Plugins;
+--                static_placeholder;
+   begin
+      if Static_Placeholder = "" then -- not
+         -- If ext/hash is not present, compat.php's hash_hmac() does not support
+         -- sha256.
+         declare
+            Algo : constant String :=
+              (if True -- Function_Exists ("hash")
+               then "sha256" else "sha1");
 
-        --         /*
-        --         -- Add the filter to remove the placeholder escaper. Uses priority 0, so that anything
-        --         -- else attached to this filter will receive the query with the placeholder string removed.
-        --         --
-        --         if (false === has_filter("query", array(this, "remove_placeholder_escape"))) then
-        --                 add_filter("query", array(this, "remove_placeholder_escape"), 0);
-        --         end;
+            -- Old WP installs may not have AUTH_SALT defined.
+            Salt : constant String :=
+              (if True -- Defined ("AUTH_SALT") and then AUTH_SALT
+               then Globals.AUTH_SALT else Rand'Image); -- (string)
+         begin
+            Static_Placeholder :=
+              +"{" & Hash_HMAC (Algo, Uniqid (Salt, True), Salt) & "}";
+         end;
+      end if;
 
-        --         return placeholder;
-        -- end;
+      --
+      -- Add the filter to remove the placeholder escaper. Uses priority 0, so that
+      -- anything else attached to this filter will receive the query with the
+      -- placeholder string removed.
+      --
+      if
+        False = Has_Filter ("query",
+                            To_Array (This, Remove_Placeholder_Escape'Access))
+      then
+         Add_Filter ("query",
+                     To_Array (This, Remove_Placeholder_Escape'Access), 0);
+      end if;
 
-        --
-        -- Adds a placeholder escape string, to escape anything that resembles a printf() placeholder.
-        --
-        -- @since 4.8.3
-        --
-        -- @param string query The query to escape.
-        -- @return string The query with the placeholder escape string inserted where necessary.
-        --
-        -- public function add_placeholder_escape(query) then
-        --         /*
-        --         -- To prevent returning anything that even vaguely resembles a placeholder,
-        --         -- we clobber every % we can find.
-        --         --
-        --         return str_replace("%", this.placeholder_escape(), query);
-        -- end;
+      return -Static_Placeholder;
+   end Placeholder_Escape;
 
-        --
-        -- Removes the placeholder escape strings from a query.
-        --
-        -- @since 4.8.3
-        --
-        -- @param string query The query from which the placeholder will be removed.
-        -- @return string The query with the placeholder removed.
-        --
-        -- public function remove_placeholder_escape(query) then
-        --         return str_replace(this.placeholder_escape(), "%", query);
-        -- end;
+   ----------------------------
+   -- Add_Placeholder_Escape --
+   ----------------------------
+
+   function Add_Placeholder_Escape (This  : Wpdb_Class;
+                                    Query : Statement_Type)
+                                    return Statement_Type
+   is
+      use Php.Strings;
+   begin
+      --
+      -- To prevent returning anything that even vaguely resembles a placeholder,
+      -- we clobber every % we can find.
+      --
+      return Statement_Type (
+        Str_Replace ("%", This.Placeholder_Escape, String (Query)));
+   end Add_Placeholder_Escape;
+
+   -------------------------------
+   -- Remove_Placeholder_Escape --
+   -------------------------------
+
+   function Remove_Placeholder_Escape (This  : Wpdb_Class;
+                                       Query : String)
+                                       return String
+   is
+      use Php.Strings;
+   begin
+      return Str_Replace (This.Placeholder_Escape, "%", Query);
+   end Remove_Placeholder_Escape;
 
    ------------
    -- Insert --
@@ -1822,7 +2082,7 @@ is
       This.Insert_Id := 0;
 
       if
-        not In_Array (Strtoupper (Typ),
+        not In_List (Strtoupper (Typ),
                       To_List (List => (+"REPLACE", +"INSERT")), True)
       then
          return 0; -- false;
@@ -2024,9 +2284,12 @@ is
    is
       use Php.Strings;
       use Inc_Load;
+      use Inc_L10n;
 
       Data_2 : Array_Type := Data;
    begin
+      Ada.Text_IO.Put_Line ("process_fields:");
+
       Data_2 := This.Process_Field_Formats (Data_2, Format);
       if Empty_Array = Data_2 then -- false
          return Empty_Array; -- False;
@@ -2042,6 +2305,7 @@ is
          return Empty_Array; -- False;
       end if;
 
+      Arrays.IO.Dump (Data_2);
       declare
          Converted_Data : constant Array_Type :=
            This.Strip_Invalid_Text (Data_2);
@@ -2093,6 +2357,7 @@ is
                                    return Array_Type
    is
       use Php.Lists;
+      use Php.Strings;
 
       Data_2           : Array_Type := Data;
       Formats          : List_Type  := To_List (Format); -- (array)
@@ -2109,7 +2374,7 @@ is
             ));
          begin
             if not Empty (Format) then
-               Set (Value_2, "format", From_String (Array_Shift (Formats)));
+               Set (Value_2, "format", From_String (List_Shift (Formats)));
                if Kind_Of (Get (Value_2, "format")) in Kind_Null then -- not
                   Set (Value_2, "format",
                        From_String (-Original_Formats.First_Element)); -- Reset
@@ -2129,7 +2394,7 @@ is
    -- Process_Field_Charsets --
    ----------------------------
 
-   function Process_Field_Charsets (This  : Wpdb_Class;
+   function Process_Field_Charsets (This  : in out Wpdb_Class;
                                     Data  : Array_Type;
                                     Table : String)
                                     return Array_Type
@@ -2169,15 +2434,18 @@ is
    -- Process_Field_Lengths --
    ---------------------------
 
-   function Process_Field_Lengths (This  : Wpdb_Class;
+   function Process_Field_Lengths (This  : in out Wpdb_Class;
                                    Data  : Array_Type;
                                    Table : String)
                                    return Array_Type
    is
-      use Inc_Load;
+--    use Inc_Load;
 
       Data_2 : Array_Type := Data;
    begin
+      Ada.Text_IO.Put_Line ("process_field_lengths: data:");
+      Arrays.IO.Dump (Data);
+
       for A in Data_2.Iterate loop
          declare
             Field : constant String := Key (A);
@@ -2185,7 +2453,7 @@ is
          begin
             if Get_As_String (Value, "format") in "%d" | "%f" then
                --
-               -- We can skip this field if we know it isn"t a string.
+               -- We can skip this field if we know it isn't a string.
                -- This checks %d/%f versus ! %s because its sprintf() could take more.
                --
                Set (Value, "length", From_Boolean (False));
@@ -2193,9 +2461,10 @@ is
                Set (Value, "length",
                     From_Array (This.Get_Col_Length (Table, Field)));
 
-               if Is_Wp_Error (Get_As_String (Value, "length")) then
-                  return Empty_Array; -- false;
-               end if;
+               Arrays.IO.Dump (Value);
+--               if Is_Wp_Error (Get_As_String (Value, "length")) then
+--                  return Empty_Array; -- false;
+--               end if;
             end if;
 
             Set (Data_2, Field, From_Array (Value));
@@ -2205,88 +2474,65 @@ is
       return Data_2;
    end Process_Field_Lengths;
 
-        --
-        -- Retrieves one variable from the database.
-        --
-        -- Executes a SQL query and returns the value from the SQL result.
-        -- If the SQL result contains more than one column and/or more than one row,
-        -- the value in the column and row specified is returned. If query is null,
-        -- the value in the specified column and row from the previous SQL result is returned.
-        --
-        -- @since 0.71
-        --
-        -- @param string|null query Optional. SQL query. Defaults to null, use the result from the previous query.
-        -- @param int         x     Optional. Column of value to return. Indexed from 0.
-        -- @param int         y     Optional. Row of value to return. Indexed from 0.
-        -- @return string|null Database query result (as string), or null on failure.
-        --
-        -- public function get_var(query = null, x = 0, y = 0) then
-        --         this.func_call = "\db.get_var(\"query\", x, y)";
+   -------------
+   -- Get_Var --
+   -------------
 
-        --         if (query) then
-        --                 if (this.check_current_query && this.check_safe_collation(query)) then
-        --                         this.check_current_query = false;
-        --                 end;
-
-        --                 this.query(query);
-        --         end;
-
-        --         // Extract var out of cached results based on x,y vals.
-        --         if (! empty(this.last_result[ y ])) then
-        --                 values = array_values(get_object_vars(this.last_result[ y ]));
-        --         end;
-
-        --         // If there is a value return it, else return null.
-        --         return (isset(values[ x ]) && "" !== values[ x ]) ? values[ x ] : null;
-        -- end;
-
-        --
-        -- Retrieves one row from the database.
-        --
-        -- Executes a SQL query and returns the row from the SQL result.
-        --
-        -- @since 0.71
-        --
-        -- @param string|null query  SQL query.
-        -- @param string      output Optional. The required return type. One of OBJECT, ARRAY_A, or ARRAY_N, which
-        --                            correspond to an stdClass object, an associative array, or a numeric array,
-        --                            respectively. Default OBJECT.
-        -- @param int         y      Optional. Row to return. Indexed from 0.
-        -- @return array|object|null|void Database query result in format specified by output or null on failure.
-        --
---        public function get_row(query = null, output = OBJECT, y = 0)
-   procedure Get_Row (Db      : in out Wpdb_Class;
-                      Post    : Inc_Class_Wp_Posts.Wp_Post;
-                      Query   : String  := ""; -- = null,
-                      Output  : String  := ""; -- = OBJECT,
-                      Y       : Natural := 0;
-                      Success : out Boolean)
-   is
-      Unused : constant String :=
-        Get_Row (Db      => Db,
-                 Post    => Post,
-                 Query   => Query,
-                 Output  => Output,
-                 Y       => Y,
-                 Success => Success);
-   begin
-      null;
-   end Get_Row;
-
-   function Get_Row (Db      : in out Wpdb_Class;
-                     Post    : Inc_Class_Wp_Posts.Wp_Post;
-                     Query   : String  := ""; -- = null,
-                     Output  : String  := ""; -- = OBJECT,
-                     Y       : Natural := 0;
-                     Success : out Boolean)
+   function Get_Var (This  : in out Wpdb_Class;
+                     Query : Statement_Type := ""; -- null
+                     X     : Integer        := 0;
+                     Y     : Integer        := 0)
                      return String
    is
-      use Php.Strings;
+--    use Php.Arrays;
+   begin
+      This.Func_Call :=
+        +("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
+
+      if Query /= "" then
+         if
+           This.Check_Current_Query and then
+           This.Check_Safe_Collation (Query)
+         then
+            This.Check_Current_Query := False;
+         end if;
+
+         This.Query (Query);
+      end if;
+
+      return This.Last_Result (Y);
+      -- declare
+      --    -- Extract var out of cached results based on x,y vals.
+      --    Values : constant Array_Type :=
+      --      (if not Empty (This.Last_Result (Y))
+      --       then Array_Values (Get_Object_Vars (This.Last_Result (Y)))
+      --       else Empty_Array);
+      -- begin
+      --    -- If there is a value return it, else return null.
+      --    return
+      --      (if Isset (Values, X) and then "" /= Get_As_String (Values, X)
+      --       then Get_As_String (Values, X)
+      --       else ""); -- null);
+      -- end;
+   end Get_Var;
+
+   -------------
+   -- Get_Row --
+   -------------
+
+   procedure Get_Row (Db      : in out Wpdb_Class;
+                      Query   : Statement_Type; -- := ""; -- = null,
+--                    Output  : String         := ""; -- = OBJECT,
+--                    Y       : Natural        := 0;
+                      Success : out Boolean)
+--                     return String
+   is
+--    use Php.Strings;
 
       Unused_Result : Integer;
    begin
       Success := True;
-      Db.Func_Call := +("\db.get_row(\" & Query & ",output,y)"); -- \
+      Db.Func_Call := +("\db.get_row(\" & String (Query) & ",output,y)"); -- \
 
       if Query /= "" then
          if
@@ -2299,15 +2545,34 @@ is
          Unused_Result := Db.Query (Query);
       else
          Success := False;
-         return ""; --  null;
+         return; --  ""; --  null;
+      end if;
+   end Get_Row;
+
+   -------------
+   -- Get_Row --
+   -------------
+
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Query   : Statement_Type; --  := ""; -- = null,
+--                   Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
+                     Success : out Boolean)
+                     return String
+   is
+   begin
+      Get_Row (Db, Query, Success);
+      if not Success then
+         return "";
       end if;
 
-      if not Isset (Db.Last_Result (Y)) then
+      if Db.Last_Result.Last_Index < Y then
+--    if not Isset (Db.Last_Result (Y)) then
          Success := False;
          return ""; --  null;
       end if;
 
-      if "OBJECT" = Output then
+--    if "OBJECT" = Output then
          return (if Db.Last_Result (Y) /= ""
                  then Db.Last_Result (Y) else ""); -- null
       -- elsif "ARRAY_A" = Output then
@@ -2316,14 +2581,43 @@ is
       -- elsif "ARRAY_N" = Output then
       --    return (if Db.Last_Result (Y) /= ""
       --            then Array_Values (Get_Object_Vars (Db.Last_Result (Y))) else "");
-      elsif "OBJECT" = Strtoupper (Output) then
-         -- Back compat for OBJECT being previously case-insensitive.
-         return (if Db.Last_Result (Y) /= ""
-                 then Db.Last_Result (Y) else "");
-      else
-         Db.Print_Error (" db.get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
+--    elsif "OBJECT" = Strtoupper (Output) then
+--       -- Back compat for OBJECT being previously case-insensitive.
+--       return (if Db.Last_Result (Y) /= ""
+--               then Db.Last_Result (Y) else "");
+--    else
+--       Db.Print_Error (" db.get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
+--    end if;
+--    return "";
+   end Get_Row;
+
+   -------------
+   -- Get_Row --
+   -------------
+
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Query   : Statement_Type;
+                     Y       : Natural        := 0;
+                     Success : out Boolean)
+                     return Array_Type
+   is
+   begin
+      Get_Row (Db, Query, Success);
+      if not Success then
+         return Empty_Array; -- "";
       end if;
-      return "";
+
+--    if not Isset (Db.Last_Result (Y)) then
+      if Db.Last_Result.Last_Index < Y then
+         Success := False;
+         return Empty_Array; -- ""; --  null;
+      end if;
+
+      if Db.Last_Result (Y) = "" then
+         return Empty_Array;
+      else
+         return Empty_Array; -- Get_Object_Vars (Db.Last_Result (Y));
+      end if;
    end Get_Row;
 
         --
@@ -2358,186 +2652,247 @@ is
         --         return new_array;
         -- end;
 
-        --
-        -- Retrieves an entire SQL result set from the database (i.e., many rows).
-        --
-        -- Executes a SQL query and returns the entire SQL result.
-        --
-        -- @since 0.71
-        --
-        -- @param string query  SQL query.
-        -- @param string output Optional. Any of ARRAY_A | ARRAY_N | OBJECT | OBJECT_K constants.
-        --                       With one of the first three, return an array of rows indexed
-        --                       from 0 by SQL result row number. Each row is an associative array
-        --                       (column => value, ...), a numerically indexed array (0 => value, ...),
-        --                       or an object (.column = value), respectively. With OBJECT_K,
-        --                       return an associative array of row objects keyed by the value
-        --                       of each row"s first column"s value. Duplicate keys are discarded.
-        -- @return array|object|null Database query results.
-        --
-        -- public function get_results(query = null, output = OBJECT) then
-        --         this.func_call = "\db.get_results(\"query\", output)";
+   ----------------
+   -- Get_Result --
+   ----------------
 
-        --         if (query) then
-        --                 if (this.check_current_query && this.check_safe_collation(query)) then
-        --                         this.check_current_query = false;
-        --                 end;
+   procedure Get_Results (This  : in out Wpdb_Class;
+                          Query : Statement_Type) --  ""; -- null
+   is
+   begin
+      This.Func_Call := +"\db.get_results(""" & String (Query) & """";
+      --  & Output & ")";
 
-        --                 this.query(query);
-        --         end; else then
-        --                 return null;
-        --         end;
+      if Query /= "" then
+         if
+           This.Check_Current_Query and then
+           This.Check_Safe_Collation (Query)
+         then
+            This.Check_Current_Query := False;
+         end if;
 
-        --         new_array = array();
-        --         if (OBJECT === output) then
-        --                 // Return an integer-keyed array of row objects.
-        --                 return this.last_result;
-        --         end; elseif (OBJECT_K === output) then
-        --                 // Return an array of row objects with keys from column 1.
-        --                 // (Duplicates are discarded.)
-        --                 if (this.last_result) then
-        --                         foreach (this.last_result as row) then
-        --                                 var_by_ref = get_object_vars(row);
-        --                                 key        = array_shift(var_by_ref);
-        --                                 if (! isset(new_array[ key ])) then
-        --                                         new_array[ key ] = row;
-        --                                 end;
-        --                         end;
-        --                 end;
-        --                 return new_array;
-        --         end; elseif (ARRAY_A === output || ARRAY_N === output) then
-        --                 // Return an integer-keyed array of...
-        --                 if (this.last_result) then
-        --                         foreach ((array) this.last_result as row) then
-        --                                 if (ARRAY_N === output) then
-        --                                         // ...integer-keyed row arrays.
-        --                                         new_array[] = array_values(get_object_vars(row));
-        --                                 end; else then
-        --                                         // ...column name-keyed row arrays.
-        --                                         new_array[] = get_object_vars(row);
-        --                                 end;
-        --                         end;
-        --                 end;
-        --                 return new_array;
-        --         end; elseif (strtoupper(output) === OBJECT) then
-        --                 // Back compat for OBJECT being previously case-insensitive.
-        --                 return this.last_result;
-        --         end;
-        --         return null;
-        -- end;
+         This.Query (Query);
+      else
+         return; --  Empty_Array; -- null
+      end if;
+   end Get_Results;
 
-        --
-        -- Retrieves the character set for the given table.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string table Table name.
-        -- @return string|WP_Error Table character set, WP_Error object if it couldn"t be found.
-        --
-        -- protected function get_table_charset(table) then
-        --         tablekey = strtolower(table);
+   -----------------
+   -- Get_Results --
+   -----------------
 
-        --         --
-        --         -- Filters the table charset value before the DB is checked.
-        --         --
-        --         -- Returning a non-null value from the filter will effectively short-circuit
-        --         -- checking the DB for the charset, returning that value instead.
-        --         --
-        --         -- @since 4.2.0
-        --         --
-        --         -- @param string|WP_Error|null charset The character set to use, WP_Error object
-        --         --                                      if it couldn"t be found. Default null.
-        --         -- @param string               table   The name of the table being checked.
-        --         --
-        --         charset = apply_filters("pre_get_table_charset", null, table);
-        --         if (null !== charset) then
-        --                 return charset;
-        --         end;
+   function Get_Results (This   : in out Wpdb_Class;
+                         Query  : Statement_Type; -- String := ""; -- null
+                         Output : String := "OBJECT")
+                         return Array_Type
+   is
+      use Ada.Text_IO;
+   begin
+      Put_Line ("get_results: ");
+      Put_Line ("  output: " & Output);
+      Get_Results (This, Query);
+      pragma Assert (Output = "OBJECT");
+                -- new_array = array();
+                -- if (OBJECT === output) then
+      -- Return an integer-keyed array of row objects.
+--    return This.Last_Result;
+      declare
+         Result : Array_Type;
+      begin
+         for A of This.Last_Result loop
+            Result.Append (From_String (A));
+         end loop;
+         return Result;
+      end;
+                -- end; elseif (OBJECT_K === output) then
+                --         // Return an array of row objects with keys from column 1.
+                --         // (Duplicates are discarded.)
+                --         if (this.last_result) then
+                --                 foreach (this.last_result as row) then
+                --                         var_by_ref = get_object_vars(row);
+                --                         key        = array_shift(var_by_ref);
+                --                         if (! isset(new_array[ key ])) then
+                --                                 new_array[ key ] = row;
+                --                         end;
+                --                 end;
+                --         end;
+                --         return new_array;
+                -- end; elseif (ARRAY_A === output || ARRAY_N === output) then
+                --         // Return an integer-keyed array of...
+                --         if (this.last_result) then
+                --                 foreach ((array) this.last_result as row) then
+                --                         if (ARRAY_N === output) then
+                --                                 // ...integer-keyed row arrays.
+                --                                 new_array[] = array_values(get_object_vars(row));
+                --                         end; else then
+                --                                 // ...column name-keyed row arrays.
+                --                                 new_array[] = get_object_vars(row);
+                --                         end;
+                --                 end;
+                --         end;
+                --         return new_array;
+                -- end; elseif (strtoupper(output) === OBJECT) then
+                --         // Back compat for OBJECT being previously case-insensitive.
+                --         return this.last_result;
+                -- end;
+                -- return null;
+   end Get_Results;
 
-        --         if (isset(this.table_charset[ tablekey ])) then
-        --                 return this.table_charset[ tablekey ];
-        --         end;
+   -----------------------
+   -- Get_Table_Charset --
+   -----------------------
 
-        --         charsets = array();
-        --         columns  = array();
+   function Get_Table_Charset (This  : in out Wpdb_Class;
+                               Table : String)
+                               return String
+   is
+      use Ada.Containers;
+      use Ada.Text_IO;
+      use Php.Lists;
+      use Php.Strings;
+      use Inc_Plugins;
 
-        --         table_parts = explode(".", table);
-        --         table       = "`" . implode("`.`", table_parts) . "`";
-        --         results     = this.get_results("SHOW FULL COLUMNS FROM table");
-        --         if (! results) then
-        --                 return new WP_Error("wpdb_get_table_charset_failure", __("Could not retrieve table charset."));
-        --         end;
+      Tablekey : constant String := Strtolower (Table);
 
-        --         foreach (results as column) then
-        --                 columns[ strtolower(column.Field) ] = column;
-        --         end;
+      --
+      -- Filters the table charset value before the DB is checked.
+      --
+      -- Returning a non-null value from the filter will effectively short-circuit
+      -- checking the DB for the charset, returning that value instead.
+      --
+      -- @since 4.2.0
+      --
+      -- @param string|WP_Error|null charset The character set to use, WP_Error object
+      --                                      if it couldn't be found. Default null.
+      -- @param string               table   The name of the table being checked.
+      --
+      Charset : Unbounded_String :=
+        +Apply_Filters ("pre_get_table_charset", "", -- null,
+                        Table);
+   begin
+      Put_Line ("get_table_charset:");
+      Put_Line ("  table: " & Tablekey);
+      Put_Line ("  charset: " & (-Charset));
 
-        --         this.col_meta[ tablekey ] = columns;
+      if "" /= Charset then -- null
+         return -Charset;
+      end if;
 
-        --         foreach (columns as column) then
-        --                 if (! empty(column.Collation)) then
-        --                         list(charset) = explode("_", column.Collation);
+      if Isset (This.Table_Charset, Tablekey) then
+         return Get_As_String (This.Table_Charset, Tablekey);
+      end if;
 
-        --                         // If the current connection can"t support utf8mb4 characters, let"s only send 3-byte utf8 characters.
-        --                         if ("utf8mb4" === charset && ! this.has_cap("utf8mb4")) then
-        --                                 charset = "utf8";
-        --                         end;
+      declare
+         Charsets : Array_Type;
+         Columns  : Array_Type;
 
-        --                         charsets[ strtolower(charset) ] = true;
-        --                 end;
+         Table_Parts : constant List_Type  := Explode (".", Table);
+         Table       : constant String     := "`" & Implode ("`.`", Table_Parts) & "`";
 
-        --                 list(type) = explode("(", column.Type);
+         Results     : constant Array_Type :=
+           This.Get_Results (Statement_Type ("SHOW FULL COLUMNS FROM " & Table));
+      begin
+         if Results = Empty_Array then -- not
+            return "";
+            -- new Wp_Error ("wpdb_get_table_charset_failure",
+            --               abs "Could not retrieve table charset.");
+         end if;
 
-        --                 // A binary/blob means the whole query gets treated like this.
-        --                 if (in_array(strtoupper(type), array("BINARY", "VARBINARY", "TINYBLOB", "MEDIUMBLOB", "BLOB", "LONGBLOB"), true)) then
-        --                         this.table_charset[ tablekey ] = "binary";
-        --                         return "binary";
-        --                 end;
-        --         end;
+         -- for A in Results.Iterate loop
+         --    declare
+         --       Column : String := Key (A);
+         --    begin
+         --       Set (Columns, Strtolower (Column.Field), From_String (Column));
+         --    end;
+         -- end loop;
 
-        --         // utf8mb3 is an alias for utf8.
-        --         if (isset(charsets["utf8mb3"])) then
-        --                 charsets["utf8"] = true;
-        --                 unset(charsets["utf8mb3"]);
-        --         end;
+         -- Set (This.Col_Meta, Tablekey, From_Array (Columns));
 
-        --         // Check if we have more than one charset in play.
-        --         count = count(charsets);
-        --         if (1 === count) then
-        --                 charset = key(charsets);
-        --         end; elseif (0 === count) then
-        --                 // No charsets, assume this table can store whatever.
-        --                 charset = false;
-        --         end; else then
-        --                 // More than one charset. Remove latin1 if present and recalculate.
-        --                 unset(charsets["latin1"]);
-        --                 count = count(charsets);
-        --                 if (1 === count) then
-        --                         // Only one charset (besides latin1).
-        --                         charset = key(charsets);
-        --                 end; elseif (2 === count && isset(charsets["utf8"], charsets["utf8mb4"])) then
-        --                         // Two charsets, but they"re utf8 and utf8mb4, use utf8.
-        --                         charset = "utf8";
-        --                 end; else then
-        --                         // Two mixed character sets. ascii.
-        --                         charset = "ascii";
-        --                 end;
-        --         end;
+         -- for Column of Columns loop
+         --    if not Empty (Column.Collation) then
+         --       declare
+         --          List : List_Type := Explode ("_", Column.Collation);
+         --       begin
+         --          Charset := List.First_Element;
 
-        --         this.table_charset[ tablekey ] = charset;
-        --         return charset;
-        -- end;
+         --          -- If the current connection can't support utf8mb4 characters,
+         --          -- let's only send 3-byte utf8 characters.
+         --          if "utf8mb4" = Charset and then not This.Has_Cap ("utf8mb4") then
+         --             Charset := +"utf8";
+         --          end if;
+
+         --          Set (Charsets, Strtolower (-Charset), From_Boolean (True));
+         --       end;
+         --    end if;
+
+         --    declare
+         --       List : List_Type := Explode ("(", Column.Typ);
+         --       Typ  : String := -List.First_Element;
+
+         --       Blob : constant List_Type :=
+         --         To_List (List => (+"BINARY", +"VARBINARY", +"TINYBLOB",
+         --                           +"MEDIUMBLOB", +"BLOB", +"LONGBLOB"));
+         --    begin
+         --       -- A binary/blob means the whole query gets treated like this.
+         --       if In_List (Strtoupper (Typ), Blob, True) then
+         --          Set (This.Table_Charset, Tablekey, From_String ("binary"));
+         --          return "binary";
+         --       end if;
+         --    end;
+         -- end loop;
+
+         -- utf8mb3 is an alias for utf8.
+         if Isset (Charsets, "utf8mb3") then
+            Set (Charsets, "utf8", From_Boolean (True));
+            Delete (Ref (Charsets, "utf8mb3"));
+         end if;
+
+         -- Check if we have more than one charset in play.
+         declare
+            Count : Count_Type := Charsets.Length;
+         begin
+            if Count in 1 then
+               Charset := +As_String (Charsets.First_Element); -- Key (Charsets);
+            elsif Count in 0 then
+               -- No charsets, assume this table can store whatever.
+               Charset := +""; -- false;
+            else
+               -- More than one charset. Remove latin1 if present and recalculate.
+               Delete (Ref (Charsets, "latin1"));
+               Count := Charsets.Length;
+
+               if 1 = Count then
+                  -- Only one charset (besides latin1).
+                  Charset := +As_String (Charsets.First_Element); -- Key (Charsets);
+               elsif
+                 Count in 2 and then
+                 Isset (Charsets, "utf8") and then
+                 Isset (Charsets, "utf8mb4")
+               then
+                  -- Two charsets, but they're utf8 and utf8mb4, use utf8.
+                  Charset := +"utf8";
+               else
+                  -- Two mixed character sets. ascii.
+                  Charset := +"ascii";
+               end if;
+            end if;
+         end;
+         Set (This.Table_Charset, Tablekey, From_String (-Charset));
+         return -Charset;
+      end;
+   end Get_Table_Charset;
 
    ---------------------
    -- Get_Col_Charset --
    ---------------------
 
-   function Get_Col_Charset (This   : Wpdb_Class;
+   function Get_Col_Charset (This   : in out Wpdb_Class;
                              Table  : String;
                              Column : String)
                              return String
    is
       use Php.Strings;
+      use Databases;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -2564,7 +2919,8 @@ is
       end if;
 
       -- Skip this entirely if this isn't a MySQL database.
-      if not This.Is_MySQL then
+      if This.Engine not in Engine_MySQL then
+--    if not This.Is_MySQL then
 --    if Empty (This.Is_MySQL) then
          return ""; -- False;
       end if;
@@ -2614,7 +2970,7 @@ is
    -- Get_Col_Length --
    --------------------
 
-   function Get_Col_Length (This   : Wpdb_Class;
+   function Get_Col_Length (This   : in out Wpdb_Class;
                             Table  : String;
                             Column : String)
                             return Array_Type
@@ -2626,12 +2982,14 @@ is
       Columnkey : constant String := Strtolower (Column);
    begin
       -- Skip this entirely if this isn't a MySQL database.
-      if not This.Is_MySQL then
+      if False then
+--    if not This.Is_MySQL then      -- YYY
 --    if Empty (This.Is_MySQL) then
          return Empty_Array; -- False;
       end if;
 
-      if Empty (Get_As_String (This.Col_Meta, Tablekey)) then
+      if Empty (This.Col_Meta, Tablekey) then
+--    if Empty (Get_As_String (This.Col_Meta, Tablekey)) then
          -- This primes column information for us.
          declare
             Table_Charset : constant String := This.Get_Table_Charset (Table);
@@ -2725,40 +3083,37 @@ is
         --         return false;
         -- end;
 
-        --
-        -- Checks if the query is accessing a collation considered safe on the current version of MySQL.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string query The query to check.
-        -- @return bool True if the collation is safe, false if it isn"t.
-        --
-        -- protected function check_safe_collation(query) then
+    --------------------------
+    -- Check_Safe_Collation --
+    --------------------------
 
    function Check_Safe_Collation (This  : in out Wpdb_Class;
-                                  Query : String)
+                                  Query : Statement_Type)
                                   return Boolean
    is
+      use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
 
-      Query_2        : constant String := Ltrim (Query, "\r\n\t (");
+      Query_2 : constant Statement_Type :=
+        Statement_Type (Ltrim (String (Query), "\r\n\t ("));
+
       Unused_Matches : List_Type;
    begin
       if This.Checking_Collation then
          return True;
       end if;
 
-      -- We don"t need to check the collation for queries that don"t read data.
+      -- We don't need to check the collation for queries that don't read data.
       if
         0 /= Preg_Match ("/^(?:SHOW|DESCRIBE|DESC|EXPLAIN|CREATE)\s/i",
-                         Query_2, Unused_Matches)
+                         String (Query_2), Unused_Matches)
       then
          return True;
       end if;
 
-      -- All-ASCII queries don"t need extra checking.
-      if This.Check_ASCII (Query_2) then
+      -- All-ASCII queries don't need extra checking.
+      if This.Check_ASCII (String (Query_2)) then
          return True;
       end if;
 
@@ -2775,18 +3130,22 @@ is
          begin
             This.Checking_Collation := False;
 
-            -- Tables with no collation, or latin1 only, don"t need extra checking.
+            -- Tables with no collation, or latin1 only, don't need extra checking.
             if "" = Collation or else "latin1" = Collation then -- false =
                return True;
             end if;
          end;
 
          Table := Strtolower (Table);
+         Put_Line ("check_safe_collation :");
+         Put_Line ("  " & Table);
+         Put_Line (This.Col_Meta'Image);
+
          if "" = As_String (Get (This.Col_Meta, Table)) then
             return False;
          end if;
 
-         -- If any of the columns don"t have one of these collations, it needs
+         -- If any of the columns don't have one of these collations, it needs
          -- more sanity checking.
          declare
             Safe_Collations : List_Type := To_List (List =>
@@ -2827,11 +3186,13 @@ is
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use Databases;
       use Inc_Functions;
 
       Data_2          : Array_Type := Data;
       DB_Check_String : Boolean    := False;
    begin
+      Arrays.IO.Dump (Data_2);
       for B in Data_2.Iterate loop -- &value
          declare
             Value   : Array_Type := As_Array (Element (B));
@@ -2979,13 +3340,16 @@ is
                         if This.Charset /= "" then
                            Connection_Charset := This.Charset;
                         else
-                           if This.Use_Mysqli then
+                           case This.Engine is
+                           when Engine_MySQLi =>
                               Connection_Charset := +"XXX-998";
 --                              Mysqli_Character_Set_Name (This.Dbh);
-                           else
+                           when Engine_MySQL =>
                               Connection_Charset := +"XXX-999";
 --                              Mysql_Client_Encoding;
-                           end if;
+                           when Engine_SQLite =>
+                              raise Program_Error with "not implemented";
+                           end case;
                         end if;
 
                         if Kind_Of (Get (Value, "length")) = Kind_Array then
@@ -2996,21 +3360,27 @@ is
                                                                 Key_1 => "length",
                                                                 Key_2 => "length")))));
                            begin
-                              Set (Queries, Col, From_String (
-                                   This.Prepare ("CONVERT(LEFT(CONVERT(%s USING " &
-                                                 (-Charset) & "), " & Length &
-                                                 ") USING " & (-Connection_Charset) &
-                                                 ")",
-                                                 Get_As_String (Value, "value"))));
+                              Set (Queries, Col, From_String (String (
+                                   This.Prepare (
+                                     "CONVERT(LEFT(CONVERT(%s USING " &
+                                     (-Charset) & "), " & Length &
+                                     ") USING " & (-Connection_Charset) &
+                                     ")",
+                                     To_List (Get_As_String (Value, "value"))
+                                   )
+                                  )));
                            end;
                         elsif "binary" /= Charset then
                            -- If we don't have a length, there's no need to convert
                            -- binary - it will always return the same result.
-                           Set (Queries, Col, From_String (
-                                This.Prepare ("CONVERT(CONVERT(%s USING " &
-                                              (-Charset) & ") USING " &
-                                              (-Connection_Charset) & ")",
-                                              Get_As_String (Value, "value"))));
+                           Set (Queries, Col, From_String (String (
+                                This.Prepare (
+                                  "CONVERT(CONVERT(%s USING " &
+                                  (-Charset) & ") USING " &
+                                  (-Connection_Charset) & ")",
+                                  To_List (Get_As_String (Value, "value"))
+                                )
+                               )));
                         end if;
                      end;
                      Delete (Ref_2 (Data_2, Key_1 => Col, Key_2 => "db"));
@@ -3040,8 +3410,10 @@ is
                   Success : Boolean;
 
                   Row : constant Array_Type :=
-                    This.Get_Row ("SELECT " & Implode (", ", SQL), "ARRAY_A",
-                                  Success => Success);
+                    This.Get_Row
+                      (Statement_Type ("SELECT " & Implode (", ", SQL)),
+--                     Output  => "ARRAY_A",
+                       Success => Success);
                begin
                   if Row = Empty_Array then -- not
                      raise Constraint_Error with "wpdb_strip_invalid_text_failure";
@@ -3070,15 +3442,17 @@ is
       return Data_2;
    end Strip_Invalid_Text;
 
-        --
-        -- Strips any invalid characters from the query.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string query Query to convert.
-        -- @return string|WP_Error The converted query, or a WP_Error object if the conversion fails.
-        --
-        -- protected function strip_invalid_text_from_query(query) then
+   -----------------------------------
+   -- Strip_Invalid_Text_From_Query --
+   -----------------------------------
+
+   function Strip_Invalid_Text_From_Query (This  : Wpdb_Class;
+                                           Query : String)
+                                           return String
+   is
+   begin
+      return Query;
+   end Strip_Invalid_Text_From_Query;
         --         -- We don"t need to check the collation for queries that don"t read data.
         --         trimmed_query = ltrim(query, "\r\n\t (");
         --         if (preg_match("/^(?:SHOW|DESCRIBE|DESC|EXPLAIN|CREATE)\s/i", trimmed_query)) then
@@ -3155,80 +3529,99 @@ is
         --         return data[ column ]["value"];
         -- end;
 
-        --
-        -- Finds the first table name referenced in a query.
-        --
-        -- @since 4.2.0
-        --
-        -- @param string query The query to search.
-        -- @return string|false The table name found, or false if a table couldn"t be found.
-        --
-        -- protected function get_table_from_query(query) then
-        --         -- Remove characters that can legally trail the table name.
-        --         query = rtrim(query, ";/-#");
+   --------------------------
+   -- Get_Table_From_Query --
+   --------------------------
 
-        --         -- Allow (select...) union [...] style queries. Use the first query"s table name.
-        --         query = ltrim(query, "\r\n\t (");
+   function Get_Table_From_Query (This  : Wpdb_Class;
+                                  Query : Statement_Type)
+                                  return String
+   is
+      use Ada.Text_IO;
+      use Php.Preg;
+      use Php.Strings;
 
-        --         -- Strip everything between parentheses except nested selects.
-        --         query = preg_replace("/\((?!\s*select)[^(]*?\)/is", "()", query);
+      -- Remove characters that can legally trail the table name.
+      Query_2 : constant String := Rtrim (String (Query), ";/-#");
 
-        --         -- Quickly match most common queries.
-        --         if (preg_match(
-        --                 "/^\s*(?:"
-        --                         . "SELECT.*?\s+FROM"
-        --                         . "|INSERT(?:\s+LOW_PRIORITY|\s+DELAYED|\s+HIGH_PRIORITY)?(?:\s+IGNORE)?(?:\s+INTO)?"
-        --                         . "|REPLACE(?:\s+LOW_PRIORITY|\s+DELAYED)?(?:\s+INTO)?"
-        --                         . "|UPDATE(?:\s+LOW_PRIORITY)?(?:\s+IGNORE)?"
-        --                         . "|DELETE(?:\s+LOW_PRIORITY|\s+QUICK|\s+IGNORE)*(?:.+?FROM)?"
-        --                 . ")\s+((?:[0-9a-zA-Z_.`-]|[\xC2-\xDF][\x80-\xBF])+)/is",
-        --                 query,
-        --                 maybe
-        --        )) then
-        --                 return str_replace("`", "", maybe[1]);
-        --         end;
+      -- Allow (select...) union [...] style queries. Use the first query's table name.
+      Query_3 : constant String := Ltrim (Query_2, "\r\n\t (");
 
-        --         -- SHOW TABLE STATUS and SHOW TABLES WHERE Name = "wp_posts"
-        --         if (preg_match("/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES).+WHERE\s+Name\s*=\s*("|\")((?:[0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)\\1/is", query, maybe)) then
-        --                 return maybe[2];
-        --         end;
+      -- Strip everything between parentheses except nested selects.
+      Query_4 : constant String :=
+        Preg_Replace ("/\((?!\s*select)[^(]*?\)/is", "()", Query_3);
 
-        --         /*
-        --         -- SHOW TABLE STATUS LIKE and SHOW TABLES LIKE "wp\_123\_%"
-        --         -- This quoted LIKE operand seldom holds a full table name.
-        --         -- It is usually a pattern for matching a prefix so we just
-        --         -- strip the trailing % and unescape the _ to get "wp_123_"
-        --         -- which drop-ins can use for routing these SQL statements.
-        --         --
-        --         if (preg_match("/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES)\s+(?:WHERE\s+Name\s+)?LIKE\s*("|\")((?:[\\\\0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)%?\\1/is", query, maybe)) then
-        --                 return str_replace("\\_", "_", maybe[2]);
-        --         end;
+      Maybe : List_Type;
+   begin
+      Put_Line ("get_table_from_query: ");
+      Put_Line ("  query: " & String (Query));
 
-        --         -- Big pattern for the rest of the table-related queries.
-        --         if (preg_match(
-        --                 "/^\s*(?:"
-        --                         . "(?:EXPLAIN\s+(?:EXTENDED\s+)?)?SELECT.*?\s+FROM"
-        --                         . "|DESCRIBE|DESC|EXPLAIN|HANDLER"
-        --                         . "|(?:LOCK|UNLOCK)\s+TABLE(?:S)?"
-        --                         . "|(?:RENAME|OPTIMIZE|BACKUP|RESTORE|CHECK|CHECKSUM|ANALYZE|REPAIR).*\s+TABLE"
-        --                         . "|TRUNCATE(?:\s+TABLE)?"
-        --                         . "|CREATE(?:\s+TEMPORARY)?\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?"
-        --                         . "|ALTER(?:\s+IGNORE)?\s+TABLE"
-        --                         . "|DROP\s+TABLE(?:\s+IF\s+EXISTS)?"
-        --                         . "|CREATE(?:\s+\w+)?\s+INDEX.*\s+ON"
-        --                         . "|DROP\s+INDEX.*\s+ON"
-        --                         . "|LOAD\s+DATA.*INFILE.*INTO\s+TABLE"
-        --                         . "|(?:GRANT|REVOKE).*ON\s+TABLE"
-        --                         . "|SHOW\s+(?:.*FROM|.*TABLE)"
-        --                 . ")\s+\(*\s*((?:[0-9a-zA-Z_.`-]|[\xC2-\xDF][\x80-\xBF])+)\s*\)*/is",
-        --                 query,
-        --                 maybe
-        --        )) then
-        --                 return str_replace("`", "", maybe[1]);
-        --         end;
+      -- Quickly match most common queries.
+      if
+        Preg_Match (
+          "/^\s*(?:"
+          & "SELECT.*?\s+FROM"
+          & "|INSERT(?:\s+LOW_PRIORITY|\s+DELAYED|\s+HIGH_PRIORITY)?(?:\s+IGNORE)?(?:\s+INTO)?"
+          & "|REPLACE(?:\s+LOW_PRIORITY|\s+DELAYED)?(?:\s+INTO)?"
+          & "|UPDATE(?:\s+LOW_PRIORITY)?(?:\s+IGNORE)?"
+          & "|DELETE(?:\s+LOW_PRIORITY|\s+QUICK|\s+IGNORE)*(?:.+?FROM)?"
+          & ")\s+((?:[0-9a-zA-Z_.`-]|[\xC2-\xDF][\x80-\xBF])+)/is",
+          Query_4,
+          Maybe) /= 0
+      then
+         return Str_Replace ("`", "", -Maybe (1)); -- [1]
+      end if;
 
-        --         return false;
-        -- end;
+      -- SHOW TABLE STATUS and SHOW TABLES WHERE Name = "wp_posts"
+      if
+        Preg_Match (
+          "/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES).+WHERE\s+Name\s*=\s*('|\')((?:[0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)\\1/is",
+          Query_4, Maybe) /= 0
+      then
+         return -Maybe (2); -- [2];
+      end if;
+
+      --
+      -- SHOW TABLE STATUS LIKE and SHOW TABLES LIKE "wp\_123\_%"
+      -- This quoted LIKE operand seldom holds a full table name.
+      -- It is usually a pattern for matching a prefix so we just
+      -- strip the trailing % and unescape the _ to get "wp_123_"
+      -- which drop-ins can use for routing these SQL statements.
+      --
+      if
+        Preg_Match (
+          "/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES)\s+(?:WHERE\s+Name\s+)?LIKE\s*('|\')((?:[\\\\0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)%?\\1/is",
+          Query_4, Maybe) /= 0
+      then
+         return Str_Replace ("\\_", "_", -Maybe (2)); -- [2]);
+      end if;
+
+      -- Big pattern for the rest of the table-related queries.
+      if
+        Preg_Match (
+          "/^\s*(?:"
+          & "(?:EXPLAIN\s+(?:EXTENDED\s+)?)?SELECT.*?\s+FROM"
+          & "|DESCRIBE|DESC|EXPLAIN|HANDLER"
+          & "|(?:LOCK|UNLOCK)\s+TABLE(?:S)?"
+          & "|(?:RENAME|OPTIMIZE|BACKUP|RESTORE|CHECK|CHECKSUM|ANALYZE|REPAIR).*\s+TABLE"
+          & "|TRUNCATE(?:\s+TABLE)?"
+          & "|CREATE(?:\s+TEMPORARY)?\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?"
+          & "|ALTER(?:\s+IGNORE)?\s+TABLE"
+          & "|DROP\s+TABLE(?:\s+IF\s+EXISTS)?"
+          & "|CREATE(?:\s+\w+)?\s+INDEX.*\s+ON"
+          & "|DROP\s+INDEX.*\s+ON"
+          & "|LOAD\s+DATA.*INFILE.*INTO\s+TABLE"
+          & "|(?:GRANT|REVOKE).*ON\s+TABLE"
+          & "|SHOW\s+(?:.*FROM|.*TABLE)"
+          & ")\s+\(*\s*((?:[0-9a-zA-Z_.`-]|[\xC2-\xDF][\x80-\xBF])+)\s*\)*/is",
+          Query_4,
+          Maybe) /= 0
+      then
+         return Str_Replace ("`", "", -Maybe (1)); -- [1]);
+      end if;
+
+      return ""; -- False;
+   end Get_Table_From_Query;
 
         --
         -- Loads the column metadata from the last query.
@@ -3306,19 +3699,17 @@ is
         --         return (microtime(true) - this.time_start);
         -- end;
 
-        --
-        -- Wraps errors in a nice header and footer and dies.
-        --
-        -- Will not die if wpdb::show_errors is false.
-        --
-        -- @since 1.5.0
-        --
-        -- @param string message    The error message.
-        -- @param string error_code Optional. A computer-readable string to identify the error.
-        --                           Default "500".
-        -- @return void|false Void if the showing of errors is enabled, false if disabled.
-        --
-        -- public function bail(message, error_code = "500") then
+   ----------
+   -- Bail --
+   ----------
+
+   procedure Bail (This       : Wpdb_Class;
+                   Message    : String;
+                   Error_Code : String := "500")
+   is
+   begin
+      raise Program_Error with "not implemted";
+   end Bail;
         --         if (this.show_errors) then
         --                 error = "";
 
@@ -3380,23 +3771,35 @@ is
         --         return closed;
         -- end;
 
-        --
-        -- Determines whether MySQL database is at least the required minimum version.
-        --
-        -- @since 2.5.0
-        --
-        -- @global string wp_version             The WordPress version string.
-        -- @global string required_mysql_version The required MySQL version string.
-        -- @return void|WP_Error
-        --
-        -- public function check_database_version() then
-        --         global wp_version, required_mysql_version;
-        --         -- Make sure the server has the required MySQL version.
-        --         if (version_compare(this.db_version(), required_mysql_version, "<")) then
-        --                 /* translators: 1: WordPress version number, 2: Minimum required MySQL version number.--
-        --                 return new WP_Error("database_version", sprintf(__("<strong>Error:</strong> WordPress %1s requires MySQL %2s or higher"), wp_version, required_mysql_version));
-        --         end;
-        -- end;
+   ----------------------------
+   -- Check_Database_Version --
+   ----------------------------
+
+   function Check_Database_Version (This : Wpdb_Class)
+            return Inc_Class_Wp_Errors.Wp_Error
+   is
+      use Php.Misc;
+      use Php.Strings;
+      use Inc_Class_Wp_Errors;
+      use Inc_L10n;
+      use Inc_Versions;
+--    global wp_version, required_mysql_version;
+   begin
+      -- Make sure the server has the required MySQL version.
+      if Version_Compare (This.DB_Version, Required_MySQL_Version, "<") then
+         -- translators: 1: WordPress version number, 2: Minimum required MySQL version number.
+         return X_Construct
+           ("database_version",
+            Sprintf (abs "<strong>Error:</strong> WordPress %1s requires MySQL %2s or higher",
+            To_List (List => (
+              1 => +Wp_Version,
+              2 => +Required_MySQL_Version
+            ))
+          ));
+      end if;
+
+      return Null_Wp_Error;
+   end Check_Database_Version;
 
         --
         -- Determines whether the database supports collation.
@@ -3415,25 +3818,27 @@ is
         --         return this.has_cap("collation");
         -- end;
 
-        --
-        -- Retrieves the database character collate.
-        --
-        -- @since 3.5.0
-        --
-        -- @return string The database character collate.
-        --
-        -- public function get_charset_collate() then
-        --         charset_collate = "";
+   -------------------------
+   -- Get_Charset_Collate --
+   -------------------------
 
-        --         if (! empty(this.charset)) then
-        --                 charset_collate = "DEFAULT CHARACTER SET this.charset";
-        --         end;
-        --         if (! empty(this.collate)) then
-        --                 charset_collate .= " COLLATE this.collate";
-        --         end;
+   function Get_Charset_Collate (This : Wpdb_Class)
+                                 return String
+   is
+      use Php.Strings;
 
-        --         return charset_collate;
-        -- end;
+      Charset_Collate : Unbounded_String;
+   begin
+      if not Empty (-This.Charset) then
+         Charset_Collate := +"DEFAULT CHARACTER SET " & This.Charset;
+      end if;
+
+      if not Empty (-This.Collate) then
+         Append (Charset_Collate, " COLLATE " & This.Collate);
+      end if;
+
+      return -Charset_Collate;
+   end Get_Charset_Collate;
 
         --
         -- Determines whether the database or WPDB supports a particular feature.
@@ -3543,4 +3948,46 @@ is
       return "XXX-990"; -- Server_Info;
    end DB_Server_Info;
 
+   ---------------
+   -- Set_Table --
+   ---------------
+
+   procedure Set_Table (This  : in out Wpdb_Class;
+                        Table : String;
+                        Value : String)
+   is
+      use Ada.Text_IO;
+   begin
+      if Table = "options" then
+         This.Options := +Value;
+      end if;
+
+      Put_Line ("set_table: " & Table);
+      pragma Assert (False);
+   end Set_Table;
+
+begin
+   -- Globals.WpDB.M_Tables.Include ("posts",              "");
+   -- Globals.WpDB.M_Tables.Include ("comments",           "");
+   -- Globals.WpDB.M_Tables.Include ("links",              "");
+   -- Globals.WpDB.M_Tables.Include ("options",            "");
+   -- Globals.WpDB.M_Tables.Include ("postmeta",           "");
+   -- Globals.WpDB.M_Tables.Include ("terms",              "");
+   -- Globals.WpDB.M_Tables.Include ("term_taxonomy",      "");
+   -- Globals.WpDB.M_Tables.Include ("term_relationships", "");
+   -- Globals.WpDB.M_Tables.Include ("termmeta",           "");
+   -- Globals.WpDB.M_Tables.Include ("commentmeta",        "");
+   null;
+           -- [ -- String_Maps.To_Map ((
+           --   Build ("posts",              ""),
+           --   Build ("comments",           ""),
+           --   Build ("links",              ""),
+           --   Build ("options",            ""),
+           --   Build ("postmeta",           ""),
+           --   Build ("terms",              ""),
+           --   Build ("term_taxonomy",      ""),
+           --   Build ("term_relationships", ""),
+           --   Build ("termmeta",           ""),
+           --   Build ("Commentmeta",        "")
+           -- ]; -- ));
 end Inc_Class_Wpdb;

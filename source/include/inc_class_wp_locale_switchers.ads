@@ -95,7 +95,7 @@ is
    --
    -- @return string|false Locale on success, false on failure.
    --
-   function Restore_Previous_Locale (This : Wp_Locale_Switcher)
+   function Restore_Previous_Locale (This : in out Wp_Locale_Switcher)
                                      return String;
         --         previous_locale = array_pop( this.locales );
 

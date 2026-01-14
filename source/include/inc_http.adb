@@ -10,17 +10,21 @@
 --
 
 with Ada.Containers;
+with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.HTML;
 with Php.Lists;
+with Php.Strings;
 with Php.Types;
+
+with Hb_Common;
 
 with Inc_Class_Wp_Http;
 with Inc_Functions;
 with Inc_Load;
 
-package body Inc_Http
+package body Inc_HTTP
 is
 
    subtype Wp_Http is Inc_Class_Wp_Http.Wp_Http;
@@ -400,8 +404,8 @@ is
                      Is_Numeric'Access).Length = Count
       then
          Capabilities_2 :=
-           Array_Combine (Array_Values (Capabilities_2),
-                          List_Fill (0, Integer (Count), From_Boolean (True)));
+           List_Combine (Array_Values (Capabilities_2),
+                         List_Fill (0, Integer (Count), From_Boolean (True)));
       end if;
 
       if
@@ -691,121 +695,102 @@ is
 --         return queried[ host ];
 -- end;
 
--- --
--- -- A wrapper for PHP"s parse_url() function that handles consistency in the return values
--- -- across PHP versions.
--- --
--- -- PHP 5.4.7 expanded parse_url()"s ability to handle non-absolute URLs, including
--- -- schemeless and relative URLs with "://" in the path. This function works around
--- -- those limitations providing a standard output on PHP 5.2~5.4+.
--- --
--- -- Secondly, across various PHP versions, schemeless URLs containing a ":" in the query
--- -- are being handled inconsistently. This function works around those differences as well.
--- --
--- -- @since 4.4.0
--- -- @since 4.7.0 The `component` parameter was added for parity with PHP"s `parse_url()`.
--- --
--- -- @link https://www.php.net/manual/en/function.parse-url.php
--- --
--- -- @param string url       The URL to parse.
--- -- @param int    component The specific component to retrieve. Use one of the PHP
--- --                          predefined constants to specify which one.
--- --                          Defaults to -1 (= return all parts as an array).
--- -- @return mixed False on parse failure; Array of URL components on success;
--- --               When a specific component has been requested: null if the component
--- --               doesn"t exist in the given URL; a string or - in the case of
--- --               PHP_URL_PORT - integer when it does. See parse_url()"s return values.
--- --
--- function wp_parse_url( url, component = -1 ) then
---         to_unset = array();
---         url      = (string) url;
+   ------------------
+   -- Wp_Parse_URL --
+   ------------------
 
---         if ( "//" === substr( url, 0, 2 ) ) then
---                 to_unset[] = "scheme";
---                 url        = "placeholder:" . url;
---         end; elseif ( "/" === substr( url, 0, 1 ) ) then
---                 to_unset[] = "scheme";
---                 to_unset[] = "host";
---                 url        = "placeholder://placeholder" . url;
---         end;
+   function Wp_Parse_URL (URL       : String;
+                          Component : Integer := -1)
+                          return Array_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Strings;
+      use Hb_Common;
 
---         parts = parse_url( url );
+      To_Unset : Array_Type;
+      URL_2 : Unbounded_String := +URL;
+   begin
+      if "//" = Substr (-URL_2, 0, 2) then
+         To_Unset.Append (From_String ("scheme"));
+         URL_2 := "placeholder:" & URL_2;
 
---         if ( false === parts ) then
---                 // Parsing failure.
---                 return parts;
---         end;
+      elsif "/" = Substr (URL, 0, 1) then
+         To_Unset.Append (From_String ("scheme"));
+         To_Unset.Append (From_String ("host"));
+         URL_2 := "placeholder://placeholder" & URL_2;
+      end if;
 
---         // Remove the placeholder values.
---         foreach ( to_unset as key ) then
---                 unset( parts[ key ] );
---         end;
+      declare
+         Parts : constant Array_Type := Parse_URL (-URL_2);
+      begin
+         if Parts = Empty_Array then -- false
+            -- Parsing failure.
+            return Parts;
+         end if;
 
---         return _get_component_from_parsed_url_array( parts, component );
--- end;
+         -- Remove the placeholder values.
+         for Key in To_Unset.Iterate loop
+            Delete (Ref (Parts, Arrays.Key (Key)));
+         end loop;
 
--- --
--- -- Retrieve a specific component from a parsed URL array.
--- --
--- -- @internal
--- --
--- -- @since 4.7.0
--- -- @access private
--- --
--- -- @link https://www.php.net/manual/en/function.parse-url.php
--- --
--- -- @param array|false url_parts The parsed URL. Can be false if the URL failed to parse.
--- -- @param int         component The specific component to retrieve. Use one of the PHP
--- --                               predefined constants to specify which one.
--- --                               Defaults to -1 (= return all parts as an array).
--- -- @return mixed False on parse failure; Array of URL components on success;
--- --               When a specific component has been requested: null if the component
--- --               doesn"t exist in the given URL; a string or - in the case of
--- --               PHP_URL_PORT - integer when it does. See parse_url()"s return values.
--- --
--- function _get_component_from_parsed_url_array( url_parts, component = -1 ) then
---         if ( -1 === component ) then
---                 return url_parts;
---         end;
+         return X_Get_Component_From_Parsed_URL_Array (Parts, Component);
+      end;
+   end Wp_Parse_URL;
 
---         key = _wp_translate_php_url_constant_to_key( component );
---         if ( false !== key && is_array( url_parts ) && isset( url_parts[ key ] ) ) then
---                 return url_parts[ key ];
---         end; else then
---                 return null;
---         end;
--- end;
+   -------------------------------------------
+   -- X_Get_Component_From_Parsed_URL_Array --
+   -------------------------------------------
 
--- --
--- -- Translate a PHP_URL_* constant to the named array keys PHP uses.
--- --
--- -- @internal
--- --
--- -- @since 4.7.0
--- -- @access private
--- --
--- -- @link https://www.php.net/manual/en/url.constants.php
--- --
--- -- @param int constant PHP_URL_* constant.
--- -- @return string|false The named key or false.
--- --
--- function _wp_translate_php_url_constant_to_key( constant ) then
---         translation = array(
---                 PHP_URL_SCHEME   => "scheme",
---                 PHP_URL_HOST     => "host",
---                 PHP_URL_PORT     => "port",
---                 PHP_URL_USER     => "user",
---                 PHP_URL_PASS     => "pass",
---                 PHP_URL_PATH     => "path",
---                 PHP_URL_QUERY    => "query",
---                 PHP_URL_FRAGMENT => "fragment",
---         );
+   function X_Get_Component_From_Parsed_URL_Array (URL_Parts : Array_Type;
+                                                   Component : Integer := -1)
+                                                   return Array_Type
+   is
+   begin
+      if -1 = Component then
+         return URL_Parts;
+      end if;
 
---         if ( isset( translation[ constant ] ) ) then
---                 return translation[ constant ];
---         end; else then
---                 return false;
---         end;
--- end;
+      declare
+         Key : constant String :=
+           X_Wp_Translate_PHP_URL_Constant_To_Key (Component);
+      begin
+         if
+           "" /= Key and then -- false
+--         Is_Array (URL_Parts) and then
+           Isset (URL_Parts, Key)
+         then
+            return As_Array (Get (URL_Parts, Key));
+         else
+            return Empty_Array; -- null;
+         end if;
+      end;
+   end X_Get_Component_From_Parsed_URL_Array;
 
-end Inc_Http;
+   --------------------------------------------
+   -- X_Wp_Translate_PHP_URL_Constant_To_Key --
+   --------------------------------------------
+
+   function X_Wp_Translate_PHP_URL_Constant_To_Key (Component : Integer)
+                                                    return String
+   is
+      -- Translation : constant Array_Type := To_Array (List => (
+      --           PHP_URL_SCHEME   => "scheme",
+      --           PHP_URL_HOST     => "host",
+      --           PHP_URL_PORT     => "port",
+      --           PHP_URL_USER     => "user",
+      --           PHP_URL_PASS     => "pass",
+      --           PHP_URL_PATH     => "path",
+      --           PHP_URL_QUERY    => "query",
+      --           PHP_URL_FRAGMENT => "fragment",
+      --   );
+   begin
+      --   if ( isset( translation[ constant ] ) ) then
+      --           return translation[ constant ];
+      --   else
+      --           return false;
+      --   end if;
+      return "";
+   end X_Wp_Translate_PHP_URL_Constant_To_Key;
+
+end Inc_HTTP;

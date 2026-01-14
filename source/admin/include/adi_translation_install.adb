@@ -26,7 +26,7 @@ with Adi_Class_Wp_Automatic_Upgrader_Skins;
 with Adi_Class_Wp_Upgrader_Skins;
 
 with Inc_Formatting;
-with Inc_Http;
+with Inc_HTTP;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
@@ -59,7 +59,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Class_Wp_Errors;
-      use Inc_Http;
+      use Inc_HTTP;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Link_Templates;
@@ -70,7 +70,7 @@ is
 --    require ABSPATH . WPINC . "/version.php";
 
       if
-        not In_Array (Typ, To_List (List => (+"plugins", +"themes", +"core")), True)
+        not In_List (Typ, To_List (List => (+"plugins", +"themes", +"core")), True)
       then
          return (Success => False,
                  Arry    => Empty_Array,
@@ -257,6 +257,7 @@ is
    is
       use Php.Arrays;
       use Php.Echoing;
+      use Php.Strings;
       use Hb_Common;
       use Inc_Formatting;
       use Inc_L10n;

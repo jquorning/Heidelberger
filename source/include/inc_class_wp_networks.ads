@@ -13,30 +13,36 @@ is
    use Ada.Strings.Unbounded;
 
    procedure Dummy;
---
--- Core class used for interacting with a multisite network.
---
--- This class is used during load to populate the `$current_site` global and
--- setup the current network.
---
--- This class is most useful in WordPress multi-network installations where the
--- ability to interact with any network of sites is required.
---
--- @since 4.4.0
---
--- @property int $id
--- @property int $site_id
---
---#[AllowDynamicProperties]
+
+   --
+   -- Core class used for interacting with a multisite network.
+   --
+   -- This class is used during load to populate the `$current_site` global and
+   -- setup the current network.
+   --
+   -- This class is most useful in WordPress multi-network installations where the
+   -- ability to interact with any network of sites is required.
+   --
+   -- @since 4.4.0
+   --
+   type Prop_Type is record
+      Id      : Integer;
+      Site_Id : Integer;
+   end record;
+
+   -- @property int $id
+   -- @property int $site_id
+   --
+   --#[AllowDynamicProperties]
    type Wp_Network is
-      record
+     record
         --
         -- Network ID.
         --
         -- @since 4.4.0
-        -- @since 4.6.0 Converted from public to private to explicitly enable more intuitive
-        --              access via magic methods. As part of the access change, the type was
-        --              also changed from `string` to `int`.
+        -- @since 4.6.0 Converted from public to private to explicitly enable more
+        --              intuitive access via magic methods. As part of the access
+        --              change, the type was also changed from `string` to `int`.
         -- @var int
         --
 --        private
@@ -48,7 +54,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        domain : Unbounded_String;
+        Domain : Unbounded_String;
 
         --
         -- Path of the network.
@@ -78,7 +84,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        cookie_domain : Unbounded_String;
+        Cookie_Domain : Unbounded_String;
 
         --
         -- Name of this network.
@@ -90,10 +96,12 @@ is
         --
         Site_Name : Unbounded_String;
 
+        Prop : Prop_Type;
    end record;
 
    Null_Network : constant Wp_Network :=
      (Id     => 0,
+      Prop   => (others => 0),
       others => Null_Unbounded_String);
 
 end Inc_Class_Wp_Networks;

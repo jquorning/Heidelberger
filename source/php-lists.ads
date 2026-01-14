@@ -10,91 +10,130 @@ is
    use Arrays;
    use Standard.Lists;
 
-   function In_Array (Needle   : String;
-                      Haystack : List_Type;
-                      Strict   : Boolean := False)
-                      return Boolean;
+   function In_List (Needle   : String;
+                     Haystack : List_Type;
+                     Strict   : Boolean := False)
+                     return Boolean;
 
-   function Array_Merge (Left, Right : List_Type) return List_Type
-      is (Left);
+   function List_Merge (Left, Right : List_Type)
+                        return List_Type;
 
-   function Array_Diff (Left, Right : List_Type) return List_Type
-      is (Left);
+   function List_Diff (Left, Right : List_Type)
+                       return List_Type;
 
-   function Array_Diff (Left  : List_Type;
-                        Right : String) return List_Type
-      is (Left);
+   function List_Diff (Left  : List_Type;
+                       Right : String)
+                       return List_Type;
 
-   type Filter_Callback is not null access function (Value : String)
-                                                     return Boolean;
+   type Filter_Callback is access function (Value : String)
+                                            return Boolean;
 
    function List_Filter (List     : List_Type;
-                         Callback : Filter_Callback)
-                         return List_Type
-                         is (Empty_List);
+                         Callback : Filter_Callback := null)
+                         return List_Type;
 
    function List_Fill (Start_Index : Integer;
                        Count       : Integer;
                        Value       : Multi_Type)
-                       return List_Type
-                       is (Empty_List);
+                       return List_Type;
 
-   function Array_Map (Item : String;
-                       List : List_Type)
-                       return List_Type is (Empty_List);
+   type Callable_20 is access function (Item : String)
+                                        return String;
 
-   procedure Array_Shift (List : in out List_Type);
-   function Array_Shift (List : in out List_Type)
+   type Callable_21 is access function (Item : Integer)
+                                        return Integer;
+
+   type Callable_22 is access function (Item : String;
+                                        Base : Integer)
+                                        return Integer;
+
+   type Callable_23 is access function (Item   : String;
+                                        Item_2 : String)
+                                        return String;
+
+   function List_Map (Callback : Callable_20;
+                      List     : List_Type)
+                      return List_Type
+   is (raise Program_Error with "not implemented");
+
+   function List_Map (Callback : Callable_21;
+                      List     : List_Type)
+                      return List_Type
+   is (raise Program_Error with "not implemented");
+
+   function List_Map (Callback : Callable_22;
+                      List     : List_Type)
+                      return List_Type
+   is (raise Program_Error with "not implemented");
+
+   function List_Map (Callback : Callable_23;
+                      List     : List_Type)
+                      return List_Type
+   is (raise Program_Error with "not implemented");
+
+   procedure List_Shift (List : in out List_Type);
+
+   function List_Shift (List : in out List_Type)
                          return String;
 
-   procedure Array_Unshift (List : in out List_Type;
-                            Item : String)
-                            is null;
+   procedure List_Unshift (List : in out List_Type;
+                           Item : String);
 
-   function Array_Keys (List : List_Type)
-                        return List_Type
-                        is (Empty_List);
+   function List_Keys (List : List_Type)
+                       return List_Type;
 
-   function Array_Key_Exists (Key  : String;
-                              Arry : List_Type)
-                              return Boolean
-                              is (False);
+   function List_Key_Exists (Key  : String;
+                             List : List_Type)
+                             return Boolean;
 
-   function Array_Search (Needle   : String;
-                          Haystack : List_Type;
-                          Strict   : Boolean := False)
-                          return String
-                          is ("XXX-012");
+   function List_Search (Needle   : String;
+                         Haystack : List_Type;
+                         Strict   : Boolean := False)
+                         return String
+   is (raise Program_Error with "not implemented");
 
-   function Array_Combine (Keys   : List_Type;
-                           Values : List_Type)
-                           return Array_Type
-                           is (Empty_Array);
+   function List_Combine (Keys   : List_Type;
+                          Values : List_Type)
+                          return Array_Type;
 
-   function Array_Pop (Arry : List_Type)
-                       return String
-                       is ("XXX-332");
+   function List_Pop (List : in out List_Type)
+                      return String;
 
-   procedure Array_Pop (Arry : List_Type)
-                        is null;
+   procedure List_Pop (List : in out List_Type);
 
-   function Array_Push (Arry  : List_Type;
-                        Value : String)
-                        return List_Type
-                        is (Empty_List);
+   function List_Push (List  : List_Type;
+                       Value : String)
+                       return List_Type;
 
-   function Array_Push (Arry  : List_Type;
-                        Value : List_Type)
-                        return Integer
-                        is (1);
+   procedure List_Push (List  : in out List_Type;
+                        Value : String);
 
-   function Array_Intersect (List   : List_Type;
-                             List_2 : List_Type)
-                             return List_Type
-                             is (Empty_List);
+   function List_Push (List  : List_Type;
+                       Value : List_Type)
+                       return Integer
+   is (raise Program_Error with "not implemented");
 
-   function Array_Reverse (List : List_Type)
-                           return List_Type
-                           is (Empty_List);
+   function List_Intersect (List   : List_Type;
+                            List_2 : List_Type)
+                            return List_Type;
+
+   function List_Reverse (List : List_Type)
+                          return List_Type;
+
+   type Unique_Flags is (Sort_String);
+
+   function List_Unique (Arry  : List_Type;
+                         Flags : Unique_Flags := Sort_String)
+                         return List_Type
+                         is (Empty_List);
+
+   function Get (List : List_Type;
+                 Key  : String)
+                 return String
+   is (raise Program_Error with "not implemented");
+
+   function Isset (List : List_Type;
+                   Key  : String)
+                   return Boolean;
 
 end Php.Lists;

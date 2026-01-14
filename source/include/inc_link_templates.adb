@@ -81,7 +81,7 @@ is
       Item_2 : Unbounded_String;
    begin
       if Global_Wp_Rewrite.Use_Trailing_Slashes then
-         Item_2 := +Trailingslashit (Item);
+         Item_2 := +Trailing_Slash_It (Item);
       else
          Item_2 := +Un_Trailing_Slash_It (Item);
       end if;
@@ -273,8 +273,8 @@ is
       elsif "attachment" = Post.Post_Type then
          return Get_Attachment_Link (Post, Leavename);
       elsif
-        In_Array (-Post.Post_Type,
-                  Get_Post_Types (To_Array (List => (1 =>
+        In_List (-Post.Post_Type,
+                 Get_Post_Types (To_Array (List => (1 =>
                     Build ("_builtin", False)))), True)
       then
          return Get_Post_Permalink (Post, Leavename, Sample);
@@ -664,7 +664,7 @@ is
 
          if Strpos (-Parentlink, "?") = 0 then
             Link := +User_Trailing_Slash_It (
-                       Trailingslashit (-Parentlink) & "%postname%");
+                       Trailing_Slash_It (-Parentlink) & "%postname%");
          end if;
 
          if not Leavename then
@@ -4620,7 +4620,7 @@ is
             end if;
 
             URL := +Add_Query_Arg (
-                Raw_URL_Encode_Deep (Array_Filter (URL_Args)),
+                As_Array (Raw_URL_Encode_Deep (From_Array (Array_Filter (URL_Args)))),
                 Set_URL_Scheme (-URL, Get_As_String (Args_2, "scheme"))
             );
 

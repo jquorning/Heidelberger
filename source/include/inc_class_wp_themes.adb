@@ -122,7 +122,7 @@ is
          Set (This.Headers, "Name", From_String (-This.Stylesheet));
 
          if not File_Exists (-(This.Theme_Root & "/" & This.Stylesheet)) then
-            This.Errors :=
+            This.M_Errors :=
               Wp_Error'(X_Construct (
                 "theme_not_found",
                 Sprintf (
@@ -132,7 +132,7 @@ is
                 )
               ));
          else
-            This.Errors := Wp_Error'(X_Construct
+            This.M_Errors := Wp_Error'(X_Construct
               ("theme_no_stylesheet",
                "Stylesheet is missing."));
          end if;
@@ -150,7 +150,7 @@ is
 
          if not File_Exists (-This.Theme_Root) then
             -- Don't cache this one.
-            This.Errors.Add
+            This.M_Errors.Add
               ("theme_root_missing",
                abs "<strong>Error:</strong> The themes directory is either empty or does not exist. Please check your installation.");
          end if;
@@ -160,7 +160,7 @@ is
 
          Set (This.Headers, "Name", From_String (-This.Stylesheet));
 
-         This.Errors           :=
+         This.M_Errors :=
            Wp_Error'(X_Construct ("theme_stylesheet_not_readable",
                                   abs "Stylesheet is not readable."));
          This.Template         := This.Stylesheet;
@@ -203,7 +203,7 @@ is
 --      not This.Template and then
         This.Stylesheet = +As_String (Get (This.Headers, "Template"))
       then
-         This.Errors :=
+         This.M_Errors :=
            Wp_Error'(X_Construct (
              "theme_child_invalid",
              Sprintf (
@@ -253,8 +253,8 @@ is
                     ))
                   );
                begin
-                  This.Errors := Wp_Error'(X_Construct ("theme_no_index",
-                                                        Error_Message));
+                  This.M_Errors := Wp_Error'(X_Construct ("theme_no_index",
+                                                          Error_Message));
                end;
                This.Cache_Add (
                  "theme",
@@ -301,7 +301,7 @@ is
 --             Theme_Root_Template := Directories (-This.Template) ("theme_root");
             else
                -- Parent theme is missing.
-               This.Errors := Wp_Error'(X_Construct (
+               This.M_Errors := Wp_Error'(X_Construct (
                  "theme_no_parent",
                  Sprintf (
                    -- translators: %s: Theme directory name.
@@ -334,7 +334,7 @@ is
            X_Child.Template = This.Stylesheet
          then
             X_Child.M_Parent := null;
-            X_Child.Errors   := Wp_Error'(X_Construct (
+            X_Child.M_Errors := Wp_Error'(X_Construct (
               "theme_parent_invalid",
               Sprintf (
                 -- translators: %s: Theme directory name.
@@ -353,7 +353,7 @@ is
             );
             -- The two themes actually reference each other with the Template header.
             if X_Child.Stylesheet = This.Template then
-               This.Errors := Wp_Error'(X_Construct (
+               This.M_Errors := Wp_Error'(X_Construct (
                  "theme_parent_invalid",
                  Sprintf (
                    -- translators: %s: Theme directory name.--
@@ -390,7 +390,7 @@ is
         (not Is_Wp_Error (This.Errors) or else
          not Isset (This.Errors.Errors, "theme_paused"))
       then
-         This.Errors := Wp_Error'(X_Construct (
+         This.M_Errors := Wp_Error'(X_Construct (
            "theme_paused",
            abs "This theme failed to load properly and was paused within the admin backend."));
       end if;
@@ -414,6 +414,33 @@ is
 
       return This;
    end X_Construct;
+
+   ------------
+   -- Errors --
+   ------------
+
+   function Errors (This : Wp_Theme)
+                    return Inc_Class_Wp_Errors.Wp_Error
+   is
+   begin
+      return This.M_Errors;
+--    return (if Is_Wp_Error (This.Errors) then This.Errors else False);
+   end Errors;
+
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists (This : Wp_Theme)
+                    return Boolean
+   is
+      use Php.Lists;
+      use Inc_Class_Wp_Errors;
+   begin
+      return not
+        (This.Errors /= Null_Wp_Error and then
+         In_List ("theme_not_found", This.Errors.Get_Error_Codes, True));
+   end Exists;
 
    ------------
    -- Parent --
@@ -440,9 +467,12 @@ is
    is
       use Hb_Common;
       use Inc_Caches;
+
+      Result : Boolean;
    begin
-      return Wp_Cache_Add (Key & "-" & (-This.Cache_Hash), Data, "themes",
-                           Static_Cache_Expiration);
+      Wp_Cache_Add (Key & "-" & (-This.Cache_Hash), From_Array (Data), "themes",
+                   Static_Cache_Expiration, Success => Result);
+      return Result;
    end Cache_Add;
 
    procedure Cache_Add (This : Wp_Theme;
@@ -583,7 +613,7 @@ is
 
       elsif Header = "Tags" then
          Value_3 :=
-           Array_Filter (Array_Map ("trim", Explode (",", Strip_Tags (Value))));
+           List_Filter (List_Map (Trim'Access, Explode (",", Strip_Tags (Value))));
 
       elsif Header in "Version" | "RequiresWP" | "RequiresPHP" | "UpdateURI" then
          Value_2 := +Strip_Tags (Value);
@@ -604,5 +634,41 @@ is
    begin
       return -This.Stylesheet;
    end Get_Stylesheet;
+
+   ------------------
+   -- Get_Template --
+   ------------------
+
+   function Get_Template (This : Wp_Theme)
+                          return String
+   is
+      use Hb_Common;
+   begin
+      return -This.Template;
+   end Get_Template;
+
+   ----------------------------
+   -- Get_Core_Default_Theme --
+   ----------------------------
+
+   function Get_Core_Default_Theme
+            return Wp_Theme
+   is
+      use Php.Arrays;
+      use Inc_Themes;
+   begin
+      for A in Array_Reverse (Static_Default_Themes).Iterate loop
+         declare
+            Slug  : constant String := Key (A);
+--          Name  : Multi_Type := Element (A);
+            Theme : constant Wp_Theme := Wp_Get_Theme (Slug);
+         begin
+            if Theme.Exists then
+               return Theme;
+            end if;
+         end;
+      end loop;
+      return Null_Theme; -- False;
+   end Get_Core_Default_Theme;
 
 end Inc_Class_Wp_Themes;

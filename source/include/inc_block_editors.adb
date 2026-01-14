@@ -308,7 +308,7 @@ is
       Default_Size : constant String := Get_Option ("image_default_size", "large");
 
       Image_Default_Size : String :=
-        (if In_Array (Default_Size, List_Type'(Array_Keys (Image_Size_Names)), True)
+        (if In_List (Default_Size, List_Type'(Array_Keys (Image_Size_Names)), True)
          then Default_Size else "large");
 
       Image_Dimensions : Array_Type;

@@ -8,6 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
 with Php.Strings;
@@ -166,6 +167,7 @@ package body Inc_L10n is
             return String
    is
       use Ada.Strings.Unbounded;
+      use Php.Strings;
       use Binder;
 --    use Globals;
       use Hb_Common;
@@ -1413,10 +1415,10 @@ package body Inc_L10n is
          -- different file name.
          declare
             Template_Directory : constant String :=
-              Trailingslashit (Get_Template_Directory);
+              Trailing_Slash_It (Get_Template_Directory);
 
             Stylesheet_Directory : constant String :=
-              Trailingslashit (Get_Stylesheet_Directory);
+              Trailing_Slash_It (Get_Stylesheet_Directory);
 
             Starts_With : constant Boolean :=
               Str_Starts_With (Path, Template_Directory) or else
@@ -1890,8 +1892,9 @@ package body Inc_L10n is
                                                   Textdomain  : String)
                                                   return Array_Type
    is
+      use Php.Arrays;
+      use Php.Strings;
       use Hb_Common;
---    use Php;
    begin
       if
         Empty (I18n_Schema) or else

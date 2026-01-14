@@ -90,13 +90,13 @@ is
             This.User.Domain         :=
               +(if This.User.Active_Blog = Null_Site
                 then User_Admin_URL
-                else Trailingslashit (
+                else Trailing_Slash_It (
                         Get_Home_URL (-This.User.Active_Blog.Blog_Id)));
 
             This.User.Account_Domain := This.User.Domain;
          else
 --          this.user.Active_Blog    := This.User.Blogs (Get_Current_Blog_Id);
-            This.User.Domain         := +Trailingslashit (Home_URL);
+            This.User.Domain         := +Trailing_Slash_It (Home_URL);
             This.User.Account_Domain := This.User.Domain;
          end if;
       end if;
@@ -115,7 +115,8 @@ is
             -- add_theme_support( "admin-bar", array( "callback" => "__return_false"));
             --
             Admin_Bar_Args  := Get_Theme_Support ("admin-bar");
-            Header_Callback := +Get (-Admin_Bar_Args.First_Element, "callback");
+            Header_Callback := +"XXX-970";
+            -- Get (-Admin_Bar_Args.First_Element, "callback");
          end if;
 
          if Header_Callback = "" then

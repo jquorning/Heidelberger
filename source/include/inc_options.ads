@@ -5,14 +5,19 @@
 -- @subpackage Option
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
+
 with Arrays;
-with Hb_Common;
 with Lists;
 
 package Inc_Options
 is
    use Arrays;
    use Lists;
+
+   package String_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+                                              Element_Type => String);
 
    --
    -- Retrieves an option value based on an option name.
@@ -86,32 +91,27 @@ is
    --               no option in the database, boolean `false` is returned.
    --
    function Get_Option (Option  : String;
-                        Default : Array_Type := Empty_Array)
-                        return Array_Type
-                        is (Empty_Array);
-
-   function Get_Option (Option : String)
-                        return List_Type
-                        is (Empty_List);
-
-   function Get_Option (Option  : String;
-                        Default : Integer := 0)
-                        return Integer
-                        is (1);
-
-   function Get_Option (Option  : String;
-                        Default : String := "")
-                        return String
-                        is ("XXX-219");
-
-   function Get_Option (Option  : String;
-                        Default : String := "")
+                        Default : Multi_Type := From_String (""))
                         return Multi_Type;
 
    function Get_Option (Option  : String;
+                        Default : Array_Type := Empty_Array)
+                        return Array_Type;
+
+   function Get_Option (Option : String)
+                        return List_Type;
+
+   function Get_Option (Option  : String;
+                        Default : Integer := 0)
+                        return Integer;
+
+   function Get_Option (Option  : String;
                         Default : String := "")
-                        return Boolean
-                        is (True);
+                        return String;
+
+   function Get_Option (Option  : String;
+                        Default : String := "")
+                        return Boolean;
 
    --
    -- Protects WordPress special option from being modified.
@@ -513,6 +513,21 @@ is
                             Expiration : Integer := 0);
 
    --
+   -- Deletes all expired transients.
+   --
+   -- Note that this function won"t do anything if an external object cache is in use.
+   --
+   -- The multi-table delete syntax is used to delete the transient record
+   -- from table a, and the corresponding transient_timeout record from table b.
+   --
+   -- @since 4.9.0
+   --
+   -- @param bool force_db Optional. Force cleanup to run against the database even
+   --                       when an external object cache is used.
+   --
+   procedure Delete_Expired_Transients (Force_DB : Boolean := False);
+
+   --
    -- Retrieves the value of a site transient.
    --
    -- If the transient does not exist, does not have a value, or has expired,
@@ -526,7 +541,7 @@ is
    -- @return mixed Value of transient.
    --
    function Get_Site_Transient (Transient : String)
-                                return Hb_Common.String_Maps.Map;
+                                return String_Maps.Map;
 
    --
    -- Sets/updates the value of a site transient.

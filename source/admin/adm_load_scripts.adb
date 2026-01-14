@@ -6,7 +6,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Php.Arrays;
+-- with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
@@ -46,7 +46,6 @@ is
       use Globals;
       use Hb_Common;
       use Php;
-      use Php.Arrays;
       use Php.Echoing;
       use Php.Errors;
       use Php.HTML;
@@ -73,9 +72,9 @@ is
 
       Protocol := +As_String (Get (X_SERVER, "SERVER_PROTOCOL"));
       if
-        not In_Array (-Protocol,
-                      To_List (List => (+"HTTP/1.1", +"HTTP/2",
-                                        +"HTTP/2.0", +"HTTP/3")), True)
+        not In_List (-Protocol,
+                     To_List (List => (+"HTTP/1.1", +"HTTP/2",
+                                       +"HTTP/2.0", +"HTTP/3")), True)
       then
          Protocol := +"HTTP/1.0";
       end if;
@@ -87,7 +86,7 @@ is
 -- end;
 
       Load   := +Preg_Replace ("/[^a-z0-9,_-]+/i", "", -Load);
-      Load_2 := Array_Unique (Explode (",", -Load));
+      Load_2 := List_Unique (Explode (",", -Load));
 
       if Empty (-Load) then
          Header (-Protocol & " 400 Bad Request");
@@ -103,7 +102,8 @@ is
 
       if
         Isset (X_SERVER, "HTTP_IF_NONE_MATCH") and then
-        Stripslashes (As_String (Get (X_SERVER, "HTTP_IF_NONE_MATCH"))) = Inc_Versions.Wp_Version
+        Strip_Slashes (Get_As_String (X_SERVER, "HTTP_IF_NONE_MATCH")) =
+        Inc_Versions.Wp_Version
       then
          Header (-Protocol & " 304 Not Modified");
          return; -- exit;

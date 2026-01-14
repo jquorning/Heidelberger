@@ -10,6 +10,16 @@ is
    use Arrays;
 
    --
+   -- Return the HTTP protocol sent by the server.
+   --
+   -- @since 4.4.0
+   --
+   -- @return string The HTTP protocol. Default: HTTP/1.0.
+   --
+   function Wp_Get_Server_Protocol
+            return String;
+
+   --
    -- Fix `_SERVER` variables for various setups.
    --
    -- @since 3.0.0
@@ -105,8 +115,7 @@ is
    --              mode prior to the change to `is_installing`.
    --
    function Wp_Installing (Is_Installing : Boolean := False) -- null
-            return Boolean
-            is (False);
+                           return Boolean;
 
    --
    -- Determines if SSL is used.
@@ -286,6 +295,16 @@ is
                                        return Boolean;
 
    --
+   -- Redirect to the installer if WordPress is not installed.
+   --
+   -- Dies with an error message when Multisite is enabled.
+   --
+   -- @since 3.0.0
+   -- @access private
+   --
+   procedure Wp_Not_Installed;
+
+   --
    -- Determines whether the current request is for a site"s administrative interface.
    --
    -- e.g. `/wp-admin/`
@@ -374,7 +393,7 @@ is
    --
    -- @since 4.7.0
    --
-   -- @return bool True if it"s a WordPress Ajax request, false otherwise.
+   -- @return bool True if it's a WordPress Ajax request, false otherwise.
    --
    function Wp_Doing_AJAX
             return Boolean

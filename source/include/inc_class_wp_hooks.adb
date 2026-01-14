@@ -190,14 +190,14 @@ is
    ----------------
 
    function Has_Filter (This      : Wp_Hook;
-                        Hook_Name : String := "";
-                        Callback  : Boolean := False)
+                        Hook_Name : String   := "";
+                        Callback  : Callable := null) -- Boolean := False)
                         return Boolean
    is
 --    use Inc_Elab_Plugins;
    begin
-      if False = Callback then
-         return This.Has_Filters; -- ()
+      if null = Callback then
+         return This.Has_Filters;
       end if;
 
 --       declare

@@ -1790,6 +1790,7 @@ is
                                 return String
    is
       use Ada.Strings.Unbounded;
+      use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Posts;
       use Inc_Plugins;

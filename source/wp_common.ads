@@ -84,13 +84,15 @@ is
                              return Array_Type
                              is (Empty_Array);
 
-   function To_List (List : List_Type)
-                     return List_Type
-                     is (Empty_List);
-
    function Is_Object (Admin_Bar : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
                       return Boolean
                       is (True);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Array_Type;
+                           User  : Inc_Class_Wp_Users.Wp_User)
+                           return Array_Type
+                           is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
@@ -210,6 +212,13 @@ is
    function Apply_Filters (Hook_Name : String;
                            Value     : Multi_Type;
                            Option    : String;
+                           Passed    : Boolean)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           Option    : String;
                            Id        : Integer;
                            Default   : Multi_Type)
                            return Multi_Type
@@ -301,6 +310,28 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Status     : Integer;
+                           Location   : String)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Number     : Float;
+                           Decimals   : Integer)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Code       : Integer;
+                           Descript   : String;
+                           Protocol   : String)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
                            Value      : Boolean;
                            Args       : Array_Type;
                            Typ        : String)
@@ -312,9 +343,11 @@ is
    function Apply_Filters (Hook_Name  : String;
                            Value      : Inc_Class_Wp_Http.Response_Result;
                            Args       : Array_Type;
-                           Typ        : String)
+                           URL        : String)
                            return Inc_Class_Wp_Http.Response_Result
-                           is (Value);
+                           is ((Success => True,
+                                Arry    => Empty_Array,
+                                Error   => Inc_Class_Wp_Errors.Null_Wp_Error));
 
    procedure Do_Action (Hook_Name : String;
                         A1        : Inc_Class_Wp_Http.Response_Result;

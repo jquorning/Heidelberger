@@ -5,14 +5,17 @@
 -- @subpackage Users
 --
 
+with Arrays;
 with Lists;
 
+with Inc_Class_Wp_Role;
 with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Users;
 
 package Inc_Capabilities
 is
+   use Arrays;
    use Lists;
 
    --
@@ -75,6 +78,33 @@ is
                           User_Id : Integer;
                           Args    : Args_Type := Null_Args_Type)
                           return List_Type;
+
+   --
+   -- Retrieves role object.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string role Role name.
+   -- @return WP_Role|null WP_Role object if found, null if the role does not exist.
+   --
+   function Get_Role (Role : String)
+                      return Inc_Class_Wp_Role.Wp_Role;
+
+   --
+   -- Adds a role, if it does not exist.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string role         Role name.
+   -- @param string display_name Display name for role.
+   -- @param bool[] capabilities List of capabilities keyed by the capability name,
+   --                             e.g. array( "edit_posts" => true,
+   --                                         "delete_posts" => false ).
+   -- @return WP_Role|void WP_Role object, if the role is added.
+   --
+   procedure Add_Role (Role         : String;
+                       Display_Name : String;
+                       Capabilities : Array_Type := Empty_Array);
 
    --
    -- Retrieves a list of super admins.

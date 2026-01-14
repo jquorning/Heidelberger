@@ -10,6 +10,7 @@ with Php.Arrays;
 with Php.Errors;
 with Php.Files;
 with Php.HTML;
+with Php.Lists;
 with Php.Strings;
 
 with Binder;
@@ -26,6 +27,7 @@ with Inc_Functions;
 with Inc_L10n;
 with Inc_Ms_Networks;
 with Inc_Plugins;
+with Inc_Pluggables;
 
 package body Inc_Load
 is
@@ -33,20 +35,29 @@ is
 
    X_Wp_Using_Ext_Object_Cache : Boolean := False;
 
--- --
--- -- Return the HTTP protocol sent by the server.
--- --
--- -- @since 4.4.0
--- --
--- -- @return string The HTTP protocol. Default: HTTP/1.0.
--- --
--- function wp_get_server_protocol() then
---         protocol = isset( _SERVER("SERVER_PROTOCOL") ) ? _SERVER("SERVER_PROTOCOL") : "";
---         if ( ! in_array( protocol, array( "HTTP/1.1", "HTTP/2", "HTTP/2.0", "HTTP/3" ), true ) ) then
---                 protocol = "HTTP/1.0";
---         end;
---         return protocol;
--- end;
+   ----------------------------
+   -- Wp_Get_Server_Protocol --
+   ----------------------------
+
+   function Wp_Get_Server_Protocol
+            return String
+   is
+      use Php.Lists;
+      use Hb_Common;
+
+      Protocol : constant String :=
+        (if Isset (Binder.X_SERVER, "SERVER_PROTOCOL")
+         then Get_As_String (Binder.X_SERVER, "SERVER_PROTOCOL")
+         else "");
+
+      Protocols : constant List_Type :=
+        To_List (List => (+"HTTP/1.1", +"HTTP/2", +"HTTP/2.0", +"HTTP/3"));
+   begin
+      if not In_List (Protocol, Protocols, True) then
+         return "HTTP/1.0"; -- protocol =
+      end if;
+      return Protocol;
+   end Wp_Get_Server_Protocol;
 
    ------------------------
    -- Wp_Fix_Server_Vars --
@@ -773,33 +784,37 @@ is
 --         first_init = false;
 -- end;
 
--- --
--- -- Redirect to the installer if WordPress is not installed.
--- --
--- -- Dies with an error message when Multisite is enabled.
--- --
--- -- @since 3.0.0
--- -- @access private
--- --
--- function wp_not_installed() then
---         if ( is_blog_installed() || wp_installing() ) then
---                 return;
---         end;
+   ----------------------
+   -- Wp_Not_Installed --
+   ----------------------
 
---         nocache_headers();
+   procedure Wp_Not_Installed
+   is
+      use Php.Errors;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Pluggables;
+   begin
+      if Is_Blog_Installed or else Wp_Installing then
+         return;
+      end if;
 
---         if ( is_multisite() ) then
---                 wp_die( __( "The site you have requested is not installed properly. Please contact the system administrator." ) );
---         end;
+      Nocache_Headers;
 
---         require ABSPATH . WPINC . "/kses.php";
---         require ABSPATH . WPINC . "/pluggable.php";
+      if Is_Multisite then
+         Wp_Die (abs "The site you have requested is not installed properly. Please contact the system administrator.");
+      end if;
 
---         link = wp_guess_url() . "/wp-admin/install.php";
+--    require ABSPATH . WPINC . "/kses.php";
+--    require ABSPATH . WPINC . "/pluggable.php";
 
---         wp_redirect( link );
---         die();
--- end;
+      declare
+         Link : String := Wp_Guess_URL & "/wp-admin/install.php";
+      begin
+         Wp_Redirect (Link);
+         Die;
+      end;
+   end Wp_Not_Installed;
 
 -- --
 -- -- Retrieve an array of must-use plugin files.
@@ -1351,6 +1366,7 @@ is
       use Php;
       use Php.Arrays;
       use Php.Files;
+      use Php.Lists;
       use Inc_L10n;
 --    use Inc_Class_Wpdb;
       use Inc_Class_Wp_Textdomain_Registry;
@@ -1425,7 +1441,7 @@ is
 
          exit when Locations.Is_Empty;
 
-         Locations := Array_Unique (Locations);
+         Locations := List_Unique (Locations);
 
          Find_Locale :
          for Locale of Locales loop
@@ -1464,34 +1480,41 @@ is
 --    Globals.Wp_Locale := X_Construct; -- new WP_Locale();
    end Wp_Load_Translations_Early;
 
--- --
--- -- Check or set whether WordPress is in "installation" mode.
--- --
--- -- If the `WP_INSTALLING` constant is defined during the bootstrap, `wp_installing()` will default to `true`.
--- --
--- -- @since 4.4.0
--- --
--- -- @param bool is_installing Optional. True to set WP into Installing mode, false to turn Installing mode off.
--- --                            Omit this parameter if you only want to fetch the current status.
--- -- @return bool True if WP is installing, otherwise false. When a `is_installing` is passed, the function will
--- --              report whether WP was in installing mode prior to the change to `is_installing`.
--- --
--- function wp_installing( is_installing = null ) then
---         static installing = null;
+   -------------------
+   -- Wp_Installing --
+   -------------------
+   type Three_State is (None, False, True);
+   Static_Installing : Three_State := None;
 
---         // Support for the `WP_INSTALLING` constant, defined before WP is loaded.
---         if ( is_null( installing ) ) then
---                 installing = defined( "WP_INSTALLING" ) && WP_INSTALLING;
---         end;
+   function Wp_Installing (Is_Installing : Boolean := False) -- null
+                           return Boolean
+   is
+   begin
+      -- Support for the `WP_INSTALLING` constant, defined before WP is loaded.
+      if Static_Installing = None then
+--    if Is_Null (Static_Installing) then
+         Static_Installing := (if Globals.WP_INSTALLING then True else False);
+         -- defined( "WP_INSTALLING" ) && WP_INSTALLING;
+      end if;
 
---         if ( ! is_null( is_installing ) ) then
---                 old_installing = installing;
---                 installing     = is_installing;
---                 return (bool) old_installing;
---         end;
+      if not Is_Installing then
+--    if not Is_Null (Is_Installing) then
+         declare
+            Old_Installing : constant Three_State := Static_Installing;
+         begin
+            Static_Installing := (if Is_Installing then True else False);
+            return (case Old_Installing is
+                    when None  => False,
+                    when False => False,
+                    when True  => True);      -- (bool)
+         end;
+      end if;
 
---         return (bool) installing;
--- end;
+      return (case Static_Installing is
+              when None  => False,
+              when False => False,
+              when True  => True); -- (bool)
+   end Wp_Installing;
 
 -- --
 -- -- Determines if SSL is used.

@@ -1,3 +1,5 @@
+with Ada.Text_IO;
+
 with Helpers;
 
 package body Arrays
@@ -8,6 +10,29 @@ is
 
    function "-" (Item : Unbounded_String) return String
       renames To_String;
+
+   ---------
+   -- "=" --
+   ---------
+
+   function "=" (Left, Right : Multi_Type)
+                 return Boolean
+   is
+   begin
+      if Left.Kind /= Right.Kind then
+         return False;
+      end if;
+
+      case Left.Kind is
+      when Kind_Null     => return True;
+      when Kind_Boolean  => return Left.Bool = Right.Bool;
+      when Kind_Integer  => return Left.Int  = Right.Int;
+      when Kind_String   => return Left.Str  = Right.Str;
+      when Kind_List     => return Left.List = Right.List;
+      when Kind_Array    => return Left.Arry = Right.Arry;
+      when Kind_Callable => return Left.Func = Right.Func;
+      end case;
+   end "=";
 
    ------------
    -- Append --
@@ -28,15 +53,70 @@ is
                      Key   : String;
                      Value : Multi_Type)
    is
---    Position : Cursor := Arry.Find (Key);
    begin
---    if not Has_Element (Position) then
---       Append (Arry, Key, From_Array (Empty_Array));
---       Position := Arry.Find (Key);
---    end if;
---    Append (Element (Position).Arry.all, Value);
-      Include (Arry, Key, Value);
+      Array_Maps.Include (Array_Maps.Map (Arry), Key, Value);
    end Append;
+
+   --------------
+   -- Append_2 --
+   --------------
+
+   procedure Append_2 (Arry  : in out Array_Type;
+                       Key_1 : String;
+                       Key_2 : String;
+                       Value : Multi_Type)
+   is
+      Array_2 : Array_Type := Element (Arry.Find (Key_1)).Arry.all;
+   begin
+      Array_Maps.Include (Array_Maps.Map (Array_2), Key_2, Value);
+   end Append_2;
+
+   ------------
+   -- Delete --
+   ------------
+
+   procedure Delete (Arry  : in out Array_Type;
+                     Key   : String)
+   is
+   begin
+      Array_Maps.Delete (Array_Maps.Map (Arry), Key);
+   end Delete;
+
+   -------------
+   -- Include --
+   -------------
+
+   procedure Include (Arry  : in out Array_Type;
+                      Key   : String;
+                      Value : Multi_Type)
+   is
+   begin
+      Array_Maps.Include (Array_Maps.Map (Arry), Key, Value);
+   end Include;
+
+   -------------
+   -- Prepend --
+   -------------
+
+   procedure Prepend (Arry  : in out Array_Type;
+                      Key   : String;
+                      Value : Multi_Type)
+   is
+   begin
+      Array_Maps.Insert (Array_Maps.Map (Arry), Key, Value);
+   end Prepend;
+
+   -------------
+   -- Replace --
+   -------------
+
+   procedure Replace (Arry  : in out Array_Type;
+                      Key   : String;
+                      Value : Multi_Type)
+   is
+   begin
+      Array_Maps.Replace (Array_Maps.Map (Arry), Key, Value);
+   end Replace;
 
    --------------
    -- Is_Empty --
@@ -225,10 +305,18 @@ is
    function As_String (Arry : Multi_Type)
                       return String
    is
+      use Ada.Text_IO;
    begin
-      pragma Assert (Arry.Kind = Kind_String);
-
-      return -Arry.Str;
+      case Arry.Kind is
+      when Kind_String  => return -Arry.Str;
+      when Kind_Integer => return Helpers.Image (Arry.Int);
+      when Kind_Boolean => return (if Arry.Bool then "true" else "false");
+      when Kind_Null    => return "";
+      when others =>
+         Put_Line ("as_string: ");
+         Put_Line ("  kind: " & Kind_Of (Arry)'Image);
+         pragma Assert (False);
+      end case;
    end As_String;
 
    ----------------
@@ -239,9 +327,12 @@ is
                        return Integer
    is
    begin
-      pragma Assert (Arry.Kind = Kind_Integer);
-
-      return Arry.Int;
+      case Kind_Of (Arry) is
+      when Kind_Integer => return Arry.Int;
+      when Kind_Null    => return 0;
+      when Kind_String  => return 0; -- Integer'Value (-Arry.Str);
+      when others       => pragma Assert (False);
+      end case;
    end As_Integer;
 
    ----------------
@@ -251,10 +342,17 @@ is
    function As_Boolean (Arry : Multi_Type)
                        return Boolean
    is
+      use Ada.Text_IO;
    begin
-      pragma Assert (Arry.Kind = Kind_Boolean);
+      case Kind_Of (Arry) is
+      when Kind_Boolean =>  return Arry.Bool;
+      when Kind_Null    =>  return False;
+      when others =>
+         Put_Line ("as_boolean:");
+         Put_Line ("  kind: " & Kind_Of (Arry)'Image);
+         pragma Assert (False);
 
-      return Arry.Bool;
+      end case;
    end As_Boolean;
 
    -----------------
@@ -415,16 +513,17 @@ is
    is
       M : constant Multi_Type := Get (Arry, Key);
    begin
-      case Kind_Of (M) is
-      when Kind_String =>
-         return As_String (M);
-      when Kind_Integer =>
-         return Helpers.Image (As_Integer (M));
-      when Kind_Null =>
-         return "";
-      when others =>
-         pragma Assert (False);
-      end case;
+      return As_String (M);
+      -- case Kind_Of (M) is
+      -- when Kind_String =>
+      --    return As_String (M);
+      -- when Kind_Integer =>
+      --    return Helpers.Image (As_Integer (M));
+      -- when Kind_Null =>
+      --    return "";
+      -- when others =>
+      --    pragma Assert (False);
+      -- end case;
    end Get_As_String;
 
    ------------
@@ -477,14 +576,27 @@ is
                     Key_2 : String;
                     Value : Multi_Type)
    is
-      Array_2 : constant Array_Access := Element (Arry.Find (Key_1)).Arry;
+      Level_1 : Cursor := Arry.Find (Key_1);
    begin
-      pragma Assert (Array_2 /= null);
+      if not Has_Element (Level_1) then
+         Arry.Insert (Key_1, From_Array (Empty_Array));
+         Level_1 := Arry.Find (Key_1);
+      end if;
+
       declare
-         Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
+         Array_1 : Array_Type := As_Array (Element (Level_1));
+         Level_2 : Cursor := Array_1.Find (Key_2);
       begin
-         pragma Assert (Array_3 /= null);
-         Set (Array_3.all, Value);
+         if not Has_Element (Level_2) then
+            Array_1.Insert (Key_2, From_Array (Empty_Array));
+            Level_2 := Array_1.Find (Key_2);
+         end if;
+
+         declare
+            Array_2 : Array_Type := As_Array (Element (Level_2));
+         begin
+            Set (Array_2, Value);
+         end;
       end;
    end Set_2;
 

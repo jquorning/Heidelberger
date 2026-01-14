@@ -17,10 +17,12 @@ with Php.Types;
 
 with Binder;
 with Globals;
+with Hb_Common;
 with Helpers;
 with Wp_Common;
 
 with Inc_Caches;
+with Inc_Class_Wpdb;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -37,7 +39,7 @@ is
    ----------------
 
    function Get_Option (Option  : String;
-                        Default : String := "")
+                        Default : Multi_Type := From_String (""))
                         return Multi_Type -- String
    is
       use Php.Lists;
@@ -46,14 +48,16 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Load;
-      use Inc_Plugins;
+--    use Inc_Plugins;
 
       -- Distinguish between `false` as a default, and not passing one.
-      Passed_Default : constant Boolean := Default /= "";
+      Passed_Default : constant Boolean :=
+        Kind_Of (Default) in Kind_String and then As_String (Default) /= "";
       -- Func_Num_Args > 1; -- ()
 
       Value : Multi_Type;
@@ -127,9 +131,10 @@ is
       --                           exist. Default false.
       --
       declare
-         Pre : Boolean :=
-           Apply_Filters ("pre_option_" & Option, False, Option, Default);
-      begin
+         Pre_2 : constant Multi_Type :=
+           Apply_Filters ("pre_option_" & Option, From_Boolean (False),
+                          Option, Default);
+
          --
          -- Filters the value of all existing options before it is retrieved.
          --
@@ -147,10 +152,11 @@ is
          -- @param mixed  default     The fallback value to return if the option does
          --                            not exist. Default false.
          --
-         Pre := Apply_Filters ("pre_option", Pre, Option, Default);
-
-         if False /= Pre then
-            return From_Boolean (Pre);
+         Pre : constant Multi_Type :=
+           Apply_Filters ("pre_option", Pre_2, Option, Default);
+      begin
+         if From_Boolean (False) /= Pre then
+            return Pre;
          end if;
       end;
 
@@ -190,9 +196,9 @@ is
                -- @param bool   passed_default Was `get_option()` passed a default
                --                               value?
                --
-               return From_String (
+               return
                  Apply_Filters ("default_option_" & Option,
-                                Default, Option, Passed_Default));
+                                Default, Option, Passed_Default);
             end if;
 
             declare
@@ -208,10 +214,11 @@ is
                      declare
                         Success : Boolean;
 
-                        Statement : constant String :=
+                        Statement : constant Statement_Type :=
                           Globals.WpDB.Prepare (
-                            "SELECT option_value FROM wpdb->options " &
-                            "WHERE option_name = %s LIMIT 1", Option);
+                            "SELECT option_value FROM " & (-Globals.WpDB.Options) & " " &
+                            "WHERE option_name = %s LIMIT 1",
+                            To_List (Option));
 
                         Row : constant Array_Type :=
                           Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -233,9 +240,9 @@ is
                            Wp_Cache_Set ("notoptions", Notoptions, "options");
 
                            -- This filter is documented in wp-includes/option.php
-                           return From_String (
+                           return
                              Apply_Filters ("default_option_" & Option,
-                                            Default, Option, Passed_Default));
+                                            Default, Option, Passed_Default);
                         end if;
                      end;
                   end if;
@@ -248,10 +255,10 @@ is
             Success  : Boolean;
             Suppress : constant Boolean := Globals.WpDB.Suppress_Errors; -- ();
 
-            Statement : constant String :=
+            Statement : constant Statement_Type :=
               Globals.WpDB.Prepare (
-                "SELECT option_value FROM wpdb->options " &
-                "WHERE option_name = %s LIMIT 1", Option);
+                "SELECT option_value FROM " & (-Globals.WpDB.Options) & " " &
+                "WHERE option_name = %s LIMIT 1", To_List (Option));
 
             Row : constant Array_Type :=
               Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -262,23 +269,24 @@ is
             if Is_Object (Row) then
                null;
 --             Value := Row.Option_Value;
+               Value := Get (Row, "option_value");
             else
                -- This filter is documented in wp-includes/option.php
-               return From_String (
+               return
                  Apply_Filters ("default_option_" & Option,
-                                Default, Option, Passed_Default));
+                                Default, Option, Passed_Default);
             end if;
          end;
       end if;
 
       -- If home is not set, use siteurl.
-      if "home" = Option and "" = As_String (Value) then
+      if "home" = Option and then "" = As_String (Value) then
          return Get_Option ("siteurl");
       end if;
 
       if
-        In_Array (Option, To_List (List => (+"siteurl", +"home", +"category_base",
-                                            +"tag_base")), True)
+        In_List (Option, To_List (List => (+"siteurl", +"home", +"category_base",
+                                           +"tag_base")), True)
       then
          Value := From_String (Un_Trailing_Slash_It (As_String (Value)));
       end if;
@@ -298,6 +306,82 @@ is
       --
       return Apply_Filters ("option_" & Option,
                             Maybe_Unserialize (As_String (Value)), Option);
+   end Get_Option;
+
+   ----------------
+   -- Get_Option --
+   ----------------
+
+   function Get_Option (Option  : String;
+                        Default : Array_Type := Empty_Array)
+                        return Array_Type
+   is
+      Result : constant Multi_Type :=
+        Get_Option (Option, From_Array (Default));
+   begin
+      case Kind_Of (Result) is
+      when Kind_Null   =>  return Empty_Array;
+      when Kind_Array  =>  return Empty_Array;
+      when Kind_String =>  return Empty_Array;
+      when others =>
+         null;
+      end case;
+      return As_Array (Result);
+   end Get_Option;
+
+   ----------------
+   -- Get_Option --
+   ----------------
+
+   function Get_Option (Option : String)
+                        return List_Type
+   is
+      Result : constant Multi_Type :=
+        Get_Option (Option, From_String ("XXX-964"));
+   begin
+      return As_List (Result);
+   end Get_Option;
+
+   ----------------
+   -- Get_Option --
+   ----------------
+
+   function Get_Option (Option  : String;
+                        Default : Integer := 0)
+                        return Integer
+   is
+      Result : constant Multi_Type :=
+        Get_Option (Option, From_Integer (Default));
+   begin
+      return As_Integer (Result);
+   end Get_Option;
+
+   ----------------
+   -- Get_Option --
+   ----------------
+
+   function Get_Option (Option  : String;
+                        Default : String := "")
+                        return String
+   is
+      Result : constant Multi_Type :=
+        Get_Option (Option, From_String (Default));
+   begin
+      return As_String (Result);
+   end Get_Option;
+
+   ----------------
+   -- Get_Option --
+   ----------------
+
+   function Get_Option (Option  : String;
+                        Default : String := "")
+                        return Boolean
+   is
+      Result : constant Multi_Type :=
+        Get_Option (Option, From_String (Default));
+   begin
+      return As_Boolean (Result);
    end Get_Option;
 
    -------------------------------
@@ -340,7 +424,9 @@ is
    function Wp_Load_Alloptions (Force_Cache : Boolean := False)
             return Array_Type
    is
+      use Hb_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -360,12 +446,14 @@ is
             Suppress : constant Boolean := Globals.WpDB.Suppress_Errors;
 
             Alloptions_DB : Array_Type :=
-              Globals.WpDB.Get_Results (
-                "SELECT option_name, option_value FROM wpdb->options WHERE autoload = ""yes""");
+              Globals.WpDB.Get_Results (Statement_Type (
+                "SELECT option_name, option_value FROM " &
+                (-Globals.WpDB.Options) & " WHERE autoload = ""yes"""));
          begin
             if Alloptions_DB.Is_Empty then
-               Alloptions_DB := Globals.WpDB.Get_Results (
-                 "SELECT option_name, option_value FROM wpdb->options");
+               Alloptions_DB := Globals.WpDB.Get_Results (Statement_Type (
+                 "SELECT option_name, option_value FROM " &
+                 (-Globals.WpDB.Options) & ""));
             end if;
 
             Unused := Globals.WpDB.Suppress_Errors (Suppress);
@@ -397,8 +485,8 @@ is
                --
                Alloptions := Apply_Filters ("pre_cache_alloptions", Alloptions);
 
-               Unused :=
-                 Wp_Cache_Add ("alloptions", Alloptions, "options");
+               Wp_Cache_Add ("alloptions", From_Array (Alloptions), "options",
+                             Success => Unused);
             end if;
          end;
       end if;
@@ -512,7 +600,7 @@ is
 --      end if;
 
       declare
-         Value_2   : Multi_Type :=
+         Value_2 : Multi_Type :=
            From_String (Sanitize_Option (Option, As_String (Value)));
 
          Old_Value : constant Multi_Type := Get_Option (Option);
@@ -688,6 +776,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -779,7 +868,7 @@ is
          Do_Action ("add_option", Option, Value_2);
 
          declare
-            Statement : constant String :=
+            Statement : constant Statement_Type :=
               Globals.WpDB.Prepare (
                 "INSERT INTO `wpdb->options` (`option_name`, `option_value`, " &
                 "`autoload`) " &
@@ -873,9 +962,9 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Load;
       use Inc_Plugins;
---    global wpdb;
    begin
       -- if Is_Scalar (Option) then
       --    Option := Trim (Option);
@@ -891,10 +980,10 @@ is
       declare
          Success : Boolean;
 
-         Statement : constant String :=
+         Statement : constant Statement_Type :=
            Globals.WpDB.Prepare (
              "SELECT autoload FROM wpdb->options " &
-             "WHERE option_name = %s", Option);
+             "WHERE option_name = %s", To_List (Option));
 
          Row : constant Boolean :=
            Globals.WpDB.Get_Row (Statement, Success => Success) /= 0;
@@ -1169,7 +1258,7 @@ is
       Result : Boolean;
    begin
       if Wp_Using_Ext_Object_Cache or else Wp_Installing then
-         Result := Wp_Cache_Set (Transient, Value_2, "transient", Expiration);
+         Wp_Cache_Set (Transient, Value_2, "transient", Expiration, Success => Result);
       else
          declare
             Transient_Timeout : constant String := "_transient_timeout_" & Transient;
@@ -1259,68 +1348,68 @@ is
       null;
    end Set_Transient;
 
--- --
--- -- Deletes all expired transients.
--- --
--- -- Note that this function won"t do anything if an external object cache is in use.
--- --
--- -- The multi-table delete syntax is used to delete the transient record
--- -- from table a, and the corresponding transient_timeout record from table b.
--- --
--- -- @since 4.9.0
--- --
--- -- @param bool force_db Optional. Force cleanup to run against the database even when an external object cache is used.
--- --
--- function delete_expired_transients( force_db = false ) then
---         global wpdb;
+   --------------------------------
+   -- Delete_Expired_Transitents --
+   --------------------------------
 
---         if ( ! force_db && wp_using_ext_object_cache() ) then
---                 return;
---         end;
+   procedure Delete_Expired_Transients (Force_DB : Boolean := False)
+   is
+      use Globals;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_Load;
+--    global wpdb;
+   begin
+      if not Force_DB and then Wp_Using_Ext_Object_Cache then
+         return;
+      end if;
 
---         wpdb->query(
---                 wpdb->prepare(
---                         "DELETE a, b FROM thenwpdb->optionsend; a, thenwpdb->optionsend; b
---                         WHERE a.option_name LIKE %s
---                         AND a.option_name NOT LIKE %s
---                         AND b.option_name = CONCAT( "_transient_timeout_", SUBSTRING( a.option_name, 12 ) )
---                         AND b.option_value < %d",
---                         wpdb->esc_like( "_transient_" ) . "%",
---                         wpdb->esc_like( "_transient_timeout_" ) . "%",
---                         time()
---                 )
---         );
+      WpDB.Query (
+        WpDB.Prepare (
+          "DELETE a, b FROM {wpdb->options} a, {wpdb->options} b " &
+          "WHERE a.option_name LIKE %s " &
+          "AND a.option_name NOT LIKE %s " &
+          "AND b.option_name = CONCAT( '_transient_timeout_', SUBSTRING( a.option_name, 12 ) ) " &
+          "AND b.option_value < %d",
+          To_List (List => (
+            1 => +(WpDB.ESC_Like ("_transient_") & "%"),
+            2 => +(WpDB.ESC_Like ("_transient_timeout_") & "%"),
+            3 => +Helpers.Image (Php.Misc.Time)
+          ))
+        ));
 
---         if ( ! is_multisite() ) then
---                 // Single site stores site transients in the options table.
---                 wpdb->query(
---                         wpdb->prepare(
---                                 "DELETE a, b FROM thenwpdb->optionsend; a, thenwpdb->optionsend; b
---                                 WHERE a.option_name LIKE %s
---                                 AND a.option_name NOT LIKE %s
---                                 AND b.option_name = CONCAT( "_site_transient_timeout_", SUBSTRING( a.option_name, 17 ) )
---                                 AND b.option_value < %d",
---                                 wpdb->esc_like( "_site_transient_" ) . "%",
---                                 wpdb->esc_like( "_site_transient_timeout_" ) . "%",
---                                 time()
---                         )
---                 );
---         end; elseif ( is_multisite() && is_main_site() && is_main_network() ) then
---                 // Multisite stores site transients in the sitemeta table.
---                 wpdb->query(
---                         wpdb->prepare(
---                                 "DELETE a, b FROM thenwpdb->sitemetaend; a, thenwpdb->sitemetaend; b
---                                 WHERE a.meta_key LIKE %s
---                                 AND a.meta_key NOT LIKE %s
---                                 AND b.meta_key = CONCAT( "_site_transient_timeout_", SUBSTRING( a.meta_key, 17 ) )
---                                 AND b.meta_value < %d",
---                                 wpdb->esc_like( "_site_transient_" ) . "%",
---                                 wpdb->esc_like( "_site_transient_timeout_" ) . "%",
---                                 time()
---                         )
---                 );
---         end;
--- end;
+      if not Is_Multisite then
+         -- Single site stores site transients in the options table.
+         WpDB.Query (
+           WpDB.Prepare (
+             "DELETE a, b FROM {wpdb->options} a, {wpdb->options} b " &
+             "WHERE a.option_name LIKE %s " &
+             "AND a.option_name NOT LIKE %s " &
+             "AND b.option_name = CONCAT('_site_transient_timeout_', SUBSTRING( a.option_name, 17 ) ) " &
+             "AND b.option_value < %d",
+             To_List (List => (
+               1 => +(WpDB.ESC_Like ("_site_transient_") & "%"),
+               2 => +(WpDB.ESC_Like ("_site_transient_timeout_") & "%"),
+               3 => +Helpers.Image (Php.Misc.Time)
+             ))
+           ));
+      elsif Is_Multisite and then Is_Main_Site and then Is_Main_Network then
+         -- Multisite stores site transients in the sitemeta table.
+         WpDB.Query (
+           WpDB.Prepare (
+             "DELETE a, b FROM {wpdb->sitemeta} a, {wpdb->sitemeta} b " &
+             "WHERE a.meta_key LIKE %s " &
+             "AND a.meta_key NOT LIKE %s " &
+             "AND b.meta_key = CONCAT('_site_transient_timeout_', SUBSTRING( a.meta_key, 17 ) ) " &
+             "AND b.meta_value < %d",
+             To_List (List => (
+               1 => +(WpDB.ESC_Like ("_site_transient_") & "%"),
+               2 => +(WpDB.ESC_Like ("_site_transient_timeout_") & "%"),
+               3 => +Helpers.Image (Php.Misc.Time)
+             ))
+           ));
+      end if;
+   end Delete_Expired_Transients;
 
    ----------------------
    -- Wp_User_Settings --
@@ -1610,6 +1699,7 @@ is
                              Deprecated : Boolean := True)
                              return Multi_Type
    is
+      pragma Unreferenced (Deprecated);
    begin
       return Get_Network_Option (0, -- null,
                                  Option, Default);
@@ -1686,6 +1776,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Functions;
       use Inc_Load;
 --    use Inc_Plugins;
@@ -1770,7 +1861,7 @@ is
                  Apply_Filters ("default_site_option_" & Option,
                                 Default, Option, Network_Id);
             begin
-               Value := Get_Option (Option, As_String (Default_2));
+               Value := Get_Option (Option, Default_2);
             end;
          else
             declare
@@ -1786,7 +1877,7 @@ is
                   declare
                      Success : Boolean;
 
-                     Statement : constant String :=
+                     Statement : constant Statement_Type :=
                        Globals.WpDB.Prepare (
                          "SELECT meta_value FROM wpdb->sitemeta " &
                          "WHERE meta_key = %s AND site_id = %d",
@@ -2008,6 +2099,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -2045,7 +2137,7 @@ is
          declare
             Success : Boolean;
 
-            Statement : constant String :=
+            Statement : constant Statement_Type :=
               Globals.WpDB.Prepare (
                 "SELECT meta_id FROM {wpdb->sitemeta} " &
                 "WHERE meta_key = %s AND site_id = %d",
@@ -2148,7 +2240,7 @@ is
          Old_Value : constant Multi_Type :=
            Get_Network_Option (Network_Id_2, Option, From_Boolean (False));
 
-         Value_2 : Multi_Type;
+         Value_2 : Multi_Type := Value;
       begin
          --
          -- Filters a specific network option before its value is updated.
@@ -2339,13 +2431,13 @@ is
 -- --
 -- function get_site_transient( transient ) then
    function Get_Site_Transient (Transient : String)
-                                return Hb_Common.String_Maps.Map
+                                return String_Maps.Map
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
-      use Php;
       use Php.Lists;
       use Php.Misc;
+      use Php.Strings;
+      use Hb_Common;
       use Inc_Caches;
       use Inc_Load;
 
@@ -2391,7 +2483,7 @@ is
                                 +"update_themes"));
             Transient_Option : constant String := "_site_transient_" & Transient;
          begin
-            if not In_Array (Transient, No_Timeout, True) then
+            if not In_List (Transient, No_Timeout, True) then
                declare
                   Transient_Timeout : constant String :=
                     "_site_transient_timeout_" & Transient;
@@ -2428,7 +2520,7 @@ is
       declare
          use Inc_Plugins;
 
-         M : Hb_Common.String_Maps.Map;
+         M : String_Maps.Map;
          R : constant String :=
            Apply_Filters ("site_transient_" & Transient, -Value, Transient);
       begin
@@ -2488,8 +2580,8 @@ is
       Result : Boolean;
    begin
       if Wp_Using_Ext_Object_Cache or else Wp_Installing then
-         Result := Wp_Cache_Set (Transient, From_Array (Value_2),
-                                 "site-transient", Expiration_2);
+         Wp_Cache_Set (Transient, From_Array (Value_2),
+                       "site-transient", Expiration_2, Success => Result);
       else
          declare
             Transient_Timeout : constant String :=

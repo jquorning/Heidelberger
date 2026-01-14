@@ -8,6 +8,8 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Strings;
+
 with Globals;
 with Hb_Common;
 with Lists;
@@ -30,6 +32,7 @@ is
                  Locale : String)
                  return String
    is
+      use Php.Strings;
    begin
       if Isset (This.Alll (Domain) (Locale)) then
          return This.Alll (Domain) (Locale);
@@ -46,6 +49,7 @@ is
                  Domain : String)
                  return Boolean
    is
+      use Php.Strings;
    begin
       return
         not Empty (This.Current (Domain)) or else
@@ -62,8 +66,10 @@ is
                   Locale : String;
                   Path   : String)
    is
-      Path_2 : constant String := (if Path /= ""
-                                   then Trailingslashit (Path) else ""); -- False
+      Path_2 : constant String :=
+        (if Path /= ""
+         then Trailing_Slash_It (Path) else ""); -- False
+
       Map : String_Maps.Map;
    begin
       Map.Include (Key      => Locale,
@@ -97,6 +103,8 @@ is
                                     Locale : String)
                                     return String
    is
+      use Php.Strings;
+
       Locations : List_Type := To_List (List => (
          +Globals.WP_LANG_DIR & "/plugins",
          +Globals.WP_LANG_DIR & "/themes"
@@ -122,14 +130,14 @@ is
 --       if In_Array (-Path, This.Cached_Mo_Files (Location), True) then
             This.Set (Domain, Locale, -Location);
 
-            return Trailingslashit (-Location);
+            return Trailing_Slash_It (-Location);
          end if;
       end loop;
 
       -- If no path is found for the given locale and a custom path has been set
       -- using load_plugin_textdomain/load_theme_textdomain, use that one.
       if "en_US" /= Locale and then Isset (This.Custom_Paths (Domain)) then
-         Path := +Trailingslashit (This.Custom_Paths (Domain));
+         Path := +Trailing_Slash_It (This.Custom_Paths (Domain));
          This.Set (Domain, Locale, -Path);
          return -Path;
       end if;

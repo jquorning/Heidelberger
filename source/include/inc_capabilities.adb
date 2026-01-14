@@ -1,9 +1,9 @@
--- --
--- -- Core User Role & Capabilities API
--- --
--- -- @package WordPress
--- -- @subpackage Users
--- --
+--
+-- Core User Role & Capabilities API
+--
+-- @package WordPress
+-- @subpackage Users
+--
 
 with Ada.Strings.Unbounded;
 
@@ -11,7 +11,6 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
-with Arrays;
 with Globals;
 with Hb_Common;
 
@@ -29,16 +28,13 @@ with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
 with Inc_Posts;
+with Inc_Roles;
 
 package body Inc_Capabilities
 is
-   use Arrays;
 
    Global_Super_Admins        : List_Type;
    Global_Post_Type_Meta_Caps : Array_Type;
-
-   Global_Wp_Roles : constant Inc_Class_Wp_Roles.Wp_Roles :=
-     Inc_Class_Wp_Roles.X_Construct;
 
    function Apply_Filters (Hook  : String;
                            Value : List_Type;
@@ -211,7 +207,7 @@ is
             -- If the post author is set and the user is the author...
             if Post.Post_Author /= 0 and then User_Id = Post.Post_Author then
                -- If the post is published or scheduled...
-               if In_Array (-Post.Post_Status, Publish_Future, True) then
+               if In_List (-Post.Post_Status, Publish_Future, True) then
                   Append (Caps,
                           As_String (Get (
                             Post_Type.Cap, "delete_published_posts")));
@@ -220,7 +216,7 @@ is
                      Status : constant String :=
                        Get_Post_Meta (Post.Id, "_wp_trash_meta_status", True);
                   begin
-                     if In_Array (Status, Publish_Future, True) then
+                     if In_List (Status, Publish_Future, True) then
                         Append (Caps,
                                 As_String (Get (
                                   Post_Type.Cap, "delete_published_posts")));
@@ -243,7 +239,7 @@ is
                          Post_Type.Cap, "delete_others_posts")));
                -- The post is published or scheduled, extra cap required.
                if
-                 In_Array (-Post.Post_Status, Publish_Future, True)
+                 In_List (-Post.Post_Status, Publish_Future, True)
                then
                   Append (Caps,
                           As_String (Get (
@@ -261,7 +257,7 @@ is
             --
             if Get_Option ("wp_page_for_privacy_policy") = Integer (Post.Id) then
                Caps :=
-                 Array_Merge (Caps, Map_Meta_Cap ("manage_privacy_options", User_Id));
+                 List_Merge (Caps, Map_Meta_Cap ("manage_privacy_options", User_Id));
             end if;
          end;
          << Break_2 >>
@@ -344,7 +340,7 @@ is
             -- If the post author is set and the user is the author...
             if Post.Post_Author /= 0 and then User_Id = Post.Post_Author then
                -- If the post is published or scheduled...
-               if In_Array (-Post.Post_Status, Publish_Future, True) then
+               if In_List (-Post.Post_Status, Publish_Future, True) then
                   Append (Caps,
                           As_String (Get (
                             Post_Type.Cap, "edit_published_posts")));
@@ -354,7 +350,7 @@ is
                      Status : constant String :=
                        Get_Post_Meta (Post.Id, "_wp_trash_meta_status", True);
                   begin
-                     if In_Array (Status, Publish_Future, True) then
+                     if In_List (Status, Publish_Future, True) then
                         Append (Caps,
                                 As_String (Get (
                                   Post_Type.Cap, "edit_published_posts")));
@@ -374,7 +370,7 @@ is
                -- The user is trying to edit someone else"s post.
                Append (Caps, As_String (Get (Post_Type.Cap, "edit_others_posts")));
                -- The post is published or scheduled, extra cap required.
-               if In_Array (-Post.Post_Status, Publish_Future, True) then
+               if In_List (-Post.Post_Status, Publish_Future, True) then
                   Append (Caps,
                           As_String (Get (
                             Post_Type.Cap, "edit_published_posts")));
@@ -391,7 +387,7 @@ is
             --
             if Get_Option ("wp_page_for_privacy_policy") = Integer (Post.Id) then
                Caps :=
-                 Array_Merge (Caps, Map_Meta_Cap ("manage_privacy_options", User_Id));
+                 List_Merge (Caps, Map_Meta_Cap ("manage_privacy_options", User_Id));
             end if;
          end;
          << Break_3 >>
@@ -1043,7 +1039,7 @@ is
               +"edit_published_blocks"
             ));
          begin
-            if In_Array (Cap, Block_Caps, True) then
+            if In_List (Cap, Block_Caps, True) then
                Cap_2 := +Str_Replace ("_blocks", "_posts", Cap);
             end if;
          end;
@@ -1216,7 +1212,8 @@ is
    function Wp_Roles_X -- _X added
             return Inc_Class_Wp_Roles.Wp_Roles
    is
---        global wp_roles;
+      use Inc_Class_Wp_Roles;
+      use Inc_Roles;
    begin
       -- if not Isset (Global_Wp_Roles) then
       --    Global_Wp_Roles := new WP_Roles();
@@ -1224,36 +1221,40 @@ is
       return Global_Wp_Roles;
    end Wp_Roles_X;
 
--- --
--- -- Retrieves role object.
--- --
--- -- @since 2.0.0
--- --
--- -- @param string role Role name.
--- -- @return WP_Role|null WP_Role object if found, null if the role does not exist.
--- --
--- function get_role( role ) then
---         return wp_roles().get_role( role );
--- end;
+   --------------
+   -- Get_Role --
+   --------------
 
--- --
--- -- Adds a role, if it does not exist.
--- --
--- -- @since 2.0.0
--- --
--- -- @param string role         Role name.
--- -- @param string display_name Display name for role.
--- -- @param bool[] capabilities List of capabilities keyed by the capability name,
--- --                             e.g. array( "edit_posts" => true, "delete_posts" => false ).
--- -- @return WP_Role|void WP_Role object, if the role is added.
--- --
--- function add_role( role, display_name, capabilities = array() ) then
---         if ( empty( role ) ) then
---                 return;
---         end;
+   function Get_Role (Role : String)
+                      return Inc_Class_Wp_Role.Wp_Role
+   is
+   begin
+      return Wp_Roles_X.Get_Role (Role);
+--    return wp_roles().Get_Role (Role);
+   end Get_Role;
 
---         return wp_roles().add_role( role, display_name, capabilities );
--- end;
+   --------------
+   -- Add_Role --
+   --------------
+
+   procedure Add_Role (Role         : String;
+                       Display_Name : String;
+                       Capabilities : Array_Type := Empty_Array)
+   is
+      use Php.Strings;
+      use Inc_Class_Wp_Role;
+      use Inc_Class_Wp_Roles;
+      use Inc_Roles;
+
+      Unused : Wp_Role;
+   begin
+      if Empty (Role) then
+         return;
+      end if;
+
+      Unused := Global_Wp_Roles.Add_Role (Role, Display_Name, Capabilities);
+--    return Wp_Roles_X.Add_Role (Role, Display_Name, Capabilities);
+   end Add_Role;
 
 -- --
 -- -- Removes a role, if it exists.
@@ -1313,7 +1314,7 @@ is
          begin
             if
               Is_Array (Super_Admins) and then
-              In_Array (-User.Prop.User_Login, Super_Admins, True)
+              In_List (-User.Prop.User_Login, Super_Admins, True)
             then
                return True;
             end if;

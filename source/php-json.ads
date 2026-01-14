@@ -8,7 +8,9 @@ package Php.JSON
 is
    use Arrays;
 
-   function JSON_Encode (Value : Multi_Type)
+   function JSON_Encode (Value : Multi_Type;
+                         Flags : Integer := 0;
+                         Depth : Integer := 512)
                          return String
                          is ("XXX-007");
 
@@ -26,5 +28,13 @@ is
    function JSON_Last_Error_Msg
             return String
             is ("XXX-979");
+
+   function Serialize (Value : Multi_Type)
+                       return String
+                       is (raise Program_Error with "not implemented");
+
+   function Unserialize (Data : String)
+                         return Multi_Type
+                         is (raise Program_Error with "not implemented");
 
 end Php.JSON;

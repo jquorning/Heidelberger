@@ -8,6 +8,7 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 with Php.Lists;
 with Php.Strings;
@@ -62,7 +63,7 @@ is
             Handle : constant String := -A; -- .Value;
          begin
             if
-              not In_Array (Handle, This.Done, True) and then
+              not In_List (Handle, This.Done, True) and then
               This.Registered.Find (Handle) /= Dependency_Maps.No_Element
             then
                --
@@ -122,9 +123,9 @@ is
          declare
             Handle_Parts : constant List_Type := Explode ("?", -Handle);
             Handle_2     : constant String    := -Handle_Parts.First_Element; --  (0);
-            Queued       : constant Boolean   := In_Array (Handle_2, This.To_Do, True);
+            Queued       : constant Boolean   := In_List (Handle_2, This.To_Do, True);
          begin
-            if In_Array (Handle_2, This.Done, True) then -- Already done.
+            if In_List (Handle_2, This.Done, True) then -- Already done.
                goto Continue;
             end if;
 
@@ -146,8 +147,8 @@ is
                elsif
                  not This.Registered (Handle_2).Deps.Is_Empty and then
 --               This.Registered (Handle_2).Deps /= Empty_String_Array and then
-                 Empty_List = Array_Diff (This.Registered (Handle_2).Deps,
-                                          Array_Keys (This.Registered))
+                 Empty_List = List_Diff (This.Registered (Handle_2).Deps,
+                                         Array_Keys (This.Registered))
                then
                   Keep_Going := False; -- Item requires dependencies that don't exist.
                elsif
@@ -229,7 +230,7 @@ is
         -- X_Wp_Dependency'
 
       -- If the item was enqueued before the details were registered, enqueue it now.
-      if Array_Key_Exists (Handle, This.Queued_Before_Register) then
+      if List_Key_Exists (Handle, This.Queued_Before_Register) then
          if
            This.Queued_Before_Register.Find (+Handle) = List_Vectors.No_Element
          then
@@ -295,6 +296,7 @@ is
                       Key    : String)
                       return String -- Array_Type
    is
+      use Php.Strings;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
    begin
       if This.Registered.Find (Handle) = No_Element then
@@ -348,7 +350,7 @@ is
             Position : List_Vectors.Cursor;
          begin
             if
-              not In_Array (First, This.Queue, True) and then
+              not In_List (First, This.Queue, True) and then
               Has_Element (This.Registered.Find (First))
             then
                This.Queue.Append (+First); -- Handle_2 (Handle_2.First_Index)); -- ()
@@ -401,7 +403,7 @@ is
             Handle_2 : constant List_Type := Explode ("?", -Handle);
             First    : constant String := -Handle_2 (Handle_2.First_Index);
             Key      : constant String :=
-               Array_Search (First, This.Queue, True);
+               List_Search (First, This.Queue, True);
 
             Position_1 : List_Vectors.Cursor;
             Position_2 : Inc_Class_Wp_Dependency.String_Maps.Cursor;
@@ -419,7 +421,7 @@ is
 --             Unset (This.Queue (Key));
 --             Unset (This.Args (Handle_2 (Handle_2.First_Index)));
 
-            elsif Array_Key_Exists (First, This.Queued_Before_Register) then
+            elsif List_Key_Exists (First, This.Queued_Before_Register) then
                Position_1 := This.Queued_Before_Register.Find (+First);
                This.Queued_Before_Register.Delete (Position_1);
 --             Unset (This.Queued_Before_Register (Handle_2 (Handle_2.First_Index)));
@@ -475,14 +477,14 @@ is
                         All_Deps.Append (Deps);
 --                      All_Deps.Append (To_List (Deps));
 --                      All_Deps.Append (Array_Fill_Keys (Deps, True));
-                        Unused := Array_Push (Queues, Deps);
+                        Unused := List_Push (Queues, Deps);
                      end if;
                   end;
                   Done.Append (Queued);
 --                Done (Queued) := True;
                end if;
             end loop;
-            Queue_2.Append (+Array_Pop (Queues));
+            Queue_2.Append (+List_Pop (Queues));
 --            Queue_2 := Array_Pop (Queues);
          end loop;
 
@@ -521,7 +523,7 @@ is
 --                        case "enqueued":
 --                        case "queue": -- Back compat.
       elsif Status in "enqueued" | "queue" then
-         if In_Array (Handle, This.Queue, True) then
+         if In_List (Handle, This.Queue, True) then
             return (True, Null_Deps);
          end if;
          return (This.Recurse_Deps (This.Queue, Handle), Null_Deps);
@@ -529,12 +531,12 @@ is
 --                        case "to_do":
 --                        case "to_print": -- Back compat.
       elsif Status in "to_do" | "to_print" then
-         return (In_Array (Handle, This.To_Do, True), Null_Deps);
+         return (In_List (Handle, This.To_Do, True), Null_Deps);
 
 --                        case "done":
 --                        case "printed": -- Back compat.
       elsif Status in "done" | "printed" then
-         return (In_Array (Handle, This.Done, True), Null_Deps);
+         return (In_List (Handle, This.Done, True), Null_Deps);
       end if;
 
       return (False, Null_Deps);
@@ -551,10 +553,7 @@ is
                        Group     : Integer)
                        return Boolean
    is
---    use Inc_Class_Wp_Dependencies;
       use Inc_Class_Wp_Dependencies.Integer_Maps;
-
-      Group_2 : Integer := Group; -- (int)
    begin
       if
         This.Groups.Find (Handle) /= No_Element and then
@@ -564,7 +563,10 @@ is
          return False;
       end if;
 
-      This.Groups.Replace (Handle, Group);
+      Ada.Text_IO.Put_Line (This'Image);
+      This.Groups.Include (Key      => Handle,
+                           New_Item => Group);
+--    This.Groups.Replace (Handle, Group);
 --    This.Groups (Handle) := Group;
 
       return True;

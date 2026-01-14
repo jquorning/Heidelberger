@@ -7,9 +7,11 @@
 --
 
 with Php.Arrays;
+with Php.Strings;
 
 with Globals;
 with Hb_Common;
+with Lists;
 
 with Inc_Load;
 with Inc_Ms_Blogs;
@@ -18,7 +20,6 @@ with Inc_Plugins;
 
 package body Inc_Class_Wp_Roles
 is
-   Global_Wp_User_Roles : Array_Type;
 
    -----------------
    -- X_Construct --
@@ -27,8 +28,6 @@ is
    function X_Construct (Site_Id : Integer := 0)
                          return Wp_Roles
    is
---    use Hb_Common;
-
       This : Wp_Roles;
    begin
       This.Use_DB := Global_Wp_User_Roles.Is_Empty;
@@ -39,6 +38,71 @@ is
    end X_Construct;
 
    --------------
+   -- Add_Role --
+   --------------
+
+   function Add_Role (This         : in out Wp_Roles;
+                      Role         : String;
+                      Display_Name : String;
+                      Capabilities : Array_Type := Empty_Array)
+                      return Inc_Class_Wp_Role.Wp_Role
+   is
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Class_Wp_Role;
+      use Inc_Options;
+   begin
+      if Empty (Role) or else Isset (This.Roles, Role) then
+         return Null_Role; -- Null_Role added
+      end if;
+
+      Set (This.Roles, Role, From_Array (
+           To_Array (List => (
+             Build ("name",         Display_Name),
+             Build ("capabilities", Capabilities)
+           ))));
+
+      if This.Use_DB then
+         Update_Option (-This.Role_Key, From_Array (This.Roles));
+      end if;
+
+      This.Role_Objects.Include (
+        Key      => Role,
+        New_Item => Inc_Class_Wp_Role.X_Construct (Role, Capabilities));
+
+      Set (This.Role_Names, Role, From_String (Display_Name));
+
+      return This.Role_Objects (Role);
+   end Add_Role;
+
+   -------------
+   -- Add_Cap --
+   -------------
+
+   procedure Add_Cap (This  : in out Wp_Roles;
+                      Role  : String;
+                      Cap   : String;
+                      Grant : Boolean := True)
+   is
+      use Hb_Common;
+      use Inc_Options;
+   begin
+      if not Isset (This.Roles, Role) then
+         return;
+      end if;
+
+      Set_3 (This.Roles,
+             Key_1 => Role,
+             Key_2 => "capabilities",
+             Key_3 => Cap,
+             Value => From_Boolean (Grant));
+
+      if This.Use_DB then
+         Update_Option (-This.Role_Key, From_Array (This.Roles));
+      end if;
+   end Add_Cap;
+
+   --------------
    -- Get_Role --
    --------------
 
@@ -46,9 +110,8 @@ is
                       Role : String)
                       return Inc_Class_Wp_Role.Wp_Role
    is
---    use Hb_Common;
       use Inc_Class_Wp_Role;
-      use Inc_Class_Wp_Roles.Role_Maps;
+      use Inc_Class_Wp_Role.Role_Maps;
    begin
       if Has_Element (This.Role_Objects.Find (Role)) then
 --    if Isset (This.Role_Objects, Role) then
@@ -64,9 +127,9 @@ is
 
    procedure Init_Roles (This : in out Wp_Roles)
    is
-      use Hb_Common;
-      use Php;
       use Php.Arrays;
+      use Hb_Common;
+      use Lists;
       use Inc_Class_Wp_Role;
       use Inc_Plugins;
    begin
@@ -75,7 +138,7 @@ is
       end if;
 
       This.Role_Objects := Role_Maps.Empty_Map; -- Empty_Array;
-      This.Role_Names   := Empty_List;
+      This.Role_Names   := Empty_Array; -- List;
 
       for Role_2 of List_Type'(Array_Keys (This.Roles)) loop
          declare

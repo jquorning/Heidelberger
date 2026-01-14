@@ -305,10 +305,10 @@ is
                                Preg_Replace ("/^([.0-9]+).*/", "1",
                                              Inc_General_Templates.Get_Bloginfo ("version"))));
       Append (Admin_Body_Class, " admin-color-" &
-                               Sanitize_Html_Class (
+                               Sanitize_HTML_Class (
                                  Inc_Users.Get_User_Option ("admin_color"), "fresh"));
       Append (Admin_Body_Class, (" locale-" &
-                               Sanitize_Html_Class (Strtolower (
+                               Sanitize_HTML_Class (Strtolower (
                                  Str_Replace ("_", "-", Get_User_Locale)))));
 
       if Inc_Vars.Wp_Is_Mobile then

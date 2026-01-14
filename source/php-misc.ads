@@ -65,10 +65,6 @@ is
                  return String
                  is ("XXX-937");
 
-   function Serialize (Value : String)
-                       return String
-                       is ("XXX-978");
-
    function Current (List : List_Type)
                      return String
                      is ("XXX-011");
@@ -80,5 +76,15 @@ is
    function Function_Exists (Func : String)
                              return Boolean
                              is (True);
+
+   function Microtime
+            return String
+            is ("XXX-964");
+
+   ALL_WITH_BC : constant String := "ALL";
+
+   function Timezone_Identifiers_List (A : String)
+            return List_Type
+            is (Empty_List);
 
 end Php.Misc;

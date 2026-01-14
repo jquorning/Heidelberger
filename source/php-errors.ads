@@ -12,8 +12,9 @@ is
             return Array_Type
             is (Empty_Array);
 
-   procedure Die (Reason : String := "")
-             is null;
+   Program_Termination : exception;
+
+   procedure Die (Reason : String := "");
 
    procedure Error_Reporting (Error_Level : Integer := 0)
              is null;

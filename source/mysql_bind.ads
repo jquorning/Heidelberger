@@ -1,0 +1,62 @@
+--
+--
+--
+
+with Databases;
+
+package MySQL_Bind
+is
+
+   function Mysql_Init
+            return Integer
+   is (raise Program_Error with "not implemented");
+
+   procedure Mysql_Real_Connect
+   is null;
+
+   procedure Mysql_Free_Result (Result : Databases.Three_State)
+   is null;
+
+   function Mysql_Connect
+              ( -- Dbh    : Integer;
+               Host   : String;
+               User   : String;
+               Pw     : String;
+               Links  : Boolean; -- String;
+--             Port   : Natural;
+--             Socket : String;
+               Flags  : Integer)
+            return Integer
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Affected_Rows (Dbh : Integer)
+                                 return Natural
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Insert_Id (Dbh : Integer)
+                             return Natural
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Fetch_Object (Result : Databases.Three_State)
+                                return Natural
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Errno (Dbh : Integer)
+                         return Natural
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Error (Dbh : Integer)
+                          return String
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Query (Dbh   : Integer;
+                         Query : String)
+                         return Databases.Three_State
+   is (raise Program_Error with "not implemented");
+
+   function MySQL_Real_Escape_String (Item : String;
+                                      Dbh  : Integer)
+                                      return String
+   is (raise Program_Error with "not implemented");
+
+end MySQL_Bind;

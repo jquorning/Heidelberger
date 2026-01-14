@@ -7,6 +7,7 @@
 --
 
 with Php.Lists;
+with Php.Strings;
 
 with Globals;
 with Hb_Common;
@@ -27,7 +28,7 @@ is
                          return Wp_Terms_List_Table
    is
       use Hb_Common;
---    use Php;
+      use Php.Strings;
       use Inc_L10n;
 --    use Inc_Posts;
 
@@ -64,10 +65,10 @@ is
       -- @todo Still needed? Maybe just the show_ui part.
       if
         Empty (-Globals.Post_Type) or else
-        not Php.Lists.In_Array (-Globals.Post_Type,
-                                Inc_Posts.Get_Post_Types (To_Array ((1 =>
-                                  Build ("show_ui", "true")))),
-                                True)
+        not Php.Lists.In_List (-Globals.Post_Type,
+                               Inc_Posts.Get_Post_Types (To_Array ((1 =>
+                                 Build ("show_ui", "true")))),
+                               True)
       then
          Globals.Post_Type := +"post";
       end if;

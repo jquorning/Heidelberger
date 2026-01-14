@@ -9,8 +9,10 @@ with Ada.Containers;
 
 with Php.Arrays;
 with Php.HTML;
+with Php.JSON;
 with Php.Lists;
 with Php.Misc;
+with Php.Numerics;
 with Php.Strings;
 
 with Globals;
@@ -1859,8 +1861,8 @@ is
          end if;
       elsif
         "attachment" = Post_2.Post_Type and then
-        not In_Array (-Post_Status,
-                      To_List (List => (+"private", +"trash", +"auto-draft")), True)
+        not In_List (-Post_Status,
+                     To_List (List => (+"private", +"trash", +"auto-draft")), True)
       then
          --
          -- Ensure uninherited attachments have a permitted status either "private",
@@ -2754,6 +2756,7 @@ is
       return Array_Type
    is
       use Php.Arrays;
+      use Php.Strings;
       use Hb_Common;
    begin
 --      object.labels = (array) object.labels;
@@ -3590,6 +3593,7 @@ is
    is
       use Php.Arrays;
       use Php.Lists;
+      use Php.Numerics;
       use Php.Strings;
       use Hb_Common;
       use Wp_Common;
@@ -3601,14 +3605,14 @@ is
       pragma Unreferenced (Value);
       Array_Int_Fields : constant List_Type := To_List ("ancestors");
    begin
-      if In_Array (Field, Int_Fields, True) then
+      if In_List (Field, Int_Fields, True) then
          null;
 --       Value_2 := Integer (Value_2);
       end if;
 
       -- Fields which contain arrays of integers.
-      if In_Array (Field, Array_Int_Fields, True) then
-         Value_2 := Array_Map ("absint", Value_2);
+      if In_List (Field, Array_Int_Fields, True) then
+         Value_2 := Array_Map (Absint'Access, Value_2);
          return Value_2;
       end if;
 
@@ -3665,7 +3669,7 @@ is
                                          Value_2, Post_Id);
             end if;
 
-            if In_Array (Field, Format_To_Edit, True) then
+            if In_List (Field, Format_To_Edit, True) then
                if "post_content" = Field then
                   null;
 --                Value_2 := Format_To_Edit (Value_2, User_Can_Richedit); -- ()
@@ -6550,6 +6554,7 @@ is
       use Ada.Containers;
       use Hb_Common;
       use Php.HTML;
+      use Php.JSON;
       use Php.Strings;
       use Php.Lists;
       use Php.Misc;
@@ -6560,8 +6565,11 @@ is
 
       Last_Changed : constant String := Wp_Cache_Get_Last_Changed ("posts");
 
-      Unused    : Boolean;
-      Hash      : constant String  := MD5 (Page_Path & Serialize (Post_Type));
+      Unused : Boolean;
+
+      Hash : constant String :=
+        MD5 (Page_Path & Serialize (From_String (Post_Type)));
+
       Cache_Key : constant String  := "get_page_by_path:" & Hash & ":" & Last_Changed;
       Cached    : constant Wp_Post :=
         Wp_Cache_Get (Cache_Key, "posts", Found => Unused);
@@ -6578,12 +6586,15 @@ is
       end if;
 
       declare
-         Page_Path_2   : constant String := RawURLencode (URLdecode (Page_Path));
-         Page_Path_3   : constant String := Str_Replace ("%2F", "/", Page_Path_2);
-         Page_Path     : constant String := Str_Replace ("%20", " ", Page_Path_3);
+         Page_Path_2 : constant String := Raw_URL_Encode (URL_Decode (Page_Path));
+         Page_Path_3 : constant String := Str_Replace ("%2F", "/", Page_Path_2);
+         Page_Path   : constant String := Str_Replace ("%20", " ", Page_Path_3);
 
-         Parts_2       : constant List_Type := Explode ("/", Trim (Page_Path, "/"));
-         Parts         : constant List_Type := Array_Map ("sanitize_title_for_query", Parts_2);
+         Parts_2     : constant List_Type := Explode ("/", Trim (Page_Path, "/"));
+
+         Parts : constant List_Type :=
+           List_Map (Sanitize_Title_For_Query'Access, Parts_2);
+
          Escaped_Parts : constant List_Type := ESC_SQL (Parts);
 
          In_String : constant String := """" & Implode (",", Escaped_Parts) & """";
@@ -6608,7 +6619,7 @@ is
                 "AND post_type IN (" & Post_Type_In_String & ") ";
 
          Pages    : Post_Array := Globals.WpDB.Get_Results (SQL, "OBJECT_K");
-         Revparts : constant List_Type  := Array_Reverse (Parts);
+         Revparts : constant List_Type  := List_Reverse (Parts);
 
          Foundid : Natural := 0;
       begin

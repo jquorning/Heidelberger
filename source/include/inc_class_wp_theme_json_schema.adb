@@ -136,12 +136,13 @@ is
       use Php;
       use Php.Lists;
 
+      Path_2       : List_Type  := Path;
       Tmp_Settings : Array_Type := Settings;
       -- phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
-      Last_Key : constant String := Array_Pop (Path);
+      Last_Key : constant String := List_Pop (Path_2);
    begin
-      for Key of Path loop
+      for Key of Path_2 loop
          Tmp_Settings := As_Array (Get (Tmp_Settings, -Key));
       end loop;
 

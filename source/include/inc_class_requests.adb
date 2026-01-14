@@ -130,6 +130,7 @@ is
             return String
    is
       use Php.Files;
+      use Php.Strings;
       use Hb_Common;
    begin
       if not Empty (-Certificate_Path) then -- self::
@@ -198,7 +199,7 @@ is
 
       if not Isset (Options, "data_format") then
          if
-           In_Array (Typ, To_List (List => (+HEAD, +GET_Method, +DELETE_Method)),
+           In_List (Typ, To_List (List => (+HEAD, +GET_Method, +DELETE_Method)),
            -- 3x self::
                      True)
          then
@@ -275,7 +276,7 @@ is
          Unused    : Natural;
       begin
          Unused := Preg_Match ("#^HTTP/(1\.\d)[ \t]+(\d+)#i",
-                               Array_Shift (Headers_4), Matches);
+                               List_Shift (Headers_4), Matches);
 
          if Matches.Is_Empty then
             raise Requests_Exception

@@ -7,14 +7,16 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Echoing;
+with Php.Errors;
+with Php.Strings;
+
 with Templates_Parser;
 
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
-with Php.Echoing;
-with Php.Strings;
 with Lists;
 with Wp_Common;
 
@@ -994,6 +996,10 @@ is
             end;
          end;
       end Label_1;
+
+   exception
+      when Php.Errors.Program_Termination =>
+         null;
    end Render;
 
    ------------------

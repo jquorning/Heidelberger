@@ -44,13 +44,14 @@ is
       use Php;
       use Php.Arrays;
       use Php.Lists;
+      use Php.Strings;
 --    use Inc_Class_Wp_Theme_JSON;
       use Inc_Functions;
 
       This : Wp_Theme_JSON;
 
       Origin_2 : constant String :=
-        (if not In_Array (Origin, VALID_ORIGINS, True) -- static::
+        (if not In_List (Origin, VALID_ORIGINS, True) -- static::
          then "theme"
          else Origin);
 
@@ -529,11 +530,11 @@ is
 
       Stylesheet : Unbounded_String;
    begin
-      if In_Array ("variables", Types, True) then
+      if In_List ("variables", Types, True) then
          Append (Stylesheet, This.Get_CSS_Variables (Setting_Nodes, Origins_2));
       end if;
 
-      if In_Array ("styles", Types, True) then
+      if In_List ("styles", Types, True) then
          declare
             Root_Block_Key : constant String :=
               Array_Search (ROOT_BLOCK_SELECTOR, Array_Column (Style_Nodes, "selector"), True);
@@ -547,7 +548,7 @@ is
          end;
          Append (Stylesheet, This.Get_Block_Classes (Style_Nodes));
 
-      elsif In_Array ("base-layout-styles", Types, True) then
+      elsif In_List ("base-layout-styles", Types, True) then
          -- Base layout styles are provided as part of `styles`, so only output separately if
          -- explicitly requested. For backwards compatibility, the Columns block is explicitly
          -- included, to support a different default gap value.
@@ -570,7 +571,7 @@ is
          end;
       end if;
 
-      if In_Array ("presets", Types, True) then
+      if In_List ("presets", Types, True) then
          Append (Stylesheet, This.Get_Preset_Classes (Setting_Nodes, Origins_2));
       end if;
 
@@ -613,7 +614,7 @@ is
                                return String
    is
       use Ada.Strings.Unbounded;
-      use Php;
+      use Php.Arrays;
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
@@ -883,8 +884,8 @@ is
                         if
                           not Empty (As_String (Get (Layout_Definition, "displayMode"))) and then
                           Kind_Of (Get (Layout_Definition, "displayMode")) = Kind_String and then
-                          In_Array (As_String (Get (Layout_Definition, "displayMode")),
-                                    Valid_Display_Modes, True)
+                          In_List (As_String (Get (Layout_Definition, "displayMode")),
+                                   Valid_Display_Modes, True)
                         then
                            declare
                               Layout_Selector : constant String := Sprintf (
@@ -978,18 +979,18 @@ is
    begin
       for Metadata_2 in Setting_Nodes.Iterate loop
          declare
-            Metadata : constant Multi_Type := Element (Metadata_2);
+            Metadata : constant Array_Type := As_Array (Element (Metadata_2));
          begin
-            if "" = As_String (Get (As_Array (Metadata), "selector")) then -- null
+            if "" = Get_As_String (Metadata, "selector") then -- null
                goto Continue;
             end if;
 
             declare
-               Selector : constant String := Get (As_String (Metadata), "selector");
+               Selector : constant String := Get_As_String (Metadata, "selector");
 
                Node : constant Multi_Type :=
                  X_Wp_Array_Get (This.Theme_JSON,
-                                 As_List (Get (As_Array (Metadata), "path")));
+                                 As_List (Get (Metadata, "path")));
             begin
                Append (Preset_Rules,
                        Compute_Preset_Classes (As_Array (Node),
@@ -1018,18 +1019,18 @@ is
    begin
       for Metadata_2 in Nodes.Iterate loop
          declare
-            Metadata : constant Multi_Type := Element (Metadata_2);
+            Metadata : constant Array_Type := As_Array (Element (Metadata_2));
          begin
-            if "" = As_String (Get (As_Array (Metadata), "selector")) then -- null
+            if "" = Get_As_String (Metadata, "selector") then -- null
                goto Continue;
             end if;
 
             declare
-               Selector : constant String := Get (As_String (Metadata), "selector");
+               Selector : constant String := Get_As_String (Metadata, "selector");
 
                Node : constant Multi_Type :=
                  X_Wp_Array_Get (This.Theme_JSON,
-                                 As_List (Get (As_Array (Metadata), "path")));
+                                 As_List (Get (Metadata, "path")));
 
                Declarations : Array_Type :=
                  Compute_Preset_Vars (As_Array (Node), Origins);
@@ -1768,6 +1769,7 @@ is
       use Php;
       use Php.Arrays;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Functions;
 
       Node : constant Array_Type :=
@@ -1844,7 +1846,7 @@ is
       --
       declare
          Is_Processing_Element : constant Boolean :=
-           In_Array ("elements", As_List (Get (Block_Metadata, "path")), True);
+           In_List ("elements", As_List (Get (Block_Metadata, "path")), True);
 
          Current_Element : String :=
            (if Is_Processing_Element
@@ -2499,6 +2501,7 @@ is
                                Node_Path : List_Type)
                                return Array_Type
    is
+      use Php.Arrays;
       use Inc_Functions;
 
       Slugs : Array_Type;

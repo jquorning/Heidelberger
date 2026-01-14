@@ -11,6 +11,9 @@ with Arrays;
 
 package Adi_Upgrade
 is
+   use Arrays;
+
+   Wp_Current_DB_Version : Integer := 0;  -- Added by jq
 
 -- -- Include user installation customization script.--
 -- if ( file_exists( WP_CONTENT_DIR . "/install.php" ) ) then
@@ -2559,41 +2562,20 @@ is
 --         return all_options;
 -- end;
 
--- --
--- -- Utility version of get_option that is private to installation/upgrade.
--- --
--- -- @ignore
--- -- @since 1.5.1
--- -- @access private
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string setting Option name.
--- -- @return mixed
--- --
--- function __get_option( setting ) then -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore,PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore
---         global wpdb;
-
---         if ( "home" === setting && defined( "WP_HOME" ) ) then
---                 return untrailingslashit( WP_HOME );
---         end;
-
---         if ( "siteurl" === setting && defined( "WP_SITEURL" ) ) then
---                 return untrailingslashit( WP_SITEURL );
---         end;
-
---         option = wpdb->get_var( wpdb->prepare( "SELECT option_value FROM wpdb->options WHERE option_name = %s", setting ) );
-
---         if ( "home" === setting && ! option ) then
---                 return __get_option( "siteurl" );
---         end;
-
---         if ( in_array( setting, array( "siteurl", "home", "category_base", "tag_base" ), true ) ) then
---                 option = untrailingslashit( option );
---         end;
-
---         return maybe_unserialize( option );
--- end;
+   --
+   -- Utility version of get_option that is private to installation/upgrade.
+   --
+   -- @ignore
+   -- @since 1.5.1
+   -- @access private
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string setting Option name.
+   -- @return mixed
+   --
+   function X_Get_Option (Setting : String)
+                          return Arrays.Multi_Type;
 
 -- --
 -- -- Filters for content to remove unnecessary slashes.
@@ -2624,437 +2606,27 @@ is
 --         return content;
 -- end;
 
--- --
--- -- Modifies the database based on specified SQL statements.
--- --
--- -- Useful for creating new tables and updating existing tables to a new structure.
--- --
--- -- @since 1.5.0
--- -- @since 6.1.0 Ignores display width for integer data types on MySQL 8.0.17 or later,
--- --              to match MySQL behavior. Note: This does not affect MariaDB.
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string[]|string queries Optional. The query to run. Can be multiple queries
--- --                                 in an array, or a string of queries separated by
--- --                                 semicolons. Default empty string.
--- -- @param bool            execute Optional. Whether or not to execute the query right away.
--- --                                 Default true.
--- -- @return array Strings containing the results of the various update queries.
--- --
--- function dbDelta( queries = "", execute = true ) then -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
---         global wpdb;
-
---         if ( in_array( queries, array( "", "all", "blog", "global", "ms_global" ), true ) ) then
---                 queries = wp_get_db_schema( queries );
---         end;
-
---         -- Separate individual queries into an array.
---         if ( ! is_array( queries ) ) then
---                 queries = explode( ";", queries );
---                 queries = array_filter( queries );
---         end;
-
---         --
---         -- Filters the dbDelta SQL queries.
---         --
---         -- @since 3.3.0
---         --
---         -- @param string[] queries An array of dbDelta SQL queries.
---         --
---         queries = apply_filters( "dbdelta_queries", queries );
-
---         cqueries   = array(); -- Creation queries.
---         iqueries   = array(); -- Insertion queries.
---         for_update = array();
-
---         -- Create a tablename index for an array (cqueries) of queries.
---         foreach ( queries as qry ) then
---                 if ( preg_match( "|CREATE TABLE ([^ ]*)|", qry, matches ) ) then
---                         cqueries[ trim( matches[1], "`" ) ] = qry;
---                         for_update[ matches[1] ]            = "Created table " . matches[1];
---                 end; elseif ( preg_match( "|CREATE DATABASE ([^ ]*)|", qry, matches ) ) then
---                         array_unshift( cqueries, qry );
---                 end; elseif ( preg_match( "|INSERT INTO ([^ ]*)|", qry, matches ) ) then
---                         iqueries[] = qry;
---                 end; elseif ( preg_match( "|UPDATE ([^ ]*)|", qry, matches ) ) then
---                         iqueries[] = qry;
---                 end; else then
---                         -- Unrecognized query type.
---                 end;
---         end;
-
---         --
---         -- Filters the dbDelta SQL queries for creating tables and/or databases.
---         --
---         -- Queries filterable via this hook contain "CREATE TABLE" or "CREATE DATABASE".
---         --
---         -- @since 3.3.0
---         --
---         -- @param string[] cqueries An array of dbDelta create SQL queries.
---         --
---         cqueries = apply_filters( "dbdelta_create_queries", cqueries );
-
---         --
---         -- Filters the dbDelta SQL queries for inserting or updating.
---         --
---         -- Queries filterable via this hook contain "INSERT INTO" or "UPDATE".
---         --
---         -- @since 3.3.0
---         --
---         -- @param string[] iqueries An array of dbDelta insert or update SQL queries.
---         --
---         iqueries = apply_filters( "dbdelta_insert_queries", iqueries );
-
---         text_fields = array( "tinytext", "text", "mediumtext", "longtext" );
---         blob_fields = array( "tinyblob", "blob", "mediumblob", "longblob" );
---         int_fields  = array( "tinyint", "smallint", "mediumint", "int", "integer", "bigint" );
-
---         global_tables  = wpdb->tables( "global" );
---         db_version     = wpdb->db_version();
---         db_server_info = wpdb->db_server_info();
-
---         foreach ( cqueries as table => qry ) then
---                 -- Upgrade global tables only for the main site. Don"t upgrade at all if conditions are not optimal.
---                 if ( in_array( table, global_tables, true ) && ! wp_should_upgrade_global_tables() ) then
---                         unset( cqueries[ table ], for_update[ table ] );
---                         continue;
---                 end;
-
---                 -- Fetch the table column structure from the database.
---                 suppress    = wpdb->suppress_errors();
---                 tablefields = wpdb->get_results( "DESCRIBE thentableend;;" );
---                 wpdb->suppress_errors( suppress );
-
---                 if ( ! tablefields ) then
---                         continue;
---                 end;
-
---                 -- Clear the field and index arrays.
---                 cfields                  = array();
---                 indices                  = array();
---                 indices_without_subparts = array();
-
---                 -- Get all of the field names in the query from between the parentheses.
---                 preg_match( "|\((.*)\)|ms", qry, match2 );
---                 qryline = trim( match2[1] );
-
---                 -- Separate field lines into an array.
---                 flds = explode( "\n", qryline );
-
---                 -- For every field line specified in the query.
---                 foreach ( flds as fld ) then
---                         fld = trim( fld, " \t\n\r\0\x0B," ); -- Default trim characters, plus ",".
-
---                         -- Extract the field name.
---                         preg_match( "|^([^ ]*)|", fld, fvals );
---                         fieldname            = trim( fvals[1], "`" );
---                         fieldname_lowercased = strtolower( fieldname );
-
---                         -- Verify the found field name.
---                         validfield = true;
---                         switch ( fieldname_lowercased ) then
---                                 case "":
---                                 case "primary":
---                                 case "index":
---                                 case "fulltext":
---                                 case "unique":
---                                 case "key":
---                                 case "spatial":
---                                         validfield = false;
-
---                                         /*
---                                         -- Normalize the index definition.
---                                         --
---                                         -- This is done so the definition can be compared against the result of a
---                                         -- `SHOW INDEX FROM table_name` query which returns the current table
---                                         -- index information.
---                                         --
-
---                                         -- Extract type, name and columns from the definition.
---                                         -- phpcs:disable Squiz.Strings.ConcatenationSpacing.PaddingFound -- don"t remove regex indentation
---                                         preg_match(
---                                                 "/^"
---                                                 .   "(?P<index_type>"             -- 1) Type of the index.
---                                                 .       "PRIMARY\s+KEY|(?:UNIQUE|FULLTEXT|SPATIAL)\s+(?:KEY|INDEX)|KEY|INDEX"
---                                                 .   ")"
---                                                 .   "\s+"                         -- Followed by at least one white space character.
---                                                 .   "(?:"                         -- Name of the index. Optional if type is PRIMARY KEY.
---                                                 .       "`?"                      -- Name can be escaped with a backtick.
---                                                 .           "(?P<index_name>"     -- 2) Name of the index.
---                                                 .               "(?:[0-9a-zA-Z_-]|[\xC2-\xDF][\x80-\xBF])+"
---                                                 .           ")"
---                                                 .       "`?"                      -- Name can be escaped with a backtick.
---                                                 .       "\s+"                     -- Followed by at least one white space character.
---                                                 .   ")*"
---                                                 .   "\("                          -- Opening bracket for the columns.
---                                                 .       "(?P<index_columns>"
---                                                 .           ".+?"                 -- 3) Column names, index prefixes, and orders.
---                                                 .       ")"
---                                                 .   "\)"                          -- Closing bracket for the columns.
---                                                 . "/im",
---                                                 fld,
---                                                 index_matches
---                                         );
---                                         -- phpcs:enable
-
---                                         -- Uppercase the index type and normalize space characters.
---                                         index_type = strtoupper( preg_replace( "/\s+/", " ", trim( index_matches["index_type"] ) ) );
-
---                                         -- "INDEX" is a synonym for "KEY", standardize on "KEY".
---                                         index_type = str_replace( "INDEX", "KEY", index_type );
-
---                                         -- Escape the index name with backticks. An index for a primary key has no name.
---                                         index_name = ( "PRIMARY KEY" === index_type ) ? "" : "`" . strtolower( index_matches["index_name"] ) . "`";
-
---                                         -- Parse the columns. Multiple columns are separated by a comma.
---                                         index_columns                  = array_map( "trim", explode( ",", index_matches["index_columns"] ) );
---                                         index_columns_without_subparts = index_columns;
-
---                                         -- Normalize columns.
---                                         foreach ( index_columns as id => &index_column ) then
---                                                 -- Extract column name and number of indexed characters (sub_part).
---                                                 -- phpcs:disable Squiz.Strings.ConcatenationSpacing.PaddingFound -- don"t remove regex indentation
---                                                 preg_match(
---                                                         "/"
---                                                         .   "`?"                      -- Name can be escaped with a backtick.
---                                                         .       "(?P<column_name>"    -- 1) Name of the column.
---                                                         .           "(?:[0-9a-zA-Z_-]|[\xC2-\xDF][\x80-\xBF])+"
---                                                         .       ")"
---                                                         .   "`?"                      -- Name can be escaped with a backtick.
---                                                         .   "(?:"                     -- Optional sub part.
---                                                         .       "\s*"                 -- Optional white space character between name and opening bracket.
---                                                         .       "\("                  -- Opening bracket for the sub part.
---                                                         .           "\s*"             -- Optional white space character after opening bracket.
---                                                         .           "(?P<sub_part>"
---                                                         .               "\d+"         -- 2) Number of indexed characters.
---                                                         .           ")"
---                                                         .           "\s*"             -- Optional white space character before closing bracket.
---                                                         .       "\)"                  -- Closing bracket for the sub part.
---                                                         .   ")?"
---                                                         . "/",
---                                                         index_column,
---                                                         index_column_matches
---                                                 );
---                                                 -- phpcs:enable
-
---                                                 -- Escape the column name with backticks.
---                                                 index_column = "`" . index_column_matches["column_name"] . "`";
-
---                                                 -- We don"t need to add the subpart to index_columns_without_subparts
---                                                 index_columns_without_subparts[ id ] = index_column;
-
---                                                 -- Append the optional sup part with the number of indexed characters.
---                                                 if ( isset( index_column_matches["sub_part"] ) ) then
---                                                         index_column .= "(" . index_column_matches["sub_part"] . ")";
---                                                 end;
---                                         end;
-
---                                         -- Build the normalized index definition and add it to the list of indices.
---                                         indices[]                  = "thenindex_typeend; thenindex_nameend; (" . implode( ",", index_columns ) . ")";
---                                         indices_without_subparts[] = "thenindex_typeend; thenindex_nameend; (" . implode( ",", index_columns_without_subparts ) . ")";
-
---                                         -- Destroy no longer needed variables.
---                                         unset( index_column, index_column_matches, index_matches, index_type, index_name, index_columns, index_columns_without_subparts );
-
---                                         break;
---                         end;
-
---                         -- If it"s a valid field, add it to the field array.
---                         if ( validfield ) then
---                                 cfields[ fieldname_lowercased ] = fld;
---                         end;
---                 end;
-
---                 -- For every field in the table.
---                 foreach ( tablefields as tablefield ) then
---                         tablefield_field_lowercased = strtolower( tablefield->Field );
---                         tablefield_type_lowercased  = strtolower( tablefield->Type );
-
---                         tablefield_type_without_parentheses = preg_replace(
---                                 "/"
---                                 . "(.+)"       -- Field type, e.g. `int`.
---                                 . "\(\d*\)"    -- Display width.
---                                 . "(.*)"       -- Optional attributes, e.g. `unsigned`.
---                                 . "/",
---                                 "12",
---                                 tablefield_type_lowercased
---                         );
-
---                         -- Get the type without attributes, e.g. `int`.
---                         tablefield_type_base = strtok( tablefield_type_without_parentheses, " " );
-
---                         -- If the table field exists in the field array...
---                         if ( array_key_exists( tablefield_field_lowercased, cfields ) ) then
-
---                                 -- Get the field type from the query.
---                                 preg_match( "|`?" . tablefield->Field . "`? ([^ ]*( unsigned)?)|i", cfields[ tablefield_field_lowercased ], matches );
---                                 fieldtype            = matches[1];
---                                 fieldtype_lowercased = strtolower( fieldtype );
-
---                                 fieldtype_without_parentheses = preg_replace(
---                                         "/"
---                                         . "(.+)"       -- Field type, e.g. `int`.
---                                         . "\(\d*\)"    -- Display width.
---                                         . "(.*)"       -- Optional attributes, e.g. `unsigned`.
---                                         . "/",
---                                         "12",
---                                         fieldtype_lowercased
---                                 );
-
---                                 -- Get the type without attributes, e.g. `int`.
---                                 fieldtype_base = strtok( fieldtype_without_parentheses, " " );
-
---                                 -- Is actual field type different from the field type in query?
---                                 if ( tablefield->Type != fieldtype ) then
---                                         do_change = true;
---                                         if ( in_array( fieldtype_lowercased, text_fields, true ) && in_array( tablefield_type_lowercased, text_fields, true ) ) then
---                                                 if ( array_search( fieldtype_lowercased, text_fields, true ) < array_search( tablefield_type_lowercased, text_fields, true ) ) then
---                                                         do_change = false;
---                                                 end;
---                                         end;
-
---                                         if ( in_array( fieldtype_lowercased, blob_fields, true ) && in_array( tablefield_type_lowercased, blob_fields, true ) ) then
---                                                 if ( array_search( fieldtype_lowercased, blob_fields, true ) < array_search( tablefield_type_lowercased, blob_fields, true ) ) then
---                                                         do_change = false;
---                                                 end;
---                                         end;
-
---                                         if ( in_array( fieldtype_base, int_fields, true ) && in_array( tablefield_type_base, int_fields, true )
---                                                 && fieldtype_without_parentheses === tablefield_type_without_parentheses
---                                         ) then
---                                                 /*
---                                                 -- MySQL 8.0.17 or later does not support display width for integer data types,
---                                                 -- so if display width is the only difference, it can be safely ignored.
---                                                 -- Note: This is specific to MySQL and does not affect MariaDB.
---                                                 --
---                                                 if ( version_compare( db_version, "8.0.17", ">=" )
---                                                         && ! str_contains( db_server_info, "MariaDB" )
---                                                 ) then
---                                                         do_change = false;
---                                                 end;
---                                         end;
-
---                                         if ( do_change ) then
---                                                 -- Add a query to change the column type.
---                                                 cqueries[] = "ALTER TABLE thentableend; CHANGE COLUMN `thentablefield->Fieldend;` " . cfields[ tablefield_field_lowercased ];
-
---                                                 for_update[ table . "." . tablefield->Field ] = "Changed type of thentableend;.thentablefield->Fieldend; from thentablefield->Typeend; to thenfieldtypeend;";
---                                         end;
---                                 end;
-
---                                 -- Get the default value from the array.
---                                 if ( preg_match( "| DEFAULT "(.*?)"|i", cfields[ tablefield_field_lowercased ], matches ) ) then
---                                         default_value = matches[1];
---                                         if ( tablefield->Default != default_value ) then
---                                                 -- Add a query to change the column"s default value
---                                                 cqueries[] = "ALTER TABLE thentableend; ALTER COLUMN `thentablefield->Fieldend;` SET DEFAULT "thendefault_valueend;"";
-
---                                                 for_update[ table . "." . tablefield->Field ] = "Changed default value of thentableend;.thentablefield->Fieldend; from thentablefield->Defaultend; to thendefault_valueend;";
---                                         end;
---                                 end;
-
---                                 -- Remove the field from the array (so it"s not added).
---                                 unset( cfields[ tablefield_field_lowercased ] );
---                         end; else then
---                                 -- This field exists in the table, but not in the creation queries?
---                         end;
---                 end;
-
---                 -- For every remaining field specified for the table.
---                 foreach ( cfields as fieldname => fielddef ) then
---                         -- Push a query line into cqueries that adds the field to that table.
---                         cqueries[] = "ALTER TABLE thentableend; ADD COLUMN fielddef";
-
---                         for_update[ table . "." . fieldname ] = "Added column " . table . "." . fieldname;
---                 end;
-
---                 -- Index stuff goes here. Fetch the table index structure from the database.
---                 tableindices = wpdb->get_results( "SHOW INDEX FROM thentableend;;" );
-
---                 if ( tableindices ) then
---                         -- Clear the index array.
---                         index_ary = array();
-
---                         -- For every index in the table.
---                         foreach ( tableindices as tableindex ) then
---                                 keyname = strtolower( tableindex->Key_name );
-
---                                 -- Add the index to the index data array.
---                                 index_ary[ keyname ]["columns"][]  = array(
---                                         "fieldname" => tableindex->Column_name,
---                                         "subpart"   => tableindex->Sub_part,
---                                 );
---                                 index_ary[ keyname ]["unique"]     = ( 0 == tableindex->Non_unique ) ? true : false;
---                                 index_ary[ keyname ]["index_type"] = tableindex->Index_type;
---                         end;
-
---                         -- For each actual index in the index array.
---                         foreach ( index_ary as index_name => index_data ) then
-
---                                 -- Build a create string to compare to the query.
---                                 index_string = "";
---                                 if ( "primary" === index_name ) then
---                                         index_string .= "PRIMARY ";
---                                 end; elseif ( index_data["unique"] ) then
---                                         index_string .= "UNIQUE ";
---                                 end;
---                                 if ( "FULLTEXT" === strtoupper( index_data["index_type"] ) ) then
---                                         index_string .= "FULLTEXT ";
---                                 end;
---                                 if ( "SPATIAL" === strtoupper( index_data["index_type"] ) ) then
---                                         index_string .= "SPATIAL ";
---                                 end;
---                                 index_string .= "KEY ";
---                                 if ( "primary" !== index_name ) then
---                                         index_string .= "`" . index_name . "`";
---                                 end;
---                                 index_columns = "";
-
---                                 -- For each column in the index.
---                                 foreach ( index_data["columns"] as column_data ) then
---                                         if ( "" !== index_columns ) then
---                                                 index_columns .= ",";
---                                         end;
-
---                                         -- Add the field to the column list string.
---                                         index_columns .= "`" . column_data["fieldname"] . "`";
---                                 end;
-
---                                 -- Add the column list to the index create string.
---                                 index_string .= " (index_columns)";
-
---                                 -- Check if the index definition exists, ignoring subparts.
---                                 aindex = array_search( index_string, indices_without_subparts, true );
---                                 if ( false !== aindex ) then
---                                         -- If the index already exists (even with different subparts), we don't need to create it.
---                                         unset( indices_without_subparts[ aindex ] );
---                                         unset( indices[ aindex ] );
---                                 end;
---                         end;
---                 end;
-
---                 -- For every remaining index specified for the table.
---                 foreach ( (array) indices as index ) then
---                         -- Push a query line into cqueries that adds the index to that table.
---                         cqueries[] = "ALTER TABLE thentableend; ADD index";
-
---                         for_update[] = "Added index " . table . " " . index;
---                 end;
-
---                 -- Remove the original table creation query from processing.
---                 unset( cqueries[ table ], for_update[ table ] );
---         end;
-
---         allqueries = array_merge( cqueries, iqueries );
---         if ( execute ) then
---                 foreach ( allqueries as query ) then
---                         wpdb->query( query );
---                 end;
---         end;
-
---         return for_update;
--- end;
+   --
+   -- Modifies the database based on specified SQL statements.
+   --
+   -- Useful for creating new tables and updating existing tables to a new structure.
+   --
+   -- @since 1.5.0
+   -- @since 6.1.0 Ignores display width for integer data types on MySQL 8.0.17 or
+   --              later, to match MySQL behavior. Note: This does not affect MariaDB.
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string[]|string queries Optional. The query to run. Can be multiple
+   --                                 queries in an array, or a string of queries
+   --                                 separated by semicolons. Default empty string.
+   -- @param bool            execute Optional. Whether or not to execute the query
+   --                                 right away. Default true.
+   -- @return array Strings containing the results of the various update queries.
+   --
+   function DB_Delta (Queries : String  := "";
+                      Execute : Boolean := True)
+                      return Array_Type;
 
 -- --
 -- -- Updates the database tables to a new schema.
@@ -3089,10 +2661,7 @@ is
    --
    -- @param string tables Optional. Which set of tables to update. Default is "all".
    --
-   procedure Make_DB_Current_Silent (Tables : String := "all")
-   is null;
---         dbDelta( tables );
--- end;
+   procedure Make_DB_Current_Silent (Tables : String := "all");
 
 -- --
 -- -- Creates a site theme from an existing theme.
@@ -3352,14 +2921,7 @@ is
    --
    -- @global wpdb wpdb WordPress database abstraction object.
    --
-   procedure Wp_Check_MySQL_Version
-   is null;
---         global wpdb;
---         result = wpdb->check_database_version();
---         if ( is_wp_error( result ) ) then
---                 wp_die( result );
---         end;
--- end;
+   procedure Wp_Check_MySQL_Version;
 
 -- --
 -- -- Disables the Automattic widgets plugin, which was merged into core.
@@ -3456,52 +3018,25 @@ is
 --         end;
 -- end;
 
--- --
--- -- Determine if global tables should be upgraded.
--- --
--- -- This function performs a series of checks to ensure the environment allows
--- -- for the safe upgrading of global WordPress database tables. It is necessary
--- -- because global tables will commonly grow to millions of rows on large
--- -- installations, and the ability to control their upgrade routines can be
--- -- critical to the operation of large networks.
--- --
--- -- In a future iteration, this function may use `wp_is_large_network()` to more-
--- -- intelligently prevent global table upgrades. Until then, we make sure
--- -- WordPress is on the main site of the main network, to avoid running queries
--- -- more than once in multi-site or multi-network environments.
--- --
--- -- @since 4.3.0
--- --
--- -- @return bool Whether to run the upgrade routines on global tables.
--- --
--- function wp_should_upgrade_global_tables() then
-
---         -- Return false early if explicitly not upgrading.
---         if ( defined( "DO_NOT_UPGRADE_GLOBAL_TABLES" ) ) then
---                 return false;
---         end;
-
---         -- Assume global tables should be upgraded.
---         should_upgrade = true;
-
---         -- Set to false if not on main network (does not matter if not multi-network).
---         if ( ! is_main_network() ) then
---                 should_upgrade = false;
---         end;
-
---         -- Set to false if not on main site of current network (does not matter if not multi-site).
---         if ( ! is_main_site() ) then
---                 should_upgrade = false;
---         end;
-
---         --
---         -- Filters if upgrade routines should be run on global tables.
---         --
---         -- @since 4.3.0
---         --
---         -- @param bool should_upgrade Whether to run the upgrade routines on global tables.
---         --
---         return apply_filters( "wp_should_upgrade_global_tables", should_upgrade );
--- end;
+   --
+   -- Determine if global tables should be upgraded.
+   --
+   -- This function performs a series of checks to ensure the environment allows
+   -- for the safe upgrading of global WordPress database tables. It is necessary
+   -- because global tables will commonly grow to millions of rows on large
+   -- installations, and the ability to control their upgrade routines can be
+   -- critical to the operation of large networks.
+   --
+   -- In a future iteration, this function may use `wp_is_large_network()` to more-
+   -- intelligently prevent global table upgrades. Until then, we make sure
+   -- WordPress is on the main site of the main network, to avoid running queries
+   -- more than once in multi-site or multi-network environments.
+   --
+   -- @since 4.3.0
+   --
+   -- @return bool Whether to run the upgrade routines on global tables.
+   --
+   function Wp_Should_Upgrade_Global_Tables
+            return Boolean;
 
 end Adi_Upgrade;

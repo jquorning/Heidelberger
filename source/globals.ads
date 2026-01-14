@@ -27,7 +27,6 @@ is
    WP_PLUGIN_DIR   : Unbounded_String;
    WPMU_PLUGIN_DIR : Unbounded_String;
    WP_CONTENT_DIR  : Unbounded_String;
-   WP_SITEURL      : constant String := "";
    WP_LANG_DIR     : constant String := "";
    WP_TEMP_DIR     : Unbounded_String;
 
@@ -46,6 +45,7 @@ is
    CONCATENATE_SCRIPTS  : Boolean;
    COMPRESS_SCRIPTS     : Boolean;
    COMPRESS_CSS         : Boolean;
+   MULTISITE            : constant Boolean := False;
 
    TEMPLATEPATH     : Unbounded_String;
    STYLESHEETPATH   : Unbounded_String;
@@ -54,6 +54,7 @@ is
    MINUTE_IN_SECONDS : constant Natural := 60;
    HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
    DAY_IN_SECONDS    : constant Natural := 24 * HOUR_IN_SECONDS;
+   MONTH_IN_SECONDS  : constant Natural := 30 * DAY_IN_SECONDS;
    YEAR_IN_SECONDS   : constant Natural := 365 * DAY_IN_SECONDS;
 
    SITECOOKIEPATH : Unbounded_String;
@@ -91,6 +92,12 @@ is
 
    WP_PROXY_HOST : Unbounded_String;
    WP_PROXY_PORT : Unbounded_String;
+
+   WP_HOME_DEF : constant Boolean := False;
+   WP_HOME     : constant String  := "";
+
+   WP_SITEURL_DEF : constant Boolean := False;
+   WP_SITEURL     : constant String  := "";
 
    Wp_Importers : Array_Type;
 
@@ -133,5 +140,10 @@ is
 
    CUSTOM_USER_TABLE      : constant String := "USER_TABLE";
    CUSTOM_USER_META_TABLE : constant String := "USER_META_TABLE";
+
+   AUTH_SALT : constant String := "SALT";
+
+   DB_COLLATE : constant String := "";
+   DB_CHARSET : constant String := "";
 
 end Globals;

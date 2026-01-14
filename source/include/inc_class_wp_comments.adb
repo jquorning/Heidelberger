@@ -8,6 +8,7 @@
 
 with Globals;
 with Hb_Common;
+with Lists;
 
 with Inc_Caches;
 with Inc_Class_Wpdb;
@@ -24,6 +25,7 @@ is
    is
       use Globals;
       use Hb_Common;
+      use Lists;
       use Inc_Caches;
       use Inc_Class_Wpdb;
 
@@ -45,7 +47,7 @@ is
               WpDB.Get_Row (
                 WpDB.Prepare (
                   "SELECT * FROM wpdb.comments WHERE comment_ID = %d LIMIT 1",
-                  Integer'Image (Comment_Id)),
+                  To_List (Integer'Image (Comment_Id))),
                   Success => Success);
 
             if X_Comment = Null_Comment then -- not

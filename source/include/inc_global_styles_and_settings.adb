@@ -40,7 +40,7 @@ is
 
       Path_2 : constant List_Type :=
         (if not Empty (Context, "block_name")
-         then Array_Merge (To_List (List => (
+         then List_Merge (To_List (List => (
                 +"blocks", +As_String (Get (Context, "block_name")))),
                            Path)
          else Path);
@@ -151,7 +151,7 @@ is
          Styles_Variables : Unbounded_String;
          Styles_REST      : Unbounded_String;
       begin
-         if In_Array ("variables", Types_2, True) then
+         if In_List ("variables", Types_2, True) then
             --
             -- Only use the default, theme, and custom origins. Why?
             -- Because styles for `blocks` origin are added at a later phase
@@ -164,7 +164,7 @@ is
             begin
                Styles_Variables := +Tree.Get_Stylesheet (To_List ("variables"),
                                                          Origins);
-               Types_2          := Array_Diff (Types_2, To_List ("variables"));
+               Types_2          := List_Diff (Types_2, To_List ("variables"));
             end;
          end if;
 

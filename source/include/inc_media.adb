@@ -887,7 +887,7 @@ is
 
       Default_Sizes : constant List_Type :=
         (if not Empty (Additional_Sizes)
-         then Array_Merge (Default_Sizes_2, Array_Keys (Additional_Sizes))
+         then List_Merge (Default_Sizes_2, Array_Keys (Additional_Sizes))
          else Default_Sizes_2);
 
    begin

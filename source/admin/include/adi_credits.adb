@@ -21,7 +21,7 @@ with Inc_Options;
 with Inc_Versions;
 with Inc_L10n;
 with Inc_Link_Templates;
-with Inc_Http;
+with Inc_HTTP;
 
 package body Adi_Credits
 is
@@ -54,7 +54,7 @@ is
 
       Version_2 : Unbounded_String := +Version;
       Locale_2  : Unbounded_String := +Locale;
-      Results   : Hb_Common.String_Maps.Map; -- Array_Type;
+      Results   : Inc_Options.String_Maps.Map; -- Array_Type;
    begin
       if Version = "" then
          -- Include an unmodified wp_version.
@@ -91,7 +91,7 @@ is
 --               url := Set_Url_Scheme (Url, "https");
 --            end if;
 
-            Response := Inc_Http.Wp_Remote_Get (-URL, Options);
+            Response := Inc_HTTP.Wp_Remote_Get (-URL, Options);
 
 --            if
 --              Is_Wp_Error (Response) or else

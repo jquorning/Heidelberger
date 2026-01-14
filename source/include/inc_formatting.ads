@@ -46,10 +46,80 @@ is
    -- @param bool   reset Set to true for unit testing. Translated patterns will reset.
    -- @return string The string replaced with HTML entities.
    --
-   function Wptexturize (Text  : String;
-                         Reset : Boolean := False)
-                         return String
-                         is ("XXX-513");
+   function Wp_Texturize (Text  : String;
+                          Reset : Boolean := False)
+                          return String;
+
+   --
+   -- Implements a logic tree to determine whether or not "7"." represents seven feet,
+   -- then converts the special char into either a prime char or a closing quote char.
+   --
+   -- @since 4.3.0
+   --
+   -- @param string haystack    The plain text to be searched.
+   -- @param string needle      The character to search for such as " or ".
+   -- @param string prime       The prime char to use for replacement.
+   -- @param string open_quote  The opening quote char. Opening quote replacement
+   --                           must be accomplished already.
+   -- @param string close_quote The closing quote char to use for replacement.
+   -- @return string The haystack value after primes and quotes replacements.
+   --
+   function Wptexturize_Primes (Haystack    : String;
+                                Needle      : String;
+                                Prime       : String;
+                                Open_Quote  : String;
+                                Close_Quote : String)
+                                return String;
+
+   --
+   -- Searches for disabled element tags. Pushes element to stack on tag open
+   -- and pops on tag close.
+   --
+   -- Assumes first char of `text` is tag opening and last char is tag closing.
+   -- Assumes second char of `text` is optionally `/` to indicate closing as in
+   -- `</html>`.
+   --
+   -- @since 2.9.0
+   -- @access private
+   --
+   -- @param string   text              Text to check. Must be a tag like `<html>`
+   --                                   or `[shortcode]`.
+   -- @param string[] stack             Array of open tag elements.
+   -- @param string[] disabled_elements Array of tag names to match against. Spaces
+   --                                   are not allowed in tag names.
+   --
+   procedure X_Wptexturize_Pushpop_Element
+               (Text              : String;
+                Stack             : in out List_Type;
+                Disabled_Elements : List_Type);
+
+   --
+   -- Retrieves the regular expression for shortcodes.
+   --
+   -- @access private
+   -- @ignore
+   -- @since 4.4.0
+   --
+   -- @param string[] tagnames Array of shortcodes to find.
+   -- @return string The regular expression
+   --
+   function X_Get_Wptexturize_Shortcode_Regex (Tagnames : List_Type)
+                                               return String;
+
+   --
+   -- Retrieves the combined regular expression for HTML and shortcodes.
+   --
+   -- @access private
+   -- @ignore
+   -- @internal This function will be removed in 4.5.0 per Shortcode API Roadmap.
+   -- @since 4.4.0
+   --
+   -- @param string shortcode_regex Optional. The result from
+   --                                _get_wptexturize_shortcode_regex().
+   -- @return string The regular expression
+   --
+   function X_Get_Wptexturize_Split_Regex (Shortcode_Regex : String := "")
+                                           return String;
 
    --
    -- Parses a string into variables to be stored in an array.
@@ -95,7 +165,6 @@ is
    function X_Wp_Specialchars
               (Item          : String;
                Quote_Style   : Php.HTML.Flag_Type := Php.HTML.ENT_NOQUOTES;
---             Quote_Style   : Integer := Php.ENT_NOQUOTES;
                Charset       : String  := ""; -- Boolean := False;
                Double_Encode : Boolean := False)
                return String;
@@ -116,10 +185,9 @@ is
    --                        up as an empty string. Defaults to an empty string.
    -- @return string The sanitized value
    --
-   function Sanitize_Html_Class (Class    : String;
+   function Sanitize_HTML_Class (Class    : String;
                                  Fallback : String := "")
-                                 return String
-                                 is ("XXX-304");
+                                 return String;
 
    --
    -- Sanitizes a URL for database or redirect usage.
@@ -135,10 +203,9 @@ is
    --                            Defaults to return value of wp_allowed_protocols().
    -- @return string The cleaned URL after esc_url() is run with the "db" context.
    --
-   -- function sanitize_url( url, protocols = null ) then
-   function Sanitize_URL (Url : String)
-                          return String
-                          is ("XXX-322");
+   function Sanitize_URL (URL       : String;
+                          Protocols : List_Type := Empty_List)
+                          return String;
 
    --
    -- Sanitizes a string into a slug, which can be used in URLs or HTML attributes.
@@ -162,8 +229,7 @@ is
    function Sanitize_Title (Title          : String;
                             Fallback_Title : String := "";
                             Context        : String := "save")
-                            return String
-                            is ("XXX-341");
+                            return String;
 
    --
    -- Sanitizes a username, stripping out unsafe characters.
@@ -183,6 +249,19 @@ is
    function Sanitize_User (Username : String;
                            Strict   : Boolean := False)
                            return String;
+
+   --
+   -- Sanitizes a title with the "query" context.
+   --
+   -- Used for querying the database for a value from URL.
+   --
+   -- @since 3.1.0
+   --
+   -- @param string title The string to be sanitized.
+   -- @return string The sanitized string.
+   --
+   function Sanitize_Title_For_Query (Title : String)
+                                      return String;
 
    --
    -- Sanitizes a title, replacing whitespace and a few other characters with dashes.
@@ -206,6 +285,28 @@ is
                                         return String;
 
    --
+   -- Performs a deep string replace operation to ensure the values in search are
+   -- no longer present.
+   --
+   -- Repeats the replacement operation until it no longer replaces anything so as
+   -- to remove "nested" values e.g. subject = "%0%0%0DDD", search ="%0D",
+   -- result ="" rather than the "%0%0DD" that str_replace would return
+   --
+   -- @since 2.8.1
+   -- @access private
+   --
+   -- @param string|array search  The value being searched for, otherwise known as
+   --                              the needle. An array may be used to designate
+   --                              multiple needles.
+   -- @param string       subject The string being searched and replaced on,
+   --                              otherwise known as the haystack.
+   -- @return string The string with the replaced values.
+   --
+   function X_Deep_Replace (Search  : List_Type;
+                            Subject : String)
+                            return String;
+
+   --
    -- Checks and cleans a URL.
    --
    -- A number of characters are removed from the URL. If the URL is for displaying
@@ -222,10 +323,33 @@ is
    --                An empty string is returned if `url` specifies a protocol other
    --                than those in `protocols`, or if `url` contains an empty string.
    --
-   -- function esc_url( url, protocols = null, _context = "display" ) then
-   function ESC_URL (Item : String)
-                    return String
-                    is (Item & "XXX-513");
+   function ESC_URL (URL       : String;
+                     Protocols : List_Type := Empty_List;
+                     X_Context : String    := "display")
+                    return String;
+
+   --
+   -- Navigates through an array, object, or scalar, and removes slashes from
+   -- the values.
+   --
+   -- @since 2.0.0
+   --
+   -- @param mixed value The value to be stripped.
+   -- @return mixed Stripped value.
+   --
+   function Strip_Slashes_Deep (Value : Multi_Type)
+                                return Multi_Type;
+
+   --
+   -- Callback function for `stripslashes_deep()` which strips slashes from strings.
+   --
+   -- @since 4.4.0
+   --
+   -- @param mixed value The array or string to be stripped.
+   -- @return mixed The stripped value.
+   --
+   function Strip_Slashes_From_Strings_Only (Value : String)
+                                             return String;
 
    --
    -- Navigates through an array, object, or scalar, and encodes the values to be used
@@ -236,8 +360,8 @@ is
    -- @param mixed value The array or string to be encoded.
    -- @return mixed The encoded value.
    --
-   function URLencode_Deep (Value : Array_Type)
-                            return Array_Type;
+   function URL_Encode_Deep (Value : Multi_Type)
+                             return Multi_Type;
 
    --
    -- Navigates through an array, object, or scalar, and raw-encodes the values to be
@@ -248,8 +372,8 @@ is
    -- @param mixed value The array or string to be encoded.
    -- @return mixed The encoded value.
    --
-   function Raw_URL_Encode_Deep (Value : Array_Type)
-                                 return Array_Type; -- String;
+   function Raw_URL_Encode_Deep (Value : Multi_Type)
+                                 return Multi_Type;
 
    --
    -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
@@ -264,8 +388,7 @@ is
    -- @return string Escaped text.
    --
    function ESC_JS (Text : String)
-                    return String
-                    is ("XXX-341");
+                    return String;
 
    --
    -- Escaping for HTML blocks.
@@ -320,8 +443,7 @@ is
    --
    function Sanitize_Option (Option : String;
                              Value  : String)
-                             return String
-                             is (raise Program_Error with "not implemented");
+                             return String;
 
    --
    -- Escapes data for use in a MySQL query.
@@ -344,11 +466,10 @@ is
    --
    function ESC_SQL (Data : List_Type)
                      return List_Type
-                     is (Empty_List);
+   is (raise Program_Error with "not implemented");
 
    function ESC_SQL (Data : String)
-                     return String
-                     is ("XXX-971");
+                     return String;
 
    --
    -- Checks for invalid UTF8 in a string.
@@ -789,9 +910,8 @@ is
    -- @param string string What to add the trailing slash to.
    -- @return string String with trailing slash added.
    --
-   function Trailingslashit (Item : String)
-                             return String
-                             is ("XXX-335");
+   function Trailing_Slash_It (Item : String)
+                               return String;
 
    --
    -- Removes trailing forward slashes and backslashes if they exist.
@@ -805,8 +925,7 @@ is
    -- @return string String without the trailing slashes.
    --
    function Un_Trailing_Slash_It (Item : String)
-                                  return String
-                                  is ("XXX-707");
+                                  return String;
 
    --
    -- Safely extracts not more than the first count characters from HTML string.
@@ -823,11 +942,10 @@ is
    --                     Defaults to empty string.
    -- @return string The excerpt.
    --
-   function Wp_Html_Excerpt (Str   : String;
+   function Wp_HTML_Excerpt (Str   : String;
                              Count : Integer;
-                             More  : String := "") -- = null
-                             return String
-                             is ("XXX-353");
+                             More  : String := "")
+                             return String;
 
    --
    -- Strips out all characters not allowed in a locale name.
@@ -838,8 +956,7 @@ is
    -- @return string The sanitized value.
    --
    function Sanitize_Locale_Name (Locale_Name : String)
-                                  return String
-                                  is ("XXX-706");
+                                  return String;
 
    --
    -- Sanitizes a string key.
@@ -853,8 +970,7 @@ is
    -- @return string Sanitized key.
    --
    function Sanitize_Key (Key : String)
-                          return String
-                          is ("XXX-402");
+                          return String;
 
    --
    -- i18n-friendly version of basename().
@@ -867,8 +983,7 @@ is
    --
    function Wp_Basename (Path   : String;
                          Suffix : String := "")
-                         return String
-                         is ("XXX-446");
+                         return String;
 
    --
    -- Maps a function to all non-iterable elements of an array or an object.
@@ -884,9 +999,9 @@ is
    --
    type Callable is access function (Item : String) return String;
 
-   function Map_Deep (Value    : Array_Type;
+   function Map_Deep (Value    : Multi_Type;
                       Callback : Callable)
-                      return Array_Type;
+                      return Multi_Type;
 
    --
    -- WordPress implementation of PHP sprintf() with filters.
@@ -904,7 +1019,6 @@ is
    -- function wp_sprintf( pattern, ...args ) then
    function Wp_Sprintf (Pattern : String;
                         Arg_1   : String)
-                        -- , ...args )
                         return String
                         is (Pattern);
 
@@ -928,6 +1042,20 @@ is
                                return String;
 
    --
+   -- Returns the regexp for common whitespace characters.
+   --
+   -- By default, spaces include new lines, tabs, nbsp entities, and the UTF-8 nbsp.
+   -- This is designed to replace the PCRE \s sequence. In ticket #22692, that
+   -- sequence was found to be unreliable due to random inclusion of the A0 byte.
+   --
+   -- @since 4.0.0
+   --
+   -- @return string The spaces regexp.
+   --
+   function Wp_Spaces_Regexp
+            return String;
+
+   --
    -- Adds slashes to a string or recursively adds slashes to strings within an array.
    --
    -- This should be used when preparing data for core API that expects slashed data.
@@ -940,8 +1068,7 @@ is
    -- @return string|array Slashed `value`, in the same type as supplied.
    --
    function Wp_Slash (Value : String)
-                      return String
-                      is ("XXX-626");
+                      return String;
 
    --
    -- Removes slashes from a string or recursively removes slashes from strings
@@ -955,8 +1082,7 @@ is
    -- @param string|array value String or array of data to unslash.
    -- @return string|array Unslashed `value`, in the same type as supplied.
    --
-   function Wp_Unslash (Item : String)
-                        return String
-                        is ("XXX-215");
+   function Wp_Unslash (Value : String)
+                        return String;
 
 end Inc_Formatting;

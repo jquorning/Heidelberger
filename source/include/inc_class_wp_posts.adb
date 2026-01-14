@@ -26,6 +26,10 @@ is
 
    use Adi_Caches;
 
+   ------------------
+   -- Get_Instance --
+   ------------------
+
    procedure Get_Instance (Id      : Post_Id;
                            Post    : out Wp_Post;
                            Success : out Boolean)
@@ -49,16 +53,16 @@ is
       if not Success then
          declare
             use Globals;
+            use Inc_Class_Wpdb;
 
-            Statement : constant String
-              := WpDB.Prepare
-                ("SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
-                 (To_List (Item => Id'Image)));
+            Statement : constant Statement_Type :=
+              WpDB.Prepare (
+                "SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
+                To_List (Id'Image));
          begin
-            Inc_Class_Wpdb.Get_Row (WpDB, Post,
-                                    Query   => Statement,
-                                    Success => Success);
---            Post := Wpdb.Get_Row (Statement, Success);
+            Post := Inc_Class_Wpdb.Get_Row (WpDB, -- Post,
+                                            Query   => Statement,
+                                            Success => Success);
          end;
 
          if not Success then
@@ -250,13 +254,12 @@ is
       use Wp_Common;
 
       Post_2 : Array_Type := Get_Object_Vars (Post);
+      List   : constant List_Type := To_List (List =>
+        (+"ancestors", +"page_template", +"post_category", +"tags_input"));
    begin
-      for
-        Key of To_List (List => (+"ancestors", +"page_template",
-                                 +"post_category", +"tags_input"))
-      loop
-         if X_Isset (Post_2, -Key) then
-            Set (Post_2, -Key, From_String (As_String (Get (Post_2, -Key)))); -- x_get
+      for Key of List loop
+         if X_Isset (Post, -Key) then
+            Set (Post_2, -Key, From_String (Get_As_String (Post_2, -Key))); -- x_get
          end if;
       end loop;
 

@@ -6,6 +6,8 @@
 -- @subpackage translations
 --
 
+with Php.Arrays;
+
 with Hb_Common;
 
 package body POMO_Translations
@@ -116,6 +118,7 @@ is
                        Context  : String := "") -- null
                        return String
    is
+      use Php.Arrays;
       use Hb_Common;
       use POMO_Entries;
 

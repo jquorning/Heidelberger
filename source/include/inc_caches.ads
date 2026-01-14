@@ -18,8 +18,6 @@ package Inc_Caches
 is
    use Arrays;
 
-   procedure Dummy;
-
    --
    -- Removes the cache contents matching key and group.
    --
@@ -34,8 +32,7 @@ is
    -- @return bool True on successful removal, false on failure.
    --
    procedure Wp_Cache_Delete (Key   : String;
-                              Group : String := "")
-                              is null;
+                              Group : String := "");
 
    --
    -- Removes all cache items.
@@ -47,8 +44,7 @@ is
    --
    -- @return bool True on success, false on failure.
    --
-   procedure Wp_Cache_Flush
-   is null;
+   procedure Wp_Cache_Flush;
 
    --
    -- Adds a group or set of groups to the list of global groups.
@@ -87,30 +83,29 @@ is
    --                           seconds. Default 0 (no expiration).
    -- @return bool True on success, false if cache key and group already exist.
    --
-   function Wp_Cache_Add (Key    : String;
-                          Data   : Array_Type;
-                          Group  : String  := "";
-                          Expire : Natural := 0)
-                          return Boolean
-                          is (False);
+   procedure Wp_Cache_Add (Key     : String;
+                           Data    : Multi_Type;
+                           Group   : String  := "";
+                           Expire  : Natural := 0;
+                           Success : out Boolean);
 
-   procedure Wp_Cache_Add (Key    : String;
-                           Data   : Multi_Type;
-                           Group  : String  := "";
-                           Expire : Natural := 0)
-                           is null;
+   generic
+      type Data_Type is private;
+   procedure Generic_Wp_Cache_Add (Key    : String;
+                                   Data   : Data_Type;
+                                   Group  : String  := "";
+                                   Expire : Natural := 0);
 
-   procedure Wp_Cache_Add (Key    : String;
-                           Data   : Integer; -- String;
-                           Group  : String  := "";
-                           Expire : Natural := 0)
-                           is null;
+   procedure Generic_Wp_Cache_Add (Key    : String;
+                                   Data   : Data_Type;
+                                   Group  : String  := "";
+                                   Expire : Natural := 0)
+   is null;
 
-   procedure Wp_Cache_Add (Key    : String;
-                           Data   : Inc_Class_Wp_Comments.Wp_Comment; -- String;
-                           Group  : String  := "";
-                           Expire : Natural := 0)
-                           is null;
+   procedure Wp_Cache_Add is new Generic_Wp_Cache_Add (Multi_Type);
+   procedure Wp_Cache_Add is new Generic_Wp_Cache_Add (Integer);
+   procedure Wp_Cache_Add is new
+     Generic_Wp_Cache_Add (Inc_Class_Wp_Comments.Wp_Comment);
 
    --
    -- Retrieves the cache contents from the cache by key and group.
@@ -134,70 +129,68 @@ is
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return String
-                          is ("XXX-628");
-
-   function Wp_Cache_Get (Key   : String;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return Boolean
-                          is (True);
+                          Found : out Boolean)
+                          return Multi_Type;
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Posts.Wp_Post
-                          is (Inc_Class_Wp_Posts.Null_Post);
+                          return String;
 
-   function Wp_Cache_Get (Key   : Integer; -- String;
+   function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Comments.Wp_Comment
-                          is (Inc_Class_Wp_Comments.Null_Comment);
+                          return Boolean;
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return Array_Type
-                          is (Empty_Array);
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Posts.Wp_Post;
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return Integer
-                          is (99);
-
-   function Wp_Cache_Get (Key   : Integer;
-                          Group : String  := "";
-                          Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return Inc_Class_Wp_Users.Wp_User -- Integer
-                          is (Inc_Class_Wp_Users.Null_User);
+                          Found : out Boolean)
+                          return Array_Type;
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return Inc_Comments.Comment_Counts
-                          is (Inc_Comments.Null_Comment_Counts);
+                          Found : out Boolean)
+                          return Integer;
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
                           Force : Boolean := False;
-                          Found : out Boolean) -- = null
-                          return Multi_Type
-                          is (raise Program_Error with "not implemented");
+                          Found : out Boolean)
+                          return Inc_Comments.Comment_Counts;
+
+   function Wp_Cache_Get (Key   : Integer;         -- Comment_Id
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Comments.Wp_Comment;
+
+   function Wp_Cache_Get (Key   : Integer;         -- User_Id
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Users.Wp_User;
+
+   function Wp_Cache_Get (Key   : String;         -- User_Id
+                          Group : String  := "";
+                          Force : Boolean := False;
+                          Found : out Boolean)
+                          return Inc_Class_Wp_Users.Wp_User;
 
    --
    -- Saves the data to the cache.
    --
-   -- Differs from wp_cache_add() and wp_cache_replace() in that it will always write data.
+   -- Differs from wp_cache_add() and wp_cache_replace() in that it will always
+   -- write data.
    --
    -- @since 2.0.0
    --
@@ -206,47 +199,36 @@ is
    --
    -- @param int|string $key    The cache key to use for retrieval later.
    -- @param mixed      $data   The contents to store in the cache.
-   -- @param string     $group  Optional. Where to group the cache contents. Enables the same key
-   --                           to be used across groups. Default empty.
-   -- @param int        $expire Optional. When to expire the cache contents, in seconds.
-   --                           Default 0 (no expiration).
+   -- @param string     $group  Optional. Where to group the cache contents. Enables
+   --                           the same key to be used across groups. Default empty.
+   -- @param int        $expire Optional. When to expire the cache contents, in
+   --                           seconds. Default 0 (no expiration).
+   --
    -- @return bool True on success, false on failure.
    --
-   -- function Wp_Cache_Set (Key    : String;
-   --                        Data   : Integer;
-   --                        Group  : String  := "";
-   --                        Expire : Integer := 0)
-   --                        return Boolean;
+   procedure Wp_Cache_Set (Key     : String;
+                           Data    : Multi_Type;
+                           Group   : String  := "";
+                           Expire  : Integer := 0;
+                           Success : out Boolean);
 
-   procedure Wp_Cache_Set (Key    : String;
-                           Data   : Integer;
-                           Group  : String  := "";
-                           Expire : Integer := 0)
-                           is null;
+   generic
+      type Data_Type (<>) is private;
+   procedure Generic_Wp_Cache_Set (Key    : String;
+                                   Data   : Data_Type;
+                                   Group  : String  := "";
+                                   Expire : Integer := 0);
 
-   function Wp_Cache_Set (Key    : String;
-                          Data   : Multi_Type;
-                          Group  : String  := "";
-                          Expire : Integer := 0)
-                          return Boolean
-                          is (False);
+   procedure Generic_Wp_Cache_Set (Key    : String;
+                                   Data   : Data_Type;
+                                   Group  : String  := "";
+                                   Expire : Integer := 0)
+   is null;
 
-   procedure Wp_Cache_Set (Key    : String;
-                           Data   : Array_Type;
-                           Group  : String  := "";
-                           Expire : Integer := 0)
-                           is null;
-
-   procedure Wp_Cache_Set (Key    : String;
-                           Data   : Boolean;
-                           Group  : String  := "";
-                           Expire : Integer := 0)
-                           is null;
-
-   procedure Wp_Cache_Set (Key    : String;
-                           Data   : Inc_Comments.Comment_Counts;
-                           Group  : String  := "";
-                           Expire : Integer := 0)
-                           is null;
+   procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Integer);
+   procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (String);
+   procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Array_Type);
+   procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Boolean);
+   procedure Wp_Cache_Set is new Generic_Wp_Cache_Set (Inc_Comments.Comment_Counts);
 
 end Inc_Caches;

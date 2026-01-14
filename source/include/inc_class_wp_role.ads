@@ -6,6 +6,7 @@
 -- @since 4.4.0
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
@@ -59,22 +60,18 @@ is
    function X_Construct (Role         : String;
                          Capabilities : Array_Type)
                          return Wp_Role;
-        --         this->name         = role;
-        --         this->capabilities = capabilities;
-        -- end;
 
-        -- --
-        -- -- Assign role a capability.
-        -- --
-        -- -- @since 2.0.0
-        -- --
-        -- -- @param string cap   Capability name.
-        -- -- @param bool   grant Whether role has capability privilege.
-        -- --
-        -- public function add_cap( cap, grant = true ) then
-        --         this->capabilities[ cap ] = grant;
-        --         wp_roles()->add_cap( this->name, cap, grant );
-        -- end;
+   --
+   -- Assign role a capability.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string cap   Capability name.
+   -- @param bool   grant Whether role has capability privilege.
+   --
+   procedure Add_Cap (This  : in out Wp_Role;
+                      Cap   : String;
+                      Grant : Boolean := True);
 
         -- --
         -- -- Removes a capability from a role.
@@ -115,6 +112,12 @@ is
         --                 return false;
         --         end;
         -- end;
+
+   package Role_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Inc_Class_Wp_Role.Wp_Role,
+         "="          => Inc_Class_Wp_Role."=");
 
    Null_Role : constant Wp_Role :=
      (Name         => Null_Unbounded_String,

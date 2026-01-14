@@ -87,7 +87,7 @@ is
          -- @var WP_Error
          --
          -- private
-         Errors : Inc_Class_Wp_Errors.Wp_Error;
+         M_Errors : Inc_Class_Wp_Errors.Wp_Error;
 
          --
          -- The directory name of the theme's files, inside the theme root.
@@ -453,42 +453,41 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Returns errors property.
---         --
---         -- @since 3.4.0
---         --
---         -- @return WP_Error|false WP_Error if there are errors, or false.
---         --
---         public function errors() then
+   --
+   -- Returns errors property.
+   --
+   -- @since 3.4.0
+   --
+   -- @return WP_Error|false WP_Error if there are errors, or false.
+   --
+   function Errors (This : Wp_Theme)
+                    return Inc_Class_Wp_Errors.Wp_Error;
 --                 return is_wp_error( this->errors ) ? this->errors : false;
 --         end;
 
---         --
---         -- Determines whether the theme exists.
---         --
---         -- A theme with errors exists. A theme with the error of 'theme_not_found',
---         -- meaning that the theme's directory was not found, does not exist.
---         --
---         -- @since 3.4.0
---         --
---         -- @return bool Whether the theme exists.
---         --
---         public function exists() then
---                 return ! ( this->errors() && in_array( 'theme_not_found', this->errors()->get_error_codes(), true ) );
---         end;
+   --
+   -- Determines whether the theme exists.
+   --
+   -- A theme with errors exists. A theme with the error of 'theme_not_found',
+   -- meaning that the theme's directory was not found, does not exist.
+   --
+   -- @since 3.4.0
+   --
+   -- @return bool Whether the theme exists.
+   --
+   function Exists (This : Wp_Theme)
+                    return Boolean;
 
    --
    -- Returns reference to the parent theme.
    --
    -- @since 3.4.0
    --
-   -- @return WP_Theme|false Parent theme, or false if the active theme is not a child theme.
+   -- @return WP_Theme|false Parent theme, or false if the active theme is not a
+   --                        child theme.
    --
    function Parent (This : Wp_Theme)
                     return Wp_Theme;
---                 return isset( this->parent ) ? this->parent : false;
---         end;
 
 --         --
 --         -- Perform reinitialization tasks.
@@ -855,22 +854,20 @@ is
    --
    function Get_Stylesheet (This : Wp_Theme)
                             return String;
---                 return this->stylesheet;
---         end;
 
---         --
---         -- Returns the directory name of the theme's "template" files, inside the theme root.
---         --
---         -- In the case of a child theme, this is the directory name of the parent theme.
---         -- Otherwise, the get_template() is the same as get_stylesheet().
---         --
---         -- @since 3.4.0
---         --
---         -- @return string Template
---         --
---         public function get_template() then
---                 return this->template;
---         end;
+   --
+   -- Returns the directory name of the theme's "template" files, inside the theme
+   -- root.
+   --
+   -- In the case of a child theme, this is the directory name of the parent theme.
+   -- Otherwise, the get_template() is the same as get_stylesheet().
+   --
+   -- @since 3.4.0
+   --
+   -- @return string Template
+   --
+   function Get_Template (This : Wp_Theme)
+                          return String;
 
 --         --
 --         -- Returns the absolute path to the directory of a theme's "stylesheet" files.
@@ -1348,24 +1345,19 @@ is
 --                 return apply_filters( 'theme_file_path', path, file );
 --         end;
 
---         --
---         -- Determines the latest WordPress default theme that is installed.
---         --
---         -- This hits the filesystem.
---         --
---         -- @since 4.4.0
---         --
---         -- @return WP_Theme|false Object, or false if no theme is installed, which would be bad.
---         --
---         public static function get_core_default_theme() then
---                 foreach ( array_reverse( self::default_themes ) as slug => name ) then
---                         theme = wp_get_theme( slug );
---                         if ( theme->exists() ) then
---                                 return theme;
---                         end;
---                 end;
---                 return false;
---         end;
+   --
+   -- Determines the latest WordPress default theme that is installed.
+   --
+   -- This hits the filesystem.
+   --
+   -- @since 4.4.0
+   --
+   -- @return WP_Theme|false Object, or false if no theme is installed, which would
+   --                         be bad.
+   --
+   -- static
+   function Get_Core_Default_Theme
+            return Wp_Theme;
 
 --         --
 --         -- Returns array of stylesheet names of themes allowed on the site or network.
@@ -1613,6 +1605,6 @@ is
        Template          => Null_Unbounded_String,
        M_Parent          => null,
        Cache_Hash        => Null_Unbounded_String,
-       Errors            => Inc_Class_Wp_Errors.Null_Wp_Error);
+       M_Errors          => Inc_Class_Wp_Errors.Null_Wp_Error);
 
 end Inc_Class_Wp_Themes;

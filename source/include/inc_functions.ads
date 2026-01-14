@@ -39,10 +39,12 @@ is
                            Field     : String;
                            Index_Key : String := "")  -- null)
                            return Array_Type;
+
    function Wp_List_Pluck (List      : Inc_Class_Wp_Terms.Wp_Term_Array;
                            Field     : String;
                            Index_Key : String := "")  -- null)
-                           return Array_Type is (Empty_Array);
+                           return Array_Type
+   is (raise Program_Error with "not implemented");
 
    --
    -- Loads custom DB error or display WordPress DB error.
@@ -83,8 +85,7 @@ is
                           Orderby       : String := ""; -- = array(),
                           Order         : String := "ASC";
                           Preserve_Keys : Boolean := False)
-                          return List_Type
-                          is (raise Program_Error with "not implemented");
+                          return List_Type;
 
    --
    -- Filters/validates a variable as a boolean.
@@ -108,8 +109,7 @@ is
    -- @return mixed A scalar data.
    --
    function Maybe_Serialize (Data : String)
-                             return Multi_Type
-                             is (raise Program_Error with "not implemented");
+                             return Multi_Type;
 
    --
    -- Unserializes data only if it was serialized.
@@ -120,8 +120,26 @@ is
    -- @return mixed Unserialized data can be any type.
    --
    function Maybe_Unserialize (Data : String)
-                               return Multi_Type
-                               is (raise Program_Error with "not implemented");
+                               return Multi_Type;
+
+   --
+   -- Checks value to find if it was serialized.
+   --
+   -- If data is not a string, then returned value will always be false.
+   -- Serialized data is always a string.
+   --
+   -- @since 2.0.5
+   -- @since 6.1.0 Added Enum support.
+   --
+   -- @param string data   Value to check to see if was serialized.
+   -- @param bool   strict Optional. Whether to be strict about the end of the string.
+   --                        Default true.
+   -- @return bool False if not serialized and true if it was.
+   --
+   function Is_Serialized (Data   : String;
+                           Strict : Boolean := True)
+                           return Boolean;
+
    --
    -- Builds URL query based on an associative and, or indexed array.
    --
@@ -253,6 +271,33 @@ is
                                     return String;
 
    --
+   -- Sets HTTP status header.
+   --
+   -- @since 2.0.0
+   -- @since 4.4.0 Added the `description` parameter.
+   --
+   -- @see get_status_header_desc()
+   --
+   -- @param int    code        HTTP status code.
+   -- @param string description Optional. A custom description for the HTTP status.
+   --
+   procedure Status_Header (Code        : Integer;
+                            Description : String := "");
+
+   --
+   -- Gets the header information to prevent caching.
+   --
+   -- The several different headers cover the different ways cache prevention
+   -- is handled by different browsers
+   --
+   -- @since 2.8.0
+   --
+   -- @return array The associative array of header names and field values.
+   --
+   function Wp_Get_Nocache_Headers
+            return Array_Type;
+
+   --
    -- Determines whether WordPress is already installed.
    --
    -- The cache will be checked first. If you have a cache plugin, which saves
@@ -311,7 +356,7 @@ is
    --
    -- @see wp_get_nocache_headers()
    --
-   procedure Nocache_Headers is null;
+   procedure Nocache_Headers;
 
    --
    -- Retrieves URL with nonce added to URL query.
@@ -323,11 +368,10 @@ is
    -- @param string     $name      Optional. Nonce name. Default '_wpnonce'.
    -- @return string Escaped URL with nonce action added.
    --
-   function Wp_Nonce_Url (Actionurl : String;
-                          Action    : String := "-1";
-                          Name      : String := "_wpnonce")
-                          return String
-                          is ("XXX-466");
+   function Wp_Nonce_URL (Action_URL : String;
+                          Action     : String := "-1";
+                          Name       : String := "_wpnonce")
+                          return String;
 
    --
    -- Retrieves or display nonce hidden field for forms.
@@ -728,7 +772,19 @@ is
    --
    function Is_Main_Site (Site_Id    : Integer := 0; -- = null,
                           Network_Id : Integer := 0) -- = null
-                          return Boolean is (False);
+                          return Boolean;
+
+   --
+   -- Gets the main site ID.
+   --
+   -- @since 4.9.0
+   --
+   -- @param int network_id Optional. The ID of the network for which to get the
+   --                        main site. Defaults to the current network.
+   -- @return int The ID of the main site.
+   --
+   function Get_Main_Site_Id (Network_Id : Integer := 0) -- null
+                              return Integer;
 
    --
    -- Converts float number to format based on the locale.
@@ -744,8 +800,7 @@ is
    --
    function Number_Format_I18n (Number   : Float;
                                 Decimals : Integer := 0)
-                                return String
-                                is ("XXX-302");
+                                return String;
 
    --
    -- Removes an item or items from a query string.
@@ -782,8 +837,7 @@ is
    --
    function Validate_File (File          : String;
                            Allowed_Files : Array_Type := Empty_Array)
-                           return Integer
-                           is (0);
+                           return Integer;
 
    --
    -- Kills WordPress execution and displays HTML page with an error message.
@@ -893,6 +947,36 @@ is
             return String;
 
    --
+   -- Temporarily suspends cache additions.
+   --
+   -- Stops more data being added to the cache, but still allows cache retrieval.
+   -- This is useful for actions, such as imports, when a lot of data would otherwise
+   -- be almost uselessly added to the cache.
+   --
+   -- Suspension lasts for a single page load at most. Remember to call this
+   -- function again if you wish to re-enable cache adds earlier.
+   --
+   -- @since 3.3.0
+   --
+   -- @param bool suspend Optional. Suspends additions if true, re-enables them if
+   --                     false.
+   -- @return bool The current suspend setting
+   --
+   function Wp_Suspend_Cache_Addition (Suspend : Boolean := False)
+                                       return Boolean;
+
+   --
+   -- Determines whether a network is the main network of the Multisite installation.
+   --
+   -- @since 3.7.0
+   --
+   -- @param int network_id Optional. Network ID to test. Defaults to current network.
+   -- @return bool True if network_id is the main network, or if not running Multisite.
+   --
+   function Is_Main_Network (Network_Id : Integer := 0)
+                             return Boolean;
+
+   --
    -- Gets the main network ID.
    --
    -- @since 4.3.0
@@ -939,8 +1023,7 @@ is
    -- @return int|string|false The limit that was set or false on failure.
    --
    function Wp_Raise_Memory_Limit (Context : String := "admin")
-                                   return Integer
-                                   is (0);
+                                   return Integer;
 
    --
    -- Encodes a variable into JSON, with some sanity checks.
@@ -954,17 +1037,45 @@ is
    --                       greater than 0. Default 512.
    -- @return string|false The JSON encoded string, or false if it cannot be encoded.
    --
-   function Wp_JSON_Encode (Data    : Array_Type;
+   function Wp_JSON_Encode (Data    : Multi_Type;
                             Options : Integer := 0;
                             Depth   : Integer := 512)
-                            return String
-                            is ("XXX-306");
+                            return String;
 
-   function Wp_JSON_Encode (Data    : Boolean;
-                            Options : Integer := 0;
-                            Depth   : Integer := 512)
-                            return String
-                            is ("XXX-305");
+   --
+   -- Performs sanity checks on data that shall be encoded to JSON.
+   --
+   -- @ignore
+   -- @since 4.1.0
+   -- @access private
+   --
+   -- @see wp_json_encode()
+   --
+   -- @throws Exception If depth limit is reached.
+   --
+   -- @param mixed data  Variable (usually an array or object) to encode as JSON.
+   -- @param int   depth Maximum depth to walk through data. Must be greater than 0.
+   -- @return mixed The sanitized data that shall be encoded to JSON.
+   --
+   function X_Wp_JSON_Sanity_Check (Data  : Multi_Type;
+                                    Depth : Integer)
+                                    return Multi_Type;
+
+   --
+   -- Converts a string to UTF-8, so that it can be safely encoded to JSON.
+   --
+   -- @ignore
+   -- @since 4.1.0
+   -- @access private
+   --
+   -- @see _wp_json_sanity_check()
+   --
+   -- @param string string The string which is to be converted.
+   -- @return string The checked string.
+   --
+   function X_Wp_JSON_Convert_String (Item : String)
+                                      return String;
+
    --
    -- Gets last changed date for the specified cache group.
    --
@@ -975,8 +1086,7 @@ is
    --                was last changed.
    --
    function Wp_Cache_Get_Last_Changed (Group : String)
-                                       return String
-                                       is ("XXX-979");
+                                       return String;
 
    --
    -- Tests if a given path is a stream URL

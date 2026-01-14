@@ -9,6 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Php.Lists;
+with Php.Numerics;
 with Php.Strings;
 
 with Binder;
@@ -36,8 +37,8 @@ is
       use Hb_Common;
       use Binder;
       use Globals;
-      use Php;
       use Php.Lists;
+      use Php.Numerics;
       use Php.Strings;
       use Inc_Class_Wp_Post_Type;
 --    use Inc_Capabilities;
@@ -77,8 +78,10 @@ is
             "WHERE post_type = %s " &
             "AND post_status NOT IN ( """ & Implode ("','", Exclude_States) & " ) " &
             "AND post_author = %d",
-            -Post_Type,
-            Inc_Users.Get_Current_User_Id'Image
+            To_List (List => (
+              1 => Post_Type,
+              2 => +Inc_Users.Get_Current_User_Id'Image
+            ))
           )));
 
       if
@@ -102,7 +105,7 @@ is
          if "post" = Post_Type and not Sticky_Posts.Is_Empty then
             declare
                Sticky_Posts_2 : constant String :=
-                 Implode (", ", Array_Map ("absint", Sticky_Posts)); -- (array)
+                 Implode (", ", List_Map (Absint'Access, Sticky_Posts)); -- (array)
             begin
                This.Sticky_Posts_Count := Natural'Value (
                  WpDB.Get_Var ( -- (int)
@@ -112,7 +115,7 @@ is
                      "WHERE post_type = %s " &
                      "AND post_status NOT IN (""trash"", ""auto-draft"") " &
                      "AND ID IN (" & Sticky_Posts_2 & ")",
-                     -Post_Type
+                     To_List (-Post_Type)
                  )));
             end;
          end if;

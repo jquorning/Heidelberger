@@ -7,437 +7,640 @@
 --
 
 with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
-with Php.Preg;
+with Php.Arrays;
+with Php.Files;
 with Php.Lists;
+with Php.Multibyte;
+with Php.Preg;
+with Php.Types;
 with Php.Strings;
 
+with Globals;
 with Hb_Common;
 
+with Inc_Functions;
+with Inc_HTTP;
 with Inc_KSES;
+with Inc_L10n;
 with Inc_Options;
 with Inc_Plugins;
 
 package body Inc_Formatting
 is
-   use Ada.Strings.Unbounded;
 
--- --
--- -- Replaces common plain text characters with formatted entities.
--- --
--- -- Returns given text with transformations of quotes into smart quotes, apostrophes,
--- -- dashes, ellipses, the trademark symbol, and the multiplication symbol.
--- --
--- -- As an example,
--- --
--- --     "cause today"s effort makes it worth tomorrow"s "holiday" ...
--- --
--- -- Becomes:
--- --
--- --     &#8217;cause today&#8217;s effort makes it worth tomorrow&#8217;s &#8220;holiday&#8221; &#8230;
--- --
--- -- Code within certain HTML blocks are skipped.
--- --
--- -- Do not use this function before the {@see "init"end; action hook; everything will break.
--- --
--- -- @since 0.71
--- --
--- -- @global array wp_cockneyreplace Array of formatted entities for certain common phrases.
--- -- @global array shortcode_tags
--- --
--- -- @param string text  The text to be formatted.
--- -- @param bool   reset Set to true for unit testing. Translated patterns will reset.
--- -- @return string The string replaced with HTML entities.
--- --
--- function wptexturize( text, reset = false ) then
---         global wp_cockneyreplace, shortcode_tags;
---         static static_characters            = null,
---                 static_replacements             = null,
---                 dynamic_characters              = null,
---                 dynamic_replacements            = null,
---                 default_no_texturize_tags       = null,
---                 default_no_texturize_shortcodes = null,
---                 run_texturize                   = true,
---                 apos                            = null,
---                 prime                           = null,
---                 double_prime                    = null,
---                 opening_quote                   = null,
---                 closing_quote                   = null,
---                 opening_single_quote            = null,
---                 closing_single_quote            = null,
---                 open_q_flag                     = "<!--oq-->",
---                 open_sq_flag                    = "<!--osq-->",
---                 apos_flag                       = "<!--apos-->";
+   Global_Wp_Cockneyreplace : Array_Type;
+   Global_Shortcode_Tags    : Array_Type;
 
---         // If there"s nothing to do, just stop.
---         if ( empty( text ) || false === run_texturize ) then
---                 return text;
---         end;
+   ------------------
+   -- Wp_Texturize --
+   ------------------
 
---         // Set up static variables. Run once only.
---         if ( reset || ! isset( static_characters ) ) then
---                 --
---                 -- Filters whether to skip running wptexturize().
---                 --
---                 -- Returning false from the filter will effectively short-circuit wptexturize()
---                 -- and return the original text passed to the function instead.
---                 --
---                 -- The filter runs only once, the first time wptexturize() is called.
---                 --
---                 -- @since 4.0.0
---                 --
---                 -- @see wptexturize()
---                 --
---                 -- @param bool run_texturize Whether to short-circuit wptexturize().
---                 --
---                 run_texturize = apply_filters( "run_wptexturize", run_texturize );
---                 if ( false === run_texturize ) then
---                         return text;
---                 end;
+   function Wp_Texturize (Text  : String;
+                          Reset : Boolean := False)
+                          return String
+   is
+      use Php.Arrays;
+      use Php.Lists;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_L10n;
+      use Inc_Plugins;
 
---                 /* translators: Opening curly double quote.--
---                 opening_quote = _x( "&#8220;", "opening curly double quote" );
---                 /* translators: Closing curly double quote.--
---                 closing_quote = _x( "&#8221;", "closing curly double quote" );
+      -- static
+      Static_Characters    : List_Type;
+      Static_Replacements  : List_Type;
+      Dynamic_Characters   : Array_Type;
+      Dynamic_Replacements : Array_Type;
+        --         default_no_texturize_tags       = null,
+        --         default_no_texturize_shortcodes = null,
+      Run_Texturize : Boolean := True;
+        --         apos                            = null,
+        --         prime                           = null,
+        --         double_prime                    = null,
+        --         opening_quote                   = null,
+        --         closing_quote                   = null,
+        --         opening_single_quote            = null,
+        --         closing_single_quote            = null,
 
---                 /* translators: Apostrophe, for example in "cause or can"t.--
---                 apos = _x( "&#8217;", "apostrophe" );
+      -- translators: Opening curly double quote.
+      Opening_Quote : constant String :=
+        X_X ("&#8220;", "opening curly double quote");
 
---                 /* translators: Prime, for example in 9" (nine feet).--
---                 prime = _x( "&#8242;", "prime" );
---                 /* translators: Double prime, for example in 9" (nine inches).--
---                 double_prime = _x( "&#8243;", "double prime" );
+      -- translators: Closing curly double quote.
+      Closing_Quote : constant String :=
+        X_X ("&#8221;", "closing curly double quote");
 
---                 /* translators: Opening curly single quote.--
---                 opening_single_quote = _x( "&#8216;", "opening curly single quote" );
---                 /* translators: Closing curly single quote.--
---                 closing_single_quote = _x( "&#8217;", "closing curly single quote" );
+      -- translators: Apostrophe, for example in "cause or can't.
+      Apos : constant String :=
+        X_X ("&#8217;", "apostrophe");
 
---                 /* translators: En dash.--
---                 en_dash = _x( "&#8211;", "en dash" );
---                 /* translators: Em dash.--
---                 em_dash = _x( "&#8212;", "em dash" );
+      -- translators: Prime, for example in 9" (nine feet).
+      Prime : constant String :=
+        X_X ("&#8242;", "prime");
 
---                 default_no_texturize_tags       = array( "pre", "code", "kbd", "style", "script", "tt" );
---                 default_no_texturize_shortcodes = array( "code" );
+      -- translators: Double prime, for example in 9" (nine inches).
+      Double_Prime : constant String :=
+        X_X ("&#8243;", "double prime");
 
---                 // If a plugin has provided an autocorrect array, use it.
---                 if ( isset( wp_cockneyreplace ) ) then
---                         cockney        = array_keys( wp_cockneyreplace );
---                         cockneyreplace = array_values( wp_cockneyreplace );
---                 end; else then
---                         /*
---                         -- translators: This is a comma-separated list of words that defy the syntax of quotations in normal use,
---                         -- for example... "We do not have enough words yet"... is a typical quoted phrase. But when we write
---                         -- lines of code "til we have enough of "em, then we need to insert apostrophes instead of quotes.
---                         --
---                         cockney = explode(
---                                 ",",
---                                 _x(
---                                         ""tain"t,"twere,"twas,"tis,"twill,"til,"bout,"nuff,"round,"cause,"em",
---                                         "Comma-separated list of words to texturize in your language"
---                                 )
---                         );
+      -- translators: Opening curly single quote.
+      Opening_Single_Quote : constant String :=
+        X_X ("&#8216;", "opening curly single quote");
 
---                         cockneyreplace = explode(
---                                 ",",
---                                 _x(
---                                         "&#8217;tain&#8217;t,&#8217;twere,&#8217;twas,&#8217;tis,&#8217;twill,&#8217;til,&#8217;bout,&#8217;nuff,&#8217;round,&#8217;cause,&#8217;em",
---                                         "Comma-separated list of replacement words in your language"
---                                 )
---                         );
---                 end;
+      -- translators: Closing curly single quote.
+      Closing_Single_Quote : constant String :=
+        X_X ("&#8217;", "closing curly single quote");
 
---                 static_characters   = array_merge( array( "...", "``", "\"\"", " (tm)" ), cockney );
---                 static_replacements = array_merge( array( "&#8230;", opening_quote, closing_quote, " &#8482;" ), cockneyreplace );
+      -- translators: En dash.
+      En_Dash : constant String :=
+        X_X ("&#8211;", "en dash");
 
---                 // Pattern-based replacements of characters.
---                 // Sort the remaining patterns into several arrays for performance tuning.
---                 dynamic_characters   = array(
---                         "apos"  => array(),
---                         "quote" => array(),
---                         "dash"  => array(),
---                 );
---                 dynamic_replacements = array(
---                         "apos"  => array(),
---                         "quote" => array(),
---                         "dash"  => array(),
---                 );
---                 dynamic              = array();
---                 spaces               = wp_spaces_regexp();
+      -- translators: Em dash.
+      Em_Dash : constant String :=
+        X_X ("&#8212;", "em dash");
 
---                 // "99" and "99" are ambiguous among other patterns; assume it"s an abbreviated year at the end of a quotation.
---                 if ( """ !== apos || """ !== closing_single_quote ) then
---                         dynamic[ "/\"(\d\d)\"(?=\Z|[.,:;!?)end;\-\]]|&gt;|" . spaces . ")/" ] = apos_flag . "1" . closing_single_quote;
---                 end;
---                 if ( """ !== apos || """ !== closing_quote ) then
---                         dynamic[ "/\"(\d\d)"(?=\Z|[.,:;!?)end;\-\]]|&gt;|" . spaces . ")/" ] = apos_flag . "1" . closing_quote;
---                 end;
+      Default_No_Texturize_Tags : constant List_Type :=
+        To_List (List => (+"pre", +"code", +"kbd", +"style", +"script", +"tt"));
 
---                 // "99 "99s "99"s (apostrophe)  But never "9 or "99% or "999 or "99.0.
---                 if ( """ !== apos ) then
---                         dynamic["/\"(?=\d\d(?:\Z|(?![%\d]|[.,]\d)))/"] = apos_flag;
---                 end;
+      Default_No_Texturize_Shortcodes : constant List_Type :=
+        To_List ("code");
 
---                 // Quoted numbers like "0.42".
---                 if ( """ !== opening_single_quote && """ !== closing_single_quote ) then
---                         dynamic[ "/(?<=\A|" . spaces . ")\"(\d[.,\d]*)\"/" ] = open_sq_flag . "1" . closing_single_quote;
---                 end;
+      Open_Q_Flag  : constant String := "<!--oq-->";
+      Open_Sq_Flag : constant String := "<!--osq-->";
+      Apos_Flag    : constant String := "<!--apos-->";
 
---                 // Single quote at start, or preceded by (, then, <, [, ", -, or spaces.
---                 if ( """ !== opening_single_quote ) then
---                         dynamic[ "/(?<=\A|[([then"\-]|&lt;|" . spaces . ")\"/" ] = open_sq_flag;
---                 end;
+      Cockney        : List_Type;
+      Cockneyreplace : List_Type;
 
---                 // Apostrophe in a word. No spaces, double apostrophes, or other punctuation.
---                 if ( """ !== apos ) then
---                         dynamic[ "/(?<!" . spaces . ")\"(?!\Z|[.,:;!?"\"()thenend;[\]\-]|&[lg]t;|" . spaces . ")/" ] = apos_flag;
---                 end;
+      Dynamic : Array_Type;
+      Spaces  : constant String := Wp_Spaces_Regexp;
 
---                 dynamic_characters["apos"]   = array_keys( dynamic );
---                 dynamic_replacements["apos"] = array_values( dynamic );
---                 dynamic                      = array();
+   begin
+      -- If there's nothing to do, just stop.
+      if Empty (Text) or else False = Run_Texturize then
+         return Text;
+      end if;
 
---                 // Quoted numbers like "42".
---                 if ( """ !== opening_quote && """ !== closing_quote ) then
---                         dynamic[ "/(?<=\A|" . spaces . ")"(\d[.,\d]*)"/" ] = open_q_flag . "1" . closing_quote;
---                 end;
+      -- Set up static variables. Run once only.
+      if Reset or else not Static_Characters.Is_Empty then -- isset
+         --
+         -- Filters whether to skip running wptexturize().
+         --
+         -- Returning false from the filter will effectively short-circuit
+         -- wptexturize() and return the original text passed to the function instead.
+         --
+         -- The filter runs only once, the first time wptexturize() is called.
+         --
+         -- @since 4.0.0
+         --
+         -- @see wptexturize()
+         --
+         -- @param bool run_texturize Whether to short-circuit wptexturize().
+         --
+         Run_Texturize := Apply_Filters ("run_wptexturize", Run_Texturize);
+         if False = Run_Texturize then
+            return Text;
+         end if;
 
---                 // Double quote at start, or preceded by (, then, <, [, -, or spaces, and not followed by spaces.
---                 if ( """ !== opening_quote ) then
---                         dynamic[ "/(?<=\A|[([then\-]|&lt;|" . spaces . ")"(?!" . spaces . ")/" ] = open_q_flag;
---                 end;
+         -- If a plugin has provided an autocorrect array, use it.
+         if Isset (Global_Wp_Cockneyreplace) then
+            Cockney        := Array_Keys   (Global_Wp_Cockneyreplace);
+            Cockneyreplace := Array_Values (Global_Wp_Cockneyreplace);
+         else
+            --
+            -- translators: This is a comma-separated list of words that defy the
+            -- syntax of quotations in normal use for example... "We do not have
+            -- enough words yet"... is a typical quoted phrase. But when we write
+            -- lines of code "til we have enough of "em, then we need to insert
+            -- apostrophes instead of quotes.
+            --
+            Cockney :=
+              Explode (
+                ",",
+                X_X (
+                  "'tain't,'twere,'twas,'tis,'twill,'til,'bout,'nuff,'round,'cause,'em",
+                  "Comma-separated list of words to texturize in your language"
+                )
+              );
 
---                 dynamic_characters["quote"]   = array_keys( dynamic );
---                 dynamic_replacements["quote"] = array_values( dynamic );
---                 dynamic                       = array();
+            Cockneyreplace :=
+              Explode (
+                ",",
+                X_X (
+                  "&#8217;tain&#8217;t,&#8217;twere,&#8217;twas,&#8217;tis,&#8217;twill,&#8217;til,&#8217;bout,&#8217;nuff,&#8217;round,&#8217;cause,&#8217;em",
+                  "Comma-separated list of replacement words in your language"
+                )
+              );
+         end if;
 
---                 // Dashes and spaces.
---                 dynamic["/---"] = em_dash;
---                 dynamic[ "/(?<=^|" . spaces . ")--(?=|" . spaces . ")/" ] = em_dash;
---                 dynamic["/(?<!xn)--"]                                       = en_dash;
---                 dynamic[ "/(?<=^|" . spaces . ")-(?=|" . spaces . ")/" ]  = en_dash;
+         Static_Characters :=
+           List_Merge (To_List (List => (+"...", +"``", +"\\", +" (tm)")),
+                       Cockney);
 
---                 dynamic_characters["dash"]   = array_keys( dynamic );
---                 dynamic_replacements["dash"] = array_values( dynamic );
---         end;
+         Static_Replacements :=
+           List_Merge (
+             To_List (List => (+"&#8230;", +Opening_Quote, +Closing_Quote,
+                               +" &#8482;")),
+             Cockneyreplace);
 
---         // Must do this every time in case plugins use these filters in a context sensitive manner.
---         --
---         -- Filters the list of HTML elements not to texturize.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string[] default_no_texturize_tags An array of HTML element names.
---         --
---         no_texturize_tags = apply_filters( "no_texturize_tags", default_no_texturize_tags );
---         --
---         -- Filters the list of shortcodes not to texturize.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string[] default_no_texturize_shortcodes An array of shortcode names.
---         --
---         no_texturize_shortcodes = apply_filters( "no_texturize_shortcodes", default_no_texturize_shortcodes );
+         -- Pattern-based replacements of characters.
+         -- Sort the remaining patterns into several arrays for performance tuning.
+         Dynamic_Characters := To_Array (List => (
+           Build ("apos",  Empty_Array),
+           Build ("quote", Empty_Array),
+           Build ("dash",  Empty_Array)
+         ));
 
---         no_texturize_tags_stack       = array();
---         no_texturize_shortcodes_stack = array();
+         Dynamic_Replacements := To_Array (List => (
+           Build ("apos",  Empty_Array),
+           Build ("quote", Empty_Array),
+           Build ("dash",  Empty_Array)
+         ));
 
---         // Look for shortcodes and HTML elements.
+         Dynamic := Empty_Array;
+--       Spaces  := Wp_Spaces_Regexp;
 
---         preg_match_all( "@\[/?([^<>&/\[\]\x00-\x20=]++)@", text, matches );
---         tagnames         = array_intersect( array_keys( shortcode_tags ), matches[1] );
---         found_shortcodes = ! empty( tagnames );
---         shortcode_regex  = found_shortcodes ? _get_wptexturize_shortcode_regex( tagnames ) : "";
---         regex            = _get_wptexturize_split_regex( shortcode_regex );
+         -- "99" and "99" are ambiguous among other patterns; assume it's an
+         -- abbreviated year at the end of a quotation.
+         if "'" /= Apos or "'" /= Closing_Single_Quote then
+            declare
+               Key : constant String := "/\'(\d\d)\'(?=\Z|[.,:;!?)end;\-\]]|&gt;|" & Spaces & ")/";
+            begin
+               Set (Dynamic, Key,
+                    From_String (Apos_Flag & "$1" & Closing_Single_Quote));
+            end;
+         end if;
 
---         textarr = preg_split( regex, text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+         if "'" /= Apos or "'" /= Closing_Quote then
+            declare
+               Key : constant String := "/\'(\d\d)'(?=\Z|[.,:;!?)end;\-\]]|&gt;|" & Spaces & ")/";
+            begin
+               Set (Dynamic, Key,
+                    From_String (Apos_Flag & "$1" & Closing_Quote));
+            end;
+         end if;
 
---         foreach ( textarr as &curl ) then
---                 // Only call _wptexturize_pushpop_element if curl is a delimiter.
---                 first = curl[0];
---                 if ( "<" === first ) then
---                         if ( "<!--" === substr( curl, 0, 4 ) ) then
---                                 // This is an HTML comment delimiter.
---                                 continue;
---                         end; else then
---                                 // This is an HTML element delimiter.
+         -- "99 "99s "99"s (apostrophe)  But never "9 or "99% or "999 or "99.0.
+         if "'" /= Apos then
+            declare
+               Key : constant String := "/\'(?=\d\d(?:\Z|(?![%\d]|[.,]\d)))/";
+            begin
+               Set (Dynamic, Key, From_String (Apos_Flag));
+            end;
+         end if;
 
---                                 // Replace each & with &#038; unless it already looks like an entity.
---                                 curl = preg_replace( "/&(?!#(?:\d+|x[a-f0-9]+);|[a-z1-4]then1,8end;;)/i", "&#038;", curl );
+         -- Quoted numbers like "0.42".
+         if "'" /= Opening_Single_Quote and "'" /= Closing_Single_Quote then
+            declare
+               Key : constant String := "/(?<=\A|" & Spaces & ")\'(\d[.,\d]*)\'/";
+            begin
+               Set (Dynamic, Key,
+                    From_String (Open_Sq_Flag & "$1" & Closing_Single_Quote));
+            end;
+         end if;
 
---                                 _wptexturize_pushpop_element( curl, no_texturize_tags_stack, no_texturize_tags );
---                         end;
---                 end; elseif ( "" === trim( curl ) ) then
---                         // This is a newline between delimiters. Performance improves when we check this.
---                         continue;
+         -- Single quote at start, or preceded by (, then, <, [, ", -, or spaces.
+         if "'" /= Opening_Single_Quote then
+            declare
+               Key : constant String := "/(?<=\A|[([{""\-]|&lt;|" & Spaces & ")\'/";
+            begin
+               Set (Dynamic, Key, From_String (Open_Sq_Flag));
+            end;
+         end if;
 
---                 end; elseif ( "[" === first && found_shortcodes && 1 === preg_match( "/^" . shortcode_regex . "/", curl ) ) then
---                         // This is a shortcode delimiter.
+         -- Apostrophe in a word. No spaces, double apostrophes, or other punctuation.
+         if "'" /= Apos then
+            declare
+               Key : constant String :=
+                 "/(?<!" & Spaces & ")\'(?!\Z|[.,:;!?""\'(){}[\]\-]|&[lg]t;|" &
+                 Spaces & ")/";
+            begin
+               Set (Dynamic, Key, From_String (Apos_Flag));
+            end;
+         end if;
 
---                         if ( "[[" !== substr( curl, 0, 2 ) && "]]" !== substr( curl, -2 ) ) then
---                                 // Looks like a normal shortcode.
---                                 _wptexturize_pushpop_element( curl, no_texturize_shortcodes_stack, no_texturize_shortcodes );
---                         end; else then
---                                 // Looks like an escaped shortcode.
---                                 continue;
---                         end;
---                 end; elseif ( empty( no_texturize_shortcodes_stack ) && empty( no_texturize_tags_stack ) ) then
---                         // This is neither a delimiter, nor is this content inside of no_texturize pairs. Do texturize.
+         Set (Dynamic_Characters,   "apos", From_List (Array_Keys   (Dynamic)));
+         Set (Dynamic_Replacements, "apos", From_List (Array_Values (Dynamic)));
+         Dynamic := Empty_Array;
 
---                         curl = str_replace( static_characters, static_replacements, curl );
+         -- Quoted numbers like "42".
+         if "'" /= Opening_Quote and "'" /= Closing_Quote then
+            declare
+               Key : constant String := "/(?<=\A|" & Spaces & ")'(\d[.,\d]*)'/";
+            begin
+               Set (Dynamic, Key,
+                    From_String (Open_Q_Flag & "$1" & Closing_Quote));
+            end;
+         end if;
 
---                         if ( false !== strpos( curl, """ ) ) then
---                                 curl = preg_replace( dynamic_characters["apos"], dynamic_replacements["apos"], curl );
---                                 curl = wptexturize_primes( curl, """, prime, open_sq_flag, closing_single_quote );
---                                 curl = str_replace( apos_flag, apos, curl );
---                                 curl = str_replace( open_sq_flag, opening_single_quote, curl );
---                         end;
---                         if ( false !== strpos( curl, """ ) ) then
---                                 curl = preg_replace( dynamic_characters["quote"], dynamic_replacements["quote"], curl );
---                                 curl = wptexturize_primes( curl, """, double_prime, open_q_flag, closing_quote );
---                                 curl = str_replace( open_q_flag, opening_quote, curl );
---                         end;
---                         if ( false !== strpos( curl, "-" ) ) then
---                                 curl = preg_replace( dynamic_characters["dash"], dynamic_replacements["dash"], curl );
---                         end;
+         -- Double quote at start, or preceded by (, then, <, [, -, or spaces, and
+         -- not followed by spaces.
+         if "'" /= Opening_Quote then
+            declare
+               Key : constant String :=
+                 "/(?<=\A|[([then\-]|&lt;|" & Spaces & ")'(?!" & Spaces & ")/";
+            begin
+               Set (Dynamic, Key, From_String (Open_Q_Flag));
+            end;
+         end if;
 
---                         // 9x9 (times), but never 0x9999.
---                         if ( 1 === preg_match( "/(?<=\d)x\d/", curl ) ) then
---                                 // Searching for a digit is 10 times more expensive than for the x, so we avoid doing this one!
---                                 curl = preg_replace( "/\b(\d(?(?<=0)[\d\.,]+|[\d\.,]*))x(\d[\d\.,]*)\b/", "1&#215;2", curl );
---                         end;
+         Set (Dynamic_Characters,   "quote", From_List (Array_Keys   (Dynamic)));
+         Set (Dynamic_Replacements, "quote", From_List (Array_Values (Dynamic)));
+         Dynamic := Empty_Array;
 
---                         // Replace each & with &#038; unless it already looks like an entity.
---                         curl = preg_replace( "/&(?!#(?:\d+|x[a-f0-9]+);|[a-z1-4]then1,8end;;)/i", "&#038;", curl );
---                 end;
---         end;
+         -- Dashes and spaces.
+         Set (Dynamic, "/---/", From_String (Em_Dash));
+         Set (Dynamic, "/(?<=^|" & Spaces & ")--(?=|" & Spaces & ")/",
+              From_String (Em_Dash));
 
---         return implode( "", textarr );
--- end;
+         Set (Dynamic, "/(?<!xn)--/", From_String (En_Dash));
+         Set (Dynamic, "/(?<=^|" & Spaces & ")-(?=|" & Spaces & ")/",
+              From_String (En_Dash));
 
--- --
--- -- Implements a logic tree to determine whether or not "7"." represents seven feet,
--- -- then converts the special char into either a prime char or a closing quote char.
--- --
--- -- @since 4.3.0
--- --
--- -- @param string haystack    The plain text to be searched.
--- -- @param string needle      The character to search for such as " or ".
--- -- @param string prime       The prime char to use for replacement.
--- -- @param string open_quote  The opening quote char. Opening quote replacement must be
--- --                            accomplished already.
--- -- @param string close_quote The closing quote char to use for replacement.
--- -- @return string The haystack value after primes and quotes replacements.
--- --
--- function wptexturize_primes( haystack, needle, prime, open_quote, close_quote ) then
---         spaces           = wp_spaces_regexp();
---         flag             = "<!--wp-prime-or-quote-->";
---         quote_pattern    = "/needle(?=\\Z|[.,:;!?)end;\\-\\]]|&gt;|" . spaces . ")/";
---         prime_pattern    = "/(?<=\\d)needle/";
---         flag_after_digit = "/(?<=\\d)flag/";
---         flag_no_digit    = "/(?<!\\d)flag/";
+         Set (Dynamic_Characters,   "dash", From_List (Array_Keys   (Dynamic)));
+         Set (Dynamic_Replacements, "dash", From_List (Array_Values (Dynamic)));
+      end if;
 
---         sentences = explode( open_quote, haystack );
+      -- Must do this every time in case plugins use these filters in a context
+      -- sensitive manner.
 
---         foreach ( sentences as key => &sentence ) then
---                 if ( false === strpos( sentence, needle ) ) then
---                         continue;
---                 end; elseif ( 0 !== key && 0 === substr_count( sentence, close_quote ) ) then
---                         sentence = preg_replace( quote_pattern, flag, sentence, -1, count );
---                         if ( count > 1 ) then
---                                 // This sentence appears to have multiple closing quotes. Attempt Vulcan logic.
---                                 sentence = preg_replace( flag_no_digit, close_quote, sentence, -1, count2 );
---                                 if ( 0 === count2 ) then
---                                         // Try looking for a quote followed by a period.
---                                         count2 = substr_count( sentence, "flag." );
---                                         if ( count2 > 0 ) then
---                                                 // Assume the rightmost quote-period match is the end of quotation.
---                                                 pos = strrpos( sentence, "flag." );
---                                         end; else then
---                                                 // When all else fails, make the rightmost candidate a closing quote.
---                                                 // This is most likely to be problematic in the context of bug #18549.
---                                                 pos = strrpos( sentence, flag );
---                                         end;
---                                         sentence = substr_replace( sentence, close_quote, pos, strlen( flag ) );
---                                 end;
---                                 // Use conventional replacement on any remaining primes and quotes.
---                                 sentence = preg_replace( prime_pattern, prime, sentence );
---                                 sentence = preg_replace( flag_after_digit, prime, sentence );
---                                 sentence = str_replace( flag, close_quote, sentence );
---                         end; elseif ( 1 == count ) then
---                                 // Found only one closing quote candidate, so give it priority over primes.
---                                 sentence = str_replace( flag, close_quote, sentence );
---                                 sentence = preg_replace( prime_pattern, prime, sentence );
---                         end; else then
---                                 // No closing quotes found. Just run primes pattern.
---                                 sentence = preg_replace( prime_pattern, prime, sentence );
---                         end;
---                 end; else then
---                         sentence = preg_replace( prime_pattern, prime, sentence );
---                         sentence = preg_replace( quote_pattern, close_quote, sentence );
---                 end;
---                 if ( """ === needle && false !== strpos( sentence, """ ) ) then
---                         sentence = str_replace( """, close_quote, sentence );
---                 end;
---         end;
+      declare
+         --
+         -- Filters the list of HTML elements not to texturize.
+         --
+         -- @since 2.8.0
+         --
+         -- @param string[] default_no_texturize_tags An array of HTML element names.
+         --
+         No_Texturize_Tags : constant List_Type :=
+           Apply_Filters ("no_texturize_tags", Default_No_Texturize_Tags);
 
---         return implode( open_quote, sentences );
--- end;
+         --
+         -- Filters the list of shortcodes not to texturize.
+         --
+         -- @since 2.8.0
+         --
+         -- @param string[] default_no_texturize_shortcodes An array of shortcode
+         -- names.
+         --
+         No_Texturize_Shortcodes : constant List_Type :=
+           Apply_Filters ("no_texturize_shortcodes", Default_No_Texturize_Shortcodes);
 
--- --
--- -- Searches for disabled element tags. Pushes element to stack on tag open
--- -- and pops on tag close.
--- --
--- -- Assumes first char of `text` is tag opening and last char is tag closing.
--- -- Assumes second char of `text` is optionally `/` to indicate closing as in `</html>`.
--- --
--- -- @since 2.9.0
--- -- @access private
--- --
--- -- @param string   text              Text to check. Must be a tag like `<html>` or `[shortcode]`.
--- -- @param string[] stack             Array of open tag elements.
--- -- @param string[] disabled_elements Array of tag names to match against. Spaces are not allowed in tag names.
--- --
--- function _wptexturize_pushpop_element( text, &stack, disabled_elements ) then
---         // Is it an opening tag or closing tag?
---         if ( isset( text[1] ) && "/" !== text[1] ) then
---                 opening_tag = true;
---                 name_offset = 1;
---         end; elseif ( 0 === count( stack ) ) then
---                 // Stack is empty. Just stop.
---                 return;
---         end; else then
---                 opening_tag = false;
---                 name_offset = 2;
---         end;
+         No_Texturize_Tags_Stack       : List_Type;
+         No_Texturize_Shortcodes_Stack : List_Type;
 
---         // Parse out the tag name.
---         space = strpos( text, " " );
---         if ( false === space ) then
---                 space = -1;
---         end; else then
---                 space -= name_offset;
---         end;
---         tag = substr( text, name_offset, space );
+         Matches : List_Type;
+      begin
+         -- Look for shortcodes and HTML elements.
+         Preg_Match_All ("@\[/?([^<>&/\[\]\x00-\x20=]++)@", Text, Matches);
 
---         // Handle disabled tags.
---         if ( in_array( tag, disabled_elements, true ) ) then
---                 if ( opening_tag ) then
---                         /*
---                         -- This disables texturize until we find a closing tag of our type
---                         -- (e.g. <pre>) even if there was invalid nesting before that.
---                         --
---                         -- Example: in the case <pre>sadsadasd</code>"baba"</pre>
---                         --          "baba" won"t be texturized.
---                         --
+         declare
+            Tagnames : constant List_Type :=
+              List_Intersect (Array_Keys (Global_Shortcode_Tags),
+                              To_List (-Matches (1)));
 
---                         array_push( stack, tag );
---                 end; elseif ( end( stack ) == tag ) then
---                         array_pop( stack );
---                 end;
---         end;
--- end;
+            Found_Shortcodes : constant Boolean := not Tagnames.Is_Empty;
+            Shortcode_Regex  : constant String :=
+              (if Found_Shortcodes
+               then X_Get_Wptexturize_Shortcode_Regex (Tagnames) else "");
+
+            Regex : constant String :=
+              X_Get_Wptexturize_Split_Regex (Shortcode_Regex);
+
+            Textarr : constant List_Type :=
+              Preg_Split (Regex, Text, -1,
+                          PREG_SPLIT_DELIM_CAPTURE + PREG_SPLIT_NO_EMPTY);
+         begin
+            for Curl_0 of Textarr loop -- &
+               -- Only call _wptexturize_pushpop_element if curl is a delimiter.
+               declare
+                  Curl  : String := -Curl_0;
+                  First : constant Character := Curl (1);
+               begin
+
+                  if '<' = First then
+                     if "<!--" = Substr (Curl, 0, 4) then
+                        -- This is an HTML comment delimiter.
+                        goto Continue;
+                     else
+                        -- This is an HTML element delimiter.
+
+                        -- Replace each & with &#038; unless it already looks like
+                        -- an entity.
+                        Curl :=
+                          Preg_Replace ("/&(?!#(?:\d+|x[a-f0-9]+);|[a-z1-4]{1,8};)/i",
+                                        "&#038;", Curl);
+
+                        X_Wptexturize_Pushpop_Element (Curl,
+                                                       No_Texturize_Tags_Stack,
+                                                       No_Texturize_Tags);
+                     end if;
+
+                  elsif "" = Trim (Curl) then
+                     -- This is a newline between delimiters. Performance improves
+                     -- when we check this.
+                     goto Continue;
+
+                  elsif
+                    '[' = First and Found_Shortcodes and
+                    1 = Preg_Match ("/^" & Shortcode_Regex & "/", Curl)
+                  then
+                     -- This is a shortcode delimiter.
+
+                     if "[[" /= Substr (Curl, 0, 2) and "]]" /= Substr (Curl, -2) then
+                        -- Looks like a normal shortcode.
+                        X_Wptexturize_Pushpop_Element (Curl,
+                                                       No_Texturize_Shortcodes_Stack,
+                                                       No_Texturize_Shortcodes);
+                     else
+                        -- Looks like an escaped shortcode.
+                        goto Continue;
+                     end if;
+
+                  elsif
+                    No_Texturize_Shortcodes_Stack.Is_Empty and
+                    No_Texturize_Tags_Stack.Is_Empty
+                  then
+                     -- This is neither a delimiter, nor is this content inside of
+                     -- no_texturize pairs. Do texturize.
+                     Curl := Str_Replace (Static_Characters,
+                                          Static_Replacements, Curl);
+
+                     if 0 /= Strpos (Curl, "'") then  -- false
+                        Curl :=
+                          Preg_Replace (Get_As_String (Dynamic_Characters, "apos"),
+                                        Get_As_String (Dynamic_Replacements, "apos"),
+                                        Curl);
+                        Curl := Wptexturize_Primes (Curl, "'", Prime, Open_Sq_Flag,
+                                                    Closing_Single_Quote);
+                        Curl := Str_Replace (Apos_Flag, Apos, Curl);
+                        Curl := Str_Replace (Open_Sq_Flag, Opening_Single_Quote, Curl);
+                     end if;
+
+                     if 0 /= Strpos (Curl, "'") then  -- false
+                        Curl :=
+                          Preg_Replace (Get_As_String (Dynamic_Characters, "quote"),
+                                        Get_As_String (Dynamic_Replacements, "quote"),
+                                        Curl);
+                        Curl := Wptexturize_Primes (Curl, "'", Double_Prime,
+                                                    Open_Q_Flag, Closing_Quote);
+                        Curl := Str_Replace (Open_Q_Flag, Opening_Quote, Curl);
+                     end if;
+
+                     if 0 /= Strpos (Curl, "-") then  -- false
+                        Curl :=
+                          Preg_Replace (Get_As_String (Dynamic_Characters, "dash"),
+                                        Get_As_String (Dynamic_Replacements, "dash"),
+                                        Curl);
+                     end if;
+
+                     -- 9x9 (times), but never 0x9999.
+                     if 1 = Preg_Match ("/(?<=\d)x\d/", Curl) then
+                        -- Searching for a digit is 10 times more expensive than for
+                        -- the x, so we avoid doing this one!
+                        Curl := Preg_Replace
+                           ("/\b(\d(?(?<=0)[\d\.,]+|[\d\.,]*))x(\d[\d\.,]*)\b/",
+                            "1&#215;2", Curl);
+                     end if;
+
+                     -- Replace each & with &#038; unless it already looks like
+                     -- an entity.
+                     Curl :=
+                       Preg_Replace ("/&(?!#(?:\d+|x[a-f0-9]+);|[a-z1-4]{1,8};)/i",
+                                     "&#038;", Curl);
+                  end if;
+               end;
+               << Continue >>
+            end loop;
+
+            return Implode ("", Textarr);
+         end;
+      end;
+   end Wp_Texturize;
+
+   ------------------------
+   -- Wptexturize_Primes --
+   ------------------------
+
+   function Wptexturize_Primes (Haystack    : String;
+                                Needle      : String;
+                                Prime       : String;
+                                Open_Quote  : String;
+                                Close_Quote : String)
+                                return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+
+      Spaces           : constant String := Wp_Spaces_Regexp;
+      Flag             : constant String := "<!--wp-prime-or-quote-->";
+
+      Quote_Pattern    : constant String :=
+        "/" & Needle & "(?=\\Z|[.,:;!?)}\\-\\]]|&gt;|" & Spaces & ")/";
+
+      Prime_Pattern    : constant String := "/(?<=\\d)" & Needle & "/";
+      Flag_After_Digit : constant String := "/(?<=\\d)" & Flag & "/";
+      Flag_No_Digit    : constant String := "/(?<!\\d)" & Flag & "/";
+
+      Sentences : constant List_Type := Explode (Open_Quote, Haystack);
+      Sentence_6 : Unbounded_String;
+   begin
+      for A in Sentences.First_Index .. Sentences.Last_Index loop
+         declare
+            Index    : constant Integer := A;
+            Sentence : constant String  := -Sentences (A);     -- &
+         begin
+            if 0 = Strpos (Sentence, Needle) then
+               goto Continue;
+            elsif 0 /= Index and then 0 = Substr_Count (Sentence, Close_Quote) then
+               declare
+                  Count      : Natural;
+                  Sentence_2 : constant String :=
+                    Preg_Replace (Quote_Pattern, Flag, Sentence, -1, Count);
+               begin
+                  if Count > 1 then
+                     -- This sentence appears to have multiple closing quotes.
+                     -- Attempt Vulcan logic.
+                     declare
+                        Count_2    : Natural;
+                        Sentence_3 : Unbounded_String :=
+                          +Preg_Replace (Flag_No_Digit, Close_Quote,
+                                         Sentence_2, -1, Count_2);
+                     begin
+                        if 0 = Count_2 then
+                           -- Try looking for a quote followed by a period.
+                           declare
+                              Count_3 : constant Natural :=
+                                Substr_Count (-Sentence_3, Flag & ".");
+                              Pos     : Natural;
+                           begin
+                              if Count_3 > 0 then
+                                 -- Assume the rightmost quote-period match is the end
+                                 -- of quotation.
+                                 Pos := Strrpos (-Sentence_3, Flag & ".");
+                              else
+                                 -- When all else fails, make the rightmost candidate
+                                 -- a closing quote. This is most likely to be
+                                 -- problematic in the context of bug #18549.
+                                 Pos := Strrpos (-Sentence_3, Flag);
+                              end if;
+
+                              Sentence_3 :=
+                                +Substr_Replace (-Sentence_3, Close_Quote,
+                                                 Pos, Strlen (Flag));
+                           end;
+                        end if;
+                        -- Use conventional replacement on any remaining primes and
+                        -- quotes.
+                        declare
+                           Sentence_4 : constant String :=
+                             Preg_Replace (Prime_Pattern, Prime, -Sentence_3);
+
+                           Sentence_5 : constant String :=
+                             Preg_Replace (Flag_After_Digit, Prime, Sentence_4);
+                        begin
+                           Sentence_6 := +Str_Replace (Flag, Close_Quote, Sentence_5);
+                        end;
+                     end;
+
+                  elsif 1 = Count then
+                     -- Found only one closing quote candidate, so give it priority
+                     -- over primes.
+                     declare
+                        Sentence_4 : constant String :=
+                          Str_Replace (Flag, Close_Quote, Sentence_2);
+                     begin
+                        Sentence_6 := +Preg_Replace (Prime_Pattern, Prime, Sentence_4);
+                     end;
+                  else
+                     -- No closing quotes found. Just run primes pattern.
+                     Sentence_6 := +Preg_Replace (Prime_Pattern, Prime, Sentence_2);
+                  end if;
+               end;
+            else
+               declare
+                  Sentence_4 : constant String :=
+                    Preg_Replace (Prime_Pattern, Prime, Sentence);
+               begin
+                  Sentence_6 := +Preg_Replace (Quote_Pattern, Close_Quote, Sentence_4);
+               end;
+            end if;
+
+            if "'" = Needle and 0 /= Strpos (-Sentence_6, "'") then
+               Sentence_6 := +Str_Replace ("'", Close_Quote, -Sentence_6);
+            end if;
+         end;
+         << Continue >>
+      end loop;
+
+      return Implode (Open_Quote, -Sentence_6);
+   end Wptexturize_Primes;
+
+   -----------------------------------
+   -- X_Wptexturize_Pushpop_Element --
+   -----------------------------------
+
+   procedure X_Wptexturize_Pushpop_Element
+               (Text              : String;
+                Stack             : in out List_Type;
+                Disabled_Elements : List_Type)
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Lists;
+      use Php.Strings;
+
+      Opening_Tag : Boolean;
+      Name_Offset : Integer;
+   begin
+      -- Is it an opening tag or closing tag?
+      if Text'Length >= 1 and then '/' /= Text (Text'First) then
+--    if Isset (Text (1)) and '/' /= Text (1) then
+         Opening_Tag := True;
+         Name_Offset := 1;
+      elsif Stack.Is_Empty then
+         -- Stack is empty. Just stop.
+         return;
+      else
+         Opening_Tag := False;
+         Name_Offset := 2;
+      end if;
+
+      -- Parse out the tag name.
+      declare
+         Space : Integer := Strpos (Text, " ");
+      begin
+         if 0 = Space then -- false
+            Space := -1;
+         else
+            Space := Space - Name_Offset;
+         end if;
+
+         declare
+            Tag : constant String := Substr (Text, Name_Offset, Space);
+         begin
+            -- Handle disabled tags.
+            if In_List (Tag, Disabled_Elements, True) then
+               if Opening_Tag then
+                  --
+                  -- This disables texturize until we find a closing tag of our type
+                  -- (e.g. <pre>) even if there was invalid nesting before that.
+                  --
+                  -- Example: in the case <pre>sadsadasd</code>"baba"</pre>
+                  --          "baba" won't be texturized.
+                  --
+
+                  List_Push (Stack, Tag);
+               elsif Stack.Last_Element = Tag then
+                  List_Pop (Stack);
+               end if;
+            end if;
+         end;
+      end;
+   end X_Wptexturize_Pushpop_Element;
 
 -- --
 -- -- Replaces double line breaks with paragraph elements.
@@ -683,78 +886,90 @@ is
 --         return regex;
 -- end;
 
--- --
--- -- Retrieves the combined regular expression for HTML and shortcodes.
--- --
--- -- @access private
--- -- @ignore
--- -- @internal This function will be removed in 4.5.0 per Shortcode API Roadmap.
--- -- @since 4.4.0
--- --
--- -- @param string shortcode_regex Optional. The result from _get_wptexturize_shortcode_regex().
--- -- @return string The regular expression
--- --
--- function _get_wptexturize_split_regex( shortcode_regex = "" ) then
---         static html_regex;
+   -----------------------------------
+   -- X_Get_Wptexturize_Split_Regex --
+   -----------------------------------
 
---         if ( ! isset( html_regex ) ) then
---                 // phpcs:disable Squiz.Strings.ConcatenationSpacing.PaddingFound -- don"t remove regex indentation
---                 comment_regex =
---                         "!"             // Start of comment, after the <.
---                         . "(?:"         // Unroll the loop: Consume everything until --> is found.
---                         .     "-(?!->)" // Dash not followed by end of comment.
---                         .     "[^\-]*+" // Consume non-dashes.
---                         . ")*+"         // Loop possessively.
---                         . "(?:-->)?";   // End of comment. If not found, match all input.
+   Static_HTML_Regex : Ada.Strings.Unbounded.Unbounded_String;
 
---                 html_regex = // Needs replaced with wp_html_split() per Shortcode API Roadmap.
---                         "<"                  // Find start of element.
---                         . "(?(?=!--)"        // Is this a comment?
---                         .     comment_regex // Find end of comment.
---                         . "|"
---                         .     "[^>]*>?"      // Find end of element. If not found, match all input.
---                         . ")";
---                 // phpcs:enable
---         end;
+   function X_Get_Wptexturize_Split_Regex (Shortcode_Regex : String := "")
+                                           return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+   begin
+      if Static_HTML_Regex = "" then
+--    if not Isset (Static_HTML_Regex) then
+         -- phpcs:disable Squiz.Strings.ConcatenationSpacing.PaddingFound
+         -- don't remove regex indentation
+         declare
+            Comment_Regex : constant String :=
+              "!"             -- Start of comment, after the <.
+              & "(?:"         -- Unroll the loop: Consume everything until -->
+                              -- is found.
+              &     "-(?!->)" -- Dash not followed by end of comment.
+              &     "[^\-]*+" -- Consume non-dashes.
+              & ")*+"         -- Loop possessively.
+              & "(?:-->)?";   -- End of comment. If not found, match all input.
+         begin
+            -- Needs replaced with wp_html_split() per Shortcode API Roadmap.
+            Static_HTML_Regex :=
+              +"<"                  -- Find start of element.
+               & "(?(?=!--)"        -- Is this a comment?
+               &     Comment_Regex  -- Find end of comment.
+               & "|"
+               &     "[^>]*>?"      -- Find end of element. If not found, match
+                                    -- all input.
+               & ")";
+         end;
+         -- phpcs:enable
+      end if;
 
---         if ( empty( shortcode_regex ) ) then
---                 regex = "/(" . html_regex . ")/";
---         end; else then
---                 regex = "/(" . html_regex . "|" . shortcode_regex . ")/";
---         end;
+      declare
+         Regex : constant String :=
+           (if Shortcode_Regex = ""
+            then "/(" & (-Static_HTML_Regex) & ")/"
+            else "/(" & (-Static_HTML_Regex) & "|" & Shortcode_Regex & ")/");
+      begin
+         return Regex;
+      end;
+   end X_Get_Wptexturize_Split_Regex;
 
---         return regex;
--- end;
+   ---------------------------------------
+   -- X_Get_Wptexturize_Shortcode_Regex --
+   ---------------------------------------
 
--- --
--- -- Retrieves the regular expression for shortcodes.
--- --
--- -- @access private
--- -- @ignore
--- -- @since 4.4.0
--- --
--- -- @param string[] tagnames Array of shortcodes to find.
--- -- @return string The regular expression
--- --
--- function _get_wptexturize_shortcode_regex( tagnames ) then
---         tagregexp = implode( "|", array_map( "preg_quote", tagnames ) );
---         tagregexp = "(?:tagregexp)(?=[\\s\\]\\/])"; // Excerpt of get_shortcode_regex().
---         // phpcs:disable Squiz.Strings.ConcatenationSpacing.PaddingFound -- don"t remove regex indentation
---         regex =
---                 "\["                // Find start of shortcode.
---                 . "[\/\[]?"         // Shortcodes may begin with [/ or [[.
---                 . tagregexp        // Only match registered shortcodes, because performance.
---                 . "(?:"
---                 .     "[^\[\]<>]+"  // Shortcodes do not contain other shortcodes. Quantifier critical.
---                 . "|"
---                 .     "<[^\[\]>]*>" // HTML elements permitted. Prevents matching ] before >.
---                 . ")*+"             // Possessive critical.
---                 . "\]"              // Find end of shortcode.
---                 . "\]?";            // Shortcodes may end with ]].
---         // phpcs:enable
+   function X_Get_Wptexturize_Shortcode_Regex (Tagnames : List_Type)
+                                               return String
+   is
+      use Php.Lists;
+      use Php.Preg;
+      use Php.Strings;
 
---         return regex;
--- end;
+      Tagregexp_2 : constant String :=
+        Implode ("|", List_Map (Preg_Quote'Access, Tagnames));
+
+      Tagregexp : constant String :=
+        "(?:" & Tagregexp_2 & ")(?=[\\s\\]\\/])"; -- Excerpt of get_shortcode_regex().
+
+      -- phpcs:disable Squiz.Strings.ConcatenationSpacing.PaddingFound
+      -- don't remove regex indentation
+      Regex : constant String :=
+        "\["                -- Find start of shortcode.
+        & "[\/\[]?"         -- Shortcodes may begin with [/ or [[.
+        & Tagregexp         -- Only match registered shortcodes, because performance.
+        & "(?:"
+        &     "[^\[\]<>]+"  -- Shortcodes do not contain other shortcodes.
+        --                     Quantifier critical.
+        & "|"
+        &     "<[^\[\]>]*>" -- HTML elements permitted. Prevents matching ] before >.
+        & ")*+"             -- Possessive critical.
+        & "\]"              -- Find end of shortcode.
+        & "\]?";            -- Shortcodes may end with ]].
+        -- phpcs:enable
+   begin
+      return Regex;
+   end X_Get_Wptexturize_Shortcode_Regex;
 
 -- --
 -- -- Replaces characters or phrases within HTML elements only.
@@ -922,7 +1137,7 @@ is
 -- end;
 
    Static_X_Charset_Set : Boolean := False;
-   Static_X_Charset     : Unbounded_String;
+   Static_X_Charset     : Ada.Strings.Unbounded.Unbounded_String;
 
    -----------------------
    -- X_Wp_Specialchars --
@@ -931,20 +1146,18 @@ is
    function X_Wp_Specialchars
               (Item          : String;
                Quote_Style   : Php.HTML.Flag_Type := Php.HTML.ENT_NOQUOTES;
---             Quote_Style   : Integer := ENT_NOQUOTES;
                Charset       : String  := "";
                Double_Encode : Boolean := False)
                return String
    is
-      use Hb_Common;
-      use Php;
+      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Lists;
       use Php.Preg;
+      use Hb_Common;
 
---    string = (string) string;
-      Quote_Style_2 : Flag_Type := Quote_Style;
-      X_Quote_Style : Flag_Type := Quote_Style_2;
+      Quote_Style_2 : Php.HTML.Flag_Type := Quote_Style;
+      X_Quote_Style : Php.HTML.Flag_Type := Quote_Style_2;
       Charset_2     : Unbounded_String := +Charset;
       Item_2        : Unbounded_String := +Item;
    begin
@@ -990,7 +1203,7 @@ is
       end if;
 
       if
-        In_Array (-Charset_2, To_List (List => (+"utf8", +"utf-8", +"UTF8")), True)
+        In_List (-Charset_2, To_List (List => (+"utf8", +"utf-8", +"UTF8")), True)
       then
          Charset_2 := +"UTF-8";
       end if;
@@ -1013,7 +1226,7 @@ is
                                          then "xml" else "html"));
       end if;
 
-      Item_2 := +HTMLspecialchars (-Item_2, Quote_Style, Charset, Double_Encode);
+      Item_2 := +HTML_Special_Chars (-Item_2, Quote_Style, Charset, Double_Encode);
 
       -- -- Back-compat.
       -- if "single" = X_Quote_Style then
@@ -1133,7 +1346,6 @@ is
       use Php.Lists;
       use Inc_Options;
 
---    string = (string) string;
    begin
       if 0 = Item'Length then
          return "";
@@ -1143,7 +1355,7 @@ is
 --    static is_utf8 = null;
       if not Static_Is_UTF8_Bool then
          Static_Is_UTF8 :=
-           In_Array (Get_Option ("blog_charset"),
+           In_List (Get_Option ("blog_charset"),
                      To_List (List => (+"utf8", +"utf-8", +"UTF8", +"UTF-8")), True);
          Static_Is_UTF8_Bool := True;
       end if;
@@ -1816,92 +2028,85 @@ is
       return Apply_Filters ("sanitize_user", Username_8, Raw_Username, Strict);
    end Sanitize_User;
 
--- --
--- -- Sanitizes a string key.
--- --
--- -- Keys are used as internal identifiers. Lowercase alphanumeric characters,
--- -- dashes, and underscores are allowed.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string key String key.
--- -- @return string Sanitized key.
--- --
--- function sanitize_key( key ) then
---         sanitized_key = "";
+   ------------------
+   -- Sanitize_Key --
+   ------------------
 
---         if ( is_scalar( key ) ) then
---                 sanitized_key = strtolower( key );
---                 sanitized_key = preg_replace( "/[^a-z0-9_\-]/", "", sanitized_key );
---         end;
+   function Sanitize_Key (Key : String)
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Plugins;
 
---         --
---         -- Filters a sanitized key string.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string sanitized_key Sanitized key.
---         -- @param string key           The key prior to sanitization.
---         --
---         return apply_filters( "sanitize_key", sanitized_key, key );
--- end;
+      Sanitized_Key : Unbounded_String;
+   begin
+--    if Is_Scalar (Key) then
+      Sanitized_Key := +Strtolower (Key);
+      Sanitized_Key := +Preg_Replace ("/[^a-z0-9_\-]/", "", -Sanitized_Key);
+--    end if;
 
--- --
--- -- Sanitizes a string into a slug, which can be used in URLs or HTML attributes.
--- --
--- -- By default, converts accent characters to ASCII characters and further
--- -- limits the output to alphanumeric characters, underscore (_) and dash (-)
--- -- through the {@see "sanitize_title"} filter.
--- --
--- -- If `title` is empty and `fallback_title` is set, the latter will be used.
--- --
--- -- @since 1.0.0
--- --
--- -- @param string title          The string to be sanitized.
--- -- @param string fallback_title Optional. A title to use if title is empty. Default empty.
--- -- @param string context        Optional. The operation for which the string is sanitized.
--- --                               When set to "save", the string runs through remove_accents().
--- --                               Default "save".
--- -- @return string The sanitized string.
--- --
--- function sanitize_title( title, fallback_title = "", context = "save" ) then
---         raw_title = title;
+      --
+      -- Filters a sanitized key string.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string sanitized_key Sanitized key.
+      -- @param string key           The key prior to sanitization.
+      --
+      return Apply_Filters ("sanitize_key", -Sanitized_Key, Key);
+   end Sanitize_Key;
 
---         if ( "save" === context ) then
---                 title = remove_accents( title );
---         end;
+   --------------------
+   -- Sanitize_Title --
+   --------------------
 
---         --
---         -- Filters a sanitized title string.
---         --
---         -- @since 1.2.0
---         --
---         -- @param string title     Sanitized title.
---         -- @param string raw_title The title prior to sanitization.
---         -- @param string context   The context for which the title is being sanitized.
---         --
---         title = apply_filters( "sanitize_title", title, raw_title, context );
+   function Sanitize_Title (Title          : String;
+                            Fallback_Title : String := "";
+                            Context        : String := "save")
+                            return String
+   is
+      use Inc_Plugins;
 
---         if ( "" === title || false === title ) then
---                 title = fallback_title;
---         end;
+      Raw_Title : constant String := Title;
 
---         return title;
--- end;
+      Title_2 : constant String :=
+        (if "save" = Context
+         then Remove_Accents (Title)
+         else Title);
 
--- --
--- -- Sanitizes a title with the "query" context.
--- --
--- -- Used for querying the database for a value from URL.
--- --
--- -- @since 3.1.0
--- --
--- -- @param string title The string to be sanitized.
--- -- @return string The sanitized string.
--- --
--- function sanitize_title_for_query( title ) then
---         return sanitize_title( title, "", "query" );
--- end;
+      --
+      -- Filters a sanitized title string.
+      --
+      -- @since 1.2.0
+      --
+      -- @param string title     Sanitized title.
+      -- @param string raw_title The title prior to sanitization.
+      -- @param string context   The context for which the title is being sanitized.
+      --
+      Title_3 : constant String :=
+        Apply_Filters ("sanitize_title", Title_2, Raw_Title, Context);
+
+      Title_4 : constant String :=
+        (if "" = Title_3 -- or else False = Title_3
+         then Fallback_Title
+         else Title_3);
+   begin
+      return Title_4;
+   end Sanitize_Title;
+
+   ------------------------------
+   -- Sanitize_Title_For_Query --
+   ------------------------------
+
+   function Sanitize_Title_For_Query (Title : String)
+                                      return String
+   is
+   begin
+      return Sanitize_Title (Title, "", "query");
+   end Sanitize_Title_For_Query;
 
 -- --
 -- -- Sanitizes a title, replacing whitespace and a few other characters with dashes.
@@ -2064,65 +2269,65 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Sanitizes an HTML classname to ensure it only contains valid characters.
--- --
--- -- Strips the string down to A-Z,a-z,0-9,_,-. If this results in an empty
--- -- string then it will return the alternative value supplied.
--- --
--- -- @todo Expand to support the full range of CDATA that a class attribute can contain.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string class    The classname to be sanitized
--- -- @param string fallback Optional. The value to return if the sanitization ends up as an empty string.
--- --  Defaults to an empty string.
--- -- @return string The sanitized value
--- --
--- function sanitize_html_class( class, fallback = "" ) then
---         // Strip out any %-encoded octets.
---         sanitized = preg_replace( "|%[a-fA-F0-9][a-fA-F0-9]|", "", class );
+   -------------------------
+   -- Sanitize_HTML_Class --
+   -------------------------
 
---         // Limit to A-Z, a-z, 0-9, "_", "-".
---         sanitized = preg_replace( "/[^A-Za-z0-9_-]/", "", sanitized );
+   function Sanitize_HTML_Class (Class    : String;
+                                 Fallback : String := "")
+                                 return String
+   is
+      use Php.Preg;
+      use Inc_Plugins;
 
---         if ( "" === sanitized && fallback ) then
---                 return sanitize_html_class( fallback );
---         end;
---         --
---         -- Filters a sanitized HTML class string.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string sanitized The sanitized HTML class.
---         -- @param string class     HTML class before sanitization.
---         -- @param string fallback  The fallback string.
---         --
---         return apply_filters( "sanitize_html_class", sanitized, class, fallback );
--- end;
+      -- Strip out any %-encoded octets.
+      Sanitized_1 : constant String :=
+        Preg_Replace ("|%[a-fA-F0-9][a-fA-F0-9]|", "", Class);
 
--- --
--- -- Strips out all characters not allowed in a locale name.
--- --
--- -- @since 6.2.1
--- --
--- -- @param string locale_name The locale name to be sanitized.
--- -- @return string The sanitized value.
--- --
--- function sanitize_locale_name( locale_name ) then
---         // Limit to A-Z, a-z, 0-9, "_", "-".
---         sanitized = preg_replace( "/[^A-Za-z0-9_-]/", "", locale_name );
+      -- Limit to A-Z, a-z, 0-9, "_", "-".
+      Sanitized : constant String :=
+        Preg_Replace ("/[^A-Za-z0-9_-]/", "", Sanitized_1);
+   begin
+      if "" = Sanitized and Fallback /= "" then
+         return Sanitize_HTML_Class (Fallback);
+      end if;
 
---         --
---         -- Filters a sanitized locale name string.
---         --
---         -- @since 6.2.1
---         --
---         -- @param string sanitized   The sanitized locale name.
---         -- @param string locale_name The locale name before sanitization.
---         --
---         return apply_filters( "sanitize_locale_name", sanitized, locale_name );
--- end;
+      --
+      -- Filters a sanitized HTML class string.
+      --
+      -- @since 2.8.0
+      --
+      -- @param string sanitized The sanitized HTML class.
+      -- @param string class     HTML class before sanitization.
+      -- @param string fallback  The fallback string.
+      --
+      return Apply_Filters ("sanitize_html_class", Sanitized, Class, Fallback);
+   end Sanitize_HTML_Class;
+
+   --------------------------
+   -- Sanitize_Locale_Name --
+   --------------------------
+
+   function Sanitize_Locale_Name (Locale_Name : String)
+                                  return String
+   is
+      use Php.Preg;
+      use Inc_Plugins;
+
+      -- Limit to A-Z, a-z, 0-9, "_", "-".
+      Sanitized : constant String :=
+        Preg_Replace ("/[^A-Za-z0-9_-]/", "", Locale_Name);
+   begin
+      --
+      -- Filters a sanitized locale name string.
+      --
+      -- @since 6.2.1
+      --
+      -- @param string sanitized   The sanitized locale name.
+      -- @param string locale_name The locale name before sanitization.
+      --
+      return Apply_Filters ("sanitize_locale_name", Sanitized, Locale_Name);
+   end Sanitize_Locale_Name;
 
 -- --
 -- -- Converts lone & characters into `&#038;` (a.k.a. `&amp;`)
@@ -2444,38 +2649,28 @@ is
 --         return addcslashes( string, "A..Za..z" );
 -- end;
 
--- --
--- -- Appends a trailing slash.
--- --
--- -- Will remove trailing forward and backslashes if it exists already before adding
--- -- a trailing forward slash. This prevents double slashing a string or path.
--- --
--- -- The primary use of this is for paths and thus should be used for paths. It is
--- -- not restricted to paths and offers no specific path support.
--- --
--- -- @since 1.2.0
--- --
--- -- @param string string What to add the trailing slash to.
--- -- @return string String with trailing slash added.
--- --
--- function trailingslashit( string ) then
---         return untrailingslashit( string ) . "/";
--- end;
+   -----------------------
+   -- Trailing_Slash_It --
+   -----------------------
 
--- --
--- -- Removes trailing forward slashes and backslashes if they exist.
--- --
--- -- The primary use of this is for paths and thus should be used for paths. It is
--- -- not restricted to paths and offers no specific path support.
--- --
--- -- @since 2.2.0
--- --
--- -- @param string string What to remove the trailing slashes from.
--- -- @return string String without the trailing slashes.
--- --
--- function untrailingslashit( string ) then
---         return rtrim( string, "/\\" );
--- end;
+   function Trailing_Slash_It (Item : String)
+                               return String
+   is
+   begin
+      return Un_Trailing_Slash_It (Item) & "/";
+   end Trailing_Slash_It;
+
+   --------------------------
+   -- Un_Trailing_Slash_It --
+   --------------------------
+
+   function Un_Trailing_Slash_It (Item : String)
+                                  return String
+   is
+      use Php.Strings;
+   begin
+      return Rtrim (Item, "/\\");
+   end Un_Trailing_Slash_It;
 
 -- --
 -- -- Adds slashes to a string or recursively adds slashes to strings within an array.
@@ -2489,48 +2684,51 @@ is
 --         return wp_slash( gpc );
 -- end;
 
--- --
--- -- Navigates through an array, object, or scalar, and removes slashes from the values.
--- --
--- -- @since 2.0.0
--- --
--- -- @param mixed value The value to be stripped.
--- -- @return mixed Stripped value.
--- --
--- function stripslashes_deep( value ) then
---         return map_deep( value, "stripslashes_from_strings_only" );
--- end;
+   ------------------------
+   -- Strip_Slashes_Deep --
+   ------------------------
 
--- --
--- -- Callback function for `stripslashes_deep()` which strips slashes from strings.
--- --
--- -- @since 4.4.0
--- --
--- -- @param mixed value The array or string to be stripped.
--- -- @return mixed The stripped value.
--- --
--- function stripslashes_from_strings_only( value ) then
---         return is_string( value ) ? stripslashes( value ) : value;
--- end;
+   function Strip_Slashes_Deep (Value : Multi_Type)
+                                return Multi_Type
+   is
+   begin
+      return Map_Deep (Value, Strip_Slashes_From_Strings_Only'Access);
+   end Strip_Slashes_Deep;
 
-   --------------------
-   -- URLencode_Deep --
-   --------------------
+   -------------------------------------
+   -- Strip_Slashes_From_Strings_Only --
+   -------------------------------------
 
-   function URLencode_Deep (Value : Array_Type)
-                            return Array_Type
-   is (Map_Deep (Value, Php.HTML.URLencode'Access));
+   function Strip_Slashes_From_Strings_Only (Value : String)
+                                             return String
+   is
+      use Php.Strings;
+      use Php.Types;
+   begin
+      return
+        (if Is_String (Value)
+         then Strip_Slashes (Value)
+         else Value);
+   end Strip_Slashes_From_Strings_Only;
+
+   ---------------------
+   -- URL_Encode_Deep --
+   ---------------------
+
+   function URL_Encode_Deep (Value : Multi_Type)
+                             return Multi_Type
+   is (Map_Deep (Value, Php.HTML.URL_Encode'Access));
 
    -------------------------
    -- Raw_URL_Encode_Deep --
    -------------------------
 
-   function Raw_URL_Encode_Deep (Value : Array_Type) -- String)
-                                 return Array_Type -- String
+   function Raw_URL_Encode_Deep (Value : Multi_Type)
+                                 return Multi_Type
    is
       use Php.HTML;
    begin
-      return Map_Deep (Value, RawURLencode'Access);
+      return Map_Deep (Value, Raw_URL_Encode'Access);
    end Raw_URL_Encode_Deep;
 
 -- --
@@ -3986,170 +4184,188 @@ is
 --         return apply_filters( "format_for_editor", text, default_editor );
 -- end;
 
--- --
--- -- Performs a deep string replace operation to ensure the values in search are no longer present.
--- --
--- -- Repeats the replacement operation until it no longer replaces anything so as to remove "nested" values
--- -- e.g. subject = "%0%0%0DDD", search ="%0D", result ="" rather than the "%0%0DD" that
--- -- str_replace would return
--- --
--- -- @since 2.8.1
--- -- @access private
--- --
--- -- @param string|array search  The value being searched for, otherwise known as the needle.
--- --                              An array may be used to designate multiple needles.
--- -- @param string       subject The string being searched and replaced on, otherwise known as the haystack.
--- -- @return string The string with the replaced values.
--- --
--- function _deep_replace( search, subject ) then
---         subject = (string) subject;
+   --------------------
+   -- X_Deep_Replace --
+   --------------------
 
---         count = 1;
---         while ( count ) then
---                 subject = str_replace( search, "", subject, count );
---         end;
+   function X_Deep_Replace (Search  : List_Type;
+                            Subject : String)
+                            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
 
---         return subject;
--- end;
+      Sub   : Unbounded_String := +Subject;
+      Count : Natural := 1;
+   begin
+      while Count /= 0 loop
+         Sub := +Str_Replace (Search, "", -Sub, Count);
+      end loop;
 
--- --
--- -- Escapes data for use in a MySQL query.
--- --
--- -- Usually you should prepare queries using wpdb::prepare().
--- -- Sometimes, spot-escaping is required or useful. One example
--- -- is preparing an array for use in an IN clause.
--- --
--- -- NOTE: Since 4.8.3, "%" characters will be replaced with a placeholder string,
--- -- this prevents certain SQLi attacks from taking place. This change in behaviour
--- -- may cause issues for code that expects the return value of esc_sql() to be useable
--- -- for other purposes.
--- --
--- -- @since 2.8.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string|array data Unescaped data.
--- -- @return string|array Escaped data, in the same type as supplied.
--- --
--- function esc_sql( data ) then
---         global wpdb;
---         return wpdb->_escape( data );
--- end;
+      return -Sub;
+   end X_Deep_Replace;
 
--- --
--- -- Checks and cleans a URL.
--- --
--- -- A number of characters are removed from the URL. If the URL is for displaying
--- -- (the default behaviour) ampersands are also replaced. The {@see "clean_url"} filter
--- -- is applied to the returned cleaned URL.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string   url       The URL to be cleaned.
--- -- @param string[] protocols Optional. An array of acceptable protocols.
--- --                            Defaults to return value of wp_allowed_protocols().
--- -- @param string   _context  Private. Use sanitize_url() for database usage.
--- -- @return string The cleaned URL after the {@see "clean_url"} filter is applied.
--- --                An empty string is returned if `url` specifies a protocol other than
--- --                those in `protocols`, or if `url` contains an empty string.
--- --
--- function esc_url( url, protocols = null, _context = "display" ) then
---         original_url = url;
+   -------------
+   -- ESC_SQL --
+   -------------
 
---         if ( "" === url ) then
---                 return url;
---         end;
+   function ESC_SQL (Data : String)
+                     return String
+   is
+      use Globals;
+   begin
+      return WpDB.X_Escape (Data);
+   end ESC_SQL;
 
---         url = str_replace( " ", "%20", ltrim( url ) );
---         url = preg_replace( "|[^a-z0-9-~+_.?#=!&;,/:%@\|*\"()\[\]\\x80-\\xff]|i", "", url );
+   -------------
+   -- ESC_URL --
+   -------------
 
---         if ( "" === url ) then
---                 return url;
---         end;
+   function ESC_URL (URL       : String;
+                     Protocols : List_Type := Empty_List;
+                     X_Context : String    := "display")
+                    return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Lists;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_HTTP;
+      use Inc_KSES;
+      use Inc_Plugins;
 
---         if ( 0 !== stripos( url, "mailto:" ) ) then
---                 strip = array( "%0d", "%0a", "%0D", "%0A" );
---                 url   = _deep_replace( strip, url );
---         end;
+      Original_URL : constant String := URL;
+   begin
+      if "" = URL then
+         return URL;
+      end if;
 
---         url = str_replace( ";//", "://", url );
---         /*
---         -- If the URL doesn"t appear to contain a scheme, we presume
---         -- it needs http:// prepended (unless it"s a relative link
---         -- starting with /, # or ?, or a PHP file).
---         --
---         if ( strpos( url, ":" ) === false && ! in_array( url[0], array( "/", "#", "?" ), true ) &&
---                 ! preg_match( "/^[a-z0-9-]+?\.php/i", url ) ) then
---                 url = "http://" . url;
---         end;
+      declare
+         URL_2 : constant String := Str_Replace (" ", "%20", Ltrim (URL));
 
---         // Replace ampersands and single quotes only when displaying.
---         if ( "display" === _context ) then
---                 url = wp_kses_normalize_entities( url );
---                 url = str_replace( "&amp;", "&#038;", url );
---                 url = str_replace( """, "&#039;", url );
---         end;
+         URL_3 : constant String :=
+           Preg_Replace ("|[^a-z0-9-~+_.?#=!&;,/:%@\|*\'()\[\]\\x80-\\xff]|i", "",
+                         URL_2);
 
---         if ( ( false !== strpos( url, "[" ) ) || ( false !== strpos( url, "]" ) ) ) then
+         Strip : constant List_Type :=
+           To_List (List => (+"%0d", +"%0a", +"%0D", +"%0A"));
 
---                 parsed = wp_parse_url( url );
---                 front  = "";
+         URL_4 : constant String :=
+           (if 0 /= Stripos (URL_3, "mailto:")
+            then X_Deep_Replace (Strip, URL_3)
+            else URL_3);
 
---                 if ( isset( parsed["scheme"] ) ) then
---                         front .= parsed["scheme"] . "://";
---                 end; elseif ( "/" === url[0] ) then
---                         front .= "//";
---                 end;
+         URL_5 : constant String := Str_Replace (";//", "://", URL_4);
 
---                 if ( isset( parsed["user"] ) ) then
---                         front .= parsed["user"];
---                 end;
+         URL_6 : Unbounded_String := +URL_5;
+      begin
+         if "" = URL_3 then
+            return URL_3;
+         end if;
 
---                 if ( isset( parsed["pass"] ) ) then
---                         front .= ":" . parsed["pass"];
---                 end;
+         --
+         -- If the URL doesn't appear to contain a scheme, we presume
+         -- it needs http:// prepended (unless it's a relative link
+         -- starting with /, # or ?, or a PHP file).
+         --
+         if
+           Strpos (URL_5, ":") = 0 and then
+           not In_List (URL_5 (URL_5'First) & "",
+                        To_List (List => (+"/", +"#", +"?")), True) and then
+           not Preg_Match ("/^[a-z0-9-]+?\.php/i", URL_5)
+         then
+            URL_6 := +"http://" & URL_5;
+         end if;
 
---                 if ( isset( parsed["user"] ) || isset( parsed["pass"] ) ) then
---                         front .= "@";
---                 end;
+         -- Replace ampersands and single quotes only when displaying.
+         if "display" = X_Context then
+            URL_6 := +Wp_KSES_Normalize_Entities     (-URL_6);
+            URL_6 := +Str_Replace ("&amp;", "&#038;", -URL_6);
+            URL_6 := +Str_Replace ("""", "&#039;",    -URL_6);
+         end if;
 
---                 if ( isset( parsed["host"] ) ) then
---                         front .= parsed["host"];
---                 end;
+         if
+           0 /= Strpos (-URL_6, "[") or else
+           0 /= Strpos (-URL_6, "]")
+         then
+            declare
+               Parsed : constant Array_Type := Wp_Parse_URL (-URL_6);
+               Front  : Unbounded_String;
+            begin
+               if Isset (Parsed, "scheme") then
+                  Append (Front, Get_As_String (Parsed, "scheme") & "://");
+               elsif '/' = Element (URL_6, 1) then -- [0]
+                  Append (Front, "//");
+               end if;
 
---                 if ( isset( parsed["port"] ) ) then
---                         front .= ":" . parsed["port"];
---                 end;
+               if Isset (Parsed, "user") then
+                  Append (Front, Get_As_String (Parsed, "user"));
+               end if;
 
---                 end_dirty = str_replace( front, "", url );
---                 end_clean = str_replace( array( "[", "]" ), array( "%5B", "%5D" ), end_dirty );
---                 url       = str_replace( end_dirty, end_clean, url );
+               if Isset (Parsed, "pass") then
+                  Append (Front, ":" & Get_As_String (Parsed, "pass"));
+               end if;
 
---         end;
+               if Isset (Parsed, "user") or else Isset (Parsed, "pass") then
+                  Append (Front, "@");
+               end if;
 
---         if ( "/" === url[0] ) then
---                 good_protocol_url = url;
---         end; else then
---                 if ( ! is_array( protocols ) ) then
---                         protocols = wp_allowed_protocols();
---                 end;
---                 good_protocol_url = wp_kses_bad_protocol( url, protocols );
---                 if ( strtolower( good_protocol_url ) != strtolower( url ) ) then
---                         return "";
---                 end;
---         end;
+               if Isset (Parsed, "host") then
+                  Append (Front, Get_As_String (Parsed, "host"));
+               end if;
 
---         --
---         -- Filters a string cleaned and escaped for output as a URL.
---         --
---         -- @since 2.3.0
---         --
---         -- @param string good_protocol_url The cleaned URL to be returned.
---         -- @param string original_url      The URL prior to cleaning.
---         -- @param string _context          If "display", replace ampersands and single quotes only.
---         --
---         return apply_filters( "clean_url", good_protocol_url, original_url, _context );
--- end;
+               if Isset (Parsed, "port") then
+                  Append (Front, ":" & Get_As_String (Parsed, "port"));
+               end if;
+
+               declare
+                  End_Dirty : constant String := Str_Replace (-Front, "", -URL_6);
+                  End_Clean : constant String :=
+                    Str_Replace (To_List (List => (+"[", +"]")),
+                                 To_List (List => (+"%5B", +"%5D")), End_Dirty);
+               begin
+                  URL_6 := +Str_Replace (End_Dirty, End_Clean, -URL_6);
+               end;
+            end;
+         end if;
+
+         declare
+            Good_Protocol_URL : Unbounded_String;
+         begin
+            if '/' = Element (URL_6, 1) then -- [0]
+               Good_Protocol_URL := URL_6;
+            else
+               declare
+                  Protocols_2 : List_Type :=
+                    (if Protocols in Empty_List -- not Is_Array (Protocols)
+                     then Wp_Allowed_Protocols
+                     else Protocols);
+               begin
+                  Good_Protocol_URL := +Wp_KSES_Bad_Protocol (-URL_6, Protocols_2);
+                  if Strtolower (-Good_Protocol_URL) /= Strtolower (-URL_6) then
+                     return "";
+                  end if;
+               end;
+            end if;
+
+            --
+            -- Filters a string cleaned and escaped for output as a URL.
+            --
+            -- @since 2.3.0
+            --
+            -- @param string good_protocol_url The cleaned URL to be returned.
+            -- @param string original_url      The URL prior to cleaning.
+            -- @param string _context          If "display", replace ampersands
+            --                                  and single quotes only.
+            --
+            return Apply_Filters ("clean_url", -Good_Protocol_URL,
+                                  Original_URL, X_Context);
+         end;
+      end;
+   end ESC_URL;
 
 -- --
 -- -- Sanitizes a URL for database or redirect usage.
@@ -4170,23 +4386,17 @@ is
 --         return sanitize_url( url, protocols );
 -- end;
 
--- --
--- -- Sanitizes a URL for database or redirect usage.
--- --
--- -- @since 2.3.1
--- -- @since 2.8.0 Deprecated in favor of esc_url_raw().
--- -- @since 5.9.0 Restored (un-deprecated).
--- --
--- -- @see esc_url()
--- --
--- -- @param string   url       The URL to be cleaned.
--- -- @param string[] protocols Optional. An array of acceptable protocols.
--- --                            Defaults to return value of wp_allowed_protocols().
--- -- @return string The cleaned URL after esc_url() is run with the "db" context.
--- --
--- function sanitize_url( url, protocols = null ) then
---         return esc_url( url, protocols, "db" );
--- end;
+   ------------------
+   -- Sanitize_URL --
+   ------------------
+
+   function Sanitize_URL (URL       : String;
+                          Protocols : List_Type := Empty_List)
+                          return String
+   is
+   begin
+      return ESC_URL (URL, Protocols, "db");
+   end Sanitize_URL;
 
 -- --
 -- -- Converts entities, while preserving already-encoded entities.
@@ -4204,37 +4414,42 @@ is
 --         return preg_replace( "/&(?![A-Za-z]then0,4end;\wthen2,3end;;|#[0-9]then2,3end;;)/", "&amp;", strtr( myHTML, translation_table ) );
 -- end;
 
--- --
--- -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
--- --
--- -- Escapes text strings for echoing in JS. It is intended to be used for inline JS
--- -- (in a tag attribute, for example `onclick="..."`). Note that the strings have to
--- -- be in single quotes. The {@see "js_escape"} filter is also applied here.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text The text to be escaped.
--- -- @return string Escaped text.
--- --
--- function esc_js( text ) then
---         safe_text = wp_check_invalid_utf8( text );
---         safe_text = _wp_specialchars( safe_text, ENT_COMPAT );
---         safe_text = preg_replace( "/&#(x)?0*(?(1)27|39);?/i", """, stripslashes( safe_text ) );
---         safe_text = str_replace( "\r", "", safe_text );
---         safe_text = str_replace( "\n", "\\n", addslashes( safe_text ) );
---         --
---         -- Filters a string cleaned and escaped for output in JavaScript.
---         --
---         -- Text passed to esc_js() is stripped of invalid or special characters,
---         -- and properly slashed for output.
---         --
---         -- @since 2.0.6
---         --
---         -- @param string safe_text The text after it has been escaped.
---         -- @param string text      The text prior to being escaped.
---         --
---         return apply_filters( "js_escape", safe_text, text );
--- end;
+   ------------
+   -- ESC_JS --
+   ------------
+
+   function ESC_JS (Text : String)
+                    return String
+   is
+      use Php.Strings;
+      use Php.HTML;
+      use Php.Preg;
+      use Inc_Plugins;
+
+      Safe_Text_5 : constant String := Wp_Check_Invalid_UTF8 (Text);
+      Safe_Text_4 : constant String := X_Wp_Specialchars (Safe_Text_5, ENT_COMPAT);
+
+      Safe_Text_3 : constant String :=
+        Preg_Replace ("/&#(x)?0*(?(1)27|39);?/i", "'", Strip_Slashes (Safe_Text_4));
+
+      Safe_Text_2 : constant String := Str_Replace ("\r", "", Safe_Text_3);
+
+      Safe_Text   : constant String :=
+        Str_Replace ("\n", "\\n", Add_Slashes (Safe_Text_2));
+   begin
+      --
+      -- Filters a string cleaned and escaped for output in JavaScript.
+      --
+      -- Text passed to esc_js() is stripped of invalid or special characters,
+      -- and properly slashed for output.
+      --
+      -- @since 2.0.6
+      --
+      -- @param string safe_text The text after it has been escaped.
+      -- @param string text      The text prior to being escaped.
+      --
+      return Apply_Filters ("js_escape", Safe_Text, Text);
+   end ESC_JS;
 
 --
 -- Escaping for HTML blocks.
@@ -4408,21 +4623,21 @@ is
       return Preg_Replace ("|^(https?:)?//[^/]+(/?.*)|i", "2", Link);
    end Wp_Make_Link_Relative;
 
--- --
--- -- Sanitizes various option values based on the nature of the option.
--- --
--- -- This is basically a switch statement which will pass value through a number
--- -- of functions depending on the option.
--- --
--- -- @since 2.0.5
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string option The name of the option.
--- -- @param string value  The unsanitised value.
--- -- @return string Sanitized value.
--- --
--- function sanitize_option( option, value ) then
+   ---------------------
+   -- Sanitize_Option --
+   ---------------------
+
+   function Sanitize_Option (Option : String;
+                             Value  : String)
+                             return String
+   is
+      use Ada.Text_IO;
+   begin
+      Put_Line ("sanitize_option: option: " & Option & "  value: " & Value);
+      Put_Line ("sanitize_option: not implemented");
+      return Value;
+   end Sanitize_Option;
+
 --         global wpdb;
 
 --         original_value = value;
@@ -4695,34 +4910,31 @@ is
    -- Map_Deep --
    --------------
 
-   function Map_Deep (Value    : Array_Type;
+   function Map_Deep (Value    : Multi_Type;
                       Callback : Callable)
-                      return Array_Type
+                      return Multi_Type
    is
---    use Hb_Common;
-
-      Value_2 : Array_Type;
    begin
-      -- if ( is_array( value ) ) then
-      for A in Value.Iterate loop
+      case Kind_Of (Value) is
+
+      when Kind_Array =>
          declare
-            Index : constant String     := Key (A);
-            Item  : constant Multi_Type := Element (A);
+            Arry : constant Array_Type := As_Array (Value);
+            Result : Array_Type;
          begin
-            case Kind_Of (Item) is
-            when Kind_Array =>
-               Set (Value_2, Index,
-                    From_Array (Map_Deep (As_Array (Item), Callback)));
---             Value_2.Include (Key      => Index,
---                              New_Item => Map_Deep (Item.Arry.all, Callback));
---             value[ index ] = map_deep( item, callback );
-            when Kind_String =>
-               Set (Value_2, Index,
-                    From_String (Callback (As_String (Item))));
-            when others => null;
-            end case;
+            for A in Arry.Iterate loop
+               Result.Append (Map_Deep (Element (A), Callback));
+            end loop;
+            return From_Array (Result);
          end;
-      end loop;
+
+      when Kind_String =>
+         return From_String (Callback (As_String (Value)));
+
+      when others =>
+         pragma Assert (False);
+
+      end case;
          -- end; elseif ( is_object( value ) ) then
          --         object_vars = get_object_vars( value );
          --         foreach ( object_vars as property_name => property_value ) then
@@ -4733,7 +4945,6 @@ is
          -- end;
 
          -- return value;
-      return Value_2;
    end Map_Deep;
 
 --    function Map_Deep (Value    : String;
@@ -4980,36 +5191,33 @@ is
 --         return result . substr( pattern, 2 );
 -- end;
 
--- --
--- -- Safely extracts not more than the first count characters from HTML string.
--- --
--- -- UTF-8, tags and entities safe prefix extraction. Entities inside will--NOT*
--- -- be counted as one character. For example &amp; will be counted as 4, &lt; as
--- -- 3, etc.
--- --
--- -- @since 2.5.0
--- --
--- -- @param string str   String to get the excerpt from.
--- -- @param int    count Maximum number of characters to take.
--- -- @param string more  Optional. What to append if str needs to be trimmed. Defaults to empty string.
--- -- @return string The excerpt.
--- --
--- function wp_html_excerpt( str, count, more = null ) then
---         if ( null === more ) then
---                 more = "";
---         end;
+   ---------------------
+   -- Wp_HTML_Excerpt --
+   ---------------------
 
---         str     = wp_strip_all_tags( str, true );
---         excerpt = mb_substr( str, 0, count );
+   function Wp_HTML_Excerpt (Str   : String;
+                             Count : Integer;
+                             More  : String := "")
+                             return String
+   is
+      use Php.Multibyte;
+      use Php.Strings;
+      use Php.Preg;
 
---         // Remove part of an entity at the end.
---         excerpt = preg_replace( "/&[^;\s]then0,6end;/", "", excerpt );
---         if ( str != excerpt ) then
---                 excerpt = trim( excerpt ) . more;
---         end;
+      Str_2   : constant String := Wp_Strip_All_Tags (Str, True);
+      Excerpt : constant String := MB_Substr (Str_2, 0, Count);
 
---         return excerpt;
--- end;
+      -- Remove part of an entity at the end.
+      Excerpt_2 : constant String :=
+        Preg_Replace ("/&[^;\s]{0,6}/", "", Excerpt);
+
+      Excerpt_3 : constant String :=
+        (if Str_2 /= Excerpt_2
+         then Trim (Excerpt_2) & More
+         else Excerpt_2);
+   begin
+      return Excerpt_3;
+   end Wp_HTML_Excerpt;
 
 -- --
 -- -- Adds a base URL to relative links in passed content.
@@ -5120,10 +5328,10 @@ is
                                Remove_Breaks : Boolean := False)
                                return String
    is
-      use Hb_Common;
-      use Php;
+      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
+      use Hb_Common;
 
       Item_3 : constant String :=
         Preg_Replace ("@<(script|style)[^>]*?>.*?</\\1>@si", "", Item);
@@ -5246,18 +5454,26 @@ is
 --         return filtered;
 -- end;
 
--- --
--- -- i18n-friendly version of basename().
--- --
--- -- @since 3.1.0
--- --
--- -- @param string path   A path.
--- -- @param string suffix If the filename ends in suffix this will also be cut off.
--- -- @return string
--- --
--- function wp_basename( path, suffix = "" ) then
---         return urldecode( basename( str_replace( array( "%2F", "%5C" ), "/", urlencode( path ) ), suffix ) );
--- end;
+   -----------------
+   -- Wp_Basename --
+   -----------------
+
+   function Wp_Basename (Path   : String;
+                         Suffix : String := "")
+                         return String
+   is
+      use Php.Files;
+      use Php.HTML;
+      use Php.Strings;
+      use Hb_Common;
+   begin
+      return
+        URL_Decode (
+          Basename (
+            Str_Replace (To_List (List => (+"%2F", +"%5C")), "/",
+                         URL_Encode (Path)),
+            Suffix));
+   end Wp_Basename;
 
 -- // phpcs:disable WordPress.WP.CapitalPDangit.Misspelled, WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid -- 8-)
 -- --
@@ -5341,44 +5557,36 @@ is
 --         return apply_filters( "sanitize_trackback_urls", urls_to_ping, to_ping );
 -- end;
 
--- --
--- -- Adds slashes to a string or recursively adds slashes to strings within an array.
--- --
--- -- This should be used when preparing data for core API that expects slashed data.
--- -- This should not be used to escape data going directly into an SQL query.
--- --
--- -- @since 3.6.0
--- -- @since 5.5.0 Non-string values are left untouched.
--- --
--- -- @param string|array value String or array of data to slash.
--- -- @return string|array Slashed `value`, in the same type as supplied.
--- --
--- function wp_slash( value ) then
---         if ( is_array( value ) ) then
---                 value = array_map( "wp_slash", value );
---         end;
+   --------------
+   -- Wp_Slash --
+   --------------
 
---         if ( is_string( value ) ) then
---                 return addslashes( value );
---         end;
+   function Wp_Slash (Value : String)
+                      return String
+   is
+      use Php.Strings;
+   begin
+--    if ( is_array( value ) ) then
+--       value = array_map( "wp_slash", value );
+--    end if;
 
---         return value;
--- end;
+--    if ( is_string( value ) ) then
+      return Add_Slashes (Value);
+--    end if;
 
--- --
--- -- Removes slashes from a string or recursively removes slashes from strings within an array.
--- --
--- -- This should be used to remove slashes from data passed to core API that
--- -- expects data to be unslashed.
--- --
--- -- @since 3.6.0
--- --
--- -- @param string|array value String or array of data to unslash.
--- -- @return string|array Unslashed `value`, in the same type as supplied.
--- --
--- function wp_unslash( value ) then
---         return stripslashes_deep( value );
--- end;
+--    return Value;
+   end Wp_Slash;
+
+   ----------------
+   -- Wp_Unslash --
+   ----------------
+
+   function Wp_Unslash (Value : String)
+                        return String
+   is
+   begin
+      return As_String (Strip_Slashes_Deep (From_String (Value)));
+   end Wp_Unslash;
 
 -- --
 -- -- Extracts and returns the first URL from passed content.
@@ -5400,38 +5608,39 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Returns the regexp for common whitespace characters.
--- --
--- -- By default, spaces include new lines, tabs, nbsp entities, and the UTF-8 nbsp.
--- -- This is designed to replace the PCRE \s sequence. In ticket #22692, that
--- -- sequence was found to be unreliable due to random inclusion of the A0 byte.
--- --
--- -- @since 4.0.0
--- --
--- -- @return string The spaces regexp.
--- --
--- function wp_spaces_regexp() then
---         static spaces = "";
+   ----------------------
+   -- Wp_Spaces_Regexp --
+   ----------------------
 
---         if ( empty( spaces ) ) then
---                 --
---                 -- Filters the regexp for common whitespace characters.
---                 --
---                 -- This string is substituted for the \s sequence as needed in regular
---                 -- expressions. For websites not written in English, different characters
---                 -- may represent whitespace. For websites not encoded in UTF-8, the 0xC2 0xA0
---                 -- sequence may not be in use.
---                 --
---                 -- @since 4.0.0
---                 --
---                 -- @param string spaces Regexp pattern for matching common whitespace characters.
---                 --
---                 spaces = apply_filters( "wp_spaces_regexp", "[\r\n\t ]|\xC2\xA0|&nbsp;" );
---         end;
+   Static_Spaces : Ada.Strings.Unbounded.Unbounded_String;
 
---         return spaces;
--- end;
+   function Wp_Spaces_Regexp
+            return String
+   is
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Plugins;
+   begin
+      if Empty (-Static_Spaces) then
+         --
+         -- Filters the regexp for common whitespace characters.
+         --
+         -- This string is substituted for the \s sequence as needed in regular
+         -- expressions. For websites not written in English, different characters
+         -- may represent whitespace. For websites not encoded in UTF-8, the 0xC2 0xA0
+         -- sequence may not be in use.
+         --
+         -- @since 4.0.0
+         --
+         -- @param string spaces Regexp pattern for matching common whitespace
+         --                      characters.
+         --
+         Static_Spaces :=
+           +Apply_Filters ("wp_spaces_regexp", "[\r\n\t ]|\xC2\xA0|&nbsp;");
+      end if;
+
+      return -Static_Spaces;
+   end Wp_Spaces_Regexp;
 
 -- --
 -- -- Prints the important emoji-related styles.

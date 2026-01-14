@@ -2,8 +2,11 @@
 --
 --
 
+with Lists;
+
 package Php.Files
 is
+   use Lists;
 
    function File_Exists (Filename : String)
                          return Boolean
@@ -42,6 +45,11 @@ is
    function Realpath (Path : String)
             return String
             is ("XXX-779");
+
+   function Glob (Pattern : String;
+                  Flags   : Integer := 0)
+                  return List_Type
+                  is (Empty_List);
 
    type Resource is access all Integer;
 

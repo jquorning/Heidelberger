@@ -254,7 +254,7 @@ is
                end if;
 
                -- If we"re to use _wp_last_object_menu, increment it first.
-               Ptype_For_Id := +Inc_Formatting.Sanitize_Html_Class (-Ptype);
+               Ptype_For_Id := +Inc_Formatting.Sanitize_HTML_Class (-Ptype);
                Menu_Icon    := +"dashicons-admin-post";
 
                if Is_String (-Ptype_Obj.Menu_Icon) then
@@ -319,7 +319,7 @@ is
                   if
                     not Tax.Show_UI      or else
                     not Tax.Show_In_Menu or else
-                    not In_Array (-Ptype, Tax.Object_Type, True) -- (array)
+                    not In_List (-Ptype, Tax.Object_Type, True) -- (array)
                   then
                      goto Continue_3;
                   end if;
@@ -404,7 +404,7 @@ is
             Customize_Url : constant String :=
                 Add_Query_Arg
                   ("return",
-                   URLencode (Remove_Query_Arg (List_Type'(Wp_Removable_Query_Args),
+                   URL_Encode (Remove_Query_Arg (List_Type'(Wp_Removable_Query_Args),
                                           Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI"))))),
                    "customize.php");
          begin
@@ -469,8 +469,8 @@ is
                end;
             end if;
 
-            Unset (Customize_Url);
-            Unset (Appearance_Cap);
+--          Unset (Customize_Url);
+--          Unset (Appearance_Cap);
          end;
       end;
 

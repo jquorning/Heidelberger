@@ -7,6 +7,7 @@
 
 with Ada.Strings.Unbounded;
 
+with Php.Arrays;
 with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
@@ -282,9 +283,10 @@ is
                return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
-      use Php;
+      use Php.Arrays;
       use Php.Numerics;
+      use Php.Strings;
+      use Hb_Common;
       use Inc_Global_Styles_And_Settings;
    begin
       if not Isset (Preset, "size") then

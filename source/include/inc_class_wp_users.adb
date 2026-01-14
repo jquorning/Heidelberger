@@ -46,6 +46,7 @@ is
                          Site_Id : Integer := 0) -- ""
                          return Wp_User
    is
+      use Php.Arrays;
       use Hb_Common;
 
       This : Wp_User;
@@ -128,6 +129,7 @@ is
       use Php;
       use Php.Strings;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Formatting;
       use Inc_Users;
 
@@ -195,10 +197,11 @@ is
 
          Unused_Success : Boolean;
 
-         Statement : constant String :=
+         Statement : constant Statement_Type :=
            WpDB.Prepare (
              "SELECT * FROM wpdb->users " &
-             "WHERE " & (-DB_Field) & " = %s LIMIT 1", -Value_2);
+             "WHERE " & (-DB_Field) & " = %s LIMIT 1",
+             To_List (-Value_2));
 
          User : constant Wp_User :=
            WpDB.Get_Row (Statement,
@@ -570,6 +573,7 @@ is
                        Role : String)
    is
       use Php.Lists;
+      use Php.Strings;
       use Hb_Common;
       use Wp_Common;
       use Inc_Users;
@@ -616,7 +620,7 @@ is
             << Continue >>
          end loop;
 
-         if Role /= "" and then not In_Array (Role, Old_Roles, True) then
+         if Role /= "" and then not In_List (Role, Old_Roles, True) then
             -- This action is documented in wp-includes/class-wp-user.php
             Do_Action ("add_user_role", This.Id, Role);
          end if;
@@ -739,8 +743,8 @@ is
                      return Boolean
    is
       use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Capabilities;
       use Inc_Load;
    begin
@@ -757,7 +761,7 @@ is
          -- Multisite super admin has all caps by definition, Unless specifically
          -- denied.
          if Is_Multisite and then Is_Super_Admin (This.Id) then
-            if In_Array ("do_not_allow", Caps, True) then
+            if In_List ("do_not_allow", Caps, True) then
                return False;
             end if;
             return True;

@@ -6,11 +6,9 @@
 -- @since 4.4.0
 --
 
-with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Lists;
 
 with Inc_Class_Wp_Role;
 
@@ -18,13 +16,8 @@ package Inc_Class_Wp_Roles
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Lists;
 
-   package Role_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Inc_Class_Wp_Role.Wp_Role,
-         "="          => Inc_Class_Wp_Role."=");
+   Global_Wp_User_Roles : Array_Type;
 
    --
    -- Core class used to implement a user roles API.
@@ -59,7 +52,7 @@ is
          -- @since 2.0.0
          -- @var WP_Role[]
          --
-         Role_Objects : Role_Maps.Map; -- Array_Type;
+         Role_Objects : Inc_Class_Wp_Role.Role_Maps.Map; -- Array_Type;
 
          --
          -- List of role names.
@@ -67,7 +60,7 @@ is
          -- @since 2.0.0
          -- @var string[]
          --
-         Role_Names : List_Type;
+         Role_Names : Array_Type; -- List_Type;
 
          --
          -- Option name for storing role list.
@@ -162,39 +155,30 @@ is
 --                 this.for_site();
 --         end;
 
---         --
---         -- Adds a role name with capabilities to the list.
---         --
---         -- Updates the list of roles, if the role doesn"t already exist.
---         --
---         -- The capabilities are defined in the following format: `array( "read" => true )`.
---         -- To explicitly deny the role a capability, set the value for that capability to false.
---         --
---         -- @since 2.0.0
---         --
---         -- @param string role         Role name.
---         -- @param string display_name Role display name.
---         -- @param bool[] capabilities Optional. List of capabilities keyed by the capability name,
---         --                             e.g. `array( "edit_posts" => true, "delete_posts" => false )`.
---         --                             Default empty array.
---         -- @return WP_Role|void WP_Role object, if the role is added.
---         --
---         public function add_role( role, display_name, capabilities = array() ) then
---                 if ( empty( role ) || isset( this.roles[ role ] ) ) then
---                         return;
---                 end;
-
---                 this.roles[ role ] = array(
---                         "name"         => display_name,
---                         "capabilities" => capabilities,
---                 );
---                 if ( this.use_db ) then
---                         update_option( this.role_key, this.roles );
---                 end;
---                 this.role_objects[ role ] = new WP_Role( role, capabilities );
---                 this.role_names[ role ]   = display_name;
---                 return this.role_objects[ role ];
---         end;
+   --
+   -- Adds a role name with capabilities to the list.
+   --
+   -- Updates the list of roles, if the role doesn't already exist.
+   --
+   -- The capabilities are defined in the following format: `array( "read" => true )`.
+   -- To explicitly deny the role a capability, set the value for that capability
+   -- to false.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string role         Role name.
+   -- @param string display_name Role display name.
+   -- @param bool[] capabilities Optional. List of capabilities keyed by the
+   --                             capability name, e.g. `array( "edit_posts" => true,
+   --                             "delete_posts" => false )`.
+   --                             Default empty array.
+   -- @return WP_Role|void WP_Role object, if the role is added.
+   --
+   function Add_Role (This         : in out Wp_Roles;
+                      Role         : String;
+                      Display_Name : String;
+                      Capabilities : Array_Type := Empty_Array)
+                      return Inc_Class_Wp_Role.Wp_Role;
 
 --         --
 --         -- Removes a role by name.
@@ -221,26 +205,20 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Adds a capability to role.
---         --
---         -- @since 2.0.0
---         --
---         -- @param string role  Role name.
---         -- @param string cap   Capability name.
---         -- @param bool   grant Optional. Whether role is capable of performing capability.
---         --                      Default true.
---         --
---         public function add_cap( role, cap, grant = true ) then
---                 if ( ! isset( this.roles[ role ] ) ) then
---                         return;
---                 end;
-
---                 this.roles[ role ]["capabilities"][ cap ] = grant;
---                 if ( this.use_db ) then
---                         update_option( this.role_key, this.roles );
---                 end;
---         end;
+   --
+   -- Adds a capability to role.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string role  Role name.
+   -- @param string cap   Capability name.
+   -- @param bool   grant Optional. Whether role is capable of performing capability.
+   --                      Default true.
+   --
+   procedure Add_Cap (This  : in out Wp_Roles;
+                      Role  : String;
+                      Cap   : String;
+                      Grant : Boolean := True);
 
 --         --
 --         -- Removes a capability from role.
@@ -374,4 +352,5 @@ is
 
 --                 return get_option( this.role_key, array() );
 --         end;
+
 end Inc_Class_Wp_Roles;

@@ -487,7 +487,7 @@ is
       for Transport of Request_Order loop
          declare
             Transport_2 : String :=
-              (if In_Array (-Transport, Transports, True)
+              (if In_List (-Transport, Transports, True)
                then UC_First (-Transport)
                else -Transport);
 
@@ -726,8 +726,8 @@ is
                return not Preg_Match (-Static_Wildcard_Regex,
                                       Get_As_String (Check, "host"));
             else
-               return not In_Array (Get_As_String (Check, "host"),
-                                    Static_Accessible_Hosts, True);
+               return not In_List (Get_As_String (Check, "host"),
+                                   Static_Accessible_Hosts, True);
                -- Inverse logic, if it's in the array, then don't block it.
             end if;
          end;

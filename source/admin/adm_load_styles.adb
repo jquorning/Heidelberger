@@ -4,7 +4,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Php.Arrays;
+-- with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
@@ -47,8 +47,6 @@ is
       use Globals;
       use Helpers;
       use Hb_Common;
-      use Php;
-      use Php.Arrays;
       use Php.Echoing;
       use Php.HTML;
       use Php.Lists;
@@ -83,8 +81,8 @@ is
       WP_CONTENT_DIR := +ABSPATH & "wp-content";
 
       Protocol := +As_String (Get (X_SERVER, "SERVER_PROTOCOL"));
-      if not In_Array (-Protocol, To_List (List => (+"HTTP/1.1", +"HTTP/2",
-                                                    +"HTTP/2.0", +"HTTP/3")), True)
+      if not In_List (-Protocol, To_List (List => (+"HTTP/1.1", +"HTTP/2",
+                                                   +"HTTP/2.0", +"HTTP/3")), True)
       then
          Protocol := +"HTTP/1.0";
       end if;
@@ -96,14 +94,15 @@ is
 -- end;
 
       Load   := +Preg_Replace ("/[^a-z0-9,_-]+/i", "", -Load);
-      Load_2 := Array_Unique (Explode (",", -Load));
+      Load_2 := List_Unique (Explode (",", -Load));
 
       if Empty (-Load) then
          Header ((-Protocol) & " 400 Bad Request");
          return; -- exit;
       end if;
 
-      RTL            := Isset (XX_GET, "dir") and then "rtl" = As_String (Get (XX_GET, "dir"));
+      RTL            := Isset (XX_GET, "dir") and then
+                        "rtl" = Get_As_String (XX_GET, "dir");
       Expires_Offset := 31536000; -- 1 year.
       Outt           := +"";
 
@@ -111,7 +110,8 @@ is
 
       if
         Isset (X_SERVER, "HTTP_IF_NONE_MATCH") and then
-        Stripslashes (As_String (Get (X_SERVER, "HTTP_IF_NONE_MATCH"))) = Inc_Versions.Wp_Version
+        Strip_Slashes (Get_As_String (X_SERVER, "HTTP_IF_NONE_MATCH")) =
+        Inc_Versions.Wp_Version
       then
          Header ((-Protocol) & " 304 Not Modified");
          return; -- exit;

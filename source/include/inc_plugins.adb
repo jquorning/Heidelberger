@@ -178,7 +178,7 @@ is
 --    if not Isset (Wp_Filter (Hook_Name)) then
          if Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
 --       if Isset (Wp_Filter ("all")) then
-            Array_Pop (Wp_Current_Filter);
+            List_Pop (Wp_Current_Filter);
          end if;
 
          return Value;
@@ -200,7 +200,7 @@ is
 --         Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
       begin
 
-         Unused := +Array_Pop (Wp_Current_Filter);
+         Unused := +List_Pop (Wp_Current_Filter);
 
          return Filtered;
       end;
@@ -262,7 +262,7 @@ is
    ----------------
 
    function Has_Filter (Hook_Name : String;
-                        Callback  : Boolean := False)
+                        Callback  : Callable := null) -- Boolean := False)
                         return Boolean
    is
       use Inc_Elab_Hooks.Hook_Maps;
@@ -371,7 +371,7 @@ is
 --       return not Empty (Wp_Current_Filter);
       end if;
 
-      return In_Array (Hook_Name, Wp_Current_Filter, True);
+      return In_List (Hook_Name, Wp_Current_Filter, True);
 
    end Doing_Filter;
 
@@ -459,7 +459,7 @@ is
 --    if not Isset (Wp_Filter, Hook_Name) then
          if Has_Element (Wp_Filter.Find ("all")) then
 --       if Isset (Wp_Filter, "all") then
-            Array_Pop (Wp_Current_Filter);
+            List_Pop (Wp_Current_Filter);
          end if;
 
          return;
@@ -483,7 +483,7 @@ is
 
          Wp_Filter (Hook_Name).Do_Action (Arg);
       end;
-      Array_Pop (Wp_Current_Filter);
+      List_Pop (Wp_Current_Filter);
    end Do_Action;
 
 -- --

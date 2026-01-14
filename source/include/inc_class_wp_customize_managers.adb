@@ -225,12 +225,12 @@ is
       This.Selective_Refresh :=
         Cust_Class_Wp_Customize_Selective_Refresh.X_Construct (This_Ref);
 
-      if In_Array ("widgets", Components, True) then
+      if In_List ("widgets", Components, True) then
          This.Widgets :=
            Inc_Class_Wp_Customize_Widgets.X_Construct (This_Ref);
       end if;
 
-      if In_Array ("nav_menus", Components, True) then
+      if In_List ("nav_menus", Components, True) then
          This.Nav_Menus :=
            Inc_Class_Wp_Customize_Nav_Menus.X_Construct (This_Ref);
       end if;
@@ -506,6 +506,7 @@ is
    is
       use Php;
       use Php.Lists;
+      use Php.Strings;
       use Inc_Class_Wp_Posts;
       use Inc_Functions;
       use Inc_Load;
@@ -521,7 +522,7 @@ is
                     This.Get_Changeset_Posts (
                       To_Array (List => (
                         Build ("post_status",
-                               Array_Diff (Get_Post_Stati, To_List (List => (
+                               List_Diff (Get_Post_Stati, To_List (List => (
                                  +"auto-draft", +"publish", +"trash",
                                  +"inherit", +"private")))),
                         Build ("exclude_restore_dismissed", False),
@@ -727,6 +728,7 @@ is
    function Changeset_UUID (This : in out Wp_Customize_Manager)
                             return String
    is
+      use Php.Strings;
    begin
       if Empty (-This.X_Changeset_UUID) then
          This.Establish_Loaded_Changeset;

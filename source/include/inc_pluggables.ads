@@ -7,12 +7,14 @@
 --
 
 with Arrays;
+with Lists;
 
 with Inc_Class_Wp_Users;
 
 package Inc_Pluggables
 is
    use Arrays;
+   use Lists;
 
    --
    -- Retrieves the current user object.
@@ -78,9 +80,9 @@ is
    -- conditional in conjunction with the {@see 'wp_redirect'} and
    --  {@see 'wp_redirect_location'} filters:
    --
-   --     if ( wp_redirect( url ) ) then
+   --     if ( wp_redirect( url ) ) {
    --         exit;
-   --     end;
+   --     }
    --
    -- @since 1.5.1
    -- @since 5.1.0 The `x_redirect_by` parameter was added.
@@ -95,9 +97,35 @@ is
    --                             Default 'WordPress'.
    -- @return bool False if the redirect was cancelled, true otherwise.
    --
-   -- function wp_redirect( location, status = 302, x_redirect_by = 'WordPress' ) then
-   procedure Wp_Redirect (Location : String)
-                          is null;
+   procedure Wp_Redirect (Location      : String;
+                          Status        : Integer := 302;
+                          X_Redirect_By : String  := "WordPress");
+
+   --
+   -- Sanitizes a URL for use in a redirect.
+   --
+   -- @since 2.3.0
+   --
+   -- @param string location The path to redirect to.
+   -- @return string Redirect-sanitized URL.
+   --
+   function Wp_Sanitize_Redirect (Location : String)
+                                  return String;
+
+   --
+   -- URL encodes UTF-8 characters in a URL.
+   --
+   -- @ignore
+   -- @since 4.2.0
+   -- @access private
+   --
+   -- @see wp_sanitize_redirect()
+   --
+   -- @param array matches RegEx matches against the redirect location.
+   -- @return string URL-encoded version of the first RegEx match.
+   --
+   function X_Wp_Sanitize_UTF8_In_Redirect (Matches : List_Type)
+                                            return String;
 
    --
    -- Creates a cryptographic token tied to a specific action, user, user session,

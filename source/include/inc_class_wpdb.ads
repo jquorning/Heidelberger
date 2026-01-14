@@ -9,9 +9,13 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
 
 with Arrays;
+with Databases;
+with Hb_Common;
+with SQLite;
 with Lists;
 
 with Inc_Class_Wp_Comments;
+with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Users;
 
@@ -19,7 +23,10 @@ package Inc_Class_Wpdb
 is
    use Ada.Strings.Unbounded;
    use Arrays;
+   use Hb_Common;
    use Lists;
+
+   type Statement_Type is new String;
 
    package String_Vectors is new
       Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
@@ -70,7 +77,7 @@ is
          --
          -- @var int
          --
---        public $num_queries = 0;
+         Num_Queries : Natural := 0;
 
          --
          -- Count of rows returned by the last query.
@@ -79,7 +86,7 @@ is
          --
          -- @var int
          --
---        public $num_rows = 0;
+         Num_Rows : Natural := 0;
 
          --
          -- Count of rows affected by the last query.
@@ -88,7 +95,7 @@ is
          --
          -- @var int
          --
---        public $rows_affected = 0;
+         Rows_Affected : Natural := 0;
 
          --
          -- The ID generated for an AUTO_INCREMENT column by the last query (usually
@@ -107,7 +114,7 @@ is
          --
          -- @var string
          --
---        public $last_query;
+         Last_Query : Unbounded_String;
 
          --
          -- Results of the last query.
@@ -135,7 +142,8 @@ is
          --
          -- @var mysqli_result|resource|bool|null
          --
---        protected $result;
+--        protected
+          Result : Databases.Three_State := Databases.None;
 
          --
          -- Cached column info, for sanity checking data before inserting.
@@ -233,7 +241,7 @@ is
          --
          -- @var string
          --
-         Prefix : Unbounded_String; -- = '';
+         Prefix : Unbounded_String;
 
          --
          -- WordPress base table prefix.
@@ -251,7 +259,7 @@ is
          --
          -- @var bool
          --
---        public $ready = false;
+         Ready : Boolean := False;
 
          --
          -- Blog ID.
@@ -269,7 +277,7 @@ is
          --
          -- @var int
          --
---        public $siteid = 0;
+         Siteid : Integer := 0;
 
          --
          -- List of WordPress per-site tables.
@@ -279,19 +287,31 @@ is
          -- @see wpdb::tables()
          -- @var string[]
          --
-         Tables : String_Maps.Map;
-         --  := To_Map ((
-         --       Build ("posts",              ""),
-         --       Build ("comments",           ""),
-         --       Build ("links",              ""),
-         --       Build ("options",            ""),
-         --       Build ("postmeta",           ""),
-         --       Build ("terms",              ""),
-         --       Build ("term_taxonomy",      ""),
-         --       Build ("term_relationships", ""),
-         --       Build ("termmeta",           ""),
-         --       Build ("Commentmeta",        "")
-         -- ));
+         M_Tables : List_Type := To_List (List => (
+              +"posts",
+              +"comments",
+              +"links",
+              +"options",
+              +"postmeta",
+              +"terms",
+              +"term_taxonomy",
+              +"term_relationships",
+              +"termmeta",
+              +"Commentmeta"));
+
+         -- String_Maps.Map; --  :=
+           -- [ -- String_Maps.To_Map ((
+           --   Build ("posts",              ""),
+           --   Build ("comments",           ""),
+           --   Build ("links",              ""),
+           --   Build ("options",            ""),
+           --   Build ("postmeta",           ""),
+           --   Build ("terms",              ""),
+           --   Build ("term_taxonomy",      ""),
+           --   Build ("term_relationships", ""),
+           --   Build ("termmeta",           ""),
+           --   Build ("Commentmeta",        "")
+           -- ]; -- ));
 
          --
          -- List of deprecated WordPress tables.
@@ -304,7 +324,8 @@ is
          -- @see wpdb::tables()
          -- @var string[]
          --
---        public $old_tables = array( 'categories', 'post2cat', 'link2cat' );
+         Old_Tables : List_Type :=
+           To_List (List => (+"categories", +"post2cat", +"link2cat"));
 
          --
          -- List of WordPress global tables.
@@ -314,7 +335,8 @@ is
          -- @see wpdb::tables()
          -- @var string[]
          --
---        public $global_tables = array( 'users', 'usermeta' );
+         Global_Tables : List_Type :=
+           To_List (List => (+"users", +"usermeta"));
 
          --
          -- List of Multisite global tables.
@@ -324,14 +346,15 @@ is
          -- @see wpdb::tables()
          -- @var string[]
          --
---        public $ms_global_tables = array(
---                'blogs',
---                'blogmeta',
---                'signups',
---                'site',
---                'sitemeta',
---                'registration_log',
---        );
+         MS_Global_Tables : List_Type :=
+           To_List (List => (
+             +"blogs",
+             +"blogmeta",
+             +"signups",
+             +"site",
+             +"sitemeta",
+             +"registration_log"
+           ));
 
          --
          -- List of deprecated WordPress Multisite global tables.
@@ -341,7 +364,8 @@ is
          -- @see wpdb::tables()
          -- @var string[]
          --
---        public $old_ms_global_tables = array( 'sitecategories' );
+         Old_MS_Global_Tables : List_Type :=
+           To_List ("sitecategories");
 
          --
          -- WordPress Comments table.
@@ -350,7 +374,7 @@ is
          --
          -- @var string
          --
---        public $comments;
+         Comments : Unbounded_String;
 
          --
          -- WordPress Comment Metadata table.
@@ -359,7 +383,7 @@ is
          --
          -- @var string
          --
---        public $commentmeta;
+         Commentmeta : Unbounded_String;
 
          --
          -- WordPress Links table.
@@ -368,7 +392,7 @@ is
          --
          -- @var string
          --
---        public $links;
+         Links : Unbounded_String;
 
          --
          -- WordPress Options table.
@@ -377,7 +401,9 @@ is
          --
          -- @var string
          --
-         Options : Unbounded_String;
+         Options : Unbounded_String :=
+           To_Unbounded_String ("options"); -- added
+--         To_Unbounded_String ("XXX-968"); -- added
 
          --
          -- WordPress Post Metadata table.
@@ -386,7 +412,7 @@ is
          --
          -- @var string
          --
---        public $postmeta;
+         Postmeta : Unbounded_String;
 
          --
          -- WordPress Posts table.
@@ -395,7 +421,7 @@ is
          --
          -- @var string
          --
---        public $posts;
+         Posts : Unbounded_String;
 
          --
          -- WordPress Terms table.
@@ -404,7 +430,7 @@ is
          --
          -- @var string
          --
---        public $terms;
+         Terms : Unbounded_String;
 
          --
          -- WordPress Term Relationships table.
@@ -413,7 +439,7 @@ is
          --
          -- @var string
          --
---        public $term_relationships;
+         Term_Relationships : Unbounded_String;
 
          --
          -- WordPress Term Taxonomy table.
@@ -422,7 +448,7 @@ is
          --
          -- @var string
          --
---        public $term_taxonomy;
+         Term_Taxonomy : Unbounded_String;
 
          --
          -- WordPress Term Meta table.
@@ -431,11 +457,11 @@ is
          --
          -- @var string
          --
---        public $termmeta;
+         Termmeta : Unbounded_String;
 
-         --
-         -- Global and Multisite tables
-         --
+         ---------------------------------
+         -- Global and Multisite tables --
+         ---------------------------------
 
          --
          -- WordPress User Metadata table.
@@ -444,7 +470,7 @@ is
          --
          -- @var string
          --
---        public $usermeta;
+         Usermeta : Unbounded_String;
 
          --
          -- WordPress Users table.
@@ -462,7 +488,7 @@ is
          --
          -- @var string
          --
---        public $blogs;
+         Blogs : Unbounded_String;
 
          --
          -- Multisite Blog Metadata table.
@@ -471,7 +497,7 @@ is
          --
          -- @var string
          --
---        public $blogmeta;
+         Blogmeta : Unbounded_String;
 
          --
          -- Multisite Registration Log table.
@@ -480,7 +506,7 @@ is
          --
          -- @var string
          --
---        public $registration_log;
+         Registration_Log : Unbounded_String;
 
          --
          -- Multisite Signups table.
@@ -489,7 +515,7 @@ is
          --
          -- @var string
          --
---        public $signups;
+         Signups : Unbounded_String;
 
          --
          -- Multisite Sites table.
@@ -498,7 +524,7 @@ is
          --
          -- @var string
          --
---        public $site;
+         Site : Unbounded_String;
 
          --
          -- Multisite Sitewide Terms table.
@@ -507,7 +533,7 @@ is
          --
          -- @var string
          --
---        public $sitecategories;
+         Sitecategories : Unbounded_String;
 
          --
          -- Multisite Site Metadata table.
@@ -551,7 +577,7 @@ is
          --
          -- @var string
          --
---        public $collate;
+         Collate : Unbounded_String;
 
          --
          -- Database Username.
@@ -608,6 +634,8 @@ is
          -- @var mysqli|resource|false|null
          --
          -- protected $dbh;
+         Dbh    : Integer;
+         Handle : SQLite.Data_Base;
 
          --
          -- A textual description of the last query/get_row/get_var call.
@@ -630,7 +658,7 @@ is
          --
          -- @var bool
          --
-         Is_MySQL : Boolean := False; --  = null;
+--       Is_MySQL : Boolean := False; --  = null;
 
          --
          -- A list of incompatible SQL modes.
@@ -649,6 +677,11 @@ is
 --        );
 
          --
+         -- Added by jq
+         --
+         Engine : Databases.Engine_Type;
+
+         --
          -- Whether to use mysqli over mysql. Default false.
          --
          -- @since 3.9.0
@@ -656,7 +689,7 @@ is
          -- @var bool
          --
          -- private
-         Use_Mysqli : Boolean := False;
+--         Use_Mysqli : Boolean := False;
 
          --
          -- Whether we've managed to successfully connect at some point.
@@ -665,7 +698,8 @@ is
          --
          -- @var bool
          --
---        private $has_connected = false;
+         -- private
+         Has_Connected : Boolean := False;
 
          --
          -- Time when the last query was performed.
@@ -711,6 +745,62 @@ is
                          return Wpdb_Class;
 
    --
+   -- Sets this.charset and this.collate.
+   --
+   -- @since 3.1.0
+   --
+   procedure Init_Charset (This : in out Wpdb_Class);
+
+   --
+   -- Determines the best charset and collation to use given a charset and collation.
+   --
+   -- For example, when able, utf8mb4 should be used instead of utf8.
+   --
+   -- @since 4.6.0
+   --
+   -- @param string charset The character set to check.
+   -- @param string collate The collation to check.
+   -- @return array {
+   --     The most appropriate character set and collation to use.
+   --
+   --     @type string charset Character set.
+   --     @type string collate Collation.
+   -- }
+   --
+   function Determine_Charset (This    : Wpdb_Class;
+                               Charset : String;
+                               Collate : String)
+                               return Array_Type;
+
+   --
+   -- Sets the connection's character set.
+   --
+   -- @since 3.1.0
+   --
+   -- @param mysqli|resource dbh     The connection returned by `mysqli_connect()`
+   --                                or `mysql_connect()`.
+   -- @param string          charset Optional. The character set. Default null.
+   -- @param string          collate Optional. The collation. Default null.
+   --
+   procedure Set_Charset (This    : Wpdb_Class;
+                          Dbh     : Integer;
+                          Charset : String := "";  -- = null
+                          Collate : String := ""); -- = null
+
+   --
+   -- Changes the current SQL mode, and ensures its WordPress compatibility.
+   --
+   -- If no modes are passed, it will ensure the current MySQL server modes are
+   -- compatible.
+   --
+   -- @since 3.9.0
+   --
+   -- @param array modes Optional. A list of SQL modes to set. Default empty array.
+   --
+   procedure Set_SQL_Mode (This  : Wpdb_Class;
+                           Modes : Array_Type := Empty_Array);
+
+   --
    -- Gets blog prefix.
    --
    -- @since 3.0.0
@@ -719,9 +809,52 @@ is
    -- @return string Blog prefix.
    --
    function Get_Blog_Prefix (This    : Wpdb_Class;
-                             Blog_Id : Integer := 0) -- null
-                             return String
-                             is ("XXX-709");
+                             Blog_Id : Integer := 0)
+                             return String;
+
+   --
+   -- Returns an array of WordPress tables.
+   --
+   -- Also allows for the `CUSTOM_USER_TABLE` and `CUSTOM_USER_META_TABLE` to override
+   -- the WordPress users and usermeta tables that would otherwise be determined by
+   -- the prefix.
+   --
+   -- The `scope` argument can take one of the following:
+   --
+   -- - "all" - returns "all" and "global" tables. No old tables are returned.
+   -- - "blog" - returns the blog-level tables for the queried blog.
+   -- - "global" - returns the global tables for the installation, returning multisite
+   --                 tables only on multisite.
+   -- - "ms_global" - returns the multisite global tables, regardless if current
+   --                 installation is multisite.
+   -- - "old" - returns tables which are deprecated.
+   --
+   -- @since 3.0.0
+   -- @since 6.1.0 `old` now includes deprecated multisite global tables only on
+   --              multisite.
+   --
+   -- @uses wpdb::tables
+   -- @uses wpdb::old_tables
+   -- @uses wpdb::global_tables
+   -- @uses wpdb::ms_global_tables
+   -- @uses wpdb::old_ms_global_tables
+   --
+   -- @param string scope   Optional. Possible values include "all", "global",
+   --                        "ms_global", "blog", or "old" tables. Default "all".
+   -- @param bool   prefix  Optional. Whether to include table prefixes. If blog
+   --                        prefix is requested, then the custom users and usermeta
+   --                        tables will be mapped. Default true.
+   -- @param int    blog_id Optional. The blog_id to prefix. Used only when prefix is
+   --                        requested. Defaults to `wpdb::blogid`.
+   -- @return string[] Table names. When a prefix is requested, the key is the
+   --                  unprefixed table name.
+   --
+   function Tables (This    : Wpdb_Class;
+                    Scope   : String  := "all";
+                    Prefix  : Boolean := True;
+                    Blog_Id : Integer := 0)
+                    return Array_Type;
+
    --
    -- Checks if a string is ASCII.
    --
@@ -755,6 +888,49 @@ is
                         return Boolean;
 
    --
+   -- Parses the DB_HOST setting to interpret it for mysqli_real_connect().
+   --
+   -- mysqli_real_connect() doesn"t support the host param including a port or socket
+   -- like mysql_connect() does. This duplicates how mysql_connect() detects a port
+   -- and/or socket file.
+   --
+   -- @since 4.9.0
+   --
+   -- @param string host The DB_HOST setting to parse.
+   -- @return array|false {
+   --     Array containing the host, the port, the socket and
+   --     whether it is an IPv6 address, in that order.
+   --     False if the host couldn"t be parsed.
+   --
+   --     @type string      0 Host name.
+   --     @type string|null 1 Port.
+   --     @type string|null 2 Socket.
+   --     @type bool        3 Whether it is an IPv6 address.
+   -- }
+   --
+   function Parse_DB_Host (This : Wpdb_Class;
+                           Host : String)
+                           return Array_Type;
+
+   --
+   -- Checks that the connection to the database is still up. If not, try to reconnect.
+   --
+   -- If this function is unable to reconnect, it will forcibly die, or if called
+   -- after the {@see "template_redirect"} hook has been fired, return false instead.
+   --
+   -- If `allow_bail` is false, the lack of database connection will need to be
+   -- handled manually.
+   --
+   -- @since 3.9.0
+   --
+   -- @param bool allow_bail Optional. Allows the function to bail. Default true.
+   -- @return bool|void True if the connection is up.
+   --
+   function Check_Connection (This       : Wpdb_Class;
+                              Allow_Bail : Boolean := True)
+                              return Boolean;
+
+   --
    -- Checks if the query is accessing a collation considered safe on the current
    -- version of MySQL.
    --
@@ -763,9 +939,9 @@ is
    -- @param string $query The query to check.
    -- @return bool True if the collation is safe, false if it isn't.
    --
-   -- protected function check_safe_collation( $query ) then
+   -- protected
    function Check_Safe_Collation (This  : in out Wpdb_Class;
-                                  Query : String)
+                                  Query : Statement_Type)
                                   return Boolean;
 
    --
@@ -786,6 +962,20 @@ is
    function Strip_Invalid_Text (This : in out Wpdb_Class;
                                 Data : Array_Type)
                                 return Array_Type;
+
+   --
+   -- Strips any invalid characters from the query.
+   --
+   -- @since 4.2.0
+   --
+   -- @param string query Query to convert.
+   -- @return string|WP_Error The converted query, or a WP_Error object if the
+   --                          conversion fails.
+   --
+   -- protected
+   function Strip_Invalid_Text_From_Query (This  : Wpdb_Class;
+                                           Query : String)
+                                           return String;
 
    --
    -- Deletes a row in the table.
@@ -877,7 +1067,7 @@ is
    --                     False on failure.
    --
    -- protected
-   function Process_Field_Charsets (This  : Wpdb_Class;
+   function Process_Field_Charsets (This  : in out Wpdb_Class;
                                     Data  : Array_Type;
                                     Table : String)
                                     return Array_Type;
@@ -894,7 +1084,7 @@ is
    --                     corresponding field.
    --
    -- protected
-   function Process_Field_Lengths (This  : Wpdb_Class;
+   function Process_Field_Lengths (This  : in out Wpdb_Class;
                                    Data  : Array_Type;
                                    Table : String)
                                    return Array_Type;
@@ -1039,14 +1229,48 @@ is
    --                          Number of rows affected/selected for all other
    --                          queries. Boolean false on error.
    --
-   function Query (Db    : Wpdb_Class;
-                   Query : String)
-                   return Integer
-                   is (0);
+   function Query (This  : in out Wpdb_Class;
+                   Query : Statement_Type)
+                   return Integer;
 
-   procedure Query (Db    : Wpdb_Class;
-                    Query : String)
-                    is null;
+   procedure Query (Db    : in out Wpdb_Class;
+                    Query : Statement_Type);
+
+   --
+   -- Internal function to perform the mysql_query() call.
+   --
+   -- @since 3.9.0
+   --
+   -- @see wpdb::query()
+   --
+   -- @param string query The query to run.
+   --
+   -- private
+   procedure X_Do_Query (This  : in out Wpdb_Class;
+                         Query : String);
+
+   --
+   -- Generates and returns a placeholder escape string for use in queries returned
+   -- by ::prepare().
+   --
+   -- @since 4.8.3
+   --
+   -- @return string String to escape placeholders.
+   --
+   function Placeholder_Escape (This : Wpdb_Class)
+                                return String;
+
+   --
+   -- Removes the placeholder escape strings from a query.
+   --
+   -- @since 4.8.3
+   --
+   -- @param string query The query from which the placeholder will be removed.
+   -- @return string The query with the placeholder removed.
+   --
+   function Remove_Placeholder_Escape (This  : Wpdb_Class;
+                                       Query : String)
+                                       return String;
 
    --
    -- Adds a placeholder escape string, to escape anything that resembles a printf()
@@ -1058,9 +1282,9 @@ is
    -- @return string The query with the placeholder escape string inserted where
    --                necessary.
    --
-   function Add_Placeholder_Escape (Db    : Wpdb_Class;
-                                    Query : String)
-                                    return String is ("XXX-206");
+   function Add_Placeholder_Escape (This  : Wpdb_Class;
+                                    Query : Statement_Type)
+                                    return Statement_Type;
 
    --
    -- Prepares a SQL query for safe execution.
@@ -1122,14 +1346,7 @@ is
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
                      Args  : List_Type) --, ...$args )
-                     return String;
-
-   function Prepare (Db    : Wpdb_Class;
-                     Query : String;
-                     Arg_1 : String;
-                     Arg_2 : String := "") --, ...$args )
-                     return String
-                     is ("XXX-212");
+                     return Statement_Type; -- String;
 
    --
    -- Enables showing of database errors.
@@ -1214,6 +1431,13 @@ is
                               Suppress : Boolean := True);
 
    --
+   -- Kills cached query results.
+   --
+   -- @since 0.71
+   --
+   procedure Flush (This : in out Wpdb_Class);
+
+   --
    -- Retrieves one row from the database.
    --
    -- Executes a SQL query and returns the row from the SQL result.
@@ -1231,53 +1455,56 @@ is
    --                                $output or null on failure.
    --
    procedure Get_Row (Db      : in out Wpdb_Class;
-                      Post    : Inc_Class_Wp_Posts.Wp_Post;
-                      Query   : String  := ""; -- = null,
-                      Output  : String  := ""; -- = OBJECT,
-                      Y       : Natural := 0;
+                      Query   : Statement_Type; --  := ""; -- = null,
+--                    Output  : String         := ""; -- = OBJECT,
+--                    Y       : Natural        := 0;
                       Success : out Boolean);
+--                    return String;
 
    function Get_Row (Db      : in out Wpdb_Class;
-                     Post    : Inc_Class_Wp_Posts.Wp_Post;
-                     Query   : String  := ""; -- = null,
-                     Output  : String  := ""; -- = OBJECT,
-                     Y       : Natural := 0;
+                     Query   : Statement_Type; --  := ""; -- = null,
+--                   Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
                      Success : out Boolean)
                      return String;
 
    function Get_Row (Db      : in out Wpdb_Class;
---                   User    : Integer;
-                     Query   : String  := ""; -- = null,
-                     Output  : String  := ""; -- = OBJECT,
-                     Y       : Natural := 0;
+                     Query   : Statement_Type;
+                     Y       : Natural        := 0;
                      Success : out Boolean)
-                     return Inc_Class_Wp_Users.Wp_User
-                     is (Inc_Class_Wp_Users.Null_User);
+                     return Array_Type;
 
-   function Get_Row (DB      : in out Wpdb_Class;
-                     Query   : String  := ""; -- = null,
-                     Output  : String  := ""; -- = OBJECT,
-                     Y       : Natural := 0;
-                     Success : out Boolean)
-                     return Array_Type
-                     is (raise Program_Error with "not implemented");
-
-   function Get_Row (DB      : in out Wpdb_Class;
-                     Query   : String  := ""; -- = null,
-                     Output  : String  := ""; -- = OBJECT,
-                     Y       : Natural := 0;
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Query   : Statement_Type; -- := ""; -- = null,
+                     Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
                      Success : out Boolean)
                      return Natural
                      is (raise Program_Error with "not implemented");
 
    function Get_Row (Db      : in out Wpdb_Class;
---                   User    : Integer;
-                     Query   : String  := ""; -- = null,
-                     Output  : String  := ""; -- = OBJECT,
-                     Y       : Natural := 0;
+                     Query   : Statement_Type; -- := ""; -- = null,
+                     Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
                      Success : out Boolean)
                      return Inc_Class_Wp_Comments.Wp_Comment
                      is (Inc_Class_Wp_Comments.Null_Comment);
+
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Query   : Statement_Type; -- := ""; -- = null,
+                     Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
+                     Success : out Boolean)
+                     return Inc_Class_Wp_Posts.Wp_Post
+                     is (Inc_Class_Wp_Posts.Null_Post);
+
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Query   : Statement_Type; --  := ""; -- = null,
+                     Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
+                     Success : out Boolean)
+                     return Inc_Class_Wp_Users.Wp_User
+                     is (Inc_Class_Wp_Users.Null_User);
 
    --
    -- Retrieves the character set for the given column.
@@ -1290,7 +1517,7 @@ is
    --                               column has no character set. WP_Error object if
    --                               there was an error.
    --
-   function Get_Col_Charset (This   : Wpdb_Class;
+   function Get_Col_Charset (This   : in out Wpdb_Class;
                              Table  : String;
                              Column : String)
                              return String;
@@ -1312,7 +1539,7 @@ is
    --     @type string type   One of "byte" or "char".
    -- }
    --
-   function Get_Col_Length (This   : Wpdb_Class;
+   function Get_Col_Length (This   : in out Wpdb_Class;
                             Table  : String;
                             Column : String)
                             return Array_Type;
@@ -1333,8 +1560,8 @@ is
    --               number.
    --
    function Get_Col (Db    : in out Wpdb_Class;
-                     Query : String  := "";  -- null;
-                     X     : Integer := 0)
+                     Query : Statement_Type := "";  -- null;
+                     X     : Integer        := 0)
                      return List_Type
                      is (Empty_List);
 
@@ -1352,15 +1579,17 @@ is
    --                      an associative array (column => value, ...), a numerically
    --                      indexed array (0 => value, ...), or an object (.column =
    --                      value), respectively. With OBJECT_K. return an associative
-   --                      array of row objects keyed by the value of each row"s
+   --                      array of row objects keyed by the value of each row's
    --                      first column"s value. Duplicate keys are discarded.
    -- @return array|object|null Database query results.
    --
-   function Get_Results (This   : Wpdb_Class;
-                         Query  : String := ""; -- null
+   procedure Get_Results (This   : in out Wpdb_Class;
+                          Query  : Statement_Type);  -- "" -- null
+
+   function Get_Results (This   : in out Wpdb_Class;
+                         Query  : Statement_Type; --  := ""; -- null
                          Output : String := "OBJECT")
-                         return Array_Type
-                         is (Empty_Array);
+                         return Array_Type;
 
    function Get_Results (This   : Wpdb_Class;
                          Query  : String := ""; -- null
@@ -1377,11 +1606,10 @@ is
    -- @return string|WP_Error Table character set, WP_Error object if it couldn't
    --                         be found.
    --
-   -- protected function get_table_charset(table) then
-   function Get_Table_Charset (This  : Wpdb_Class;
+   -- protected
+   function Get_Table_Charset (This  : in out Wpdb_Class;
                                Table : String)
-                               return String
-                               is ("XXX-205");
+                               return String;
 
    --
    -- Finds the first table name referenced in a query.
@@ -1391,11 +1619,48 @@ is
    -- @param string query The query to search.
    -- @return string|false The table name found, or false if a table couldn"t be found.
    --
-   -- protected function get_table_from_query(query) then
+   -- protected
    function Get_Table_From_Query (This  : Wpdb_Class;
-                                  Query : String)
-                                  return String
-                                  is ("XXX-203");
+                                  Query : Statement_Type)
+                                  return String;
+
+   --
+   -- Wraps errors in a nice header and footer and dies.
+   --
+   -- Will not die if wpdb::show_errors is false.
+   --
+   -- @since 1.5.0
+   --
+   -- @param string message    The error message.
+   -- @param string error_code Optional. A computer-readable string to identify
+   --                           the error. Default "500".
+   -- @return void|false Void if the showing of errors is enabled, false if disabled.
+   --
+   procedure Bail (This       : Wpdb_Class;
+                   Message    : String;
+                   Error_Code : String := "500");
+
+   --
+   -- Retrieves the database character collate.
+   --
+   -- @since 3.5.0
+   --
+   -- @return string The database character collate.
+   --
+   function Get_Charset_Collate (This : Wpdb_Class)
+                                 return String;
+
+   --
+   -- Determines whether MySQL database is at least the required minimum version.
+   --
+   -- @since 2.5.0
+   --
+   -- @global string wp_version             The WordPress version string.
+   -- @global string required_mysql_version The required MySQL version string.
+   -- @return void|WP_Error
+   --
+   function Check_Database_Version (This : Wpdb_Class)
+            return Inc_Class_Wp_Errors.Wp_Error;
 
    --
    -- Sets the table prefix for the WordPress tables.
@@ -1414,6 +1679,64 @@ is
                         return String;
 
    --
+   -- Sets blog ID.
+   --
+   -- @since 3.0.0
+   --
+   -- @param int blog_id
+   -- @param int network_id Optional.
+   -- @return int Previous blog ID.
+   --
+   function Set_Blog_Id (This       : in out Wpdb_Class;
+                         Blog_Id    : Integer;
+                         Network_Id : Integer := 0)
+                         return Integer;
+
+   --
+   -- Selects a database using the current or provided database connection.
+   --
+   -- The database name will be changed based on the current database connection.
+   -- On failure, the execution will bail and display a DB error.
+   --
+   -- @since 0.71
+   --
+   -- @param string          db  Database name.
+   -- @param mysqli|resource dbh Optional database connection.
+   --
+   procedure Selectt (This : Wpdb_Class;
+                      Db   : String;
+                      Dbh  : Integer); --  = null) then
+
+   --
+   -- Real escape, using mysqli_real_escape_string() or mysql_real_escape_string().
+   --
+   -- @since 2.8.0
+   --
+   -- @see mysqli_real_escape_string()
+   -- @see mysql_real_escape_string()
+   --
+   -- @param string string String to escape.
+   -- @return string Escaped string.
+   --
+   function X_Real_Escape (This : Wpdb_Class;
+                           Item : String)
+                           return String;
+
+   --
+   -- Escapes data. Works on arrays.
+   --
+   -- @since 2.8.0
+   --
+   -- @uses wpdb::_real_escape()
+   --
+   -- @param string|array data Data to escape.
+   -- @return string|array Escaped data, in the same type as supplied.
+   --
+   function X_Escape (This : Wpdb_Class;
+                      Data : String)
+                      return String;
+
+   --
    -- Retrieves one variable from the database.
    --
    -- Executes a SQL query and returns the value from the SQL result.
@@ -1430,12 +1753,11 @@ is
    -- @param int         y     Optional. Row of value to return. Indexed from 0.
    -- @return string|null Database query result (as string), or null on failure.
    --
-   function Get_Var (This  : Wpdb_Class;
-                     Query : String  := ""; -- null
-                     X     : Integer := 0;
-                     Y     : Integer := 0)
-                     return String
-                     is ("1"); -- "XXX-887"
+   function Get_Var (This  : in out Wpdb_Class;
+                     Query : Statement_Type := ""; -- null
+                     X     : Integer        := 0;
+                     Y     : Integer        := 0)
+                     return String;
 
    --
    -- Retrieves the database server version.
@@ -1464,5 +1786,10 @@ is
                       S  : String)
                       return Array_Type
                       is (Empty_Array);
+
+   -- Added
+   procedure Set_Table (This  : in out Wpdb_Class;
+                        Table : String;
+                        Value : String);
 
 end Inc_Class_Wpdb;

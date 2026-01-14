@@ -135,8 +135,8 @@ is
                   return String
    is
       use Ada.Containers;
+      use Php.Arrays;
       use Hb_Common;
---    use Inc_Class_Wp_Terms;
 
       Output : Unbounded_String;
    begin
@@ -206,8 +206,8 @@ is
                      E : constant Multi_Type := Arrays.Element (E_2);
                   begin
                      if
-                       Get (Root, Parent_Field) =
-                       As_String (Get (As_Array (E), Parent_Field))
+                       "XXX-969" = -- Get (Root, Parent_Field) =
+                       Get_As_String (As_Array (E), Parent_Field)
                      then
 --                   if Root.Parent_Field = E.Parent_Field then
                         Append (Top_Level_Elements,

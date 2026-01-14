@@ -14,6 +14,7 @@ with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
+with Php.Numerics;
 with Php.Strings;
 with Php.Types;
 
@@ -167,6 +168,8 @@ is
       end if;
 
       declare
+         use Php.Numerics;
+         use Php.Lists;
          use Inc_Capabilities;
          use Inc_Class_Wp_Taxonomy;
          use Inc_Class_Wp_Terms;
@@ -196,8 +199,9 @@ is
 
          if Is_Array (As_Array (Get (Parsed_Args, "selected_cats"))) then
             Set (Args_2, "selected_cats",
-                 From_Array (
-                   Array_Map ("intval", As_Array (Get (Parsed_Args, "selected_cats")))));
+                 From_List (
+                   List_Map (Intval'Access,
+                             As_List (Get (Parsed_Args, "selected_cats")))));
          elsif Post_Id /= 0 then
             null;
 --                Set (Args_2, "selected_cats",
@@ -209,8 +213,9 @@ is
 
          if Is_Array (As_Array (Get (Parsed_Args, "popular_cats"))) then
             Set (Args_2, "popular_cats",
-                 From_Array (
-                   Array_Map ("intval", As_Array (Get (Parsed_Args, "popular_cats")))));
+                 From_List (
+                   List_Map (Intval'Access,
+                             As_List (Get (Parsed_Args, "popular_cats")))));
          else
             Set (Args_2, "popular_cats",
                      Get_Terms (
@@ -2642,10 +2647,10 @@ is
                               return List_Type
    is
 --    static (Header_Images);
-
+      use Php.Arrays;
+      use Php.Strings;
       use Inc_Themes;
       use Inc_Posts;
---    use Array_Maps;
       use Inc_Class_Wp_Posts;
 
       Media_States : Unbounded_String; -- Array_Type := Empty_Array;
@@ -2868,7 +2873,7 @@ is
             goto Continue_3;
          end if;
 
-         Classes.Append ((if In_Array (-T, Button_Shorthand, True)
+         Classes.Append ((if In_List (-T, Button_Shorthand, True)
                           then "button-" & T else T)); -- ()
          <<Continue_3>>
       end loop;
@@ -2876,7 +2881,7 @@ is
       declare
          -- Remove empty items, remove duplicate items, and finally build a string.
          Class  : constant String :=
-            Implode (" ", List_Type'(Array_Unique (Array_Filter (Classes))));
+            Implode (" ", List_Type'(List_Unique (List_Filter (Classes))));
 
          Text_2 : String := (if Text /= "" then Text else abs "Save Changes");
          -- Default the id attribute to name unless an id was specifically

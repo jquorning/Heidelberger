@@ -8,8 +8,20 @@ package Php.Numerics
 is
    use Arrays;
 
-   function Max (Arry : Array_Type) return Integer is (1);
-   function Hexdec (Hex : String) return Integer is (99);
+   function Intval (Value : String;
+                    Base  : Integer := 10)
+                    return Integer;
+
+   function Absint (Num : Integer)
+                    return Integer;
+
+   function Max (Arry : Array_Type)
+                 return Integer
+                 is (1);
+
+   function Hexdec (Hex : String)
+                    return Integer
+                    is (99);
 
    function MT_Rand (Min : Natural;
                      Max : Natural)
@@ -24,5 +36,27 @@ is
                   Max : Integer)
                   return Natural
                   is (99);
+
+   function Rand
+            return Natural
+            is (99);
+
+   function Hash_HMAC (Algo : String;
+                       Data : String;
+                       Key  : String)
+                       return String
+   is ("XXX-972");
+
+   function Uniqid (Prefix       : String;
+                    More_Entropy : Boolean := False)
+                    return String
+   is ("XXX-973");
+
+   function Number_Format (Num                 : Float;
+                           Decimals            : Integer := 0;
+                           Decimal_Separator   : String := ".";
+                           Thousands_Separator : String := ",")
+                           return String
+                           is ("999,999.99");
 
 end Php.Numerics;

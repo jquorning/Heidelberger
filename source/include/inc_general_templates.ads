@@ -87,50 +87,67 @@ is
                           Filter : String := "raw")
                           return String;
 
---
--- Retrieves the login URL.
---
--- @since 2.7.0
---
--- @param string redirect     Path to redirect to on log in.
--- @param bool   force_reauth Whether to force reauthorization, even if a cookie is present.
---                             Default false.
--- @return string The login URL. Not HTML-encoded.
---
+   --
+   -- Retrieves the login URL.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string redirect     Path to redirect to on log in.
+   -- @param bool   force_reauth Whether to force reauthorization, even if a cookie
+   --                             is present. Default false.
+   -- @return string The login URL. Not HTML-encoded.
+   --
    function Wp_Login_URL (Redirect     : String  := "";
                           Force_Reauth : Boolean := False)
                           return String
                           is ("XXX-411");
 
---
--- Retrieves the logout URL.
---
--- Returns the URL that allows the user to log out of the site.
---
--- @since 2.7.0
---
--- @param string redirect Path to redirect to on logout.
--- @return string The logout URL. Note: HTML-encoded via esc_html() in wp_nonce_url().
---
+   --
+   -- Retrieves the logout URL.
+   --
+   -- Returns the URL that allows the user to log out of the site.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string redirect Path to redirect to on logout.
+   -- @return string The logout URL. Note: HTML-encoded via esc_html() in
+   --                 wp_nonce_url().
+   --
    function Wp_Logout_URL (Redirect : String := "")
                            return String
                            is ("XXX-351");
 
---
--- Retrieves the contents of the search WordPress query variable.
---
--- The search query string is passed through esc_attr() to ensure that it is safe
--- for placing in an HTML attribute.
---
--- @since 2.3.0
---
--- @param bool escaped Whether the result is escaped. Default true.
---                      Only use when you are later escaping it. Do not use unescaped.
--- @return string
---
+   --
+   -- Retrieves the contents of the search WordPress query variable.
+   --
+   -- The search query string is passed through esc_attr() to ensure that it is safe
+   -- for placing in an HTML attribute.
+   --
+   -- @since 2.3.0
+   --
+   -- @param bool escaped Whether the result is escaped. Default true.
+   --                      Only use when you are later escaping it. Do not use
+   --                      unescaped.
+   -- @return string
+   --
    function Get_Search_Query (Escaped : Boolean := True)
                               return String
                               is ("XXX-445");
+
+   --
+   -- Gets the language attributes for the "html" tag.
+   --
+   -- Builds up a set of HTML attributes containing the text direction and language
+   -- information for the page.
+   --
+   -- @since 4.3.0
+   --
+   -- @param string doctype Optional. The type of HTML document. Accepts "xhtml" or
+   --                        "html". Default "html".
+   -- @return string A space-separated list of language attributes.
+   --
+   function Get_Language_Attributes (Doctype : String := "html")
+                                     return String;
 
    --
    -- Displays the language attributes for the "html" tag.
@@ -144,8 +161,7 @@ is
    -- @param string doctype Optional. The type of HTML document. Accepts "xhtml" or
    -- "html". Default "html".
    --
-   procedure Language_Attributes (Doctype : String := "html")
-   is null;
+   procedure Language_Attributes (Doctype : String := "html");
 
    --
    -- Outputs the HTML disabled attribute.

@@ -566,7 +566,7 @@ is
                    Build ("post_type",    Post_Type_Filter),
                    Build ("post_name",
                           Sprintf ("wp-global-styles-%s",
-                                   To_List (URLencode (Stylesheet)))),
+                                   To_List (URL_Encode (Stylesheet)))),
                    Build ("tax_input",    To_Array (List => (1 =>
                       Build ("wp_theme", Stylesheet) -- To_Array (Stylesheet))
                    )))

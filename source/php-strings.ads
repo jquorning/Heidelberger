@@ -10,6 +10,13 @@ is
    use Arrays;
    use Lists;
 
+   function Empty (A : String)
+                   return Boolean
+                   is (A'Length = 0);
+
+   function Isset (Item : String)
+                   return Boolean;
+
    function Strstr (Haystack      : String;
                     Needle        : String;
                     Before_Needle : Boolean := False)
@@ -19,10 +26,23 @@ is
                     Pattern : String)
                     return Natural;
 
-   function Stripos (Heystack : String;
+   function Strrpos (Haystack : String;
                      Needle   : String)
-                     return Natural
-                     is (999);
+                     return Natural;
+
+   function Stripos (Haystack : String;
+                     Needle   : String)
+                     return Natural;
+
+   function Substr_Count (Haystack : String;
+                          Needle   : String)
+                          return Natural;
+
+   function Substr_Replace (Item    : String;
+                            Replace : String;
+                            Offset  : Natural;
+                            Length  : Natural)
+                            return String;
 
    function Str_Replace (Search  : String;
                          Replace : String;
@@ -32,61 +52,68 @@ is
    function Str_Replace (Search  : List_Type;
                          Replace : List_Type;
                          Subject : String)
-                         return String
-                         is ("XXX-020");
+                         return String;
 
    function Str_Replace (Search  : List_Type;
                          Replace : String;
                          Subject : String)
-                         return String
-                         is ("XXX-221");
+                         return String;
+
+   function Str_Replace (Search  : List_Type;
+                         Replace : String;
+                         Subject : String;
+                         Count   : out Natural)
+                         return String;
 
    function Str_Repeat (Item  : String;
                         Times : Natural)
-                        return String
-                        is ("XXX-010");
+                        return String;
 
-   function Substr (Str    : String;
+   function Substr (Item   : String;
                     Offset : Integer;
-                    Length : Integer := 0)
+                    Length : Integer := Integer'First)
                     return String;
 
    function Strlen (Item : String)
-                    return Natural
-                    is (Item'Length);
+                    return Natural;
 
    function Str_Starts_With (Haystack : String;
                              Needle   : String)
-                             return Boolean
-                             is (True);
+                             return Boolean;
 
    function Str_Contains (Haystack : String;
                           Needle   : String)
-                          return Boolean
-                          is (False);
+                          return Boolean;
 
-   function Strtoupper (Item : String) return String is (Item);
-   function Strtolower (Item : String) return String is (Item);
-   function UC_First   (Item : String) return String is (Item);
+   function Strtoupper (Item : String) return String;
+   function Strtolower (Item : String) return String;
+   function UC_First   (Item : String) return String;
 
-   function Strncmp (Left, Right : String;
+   function Strncmp (Left   : String;
+                     Right  : String;
                      Length : Integer)
-                     return Integer
-                     is (1);
+                     return Integer;
 
    function Strnatcasecmp (Left, Right : String)
                            return Integer;
 
+   Default_Characters : constant String :=
+     " " & ASCII.LF & ASCII.CR & ASCII.HT & ASCII.VT & ASCII.NUL;
+
    function Ltrim (Item       : String;
-                   Characters : String := "")
-                   return String is (Item);
+                   Characters : String := Default_Characters)
+                   return String;
 
    function Rtrim (Item       : String;
-                   Characters : String := "")
-                   return String is (Item);
+                   Characters : String := Default_Characters)
+                   return String;
 
-   function Trim (Item : String; Characters : String := "")
-                  return String is (Item);
+   function Trim (Item       : String;
+                  Characters : String := Default_Characters)
+                  return String;
+
+--   function Trim (Item : String)
+--                  return String;
 
    function Sprintf (Format : String;
                      Args   : List_Type)
@@ -98,60 +125,38 @@ is
 
    function Strtok (Item  : String;
                     Token : String)
-                    return String
-                    is ("XXX-783");
+                    return String;
 
    function Str_Split (Item   : String;
                        Length : Natural := 1)
-                       return Array_Type
-                       is (Empty_Array);
+                       return Array_Type;
+
+   function Strval (Value : String)
+                    return String
+                    is (Value);
 
    function Stristr (Haystack      : String;
                      Needle        : String;
                      Before_Needle : Boolean := False)
-                     return Boolean  -- string|false
-                     is (False);
+                     return Boolean;  -- string|false
 
    function Strip_Tags (Item         : String;
                         Allowed_Tags : Array_Type := Empty_Array)
-                        return String
-                        is ("XXX-600");
+                        return String;
 
-   function Glob (Pattern : String;
-                  Flags   : Integer := 0)
-                  return List_Type
-                  is (Empty_List);
-
-   function Addslashes (Item : String)
+   function Add_Slashes (Item : String)
             return String;
 
    function Add_C_Slashes (Item       : String;
                            Characters : String)
-                           return String
-                           is ("XXX-989");
+                           return String;
 
-   function Stripslashes (Item : String)
-                          return String
-                          is (Item);
+   function Strip_Slashes (Item : String)
+                          return String;
 
    function Printf (Format : String;
                     Args   : List_Type)
                     return String;
-
-   function Explode (Item  : String;
-                     Table : Array_Type)
-                     return Array_Type
-                     is (Empty_Array);
-
-   function Explode (Item : String;
-                     List : List_Type)
-                     return List_Type
-                     is (Empty_List);
-
-   function Explode (Separator : String;
-                     Item      : String;
-                     Limit     : Integer := Integer'Last)
-                     return List_Type;
 
    function Implode (Separator : String;
                      Arry      : Array_Type)
@@ -159,10 +164,15 @@ is
 
    function Implode (Separator : String;
                      Arry      : String)
-                     return String is ("XXX-208");
+                     return String;
 
    function Implode (Separator : String;
                      List      : List_Type)
-                     return String is ("XXX-307");
+                     return String;
+
+   function Explode (Separator : String;
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
+                     return List_Type;
 
 end Php.Strings;

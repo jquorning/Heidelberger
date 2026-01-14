@@ -12,6 +12,29 @@ is
 
    Generator : Natural_Random.Generator;
 
+   ------------
+   -- Intval --
+   ------------
+
+   function Intval (Value : String;
+                    Base  : Integer := 10)
+                    return Integer
+   is
+   begin
+      return Integer'Value (Value);
+   end Intval;
+
+   ------------
+   -- Absint --
+   ------------
+
+   function Absint (Num : Integer)
+                    return Integer
+   is
+   begin
+      return abs Num;
+   end Absint;
+
    -------------
    -- MT_Rand --
    -------------

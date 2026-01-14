@@ -144,7 +144,7 @@ is
    --
    function Has_Filter (This      : Wp_Hook;
                         Hook_Name : String := "";
-                        Callback  : Boolean := False)
+                        Callback  : Callable := null) -- Boolean := False)
                         return Boolean;
 
    --

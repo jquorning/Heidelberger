@@ -10,73 +10,109 @@ is
    use Standard.Arrays;
    use Lists;
 
-   function Array_Merge (Left, Right : Array_Type) return Array_Type
-      is (Left);
+   function Array_Merge (Left  : Array_Type;
+                         Right : Array_Type)
+                         return Array_Type;
 
-   function Array_Merge (Arry_1, Arry_2, Arry_3 : Array_Type)
-            return Array_Type
-   is (Array_Merge (Array_Merge (Arry_1, Arry_2), Arry_3));
+   function Array_Merge (Arry_1 : Array_Type;
+                         Arry_2 : Array_Type;
+                         Arry_3 : Array_Type)
+                         return Array_Type;
 
    function Array_Merge_Recursive (Left, Right : Array_Type)
                                    return Array_Type
-                                   is (Left);
+   is (raise Program_Error with "not implemented");
 
-   function Array_Diff (Left, Right : Array_Type) return Array_Type
-      is (Left);
+   function Array_Diff (Left  : Array_Type;
+                        Right : Array_Type)
+                        return Array_Type;
 
    function Array_Diff_Key (Arry : Array_Type;
                             That : Array_Type)
                             return Array_Type
-                            is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
-   function Array_Map (Item  : String;
-                       Table : Array_Type)
-                       return Array_Type is (Empty_Array);
+   type Callable_20 is access function (Item : String)
+                                        return String;
 
-   function Array_Map (Item  : String;
-                       Table : Array_Type)
-                       return List_Type is (Empty_List);
+   type Callable_21 is access function (Item : String;
+                                        Base : Integer)
+                                        return Integer;
+
+   type Callable_22 is access function (Value : Integer)
+                                        return Integer;
+
+   type Callable_23 is access function (Item   : String;
+                                        Item_2 : String)
+                                        return String;
+
+   function Array_Map (Callback : Callable_20;
+                       Arry     : Array_Type)
+                       return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   function Array_Map (Callback : Callable_22;
+                       Arry     : Array_Type)
+                       return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   function Array_Map (Callback : Callable_20;
+                       Arry     : Array_Type)
+                       return List_Type
+   is (raise Program_Error with "not implemented");
+
+   function Array_Map (Callback : Callable_21;
+                       Arry     : Array_Type)
+                       return List_Type
+   is (raise Program_Error with "not implemented");
+
+   function Array_Map (Callback : Callable_20;
+                       List     : List_Type)
+                       return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   function Array_Map (Callback : Callable_23;
+                       List     : List_Type)
+                       return Array_Type
+   is (raise Program_Error with "not implemented");
 
    function In_Array (Needle   : String;
                       Haystack : Array_Type;
                       Strict   : Boolean := False)
-                      return Boolean is (False);
+                      return Boolean;
 
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
 
    function Array_Values (Arry : Array_Type)
-                          return List_Type
-                          is (Empty_List);
+                          return List_Type;
 
    function Array_Values (Arry : Array_Type)
                           return Array_Type
-                          is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Keys (Arry : Array_Type)
                         return Array_Type
-                        is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Keys (Arry : Array_Type)
-                        return List_Type
-                        is (Empty_List);
+                        return List_Type;
 
    function Array_Keys (Arry         : Array_Type;
                         Filter_Value : String;
                         Strict       : Boolean := False)
                         return List_Type
-                        is (Empty_List);
+   is (raise Program_Error with "not implemented");
 
    function Array_Key_Exists (Key  : String;
                               Arry : Array_Type)
-                              return Boolean
-                              is (False);
+                              return Boolean;
 
    function Array_Search (Needle   : String;
                           Haystack : Array_Type;
                           Strict   : Boolean := False)
                           return String
-                          is ("XXX-315");
+   is (raise Program_Error with "not implemented");
 
    function Array_Search (Needle   : String;
                           Haystack : Array_Type;
@@ -87,25 +123,25 @@ is
    function Array_Intersect_Key (Arry   : Array_Type;
                                  Arry_2 : Array_Type)
                                  return Array_Type
-                                 is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Flip (Arry : Array_Type)
                         return Array_Type
-                        is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Flip (Arry : List_Type)
                         return Array_Type
-                        is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Fill_Keys (Keys  : Array_Type;
                              Value : Boolean)
                              return Array_Type
-                             is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Fill_Keys (Keys  : List_Type;
                              Value : Multi_Type)
                              return Array_Type
-                             is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    ARRAY_FILTER_USE_KEY  : constant Integer := 47; -- arbitrary value
    ARRAY_FILTER_USE_BOTH : constant Integer := 48; -- arbitrary value
@@ -119,19 +155,19 @@ is
                           Callback : Filter_Callback_1 := null;
                           Mode     : Integer           := 0)
                           return Array_Type
-                          is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Filter (Arry     : Array_Type;
                           Callback : Filter_Callback_1 := null;
                           Mode     : Integer          := 0)
                           return List_Type
-                          is (Empty_List);
+   is (raise Program_Error with "not implemented");
 
    function Array_Filter (Arry     : Array_Type;
                           Callback : Filter_Callback_2; --  := null;
                           Mode     : Integer           := 0)
                           return Array_Type
-                          is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    type Reduce_Callback is access function (Carry : String;
                                             Acc   : Array_Type)
@@ -141,7 +177,7 @@ is
                           Callback : Reduce_Callback;
                           Initial  : String)
                           return String
-                          is ("XXX-006");
+   is (raise Program_Error with "not implemented");
 
    type Reduce_Callback_2 is not null access function (Carry : Integer;
                                                        Item  : String)
@@ -151,17 +187,17 @@ is
                           Callback : Reduce_Callback_2;
                           Initial  : Integer)
                           return Integer
-                          is (raise Program_Error with "not implemented");
+   is (raise Program_Error with "not implemented");
 
    function Array_Combine (Keys   : Array_Type;
                            Values : Array_Type)
                            return Array_Type
-                           is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Column (Arry       : Array_Type;
                           Column_Key : String)
                           return Array_Type
-                          is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Array_Pop (Arry : Array_Type)
                        return Integer
@@ -187,36 +223,33 @@ is
                           return Array_Type
                           is (Empty_Array);
 
-   type Unique_Flags is (Sort_String);
-
-   function Array_Unique (Arry  : Array_Type;
-                          Flags : Unique_Flags := Sort_String)
-                          return Array_Type
-                          is (Empty_Array);
-
-   function Array_Unique (Arry  : List_Type;
-                          Flags : Unique_Flags := Sort_String)
-                          return List_Type
-                          is (Empty_List);
-
-   function Array_Unique (Arry  : List_Type;
-                          Flags : Unique_Flags := Sort_String)
-                          return Array_Type
-                          is (Empty_Array);
-
    function Array_Intersect (Arry    : Array_Type;
                              Array_2 : Array_Type)
-                             return Array_Type
-                             is (Empty_Array);
+                             return Array_Type;
 
    function Array_Reverse (Arry          : Array_Type;
                            Preserve_Keys : Boolean := False)
-                           return Array_Type
-                           is (Empty_Array);
+                           return Array_Type;
 
    function Array_Replace_Recursive (Arry    : Array_Type;
                                      Array_2 : Array_Type)
                                      return Array_Type
                                      is (Empty_Array);
+
+   type Unique_Flags is (Sort_String);
+
+   function Array_Unique (Arry  : Array_Type;
+                          Flags : Unique_Flags := Sort_String)
+                          return Array_Type;
+
+   function Isset (Arry : Array_Type;
+                   Key  : Integer)
+                   return Boolean;
+
+   function Isset (Item : Array_Type)
+                   return Boolean;
+
+   function Empty (Table : Array_Type)
+                   return Boolean;
 
 end Php.Arrays;

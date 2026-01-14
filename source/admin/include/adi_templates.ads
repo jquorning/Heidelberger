@@ -39,6 +39,9 @@ is
 -- @param bool        $checked_ontop        Optional. Whether to move checked items out of the hierarchy and to
 --                                          the top of the list. Default true.
 --
+
+   type Walker_Type is access procedure;
+
    procedure Wp_Category_Checklist (Post_Id              : Integer     := 0;
                                     Descendants_And_Self : Integer     := 0;
                                     Selected_Cats        : Array_Type  := Empty_Array;

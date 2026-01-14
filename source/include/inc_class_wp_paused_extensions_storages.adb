@@ -5,6 +5,8 @@
 -- @since 5.2.0
 --
 
+with Php.Strings;
+
 with Hb_Common;
 
 with Inc_Error_Protection;
@@ -102,6 +104,7 @@ is
    function Get_Option_Name (This : Wp_Paused_Extensions_Storage)
                              return String
    is
+      use Php.Strings;
       use Hb_Common;
       use Inc_Error_Protection;
    begin

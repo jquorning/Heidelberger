@@ -213,7 +213,7 @@ is
                   elsif 0 = Strpos (-Item.Icon_Url, "dashicons-") then
                      Img       := +"<br />";
                      Img_Class := +" dashicons-before " &
-                                   Inc_Formatting.Sanitize_Html_Class (-Item.Icon_Url);
+                                   Inc_Formatting.Sanitize_HTML_Class (-Item.Icon_Url);
                   end if;
                end if;
 
@@ -221,7 +221,7 @@ is
                   Arrow : constant String :=
                      "<div class=""wp-menu-arrow""><div></div></div>";
                   Title : constant String :=
-                     Inc_Formatting.Wptexturize (-Item.Menu_Title);
+                     Inc_Formatting.Wp_Texturize (-Item.Menu_Title);
                begin
                   -- Hide separators from screen readers.
                   if Is_Separator then
@@ -410,7 +410,7 @@ is
                                    Strpos (String (Sub_File), "?");
 
                                  Title : constant String :=
-                                   Inc_Formatting.Wptexturize (-Sub_Item.Menu_Title);
+                                   Inc_Formatting.Wp_Texturize (-Sub_Item.Menu_Title);
 
                               begin
                                  if 0 /= Pos then

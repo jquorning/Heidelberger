@@ -1423,7 +1423,7 @@ is
                if 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
                   -- "value"
                   Thisval := Match (1);
-                  if In_Array (Strtolower (-Attrname), URIs, True) then
+                  if In_List (Strtolower (-Attrname), URIs, True) then
                      Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
                   end if;
 
@@ -1442,7 +1442,7 @@ is
                elsif 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
                   -- "value"
                   Thisval := Match (1);
-                  if In_Array (Strtolower (-Attrname), URIs, True) then
+                  if In_List (Strtolower (-Attrname), URIs, True) then
                      Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
                   end if;
 
@@ -1461,7 +1461,7 @@ is
                elsif 0 /= Preg_Match ("%^([^\s\""]+)(\s+|/?$)%", -Attr_2, Match) then
                   -- value
                   Thisval := Match (1);
-                  if In_Array (Strtolower (-Attrname), URIs, True) then
+                  if In_List (Strtolower (-Attrname), URIs, True) then
                      Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
                   end if;
 
@@ -1743,8 +1743,6 @@ is
                              Options : Array_Type := Empty_Array) -- null
                              return String
    is
---    use Hb_Common;
-      use Php;
       use Php.Preg;
 
       Options_2 : constant Array_Type :=
@@ -2538,19 +2536,19 @@ is
                begin
                   -- Allow assigning values to CSS variables.
                   if
-                    In_Array ("--*", Allowed_Attr, True) and then
+                    In_List ("--*", Allowed_Attr, True) and then
                     Preg_Match ("/^--[a-zA-Z0-9-_]+$/", CSS_Selector)
                   then
                      Allowed_Attr.Append (+CSS_Selector);
                      Is_Custom_Var  := True;
                   end if;
 
-                  if In_Array (CSS_Selector, Allowed_Attr, True) then
+                  if In_List (CSS_Selector, Allowed_Attr, True) then
                      Found         := True;
-                     URL_Attr      := In_Array (CSS_Selector,
-                                                CSS_URL_Data_Types, True);
-                     Gradient_Attr := In_Array (CSS_Selector,
-                                                CSS_Gradient_Data_Types, True);
+                     URL_Attr      := In_List (CSS_Selector,
+                                               CSS_URL_Data_Types, True);
+                     Gradient_Attr := In_List (CSS_Selector,
+                                               CSS_Gradient_Data_Types, True);
                   end if;
 
                   if Is_Custom_Var then

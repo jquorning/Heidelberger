@@ -39,6 +39,7 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_List_Table
    is
+      use Php.Arrays;
       use Hb_Common;
       use Adi_Templates;
       use Inc_Formatting;
@@ -468,7 +469,7 @@ is
                            Which : String := "")
    is
       use Hb_Common;
-      use Php;
+      use Php.Arrays;
       use Php.Echoing;
       use Inc_Formatting;
       use Inc_L10n;
@@ -1187,6 +1188,7 @@ is
    function Get_Primary_Column_Name (This : Wp_List_Table)
                                      return String
    is
+      use Php.Strings;
       use Hb_Common;
       use Inc_Plugins;
 
@@ -1345,7 +1347,7 @@ is
       Hidden_2 : constant Array_Type := Column_Info.Hidden;
 
       Hidden   : constant List_Type :=
-        Array_Intersect (Array_Keys (Columns), Array_Filter (Hidden_2));
+        List_Intersect (Array_Keys (Columns), Array_Filter (Hidden_2));
    begin
       return Natural (Columns.Length - List_Vectors.Length (Hidden));
 --    return Natural (Array_Maps.Length (Columns) - List_Vectors.Length (Hidden));
@@ -1440,9 +1442,9 @@ is
             if "cb" = Column_Key then
                Class.Append (+"check-column");
             elsif
-               In_Array (Column_Key, To_List (List => (+"posts",
-                                                       +"comments",
-                                                       +"links")), True)
+               In_List (Column_Key, To_List (List => (+"posts",
+                                                      +"comments",
+                                                      +"links")), True)
             then
                Class.Append (+"num");
             end if;
@@ -1472,8 +1474,8 @@ is
                      Order := +Php.Strings.Strtolower (Desc_First);
 
                      if
-                       not In_Array (-Order, To_List (List => (+"desc",
-                                                               +"asc")), True)
+                       not In_List (-Order, To_List (List => (+"desc",
+                                                              +"asc")), True)
                      then
                         Order := +(if Desc_First /= "" then "desc" else "asc");
                      end if;

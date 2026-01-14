@@ -1,7 +1,10 @@
-with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
+with Ada.Strings.Unbounded;
 
 with Php.Echoing;
+with Php.Errors;
+with Php.HTML;
+
 with Hb_Common;
 
 -- with Adm_Admin;
@@ -91,6 +94,18 @@ is
 
       Payload := +Php.Echoing.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);
+
+   exception
+      when Php.Errors.Program_Termination =>
+         declare
+            use Php.HTML;
+
+            H : constant String := Get_Header;
+         begin
+--          return AWS.Response.URL (Location => H);
+            return AWS.Response.URL (Location => "XXX-958");
+         end;
+
    end Render;
 
 end Binder;

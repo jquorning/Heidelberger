@@ -35,6 +35,9 @@ is
 
    Null_Multi_Type : constant Multi_Type;
 
+   function "=" (Left, Right : Multi_Type)
+                 return Boolean;
+
    type Array_Type is tagged private
       with
          Default_Iterator  => Iterate,
@@ -64,6 +67,27 @@ is
                      Key   : String;
                      Value : Multi_Type);
    -- Append Value to Array_Type.
+
+   procedure Append_2 (Arry  : in out Array_Type;
+                       Key_1 : String;
+                       Key_2 : String;
+                       Value : Multi_Type);
+   -- Append Value to Array_Type.
+
+   procedure Delete (Arry  : in out Array_Type;
+                     Key   : String);
+
+   procedure Include (Arry  : in out Array_Type;
+                      Key   : String;
+                      Value : Multi_Type);
+
+   procedure Prepend (Arry  : in out Array_Type;
+                      Key   : String;
+                      Value : Multi_Type);
+
+   procedure Replace (Arry  : in out Array_Type;
+                      Key   : String;
+                      Value : Multi_Type);
 
    function Is_Empty (Arry : Array_Type)
                       return Boolean;

@@ -1,14 +1,25 @@
+--
+-- Theme, template, and stylesheet functions.
+--
+-- @package WordPress
+-- @subpackage Theme
+--
 
 with Arrays;
 with Hb_Common;
 with Lists;
 
 with Inc_Class_Wp_Themes;
+with Inc_Options;
 
 package Inc_Themes
 is
    use Arrays;
    use Lists;
+
+--   package String_Maps is new
+--      Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
+--                                              Element_Type => String);
 
    Wp_Theme_Directories : List_Type;
 
@@ -84,7 +95,7 @@ is
    --                      or a single theme root if all themes have the same root.
    --
    function Get_Theme_Roots
-            return Hb_Common.String_Maps.Map;
+            return Inc_Options.String_Maps.Map;
 
    --
    -- Registers a directory that contains themes.

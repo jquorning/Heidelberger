@@ -10,6 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Lists;
+with Php.Numerics;
 with Php.Strings;
 with Php.Types;
 
@@ -537,6 +538,8 @@ is
                                Args        : Array_Type)
                                return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
    is
+      use Php.Arrays;
+      use Php.Strings;
       use Hb_Common;
       use Inc_Class_Wp_Taxonomy;
       use Inc_Formatting;
@@ -2294,6 +2297,7 @@ is
       use Wp_Common;
 --    use Adi_Templates;
       use Inc_Class_Wp_Terms;
+      use Inc_Formatting;
       use Integer_Vectors;
 
       Object_Ids_3 : List_Type;
@@ -2327,10 +2331,10 @@ is
       end loop;
 
       declare
+         use Php.Numerics;
          use Inc_Functions;
---       use Inc_Plugins;
 
-         Object_Ids_2 : constant List_Type  := Array_Map ("intval", Object_Ids_3);
+         Object_Ids_2 : constant List_Type  := List_Map (Intval'Access, Object_Ids_3);
          Args_2       : constant Array_Type := Wp_Parse_Args (Args);
          Taxonomies_2 : constant Array_Type := Taxonomies;
 
@@ -2439,7 +2443,8 @@ is
             Object_Ids_3 : constant String := Implode (",", Object_Ids_2);
             Taxonomies_3 : constant String
                := """" &
-                  Implode (", ", Array_Type'(Array_Map ("esc_sql", Taxonomies_2))) &
+                  Implode (", ", Array_Type'(Array_Map (ESC_SQL'Access,
+                                                        Taxonomies_2))) &
                   """";
          begin
             --

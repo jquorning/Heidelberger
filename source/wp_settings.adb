@@ -64,7 +64,7 @@ is
 -- require ABSPATH . WPINC . '/load.php';
 
       -- Check for the required PHP version and for the MySQL extension or a
-      --  database drop-in.
+      -- database drop-in.
       Inc_Load.Wp_Check_Php_Mysql_Versions;
 
       -- Include files required for initialization.
@@ -102,7 +102,7 @@ is
 --    Date_Default_Timezone_Set ("UTC");
 
       -- Standardize $_SERVER variables across setups.
---    Inc_Load.Wp_Fix_Server_Vars;
+      Inc_Load.Wp_Fix_Server_Vars;
 
       -- Check if we're in maintenance mode.
 --    Inc_Load.Wp_Maintenance;
@@ -202,7 +202,7 @@ is
 --    require_once ABSPATH . WPINC . '/class-wp-locale-switcher.php';
 
       -- Run the installer if WordPress is not installed.
---    Inc_Load.Wp_Not_Installed;
+      Inc_Load.Wp_Not_Installed;
 
 -- Load most of WordPress.
 -- require ABSPATH . WPINC . '/class-wp-walker.php';

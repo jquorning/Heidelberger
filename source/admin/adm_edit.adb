@@ -10,6 +10,8 @@ with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Echoing;
+with Php.Errors;
+with Php.Numerics;
 with Php.Preg;
 with Php.Strings;
 with Php.Types;
@@ -69,9 +71,9 @@ is
    is
       use Binder;
       use Hb_Common;
-      use Php;
       use Php.Arrays;
       use Php.Echoing;
+      use Php.Numerics;
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
@@ -199,11 +201,12 @@ is
                         if "delete_all" = Doaction then
                         -- Prepare for deletion of all posts with a specified post status
                         -- (i.e. Empty Trash).
-                           Post_Status
-                              := +Preg_Replace (Pattern     => "/(^a-z0-9_-)+/i",
-                                                Replacement => "",
-                                                Subject     => As_String (Get (X_REQUEST,
-                                                                    "post_status")));
+                           Post_Status :=
+                              +Preg_Replace (
+                                 Pattern     => "/(^a-z0-9_-)+/i",
+                                 Replacement => "",
+                                 Subject     => As_String (Get (X_REQUEST,
+                                                                "post_status")));
 
                            -- Validate the post status exists.
                            if
@@ -211,27 +214,33 @@ is
                                 /= Null_Status
                            then
                               --
-                              -- @global wpdb $wpdb WordPress database abstraction object.
+                              -- @global wpdb $wpdb WordPress database abstraction
+                              -- object.
                               --
                               -- global $wpdb;
                               --
                               Post_Ids := Globals.WpDB.Get_Col (
-                                 Globals.WpDB.Prepare
-                                    ("SELECT ID FROM " & (-Post_Type) &
-                                     " WHERE post_type=%s AND post_status = %s",
-                                     -Post_Type, -Post_Status));
+                                 Globals.WpDB.Prepare (
+                                   "SELECT ID FROM " & (-Post_Type) &
+                                   " WHERE post_type=%s AND post_status = %s",
+                                   To_List (List => (
+                                     1 => Post_Type,
+                                     2 => Post_Status
+                                   ))
+                                 ));
                            end if;
                            Doaction := "delete";
 
-                        elsif Isset (As_String (Get (X_REQUEST, "media"))) then
+                        elsif Isset (X_REQUEST, "media") then
                            Post_Ids := As_List (Get (X_REQUEST, "media"));
 
-                        elsif Isset (As_String (Get (X_REQUEST, "ids"))) then
-                           Post_Ids := Explode (",", As_List (Get (X_REQUEST, "ids")));
+                        elsif Isset (X_REQUEST, "ids") then
+                           Post_Ids := Explode (",", Get_As_String (X_REQUEST, "ids"));
 
                         elsif not Empty (As_String (Get (X_REQUEST, "post"))) then
                            Post_Ids := List_Type'(
-                             Array_Map ("intval", As_Array (Get (X_REQUEST, "post"))));
+                             Array_Map (Intval'Access,
+                                        As_Array (Get (X_REQUEST, "post"))));
                         end if;
 
                         if Post_Ids.Is_Empty then
@@ -353,11 +362,11 @@ is
                               begin
                                  if Is_Array (Done) then
                                     Set (Done, "updated",
-                                         From_Integer (Count (As_String (Get (Done, "updated")))));
+                                         From_Integer (Get_As_String (Done, "updated")'Length));
                                     Set (Done, "skipped",
-                                         From_Integer (Count (As_String (Get (Done, "skipped")))));
+                                         From_Integer (Get_As_String (Done, "skipped")'Length));
                                     Set (Done, "locked",
-                                         From_Integer (Count (As_String (Get (Done, "locked")))));
+                                         From_Integer (Get_As_String (Done, "locked")'Length));
                                     Sendback := +Add_Query_Arg (Done, -Sendback);
                                  end if;
                               end;
@@ -793,6 +802,9 @@ is
             end;
          end;
       end;
+   exception
+      when Php.Errors.Program_Termination =>
+         null;
    end Render;
 
    ------------------
@@ -865,10 +877,12 @@ is
                     Preg_Replace ("/[^0-9,]/", "",
                       As_Array (Get (X_REQUEST, "ids")));
 
-                  URL_2 : constant String
-                     := """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
-                        Ids'Image & """";
-                  URL   : constant String  := ESC_URL (Wp_Nonce_Url (URL_2, "bulk-posts"));
+                  URL_2 : constant String :=
+                     """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
+                     Ids'Image & """";
+
+                  URL : constant String :=
+                    ESC_URL (Wp_Nonce_URL (URL_2, "bulk-posts"));
                begin
                   Append (Messages, "<a href=""" & URL & """>" & abs "Undo" & "</a>");
                end;
@@ -877,12 +891,12 @@ is
                -- "bulk-posts" )) & """>" & abs "Undo" & "</a>";
             end if;
 
-            if "untrashed" = Message and then Isset (As_String (Get (X_REQUEST, "ids"))) then
+            if "untrashed" = Message and then Isset (X_REQUEST, "ids") then
                declare
                   use List_Vectors;
 
                   Ids : constant List_Type :=
-                     Explode (",", As_List (Get (X_REQUEST, "ids")));
+                     Explode (",", Get_As_String (X_REQUEST, "ids"));
                begin
                   if
                     1 = Length (Ids) and then

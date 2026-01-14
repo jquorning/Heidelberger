@@ -15,6 +15,7 @@ is
    ENT_NOQUOTES   : constant Flag_Type := 16#0008#;
    ENT_XML1       : constant Flag_Type := 16#0010#;
    ENT_HTML401    : constant Flag_Type := 16#0020#;
+   ENT_COMPAT     : constant Flag_Type := 16#0040#;
    -- Shold be or'ed together instead
 
    function HTML_Entity_Decode (Item     : String;
@@ -23,30 +24,36 @@ is
                                 return String
                                 is ("XXX-312");
 
-   function HTMLentities (Item          : String;
-                          Flags         : Flag_Type := ENT_QUOTES;
-                          Encoding      : String  := "";
-                          Double_Encode : Boolean := True)
-                          return String
-                          is ("XXX-462");
+   function HTML_Entities (Item          : String;
+                           Flags         : Flag_Type := ENT_QUOTES;
+                           Encoding      : String  := "";
+                           Double_Encode : Boolean := True)
+                           return String
+                           is ("XXX-462");
 
-   function HTMLspecialchars (Item          : String;
-                              Flags         : Flag_Type := ENT_QUOTES +
-                                                           ENT_SUBSTITUTE +
-                                                           ENT_HTML401;
-                              Encoding      : String := "";
-                              Double_Encode : Boolean := True)
-                              return String
-                              is (Item);
+   function HTML_Special_Chars (Item          : String;
+                                Flags         : Flag_Type := ENT_QUOTES +
+                                                             ENT_SUBSTITUTE +
+                                                             ENT_HTML401;
+                                Encoding      : String := "";
+                                Double_Encode : Boolean := True)
+                                return String
+                                is (Item);
 
-   function URLencode (Item : String)
-                       return String
-                       is ("XXX-301");
+   function URL_Encode (Item : String)
+                        return String
+                        is ("XXX-301");
+
+   function Get_Header
+            return String;
+   -- Get header set by Header. Not part of PHP.
 
    procedure Header (Header        : String;
                      Replace       : Boolean := True;
-                     Response_Code : Integer := 0)
-                     is null;
+                     Response_Code : Integer := 0);
+
+   procedure Header_Remove (Name : String)
+   is null;
 
    function Headers_Sent (Filename : String  := "";
                           Line     : Integer := 0)
@@ -61,21 +68,21 @@ is
 
    function Parse_URL (URL       : String;
                        Component : Integer := -1)
-            return String
-            is ("XXX-781");
+                       return String
+                       is ("XXX-781");
 
    function Parse_URL (URL       : String;
                        Component : Integer := -1)
                        return Arrays.Array_Type
                        is (Arrays.Empty_Array);
 
-   function RawURLencode (Item : String)
-                          return String
-                          is ("XXX-977");
+   function Raw_URL_Encode (Item : String)
+                            return String
+                            is ("XXX-977");
 
-   function URLdecode (Item : String)
-                       return String
-                       is ("XXX-976");
+   function URL_Decode (Item : String)
+                        return String
+                        is ("XXX-976");
 
    procedure Set_Cookie (Name      : String;
                          Value     : String  := "";
@@ -85,5 +92,11 @@ is
                          Secure    : Boolean := False;
                          HTTP_Only : Boolean := False)
                          is null;
+
+   function Php_Sapi_Name return String
+     is ("cgi");
+
+   function PHP_SAPI return String
+     renames Php_Sapi_Name;
 
 end Php.HTML;

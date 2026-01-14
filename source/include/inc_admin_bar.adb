@@ -467,7 +467,7 @@ is
       end if;
 
       declare
-         Title : constant String := Wp_Html_Excerpt (-Blogname, 40, "&hellip;");
+         Title : constant String := Wp_HTML_Excerpt (-Blogname, 40, "&hellip;");
          Node  : Node_Args;
       begin
          Node.Id    := +"site-name";
@@ -613,7 +613,7 @@ is
          Current_URL := +Remove_Query_Arg ("customize_changeset_uuid", -Current_URL);
       end if;
 
-      Customize_URL := +Add_Query_Arg ("url", URLencode (-Current_URL),
+      Customize_URL := +Add_Query_Arg ("url", URL_Encode (-Current_URL),
                                        Wp_Customize_Url);
       if Is_Customize_Preview then
          Customize_URL :=
@@ -948,6 +948,7 @@ is
 
    procedure Wp_Admin_Bar_Shortlink_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use Php.Strings;
       use Inc_Formatting;
       use Inc_Link_Templates;
 
@@ -980,6 +981,7 @@ is
 
    procedure Wp_Admin_Bar_Edit_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use Php.Strings;
       use Adi_Class_Wp_Screens;
       use Inc_Class_Wp_Terms;
       use Inc_Link_Templates;
@@ -1598,7 +1600,7 @@ is
 
       URL := +Wp_Login_URL;
       URL := +Add_Query_Arg ("action", EXIT_ACTION, -URL); -- ::
-      URL := +Wp_Nonce_Url (-URL, EXIT_ACTION); -- ::
+      URL := +Wp_Nonce_URL (-URL, EXIT_ACTION); -- ::
 
       declare
          Node : Node_Args;

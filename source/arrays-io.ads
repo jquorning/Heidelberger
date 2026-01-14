@@ -1,4 +1,4 @@
-package Arrays.Io
+package Arrays.IO
 is
    procedure Dump (Arry : Array_Type);
-end Arrays.Io;
+end Arrays.IO;

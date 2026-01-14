@@ -41,6 +41,10 @@ is
                          return Wp_Network
                          is (Null_Network);
 
+   function Get_Network (Network : Integer) --  := null)
+                         return Wp_Network
+                         is (Null_Network);
+
    --
    -- Retrieves a list of networks.
    --

@@ -507,13 +507,11 @@ is
    function Retrieve_Widgets (Theme_Changed : String := "") -- false
                               return Array_Type
    is
-      use List_Vectors;
-      use Hb_Common;
-      use Php;
       use Php.Arrays;
       use Php.Preg;
       use Php.Sorting;
       use Php.Types;
+      use List_Vectors;
       use Inc_Class_Wp_Customize_Widgets;
 --    use Inc_Themes;
 
@@ -663,7 +661,7 @@ is
                Sidebar : constant String := Key (A);
                Name    : Multi_Type := Element (A);
             begin
-               if In_Array (Sidebar, Existing_Sidebars, True) then
+               if In_List (Sidebar, Existing_Sidebars, True) then
                   Set (New_Sidebars_Widgets, Sidebar,
                        Get (Existing_Sidebars_Widgets, Sidebar));
                   Delete (Ref (Existing_Sidebars_Widgets, Sidebar));
@@ -847,7 +845,7 @@ is
                                    As_String (Arrays.Element (E));
 
                                  Active_Key : constant String :=
-                                   Array_Search (Widget_Id, New_Widgets, True);
+                                   List_Search (Widget_Id, New_Widgets, True);
                               begin
 
                                  -- If the widget is used elsewhere...
@@ -912,7 +910,7 @@ is
             if Kind_Of (Widgets) = Kind_Array then
                Set (Sidebars_Widgets_2, Sidebar,
                     From_List (
-                      Array_Intersect (As_List (Widgets), Allowed_Widget_Ids)));
+                      List_Intersect (As_List (Widgets), Allowed_Widget_Ids)));
             end if;
          end;
       end loop;

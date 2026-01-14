@@ -216,8 +216,8 @@ is
    procedure Register_Settings (This : in out Wp_Customize_Widgets)
    is
       use Binder;
-      use Php;
       use Php.Arrays;
+      use Php.Lists;
       use Inc_Formatting;
 
       Widget_Setting_Ids   : List_Type;
@@ -243,7 +243,7 @@ is
          use Inc_Class_Wp_Customize_Managers;
 
          Settings : constant Setting_Lists.Vector :=
-           This.Manager.Add_Dynamic_Settings (Array_Unique (Widget_Setting_Ids));
+           This.Manager.Add_Dynamic_Settings (List_Unique (Widget_Setting_Ids));
       begin
          if This.Manager.Settings_Previewed then
             for Setting of Settings loop
@@ -532,7 +532,7 @@ is
                                                               Key_1 => Sidebar_Id,
                                                               Key_2 => "name")))),
                                 Build ("priority",
-                                       Array_Search
+                                       List_Search
                                          (Sidebar_Id,
                                           List_Type'(Array_Keys (Global_Wp_Registered_Sidebars)), True)),
                                 Build ("panel",      "widgets"),
@@ -764,8 +764,8 @@ is
         As_Integer (Get (Ref_2 (Global_Wp_Registered_Widget_Controls,
                                 Key_1 => Widget_Id, Key_2 => "width")));
       Is_Core : constant Boolean :=
-        In_Array (As_String (Get (Parsed_Widget_Id, "id_base")),
-                  This.Core_Widget_Id_Bases, True);
+        In_List (As_String (Get (Parsed_Widget_Id, "id_base")),
+                 This.Core_Widget_Id_Bases, True);
 
       Is_Wide : constant Boolean := Width > 250 and not Is_Core;
    begin
@@ -1025,7 +1025,7 @@ is
               "customize-widgets",
               "data",
               Sprintf ("var _wpCustomizeWidgetsSettings = %s;",
-                       To_List (Wp_JSON_Encode (Settings)))
+                       To_List (Wp_JSON_Encode (From_Array (Settings))))
               );
          end;
 
@@ -1058,7 +1058,7 @@ is
                    "wp.domReady( function() {" & NL &
                    "   wp.customizeWidgets.initialize( ""widgets-customizer"", %s );" & NL &
                    "} );" & NL,
-                   To_List (Wp_JSON_Encode (Editor_Settings))
+                   To_List (Wp_JSON_Encode (From_Array (Editor_Settings)))
                  )
                );
 
@@ -1066,13 +1066,16 @@ is
                Wp_Add_Inline_Script (
                  "wp-blocks",
                  "wp.blocks.unstable__bootstrapServerSideBlockDefinitions(" &
-                 Wp_JSON_Encode (Get_Block_Editor_Server_Block_Settings) & ");" & NL
+                 Wp_JSON_Encode (From_Array (
+                   Get_Block_Editor_Server_Block_Settings)) &
+                 ");" & NL
                );
 
                Wp_Add_Inline_Script (
                  "wp-blocks",
                  Sprintf ("wp.blocks.setCategories( %s );",
-                          To_List (Wp_JSON_Encode (Get_Block_Categories (Block_Editor_Context)))),
+                          To_List (Wp_JSON_Encode (From_Array (
+                                     Get_Block_Categories (Block_Editor_Context))))),
                  "after"
                );
 
@@ -1258,12 +1261,12 @@ is
                                       Widget_Ids : List_Type)
                                       return List_Type
    is
-      use Php;
       use Php.Lists;
+      use Php.Strings;
       use Php.Preg;
 
       Widget_Ids_2 : constant List_Type :=
-        Array_Map ("strval", Widget_Ids); -- (arrays)
+        List_Map (Strval'Access, Widget_Ids); -- (arrays)
 
       Sanitized_Widget_Ids : List_Type;
    begin
@@ -1641,7 +1644,7 @@ is
 
          Echo ("<script type=""text/javascript"">" & NL);
          Echo ("        var _wpWidgetCustomizerPreviewSettings = " &
-               Wp_JSON_Encode (Settings) & ";" & NL);
+               Wp_JSON_Encode (From_Array (Settings)) & ";" & NL);
          Echo ("</script>" & NL);
       end;
    end Export_Preview_Data;
@@ -1822,8 +1825,8 @@ is
                                            Params : Array_Type)
                                            return Array_Type
    is
-      use Php;
       use Php.Arrays;
+      use Php.Lists;
       use Php.Preg;
       use Php.Strings;
       use Inc_Formatting;
@@ -1897,7 +1900,7 @@ is
               " data-customize-partial-type=""widget""" &
 
               Sprintf (" data-customize-partial-placement-context=""%s""",
-                       To_List (ESC_Attr (Wp_JSON_Encode (Context)))) &
+                       To_List (ESC_Attr (Wp_JSON_Encode (From_Array (Context))))) &
 
               Sprintf (" data-customize-widget-id=""%s""",
                        To_List (ESC_Attr (Widget_Id)));
@@ -1970,7 +1973,7 @@ is
       use Php.Lists;
       use Inc_Formatting;
    begin
-      Array_Unshift (This.Current_Dynamic_Sidebar_Id_Stack, Index);
+      List_Unshift (This.Current_Dynamic_Sidebar_Id_Stack, Index);
 
       if not Isset (This.Sidebar_Instance_Count, Index) then
          Set (This.Sidebar_Instance_Count, Index, From_Integer (0));
@@ -2003,7 +2006,7 @@ is
       use Php.Lists;
       use Inc_Formatting;
    begin
-      Array_Shift (This.Current_Dynamic_Sidebar_Id_Stack);
+      List_Shift (This.Current_Dynamic_Sidebar_Id_Stack);
 
       if not This.Manager.Selective_Refresh.Is_Render_Partials_Request then
          Printf ("\n<!--dynamic_sidebar_after:%s:%d-->\n",
@@ -2059,7 +2062,7 @@ is
 
       Id_Data   : Array_Type      := Partial.Id_Data; -- ()
       List      : List_Type       := As_List (Get (Id_Data, "keys"));
-      Widget_Id : constant String := Array_Shift (List);
+      Widget_Id : constant String := List_Shift (List);
    begin
       Set (Id_Data, From_List (List));
 
