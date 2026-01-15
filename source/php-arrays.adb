@@ -2,6 +2,8 @@
 --
 --
 
+with Php.Strings;
+
 with Hb_Common;
 
 package body Php.Arrays
@@ -237,5 +239,33 @@ is
    begin
       return Table = Empty_Array;
    end Empty;
+
+   ---------------------------
+   -- Array_Change_Key_Case --
+   ---------------------------
+
+   function Array_Change_Key_Case (Arry : Array_Type;
+                                   Cas  : Integer := CASE_LOWER)
+                                   return Array_Type
+   is
+      use Php.Strings;
+
+      Result : Array_Type;
+   begin
+      for A in Arry.Iterate loop
+         declare
+            K     : constant String     := Key (A);
+            Value : constant Multi_Type := Element (A);
+            K2    : constant String :=
+              (case Cas is
+               when CASE_LOWER => Strtolower (K),
+               when CASE_UPPER => Strtoupper (K),
+               when others => raise Program_Error);
+         begin
+            Result.Append (K2, Value);
+         end;
+      end loop;
+      return Result;
+   end Array_Change_Key_Case;
 
 end Php.Arrays;

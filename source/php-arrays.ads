@@ -252,4 +252,11 @@ is
    function Empty (Table : Array_Type)
                    return Boolean;
 
+   CASE_UPPER : constant Integer := 1;
+   CASE_LOWER : constant Integer := 2;
+
+   function Array_Change_Key_Case (Arry : Array_Type;
+                                   Cas  : Integer := CASE_LOWER)
+                                   return Array_Type;
+
 end Php.Arrays;

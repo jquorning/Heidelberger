@@ -240,42 +240,54 @@ is
                                Collate : String)
                                return Array_Type
    is
+      use Php.Strings;
+
+      Charset_2 : Unbounded_String := +Charset;
+      Collate_2 : Unbounded_String := +Collate;
    begin
+--      if
+--        (This.Engine = engine_Mysqli and then not
+--        (This.Dbh in mysqli)) or else
+--         Empty (This.Dbh)
+----      (This.Use_Mysqli and then not
+----      (This.Dbh in mysqli)) or else
+----       Empty (This.Dbh)
+--      then
+--         return Compact ("charset", "collate");
+--      end if;
+
+      if "utf8" = Charset_2 and then This.Has_Cap ("utf8mb4") then
+         Charset_2 := +"utf8mb4";
+      end if;
+
+      if "utf8mb4" = Charset_2 and then not This.Has_Cap ("utf8mb4") then
+         Charset_2 := +"utf8";
+         Collate_2 := +Str_Replace ("utf8mb4_", "utf8_", -Collate_2);
+      end if;
+
+      if "utf8mb4" = Charset_2 then
+         -- _general_ is outdated, so we can upgrade it to _unicode_, instead.
+         if Collate_2 = "" or else "utf8_general_ci" = Collate_2 then -- not
+            Collate_2 := +"utf8mb4_unicode_ci";
+         else
+            Collate_2 := +Str_Replace ("utf8_", "utf8mb4_", -Collate_2);
+         end if;
+      end if;
+
+      -- _unicode_520_ is a better collation, we should use that when it's available.
+      if
+        This.Has_Cap ("utf8mb4_520") and then
+        "utf8mb4_unicode_ci" = Collate_2
+      then
+         Collate_2 := +"utf8mb4_unicode_520_ci";
+      end if;
+
       return
         To_Array (List => (
-          Build ("charset", Charset),
-          Build ("collate", Collate)
-       ));
+          Build ("charset", -Charset_2),
+          Build ("collate", -Collate_2)
+        ));
    end Determine_Charset;
-        --         if ((this.use_mysqli && ! (this.dbh instanceof mysqli)) || empty(this.dbh)) then
-        --                 return compact("charset", "collate");
-        --         end;
-
-        --         if ("utf8" === charset && this.has_cap("utf8mb4")) then
-        --                 charset = "utf8mb4";
-        --         end;
-
-        --         if ("utf8mb4" === charset && ! this.has_cap("utf8mb4")) then
-        --                 charset = "utf8";
-        --                 collate = str_replace("utf8mb4_", "utf8_", collate);
-        --         end;
-
-        --         if ("utf8mb4" === charset) then
-        --                 // _general_ is outdated, so we can upgrade it to _unicode_, instead.
-        --                 if (! collate || "utf8_general_ci" === collate) then
-        --                         collate = "utf8mb4_unicode_ci";
-        --                 end; else then
-        --                         collate = str_replace("utf8_", "utf8mb4_", collate);
-        --                 end;
-        --         end;
-
-        --         // _unicode_520_ is a better collation, we should use that when it"s available.
-        --         if (this.has_cap("utf8mb4_520") && "utf8mb4_unicode_ci" === collate) then
-        --                 collate = "utf8mb4_unicode_520_ci";
-        --         end;
-
-        --         return compact("charset", "collate");
-        -- end;
 
    -----------------
    -- Set_Charset --
@@ -286,45 +298,78 @@ is
                           Charset : String := "";  -- = null
                           Collate : String := "") -- = null
    is
+      use Php.Strings;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+
+      Charset_2 : constant String :=
+        (if not Isset (Charset)
+         then -This.Charset
+         else Charset);
+
+      Collate_2 : constant String :=
+        (if not Isset (Collate)
+         then -This.Collate
+         else Collate);
    begin
-      null; -- raise Program_Error with "not implemented";
+      if This.Has_Cap ("collation") and then not Empty (Charset_2) then
+         declare
+            Set_Charset_Succeeded : Boolean := True;
+         begin
+            case This.Engine is -- if This.Use_Mysqli then
+
+            when Engine_MySQLi =>
+               if
+--               Function_Exists ("mysqli_set_charset") and then
+                 This.Has_Cap ("set_charset")
+               then
+                  Set_Charset_Succeeded := Mysqli_Set_Charset (Dbh, Charset_2);
+               end if;
+
+               if Set_Charset_Succeeded then
+                  declare
+                     Query : Unbounded_String :=
+                       +String (This.Prepare ("SET NAMES %s", To_List (Charset_2)));
+                  begin
+                     if not Empty (Collate_2) then
+                        Append (Query,
+                                String (This.Prepare (" COLLATE %s",
+                                                      To_List (Collate_2))));
+                     end if;
+                     Mysqli_Query (Dbh, -Query);
+                  end;
+               end if;
+            when Engine_MySQL =>   --                     else
+
+               if
+--               Function_Exists ("mysql_set_charset") and then
+                 This.Has_Cap ("set_charset")
+               then
+                  Set_Charset_Succeeded := Mysql_Set_Charset (Charset_2, Dbh);
+               end if;
+
+               if Set_Charset_Succeeded then
+                  declare
+                     Query : Unbounded_String :=
+                       +String (This.Prepare ("SET NAMES %s", To_List (Charset_2)));
+                  begin
+                     if not Empty (Collate_2) then
+                        Append (Query,
+                                String (This.Prepare (" COLLATE %s",
+                                        To_List (Collate_2))));
+                     end if;
+                     Mysql_Query (-Query, Dbh);
+                  end;
+               end if;
+
+            when Engine_SQLite =>
+               pragma Assert (False);
+
+            end case;
+         end;
+      end if;
    end Set_Charset;
-
-        --         if (! isset(charset)) then
-        --                 charset = this.charset;
-        --         end;
-        --         if (! isset(collate)) then
-        --                 collate = this.collate;
-        --         end;
-        --         if (this.has_cap("collation") && ! empty(charset)) then
-        --                 set_charset_succeeded = true;
-
-        --                 if (this.use_mysqli) then
-        --                         if (function_exists("mysqli_set_charset") && this.has_cap("set_charset")) then
-        --                                 set_charset_succeeded = mysqli_set_charset(dbh, charset);
-        --                         end;
-
-        --                         if (set_charset_succeeded) then
-        --                                 query = this.prepare("SET NAMES %s", charset);
-        --                                 if (! empty(collate)) then
-        --                                         query .= this.prepare(" COLLATE %s", collate);
-        --                                 end;
-        --                                 mysqli_query(dbh, query);
-        --                         end;
-        --                 end; else then
-        --                         if (function_exists("mysql_set_charset") && this.has_cap("set_charset")) then
-        --                                 set_charset_succeeded = mysql_set_charset(charset, dbh);
-        --                         end;
-        --                         if (set_charset_succeeded) then
-        --                                 query = this.prepare("SET NAMES %s", charset);
-        --                                 if (! empty(collate)) then
-        --                                         query .= this.prepare(" COLLATE %s", collate);
-        --                                 end;
-        --                                 mysql_query(query, dbh);
-        --                         end;
-        --                 end;
-        --         end;
-        -- end;
 
    ------------------
    -- Set_SQL_Mode --
@@ -333,63 +378,101 @@ is
    procedure Set_SQL_Mode (This  : Wpdb_Class;
                            Modes : Array_Type := Empty_Array)
    is
+      use Php.Arrays;
+      use Php.Lists;
+      use Php.Strings;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Inc_Plugins;
+
+      Res       : Array_Type;
+      Modes_Str : Unbounded_String;
+      Modes_2   : Array_Type := Modes;
    begin
-      null; -- raise Program_Error with "not implemented";
+      if Modes_2.Is_Empty then
+         case This.Engine is
+
+         when Engine_MySQLi =>
+            Res := Mysqli_Query (This.Dbh, "SELECT @@SESSION.sql_mode");
+
+         when Engine_MySQL =>
+            Res := Mysql_Query ("SELECT @@SESSION.sql_mode", This.Dbh);
+
+         when Engine_SQLite =>
+            pragma Assert (False);
+         end case;
+
+         if Res.Is_Empty then
+            return;
+         end if;
+
+         case This.Engine is
+
+         when Engine_MySQLi =>
+            declare
+               Modes_Array : constant List_Type :=
+                 Mysqli_Fetch_Array (Res);
+            begin
+               if Empty (-Modes_Array (1)) then -- [0]
+                  return;
+               end if;
+               Modes_Str := Modes_Array (1); -- [0]
+            end;
+
+         when Engine_MySQL =>
+            Modes_Str := +Mysql_Result (Res, 0);
+
+         when Engine_SQLite =>
+            pragma Assert (False);
+         end case;
+
+         if Empty (-Modes_Str) then
+            return;
+         end if;
+
+         Modes_2 := Explode (",", -Modes_Str);
+      end if;
+
+      Modes_2 := Array_Change_Key_Case (Modes_2, CASE_UPPER);
+
+      declare
+         --
+         -- Filters the list of incompatible SQL modes to exclude.
+         --
+         -- @since 3.9.0
+         --
+         -- @param array incompatible_modes An array of incompatible modes.
+         --
+         Incompatible_Modes : constant List_Type :=
+           Apply_Filters ("incompatible_sql_modes",
+                          This.Incompatible_Modes); -- (array)
+      begin
+         for A in Modes_2.Iterate loop
+            declare
+               I    : String := Key (A);
+               Mode : String := As_String (Element (A));
+            begin
+               if In_List (Mode, Incompatible_Modes, True) then
+                  Delete (Ref (Modes_2, I)); -- [i]
+               end if;
+            end;
+         end loop;
+      end;
+
+      declare
+         Mode : constant String := Implode (",", Modes_2);
+      begin
+         case This.Engine is
+         when Engine_MySQLi =>
+            Mysqli_Query (This.Dbh, "SET SESSION sql_mode='" & Mode & "'");
+         when Engine_MySQL =>
+            Mysql_Query ("SET SESSION sql_mode='" & Mode & "'", This.Dbh);
+         when Engine_SQLite =>
+            pragma Assert (False);
+         end case;
+      end;
    end Set_SQL_Mode;
-
-        --         if (empty(modes)) then
-        --                 if (this.use_mysqli) then
-        --                         res = mysqli_query(this.dbh, "SELECT @@SESSION.sql_mode");
-        --                 end; else then
-        --                         res = mysql_query("SELECT @@SESSION.sql_mode", this.dbh);
-        --                 end;
-
-        --                 if (empty(res)) then
-        --                         return;
-        --                 end;
-
-        --                 if (this.use_mysqli) then
-        --                         modes_array = mysqli_fetch_array(res);
-        --                         if (empty(modes_array[0])) then
-        --                                 return;
-        --                         end;
-        --                         modes_str = modes_array[0];
-        --                 end; else then
-        --                         modes_str = mysql_result(res, 0);
-        --                 end;
-
-        --                 if (empty(modes_str)) then
-        --                         return;
-        --                 end;
-
-        --                 modes = explode(",", modes_str);
-        --         end;
-
-        --         modes = array_change_key_case(modes, CASE_UPPER);
-
-        --         --
-        --         -- Filters the list of incompatible SQL modes to exclude.
-        --         --
-        --         -- @since 3.9.0
-        --         --
-        --         -- @param array incompatible_modes An array of incompatible modes.
-        --         --
-        --         incompatible_modes = (array) apply_filters("incompatible_sql_modes", this.incompatible_modes);
-
-        --         foreach (modes as i => mode) then
-        --                 if (in_array(mode, incompatible_modes, true)) then
-        --                         unset(modes[ i ]);
-        --                 end;
-        --         end;
-
-        --         modes_str = implode(",", modes);
-
-        --         if (this.use_mysqli) then
-        --                 mysqli_query(this.dbh, "SET SESSION sql_mode="modes_str"");
-        --         end; else then
-        --                 mysql_query("SET SESSION sql_mode="modes_str"", this.dbh);
-        --         end;
-        -- end;
 
    ----------------
    -- Set_Prefix --
@@ -599,16 +682,16 @@ is
                then This.Blogid
                else Blog_Id);
 
-            Blog_Prefix : String    := This.Get_Blog_Prefix (Blog_Id_2);
-            Base_Prefix : String    := -This.Base_Prefix;
+            Blog_Prefix : constant String := This.Get_Blog_Prefix (Blog_Id_2);
+            Base_Prefix : constant String := -This.Base_Prefix;
 
-            Global_Tables : List_Type :=
+            Global_Tables : constant List_Type :=
               List_Merge (This.Global_Tables, This.MS_Global_Tables);
          begin
             for A in Tables_2.Iterate loop
                declare
 --                K     : String     := Key (A);
-                  Table : String := Key (A);
+                  Table : constant String := Key (A);
 --                Table : Array_Type := As_Array (Element (A));
                begin
                   if In_List (Table, Global_Tables, True) then
@@ -646,83 +729,103 @@ is
    -- Selectt --
    -------------
 
-   procedure Selectt (This : Wpdb_Class;
-                      Db   : String;
+   procedure Selectt (This : in out Wpdb_Class;
+                      DB   : String;
                       Dbh  : Integer) --  = null
    is
+      use Php.HTML;
+      use Php.Strings;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
+
+      Success : Boolean;
    begin
-      null; -- raise Program_Error with "not implemented";
+      -- if Is_Null (Dbh) then
+      --    Dbh := This.Dbh;
+      -- end if;
+
+      case This.Engine is
+      when Engine_MySQLi =>
+         Success := Mysqli_Select_DB (Dbh, DB);
+      when Engine_MySQL =>
+         Success := Mysql_Select_DB (DB, Dbh);
+      when Engine_SQLite =>
+         pragma Assert (False);
+      end case;
+
+      if not Success then
+         This.Ready := False;
+         if not Did_Action ("template_redirect") then
+            Wp_Load_Translations_Early;
+            declare
+               Message : Unbounded_String;
+            begin
+               Append (Message, "<h1>" & abs "Cannot select database" & "</h1>\n");
+
+               Append (Message, "<p>" & Sprintf (
+                 -- translators: %s: Database name.
+                 abs "The database server could be connected to (which means your username and password is okay) but the %s database could not be selected.",
+                 To_List ("<code>" & HTML_Special_Chars (DB, ENT_QUOTES) & "</code>")
+                 ) & "</p>\n");
+
+               Append (Message, "<ul>\n");
+               Append (Message, "<li>" & abs "Are you sure it exists?" & "</li>\n");
+
+               Append (Message, "<li>" & Sprintf (
+                       -- translators: 1: Database user, 2: Database name.
+                       abs "Does the user %1s have permission to use the %2s database?",
+                       To_List (List => (
+                         1 => +"<code>" &
+                              HTML_Special_Chars (-This.Dbuser, ENT_QUOTES) &
+                              "</code>",
+                         2 => +"<code>" &
+                              HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"
+                       ))
+                       ) & "</li>\n");
+
+               Append (Message, "<li>" & Sprintf (
+                       -- translators: %s: Database name.
+                       abs "On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1s</code>. Could that be the problem?",
+                       To_List (HTML_Special_Chars (DB, ENT_QUOTES))
+                      ) & "</li>\n");
+
+               Append (Message, "</ul>\n");
+
+               Append (Message, "<p>" & Sprintf (
+                       -- translators: %s: Support forums URL.
+                       abs "If you do not know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href=""%s"">WordPress Support Forums</a>.",
+                       To_List (abs "https://wordpress.org/support/forums/")
+                      ) & "</p>\n");
+
+               This.Bail (-Message, "db_select_fail");
+            end;
+         end if;
+      end if;
    end Selectt;
-        --         if (is_null(dbh)) then
-        --                 dbh = this.dbh;
-        --         end;
 
-        --         if (this.use_mysqli) then
-        --                 success = mysqli_select_db(dbh, db);
-        --         end; else then
-        --                 success = mysql_select_db(db, dbh);
-        --         end;
-        --         if (! success) then
-        --                 this.ready = false;
-        --                 if (! did_action("template_redirect")) then
-        --                         wp_load_translations_early();
+   --      Do not use, deprecated.
 
-        --                         message = "<h1>" . __("Cannot select database") . "</h1>\n";
+   --      Use esc_sql() or wpdb::prepare() instead.
 
-        --                         message .= "<p>" . sprintf(
-        --                                 /* translators: %s: Database name.--
-        --                                 __("The database server could be connected to (which means your username and password is okay) but the %s database could not be selected."),
-        --                                 "<code>" . htmlspecialchars(db, ENT_QUOTES) . "</code>"
-        --                        ) . "</p>\n";
+   --      @since 2.8.0
+   --      @deprecated 3.6.0 Use wpdb::prepare()
+   --      @see wpdb::prepare()
+   --      @see esc_sql()
 
-        --                         message .= "<ul>\n";
-        --                         message .= "<li>" . __("Are you sure it exists?") . "</li>\n";
+   --      @param string string
+   --      @return string
 
-        --                         message .= "<li>" . sprintf(
-        --                                 /* translators: 1: Database user, 2: Database name.--
-        --                                 __("Does the user %1s have permission to use the %2s database?"),
-        --                                 "<code>" . htmlspecialchars(this.dbuser, ENT_QUOTES) . "</code>",
-        --                                 "<code>" . htmlspecialchars(db, ENT_QUOTES) . "</code>"
-        --                        ) . "</li>\n";
+   --      public function _weak_escape(string) then
+   --              if (func_num_args() === 1 && function_exists("_deprecated_function")) then
+   --                      _deprecated_function(__METHOD__, "3.6.0", "wpdb::prepare() or esc_sql()");
+   --              end;
+   --              return addslashes(string);
 
-        --                         message .= "<li>" . sprintf(
-        --                                 /* translators: %s: Database name.--
-        --                                 __("On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1s</code>. Could that be the problem?"),
-        --                                 htmlspecialchars(db, ENT_QUOTES)
-        --                        ) . "</li>\n";
-
-        --                         message .= "</ul>\n";
-
-        --                         message .= "<p>" . sprintf(
-        --                                 /* translators: %s: Support forums URL.--
-        --                                 __("If you do not know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href="%s">WordPress Support Forums</a>."),
-        --                                 __("https://wordpress.org/support/forums/")
-        --                        ) . "</p>\n";
-
-        --                         this.bail(message, "db_select_fail");
-        --                 end;
-        --         end;
-        -- end;
-
-        --
-        -- Do not use, deprecated.
-        --
-        -- Use esc_sql() or wpdb::prepare() instead.
-        --
-        -- @since 2.8.0
-        -- @deprecated 3.6.0 Use wpdb::prepare()
-        -- @see wpdb::prepare()
-        -- @see esc_sql()
-        --
-        -- @param string string
-        -- @return string
-        --
-        -- public function _weak_escape(string) then
-        --         if (func_num_args() === 1 && function_exists("_deprecated_function")) then
-        --                 _deprecated_function(__METHOD__, "3.6.0", "wpdb::prepare() or esc_sql()");
-        --         end;
-        --         return addslashes(string);
-        -- end;
+   --      end;
 
    -------------------
    -- X_Real_Escape --
@@ -736,7 +839,6 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
-      use Inc_Class_Wpdb;
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;
@@ -846,59 +948,9 @@ is
         --         end;
         -- end;
 
-        --
-        -- Prepares a SQL query for safe execution.
-        --
-        -- Uses sprintf()-like syntax. The following placeholders can be used in the query string:
-        --
-        -- - %d (integer)
-        -- - %f (float)
-        -- - %s (string)
-        --
-        -- All placeholders MUST be left unquoted in the query string. A corresponding argument
-        -- MUST be passed for each placeholder.
-        --
-        -- Note: There is one exception to the above: for compatibility with old behavior,
-        -- numbered or formatted string placeholders (eg, `%1s`, `%5s`) will not have quotes
-        -- added by this function, so should be passed with appropriate quotes around them.
-        --
-        -- Literal percentage signs (`%`) in the query string must be written as `%%`. Percentage wildcards
-        -- (for example, to use in LIKE syntax) must be passed via a substitution argument containing
-        -- the complete LIKE string, these cannot be inserted directly in the query string.
-        -- Also see wpdb::esc_like().
-        --
-        -- Arguments may be passed as individual arguments to the method, or as a single array
-        -- containing all arguments. A combination of the two is not supported.
-        --
-        -- Examples:
-        --
-        --     wpdb.prepare(
-        --         "SELECT-- FROM `table` WHERE `column` = %s AND `field` = %d OR `other_field` LIKE %s",
-        --         array("foo", 1337, "%bar")
-        --    );
-        --
-        --     wpdb.prepare(
-        --         "SELECT DATE_FORMAT(`field`, "%%c") FROM `table` WHERE `column` = %s",
-        --         "foo"
-        --    );
-        --
-        -- @since 2.3.0
-        -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
-        --              by updating the function signature. The second parameter was changed
-        --              from `args` to `...args`.
-        --
-        -- @link https://www.php.net/sprintf Description of syntax.
-        --
-        -- @param string      query   Query statement with sprintf()-like placeholders.
-        -- @param array|mixed args    The array of variables to substitute into the query"s placeholders
-        --                             if being called with an array of arguments, or the first variable
-        --                             to substitute into the query"s placeholders if being called with
-        --                             individual arguments.
-        -- @param mixed       ...args Further variables to substitute into the query"s placeholders
-        --                             if being called with individual arguments.
-        -- @return string|void Sanitized query string, if there is a query to prepare.
-        --
-        -- public function prepare(query, ...args)
+   -------------
+   -- Prepare --
+   -------------
 
    function Prepare (Db    : Wpdb_Class;
                      Query : String;
@@ -3840,73 +3892,80 @@ is
       return -Charset_Collate;
    end Get_Charset_Collate;
 
-        --
-        -- Determines whether the database or WPDB supports a particular feature.
-        --
-        -- Capability sniffs for the database server and current version of WPDB.
-        --
-        -- Database sniffs are based on the version of MySQL the site is using.
-        --
-        -- WPDB sniffs are added as new features are introduced to allow theme and plugin
-        -- developers to determine feature support. This is to account for drop-ins which may
-        -- introduce feature support at a different time to WordPress.
-        --
-        -- @since 2.7.0
-        -- @since 4.1.0 Added support for the "utf8mb4" feature.
-        -- @since 4.6.0 Added support for the "utf8mb4_520" feature.
-        --
-        -- @see wpdb::db_version()
-        --
-        -- @param string db_cap The feature to check for. Accepts "collation", "group_concat",
-        --                       "subqueries", "set_charset", "utf8mb4", or "utf8mb4_520".
-        -- @return bool True when the database feature is supported, false otherwise.
-        --
-        -- public function has_cap(db_cap) then
-        --         db_version     = this.db_version();
-        --         db_server_info = this.db_server_info();
+   -------------
+   -- Has_Cap --
+   -------------
 
-        --         -- Account for MariaDB version being prefixed with "5.5.5-" on older PHP versions.
-        --         if ("5.5.5" === db_version && str_contains(db_server_info, "MariaDB")
-        --                 && PHP_VERSION_ID < 80016 -- PHP 8.0.15 or older.
-        --        ) then
-        --                 -- Strip the "5.5.5-" prefix and set the version to the correct value.
-        --                 db_server_info = preg_replace("/^5\.5\.5-(.*)/", "1", db_server_info);
-        --                 db_version     = preg_replace("/[^0-9.].*/", "", db_server_info);
-        --         end;
+   function Has_Cap (This   : Wpdb_Class;
+                     DB_Cap : String)
+                     return Boolean
+   is
+      use Php.Misc;
+      use Php.Preg;
+      use Php.Strings;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Databases;
 
-        --         switch (strtolower(db_cap)) then
-        --                 case "collation":    -- @since 2.5.0
-        --                 case "group_concat": -- @since 2.7.0
-        --                 case "subqueries":   -- @since 2.7.0
-        --                         return version_compare(db_version, "4.1", ">=");
-        --                 case "set_charset":
-        --                         return version_compare(db_version, "5.0.7", ">=");
-        --                 case "utf8mb4":      -- @since 4.1.0
-        --                         if (version_compare(db_version, "5.5.3", "<")) then
-        --                                 return false;
-        --                         end;
-        --                         if (this.use_mysqli) then
-        --                                 client_version = mysqli_get_client_info();
-        --                         end; else then
-        --                                 client_version = mysql_get_client_info();
-        --                         end;
+      DB_Version     : Unbounded_String := +This.DB_Version;
+      DB_Server_Info : Unbounded_String := +This.DB_Server_Info;
+      Client_Version : Unbounded_String;
 
-        --                         /*
-        --                         -- libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
-        --                         -- mysqlnd has supported utf8mb4 since 5.0.9.
-        --                         --
-        --                         if (false !== strpos(client_version, "mysqlnd")) then
-        --                                 client_version = preg_replace("/^\D+([\d.]+).*/", "1", client_version);
-        --                                 return version_compare(client_version, "5.0.9", ">=");
-        --                         end; else then
-        --                                 return version_compare(client_version, "5.5.3", ">=");
-        --                         end;
-        --                 case "utf8mb4_520": -- @since 4.6.0
-        --                         return version_compare(db_version, "5.6", ">=");
-        --         end;
+      DB_Cap_Lower : constant String := Strtolower (DB_Cap);
+   begin
+      -- Account for MariaDB version being prefixed with "5.5.5-" on older
+      -- PHP versions.
+      if
+        "5.5.5" = DB_Version and then
+        Str_Contains (-DB_Server_Info, "MariaDB") -- and then
+--      PHP_VERSION_ID < 80016   -- PHP 8.0.15 or older.
+      then
+         -- Strip the "5.5.5-" prefix and set the version to the correct value.
+         DB_Server_Info := +Preg_Replace ("/^5\.5\.5-(.*)/", "$1", -DB_Server_Info);
+         DB_Version     := +Preg_Replace ("/[^0-9.].*/", "",       -DB_Server_Info);
+      end if;
 
-        --         return false;
-        -- end;
+      if DB_Cap_Lower in
+                        "collation" |    -- @since 2.5.0
+                        "group_concat" | -- @since 2.7.0
+                        "subqueries"    -- @since 2.7.0
+      then
+         return Version_Compare (-DB_Version, "4.1", ">=");
+
+      elsif DB_Cap_Lower in "set_charset" then
+         return Version_Compare (-DB_Version, "5.0.7", ">=");
+
+      elsif DB_Cap_Lower in "utf8mb4" then      -- @since 4.1.0
+         if Version_Compare (-DB_Version, "5.5.3", "<") then
+            return False;
+         end if;
+
+         case This.Engine is
+         when Engine_MySQLi =>
+            Client_Version := +Mysqli_Get_Client_Info;
+         when Engine_MySQL =>
+            Client_Version := +Mysql_Get_Client_Info;
+         when Engine_SQLite =>
+            pragma Assert (False);
+         end case;
+
+         --
+         -- libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
+         -- mysqlnd has supported utf8mb4 since 5.0.9.
+         --
+         if 0 /= Strpos (-Client_Version, "mysqlnd") then -- false
+            Client_Version := +Preg_Replace ("/^\D+([\d.]+).*/", "1", -Client_Version);
+            return Version_Compare (-Client_Version, "5.0.9", ">=");
+         else
+            return Version_Compare (-Client_Version, "5.5.3", ">=");
+         end if;
+
+      elsif DB_Cap_Lower in "utf8mb4_520" then -- @since 4.6.0
+         return Version_Compare (-DB_Version, "5.6", ">=");
+      end if;
+
+      return False;
+   end Has_Cap;
 
         --
         -- Retrieves a comma-separated list of the names of the functions that called wpdb.

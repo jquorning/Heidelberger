@@ -2,7 +2,9 @@
 --
 --
 
+with Arrays;
 with Databases;
+with Lists;
 
 package MySQLi_Bind
 is
@@ -69,9 +71,36 @@ is
                           return Databases.Three_State
    is (raise Program_Error with "not implemented");
 
+   function Mysqli_Query (Dbh   : Integer;
+                          Query : String)
+                          return Arrays.Array_Type
+   is (raise Program_Error with "not implemented");
+
+   procedure Mysqli_Query (Dbh   : Integer;
+                           Query : String)
+   is null;
+
    function MySQLi_Real_Escape_String (Dhb  : Integer;
                                        Item : String)
                                        return String
    is (raise Program_Error with "not implemented");
+
+   function Mysqli_Set_Charset (Dbh     : Integer;
+                                Charset : String)
+                                return Boolean
+   is (raise Program_Error with "not implemented");
+
+   function Mysqli_Fetch_Array (Res : Arrays.Array_Type)
+                                return Lists.List_Type
+                                is (Lists.Empty_List);
+
+   function Mysqli_Select_DB (Dbh : Integer;
+                               DB : String)
+                              return Boolean
+                              is (False);
+
+   function Mysqli_Get_Client_Info
+            return String
+            is ("XXX-887");
 
 end MySQLi_Bind;

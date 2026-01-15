@@ -723,4 +723,25 @@ is
       return List;
    end Explode;
 
+   -------------
+   -- Explode --
+   -------------
+
+   function Explode (Separator : String;
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
+                     return Array_Type
+   is
+      use Hb_Common;
+
+      List : constant List_Type := Explode (Separator, Item, Limit);
+      Result : Array_Type;
+   begin
+      for A of List loop
+         Result.Append (Key   => -A,
+                        Value => From_String (""));
+      end loop;
+      return Result;
+   end Explode;
+
 end Php.Strings;

@@ -2,6 +2,7 @@
 --
 --
 
+with Arrays;
 with Databases;
 
 package MySQL_Bind
@@ -54,9 +55,37 @@ is
                          return Databases.Three_State
    is (raise Program_Error with "not implemented");
 
+   function Mysql_Query (Query : String;
+                         Dbh   : Integer)
+                         return Arrays.Array_Type
+   is (raise Program_Error with "not implemented");
+
+   procedure Mysql_Query (Query : String;
+                          Dbh   : Integer)
+   is null;
+
    function MySQL_Real_Escape_String (Item : String;
                                       Dbh  : Integer)
                                       return String
    is (raise Program_Error with "not implemented");
+
+   function Mysql_Set_Charset (Charset : String;
+                               Dbh     : Integer)
+                               return Boolean
+   is (raise Program_Error with "not implemented");
+
+   function Mysql_Result (Res : Arrays.Array_Type;
+                          Dymmy : Integer)
+                          return String
+                          is ("XXX-897");
+
+   function Mysql_Select_DB (DB  : String;
+                             Dbh : Integer)
+                             return Boolean
+                             is (False);
+
+   function Mysql_Get_Client_Info
+            return String
+            is ("XXX-886");
 
 end MySQL_Bind;

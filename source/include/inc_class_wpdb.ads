@@ -667,14 +667,16 @@ is
          --
          -- @var string[]
          --
---        protected $incompatible_modes = array(
---                'NO_ZERO_DATE',
---                'ONLY_FULL_GROUP_BY',
---                'STRICT_TRANS_TABLES',
---                'STRICT_ALL_TABLES',
---                'TRADITIONAL',
---                'ANSI',
---        );
+--        protected
+         Incompatible_Modes : List_Type :=
+           To_List (List => (
+               +"NO_ZERO_DATE",
+               +"ONLY_FULL_GROUP_BY",
+               +"STRICT_TRANS_TABLES",
+               +"STRICT_ALL_TABLES",
+               +"TRADITIONAL",
+               +"ANSI"
+         ));
 
          --
          -- Added by jq
@@ -1315,7 +1317,8 @@ is
    -- Examples:
    --
    --     $wpdb->prepare(
-   --         "SELECT-- FROM `table` WHERE `column` = %s AND `field` = %d OR `other_field` LIKE %s",
+   --         "SELECT * FROM `table` WHERE `column` = %s AND `field` = %d OR
+   --         `other_field` LIKE %s",
    --         array( 'foo', 1337, '%bar' )
    --     );
    --
@@ -1651,6 +1654,32 @@ is
                                  return String;
 
    --
+   -- Determines whether the database or WPDB supports a particular feature.
+   --
+   -- Capability sniffs for the database server and current version of WPDB.
+   --
+   -- Database sniffs are based on the version of MySQL the site is using.
+   --
+   -- WPDB sniffs are added as new features are introduced to allow theme and plugin
+   -- developers to determine feature support. This is to account for drop-ins which
+   -- may introduce feature support at a different time to WordPress.
+   --
+   -- @since 2.7.0
+   -- @since 4.1.0 Added support for the "utf8mb4" feature.
+   -- @since 4.6.0 Added support for the "utf8mb4_520" feature.
+   --
+   -- @see wpdb::db_version()
+   --
+   -- @param string db_cap The feature to check for. Accepts "collation",
+   --                       "group_concat", "subqueries", "set_charset", "utf8mb4",
+   --                       or "utf8mb4_520".
+   -- @return bool True when the database feature is supported, false otherwise.
+   --
+   function Has_Cap (This   : Wpdb_Class;
+                     DB_Cap : String)
+                     return Boolean;
+
+   --
    -- Determines whether MySQL database is at least the required minimum version.
    --
    -- @since 2.5.0
@@ -1703,8 +1732,8 @@ is
    -- @param string          db  Database name.
    -- @param mysqli|resource dbh Optional database connection.
    --
-   procedure Selectt (This : Wpdb_Class;
-                      Db   : String;
+   procedure Selectt (This : in out Wpdb_Class;
+                      DB   : String;
                       Dbh  : Integer); --  = null) then
 
    --

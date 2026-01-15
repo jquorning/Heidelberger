@@ -175,4 +175,9 @@ is
                      Limit     : Integer := Integer'Last)
                      return List_Type;
 
+   function Explode (Separator : String;
+                     Item      : String;
+                     Limit     : Integer := Integer'Last)
+                     return Array_Type;
+
 end Php.Strings;
