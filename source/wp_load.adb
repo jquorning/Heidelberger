@@ -124,7 +124,7 @@ is
 --          WP_CONTENT_DIR := ABSPATH & "wp-content";
 --          require_once ABSPATH & WPINC & "/version.php";
 
-            Inc_Load.Wp_Check_Php_Mysql_Versions;
+            Inc_Load.Wp_Check_PHP_MySQL_Versions;
             Inc_Load.Wp_Load_Translations_Early;
 
             -- Die with an error message.

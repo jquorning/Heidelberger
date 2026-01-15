@@ -42,7 +42,7 @@ is
    -- @global string required_php_version The required PHP version string.
    -- @global string wp_version           The WordPress version string.
    --
-   procedure Wp_Check_Php_Mysql_Versions;
+   procedure Wp_Check_PHP_MySQL_Versions;
 
    --
    -- Retrieves the current network ID.
@@ -126,8 +126,7 @@ is
    -- @return bool True if SSL, otherwise false.
    --
    function Is_SSL
-            return Boolean
-            is (False);
+            return Boolean;
 
    --
    -- Die with a maintenance message when conditions are met.
@@ -259,8 +258,7 @@ is
    -- @return bool True if inside WordPress network administration pages.
    --
    function Is_Network_Admin
-            return Boolean
-            is (False);
+            return Boolean;
 
    --
    -- Determines whether the current request is for a user admin screen.
@@ -277,8 +275,7 @@ is
    -- @return bool True if inside WordPress user administration pages.
    --
    function Is_User_Admin
-            return Boolean
-            is (False);
+            return Boolean;
 
    --
    -- Toggle `_wp_using_ext_object_cache` on and off without directly
@@ -319,8 +316,7 @@ is
    -- @return bool True if inside WordPress site administration pages.
    --
    function Is_Blog_Admin
-            return Boolean
-            is (True);
+            return Boolean;
 
    --
    -- If Multisite is enabled.
@@ -342,8 +338,7 @@ is
    -- @return int Site ID.
    --
    function Get_Current_Blog_Id
-            return Integer
-            is (1);
+            return Integer;
 
    --
    -- Is WordPress in Recovery Mode.
@@ -355,8 +350,7 @@ is
    -- @return bool
    --
    function Wp_Is_Recovery_Mode
-            return Boolean
-            is (False);
+            return Boolean;
 
    --
    -- Checks whether the given variable is a WordPress Error.
@@ -396,9 +390,11 @@ is
    -- @return bool True if it's a WordPress Ajax request, false otherwise.
    --
    function Wp_Doing_AJAX
-            return Boolean
-            is (True);
+            return Boolean;
 
+   --
+   -- Checks whether current request is a JSON request, or is expecting a
+   -- JSON response.
    --
    -- @since 5.0.0
    --
@@ -406,7 +402,17 @@ is
    --              `application/json`. False otherwise.
    --
    function Wp_Is_JSON_Request
-            return Boolean
-            is (False);
+            return Boolean;
+
+   --
+   -- Checks whether a string is a valid JSON Media Type.
+   --
+   -- @since 5.6.0
+   --
+   -- @param string media_type A Media Type string to check.
+   -- @return bool True if string is a valid JSON Media Type.
+   --
+   function Wp_Is_JSON_Media_Type (Media_Type : String)
+                                   return Boolean;
 
 end Inc_Load;

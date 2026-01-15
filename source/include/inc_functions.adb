@@ -1913,8 +1913,8 @@ is
          if not Isset (All_Options, "siteurl") then
             Installed_Site := +Globals.WpDB.Get_Var
               (Statement_Type ("SELECT option_value FROM " &
-                               (-Globals.WpDB.Options) & " " &
-                               "WHERE option_name = ""siteurl"""));
+                               (-Globals.WpDB.Options) &
+                               " WHERE option_name = 'siteurl'"));
          else
             Installed_Site := +Get_As_String (All_Options, "siteurl");
          end if;

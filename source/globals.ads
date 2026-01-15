@@ -1,8 +1,10 @@
+--
+--
+--
+
 with Ada.Strings.Unbounded;
 
 with Arrays;
-
--- with Adm_Menu;
 
 with Adi_Class_Wp_Screens;
 
@@ -66,16 +68,23 @@ is
    WpDB : Inc_Class_Wpdb.Wpdb_Class;
 
    XMLRPC_REQUEST : Boolean := False;
-   DOING_AJAX     : Boolean := False;
+
+   DOING_AJAX_DEF : constant Boolean := False;
+   DOING_AJAX     : constant Boolean := False;
+
    IFRAME_REQUEST : Boolean := False;
    DOING_CRON     : Boolean := False;
 
    MEDIA_TRASH : Boolean := False;
 
    WP_ADMIN          : Boolean;
-   WP_NETWORK_ADMIN  : Boolean;
-   WP_USER_ADMIN     : Boolean;
-   WP_BLOG_ADMIN     : Boolean;
+   WP_NETWORK_ADMIN_DEF : constant Boolean := False;
+   WP_NETWORK_ADMIN     : constant Boolean := False;
+   WP_USER_ADMIN_DEF    : constant Boolean := False;
+   WP_USER_ADMIN        : constant Boolean := False;
+   WP_BLOG_ADMIN_DEF    : constant Boolean := False;
+   WP_BLOG_ADMIN        :          Boolean := False;
+
    WP_LOAD_IMPORTERS : Boolean;
 
    WP_DEBUG         : Boolean;
@@ -83,7 +92,7 @@ is
    SCRIPT_DEBUG     : Boolean := False;
    REST_REQUEST     : Boolean := False;
 
-   WP_INSTALLING         : Boolean := False;
+   WP_INSTALLING         : Boolean := True;
    WP_REPAIRING          : Boolean := False;
    WP_INSTALLING_NETWORK : Boolean := False;
 

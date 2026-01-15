@@ -11,6 +11,7 @@ with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.Lists;
+with Php.Preg;
 with Php.Strings;
 
 with Binder;
@@ -20,9 +21,12 @@ with Lists;
 
 with Wp_Config;
 
+with Adi_Class_Wp_Screens;
+
 with Inc_Class_Wpdb;
 with Inc_Class_Wp_Networks;
 with Inc_Class_Wp_Textdomain_Registry;
+with Inc_Error_Protection;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Ms_Networks;
@@ -183,7 +187,7 @@ is
    -- Wp_Check_Php_Mysql_Versions --
    ---------------------------------
 
-   procedure Wp_Check_Php_Mysql_Versions
+   procedure Wp_Check_PHP_MySQL_Versions
    is
 --         global required_php_version, wp_version;
 --         php_version = PHP_VERSION;
@@ -215,7 +219,7 @@ is
 --                 );
 --                 exit( 1 );
 --         end;
-   end Wp_Check_Php_Mysql_Versions;
+   end Wp_Check_PHP_MySQL_Versions;
 
 -- --
 -- -- Retrieves the current environment type.
@@ -809,7 +813,8 @@ is
 --    require ABSPATH . WPINC . "/pluggable.php";
 
       declare
-         Link : String := Wp_Guess_URL & "/wp-admin/install.php";
+         Link : constant String :=
+           Wp_Guess_URL & "/wp-admin/install.php";
       begin
          Wp_Redirect (Link);
          Die;
@@ -1001,18 +1006,17 @@ is
 --         return themes;
 -- end;
 
--- --
--- -- Is WordPress in Recovery Mode.
--- --
--- -- In this mode, plugins or themes that cause WSODs will be paused.
--- --
--- -- @since 5.2.0
--- --
--- -- @return bool
--- --
--- function wp_is_recovery_mode() then
---         return wp_recovery_mode()->is_active();
--- end;
+   -------------------------
+   -- Wp_Is_Recovery_Mode --
+   -------------------------
+
+   function Wp_Is_Recovery_Mode
+            return Boolean
+   is
+      use Inc_Error_Protection;
+   begin
+      return X_Wp_Recovery_Mode.Is_Active; -- ()
+   end Wp_Is_Recovery_Mode;
 
 -- --
 -- -- Determines whether we are currently on an endpoint that should be protected against WSODs.
@@ -1212,80 +1216,56 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Determines whether the current request is for a site"s administrative interface.
--- --
--- -- e.g. `/wp-admin/`
--- --
--- -- Does not check if the user is an administrator; use current_user_can()
--- -- for checking roles and capabilities.
--- --
--- -- @since 3.1.0
--- --
--- -- @global WP_Screen current_screen WordPress current screen object.
--- --
--- -- @return bool True if inside WordPress site administration pages.
--- --
--- function is_blog_admin() then
---         if ( isset( GLOBALS("current_screen") ) ) then
---                 return GLOBALS("current_screen")->in_admin( "site" );
---         end; elseif ( defined( "WP_BLOG_ADMIN" ) ) then
---                 return WP_BLOG_ADMIN;
---         end;
+   -------------------
+   -- Is_Blog_Admin --
+   -------------------
 
---         return false;
--- end;
+   function Is_Blog_Admin
+            return Boolean
+   is
+   begin
+      if Isset (Globals.GLOBALS, "current_screen") then
+         return Globals.Current_Screen.In_Admin ("site");
+      elsif Globals.WP_BLOG_ADMIN_DEF then
+         return Globals.WP_BLOG_ADMIN;
+      end if;
 
--- --
--- -- Determines whether the current request is for the network administrative interface.
--- --
--- -- e.g. `/wp-admin/network/`
--- --
--- -- Does not check if the user is an administrator; use current_user_can()
--- -- for checking roles and capabilities.
--- --
--- -- Does not check if the site is a Multisite network; use is_multisite()
--- -- for checking if Multisite is enabled.
--- --
--- -- @since 3.1.0
--- --
--- -- @global WP_Screen current_screen WordPress current screen object.
--- --
--- -- @return bool True if inside WordPress network administration pages.
--- --
--- function is_network_admin() then
---         if ( isset( GLOBALS("current_screen") ) ) then
---                 return GLOBALS("current_screen")->in_admin( "network" );
---         end; elseif ( defined( "WP_NETWORK_ADMIN" ) ) then
---                 return WP_NETWORK_ADMIN;
---         end;
+      return False;
+   end Is_Blog_Admin;
 
---         return false;
--- end;
+   ----------------------
+   -- Is_Network_Admin --
+   ----------------------
 
--- --
--- -- Determines whether the current request is for a user admin screen.
--- --
--- -- e.g. `/wp-admin/user/`
--- --
--- -- Does not check if the user is an administrator; use current_user_can()
--- -- for checking roles and capabilities.
--- --
--- -- @since 3.1.0
--- --
--- -- @global WP_Screen current_screen WordPress current screen object.
--- --
--- -- @return bool True if inside WordPress user administration pages.
--- --
--- function is_user_admin() then
---         if ( isset( GLOBALS("current_screen") ) ) then
---                 return GLOBALS("current_screen")->in_admin( "user" );
---         end; elseif ( defined( "WP_USER_ADMIN" ) ) then
---                 return WP_USER_ADMIN;
---         end;
+   function Is_Network_Admin
+            return Boolean
+   is
+   begin
+      if Isset (Globals.GLOBALS, "current_screen") then
+         return Globals.Current_Screen.In_Admin ("network");
+      elsif Globals.WP_NETWORK_ADMIN_DEF then
+         return Globals.WP_NETWORK_ADMIN;
+      end if;
 
---         return false;
--- end;
+      return False;
+   end Is_Network_Admin;
+
+   -------------------
+   -- Is_User_Admin --
+   -------------------
+
+   function Is_User_Admin
+            return Boolean
+   is
+   begin
+      if Isset (Globals.GLOBALS, "current_screen") then
+         return Globals.Current_Screen.In_Admin ("user");
+      elsif Globals.WP_USER_ADMIN_DEF then
+         return Globals.WP_USER_ADMIN;
+      end if;
+
+      return False;
+   end Is_User_Admin;
 
 --
 -- If Multisite is enabled.
@@ -1310,19 +1290,18 @@ is
       return False;
    end Is_Multisite;
 
--- --
--- -- Retrieve the current site ID.
--- --
--- -- @since 3.1.0
--- --
--- -- @global int blog_id
--- --
--- -- @return int Site ID.
--- --
--- function get_current_blog_id() then
---         global blog_id;
---         return absint( blog_id );
--- end;
+   -------------------------
+   -- Get_Current_Blog_Id --
+   -------------------------
+
+   Global_Blog_Id : Integer := 0;
+
+   function Get_Current_Blog_Id
+            return Integer
+   is
+   begin
+      return abs Global_Blog_Id;
+   end Get_Current_Blog_Id;
 
    ----------------------------
    -- Get_Current_Network_Id --
@@ -1364,7 +1343,6 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Php;
-      use Php.Arrays;
       use Php.Files;
       use Php.Lists;
       use Inc_L10n;
@@ -1516,28 +1494,33 @@ is
               when True  => True); -- (bool)
    end Wp_Installing;
 
--- --
--- -- Determines if SSL is used.
--- --
--- -- @since 2.6.0
--- -- @since 4.6.0 Moved from functions.php to load.php.
--- --
--- -- @return bool True if SSL, otherwise false.
--- --
--- function is_ssl() then
---         if ( isset( _SERVER("HTTPS") ) ) then
---                 if ( "on" === strtolower( _SERVER("HTTPS") ) ) then
---                         return true;
---                 end;
+   ------------
+   -- Is_SSL --
+   ------------
 
---                 if ( "1" == _SERVER("HTTPS") ) then
---                         return true;
---                 end;
---         end; elseif ( isset( _SERVER("SERVER_PORT") ) && ( "443" == _SERVER("SERVER_PORT") ) ) then
---                 return true;
---         end;
---         return false;
--- end;
+   function Is_SSL
+            return Boolean
+   is
+      use Php.Strings;
+      use Binder;
+   begin
+      if Isset (X_SERVER, "HTTPS") then
+         if "on" = Strtolower (Get_As_String (X_SERVER, "HTTPS")) then
+            return True;
+         end if;
+
+         if "1" = Get_As_String (X_SERVER, "HTTPS") then
+            return True;
+         end if;
+
+      elsif
+        Isset (X_SERVER, "SERVER_PORT") and then
+        "443" = Get_As_String (X_SERVER, "SERVER_PORT")
+      then
+         return True;
+      end if;
+      return False;
+   end Is_SSL;
 
    ----------------------------
    -- Wp_Convert_Hr_To_Bytes --
@@ -1599,23 +1582,26 @@ is
 --         return false;
 -- end;
 
--- --
--- -- Determines whether the current request is a WordPress Ajax request.
--- --
--- -- @since 4.7.0
--- --
--- -- @return bool True if it"s a WordPress Ajax request, false otherwise.
--- --
--- function wp_doing_ajax() then
---         --
---         -- Filters whether the current request is a WordPress Ajax request.
---         --
---         -- @since 4.7.0
---         --
---         -- @param bool wp_doing_ajax Whether the current request is a WordPress Ajax request.
---         --
---         return apply_filters( "wp_doing_ajax", defined( "DOING_AJAX" ) && DOING_AJAX );
--- end;
+   -------------------
+   -- Wp_Doing_AJAX --
+   -------------------
+
+   function Wp_Doing_AJAX
+            return Boolean
+   is
+      use Globals;
+      use Inc_Plugins;
+   begin
+      --
+      -- Filters whether the current request is a WordPress Ajax request.
+      --
+      -- @since 4.7.0
+      --
+      -- @param bool wp_doing_ajax Whether the current request is a WordPress
+      -- Ajax request.
+      --
+      return Apply_Filters ("wp_doing_ajax", DOING_AJAX_DEF and then DOING_AJAX);
+   end Wp_Doing_AJAX;
 
 -- --
 -- -- Determines whether the current request should use themes.
@@ -1752,27 +1738,31 @@ is
 --         echo "\n###### wp_scraping_result_end:scrape_key ######\n";
 -- end;
 
--- --
--- -- Checks whether current request is a JSON request, or is expecting a JSON response.
--- --
--- -- @since 5.0.0
--- --
--- -- @return bool True if `Accepts` or `Content-Type` headers contain `application/json`.
--- --              False otherwise.
--- --
--- function wp_is_json_request() then
+   ------------------------
+   -- Wp_Is_JSON_Request --
+   ------------------------
 
---         if ( isset( _SERVER("HTTP_ACCEPT") ) && wp_is_json_media_type( _SERVER("HTTP_ACCEPT") ) ) then
---                 return true;
---         end;
+   function Wp_Is_JSON_Request
+            return Boolean
+   is
+      use Binder;
+   begin
+      if
+        Isset (X_SERVER, "HTTP_ACCEPT") and then
+        Wp_Is_JSON_Media_Type (Get_As_String (X_SERVER, "HTTP_ACCEPT"))
+      then
+         return True;
+      end if;
 
---         if ( isset( _SERVER("CONTENT_TYPE") ) && wp_is_json_media_type( _SERVER("CONTENT_TYPE") ) ) then
---                 return true;
---         end;
+      if
+        Isset (X_SERVER, "CONTENT_TYPE") and then
+        Wp_Is_JSON_Media_Type (Get_As_String (X_SERVER, "CONTENT_TYPE"))
+      then
+         return True;
+      end if;
 
---         return false;
-
--- end;
+      return False;
+   end Wp_Is_JSON_Request;
 
 -- --
 -- -- Checks whether current request is a JSONP request, or is expecting a JSONP response.
@@ -1802,23 +1792,24 @@ is
 
 -- end;
 
--- --
--- -- Checks whether a string is a valid JSON Media Type.
--- --
--- -- @since 5.6.0
--- --
--- -- @param string media_type A Media Type string to check.
--- -- @return bool True if string is a valid JSON Media Type.
--- --
--- function wp_is_json_media_type( media_type ) then
---         static cache = array();
+   ---------------------------
+   -- Wp_Is_JSON_Media_Type --
+   ---------------------------
 
---         if ( ! isset( cache( media_type ) ) ) then
---                 cache( media_type ) = (bool) preg_match( "/(^|\s|,)application\/((\w!#\&-\^\.\+)+\+)?json(\+oembed)?(|\s|;|,)/i", media_type );
---         end;
+   Static_Cache : Array_Type;
 
---         return cache( media_type );
--- end;
+   function Wp_Is_JSON_Media_Type (Media_Type : String)
+                                   return Boolean
+   is
+      use Php.Preg;
+   begin
+      if not Isset (Static_Cache, Media_Type) then
+         Set (Static_Cache, Media_Type, From_Boolean (
+              Preg_Match ("/(^|\s|,)application\/((\w!#\&-\^\.\+)+\+)?json(\+oembed)?(|\s|;|,)/i", Media_Type)));
+      end if;
+
+      return As_Boolean (Get (Static_Cache, Media_Type));
+   end Wp_Is_JSON_Media_Type;
 
 -- --
 -- -- Checks whether current request is an XML request, or is expecting an XML response.

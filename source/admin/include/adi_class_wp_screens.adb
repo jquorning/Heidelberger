@@ -7,6 +7,7 @@
 --
 
 with Php.Echoing;
+with Php.Strings;
 
 package body Adi_Class_Wp_Screens
 is
@@ -246,22 +247,22 @@ is
 --         --
 --         private function __construct() thenend;
 
---         --
---         -- Indicates whether the screen is in a particular admin.
---         --
---         -- @since 3.5.0
---         --
---         -- @param string $admin The admin to check against (network | user | site).
---         --                      If empty any of the three admins will result in true.
---         -- @return bool True if the screen is in the indicated admin, false otherwise.
---         --
---         public function in_admin( $admin = null ) then
---                 if ( empty( $admin ) ) then
---                         return (bool) $this->in_admin;
---                 end;
+   --------------
+   -- In_Admin --
+   --------------
 
---                 return ( $admin === $this->in_admin );
---         end;
+   function In_Admin (This  : Wp_Screen;
+                      Admin : String := "") -- null
+                      return Boolean
+   is
+      use Php.Strings;
+   begin
+      if Empty (Admin) then
+         return This.M_In_Admin /= ""; -- (bool)
+      end if;
+
+      return Admin = This.M_In_Admin;
+   end In_Admin;
 
 --         --
 --         -- Sets or returns whether the block editor is loading on the current screen.

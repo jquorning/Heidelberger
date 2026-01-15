@@ -65,7 +65,7 @@ is
 
       -- Check for the required PHP version and for the MySQL extension or a
       -- database drop-in.
-      Inc_Load.Wp_Check_Php_Mysql_Versions;
+      Inc_Load.Wp_Check_PHP_MySQL_Versions;
 
       -- Include files required for initialization.
       -- require ABSPATH . WPINC . '/class-wp-paused-extensions-storage.php';

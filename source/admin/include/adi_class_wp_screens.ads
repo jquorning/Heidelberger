@@ -67,7 +67,8 @@ is
         -- @since 3.5.0
         -- @var string
         --
---        protected in_admin;
+--        protected
+        M_In_Admin : Unbounded_String;
 
         --
         -- Whether the screen is in the network admin.
@@ -222,6 +223,19 @@ is
       procedure Set_Parentage (This        : Wp_Screen;
                                Parent_File : String)
                                is null;
+
+   --
+   -- Indicates whether the screen is in a particular admin.
+   --
+   -- @since 3.5.0
+   --
+   -- @param string $admin The admin to check against (network | user | site).
+   --                      If empty any of the three admins will result in true.
+   -- @return bool True if the screen is in the indicated admin, false otherwise.
+   --
+   function In_Admin (This  : Wp_Screen;
+                      Admin : String := "") -- null
+                      return Boolean;
 
       --
       -- Renders the screen"s help section.
