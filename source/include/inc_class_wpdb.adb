@@ -378,6 +378,7 @@ is
    procedure Set_SQL_Mode (This  : Wpdb_Class;
                            Modes : Array_Type := Empty_Array)
    is
+      use Ada.Text_IO;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
@@ -400,7 +401,9 @@ is
             Res := Mysql_Query ("SELECT @@SESSION.sql_mode", This.Dbh);
 
          when Engine_SQLite =>
-            pragma Assert (False);
+            Put_Line ("set_sql_mode: no query session");
+            Res := Empty_Array;
+--          pragma Assert (False);
          end case;
 
          if Res.Is_Empty then
@@ -424,7 +427,9 @@ is
             Modes_Str := +Mysql_Result (Res, 0);
 
          when Engine_SQLite =>
-            pragma Assert (False);
+            Put_Line ("set_sql_mode: modes_str");
+            Modes_Str := +"";
+--          pragma Assert (False);
          end case;
 
          if Empty (-Modes_Str) then
@@ -450,8 +455,8 @@ is
       begin
          for A in Modes_2.Iterate loop
             declare
-               I    : String := Key (A);
-               Mode : String := As_String (Element (A));
+               I    : constant String := Key (A);
+               Mode : constant String := As_String (Element (A));
             begin
                if In_List (Mode, Incompatible_Modes, True) then
                   Delete (Ref (Modes_2, I)); -- [i]
@@ -469,7 +474,8 @@ is
          when Engine_MySQL =>
             Mysql_Query ("SET SESSION sql_mode='" & Mode & "'", This.Dbh);
          when Engine_SQLite =>
-            pragma Assert (False);
+            Put_Line ("set_sql_mode: no set session");
+--          pragma Assert (False);
          end case;
       end;
    end Set_SQL_Mode;
@@ -733,6 +739,7 @@ is
                       DB   : String;
                       Dbh  : Integer) --  = null
    is
+      use Ada.Text_IO;
       use Php.HTML;
       use Php.Strings;
       use Databases;
@@ -754,7 +761,9 @@ is
       when Engine_MySQL =>
          Success := Mysql_Select_DB (DB, Dbh);
       when Engine_SQLite =>
-         pragma Assert (False);
+         Put_Line ("selectt: no select_db");
+         Success := False;
+--       pragma Assert (False);
       end case;
 
       if not Success then
@@ -762,46 +771,44 @@ is
          if not Did_Action ("template_redirect") then
             Wp_Load_Translations_Early;
             declare
-               Message : Unbounded_String;
+               Message : constant String :=
+                 "<h1>" & abs "Cannot select database" & "</h1>\n" &
+                 "<p>" & Sprintf (
+                   -- translators: %s: Database name.
+                   abs "The database server could be connected to (which means your username and password is okay) but the %s database could not be selected.",
+                   To_List ("<code>" & HTML_Special_Chars (DB, ENT_QUOTES) & "</code>")
+                 ) & "</p>\n" &
+
+                 "<ul>\n" &
+                 "<li>" & abs "Are you sure it exists?" & "</li>\n" &
+
+                 "<li>" & Sprintf (
+                   -- translators: 1: Database user, 2: Database name.
+                   abs "Does the user %1s have permission to use the %2s database?",
+                   To_List (List => (
+                     1 => +"<code>" &
+                          HTML_Special_Chars (-This.Dbuser, ENT_QUOTES) &
+                          "</code>",
+                     2 => +"<code>" &
+                          HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"
+                   ))
+                 ) & "</li>\n" &
+
+                 "<li>" & Sprintf (
+                   -- translators: %s: Database name.
+                   abs "On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1s</code>. Could that be the problem?",
+                   To_List (HTML_Special_Chars (DB, ENT_QUOTES))
+                 ) & "</li>\n" &
+
+                 "</ul>\n" &
+
+                 "<p>" & Sprintf (
+                   -- translators: %s: Support forums URL.
+                   abs "If you do not know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href=""%s"">WordPress Support Forums</a>.",
+                   To_List (abs "https://wordpress.org/support/forums/")
+                 ) & "</p>\n";
             begin
-               Append (Message, "<h1>" & abs "Cannot select database" & "</h1>\n");
-
-               Append (Message, "<p>" & Sprintf (
-                 -- translators: %s: Database name.
-                 abs "The database server could be connected to (which means your username and password is okay) but the %s database could not be selected.",
-                 To_List ("<code>" & HTML_Special_Chars (DB, ENT_QUOTES) & "</code>")
-                 ) & "</p>\n");
-
-               Append (Message, "<ul>\n");
-               Append (Message, "<li>" & abs "Are you sure it exists?" & "</li>\n");
-
-               Append (Message, "<li>" & Sprintf (
-                       -- translators: 1: Database user, 2: Database name.
-                       abs "Does the user %1s have permission to use the %2s database?",
-                       To_List (List => (
-                         1 => +"<code>" &
-                              HTML_Special_Chars (-This.Dbuser, ENT_QUOTES) &
-                              "</code>",
-                         2 => +"<code>" &
-                              HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"
-                       ))
-                       ) & "</li>\n");
-
-               Append (Message, "<li>" & Sprintf (
-                       -- translators: %s: Database name.
-                       abs "On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1s</code>. Could that be the problem?",
-                       To_List (HTML_Special_Chars (DB, ENT_QUOTES))
-                      ) & "</li>\n");
-
-               Append (Message, "</ul>\n");
-
-               Append (Message, "<p>" & Sprintf (
-                       -- translators: %s: Support forums URL.
-                       abs "If you do not know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href=""%s"">WordPress Support Forums</a>.",
-                       To_List (abs "https://wordpress.org/support/forums/")
-                      ) & "</p>\n");
-
-               This.Bail (-Message, "db_select_fail");
+               This.Bail (Message, "db_select_fail");
             end;
          end if;
       end if;
@@ -2533,13 +2540,14 @@ is
    function Get_Var (This  : in out Wpdb_Class;
                      Query : Statement_Type := ""; -- null
                      X     : Integer        := 0;
-                     Y     : Integer        := 0)
+                     Y     : Integer        := 1)
                      return String
    is
---    use Php.Arrays;
+      use Ada.Text_IO;
    begin
       This.Func_Call :=
         +("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
+      Put_Line ("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
 
       if Query /= "" then
          if
@@ -2550,6 +2558,11 @@ is
          end if;
 
          This.Query (Query);
+      end if;
+
+      -- Added
+      if This.Last_Result.Is_Empty then
+         return "XXX-885";
       end if;
 
       return This.Last_Result (Y);
@@ -3755,45 +3768,58 @@ is
    -- Bail --
    ----------
 
-   procedure Bail (This       : Wpdb_Class;
+   procedure Bail (This       : in out Wpdb_Class;
                    Message    : String;
                    Error_Code : String := "500")
    is
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
+      use Inc_Functions;
    begin
-      raise Program_Error with "not implemted";
+      if This.Show_Errors then
+         declare
+            Error : Unbounded_String;
+         begin
+            case This.Engine is
+
+            when Engine_MySQLi =>
+               if True then
+--             if This.Dbh in Mysqli then
+                  Error := +Mysqli_Error (This.Dbh);
+               elsif Mysqli_Connect_Errno  then
+                  Error := +Mysqli_Connect_Error;
+               end if;
+
+            when Engine_MySQL =>
+               if True then
+--             if Is_Resource (This.Dbh) then
+                  Error := +Mysql_Error (This.Dbh);
+               else
+                  Error := +Mysql_Error;
+               end if;
+
+            when Engine_SQLite =>
+               pragma Assert (False);
+               Error := +"";
+            end case;
+
+            if Error /= "" then
+               Wp_Die ("<p><code>" & Error_Code & "</code></p>\n" & Message);
+            end if;
+         end;
+         Wp_Die (Message);
+
+      else
+--       if Class_Exists ("WP_Error", False) then
+--          This.Error := new Wp_Error (Error_Code, Message);
+--       else
+         This.Error := +Message;
+--       end if;
+
+         return; --  False;
+      end if;
    end Bail;
-        --         if (this.show_errors) then
-        --                 error = "";
-
-        --                 if (this.use_mysqli) then
-        --                         if (this.dbh instanceof mysqli) then
-        --                                 error = mysqli_error(this.dbh);
-        --                         end; elseif (mysqli_connect_errno()) then
-        --                                 error = mysqli_connect_error();
-        --                         end;
-        --                 end; else then
-        --                         if (is_resource(this.dbh)) then
-        --                                 error = mysql_error(this.dbh);
-        --                         end; else then
-        --                                 error = mysql_error();
-        --                         end;
-        --                 end;
-
-        --                 if (error) then
-        --                         message = "<p><code>" . error . "</code></p>\n" . message;
-        --                 end;
-
-        --                 wp_die(message);
-        --         end; else then
-        --                 if (class_exists("WP_Error", false)) then
-        --                         this.error = new WP_Error(error_code, message);
-        --                 end; else then
-        --                         this.error = message;
-        --                 end;
-
-        --                 return false;
-        --         end;
-        -- end;
 
         --
         -- Closes the current database connection.

@@ -72,6 +72,8 @@ is
             Put_Line ("  " & Pattern);
 
          when others =>
+            Put_Line ("find_marks: " & Flag & " not implemented");
+            Put_Line (" in: " & Pattern);
             raise Program_Error with "not implemented";
          end case;
       end loop;

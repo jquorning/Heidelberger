@@ -546,7 +546,6 @@ is
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String := "";
                         Arg_3     : String := "");
-   --                  , ...arg )
 
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;
@@ -625,6 +624,12 @@ is
                         Transient  : String;
                         Value      : Array_Type;
                         Expiration : Integer)
+                        is null;
+
+   procedure Do_Action (Hook_Name  : String;
+                        Arg_1      : String;
+                        Arg_2      : String;
+                        Arg_3      : String)
                         is null;
 
    --

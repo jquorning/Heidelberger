@@ -1639,7 +1639,7 @@ is
    --                           the error. Default "500".
    -- @return void|false Void if the showing of errors is enabled, false if disabled.
    --
-   procedure Bail (This       : Wpdb_Class;
+   procedure Bail (This       : in out Wpdb_Class;
                    Message    : String;
                    Error_Code : String := "500");
 
@@ -1785,7 +1785,7 @@ is
    function Get_Var (This  : in out Wpdb_Class;
                      Query : Statement_Type := ""; -- null
                      X     : Integer        := 0;
-                     Y     : Integer        := 0)
+                     Y     : Integer        := 1)
                      return String;
 
    --

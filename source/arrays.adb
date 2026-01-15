@@ -403,8 +403,8 @@ is
    is
       M : Multi_Type;
    begin
-      M.Kind     := Kind_List;
-      M.List.all := Value;
+      M.Kind := Kind_List;
+      M.List := new Lists.List_Type'(Value);
       return M;
    end From_List;
 

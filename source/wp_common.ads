@@ -333,6 +333,14 @@ is
 
    function Apply_Filters (Hook_Name  : String;
                            Value      : Boolean;
+                           Funct      : String;
+                           Message    : String;
+                           Version    : String)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Boolean;
                            Args       : Array_Type;
                            Typ        : String)
                            return Inc_Class_Wp_Http.Response_Result

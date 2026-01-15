@@ -178,18 +178,15 @@ is
    -- Wp_Enqueue_Style --
    ----------------------
 
--- function wp_enqueue_style( handle, src = '', deps = array(), ver = false, media = 'all' ) then
    procedure Wp_Enqueue_Style (Handle : String;
                                Src    : String    := "";
                                Deps   : List_Type := Empty_List;
-                               -- String_Array := Empty_String_Array;
-                               Ver    : String    := ""; -- Boolean      := False;
+                               Ver    : String    := "";
                                Media  : String    := "all")
    is
       use Php.Strings;
       use Inc_Class_Wp_Dependencies;
       use Inc_Functions_Wp_Scripts;
---    use String_Vectors;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
       declare

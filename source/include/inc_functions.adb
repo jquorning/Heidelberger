@@ -1944,7 +1944,7 @@ is
          --
          for Table_0 in Wp_Tables.Iterate loop
             declare
-               Table : String := Key (Table_0);
+               Table : constant String := Key (Table_0);
             begin
                -- The existence of custom user tables Shouldn't suggest an unwise
                -- state or prevent a clean installation.
@@ -5981,101 +5981,102 @@ is
 --         end;
 -- end;
 
---
--- Marks something as being incorrectly called.
---
--- There is a hook {@see "doing_it_wrong_run"} that will be called that can be used
--- to get the backtrace up to what file and function called the deprecated
--- function.
---
--- The current behavior is to trigger a user error if `WP_DEBUG` is true.
---
--- @since 3.1.0
--- @since 5.4.0 This function is no longer marked as "private".
---
--- @param string function The function that was called.
--- @param string message  A message explaining what has been done incorrectly.
--- @param string version  The version of WordPress where the message was added.
---
--- function _doing_it_wrong( function, message, version ) then
+   ----------------------
+   -- X_Doing_It_Wrong --
+   ----------------------
 
    procedure X_Doing_It_Wrong (Funct   : String;
                                Message : String;
                                Version : String)
    is
-      use Ada.Text_IO;
+      use Php.Errors;
+      use Php.Misc;
+      use Php.Strings;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_L10n;
+      use Inc_Plugins;
+
+      Message_2 : Unbounded_String := +Message;
+      Version_2 : Unbounded_String := +Version;
    begin
-      Put_Line ("X_Doing_It_Wrong");
-      Put_Line (Funct);
-      Put_Line (Message);
-      Put_Line (Version);
+      --
+      -- Fires when the given function is being used incorrectly.
+      --
+      -- @since 3.1.0
+      --
+      -- @param string function The function that was called.
+      -- @param string message  A message explaining what has been done incorrectly.
+      -- @param string version  The version of WordPress where the message was added.
+      --
+      Do_Action ("doing_it_wrong_run", Funct, -Message_2, -Version_2);
 
---         --
---         -- Fires when the given function is being used incorrectly.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string function The function that was called.
---         -- @param string message  A message explaining what has been done incorrectly.
---         -- @param string version  The version of WordPress where the message was added.
---         --
---         do_action( "doing_it_wrong_run", function, message, version );
+      --
+      -- Filters whether to trigger an error for _doing_it_wrong() calls.
+      --
+      -- @since 3.1.0
+      -- @since 5.1.0 Added the function, message and version parameters.
+      --
+      -- @param bool   trigger  Whether to trigger the error for _doing_it_wrong()
+      --                        calls. Default true.
+      -- @param string function The function that was called.
+      -- @param string message  A message explaining what has been done incorrectly.
+      -- @param string version  The version of WordPress where the message was added.
+      --
+      if
+        Globals.WP_DEBUG and then
+        Apply_Filters ("doing_it_wrong_trigger_error", True,
+                       Funct, -Message_2, -Version_2)
+      then
+         if Function_Exists ("__") then
+            if Version_2 /= "" then
+               -- translators: %s: Version number.
+               Version_2 := +Sprintf (abs "(This message was added in version %s.)",
+                                      To_List (-Version_2));
+            end if;
 
---         --
---         -- Filters whether to trigger an error for _doing_it_wrong() calls.
---         --
---         -- @since 3.1.0
---         -- @since 5.1.0 Added the function, message and version parameters.
---         --
---         -- @param bool   trigger  Whether to trigger the error for _doing_it_wrong() calls. Default true.
---         -- @param string function The function that was called.
---         -- @param string message  A message explaining what has been done incorrectly.
---         -- @param string version  The version of WordPress where the message was added.
---         --
---         if ( WP_DEBUG && apply_filters( "doing_it_wrong_trigger_error", true, function, message, version ) ) then
---                 if ( function_exists( "__" ) ) then
---                         if ( version ) then
---                                 /* translators: %s: Version number.--
---                                 version = sprintf( __( "(This message was added in version %s.)" ), version );
---                         end;
+            Append (Message_2, " " & Sprintf (
+               -- translators: %s: Documentation URL.
+               abs "Please see <a href=""%s"">Debugging in WordPress</a> for more information.",
+               To_List (abs "https://wordpress.org/support/article/debugging-in-wordpress/")
+            ));
 
---                         message .= " " . sprintf(
---                                 /* translators: %s: Documentation URL.--
---                                 __( "Please see <a href="%s">Debugging in WordPress</a> for more information." ),
---                                 __( "https://wordpress.org/support/article/debugging-in-wordpress/" )
---                         );
+            Trigger_Error (
+              Sprintf (
+                -- translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: WordPress version number.
+                abs "Function %1s was called <strong>incorrectly</strong>. %2s %3s",
+                To_List (List => (
+                  1 => +Funct,
+                  2 => Message_2,
+                  3 => Version_2
+                ))
+              ),
+              E_USER_NOTICE
+            );
+         else
+            if Version_2 /= "" then
+               Version_2 := +Sprintf ("(This message was added in version %s.)",
+                                      To_List (-Version_2));
+            end if;
 
---                         trigger_error(
---                                 sprintf(
---                                         /* translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: WordPress version number.--
---                                         __( "Function %1s was called <strong>incorrectly</strong>. %2s %3s" ),
---                                         function,
---                                         message,
---                                         version
---                                 ),
---                                 E_USER_NOTICE
---                         );
---                 end; else then
---                         if ( version ) then
---                                 version = sprintf( "(This message was added in version %s.)", version );
---                         end;
+            Append (Message_2, Sprintf (
+              " Please see <a href=""%s"">Debugging in WordPress</a> for more information.",
+              To_List ("https://wordpress.org/support/article/debugging-in-wordpress/")
+            ));
 
---                         message .= sprintf(
---                                 " Please see <a href="%s">Debugging in WordPress</a> for more information.",
---                                 "https://wordpress.org/support/article/debugging-in-wordpress/"
---                         );
-
---                         trigger_error(
---                                 sprintf(
---                                         "Function %1s was called <strong>incorrectly</strong>. %2s %3s",
---                                         function,
---                                         message,
---                                         version
---                                 ),
---                                 E_USER_NOTICE
---                         );
---                 end;
---         end;
+            Trigger_Error (
+              Sprintf (
+                "Function %1s was called <strong>incorrectly</strong>. %2s %3s",
+                To_List (List => (
+                  1 => +Funct,
+                  2 => Message_2,
+                  3 => Version_2
+                ))
+              ),
+              E_USER_NOTICE
+            );
+         end if;
+      end if;
    end X_Doing_It_Wrong;
 
 --

@@ -39,10 +39,6 @@ is
                Flags  : Integer)
    is null;
 
-   function Mysqli_Error (Dbh : Integer)
-                          return String
-   is (raise Program_Error with "not implemented");
-
    function Mysqli_Affected_Rows (Dbh : Integer)
                                  return Natural
    is (raise Program_Error with "not implemented");
@@ -102,5 +98,17 @@ is
    function Mysqli_Get_Client_Info
             return String
             is ("XXX-887");
+
+   function Mysqli_Error (Dbh : Integer)
+                          return String
+                          is ("");
+
+   function Mysqli_Connect_Error
+            return String
+            is ("");
+
+   function Mysqli_Connect_Errno
+            return Boolean
+            is (True);
 
 end MySQLi_Bind;

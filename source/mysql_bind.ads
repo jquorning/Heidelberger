@@ -46,10 +46,6 @@ is
                          return Natural
    is (raise Program_Error with "not implemented");
 
-   function Mysql_Error (Dbh : Integer)
-                          return String
-   is (raise Program_Error with "not implemented");
-
    function Mysql_Query (Dbh   : Integer;
                          Query : String)
                          return Databases.Three_State
@@ -87,5 +83,13 @@ is
    function Mysql_Get_Client_Info
             return String
             is ("XXX-886");
+
+   function Mysql_Error (Dbh : Integer)
+                         return String
+                         is ("");
+
+   function Mysql_Error
+            return String
+            is ("");
 
 end MySQL_Bind;

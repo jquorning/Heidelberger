@@ -87,7 +87,7 @@ is
 
    WP_LOAD_IMPORTERS : Boolean;
 
-   WP_DEBUG         : Boolean;
+   WP_DEBUG         : Boolean := True;
    WP_DEBUG_DISPLAY : Boolean;
    SCRIPT_DEBUG     : Boolean := False;
    REST_REQUEST     : Boolean := False;

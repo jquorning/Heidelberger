@@ -221,7 +221,6 @@ is
                          return String
    is
       use Ada.Strings.Unbounded;
---    use Ada.Strings;
 --    use Ada.Text_IO;
       use Hb_Common;
 
@@ -236,26 +235,33 @@ is
       while First <= Subject'Last loop
          declare
             B : Natural := Natural'Last;
-            I : Natural;
-            E : Natural;
+            Found_Index : Natural;
+            Position    : Natural;
          begin
-            for A in Search.First_Index .. Search.Last_Index loop
-               E := Index (Source  => +Subject (First .. Subject'Last),
-                           Pattern => -Search (A));
-               if E /= 0 and then E < B then
-                  B := E;
-                  I := A;
+            for Search_Index in Search.First_Index .. Search.Last_Index loop
+               Position := Index (Source  => +Subject (First .. Subject'Last),
+                                  Pattern => -Search (Search_Index));
+               if Position /= 0 and then Position < B then
+                  B := Position;
+                  Found_Index := Search_Index;
+               end if;
+
+               if Position = 0 then
+                  Append (Result, Subject);
+                  Count := Count + 1;
+                  return -Result;
                end if;
             end loop;
 
-            if E = Natural'Last then
+            if Position = Natural'Last then
                Append (Result, Subject);
+               Count := Count + 1;
                exit;
             else
                Append (Result, Subject (First .. B - 1));
                Append (Result, Replace);
                Count := Count + 1;
-               First := First + Length (Search (I));
+               First := Position + Length (Search (Found_Index));
             end if;
          end;
       end loop;
@@ -518,7 +524,13 @@ is
    function Strip_Tags (Item         : String;
                         Allowed_Tags : Array_Type := Empty_Array)
                         return String
-   is (raise Program_Error with "XXX-600");
+   is
+      use Ada.Text_IO;
+   begin
+      Put_Line ("strip_tags: " & Item);
+      Put_Line ("  " & Allowed_Tags'Image);
+      return Item;
+   end Strip_Tags;
 
    -----------------
    -- Add_Slashes --

@@ -329,13 +329,11 @@ is
    -- Enqueue --
    -------------
 
---        public function enqueue( handles ) then
    procedure Enqueue (This    : in out Wp_Dependencies;
                       Handles : List_Type)
    is
       use Php.Lists;
       use Php.Strings;
---    use String_Vectors;
       use Inc_Class_Wp_Dependency;
       use Inc_Class_Wp_Dependency.Dependency_Maps;
       use List_Vectors;
@@ -343,9 +341,7 @@ is
       for Handle of Handles loop
          declare
             Handle_2 : constant List_Type := Explode ("?", -Handle);
-
-            First    : constant String := -Handle_2 (Handle_2.First_Index);
-            Second   : constant String := -Handle_2 (Handle_2.First_Index + 1);
+            First    : constant String    := -Handle_2 (Handle_2.First_Index);
 
             Position : List_Vectors.Cursor;
          begin
@@ -359,8 +355,8 @@ is
                -- recurse_deps().
                This.All_Queued_Deps.Clear; --  := null;
 
-               if "" /= Second then
-                  This.Args (First) :=  Second;
+               if Handle_2.Last_Index > 1 then
+                  This.Args (First) := -Handle_2 (Handle_2.First_Index + 1);
                end if;
 
             elsif not Has_Element (This.Registered.Find (First)) then
@@ -370,15 +366,15 @@ is
                   This.Queued_Before_Register.Delete (Position);
                end if;
 
-               if Second /= "" then
+               if Handle_2.Last_Index > 1 then
                   Position := This.Queued_Before_Register.Find (+First);
 
                   if Has_Element (Position) then
                      This.Queued_Before_Register.Replace_Element
-                       (Position, New_Item => +Second);
+                       (Position, New_Item => Handle_2 (Handle_2.First_Index + 1));
                   else
                      This.Queued_Before_Register.Append
-                       (New_Item => +Second);
+                       (New_Item => Handle_2 (Handle_2.First_Index + 1));
                   end if;
                end if;
             end if;

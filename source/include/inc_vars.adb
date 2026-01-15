@@ -14,13 +14,14 @@
 -- @package WordPress
 --
 
+with Php.HTML;
+with Php.Preg;
+with Php.Strings;
+
 with Arrays;
 with Binder;
 with Hb_Common;
 with Lists;
-with Php.HTML;
-with Php.Preg;
-with Php.Strings;
 
 with Inc_Load;
 with Inc_Plugins;
@@ -56,8 +57,7 @@ is
          elsif Is_User_Admin then
             Unused := Preg_Match ("#/wp-admin/user/?(.*?)#i", Php_Self, Self_Matches);
          else
-            Unused := Preg_Match ("/wp-admin/?(.*?)", Php_Self, Self_Matches);
---          Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
+            Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
          end if;
 
          Pagenow := +(if "" /= Self_Matches (1)

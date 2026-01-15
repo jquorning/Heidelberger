@@ -7,6 +7,8 @@
 -- @subpackage Dependencies
 --
 
+with Ada.Strings.Unbounded;
+
 with Php.Preg;
 with Php.Strings;
 
@@ -38,51 +40,53 @@ is
 --       return Inc_Class_Wp_Scripts.Wp_Scripts;
 --    end Wp_Scripts_X;
 
---
--- Helper function to output a _doing_it_wrong message when applicable.
---
--- @ignore
--- @since 4.2.0
--- @since 5.5.0 Added the `handle` parameter.
---
--- @param string function Function name.
--- @param string handle   Optional. Name of the script or stylesheet that was
---                         registered or enqueued too early. Default empty.
---
+   ---------------------------------------
+   -- X_Wp_Scripts_Maybe_Doing_It_Wrong --
+   ---------------------------------------
+
    procedure X_Wp_Scripts_Maybe_Doing_It_Wrong (Funct  : String;
                                                 Handle : String := "")
    is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Plugins;
+
+      Message : Unbounded_String;
    begin
-      null;
+      if
+        Did_Action ("init")                  or else
+        Did_Action ("wp_enqueue_scripts")    or else
+        Did_Action ("admin_enqueue_scripts") or else
+        Did_Action ("login_enqueue_scripts")
+      then
+         return;
+      end if;
+
+      Message := +Sprintf (
+        -- translators: 1: wp_enqueue_scripts, 2: admin_enqueue_scripts, 3: login_enqueue_scripts
+        abs "Scripts and styles should not be registered or enqueued until the %1s, %2s, or %3s hooks.",
+        To_List (List => (
+          1 => +"<code>wp_enqueue_scripts</code>",
+          2 => +"<code>admin_enqueue_scripts</code>",
+          3 => +"<code>login_enqueue_scripts</code>"
+        )));
+
+      if Handle /= "" then
+         Append (Message, " " & Sprintf (
+           -- translators: %s: Name of the script or stylesheet.
+           abs "This notice was triggered by the %s handle.",
+           To_List ("<code>" & Handle & "</code>")
+         ));
+      end if;
+
+      X_Doing_It_Wrong (
+        Funct,
+        -Message,
+        "3.3.0"
+      );
    end X_Wp_Scripts_Maybe_Doing_It_Wrong;
---         if ( did_action( "init" ) || did_action( "wp_enqueue_scripts" )
---                 || did_action( "admin_enqueue_scripts" ) || did_action( "login_enqueue_scripts" )
---         ) then
---                 return;
---         end;
-
---         message = sprintf(
---                 -- translators: 1: wp_enqueue_scripts, 2: admin_enqueue_scripts, 3: login_enqueue_scripts
---                 __( "Scripts and styles should not be registered or enqueued until the %1s, %2s, or %3s hooks." ),
---                 "<code>wp_enqueue_scripts</code>",
---                 "<code>admin_enqueue_scripts</code>",
---                 "<code>login_enqueue_scripts</code>"
---         );
-
---         if ( handle ) then
---                 message .= " " . sprintf(
---                         /* translators: %s: Name of the script or stylesheet.--
---                         __( "This notice was triggered by the %s handle." ),
---                         "<code>" . handle . "</code>"
---                 );
---         end;
-
---         _doing_it_wrong(
---                 function,
---                 message,
---                 "3.3.0"
---         );
--- end;
 
    ----------------------
    -- Wp_Print_Scripts --

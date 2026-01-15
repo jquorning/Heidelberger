@@ -18,8 +18,8 @@ with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
 with Inc_Options;
-with Inc_Rewrites;
 with Inc_Plugins;
+with Inc_Rewrites;
 with Inc_Taxonomys;
 
 package body Inc_Class_Wp_Taxonomy
