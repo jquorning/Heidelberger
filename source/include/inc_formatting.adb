@@ -4367,24 +4367,17 @@ is
       end;
    end ESC_URL;
 
--- --
--- -- Sanitizes a URL for database or redirect usage.
--- --
--- -- This function is an alias for sanitize_url().
--- --
--- -- @since 2.8.0
--- -- @since 6.1.0 Turned into an alias for sanitize_url().
--- --
--- -- @see sanitize_url()
--- --
--- -- @param string   url       The URL to be cleaned.
--- -- @param string[] protocols Optional. An array of acceptable protocols.
--- --                            Defaults to return value of wp_allowed_protocols().
--- -- @return string The cleaned URL after sanitize_url() is run.
--- --
--- function esc_url_raw( url, protocols = null ) then
---         return sanitize_url( url, protocols );
--- end;
+   -----------------
+   -- ESC_URL_Raw --
+   -----------------
+
+   function ESC_URL_Raw (URL       : String;
+                         Protocols : List_Type := Empty_List) -- null
+                         return String
+   is
+   begin
+      return Sanitize_URL (URL, Protocols);
+   end ESC_URL_Raw;
 
    ------------------
    -- Sanitize_URL --

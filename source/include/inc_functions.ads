@@ -559,6 +559,18 @@ is
       return Array_Type;
 
    --
+   -- Displays "Are You Sure" message to confirm the action being taken.
+   --
+   -- If the action has the nonce explain message, then it will be displayed
+   -- along with the "Are you sure?" message.
+   --
+   -- @since 2.0.4
+   --
+   -- @param string action The nonce action.
+   --
+   procedure Wp_Nonce_AYS (Action : String);
+
+   --
    -- Marks something as being incorrectly called.
    --
    -- There is a hook {@see 'doing_it_wrong_run'} that will be called that can be used

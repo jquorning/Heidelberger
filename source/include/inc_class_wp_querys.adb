@@ -4200,19 +4200,18 @@ is
 --                 return (bool) $this->is_embed;
 --         end;
 
---         --
---         -- Is the query the main query?
---         --
---         -- @since 3.3.0
---         --
---         -- @global WP_Query $wp_query WordPress Query object.
---         --
---         -- @return bool Whether the query is the main query.
---         --
---         public function is_main_query() then
---                 global $wp_the_query;
---                 return $wp_the_query === $this;
---         end;
+   -------------------
+   -- Is_Main_Query --
+   -------------------
+
+   Global_Wp_The_Query : Wp_Query;
+
+   function Is_Main_Query (This : Wp_Query)
+                           return Boolean
+   is
+   begin
+      return Global_Wp_The_Query = This;
+   end Is_Main_Query;
 
 --         --
 --         -- Set up global post data.

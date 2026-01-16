@@ -15,6 +15,7 @@ with Hb_Common;
 with Inc_Load;
 with Inc_Options;
 with Inc_Plugins;
+with Inc_Querys;
 
 package body Inc_Media
 is
@@ -5491,98 +5492,98 @@ is
 --         return compact( "width", "height", "type" );
 -- end;
 
--- --
--- -- Gets the default value to use for a `loading` attribute on an element.
--- --
--- -- This function should only be called for a tag and context if lazy-loading is generally enabled.
--- --
--- -- The function usually returns "lazy", but uses certain heuristics to guess whether the current element is likely to
--- -- appear above the fold, in which case it returns a boolean `false`, which will lead to the `loading` attribute being
--- -- omitted on the element. The purpose of this refinement is to avoid lazy-loading elements that are within the initial
--- -- viewport, which can have a negative performance impact.
--- --
--- -- Under the hood, the function uses {@see wp_increase_content_media_count()} every time it is called for an element
--- -- within the main content. If the element is the very first content element, the `loading` attribute will be omitted.
--- -- This default threshold of 1 content element to omit the `loading` attribute for can be customized using the
--- -- {@see "wp_omit_loading_attr_threshold"} filter.
--- --
--- -- @since 5.9.0
--- --
--- -- @param string context Context for the element for which the `loading` attribute value is requested.
--- -- @return string|bool The default `loading` attribute value. Either "lazy", "eager", or a boolean `false`, to indicate
--- --                     that the `loading` attribute should be skipped.
--- --
--- function wp_get_loading_attr_default( context ) then
---         -- Only elements with "the_content" or "the_post_thumbnail" context have special handling.
---         if ( "the_content" not== context and then "the_post_thumbnail" not== context ) then
---                 return "lazy";
---         end;
+   ---------------------------------
+   -- Wp_Get_Loading_Attr_Default --
+   ---------------------------------
 
---         -- Only elements within the main query loop have special handling.
---         if ( is_admin() || not in_the_loop() || not is_main_query() ) then
---                 return "lazy";
---         end;
+   function Wp_Get_Loading_Attr_Default (Context : String)
+                                         return String
+   is
+      use Inc_Load;
+      use Inc_Querys;
+   begin
+      -- Only elements with "the_content" or "the_post_thumbnail" context have
+      -- special handling.
+      if "the_content" /= Context and then "the_post_thumbnail" /= Context then
+         return "lazy";
+      end if;
 
---         -- Increase the counter since this is a main query content element.
---         content_media_count = wp_increase_content_media_count();
+      -- Only elements within the main query loop have special handling.
+      if
+        Is_Admin        or else
+        not In_The_Loop or else
+        not Is_Main_Query
+      then
+         return "lazy";
+      end if;
 
---         -- If the count so far is below the threshold, return `false` so that the `loading` attribute is omitted.
---         if ( content_media_count <= wp_omit_loading_attr_threshold() ) then
---                 return false;
---         end;
+      -- Increase the counter since this is a main query content element.
+      declare
+         Content_Media_Count : constant Integer :=
+           Wp_Increase_Content_Media_Count;
+      begin
+         -- If the count so far is below the threshold, return `false` so that the
+         -- `loading` attribute is omitted.
+         if Content_Media_Count <= Wp_Omit_Loading_Attr_Threshold then
+            return ""; -- false
+         end if;
+      end;
 
---         -- For elements after the threshold, lazy-load them as usual.
---         return "lazy";
--- end;
+      -- For elements after the threshold, lazy-load them as usual.
+      return "lazy";
+   end Wp_Get_Loading_Attr_Default;
 
--- --
--- -- Gets the threshold for how many of the first content media elements to not lazy-load.
--- --
--- -- This function runs the {@see "wp_omit_loading_attr_threshold"} filter, which uses a default threshold value of 1.
--- -- The filter is only run once per page load, unless the `force` parameter is used.
--- --
--- -- @since 5.9.0
--- --
--- -- @param bool force Optional. If set to true, the filter will be (re-)applied even if it already has been before.
--- --                    Default false.
--- -- @return int The number of content media elements to not lazy-load.
--- --
--- function wp_omit_loading_attr_threshold( force = false ) then
---         static omit_threshold;
+   ------------------------------------
+   -- Wp_Omit_Loading_Attr_Threshold --
+   ------------------------------------
 
---         -- This function may be called multiple times. Run the filter only once per page load.
---         if ( not isset( omit_threshold ) || force ) then
---                 --
---                 -- Filters the threshold for how many of the first content media elements to not lazy-load.
---                 --
---                 -- For these first content media elements, the `loading` attribute will be omitted. By default, this is the case
---                 -- for only the very first content media element.
---                 --
---                 -- @since 5.9.0
---                 --
---                 -- @param int omit_threshold The number of media elements where the `loading` attribute will not be added. Default 1.
---                 --
---                 omit_threshold = apply_filters( "wp_omit_loading_attr_threshold", 1 );
---         end;
+   Static_Omit_Threshold_Set : Boolean := False;
+   Static_Omit_Threshold     : Integer;
 
---         return omit_threshold;
--- end;
+   function Wp_Omit_Loading_Attr_Threshold (Force : Boolean := False)
+                                            return Integer
+   is
+      use Inc_Plugins;
+   begin
+      -- This function may be called multiple times. Run the filter only once per
+      -- page load.
+      if not Static_Omit_Threshold_Set or else Force then
+--    if not Isset (Static_Omit_Threshold) or else Force then
+         Static_Omit_Threshold_Set := True;
+         --
+         -- Filters the threshold for how many of the first content media elements
+         -- to not lazy-load.
+         --
+         -- For these first content media elements, the `loading` attribute will
+         -- be omitted. By default, this is the case for only the very first content
+         -- media element.
+         --
+         --
+         -- @since 5.9.0
+         --
+         -- @param int omit_threshold The number of media elements where the
+         --                           `loading` attribute will not be added. Default 1.
+         --
+         Static_Omit_Threshold :=
+           Apply_Filters ("wp_omit_loading_attr_threshold", 1);
+      end if;
 
--- --
--- -- Increases an internal content media count variable.
--- --
--- -- @since 5.9.0
--- -- @access private
--- --
--- -- @param int amount Optional. Amount to increase by. Default 1.
--- -- @return int The latest content media count, after the increase.
--- --
--- function wp_increase_content_media_count( amount = 1 ) then
---         static content_media_count = 0;
+      return Static_Omit_Threshold;
+   end Wp_Omit_Loading_Attr_Threshold;
 
---         content_media_count += amount;
+   -------------------------------------
+   -- Wp_Increase_Content_Media_Count --
+   -------------------------------------
 
---         return content_media_count;
--- end;
+   Static_Content_Media_Count : Integer := 0;
+
+   function Wp_Increase_Content_Media_Count (Amount : Integer := 1)
+                                             return Integer
+   is
+   begin
+      Static_Content_Media_Count := @ + Amount;
+
+      return Static_Content_Media_Count;
+   end Wp_Increase_Content_Media_Count;
 
 end Inc_Media;

@@ -24,6 +24,7 @@ is
       record
          Nickname      : Unbounded_String;
          User_Login    : Unbounded_String;
+         User_Pass     : Unbounded_String;
          User_Nicename : Unbounded_String;
          User_Email    : Unbounded_String;
          User_URL      : Unbounded_String;

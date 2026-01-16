@@ -439,6 +439,19 @@ is
                         return Boolean;
 
    --
+   -- Retrieves the name of the current filter hook.
+   --
+   -- @since 2.5.0
+   --
+   -- @global string[] wp_current_filter Stores the list of current filters with
+   -- the current one last
+   --
+   -- @return string Hook name of the current filter.
+   --
+   function Current_Filter
+            return String;
+
+   --
    -- Returns whether or not a filter hook is currently being processed.
    --
    -- The function current_filter() only returns the most recent filter being executed.

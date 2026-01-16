@@ -3,7 +3,6 @@
 --
 
 with Arrays;
-with Hb_Common;
 with Lists;
 
 with Adi_Class_Wp_Screens;
@@ -13,7 +12,6 @@ with Inc_Class_Wp_Posts;
 package Adi_Templates
 is
    use Arrays;
-   use Hb_Common;
    use Lists;
 
 --

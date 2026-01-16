@@ -35,6 +35,7 @@ with Inc_Class_Wpdb;
 with Inc_Class_Wp_List_Util;
 with Inc_Class_Wp_Networks;
 with Inc_Formatting;
+with Inc_General_Templates;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
@@ -3738,51 +3739,71 @@ is
       return Apply_Filters ("upload_mimes", T, User);
    end Get_Allowed_MIME_Types;
 
---
--- Displays "Are You Sure" message to confirm the action being taken.
---
--- If the action has the nonce explain message, then it will be displayed
--- along with the "Are you sure?" message.
---
--- @since 2.0.4
---
--- @param string action The nonce action.
---
--- function wp_nonce_ays( action ) then
---         // Default title and response code.
---         title         = __( "Something went wrong." );
---         response_code = 403;
+   ------------------
+   -- Wp_Nonce_AYS --
+   ------------------
 
---         if ( "log-out" === action ) then
---                 title = sprintf(
---                         /* translators: %s: Site title.--
---                         __( "You are attempting to log out of %s" ),
---                         get_bloginfo( "name" )
---                 );
---                 html        = title;
---                 html       .= "</p><p>";
---                 redirect_to = isset( _REQUEST["redirect_to"] ) ? _REQUEST["redirect_to"] : "";
---                 html       .= sprintf(
---                         /* translators: %s: Logout URL.--
---                         __( "Do you really want to <a href="%s">log out</a>?" ),
---                         wp_logout_url( redirect_to )
---                 );
---         end; else then
---                 html = __( "The link you followed has expired." );
---                 if ( wp_get_referer() ) then
---                         wp_http_referer = remove_query_arg( "updated", wp_get_referer() );
---                         wp_http_referer = wp_validate_redirect( esc_url_raw( wp_http_referer ) );
---                         html .= "</p><p>";
---                         html .= sprintf(
---                                 "<a href="%s">%s</a>",
---                                 esc_url( wp_http_referer ),
---                                 __( "Please try again." )
---                         );
---                 end;
---         end;
+   procedure Wp_Nonce_AYS (Action : String)
+   is
+      use Php.Strings;
+      use Binder;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_General_Templates;
+      use Inc_L10n;
+      use Inc_Pluggables;
 
---         wp_die( html, title, response_code );
--- end;
+      -- Default title and response code.
+      Title         : Unbounded_String := +abs "Something went wrong.";
+      Response_Code : constant Integer := 403;
+      HTML          : Unbounded_String;
+   begin
+      if "log-out" = Action then
+         Title := +Sprintf (
+           -- translators: %s: Site title.
+           abs "You are attempting to log out of %s",
+           To_List (Get_Bloginfo ("name"))
+         );
+         HTML        := Title;
+         Append (HTML, "</p><p>");
+
+         declare
+            Redirect_To : constant String :=
+              (if Isset (X_REQUEST, "redirect_to")
+               then Get_As_String (X_REQUEST, "redirect_to") else "");
+         begin
+            Append (HTML,
+                    Sprintf (
+                      -- translators: %s: Logout URL.
+                      abs "Do you really want to <a href=""%s"">log out</a>?",
+                      To_List (Wp_Logout_URL (Redirect_To))
+                   ));
+         end;
+      else
+         HTML := +abs "The link you followed has expired.";
+         if Wp_Get_Referer /= "" then
+            declare
+               Wp_HTTP_Referer_2 : constant String :=
+                 Remove_Query_Arg ("updated", Wp_Get_Referer);
+
+               Wp_HTTP_Referer : constant String :=
+                 Wp_Validate_Redirect (ESC_URL_Raw (Wp_HTTP_Referer_2));
+            begin
+               Append (HTML, "</p><p>");
+               Append (HTML,
+                       Sprintf (
+                         "<a href=""%s"">%s</a>",
+                         To_List (List => (
+                           1 => +ESC_URL (Wp_HTTP_Referer),
+                           2 => +abs "Please try again."
+                         ))
+                      ));
+            end;
+         end if;
+      end if;
+
+      Wp_Die (-HTML, -Title, Response_Code);
+   end Wp_Nonce_AYS;
 
 --
 -- Kills WordPress execution and displays HTML page with an error message.

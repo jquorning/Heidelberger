@@ -97,6 +97,11 @@ is
    --                             Default 'WordPress'.
    -- @return bool False if the redirect was cancelled, true otherwise.
    --
+   function Wp_Redirect (Location      : String;
+                         Status        : Integer := 302;
+                         X_Redirect_By : String  := "WordPress")
+                         return Boolean;
+
    procedure Wp_Redirect (Location      : String;
                           Status        : Integer := 302;
                           X_Redirect_By : String  := "WordPress");
@@ -160,8 +165,7 @@ is
             return String;
 
    function Wp_Create_Nonce (Action : String)
-            return String
-            is ("XXX-780");
+            return String;
 
    --
    -- Returns the time-dependent variable for nonce creation.
@@ -177,6 +181,29 @@ is
    --
    function Wp_Nonce_Tick (Action : Integer := -1)
                            return Float;
+
+   --
+   -- Validates authentication cookie.
+   --
+   -- The checks include making sure that the authentication cookie is set and
+   -- pulling in the contents (if cookie is not used).
+   --
+   -- Makes sure the cookie is not expired. Verifies the hash in cookie is what is
+   -- should be and compares the two.
+   --
+   -- @since 2.5.0
+   --
+   -- @global int login_grace_period
+   --
+   -- @param string cookie Optional. If used, will validate contents instead of
+   --                      cookie's.
+   -- @param string scheme Optional. The cookie scheme to use: 'auth', 'secure_auth',
+   --                      or 'logged_in'.
+   -- @return int|false User ID if valid cookie, false if invalid.
+   --
+   function Wp_Validate_Auth_Cookie (Cookie : String := "";
+                                     Scheme : String := "")
+                                     return Integer;
 
    --
    -- Parses a cookie into its components.
@@ -225,9 +252,12 @@ is
    --                   2 if the nonce is valid and generated between 12-24 hours ago.
    --                   False if the nonce is invalid.
    --
-   procedure Check_Admin_Referer (Action : String := "-1";  -- = -1
-                                  Query_Arg : String := "_wpnonce")
-                                  is null;
+   function Check_Admin_Referer (Action    : String := "-1"; -- Integer := -1;
+                                 Query_Arg : String := "_wpnonce")
+                                 return Integer;
+
+   procedure Check_Admin_Referer (Action    : String := "-1";  -- = -1
+                                  Query_Arg : String := "_wpnonce");
 
    --
    -- Checks if a user is logged in, if not it redirects them to the login page.
@@ -239,7 +269,7 @@ is
    --
    -- @since 1.5.0
    --
-   procedure Auth_Redirect is null;
+   procedure Auth_Redirect;
 
    --
    -- Determines whether the current visitor is a logged in user.
@@ -253,8 +283,7 @@ is
    -- @return bool True if user is logged in, false if not logged in.
    --
    function Is_User_Logged_In
-            return Boolean
-            is (True);
+            return Boolean;
 
    --
    -- Performs a safe (local) redirect, using wp_redirect().
@@ -295,8 +324,7 @@ is
    function Wp_Safe_Redirect (Location      : String;
                               Status        : Integer := 302;
                               X_Redirect_By : String := "WordPress")
-                              return Boolean
-                              is (False);
+                              return Boolean;
 
    --
    -- Retrieves the avatar `<img>` tag for a user, email address, MD5 hash, comment,
@@ -311,40 +339,47 @@ is
    -- @param int    size        Optional. Height and width of the avatar image file
    --                           in pixels. Default 96.
    -- @param string default     Optional. URL for the default image or a default type.
-   --                           Accepts '404'
-   --                            (return a 404 instead of a default image), 'retro' (8bit), 'monsterid'
-   --                            (monster), 'wavatar' (cartoon face), 'indenticon' (the "quilt"),
-   --                            'mystery', 'mm', or 'mysteryman' (The Oyster Man), 'blank' (transparent GIF),
-   --                            or 'gravatar_default' (the Gravatar logo). Default is the value of the
-   --                            'avatar_default' option, with a fallback of 'mystery'.
-   -- @param string alt         Optional. Alternative text to use in img tag. Default empty.
+   --                           Accepts '404' (return a 404 instead of a default
+   --                           image), 'retro' (8bit), 'monsterid' (monster),
+   --                           'wavatar' (cartoon face), 'indenticon' (the "quilt"),
+   --                           'mystery', 'mm', or 'mysteryman' (The Oyster Man),
+   --                           'blank' (transparent GIF), or 'gravatar_default' (the
+   --                           Gravatar logo). Default is the value of the
+   --                           'avatar_default' option, with a fallback of 'mystery'.
+   -- @param string alt         Optional. Alternative text to use in img tag. Default
+   --                           empty.
    -- @param array  args {
    --     Optional. Extra arguments to retrieve the avatar.
    --
-   --     @type int          height        Display height of the avatar in pixels. Defaults to size.
-   --     @type int          width         Display width of the avatar in pixels. Defaults to size.
-   --     @type bool         force_default Whether to always show the default image, never the Gravatar. Default false.
-   --     @type string       rating        What rating to display avatars up to. Accepts 'G', 'PG', 'R', 'X', and are
-   --                                       judged in that order. Default is the value of the 'avatar_rating' option.
-   --     @type string       scheme        URL scheme to use. See set_url_scheme() for accepted values.
-   --                                       Default null.
-   --     @type array|string class         Array or string of additional classes to add to the img element.
-   --                                       Default null.
-   --     @type bool         force_display Whether to always show the avatar - ignores the show_avatars option.
-   --                                       Default false.
+   --     @type int          height        Display height of the avatar in pixels.
+   --                                      Defaults to size.
+   --     @type int          width         Display width of the avatar in pixels.
+   --                                      Defaults to size.
+   --     @type bool         force_default Whether to always show the default image,
+   --                                      never the Gravatar. Default false.
+   --     @type string       rating        What rating to display avatars up to.
+   --                                      Accepts 'G', 'PG', 'R', 'X', and are judged
+   --                                      in that order. Default is the value of the
+   --                                      'avatar_rating' option.
+   --     @type string       scheme        URL scheme to use. See set_url_scheme() for
+   --                                      accepted values. Default null.
+   --     @type array|string class         Array or string of additional classes to
+   --                                      add to the img element. Default null.
+   --     @type bool         force_display Whether to always show the avatar - ignores
+   --                                      the show_avatars option. Default false.
    --     @type string       loading       Value for the `loading` attribute.
-   --                                       Default null.
-   --     @type string       extra_attr    HTML attributes to insert in the IMG element. Is not sanitized. Default empty.
+   --                                      Default null.
+   --     @type string       extra_attr    HTML attributes to insert in the IMG
+   --                                      element. Is not sanitized. Default empty.
    -- }
    -- @return string|false `<img>` tag for the user's avatar. False on failure.
    --
-   function Get_Avatar (Id_Or_Email : Integer;
-                        Size        : Integer := 96;
-                        Default     : String  := "";
-                        Alt         : String  := "";
-                        Args        : Integer := 0) -- = null
-                        return String
-                        is ("XXX-358");
+   function Get_Avatar (Id_Or_Email : String;
+                        Size        : Integer    := 96;
+                        Default     : String     := "";
+                        Alt         : String     := "";
+                        Args        : Array_Type := Empty_Array) -- = null
+                        return String;
 
    --
    -- Returns a salt to add to hashes.

@@ -339,20 +339,17 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Retrieves the name of the current filter hook.
--- --
--- -- @since 2.5.0
--- --
--- -- @global string[] wp_current_filter Stores the list of current filters with the current one last
--- --
--- -- @return string Hook name of the current filter.
--- --
--- function current_filter() then
---         global wp_current_filter;
+   --------------------
+   -- Current_Filter --
+   --------------------
 
---         return end( wp_current_filter );
--- end;
+   function Current_Filter
+            return String
+   is
+      use Hb_Common;
+   begin
+      return -Wp_Current_Filter.Last_Element; -- end()
+   end Current_Filter;
 
    -----------------
    -- Doing_Filer --
@@ -363,8 +360,6 @@ is
    is
       use Php;
       use Php.Lists;
---    use Hb_Common;
---    global wp_current_filter;
    begin
       if "" = Hook_Name then
          return not Wp_Current_Filter.Is_Empty;

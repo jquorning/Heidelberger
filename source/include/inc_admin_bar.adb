@@ -18,6 +18,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
+with Helpers;
 with Lists;
 with Wp_Common;
 
@@ -312,7 +313,7 @@ is
       end if;
 
       declare
-         Avatar : constant String := Get_Avatar (User_Id, 26);
+         Avatar : constant String := Get_Avatar (Helpers.Image (User_Id), 26);
 
          -- translators: %s: Current user"s display name.
          Howdy : constant String :=
@@ -373,7 +374,7 @@ is
          Admin_Bar.Add_Group (Node);
       end;
 
-      User_Info := +Get_Avatar (User_Id, 64);
+      User_Info := +Get_Avatar (Helpers.Image (User_Id), 64);
       User_Info := User_Info & "<span class=""display-name"">" &
                                Current_User.Prop.Display_Name & "</span>";
 
@@ -1754,7 +1755,7 @@ is
    is
       use Inc_Users;
 
-      Pref : constant Boolean := Get_User_Option ("show_admin_bar_{context}", User);
+      Pref : constant Boolean := Get_User_Option ("show_admin_bar_" & Context, User);
    begin
       if not Pref then -- False = Pref then
          return True;

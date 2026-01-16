@@ -87,4 +87,9 @@ is
             return List_Type
             is (Empty_List);
 
+   function Hash_Equals (Hash_1 : String;
+                         Hash_2 : String)
+                         return Boolean
+   is (Hash_1 = Hash_2);
+
 end Php.Misc;

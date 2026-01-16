@@ -19,6 +19,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
+with Hb_Common;
 with Wp_Common;
 
 with Inc_Admin_Bar;
@@ -124,9 +125,9 @@ is
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String
    is
-      use Php.Arrays;
       use Php.Echoing;
       use Php.Types;
+      use Hb_Common;
       use Inc_Plugins;
 
       Output : Unbounded_String;
@@ -2649,6 +2650,7 @@ is
 --    static (Header_Images);
       use Php.Arrays;
       use Php.Strings;
+      use Hb_Common;
       use Inc_Themes;
       use Inc_Posts;
       use Inc_Class_Wp_Posts;
@@ -2851,10 +2853,10 @@ is
                                Other_Attributes : Array_Type := Empty_Array)
                                 return String
    is
-      use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Hb_Common;
       use Inc_Formatting;
 
       Typ_2            : List_Type;
@@ -2948,6 +2950,7 @@ is
    is
       use Php.Echoing;
       use Php.HTML;
+      use Hb_Common;
       use Inc_Options;
 
       Admin_Html_Class : constant String :=
@@ -2986,7 +2989,7 @@ is
                                return Adi_Class_Wp_Screens.Wp_Screen
    is
       use Php.Strings;
---    use Adi_Class_Wp_Screens;
+      use Hb_Common;
       use Inc_Functions;
    begin
       if False then -- not Class_Exists ("WP_Screen") then

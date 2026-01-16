@@ -11,25 +11,33 @@ with Ada.Strings.Unbounded;
 with Ada.Numerics.Discrete_Random;
 -- with Ada.Text_IO;
 
+with Php.Arrays;
+with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.Lists;
+with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
 with Binder;
 with Hb_Common;
+with Helpers;
 with Globals;
 with Wp_Common;
 
+with Inc_Class_Wp_Session_Tokens;
+with Inc_Class_Wp_Session_Tokens_Factory;
 with Inc_Compat;
 with Inc_Default_Constants;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_General_Templates;
 with Inc_KSES;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
+with Inc_Media;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Users;
@@ -111,11 +119,10 @@ is
    function Get_Userdata (User_Id : Integer)
                           return Inc_Class_Wp_Users.Wp_User
    is
-      U : Inc_Class_Wp_Users.Wp_User;
    begin
-      return U;
---    return Get_User_By ("id", User_Id);
+      return Get_User_By ("id", User_Id);
    end Get_Userdata;
+
 -- endif;
 
 -- if ( ! function_exists( 'get_user_by' ) ) :
@@ -701,171 +708,209 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_validate_auth_cookie' ) ) :
---         --
---         -- Validates authentication cookie.
---         --
---         -- The checks include making sure that the authentication cookie is set and
---         -- pulling in the contents (if cookie is not used).
---         --
---         -- Makes sure the cookie is not expired. Verifies the hash in cookie is what is
---         -- should be and compares the two.
---         --
---         -- @since 2.5.0
---         --
---         -- @global int login_grace_period
---         --
---         -- @param string cookie Optional. If used, will validate contents instead of cookie's.
---         -- @param string scheme Optional. The cookie scheme to use: 'auth', 'secure_auth', or 'logged_in'.
---         -- @return int|false User ID if valid cookie, false if invalid.
---         --
---         function wp_validate_auth_cookie( cookie = '', scheme = '' ) then
---                 cookie_elements = wp_parse_auth_cookie( cookie, scheme );
---                 if ( ! cookie_elements ) then
---                         --
---                         -- Fires if an authentication cookie is malformed.
---                         --
---                         -- @since 2.7.0
---                         --
---                         -- @param string cookie Malformed auth cookie.
---                         -- @param string scheme Authentication scheme. Values include 'auth', 'secure_auth',
---                         --                       or 'logged_in'.
---                         --
---                         do_action( 'auth_cookie_malformed', cookie, scheme );
---                         return false;
---                 end;
 
---                 scheme     = cookie_elements['scheme'];
---                 username   = cookie_elements['username'];
---                 hmac       = cookie_elements['hmac'];
---                 token      = cookie_elements['token'];
---                 expired    = cookie_elements['expiration'];
---                 expiration = cookie_elements['expiration'];
+   -----------------------------
+   -- Wp_Validate_Auth_Cookie --
+   -----------------------------
 
---                 -- Allow a grace period for POST and Ajax requests.
---                 if ( wp_doing_ajax() || 'POST' === _SERVER['REQUEST_METHOD'] ) then
---                         expired += HOUR_IN_SECONDS;
---                 end;
+   function Wp_Validate_Auth_Cookie (Cookie : String := "";
+                                     Scheme : String := "")
+                                     return Integer
+   is
+      use Php.Misc;
+      use Php.Strings;
+      use Binder;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Users;
+      use Inc_Compat;
+      use Inc_Load;
+      use Inc_Plugins;
 
---                 -- Quick check to see if an honest cookie has expired.
---                 if ( expired < time() ) then
---                         --
---                         -- Fires once an authentication cookie has expired.
---                         --
---                         -- @since 2.7.0
---                         --
---                         -- @param string[] cookie_elements then
---                         --     Authentication cookie components. None of the components should be assumed
---                         --     to be valid as they come directly from a client-provided cookie value.
---                         --
---                         --     @type string username   User's username.
---                         --     @type string expiration The time the cookie expires as a UNIX timestamp.
---                         --     @type string token      User's session token used.
---                         --     @type string hmac       The security hash for the cookie.
---                         --     @type string scheme     The cookie scheme to use.
---                         -- end;
---                         --
---                         do_action( 'auth_cookie_expired', cookie_elements );
---                         return false;
---                 end;
+      Cookie_Elements : constant Array_Type :=
+        Wp_Parse_Auth_Cookie (Cookie, Scheme);
+   begin
+      if Cookie_Elements = Empty_Array then -- not
+         --
+         -- Fires if an authentication cookie is malformed.
+         --
+         -- @since 2.7.0
+         --
+         -- @param string cookie Malformed auth cookie.
+         -- @param string scheme Authentication scheme. Values include 'auth',
+         --                      'secure_auth', or 'logged_in'.
+         --
+         Do_Action ("auth_cookie_malformed", Cookie, Scheme);
+         return 0; -- False;
+      end if;
 
---                 user = get_user_by( 'login', username );
---                 if ( ! user ) then
---                         --
---                         -- Fires if a bad username is entered in the user authentication process.
---                         --
---                         -- @since 2.7.0
---                         --
---                         -- @param string[] cookie_elements then
---                         --     Authentication cookie components. None of the components should be assumed
---                         --     to be valid as they come directly from a client-provided cookie value.
---                         --
---                         --     @type string username   User's username.
---                         --     @type string expiration The time the cookie expires as a UNIX timestamp.
---                         --     @type string token      User's session token used.
---                         --     @type string hmac       The security hash for the cookie.
---                         --     @type string scheme     The cookie scheme to use.
---                         -- end;
---                         --
---                         do_action( 'auth_cookie_bad_username', cookie_elements );
---                         return false;
---                 end;
+      declare
+         Scheme     : constant String := Get_As_String (Cookie_Elements, "scheme");
+         Username   : constant String := Get_As_String (Cookie_Elements, "username");
+         Hmac       : constant String := Get_As_String (Cookie_Elements, "hmac");
+         Token      : constant String := Get_As_String (Cookie_Elements, "token");
+         Expiration : constant String := Get_As_String (Cookie_Elements, "expiration");
+         Expired    : Natural := As_Integer (Get (Cookie_Elements, "expiration"));
+      begin
+         -- Allow a grace period for POST and Ajax requests.
+         if
+           Wp_Doing_AJAX or else
+           "POST" = Get_As_String (X_SERVER, "REQUEST_METHOD")
+         then
+            Expired := Expired + Globals.HOUR_IN_SECONDS;
+         end if;
 
---                 pass_frag = substr( user->user_pass, 8, 4 );
+         -- Quick check to see if an honest cookie has expired.
+         if Expired < Php.Misc.Time then
+            --
+            -- Fires once an authentication cookie has expired.
+            --
+            -- @since 2.7.0
+            --
+            -- @param string[] cookie_elements {
+            --     Authentication cookie components. None of the components should
+            --     be assumed to be valid as they come directly from a client-provided
+            --     cookie value.
+            --
+            --     @type string username   User's username.
+            --     @type string expiration The time the cookie expires as a UNIX
+            --                              timestamp.
+            --     @type string token      User's session token used.
+            --     @type string hmac       The security hash for the cookie.
+            --     @type string scheme     The cookie scheme to use.
+            -- }
+            --
+            Do_Action ("auth_cookie_expired", Cookie_Elements);
+            return 0; -- False;
+         end if;
 
---                 key = wp_hash( username . '|' . pass_frag . '|' . expiration . '|' . token, scheme );
+         declare
+            User : constant Wp_User := Get_User_By ("login", Username);
+         begin
+            if User = Null_User then  -- not
+               --
+               -- Fires if a bad username is entered in the user authentication
+               -- process.
+               --
+               -- @since 2.7.0
+               --
+               -- @param string[] cookie_elements {
+               --     Authentication cookie components. None of the components
+               --     should be assumed to be valid as they come directly from a
+               --     client-provided cookie value.
+               --
+               --     @type string username   User's username.
+               --     @type string expiration The time the cookie expires as a
+               --                             UNIX timestamp.
+               --     @type string token      User's session token used.
+               --     @type string hmac       The security hash for the cookie.
+               --     @type string scheme     The cookie scheme to use.
+               -- }
+               --
+               Do_Action ("auth_cookie_bad_username", Cookie_Elements);
+               return 0; -- False;
+            end if;
 
---                 -- If ext/hash is not present, compat.php's hash_hmac() does not support sha256.
---                 algo = function_exists( 'hash' ) ? 'sha256' : 'sha1';
---                 hash = hash_hmac( algo, username . '|' . expiration . '|' . token, key );
+            declare
+               Pass_Frag : constant String := Substr (-User.Prop.User_Pass, 8, 4);
 
---                 if ( ! hash_equals( hash, hmac ) ) then
---                         --
---                         -- Fires if a bad authentication cookie hash is encountered.
---                         --
---                         -- @since 2.7.0
---                         --
---                         -- @param string[] cookie_elements then
---                         --     Authentication cookie components. None of the components should be assumed
---                         --     to be valid as they come directly from a client-provided cookie value.
---                         --
---                         --     @type string username   User's username.
---                         --     @type string expiration The time the cookie expires as a UNIX timestamp.
---                         --     @type string token      User's session token used.
---                         --     @type string hmac       The security hash for the cookie.
---                         --     @type string scheme     The cookie scheme to use.
---                         -- end;
---                         --
---                         do_action( 'auth_cookie_bad_hash', cookie_elements );
---                         return false;
---                 end;
+               Key : constant String :=
+                 Wp_Hash (Username & '|' & Pass_Frag & '|' & Expiration & '|' & Token,
+                          Scheme);
 
---                 manager = WP_Session_Tokens::get_instance( user->ID );
---                 if ( ! manager->verify( token ) ) then
---                         --
---                         -- Fires if a bad session token is encountered.
---                         --
---                         -- @since 4.0.0
---                         --
---                         -- @param string[] cookie_elements then
---                         --     Authentication cookie components. None of the components should be assumed
---                         --     to be valid as they come directly from a client-provided cookie value.
---                         --
---                         --     @type string username   User's username.
---                         --     @type string expiration The time the cookie expires as a UNIX timestamp.
---                         --     @type string token      User's session token used.
---                         --     @type string hmac       The security hash for the cookie.
---                         --     @type string scheme     The cookie scheme to use.
---                         -- end;
---                         --
---                         do_action( 'auth_cookie_bad_session_token', cookie_elements );
---                         return false;
---                 end;
+               -- If ext/hash is not present, compat.php's hash_hmac() does not
+               -- support sha256.
+               Algo : String := (if Function_Exists ("hash")
+                                 then "sha256" else "sha1");
 
---                 -- Ajax/POST grace period set above.
---                 if ( expiration < time() ) then
---                         GLOBALS['login_grace_period'] = 1;
---                 end;
+               Hash : constant String :=
+                 Hash_Hmac (Algo, Username & '|' & Expiration & '|' & Token, Key);
+            begin
+               if not Hash_Equals (Hash, Hmac) then
+                  --
+                  -- Fires if a bad authentication cookie hash is encountered.
+                  --
+                  -- @since 2.7.0
+                  --
+                  -- @param string[] cookie_elements {
+                  --     Authentication cookie components. None of the components
+                  --     should be assumed to be valid as they come directly from
+                  --     a client-provided cookie value.
+                  --
+                  --     @type string username   User's username.
+                  --     @type string expiration The time the cookie expires as a
+                  --                             UNIX timestamp.
+                  --     @type string token      User's session token used.
+                  --     @type string hmac       The security hash for the cookie.
+                  --     @type string scheme     The cookie scheme to use.
+                  -- }
+                  --
+                  Do_Action ("auth_cookie_bad_hash", Cookie_Elements);
+                  return 0; -- False;
+               end if;
+            end;
 
---                 --
---                 -- Fires once an authentication cookie has been validated.
---                 --
---                 -- @since 2.7.0
---                 --
---                 -- @param string[] cookie_elements then
---                 --     Authentication cookie components.
---                 --
---                 --     @type string username   User's username.
---                 --     @type string expiration The time the cookie expires as a UNIX timestamp.
---                 --     @type string token      User's session token used.
---                 --     @type string hmac       The security hash for the cookie.
---                 --     @type string scheme     The cookie scheme to use.
---                 -- end;
---                 -- @param WP_User  user            User object.
---                 --
---                 do_action( 'auth_cookie_valid', cookie_elements, user );
+            declare
+               use Inc_Class_Wp_Session_Tokens;
+               use Inc_Class_Wp_Session_Tokens_Factory;
 
---                 return user->ID;
---         end;
+               Manager : constant Wp_Session_Tokens'Class := Get_Instance (User.Id);
+            begin
+               if not Manager.Verify (Token) then
+                  --
+                  -- Fires if a bad session token is encountered.
+                  --
+                  -- @since 4.0.0
+                  --
+                  -- @param string[] cookie_elements {
+                  --     Authentication cookie components. None of the components
+                  --     should be assumed to be valid as they come directly from
+                  --     a client-provided cookie value.
+                  --
+                  --     @type string username   User's username.
+                  --     @type string expiration The time the cookie expires as a
+                  --                             UNIX timestamp.
+                  --     @type string token      User's session token used.
+                  --     @type string hmac       The security hash for the cookie.
+                  --     @type string scheme     The cookie scheme to use.
+                  -- }
+                  --
+                  Do_Action ("auth_cookie_bad_session_token", Cookie_Elements);
+                  return 0; -- False;
+               end if;
+            end;
+
+            -- Ajax/POST grace period set above.
+            if Expired < Php.Misc.Time then
+--          if Expiration < Php.Misc.Time then            -- ???
+               Globals.Login_Grace_Period := 1;
+--             GLOBALS["login_grace_period"] = 1;
+            end if;
+
+            --
+            -- Fires once an authentication cookie has been validated.
+            --
+            -- @since 2.7.0
+            --
+            -- @param string[] cookie_elements {
+            --     Authentication cookie components.
+            --
+            --     @type string username   User's username.
+            --     @type string expiration The time the cookie expires as a UNIX
+            --                             timestamp.
+            --     @type string token      User's session token used.
+            --     @type string hmac       The security hash for the cookie.
+            --     @type string scheme     The cookie scheme to use.
+            -- }
+            -- @param WP_User  user            User object.
+            --
+            Do_Action ("auth_cookie_valid", Cookie_Elements, User);
+
+            return User.Id;
+         end;
+      end;
+   end Wp_Validate_Auth_Cookie;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_generate_auth_cookie' ) ) :
@@ -1184,150 +1229,212 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'is_user_logged_in' ) ) :
---         --
---         -- Determines whether the current visitor is a logged in user.
---         --
---         -- For more information on this and similar theme functions, check out
---         -- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
---         -- Conditional Tags} article in the Theme Developer Handbook.
---         --
---         -- @since 2.0.0
---         --
---         -- @return bool True if user is logged in, false if not logged in.
---         --
---         function is_user_logged_in() then
---                 user = wp_get_current_user();
 
---                 return user->exists();
---         end;
+   -----------------------
+   -- Is_User_Logged_In --
+   -----------------------
+
+   function Is_User_Logged_In
+            return Boolean
+   is
+      use Inc_Class_Wp_Users;
+
+      User : constant Wp_User := Wp_Get_Current_User;
+   begin
+      return User.Exists;
+   end Is_User_Logged_In;
+
 -- endif;
 
 -- if ( ! function_exists( 'auth_redirect' ) ) :
---         --
---         -- Checks if a user is logged in, if not it redirects them to the login page.
---         --
---         -- When this code is called from a page, it checks to see if the user viewing the page is logged in.
---         -- If the user is not logged in, they are redirected to the login page. The user is redirected
---         -- in such a way that, upon logging in, they will be sent directly to the page they were originally
---         -- trying to access.
---         --
---         -- @since 1.5.0
---         --
---         function auth_redirect() then
---                 secure = ( is_ssl() || force_ssl_admin() );
 
---                 --
---                 -- Filters whether to use a secure authentication redirect.
---                 --
---                 -- @since 3.1.0
---                 --
---                 -- @param bool secure Whether to use a secure authentication redirect. Default false.
---                 --
---                 secure = apply_filters( 'secure_auth_redirect', secure );
+   -------------------
+   -- Auth_Redirect --
+   -------------------
 
---                 -- If https is required and request is http, redirect.
---                 if ( secure && ! is_ssl() && false !== strpos( _SERVER['REQUEST_URI'], 'wp-admin' ) ) then
---                         if ( 0 === strpos( _SERVER['REQUEST_URI'], 'http' ) ) then
---                                 wp_redirect( set_url_scheme( _SERVER['REQUEST_URI'], 'https' ) );
---                                 exit;
---                         end; else then
---                                 wp_redirect( 'https://' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
---                                 exit;
---                         end;
---                 end;
+   procedure Auth_Redirect
+   is
+      use Php.Errors;
+      use Php.Strings;
+      use Binder;
+      use Wp_Common;
+      use Inc_Functions;
+      use Inc_General_Templates;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Plugins;
+      use Inc_Users;
 
---                 --
---                 -- Filters the authentication redirect scheme.
---                 --
---                 -- @since 2.9.0
---                 --
---                 -- @param string scheme Authentication redirect scheme. Default empty.
---                 --
---                 scheme = apply_filters( 'auth_redirect_scheme', '' );
+      Secure_2 : constant Boolean := Is_SSL or else Force_SSL_Admin;
 
---                 user_id = wp_validate_auth_cookie( '', scheme );
---                 if ( user_id ) then
---                         --
---                         -- Fires before the authentication redirect.
---                         --
---                         -- @since 2.8.0
---                         --
---                         -- @param int user_id User ID.
---                         --
---                         do_action( 'auth_redirect', user_id );
+      --
+      -- Filters whether to use a secure authentication redirect.
+      --
+      -- @since 3.1.0
+      --
+      -- @param bool secure Whether to use a secure authentication redirect.
+      --                    Default false.
+      --
+      Secure : constant Boolean :=
+        Apply_Filters ("secure_auth_redirect", Secure_2);
+   begin
+      -- If https is required and request is http, redirect.
+      if
+        Secure and then
+        not Is_SSL and then
+        0 /= Strpos (Get_As_String (X_SERVER, "REQUEST_URI"), "wp-admin") -- false
+      then
+         if 0 = Strpos (Get_As_String (X_SERVER, "REQUEST_URI"), "http") then
+            Wp_Redirect (Set_URL_Scheme (Get_As_String (X_SERVER, "REQUEST_URI"),
+                                         "https"));
+            Die; -- exit;
+         else
+            Wp_Redirect ("https://" &
+                         Get_As_String (X_SERVER, "HTTP_HOST") &
+                         Get_As_String (X_SERVER, "REQUEST_URI"));
+            Die; -- exit;
+         end if;
+      end if;
 
---                         -- If the user wants ssl but the session is not ssl, redirect.
---                         if ( ! secure && get_user_option( 'use_ssl', user_id ) && false !== strpos( _SERVER['REQUEST_URI'], 'wp-admin' ) ) then
---                                 if ( 0 === strpos( _SERVER['REQUEST_URI'], 'http' ) ) then
---                                         wp_redirect( set_url_scheme( _SERVER['REQUEST_URI'], 'https' ) );
---                                         exit;
---                                 end; else then
---                                         wp_redirect( 'https://' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
---                                         exit;
---                                 end;
---                         end;
+      --
+      -- Filters the authentication redirect scheme.
+      --
+      -- @since 2.9.0
+      --
+      -- @param string scheme Authentication redirect scheme. Default empty.
+      --
+      declare
+         Scheme  : constant String  := Apply_Filters ("auth_redirect_scheme", "");
+         User_Id : constant Integer := Wp_Validate_Auth_Cookie ("", Scheme);
+      begin
+         if User_Id /= 0 then
+            --
+            -- Fires before the authentication redirect.
+            --
+            -- @since 2.8.0
+            --
+            -- @param int user_id User ID.
+            --
+            Do_Action ("auth_redirect", User_Id);
 
---                         return; -- The cookie is good, so we're done.
---                 end;
+            -- If the user wants ssl but the session is not ssl, redirect.
+            if
+              not Secure and then
+              Get_User_Option ("use_ssl", User_Id) and then
+              0 /= Strpos (Get_As_String (X_SERVER, "REQUEST_URI"), "wp-admin") -- false
+            then
+               if 0 = Strpos (Get_As_String (X_SERVER, "REQUEST_URI"), "http") then
+                  Wp_Redirect
+                    (Set_URL_Scheme (Get_As_String (X_SERVER, "REQUEST_URI"),
+                     "https"));
+                  Die; -- exit;
+               else
+                  Wp_Redirect ("https://" &
+                               Get_As_String (X_SERVER, "HTTP_HOST") &
+                               Get_As_String (X_SERVER, "REQUEST_URI"));
+                  Die; -- exit;
+               end if;
+            end if;
 
---                 -- The cookie is no good, so force login.
---                 nocache_headers();
+            return; -- The cookie is good, so we're done.
+         end if;
 
---                 redirect = ( strpos( _SERVER['REQUEST_URI'], '/options.php' ) && wp_get_referer() ) ? wp_get_referer() : set_url_scheme( 'http://' . _SERVER['HTTP_HOST'] . _SERVER['REQUEST_URI'] );
+         -- The cookie is no good, so force login.
+         Nocache_Headers;
 
---                 login_url = wp_login_url( redirect, true );
+         declare
+            Redirect : constant String :=
+              (if Strpos (Get_As_String (X_SERVER, "REQUEST_URI"),
+                         "/options.php") /= 0 and then Wp_Get_Referer /= ""
+               then Wp_Get_Referer
+               else Set_URL_Scheme ("http://" &
+                                    Get_As_String (X_SERVER, "HTTP_HOST") &
+                                    Get_As_String (X_SERVER, "REQUEST_URI")));
 
---                 wp_redirect( login_url );
---                 exit;
---         end;
+            Login_URL : constant String :=
+              Wp_Login_URL (Redirect, True);
+         begin
+            Wp_Redirect (Login_URL);
+            Die; -- exit;
+         end;
+      end;
+   end Auth_Redirect;
+
 -- endif;
 
 -- if ( ! function_exists( 'check_admin_referer' ) ) :
---         --
---         -- Ensures intent by verifying that a user was referred from another admin page with the correct security nonce.
---         --
---         -- This function ensures the user intends to perform a given action, which helps protect against clickjacking style
---         -- attacks. It verifies intent, not authorisation, therefore it does not verify the user's capabilities. This should
---         -- be performed with `current_user_can()` or similar.
---         --
---         -- If the nonce value is invalid, the function will exit with an "Are You Sure?" style message.
---         --
---         -- @since 1.2.0
---         -- @since 2.5.0 The `query_arg` parameter was added.
---         --
---         -- @param int|string action    The nonce action.
---         -- @param string     query_arg Optional. Key to check for nonce in `_REQUEST`. Default '_wpnonce'.
---         -- @return int|false 1 if the nonce is valid and generated between 0-12 hours ago,
---         --                   2 if the nonce is valid and generated between 12-24 hours ago.
---         --                   False if the nonce is invalid.
---         --
---         function check_admin_referer( action = -1, query_arg = '_wpnonce' ) then
---                 if ( -1 === action ) then
---                         _doing_it_wrong( __FUNCTION__, __( 'You should specify an action to be verified by using the first parameter.' ), '3.2.0' );
---                 end;
 
---                 adminurl = strtolower( admin_url() );
---                 referer  = strtolower( wp_get_referer() );
---                 result   = isset( _REQUEST[ query_arg ] ) ? wp_verify_nonce( _REQUEST[ query_arg ], action ) : false;
+   -------------------------
+   -- Check_Admin_Referer --
+   -------------------------
 
---                 --
---                 -- Fires once the admin request has been validated or not.
---                 --
---                 -- @since 1.5.1
---                 --
---                 -- @param string    action The nonce action.
---                 -- @param false|int result False if the nonce is invalid, 1 if the nonce is valid and generated between
---                 --                          0-12 hours ago, 2 if the nonce is valid and generated between 12-24 hours ago.
---                 --
---                 do_action( 'check_admin_referer', action, result );
+   function Check_Admin_Referer (Action    : String := "-1";
+                                 Query_Arg : String := "_wpnonce")
+                                 return Integer
+   is
+      use Php.Errors;
+      use Php.Strings;
+      use Binder;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Plugins;
+   begin
+      if "-1" = Action then -- -1
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "You should specify an action to be verified by using the first parameter.",
+           "3.2.0");
+      end if;
 
---                 if ( ! result && ! ( -1 === action && strpos( referer, adminurl ) === 0 ) ) then
---                         wp_nonce_ays( action );
---                         die();
---                 end;
+      declare
+         Adminurl : constant String := Strtolower (Admin_URL);
+         Referer  : constant String := Strtolower (Wp_Get_Referer);
 
---                 return result;
---         end;
+         Result : constant Integer :=
+           (if Isset (X_REQUEST, Query_Arg)
+            then Wp_Verify_Nonce (Get_As_String (X_REQUEST, Query_Arg), Action)
+            else 0); -- False);
+      begin
+         --
+         -- Fires once the admin request has been validated or not.
+         --
+         -- @since 1.5.1
+         --
+         -- @param string    action The nonce action.
+         -- @param false|int result False if the nonce is invalid, 1 if the nonce is
+         --                          valid and generated between 0-12 hours ago, 2 if
+         --                          the nonce is valid and generated between 12-24
+         --                          hours ago.
+         --
+         --
+         Do_Action ("check_admin_referer", Action, Result);
+
+         if
+           Result = 0 and then -- not
+           not ("-1" = Action and then Strpos (Referer, Adminurl) = 0) -- -1
+         then
+            Wp_Nonce_AYS (Action'Image); -- 'image added
+            Die;
+         end if;
+
+         return Result;
+      end;
+   end Check_Admin_Referer;
+
+   -------------------------
+   -- Check_Admin_Referer --
+   -------------------------
+
+   procedure Check_Admin_Referer (Action    : String := "-1";  -- = -1
+                                  Query_Arg : String := "_wpnonce")
+   is
+      Unused : constant Integer :=
+        Check_Admin_Referer (Action, Query_Arg);
+   begin
+      null;
+   end Check_Admin_Referer;
+
 -- endif;
 
 -- if ( ! function_exists( 'check_ajax_referer' ) ) :
@@ -1392,9 +1499,10 @@ is
    -- Wp_Redirect --
    -----------------
 
-   procedure Wp_Redirect (Location      : String;
-                          Status        : Integer := 302;
-                          X_Redirect_By : String  := "WordPress")
+   function Wp_Redirect (Location      : String;
+                         Status        : Integer := 302;
+                         X_Redirect_By : String  := "WordPress")
+                         return Boolean
    is
       use Php.HTML;
       use Wp_Common;
@@ -1402,7 +1510,6 @@ is
       use Inc_L10n;
       use Inc_Plugins;
       use Inc_Vars;
---    global is_IIS;
 
       --
       -- Filters the redirect location.
@@ -1427,7 +1534,7 @@ is
         Apply_Filters ("wp_redirect_status", Status, Location_2);
    begin
       if Location_2 = "" then
-         return; --  False;
+         return False;
       end if;
 
       if Status_2 not in 300 .. 399 then
@@ -1463,9 +1570,23 @@ is
 
             Header ("Location: " & Location_3, True, Status_2);
 
-            return; --  true;
+            return True;
          end;
       end;
+   end Wp_Redirect;
+
+   -----------------
+   -- Wp_Redirect --
+   -----------------
+
+   procedure Wp_Redirect (Location      : String;
+                          Status        : Integer := 302;
+                          X_Redirect_By : String  := "WordPress")
+   is
+      Unused : constant Boolean :=
+        Wp_Redirect (Location, Status, X_Redirect_By);
+   begin
+      null;
    end Wp_Redirect;
 
 -- endif;
@@ -1537,55 +1658,40 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_safe_redirect' ) ) :
---         --
---         -- Performs a safe (local) redirect, using wp_redirect().
---         --
---         -- Checks whether the location is using an allowed host, if it has an absolute
---         -- path. A plugin can therefore set or remove allowed host(s) to or from the
---         -- list.
---         --
---         -- If the host is not allowed, then the redirect defaults to wp-admin on the siteurl
---         -- instead. This prevents malicious redirects which redirect to another host,
---         -- but only used in a few places.
---         --
---         -- Note: wp_safe_redirect() does not exit automatically, and should almost always be
---         -- followed by a call to `exit;`:
---         --
---         --     wp_safe_redirect( url );
---         --     exit;
---         --
---         -- Exiting can also be selectively manipulated by using wp_safe_redirect() as a conditional
---         -- in conjunction with the {@see 'wp_redirect'} and {@see 'wp_redirect_location'} filters:
---         --
---         --     if ( wp_safe_redirect( url ) ) then
---         --         exit;
---         --     end;
---         --
---         -- @since 2.3.0
---         -- @since 5.1.0 The return value from wp_redirect() is now passed on, and the `x_redirect_by` parameter was added.
---         --
---         -- @param string location      The path or URL to redirect to.
---         -- @param int    status        Optional. HTTP response status code to use. Default '302' (Moved Temporarily).
---         -- @param string x_redirect_by Optional. The application doing the redirect. Default 'WordPress'.
---         -- @return bool False if the redirect was cancelled, true otherwise.
---         --
---         function wp_safe_redirect( location, status = 302, x_redirect_by = 'WordPress' ) then
 
---                 -- Need to look at the URL the way it will end up in wp_redirect().
---                 location = wp_sanitize_redirect( location );
+   ----------------------
+   -- Wp_Safe_Redirect --
+   ----------------------
 
---                 --
---                 -- Filters the redirect fallback URL for when the provided redirect is not safe (local).
---                 --
---                 -- @since 4.3.0
---                 --
---                 -- @param string fallback_url The fallback URL to use by default.
---                 -- @param int    status       The HTTP response status code to use.
---                 --
---                 location = wp_validate_redirect( location, apply_filters( 'wp_safe_redirect_fallback', admin_url(), status ) );
+   function Wp_Safe_Redirect (Location      : String;
+                              Status        : Integer := 302;
+                              X_Redirect_By : String := "WordPress")
+                              return Boolean
+   is
+      use Inc_Link_Templates;
+      use Inc_Plugins;
 
---                 return wp_redirect( location, status, x_redirect_by );
---         end;
+      -- Need to look at the URL the way it will end up in wp_redirect().
+      Location_2 : constant String :=
+        Wp_Sanitize_Redirect (Location);
+
+      --
+      -- Filters the redirect fallback URL for when the provided redirect is not
+      -- safe (local).
+      --
+      -- @since 4.3.0
+      --
+      -- @param string fallback_url The fallback URL to use by default.
+      -- @param int    status       The HTTP response status code to use.
+      --
+      Location_3 : constant String :=
+        Wp_Validate_Redirect
+          (Location_2,
+           Apply_Filters ("wp_safe_redirect_fallback", Admin_URL, Status));
+   begin
+      return Wp_Redirect (Location_3, Status, X_Redirect_By);
+   end Wp_Safe_Redirect;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_validate_redirect' ) ) :
@@ -1608,7 +1714,6 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
-      use Inc_Plugins;
 
       Location_2 : constant String :=
         Wp_Sanitize_Redirect (Trim (Location, " \t\n\r\0\x08\x0B"));
@@ -2473,6 +2578,18 @@ is
                     -12, 10);
       end;
    end Wp_Create_Nonce;
+
+   ---------------------
+   -- Wp_Create_Nonce --
+   ---------------------
+
+   function Wp_Create_Nonce (Action : String)
+            return String
+   is
+   begin
+      return Wp_Create_Nonce (Integer'Value (Action));
+   end Wp_Create_Nonce;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_salt' ) ) :
@@ -2920,183 +3037,251 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'get_avatar' ) ) :
---         --
---         -- Retrieves the avatar `<img>` tag for a user, email address, MD5 hash, comment, or post.
---         --
---         -- @since 2.5.0
---         -- @since 4.2.0 Optional `args` parameter added.
---         --
---         -- @param mixed  id_or_email The Gravatar to retrieve. Accepts a user_id, gravatar md5 hash,
---         --                            user email, WP_User object, WP_Post object, or WP_Comment object.
---         -- @param int    size        Optional. Height and width of the avatar image file in pixels. Default 96.
---         -- @param string default     Optional. URL for the default image or a default type. Accepts '404'
---         --                            (return a 404 instead of a default image), 'retro' (8bit), 'monsterid'
---         --                            (monster), 'wavatar' (cartoon face), 'indenticon' (the "quilt"),
---         --                            'mystery', 'mm', or 'mysteryman' (The Oyster Man), 'blank' (transparent GIF),
---         --                            or 'gravatar_default' (the Gravatar logo). Default is the value of the
---         --                            'avatar_default' option, with a fallback of 'mystery'.
---         -- @param string alt         Optional. Alternative text to use in img tag. Default empty.
---         -- @param array  args then
---         --     Optional. Extra arguments to retrieve the avatar.
---         --
---         --     @type int          height        Display height of the avatar in pixels. Defaults to size.
---         --     @type int          width         Display width of the avatar in pixels. Defaults to size.
---         --     @type bool         force_default Whether to always show the default image, never the Gravatar. Default false.
---         --     @type string       rating        What rating to display avatars up to. Accepts 'G', 'PG', 'R', 'X', and are
---         --                                       judged in that order. Default is the value of the 'avatar_rating' option.
---         --     @type string       scheme        URL scheme to use. See set_url_scheme() for accepted values.
---         --                                       Default null.
---         --     @type array|string class         Array or string of additional classes to add to the img element.
---         --                                       Default null.
---         --     @type bool         force_display Whether to always show the avatar - ignores the show_avatars option.
---         --                                       Default false.
---         --     @type string       loading       Value for the `loading` attribute.
---         --                                       Default null.
---         --     @type string       extra_attr    HTML attributes to insert in the IMG element. Is not sanitized. Default empty.
---         -- end;
---         -- @return string|false `<img>` tag for the user's avatar. False on failure.
---         --
---         function get_avatar( id_or_email, size = 96, default = '', alt = '', args = null ) then
---                 defaults = array(
---                         -- get_avatar_data() args.
---                         'size'          => 96,
---                         'height'        => null,
---                         'width'         => null,
---                         'default'       => get_option( 'avatar_default', 'mystery' ),
---                         'force_default' => false,
---                         'rating'        => get_option( 'avatar_rating' ),
---                         'scheme'        => null,
---                         'alt'           => '',
---                         'class'         => null,
---                         'force_display' => false,
---                         'loading'       => null,
---                         'extra_attr'    => '',
---                         'decoding'      => 'async',
---                 );
 
---                 if ( wp_lazy_loading_enabled( 'img', 'get_avatar' ) ) then
---                         defaults['loading'] = wp_get_loading_attr_default( 'get_avatar' );
---                 end;
+   ----------------
+   -- Get_Avatar --
+   ----------------
 
---                 if ( empty( args ) ) then
---                         args = array();
---                 end;
+   function Get_Avatar (Id_Or_Email : String;
+                        Size        : Integer    := 96;
+                        Default     : String     := "";
+                        Alt         : String     := "";
+                        Args        : Array_Type := Empty_Array)
+                        return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Arrays;
+      use Php.Lists;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Media;
+      use Inc_Options;
+      use Inc_Plugins;
 
---                 args['size']    = (int) size;
---                 args['default'] = default;
---                 args['alt']     = alt;
+      Defaults : Array_Type := To_Array (List => (
+        -- get_avatar_data() args.
+        Build ("size",          96),
+        Build ("height",        Null_Value),
+        Build ("width",         Null_Value),
+        Build ("default",       String'(Get_Option ("avatar_default", "mystery"))),
+        Build ("force_default", False),
+        Build ("rating",        String'(Get_Option ("avatar_rating"))),
+        Build ("scheme",        Null_Value),
+        Build ("alt",           ""),
+        Build ("class",         Null_Value),
+        Build ("force_display", False),
+        Build ("loading",       Null_Value),
+        Build ("extra_attr",    ""),
+        Build ("decoding",      "async")
+      ));
 
---                 args = wp_parse_args( args, defaults );
+      Args_2 : Array_Type := Args;
+   begin
+      if Wp_Lazy_Loading_Enabled ("img", "get_avatar") then
+         Set (Defaults, "loading", From_String (
+              Wp_Get_Loading_Attr_Default ("get_avatar")));
+      end if;
 
---                 if ( empty( args['height'] ) ) then
---                         args['height'] = args['size'];
---                 end;
---                 if ( empty( args['width'] ) ) then
---                         args['width'] = args['size'];
---                 end;
+      if Args = Empty_Array then
+         Args_2 := Empty_Array;
+      end if;
 
---                 if ( is_object( id_or_email ) && isset( id_or_email->comment_ID ) ) then
---                         id_or_email = get_comment( id_or_email );
---                 end;
+      Set (Args_2, "size",    From_Integer (Size));
+      Set (Args_2, "default", From_String (Default));
+      Set (Args_2, "alt",     From_String (Alt));
 
---                 --
---                 -- Allows the HTML for a user's avatar to be returned early.
---                 --
---                 -- Returning a non-null value will effectively short-circuit get_avatar(), passing
---                 -- the value through the {@see 'get_avatar'} filter and returning early.
---                 --
---                 -- @since 4.2.0
---                 --
---                 -- @param string|null avatar      HTML for the user's avatar. Default null.
---                 -- @param mixed       id_or_email The avatar to retrieve. Accepts a user_id, Gravatar MD5 hash,
---                 --                                 user email, WP_User object, WP_Post object, or WP_Comment object.
---                 -- @param array       args        Arguments passed to get_avatar_url(), after processing.
---                 --
---                 avatar = apply_filters( 'pre_get_avatar', null, id_or_email, args );
+      Args_2 := Wp_Parse_Args (Args_2, Defaults);
 
---                 if ( ! is_null( avatar ) ) then
---                         -- This filter is documented in wp-includes/pluggable.php--
---                         return apply_filters( 'get_avatar', avatar, id_or_email, args['size'], args['default'], args['alt'], args );
---                 end;
+      if Empty (Args_2, "height") then
+         Set (Args_2, "height",
+              From_Integer (As_Integer (Get (Args_2, "size"))));
+      end if;
 
---                 if ( ! args['force_display'] && ! get_option( 'show_avatars' ) ) then
---                         return false;
---                 end;
+      if Empty (Args_2, "width") then
+         Set (Args_2, "width",
+              From_Integer (As_Integer (Get (Args_2, "size"))));
+      end if;
 
---                 url2x = get_avatar_url( id_or_email, array_merge( args, array( 'size' => args['size']-- 2 ) ) );
+      -- if
+      --   Is_Object (Id_Or_Email) and then
+      --   Isset (Id_Or_Email.Comment_Id)
+      -- then
+      --    Id_Or_Email := Get_Comment (Id_Or_Email);
+      -- end if;
 
---                 args = get_avatar_data( id_or_email, args );
+      --
+      -- Allows the HTML for a user"s avatar to be returned early.
+      --
+      -- Returning a non-null value will effectively short-circuit get_avatar(),
+      -- passing the value through the {@see "get_avatar"} filter and returning early.
+      --
+      -- @since 4.2.0
+      --
+      -- @param string|null avatar      HTML for the user's avatar. Default null.
+      -- @param mixed       id_or_email The avatar to retrieve. Accepts a user_id,
+      --                                Gravatar MD5 hash,  user email, WP_User
+      --                                object, WP_Post object, or WP_Comment object.
+      -- @param array       args        Arguments passed to get_avatar_url(), after
+      --                                processing.
+      --
+      declare
+         Avatar : constant String :=
+           Apply_Filters ("pre_get_avatar", "", Id_Or_Email, Args_2); -- null
+      begin
+         if Avatar /= "" then
+--       if not Is_Null (Avatar) then
+            -- This filter is documented in wp-includes/pluggable.php
+            return
+              Apply_Filters ("get_avatar", Avatar, Id_Or_Email,
+                             As_Integer (Get (Args_2, "size")),
+                             As_Array   (Get (Args_2, "default")),
+                             Get_As_String   (Args_2, "alt"),
+                             Args_2);
+         end if;
 
---                 url = args['url'];
+         if
+           not As_Boolean (Get (Args_2, "force_display")) and then
+           not Get_Option ("show_avatars")
+         then
+            return ""; -- False
+         end if;
 
---                 if ( ! url || is_wp_error( url ) ) then
---                         return false;
---                 end;
+         declare
+            URL_2x : constant String :=
+              Get_Avatar_URL (Id_Or_Email,
+                              Array_Merge (Args_2, To_Array (List => (1 =>
+                                Build ("size",
+                                       As_Integer (Get (Args_2, "size")) * 2)))));
 
---                 class = array( 'avatar', 'avatar-' . (int) args['size'], 'photo' );
+            Args_3 : constant Array_Type := Get_Avatar_Data (Id_Or_Email, Args_2);
 
---                 if ( ! args['found_avatar'] || args['force_default'] ) then
---                         class[] = 'avatar-default';
---                 end;
+            URL : constant String := Get_As_String (Args_3, "url");
+         begin
+            if URL = "" or else Is_Wp_Error (URL) then
+               return ""; -- False
+            end if;
 
---                 if ( args['class'] ) then
---                         if ( is_array( args['class'] ) ) then
---                                 class = array_merge( class, args['class'] );
---                         end; else then
---                                 class[] = args['class'];
---                         end;
---                 end;
+            declare
+               Class : List_Type := To_List (List => (
+                 +"avatar",
+                 +("avatar-" & Helpers.Image (As_Integer (Get (Args_3, "size")))),
+                 +"photo")); -- (int)
+            begin
+               if
+                 not As_Boolean (Get (Args_2, "found_avatar")) or else
+                 As_Boolean (Get (Args_3, "force_default"))
+               then
+                  Class.Append (+"avatar-default");
+               end if;
 
---                 -- Add `loading` attribute.
---                 extra_attr = args['extra_attr'];
---                 loading    = args['loading'];
+               if As_Boolean (Get (Args_3, "class")) then
+                  if Kind_Of (Get (Args_3, "class")) = Kind_List then -- array
+                     Class := List_Merge (Class, As_List (Get (Args, "class")));
+                  else
+                     Class.Append (+Get_As_String (Args_3, "class"));
+                  end if;
+               end if;
 
---                 if ( in_array( loading, array( 'lazy', 'eager' ), true ) && ! preg_match( '/\bloading\s*=/', extra_attr ) ) then
---                         if ( ! empty( extra_attr ) ) then
---                                 extra_attr .= ' ';
---                         end;
+               -- Add `loading` attribute.
+               declare
+                  Extra_Attr : Unbounded_String :=
+                    +Get_As_String (Args_3, "extra_attr");
 
---                         extra_attr .= "loading='thenloadingend;'";
---                 end;
+                  Loading : constant String :=
+                    Get_As_String (Args_3, "loading");
 
---                 if ( in_array( args['decoding'], array( 'async', 'sync', 'auto' ) ) && ! preg_match( '/\bdecoding\s*=/', extra_attr ) ) then
---                         if ( ! empty( extra_attr ) ) then
---                                 extra_attr .= ' ';
---                         end;
---                         extra_attr .= "decoding='thenargs['decoding']end;'";
---                 end;
+                  Lazy_Eager : constant List_Type :=
+                    To_List (List => (+"lazy", +"eager"));
 
---                 avatar = sprintf(
---                         "<img alt='%s' src='%s' srcset='%s' class='%s' height='%d' width='%d' %s/>",
---                         esc_attr( args['alt'] ),
---                         esc_url( url ),
---                         esc_url( url2x ) . ' 2x',
---                         esc_attr( implode( ' ', class ) ),
---                         (int) args['height'],
---                         (int) args['width'],
---                         extra_attr
---                 );
+                  Async_Sync_Auto : constant List_Type :=
+                    To_List (List => (+"async", +"sync", +"auto"));
+               begin
+                  if
+                    In_List (Loading, Lazy_Eager, True) and then
+                    not Preg_Match ("/\bloading\s*=/", -Extra_Attr)
+                  then
+                     if not Empty (-Extra_Attr) then
+                        Append (Extra_Attr, " ");
+                     end if;
 
---                 --
---                 -- Filters the HTML for a user's avatar.
---                 --
---                 -- @since 2.5.0
---                 -- @since 4.2.0 The `args` parameter was added.
---                 --
---                 -- @param string avatar      HTML for the user's avatar.
---                 -- @param mixed  id_or_email The avatar to retrieve. Accepts a user_id, Gravatar MD5 hash,
---                 --                            user email, WP_User object, WP_Post object, or WP_Comment object.
---                 -- @param int    size        Square avatar width and height in pixels to retrieve.
---                 -- @param string default     URL for the default image or a default type. Accepts '404', 'retro', 'monsterid',
---                 --                            'wavatar', 'indenticon', 'mystery', 'mm', 'mysteryman', 'blank', or 'gravatar_default'.
---                 -- @param string alt         Alternative text to use in the avatar image tag.
---                 -- @param array  args        Arguments passed to get_avatar_data(), after processing.
---                 --
---                 return apply_filters( 'get_avatar', avatar, id_or_email, args['size'], args['default'], args['alt'], args );
---         end;
+                     Append (Extra_Attr, "loading=""" & Loading & """");
+                  end if;
+
+                  if
+                    In_List (Get_As_String (Args_2, "decoding"),
+                             Async_Sync_Auto)
+                    and then
+                    not Preg_Match ("/\bdecoding\s*=/", -Extra_Attr)
+                  then
+                     if not Empty (-Extra_Attr) then
+                        Append (Extra_Attr, " ");
+                     end if;
+                     Append (Extra_Attr,
+                             "decoding=""" &
+                             Get_As_String (Args_3, "decoding") &
+                             """");
+                  end if;
+
+                  declare
+                     Avatar_2 : constant String :=
+                       Sprintf (
+                         "<img alt=""%s"" src=""%s"" srcset=""%s"" class=""%s"" height=""%d"" width=""%d"" %s/>",
+                         To_List (List => (
+                           1 => +ESC_Attr (Get_As_String (Args_3, "alt")),
+                           2 => +ESC_URL (URL),
+                           3 => +ESC_URL (URL_2x) & " 2x",
+                           4 => +ESC_Attr (Implode (" ", Class)),
+                           5 => +Helpers.Image (As_Integer (Get (Args_3, "height"))),
+                           6 => +Helpers.Image (As_Integer (Get (Args_3, "width"))),
+                           7 => Extra_Attr
+                         ))
+                       );
+                  begin
+                     --
+                     -- Filters the HTML for a user"s avatar.
+                     --
+                     -- @since 2.5.0
+                     -- @since 4.2.0 The `args` parameter was added.
+                     --
+                     -- @param string avatar      HTML for the user"s avatar.
+                     -- @param mixed  id_or_email The avatar to retrieve. Accepts a
+                     --                           user_id, Gravatar MD5 hash,  user
+                     --                           email, WP_User object, WP_Post
+                     --                           object, or WP_Comment object.
+                     -- @param int    size        Square avatar width and height in
+                     --                           pixels to retrieve.
+                     -- @param string default     URL for the default image or a
+                     --                           default type. Accepts "404",
+                     --                           "retro", "monsterid", "wavatar",
+                     --                           "indenticon", "mystery", "mm",
+                     --                           "mysteryman", "blank", or
+                     --                           "gravatar_default".
+                     -- @param string alt         Alternative text to use in the
+                     --                           avatar image tag.
+                     -- @param array  args        Arguments passed to
+                     --                           get_avatar_data(), after processing.
+                     --
+                     return Apply_Filters ("get_avatar", Avatar_2, Id_Or_Email,
+                                           As_Integer (Get (Args_3, "size")),
+                                           As_Array   (Get (Args_3, "default")),
+                                           Get_As_String   (Args_3, "alt"),
+                                           Args_3);
+                  end;
+               end;
+            end;
+         end;
+      end;
+   end Get_Avatar;
+
 -- endif;
 
--- if ( ! function_exists( 'wp_text_diff' ) ) :
+-- if ( ! function_exists( "wp_text_diff" ) ) :
 --         --
 --         -- Displays a human readable HTML representation of the difference between two strings.
 --         --
@@ -3128,15 +3313,15 @@ is
 --         --
 --         function wp_text_diff( left_string, right_string, args = null ) then
 --                 defaults = array(
---                         'title'           => '',
---                         'title_left'      => '',
---                         'title_right'     => '',
---                         'show_split_view' => true,
+--                         "title"           => "",
+--                         "title_left"      => "",
+--                         "title_right"     => "",
+--                         "show_split_view" => true,
 --                 );
 --                 args     = wp_parse_args( args, defaults );
 
---                 if ( ! class_exists( 'WP_Text_Diff_Renderer_Table', false ) ) then
---                         require ABSPATH . WPINC . '/wp-diff.php';
+--                 if ( ! class_exists( "WP_Text_Diff_Renderer_Table", false ) ) then
+--                         require ABSPATH . WPINC . "/wp-diff.php";
 --                 end;
 
 --                 left_string  = normalize_whitespace( left_string );
@@ -3149,27 +3334,27 @@ is
 --                 diff        = renderer->render( text_diff );
 
 --                 if ( ! diff ) then
---                         return '';
+--                         return "";
 --                 end;
 
---                 is_split_view       = ! empty( args['show_split_view'] );
---                 is_split_view_class = is_split_view ? ' is-split-view' : '';
+--                 is_split_view       = ! empty( args["show_split_view"] );
+--                 is_split_view_class = is_split_view ? " is-split-view" : "";
 
---                 r = "<table class='diffis_split_view_class'>\n";
+--                 r = "<table class="diffis_split_view_class">\n";
 
---                 if ( args['title'] ) then
---                         r .= "<caption class='diff-title'>args[title]</caption>\n";
+--                 if ( args["title"] ) then
+--                         r .= "<caption class="diff-title">args[title]</caption>\n";
 --                 end;
 
---                 if ( args['title_left'] || args['title_right'] ) then
---                         r .= '<thead>';
+--                 if ( args["title_left"] || args["title_right"] ) then
+--                         r .= "<thead>";
 --                 end;
 
---                 if ( args['title_left'] || args['title_right'] ) then
---                         th_or_td_left  = empty( args['title_left'] ) ? 'td' : 'th';
---                         th_or_td_right = empty( args['title_right'] ) ? 'td' : 'th';
+--                 if ( args["title_left"] || args["title_right"] ) then
+--                         th_or_td_left  = empty( args["title_left"] ) ? "td" : "th";
+--                         th_or_td_right = empty( args["title_right"] ) ? "td" : "th";
 
---                         r .= "<tr class='diff-sub-title'>\n";
+--                         r .= "<tr class="diff-sub-title">\n";
 --                         r .= "\t<th_or_td_left>args[title_left]</th_or_td_left>\n";
 --                         if ( is_split_view ) then
 --                                 r .= "\t<th_or_td_right>args[title_right]</th_or_td_right>\n";
@@ -3177,12 +3362,12 @@ is
 --                         r .= "</tr>\n";
 --                 end;
 
---                 if ( args['title_left'] || args['title_right'] ) then
+--                 if ( args["title_left"] || args["title_right"] ) then
 --                         r .= "</thead>\n";
 --                 end;
 
 --                 r .= "<tbody>\ndiff\n</tbody>\n";
---                 r .= '</table>';
+--                 r .= "</table>";
 
 --                 return r;
 --         end;

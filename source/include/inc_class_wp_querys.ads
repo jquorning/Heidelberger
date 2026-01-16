@@ -755,6 +755,18 @@ is
                          return Boolean;
 
    --
+   -- Is the query the main query?
+   --
+   -- @since 3.3.0
+   --
+   -- @global WP_Query $wp_query WordPress Query object.
+   --
+   -- @return bool Whether the query is the main query.
+   --
+   function Is_Main_Query (This : Wp_Query)
+                           return Boolean;
+
+   --
    -- Sets up the WordPress query by parsing query string.
    --
    -- @since 1.5.0

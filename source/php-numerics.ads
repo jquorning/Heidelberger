@@ -59,4 +59,13 @@ is
                            return String
                            is ("999,999.99");
 
+   function SHA1 (Item : String)
+                  return String
+                  is ("XXX-884");
+
+   function Hash (Alg  : String;
+                  Item : String)
+                  return String
+                  is ("XXX-883");
+
 end Php.Numerics;

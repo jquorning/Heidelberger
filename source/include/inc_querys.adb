@@ -11,14 +11,19 @@
 -- @subpackage Query
 --
 
--- with Hb_Common;
+with Php.Strings;
+
+with Hb_Common;
+with Lists;
 
 with Inc_Class_Wp_Querys;
 with Inc_Functions;
 with Inc_L10n;
+with Inc_Plugins;
 
 package body Inc_Querys
 is
+   use Lists;
 
    Wp_Query : constant Inc_Class_Wp_Querys.Wp_Query :=
      Inc_Class_Wp_Querys.Null_Query;
@@ -818,44 +823,48 @@ is
 --         return wp_query->is_embed();
 -- end;
 
--- --
--- -- Determines whether the query is the main query.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 3.3.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool Whether the query is the main query.
--- --
--- function is_main_query() then
---         global wp_query;
+   -------------------
+   -- Is_Main_Query --
+   -------------------
 
---         if ( ! isset( wp_query ) ) then
---                 _doing_it_wrong( __FUNCTION__, __( "Conditional query tags do not work before the query is run. Before then, they always return false." ), "6.1.0" );
---                 return false;
---         end;
+   function Is_Main_Query
+            return Boolean
+   is
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Plugins;
 
---         if ( "pre_get_posts" === current_filter() ) then
---                 _doing_it_wrong(
---                         __FUNCTION__,
---                         sprintf(
---                                 /* translators: 1: pre_get_posts, 2: WP_Query->is_main_query(), 3: is_main_query(), 4: Documentation URL.--
---                                 __( "In %1s, use the %2s method, not the %3s function. See %4s." ),
---                                 "<code>pre_get_posts</code>",
---                                 "<code>WP_Query->is_main_query()</code>",
---                                 "<code>is_main_query()</code>",
---                                 __( "https://developer.wordpress.org/reference/functions/is_main_query/" )
---                         ),
---                         "3.7.0"
---                 );
---         end;
+--    global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
+           "6.1.0");
+         return False;
+      end  if;
 
---         return wp_query->is_main_query();
--- end;
+      if "pre_get_posts" = Current_Filter then
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           Sprintf (
+             -- translators: 1: pre_get_posts, 2: WP_Query->is_main_query(), 3: is_main_query(), 4: Documentation URL.
+             abs "In %1s, use the %2s method, not the %3s function. See %4s.",
+             To_List (List => (
+               1 => +"<code>pre_get_posts</code>",
+               2 => +"<code>WP_Query->is_main_query()</code>",
+               3 => +"<code>is_main_query()</code>",
+               4 => +abs "https://developer.wordpress.org/reference/functions/is_main_query/"
+             ))
+           ),
+           "3.7.0"
+         );
+      end if;
+
+      return Wp_Query.Is_Main_Query;
+   end Is_Main_Query;
 
 -- /*
 -- -- The Loop. Post loop control.
@@ -880,28 +889,21 @@ is
 --         return wp_query->have_posts();
 -- end;
 
--- --
--- -- Determines whether the caller is in the Loop.
--- --
--- -- For more information on this and similar theme functions, check out
--- -- the then@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- -- Conditional Tagsend; article in the Theme Developer Handbook.
--- --
--- -- @since 2.0.0
--- --
--- -- @global WP_Query wp_query WordPress Query object.
--- --
--- -- @return bool True if caller is within loop, false if loop hasn"t started or ended.
--- --
--- function in_the_loop() then
---         global wp_query;
+   -----------------
+   -- In_The_Loop --
+   -----------------
 
---         if ( ! isset( wp_query ) ) then
---                 return false;
---         end;
+   function In_The_Loop
+            return Boolean
+   is
+--    global wp_query;
+   begin
+      if not Isset (Wp_Query) then
+         return False;
+      end if;
 
---         return wp_query->in_the_loop;
--- end;
+      return Wp_Query.In_The_Loop;
+   end In_The_Loop;
 
 -- --
 -- -- Rewind the loop posts.

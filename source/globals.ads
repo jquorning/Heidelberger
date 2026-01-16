@@ -155,4 +155,6 @@ is
    DB_COLLATE : constant String := "";
    DB_CHARSET : constant String := "";
 
+   Login_Grace_Period : Integer := 0;
+
 end Globals;

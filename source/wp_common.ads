@@ -346,6 +346,16 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Email      : String;
+                           Size       : Integer;
+                           Default    : Array_Type;
+                           Alt        : String;
+                           Args       : Array_Type)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
                            Value      : Boolean;
                            Args       : Array_Type;
                            Typ        : String)
@@ -385,6 +395,20 @@ is
                         User      : Integer;
                         Role      : String;
                         Roles     : List_Type)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        User      : Integer)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Action    : Integer;
+                        Result    : Boolean)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Cookie    : Array_Type;
+                        User      : Inc_Class_Wp_Users.Wp_User)
                         is null;
 
 end Wp_Common;
