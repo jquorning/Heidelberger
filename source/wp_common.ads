@@ -340,6 +340,12 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name  : String;
+                           Value      : List_Type;
+                           Host       : String)
+                           return List_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
                            Value      : Boolean;
                            Args       : Array_Type;
                            Typ        : String)

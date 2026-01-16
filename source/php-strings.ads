@@ -127,6 +127,10 @@ is
                     Token : String)
                     return String;
 
+   function Strpbrk (Item       : String;
+                     Characters : String)
+                     return String;
+
    function Str_Split (Item   : String;
                        Length : Natural := 1)
                        return Array_Type;

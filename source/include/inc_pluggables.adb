@@ -11,13 +11,14 @@ with Ada.Strings.Unbounded;
 with Ada.Numerics.Discrete_Random;
 -- with Ada.Text_IO;
 
+with Php.Files;
 with Php.HTML;
 with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
-with Hb_Common;
 with Binder;
+with Hb_Common;
 with Globals;
 with Wp_Common;
 
@@ -26,6 +27,7 @@ with Inc_Default_Constants;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_KSES;
+with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
@@ -1587,85 +1589,135 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_validate_redirect' ) ) :
---         --
---         -- Validates a URL for use in a redirect.
---         --
---         -- Checks whether the location is using an allowed host, if it has an absolute
---         -- path. A plugin can therefore set or remove allowed host(s) to or from the
---         -- list.
---         --
---         -- If the host is not allowed, then the redirect is to default supplied.
---         --
---         -- @since 2.8.1
---         --
---         -- @param string location The redirect to validate.
---         -- @param string default  The value to return if location is not allowed.
---         -- @return string redirect-sanitized URL.
---         --
---         function wp_validate_redirect( location, default = '' ) then
---                 location = wp_sanitize_redirect( trim( location, " \t\n\r\0\x08\x0B" ) );
---                 -- Browsers will assume 'http' is your protocol, and will obey a redirect to a URL starting with '--'.
---                 if ( '--' === substr( location, 0, 2 ) ) then
---                         location = 'http:' . location;
---                 end;
 
---                 -- In PHP 5 parse_url() may fail if the URL query part contains 'http://'.
---                 -- See https://bugs.php.net/bug.php?id=38143
---                 cut  = strpos( location, '?' );
---                 test = cut ? substr( location, 0, cut ) : location;
+   --------------------------
+   -- Wp_Validate_Redirect --
+   --------------------------
 
---                 lp = parse_url( test );
+   function Wp_Validate_Redirect (Location : String;
+                                  Default  : String := "")
+                                  return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Files;
+      use Php.HTML;
+      use Php.Lists;
+      use Php.Strings;
+      use Binder;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Plugins;
 
---                 -- Give up if malformed URL.
---                 if ( false === lp ) then
---                         return default;
---                 end;
+      Location_2 : constant String :=
+        Wp_Sanitize_Redirect (Trim (Location, " \t\n\r\0\x08\x0B"));
 
---                 -- Allow only 'http' and 'https' schemes. No 'data:', etc.
---                 if ( isset( lp['scheme'] ) && ! ( 'http' === lp['scheme'] || 'https' === lp['scheme'] ) ) then
---                         return default;
---                 end;
+      Location_3 : Unbounded_String := +Location_2;
+   begin
+      -- Browsers will assume 'http' is your protocol, and will obey a redirect
+      -- to a URL starting with '//'.
+      if "//" = Substr (-Location_3, 0, 2) then
+         Location_3 := "http:" & Location_3;
+      end if;
 
---                 if ( ! isset( lp['host'] ) && ! empty( lp['path'] ) && '/' !== lp['path'][0] ) then
---                         path = '';
---                         if ( ! empty( _SERVER['REQUEST_URI'] ) ) then
---                                 path = dirname( parse_url( 'http://placeholder' . _SERVER['REQUEST_URI'], PHP_URL_PATH ) . '?' );
---                                 path = wp_normalize_path( path );
---                         end;
---                         location = '/' . ltrim( path . '/', '/' ) . location;
---                 end;
+      -- In PHP 5 parse_url() may fail if the URL query part contains 'http://'.
+      -- See https://bugs.php.net/bug.php?id=38143
+      declare
+         Cut : constant Natural := Strpos (-Location_3, "?");
 
---                 -- Reject if certain components are set but host is not.
---                 -- This catches URLs like https:host.com for which parse_url() does not set the host field.
---                 if ( ! isset( lp['host'] ) && ( isset( lp['scheme'] ) || isset( lp['user'] ) || isset( lp['pass'] ) || isset( lp['port'] ) ) ) then
---                         return default;
---                 end;
+         Test : constant String :=
+           (if Cut /= 0 then Substr (-Location_3, 0, Cut) else -Location_3);
 
---                 -- Reject malformed components parse_url() can return on odd inputs.
---                 foreach ( array( 'user', 'pass', 'host' ) as component ) then
---                         if ( isset( lp[ component ] ) && strpbrk( lp[ component ], ':/?#@' ) ) then
---                                 return default;
---                         end;
---                 end;
+         Lp : constant Array_Type := Parse_URL (Test);
+      begin
+         -- Give up if malformed URL.
+         if Lp = Empty_Array then -- false
+            return Default;
+         end if;
 
---                 wpp = parse_url( home_url() );
+         -- Allow only 'http' and 'https' schemes. No 'data:', etc.
+         if
+           Isset (Lp, "scheme") and then
+           Get_As_String (Lp, "scheme") not in "http" | "https"
+         then
+            return Default;
+         end if;
 
---                 --
---                 -- Filters the list of allowed hosts to redirect to.
---                 --
---                 -- @since 2.3.0
---                 --
---                 -- @param string[] hosts An array of allowed host names.
---                 -- @param string   host  The host name of the redirect destination; empty string if not set.
---                 --
---                 allowed_hosts = (array) apply_filters( 'allowed_redirect_hosts', array( wpp['host'] ), isset( lp['host'] ) ? lp['host'] : '' );
+         if
+           not Isset (Lp, "host") and then
+           not Empty (Lp, "path") and then
+           '/' /= Get_As_String (Lp, "path") (1)
+         then
+            declare
+               Path : Unbounded_String;
+            begin
+               if not Empty (X_SERVER, "REQUEST_URI") then
+                  Path :=
+                    +Dirname (Parse_URL ("http://placeholder" &
+                              Get_As_String (X_SERVER, "REQUEST_URI"),
+                              PHP_URL_PATH) & '?');
 
---                 if ( isset( lp['host'] ) && ( ! in_array( lp['host'], allowed_hosts, true ) && strtolower( wpp['host'] ) !== lp['host'] ) ) then
---                         location = default;
---                 end;
+                  Path := +Wp_Normalize_Path (-Path);
+               end if;
+               Location_3 := '/' & Ltrim ((-Path) & '/', "/") & Location_3;
+            end;
+         end if;
 
---                 return location;
---         end;
+         -- Reject if certain components are set but host is not.
+         -- This catches URLs like https:host.com for which parse_url() does not
+         -- set the host field.
+         if
+           not Isset (Lp, "host") and then
+           (Isset (Lp, "scheme") or else
+            Isset (Lp, "user")   or else
+            Isset (Lp, "pass")   or else
+            Isset (Lp, "port"))
+         then
+            return Default;
+         end if;
+
+         -- Reject malformed components parse_url() can return on odd inputs.
+         for Component of To_List (List => (+"user", +"pass", +"host")) loop
+            if
+              Isset (Lp, -Component) and then
+              Strpbrk (Get_As_String (Lp, -Component), ":/?#@") /= ""
+            then
+               return Default;
+            end if;
+         end loop;
+
+         declare
+            Wpp : constant Array_Type := Parse_URL (Home_URL);
+
+            --
+            -- Filters the list of allowed hosts to redirect to.
+            --
+            -- @since 2.3.0
+            --
+            -- @param string[] hosts An array of allowed host names.
+            -- @param string   host  The host name of the redirect destination;
+            --                       empty string if not set.
+            --
+            Allowed_Hosts : constant List_Type :=
+              Apply_Filters ("allowed_redirect_hosts",
+                             To_List (Get_As_String (Wpp, "host")),
+                             (if Isset (Lp, "host")
+                              then Get_As_String (Lp, "host") else "")); -- (array)
+         begin
+            if
+              Isset (Lp, "host") and then
+              (not In_List (Get_As_String (Lp, "host"), Allowed_Hosts, True) and then
+               Strtolower (Get_As_String (Wpp, "host")) /= Get_As_String (Lp, "host"))
+            then
+               Location_3 := +Default;
+            end if;
+
+            return -Location_3;
+         end;
+      end;
+   end Wp_Validate_Redirect;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_notify_postauthor' ) ) :

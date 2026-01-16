@@ -35,6 +35,7 @@ with Inc_Class_Wpdb;
 with Inc_Class_Wp_List_Util;
 with Inc_Class_Wp_Networks;
 with Inc_Formatting;
+with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Ms_Networks;
@@ -1181,10 +1182,10 @@ is
                            URL   : String := "")
                            return String
    is
-      use Hb_Common;
-      use Php;
+      use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
+      use Hb_Common;
       use Inc_Formatting;
 
       Protocol : Unbounded_String;
@@ -1208,6 +1209,8 @@ is
       URI   : constant String  := As_String (Get (Binder.X_SERVER, "REQUEST_URI"));
       URI_2 : Unbounded_String := +URI;
    begin
+      Put_Line ("add_query_arg: " & URI);
+
       Frag := +Strstr (URI, "#");
       if Frag = "" then
          URI_2 := +Substr (URI, 0, -Strlen (-Frag));
@@ -1227,6 +1230,8 @@ is
          Protocol := +"";
       end if;
 
+      Put_Line ("add_query_arg: " & (-URI_2));
+
       declare
          URI_3 : constant String := -URI_2;
          Query : Unbounded_String;
@@ -1237,7 +1242,6 @@ is
             begin
                Base  := List (1);
                Query := List (2);
---             list( base, query ) := Explode ("?", -URI, 2);
             end;
             Append (Base, "?");
 
@@ -1281,11 +1285,19 @@ is
       end;
    end Add_Query_Arg;
 
+   -------------------
+   -- Add_Query_Arg --
+   -------------------
+
    function Add_Query_Arg (Key   : String;
                            Value : String;
                            URL   : String := "")
                            return String
    is (Add_Query_Arg (To_List (Key), Value, URL));
+
+   -------------------
+   -- Add_Query_Arg --
+   -------------------
 
    function Add_Query_Arg (Key   : Array_Type;
                            Value : String;
@@ -1293,7 +1305,6 @@ is
                            return String
    is
       use Hb_Common;
---    use Array_Maps;
 
       Res : Unbounded_String := +URL;
    begin
@@ -1320,6 +1331,10 @@ is
       end loop;
       return -Query_2;
    end Remove_Query_Arg;
+
+   ----------------------
+   -- Remove_Query_Arg --
+   ----------------------
 
    function Remove_Query_Arg (Key   : String;
                               Query : String := "")
@@ -2094,47 +2109,56 @@ is
 --         return orig_referer_field;
 -- end;
 
---
--- Retrieves referer from "_wp_http_referer" or HTTP referer.
---
--- If it"s the same as the current request URL, will return false.
---
--- @since 2.0.4
---
--- @return string|false Referer URL on success, false on failure.
---
--- function wp_get_referer() then
---         if ( ! function_exists( "wp_validate_redirect" ) ) then
---                 return false;
---         end;
+   --------------------
+   -- Wp_Get_Referer --
+   --------------------
 
---         ref = wp_get_raw_referer();
+   function Wp_Get_Referer
+            return String
+   is
+      use Php.Misc;
+      use Binder;
+      use Inc_Formatting;
+      use Inc_Link_Templates;
+      use Inc_Pluggables;
+   begin
+      if not Function_Exists ("wp_validate_redirect") then
+         return ""; -- false
+      end if;
 
---         if ( ref && wp_unslash( _SERVER["REQUEST_URI"] ) !== ref && home_url() . wp_unslash( _SERVER["REQUEST_URI"] ) !== ref ) then
---                 return wp_validate_redirect( ref, false );
---         end;
+      declare
+         Ref : constant String := Wp_Get_Raw_Referer;
+      begin
+         if
+           Ref /= "" and then
+           Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")) /= Ref and then
+           Home_URL & Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")) /= Ref
+         then
+            return Wp_Validate_Redirect (Ref, ""); -- False
+         end if;
+      end;
+      return ""; -- false
+   end Wp_Get_Referer;
 
---         return false;
--- end;
+   ------------------------
+   -- Wp_Get_Raw_Referer --
+   ------------------------
 
---
--- Retrieves unvalidated referer from "_wp_http_referer" or HTTP referer.
---
--- Do not use for redirects, use wp_get_referer() instead.
---
--- @since 4.5.0
---
--- @return string|false Referer URL on success, false on failure.
---
--- function wp_get_raw_referer() then
---         if ( ! empty( _REQUEST["_wp_http_referer"] ) ) then
---                 return wp_unslash( _REQUEST["_wp_http_referer"] );
---         end; elseif ( ! empty( _SERVER["HTTP_REFERER"] ) ) then
---                 return wp_unslash( _SERVER["HTTP_REFERER"] );
---         end;
+   function Wp_Get_Raw_Referer
+            return String
+   is
+      use Binder;
+      use Inc_Formatting;
+   begin
+      if not Empty (X_REQUEST, "_wp_http_referer") then
+         return Wp_Unslash (Get_As_String (X_REQUEST, "_wp_http_referer"));
 
---         return false;
--- end;
+      elsif not Empty (X_SERVER, "HTTP_REFERER") then
+         return Wp_Unslash (Get_As_String (X_SERVER, "HTTP_REFERER"));
+      end if;
+
+      return ""; -- false
+   end Wp_Get_Raw_Referer;
 
 --
 -- Retrieves original referer that was posted, if it exists.

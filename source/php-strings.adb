@@ -498,6 +498,24 @@ is
                     return String
    is (raise Program_Error with "XXX-783");
 
+   -------------
+   -- Strpbrk --
+   -------------
+
+   function Strpbrk (Item       : String;
+                     Characters : String)
+                     return String
+   is
+      use Ada.Strings.Fixed;
+
+      Pos : constant Natural := Index (Item, Characters);
+   begin
+      if Pos = 0 then
+         return "";
+      end if;
+      return Item (Pos .. Item'Last);
+   end Strpbrk;
+
    ---------------
    -- Str_Split --
    ---------------

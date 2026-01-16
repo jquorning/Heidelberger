@@ -465,8 +465,19 @@ is
    -- @return string|false Referer URL on success, false on failure.
    --
    function Wp_Get_Referer
-            return String
-            is ("XXX-465");
+            return String;
+
+   --
+   -- Retrieves unvalidated referer from "_wp_http_referer" or HTTP referer.
+   --
+   -- Do not use for redirects, use wp_get_referer() instead.
+   --
+   -- @since 4.5.0
+   --
+   -- @return string|false Referer URL on success, false on failure.
+   --
+   function Wp_Get_Raw_Referer
+            return String;
 
    --
    -- Normalizes a filesystem path.

@@ -33,7 +33,6 @@ with Adi_Templates;
 with Inc_Capabilities;
 with Inc_Categories;
 with Inc_Category_Templates;
--- with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Formatting;
 with Inc_Functions;

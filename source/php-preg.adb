@@ -147,6 +147,11 @@ is
       use Ada.Text_IO;
       use GNAT.Regpat;
    begin
+      Put_Line ("preg_replace:");
+      Put_Line ("  pattern    : " & Pattern);
+      Put_Line ("  replacement: " & Replacement);
+      Put_Line ("  subject    : " & Subject);
+
       declare
          Marks : constant Marks_Type :=
            Find_Marks (Pattern);
@@ -164,6 +169,7 @@ is
 
    exception
       when Expression_Error =>
+         Put_Line ("preg_replace:");
          Put_Line ("  EXCEPTION: Expression_Error");
          return Subject;
    end Preg_Replace;
