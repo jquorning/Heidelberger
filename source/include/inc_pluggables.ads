@@ -477,7 +477,6 @@ is
    --
    function Wp_Verify_Nonce (Nonce  : String;
                              Action : String := "-1") -- Integer := -1)
-                             return Integer
-                             is (1);
+                             return Integer;
 
 end Inc_Pluggables;

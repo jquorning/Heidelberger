@@ -2479,72 +2479,92 @@ is
       return Float'Ceiling (0.0 / Float (Nonce_Life / 2));
 --    return Float'Ceil (time() / ( nonce_life / 2));
    end Wp_Nonce_Tick;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_verify_nonce' ) ) :
---         --
---         -- Verifies that a correct security nonce was used with time limit.
---         --
---         -- A nonce is valid for 24 hours (by default).
---         --
---         -- @since 2.0.3
---         --
---         -- @param string     nonce  Nonce value that was used for verification, usually via a form field.
---         -- @param string|int action Should give context to what is taking place and be the same when nonce was created.
---         -- @return int|false 1 if the nonce is valid and generated between 0-12 hours ago,
---         --                   2 if the nonce is valid and generated between 12-24 hours ago.
---         --                   False if the nonce is invalid.
---         --
---         function wp_verify_nonce( nonce, action = -1 ) then
---                 nonce = (string) nonce;
---                 user  = wp_get_current_user();
---                 uid   = (int) user->ID;
---                 if ( ! uid ) then
---                         --
---                         -- Filters whether the user who generated the nonce is logged out.
---                         --
---                         -- @since 3.5.0
---                         --
---                         -- @param int        uid    ID of the nonce-owning user.
---                         -- @param string|int action The nonce action, or -1 if none was provided.
---                         --
---                         uid = apply_filters( 'nonce_user_logged_out', uid, action );
---                 end;
 
---                 if ( empty( nonce ) ) then
---                         return false;
---                 end;
+   ---------------------
+   -- Wp_Verify_Nonce --
+   ---------------------
 
---                 token = wp_get_session_token();
---                 i     = wp_nonce_tick( action );
+   function Wp_Verify_Nonce (Nonce  : String;
+                             Action : String := "-1") -- Integer := -1)
+                             return Integer
+   is
+      use Php.Misc;
+      use Php.Strings;
+      use Helpers;
+      use Wp_Common;
+      use Inc_Class_Wp_Users;
+      use Inc_Users;
 
---                 -- Nonce generated 0-12 hours ago.
---                 expected = substr( wp_hash( i . '|' . action . '|' . uid . '|' . token, 'nonce' ), -12, 10 );
---                 if ( hash_equals( expected, nonce ) ) then
---                         return 1;
---                 end;
+--    Nonce := (string) nonce;
+      User : constant Wp_User := Wp_Get_Current_User;
+      Uid  : Integer := User.Id; -- (int)
+   begin
+      if Uid = 0 then
+         --
+         -- Filters whether the user who generated the nonce is logged out.
+         --
+         -- @since 3.5.0
+         --
+         -- @param int        uid    ID of the nonce-owning user.
+         -- @param string|int action The nonce action, or -1 if none was provided.
+         --
+         Uid := Apply_Filters ("nonce_user_logged_out", Uid, Action);
+      end if;
 
---                 -- Nonce generated 12-24 hours ago.
---                 expected = substr( wp_hash( ( i - 1 ) . '|' . action . '|' . uid . '|' . token, 'nonce' ), -12, 10 );
---                 if ( hash_equals( expected, nonce ) ) then
---                         return 2;
---                 end;
+      if Empty (Nonce) then
+         return 0; -- False;
+      end if;
 
---                 --
---                 -- Fires when nonce verification fails.
---                 --
---                 -- @since 4.4.0
---                 --
---                 -- @param string     nonce  The invalid nonce.
---                 -- @param string|int action The nonce action.
---                 -- @param WP_User    user   The current user object.
---                 -- @param string     token  The user's session token.
---                 --
---                 do_action( 'wp_verify_nonce_failed', nonce, action, user, token );
+      declare
+         Token : constant String := Wp_Get_Session_Token;
+         I     : constant Float  := Wp_Nonce_Tick (Integer'Value (Action));
+         II    : constant Integer := Integer (I); -- added
 
---                 -- Invalid nonce.
---                 return false;
---         end;
+         -- Nonce generated 0-12 hours ago.
+         Expected_1 : constant String :=
+           Substr (Wp_Hash (Image (II) & '|' & Action & '|' &
+                            Image (Uid) & '|' & Token,
+                            "nonce"),
+                   -12, 10);
+      begin
+         if Hash_Equals (Expected_1, Nonce) then
+            return 1;
+         end if;
+
+         declare
+            -- Nonce generated 12-24 hours ago.
+            Expected_2 : constant String :=
+              Substr (Wp_Hash (Image (II - 1) & '|' & Action & '|' &
+                               Image (Uid) & '|' & Token,
+                               "nonce"),
+                      -12, 10);
+         begin
+            if Hash_Equals (Expected_2, Nonce) then
+               return 2;
+            end if;
+         end;
+
+         --
+         -- Fires when nonce verification fails.
+         --
+         -- @since 4.4.0
+         --
+         -- @param string     nonce  The invalid nonce.
+         -- @param string|int action The nonce action.
+         -- @param WP_User    user   The current user object.
+         -- @param string     token  The user's session token.
+         --
+         Do_Action ("wp_verify_nonce_failed", Nonce, Action, User, Token);
+      end;
+
+      -- Invalid nonce.
+      return 0; -- false;
+   end Wp_Verify_Nonce;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_create_nonce' ) ) :

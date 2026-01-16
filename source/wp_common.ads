@@ -411,4 +411,11 @@ is
                         User      : Inc_Class_Wp_Users.Wp_User)
                         is null;
 
+   procedure Do_Action (Hook_Name : String;
+                        Nonce     : String;
+                        Action    : String;
+                        User      : Inc_Class_Wp_Users.Wp_User;
+                        Token     : String)
+                        is null;
+
 end Wp_Common;
