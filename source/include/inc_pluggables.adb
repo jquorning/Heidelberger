@@ -7,9 +7,8 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 with Ada.Numerics.Discrete_Random;
--- with Ada.Text_IO;
+with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Errors;

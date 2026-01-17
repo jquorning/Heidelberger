@@ -624,7 +624,7 @@ is
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
                      Clear_Echo;
                      declare
-                        Unused : String :=
+                        Unused : constant String :=
                            Inc_Functions.Wp_Nonce_Field ("add-tag",
                                                          "_wpnonce_add-tag");
                      begin

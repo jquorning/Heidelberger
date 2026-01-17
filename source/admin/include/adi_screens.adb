@@ -27,7 +27,6 @@ is
                                 return Array_Type
    is
       use Hb_Common;
---    use Wp_Common;
       use Inc_Plugins;
 --    static column_headers = array();
    begin

@@ -9,8 +9,6 @@
 with Php.Misc;
 with Php.Numerics;
 
-with Inc_Plugins;
-
 package body Inc_Class_Wp_Session_Tokens
 is
 
@@ -29,7 +27,7 @@ is
    -- Hash_Token --
    ----------------
 
-   function Hash_Token (This  : Wp_Session_Tokens;
+   function Hash_Token (This  : Wp_Session_Tokens'Class;
                         Token : String)
                         return String
    is
@@ -48,7 +46,7 @@ is
    -- Verify --
    ------------
 
-   function Verify (This  : Wp_Session_Tokens;
+   function Verify (This  : Wp_Session_Tokens'Class;
                     Token : String)
                     return Boolean
    is

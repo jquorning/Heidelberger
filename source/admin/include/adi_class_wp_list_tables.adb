@@ -1115,7 +1115,6 @@ is
    function Get_Columns (This : Wp_List_Table)
                          return Array_Type
    is
-      use Php;
       use Php.Errors;
    begin
       Die ("function WP_List_Table::get_columns() must be overridden in a subclass.");
@@ -1142,7 +1141,7 @@ is
    is
       use Hb_Common;
 
-      Columns : constant Array_Type       := This.Get_Columns;
+      Columns : constant Array_Type := This.Get_Columns;
       Column  : Unbounded_String := +"";
    begin
       if Columns.Is_Empty then
@@ -1192,35 +1191,34 @@ is
       use Hb_Common;
       use Inc_Plugins;
 
---    Columns : constant List_Type := Adi_Screens.Get_Column_Headers (This.Screen);
-      Columns : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
-      Default : Unbounded_String    := +This.Get_Default_Primary_Column_Name;
-   begin
+      Columns   : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
+      Default_2 : constant String     := This.Get_Default_Primary_Column_Name;
+
       -- If the primary column doesn't exist,
       -- fall back to the first non-checkbox column.
-      if not Isset (Columns, -Default) then
-         Default := +This.Get_Default_Primary_Column_Name; -- self::
-      end if;
+      Default : constant String :=
+        (if not Isset (Columns, Default_2)
+         then This.Get_Default_Primary_Column_Name -- self::
+         else Default_2);
 
-      declare
-         --
-         -- Filters the name of the primary column for the current list table.
-         --
-         -- @since 4.3.0
-         --
-         -- @param string default Column name default for the specific list table, e.g.
-         --                       "name".
-         -- @param string context Screen ID for specific list table, e.g. "plugins".
-         --
-         Column : Unbounded_String :=
-           +Apply_Filters ("list_table_primary_column", -Default, -This.Screen.Id);
-      begin
-         if Empty (-Column) or else not Isset (Columns, -Column) then
-            Column := Default;
-         end if;
+      --
+      -- Filters the name of the primary column for the current list table.
+      --
+      -- @since 4.3.0
+      --
+      -- @param string default Column name default for the specific list table, e.g.
+      --                       "name".
+      -- @param string context Screen ID for specific list table, e.g. "plugins".
+      --
+      Column_2 : constant String :=
+         Apply_Filters ("list_table_primary_column", Default, -This.Screen.Id);
 
-         return -Column;
-      end;
+      Column : constant String :=
+        (if Empty (Column_2) or else not Isset (Columns, Column_2)
+         then Default
+         else Column_2);
+   begin
+      return Column;
    end Get_Primary_Column_Name;
 
    ---------------------
@@ -1230,9 +1228,7 @@ is
    function Get_Column_Info (This : in out Wp_List_Table)
                              return Columns_Type
    is
---    use type Ada.Containers.Count_Type;
       use Hb_Common;
---    use Php;
       use Inc_Plugins;
    begin
       -- _column_headers is already set / cached.
@@ -1362,23 +1358,19 @@ is
    procedure Print_Column_Headers (This    : in out Wp_List_Table;
                                    With_Id : Boolean := True)
    is
-      use Binder;
-      use Hb_Common;
-      use Php;
       use Php.Arrays;
       use Php.Echoing;
       use Php.Lists;
       use Php.Misc;
       use Php.Strings;
+      use Binder;
+      use Hb_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
 
-      -- Columns  :          List_Type := Column_Info.Columns;
-      -- Hidden   : constant List_Type := Column_Info.Hidden;
-      -- Sortable : constant List_Type := Column_Info.Sortable;
       Columns  :          Array_Type := Column_Info.Columns;
       Hidden   : constant Array_Type := Column_Info.Hidden;
       Sortable : constant Array_Type := Column_Info.Sortable;
@@ -1392,25 +1384,19 @@ is
           ("http://" & HTTP_Host & Request_URI);
 
       Current_URL : constant String := Remove_Query_Arg ("paged", Current_URL_2);
-      Current_Orderby : Unbounded_String;
-      Current_Order   : Unbounded_String;
+
+      Current_Orderby : constant String :=
+        (if Isset (XX_GET, "orderby")
+         then Get_As_String (XX_GET, "orderby")
+         else "");
+
+      Current_Order : constant String :=
+        (if Isset (XX_GET, "order") and then
+            "desc" = Get_As_String (XX_GET, "order")
+         then "desc"
+         else "asc");
+
    begin
-
-      if Isset (XX_GET, "orderby") then
-         Current_Orderby := +As_String (Get (XX_GET, "orderby"));
-      else
-         Current_Orderby := +"";
-      end if;
-
-      if
-        Isset (XX_GET, "order") and then
-        "desc" = As_String (Get (XX_GET, "order"))
-      then
-         Current_Order := +"desc";
-      else
-         Current_Order := +"asc";
-      end if;
-
       if Isset (Columns, "cb") then
 --       static cb_counter = 1;
          Set (Columns, "cb",
@@ -1469,7 +1455,7 @@ is
                      Order := +(if "asc" = Current_Order then "desc" else "asc");
 
                      Class.Append (+"sorted");
-                     Class.Append (Current_Order);
+                     Class.Append (+Current_Order);
                   else
                      Order := +Php.Strings.Strtolower (Desc_First);
 
@@ -1520,10 +1506,9 @@ is
 
    procedure Display (This : in out Wp_List_Table)
    is
-      use Hb_Common;
-      use Php;
       use Php.Echoing;
       use Php.Strings;
+      use Hb_Common;
 
       Singular : constant String := As_String (Get (This.X_Args, "singular"));
    begin
@@ -1535,6 +1520,7 @@ is
       Echo ("  <thead>" & NL);
       Echo ("  <tr>" & NL);
       Echo ("    ");
+
       This.Print_Column_Headers;
 
       Echo ("  </tr>" & NL);
@@ -1561,7 +1547,6 @@ is
       Echo (NL);
       Echo ("</table>" & NL);
       This.Display_Tablenav ("bottom");
-
    end Display;
 
    -----------------------

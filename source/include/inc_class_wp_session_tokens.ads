@@ -68,16 +68,9 @@ is
    -- @return string A hash of the session token (a verifier).
    --
    -- private
-   function Hash_Token (This  : Wp_Session_Tokens;
+   function Hash_Token (This  : Wp_Session_Tokens'Class;
                         Token : String)
                         return String;
---                 // If ext/hash is not present, use sha1() instead.
---                 if ( function_exists( 'hash' ) ) then
---                         return hash( 'sha256', token );
---                 end; else then
---                         return sha1( token );
---                 end;
---         end;
 
 --         --
 --         -- Retrieves a user's session for the given token.
@@ -103,7 +96,7 @@ is
    -- @return bool Whether the token is valid for the user.
    --
    -- final public
-   function Verify (This  : Wp_Session_Tokens;
+   function Verify (This  : Wp_Session_Tokens'Class;
                     Token : String)
                     return Boolean;
 
@@ -260,10 +253,11 @@ is
    -- @return array|null The session, or null if it does not exist.
    --
    -- abstract protected
-   function Get_Session (This     : Inc_Class_Wp_Session_Tokens.Wp_Session_Tokens;
+   function Get_Session (This     : Wp_Session_Tokens'Class;
                          Verifier : String)
                          return Array_Type
-                         is abstract;
+                         is (Empty_Array);
+--                       is abstract;
 
 --         --
 --         -- Updates a session based on its verifier (token hash).
