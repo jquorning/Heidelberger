@@ -9,16 +9,18 @@ project Heidelberger is
 
    for Source_Dirs use (
       "source/",
+      "source/admin/",
+      "source/admin/include/",
+      "source/bind/",
       "source/include/",
       "source/include/block-support/",
       "source/include/customize/",
       "source/include/pomo/",
       "source/include/requests/",
       "source/include/style/",
-      "source/admin/",
-      "source/admin/include/",
-      "source/bind/",
+      "source/php/",
       "config/");
+
    for Object_Dir use "obj/" & Heidelberger_Config.Build_Profile;
    for Create_Missing_Dirs use "True";
    for Exec_Dir use "bin";
@@ -33,7 +35,6 @@ project Heidelberger is
          Heidelberger_Config.Ada_Compiler_Switches & (
          "-gnat2022",
          "-g",
-         "-O0",
          "-Og",
 --       "-gnatE", -- inc_capabilities
 --       "-gnatd_F",
