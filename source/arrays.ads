@@ -366,13 +366,13 @@ private
 
    type Multi_Type is
       record
-         Kind : Array_Kind;
+         Kind : Array_Kind       := Kind_Null;
          Str  : Unbounded_String;
-         Int  : Integer;
-         Arry : Array_Access;
-         List : List_Access;
-         Func : Callable;
-         Bool : Boolean;
+         Int  : Integer          := 0;
+         Arry : Array_Access     := null;
+         List : List_Access      := null;
+         Func : Callable         := null;
+         Bool : Boolean          := False;
       end record;
 
    package Array_Maps is
