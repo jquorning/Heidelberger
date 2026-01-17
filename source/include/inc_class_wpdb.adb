@@ -580,7 +580,6 @@ is
                Table          : constant String := Key (A);
                Prefixed_Table : constant String := As_String (Element (A));
             begin
---             This.M_Tables := Prefixed_Table;
                Set_Table (This, Table, Prefixed_Table);
             end;
          end loop;
@@ -590,7 +589,6 @@ is
                Table          : constant String := Key (A);
                Prefixed_Table : constant String := As_String (Element (A));
             begin
---             This.M_Tables := Prefixed_Table;
                Set_Table (This, Table, Prefixed_Table);
             end;
          end loop;
@@ -1033,7 +1031,7 @@ is
       --
          declare
             Allowed_Format : constant String :=
-               "(?:[1-9][0-9]*[])?[-+0-9]*(?: |0|\'.)?[-+0-9]*(?:\.[0-9]+)?";
+               "(?:[1-9][0-9]*[$])?[-+0-9]*(?: |0|\'.)?[-+0-9]*(?:\.[0-9]+)?";
 
             --
             -- If a %s placeholder already has quotes around it, removing the
@@ -1058,7 +1056,7 @@ is
 
             -- Force floats to be locale-unaware.
             Query_7 : constant String :=
-              Preg_Replace ("/%(?:%||(?!(" & Allowed_Format & ")?[sdF]))/",
+              Preg_Replace ("/%(?:%|$|(?!(" & Allowed_Format & ")?[sdF]))/",
                             "%%\\1", Query_6);
             -- Escape any unescaped percents.
 
@@ -1084,7 +1082,7 @@ is
                   return "";
                else
                   --
-                  -- If we don"t have the right number of placeholders,
+                  -- If we don't have the right number of placeholders,
                   -- but they were passed as individual arguments,
                   -- or we were expecting multiple arguments in an array, throw
                   -- a warning.
@@ -1097,12 +1095,14 @@ is
                       -- arguments passed.
                       abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
                       To_List (List => (
-                        1 => +Placeholders'Image,
-                        2 => +Args_Count'Image))),
-                      "4.8.3");
+                        1 => +Helpers.Image (Placeholders),
+                        2 => +Helpers.Image (Args_Count)
+                      ))
+                    ),
+                    "4.8.3");
 
                   --
-                  -- If we don"t have enough arguments to match the placeholders,
+                  -- If we don't have enough arguments to match the placeholders,
                   -- return an empty string to avoid a fatal error on PHP 8.
                   --
                   if Args_Count < Placeholders then
@@ -4023,14 +4023,22 @@ is
    function DB_Server_Info (This : Wpdb_Class)
             return String
    is
-   begin
-      -- if This.Use_MySQLi then
-      --    Server_Info := MySQLi_Get_Server_Info (This.Dbh);
-      -- end; else then
-      --    Server_Info := MySQL_Get_Server_Info (This.Dbh);
-      -- end if;
+      use Databases;
+      use MySQL_Bind;
+      use MySQLi_Bind;
 
-      return "XXX-990"; -- Server_Info;
+      Server_Info : Unbounded_String;
+   begin
+      case This.Engine is
+      when Engine_MySQLi =>
+         Server_Info := +MySQLi_Get_Server_Info (This.Dbh);
+      when Engine_MySQL =>
+         Server_Info := +MySQL_Get_Server_Info (This.Dbh);
+      when Engine_SQLite =>
+         Server_Info := +"XXX-990";
+      end case;
+
+      return -Server_Info;
    end DB_Server_Info;
 
    ---------------

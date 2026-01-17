@@ -15,6 +15,7 @@ with Php.Strings;
 with Binder;
 with Globals;
 with Hb_Common;
+with Helpers;
 with Lists;
 
 with Inc_Class_Wp_Post_Type;
@@ -34,22 +35,24 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_Posts_List_Table
    is
-      use Hb_Common;
-      use Binder;
-      use Globals;
+      use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Numerics;
       use Php.Strings;
+      use Hb_Common;
+      use Binder;
       use Inc_Class_Wp_Post_Type;
 --    use Inc_Capabilities;
       use Inc_Posts;
+      use Inc_Users;
 
-      This : Wp_Posts_List_Table := (
+      List_Table : Wp_Posts_List_Table := (
         Adi_Class_Wp_List_Tables.X_Construct (
           To_Array ((
             Build ("plural", "posts"),
             Build ("screen", (if Isset (Args, "screen")
-                              then As_String (Get (Args, "screen")) else "null"))
+                              then Get_As_String (Args, "screen")
+                              else "null"))
           ))
         )
         with
@@ -58,34 +61,32 @@ is
           Sticky_Posts_Count   => 0
       );
 
---    Post_Type        : String       := -This.Screen.Post_Type;
---    Post_Type_Object : Wp_Post_Type := Get_Post_Type_Object (Post_Type);
-
       Exclude_States : constant List_Type := Get_Post_Stati (
         To_Array ((1 =>
           Build ("show_in_admin_all_list", "false")
         ))
       );
    begin
-      Globals.Post_Type        := This.Screen.Post_Type;
-      Globals.Post_Type_Object := Get_Post_Type_Object (-Post_Type);
+      Globals.Post_Type        := List_Table.Screen.Post_Type;
+      Globals.Post_Type_Object := Get_Post_Type_Object (-Globals.Post_Type);
 
-      This.User_Posts_Count := Natural'Value (
-        WpDB.Get_Var ( -- (int)
-          WpDB.Prepare (
-            "SELECT COUNT( 1 ) "    &
-            "FROM wpdb->posts "     &
-            "WHERE post_type = %s " &
-            "AND post_status NOT IN ( """ & Implode ("','", Exclude_States) & " ) " &
-            "AND post_author = %d",
+      List_Table.User_Posts_Count := Natural'Value (
+        Globals.WpDB.Get_Var ( -- (int)
+          Globals.WpDB.Prepare (
+            "SELECT COUNT( 1 )"              &
+            " FROM " & (-Globals.WpDB.Posts) &
+            " WHERE post_type = %s"          &
+            " AND post_status NOT IN ( '"    &
+            Implode ("','", Exclude_States) & "' )" &
+            " AND post_author = %d",
             To_List (List => (
-              1 => Post_Type,
-              2 => +Inc_Users.Get_Current_User_Id'Image
+              1 => Globals.Post_Type,
+              2 => +Helpers.Image (Get_Current_User_Id)
             ))
           )));
 
       if
-        This.User_Posts_Count /= 0
+        List_Table.User_Posts_Count /= 0
 --      and then not Current_User_Can (Post_Type_Object.Cap.Edit_Others_Posts)
         and then Empty (X_REQUEST, "post_status")
         and then Empty (X_REQUEST, "all_posts")
@@ -93,35 +94,33 @@ is
         and then Empty (X_REQUEST, "show_sticky")
       then
          Set (XX_GET, "author",
-              From_String (Inc_Users.Get_Current_User_Id'Image));
+              From_String (Helpers.Image (Get_Current_User_Id)));
       end if;
 
       declare
-         use Ada.Strings.Unbounded;
-
          Sticky_Posts : constant List_Type :=
            Inc_Options.Get_Option ("sticky_posts");
       begin
-         if "post" = Post_Type and not Sticky_Posts.Is_Empty then
+         if "post" = Globals.Post_Type and not Sticky_Posts.Is_Empty then
             declare
                Sticky_Posts_2 : constant String :=
                  Implode (", ", List_Map (Absint'Access, Sticky_Posts)); -- (array)
             begin
-               This.Sticky_Posts_Count := Natural'Value (
-                 WpDB.Get_Var ( -- (int)
-                   WpDB.Prepare (
-                     "SELECT COUNT( 1 ) "    &
-                     "FROM wpdb->posts "     &
-                     "WHERE post_type = %s " &
-                     "AND post_status NOT IN (""trash"", ""auto-draft"") " &
-                     "AND ID IN (" & Sticky_Posts_2 & ")",
-                     To_List (-Post_Type)
+               List_Table.Sticky_Posts_Count := Natural'Value (
+                 Globals.WpDB.Get_Var ( -- (int)
+                   Globals.WpDB.Prepare (
+                     "SELECT COUNT( 1 )"              &
+                     " FROM " & (-Globals.WpDB.Posts) &
+                     " WHERE post_type = %s"          &
+                     " AND post_status NOT IN (""trash"", ""auto-draft"")" &
+                     " AND ID IN (" & Sticky_Posts_2 & ")",
+                     To_List (-Globals.Post_Type)
                  )));
             end;
          end if;
       end;
 
-      return This;
+      return List_Table;
    end X_Construct;
 
 --         --

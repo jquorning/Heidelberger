@@ -111,4 +111,8 @@ is
             return Boolean
             is (True);
 
+   function MySQLi_Get_Server_Info (Dbh : Integer)
+                                    return String
+   is (raise Program_Error with "not implemented");
+
 end MySQLi_Bind;
