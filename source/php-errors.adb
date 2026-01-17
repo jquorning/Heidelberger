@@ -2,6 +2,8 @@
 --
 --
 
+with Ada.Text_IO;
+
 with Php.Echoing;
 
 package body Php.Errors
@@ -18,5 +20,29 @@ is
       Echo (Reason);
       raise Program_Termination;
    end Die;
+
+   ---------------------
+   -- Error_Reporting --
+   ---------------------
+
+   procedure Error_Reporting (Error_Level : Integer := 0)
+   is
+      use Ada.Text_IO;
+   begin
+      Put_Line ("error_reporting: " & Error_Level'Image);
+   end Error_Reporting;
+
+   -------------------
+   -- Trigger_Error --
+   -------------------
+
+   procedure Trigger_Error (Message     : String;
+                            Error_Level : Integer := E_USER_NOTICE)
+   is
+      use Ada.Text_IO;
+   begin
+      Put_Line ("trigger_error:" & Error_Level'Image);
+      Put_Line (Message);
+   end Trigger_Error;
 
 end Php.Errors;
