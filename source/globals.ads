@@ -157,4 +157,7 @@ is
 
    Login_Grace_Period : Integer := 0;
 
+   Global_Page  : Natural;
+   Global_Paged : Natural;
+
 end Globals;

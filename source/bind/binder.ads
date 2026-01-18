@@ -1,3 +1,7 @@
+--
+--
+--
+
 with AWS.Response;
 with AWS.Status;
 
@@ -7,7 +11,7 @@ package Binder
 is
    use Arrays;
 
-   procedure Web_Server_To_PHP;
+   procedure Web_Server_To_PHP (Status : AWS.Status.Data);
 
    procedure PHP_To_Web_Server;
 

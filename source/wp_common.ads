@@ -2,6 +2,8 @@
 --
 --
 
+with Php.Calendar;
+
 with Arrays;
 with Lists;
 
@@ -17,6 +19,7 @@ with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Users;
+with Inc_Media;
 with Inc_Posts;
 with Inc_Taxonomys;
 
@@ -353,6 +356,28 @@ is
                            Alt        : String;
                            Args       : Array_Type)
                            return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Size       : Integer;
+                           Blog_Id    : Integer)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Php.Calendar.Time_Type;
+                           Format     : String;
+                           GMT        : Boolean)
+                           return String -- Php.Calendar.Time_Type
+                           is ("XXX-844");
+
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Inc_Media.Image_Src_Type;
+                           Id         : Integer;
+                           Size       : String;
+                           Icon       : Boolean)
+                           return Inc_Media.Image_Src_Type
                            is (Value);
 
    function Apply_Filters (Hook_Name  : String;

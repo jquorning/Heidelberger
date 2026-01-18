@@ -40,7 +40,7 @@ is
    -- Web_Server_To_PHP --
    -----------------------
 
-   procedure Web_Server_To_PHP
+   procedure Web_Server_To_PHP (Status : AWS.Status.Data)
    is separate;
 
    -----------------------
@@ -62,7 +62,7 @@ is
       URL     : constant String := AWS.Status.URL (Request);
       Payload : Unbounded_String;
    begin
-      Web_Server_To_PHP;
+      Web_Server_To_PHP (Status => Request);
 
       if Index (URL, "/wp-admin/credits.php") /= 0 then
          Adm_Credits.Render;

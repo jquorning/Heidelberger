@@ -37,10 +37,9 @@ is
    procedure Render
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
-      use Php;
       use Php.Echoing;
       use Php.Strings;
+      use Hb_Common;
       use Inc_L10n;
 
       List : constant List_Type :=

@@ -835,8 +835,8 @@ is
                     +Sprintf (
                       "<img class=""blavatar"" src=""%s"" srcset=""%s 2x"" alt="""" width=""16"" height=""16""%s />",
                       To_List (List =>
-                        (1 => +ESC_URL (Get_Site_Icon_Url (16)),
-                         2 => +ESC_URL (Get_Site_Icon_Url (32)),
+                        (1 => +ESC_URL (Get_Site_Icon_URL (16)),
+                         2 => +ESC_URL (Get_Site_Icon_URL (32)),
                          3 => +(if Wp_Lazy_Loading_Enabled ("img", "site_icon_in_toolbar") then " loading=""lazy""" else "")))
                     );
                else

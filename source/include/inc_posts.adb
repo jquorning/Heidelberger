@@ -7774,15 +7774,18 @@ is
 --         return wp_attachment_is( "image", post );
 -- end;
 
---
--- Retrieves the icon for a MIME type or attachment.
---
--- @since 2.1.0
---
--- @param string|int mime MIME type or attachment ID.
--- @return string|False Icon, False otherwise.
---
--- function wp_mime_type_icon( mime = 0 ) then
+   -----------------------
+   -- Wp_MIME_Type_Icon --
+   -----------------------
+
+   function Wp_MIME_Type_Icon (MIME : Integer := 0)
+                               return String
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return "";
+   end Wp_MIME_Type_Icon;
+
 --         if ( ! is_numeric( mime ) ) then
 --                 icon = wp_cache_get( "mime_type_icon_mime" );
 --         end;

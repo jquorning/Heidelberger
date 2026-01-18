@@ -16,7 +16,6 @@ with Php.Strings;
 with Hb_Common;
 with Lists;
 
-with Inc_Class_Wp_Querys;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
@@ -24,9 +23,6 @@ with Inc_Plugins;
 package body Inc_Querys
 is
    use Lists;
-
-   Wp_Query : constant Inc_Class_Wp_Querys.Wp_Query :=
-     Inc_Class_Wp_Querys.Null_Query;
 
    function Isset (Query : Inc_Class_Wp_Querys.Wp_Query)
                    return Boolean;
@@ -52,7 +48,7 @@ is
                            return String
    is
    begin
-      return Wp_Query.Get (Var, Default);
+      return Global_Wp_Query.Get (Var, Default);
    end Get_Query_Var;
 
    ------------------------
@@ -63,7 +59,7 @@ is
             return Inc_Class_Wp_Terms.Wp_Term
    is
    begin
-      return Wp_Query.Get_Queried_Object;
+      return Global_Wp_Query.Get_Queried_Object;
    end Get_Queried_Object;
 
    function Get_Queried_Object
@@ -83,7 +79,7 @@ is
    is
 --    global wp_query;
    begin
-      return Wp_Query.Get_Queried_Object_Id;
+      return Global_Wp_Query.Get_Queried_Object_Id;
    end Get_Queried_Object_Id;
 
 -- --
@@ -205,7 +201,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -213,7 +209,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Post_Type_Archive (Post_Types);
+      return Global_Wp_Query.Is_Post_Type_Archive (Post_Types);
    end Is_Post_Type_Archive;
 
 -- --
@@ -253,7 +249,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -261,7 +257,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Author (Author);
+      return Global_Wp_Query.Is_Author (Author);
    end Is_Author;
 
    -----------------
@@ -275,7 +271,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -284,7 +280,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Category (Category);
+      return Global_Wp_Query.Is_Category (Category);
    end Is_Category;
 
    ------------
@@ -298,7 +294,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -306,7 +302,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Tag (Tag);
+      return Global_Wp_Query.Is_Tag (Tag);
    end Is_Tag;
 
    ------------
@@ -321,7 +317,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -329,7 +325,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Tax (Taxonomy, Term);
+      return Global_Wp_Query.Is_Tax (Taxonomy, Term);
    end Is_Tax;
 
 -- --
@@ -368,7 +364,7 @@ is
       use Inc_L10n;
 --    global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -376,7 +372,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Day;
+      return Global_Wp_Query.Is_Day;
    end Is_Day;
 
 -- --
@@ -437,7 +433,7 @@ is
       use Inc_L10n;
 --         global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -445,7 +441,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Front_Page;
+      return Global_Wp_Query.Is_Front_Page;
    end Is_Front_Page;
 
    -------------
@@ -460,7 +456,7 @@ is
       use Inc_L10n;
 --         global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -468,7 +464,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Home;
+      return Global_Wp_Query.Is_Home;
    end Is_Home;
 
 -- --
@@ -513,7 +509,7 @@ is
       use Inc_L10n;
 --         global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -521,7 +517,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Month;
+      return Global_Wp_Query.Is_Month;
    end Is_Month;
 
 -- --
@@ -654,7 +650,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -662,7 +658,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Search;
+      return Global_Wp_Query.Is_Search;
    end Is_Search;
 
    ---------------
@@ -676,7 +672,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -684,7 +680,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Single (Post);
+      return Global_Wp_Query.Is_Single (Post);
    end Is_Single;
 
    -----------------
@@ -698,7 +694,7 @@ is
       use Inc_Functions;
       use Inc_L10n;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -706,7 +702,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Singular (Post_Types);
+      return Global_Wp_Query.Is_Singular (Post_Types);
    end Is_Singular;
 
 -- --
@@ -769,7 +765,7 @@ is
       use Inc_L10n;
 --         global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -777,7 +773,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_Year;
+      return Global_Wp_Query.Is_Year;
    end Is_Year;
 
    ------------
@@ -792,7 +788,7 @@ is
       use Inc_L10n;
 --    global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -800,7 +796,7 @@ is
          return False;
       end if;
 
-      return Wp_Query.Is_404;
+      return Global_Wp_Query.Is_404;
    end Is_404;
 
 -- --
@@ -838,7 +834,7 @@ is
 
 --    global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          X_Doing_It_Wrong (
            "__FUNCTION__",
            abs "Conditional query tags do not work before the query is run. Before then, they always return false.",
@@ -863,7 +859,7 @@ is
          );
       end if;
 
-      return Wp_Query.Is_Main_Query;
+      return Global_Wp_Query.Is_Main_Query;
    end Is_Main_Query;
 
 -- /*
@@ -898,11 +894,11 @@ is
    is
 --    global wp_query;
    begin
-      if not Isset (Wp_Query) then
+      if not Isset (Global_Wp_Query) then
          return False;
       end if;
 
-      return Wp_Query.In_The_Loop;
+      return Global_Wp_Query.In_The_Loop;
    end In_The_Loop;
 
 -- --

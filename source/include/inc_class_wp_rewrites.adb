@@ -6,6 +6,7 @@
 -- @since 1.5.0
 --
 
+with Php.Preg;
 with Php.Strings;
 
 with Hb_Common;
@@ -25,6 +26,25 @@ is
    begin
       return not Empty (-This.Permalink_Structure);
    end Using_Permalinks;
+
+   ----------------------------
+   -- Using_Index_Permalinks --
+   ----------------------------
+
+   function Using_Index_Permalinks (This : Wp_Rewrite)
+                                    return Boolean
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+   begin
+      if Empty (-This.Permalink_Structure) then
+         return False;
+      end if;
+
+      -- If the index is not in the permalink, we're using mod_rewrite.
+      return Preg_Match ("#^/*" & (-This.Index) & "#", -This.Permalink_Structure);
+   end Using_Index_Permalinks;
 
    ---------------------------
    -- Get_Extra_Permastruct --

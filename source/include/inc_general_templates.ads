@@ -5,24 +5,18 @@
 -- @subpackage Template
 --
 
+with Php.Calendar;
+
 with Arrays;
 
 with Inc_Class_Wp_Posts;
 
 package Inc_General_Templates
 is
+   use Arrays;
 
---
--- Determines whether the site has a Site Icon.
---
--- @since 4.3.0
---
--- @param int blog_id Optional. ID of the blog in question. Default current blog.
--- @return bool Whether the site has a site icon or not.
---
-   function Has_Site_Icon (Blog_Id : Integer := 0)
-                           return Boolean
-                           is (True);
+   Post_Not_Found  : exception;
+   Some_Time_Error : exception;
 
    --
    -- Displays information about the current site.
@@ -33,8 +27,18 @@ is
    --
    -- @param string show Optional. Site information to display. Default empty.
    --
-   procedure Bloginfo (Show : String := "")
-   is null;
+   procedure Bloginfo (Show : String := "");
+
+   --
+   -- Determines whether the site has a Site Icon.
+   --
+   -- @since 4.3.0
+   --
+   -- @param int blog_id Optional. ID of the blog in question. Default current blog.
+   -- @return bool Whether the site has a site icon or not.
+   --
+   function Has_Site_Icon (Blog_Id : Integer := 0)
+                           return Boolean;
 
    --
    -- Retrieves information about the current site.
@@ -50,15 +54,15 @@ is
    -- - "version" - The current WordPress version
    -- - "html_type" - The content-type (default: "text/html"). Themes and plugins
    --   can override the default value using the {@see "pre_option_html_type"} filter
-   -- - "text_direction" - The text direction determined by the site"s language. is_rtl()
-   --   should be used instead
+   -- - "text_direction" - The text direction determined by the site"s language.
+   --   is_rtl() should be used instead
    -- - "language" - Language code for the current site
-   -- - "stylesheet_url" - URL to the stylesheet for the active theme. An active child theme
-   --   will take precedence over this value
-   -- - "stylesheet_directory" - Directory path for the active theme.  An active child theme
-   --   will take precedence over this value
-   -- - "template_url" / "template_directory" - URL of the active theme"s directory. An active
-   --   child theme will NOT take precedence over this value
+   -- - "stylesheet_url" - URL to the stylesheet for the active theme. An active
+   --   child theme will take precedence over this value
+   -- - "stylesheet_directory" - Directory path for the active theme.  An active
+   --   child theme will take precedence over this value
+   -- - "template_url" / "template_directory" - URL of the active theme"s directory.
+   --   An active child theme will NOT take precedence over this value
    -- - "pingback_url" - The pingback XML-RPC file URL (xmlrpc.php)
    -- - "atom_url" - The Atom feed URL (/feed/atom)
    -- - "rdf_url" - The RDF/RSS 1.0 feed URL (/feed/rdf)
@@ -88,21 +92,6 @@ is
                           return String;
 
    --
-   -- Retrieves the login URL.
-   --
-   -- @since 2.7.0
-   --
-   -- @param string redirect     Path to redirect to on log in.
-   -- @param bool   force_reauth Whether to force reauthorization, even if a cookie
-   --                             is present. Default false.
-   -- @return string The login URL. Not HTML-encoded.
-   --
-   function Wp_Login_URL (Redirect     : String  := "";
-                          Force_Reauth : Boolean := False)
-                          return String
-                          is ("XXX-411");
-
-   --
    -- Retrieves the logout URL.
    --
    -- Returns the URL that allows the user to log out of the site.
@@ -114,8 +103,21 @@ is
    --                 wp_nonce_url().
    --
    function Wp_Logout_URL (Redirect : String := "")
-                           return String
-                           is ("XXX-351");
+                           return String;
+
+   --
+   -- Retrieves the login URL.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string redirect     Path to redirect to on log in.
+   -- @param bool   force_reauth Whether to force reauthorization, even if a cookie
+   --                             is present. Default false.
+   -- @return string The login URL. Not HTML-encoded.
+   --
+   function Wp_Login_URL (Redirect     : String  := "";
+                          Force_Reauth : Boolean := False)
+                          return String;
 
    --
    -- Retrieves the contents of the search WordPress query variable.
@@ -131,8 +133,7 @@ is
    -- @return string
    --
    function Get_Search_Query (Escaped : Boolean := True)
-                              return String
-                              is ("XXX-445");
+                              return String;
 
    --
    -- Gets the language attributes for the "html" tag.
@@ -178,11 +179,9 @@ is
    -- @return string HTML attribute or empty string.
    --
    function Disabled (Disabled : String;
-                      Current  : Integer;
---                    Current  : Boolean := True;
+                      Current  : String; -- Integer;
                       Echo     : Boolean := True)
-                      return String
-                      is ("XXX-613");
+                      return String;
 
    --
    -- Retrieves paginated links for archive post pages.
@@ -276,24 +275,25 @@ is
    --                              depending on "type" argument. Void if total number
    --                              of pages is less than 2.
    --
-   function Paginate_Links (Args : Arrays.Array_Type := Arrays.Empty_Array) -- ""
-                            return String
-                            is ("XXX-612");
+   function Paginate_Links (Args : Array_Type := Empty_Array) -- ""
+                            return String;
 
--- Returns the Site Icon URL.
---
--- @since 4.3.0
---
--- @param int    size    Optional. Size of the site icon. Default 512 (pixels).
--- @param string url     Optional. Fallback url if no site icon is found. Default empty.
--- @param int    blog_id Optional. ID of the blog to get the site icon for. Default current blog.
--- @return string Site Icon URL.
---
-   function Get_Site_Icon_Url (Size    : Integer := 512;
-                               Url     : String  := "";
+   --
+   -- Returns the Site Icon URL.
+   --
+   -- @since 4.3.0
+   --
+   -- @param int    size    Optional. Size of the site icon. Default 512 (pixels).
+   -- @param string url     Optional. Fallback url if no site icon is found. Default
+   --                       empty.
+   -- @param int    blog_id Optional. ID of the blog to get the site icon for.
+   --                       Default current blog.
+   -- @return string Site Icon URL.
+   --
+   function Get_Site_Icon_URL (Size    : Integer := 512;
+                               URL     : String  := "";
                                Blog_Id : Integer := 0)
-                               return String
-                               is ("XXX-355");
+                               return String;
 
    --
    -- Outputs the HTML selected attribute.
@@ -312,8 +312,7 @@ is
    function Selected (Selectd : String;
                       Current : String; --  = true,
                       Echo    : Boolean := True)
-                      return String
-                      is ("XXX-998");
+                      return String;
 
    --
    -- Returns document title for the current page.
@@ -449,10 +448,36 @@ is
    function Get_Post_Time (Format    : String  := "U";
                            GMT       : Boolean := False;
                            Post      : Inc_Class_Wp_Posts.Wp_Post;
-                           -- Integer := 0; -- null
                            Translate : Boolean := False)
-                           return String
-                           is ("XXX-982");
+                           return String;
+
+   --
+   -- Retrieves post published or modified time as a `DateTimeImmutable` object
+   -- instance.
+   --
+   -- The object will be set to the timezone from WordPress settings.
+   --
+   -- For legacy reasons, this function allows to choose to instantiate from local or
+   -- UTC time in database. Normally this should make no difference to the result.
+   -- However, the values might get out of sync in database, typically because of
+   -- timezone setting changes. The parameter ensures the ability to reproduce
+   -- backwards compatible behaviors in such cases.
+   --
+   -- @since 5.3.0
+   --
+   -- @param int|WP_Post post   Optional. Post ID or post object. Default is global
+   --                           `post` object.
+   -- @param string      field  Optional. Published or modified time to use from
+   --                            database. Accepts "date" or "modified".
+   --                            Default "date".
+   -- @param string      source Optional. Local or UTC time to use from database.
+   --                           Accepts "local" or "gmt". Default "local".
+   -- @return DateTimeImmutable|false Time object on success, false on failure.
+   --
+   function Get_Post_Datetime (Post   : Inc_Class_Wp_Posts.Wp_Post; -- = null,
+                               Field  : String := "date";
+                               Source : String := "local")
+                               return Php.Calendar.Date_Time_Immutable;
 
    --
    -- Displays the URL of a WordPress admin CSS file.
@@ -506,8 +531,13 @@ is
    --                       Default true.
    -- @return string HTML attribute or empty string.
    --
-   function Checked (Checkd  : Integer; -- Multi_Type;
-                     Current : Integer; -- Multi_Type := True;
+   function Checked (Checkd  : String;
+                     Current : String;
+                     Echo    : Boolean := True)
+                     return String;
+
+   function Checked (Checkd  : Integer;
+                     Current : Integer;
                      Echo    : Boolean := True)
                      return String;
 
@@ -526,6 +556,12 @@ is
    --                        doing.
    -- @return string HTML attribute or empty string.
    --
+   function X_Checked_Selected_Helper (Helper  : String;
+                                       Current : String;
+                                       Echo    : Boolean;
+                                       Typ     : String)
+                                       return String;
+
    function X_Checked_Selected_Helper (Helper  : Integer;
                                        Current : Integer;
                                        Echo    : Boolean;

@@ -5,6 +5,8 @@
 -- @subpackage Media
 --
 
+with Ada.Strings.Unbounded;
+
 with Arrays;
 with Lists;
 
@@ -14,6 +16,14 @@ package Inc_Media
 is
    use Arrays;
    use Lists;
+
+   type Image_Src_Type is
+     record
+        Source  : Ada.Strings.Unbounded.Unbounded_String;
+        Width   : Integer;
+        Height  : Integer;
+        Resized : Boolean;
+     end record;
 
    --
    -- Retrieves additional image sizes.
@@ -26,6 +36,40 @@ is
    --
    function Wp_Get_Additional_Image_Sizes
             return Array_Type;
+
+   --
+   -- Scales an image to fit a particular size (such as "thumb" or "medium").
+   --
+   -- The URL might be the original image, or it might be a resized version. This
+   -- function won"t create a new resized copy, it will just return an already
+   -- resized one if it exists.
+   --
+   -- A plugin may use the {@see "image_downsize"} filter to hook into and offer image
+   -- resizing services for images. The hook must return an array with the same
+   -- elements that are normally returned from the function.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int          id   Attachment ID for image.
+   -- @param string|int[] size Optional. Image size. Accepts any registered image
+   --                          size name, or an array of width and height values in
+   --                          pixels (in that order). Default "medium".
+   -- @return array|false {
+   --     Array of image data, or boolean false if no image is available.
+   --
+   --     @type string 0 Image source URL.
+   --     @type int    1 Image width in pixels.
+   --     @type int    2 Image height in pixels.
+   --     @type bool   3 Whether the image is a resized image.
+   -- }
+   --
+   function Image_Downsize (Id   : Integer;
+                            Size : String := "medium")
+                            return Image_Src_Type
+   is (Source  => Ada.Strings.Unbounded.Null_Unbounded_String,
+       Width   => 0,
+       Height  => 0,
+       Resized => False);
 
    --
    -- Retrieves all of the taxonomies that are registered for attachments.
@@ -102,6 +146,56 @@ is
             return Array_Type;
 
    --
+   -- Retrieves an image to represent an attachment.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int          attachment_id Image attachment ID.
+   -- @param string|int[] size          Optional. Image size. Accepts any registered
+   --                                   image size name, or an array of width and
+   --                                   height values in pixels (in that order).
+   --                                   Default "thumbnail".
+   -- @param bool         icon          Optional. Whether the image should fall back
+   --                                   to a mime type icon. Default false.
+   -- @return array|false {
+   --     Array of image data, or boolean false if no image is available.
+   --
+   --     @type string 0 Image source URL.
+   --     @type int    1 Image width in pixels.
+   --     @type int    2 Image height in pixels.
+   --     @type bool   3 Whether the image is a resized image.
+   -- }
+   --
+
+   function Wp_Get_Attachment_Image_Src
+              (Attachment_Id : Integer;
+               Size          : String  := "thumbnail";
+               Icon          : Boolean := False)
+               return Image_Src_Type;
+
+   --
+   -- Gets the URL of an image attachment.
+   --
+   -- @since 4.4.0
+   --
+   -- @param int          attachment_id Image attachment ID.
+   -- @param string|int[] size          Optional. Image size. Accepts any registered
+   --                                   image size name, or an array of width and
+   --                                   height values in pixels (in that order).
+   --                                   Default "thumbnail".
+   -- @param bool         icon          Optional. Whether the image should be treated
+   --                                   as an icon. Default false.
+   -- @return string|false Attachment URL or false if no image is available. If `size`
+   --                      does not match any registered image size, the original
+   --                      image URL will be returned.
+   --
+   function Wp_Get_Attachment_Image_URL
+              (Attachment_Id : Integer;
+               Size          : String  := "thumbnail";
+               Icon          : Boolean := False)
+               return String;
+
+   --
    -- Gets the default value to use for a `loading` attribute on an element.
    --
    -- This function should only be called for a tag and context if lazy-loading is
@@ -159,5 +253,24 @@ is
    --
    function Wp_Increase_Content_Media_Count (Amount : Integer := 1)
                                              return Integer;
+
+   --
+   -- Allows PHP's getimagesize() to be debuggable when necessary.
+   --
+   -- @since 5.7.0
+   -- @since 5.8.0 Added support for WebP images.
+   --
+   -- @param string filename   The file path.
+   -- @param array  image_info Optional. Extended image information (passed by
+   --                          reference).
+   -- @return array|false Array of image information or false on failure.
+   --
+   function Wp_Getimagesize (Filename   : String;
+                             Image_Info : out Array_Type) -- null
+                             return List_Type
+                             is (Empty_List);
+
+   function Wp_Getimagesize (Filename : String)
+                             return List_Type;
 
 end Inc_Media;

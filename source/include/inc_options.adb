@@ -216,8 +216,9 @@ is
 
                         Statement : constant Statement_Type :=
                           Globals.WpDB.Prepare (
-                            "SELECT option_value FROM " & (-Globals.WpDB.Options) & " " &
-                            "WHERE option_name = %s LIMIT 1",
+                            "SELECT option_value"              &
+                            " FROM " & (-Globals.WpDB.Options) &
+                            " WHERE option_name = %s LIMIT 1",
                             To_List (Option));
 
                         Row : constant Array_Type :=

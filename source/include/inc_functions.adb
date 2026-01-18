@@ -137,26 +137,17 @@ is
 --         return new DateTimeImmutable( "now", wp_timezone() );
 -- end;
 
---
--- Retrieves the timezone of the site as a string.
---
--- Uses the `timezone_string` option to get a proper timezone name if available,
--- otherwise falls back to a manual UTC ± offset.
---
--- Example return values:
---
---  - "Europe/Rome"
---  - "America/North_Dakota/New_Salem"
---  - "UTC"
---  - "-06:30"
---  - "+00:00"
---  - "+08:45"
---
--- @since 5.3.0
---
--- @return string PHP timezone name or a ±HH:MM offset.
---
--- function wp_timezone_string() then
+   ------------------------
+   -- Wp_Timezone_String --
+   ------------------------
+
+   function Wp_Timezone_String
+            return String
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return "";
+   end Wp_Timezone_String;
 --         timezone_string = get_option( "timezone_string" );
 
 --         if ( timezone_string ) then
@@ -175,18 +166,18 @@ is
 --         return tz_offset;
 -- end;
 
---
--- Retrieves the timezone of the site as a `DateTimeZone` object.
---
--- Timezone can be based on a PHP timezone string or a ±HH:MM offset.
---
--- @since 5.3.0
---
--- @return DateTimeZone Timezone object.
---
--- function wp_timezone() then
---         return new DateTimeZone( wp_timezone_string() );
--- end;
+   -----------------
+   -- Wp_Timezone --
+   -----------------
+
+   function Wp_Timezone
+            return Php.Calendar.Date_Time_Zone
+   is
+      use Php.Calendar;
+   begin
+      return X_Construct (Wp_Timezone_String);
+--    return new DateTimeZone( wp_timezone_string() );
+   end Wp_Timezone;
 
 --
 -- Retrieves the date in localized format, based on a sum of Unix timestamp and
@@ -260,25 +251,20 @@ is
 --         return date;
 -- end;
 
---
--- Retrieves the date, in localized format.
---
--- This is a newer function, intended to replace `date_i18n()` without legacy quirks in it.
---
--- Note that, unlike `date_i18n()`, this function accepts a true Unix timestamp, not summed
--- with timezone offset.
---
--- @since 5.3.0
---
--- @global WP_Locale wp_locale WordPress date and time locale object.
---
--- @param string       format    PHP date format.
--- @param int          timestamp Optional. Unix timestamp. Defaults to current time.
--- @param DateTimeZone timezone  Optional. Timezone to output result in. Defaults to timezone
---                                from site settings.
--- @return string|false The date, translated if locale specifies it. False on invalid timestamp input.
---
--- function wp_date( format, timestamp = null, timezone = null ) then
+   -------------
+   -- Wp_Date --
+   -------------
+
+   function Wp_Date (Format    : String;
+                     Timestamp : Php.Calendar.Time_Type; -- null
+                     Timezone  : Php.Calendar.Date_Time_Zone) -- = null
+                     return String
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return "";
+   end Wp_Date;
+
 --         global wp_locale;
 
 --         if ( null === timestamp ) then
@@ -1192,7 +1178,7 @@ is
       Protocol : Unbounded_String;
       Frag     : Unbounded_String;
       Base     : Unbounded_String;
-      Qs       : Array_Type;
+      Querys   : Array_Type;
 
         -- if is_array( args[0] ) then
         --         if count( args ) < 2 || false === args[1] then
@@ -1219,11 +1205,11 @@ is
          Frag := +"";
       end if;
 
-      if 0 = Stripos (-URI_2, "http://") then
+      if 1 = Stripos (-URI_2, "http://") then
          Protocol := +"http://";
          URI_2    := +Substr (-URI_2, 7);
 
-      elsif 0 = Stripos (-URI_2, "https://") then
+      elsif 1 = Stripos (-URI_2, "https://") then
          Protocol := +"https://";
          URI_2    := +Substr (-URI_2, 8);
 
@@ -1255,8 +1241,8 @@ is
             Query := +URI_3;
          end if;
 
-         Wp_Parse_Str (-Query, Qs);
-         Qs := As_Array (URL_Encode_Deep (From_Array (Qs)));
+         Wp_Parse_Str (-Query, Querys);
+         Querys := As_Array (URL_Encode_Deep (From_Array (Querys)));
       end;
       -- This re-URL-encodes things that were already in the query string.
 
@@ -1275,7 +1261,7 @@ is
       -- end loop;
 
       declare
-         Ret_6 : constant String := Build_Query (Qs);
+         Ret_6 : constant String := Build_Query (Querys);
          Ret_5 : constant String := Trim (Ret_6, "?");
          Ret_4 : constant String := Preg_Replace ("#=(&|)#", "$1", Ret_5);
          Ret_3 : constant String := (-Protocol) & (-Base) & Ret_4 & (-Frag);

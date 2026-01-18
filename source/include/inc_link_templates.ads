@@ -8,10 +8,13 @@
 with Arrays;
 
 with Inc_Class_Wp_Posts;
+with Inc_Class_Wp_Rewrites;
 
 package Inc_Link_Templates
 is
    use Arrays;
+
+   Global_Wp_Rewrite : Inc_Class_Wp_Rewrites.Wp_Rewrite;
 
    --
    -- Retrieves a trailing-slashed string if the site is set for adding trailing
@@ -395,6 +398,39 @@ is
                                 Object_Type : String := "")
                                 return String
                                 is ("XXX-411");
+
+   --
+   -- Retrieves the link for a page number.
+   --
+   -- @since 1.5.0
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param int  pagenum Optional. Page number. Default 1.
+   -- @param bool escape  Optional. Whether to escape the URL for display, with
+   --                     esc_url(). Defaults to true. Otherwise, prepares the URL
+   --                     with sanitize_url().
+   -- @return string The link URL for the given page number.
+   --
+   function Get_Pagenum_Link (Pagenum : Integer := 1;
+                              Escape  : Boolean := True)
+                              return String;
+
+   --
+   -- Retrieves the previous posts page link.
+   --
+   -- Will only return string, if not on a single page or post.
+   --
+   -- Backported to 2.0.10 from 2.1.3.
+   --
+   -- @since 2.0.10
+   --
+   -- @global int paged
+   --
+   -- @return string|void The link for the previous posts page.
+   --
+   function Get_Previous_Posts_Page_Link
+            return String;
 
    --
    -- Returns a shortlink for a post, page, attachment, or site.

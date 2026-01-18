@@ -2673,7 +2673,7 @@ is
       end if;
 
 --    if not Isset (Db.Last_Result (Y)) then
-      if Db.Last_Result.Last_Index < Y then
+      if Y not in Db.Last_Result.First_Index .. Db.Last_Result.Last_Index then
          Success := False;
          return Empty_Array; -- ""; --  null;
       end if;

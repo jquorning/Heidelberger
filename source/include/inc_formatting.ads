@@ -382,6 +382,12 @@ is
    function URL_Encode_Deep (Value : Multi_Type)
                              return Multi_Type;
 
+   function URL_Encode_Deep (Value : Array_Type)
+                             return Array_Type;
+
+   function URL_Encode_Deep (Value : String)
+                             return String;
+
    --
    -- Navigates through an array, object, or scalar, and raw-encodes the values to be
    -- used in a URL.
@@ -1021,6 +1027,14 @@ is
    function Map_Deep (Value    : Multi_Type;
                       Callback : Callable)
                       return Multi_Type;
+
+   function Map_Deep (Value    : Array_Type;
+                      Callback : Callable)
+                      return Array_Type;
+
+   function Map_Deep (Value    : String;
+                      Callback : Callable)
+                      return String;
 
    --
    -- WordPress implementation of PHP sprintf() with filters.

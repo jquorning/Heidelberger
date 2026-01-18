@@ -112,7 +112,8 @@ is
          -- @since 3.1.0
          -- @var string
          --
-         -- public pagination_base = "page";
+         Pagination_Base : Unbounded_String :=
+           To_Unbounded_String ("page");
 
          --
          -- Comments pagination permalink base.
@@ -181,7 +182,8 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public index = "index.php";
+         Index : Unbounded_String :=
+           To_Unbounded_String ("index.php");
 
          --
          -- Variable name to use for regex matches in the rewritten query.
@@ -365,23 +367,17 @@ is
    function Using_Permalinks (This : Wp_Rewrite)
                               return Boolean;
 
---         --
---         -- Determines whether permalinks are being used and rewrite module is not enabled.
---         --
---         -- Means that permalink links are enabled and index.php is in the URL.
---         --
---         -- @since 1.5.0
---         --
---         -- @return bool Whether permalink links are enabled and index.php is in the URL.
---         --
---         public function using_index_permalinks() then
---                 if ( empty( this.permalink_structure ) ) then
---                         return false;
---                 end;
-
---                 -- If the index is not in the permalink, we"re using mod_rewrite.
---                 return preg_match( "#^/*" . this.index . "#", this.permalink_structure );
---         end;
+   --
+   -- Determines whether permalinks are being used and rewrite module is not enabled.
+   --
+   -- Means that permalink links are enabled and index.php is in the URL.
+   --
+   -- @since 1.5.0
+   --
+   -- @return bool Whether permalink links are enabled and index.php is in the URL.
+   --
+   function Using_Index_Permalinks (This : Wp_Rewrite)
+                                    return Boolean;
 
 --         --
 --         -- Determines whether permalinks are being used and rewrite module is enabled.

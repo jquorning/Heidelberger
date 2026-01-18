@@ -1246,6 +1246,17 @@ is
                             is (0);
 
    --
+   -- Retrieves the icon for a MIME type or attachment.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string|int mime MIME type or attachment ID.
+   -- @return string|False Icon, False otherwise.
+   --
+   function Wp_MIME_Type_Icon (MIME : Integer := 0)
+                               return String;
+
+   --
    -- Retrieves a page given its path.
    --
    -- @since 2.1.0

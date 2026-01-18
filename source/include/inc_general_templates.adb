@@ -10,10 +10,12 @@ with Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Echoing;
+with Php.HTML;
 with Php.Preg;
 with Php.Strings;
 
 with Globals;
+with Helpers;
 with Hb_Common;
 with Lists;
 with Wp_Common;
@@ -26,7 +28,10 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_Link_Templates;
+with Inc_Load;
 with Inc_L10n;
+with Inc_Media;
+with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Posts;
@@ -427,69 +432,83 @@ is
 --         end;
 -- end;
 
--- --
--- -- Retrieves the logout URL.
--- --
--- -- Returns the URL that allows the user to log out of the site.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string redirect Path to redirect to on logout.
--- -- @return string The logout URL. Note: HTML-encoded via esc_html() in wp_nonce_url().
--- --
--- function wp_logout_url( redirect = "" ) then
---         args = array();
---         if ( ! empty( redirect ) ) then
---                 args["redirect_to"] = urlencode( redirect );
---         end;
+   -------------------
+   -- Wp_Logout_URL --
+   -------------------
 
---         logout_url = add_query_arg( args, site_url( "wp-login.php?action=logout", "login" ) );
---         logout_url = wp_nonce_url( logout_url, "log-out" );
+   function Wp_Logout_URL (Redirect : String := "")
+                           return String
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Plugins;
 
---         --
---         -- Filters the logout URL.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string logout_url The HTML-encoded logout URL.
---         -- @param string redirect   Path to redirect to on logout.
---         --
---         return apply_filters( "logout_url", logout_url, redirect );
--- end;
+      Args : Array_Type;
+   begin
+      if not Empty (Redirect) then
+         Set (Args, "redirect_to", From_String (URL_Encode (Redirect)));
+      end if;
 
--- --
--- -- Retrieves the login URL.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string redirect     Path to redirect to on log in.
--- -- @param bool   force_reauth Whether to force reauthorization, even if a cookie is present.
--- --                             Default false.
--- -- @return string The login URL. Not HTML-encoded.
--- --
--- function wp_login_url( redirect = "", force_reauth = false ) then
---         login_url = site_url( "wp-login.php", "login" );
+      declare
+         Logout_URL_2 : constant String :=
+           Add_Query_Arg (Args, Site_URL ("wp-login.php?action=logout", "login"));
 
---         if ( ! empty( redirect ) ) then
---                 login_url = add_query_arg( "redirect_to", urlencode( redirect ), login_url );
---         end;
+         Logout_URL : constant String := Wp_Nonce_URL (Logout_URL_2, "log-out");
+      begin
+         --
+         -- Filters the logout URL.
+         --
+         -- @since 2.8.0
+         --
+         -- @param string logout_url The HTML-encoded logout URL.
+         -- @param string redirect   Path to redirect to on logout.
+         --
+         return Apply_Filters ("logout_url", Logout_URL, Redirect);
+      end;
+   end Wp_Logout_URL;
 
---         if ( force_reauth ) then
---                 login_url = add_query_arg( "reauth", "1", login_url );
---         end;
+   ------------------
+   -- Wp_Login_URL --
+   ------------------
 
---         --
---         -- Filters the login URL.
---         --
---         -- @since 2.8.0
---         -- @since 4.2.0 The `force_reauth` parameter was added.
---         --
---         -- @param string login_url    The login URL. Not HTML-encoded.
---         -- @param string redirect     The path to redirect to on login, if supplied.
---         -- @param bool   force_reauth Whether to force reauthorization, even if a cookie is present.
---         --
---         return apply_filters( "login_url", login_url, redirect, force_reauth );
--- end;
+   function Wp_Login_URL (Redirect     : String  := "";
+                          Force_Reauth : Boolean := False)
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Plugins;
+
+      Login_URL : Unbounded_String := +Site_URL ("wp-login.php", "login");
+   begin
+      if not Empty (Redirect) then
+         Login_URL :=
+           +Add_Query_Arg ("redirect_to", URL_Encode (Redirect), -Login_URL);
+      end if;
+
+      if Force_Reauth then
+         Login_URL := +Add_Query_Arg ("reauth", "1", -Login_URL);
+      end if;
+
+      --
+      -- Filters the login URL.
+      --
+      -- @since 2.8.0
+      -- @since 4.2.0 The `force_reauth` parameter was added.
+      --
+      -- @param string login_url    The login URL. Not HTML-encoded.
+      -- @param string redirect     The path to redirect to on login, if supplied.
+      -- @param bool   force_reauth Whether to force reauthorization, even if a
+      --                            cookie is present.
+      --
+      return Apply_Filters ("login_url", -Login_URL, Redirect, Force_Reauth);
+   end Wp_Login_URL;
 
 -- --
 -- -- Returns the URL that allows the user to register on the site.
@@ -762,66 +781,21 @@ is
 --         do_action( "wp_meta" );
 -- end;
 
--- --
--- -- Displays information about the current site.
--- --
--- -- @since 0.71
--- --
--- -- @see get_bloginfo() For possible `show` values
--- --
--- -- @param string show Optional. Site information to display. Default empty.
--- --
--- function bloginfo( show = "" ) then
---         echo get_bloginfo( show, "display" );
--- end;
+   --------------
+   -- Bloginfo --
+   --------------
 
--- --
--- -- Retrieves information about the current site.
--- --
--- -- Possible values for `show` include:
--- --
--- -- - "name" - Site title (set in Settings > General)
--- -- - "description" - Site tagline (set in Settings > General)
--- -- - "wpurl" - The WordPress address (URL) (set in Settings > General)
--- -- - "url" - The Site address (URL) (set in Settings > General)
--- -- - "admin_email" - Admin email (set in Settings > General)
--- -- - "charset" - The "Encoding for pages and feeds"  (set in Settings > Reading)
--- -- - "version" - The current WordPress version
--- -- - "html_type" - The content-type (default: "text/html"). Themes and plugins
--- --   can override the default value using the {@see "pre_option_html_type"} filter
--- -- - "text_direction" - The text direction determined by the site"s language. is_rtl()
--- --   should be used instead
--- -- - "language" - Language code for the current site
--- -- - "stylesheet_url" - URL to the stylesheet for the active theme. An active child theme
--- --   will take precedence over this value
--- -- - "stylesheet_directory" - Directory path for the active theme.  An active child theme
--- --   will take precedence over this value
--- -- - "template_url" / "template_directory" - URL of the active theme"s directory. An active
--- --   child theme will NOT take precedence over this value
--- -- - "pingback_url" - The pingback XML-RPC file URL (xmlrpc.php)
--- -- - "atom_url" - The Atom feed URL (/feed/atom)
--- -- - "rdf_url" - The RDF/RSS 1.0 feed URL (/feed/rdf)
--- -- - "rss_url" - The RSS 0.92 feed URL (/feed/rss)
--- -- - "rss2_url" - The RSS 2.0 feed URL (/feed)
--- -- - "comments_atom_url" - The comments Atom feed URL (/comments/feed)
--- -- - "comments_rss2_url" - The comments RSS 2.0 feed URL (/comments/feed)
--- --
--- -- Some `show` values are deprecated and will be removed in future versions.
--- -- These options will trigger the _deprecated_argument() function.
--- --
--- -- Deprecated arguments include:
--- --
--- -- - "siteurl" - Use "url" instead
--- -- - "home" - Use "url" instead
--- --
--- -- @since 0.71
--- --
--- -- @global string wp_version The WordPress version string.
--- --
--- -- @param string show   Optional. Site info to retrieve. Default empty (site name).
--- -- @param string filter Optional. How to filter what is retrieved. Default "raw".
--- -- @return string Mostly string values, might be empty.
--- --
+   procedure Bloginfo (Show : String := "")
+   is
+      use Php.Echoing;
+   begin
+      Echo (Get_Bloginfo (Show, "display"));
+   end Bloginfo;
+
+   ------------------
+   -- Get_Bloginfo --
+   ------------------
+
    function Get_Bloginfo (Show   : String := "";
                           Filter : String := "raw")
                           return String
@@ -835,7 +809,9 @@ is
 
       Output : Unbounded_String := +"XXX-970";
    begin
-      Put_Line ("get_bloginfo: " & Show);
+      Put_Line ("get_bloginfo:");
+      Put_Line ("  show  : " & Show);
+      Put_Line ("  filter: " & Filter);
 
 --         switch ( show ) then
 --                 case "home":    // Deprecated.
@@ -986,50 +962,64 @@ is
       return -Output;
    end Get_Bloginfo;
 
--- --
--- -- Returns the Site Icon URL.
--- --
--- -- @since 4.3.0
--- --
--- -- @param int    size    Optional. Size of the site icon. Default 512 (pixels).
--- -- @param string url     Optional. Fallback url if no site icon is found. Default empty.
--- -- @param int    blog_id Optional. ID of the blog to get the site icon for. Default current blog.
--- -- @return string Site Icon URL.
--- --
--- function get_site_icon_url( size = 512, url = "", blog_id = 0 ) then
---         switched_blog = false;
+   -----------------------
+   -- Get_Site_Icon_URL --
+   -----------------------
 
---         if ( is_multisite() && ! empty( blog_id ) && get_current_blog_id() !== (int) blog_id ) then
---                 switch_to_blog( blog_id );
---                 switched_blog = true;
---         end;
+   function Get_Site_Icon_URL (Size    : Integer := 512;
+                               URL     : String  := "";
+                               Blog_Id : Integer := 0)
+                               return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Load;
+      use Inc_Media;
+      use Inc_Ms_Blogs;
+      use Inc_Options;
 
---         site_icon_id = get_option( "site_icon" );
+      Switched_Blog : Boolean := False;
+      URL_2 : Unbounded_String := +URL;
+   begin
+      if
+        Is_Multisite and then
+        Blog_Id = 0  and then  -- not Empty (Blog_Id) and then
+        Get_Current_Blog_Id /= Blog_Id -- (int)
+      then
+         Switch_To_Blog (Blog_Id);
+         Switched_Blog := True;
+      end if;
 
---         if ( site_icon_id ) then
---                 if ( size >= 512 ) then
---                         size_data = "full";
---                 end; else then
---                         size_data = array( size, size );
---                 end;
---                 url = wp_get_attachment_image_url( site_icon_id, size_data );
---         end;
+      declare
+         Site_Icon_Id : constant Integer := Get_Option ("site_icon");
+         Size_Data : Unbounded_String;
+      begin
+         if Site_Icon_Id /= 0 then
+            if Size >= 512 then
+               Size_Data := +"full";
+            else
+               Size_Data := +""; -- array (Size, Size);
+            end if;
+            URL_2 := +Wp_Get_Attachment_Image_URL (Site_Icon_Id, -Size_Data);
+         end if;
+      end;
 
---         if ( switched_blog ) then
---                 restore_current_blog();
---         end;
+      if Switched_Blog then
+         Restore_Current_Blog;
+      end if;
 
---         --
---         -- Filters the site icon URL.
---         --
---         -- @since 4.4.0
---         --
---         -- @param string url     Site icon URL.
---         -- @param int    size    Size of the site icon.
---         -- @param int    blog_id ID of the blog to get the site icon for.
---         --
---         return apply_filters( "get_site_icon_url", url, size, blog_id );
--- end;
+      --
+      -- Filters the site icon URL.
+      --
+      -- @since 4.4.0
+      --
+      -- @param string url     Site icon URL.
+      -- @param int    size    Size of the site icon.
+      -- @param int    blog_id ID of the blog to get the site icon for.
+      --
+      return Apply_Filters ("get_site_icon_url", -URL_2, Size, Blog_Id);
+   end Get_Site_Icon_URL;
 
 -- --
 -- -- Displays the Site Icon URL.
@@ -1044,17 +1034,16 @@ is
 --         echo esc_url( get_site_icon_url( size, url, blog_id ) );
 -- end;
 
--- --
--- -- Determines whether the site has a Site Icon.
--- --
--- -- @since 4.3.0
--- --
--- -- @param int blog_id Optional. ID of the blog in question. Default current blog.
--- -- @return bool Whether the site has a site icon or not.
--- --
--- function has_site_icon( blog_id = 0 ) then
---         return (bool) get_site_icon_url( 512, "", blog_id );
--- end;
+   -------------------
+   -- Has_Site_Icon --
+   -------------------
+
+   function Has_Site_Icon (Blog_Id : Integer := 0)
+                           return Boolean
+   is
+   begin
+      return Get_Site_Icon_URL (512, "", Blog_Id) /= ""; -- (bool)
+   end Has_Site_Icon;
 
 -- --
 -- -- Determines whether the site has a custom logo.
@@ -1197,9 +1186,6 @@ is
 --         echo get_custom_logo( blog_id );
 -- end;
 
-   Global_Page  : Natural;
-   Global_Paged : Natural;
-
    ---------------------------
    -- Wp_Get_Document_Title --
    ---------------------------
@@ -1207,8 +1193,6 @@ is
    function Wp_Get_Document_Title
             return String
    is
-      use Arrays;
-      use Php;
       use Php.Arrays;
       use Php.Strings;
       use Hb_Common;
@@ -1218,8 +1202,8 @@ is
       use Inc_Plugins;
       use Inc_Querys;
 
-      Page  : Natural renames Global_Page;
-      Paged : Natural renames Global_Paged;
+      Page  : Natural renames Globals.Global_Page;
+      Paged : Natural renames Globals.Global_Paged;
 
       Title : Array_Type := To_Array ((1 =>
          Build ("title", "")
@@ -1595,9 +1579,6 @@ is
                                      Display : Boolean := True)
                                      return String
    is
-      use Arrays;
---    use Hb_Common;
-      use Php;
       use Php.Echoing;
       use Inc_Plugins;
       use Inc_Posts;
@@ -2832,111 +2813,152 @@ is
 --         return apply_filters( "get_the_time", the_time, format, post );
 -- end;
 
--- --
--- -- Retrieves the time at which the post was written.
--- --
--- -- @since 2.0.0
--- --
--- -- @param string      format    Optional. Format to use for retrieving the time the post
--- --                               was written. Accepts "G", "U", or PHP date format. Default "U".
--- -- @param bool        gmt       Optional. Whether to retrieve the GMT time. Default false.
--- -- @param int|WP_Post post      Post ID or post object. Default is global `post` object.
--- -- @param bool        translate Whether to translate the time string. Default false.
--- -- @return string|int|false Formatted date string or Unix timestamp if `format` is "U" or "G".
--- --                          False on failure.
--- --
--- function get_post_time( format = "U", gmt = false, post = null, translate = false ) then
---         post = get_post( post );
+   -------------------
+   -- Get_Post_Time --
+   -------------------
 
---         if ( ! post ) then
---                 return false;
---         end;
+   function Get_Post_Time (Format    : String  := "U";
+                           GMT       : Boolean := False;
+                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Translate : Boolean := False)
+                           return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Calendar;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Functions;
+      use Inc_Plugins;
+      use Inc_Posts;
 
---         source   = ( gmt ) ? "gmt" : "local";
---         datetime = get_post_datetime( post, "date", source );
+      Post_2 : constant Wp_Post := Get_Post (Post);
+   begin
+      if Post_2 = Null_Post then
+         raise Post_Not_Found;
+--       return ""; -- False;
+      end if;
 
---         if ( false === datetime ) then
---                 return false;
---         end;
+      declare
+         Source   : String := (if GMT then "gmt" else "local");
 
---         if ( "U" === format || "G" === format ) then
---                 time = datetime->getTimestamp();
+         Datetime : Date_Time_Immutable :=
+           Get_Post_Datetime (Post_2, "date", Source);
 
---                 // Returns a sum of timestamp with timezone offset. Ideally should never be used.
---                 if ( ! gmt ) then
---                         time += datetime->getOffset();
---                 end;
---         end; elseif ( translate ) then
---                 time = wp_date( format, datetime->getTimestamp(), gmt ? new DateTimeZone( "UTC" ) : null );
---         end; else then
---                 if ( gmt ) then
---                         datetime = datetime->setTimezone( new DateTimeZone( "UTC" ) );
---                 end;
+         Time_1   : Time_Type;
+         Time_2   : Unbounded_String;
+         Use_Time_2 : Boolean;
+      begin
+         if False = Datetime then
+            return ""; -- False;
+         end if;
 
---                 time = datetime->format( format );
---         end;
+         if Format in "U" | "G" then
+            Time_1 := Datetime.Get_Timestamp;
 
---         --
---         -- Filters the localized time a post was written.
---         --
---         -- @since 2.6.0
---         --
---         -- @param string|int time   Formatted date string or Unix timestamp if `format` is "U" or "G".
---         -- @param string     format Format to use for retrieving the time the post was written.
---         --                           Accepts "G", "U", or PHP date format.
---         -- @param bool       gmt    Whether to retrieve the GMT time.
---         --
---         return apply_filters( "get_post_time", time, format, gmt );
--- end;
+            -- Returns a sum of timestamp with timezone offset. Ideally should
+            -- never be used.
+            if not GMT then
+               Time_1 := Time_1 + Datetime.Get_Offset;
+            end if;
+            Use_Time_2 := False;
 
--- --
--- -- Retrieves post published or modified time as a `DateTimeImmutable` object instance.
--- --
--- -- The object will be set to the timezone from WordPress settings.
--- --
--- -- For legacy reasons, this function allows to choose to instantiate from local or UTC time in database.
--- -- Normally this should make no difference to the result. However, the values might get out of sync in database,
--- -- typically because of timezone setting changes. The parameter ensures the ability to reproduce backwards
--- -- compatible behaviors in such cases.
--- --
--- -- @since 5.3.0
--- --
--- -- @param int|WP_Post post   Optional. Post ID or post object. Default is global `post` object.
--- -- @param string      field  Optional. Published or modified time to use from database. Accepts "date" or "modified".
--- --                            Default "date".
--- -- @param string      source Optional. Local or UTC time to use from database. Accepts "local" or "gmt".
--- --                            Default "local".
--- -- @return DateTimeImmutable|false Time object on success, false on failure.
--- --
--- function get_post_datetime( post = null, field = "date", source = "local" ) then
---         post = get_post( post );
+         elsif Translate then
+            Time_2 := +Wp_Date (Format, Datetime.Get_Timestamp,
+                                (if GMT
+                                 then X_Construct ("UTC")     -- new Datetimezone
+                                 else X_Construct ("null"))); -- null
+            Use_Time_2 := True;
+         else
+            if GMT then
+               Datetime :=
+                 Datetime.Set_Time_Zone (X_Construct ("UTC")); -- new Datetimezone
+            end if;
 
---         if ( ! post ) then
---                 return false;
---         end;
+            Time_2     := +Datetime.Format (Format);
+            Use_Time_2 := True;
+         end if;
 
---         wp_timezone = wp_timezone();
+         --
+         -- Filters the localized time a post was written.
+         --
+         -- @since 2.6.0
+         --
+         -- @param string|int time   Formatted date string or Unix timestamp if
+         --                          `format` is "U" or "G".
+         -- @param string     format Format to use for retrieving the time the post
+         --                           was written.
+         --                           Accepts "G", "U", or PHP date format.
+         -- @param bool       gmt    Whether to retrieve the GMT time.
+         --
+         if Use_Time_2 then
+            return Apply_Filters ("get_post_time", -Time_2, Format, GMT);
+         else
+            return Apply_Filters ("get_post_time", Time_1, Format, GMT);
+         end if;
+      end;
+   end Get_Post_Time;
 
---         if ( "gmt" === source ) then
---                 time     = ( "modified" === field ) ? post->post_modified_gmt : post->post_date_gmt;
---                 timezone = new DateTimeZone( "UTC" );
---         end; else then
---                 time     = ( "modified" === field ) ? post->post_modified : post->post_date;
---                 timezone = wp_timezone;
---         end;
+   -----------------------
+   -- Get_Post_Datetime --
+   -----------------------
 
---         if ( empty( time ) || "0000-00-00 00:00:00" === time ) then
---                 return false;
---         end;
+   function Get_Post_Datetime (Post   : Inc_Class_Wp_Posts.Wp_Post; -- = null,
+                               Field  : String := "date";
+                               Source : String := "local")
+                               return Php.Calendar.Date_Time_Immutable
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Calendar;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Functions;
+      use Inc_Posts;
 
---         datetime = date_create_immutable_from_format( "Y-m-d H:i:s", time, timezone );
+      Post_2 : constant Wp_Post := Get_Post (Post);
+   begin
+      if Post_2 = Null_Post then
+         raise Post_Not_Found;
+--       return False;
+      end if;
 
---         if ( false === datetime ) then
---                 return false;
---         end;
+      declare
+         Wp_Timezone_2 : constant Date_Time_Zone := Wp_Timezone;
 
---         return datetime->setTimezone( wp_timezone );
--- end;
+         Time     : Unbounded_String;
+         Timezone : Date_Time_Zone;
+      begin
+         if "gmt" = Source then
+            Time     := (if "modified" = Field
+                         then Post.Post_Modified_GMT
+                         else Post.Post_Date_GMT);
+            Timezone := X_Construct ("UTC"); -- new Datetimezone ("UTC");
+         else
+            Time     := (if "modified" = Field
+                         then Post.Post_Modified
+                         else Post.Post_Date);
+            Timezone := Wp_Timezone_2;
+         end if;
+
+         if Empty (-Time) or else "0000-00-00 00:00:00" = Time then
+            raise Some_Time_Error;
+--          return False;
+         end if;
+
+         declare
+            Datetime : constant Date_Time_Immutable :=
+              Date_Create_Immutable_From_Format ("Y-m-d H:i:s", -Time, Timezone);
+         begin
+            if False = Datetime then
+               raise Some_Time_Error;
+--             return False;
+            end if;
+
+            return Datetime.Set_Time_Zone (Wp_Timezone_2);
+         end;
+      end;
+   end Get_Post_Datetime;
 
 -- --
 -- -- Retrieves post published or modified time as a Unix timestamp.
@@ -4406,33 +4428,33 @@ is
 --         return apply_filters( "wp_code_editor_settings", settings, args );
 -- end;
 
--- --
--- -- Retrieves the contents of the search WordPress query variable.
--- --
--- -- The search query string is passed through esc_attr() to ensure that it is safe
--- -- for placing in an HTML attribute.
--- --
--- -- @since 2.3.0
--- --
--- -- @param bool escaped Whether the result is escaped. Default true.
--- --                      Only use when you are later escaping it. Do not use unescaped.
--- -- @return string
--- --
--- function get_search_query( escaped = true ) then
---         --
---         -- Filters the contents of the search query variable.
---         --
---         -- @since 2.3.0
---         --
---         -- @param mixed search Contents of the search query variable.
---         --
---         query = apply_filters( "get_search_query", get_query_var( "s" ) );
+   ----------------------
+   -- Get_Search_Query --
+   ----------------------
 
---         if ( escaped ) then
---                 query = esc_attr( query );
---         end;
---         return query;
--- end;
+   function Get_Search_Query (Escaped : Boolean := True)
+                              return String
+   is
+      use Inc_Formatting;
+      use Inc_Plugins;
+      use Inc_Querys;
+
+      --
+      -- Filters the contents of the search query variable.
+      --
+      -- @since 2.3.0
+      --
+      -- @param mixed search Contents of the search query variable.
+      --
+      Query : constant String :=
+        Apply_Filters ("get_search_query", Get_Query_Var ("s"));
+   begin
+      if Escaped then
+         return ESC_Attr (Query);
+      else
+         return Query;
+      end if;
+   end Get_Search_Query;
 
 -- --
 -- -- Displays the contents of the search query variable.
@@ -4514,266 +4536,327 @@ is
       Echo (Get_Language_Attributes (Doctype));
    end Language_Attributes;
 
--- --
--- -- Retrieves paginated links for archive post pages.
--- --
--- -- Technically, the function can be used to create paginated link list for any
--- -- area. The "base" argument is used to reference the url, which will be used to
--- -- create the paginated links. The "format" argument is then used for replacing
--- -- the page number. It is however, most likely and by default, to be used on the
--- -- archive post pages.
--- --
--- -- The "type" argument controls format of the returned value. The default is
--- -- "plain", which is just a string with the links separated by a newline
--- -- character. The other possible values are either "array" or "list". The
--- -- "array" value will return an array of the paginated link list to offer full
--- -- control of display. The "list" value will place all of the paginated links in
--- -- an unordered HTML list.
--- --
--- -- The "total" argument is the total amount of pages and is an integer. The
--- -- "current" argument is the current page number and is also an integer.
--- --
--- -- An example of the "base" argument is "http://example.com/all_posts.php%_%"
--- -- and the "%_%" is required. The "%_%" will be replaced by the contents of in
--- -- the "format" argument. An example for the "format" argument is "?page=%#%"
--- -- and the "%#%" is also required. The "%#%" will be replaced with the page
--- -- number.
--- --
--- -- You can include the previous and next links in the list by setting the
--- -- "prev_next" argument to true, which it is by default. You can set the
--- -- previous text, by using the "prev_text" argument. You can set the next text
--- -- by setting the "next_text" argument.
--- --
--- -- If the "show_all" argument is set to true, then it will show all of the pages
--- -- instead of a short list of the pages near the current page. By default, the
--- -- "show_all" is set to false and controlled by the "end_size" and "mid_size"
--- -- arguments. The "end_size" argument is how many numbers on either the start
--- -- and the end list edges, by default is 1. The "mid_size" argument is how many
--- -- numbers to either side of current page, but not including current page.
--- --
--- -- It is possible to add query vars to the link by using the "add_args" argument
--- -- and see add_query_arg() for more information.
--- --
--- -- The "before_page_number" and "after_page_number" arguments allow users to
--- -- augment the links themselves. Typically this might be to add context to the
--- -- numbered links so that screen reader users understand what the links are for.
--- -- The text strings are added before and after the page number - within the
--- -- anchor tag.
--- --
--- -- @since 2.1.0
--- -- @since 4.9.0 Added the `aria_current` argument.
--- --
--- -- @global WP_Query   wp_query   WordPress Query object.
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param string|array args then
--- --     Optional. Array or string of arguments for generating paginated links for archives.
--- --
--- --     @type string base               Base of the paginated url. Default empty.
--- --     @type string format             Format for the pagination structure. Default empty.
--- --     @type int    total              The total amount of pages. Default is the value WP_Query"s
--- --                                      `max_num_pages` or 1.
--- --     @type int    current            The current page number. Default is "paged" query var or 1.
--- --     @type string aria_current       The value for the aria-current attribute. Possible values are "page",
--- --                                      "step", "location", "date", "time", "true", "false". Default is "page".
--- --     @type bool   show_all           Whether to show all pages. Default false.
--- --     @type int    end_size           How many numbers on either the start and the end list edges.
--- --                                      Default 1.
--- --     @type int    mid_size           How many numbers to either side of the current pages. Default 2.
--- --     @type bool   prev_next          Whether to include the previous and next links in the list. Default true.
--- --     @type string prev_text          The previous page text. Default "&laquo; Previous".
--- --     @type string next_text          The next page text. Default "Next &raquo;".
--- --     @type string type               Controls format of the returned value. Possible values are "plain",
--- --                                      "array" and "list". Default is "plain".
--- --     @type array  add_args           An array of query args to add. Default false.
--- --     @type string add_fragment       A string to append to each link. Default empty.
--- --     @type string before_page_number A string to appear before the page number. Default empty.
--- --     @type string after_page_number  A string to append after the page number. Default empty.
--- -- end;
--- -- @return string|string[]|void String of page links or array of page links, depending on "type" argument.
--- --                              Void if total number of pages is less than 2.
--- --
--- function paginate_links( args = "" ) then
---         global wp_query, wp_rewrite;
+   ---------------------
+   -- Paginate_Linnks --
+   ---------------------
 
---         // Setting up default values based on the current URL.
---         pagenum_link = html_entity_decode( get_pagenum_link() );
---         url_parts    = explode( "?", pagenum_link );
+   function Paginate_Links (Args : Array_Type := Empty_Array) -- ""
+                            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Arrays;
+      use Php.HTML;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Plugins;
+      use Inc_Querys;
+--    global wp_query, wp_rewrite;
 
---         // Get max pages and current page out of the current query, if available.
---         total   = isset( wp_query->max_num_pages ) ? wp_query->max_num_pages : 1;
---         current = get_query_var( "paged" ) ? (int) get_query_var( "paged" ) : 1;
+      Format_Args    : Array_Type;
+      URL_Query_Args : Array_Type;
+      -- These two do not exist in original code -- jq -- ???
 
---         // Append the format placeholder to the base URL.
---         pagenum_link = trailingslashit( url_parts[0] ) . "%_%";
+      -- Setting up default values based on the current URL.
+      Pagenum_Link_2 : constant String :=
+        HTML_Entity_Decode (Get_Pagenum_Link);
 
---         // URL base depends on permalink settings.
---         format  = wp_rewrite->using_index_permalinks() && ! strpos( pagenum_link, "index.php" ) ? "index.php/" : "";
---         format .= wp_rewrite->using_permalinks() ? user_trailingslashit( wp_rewrite->pagination_base . "/%#%", "paged" ) : "?paged=%#%";
+      URL_Parts : constant List_Type :=
+        Explode ("?", Pagenum_Link_2);
 
---         defaults = array(
---                 "base"               => pagenum_link, // http://example.com/all_posts.php%_% : %_% is replaced by format (below).
---                 "format"             => format, // ?page=%#% : %#% is replaced by the page number.
---                 "total"              => total,
---                 "current"            => current,
---                 "aria_current"       => "page",
---                 "show_all"           => false,
---                 "prev_next"          => true,
---                 "prev_text"          => __( "&laquo; Previous" ),
---                 "next_text"          => __( "Next &raquo;" ),
---                 "end_size"           => 1,
---                 "mid_size"           => 2,
---                 "type"               => "plain",
---                 "add_args"           => array(), // Array of query args to add.
---                 "add_fragment"       => "",
---                 "before_page_number" => "",
---                 "after_page_number"  => "",
---         );
+      -- Get max pages and current page out of the current query, if available.
+      Total : constant Natural :=
+        (if Global_Wp_Query.Max_Num_Pages /= 0
+         -- Isset (global_Wp_Query.Max_Num_Pages)
+         then Global_Wp_Query.Max_Num_Pages else 1);
 
---         args = wp_parse_args( args, defaults );
+      Current : constant Natural :=
+        (if Get_Query_Var ("paged") /= 0
+         then Get_Query_Var ("paged") else 1); -- (int)
 
---         if ( ! is_array( args["add_args"] ) ) then
---                 args["add_args"] = array();
---         end;
+      -- Append the format placeholder to the base URL.
+      Pagenum_Link : constant String :=
+        Trailing_Slash_It ((-URL_Parts (1))) & "%_%"; -- [0]
 
---         // Merge additional query vars found in the original URL into "add_args" array.
---         if ( isset( url_parts[1] ) ) then
---                 // Find the format argument.
---                 format       = explode( "?", str_replace( "%_%", args["format"], args["base"] ) );
---                 format_query = isset( format[1] ) ? format[1] : "";
---                 wp_parse_str( format_query, format_args );
+      -- URL base depends on permalink settings.
+      Format_2 : constant String :=
+        (if Global_Wp_Rewrite.Using_Index_Permalinks and then -- not?
+            Strpos (Pagenum_Link, "index.php") /= 0
+         then "index.php/" else "");
 
---                 // Find the query args of the requested URL.
---                 wp_parse_str( url_parts[1], url_query_args );
+      Format : constant String :=
+        Format_2 & (if Global_Wp_Rewrite.Using_Permalinks
+                    then User_Trailing_Slash_It
+                           ((-Global_Wp_Rewrite.Pagination_Base) & "/%#%", "paged")
+                    else "?paged=%#%");
 
---                 // Remove the format argument from the array of query arguments, to avoid overwriting custom format.
---                 foreach ( format_args as format_arg => format_arg_value ) then
---                         unset( url_query_args[ format_arg ] );
---                 end;
+      Defaults : constant Array_Type := To_Array (List => (
+        Build ("base",              Pagenum_Link),
+        -- http://example.com/all_posts.php%_% : %_% is replaced by format (below).
+        Build ("format",            Format),
+        -- ?page=%#% : %#% is replaced by the page number.
+        Build ("total",              Total),
+        Build ("current",            Current),
+        Build ("aria_current",       "page"),
+        Build ("show_all",           False),
+        Build ("prev_next",          True),
+        Build ("prev_text",          abs "&laquo; Previous"),
+        Build ("next_text",          abs "Next &raquo;"),
+        Build ("end_size",           1),
+        Build ("mid_size",           2),
+        Build ("type",               "plain"),
+        Build ("add_args",           Empty_Array), -- Array of query args to add.
+        Build ("add_fragment",       ""),
+        Build ("before_page_number", ""),
+        Build ("after_page_number",  "")
+      ));
 
---                 args["add_args"] = array_merge( args["add_args"], urlencode_deep( url_query_args ) );
---         end;
+      Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
+   begin
+      if Kind_Of (Get (Args_2, "add_args")) /= Kind_Array then
+--    if not Is_Array (Args_2["add_args"]) then
+         Set (Args_2, "add_args", From_Array (Empty_Array));
+      end if;
 
---         // Who knows what else people pass in args.
---         total = (int) args["total"];
---         if ( total < 2 ) then
---                 return;
---         end;
---         current  = (int) args["current"];
---         end_size = (int) args["end_size"]; // Out of bounds? Make it the default.
---         if ( end_size < 1 ) then
---                 end_size = 1;
---         end;
---         mid_size = (int) args["mid_size"];
---         if ( mid_size < 0 ) then
---                 mid_size = 2;
---         end;
+      -- Merge additional query vars found in the original URL into "add_args" array.
+      if URL_Parts.Last_Index = 2 then
+--    if Isset (url_parts[1]) then
+         declare
+            -- Find the format argument.
+            Format : constant List_Type :=
+              Explode ("?", Str_Replace ("%_%",
+                                         Get_As_String (Args_2, "format"),
+                                         Get_As_String (Args_2, "base")));
 
---         add_args   = args["add_args"];
---         r          = "";
---         page_links = array();
---         dots       = false;
+            Format_Query : String := (if Format.Last_Index = 2  -- [1]
+                                      then -Format (2) else ""); -- [1]
+--          Format_Query : String := (if isset( format[1] ) then format[1] else "");
+         begin
+            Wp_Parse_Str (Format_Query, Format_Args);
 
---         if ( args["prev_next"] && current && 1 < current ) :
---                 link = str_replace( "%_%", 2 == current ? "" : args["format"], args["base"] );
---                 link = str_replace( "%#%", current - 1, link );
---                 if ( add_args ) then
---                         link = add_query_arg( add_args, link );
---                 end;
---                 link .= args["add_fragment"];
+            -- Find the query args of the requested URL.
+            Wp_Parse_Str (-URL_Parts (2), URL_Query_Args); -- [1]
 
---                 page_links[] = sprintf(
---                         "<a class="prev page-numbers" href="%s">%s</a>",
---                         --
---                         -- Filters the paginated links for the given archive pages.
---                         --
---                         -- @since 3.0.0
---                         --
---                         -- @param string link The paginated link URL.
---                         --
---                         esc_url( apply_filters( "paginate_links", link ) ),
---                         args["prev_text"]
---                 );
---         endif;
+            -- Remove the format argument from the array of query arguments, to
+            -- avoid overwriting custom format.
+            for A in Format_Args.Iterate loop
+               declare
+                  Format_Arg       : constant String     := Key (A);
+--                Format_Arg_Value : constant Multi_Type := Element (A);
+               begin
+                  Delete (Ref (URL_Query_Args, Format_Arg));
+               end;
+            end loop;
 
---         for ( n = 1; n <= total; n++ ) :
---                 if ( n == current ) :
---                         page_links[] = sprintf(
---                                 "<span aria-current="%s" class="page-numbers current">%s</span>",
---                                 esc_attr( args["aria_current"] ),
---                                 args["before_page_number"] . number_format_i18n( n ) . args["after_page_number"]
---                         );
+            Set (Args_2, "add_args",
+                 From_Array (
+                   Array_Merge (As_Array (Get (Args_2, "add_args")),
+                                URL_Encode_Deep (URL_Query_Args))
+                ));
+         end;
+      end if;
 
---                         dots = true;
---                 else :
---                         if ( args["show_all"] || ( n <= end_size || ( current && n >= current - mid_size && n <= current + mid_size ) || n > total - end_size ) ) :
---                                 link = str_replace( "%_%", 1 == n ? "" : args["format"], args["base"] );
---                                 link = str_replace( "%#%", n, link );
---                                 if ( add_args ) then
---                                         link = add_query_arg( add_args, link );
---                                 end;
---                                 link .= args["add_fragment"];
+      declare
+         -- Who knows what else people pass in args.
+         Total    : constant Integer := As_Integer (Get (Args_2, "total"));
+         Current  : constant Integer := As_Integer (Get (Args_2, "current"));
+         End_Size : Integer := As_Integer (Get (Args_2, "end_size"));
+         Mid_Size : Integer := As_Integer (Get (Args_2, "mid_size"));
 
---                                 page_links[] = sprintf(
---                                         "<a class="page-numbers" href="%s">%s</a>",
---                                         -- This filter is documented in wp-includes/general-template.php--
---                                         esc_url( apply_filters( "paginate_links", link ) ),
---                                         args["before_page_number"] . number_format_i18n( n ) . args["after_page_number"]
---                                 );
+         Add_Args   : constant Array_Type := As_Array (Get (Args_2, "add_args"));
+         Page_Links : Unbounded_String; -- Array_Type;
+         Dots       : Boolean := False;
+      begin
+         if Total < 2 then
+            return ""; -- "" added
+         end if;
 
---                                 dots = true;
---                         elseif ( dots && ! args["show_all"] ) :
---                                 page_links[] = "<span class="page-numbers dots">" . __( "&hellip;" ) . "</span>";
+         -- Out of bounds? Make it the default.
+         if End_Size < 1 then
+            End_Size := 1;
+         end if;
 
---                                 dots = false;
---                         endif;
---                 endif;
---         endfor;
+         if Mid_Size < 0 then
+            Mid_Size := 2;
+         end if;
 
---         if ( args["prev_next"] && current && current < total ) :
---                 link = str_replace( "%_%", args["format"], args["base"] );
---                 link = str_replace( "%#%", current + 1, link );
---                 if ( add_args ) then
---                         link = add_query_arg( add_args, link );
---                 end;
---                 link .= args["add_fragment"];
+         if
+           As_Boolean (Get (Args_2, "prev_next")) and then
+           Current /= 0 and then
+           1 < Current
+         then
+            declare
+               Link_3 : constant String :=
+                 Str_Replace ("%_%",
+                              (if 2 = Current
+                               then ""
+                               else Get_As_String (Args_2, "format")),
+                             Get_As_String (Args_2, "base"));
 
---                 page_links[] = sprintf(
---                         "<a class="next page-numbers" href="%s">%s</a>",
---                         -- This filter is documented in wp-includes/general-template.php--
---                         esc_url( apply_filters( "paginate_links", link ) ),
---                         args["next_text"]
---                 );
---         endif;
+               Link_2 : constant String :=
+                 Str_Replace ("%#%", Helpers.Image (Current - 1), Link_3);
 
---         switch ( args["type"] ) then
---                 case "array":
---                         return page_links;
+               Link : Unbounded_String;
+            begin
+               if Add_Args /= Empty_Array then
+--             if Add_Args then
+                  Link := +Add_Query_Arg (Add_Args, Link_2);
+               end if;
+               Append (Link, Get_As_String (Args_2, "add_fragment"));
 
---                 case "list":
---                         r .= "<ul class="page-numbers">\n\t<li>";
---                         r .= implode( "</li>\n\t<li>", page_links );
---                         r .= "</li>\n</ul>\n";
---                         break;
+               Append (Page_Links,
+                       Sprintf (
+                         "<a class=""prev page-numbers"" href=""%s"">%s</a>",
+                         --
+                         -- Filters the paginated links for the given archive pages.
+                         --
+                         -- @since 3.0.0
+                         --
+                         -- @param string link The paginated link URL.
+                         --
+                         To_List (List => (
+                           1 => +ESC_URL (Apply_Filters ("paginate_links", -Link)),
+                           2 => +Get_As_String (Args_2, "prev_text")
+                         ))
+                       ));
+            end;
+         end if;
 
---                 default:
---                         r = implode( "\n", page_links );
---                         break;
---         end;
+         for N in 1 .. Total loop
+            if N = Current then
+               Append
+                 (Page_Links,
+                  Sprintf (
+                    "<span aria-current=""%s"" class=""page-numbers current"">%s</span>",
+                    To_List (List => (
+                      1 => +ESC_Attr (Get_As_String (Args_2, "aria_current")),
+                      2 => +Get_As_String (Args_2, "before_page_number") &
+                            Number_Format_I18n (Float (N)) &
+                            Get_As_String (Args, "after_page_number")
+                    ))
+                  ));
 
---         --
---         -- Filters the HTML output of paginated links for archives.
---         --
---         -- @since 5.7.0
---         --
---         -- @param string r    HTML output.
---         -- @param array  args An array of arguments. See paginate_links()
---         --                     for information on accepted arguments.
---         --
---         r = apply_filters( "paginate_links_output", r, args );
+               Dots := True;
+            else
+               if
+                 As_Boolean (Get (Args_2, "show_all")) or else
+                 (N <= End_Size or else
+                  (Current /= 0 and then N >= Current - Mid_Size and then
+                   N <= Current + Mid_Size) or else
+                 N > Total - End_Size)
+               then
+                  declare
+                     Link_3 : constant String :=
+                       Str_Replace ("%_%",
+                                    (if 1 = N then ""
+                                     else Get_As_String (Args_2, "format")),
+                                    Get_As_String (Args_2, "base"));
 
---         return r;
--- end;
+                     Link_2 : constant String :=
+                       Str_Replace ("%#%", Helpers.Image (N), Link_3);
+
+                     Link : Unbounded_String;
+                  begin
+                     if Add_Args /= Empty_Array then
+                        Link := +Add_Query_Arg (Add_Args, Link_2);
+                     end if;
+                     Append (Link, Get_As_String (Args_2, "add_fragment"));
+
+                     Append (
+                       Page_Links,
+                       Sprintf (
+                         "<a class=""page-numbers"" href=""%s"">%s</a>",
+                         -- This filter is documented in
+                         -- wp-includes/general-template.php
+                         To_List (List => (
+                           1 => +ESC_URL (Apply_Filters ("paginate_links", -Link)),
+                           2 => +Get_As_String (Args_2, "before_page_number") &
+                                Number_Format_I18n (Float (N)) &
+                                Get_As_String (Args_2, "after_page_number")
+                         ))
+                       ));
+                  end;
+                  Dots := True;
+
+               elsif Dots and then not As_Boolean (Get (Args_2, "show_all")) then
+                  Append (Page_Links,
+                          "<span class=""page-numbers dots"">" &
+                          abs "&hellip;" &
+                          "</span>");
+
+                  Dots := False;
+               end if;
+            end if;
+         end loop;
+
+         if
+           As_Boolean (Get (Args_2, "prev_next")) and then
+           Current /= 0 and then
+           Current < Total
+         then
+            declare
+               Link_3 : constant String :=
+                 Str_Replace ("%_%",
+                              Get_As_String (Args_2, "format"),
+                              Get_As_String (Args_2, "base"));
+
+               Link_2 : constant String :=
+                 Str_Replace ("%#%", Helpers.Image (Current + 1), Link_3);
+
+               Link : Unbounded_String;
+            begin
+               if Add_Args /= Empty_Array then
+                  Link := +Add_Query_Arg (Add_Args, Link_2);
+               end if;
+               Append (Link, Get_As_String (Args_2, "add_fragment"));
+
+               Append
+                 (Page_Links,
+                  Sprintf (
+                    "<a class=""next page-numbers"" href=""%s"">%s</a>",
+                    -- This filter is documented in wp-includes/general-template.php
+                    To_List (List => (
+                      1 => +ESC_URL (Apply_Filters ("paginate_links", -Link)),
+                      2 => +Get_As_String (Args_2, "next_text")
+                    ))
+                  ));
+            end;
+         end if;
+
+         declare
+            Typ : constant String := Get_As_String (Args_2, "type");
+            R   : Unbounded_String;
+         begin
+            if Typ in "array" then
+               return -Page_Links;
+
+            elsif Typ in "list" then
+               Append (R, "<ul class=""page-numbers"">\n\t<li>");
+               Append (R, Implode ("</li>\n\t<li>", -Page_Links));
+               Append (R, "</li>\n</ul>\n");
+
+            else
+               R := +Implode ("\n", -Page_Links);
+            end if;
+
+            --
+            -- Filters the HTML output of paginated links for archives.
+            --
+            -- @since 5.7.0
+            --
+            -- @param string r    HTML output.
+            -- @param array  args An array of arguments. See paginate_links()
+            --                     for information on accepted arguments.
+            --
+            R := +Apply_Filters ("paginate_links_output", -R, Args_2);
+
+            return -R;
+         end;
+      end;
+   end Paginate_Links;
 
 -- --
 -- -- Registers an admin color scheme css file.
@@ -5191,8 +5274,8 @@ is
    -- Checked --
    -------------
 
-   function Checked (Checkd  : Integer; -- Multi_Type;
-                     Current : Integer; -- Multi_Type := True;
+   function Checked (Checkd  : String;
+                     Current : String;
                      Echo    : Boolean := True)
                      return String
    is
@@ -5200,41 +5283,44 @@ is
       return X_Checked_Selected_Helper (Checkd, Current, Echo, "checked");
    end Checked;
 
--- --
--- -- Outputs the HTML selected attribute.
--- --
--- -- Compares the first two arguments and if identical marks as selected.
--- --
--- -- @since 1.0.0
--- --
--- -- @param mixed selected One of the values to compare.
--- -- @param mixed current  Optional. The other value to compare if not just true.
--- --                        Default true.
--- -- @param bool  echo     Optional. Whether to echo or just return the string.
--- --                        Default true.
--- -- @return string HTML attribute or empty string.
--- --
--- function selected( selected, current = true, echo = true ) then
---         return __checked_selected_helper( selected, current, echo, "selected" );
--- end;
+   -------------
+   -- Checked --
+   -------------
 
--- --
--- -- Outputs the HTML disabled attribute.
--- --
--- -- Compares the first two arguments and if identical marks as disabled.
--- --
--- -- @since 3.0.0
--- --
--- -- @param mixed disabled One of the values to compare.
--- -- @param mixed current  Optional. The other value to compare if not just true.
--- --                        Default true.
--- -- @param bool  echo     Optional. Whether to echo or just return the string.
--- --                        Default true.
--- -- @return string HTML attribute or empty string.
--- --
--- function disabled( disabled, current = true, echo = true ) then
---         return __checked_selected_helper( disabled, current, echo, "disabled" );
--- end;
+   function Checked (Checkd  : Integer;
+                     Current : Integer;
+                     Echo    : Boolean := True)
+                     return String
+   is
+   begin
+      return X_Checked_Selected_Helper (Checkd, Current, Echo, "checked");
+   end Checked;
+
+   --------------
+   -- Selected --
+   --------------
+
+   function Selected (Selectd : String;
+                      Current : String; --  = true,
+                      Echo    : Boolean := True)
+                      return String
+   is
+   begin
+      return X_Checked_Selected_Helper (Selectd, Current, Echo, "selected");
+   end Selected;
+
+   --------------
+   -- Disabled --
+   --------------
+
+   function Disabled (Disabled : String;
+                      Current  : String; -- Integer;
+                      Echo     : Boolean := True)
+                      return String
+   is
+   begin
+      return X_Checked_Selected_Helper (Disabled, Current, Echo, "disabled");
+   end Disabled;
 
 -- --
 -- -- Outputs the HTML readonly attribute.
@@ -5268,6 +5354,34 @@ is
    -- X_Checked_Selected_Helper --
    -------------------------------
 
+   function X_Checked_Selected_Helper (Helper  : String;
+                                       Current : String;
+                                       Echo    : Boolean;
+                                       Typ     : String)
+                                       return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+
+      Result : Unbounded_String;
+   begin
+      if Helper = Current then -- 2x (string)
+         Result := +" type=""" & Typ & """";
+      else
+         Result := +"";
+      end if;
+
+      if Echo then
+         Php.Echoing.Echo (-Result);
+      end if;
+
+      return -Result;
+   end X_Checked_Selected_Helper;
+
+   -------------------------------
+   -- X_Checked_Selected_Helper --
+   -------------------------------
+
    function X_Checked_Selected_Helper (Helper  : Integer;
                                        Current : Integer;
                                        Echo    : Boolean;
@@ -5275,12 +5389,11 @@ is
                                        return String
    is
       use Ada.Strings.Unbounded;
---    use Php.Echoing;
       use Hb_Common;
 
       Result : Unbounded_String;
    begin
-      if Helper'Image = Current'Image then -- 2x (string)
+      if Helper = Current then -- 2x (string)
          Result := +" type=""" & Typ & """";
       else
          Result := +"";

@@ -2,6 +2,8 @@
 --
 --
 
+with Php.Calendar;
+
 with Arrays;
 with Lists;
 
@@ -14,6 +16,65 @@ is
    use Lists;
 
    Program_Die : exception;
+
+   --
+   -- Retrieves the timezone of the site as a string.
+   --
+   -- Uses the `timezone_string` option to get a proper timezone name if available,
+   -- otherwise falls back to a manual UTC ± offset.
+   --
+   -- Example return values:
+   --
+   --  - "Europe/Rome"
+   --  - "America/North_Dakota/New_Salem"
+   --  - "UTC"
+   --  - "-06:30"
+   --  - "+00:00"
+   --  - "+08:45"
+   --
+   -- @since 5.3.0
+   --
+   -- @return string PHP timezone name or a ±HH:MM offset.
+   --
+   function Wp_Timezone_String
+            return String;
+
+   --
+   -- Retrieves the timezone of the site as a `DateTimeZone` object.
+   --
+   -- Timezone can be based on a PHP timezone string or a ±HH:MM offset.
+   --
+   -- @since 5.3.0
+   --
+   -- @return DateTimeZone Timezone object.
+   --
+   function Wp_Timezone
+            return Php.Calendar.Date_Time_Zone;
+
+   --
+   -- Retrieves the date, in localized format.
+   --
+   -- This is a newer function, intended to replace `date_i18n()` without legacy
+   -- quirks in it.
+   --
+   -- Note that, unlike `date_i18n()`, this function accepts a true Unix timestamp,
+   -- not summed with timezone offset.
+   --
+   -- @since 5.3.0
+   --
+   -- @global WP_Locale wp_locale WordPress date and time locale object.
+   --
+   -- @param string       format    PHP date format.
+   -- @param int          timestamp Optional. Unix timestamp. Defaults to current time.
+   -- @param DateTimeZone timezone  Optional. Timezone to output result in. Defaults
+   --                               to timezone from site settings.
+   -- @return string|false The date, translated if locale specifies it. False on
+   --                      invalid timestamp input.
+   --
+   function Wp_Date (Format    : String;
+                     Timestamp : Php.Calendar.Time_Type; -- null
+                     Timezone  : Php.Calendar.Date_Time_Zone) -- = null
+                     return String;
 
    --
    -- Plucks a certain field out of each object or array in an array.

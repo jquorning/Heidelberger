@@ -9,12 +9,17 @@
 with Php.Arrays;
 with Php.Ini;
 with Php.Lists;
+with Php.Strings;
 
 with Hb_Common;
+with Globals;
+with Wp_Common;
 
+with Inc_Formatting;
 with Inc_Load;
 with Inc_Options;
 with Inc_Plugins;
+with Inc_Posts;
 with Inc_Querys;
 
 package body Inc_Media
@@ -182,31 +187,10 @@ is
 --         return out;
 -- end;
 
--- --
--- -- Scales an image to fit a particular size (such as "thumb" or "medium").
--- --
--- -- The URL might be the original image, or it might be a resized version. This
--- -- function won"t create a new resized copy, it will just return an already
--- -- resized one if it exists.
--- --
--- -- A plugin may use the {@see "image_downsize"} filter to hook into and offer image
--- -- resizing services for images. The hook must return an array with the same
--- -- elements that are normally returned from the function.
--- --
--- -- @since 2.5.0
--- --
--- -- @param int          id   Attachment ID for image.
--- -- @param string|int[] size Optional. Image size. Accepts any registered image size name, or an array
--- --                           of width and height values in pixels (in that order). Default "medium".
--- -- @return array|false then
--- --     Array of image data, or boolean false if no image is available.
--- --
--- --     @type string 0 Image source URL.
--- --     @type int    1 Image width in pixels.
--- --     @type int    2 Image height in pixels.
--- --     @type bool   3 Whether the image is a resized image.
--- -- end;
--- --
+   --------------------
+   -- Image_Downsize --
+   --------------------
+
 -- function image_downsize( id, size = "medium" ) then
 --         is_image = wp_attachment_is_image( id );
 
@@ -981,66 +965,87 @@ is
       return All_Sizes;
    end Wp_Get_Registered_Image_Subsizes;
 
--- --
--- -- Retrieves an image to represent an attachment.
--- --
--- -- @since 2.5.0
--- --
--- -- @param int          attachment_id Image attachment ID.
--- -- @param string|int[] size          Optional. Image size. Accepts any registered image size name, or an array of
--- --                                    width and height values in pixels (in that order). Default "thumbnail".
--- -- @param bool         icon          Optional. Whether the image should fall back to a mime type icon. Default false.
--- -- @return array|false then
--- --     Array of image data, or boolean false if no image is available.
--- --
--- --     @type string 0 Image source URL.
--- --     @type int    1 Image width in pixels.
--- --     @type int    2 Image height in pixels.
--- --     @type bool   3 Whether the image is a resized image.
--- -- end;
--- --
--- function wp_get_attachment_image_src( attachment_id, size = "thumbnail", icon = false ) then
---         -- Get a thumbnail or intermediate image if there is one.
---         image = image_downsize( attachment_id, size );
---         if ( not image ) then
---                 src = false;
+   ---------------------------------
+   -- Wp_Get_Attachment_Image_Src --
+   ---------------------------------
 
---                 if ( icon ) then
---                         src = wp_mime_type_icon( attachment_id );
+   function Wp_Get_Attachment_Image_Src
+              (Attachment_Id : Integer;
+               Size          : String  := "thumbnail";
+               Icon          : Boolean := False)
+               return Image_Src_Type
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Plugins;
+      use Inc_Posts;
 
---                         if ( src ) then
---                                 -- This filter is documented in wp-includes/post.php--
---                                 icon_dir = apply_filters( "icon_dir", ABSPATH . WPINC . "/images/media" );
+      -- Get a thumbnail or intermediate image if there is one.
+      Image  : Image_Src_Type := Image_Downsize (Attachment_Id, Size);
+      Width  : Natural := 0;
+      Height : Natural := 0;
+   begin
+      if Image.Source = "" then
+--    if not Image then
+         declare
+            Src : Unbounded_String; -- Boolean := False;
+         begin
+            if Icon then
+               Src := +Wp_MIME_Type_Icon (Attachment_Id);
 
---                                 src_file               = icon_dir . "/" . wp_basename( src );
---                                 list( width, height ) = wp_getimagesize( src_file );
---                         end;
---                 end;
+               if Src /= "" then
+                  declare
+                     -- This filter is documented in wp-includes/post.php
+                     Icon_Dir : constant String :=
+                       Apply_Filters ("icon_dir",
+                                      -(Globals.ABSPATH & Globals.WPINC) &
+                                      "/images/media");
 
---                 if ( src and then width and then height ) then
---                         image = array( src, width, height, false );
---                 end;
---         end;
---         --
---         -- Filters the attachment image source result.
---         --
---         -- @since 4.3.0
---         --
---         -- @param array|false  image         then
---         --     Array of image data, or boolean false if no image is available.
---         --
---         --     @type string 0 Image source URL.
---         --     @type int    1 Image width in pixels.
---         --     @type int    2 Image height in pixels.
---         --     @type bool   3 Whether the image is a resized image.
---         -- end;
---         -- @param int          attachment_id Image attachment ID.
---         -- @param string|int[] size          Requested image size. Can be any registered image size name, or
---         --                                    an array of width and height values in pixels (in that order).
---         -- @param bool         icon          Whether the image should be treated as an icon.
---         --
---         return apply_filters( "wp_get_attachment_image_src", image, attachment_id, size, icon );
--- end;
+                     Src_File : constant String :=
+                       Icon_Dir & "/" & Wp_Basename (-Src);
+
+                     List : constant List_Type := Wp_Getimagesize (Src_File);
+                  begin
+                     Width  := Integer'Value (-List (1));
+                     Height := Integer'Value (-List (2));
+                  end;
+               end if;
+            end if;
+
+            if Src /= "" and then Width /= 0 and then Height /= 0 then
+               Image := (Source  => Src,
+                         Width   => Width,
+                         Height  => Height,
+                         Resized => False);
+            end if;
+         end;
+      end if;
+
+      --
+      -- Filters the attachment image source result.
+      --
+      -- @since 4.3.0
+      --
+      -- @param array|false  image         {
+      --     Array of image data, or boolean false if no image is available.
+      --
+      --     @type string 0 Image source URL.
+      --     @type int    1 Image width in pixels.
+      --     @type int    2 Image height in pixels.
+      --     @type bool   3 Whether the image is a resized image.
+      -- }
+      -- @param int          attachment_id Image attachment ID.
+      -- @param string|int[] size          Requested image size. Can be any registered
+      --                                   image size name, or an array of width and
+      --                                   height values in pixels (in that order).
+      -- @param bool         icon          Whether the image should be treated as
+      --                                   an icon.
+      --
+      return Apply_Filters ("wp_get_attachment_image_src", Image,
+                            Attachment_Id, Size, Icon);
+   end Wp_Get_Attachment_Image_Src;
 
 -- --
 -- -- Gets an HTML img element representing an image attachment.
@@ -1170,22 +1175,26 @@ is
 --         return apply_filters( "wp_get_attachment_image", html, attachment_id, size, icon, attr );
 -- end;
 
--- --
--- -- Gets the URL of an image attachment.
--- --
--- -- @since 4.4.0
--- --
--- -- @param int          attachment_id Image attachment ID.
--- -- @param string|int[] size          Optional. Image size. Accepts any registered image size name, or an array of
--- --                                    width and height values in pixels (in that order). Default "thumbnail".
--- -- @param bool         icon          Optional. Whether the image should be treated as an icon. Default false.
--- -- @return string|false Attachment URL or false if no image is available. If `size` does not match
--- --                      any registered image size, the original image URL will be returned.
--- --
--- function wp_get_attachment_image_url( attachment_id, size = "thumbnail", icon = false ) then
---         image = wp_get_attachment_image_src( attachment_id, size, icon );
---         return isset( image[0] ) ? image[0] : false;
--- end;
+   ---------------------------------
+   -- Wp_Get_Attachment_Image_URL --
+   ---------------------------------
+
+   function Wp_Get_Attachment_Image_URL
+              (Attachment_Id : Integer;
+               Size          : String  := "thumbnail";
+               Icon          : Boolean := False)
+               return String
+   is
+      use Php.Strings;
+      use Hb_Common;
+
+      Image : constant Image_Src_Type :=
+        Wp_Get_Attachment_Image_Src (Attachment_Id, Size, Icon);
+   begin
+      return
+        (if Isset (-Image.Source)
+         then -Image.Source else ""); -- False
+   end Wp_Get_Attachment_Image_URL;
 
 -- --
 -- -- Gets the attachment path relative to the upload directory.
@@ -5355,16 +5364,10 @@ is
 --         return plupload_settings;
 -- end;
 
--- --
--- -- Allows PHP"s getimagesize() to be debuggable when necessary.
--- --
--- -- @since 5.7.0
--- -- @since 5.8.0 Added support for WebP images.
--- --
--- -- @param string filename   The file path.
--- -- @param array  image_info Optional. Extended image information (passed by reference).
--- -- @return array|false Array of image information or false on failure.
--- --
+   ---------------------
+   -- Wp_Getimagesize --
+   ---------------------
+
 -- function wp_getimagesize( filename, array &image_info = null ) then
 --         -- Don't silence errors when in debug mode, unless running unit tests.
 --         if ( defined( "WP_DEBUG" ) and then WP_DEBUG
@@ -5424,6 +5427,18 @@ is
 --         -- The image could not be parsed.
 --         return false;
 -- end;
+
+   ---------------------
+   -- Wp_Getimagesize --
+   ---------------------
+
+   function Wp_Getimagesize (Filename : String)
+                             return List_Type
+   is
+      Unused_Info : Array_Type;
+   begin
+      return Wp_Getimagesize (Filename, Unused_Info);
+   end Wp_Getimagesize;
 
 -- --
 -- -- Extracts meta information about a WebP file: width, height, and type.

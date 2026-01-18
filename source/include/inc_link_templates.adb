@@ -5,9 +5,11 @@
 -- @subpackage Template
 --
 
+with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Php.Arrays;
+with Php.HTML;
 with Php.Lists;
 with Php.Misc;
 with Php.Numerics;
@@ -23,12 +25,12 @@ with Wp_Common;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Post_Type;
-with Inc_Class_Wp_Rewrites;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Category_Templates;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_General_Templates;
 with Inc_Load;
 with Inc_Ms_Blogs;
 with Inc_Options;
@@ -41,8 +43,6 @@ with Inc_Querys;
 package body Inc_Link_Templates
 is
    use Lists;
-
-   Global_Wp_Rewrite : Inc_Class_Wp_Rewrites.Wp_Rewrite;
 
 -- --
 -- -- Displays the permalink for the current post.
@@ -2522,85 +2522,132 @@ is
 --         echo get_adjacent_post_link( format, link, in_same_term, excluded_terms, previous, taxonomy );
 -- end;
 
--- --
--- -- Retrieves the link for a page number.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param int  pagenum Optional. Page number. Default 1.
--- -- @param bool escape  Optional. Whether to escape the URL for display, with esc_url(). Defaults to true.
--- --                      Otherwise, prepares the URL with sanitize_url().
--- -- @return string The link URL for the given page number.
--- --
--- function get_pagenum_link( pagenum = 1, escape = true ) then
---         global wp_rewrite;
+   ----------------------
+   -- Get_Pagenum_Link --
+   ----------------------
 
---         pagenum = (int) pagenum;
+   function Get_Pagenum_Link (Pagenum : Integer := 1;
+                              Escape  : Boolean := True)
+                              return String
+   is
+      use Ada.Containers;
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_General_Templates;
+      use Inc_Load;
+      use Inc_Plugins;
+--    global wp_rewrite;
 
---         request = remove_query_arg( "paged" );
+--    pagenum = (int) pagenum;
 
---         home_root = parse_url( home_url() );
---         home_root = ( isset( home_root["path"] ) ) ? home_root["path"] : "";
---         home_root = preg_quote( home_root, "|" );
+      Request_1 : constant String := Remove_Query_Arg ("paged");
 
---         request = preg_replace( "|^" . home_root . "|i", "", request );
---         request = preg_replace( "|^/+|", "", request );
+      Home_Root_1 : constant Array_Type := Parse_URL (Home_URL);
 
---         if ( ! wp_rewrite->using_permalinks() || is_admin() ) then
---                 base = trailingslashit( get_bloginfo( "url" ) );
+      Home_Root_2 : constant String :=
+        (if Isset (Home_Root_1, "path")
+         then Get_As_String (Home_Root_1, "path") else "");
 
---                 if ( pagenum > 1 ) then
---                         result = add_query_arg( "paged", pagenum, base . request );
---                 end; else then
---                         result = base . request;
---                 end;
---         end; else then
---                 qs_regex = "|\?.*?|";
---                 preg_match( qs_regex, request, qs_match );
+      Home_Root : constant String := Preg_Quote (Home_Root_2, "|");
 
---                 if ( ! empty( qs_match[0] ) ) then
---                         query_string = qs_match[0];
---                         request      = preg_replace( qs_regex, "", request );
---                 end; else then
---                         query_string = "";
---                 end;
+      Request_2 : constant String :=
+        Preg_Replace ("|^" & Home_Root & "|i", "", Request_1);
 
---                 request = preg_replace( "|wp_rewrite->pagination_base/\d+/?|", "", request );
---                 request = preg_replace( "|^" . preg_quote( wp_rewrite->index, "|" ) . "|i", "", request );
---                 request = ltrim( request, "/" );
+      Request   : String := Preg_Replace ("|^/+|", "", Request_2);
 
---                 base = trailingslashit( get_bloginfo( "url" ) );
+      Result : Unbounded_String;
+   begin
+      if
+        not Global_Wp_Rewrite.Using_Permalinks or else
+        Is_Admin
+      then
+         declare
+            Base : constant String :=
+              Trailing_Slash_It (Get_Bloginfo ("url"));
+         begin
+            if Pagenum > 1 then
+               Result :=
+                 +Add_Query_Arg ("paged", Helpers.Image (Pagenum), Base & Request);
+            else
+               Result := +(Base & Request);
+            end if;
+         end;
+      else
+         declare
+            Qs_Regex : constant String := "|\?.*?|";
+            Qs_Match : List_Type;
+            Query_String : Unbounded_String;
+         begin
+            Preg_Match (Qs_Regex, Request, Qs_Match);
 
---                 if ( wp_rewrite->using_index_permalinks() && ( pagenum > 1 || "" !== request ) ) then
---                         base .= wp_rewrite->index . "/";
---                 end;
+            if Qs_Match.Length >= 1 then
+--          if ( ! empty( qs_match[0] ) ) then
+               Query_String := Qs_Match (1); -- [0];
+               Request      := Preg_Replace (Qs_Regex, "", Request);
+            else
+               Query_String := +"";
+            end if;
 
---                 if ( pagenum > 1 ) then
---                         request = ( ( ! empty( request ) ) ? trailingslashit( request ) : request ) . user_trailingslashit( wp_rewrite->pagination_base . "/" . pagenum, "paged" );
---                 end;
+            declare
+               Request_4 : constant String :=
+                 Preg_Replace ("|" & (-Global_Wp_Rewrite.Pagination_Base) & "/\d+/?|",
+                               "", Request);
 
---                 result = base . request . query_string;
---         end;
+               Request_5 : constant String :=
+                 Preg_Replace
+                   ("|^" & Preg_Quote (-Global_Wp_Rewrite.Index, "|") & "|i",
+                    "", Request_4);
 
---         --
---         -- Filters the page number link for the current request.
---         --
---         -- @since 2.5.0
---         -- @since 5.2.0 Added the `pagenum` argument.
---         --
---         -- @param string result  The page number link.
---         -- @param int    pagenum The page number.
---         --
---         result = apply_filters( "get_pagenum_link", result, pagenum );
+               Request_6 : constant String := Ltrim (Request_5, "/");
 
---         if ( escape ) then
---                 return esc_url( result );
---         end; else then
---                 return sanitize_url( result );
---         end;
--- end;
+               Base : Unbounded_String := +Trailing_Slash_It (Get_Bloginfo ("url"));
+
+               Request_7 : Unbounded_String;
+            begin
+               if
+                 Global_Wp_Rewrite.Using_Index_Permalinks and then
+                 (Pagenum > 1 or "" /= Request_6)
+               then
+                  Append (Base, Global_Wp_Rewrite.Index & "/");
+               end if;
+
+               if Pagenum > 1 then
+                  Request_7 :=
+                    +(if not Empty (-Request_7)
+                      then Trailing_Slash_It (-Request_7)
+                      else -Request_7)
+                    & User_Trailing_Slash_It
+                       ((-Global_Wp_Rewrite.Pagination_Base) & "/" &
+                        Helpers.Image (Pagenum), "paged");
+               end if;
+
+               Result := Base & Request_7 & Query_String;
+            end;
+         end;
+      end if;
+
+      --
+      -- Filters the page number link for the current request.
+      --
+      -- @since 2.5.0
+      -- @since 5.2.0 Added the `pagenum` argument.
+      --
+      -- @param string result  The page number link.
+      -- @param int    pagenum The page number.
+      --
+      Result := +Apply_Filters ("get_pagenum_link", -Result, Pagenum);
+
+      if Escape then
+         return ESC_URL (-Result);
+      else
+         return Sanitize_URL (-Result);
+      end if;
+   end Get_Pagenum_Link;
 
 -- --
 -- -- Retrieves the next posts page link.
@@ -2702,30 +2749,28 @@ is
 --         echo get_next_posts_link( label, max_page );
 -- end;
 
--- --
--- -- Retrieves the previous posts page link.
--- --
--- -- Will only return string, if not on a single page or post.
--- --
--- -- Backported to 2.0.10 from 2.1.3.
--- --
--- -- @since 2.0.10
--- --
--- -- @global int paged
--- --
--- -- @return string|void The link for the previous posts page.
--- --
--- function get_previous_posts_page_link() then
---         global paged;
+   ----------------------------------
+   -- Get_Previout_Posts_Page_Link --
+   ----------------------------------
 
---         if ( ! is_single() ) then
---                 nextpage = (int) paged - 1;
---                 if ( nextpage < 1 ) then
---                         nextpage = 1;
---                 end;
---                 return get_pagenum_link( nextpage );
---         end;
--- end;
+   function Get_Previous_Posts_Page_Link
+            return String
+   is
+      use Globals;
+      use Inc_Querys;
+   begin
+      if not Is_Single then
+         declare
+            Nextpage : Integer := Global_Paged - 1;  -- (int)
+         begin
+            if Nextpage < 1 then
+               Nextpage := 1;
+            end if;
+            return Get_Pagenum_Link (Nextpage);
+         end;
+      end if;
+      return ""; -- added ???
+   end Get_Previous_Posts_Page_Link;
 
 -- --
 -- -- Displays or retrieves the previous posts page link.

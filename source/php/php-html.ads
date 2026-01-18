@@ -18,11 +18,12 @@ is
    ENT_COMPAT     : constant Flag_Type := 16#0040#;
    -- Shold be or'ed together instead
 
-   function HTML_Entity_Decode (Item     : String;
-                                Flags    : Flag_Type;
-                                Encoding : String := "")
-                                return String
-                                is ("XXX-312");
+   function HTML_Entity_Decode
+              (Item     : String;
+               Flags    : Flag_Type := ENT_QUOTES + ENT_SUBSTITUTE + ENT_HTML404;
+               Encoding : String    := "")
+               return String
+               is ("XXX-312");
 
    function HTML_Entities (Item          : String;
                            Flags         : Flag_Type := ENT_QUOTES;

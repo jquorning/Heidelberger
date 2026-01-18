@@ -2719,6 +2719,28 @@ is
                              return Multi_Type
    is (Map_Deep (Value, Php.HTML.URL_Encode'Access));
 
+   ---------------------
+   -- URL_Encode_Deep --
+   ---------------------
+
+   function URL_Encode_Deep (Value : Array_Type)
+                             return Array_Type
+   is
+   begin
+      return Map_Deep (Value, Php.HTML.URL_Encode'Access);
+   end URL_Encode_Deep;
+
+   ---------------------
+   -- URL_Encode_Deep --
+   ---------------------
+
+   function URL_Encode_Deep (Value : String)
+                             return String
+   is
+   begin
+      return Map_Deep (Value, Php.HTML.URL_Encode'Access);
+   end URL_Encode_Deep;
+
    -------------------------
    -- Raw_URL_Encode_Deep --
    -------------------------
@@ -4938,6 +4960,45 @@ is
          -- end;
 
          -- return value;
+   end Map_Deep;
+
+   --------------
+   -- Max_Deep --
+   --------------
+
+   function Map_Deep (Value    : Array_Type;
+                      Callback : Callable)
+                      return Array_Type
+   is
+      Result : Array_Type;
+   begin
+      for A in Value.Iterate loop
+         Result.Append (Map_Deep (Element (A), Callback));
+      end loop;
+      return Result;
+
+         -- end; elseif ( is_object( value ) ) then
+         --         object_vars = get_object_vars( value );
+         --         foreach ( object_vars as property_name => property_value ) then
+         --              value->property_name = map_deep( property_value, callback );
+         --         end;
+         -- end; else then
+         --         value = call_user_func( callback, value );
+         -- end;
+
+         -- return value;
+   end Map_Deep;
+
+   --------------
+   -- Max_Deep --
+   --------------
+
+   function Map_Deep (Value    : String;
+                      Callback : Callable)
+                      return String
+   is
+   begin
+      return Callback (Value);
    end Map_Deep;
 
 --    function Map_Deep (Value    : String;
