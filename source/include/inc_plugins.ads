@@ -701,6 +701,9 @@ is
                           return Boolean;
 
    --
+   -- Retrieves the number of times an action has been fired during the current
+   -- request.
+   --
    -- @since 2.1.0
    --
    -- @global int[] wp_actions Stores the number of times each action was triggered.
@@ -709,8 +712,7 @@ is
    -- @return int The number of times the action hook has been fired.
    --
    function Did_Action (Hook_Name : String)
-            return Boolean
-            is (True);
+                        return Boolean;
 
 --
 -- Fires functions attached to a deprecated action hook.

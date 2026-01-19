@@ -242,7 +242,7 @@ is
    --
    -- @global bool is_IE
    --
-   procedure X_Wp_Admin_Html_Begin;
+   procedure X_Wp_Admin_HTML_Begin;
 
    --
    -- Converts a screen string to a screen object.

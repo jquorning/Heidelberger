@@ -330,6 +330,10 @@ is
                    return Array_Type;
 
    function Build (Key   : String;
+                   Value : Multi_Type)
+                   return Array_Type;
+
+   function Build (Key   : String;
                    Value : Lists.List_Type)
                    return Array_Type;
 

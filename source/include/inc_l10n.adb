@@ -417,23 +417,18 @@ package body Inc_L10n is
       Echo (Translate (Text, Domain));
    end X_E;
 
--- --
--- -- Displays translated text that has been escaped for safe use in an attribute.
--- --
--- -- Encodes `< > & " "` (less than, greater than, ampersand, double quote, single quote).
--- -- Will never double encode entities.
--- --
--- -- If you need the value for use in PHP, use esc_attr__().
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text   Text to translate.
--- -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                       Default "default".
--- --
--- function esc_attr_e( text, domain = "default" ) then
---         echo esc_attr( translate( text, domain ) );
--- end;
+   ----------------
+   -- Esc_Attr_E --
+   ----------------
+
+   procedure Esc_Attr_E (Text   : String;
+                         Domain : String := "default")
+   is
+      use Php.Echoing;
+      use Inc_Formatting;
+   begin
+      Echo (ESC_Attr (Translate (Text, Domain)));
+   end Esc_Attr_E;
 
 -- --
 -- -- Displays translated text that has been escaped for safe use in HTML output.

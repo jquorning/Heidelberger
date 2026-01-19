@@ -94,7 +94,7 @@ is
       Meta     => Empty_Array,
       Typ      => Typ_Item,
       Children => null,
-      others   => Null_Unbounded_String);
+      others   => Ada.Strings.Unbounded.Null_Unbounded_String);
 
    ----------------
    -- Node_Array --

@@ -165,6 +165,7 @@ is
 
    procedure Wp_Admin_Bar_Wp_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use Ada.Strings.Unbounded;
       use Inc_Load;
       use Inc_Link_Templates;
       use Inc_Users;

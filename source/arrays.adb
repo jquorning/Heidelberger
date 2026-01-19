@@ -933,6 +933,24 @@ is
       return Map;
    end Build;
 
+   -----------
+   -- Build --
+   -----------
+
+   function Build (Key   : String;
+                   Value : Multi_Type)
+                   return Array_Type
+   is
+      Map : Array_Type;
+   begin
+      Map.Insert (Key => Key, New_Item => Value);
+      return Map;
+   end Build;
+
+   -----------
+   -- Build --
+   -----------
+
    function Build (Key   : String;
                    Value : Lists.List_Type)
                    return Array_Type
@@ -945,6 +963,10 @@ is
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
+
+   -----------
+   -- Build --
+   -----------
 
    function Build (Key   : String;
                    Value : String)
@@ -959,6 +981,10 @@ is
       return Map;
    end Build;
 
+   -----------
+   -- Build --
+   -----------
+
    function Build (Key   : String;
                    Value : Integer)
                    return Array_Type
@@ -971,6 +997,10 @@ is
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
+
+   -----------
+   -- Build --
+   -----------
 
    function Build (Key   : String;
                    Value : Boolean)
@@ -985,6 +1015,10 @@ is
       return Map;
    end Build;
 
+   -----------
+   -- Build --
+   -----------
+
    function Build (Key   : String;
                    Value : Callable)
                    return Array_Type
@@ -997,6 +1031,10 @@ is
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
+
+   -----------
+   -- Build --
+   -----------
 
    function Build (Key   : String;
                    Value : Null_Type)

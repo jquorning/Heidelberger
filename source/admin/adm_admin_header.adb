@@ -7,16 +7,17 @@
 
 with Ada.Strings.Unbounded;
 
-with Arrays;
-with Globals;
-with Hb_Common;
-with Lists;
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
 with Php.Ini;
 with Php.Preg;
 with Php.Strings;
+
+with Arrays;
+with Globals;
+with Hb_Common;
+with Lists;
 
 with Adm_Menu;
 with Adm_Menu_Header;
@@ -45,6 +46,7 @@ with Inc_Vars;
 
 package body Adm_Admin_Header
 is
+   use Arrays;
    use Lists;
 
    ---------
@@ -54,19 +56,19 @@ is
    procedure Run
    is
       use Ada.Strings.Unbounded;
-      use Arrays;
-      use Hb_Common;
-      use Php;
       use Php.Echoing;
       use Php.Ini;
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
+      use Hb_Common;
       use Inc_Formatting;
+      use Inc_General_Templates;
       use Inc_L10n;
       use Inc_Load;
       use Inc_Options;
       use Inc_Plugins;
+      use Inc_Users;
 
       function RTL_To_String (RTL : Boolean)
                               return String;
@@ -78,10 +80,9 @@ is
          return (if RTL then "1" else "0");
       end RTL_To_String;
 
-      Admin_Body_Class   : Unbounded_String;
-      Admin_Body_Classes : Unbounded_String;
-      Admin_Title        : Unbounded_String;
-      Screen_Title       : Unbounded_String;
+      Admin_Body_Class : Unbounded_String;
+      Admin_Title      : Unbounded_String;
+      Screen_Title     : Unbounded_String;
    begin
       Header ("Content-Type: " & Get_Option ("html_type") &
               "; charset=" & Get_Option ("blog_charset"));
@@ -124,7 +125,7 @@ is
                                   To_List (-Inc_Ms_Networks.Get_Network.Site_Name));
 
       else
-         Admin_Title := +Inc_General_Templates.Get_Bloginfo ("name");
+         Admin_Title := +Get_Bloginfo ("name");
       end if;
 
       if Admin_Title = Globals.Title then
@@ -139,24 +140,24 @@ is
            "add" /= Globals.Current_Screen.Action
          then
             declare
-               Post_Title : Unbounded_String;
+               Post_Title : constant String :=
+                 Inc_Post_Templates.Get_The_Title;
             begin
-               Post_Title := +Inc_Post_Templates.Get_The_Title;
-               if not Empty (-Post_Title) then
+               if not Empty (Post_Title) then
                   declare
                      use Inc_Class_Wp_Post_Type;
+                     use Inc_Posts;
 
-                     Post_Type_Obj : Wp_Post_Type;
+                     Post_Type_Obj : constant Wp_Post_Type :=
+                       Get_Post_Type_Object (-Globals.Typenow);
                   begin
-                     Post_Type_Obj :=
-                       Inc_Posts.Get_Post_Type_Object (-Globals.Typenow);
-
-                     Screen_Title  := +Sprintf (
+                     Screen_Title := +Sprintf (
                         -- translators: Editor admin screen title. 1: "Edit item" text for the post type, 2: Post title.
                         abs "%1s &#8220;%2s&#8221;",
-                        To_List (List => (+"XXX-603",
-                                          -- Post_Type_Obj.Labels.Edit_Item,
-                                          Post_Title)));
+                        To_List (List => (
+                          1 => +Get_As_String (Post_Type_Obj.Labels, "edit_item"),
+                          2 => +Post_Title
+                        )));
                   end;
                end if;
             end;
@@ -184,12 +185,11 @@ is
       --
       Admin_Title := +Apply_Filters ("admin_title", -Admin_Title, -Globals.Title);
 
-      Inc_Options.Wp_User_Settings;
+      Wp_User_Settings;
 
-      Adi_Templates.X_Wp_Admin_Html_Begin;
--- ?>
+      Adi_Templates.X_Wp_Admin_HTML_Begin;
+
       Echo ("<title>" & ESC_HTML (-Admin_Title) & "</title>" & NL);
--- <?php
 
       Inc_Functions_Wp_Styles.Wp_Enqueue_Style ("colors");
 
@@ -197,9 +197,9 @@ is
       Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("svg-painter");
 
       Admin_Body_Class := +Preg_Replace ("/[^a-z0-9_-]+/i", "-", -Globals.Hook_Suffix);
--- ?>
+
       Echo ("<script type=""text/javascript"">" & NL);
-      Echo ("addLoadEvent = function(func){if(typeof jQuery!==""undefined"")jQuery(function(){func();});else if(typeof wpOnload!==""function""){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func()}}};" & NL);
+      Echo ("addLoadEvent = function(func){if(typeof jQuery!=='undefined')jQuery(function(){func();});else if(typeof wpOnload!=='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}}" & NL);
       Echo ("var ajaxurl = '" &
             ESC_JS (Inc_Link_Templates.Admin_URL ("admin-ajax.php", "relative")) &
             "'," & NL);
@@ -214,7 +214,6 @@ is
 --          ESC_JS (Globals.Wp_Locale.Number_Format ("decimal_point")) & "'," & NL);
       Echo ("        isRtl = " & RTL_To_String (Is_RTL) & ";" & NL); -- (int)
       Echo ("</script>" & NL);
--- <?php
 
       --
       -- Enqueue scripts for all admin pages.
@@ -273,11 +272,11 @@ is
       --
       Do_Action ("admin_head");
 
-      if "f" = As_String (Inc_Options.Get_User_Setting ("mfold")) then
+      if "f" = As_String (Get_User_Setting ("mfold")) then
          Append (Admin_Body_Class, " folded");
       end if;
 
-      if "" = As_String (Inc_Options.Get_User_Setting ("unfold")) then -- not
+      if "" = As_String (Get_User_Setting ("unfold")) then -- not
          Append (Admin_Body_Class, " auto-fold");
       end if;
 
@@ -298,18 +297,20 @@ is
       end if;
 
       Append (Admin_Body_Class, " branch-" &
-        Str_Replace (Lists.To_List (List => (+".", +",")), "-",
-                     Inc_General_Templates.Get_Bloginfo ("version")));
+        Str_Replace (To_List (List => (+".", +",")), "-",
+                     Get_Bloginfo ("version")));
 
-      Append (Admin_Body_Class, " version-" & Str_Replace (".", "-",
-                               Preg_Replace ("/^([.0-9]+).*/", "1",
-                                             Inc_General_Templates.Get_Bloginfo ("version"))));
+      Append (Admin_Body_Class, " version-" &
+         Str_Replace (".", "-", Preg_Replace ("/^([.0-9]+).*/", "$1",
+                                              Get_Bloginfo ("version"))));
+
       Append (Admin_Body_Class, " admin-color-" &
                                Sanitize_HTML_Class (
-                                 Inc_Users.Get_User_Option ("admin_color"), "fresh"));
-      Append (Admin_Body_Class, (" locale-" &
+                                 Get_User_Option ("admin_color"), "fresh"));
+
+      Append (Admin_Body_Class, " locale-" &
                                Sanitize_HTML_Class (Strtolower (
-                                 Str_Replace ("_", "-", Get_User_Locale)))));
+                                 Str_Replace ("_", "-", Get_User_Locale))));
 
       if Inc_Vars.Wp_Is_Mobile then
          Append (Admin_Body_Class, " mobile");
@@ -364,14 +365,19 @@ is
       --
       -- @param string classes Space-separated list of CSS classes.
       --
-      Admin_Body_Classes := +Apply_Filters ("admin_body_class", "");
-      Admin_Body_Classes := +Ltrim (-Admin_Body_Classes & " " & (-Admin_Body_Class));
+      declare
+         Admin_Body_Classes_2 : constant String :=
+           Apply_Filters ("admin_body_class", "");
 
-      Echo ("<body class=""wp-admin wp-core-ui no-js " & (-Admin_Body_Classes) &
-            """>" & NL);
-      Echo ("<script type=""text/javascript"">" & NL);
-      Echo ("        document.body.className = document.body.className.replace(""no-js"",""js"")" & NL);
-      Echo ("</script>" & NL);
+         Admin_Body_Classes : constant String :=
+           Ltrim (Admin_Body_Classes_2 & " " & (-Admin_Body_Class));
+      begin
+         Echo ("<body class=""wp-admin wp-core-ui no-js " & Admin_Body_Classes &
+               """>" & NL);
+         Echo ("<script type=""text/javascript"">" & NL);
+         Echo ("        document.body.className = document.body.className.replace(""no-js"",""js"")" & NL);
+         Echo ("</script>" & NL);
+      end;
 
       -- Make sure the customize body classes are correct as early as possible.
       if Inc_Capabilities.Current_User_Can ("customize") then

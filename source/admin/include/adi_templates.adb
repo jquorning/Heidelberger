@@ -2946,7 +2946,7 @@ is
    -- X_Wp_Admin_Html_Begin --
    ---------------------------
 
-   procedure X_Wp_Admin_Html_Begin
+   procedure X_Wp_Admin_HTML_Begin
    is
       use Php.Echoing;
       use Php.HTML;
@@ -2960,10 +2960,9 @@ is
          Header ("X-UA-Compatible: IE=edge");
       end if;
 
---         ?>
       Echo ("<!DOCTYPE html>" & NL);
       Echo ("<html class=""" & Admin_Html_Class & """" & NL);
---         <?php
+
       --
       -- Fires inside the HTML tag in the admin header.
       --
@@ -2971,15 +2970,14 @@ is
       --
       Inc_Plugins.Do_Action ("admin_xml_ns" & NL);
 
-      Inc_General_Templates.Language_Attributes; -- ()
---         ?>
+      Inc_General_Templates.Language_Attributes;
+
       Echo (">" & NL);
       Echo ("<head>" & NL);
       Echo ("<meta http-equiv=""Content-Type"" content=""" &
             Inc_General_Templates.Get_Bloginfo ("html_type") & "; charset=" &
             Get_Option ("blog_charset") & """ />" & NL);
---         <?php
-   end X_Wp_Admin_Html_Begin;
+   end X_Wp_Admin_HTML_Begin;
 
    -----------------------
    -- Convert_To_Screen --

@@ -201,8 +201,7 @@ is
    --                       translated strings. Default "default".
    --
    procedure Esc_Attr_E (Text   : String;
-                         Domain : String := "default")
-                         is null;
+                         Domain : String := "default");
 
    --
    -- Retrieves translated string with gettext context.

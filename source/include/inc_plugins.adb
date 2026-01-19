@@ -6,6 +6,7 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Lists;
@@ -17,7 +18,7 @@ with Inc_Elab_Hooks;
 
 package body Inc_Plugins
 is
-   use Inc_Elab_Hooks;
+--   use Inc_Elab_Hooks;
 
 -- -- Initialize the filter globals.
 -- require __DIR__ . '/class-wp-hook.php';
@@ -83,6 +84,8 @@ is
                         Accepted_Args : Integer := 1)
                         return Boolean
    is
+      use Inc_Elab_Hooks;
+
       Hook : Wp_Hook;
    begin
       if not Hook_Maps.Has_Element (Wp_Filter.Find (Hook_Name)) then
@@ -145,11 +148,11 @@ is
                            return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
+      use Hb_Common;
+      use Inc_Elab_Hooks;
 
       Args_2 : Array_Type := Args;
    begin
@@ -422,14 +425,15 @@ is
                         Arg_2     : String := "";
                         Arg_3     : String := "")
    is
-      use Hb_Common;
-      use Php;
       use Php.Lists;
+      use Hb_Common;
       use Count_Maps;
-      use Hook_Maps;
+      use Inc_Elab_Hooks.Hook_Maps;
 
 --    global wp_filter, wp_actions, wp_current_filter;
    begin
+      Put_Line ("do_action: " & Hook_Name & ": '" & Arg_2 & "' '" & Arg_3 & "'");
+
       if not Has_Element (Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
          Wp_Actions.Include (Hook_Name, 1);
@@ -610,25 +614,23 @@ is
       return Doing_Filter (Hook_Name);
    end Doing_Action;
 
--- --
--- -- Retrieves the number of times an action has been fired during the current request.
--- --
--- -- @since 2.1.0
--- --
--- -- @global int[] wp_actions Stores the number of times each action was triggered.
--- --
--- -- @param string hook_name The name of the action hook.
--- -- @return int The number of times the action hook has been fired.
--- --
--- function did_action( hook_name ) then
---         global wp_actions;
+   ----------------
+   -- Did_Action --
+   ----------------
 
---         if ( ! isset( wp_actions[ hook_name ] ) ) then
---                 return 0;
---         end;
+   function Did_Action (Hook_Name : String)
+                        return Boolean
+   is
+      use Count_Maps;
+--        global wp_actions;
+   begin
+      if not Has_Element (Wp_Actions.Find (Hook_Name)) then
+--    if not Isset (Wp_Actions, Hook_Name) then
+         return False; -- 0;
+      end if;
 
---         return wp_actions[ hook_name ];
--- end;
+      return Wp_Actions (Hook_Name) /= 0;
+   end Did_Action;
 
 -- --
 -- -- Fires functions attached to a deprecated filter hook.

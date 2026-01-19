@@ -107,7 +107,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          True),
             Build ("query_var",             "category_name"),
-            Build ("rewrite",               As_Array (Get (Rewrite, "category"))),
+            Build ("rewrite",               Get (Rewrite, "category")),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
@@ -130,7 +130,7 @@ is
          Arrays.To_Array ((
             Build ("hierarchical",          False),
             Build ("query_var",             "tag"),
-            Build ("rewrite",               As_Array (Get (Rewrite, "post_tag"))),
+            Build ("rewrite",               Get (Rewrite, "post_tag")),
             Build ("public",                True),
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
@@ -219,7 +219,7 @@ is
                Build ("singular_name", X_X ("Format", "post format"))
             ))),
             Build ("query_var",         True),
-            Build ("rewrite",           As_Array (Get (Rewrite, "post_format"))),
+            Build ("rewrite",           Get (Rewrite, "post_format")),
             Build ("show_ui",           False),
             Build ("_builtin",          True),
             Build ("show_in_nav_menus",
