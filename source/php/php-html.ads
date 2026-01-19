@@ -79,8 +79,7 @@ is
                        is (Arrays.Empty_Array);
 
    function Raw_URL_Encode (Item : String)
-                            return String
-                            is ("XXX-977");
+                            return String;
 
    function URL_Decode (Item : String)
                         return String

@@ -3,7 +3,7 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 
@@ -19,7 +19,6 @@ is
    function Get_Header
             return String
    is
-      use Ada.Text_IO;
       use Hb_Common;
    begin
       Put_Line ("get_header:");
@@ -39,5 +38,17 @@ is
    begin
       Static_Header := +Header;
    end Header;
+
+   --------------------
+   -- Raw_URL_Encode --
+   --------------------
+
+   function Raw_URL_Encode (Item : String)
+                            return String
+   is
+   begin
+      Put_Line ("raw_url_encode: " & Item);
+      return Item;
+   end Raw_URL_Encode;
 
 end Php.HTML;

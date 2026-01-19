@@ -4788,22 +4788,21 @@ is
                 Build ("r", Get_As_String (Args_2, "rating"))
             ));
 
-            URL : Unbounded_String;
+            URL_2 : constant String :=
+              (if Is_SSL
+                 then "https://secure.gravatar.com/avatar/" & (-Email_Hash)
+               else
+                 Sprintf ("http://%d.gravatar.com/avatar/%s",
+                          To_List (List => (
+                            1 => +Helpers.Image (Gravatar_Server),
+                            2 => Email_Hash
+                          ))));
+
+            URL : constant String :=
+              Add_Query_Arg (
+                Raw_URL_Encode_Deep (Array_Filter (URL_Args)),
+                Set_URL_Scheme (URL_2, Get_As_String (Args_2, "scheme")));
          begin
-            if Is_SSL then
-               URL := +"https://secure.gravatar.com/avatar/" & Email_Hash;
-            else
-               URL := +Sprintf ("http://%d.gravatar.com/avatar/%s",
-                                To_List (List => (
-                                  +Helpers.Image (Gravatar_Server),
-                                  Email_Hash)));
-            end if;
-
-            URL := +Add_Query_Arg (
-                As_Array (Raw_URL_Encode_Deep (From_Array (Array_Filter (URL_Args)))),
-                Set_URL_Scheme (-URL, Get_As_String (Args_2, "scheme"))
-            );
-
             --
             -- Filters the avatar URL.
             --
@@ -4817,7 +4816,7 @@ is
             --                            processing.
             --
             Set (Args_2, "url", From_String (
-                 Apply_Filters ("get_avatar_url", -URL, -Id_Or_Email_2, Args_2)));
+                 Apply_Filters ("get_avatar_url", URL, -Id_Or_Email_2, Args_2)));
 
             --
             -- Filters the avatar data.

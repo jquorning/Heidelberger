@@ -2,12 +2,30 @@
 --
 --
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Php.Strings;
 
 with Hb_Common;
 
 package body Php.Arrays
 is
+
+   ------------------
+   -- Array_Filter --
+   ------------------
+
+   function Array_Filter (Arry     : Array_Type;
+                          Callback : Filter_Callback_1 := null;
+                          Mode     : Integer           := 0)
+                          return Array_Type
+   is
+   begin
+      pragma Assert (Mode = 0);
+      pragma Assert (Callback = null);
+
+      return Arry;
+   end Array_Filter;
 
    -----------------
    -- Array_Merge --

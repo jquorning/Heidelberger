@@ -1242,7 +1242,7 @@ is
          end if;
 
          Wp_Parse_Str (-Query, Querys);
-         Querys := As_Array (URL_Encode_Deep (From_Array (Querys)));
+         Querys := URL_Encode_Deep (Querys);
       end;
       -- This re-URL-encodes things that were already in the query string.
 

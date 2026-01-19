@@ -154,8 +154,7 @@ is
    function Array_Filter (Arry     : Array_Type;
                           Callback : Filter_Callback_1 := null;
                           Mode     : Integer           := 0)
-                          return Array_Type
-   is (raise Program_Error with "not implemented");
+                          return Array_Type;
 
    function Array_Filter (Arry     : Array_Type;
                           Callback : Filter_Callback_1 := null;

@@ -2688,8 +2688,19 @@ is
    -- Strip_Slashes_Deep --
    ------------------------
 
-   function Strip_Slashes_Deep (Value : Multi_Type)
-                                return Multi_Type
+   function Strip_Slashes_Deep (Value : Array_Type)
+                                return Array_Type
+   is
+   begin
+      return Map_Deep (Value, Strip_Slashes_From_Strings_Only'Access);
+   end Strip_Slashes_Deep;
+
+   ------------------------
+   -- Strip_Slashes_Deep --
+   ------------------------
+
+   function Strip_Slashes_Deep (Value : String)
+                                return String
    is
    begin
       return Map_Deep (Value, Strip_Slashes_From_Strings_Only'Access);
@@ -2710,14 +2721,6 @@ is
          then Strip_Slashes (Value)
          else Value);
    end Strip_Slashes_From_Strings_Only;
-
-   ---------------------
-   -- URL_Encode_Deep --
-   ---------------------
-
-   function URL_Encode_Deep (Value : Multi_Type)
-                             return Multi_Type
-   is (Map_Deep (Value, Php.HTML.URL_Encode'Access));
 
    ---------------------
    -- URL_Encode_Deep --
@@ -2745,8 +2748,8 @@ is
    -- Raw_URL_Encode_Deep --
    -------------------------
 
-   function Raw_URL_Encode_Deep (Value : Multi_Type)
-                                 return Multi_Type
+   function Raw_URL_Encode_Deep (Value : Array_Type)
+                                 return Array_Type
    is
       use Php.HTML;
    begin
@@ -4922,47 +4925,6 @@ is
 -- end;
 
    --------------
-   -- Map_Deep --
-   --------------
-
-   function Map_Deep (Value    : Multi_Type;
-                      Callback : Callable)
-                      return Multi_Type
-   is
-   begin
-      case Kind_Of (Value) is
-
-      when Kind_Array =>
-         declare
-            Arry : constant Array_Type := As_Array (Value);
-            Result : Array_Type;
-         begin
-            for A in Arry.Iterate loop
-               Result.Append (Map_Deep (Element (A), Callback));
-            end loop;
-            return From_Array (Result);
-         end;
-
-      when Kind_String =>
-         return From_String (Callback (As_String (Value)));
-
-      when others =>
-         pragma Assert (False);
-
-      end case;
-         -- end; elseif ( is_object( value ) ) then
-         --         object_vars = get_object_vars( value );
-         --         foreach ( object_vars as property_name => property_value ) then
-         --              value->property_name = map_deep( property_value, callback );
-         --         end;
-         -- end; else then
-         --         value = call_user_func( callback, value );
-         -- end;
-
-         -- return value;
-   end Map_Deep;
-
-   --------------
    -- Max_Deep --
    --------------
 
@@ -4973,7 +4935,16 @@ is
       Result : Array_Type;
    begin
       for A in Value.Iterate loop
-         Result.Append (Map_Deep (Element (A), Callback));
+         declare
+            K : constant String     := Key (A);
+            V : constant Multi_Type := Element (A);
+         begin
+            if Kind_Of (V) = Kind_Array then
+               Result.Append (K, From_Array (Map_Deep (As_Array (V), Callback)));
+            else
+               Result.Append (K, V);
+            end if;
+         end;
       end loop;
       return Result;
 
@@ -5639,7 +5610,7 @@ is
                         return String
    is
    begin
-      return As_String (Strip_Slashes_Deep (From_String (Value)));
+      return Strip_Slashes_Deep (Value);
    end Wp_Unslash;
 
 -- --

@@ -356,8 +356,11 @@ is
    -- @param mixed value The value to be stripped.
    -- @return mixed Stripped value.
    --
-   function Strip_Slashes_Deep (Value : Multi_Type)
-                                return Multi_Type;
+   function Strip_Slashes_Deep (Value : Array_Type)
+                                return Array_Type;
+
+   function Strip_Slashes_Deep (Value : String)
+                                return String;
 
    --
    -- Callback function for `stripslashes_deep()` which strips slashes from strings.
@@ -379,9 +382,6 @@ is
    -- @param mixed value The array or string to be encoded.
    -- @return mixed The encoded value.
    --
-   function URL_Encode_Deep (Value : Multi_Type)
-                             return Multi_Type;
-
    function URL_Encode_Deep (Value : Array_Type)
                              return Array_Type;
 
@@ -397,8 +397,8 @@ is
    -- @param mixed value The array or string to be encoded.
    -- @return mixed The encoded value.
    --
-   function Raw_URL_Encode_Deep (Value : Multi_Type)
-                                 return Multi_Type;
+   function Raw_URL_Encode_Deep (Value : Array_Type)
+                                 return Array_Type;
 
    --
    -- Escapes single quotes, `"`, `<`, `>`, `&`, and fixes line endings.
@@ -1023,10 +1023,6 @@ is
    --               non-objects inside it.
    --
    type Callable is access function (Item : String) return String;
-
-   function Map_Deep (Value    : Multi_Type;
-                      Callback : Callable)
-                      return Multi_Type;
 
    function Map_Deep (Value    : Array_Type;
                       Callback : Callable)
