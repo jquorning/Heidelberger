@@ -24,7 +24,11 @@ with Lists;
 with Wp_Common;
 
 with Inc_Capabilities;
+with Inc_Class_Wp_Admin_Bar; -- ???
+with Inc_Class_Wp_Networks;
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Sites;
+with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Category_Templates;
@@ -33,11 +37,14 @@ with Inc_Functions;
 with Inc_General_Templates;
 with Inc_Load;
 with Inc_Ms_Blogs;
+with Inc_Ms_Functions;
+with Inc_Ms_Networks;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Pluggables;
 with Inc_Posts;
 with Inc_Taxonomys;
+with Inc_Users;
 with Inc_Querys;
 
 package body Inc_Link_Templates
@@ -210,14 +217,16 @@ is
    -- Get_Permalink --
    -------------------
 
-   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+   function Get_Permalink (Post      : Inc_Class_Wp_Posts.Wp_Post;
                            Leavename : Boolean := False)
                            return String
+--   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+--                           Leavename : Boolean := False)
+--                           return String
    is
       use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Strings;
---    use Php.Types;
       use Hb_Common;
       use Wp_Common;
       use Inc_Class_Wp_Posts;
@@ -225,10 +234,8 @@ is
       use Inc_Class_Wp_Users;
       use Inc_Class_Wp_Terms.Term_Vectors;
       use Inc_Category_Templates;
---    use Inc_Functions;
       use Inc_Load;
       use Inc_Options;
---    use Inc_Plugins;
       use Inc_Pluggables;
       use Inc_Posts;
       use Inc_Taxonomys;
@@ -249,19 +256,17 @@ is
       ));
 
       Sample : Boolean;
-      Post   : Wp_Post;
       Permalink : Unbounded_String;
    begin
---      if
---        Is_Object (Post)    and then
---        Isset (Post.Filter) and then
---        "sample" = Post.Filter
---      then
---         Sample := True;
---      else
-         Post   := Get_Post (Id); -- Post);
+      if
+--      Is_Object (Post)    and then
+        Isset (-Post.Filter) and then
+        "sample" = Post.Filter
+      then
+         Sample := True;
+      else
          Sample := False;
---      end if;
+      end if;
 
       if Post.Id = 0 then
 --    if Empty (Post.Id) then
@@ -423,6 +428,22 @@ is
       -- @param bool    leavename Whether to keep the post name.
       --
       return Apply_Filters ("post_link", -Permalink, Post, Leavename);
+   end Get_Permalink;
+
+   -------------------
+   -- Get_Permalink --
+   -------------------
+
+   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+                           Leavename : Boolean := False)
+                           return String
+   is
+      use Inc_Class_Wp_Posts;
+      use Inc_Posts;
+
+      Post : constant Wp_Post := Get_Post (Id);
+   begin
+      return Get_Permalink (Post, Leavename);
    end Get_Permalink;
 
    ------------------------
@@ -1223,61 +1244,85 @@ is
 --         echo before . apply_filters( "edit_tag_link", link ) . after;
 -- end;
 
--- --
--- -- Retrieves the URL for editing a given term.
--- --
--- -- @since 3.1.0
--- -- @since 4.5.0 The `taxonomy` parameter was made optional.
--- --
--- -- @param int|WP_Term|object term        The ID or term object whose edit link will be retrieved.
--- -- @param string             taxonomy    Optional. Taxonomy. Defaults to the taxonomy of the term identified
--- --                                        by `term`.
--- -- @param string             object_type Optional. The object type. Used to highlight the proper post type
--- --                                        menu on the linked page. Defaults to the first object_type associated
--- --                                        with the taxonomy.
--- -- @return string|null The edit term link URL for the given term, or null on failure.
--- --
--- function get_edit_term_link( term, taxonomy = "", object_type = "" ) then
---         term = get_term( term, taxonomy );
---         if ( ! term || is_wp_error( term ) ) then
---                 return;
---         end;
+   ------------------------
+   -- Get_Edit_Term_Link --
+   ------------------------
 
---         tax     = get_taxonomy( term->taxonomy );
---         term_id = term->term_id;
---         if ( ! tax || ! current_user_can( "edit_term", term_id ) ) then
---                 return;
---         end;
+   function Get_Edit_Term_Link (Term        : Integer;
+                                Taxonomy    : String := "";
+                                Object_Type : String := "")
+                                return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Capabilities;
+      use Inc_Class_Wp_Taxonomy;
+      use Inc_Class_Wp_Terms;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Taxonomys;
 
---         args = array(
---                 "taxonomy" => taxonomy,
---                 "tag_ID"   => term_id,
---         );
+      Term_2 : constant Wp_Term := Get_Term (Term, Taxonomy);
+   begin
+      if
+        Term_2 = Null_Term or else
+--      not Term_2 or else
+        Is_Wp_Error (Term_2)
+      then
+         return "";
+      end if;
 
---         if ( object_type ) then
---                 args["post_type"] = object_type;
---         end; elseif ( ! empty( tax->object_type ) ) then
---                 args["post_type"] = reset( tax->object_type );
---         end;
+      declare
+         Tax     : constant Wp_Taxonomy := Get_Taxonomy (-Term_2.Taxonomy);
+         Term_Id : constant Integer := Term_2.Term_Id;
+      begin
+         if
+           Tax = Null_Taxonomy or else not
+--         not Tax or else not
+           Current_User_Can ("edit_term", Term_Id)
+         then
+            return "";
+         end if;
 
---         if ( tax->show_ui ) then
---                 location = add_query_arg( args, admin_url( "term.php" ) );
---         end; else then
---                 location = "";
---         end;
+         declare
+            Args : Array_Type := To_Array (List => (
+              Build ("taxonomy", Taxonomy),
+              Build ("tag_ID",   Term_Id)
+            ));
 
---         --
---         -- Filters the edit link for a term.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string location    The edit link.
---         -- @param int    term_id     Term ID.
---         -- @param string taxonomy    Taxonomy name.
---         -- @param string object_type The object type.
---         --
---         return apply_filters( "get_edit_term_link", location, term_id, taxonomy, object_type );
--- end;
+            Location : Unbounded_String;
+         begin
+            if Object_Type /= "" then
+               Set (Args, "post_type", From_String (Object_Type));
+            elsif not Tax.Object_Type.Is_Empty then
+--          elsif not Empty (Tax.Object_Type) then
+               Set (Args, "post_type",
+                    From_String (-Tax.Object_Type.First_Element));
+--             Set (Args, "post_type", Reset (Tax.Object_Type));
+            end if;
+
+            if Tax.Show_UI then
+               Location := +Add_Query_Arg (Args, Admin_URL ("term.php"));
+            else
+               Location := +"";
+            end if;
+
+            --
+            -- Filters the edit link for a term.
+            --
+            -- @since 3.1.0
+            --
+            -- @param string location    The edit link.
+            -- @param int    term_id     Term ID.
+            -- @param string taxonomy    Taxonomy name.
+            -- @param string object_type The object type.
+            --
+            return Apply_Filters ("get_edit_term_link", -Location,
+                                  Term_Id, Taxonomy, Object_Type);
+         end;
+      end;
+   end Get_Edit_Term_Link;
 
 -- --
 -- -- Displays or retrieves the edit term link with formatting.
@@ -1565,105 +1610,127 @@ is
 --         return apply_filters( "post_type_archive_feed_link", link, feed );
 -- end;
 
--- --
--- -- Retrieves the URL used for the post preview.
--- --
--- -- Allows additional query args to be appended.
--- --
--- -- @since 4.4.0
--- --
--- -- @param int|WP_Post post         Optional. Post ID or `WP_Post` object. Defaults to global `post`.
--- -- @param array       query_args   Optional. Array of additional query args to be appended to the link.
--- --                                  Default empty array.
--- -- @param string      preview_link Optional. Base preview link to be used if it should differ from the
--- --                                  post permalink. Default empty.
--- -- @return string|null URL used for the post preview, or null if the post does not exist.
--- --
--- function get_preview_post_link( post = null, query_args = array(), preview_link = "" ) then
---         post = get_post( post );
+   ---------------------------
+   -- Get_Preview_Post_Link --
+   ---------------------------
 
---         if ( ! post ) then
---                 return;
---         end;
+   function Get_Preview_Post_Link
+      (Post         : Inc_Class_Wp_Posts.Wp_Post := Inc_Class_Wp_Posts.Null_Post;
+       Query_Args   : Array_Type := Empty_Array;
+       Preview_Link : String     := "")
+       return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Functions;
+      use Inc_Posts;
 
---         post_type_object = get_post_type_object( post->post_type );
---         if ( is_post_type_viewable( post_type_object ) ) then
---                 if ( ! preview_link ) then
---                         preview_link = set_url_scheme( get_permalink( post ) );
---                 end;
+      Query_Args_2 : Array_Type := Query_Args;
+      Post_2 : constant Wp_Post := Get_Post (Post);
+   begin
+      if Post_2 = Null_Post then
+         return "";
+      end if;
 
---                 query_args["preview"] = "true";
---                 preview_link          = add_query_arg( query_args, preview_link );
---         end;
+      declare
+         Post_Type_Object : constant Wp_Post_Type :=
+           Get_Post_Type_Object (-Post_2.Post_Type);
 
---         --
---         -- Filters the URL used for a post preview.
---         --
---         -- @since 2.0.5
---         -- @since 4.0.0 Added the `post` parameter.
---         --
---         -- @param string  preview_link URL used for the post preview.
---         -- @param WP_Post post         Post object.
---         --
---         return apply_filters( "preview_post_link", preview_link, post );
--- end;
+         Preview_Link_2 : Unbounded_String;
+      begin
+         if Is_Post_Type_Viewable (Post_Type_Object) then
+            if Preview_Link = "" then
+               Preview_Link_2 := +Set_URL_Scheme (Get_Permalink (Post_2));
+            end if;
 
--- --
--- -- Retrieves the edit post link for post.
--- --
--- -- Can be used within the WordPress loop or outside of it. Can be used with
--- -- pages, posts, attachments, and revisions.
--- --
--- -- @since 2.3.0
--- --
--- -- @param int|WP_Post post    Optional. Post ID or post object. Default is the global `post`.
--- -- @param string      context Optional. How to output the "&" character. Default "&amp;".
--- -- @return string|null The edit post link for the given post. Null if the post type does not exist
--- --                     or does not allow an editing UI.
--- --
--- function get_edit_post_link( post = 0, context = "display" ) then
---         post = get_post( post );
+            Set (Query_Args_2, "preview", From_String ("true"));
+            Preview_Link_2 := +Add_Query_Arg (Query_Args_2, -Preview_Link_2);
+         end if;
 
---         if ( ! post ) then
---                 return;
---         end;
+         --
+         -- Filters the URL used for a post preview.
+         --
+         -- @since 2.0.5
+         -- @since 4.0.0 Added the `post` parameter.
+         --
+         -- @param string  preview_link URL used for the post preview.
+         -- @param WP_Post post         Post object.
+         --
+         return Apply_Filters ("preview_post_link", -Preview_Link_2, Post_2);
+      end;
+   end Get_Preview_Post_Link;
 
---         if ( "revision" === post->post_type ) then
---                 action = "";
---         end; elseif ( "display" === context ) then
---                 action = "&amp;action=edit";
---         end; else then
---                 action = "&action=edit";
---         end;
+   ------------------------
+   -- Get_Edit_Post_Link --
+   ------------------------
 
---         post_type_object = get_post_type_object( post->post_type );
+   function Get_Edit_Post_Link (Post    : Integer := 0;
+                                Context : String  := "display")
+                                return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Capabilities;
+      use Inc_Class_Wp_Posts;
+      use Inc_Class_Wp_Post_Type;
+      use Inc_Posts;
 
---         if ( ! post_type_object ) then
---                 return;
---         end;
+      Post_2 : constant Wp_Post := Get_Post (Post_Id (Post));
+      Action : Unbounded_String;
+      Link   : Unbounded_String;
+   begin
+      if Post_2 = Null_Post then
+         return "";
+      end if;
 
---         if ( ! current_user_can( "edit_post", post->ID ) ) then
---                 return;
---         end;
+      if "revision" = Post_2.Post_Type then
+         Action := +"";
+      elsif "display" = Context then
+         Action := +"&amp;action=edit";
+      else
+         Action := +"&action=edit";
+      end if;
 
---         if ( post_type_object->_edit_link ) then
---                 link = admin_url( sprintf( post_type_object->_edit_link . action, post->ID ) );
---         end; else then
---                 link = "";
---         end;
+      declare
+         Post_Type_Object : constant Wp_Post_Type :=
+           Get_Post_Type_Object (-Post_2.Post_Type);
+      begin
+         if Post_Type_Object = Null_Post_Type then
+--       if not Post_Type_Object then
+            return "";
+         end if;
 
---         --
---         -- Filters the post edit link.
---         --
---         -- @since 2.3.0
---         --
---         -- @param string link    The edit link.
---         -- @param int    post_id Post ID.
---         -- @param string context The link context. If set to "display" then ampersands
---         --                        are encoded.
---         --
---         return apply_filters( "get_edit_post_link", link, post->ID, context );
--- end;
+         if not Current_User_Can ("edit_post", Integer (Post_2.Id)) then
+            return "";
+         end if;
+
+         if Post_Type_Object.X_Edit_Link /= "" then
+            Link :=
+              +Admin_URL (Sprintf (-(Post_Type_Object.X_Edit_Link & Action),
+                                   To_List (Helpers.Image (Integer (Post_2.Id)))));
+         else
+            Link := +"";
+         end if;
+      end;
+
+      --
+      -- Filters the post edit link.
+      --
+      -- @since 2.3.0
+      --
+      -- @param string link    The edit link.
+      -- @param int    post_id Post ID.
+      -- @param string context The link context. If set to "display" then ampersands
+      --                        are encoded.
+      --
+      return Apply_Filters ("get_edit_post_link", -Link,
+                            Integer (Post_2.Id), Context);
+   end Get_Edit_Post_Link;
 
 -- --
 -- -- Displays the edit post link for post.
@@ -1880,45 +1947,62 @@ is
 --         echo before . apply_filters( "edit_bookmark_link", link, bookmark->link_id ) . after;
 -- end;
 
--- --
--- -- Retrieves the edit user link.
--- --
--- -- @since 3.5.0
--- --
--- -- @param int user_id Optional. User ID. Defaults to the current user.
--- -- @return string URL to edit user page or empty string.
--- --
--- function get_edit_user_link( user_id = null ) then
---         if ( ! user_id ) then
---                 user_id = get_current_user_id();
---         end;
+   ------------------------
+   -- Get_Edit_User_Link --
+   ------------------------
 
---         if ( empty( user_id ) || ! current_user_can( "edit_user", user_id ) ) then
---                 return "";
---         end;
+   function Get_Edit_User_Link (User_Id : Integer := 0) -- = null
+                                return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Inc_Capabilities;
+      use Inc_Class_Wp_Users;
+      use Inc_Functions;
+      use Inc_Plugins;
+      use Inc_Pluggables;
+      use Inc_Users;
 
---         user = get_userdata( user_id );
+      User_Id_2 : constant Integer :=
+        (if User_Id = 0
+         then Get_Current_User_Id
+         else User_Id);
 
---         if ( ! user ) then
---                 return "";
---         end;
+      Link : Unbounded_String;
+   begin
+      if
+        User_Id_2 = 0 or else -- Empty (User_Id_2) or else
+        not Current_User_Can ("edit_user", User_Id_2)
+      then
+         return "";
+      end if;
 
---         if ( get_current_user_id() == user->ID ) then
---                 link = get_edit_profile_url( user->ID );
---         end; else then
---                 link = add_query_arg( "user_id", user->ID, self_admin_url( "user-edit.php" ) );
---         end;
+      declare
+         User : constant Wp_User := Get_Userdata (User_Id_2);
+      begin
+         if User = Null_User then
+            return "";
+         end if;
 
---         --
---         -- Filters the user edit link.
---         --
---         -- @since 3.5.0
---         --
---         -- @param string link    The edit link.
---         -- @param int    user_id User ID.
---         --
---         return apply_filters( "get_edit_user_link", link, user->ID );
--- end;
+         if Get_Current_User_Id = User.Id then
+            Link := +Get_Edit_Profile_URL (User.Id);
+         else
+            Link :=
+              +Add_Query_Arg ("user_id", Helpers.Image (User.Id), -- ???
+                              Self_Admin_URL ("user-edit.php"));
+         end if;
+
+         --
+         -- Filters the user edit link.
+         --
+         -- @since 3.5.0
+         --
+         -- @param string link    The edit link.
+         -- @param int    user_id User ID.
+         --
+         return Apply_Filters ("get_edit_user_link", -Link, User.Id);
+      end;
+   end Get_Edit_User_Link;
 
 -- //
 -- // Navigation links.
@@ -3524,77 +3608,82 @@ is
 --         echo get_the_comments_pagination( args );
 -- end;
 
--- --
--- -- Retrieves the URL for the current site where the front end is accessible.
--- --
--- -- Returns the "home" option with the appropriate protocol. The protocol will be "https"
--- -- if is_ssl() evaluates to true; otherwise, it will be the same as the "home" option.
--- -- If `scheme` is "http" or "https", is_ssl() is overridden.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string      path   Optional. Path relative to the home URL. Default empty.
--- -- @param string|null scheme Optional. Scheme to give the home URL context. Accepts
--- --                            "http", "https", "relative", "rest", or null. Default null.
--- -- @return string Home URL link with optional path appended.
--- --
--- function home_url( path = "", scheme = null ) then
---         return get_home_url( null, path, scheme );
--- end;
+   --------------
+   -- Home_URL --
+   --------------
 
--- --
--- -- Retrieves the URL for a given site where the front end is accessible.
--- --
--- -- Returns the "home" option with the appropriate protocol. The protocol will be "https"
--- -- if is_ssl() evaluates to true; otherwise, it will be the same as the "home" option.
--- -- If `scheme` is "http" or "https", is_ssl() is overridden.
--- --
--- -- @since 3.0.0
--- --
--- -- @param int|null    blog_id Optional. Site ID. Default null (current site).
--- -- @param string      path    Optional. Path relative to the home URL. Default empty.
--- -- @param string|null scheme  Optional. Scheme to give the home URL context. Accepts
--- --                             "http", "https", "relative", "rest", or null. Default null.
--- -- @return string Home URL link with optional path appended.
--- --
--- function get_home_url( blog_id = null, path = "", scheme = null ) then
---         orig_scheme = scheme;
+   function Home_URL (Path   : String := "";
+                      Scheme : String := "") --  = null
+                      return String
+   is
+   begin
+      return Get_Home_URL (0, Path, Scheme); -- null
+   end Home_URL;
 
---         if ( empty( blog_id ) || ! is_multisite() ) then
---                 url = get_option( "home" );
---         end; else then
---                 switch_to_blog( blog_id );
---                 url = get_option( "home" );
---                 restore_current_blog();
---         end;
+   ------------------
+   -- Get_Home_URL --
+   ------------------
 
---         if ( ! in_array( scheme, array( "http", "https", "relative" ), true ) ) then
---                 if ( is_ssl() ) then
---                         scheme = "https";
---                 end; else then
---                         scheme = parse_url( url, PHP_URL_SCHEME );
---                 end;
---         end;
+   function Get_Home_URL (Blog_Id : Integer := 0;
+                          Path    : String  := "";
+                          Scheme  : String  := "")
+                          return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
+      use Inc_Options;
+      use Inc_Plugins;
 
---         url = set_url_scheme( url, scheme );
+      Orig_Scheme : constant String := Scheme;
+      URL      : Unbounded_String;
+      Scheme_2 : Unbounded_String;
+   begin
+      if
+        Blog_Id = 0 or else -- Empty (Blog_Id) or else
+        not Is_Multisite
+      then
+         URL := +Get_Option ("home");
+      else
+         Switch_To_Blog (Blog_Id);
+         URL := +Get_Option ("home");
+         Restore_Current_Blog;
+      end if;
 
---         if ( path && is_string( path ) ) then
---                 url .= "/" . ltrim( path, "/" );
---         end;
+      if
+        not In_List (Scheme, To_List (List => (+"http", +"https", +"relative")), True)
+      then
+         if Is_SSL then
+            Scheme_2 := +"https";
+         else
+            Scheme_2 := +Parse_URL (-URL, PHP_URL_SCHEME);
+         end if;
+      end if;
 
---         --
---         -- Filters the home URL.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string      url         The complete home URL including scheme and path.
---         -- @param string      path        Path relative to the home URL. Blank string if no path is specified.
---         -- @param string|null orig_scheme Scheme to give the home URL context. Accepts "http", "https",
---         --                                 "relative", "rest", or null.
---         -- @param int|null    blog_id     Site ID, or null for the current site.
---         --
---         return apply_filters( "home_url", url, path, orig_scheme, blog_id );
--- end;
+      URL := +Set_URL_Scheme (-URL, -Scheme_2);
+
+      if Path /= "" then -- and then Is_String (Path) then
+         Append (URL, "/" & Ltrim (Path, "/"));
+      end if;
+
+      --
+      -- Filters the home URL.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string      url         The complete home URL including scheme and path.
+      -- @param string      path        Path relative to the home URL. Blank string
+      --                                if no path is specified.
+      -- @param string|null orig_scheme Scheme to give the home URL context. Accepts
+      --                                "http", "https", "relative", "rest", or null.
+      -- @param int|null    blog_id     Site ID, or null for the current site.
+      --
+      return Apply_Filters ("home_url", -URL, Path, Orig_Scheme, Blog_Id);
+   end Get_Home_URL;
 
    --------------
    -- Site_URL --
@@ -3657,53 +3746,55 @@ is
       return Apply_Filters ("site_url", -URL, Path, Scheme, Blog_Id);
    end Get_Site_URL;
 
--- --
--- -- Retrieves the URL to the admin area for the current site.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string path   Optional. Path relative to the admin URL. Default empty.
--- -- @param string scheme The scheme to use. Default is "admin", which obeys force_ssl_admin() and is_ssl().
--- --                       "http" or "https" can be passed to force those schemes.
--- -- @return string Admin URL link with optional path appended.
--- --
--- function admin_url( path = "", scheme = "admin" ) then
---         return get_admin_url( null, path, scheme );
--- end;
+   ---------------
+   -- Admin_URL --
+   ---------------
 
--- --
--- -- Retrieves the URL to the admin area for a given site.
--- --
--- -- @since 3.0.0
--- --
--- -- @param int|null blog_id Optional. Site ID. Default null (current site).
--- -- @param string   path    Optional. Path relative to the admin URL. Default empty.
--- -- @param string   scheme  Optional. The scheme to use. Accepts "http" or "https",
--- --                          to force those schemes. Default "admin", which obeys
--- --                          force_ssl_admin() and is_ssl().
--- -- @return string Admin URL link with optional path appended.
--- --
--- function get_admin_url( blog_id = null, path = "", scheme = "admin" ) then
---         url = get_site_url( blog_id, "wp-admin/", scheme );
+   function Admin_URL (Path   : String := "";
+                       Scheme : String := "admin")
+                       return String
+   is
+   begin
+      return Get_Admin_URL (0, Path, Scheme); -- null
+   end Admin_URL;
 
---         if ( path && is_string( path ) ) then
---                 url .= ltrim( path, "/" );
---         end;
+   -------------------
+   -- Get_Admin_URL --
+   -------------------
 
---         --
---         -- Filters the admin area URL.
---         --
---         -- @since 2.8.0
---         -- @since 5.8.0 The `scheme` parameter was added.
---         --
---         -- @param string      url     The complete admin area URL including scheme and path.
---         -- @param string      path    Path relative to the admin area URL. Blank string if no path is specified.
---         -- @param int|null    blog_id Site ID, or null for the current site.
---         -- @param string|null scheme  The scheme to use. Accepts "http", "https",
---         --                             "admin", or null. Default "admin", which obeys force_ssl_admin() and is_ssl().
---         --
---         return apply_filters( "admin_url", url, path, blog_id, scheme );
--- end;
+   function Get_Admin_URL (Blog_Id : Integer := 0; --  = null
+                           Path    : String  := "";
+                           Scheme  : String  := "admin")
+                           return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Wp_Common;
+
+      URL : Unbounded_String := +Get_Site_URL (Blog_Id, "wp-admin/", Scheme);
+   begin
+      if Path /= "" then --  && is_string( path ) ) then
+         Append (URL, Ltrim (Path, "/"));
+      end if;
+
+      --
+      -- Filters the admin area URL.
+      --
+      -- @since 2.8.0
+      -- @since 5.8.0 The `scheme` parameter was added.
+      --
+      -- @param string      url     The complete admin area URL including scheme
+      --                            and path.
+      -- @param string      path    Path relative to the admin area URL. Blank
+      --                            string if no path is specified.
+      -- @param int|null    blog_id Site ID, or null for the current site.
+      -- @param string|null scheme  The scheme to use. Accepts "http", "https",
+      --                            "admin", or null. Default "admin", which obeys
+      --                            force_ssl_admin() and is_ssl().
+      --
+      return Apply_Filters ("admin_url", -URL, Path, Blog_Id, Scheme);
+   end Get_Admin_URL;
 
    ------------------
    -- Includes_URL --
@@ -3821,52 +3912,61 @@ is
 --         return apply_filters( "plugins_url", url, path, plugin );
 -- end;
 
--- --
--- -- Retrieves the site URL for the current network.
--- --
--- -- Returns the site URL with the appropriate protocol, "https" if
--- -- is_ssl() and "http" otherwise. If scheme is "http" or "https", is_ssl() is
--- -- overridden.
--- --
--- -- @since 3.0.0
--- --
--- -- @see set_url_scheme()
--- --
--- -- @param string      path   Optional. Path relative to the site URL. Default empty.
--- -- @param string|null scheme Optional. Scheme to give the site URL context. Accepts
--- --                            "http", "https", or "relative". Default null.
--- -- @return string Site URL link with optional path appended.
--- --
--- function network_site_url( path = "", scheme = null ) then
---         if ( ! is_multisite() ) then
---                 return site_url( path, scheme );
---         end;
+   ----------------------
+   -- Network_Site_URL --
+   ----------------------
 
---         current_network = get_network();
+   function Network_Site_URL (Path   : String := "";
+                              Scheme : String := "") -- null
+                              return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Class_Wp_Networks;
+      use Inc_Load;
+      use Inc_Ms_Networks;
+      use Inc_Plugins;
 
---         if ( "relative" === scheme ) then
---                 url = current_network->path;
---         end; else then
---                 url = set_url_scheme( "http://" . current_network->domain . current_network->path, scheme );
---         end;
+      URL : Unbounded_String;
+   begin
+      if not Is_Multisite then
+         return Site_URL (Path, Scheme);
+      end if;
 
---         if ( path && is_string( path ) ) then
---                 url .= ltrim( path, "/" );
---         end;
+      declare
+         Current_Network : constant Wp_Network := Get_Network;
+      begin
+         if "relative" = Scheme then
+            URL := Current_Network.Path;
+         else
+            URL :=
+              +Set_URL_Scheme
+                 ("http://" &
+                  (-Current_Network.Domain) &
+                  (-Current_Network.Path),
+                  Scheme);
+         end if;
 
---         --
---         -- Filters the network site URL.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string      url    The complete network site URL including scheme and path.
---         -- @param string      path   Path relative to the network site URL. Blank string if
---         --                            no path is specified.
---         -- @param string|null scheme Scheme to give the URL context. Accepts "http", "https",
---         --                            "relative" or null.
---         --
---         return apply_filters( "network_site_url", url, path, scheme );
--- end;
+         if Path /= "" then --  && is_string( path ) ) then
+            Append (URL, Ltrim (Path, "/"));
+         end if;
+      end;
+
+      --
+      -- Filters the network site URL.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string      url    The complete network site URL including scheme
+      --                           and path.
+      -- @param string      path   Path relative to the network site URL. Blank
+      --                           string if no path is specified.
+      -- @param string|null scheme Scheme to give the URL context. Accepts "http",
+      --                           "https", "relative" or null.
+      --
+      return Apply_Filters ("network_site_url", -URL, Path, Scheme);
+   end Network_Site_URL;
 
 -- --
 -- -- Retrieves the home URL for the current network.
@@ -3918,104 +4018,114 @@ is
 --         return apply_filters( "network_home_url", url, path, orig_scheme );
 -- end;
 
--- --
--- -- Retrieves the URL to the admin area for the network.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string path   Optional path relative to the admin URL. Default empty.
--- -- @param string scheme Optional. The scheme to use. Default is "admin", which obeys force_ssl_admin()
--- --                       and is_ssl(). "http" or "https" can be passed to force those schemes.
--- -- @return string Admin URL link with optional path appended.
--- --
--- function network_admin_url( path = "", scheme = "admin" ) then
---         if ( ! is_multisite() ) then
---                 return admin_url( path, scheme );
---         end;
+   -----------------------
+   -- Network_Admin_URL --
+   -----------------------
 
---         url = network_site_url( "wp-admin/network/", scheme );
+   function Network_Admin_URL (Path   : String := "";
+                               Scheme : String := "admin")
+                               return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Load;
+      use Inc_Plugins;
+   begin
+      if not Is_Multisite then
+         return Admin_URL (Path, Scheme);
+      end if;
 
---         if ( path && is_string( path ) ) then
---                 url .= ltrim( path, "/" );
---         end;
+      declare
+         URL : Unbounded_String :=
+           +Network_Site_URL ("wp-admin/network/", Scheme);
+      begin
+         if Path /= "" then --  && is_string( path ) ) then
+            Append (URL, Ltrim (Path, "/"));
+         end if;
 
---         --
---         -- Filters the network admin URL.
---         --
---         -- @since 3.0.0
---         -- @since 5.8.0 The `scheme` parameter was added.
---         --
---         -- @param string      url    The complete network admin URL including scheme and path.
---         -- @param string      path   Path relative to the network admin URL. Blank string if
---         --                            no path is specified.
---         -- @param string|null scheme The scheme to use. Accepts "http", "https",
---         --                            "admin", or null. Default is "admin", which obeys force_ssl_admin() and is_ssl().
---         --
---         return apply_filters( "network_admin_url", url, path, scheme );
--- end;
+         --
+         -- Filters the network admin URL.
+         --
+         -- @since 3.0.0
+         -- @since 5.8.0 The `scheme` parameter was added.
+         --
+         -- @param string      url    The complete network admin URL including
+         --                           scheme and path.
+         -- @param string      path   Path relative to the network admin URL. Blank
+         --                           string if no path is specified.
+         -- @param string|null scheme The scheme to use. Accepts "http", "https",
+         --                           "admin", or null. Default is "admin", which
+         --                           obeys force_ssl_admin() and is_ssl().
+         --
+         return Apply_Filters ("network_admin_url", -URL, Path, Scheme);
+      end;
+   end Network_Admin_URL;
 
--- --
--- -- Retrieves the URL to the admin area for the current user.
--- --
--- -- @since 3.0.0
--- --
--- -- @param string path   Optional. Path relative to the admin URL. Default empty.
--- -- @param string scheme Optional. The scheme to use. Default is "admin", which obeys force_ssl_admin()
--- --                       and is_ssl(). "http" or "https" can be passed to force those schemes.
--- -- @return string Admin URL link with optional path appended.
--- --
--- function user_admin_url( path = "", scheme = "admin" ) then
---         url = network_site_url( "wp-admin/user/", scheme );
+   --------------------
+   -- User_Admin_URL --
+   --------------------
 
---         if ( path && is_string( path ) ) then
---                 url .= ltrim( path, "/" );
---         end;
+   function User_Admin_URL (Path   : String := "";
+                            Scheme : String := "admin")
+                            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Plugins;
 
---         --
---         -- Filters the user admin URL for the current user.
---         --
---         -- @since 3.1.0
---         -- @since 5.8.0 The `scheme` parameter was added.
---         --
---         -- @param string      url    The complete URL including scheme and path.
---         -- @param string      path   Path relative to the URL. Blank string if
---         --                            no path is specified.
---         -- @param string|null scheme The scheme to use. Accepts "http", "https",
---         --                            "admin", or null. Default is "admin", which obeys force_ssl_admin() and is_ssl().
---         --
---         return apply_filters( "user_admin_url", url, path, scheme );
--- end;
+      URL : Unbounded_String :=
+        +Network_Site_URL ("wp-admin/user/", Scheme);
+   begin
+      if Path /= "" then -- and then Is_String (Path) then
+         Append (URL, Ltrim (Path, "/"));
+      end if;
 
--- --
--- -- Retrieves the URL to the admin area for either the current site or the network depending on context.
--- --
--- -- @since 3.1.0
--- --
--- -- @param string path   Optional. Path relative to the admin URL. Default empty.
--- -- @param string scheme Optional. The scheme to use. Default is "admin", which obeys force_ssl_admin()
--- --                       and is_ssl(). "http" or "https" can be passed to force those schemes.
--- -- @return string Admin URL link with optional path appended.
--- --
--- function self_admin_url( path = "", scheme = "admin" ) then
---         if ( is_network_admin() ) then
---                 url = network_admin_url( path, scheme );
---         end; elseif ( is_user_admin() ) then
---                 url = user_admin_url( path, scheme );
---         end; else then
---                 url = admin_url( path, scheme );
---         end;
+      --
+      -- Filters the user admin URL for the current user.
+      --
+      -- @since 3.1.0
+      -- @since 5.8.0 The `scheme` parameter was added.
+      --
+      -- @param string      url    The complete URL including scheme and path.
+      -- @param string      path   Path relative to the URL. Blank string if
+      --                            no path is specified.
+      -- @param string|null scheme The scheme to use. Accepts "http", "https",
+      --                            "admin", or null. Default is "admin", which obeys
+      --                            force_ssl_admin() and is_ssl().
+      --
+      return Apply_Filters ("user_admin_url", -URL, Path, Scheme);
+   end User_Admin_URL;
 
---         --
---         -- Filters the admin URL for the current site or network depending on context.
---         --
---         -- @since 4.9.0
---         --
---         -- @param string url    The complete URL including scheme and path.
---         -- @param string path   Path relative to the URL. Blank string if no path is specified.
---         -- @param string scheme The scheme to use.
---         --
---         return apply_filters( "self_admin_url", url, path, scheme );
--- end;
+   --------------------
+   -- Self_Admin_URL --
+   --------------------
+
+   function Self_Admin_URL (Path   : String := "";
+                            Scheme : String := "admin")
+                            return String
+   is
+      use Inc_Load;
+      use Inc_Plugins;
+
+      URL : constant String :=
+        (if Is_Network_Admin then Network_Admin_URL (Path, Scheme)
+         elsif Is_User_Admin then User_Admin_URL (Path, Scheme)
+         else                     Admin_URL (Path, Scheme));
+   begin
+      --
+      -- Filters the admin URL for the current site or network depending on context.
+      --
+      -- @since 4.9.0
+      --
+      -- @param string url    The complete URL including scheme and path.
+      -- @param string path   Path relative to the URL. Blank string if no path
+      --                      is specified.
+      -- @param string scheme The scheme to use.
+      --
+      return Apply_Filters ("self_admin_url", URL, Path, Scheme);
+   end Self_Admin_URL;
 
    --------------------
    -- Set_URL_Scheme --
@@ -4075,93 +4185,136 @@ is
       return Apply_Filters ("set_url_scheme", -URL_2, -Scheme_2, Orig_Scheme);
    end Set_URL_Scheme;
 
--- --
--- -- Retrieves the URL to the user"s dashboard.
--- --
--- -- If a user does not belong to any site, the global user dashboard is used. If the user
--- -- belongs to the current site, the dashboard for the current site is returned. If the user
--- -- cannot edit the current site, the dashboard to the user"s primary site is returned.
--- --
--- -- @since 3.1.0
--- --
--- -- @param int    user_id Optional. User ID. Defaults to current user.
--- -- @param string path    Optional path relative to the dashboard. Use only paths known to
--- --                        both site and user admins. Default empty.
--- -- @param string scheme  The scheme to use. Default is "admin", which obeys force_ssl_admin()
--- --                        and is_ssl(). "http" or "https" can be passed to force those schemes.
--- -- @return string Dashboard URL link with optional path appended.
--- --
--- function get_dashboard_url( user_id = 0, path = "", scheme = "admin" ) then
---         user_id = user_id ? (int) user_id : get_current_user_id();
+   -----------------------
+   -- Get_Dashboard_URL --
+   -----------------------
 
---         blogs = get_blogs_of_user( user_id );
+   function Get_Dashboard_URL (User_Id : Integer := 0;
+                               Path    : String  := "";
+                               Scheme  : String  := "admin")
+                               return String
+   is
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Admin_Bar; -- ???
+      use Inc_Class_Wp_Sites;
+      use Inc_Capabilities;
+      use Inc_Load;
+      use Inc_Ms_Functions;
+      use Inc_Users;
 
---         if ( is_multisite() && ! user_can( user_id, "manage_network" ) && empty( blogs ) ) then
---                 url = user_admin_url( path, scheme );
---         end; elseif ( ! is_multisite() ) then
---                 url = admin_url( path, scheme );
---         end; else then
---                 current_blog = get_current_blog_id();
+      function Blog_In_Blogs (Needle   : Integer;
+                              Haystack : Blog_List)
+                              return Boolean;
 
---                 if ( current_blog && ( user_can( user_id, "manage_network" ) || in_array( current_blog, array_keys( blogs ), true ) ) ) then
---                         url = admin_url( path, scheme );
---                 end; else then
---                         active = get_active_blog_for_user( user_id );
---                         if ( active ) then
---                                 url = get_admin_url( active->blog_id, path, scheme );
---                         end; else then
---                                 url = user_admin_url( path, scheme );
---                         end;
---                 end;
---         end;
+      function Blog_In_Blogs (Needle   : Integer;
+                              Haystack : Blog_List)
+                              return Boolean
+      is
+      begin
+         for Blog of Haystack loop
+            if Needle = Blog.Userblog_Id then
+               return True;
+            end if;
+         end loop;
+         return False;
+      end Blog_In_Blogs;
 
---         --
---         -- Filters the dashboard URL for a user.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string url     The complete URL including scheme and path.
---         -- @param int    user_id The user ID.
---         -- @param string path    Path relative to the URL. Blank string if no path is specified.
---         -- @param string scheme  Scheme to give the URL context. Accepts "http", "https", "login",
---         --                        "login_post", "admin", "relative" or null.
---         --
---         return apply_filters( "user_dashboard_url", url, user_id, path, scheme );
--- end;
+      User_Id_2 : constant Integer :=
+        (if User_Id /= 0
+         then User_Id
+         else Get_Current_User_Id);
 
--- --
--- -- Retrieves the URL to the user"s profile editor.
--- --
--- -- @since 3.1.0
--- --
--- -- @param int    user_id Optional. User ID. Defaults to current user.
--- -- @param string scheme  Optional. The scheme to use. Default is "admin", which obeys force_ssl_admin()
--- --                        and is_ssl(). "http" or "https" can be passed to force those schemes.
--- -- @return string Dashboard URL link with optional path appended.
--- --
--- function get_edit_profile_url( user_id = 0, scheme = "admin" ) then
---         user_id = user_id ? (int) user_id : get_current_user_id();
+      Blogs : constant Blog_List := Get_Blogs_Of_User (User_Id_2);
+      URL : Unbounded_String;
+   begin
+      if
+        Is_Multisite and then
+        not User_Can (User_Id_2, "manage_network") and then
+        Blogs.Is_Empty -- Empty (Blogs)
+      then
+         URL := +User_Admin_URL (Path, Scheme);
+      elsif not Is_Multisite then
+         URL := +Admin_URL (Path, Scheme);
+      else
+         declare
+            Current_Blog : constant Integer := Get_Current_Blog_Id;
+         begin
+            if
+              Current_Blog = 0 and then
+--            Current_Blog and then
+              (User_Can (User_Id_2, "manage_network") or else
+               Blog_In_Blogs (Current_Blog, Blogs))
+--             In_Array (Current_Blog, Array_Keys (Blogs), True))
+            then
+               URL := +Admin_URL (Path, Scheme);
+            else
+               declare
+                  Active : constant Wp_Site :=
+                    Get_Active_Blog_For_User (User_Id_2);
+               begin
+                  if Active /= Null_Site then
+                     URL := +Get_Admin_URL (Active.Blog_Id, Path, Scheme);
+                  else
+                     URL := +User_Admin_URL (Path, Scheme);
+                  end if;
+               end;
+            end if;
+         end;
+      end if;
 
---         if ( is_user_admin() ) then
---                 url = user_admin_url( "profile.php", scheme );
---         end; elseif ( is_network_admin() ) then
---                 url = network_admin_url( "profile.php", scheme );
---         end; else then
---                 url = get_dashboard_url( user_id, "profile.php", scheme );
---         end;
+      --
+      -- Filters the dashboard URL for a user.
+      --
+      -- @since 3.1.0
+      --
+      -- @param string url     The complete URL including scheme and path.
+      -- @param int    user_id The user ID.
+      -- @param string path    Path relative to the URL. Blank string if no path is
+      --                       specified.
+      -- @param string scheme  Scheme to give the URL context. Accepts "http",
+      --                       "https", "login", "login_post", "admin", "relative"
+      --                       or null.
+      --
+      return Apply_Filters ("user_dashboard_url", -URL, User_Id_2, Path, Scheme);
+   end Get_Dashboard_URL;
 
---         --
---         -- Filters the URL for a user"s profile editor.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string url     The complete URL including scheme and path.
---         -- @param int    user_id The user ID.
---         -- @param string scheme  Scheme to give the URL context. Accepts "http", "https", "login",
---         --                        "login_post", "admin", "relative" or null.
---         --
---         return apply_filters( "edit_profile_url", url, user_id, scheme );
--- end;
+   --------------------------
+   -- Get_Edit_Profile_URL --
+   --------------------------
+
+   function Get_Edit_Profile_URL (User_Id : Integer := 0;
+                                  Scheme  : String  := "admin")
+                                  return String
+   is
+      use Wp_Common;
+      use Inc_Load;
+      use Inc_Users;
+
+      User_Id_2 : constant Integer :=
+        (if User_Id /= 0
+         then User_Id
+         else Get_Current_User_Id);
+
+      URL : constant String :=
+        (if Is_User_Admin then User_Admin_URL ("profile.php", Scheme)
+         elsif Is_Network_Admin then Network_Admin_URL ("profile.php", Scheme)
+         else  Get_Dashboard_URL (User_Id_2, "profile.php", Scheme));
+   begin
+      --
+      -- Filters the URL for a user"s profile editor.
+      --
+      -- @since 3.1.0
+      --
+      -- @param string url     The complete URL including scheme and path.
+      -- @param int    user_id The user ID.
+      -- @param string scheme  Scheme to give the URL context. Accepts "http",
+      --                       "https", "login", "login_post", "admin", "relative"
+      --                       or null.
+      --
+      return Apply_Filters ("edit_profile_url", URL, User_Id_2, Scheme);
+   end Get_Edit_Profile_URL;
 
 -- --
 -- -- Returns the canonical URL for a post.

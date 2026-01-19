@@ -87,6 +87,10 @@ is
                            Leavename : Boolean := False)
                            return String;
 
+   function Get_Permalink (Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Leavename : Boolean := False)
+                           return String;
+
    --
    -- Retrieves the permalink for a post of a custom post type.
    --
@@ -199,8 +203,7 @@ is
    function Get_Home_URL (Blog_Id : Integer := 0; --  = null,
                           Path    : String  := "";
                           Scheme  : String  := "") -- = null
-                          return String
-                          is ("XXX-325");
+                          return String;
 
    --
    -- Retrieves the URL to the admin area for the current user.
@@ -215,8 +218,7 @@ is
    --
    function User_Admin_URL (Path   : String := "";
                             Scheme : String := "admin")
-                            return String
-                            is ("XXX-342");
+                            return String;
 
    --
    -- Retrieves the URL for the current site where the front end is accessible.
@@ -235,11 +237,10 @@ is
    --
    function Home_URL (Path   : String := "";
                       Scheme : String := "") --  = null
-                      return String
-                      is ("XXX-344");
+                      return String;
 
    --
-   -- Retrieves the URL to the user"s dashboard.
+   -- Retrieves the URL to the user's dashboard.
    --
    -- If a user does not belong to any site, the global user dashboard is used. If the
    -- user belongs to the current site, the dashboard for the current site is
@@ -259,8 +260,7 @@ is
    function Get_Dashboard_URL (User_Id : Integer := 0;
                                Path    : String  := "";
                                Scheme  : String  := "admin")
-                               return String
-                               is ("XXX-351");
+                               return String;
 
    --
    -- Retrieves the edit post link for post.
@@ -279,8 +279,7 @@ is
    --
    function Get_Edit_Post_Link (Post    : Integer := 0;
                                 Context : String  := "display")
-                                return String
-                                is ("XXX-444");
+                                return String;
 
    --
    -- Retrieves the URL to the admin area for either the current site or the network
@@ -296,8 +295,7 @@ is
    --
    function Self_Admin_URL (Path   : String := "";
                             Scheme : String := "admin")
-                            return String
-                            is ("XXX-605");
+                            return String;
    --
    -- Retrieves the URL to the admin area for the current site.
    --
@@ -311,8 +309,7 @@ is
    --
    function Admin_URL (Path   : String := "";
                        Scheme : String := "admin")
-                       return String
-                       is ("XXX-353");
+                       return String;
 
    --
    -- Retrieves the URL to the admin area for a given site.
@@ -329,8 +326,7 @@ is
    function Get_Admin_URL (Blog_Id : Integer := 0; --  = null
                            Path    : String  := "";
                            Scheme  : String  := "admin")
-                           return String
-                           is ("XXX-354");
+                           return String;
 
    --
    -- Retrieves the URL to the admin area for the network.
@@ -345,11 +341,10 @@ is
    --
    function Network_Admin_URL (Path   : String := "";
                                Scheme : String := "admin")
-                               return String
-                               is ("XXX-401");
+                               return String;
 
    --
-   -- Retrieves the URL to the user"s profile editor.
+   -- Retrieves the URL to the user's profile editor.
    --
    -- @since 3.1.0
    --
@@ -361,8 +356,7 @@ is
    --
    function Get_Edit_Profile_URL (User_Id : Integer := 0;
                                   Scheme  : String  := "admin")
-                                  return String
-                                  is ("XXX-402");
+                                  return String;
 
    --
    -- Retrieves the edit user link.
@@ -373,8 +367,7 @@ is
    -- @return string URL to edit user page or empty string.
    --
    function Get_Edit_User_Link (User_Id : Integer := 0) -- = null
-                                return String
-                                is ("XXX-371");
+                                return String;
 
    --
    -- Retrieves the URL for editing a given term.
@@ -396,8 +389,7 @@ is
    function Get_Edit_Term_Link (Term        : Integer;
                                 Taxonomy    : String := "";
                                 Object_Type : String := "")
-                                return String
-                                is ("XXX-411");
+                                return String;
 
    --
    -- Retrieves the link for a page number.
@@ -558,6 +550,26 @@ is
                           return String;
 
    --
+   -- Retrieves the site URL for the current network.
+   --
+   -- Returns the site URL with the appropriate protocol, "https" if
+   -- is_ssl() and "http" otherwise. If scheme is "http" or "https", is_ssl() is
+   -- overridden.
+   --
+   -- @since 3.0.0
+   --
+   -- @see set_url_scheme()
+   --
+   -- @param string      path   Optional. Path relative to the site URL. Default empty.
+   -- @param string|null scheme Optional. Scheme to give the site URL context. Accepts
+   --                            "http", "https", or "relative". Default null.
+   -- @return string Site URL link with optional path appended.
+   --
+   function Network_Site_URL (Path   : String := "";
+                              Scheme : String := "") -- null
+                              return String;
+
+   --
    -- Retrieves default data about the avatar.
    --
    -- @since 4.2.0
@@ -648,10 +660,9 @@ is
    --                      exist.
    --
    function Get_Preview_Post_Link
-      (Post         : Inc_Class_Wp_Posts.Wp_Post := Inc_Class_Wp_Posts.Null_Post; -- Integer    := 0; -- = null
+      (Post         : Inc_Class_Wp_Posts.Wp_Post := Inc_Class_Wp_Posts.Null_Post;
        Query_Args   : Array_Type := Empty_Array;
        Preview_Link : String     := "")
-       return String
-       is ("XXX-357");
+       return String;
 
 end Inc_Link_Templates;

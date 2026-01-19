@@ -3081,6 +3081,17 @@ is
       end;
    end Is_Post_Type_Viewable;
 
+   ---------------------------
+   -- Is_Post_Type_Viewable --
+   ---------------------------
+
+   function Is_Post_Type_Viewable (Post_Type : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+                                   return Boolean
+   is
+   begin
+      return False;
+   end Is_Post_Type_Viewable;
+
    -----------------------------
    -- Is_Post_Status_Viewable --
    -----------------------------

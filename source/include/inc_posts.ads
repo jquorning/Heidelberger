@@ -987,7 +987,9 @@ is
    -- @return bool Whether the post type should be considered viewable.
    --
    function Is_Post_Type_Viewable (Post_Type : String)
-   -- Inc_Class_Wp_Post_Type.Wp_Post_Type)
+                                   return Boolean;
+
+   function Is_Post_Type_Viewable (Post_Type : Inc_Class_Wp_Post_Type.Wp_Post_Type)
                                    return Boolean;
 
    --

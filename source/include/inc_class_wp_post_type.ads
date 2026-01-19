@@ -343,7 +343,8 @@ is
         -- @since 4.6.0
         -- @var string _edit_link
         --
-        -- public _edit_link = "post.php?post=%d";
+        X_Edit_Link : Unbounded_String :=
+          To_Unbounded_String ("post.php?post=%d");
 
         --
         -- Post type capabilities.

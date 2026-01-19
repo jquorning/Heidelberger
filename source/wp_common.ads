@@ -271,6 +271,14 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Path       : String;
+                           Blog       : Integer;
+                           Scheme     : String)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
                            Value      : Boolean;
                            Typ        : String;
                            Args       : Array_Type)
