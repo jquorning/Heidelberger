@@ -298,7 +298,11 @@ is
             First : constant Natural := Item'First + Offset;
             Last  : constant Natural := Item'First + Offset + Length - 1;
          begin
-            return Item (First .. Last);
+            if First not in Item'Range or Last not in Item'Range then
+               return "";
+            else
+               return Item (First .. Last);
+            end if;
          end;
       elsif Length = Integer'First then
          return Item (Item'First + Offset .. Item'Last);
@@ -742,7 +746,9 @@ is
       List  : List_Type;
    begin
       while Count < Limit loop
-         Pos := Index (Item, Separator);
+         Pos := Index (Source  => Item,
+                       Pattern => Separator,
+                       From    => First);
          exit when Pos = 0;
          List.Append (+Item (First .. Pos - 1));
          Count := Count + 1;
