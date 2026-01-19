@@ -258,4 +258,7 @@ is
                                    Cas  : Integer := CASE_LOWER)
                                    return Array_Type;
 
+   procedure Arsort (Arry : in out Array_Type)
+   is null;
+
 end Php.Arrays;

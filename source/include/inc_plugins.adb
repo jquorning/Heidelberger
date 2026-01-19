@@ -11,10 +11,14 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Php.Arrays;
 with Php.Lists;
 with Php.Misc;
+with Php.Preg;
+with Php.Strings;
 
+with Globals;
 with Hb_Common;
 
 with Inc_Elab_Hooks;
+with Inc_Functions;
 
 package body Inc_Plugins
 is
@@ -533,27 +537,17 @@ is
 --         array_pop( wp_current_filter );
 -- end;
 
--- --
--- -- Checks if any action has been registered for a hook.
--- --
--- -- When using the `callback` argument, this function may return a non-boolean value
--- -- that evaluates to false (e.g. 0), so use the `===` operator for testing the return value.
--- --
--- -- @since 2.5.0
--- --
--- -- @see has_filter() has_action() is an alias of has_filter().
--- --
--- -- @param string                      hook_name The name of the action hook.
--- -- @param callable|string|array|false callback  Optional. The callback to check for.
--- --                                               This function can be called unconditionally to speculatively check
--- --                                               a callback that may or may not exist. Default false.
--- -- @return bool|int If `callback` is omitted, returns boolean for whether the hook has
--- --                  anything registered. When checking a specific function, the priority
--- --                  of that hook is returned, or false if the function is not attached.
--- --
--- function has_action( hook_name, callback = false ) then
---         return has_filter( hook_name, callback );
--- end;
+   ----------------
+   -- Has_Action --
+   ----------------
+
+   function Has_Action (Hook_Name : String;
+                        Callback  : Callable := null)
+                        return Boolean
+   is
+   begin
+      return Has_Filter (Hook_Name, Callback);
+   end Has_Action;
 
    -------------------
    -- Remove_Action --
@@ -694,44 +688,58 @@ is
 --         do_action_ref_array( hook_name, args );
 -- end;
 
--- --
--- -- Functions for handling plugins.
--- --
+   -----------------------------------------
+   ---- Functions for handling plugins. ----
+   -----------------------------------------
 
--- --
--- -- Gets the basename of a plugin.
--- --
--- -- This method extracts the name of a plugin from its filename.
--- --
--- -- @since 1.5.0
--- --
--- -- @global array wp_plugin_paths
--- --
--- -- @param string file The filename of plugin.
--- -- @return string The name of a plugin.
--- --
--- function plugin_basename( file ) then
---         global wp_plugin_paths;
+   ---------------------
+   -- Plugin_Basename --
+   ---------------------
 
---         -- wp_plugin_paths contains normalized paths.
---         file = wp_normalize_path( file );
+   Global_Wp_Plugin_Paths : Array_Type;
 
---         arsort( wp_plugin_paths );
+   function Plugin_Basename (File : String)
+                             return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Arrays;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Functions;
 
---         foreach ( wp_plugin_paths as dir => realdir ) then
---                 if ( strpos( file, realdir ) === 0 ) then
---                         file = dir . substr( file, strlen( realdir ) );
---                 end;
---         end;
+      -- wp_plugin_paths contains normalized paths.
+      File_2 : Unbounded_String := +Wp_Normalize_Path (File);
+   begin
+      Arsort (Global_Wp_Plugin_Paths);
 
---         plugin_dir    = wp_normalize_path( WP_PLUGIN_DIR );
---         mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
+      for A in Global_Wp_Plugin_Paths.Iterate loop
+         declare
+            Dir     : constant String := Key (A);
+            Realdir : constant String := As_String (Element (A));
+         begin
+            if Strpos (-File_2, Realdir) = 0 then
+               File_2 := +(Dir & Substr (-File_2, Strlen (Realdir)));
+            end if;
+         end;
+      end loop;
 
---         -- Get relative path from plugins directory.
---         file = preg_replace( '#^' . preg_quote( plugin_dir, '#' ) . '/|^' . preg_quote( mu_plugin_dir, '#' ) . '/#', '', file );
---         file = trim( file, '/' );
---         return file;
--- end;
+      declare
+         Plugin_Dir    : constant String :=
+           Wp_Normalize_Path (-Globals.WP_PLUGIN_DIR);
+
+         MU_Plugin_Dir : constant String :=
+           Wp_Normalize_Path (-Globals.WPMU_PLUGIN_DIR);
+      begin
+         -- Get relative path from plugins directory.
+         File_2 :=
+           +Preg_Replace ("#^" & Preg_Quote (Plugin_Dir, "#") &
+                          "/|^" & Preg_Quote (MU_Plugin_Dir, "#") & "/#",
+                          "", -File_2);
+      end;
+      File_2 := +Trim (-File_2, "/");
+      return -File_2;
+   end Plugin_Basename;
 
 -- --
 -- -- Register a plugin's real path.
@@ -899,5 +907,54 @@ is
    begin
       Global_Wp_Filter ("all").Do_All_Hook (Args);
    end X_Wp_Call_All_Hook;
+
+   ----------------
+   -- Dump_Hooks --
+   ----------------
+
+   procedure Dump_Hooks
+   is
+      use Hb_Common;
+      use Count_Maps;
+      use Natural_Maps;
+      use Inc_Elab_Hooks.Hook_Maps;
+   begin
+      Put_Line ("dump_hooks:");
+
+      Put_Line ("  global_wp_actions:");
+      for A in Global_Wp_Actions.Iterate loop
+         declare
+            K : constant String  := Key (A);
+            V : constant Natural := Element (A);
+         begin
+            Put_Line ("    " & K & ": " & V'Image);
+         end;
+      end loop;
+
+      Put_Line ("  global_wp_filters:");
+      for A in Global_Wp_Filters.Iterate loop
+         declare
+            K : constant String  := Key (A);
+            V : constant Natural := Element (A);
+         begin
+            Put_Line ("    " & K & ": " & V'Image);
+         end;
+      end loop;
+
+      Put_Line ("  global_wp_current_filter:");
+      for A of Global_Wp_Current_Filter loop
+         Put_Line ("    " & (-A));
+      end loop;
+
+      Put_Line ("  global_wp_filter:");
+      for A in Global_Wp_Filter.Iterate loop
+         declare
+            K : constant String  := Key (A);
+            V : constant Wp_Hook := Element (A);
+         begin
+            Put_Line ("    " & K); --  & ": " & V'Image);
+         end;
+      end loop;
+   end Dump_Hooks;
 
 end Inc_Plugins;

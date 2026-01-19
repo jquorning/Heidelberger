@@ -2968,7 +2968,7 @@ is
       --
       -- @since 2.2.0
       --
-      Inc_Plugins.Do_Action ("admin_xml_ns" & NL);
+      Inc_Plugins.Do_Action ("admin_xml_ns");
 
       Inc_General_Templates.Language_Attributes;
 

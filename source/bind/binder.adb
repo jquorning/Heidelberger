@@ -21,6 +21,8 @@ with Adm_Load_Styles;
 with Adm_Post;
 with Adm_Privacy;
 
+with Inc_Plugins;
+
 -- with Adi_Menu;
 -- with Adi_Nav_Menus;
 
@@ -91,6 +93,8 @@ is
       end if;
 
       PHP_To_Web_Server;
+
+      Inc_Plugins.Dump_Hooks;
 
       Payload := +Php.Echoing.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);

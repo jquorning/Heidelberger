@@ -67,24 +67,27 @@ is
    --
    function Has_Action (Hook_Name : String;
                         Callback  : Callable := null) -- false
-                        return Boolean
-                        is (True);
+                        return Boolean;
 
---
--- Calls the callback functions that have been added to an action hook, specifying arguments in an array.
---
--- @since 2.1.0
---
--- @see do_action() This function is identical, but the arguments passed to the
---                  functions hooked to `hook_name` are supplied using an array.
---
--- @global WP_Hook[] wp_filter         Stores all of the filters and actions.
--- @global int[]     wp_actions        Stores the number of times each action was triggered.
--- @global string[]  wp_current_filter Stores the list of current filters with the current one last.
---
--- @param string hook_name The name of the action to be executed.
--- @param array  args      The arguments supplied to the functions hooked to `hook_name`.
---
+   --
+   -- Calls the callback functions that have been added to an action hook, specifying
+   -- arguments in an array.
+   --
+   -- @since 2.1.0
+   --
+   -- @see do_action() This function is identical, but the arguments passed to the
+   --                  functions hooked to `hook_name` are supplied using an array.
+   --
+   -- @global WP_Hook[] wp_filter         Stores all of the filters and actions.
+   -- @global int[]     wp_actions        Stores the number of times each action was
+   --                                     triggered.
+   -- @global string[]  wp_current_filter Stores the list of current filters with the
+   --                                     current one last.
+   --
+   -- @param string hook_name The name of the action to be executed.
+   -- @param array  args      The arguments supplied to the functions hooked to
+   --                         `hook_name`.
+   --
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Array_Type) is null;
    procedure Do_Action_Ref_Array (Hook_Name : String;
@@ -94,21 +97,20 @@ is
                                   Args      : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
                                   is null;
 
---
--- Gets the basename of a plugin.
---
--- This method extracts the name of a plugin from its filename.
---
--- @since 1.5.0
---
--- @global array wp_plugin_paths
---
--- @param string file The filename of plugin.
--- @return string The name of a plugin.
---
+   --
+   -- Gets the basename of a plugin.
+   --
+   -- This method extracts the name of a plugin from its filename.
+   --
+   -- @since 1.5.0
+   --
+   -- @global array wp_plugin_paths
+   --
+   -- @param string file The filename of plugin.
+   -- @return string The name of a plugin.
+   --
    function Plugin_Basename (File : String)
-                             return String
-                             is ("XXX-461");
+                             return String;
 
    --
    -- Adds a callback function to a filter hook.
@@ -159,7 +161,7 @@ is
    --     add_filter( 'hook', 'example_callback', 10, 2 );
    --     -- Where priority is 10, accepted_args is 2.
    --
-   ----Note:* The function will return true whether or not the callback is valid.
+   -- *Note:* The function will return true whether or not the callback is valid.
    -- It is up to you to take care. This is done for optimization purposes, so
    -- everything is as quick as possible.
    --
@@ -249,8 +251,6 @@ is
    -- @param mixed  ...args   Additional parameters to pass to the callback functions.
    -- @return mixed The filtered value after all hooked functions are applied to it.
    --
-   -- function apply_filters( hook_name, value, ...args ) then
-
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
                            Args      : Array_Type)
@@ -714,23 +714,25 @@ is
    function Did_Action (Hook_Name : String)
                         return Boolean;
 
---
--- Fires functions attached to a deprecated action hook.
---
--- When an action hook is deprecated, the do_action() call is replaced with
--- do_action_deprecated(), which triggers a deprecation notice and then fires
--- the original hook.
---
--- @since 4.6.0
---
--- @see _deprecated_hook()
---
--- @param string hook_name   The name of the action hook.
--- @param array  args        Array of additional function arguments to be passed to do_action().
--- @param string version     The version of WordPress that deprecated the hook.
--- @param string replacement Optional. The hook that should have been used. Default empty.
--- @param string message     Optional. A message regarding the change. Default empty.
---
+   --
+   -- Fires functions attached to a deprecated action hook.
+   --
+   -- When an action hook is deprecated, the do_action() call is replaced with
+   -- do_action_deprecated(), which triggers a deprecation notice and then fires
+   -- the original hook.
+   --
+   -- @since 4.6.0
+   --
+   -- @see _deprecated_hook()
+   --
+   -- @param string hook_name   The name of the action hook.
+   -- @param array  args        Array of additional function arguments to be passed
+   --                           to do_action().
+   -- @param string version     The version of WordPress that deprecated the hook.
+   -- @param string replacement Optional. The hook that should have been used. Default
+   --                           empty.
+   -- @param string message     Optional. A message regarding the change. Default empty.
+   --
    procedure Do_Action_Deprecated (Hook_Name   : String;
                                    Args        : List_Type;
                                    Version     : String;
@@ -791,5 +793,10 @@ is
    -- @param array args The collected parameters from the hook that was called.
    --
    procedure X_Wp_Call_All_Hook (Args : Array_Type);
+
+   --
+   -- Dump contents of hook filers. jq
+   --
+   procedure Dump_Hooks;
 
 end Inc_Plugins;
