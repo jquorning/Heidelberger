@@ -66,6 +66,7 @@ is
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_L10n;
+      use Inc_Pluggables;
       use Inc_Posts;
 
       Post_New_File : Unbounded_String;
@@ -84,7 +85,7 @@ is
            Integer'Value (As_String (Get (XX_GET, "post"))) /=
            Integer'Value (As_String (Get (X_POST, "post_ID")))
          then
-            Inc_Functions.Wp_Die
+            Wp_Die
                (abs "A post ID mismatch has been detected.",
                 abs "Sorry, you are not allowed to edit this item.", 400);
 
@@ -128,7 +129,7 @@ is
    --         Post and then
               Post_Type /= As_String (Get (X_POST, "post_type"))
             then
-               Inc_Functions.Wp_Die
+               Wp_Die
                   (abs "A post type mismatch has been detected.",
                    abs "Sorry, you are not allowed to edit this item.", 400);
             end if;
@@ -142,7 +143,7 @@ is
                   Action := +"preview";
                end if;
 
-               Sendback := +Inc_Functions.Wp_Get_Referer;  -- ();
+               Sendback := +Wp_Get_Referer;
                if
                  Sendback = "" or else
                  Ada.Strings.Fixed.Index (-Sendback, "post.php") = 0 or else
@@ -159,8 +160,6 @@ is
                   end if;
                else
                   declare
---                   use String_Vectors;
-
                      List : constant List_Type :=
                        To_List (List => (+"trashed", +"untrashed",
                                          +"deleted", +"ids"));
@@ -179,14 +178,14 @@ is
                      -- For output of the Quick Draft dashboard widget.
    --                require_once ABSPATH . "wp-admin/includes/dashboard.php";
 
-                     if Inc_Pluggables.Wp_Verify_Nonce (Nonce, "add-post") = 0 then
+                     if Wp_Verify_Nonce (Nonce, "add-post") = 0 then
                         Error_Msg := +abs "Unable to submit this form, please refresh and try again.";
                      end if;
 
                      if
                        not Current_User_Can (As_String (Get (Inc_Posts.Get_Post_Type_Object ("post").Cap, "create_posts")))
                      then
-                        goto Bailout; -- return;  -- exit;
+                        goto Bailout;
                      end if;
 
                      if Error_Msg /= "" then
@@ -197,7 +196,7 @@ is
                   Post :=
                     Inc_Posts.Get_Post (Post_Id (As_Integer (Get (X_REQUEST, "post_ID"))));
 
-                  Inc_Pluggables.Check_Admin_Referer ("add-" & (-Post.Post_Type));
+                  Check_Admin_Referer ("add-" & (-Post.Post_Type));
 
                   Set (X_POST, "comment_status",
                        From_String (Get_Default_Comment_Status (-Post.Post_Type)));
@@ -229,36 +228,36 @@ is
                   declare
                      use Adi_Dashboard;
 
-                     Unused : Integer := Edit_Post;   -- ();
+                     Unused : Integer := Edit_Post;
                   begin
-                     Wp_Dashboard_Quick_Press; -- ();
+                     Wp_Dashboard_Quick_Press;
                   end;
 
-                  goto Bailout; -- return;  -- exit;
+                  goto Bailout;
 
                elsif Action = "post" or Action = "postajaxpost" then
-                  Inc_Pluggables.Check_Admin_Referer ("add-" & (-Post_Type));
+                  Check_Admin_Referer ("add-" & (-Post_Type));
                   declare
                      Post_Id : constant Integer := (if "postajaxpost" = Action
                                                     then Edit_Post else Write_Post);
                   begin
                      Redirect_Post (Post_Id);
                   end;
-                  goto Bailout; -- return; -- exit;
+                  goto Bailout;
 
                elsif Action = "edit" then
                   if Id = 0 then -- .key added
-                     Inc_Pluggables.Wp_Redirect (Admin_URL ("post.php"));
-                     goto Bailout; -- return; -- exit;
+                     Wp_Redirect (Admin_URL ("post.php"));
+                     goto Bailout;
                   end if;
 
                   if Post = Null_Post then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                        (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
                   end if;
 
                   if Post_Type_Object = Null_Post_Type then
-                     Inc_Functions.Wp_Die (abs "Invalid post type.");
+                     Wp_Die (abs "Invalid post type.");
                   end if;
 
                   if
@@ -267,30 +266,30 @@ is
                                     (To_Array (List => (1 => Build ("show_ui", "true")))),
                                   True)
                   then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                        (abs "Sorry, you are not allowed to edit posts in this post type.");
                   end if;
 
                   if not Current_User_Can ("edit_post", Integer (Id)) then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                        (abs "Sorry, you are not allowed to edit this item.");
                   end if;
 
                   if "trash" = Post.Post_Status then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                         (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                   end if;
 
                   if not Empty (As_String (Get (XX_GET, "get-post-lock"))) then
-                     Inc_Pluggables.Check_Admin_Referer ("lock-post_" & Id'Image);
+                     Check_Admin_Referer ("lock-post_" & Id'Image);
                      declare
                         Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
                      begin
-                        Inc_Pluggables.Wp_Redirect
+                        Wp_Redirect
                            (Get_Edit_Post_Link (Integer (Id), "url"));
 --                         (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
                      end;
-                     goto Bailout; -- return; -- exit;
+                     goto Bailout;
                   end if;
 
                   Post_Type := Post.Post_Type;
@@ -359,7 +358,7 @@ is
                   <<Label_1>>
 
                elsif Action = "editattachment" then
-                  Inc_Pluggables.Check_Admin_Referer ("update-post_" & Id'Image);
+                  Check_Admin_Referer ("update-post_" & Id'Image);
 
                   -- Don't let these be changed.
                   Delete (Ref (X_POST, "guid"));
@@ -381,7 +380,7 @@ is
                   -- Intentional fall-through to trigger the edit_post() call.
 
                elsif Action = "editpost" then
-                  Inc_Pluggables.Check_Admin_Referer ("update-post_" & Id'Image);
+                  Check_Admin_Referer ("update-post_" & Id'Image);
 
                   Id := Post_Id (Edit_Post); --();
 
@@ -396,28 +395,26 @@ is
                   Redirect_Post (Integer (Id));
                   -- Send user on their way while we keep working.
 
-                  goto Bailout; -- return; -- exit;
+                  goto Bailout;
 
                elsif Action = "trash" then
-                  Inc_Pluggables.Check_Admin_Referer ("trash-post_" & Id'Image);
+                  Check_Admin_Referer ("trash-post_" & Id'Image);
 
                   if Post = Null_Post then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                         (abs "The item you are trying to move to the Trash no longer exists.");
                   end if;
 
                   if Post_Type_Object = Null_Post_Type then
-                     Inc_Functions.Wp_Die (abs "Invalid post type.");
+                     Wp_Die (abs "Invalid post type.");
                   end if;
 
                   if not Current_User_Can ("delete_post", Integer (Id)) then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                        (abs "Sorry, you are not allowed to move this item to the Trash.");
                   end if;
 
                   declare
-                     use Inc_Pluggables;
-
                      User_Id : constant Integer := Wp_Check_Post_Lock (Id'Image);
                   begin
                      if User_Id /= 0 then
@@ -427,7 +424,7 @@ is
                            User : constant Wp_User := Get_Userdata (User_Id);
                         begin
                            -- translators: %s: User"s display name.
-                           Inc_Functions.Wp_Die (
+                           Wp_Die (
                              Sprintf (
                                abs "You cannot move this item to the Trash. %s is currently editing.",
                                To_List (-User.Prop.Display_Name)));
@@ -435,38 +432,38 @@ is
                      end if;
 
                      if not Wp_Trash_Post (Id'Image) then
-                        Inc_Functions.Wp_Die
+                        Wp_Die
                            (abs "Error in moving the item to Trash.");
                      end if;
 
-                     Inc_Pluggables.Wp_Redirect (
-                           Add_Query_Arg (
-                                To_Array (List => (
-                                        Build ("trashed", "1"),
-                                        Build ("ids",     Id'Image)
-                                )),
-                                -Sendback));
+                     Wp_Redirect (
+                        Add_Query_Arg (
+                          To_Array (List => (
+                            Build ("trashed", "1"),
+                            Build ("ids",     Id'Image)
+                          )),
+                          -Sendback));
                   end;
-                  goto Bailout; -- return; --  exit;
+                  goto Bailout;
 
                elsif Action = "untrash" then
-                  Inc_Pluggables.Check_Admin_Referer ("untrash-post_" & Id'Image);
+                  Check_Admin_Referer ("untrash-post_" & Id'Image);
 
                   if Post = Null_Post then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                        (abs "The item you are trying to restore from the Trash no longer exists.");
                   end if;
 
                   if Post_Type_Object = Null_Post_Type then
-                     Inc_Functions.Wp_Die (abs "Invalid post type.");
+                     Wp_Die (abs "Invalid post type.");
                   end if;
 
                   if not Current_User_Can ("delete_post", Post) then
-                     Inc_Functions.Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
+                     Wp_Die (abs "Sorry, you are not allowed to restore this item from the Trash.");
                   end if;
 
                   if not Inc_Posts.Wp_Untrash_Post (Post) then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                         (abs "Error in restoring the item from Trash.");
                   end if;
 
@@ -476,22 +473,22 @@ is
                               Build ("ids",       Id'Image)
                            )),
                            -Sendback);
-                  Inc_Pluggables.Wp_Redirect (-Sendback);
-                  goto Bailout; -- return; -- exit;
+                  Wp_Redirect (-Sendback);
+                  goto Bailout;
 
                elsif Action = "delete" then
-                  Inc_Pluggables.Check_Admin_Referer ("delete-post_" & Id'Image);
+                  Check_Admin_Referer ("delete-post_" & Id'Image);
 
                   if Post = Null_Post then
-                     Inc_Functions.Wp_Die (abs "This item has already been deleted.");
+                     Wp_Die (abs "This item has already been deleted.");
                   end if;
 
                   if Post_Type_Object = Null_Post_Type then
-                     Inc_Functions.Wp_Die (abs "Invalid post type.");
+                     Wp_Die (abs "Invalid post type.");
                   end if;
 
                   if not Current_User_Can ("delete_post", Integer (Id)) then
-                     Inc_Functions.Wp_Die
+                     Wp_Die
                         (abs "Sorry, you are not allowed to delete this item.");
                   end if;
 
@@ -500,39 +497,38 @@ is
                         Force : constant Boolean := not MEDIA_TRASH;
                      begin
                         if Wp_Delete_Attachment (Integer (Id), Force) = Null_Post then
-                           Inc_Functions.Wp_Die
+                           Wp_Die
                               (abs "Error in deleting the attachment.");
                         end if;
                      end;
                   else
                      if Wp_Delete_Post (Integer (Id), True) = Null_Post then
-                        Inc_Functions.Wp_Die (abs "Error in deleting the item.");
+                        Wp_Die (abs "Error in deleting the item.");
                      end if;
                   end if;
 
-                  Inc_Pluggables.Wp_Redirect (
+                  Wp_Redirect (
                     Add_Query_Arg ("deleted", "1", -Sendback));
-                  goto Bailout; -- return; -- exit;
+                  goto Bailout;
 
                elsif Action = "preview" then
-                  Inc_Pluggables.Check_Admin_Referer ("update-post_" & Id'Image);
+                  Check_Admin_Referer ("update-post_" & Id'Image);
                   declare
-                     URL : constant String := Post_Preview; -- ();
+                     URL : constant String := Post_Preview;
                   begin
-                     Inc_Pluggables.Wp_Redirect (URL);
+                     Wp_Redirect (URL);
                   end;
-                  goto Bailout; -- return; -- exit;
+                  goto Bailout;
 
                elsif Action = "toggle-custom-fields" then
-                  Inc_Pluggables.Check_Admin_Referer ("toggle-custom-fields",
-                                                      "toggle-custom-fields-nonce");
+                  Check_Admin_Referer ("toggle-custom-fields",
+                                       "toggle-custom-fields-nonce");
                   declare
-                     use Inc_Pluggables;
                      use Inc_Users;
 
                      Unused   : Boolean;
                      Unused_2 : Integer;
-                     Current_User_Id : constant Integer := Get_Current_User_Id; -- ();
+                     Current_User_Id : constant Integer := Get_Current_User_Id;
                   begin
                      if 0 /= Current_User_Id then
                         declare
@@ -545,9 +541,9 @@ is
                                                          not Enable_Custom_Fields);
                         end;
                      end if;
-                     Unused := Wp_Safe_Redirect (Inc_Functions.Wp_Get_Referer); -- ()
+                     Unused := Wp_Safe_Redirect (Wp_Get_Referer);
                   end;
-                  goto Bailout; -- return; -- exit;
+                  goto Bailout;
 
                else
                   --
@@ -562,9 +558,9 @@ is
                   --
                   Do_Action ("post_action_" & (-Action), Id'Image);
 
-                  Inc_Pluggables.Wp_Redirect (Admin_URL ("edit.php"));
-                  goto Bailout; -- return; -- exit;
-               end if; -- End switch.
+                  Wp_Redirect (Admin_URL ("edit.php"));
+                  goto Bailout;
+               end if;
          end;
       end;
 
