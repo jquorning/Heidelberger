@@ -42,18 +42,9 @@ with Inc_Plugins;
 with Inc_Posts;
 with Inc_Users;
 
--- WordPress Administration Bootstrap
--- require_once __DIR__ . '/admin.php';
-
 package body Adm_Post
 is
-   use Ada.Strings.Unbounded;
--- use Ada.Text_IO;
    use Arrays;
-   use Inc_L10n;
-   use Hb_Common;
-   use Php;
-   use Globals;
    use Lists;
 
    ------------
@@ -62,8 +53,11 @@ is
 
    procedure Render
    is
-      use Binder;
+      use Ada.Strings.Unbounded;
       use Php.Strings;
+      use Binder;
+      use Hb_Common;
+      use Globals;
       use Wp_Common;
       use Adm_Menu;
       use Adi_Posts;
@@ -71,16 +65,18 @@ is
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
+      use Inc_L10n;
       use Inc_Posts;
 
       Post_New_File : Unbounded_String;
+      pragma Unreferenced (Post_New_File);
    begin
       Parent_File   := +Slug_Type'("edit.php");
       Submenu_File  := +"edit.php";
 
       Adi_Misc.Wp_Reset_Vars (To_List ("action"));
       declare
-         Id : Post_Id; -- Integer;
+         Id : Post_Id;
       begin
          if
            Isset (XX_GET, "post")    and then
@@ -251,118 +247,114 @@ is
                   goto Bailout; -- return; -- exit;
 
                elsif Action = "edit" then
-                  declare
-                     Editing : Boolean := True;
-                  begin
-                     if Id = 0 then -- .key added
-                        Inc_Pluggables.Wp_Redirect (Admin_URL ("post.php"));
-                        goto Bailout; -- return; -- exit;
-                     end if;
+                  if Id = 0 then -- .key added
+                     Inc_Pluggables.Wp_Redirect (Admin_URL ("post.php"));
+                     goto Bailout; -- return; -- exit;
+                  end if;
 
-                     if Post = Null_Post then
-                        Inc_Functions.Wp_Die
-                          (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
-                     end if;
+                  if Post = Null_Post then
+                     Inc_Functions.Wp_Die
+                       (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+                  end if;
 
-                     if Post_Type_Object = Null_Post_Type then
-                        Inc_Functions.Wp_Die (abs "Invalid post type.");
-                     end if;
+                  if Post_Type_Object = Null_Post_Type then
+                     Inc_Functions.Wp_Die (abs "Invalid post type.");
+                  end if;
 
+                  if
+                    not Php.Lists.In_List (-Globals.Typenow,
+                                  Inc_Posts.Get_Post_Types
+                                    (To_Array (List => (1 => Build ("show_ui", "true")))),
+                                  True)
+                  then
+                     Inc_Functions.Wp_Die
+                       (abs "Sorry, you are not allowed to edit posts in this post type.");
+                  end if;
+
+                  if not Current_User_Can ("edit_post", Integer (Id)) then
+                     Inc_Functions.Wp_Die
+                       (abs "Sorry, you are not allowed to edit this item.");
+                  end if;
+
+                  if "trash" = Post.Post_Status then
+                     Inc_Functions.Wp_Die
+                        (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
+                  end if;
+
+                  if not Empty (As_String (Get (XX_GET, "get-post-lock"))) then
+                     Inc_Pluggables.Check_Admin_Referer ("lock-post_" & Id'Image);
+                     declare
+                        Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
+                     begin
+                        Inc_Pluggables.Wp_Redirect
+                           (Get_Edit_Post_Link (Integer (Id), "url"));
+--                         (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
+                     end;
+                     goto Bailout; -- return; -- exit;
+                  end if;
+
+                  Post_Type := Post.Post_Type;
+                  if "post" = Post_Type then
+                     Parent_File   := +"edit.php";
+                     Submenu_File  := +"edit.php";
+                     Post_New_File := +"post-new.php";
+                  elsif "attachment" = Post_Type then
+                     Parent_File   := +"upload.php";
+                     Submenu_File  := +"upload.php";
+                     Post_New_File := +"media-new.php";
+                  else
                      if
-                       not Php.Lists.In_List (-Globals.Typenow,
-                                     Inc_Posts.Get_Post_Types
-                                       (To_Array (List => (1 => Build ("show_ui", "true")))),
-                                     True)
+--                     Isset (Post_Type_Object) and then
+--                     Post_Type_Object.Show_In_Menu_Bool and then
+                       True /= Post_Type_Object.Show_In_Menu_Bool
                      then
-                        Inc_Functions.Wp_Die
-                          (abs "Sorry, you are not allowed to edit posts in this post type.");
-                     end if;
-
-                     if not Current_User_Can ("edit_post", Integer (Id)) then
-                        Inc_Functions.Wp_Die
-                          (abs "Sorry, you are not allowed to edit this item.");
-                     end if;
-
-                     if "trash" = Post.Post_Status then
-                        Inc_Functions.Wp_Die
-                           (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
-                     end if;
-
-                     if not Empty (As_String (Get (XX_GET, "get-post-lock"))) then
-                        Inc_Pluggables.Check_Admin_Referer ("lock-post_" & Id'Image);
-                        declare
-                           Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
-                        begin
-                           Inc_Pluggables.Wp_Redirect
-                              (Get_Edit_Post_Link (Integer (Id), "url"));
---                            (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
-                        end;
-                        goto Bailout; -- return; -- exit;
-                     end if;
-
-                     Post_Type := Post.Post_Type;
-                     if "post" = Post_Type then
-                        Parent_File   := +"edit.php";
-                        Submenu_File  := +"edit.php";
-                        Post_New_File := +"post-new.php";
-                     elsif "attachment" = Post_Type then
-                        Parent_File   := +"upload.php";
-                        Submenu_File  := +"upload.php";
-                        Post_New_File := +"media-new.php";
+                        Parent_File :=
+                          Unbounded_Slug (Post_Type_Object.Show_In_Menu);
                      else
-                        if
---                        Isset (Post_Type_Object) and then
---                        Post_Type_Object.Show_In_Menu_Bool and then
-                          True /= Post_Type_Object.Show_In_Menu_Bool
-                        then
-                           Parent_File :=
-                             Unbounded_Slug (Post_Type_Object.Show_In_Menu);
-                        else
-                           Parent_File := +"edit.php?post_type=post_type";
+                        Parent_File := +"edit.php?post_type=post_type";
+                     end if;
+                     Submenu_File  := +"edit.php?post_type=post_type";
+                     Post_New_File := +"post-new.php?post_type=post_type";
+                  end if;
+
+                  Globals.Title := +Get (Post_Type_Object, "labels.edit_item");
+
+                  --
+                  -- Allows replacement of the editor.
+                  --
+                  -- @since 4.9.0
+                  --
+                  -- @param bool    replace Whether to replace the editor. Default
+                  --                false.
+                  -- @param WP_Post post    Post object.
+                  --
+                  if True = Apply_Filters ("replace_editor", "false", Post) then -- false
+                     goto Label_1; -- break;
+                  end if;
+
+                  if Use_Block_Editor_For_Post (Post) then
+--                        require ABSPATH . "wp-admin/edit-form-blocks.php";
+                     goto Label_1; -- break;
+                  end if;
+
+                  if 0 = Wp_Check_Post_Lock (Post.Id'Image) then
+                     declare
+                        Active_Post_Lock : Array_Type :=
+                           Wp_Set_Post_Lock (Integer (Post.Id));
+                        pragma Unreferenced (Active_Post_Lock);
+                     begin
+                        if "attachment" /= Post_Type then
+                           Wp_Enqueue_Script ("autosave");
                         end if;
-                        Submenu_File  := +"edit.php?post_type=post_type";
-                        Post_New_File := +"post-new.php?post_type=post_type";
-                     end if;
+                     end;
+                  end if;
 
-                     Globals.Title := +Get (Post_Type_Object, "labels.edit_item");
+                  Post := Inc_Posts.Get_Post (Id, "OBJECT", "edit");
 
-                     --
-                     -- Allows replacement of the editor.
-                     --
-                     -- @since 4.9.0
-                     --
-                     -- @param bool    replace Whether to replace the editor. Default
-                     --                false.
-                     -- @param WP_Post post    Post object.
-                     --
-                     if True = Apply_Filters ("replace_editor", "false", Post) then -- false
-                        goto Label_1; -- break;
-                     end if;
-
-                     if Use_Block_Editor_For_Post (Post) then
---                           require ABSPATH . "wp-admin/edit-form-blocks.php";
-                        goto Label_1; -- break;
-                     end if;
-
-                     if 0 = Wp_Check_Post_Lock (Post.Id'Image) then
-                        declare
-                           Active_Post_Lock : Array_Type :=
-                              Wp_Set_Post_Lock (Integer (Post.Id));
-                           pragma Unreferenced (Active_Post_Lock);
-                        begin
-                           if "attachment" /= Post_Type then
-                              Wp_Enqueue_Script ("autosave");
-                           end if;
-                        end;
-                     end if;
-
-                     Post := Inc_Posts.Get_Post (Id, "OBJECT", "edit");
-
-                     if Post_Type_Supports (-Post_Type, "comments") then
-                        Wp_Enqueue_Script ("admin-comments");
-                        Adi_Comments.Enqueue_Comment_Hotkeys_Js;
-                     end if;
-                  end;
+                  if Post_Type_Supports (-Post_Type, "comments") then
+                     Wp_Enqueue_Script ("admin-comments");
+                     Adi_Comments.Enqueue_Comment_Hotkeys_Js;
+                  end if;
 --                require ABSPATH . "wp-admin/edit-form-advanced.php";
                   <<Label_1>>
 
