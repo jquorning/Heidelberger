@@ -67,12 +67,12 @@ is
    -- Globals --
    -------------
 
-   Wp_Filter         : Inc_Elab_Hooks.Hook_Maps.Map :=
+   Global_Wp_Filter  : Inc_Elab_Hooks.Hook_Maps.Map :=
      Inc_Elab_Hooks.Build_Preinitialized_Hooks (Empty_Array); --  (Wp_Filter);
 
-   Wp_Actions        : Count_Maps.Map;
-   Wp_Filters        : Natural_Maps.Map;
-   Wp_Current_Filter : List_Type;
+   Global_Wp_Actions        : Count_Maps.Map;
+   Global_Wp_Filters        : Natural_Maps.Map;
+   Global_Wp_Current_Filter : List_Type;
 
    ----------------
    -- Add_Filter --
@@ -88,14 +88,14 @@ is
 
       Hook : Wp_Hook;
    begin
-      if not Hook_Maps.Has_Element (Wp_Filter.Find (Hook_Name)) then
+      if not Hook_Maps.Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
-         Wp_Filter.Include (Hook_Name, Hook); -- Tampering with cursor
+         Global_Wp_Filter.Include (Hook_Name, Hook); -- Tampering with cursor
 --       Wp_Filter (Hook_Name) := new WP_Hook();
       end if;
 
-      Wp_Filter (Hook_Name).Add_Filter (Hook_Name, Callback, Priority,
-                                        Accepted_Args);
+      Global_Wp_Filter (Hook_Name).Add_Filter (Hook_Name, Callback, Priority,
+                                               Accepted_Args);
 
       return True;
    end Add_Filter;
@@ -156,18 +156,18 @@ is
 
       Args_2 : Array_Type := Args;
    begin
-      if Natural_Maps.Has_Element (Wp_Filters.Find (Hook_Name)) then
+      if Natural_Maps.Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
 --    if not Isset (Wp_Filters (Hook_Name)) then
-         Wp_Filters (Hook_Name) := 1;
+         Global_Wp_Filters (Hook_Name) := 1;
       else
-         Wp_Filters (Hook_Name) :=
-           Wp_Filters (Hook_Name) + 1;
+         Global_Wp_Filters (Hook_Name) :=
+           Global_Wp_Filters (Hook_Name) + 1;
       end if;
 
       -- Do 'all' actions first.
-      if Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
+      if Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
 --    if Isset (Wp_Filter ("all")) then
-         Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (+Hook_Name);
 
          declare
             All_Args : constant Array_Type := Func_Get_Args; -- ()
@@ -177,19 +177,19 @@ is
          end;
       end if;
 
-      if not Hook_Maps.Has_Element (Wp_Filter.Find (Hook_Name)) then
+      if not Hook_Maps.Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
-         if Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
+         if Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
 --       if Isset (Wp_Filter ("all")) then
-            List_Pop (Wp_Current_Filter);
+            List_Pop (Global_Wp_Current_Filter);
          end if;
 
          return Value;
       end if;
 
-      if not Hook_Maps.Has_Element (Wp_Filter.Find ("all")) then
+      if not Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
 --    if not Isset (Wp_Filter ("all")) then
-         Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (+Hook_Name);
       end if;
 
       -- Pass the value to WP_Hook.
@@ -197,13 +197,13 @@ is
 
       declare
          Unused   : Unbounded_String;
-         Filter   : Wp_Hook renames Wp_Filter (Hook_Name);
+         Filter   : Wp_Hook renames Global_Wp_Filter (Hook_Name);
          Filtered : constant String :=
            Filter.Apply_Filters (Value, Args_2);
 --         Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
       begin
 
-         Unused := +List_Pop (Wp_Current_Filter);
+         Unused := +List_Pop (Global_Wp_Current_Filter);
 
          return Filtered;
       end;
@@ -270,12 +270,12 @@ is
    is
       use Inc_Elab_Hooks.Hook_Maps;
    begin
-      if not Has_Element (Wp_Filter.Find (Hook_Name)) then
+      if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
          return False;
       end if;
 
-      return Wp_Filter (Hook_Name).Has_Filter (Hook_Name, Callback);
+      return Global_Wp_Filter (Hook_Name).Has_Filter (Hook_Name, Callback);
    end Has_Filter;
 
 -- --
@@ -351,7 +351,7 @@ is
    is
       use Hb_Common;
    begin
-      return -Wp_Current_Filter.Last_Element; -- end()
+      return -Global_Wp_Current_Filter.Last_Element; -- end()
    end Current_Filter;
 
    -----------------
@@ -365,11 +365,11 @@ is
       use Php.Lists;
    begin
       if "" = Hook_Name then
-         return not Wp_Current_Filter.Is_Empty;
+         return not Global_Wp_Current_Filter.Is_Empty;
 --       return not Empty (Wp_Current_Filter);
       end if;
 
-      return In_List (Hook_Name, Wp_Current_Filter, True);
+      return In_List (Hook_Name, Global_Wp_Current_Filter, True);
 
    end Doing_Filter;
 
@@ -434,18 +434,18 @@ is
    begin
       Put_Line ("do_action: " & Hook_Name & ": '" & Arg_2 & "' '" & Arg_3 & "'");
 
-      if not Has_Element (Wp_Actions.Find (Hook_Name)) then
+      if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
-         Wp_Actions.Include (Hook_Name, 1);
+         Global_Wp_Actions.Include (Hook_Name, 1);
       else
-         Wp_Actions.Include (Hook_Name,
-                             Wp_Actions (Hook_Name) + 1);
+         Global_Wp_Actions.Include (Hook_Name,
+                                    Global_Wp_Actions (Hook_Name) + 1);
       end if;
 
       -- Do 'all' actions first.
-      if Has_Element (Wp_Filter.Find ("all")) then
+      if Has_Element (Global_Wp_Filter.Find ("all")) then
 --    if Isset (Wp_Filter, "all") then
-         Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (+Hook_Name);
          declare
             All_Args : Array_Type; --            := Func_Get_Args;
          begin
@@ -454,18 +454,18 @@ is
          end;
       end if;
 
-      if not Has_Element (Wp_Filter.Find (Hook_Name)) then
+      if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter, Hook_Name) then
-         if Has_Element (Wp_Filter.Find ("all")) then
+         if Has_Element (Global_Wp_Filter.Find ("all")) then
 --       if Isset (Wp_Filter, "all") then
-            List_Pop (Wp_Current_Filter);
+            List_Pop (Global_Wp_Current_Filter);
          end if;
 
          return;
       end if;
 
-      if not Has_Element (Wp_Filter.Find ("all")) then
-         Wp_Current_Filter.Append (+Hook_Name);
+      if not Has_Element (Global_Wp_Filter.Find ("all")) then
+         Global_Wp_Current_Filter.Append (+Hook_Name);
       end if;
 
       declare
@@ -480,9 +480,9 @@ is
         --         arg[0] = arg[0][0];
         -- end;
 
-         Wp_Filter (Hook_Name).Do_Action (Arg);
+         Global_Wp_Filter (Hook_Name).Do_Action (Arg);
       end;
-      List_Pop (Wp_Current_Filter);
+      List_Pop (Global_Wp_Current_Filter);
    end Do_Action;
 
 -- --
@@ -622,14 +622,13 @@ is
                         return Boolean
    is
       use Count_Maps;
---        global wp_actions;
    begin
-      if not Has_Element (Wp_Actions.Find (Hook_Name)) then
+      if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
          return False; -- 0;
       end if;
 
-      return Wp_Actions (Hook_Name) /= 0;
+      return Global_Wp_Actions (Hook_Name) /= 0;
    end Did_Action;
 
 -- --
@@ -898,7 +897,7 @@ is
 --    global wp_filter;
 --    Filter : Wp_Hook renames Wp_Filter ("all");
    begin
-      Wp_Filter ("all").Do_All_Hook (Args);
+      Global_Wp_Filter ("all").Do_All_Hook (Args);
    end X_Wp_Call_All_Hook;
 
 end Inc_Plugins;
