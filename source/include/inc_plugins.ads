@@ -731,7 +731,8 @@ is
    -- @param string version     The version of WordPress that deprecated the hook.
    -- @param string replacement Optional. The hook that should have been used. Default
    --                           empty.
-   -- @param string message     Optional. A message regarding the change. Default empty.
+   -- @param string message     Optional. A message regarding the change. Default
+   --                           empty.
    --
    procedure Do_Action_Deprecated (Hook_Name   : String;
                                    Args        : List_Type;

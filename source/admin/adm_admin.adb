@@ -10,15 +10,15 @@ with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Unbounded;
 
 with Php.Arrays;
+with Php.Files;
+with Php.HTML;
+with Php.Strings;
 
 with Arrays;
 with Binder;
 with Globals;
 with Hb_Common;
 with Lists;
-with Php.Files;
-with Php.HTML;
-with Php.Strings;
 
 with Adi_Plugins;
 with Adi_Screens;
@@ -45,10 +45,7 @@ with Wp_Load;
 
 package body Adm_Admin
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
-   use Inc_L10n;
    use Lists;
 
    ---------
@@ -57,10 +54,22 @@ is
 
    procedure Run
    is
+      use Ada.Strings.Unbounded;
       use Php.Arrays;
+      use Php.Files;
+      use Php.HTML;
+      use Php.Strings;
       use Binder;
       use Globals;
+      use Hb_Common;
       use Adi_Plugins;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Options;
+      use Inc_Pluggables;
       use Inc_Plugins;
 
       Unused : Boolean;
@@ -96,12 +105,12 @@ is
       Wp_Load.Run;
       -- require_once dirname( __DIR__ ) . "/wp-load.php";
 
-      Inc_Functions.Nocache_Headers; -- ();
+      Nocache_Headers;
 
-      if "" /= Inc_Options.Get_Option ("db_upgraded") then
+      if "" /= Get_Option ("db_upgraded") then
 
          Inc_Rewrites.Flush_Rewrite_Rules; -- ();
-         Unused := Inc_Options.Update_Option ("db_upgraded", From_Boolean (False));
+         Unused := Update_Option ("db_upgraded", From_Boolean (False));
 
          --
          -- Fires on the next page load after a successful DB upgrade.
@@ -110,16 +119,14 @@ is
          --
          Do_Action ("after_db_upgrade");
 
-      elsif not Inc_Load.Wp_Doing_AJAX and then Empty (X_POST)
-        and then Inc_Options.Get_Option ("db_version") /= Inc_Versions.Wp_DB_Version
+      elsif not Wp_Doing_AJAX and then Empty (X_POST)
+        and then Get_Option ("db_version") /= Inc_Versions.Wp_DB_Version
       then
 
-         if not Inc_Load.Is_Multisite then
-            Inc_Pluggables.Wp_Redirect
-               (Inc_Link_Templates.Admin_URL
-                 ("upgrade.php?_wp_http_referer=" &
-                  Php.HTML.URL_Encode (Inc_Formatting.Wp_Unslash
-                                      (As_String (Get (X_SERVER, "REQUEST_URI"))))));
+         if not Is_Multisite then
+            Wp_Redirect (Admin_URL ("upgrade.php?_wp_http_referer=" &
+                         URL_Encode (Wp_Unslash
+                           (As_String (Get (X_SERVER, "REQUEST_URI"))))));
             return; -- exit;
          end if;
 
@@ -169,7 +176,7 @@ is
                      Response : Array_Type;
                   begin
                      Response := Inc_HTTP.Wp_Remote_Get (
-                        Inc_Link_Templates.Admin_URL ("upgrade.php?step=1"),
+                        Admin_URL ("upgrade.php?step=1"),
                            Arrays.To_Array ((
                               Build ("timeout",     120),
                               Build ("httpversion", "1.1")
@@ -187,7 +194,7 @@ is
 
 -- require_once ABSPATH . "wp-admin/includes/admin.php";
 
-      Inc_Pluggables.Auth_Redirect; -- ();
+      Auth_Redirect;
 
 --       -- Schedule Trash collection.
 --       if
@@ -234,14 +241,12 @@ is
          Page_Hook : Unbounded_String; -- = null;
          Unused    : Integer;
       begin
---    Editing := False;
-
          if Isset (XX_GET, "page") then
             Plugin_Page :=
-              +Slug_Type (Inc_Formatting.Wp_Unslash (As_String (Get (XX_GET, "page"))));
+              +Slug_Type (Wp_Unslash (As_String (Get (XX_GET, "page"))));
 
             Plugin_Page :=
-              +Slug_Type (Inc_Plugins.Plugin_Basename (String (-Plugin_Page)));
+              +Slug_Type (Plugin_Basename (String (-Plugin_Page)));
          end if;
 
          if
@@ -274,7 +279,7 @@ is
          end if;
 
          if Inc_Capabilities.Current_User_Can ("manage_options") then
-            Unused := Inc_Functions.Wp_Raise_Memory_Limit ("admin");
+            Unused := Wp_Raise_Memory_Limit ("admin");
          end if;
 
          --
@@ -322,9 +327,8 @@ is
                         else
                            Query_String := "page=" & Unbounded_String (Plugin_Page);
                         end if;
-                        Inc_Pluggables.Wp_Redirect
-                           (Inc_Link_Templates.Admin_URL
-                              ("tools.php?" & (-Query_String)));
+                        Wp_Redirect
+                           (Admin_URL ("tools.php?" & (-Query_String)));
                      end;
                      return; -- exit;
                   end if;
@@ -350,19 +354,21 @@ is
                --
                -- Fires before a particular screen is loaded.
                --
-               -- The load-* hook fires in a number of contexts. This hook is for plugin
-               -- screens where a callback is provided when the screen is registered.
+               -- The load-* hook fires in a number of contexts. This hook is for
+               -- plugin screens where a callback is provided when the screen is
+               -- registered.
                --
-               -- The dynamic portion of the hook name, `page_hook`, refers to a mixture
-               -- of plugin page information including:
+               -- The dynamic portion of the hook name, `page_hook`, refers to a
+               -- mixture of plugin page information including:
                -- 1. The page type. If the plugin page is registered as a submenu page,
                --    such as for Settings, the page type would be "settings". Otherwise
                --    the type is "toplevel".
                -- 2. A separator of "_page_".
                -- 3. The plugin basename minus the file extension.
                --
-               -- Together, the three parts form the `page_hook`. Citing the example above,
-               -- the hook name used would be "load-settings_page_pluginbasename".
+               -- Together, the three parts form the `page_hook`. Citing the example
+               -- above, the hook name used would be
+               -- "load-settings_page_pluginbasename".
                --
                -- @see get_plugin_page_hook()
                --
@@ -395,28 +401,28 @@ is
                --
                Do_Action (-Page_Hook);
             else
-               if Inc_Functions.Validate_File (String (-Plugin_Page)) /= 0 then
-                  Inc_Functions.Wp_Die (abs  "Invalid plugin page.");
+               if Validate_File (String (-Plugin_Page)) /= 0 then
+                  Wp_Die (abs  "Invalid plugin page.");
                end if;
 
                if
-                 not (Php.Files.File_Exists (-WP_PLUGIN_DIR & "/plugin_page") and then
-                 Php.Files.Is_File (-WP_PLUGIN_DIR & "/plugin_page")) and then
-                 not (Php.Files.File_Exists (-WPMU_PLUGIN_DIR & "/plugin_page") and then
-                 Php.Files.Is_File (-WPMU_PLUGIN_DIR & "/plugin_page"))
+                 not (File_Exists (-WP_PLUGIN_DIR & "/plugin_page") and then
+                 Is_File (-WP_PLUGIN_DIR & "/plugin_page")) and then
+                 not (File_Exists (-WPMU_PLUGIN_DIR & "/plugin_page") and then
+                 Is_File (-WPMU_PLUGIN_DIR & "/plugin_page"))
                then
                   -- translators: %s: Admin page generated by a plugin.
-                  Inc_Functions.Wp_Die
-                    (Php.Strings.Sprintf (abs "Cannot load %s.",
-                                  To_List (Php.HTML.HTML_Entities (String (-Plugin_Page)))));
+                  Wp_Die
+                    (Sprintf (abs "Cannot load %s.",
+                              To_List (HTML_Entities (String (-Plugin_Page)))));
                end if;
 
                --
                -- Fires before a particular screen is loaded.
                --
-               -- The load-* hook fires in a number of contexts. This hook is for plugin
-               -- screens where the file to load is directly included, rather than the
-               -- use of a function.
+               -- The load-* hook fires in a number of contexts. This hook is for
+               -- plugin screens where the file to load is directly included, rather
+               -- than the use of a function.
                --
                -- The dynamic portion of the hook name, `plugin_page`, refers to the
                -- plugin basename.
@@ -426,7 +432,6 @@ is
                -- @since 1.5.0
                --
                Do_Action ("load-" & String (-Plugin_Page));
-               -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
                -- if not Isset (SX_GET ("noheader")) then
                --    require_once ABSPATH . "wp-admin/admin-header.php";
@@ -448,13 +453,12 @@ is
                Importer : constant String := As_String (Get (XX_GET, "import"));
             begin
                if not Inc_Capabilities.Current_User_Can ("import") then
-                  Inc_Functions.Wp_Die
-                    (abs  "Sorry, you are not allowed to import content into this site.");
+                  Wp_Die (abs "Sorry, you are not allowed to import content into this site.");
                end if;
 
-               if Inc_Functions.Validate_File (Importer) /= 0 then
-                  Inc_Pluggables.Wp_Redirect
-                     (Inc_Link_Templates.Admin_URL ("import.php?invalid=" & Importer));
+               if Validate_File (Importer) /= 0 then
+                  Wp_Redirect
+                     (Admin_URL ("import.php?invalid=" & Importer));
                   return; -- exit;
                end if;
 
@@ -462,8 +466,8 @@ is
 --               not Isset (Wp_Importers (Importer)) -- or else
 --               not Is_Callable (Wp_Importers (Importer) (2))
                then
-                  Inc_Pluggables.Wp_Redirect
-                     (Inc_Link_Templates.Admin_URL ("import.php?invalid=" & Importer));
+                  Wp_Redirect
+                     (Admin_URL ("import.php?invalid=" & Importer));
                   return; -- exit;
                end if;
 
@@ -486,7 +490,6 @@ is
                -- @since 3.5.0
                --
                Do_Action ("load-importer-" & Importer);
-               -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
                -- Used in the HTML title tag.
                Title        := +abs "Import";
@@ -513,7 +516,8 @@ is
                --                   Default false.
                --
                if Apply_Filters ("force_filtered_html_on_import", False) then
---                Kses_Init_Filters; -- () -- Always filter imported data with kses on multisite.
+--                Kses_Init_Filters; -- ()
+                  -- Always filter imported data with kses on multisite.
                   null;
                end if;
 
@@ -549,22 +553,22 @@ is
             if "page" = Typenow then
                if "post-new.php" = Pagenow then
                   Do_Action ("load-page-new.php");
-                  -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
                elsif "post.php" = Pagenow then
                   Do_Action ("load-page.php");
-                  -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
                end if;
             elsif "edit-tags.php" = Pagenow then
                if "category" = Taxnow then
                   Do_Action ("load-categories.php");
-                  -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
                elsif "link_category" = Taxnow then
                   Do_Action ("load-edit-link-categories.php");
-                  -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
                end if;
             elsif "term.php" = Pagenow then
                Do_Action ("load-edit-tags.php");
-               -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+
             end if;
          end if;
       end;
