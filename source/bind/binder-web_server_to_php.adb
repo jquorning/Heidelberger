@@ -3,7 +3,6 @@
 --
 
 with Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with AWS.Status;
 
