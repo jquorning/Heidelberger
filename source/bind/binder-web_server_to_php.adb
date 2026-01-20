@@ -4,7 +4,12 @@
 
 with Ada.Strings.Fixed;
 
+with Php.Strings;
+
+with Lists;
+
 with AWS.Status;
+with AWS.URL;
 
 separate (Binder)
 procedure Web_Server_To_PHP (Status : AWS.Status.Data)
@@ -32,4 +37,32 @@ begin
    Set (X_SERVER, "REQUEST_URI",     From_String (Request_URI));
    -- "/edit.php"));
    Set (X_SERVER, "HTTP_HOST",       From_String ("XXX-902"));
+
+   XX_GET := Empty_Array;
+   declare
+      use Php.Strings;
+      use AWS.URL;
+      use Lists;
+
+      Obj              : constant Object := Parse (URL => URL (Status));
+      Parameter_List_2 : constant String := Parameters (Obj);
+      Parameter_List   : constant String := Ltrim (Parameter_List_2, "?");
+      List             : constant List_Type := Explode ("&", Parameter_List);
+   begin
+      for A of List loop
+         declare
+            KV : constant List_Type := Explode ("=", -A);
+            First : constant String := -KV (1);
+         begin
+            if KV.Length in 2 then
+               XX_GET.Append (Key   => First,
+                              Value => From_String (-KV (2)));
+            else
+               XX_GET.Append (Key   => First,
+                              Value => From_String (""));
+            end if;
+         end;
+      end loop;
+   end;
+
 end Web_Server_To_PHP;
