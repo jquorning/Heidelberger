@@ -147,7 +147,7 @@ is
            Subject (Subject'First .. Pos - 1) &
            Replace &
            Str_Replace (Search, Replace,
-                        Subject => Subject (Pos + Subject'Length .. Subject'Last));
+                        Subject => Subject (Pos + Search'Length .. Subject'Last));
       end if;
    end Str_Replace;
 
@@ -606,11 +606,19 @@ is
    function Strip_Slashes (Item : String)
                           return String
    is
-      use Ada.Text_IO;
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
+
+      Result : Unbounded_String;
    begin
-      Put_Line ("strip_slashes: not implemented");
-      Put_Line ("  item: " & Item);
-      return Item;
+      for A of Item loop
+         if A = '/' then
+            null;
+         else
+            Append (Result, A);
+         end if;
+      end loop;
+      return -Result;
    end Strip_Slashes;
 
    ------------
