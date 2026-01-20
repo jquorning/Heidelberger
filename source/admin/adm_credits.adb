@@ -18,6 +18,8 @@ with GNATCOLL.JSON;
 with Templates_Parser;
 
 with Adi_Credits;
+with Adm_Admin;
+with Adm_Admin_Header;
 with Inc_General_Templates;
 with Inc_L10n;
 
@@ -45,10 +47,16 @@ is
       List : constant List_Type :=
          Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
 
+      Admin_Header    : Unbounded_String;
       Display_Version : constant String     := -List.First_Element;
-      Credits         : constant JSON_Value := Adi_Credits.Wp_Credits; -- ()
+      Credits         : constant JSON_Value := Adi_Credits.Wp_Credits;
    begin
       Globals.Title := +abs "Credits";
+
+      Adm_Admin.Run;
+      Clear_Echo;
+      Adm_Admin_Header.Run;
+      Admin_Header := +Get_Echo;
 
       declare
          use Templates_Parser;
@@ -93,6 +101,11 @@ is
                   To_List (Display_Version));
                Set ("VAR_credits_header", Get_Echo);
 
+            elsif Var_Name = "VAR_credits_secondary_menu" then
+               Clear_Echo;
+               Esc_Attr_E ("Secondary menu");
+               Set ("VAR_credits_secondary_menu", Get_Echo);
+
             elsif Var_Name = "VAR_credits_about" then
                Clear_Echo;
                X_E ("What&#8217;s New");
@@ -124,10 +137,20 @@ is
                   To_List (abs "https://wordpress.org/about/"));
                Set ("VAR_credits_created", Get_Echo);
 
+            elsif Var_Name = "VAR_credits_get_involved_1" then
+               Clear_Echo;
+               X_E ("Get involved in WordPress.");
+               Set ("VAR_credits_get_involved_1", Get_Echo);
+
             elsif Var_Name = "VAR_credits_see_your_name" then
                Clear_Echo;
                X_E ("Want to see your name in lights on this page?");
                Set ("VAR_credits_see_your_name", Get_Echo);
+
+            elsif Var_Name = "VAR_credits_get_involved_2" then
+               Clear_Echo;
+               X_E ("Get involved in WordPress.");
+               Set ("VAR_credits_get_involved_2", Get_Echo);
 
             elsif Var_Name = "VAR_credits_core_developers" then
                Clear_Echo;
@@ -153,6 +176,15 @@ is
                end;
                Set ("VAR_credits_props", Get_Echo);
 
+            elsif Var_Name = "VAR_credits_cond_validators" then
+               declare
+                  Cond : constant Boolean := True; -- ???
+--                  Isset_2 (Credits, "groups", "translators") or else
+--                  Isset_2 (Credits, "groups", "validators");
+               begin
+                  Set ("VAR_credits_cond_validators", Cond);
+               end;
+
             elsif Var_Name = "VAR_credits_validators" then
                Clear_Echo;
 
@@ -177,6 +209,9 @@ is
                   Wp_Credits_Section_List  (Credits, "libraries");
                end;
                Set ("VAR_credits_validators", Get_Echo);
+
+            else
+               raise Program_Error with "Unhandled var name: " & Var_Name;
             end if;
          end Value;
 
@@ -187,6 +222,7 @@ is
                                     Lazy_Tag => Lazy'Unchecked_Access);
       begin
          Clear_Echo;
+         Echo (-Admin_Header);
          Echo (-Payload);
       end;
    end Render;

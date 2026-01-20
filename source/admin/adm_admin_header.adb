@@ -63,7 +63,10 @@ is
       use Php.Strings;
       use Hb_Common;
       use Inc_Formatting;
+      use Inc_Functions_Wp_Scripts;
+      use Inc_Functions_Wp_Styles;
       use Inc_General_Templates;
+      use Inc_Link_Templates;
       use Inc_L10n;
       use Inc_Load;
       use Inc_Options;
@@ -191,17 +194,17 @@ is
 
       Echo ("<title>" & ESC_HTML (-Admin_Title) & "</title>" & NL);
 
-      Inc_Functions_Wp_Styles.Wp_Enqueue_Style ("colors");
+      Wp_Enqueue_Style ("colors");
 
-      Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("utils");
-      Inc_Functions_Wp_Scripts.Wp_Enqueue_Script ("svg-painter");
+      Wp_Enqueue_Script ("utils");
+      Wp_Enqueue_Script ("svg-painter");
 
       Admin_Body_Class := +Preg_Replace ("/[^a-z0-9_-]+/i", "-", -Globals.Hook_Suffix);
 
       Echo ("<script type=""text/javascript"">" & NL);
       Echo ("addLoadEvent = function(func){if(typeof jQuery!=='undefined')jQuery(function(){func();});else if(typeof wpOnload!=='function'){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}}" & NL);
       Echo ("var ajaxurl = '" &
-            ESC_JS (Inc_Link_Templates.Admin_URL ("admin-ajax.php", "relative")) &
+            ESC_JS (Admin_URL ("admin-ajax.php", "relative")) &
             "'," & NL);
       Echo ("        pagenow = '" &
             ESC_JS (-Globals.Current_Screen.Id) & "'," & NL);

@@ -126,7 +126,8 @@ is
          if not Is_Multisite then
             Wp_Redirect (Admin_URL ("upgrade.php?_wp_http_referer=" &
                          URL_Encode (Wp_Unslash
-                           (As_String (Get (X_SERVER, "REQUEST_URI"))))));
+                           (Get_As_String (X_SERVER, "REQUEST_URI")))));
+            raise Redirect_Signal;
             return; -- exit;
          end if;
 
