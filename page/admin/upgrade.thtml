@@ -10,13 +10,13 @@
 <body class="wp-core-ui">
 <p id="logo"><a href="@_VAR_upgrade_logo_@">@_VAR_upgrade_wordpress_@</a></p>
 
-@@IF@@ VAR_upgrade_cond_installed
+@@IF@@ @_VAR_upgrade_cond_installed_@
 
 <h1>@_VAR_upgrade_h1_not_required_@</h1>
 <p>@_VAR_upgrade_up_to_date_@</p>
 <p class="step"><a class="button button-large" href="@_VAR_upgrade_step_href_@/">@_VAR_upgrade_step_continue_@</a></p>
 
-@@ELSE_IF@@ VAR_upgrade_cond_not_compat
+@@ELSIF@@ @_VAR_upgrade_cond_not_compat_@
         @_VAR_upgrade_update_@
 @@ELSE@@
         @_VAR_upgrade_switch_step_@
