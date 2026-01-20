@@ -2489,8 +2489,8 @@ is
                   Transient_Timeout : constant String :=
                     "_site_transient_timeout_" & Transient;
 
-                  Timeout : constant Natural :=
-                    As_Integer (Get_Site_Option (Transient_Timeout));
+                  Timeout : constant Natural := 0; -- ???
+--                  As_Integer (Get_Site_Option (Transient_Timeout));
                begin
                   if 0 /= Timeout and then Timeout < Time then -- false =
                      Delete_Site_Option (Transient_Option);
