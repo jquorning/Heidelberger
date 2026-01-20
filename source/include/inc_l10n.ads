@@ -78,7 +78,7 @@ is
    --
    function Get_User_Locale (User : Integer := 0)
                              return String
-                             is ("da_DK");
+                             is ("en_US");
 
    --
    -- Determines the current locale desired for the request.

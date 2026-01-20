@@ -169,14 +169,11 @@ package body Inc_L10n is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Binder;
---    use Globals;
       use Hb_Common;
       use Inc_Formatting;
+      use Inc_Load;
       use Inc_Plugins;
 
-      Determined_Locale : Unbounded_String;
-      Wp_Lang           : Unbounded_String;
-   begin
       --
       -- Filters the locale for the current request prior to the default determination
       -- process.
@@ -189,55 +186,59 @@ package body Inc_L10n is
       -- @param string|null locale The locale to return and short-circuit. Default
       --                    null.
       --
-      Determined_Locale := +Apply_Filters ("pre_determine_locale", ""); -- null
-
+      Determined_Locale : constant String :=
+        Apply_Filters ("pre_determine_locale", ""); -- null
+   begin
       if
-        not Empty (-Determined_Locale) and then
-        Php.Types.Is_String (-Determined_Locale)
+        not Empty (Determined_Locale) and then
+        Php.Types.Is_String (Determined_Locale)
       then
-         return -Determined_Locale;
+         return Determined_Locale;
       end if;
 
-      Determined_Locale := +Get_Locale; -- ()
+      declare
+         Determined_Locale_2 : constant String :=
+           (if Is_Admin then Get_User_Locale
+            else             Get_Locale);
 
-      if Inc_Load.Is_Admin then
-         Determined_Locale := +Get_User_Locale; -- ()
-      end if;
+         Determined_Locale_3 : Unbounded_String := +Determined_Locale_2;
+      begin
+         if
+           Isset (XX_GET, "_locale") and then
+           "user" = As_String (Get (XX_GET, "_locale")) and then
+           Wp_Is_JSON_Request
+         then
+            Determined_Locale_3 := +Get_User_Locale;
+         end if;
 
-      if
-        Isset (XX_GET, "_locale") and then
-        "user" = As_String (Get (XX_GET, "_locale")) and then
-        Inc_Load.Wp_Is_JSON_Request
-      then
-         Determined_Locale := +Get_User_Locale;
-      end if;
+         declare
+            Wp_Lang : constant String :=
+              (if Isset (XX_GET, "wp_lang")  -- not Empty (XX_GET, "wp_lang")
+                 then Sanitize_Locale_Name
+                        (Wp_Unslash (Get_As_String (XX_GET, "wp_lang")))
+               elsif Isset (X_COOKIE, "wp_lang") -- not Empty (X_COOKIE, "wp_lang")
+                 then Sanitize_Locale_Name
+                        (Wp_Unslash (Get_As_String (X_COOKIE, "wp_lang")))
+               else "");
+         begin
+            if
+              not Empty (Wp_Lang) and then
+              not Empty (Globals.GLOBALS, "pagenow") and then
+              "wp-login.php" = As_String (Get (Globals.GLOBALS, "pagenow"))
+            then
+               Determined_Locale_3 := +Wp_Lang;
+            end if;
+         end;
 
-      Wp_Lang := +"";
-
-      if Isset (XX_GET, "wp_lang") then
---    if not Empty (XX_GET, "wp_lang") then
-         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (As_String (Get (XX_GET, "wp_lang"))));
-      elsif Isset (X_COOKIE, "wp_lang") then
---    elsif not Empty (X_COOKIE, "wp_lang") then
-         Wp_Lang := +Sanitize_Locale_Name (Wp_Unslash (As_String (Get (X_COOKIE, "wp_lang"))));
-      end if;
-
-      if
-        not Empty (-Wp_Lang) and then
-        not Empty (Globals.GLOBALS, "pagenow") and then
-        "wp-login.php" = As_String (Get (Globals.GLOBALS, "pagenow"))
-      then
-         Determined_Locale := Wp_Lang;
-      end if;
-
-      --
-      -- Filters the locale for the current request.
-      --
-      -- @since 5.0.0
-      --
-      -- @param string locale The locale.
-      --
-      return Apply_Filters ("determine_locale", -Determined_Locale);
+         --
+         -- Filters the locale for the current request.
+         --
+         -- @since 5.0.0
+         --
+         -- @param string locale The locale.
+         --
+         return Apply_Filters ("determine_locale", -Determined_Locale_3);
+      end;
    end Determine_Locale;
 
 -- --
