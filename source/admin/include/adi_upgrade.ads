@@ -551,241 +551,46 @@ is
 -- endif;
 
 -- if ( ! function_exists( "wp_upgrade" ) ) :
---         --
---         -- Runs WordPress Upgrade functions.
---         --
---         -- Upgrades the database if needed during a site update.
---         --
---         -- @since 2.1.0
---         --
---         -- @global int  wp_current_db_version The old (current) database version.
---         -- @global int  wp_db_version         The new database version.
---         -- @global wpdb wpdb                  WordPress database abstraction object.
---         --
---         function wp_upgrade() then
---                 global wp_current_db_version, wp_db_version, wpdb;
 
---                 wp_current_db_version = __get_option( "db_version" );
+   --
+   -- Runs WordPress Upgrade functions.
+   --
+   -- Upgrades the database if needed during a site update.
+   --
+   -- @since 2.1.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global int  wp_db_version         The new database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Wp_Upgrade;
 
---                 -- We are up to date. Nothing to do.
---                 if ( wp_db_version == wp_current_db_version ) then
---                         return;
---                 end;
-
---                 if ( ! is_blog_installed() ) then
---                         return;
---                 end;
-
---                 wp_check_mysql_version();
---                 wp_cache_flush();
---                 pre_schema_upgrade();
---                 make_db_current_silent();
---                 upgrade_all();
---                 if ( is_multisite() && is_main_site() ) then
---                         upgrade_network();
---                 end;
---                 wp_cache_flush();
-
---                 if ( is_multisite() ) then
---                         update_site_meta( get_current_blog_id(), "db_version", wp_db_version );
---                         update_site_meta( get_current_blog_id(), "db_last_updated", microtime() );
---                 end;
-
---                 --
---                 -- Fires after a site is fully upgraded.
---                 --
---                 -- @since 3.9.0
---                 --
---                 -- @param int wp_db_version         The new wp_db_version.
---                 -- @param int wp_current_db_version The old (current) wp_db_version.
---                 --
---                 do_action( "wp_upgrade", wp_db_version, wp_current_db_version );
---         end;
 -- endif;
 
--- --
--- -- Functions to be called in installation and upgrade scripts.
--- --
--- -- Contains conditional checks to determine which upgrade scripts to run,
--- -- based on database version and WP version being updated-to.
--- --
--- -- @ignore
--- -- @since 1.0.1
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- -- @global int wp_db_version         The new database version.
--- --
--- function upgrade_all() then
---         global wp_current_db_version, wp_db_version;
+   --
+   -- Functions to be called in installation and upgrade scripts.
+   --
+   -- Contains conditional checks to determine which upgrade scripts to run,
+   -- based on database version and WP version being updated-to.
+   --
+   -- @ignore
+   -- @since 1.0.1
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   -- @global int wp_db_version         The new database version.
+   --
+   procedure Upgrade_All;
 
---         wp_current_db_version = __get_option( "db_version" );
-
---         -- We are up to date. Nothing to do.
---         if ( wp_db_version == wp_current_db_version ) then
---                 return;
---         end;
-
---         -- If the version is not set in the DB, try to guess the version.
---         if ( empty( wp_current_db_version ) ) then
---                 wp_current_db_version = 0;
-
---                 -- If the template option exists, we have 1.5.
---                 template = __get_option( "template" );
---                 if ( ! empty( template ) ) then
---                         wp_current_db_version = 2541;
---                 end;
---         end;
-
---         if ( wp_current_db_version < 6039 ) then
---                 upgrade_230_options_table();
---         end;
-
---         populate_options();
-
---         if ( wp_current_db_version < 2541 ) then
---                 upgrade_100();
---                 upgrade_101();
---                 upgrade_110();
---                 upgrade_130();
---         end;
-
---         if ( wp_current_db_version < 3308 ) then
---                 upgrade_160();
---         end;
-
---         if ( wp_current_db_version < 4772 ) then
---                 upgrade_210();
---         end;
-
---         if ( wp_current_db_version < 4351 ) then
---                 upgrade_old_slugs();
---         end;
-
---         if ( wp_current_db_version < 5539 ) then
---                 upgrade_230();
---         end;
-
---         if ( wp_current_db_version < 6124 ) then
---                 upgrade_230_old_tables();
---         end;
-
---         if ( wp_current_db_version < 7499 ) then
---                 upgrade_250();
---         end;
-
---         if ( wp_current_db_version < 7935 ) then
---                 upgrade_252();
---         end;
-
---         if ( wp_current_db_version < 8201 ) then
---                 upgrade_260();
---         end;
-
---         if ( wp_current_db_version < 8989 ) then
---                 upgrade_270();
---         end;
-
---         if ( wp_current_db_version < 10360 ) then
---                 upgrade_280();
---         end;
-
---         if ( wp_current_db_version < 11958 ) then
---                 upgrade_290();
---         end;
-
---         if ( wp_current_db_version < 15260 ) then
---                 upgrade_300();
---         end;
-
---         if ( wp_current_db_version < 19389 ) then
---                 upgrade_330();
---         end;
-
---         if ( wp_current_db_version < 20080 ) then
---                 upgrade_340();
---         end;
-
---         if ( wp_current_db_version < 22422 ) then
---                 upgrade_350();
---         end;
-
---         if ( wp_current_db_version < 25824 ) then
---                 upgrade_370();
---         end;
-
---         if ( wp_current_db_version < 26148 ) then
---                 upgrade_372();
---         end;
-
---         if ( wp_current_db_version < 26691 ) then
---                 upgrade_380();
---         end;
-
---         if ( wp_current_db_version < 29630 ) then
---                 upgrade_400();
---         end;
-
---         if ( wp_current_db_version < 33055 ) then
---                 upgrade_430();
---         end;
-
---         if ( wp_current_db_version < 33056 ) then
---                 upgrade_431();
---         end;
-
---         if ( wp_current_db_version < 35700 ) then
---                 upgrade_440();
---         end;
-
---         if ( wp_current_db_version < 36686 ) then
---                 upgrade_450();
---         end;
-
---         if ( wp_current_db_version < 37965 ) then
---                 upgrade_460();
---         end;
-
---         if ( wp_current_db_version < 44719 ) then
---                 upgrade_510();
---         end;
-
---         if ( wp_current_db_version < 45744 ) then
---                 upgrade_530();
---         end;
-
---         if ( wp_current_db_version < 48575 ) then
---                 upgrade_550();
---         end;
-
---         if ( wp_current_db_version < 49752 ) then
---                 upgrade_560();
---         end;
-
---         if ( wp_current_db_version < 51917 ) then
---                 upgrade_590();
---         end;
-
---         if ( wp_current_db_version < 53011 ) then
---                 upgrade_600();
---         end;
-
---         maybe_disable_link_manager();
-
---         maybe_disable_automattic_widgets();
-
---         update_option( "db_version", wp_db_version );
---         update_option( "db_upgraded", true );
--- end;
-
--- --
--- -- Execute changes made in WordPress 1.0.
--- --
--- -- @ignore
--- -- @since 1.0.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_100() then
+   --
+   -- Execute changes made in WordPress 1.0.
+   --
+   -- @ignore
+   -- @since 1.0.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_100
+   is null;
 --         global wpdb;
 
 --         -- Get the title and ID of every post, post_name to check if it already has a value.
@@ -842,15 +647,16 @@ is
 --         endif;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 1.0.1.
--- --
--- -- @ignore
--- -- @since 1.0.1
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_101() then
+   --
+   -- Execute changes made in WordPress 1.0.1.
+   --
+   -- @ignore
+   -- @since 1.0.1
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_101
+   is null;
 --         global wpdb;
 
 --         -- Clean up indices, add a few.
@@ -863,15 +669,16 @@ is
 --         add_clean_index( wpdb->links, "link_visible" );
 -- end;
 
--- --
--- -- Execute changes made in WordPress 1.2.
--- --
--- -- @ignore
--- -- @since 1.2.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_110() then
+   --
+   -- Execute changes made in WordPress 1.2.
+   --
+   -- @ignore
+   -- @since 1.2.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_110
+   is null;
 --         global wpdb;
 
 --         -- Set user_nicename.
@@ -928,15 +735,16 @@ is
 
 -- end;
 
--- --
--- -- Execute changes made in WordPress 1.5.
--- --
--- -- @ignore
--- -- @since 1.5.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_130() then
+   --
+   -- Execute changes made in WordPress 1.5.
+   --
+   -- @ignore
+   -- @since 1.5.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_130
+   is null;
 --         global wpdb;
 
 --         -- Remove extraneous backslashes.
@@ -1016,16 +824,17 @@ is
 --         make_site_theme();
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.0.
--- --
--- -- @ignore
--- -- @since 2.0.0
--- --
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- -- @global int  wp_current_db_version The old (current) database version.
--- --
--- function upgrade_160() then
+   --
+   -- Execute changes made in WordPress 2.0.
+   --
+   -- @ignore
+   -- @since 2.0.0
+   --
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   -- @global int  wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_160
+   is null;
 --         global wpdb, wp_current_db_version;
 
 --         populate_roles_160();
@@ -1135,16 +944,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.1.
--- --
--- -- @ignore
--- -- @since 2.1.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_210() then
+   --
+   -- Execute changes made in WordPress 2.1.
+   --
+   -- @ignore
+   -- @since 2.1.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_210
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 3506 ) then
@@ -1187,16 +997,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.3.
--- --
--- -- @ignore
--- -- @since 2.3.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_230() then
+   --
+   -- Execute changes made in WordPress 2.3.
+   --
+   -- @ignore
+   -- @since 2.3.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_230
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 5200 ) then
@@ -1414,15 +1225,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Remove old options from the database.
--- --
--- -- @ignore
--- -- @since 2.3.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_230_options_table() then
+   --
+   -- Remove old options from the database.
+   --
+   -- @ignore
+   -- @since 2.3.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_230_Options_Table
+   is null;
 --         global wpdb;
 --         old_options_fields = array( "option_can_override", "option_type", "option_width", "option_height", "option_description", "option_admin_level" );
 --         wpdb->hide_errors();
@@ -1432,44 +1244,47 @@ is
 --         wpdb->show_errors();
 -- end;
 
--- --
--- -- Remove old categories, link2cat, and post2cat database tables.
--- --
--- -- @ignore
--- -- @since 2.3.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_230_old_tables() then
+   --
+   -- Remove old categories, link2cat, and post2cat database tables.
+   --
+   -- @ignore
+   -- @since 2.3.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_230_Old_Tables
+   is null;
 --         global wpdb;
 --         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "categories" );
 --         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "link2cat" );
 --         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "post2cat" );
 -- end;
 
--- --
--- -- Upgrade old slugs made in version 2.2.
--- --
--- -- @ignore
--- -- @since 2.2.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_old_slugs() then
+   --
+   -- Upgrade old slugs made in version 2.2.
+   --
+   -- @ignore
+   -- @since 2.2.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_Old_Slugs
+   is null;
 --         -- Upgrade people who were using the Redirect Old Slugs plugin.
 --         global wpdb;
 --         wpdb->query( "UPDATE wpdb->postmeta SET meta_key = "_wp_old_slug" WHERE meta_key = "old_slug"" );
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.5.0.
--- --
--- -- @ignore
--- -- @since 2.5.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_250() then
+   --
+   -- Execute changes made in WordPress 2.5.0.
+   --
+   -- @ignore
+   -- @since 2.5.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_250
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 6689 ) then
@@ -1478,29 +1293,31 @@ is
 
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.5.2.
--- --
--- -- @ignore
--- -- @since 2.5.2
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_252() then
+   --
+   -- Execute changes made in WordPress 2.5.2.
+   --
+   -- @ignore
+   -- @since 2.5.2
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_252
+   is null;
 --         global wpdb;
 
 --         wpdb->query( "UPDATE wpdb->users SET user_activation_key = """ );
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.6.
--- --
--- -- @ignore
--- -- @since 2.6.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_260() then
+   --
+   -- Execute changes made in WordPress 2.6.
+   --
+   -- @ignore
+   -- @since 2.6.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_260
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 8000 ) then
@@ -1508,16 +1325,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.7.
--- --
--- -- @ignore
--- -- @since 2.7.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_270() then
+   --
+   -- Execute changes made in WordPress 2.7.
+   --
+   -- @ignore
+   -- @since 2.7.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_270
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 8980 ) then
@@ -1530,16 +1348,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.8.
--- --
--- -- @ignore
--- -- @since 2.8.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_280() then
+   --
+   -- Execute changes made in WordPress 2.8.
+   --
+   -- @ignore
+   -- @since 2.8.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_280
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 10360 ) then
@@ -1563,15 +1382,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 2.9.
--- --
--- -- @ignore
--- -- @since 2.9.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_290() then
+   --
+   -- Execute changes made in WordPress 2.9.
+   --
+   -- @ignore
+   -- @since 2.9.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_290
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 11958 ) then
@@ -1584,16 +1404,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.0.
--- --
--- -- @ignore
--- -- @since 3.0.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_300() then
+   --
+   -- Execute changes made in WordPress 3.0.
+   --
+   -- @ignore
+   -- @since 3.0.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_300
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 15093 ) then
@@ -1635,18 +1456,19 @@ is
 
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.3.
--- --
--- -- @ignore
--- -- @since 3.3.0
--- --
--- -- @global int   wp_current_db_version The old (current) database version.
--- -- @global wpdb  wpdb                  WordPress database abstraction object.
--- -- @global array wp_registered_widgets
--- -- @global array sidebars_widgets
--- --
--- function upgrade_330() then
+   --
+   -- Execute changes made in WordPress 3.3.
+   --
+   -- @ignore
+   -- @since 3.3.0
+   --
+   -- @global int   wp_current_db_version The old (current) database version.
+   -- @global wpdb  wpdb                  WordPress database abstraction object.
+   -- @global array wp_registered_widgets
+   -- @global array sidebars_widgets
+   --
+   procedure Upgrade_330
+   is null;
 --         global wp_current_db_version, wpdb, wp_registered_widgets, sidebars_widgets;
 
 --         if ( wp_current_db_version < 19061 && wp_should_upgrade_global_tables() ) then
@@ -1716,16 +1538,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.4.
--- --
--- -- @ignore
--- -- @since 3.4.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_340() then
+   --
+   -- Execute changes made in WordPress 3.4.
+   --
+   -- @ignore
+   -- @since 3.4.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_340
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 19798 ) then
@@ -1753,16 +1576,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.5.
--- --
--- -- @ignore
--- -- @since 3.5.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_350() then
+   --
+   -- Execute changes made in WordPress 3.5.
+   --
+   -- @ignore
+   -- @since 3.5.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_350
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 22006 && wpdb->get_var( "SELECT link_id FROM wpdb->links LIMIT 1" ) ) then
@@ -1790,15 +1614,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.7.
--- --
--- -- @ignore
--- -- @since 3.7.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_370() then
+   --
+   -- Execute changes made in WordPress 3.7.
+   --
+   -- @ignore
+   -- @since 3.7.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_370
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 25824 ) then
@@ -1806,15 +1631,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.7.2.
--- --
--- -- @ignore
--- -- @since 3.7.2
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_372() then
+   --
+   -- Execute changes made in WordPress 3.7.2.
+   --
+   -- @ignore
+   -- @since 3.7.2
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_372
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 26148 ) then
@@ -1822,15 +1648,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 3.8.0.
--- --
--- -- @ignore
--- -- @since 3.8.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_380() then
+   --
+   -- Execute changes made in WordPress 3.8.0.
+   --
+   -- @ignore
+   -- @since 3.8.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_380
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 26691 ) then
@@ -1838,15 +1665,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 4.0.0.
--- --
--- -- @ignore
--- -- @since 4.0.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_400() then
+   --
+   -- Execute changes made in WordPress 4.0.0.
+   --
+   -- @ignore
+   -- @since 4.0.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_400
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 29630 ) then
@@ -1860,24 +1688,26 @@ is
 --         end;
 -- end;
 
--- --
--- -- Execute changes made in WordPress 4.2.0.
--- --
--- -- @ignore
--- -- @since 4.2.0
--- --
--- function upgrade_420() thenend;
+   --
+   -- Execute changes made in WordPress 4.2.0.
+   --
+   -- @ignore
+   -- @since 4.2.0
+   --
+   procedure Upgrade_420
+   is null; -- For real -- jq
 
--- --
--- -- Executes changes made in WordPress 4.3.0.
--- --
--- -- @ignore
--- -- @since 4.3.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_430() then
+   --
+   -- Executes changes made in WordPress 4.3.0.
+   --
+   -- @ignore
+   -- @since 4.3.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_430
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 32364 ) then
@@ -1907,15 +1737,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes comments changes made in WordPress 4.3.0.
--- --
--- -- @ignore
--- -- @since 4.3.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- function upgrade_430_fix_comments() then
+   --
+   -- Executes comments changes made in WordPress 4.3.0.
+   --
+   -- @ignore
+   -- @since 4.3.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   procedure Upgrade_430_Fix_Comments
+   is null;
 --         global wpdb;
 
 --         content_length = wpdb->get_col_length( wpdb->comments, "comment_content" );
@@ -1956,13 +1787,14 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 4.3.1.
--- --
--- -- @ignore
--- -- @since 4.3.1
--- --
--- function upgrade_431() then
+   --
+   -- Executes changes made in WordPress 4.3.1.
+   --
+   -- @ignore
+   -- @since 4.3.1
+   --
+   procedure Upgrade_431
+   is null;
 --         -- Fix incorrect cron entries for term splitting.
 --         cron_array = _get_cron_array();
 --         if ( isset( cron_array["wp_batch_split_terms"] ) ) then
@@ -1971,16 +1803,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 4.4.0.
--- --
--- -- @ignore
--- -- @since 4.4.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_440() then
+   --
+   -- Executes changes made in WordPress 4.4.0.
+   --
+   -- @ignore
+   -- @since 4.4.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_440
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 34030 ) then
@@ -1996,16 +1829,17 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 4.5.0.
--- --
--- -- @ignore
--- -- @since 4.5.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_450() then
+   --
+   -- Executes changes made in WordPress 4.5.0.
+   --
+   -- @ignore
+   -- @since 4.5.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_450
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 36180 ) then
@@ -2021,15 +1855,16 @@ is
 --         delete_user_setting( "wplink" );
 -- end;
 
--- --
--- -- Executes changes made in WordPress 4.6.0.
--- --
--- -- @ignore
--- -- @since 4.6.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_460() then
+   --
+   -- Executes changes made in WordPress 4.6.0.
+   --
+   -- @ignore
+   -- @since 4.6.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_460
+   is null;
 --         global wp_current_db_version;
 
 --         -- Remove unused post meta.
@@ -2053,33 +1888,35 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 5.0.0.
--- --
--- -- @ignore
--- -- @since 5.0.0
--- -- @deprecated 5.1.0
--- --
--- function upgrade_500() then
--- end;
+   --
+   -- Executes changes made in WordPress 5.0.0.
+   --
+   -- @ignore
+   -- @since 5.0.0
+   -- @deprecated 5.1.0
+   --
+   procedure Upgrade_500
+   is null; -- For real -- jq
 
--- --
--- -- Executes changes made in WordPress 5.1.0.
--- --
--- -- @ignore
--- -- @since 5.1.0
--- --
--- function upgrade_510() then
+   --
+   -- Executes changes made in WordPress 5.1.0.
+   --
+   -- @ignore
+   -- @since 5.1.0
+   --
+   procedure Upgrade_510
+   is null;
 --         delete_site_option( "upgrade_500_was_gutenberg_active" );
 -- end;
 
--- --
--- -- Executes changes made in WordPress 5.3.0.
--- --
--- -- @ignore
--- -- @since 5.3.0
--- --
--- function upgrade_530() then
+   --
+   -- Executes changes made in WordPress 5.3.0.
+   --
+   -- @ignore
+   -- @since 5.3.0
+   --
+   procedure Upgrade_530
+   is null;
 --         /*
 --         -- The `admin_email_lifespan` option may have been set by an admin that just logged in,
 --         -- saw the verification screen, clicked on a button there, and is now upgrading the db,
@@ -2092,13 +1929,14 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 5.5.0.
--- --
--- -- @ignore
--- -- @since 5.5.0
--- --
--- function upgrade_550() then
+   --
+   -- Executes changes made in WordPress 5.5.0.
+   --
+   -- @ignore
+   -- @since 5.5.0
+   --
+   procedure Upgrade_550
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 48121 ) then
@@ -2130,13 +1968,14 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 5.6.0.
--- --
--- -- @ignore
--- -- @since 5.6.0
--- --
--- function upgrade_560() then
+   --
+   -- Executes changes made in WordPress 5.6.0.
+   --
+   -- @ignore
+   -- @since 5.6.0
+   --
+   procedure Upgrade_560
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         if ( wp_current_db_version < 49572 ) then
@@ -2184,15 +2023,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 5.9.0.
--- --
--- -- @ignore
--- -- @since 5.9.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_590() then
+   --
+   -- Executes changes made in WordPress 5.9.0.
+   --
+   -- @ignore
+   -- @since 5.9.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_590
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 51917 ) then
@@ -2206,15 +2046,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes changes made in WordPress 6.0.0.
--- --
--- -- @ignore
--- -- @since 6.0.0
--- --
--- -- @global int wp_current_db_version The old (current) database version.
--- --
--- function upgrade_600() then
+   --
+   -- Executes changes made in WordPress 6.0.0.
+   --
+   -- @ignore
+   -- @since 6.0.0
+   --
+   -- @global int wp_current_db_version The old (current) database version.
+   --
+   procedure Upgrade_600
+   is null;
 --         global wp_current_db_version;
 
 --         if ( wp_current_db_version < 53011 ) then
@@ -2222,15 +2063,16 @@ is
 --         end;
 -- end;
 
--- --
--- -- Executes network-level upgrade routines.
--- --
--- -- @since 3.0.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function upgrade_network() then
+   --
+   -- Executes network-level upgrade routines.
+   --
+   -- @since 3.0.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Upgrade_Network
+   is null;
 --         global wp_current_db_version, wpdb;
 
 --         -- Always clear expired transients.
@@ -2495,17 +2337,18 @@ is
 --         return false;
 -- end;
 
--- --
--- -- If a table only contains utf8 or utf8mb4 columns, convert it to utf8mb4.
--- --
--- -- @since 4.2.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param string table The table to convert.
--- -- @return bool True if the table was converted, false if it wasn"t.
--- --
--- function maybe_convert_table_to_utf8mb4( table ) then
+   --
+   -- If a table only contains utf8 or utf8mb4 columns, convert it to utf8mb4.
+   --
+   -- @since 4.2.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @param string table The table to convert.
+   -- @return bool True if the table was converted, false if it wasn't.
+   --
+   procedure Maybe_Convert_Table_To_Utf8mb4 (Table : String)
+   is null;
 --         global wpdb;
 
 --         results = wpdb->get_results( "SHOW FULL COLUMNS FROM `table`" );
@@ -2923,100 +2766,33 @@ is
    --
    procedure Wp_Check_MySQL_Version;
 
--- --
--- -- Disables the Automattic widgets plugin, which was merged into core.
--- --
--- -- @since 2.2.0
--- --
--- function maybe_disable_automattic_widgets() then
---         plugins = __get_option( "active_plugins" );
+   --
+   -- Disables the Automattic widgets plugin, which was merged into core.
+   --
+   -- @since 2.2.0
+   --
+   procedure Maybe_Disable_Automattic_Widgets;
 
---         foreach ( (array) plugins as plugin ) then
---                 if ( "widgets.php" === basename( plugin ) ) then
---                         array_splice( plugins, array_search( plugin, plugins, true ), 1 );
---                         update_option( "active_plugins", plugins );
---                         break;
---                 end;
---         end;
--- end;
+   --
+   -- Disables the Link Manager on upgrade if, at the time of upgrade, no links exist
+   -- in the DB.
+   --
+   -- @since 3.5.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Maybe_Disable_Link_Manager;
 
--- --
--- -- Disables the Link Manager on upgrade if, at the time of upgrade, no links exist in the DB.
--- --
--- -- @since 3.5.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function maybe_disable_link_manager() then
---         global wp_current_db_version, wpdb;
-
---         if ( wp_current_db_version >= 22006 && get_option( "link_manager_enabled" ) && ! wpdb->get_var( "SELECT link_id FROM wpdb->links LIMIT 1" ) ) then
---                 update_option( "link_manager_enabled", 0 );
---         end;
--- end;
-
--- --
--- -- Runs before the schema is upgraded.
--- --
--- -- @since 2.9.0
--- --
--- -- @global int  wp_current_db_version The old (current) database version.
--- -- @global wpdb wpdb                  WordPress database abstraction object.
--- --
--- function pre_schema_upgrade() then
---         global wp_current_db_version, wpdb;
-
---         -- Upgrade versions prior to 2.9.
---         if ( wp_current_db_version < 11557 ) then
---                 -- Delete duplicate options. Keep the option with the highest option_id.
---                 wpdb->query( "DELETE o1 FROM wpdb->options AS o1 JOIN wpdb->options AS o2 USING (`option_name`) WHERE o2.option_id > o1.option_id" );
-
---                 -- Drop the old primary key and add the new.
---                 wpdb->query( "ALTER TABLE wpdb->options DROP PRIMARY KEY, ADD PRIMARY KEY(option_id)" );
-
---                 -- Drop the old option_name index. dbDelta() Doesn't do the drop.
---                 wpdb->query( "ALTER TABLE wpdb->options DROP INDEX option_name" );
---         end;
-
---         -- Multisite schema upgrades.
---         if ( wp_current_db_version < 25448 && is_multisite() && wp_should_upgrade_global_tables() ) then
-
---                 -- Upgrade versions prior to 3.7.
---                 if ( wp_current_db_version < 25179 ) then
---                         -- New primary key for signups.
---                         wpdb->query( "ALTER TABLE wpdb->signups ADD signup_id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST" );
---                         wpdb->query( "ALTER TABLE wpdb->signups DROP INDEX domain" );
---                 end;
-
---                 if ( wp_current_db_version < 25448 ) then
---                         -- Convert archived from enum to tinyint.
---                         wpdb->query( "ALTER TABLE wpdb->blogs CHANGE COLUMN archived archived varchar(1) NOT NULL default "0"" );
---                         wpdb->query( "ALTER TABLE wpdb->blogs CHANGE COLUMN archived archived tinyint(2) NOT NULL default 0" );
---                 end;
---         end;
-
---         -- Upgrade versions prior to 4.2.
---         if ( wp_current_db_version < 31351 ) then
---                 if ( ! is_multisite() && wp_should_upgrade_global_tables() ) then
---                         wpdb->query( "ALTER TABLE wpdb->usermeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))" );
---                 end;
---                 wpdb->query( "ALTER TABLE wpdb->terms DROP INDEX slug, ADD INDEX slug(slug(191))" );
---                 wpdb->query( "ALTER TABLE wpdb->terms DROP INDEX name, ADD INDEX name(name(191))" );
---                 wpdb->query( "ALTER TABLE wpdb->commentmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))" );
---                 wpdb->query( "ALTER TABLE wpdb->postmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))" );
---                 wpdb->query( "ALTER TABLE wpdb->posts DROP INDEX post_name, ADD INDEX post_name(post_name(191))" );
---         end;
-
---         -- Upgrade versions prior to 4.4.
---         if ( wp_current_db_version < 34978 ) then
---                 -- If compatible termmeta table is found, use it, but enforce a proper index and update collation.
---                 if ( wpdb->get_var( "SHOW TABLES LIKE "thenwpdb->termmetaend;"" ) && wpdb->get_results( "SHOW INDEX FROM thenwpdb->termmetaend; WHERE Column_name = "meta_key"" ) ) then
---                         wpdb->query( "ALTER TABLE wpdb->termmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))" );
---                         maybe_convert_table_to_utf8mb4( wpdb->termmeta );
---                 end;
---         end;
--- end;
+   --
+   -- Runs before the schema is upgraded.
+   --
+   -- @since 2.9.0
+   --
+   -- @global int  wp_current_db_version The old (current) database version.
+   -- @global wpdb wpdb                  WordPress database abstraction object.
+   --
+   procedure Pre_Schema_Upgrade;
 
    --
    -- Determine if global tables should be upgraded.

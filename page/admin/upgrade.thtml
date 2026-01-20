@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html @_VAR_upgrade_language_attributes_@>
+<head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="@_VAR_upgrade_bloginfo_@; charset=@_VAR_upgrade_charset_@" />
+        <meta name="robots" content="noindex,nofollow" />
+        <title>@_VAR_upgrade_title_@</title>
+        @_VAR_upgrade_admin_css_@
+</head>
+<body class="wp-core-ui">
+<p id="logo"><a href="@_VAR_upgrade_logo_@">@_VAR_upgrade_wordpress_@</a></p>
+
+@@IF@@ VAR_upgrade_cond_installed
+
+<h1>@_VAR_upgrade_h1_not_required_@</h1>
+<p>@_VAR_upgrade_up_to_date_@</p>
+<p class="step"><a class="button button-large" href="@_VAR_upgrade_step_href_@/">@_VAR_upgrade_step_continue_@</a></p>
+
+@@ELSE_IF@@ VAR_upgrade_cond_not_compat
+        @_VAR_upgrade_update_@
+@@ELSE@@
+        @_VAR_upgrade_switch_step_@
+@@END_IF@@
+</body>
+</html>

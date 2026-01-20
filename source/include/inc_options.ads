@@ -336,6 +336,16 @@ is
                                    return Boolean;
 
    --
+   -- Deletes a site transient.
+   --
+   -- @since 2.9.0
+   --
+   -- @param string transient Transient name. Expected to not be SQL-escaped.
+   -- @return bool True if the transient was deleted, false otherwise.
+   --
+   procedure Delete_Site_Transient (Transient : String);
+
+   --
    -- Updates the value of an option that was already added.
    --
    -- You do not need to serialize values. If the value needs to be serialized,

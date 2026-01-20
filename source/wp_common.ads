@@ -440,6 +440,11 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
+                        Version_1 : Integer;
+                        Version_2 : Integer)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
                         Cookie    : Array_Type;
                         User      : Inc_Class_Wp_Users.Wp_User)
                         is null;

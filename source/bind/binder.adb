@@ -24,6 +24,7 @@ with Adm_Load_Styles;
 -- with Adm_Nav_Menus;
 with Adm_Post;
 with Adm_Privacy;
+with Adm_Upgrade;
 
 with Inc_Plugins;
 
@@ -93,6 +94,9 @@ is
 
       elsif Index (URL, "/wp-admin/load-styles.php") /= 0 then
          Adm_Load_Styles.Run;
+
+      elsif Index (URL, "/wp-admin/upgrade.php") /= 0 then
+         Adm_Upgrade.Render;
 
       end if;
 

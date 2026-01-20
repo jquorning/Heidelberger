@@ -2369,53 +2369,63 @@ is
       return False;
    end Update_Network_Option;
 
--- --
--- -- Deletes a site transient.
--- --
--- -- @since 2.9.0
--- --
--- -- @param string transient Transient name. Expected to not be SQL-escaped.
--- -- @return bool True if the transient was deleted, false otherwise.
--- --
--- function delete_site_transient( transient ) then
+   ---------------------------
+   -- Delete_Site_Transient --
+   ---------------------------
 
---         --
---         -- Fires immediately before a specific site transient is deleted.
---         --
---         -- The dynamic portion of the hook name, `transient`, refers to the transient name.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string transient Transient name.
---         --
---         do_action( "delete_site_transient_thentransientend;", transient );
+   procedure Delete_Site_Transient (Transient : String)
+   is
+      use Inc_Caches;
+      use Inc_Load;
+      use Inc_Plugins;
 
---         if ( wp_using_ext_object_cache() || wp_installing() ) then
---                 result = wp_cache_delete( transient, "site-transient" );
---         end; else then
---                 option_timeout = "_site_transient_timeout_" . transient;
---                 option         = "_site_transient_" . transient;
---                 result         = delete_site_option( option );
+      Result : Boolean;
+   begin
+      --
+      -- Fires immediately before a specific site transient is deleted.
+      --
+      -- The dynamic portion of the hook name, `transient`, refers to the transient
+      -- name.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string transient Transient name.
+      --
+      Do_Action ("delete_site_transient_" & Transient, Transient);
 
---                 if ( result ) then
---                         delete_site_option( option_timeout );
---                 end;
---         end;
+      if
+        Wp_Using_Ext_Object_Cache or else
+        Wp_Installing
+      then
+         Result := Wp_Cache_Delete (Transient, "site-transient");
+      else
+         declare
+            Option_Timeout : constant String :=
+              "_site_transient_timeout_" & Transient;
 
---         if ( result ) then
+            Option : constant String := "_site_transient_" & Transient;
+         begin
+            Result := Delete_Site_Option (Option);
 
---                 --
---                 -- Fires after a transient is deleted.
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string transient Deleted transient name.
---                 --
---                 do_action( "deleted_site_transient", transient );
---         end;
+            if Result then
+               Delete_Site_Option (Option_Timeout);
+            end if;
+         end;
+      end if;
 
---         return result;
--- end;
+      if Result then
+         --
+         -- Fires after a transient is deleted.
+         --
+         -- @since 3.0.0
+         --
+         -- @param string transient Deleted transient name.
+         --
+         Do_Action ("deleted_site_transient", Transient);
+      end if;
+
+--    return Result;
+   end Delete_Site_Transient;
 
 -- --
 -- -- Retrieves the value of a site transient.

@@ -94,6 +94,7 @@ is
 
    function MySQL_Get_Server_Info (Dbh : Integer)
                                    return String
-   is (raise Program_Error with "not implemented");
+                                   is ("");
+-- is (raise Program_Error with "not implemented");
 
 end MySQL_Bind;

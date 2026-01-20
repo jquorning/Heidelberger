@@ -322,12 +322,26 @@ is
    -- Wp_Cache_Delete --
    ---------------------
 
+   function Wp_Cache_Delete (Key   : String;
+                             Group : String := "")
+                             return Boolean
+   is
+      Done : Boolean;
+   begin
+      Global_Wp_Object_Cache.Delete (Key, Group, Done => Done);
+      return Done;
+   end Wp_Cache_Delete;
+
+   ---------------------
+   -- Wp_Cache_Delete --
+   ---------------------
+
    procedure Wp_Cache_Delete (Key   : String;
                               Group : String := "")
    is
-      Unused_Done : Boolean;
+      Unused_Done : constant Boolean := Wp_Cache_Delete (Key, Group);
    begin
-      Global_Wp_Object_Cache.Delete (Key, Group, Done => Unused_Done);
+      null;
    end Wp_Cache_Delete;
 
 -- --

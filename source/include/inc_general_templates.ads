@@ -496,7 +496,7 @@ is
    -- Enqueues or directly prints a stylesheet link to the specified CSS file.
    --
    -- "Intelligently" decides to enqueue or to print the CSS file. If the
-   -- {@see "wp_print_styles"} action has--not* yet been called, the CSS file will be
+   -- {@see "wp_print_styles"} action has *not* yet been called, the CSS file will be
    -- enqueued. If the {@see "wp_print_styles"} action has been called, the CSS link
    -- will be printed. Printing may be forced by passing true as the force_echo
    -- (second) parameter.

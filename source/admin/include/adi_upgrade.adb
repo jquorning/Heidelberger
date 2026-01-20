@@ -10,6 +10,7 @@
 with Ada.Strings.Unbounded;
 
 with Php.Arrays;
+with Php.Files;
 with Php.Lists;
 with Php.Misc;
 with Php.Preg;
@@ -30,11 +31,13 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_L10n;
+-- with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
 with Inc_Rewrites;
 with Inc_Users;
+with Inc_Versions;
 
 package body Adi_Upgrade
 is
@@ -168,15 +171,243 @@ is
 
                return
                  To_Array (List => (
-                        Build ("url",              Guess_URL),
-                        Build ("user_id",          User_Id),
-                        Build ("password",         User_Password),
-                        Build ("password_message", -Message)
+                   Build ("url",              Guess_URL),
+                   Build ("user_id",          User_Id),
+                   Build ("password",         User_Password),
+                   Build ("password_message", -Message)
                  ));
             end;
          end;
       end;
    end Wp_Install;
+
+   ----------------
+   -- Wp_Upgrade --
+   ----------------
+
+   procedure Wp_Upgrade
+   is
+      use Wp_Common;
+      use Inc_Caches;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_Versions;
+--    global wp_current_db_version, wp_db_version, wpdb;
+   begin
+      Wp_Current_DB_Version := As_Integer (X_Get_Option ("db_version"));
+
+      -- We are up to date. Nothing to do.
+      if Wp_DB_Version = Wp_Current_DB_Version then
+         return;
+      end if;
+
+      if not Is_Blog_Installed then
+         return;
+      end if;
+
+      Wp_Check_MySQL_Version;
+      Wp_Cache_Flush;
+      Pre_Schema_Upgrade;
+      Make_DB_Current_Silent;
+      Upgrade_All;
+
+      if Is_Multisite and then Is_Main_Site then
+         Upgrade_Network;
+      end if;
+
+      Wp_Cache_Flush;
+
+      -- if Is_Multisite then
+      --    Update_Site_Meta (Get_Current_Blog_Id, "db_version", Wp_DB_Version);
+      --    Update_Site_Meta (Get_Current_Blog_Id, "db_last_updated", Microtime);
+      -- end if;
+
+      --
+      -- Fires after a site is fully upgraded.
+      --
+      -- @since 3.9.0
+      --
+      -- @param int wp_db_version         The new wp_db_version.
+      -- @param int wp_current_db_version The old (current) wp_db_version.
+      --
+      Do_Action ("wp_upgrade", Wp_DB_Version, Wp_Current_DB_Version);
+   end Wp_Upgrade;
+
+   -----------------
+   -- Upgrade_All --
+   -----------------
+
+   procedure Upgrade_All
+   is
+      use Adi_Schemas;
+      use Inc_Options;
+      use Inc_Versions;
+--    global wp_current_db_version, wp_db_version;
+   begin
+      Wp_Current_DB_Version := As_Integer (X_Get_Option ("db_version"));
+
+      -- We are up to date. Nothing to do.
+      if Wp_DB_Version = Wp_Current_DB_Version then
+         return;
+      end if;
+
+      -- If the version is not set in the DB, try to guess the version.
+      if Wp_Current_DB_Version = 0 then -- ???
+--    if Empty (Wp_Current_DB_Version) then
+         Wp_Current_DB_Version := 0;
+
+         -- If the template option exists, we have 1.5.
+         declare
+            Template : constant Multi_Type :=
+              X_Get_Option ("template");
+         begin
+            if Kind_Of (Template) /= Kind_Null then
+--          if not Empty (Template) then
+               Wp_Current_DB_Version := 2541;
+            end if;
+         end;
+      end if;
+
+      if Wp_Current_DB_Version < 6039 then
+         Upgrade_230_Options_Table;
+      end if;
+
+      Populate_Options;
+
+      if Wp_Current_DB_Version < 2541 then
+         Upgrade_100;
+         Upgrade_101;
+         Upgrade_110;
+         Upgrade_130;
+      end if;
+
+      if Wp_Current_DB_Version < 3308 then
+         Upgrade_160;
+      end if;
+
+      if Wp_Current_DB_Version < 4772 then
+         Upgrade_210;
+      end if;
+
+      if Wp_Current_DB_Version < 4351 then
+         Upgrade_Old_Slugs;
+      end if;
+
+      if Wp_Current_DB_Version < 5539 then
+         Upgrade_230;
+      end if;
+
+      if Wp_Current_DB_Version < 6124 then
+         Upgrade_230_Old_Tables;
+      end if;
+
+      if Wp_Current_DB_Version < 7499 then
+         Upgrade_250;
+      end if;
+
+      if Wp_Current_DB_Version < 7935 then
+         Upgrade_252;
+      end if;
+
+      if Wp_Current_DB_Version < 8201 then
+         Upgrade_260;
+      end if;
+
+      if Wp_Current_DB_Version < 8989 then
+         Upgrade_270;
+      end if;
+
+      if Wp_Current_DB_Version < 10360 then
+         Upgrade_280;
+      end if;
+
+      if Wp_Current_DB_Version < 11958 then
+         Upgrade_290;
+      end if;
+
+      if Wp_Current_DB_Version < 15260 then
+         Upgrade_300;
+      end if;
+
+      if Wp_Current_DB_Version < 19389 then
+         Upgrade_330;
+      end if;
+
+      if Wp_Current_DB_Version < 20080 then
+         Upgrade_340;
+      end if;
+
+      if Wp_Current_DB_Version < 22422 then
+         Upgrade_350;
+      end if;
+
+      if Wp_Current_DB_Version < 25824 then
+         Upgrade_370;
+      end if;
+
+      if Wp_Current_DB_Version < 26148 then
+         Upgrade_372;
+      end if;
+
+      if Wp_Current_DB_Version < 26691 then
+         Upgrade_380;
+      end if;
+
+      if Wp_Current_DB_Version < 29630 then
+         Upgrade_400;
+      end if;
+
+      if Wp_Current_DB_Version < 33055 then
+         Upgrade_430;
+      end if;
+
+      if Wp_Current_DB_Version < 33056 then
+         Upgrade_431;
+      end if;
+
+      if Wp_Current_DB_Version < 35700 then
+         Upgrade_440;
+      end if;
+
+      if Wp_Current_DB_Version < 36686 then
+         Upgrade_450;
+      end if;
+
+      if Wp_Current_DB_Version < 37965 then
+         Upgrade_460;
+      end if;
+
+      if Wp_Current_DB_Version < 44719 then
+         Upgrade_510;
+      end if;
+
+      if Wp_Current_DB_Version < 45744 then
+         Upgrade_530;
+      end if;
+
+      if Wp_Current_DB_Version < 48575 then
+         Upgrade_550;
+      end if;
+
+      if Wp_Current_DB_Version < 49752 then
+         Upgrade_560;
+      end if;
+
+      if Wp_Current_DB_Version < 51917 then
+         Upgrade_590;
+      end if;
+
+      if Wp_Current_DB_Version < 53011 then
+         Upgrade_600;
+      end if;
+
+      Maybe_Disable_Link_Manager;
+
+      Maybe_Disable_Automattic_Widgets;
+
+      Update_Option ("db_version",  From_Integer (Wp_DB_Version));
+      Update_Option ("db_upgraded", From_Boolean (True));
+   end Upgrade_All;
 
    ------------------
    -- X_Get_Option --
@@ -911,6 +1142,124 @@ is
          Wp_Die (Result.Get_Error_Code); -- Get_Error_Code added
       end if;
    end Wp_Check_MySQL_Version;
+
+   --------------------------------------
+   -- Maybe_Disable_Automattic_Widgets --
+   --------------------------------------
+
+   procedure Maybe_Disable_Automattic_Widgets
+   is
+      use Php.Arrays;
+      use Php.Files;
+      use Hb_Common;
+      use Inc_Options;
+
+      Plugins : constant List_Type := As_List (X_Get_Option ("active_plugins"));
+   begin
+      for Plugin of Plugins loop -- (array)
+         if "widgets.php" = Basename (-Plugin) then
+--          Array_Splice (Plugins, Array_Search (-Plugin, Plugins, True), 1); -- ???
+            Update_Option ("active_plugins", From_List (Plugins));
+            exit;
+         end if;
+      end loop;
+   end Maybe_Disable_Automattic_Widgets;
+
+   --------------------------------
+   -- Maybe_Disable_Link_Manager --
+   --------------------------------
+
+   procedure Maybe_Disable_Link_Manager
+   is
+      use Globals;
+      use Inc_Options;
+--    global wp_current_db_version, wpdb;
+   begin
+      if
+        Wp_Current_DB_Version >= 22006 and then
+        Get_Option ("link_manager_enabled") and then
+        "" = WpDB.Get_Var ("SELECT link_id FROM wpdb->links LIMIT 1") -- not
+      then
+         Update_Option ("link_manager_enabled", From_Integer (0));
+      end if;
+   end Maybe_Disable_Link_Manager;
+
+   -----------------------
+   -- Pre_Scema_Upgrade --
+   -----------------------
+
+   procedure Pre_Schema_Upgrade
+   is
+      use Globals;
+      use Hb_Common;
+      use Inc_Class_Wpdb;
+      use Inc_Load;
+--    global wp_current_db_version, wpdb;
+   begin
+      -- Upgrade versions prior to 2.9.
+      if Wp_Current_DB_Version < 11557 then
+         -- Delete duplicate options. Keep the option with the highest option_id.
+         WpDB.Query ("DELETE o1 FROM wpdb->options AS o1 JOIN wpdb->options AS o2 USING (`option_name`) WHERE o2.option_id > o1.option_id");
+
+         -- Drop the old primary key and add the new.
+         WpDB.Query ("ALTER TABLE wpdb->options DROP PRIMARY KEY, ADD PRIMARY KEY(option_id)");
+
+         -- Drop the old option_name index. dbDelta() Doesn't do the drop.
+         WpDB.Query ("ALTER TABLE wpdb->options DROP INDEX option_name");
+      end if;
+
+      -- Multisite schema upgrades.
+      if
+        Wp_Current_DB_Version < 25448 and then
+        Is_Multisite and then
+        Wp_Should_Upgrade_Global_Tables
+      then
+         -- Upgrade versions prior to 3.7.
+         if Wp_Current_DB_Version < 25179 then
+            -- New primary key for signups.
+            WpDB.Query ("ALTER TABLE wpdb->signups ADD signup_id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+            WpDB.Query ("ALTER TABLE wpdb->signups DROP INDEX domain");
+         end if;
+
+         if Wp_Current_DB_Version < 25448 then
+            -- Convert archived from enum to tinyint.
+            WpDB.Query ("ALTER TABLE wpdb->blogs CHANGE COLUMN archived archived varchar(1) NOT NULL default '0'");
+            WpDB.Query ("ALTER TABLE wpdb->blogs CHANGE COLUMN archived archived tinyint(2) NOT NULL default 0");
+         end if;
+      end if;
+
+      -- Upgrade versions prior to 4.2.
+      if Wp_Current_DB_Version < 31351 then
+         if
+           not Is_Multisite and then
+           Wp_Should_Upgrade_Global_Tables
+         then
+            WpDB.Query ("ALTER TABLE wpdb->usermeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+         end if;
+         WpDB.Query ("ALTER TABLE wpdb->terms DROP INDEX slug, ADD INDEX slug(slug(191))");
+         WpDB.Query ("ALTER TABLE wpdb->terms DROP INDEX name, ADD INDEX name(name(191))");
+         WpDB.Query ("ALTER TABLE wpdb->commentmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+         WpDB.Query ("ALTER TABLE wpdb->postmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+         WpDB.Query ("ALTER TABLE wpdb->posts DROP INDEX post_name, ADD INDEX post_name(post_name(191))");
+      end if;
+
+      -- Upgrade versions prior to 4.4.
+      if Wp_Current_DB_Version < 34978 then
+         -- If compatible termmeta table is found, use it, but enforce a proper
+         -- index and update collation.
+         if
+           "" /= WpDB.Get_Var
+             (Statement_Type ("SHOW TABLES LIKE '" & (-WpDB.Termmeta) & "'"))
+         and then
+           WpDB.Get_Results (Statement_Type (
+             "SHOW INDEX FROM " & (-WpDB.Termmeta) &
+             " WHERE Column_name = 'meta_key'")) /= Empty_Array
+         then
+            WpDB.Query ("ALTER TABLE wpdb->termmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+            Maybe_Convert_Table_To_Utf8mb4 (-WpDB.Termmeta);
+         end if;
+      end if;
+   end Pre_Schema_Upgrade;
 
    -------------------------------------
    -- Wp_Should_Upgrade_Global_Tables --

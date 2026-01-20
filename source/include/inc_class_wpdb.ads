@@ -1483,7 +1483,8 @@ is
                      Y       : Natural        := 0;
                      Success : out Boolean)
                      return Natural
-                     is (raise Program_Error with "not implemented");
+                     is (0);
+--                   is (raise Program_Error with "not implemented");
 
    function Get_Row (Db      : in out Wpdb_Class;
                      Query   : Statement_Type; -- := ""; -- = null,

@@ -31,6 +31,10 @@ is
    --                           Default empty.
    -- @return bool True on successful removal, false on failure.
    --
+   function Wp_Cache_Delete (Key   : String;
+                             Group : String := "")
+                             return Boolean;
+
    procedure Wp_Cache_Delete (Key   : String;
                               Group : String := "");
 
