@@ -12,11 +12,10 @@ is
 
    PHP_VERSION : constant String := "8.2.29";
 
-   function Version_Compare (Version1 : String;
-                             Version2 : String;
-                             Operator : String)
-                             return Boolean
-                             is (True);
+   function Version_Compare (Version_1 : String;
+                             Version_2 : String;
+                             Operator  : String)
+                             return Boolean;
 
    function Env_Exists (Name : String)
                         return Boolean
