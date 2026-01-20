@@ -42,8 +42,7 @@ is
                                 is (Item);
 
    function URL_Encode (Item : String)
-                        return String
-                        is ("XXX-301");
+                        return String;
 
    function Get_Header
             return String;

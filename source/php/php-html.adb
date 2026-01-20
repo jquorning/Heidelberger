@@ -51,4 +51,15 @@ is
       return Item;
    end Raw_URL_Encode;
 
+   ----------------
+   -- URL_Encode --
+   ----------------
+
+   function URL_Encode (Item : String)
+                        return String
+   is
+   begin
+      return Item;
+   end URL_Encode;
+
 end Php.HTML;
