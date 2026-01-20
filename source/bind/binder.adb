@@ -1,5 +1,9 @@
+--
+--
+--
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Echoing;
 with Php.Errors;
@@ -100,12 +104,14 @@ is
       return AWS.Response.Build ("text/html", Payload);
 
    exception
-      when Php.Errors.Program_Termination =>
+      when Redirect_Signal | Php.Errors.Program_Termination =>
          declare
             use Php.HTML;
 
-            H : constant String := Get_Header;
+            Header : constant String := Get_Header;
          begin
+            Put_Line ("redirect:");
+            Put_Line ("  header: " & Header);
 --          return AWS.Response.URL (Location => H);
             return AWS.Response.URL (Location => "XXX-958");
          end;
