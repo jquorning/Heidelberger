@@ -61,7 +61,7 @@ is
 
    SITECOOKIEPATH : Unbounded_String;
 
-   WPLANG : constant String := "da_DK";
+   WPLANG : constant String := "en_US";
 
    WP_SETUP_CONFIG : constant Boolean := False;
 
