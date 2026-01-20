@@ -85,8 +85,8 @@ is
                 To_Array (List => (
                         Build ("taxonomy",             "category"),
                         Build ("descendants_and_self", Descendants_And_Self'Image),
---                        Build ("selected_cats",        Selected_Cats),
---                        Build ("popular_cats",         Popular_Cats),
+                        Build ("selected_cats",        Selected_Cats),
+                        Build ("popular_cats",         Popular_Cats),
 --                        Build ("walker",               Walker),
                         Build ("checked_ontop",        Checked_Ontop'Image)
                ))
@@ -2951,9 +2951,11 @@ is
       use Php.Echoing;
       use Php.HTML;
       use Hb_Common;
+      use Inc_General_Templates;
       use Inc_Options;
+      use Inc_Plugins;
 
-      Admin_Html_Class : constant String :=
+      Admin_HTML_Class : constant String :=
         (if Inc_Admin_Bar.Is_Admin_Bar_Showing then "wp-toolbar" else "");
    begin
       if Inc_Vars.Is_IE then
@@ -2961,21 +2963,21 @@ is
       end if;
 
       Echo ("<!DOCTYPE html>" & NL);
-      Echo ("<html class=""" & Admin_Html_Class & """" & NL);
+      Echo ("<html class=""" & Admin_HTML_Class & """ ");
 
       --
       -- Fires inside the HTML tag in the admin header.
       --
       -- @since 2.2.0
       --
-      Inc_Plugins.Do_Action ("admin_xml_ns");
+      Do_Action ("admin_xml_ns");
 
-      Inc_General_Templates.Language_Attributes;
+      Language_Attributes;
 
       Echo (">" & NL);
       Echo ("<head>" & NL);
       Echo ("<meta http-equiv=""Content-Type"" content=""" &
-            Inc_General_Templates.Get_Bloginfo ("html_type") & "; charset=" &
+            Get_Bloginfo ("html_type") & "; charset=" &
             Get_Option ("blog_charset") & """ />" & NL);
    end X_Wp_Admin_HTML_Begin;
 
