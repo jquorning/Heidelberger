@@ -6,7 +6,7 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Echoing;
@@ -801,7 +801,6 @@ is
                           return String
    is
       use Ada.Strings.Unbounded;
-      use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
       use Hb_Common;
@@ -925,6 +924,8 @@ is
 --                 default:
 --                         output = get_option( "blogname" );
 --                         break;
+      else
+         Put_Line ("Unhandled show:" & Show);
       end if;
 --         end;
 
