@@ -3933,61 +3933,69 @@ is
       use MySQLi_Bind;
       use Databases;
 
-      DB_Version     : Unbounded_String := +This.DB_Version;
-      DB_Server_Info : Unbounded_String := +This.DB_Server_Info;
-      Client_Version : Unbounded_String;
+      DB_Server_Info_2 : constant String := This.DB_Server_Info;
+      DB_Version_2     : constant String := This.DB_Version;
+
+      -- Account for MariaDB version being prefixed with "5.5.5-" on older
+      -- PHP versions.
+      Is_MariaDB : constant Boolean :=
+        "5.5.5" = DB_Version_2                     and then
+        Str_Contains (DB_Server_Info_2, "MariaDB") and then
+        PHP_VERSION_ID < 80016;      -- PHP 8.0.15 or older.
+
+      DB_Server_Info : constant String :=
+        (if Is_MariaDB then
+           -- Strip the "5.5.5-" prefix and set the version to the correct value.
+           Preg_Replace ("/^5\.5\.5-(.*)/", "$1", DB_Server_Info_2)
+         else DB_Server_Info_2);
+
+      DB_Version : constant String :=
+        (if Is_MariaDB then
+           Preg_Replace ("/[^0-9.].*/", "", DB_Server_Info_2)
+         else DB_Server_Info_2);
 
       DB_Cap_Lower : constant String := Strtolower (DB_Cap);
    begin
-      -- Account for MariaDB version being prefixed with "5.5.5-" on older
-      -- PHP versions.
-      if
-        "5.5.5" = DB_Version and then
-        Str_Contains (-DB_Server_Info, "MariaDB") -- and then
---      PHP_VERSION_ID < 80016   -- PHP 8.0.15 or older.
-      then
-         -- Strip the "5.5.5-" prefix and set the version to the correct value.
-         DB_Server_Info := +Preg_Replace ("/^5\.5\.5-(.*)/", "$1", -DB_Server_Info);
-         DB_Version     := +Preg_Replace ("/[^0-9.].*/", "",       -DB_Server_Info);
-      end if;
-
       if DB_Cap_Lower in
-                        "collation" |    -- @since 2.5.0
-                        "group_concat" | -- @since 2.7.0
-                        "subqueries"    -- @since 2.7.0
+        "collation"    | -- @since 2.5.0
+        "group_concat" | -- @since 2.7.0
+        "subqueries"     -- @since 2.7.0
       then
-         return Version_Compare (-DB_Version, "4.1", ">=");
+         return Version_Compare (DB_Version, "4.1", ">=");
 
       elsif DB_Cap_Lower in "set_charset" then
-         return Version_Compare (-DB_Version, "5.0.7", ">=");
+         return Version_Compare (DB_Version, "5.0.7", ">=");
 
       elsif DB_Cap_Lower in "utf8mb4" then      -- @since 4.1.0
-         if Version_Compare (-DB_Version, "5.5.3", "<") then
+         if Version_Compare (DB_Version, "5.5.3", "<") then
             return False;
          end if;
 
-         case This.Engine is
-         when Engine_MySQLi =>
-            Client_Version := +Mysqli_Get_Client_Info;
-         when Engine_MySQL =>
-            Client_Version := +Mysql_Get_Client_Info;
-         when Engine_SQLite =>
-            pragma Assert (False);
-         end case;
-
-         --
-         -- libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
-         -- mysqlnd has supported utf8mb4 since 5.0.9.
-         --
-         if 0 /= Strpos (-Client_Version, "mysqlnd") then -- false
-            Client_Version := +Preg_Replace ("/^\D+([\d.]+).*/", "1", -Client_Version);
-            return Version_Compare (-Client_Version, "5.0.9", ">=");
-         else
-            return Version_Compare (-Client_Version, "5.5.3", ">=");
-         end if;
+         declare
+            Client_Version : constant String :=
+              (case This.Engine is
+               when Engine_MySQLi => Mysqli_Get_Client_Info,
+               when Engine_MySQL  => Mysql_Get_Client_Info,
+               when Engine_SQLite => "10.11.14");
+         begin
+            --
+            -- libmysql has supported utf8mb4 since 5.5.3, same as the MySQL server.
+            -- mysqlnd has supported utf8mb4 since 5.0.9.
+            --
+            if 0 /= Strpos (Client_Version, "mysqlnd") then
+               declare
+                  Client_Version_2 : constant String :=
+                    Preg_Replace ("/^\D+([\d.]+).*/", "1", Client_Version);
+               begin
+                  return Version_Compare (Client_Version_2, "5.0.9", ">=");
+               end;
+            else
+               return Version_Compare (Client_Version, "5.5.3", ">=");
+            end if;
+         end;
 
       elsif DB_Cap_Lower in "utf8mb4_520" then -- @since 4.6.0
-         return Version_Compare (-DB_Version, "5.6", ">=");
+         return Version_Compare (DB_Version, "5.6", ">=");
       end if;
 
       return False;
@@ -4026,19 +4034,12 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
-
-      Server_Info : Unbounded_String;
    begin
-      case This.Engine is
-      when Engine_MySQLi =>
-         Server_Info := +MySQLi_Get_Server_Info (This.Dbh);
-      when Engine_MySQL =>
-         Server_Info := +MySQL_Get_Server_Info (This.Dbh);
-      when Engine_SQLite =>
-         Server_Info := +"XXX-990";
-      end case;
-
-      return -Server_Info;
+      return
+        (case This.Engine is
+         when Engine_MySQLi => MySQLi_Get_Server_Info (This.Dbh),
+         when Engine_MySQL  => MySQL_Get_Server_Info (This.Dbh),
+         when Engine_SQLite => "10.11.14");
    end DB_Server_Info;
 
    ---------------

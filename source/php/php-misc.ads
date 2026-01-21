@@ -10,7 +10,8 @@ is
    use Arrays;
    use Lists;
 
-   PHP_VERSION : constant String := "8.2.29";
+   PHP_VERSION    : constant String  := "8.2.29";
+   PHP_VERSION_ID : constant Integer := 80229;
 
    function Version_Compare (Version_1 : String;
                              Version_2 : String;
