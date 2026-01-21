@@ -3,7 +3,7 @@
 --
 
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 
@@ -40,7 +40,6 @@ is
    function Find_Marks (Pattern : String)
                         return Marks_Type
    is
-      use Ada.Text_IO;
       use GNAT.Regpat;
 
       Mark   : constant Character := Pattern (Pattern'First);
@@ -144,7 +143,6 @@ is
                           Subject     : String)
                           return String
    is
-      use Ada.Text_IO;
       use GNAT.Regpat;
    begin
       Put_Line ("preg_replace:");
@@ -164,7 +162,11 @@ is
       begin
          Match (Re, Subject, Result);
 
-         return Replace (Replacement, Subject, Result);
+         if Result'Length in 1 then
+            return Subject;
+         else
+            return Replace (Replacement, Subject, Result);
+         end if;
       end;
 
    exception
@@ -185,7 +187,6 @@ is
                         Offset  : Integer := 0)
                         return Integer
    is
-      use Ada.Text_IO;
       use GNAT.Regpat;
       use Hb_Common;
 
@@ -310,7 +311,6 @@ is
                             Offset  : Integer := 0)
                             return Integer
    is
-      use Ada.Text_IO;
    begin
       Put_Line ("preg_match_all:");
       Put_Line ("  pattern: " & Pattern);
@@ -342,17 +342,31 @@ is
                         Flags   : Flag_Type := 0)
                         return List_Type
    is
-      use Ada.Text_IO;
+      use GNAT.Regpat;
+      use Hb_Common;
 
---    Marks : constant Marks_Type := Find_Marks (Pattern);
+      Marks : constant Marks_Type := Find_Marks (Pattern);
+
+      Engine : constant Pattern_Matcher :=
+        Compile (Pattern (Marks.First .. Marks.Last),
+                 Flags => Marks.Flags);
+
+      Result : Match_Array (0 .. Paren_Count (Engine));
+
+      List : List_Type;
    begin
       Put_Line ("preg_split:");
       Put_Line ("  pattern: " & Pattern);
---    Put_Line ("    pyned: " & Pattern (First .. Last));
---    Put_Line ("    flags: " & Pattern (Option .. Pattern'Last));
+      Put_Line ("    pyned: " & Pattern (Marks.First .. Marks.Last));
       Put_Line ("  subject: " & Subject);
-      raise Program_Error with "not implemented";
-      return Empty_List;
+
+      Match (Engine, Subject, Result);
+
+      for A of Result loop
+         List.Append (+Subject (A.First .. A.Last));
+      end loop;
+
+      return List;
    end Preg_Split;
 
    ------------------
@@ -385,7 +399,6 @@ is
                                    Subject  : String)
                                    return String
    is
-      use Ada.Text_IO;
       use GNAT.Regpat;
 
       Pattern_2 : constant String     := Remove_Space (Pattern);
