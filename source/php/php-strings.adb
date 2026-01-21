@@ -8,7 +8,7 @@ with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Less_Case_Insensitive;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Hb_Common;
 
@@ -104,10 +104,10 @@ is
                           Needle   : String)
                           return Natural
    is
-      use Ada.Strings.Fixed;
    begin
-      return Count (Source  => Haystack,
-                    Pattern => Needle);
+      return
+        Ada.Strings.Fixed.Count (Source  => Haystack,
+                                 Pattern => Needle);
    end Substr_Count;
 
    --------------------
@@ -221,36 +221,40 @@ is
                          return String
    is
       use Ada.Strings.Unbounded;
---    use Ada.Text_IO;
       use Hb_Common;
 
       Result : Unbounded_String;
       First  : Natural := Subject'First;
    begin
---    Put_Line ("str_replace:");
+      Put_Line ("str_replace:");
 --    Put_Line (Search'Image);
 --    Put_Line ("  subject: " & Subject);
 --    Put_Line ("  replace: " & Replace);
       Count := 0;
       while First <= Subject'Last loop
          declare
-            B : Natural := Natural'Last;
-            Found_Index : Natural;
-            Position    : Natural;
+            Found_Position : Natural := Natural'Last;
+            Found_Index    : Natural;
+            Position       : Natural;
          begin
             for Search_Index in Search.First_Index .. Search.Last_Index loop
-               Position := Index (Source  => +Subject (First .. Subject'Last),
-                                  Pattern => -Search (Search_Index));
-               if Position /= 0 and then Position < B then
-                  B := Position;
-                  Found_Index := Search_Index;
-               end if;
+
+               Position :=
+                 Ada.Strings.Fixed.Index (Source  => Subject,
+                                          Pattern => -Search (Search_Index),
+                                          From    => First);
 
                if Position = 0 then
                   Append (Result, Subject);
-                  Count := Count + 1;
+--                Count := Count + 1;
                   return -Result;
                end if;
+
+               if Position /= 0 and then Position < Found_Position then
+                  Found_Position := Position;
+                  Found_Index    := Search_Index;
+               end if;
+
             end loop;
 
             if Position = Natural'Last then
@@ -258,7 +262,7 @@ is
                Count := Count + 1;
                exit;
             else
-               Append (Result, Subject (First .. B - 1));
+               Append (Result, Subject (First .. Found_Position - 1));
                Append (Result, Replace);
                Count := Count + 1;
                First := Position + Length (Search (Found_Index));
@@ -547,7 +551,6 @@ is
                         Allowed_Tags : Array_Type := Empty_Array)
                         return String
    is
-      use Ada.Text_IO;
    begin
       Put_Line ("strip_tags: " & Item);
       Put_Line ("  " & Allowed_Tags'Image);
@@ -591,7 +594,6 @@ is
                            Characters : String)
                            return String
    is
-      use Ada.Text_IO;
    begin
       Put_Line ("add_c_slashes: not implemented");
       Put_Line ("  item : " & Item);
@@ -704,7 +706,6 @@ is
                      Arry      : String)
                      return String
    is
-      use Ada.Text_IO;
    begin
       Put_Line ("implode: (should this exist)");
       Put_Line ("  separator: " & Separator);
