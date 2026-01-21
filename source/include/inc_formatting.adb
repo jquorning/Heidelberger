@@ -4225,7 +4225,10 @@ is
       Count : Natural := 1;
    begin
       while Count /= 0 loop
-         Sub := +Str_Replace (Search, "", -Sub, Count);
+         Sub := +Str_Replace (Search  => Search,
+                              Replace => "",
+                              Subject => -Sub,
+                              Count   => Count);
       end loop;
 
       return -Sub;
@@ -4364,7 +4367,7 @@ is
                Good_Protocol_URL := URL_6;
             else
                declare
-                  Protocols_2 : List_Type :=
+                  Protocols_2 : constant List_Type :=
                     (if Protocols in Empty_List -- not Is_Array (Protocols)
                      then Wp_Allowed_Protocols
                      else Protocols);
