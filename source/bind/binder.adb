@@ -40,8 +40,6 @@ with Inc_Plugins;
 
 package body Binder
 is
-   use Ada.Strings.Unbounded;
-   use Hb_Common;
 
    -----------------------
    -- Web_Server_To_PHP --
@@ -65,6 +63,8 @@ is
                     return AWS.Response.Data
    is
       use Ada.Strings.Fixed;
+      use Ada.Strings.Unbounded;
+      use Hb_Common;
 
       URL     : constant String := AWS.Status.URL (Request);
       Payload : Unbounded_String;
@@ -112,12 +112,15 @@ is
          declare
             use Php.HTML;
 
-            Header : constant String := Get_Header;
+            Header   : constant String  := Get_Header;
+            Position : constant Natural := Index (Header, " ");
+            Location : constant String  := Header (Position + 1 .. Header'Last);
          begin
             Put_Line ("redirect:");
             Put_Line ("  header: " & Header);
---          return AWS.Response.URL (Location => H);
-            return AWS.Response.URL (Location => "XXX-958");
+            Put_Line ("  locati: " & Location);
+
+            return AWS.Response.URL (Location => Location);
          end;
 
    end Render;
