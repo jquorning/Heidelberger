@@ -1822,10 +1822,9 @@ is
                                        return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use Hb_Common;
 
       Count_2 : Natural := Count;
 
@@ -1833,12 +1832,13 @@ is
         Preg_Replace ("/(&#0*58(?![;0-9])|&#x0*3a(?![;a-f0-9]))/i", "$1;", Item);
 
       Item_2 : constant List_Type :=
-        Preg_Split ("/:|&#0*58;|&#x0*3a;|&colon;/i", Item_3, 2);
+        Preg_Split ("/:|&#0*58;|&#x0*3a;|&colon;/i", Item_3, Limit => 2);
 
-      Item_4 : Unbounded_String;
+      Item_4 : Unbounded_String := +Item_3;
    begin
       if
-        Isset (-Item_2 (1)) and then
+        Item_2.Length in 2 and then
+--      Isset (-Item_2 (1)) and then
         not Preg_Match ("%/\?%", -Item_2 (1)) -- (0)
       then
          Item_4 := +Trim (-Item_2 (2)); -- (1)
