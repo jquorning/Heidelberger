@@ -6,6 +6,8 @@ with Ada.Strings.Unbounded;
 
 with Php.Strings;
 
+with Hb_Common;
+
 package body Php.Misc
 is
 
@@ -22,17 +24,33 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
+      use Hb_Common;
 
       List_1 : constant List_Type := Explode (".", Version_1);
       List_2 : constant List_Type := Explode (".", Version_2);
+
+      Last   : constant Natural   :=
+        Natural'Min (List_1.Last_Index, List_2.Last_Index);
    begin
-      pragma Assert (Operator = ">=");
-      for A in List_1.First_Index .. List_1.Last_Index loop
-         if List_1 (A) >= List_2 (A) then
-            return True;
-         end if;
-      end loop;
-      return False;
+      if Operator = ">=" then
+         for A in List_1.First_Index .. Last loop
+            if Natural'Value (-List_1 (A)) >= Natural'Value (-List_2 (A)) then
+               return True;
+            end if;
+         end loop;
+         return False;
+
+      elsif Operator = "<" then
+         for A in List_1.First_Index .. Last loop
+            if Natural'Value (-List_1 (A)) < Natural'Value (-List_2 (A)) then
+               return True;
+            end if;
+         end loop;
+         return False;
+
+      else
+         pragma Assert (False);
+      end if;
    end Version_Compare;
 
    --------------------
