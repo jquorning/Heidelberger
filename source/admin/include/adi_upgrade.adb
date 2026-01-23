@@ -31,7 +31,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_L10n;
--- with Inc_Ms_Sites;
+with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
@@ -191,6 +191,7 @@ is
       use Inc_Caches;
       use Inc_Functions;
       use Inc_Load;
+      use Inc_Ms_Sites;
       use Inc_Versions;
 --    global wp_current_db_version, wp_db_version, wpdb;
    begin
@@ -217,10 +218,13 @@ is
 
       Wp_Cache_Flush;
 
-      -- if Is_Multisite then
-      --    Update_Site_Meta (Get_Current_Blog_Id, "db_version", Wp_DB_Version);
-      --    Update_Site_Meta (Get_Current_Blog_Id, "db_last_updated", Microtime);
-      -- end if;
+      if Is_Multisite then
+         Update_Site_Meta (Get_Current_Blog_Id, "db_version",
+                           From_Integer (Wp_DB_Version));
+
+         Update_Site_Meta (Get_Current_Blog_Id, "db_last_updated",
+                           From_String (Php.Misc.Microtime));
+      end if;
 
       --
       -- Fires after a site is fully upgraded.
