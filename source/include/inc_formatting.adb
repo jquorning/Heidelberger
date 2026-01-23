@@ -5020,34 +5020,36 @@ is
 --      Arry := Apply_Filters ("wp_parse_str", Arry);
    end Wp_Parse_Str;
 
--- --
--- -- Converts lone less than signs.
--- --
--- -- KSES already converts lone greater than signs.
--- --
--- -- @since 2.3.0
--- --
--- -- @param string text Text to be converted.
--- -- @return string Converted text.
--- --
--- function wp_pre_kses_less_than( text ) then
---         return preg_replace_callback( "%<[^>]*?((?=<)|>|)%", "wp_pre_kses_less_than_callback", text );
--- end;
+   ---------------------------
+   -- Wp_Pre_KSES_Less_Than --
+   ---------------------------
 
--- --
--- -- Callback function used by preg_replace.
--- --
--- -- @since 2.3.0
--- --
--- -- @param string[] matches Populated by matches to preg_replace.
--- -- @return string The text returned after esc_html if needed.
--- --
--- function wp_pre_kses_less_than_callback( matches ) then
---         if ( false === strpos( matches[0], ">" ) ) then
---                 return esc_html( matches[0] );
---         end;
---         return matches[0];
--- end;
+   function Wp_Pre_KSES_Less_Than (Text : String)
+                                   return String
+   is
+      use Php.Preg;
+   begin
+      return
+        Preg_Replace_Callback ("%<[^>]*?((?=<)|>|)%",
+                               Wp_Pre_KSES_Less_Than_Callback'Access,
+                               Text);
+   end Wp_Pre_KSES_Less_Than;
+
+   ------------------------------------
+   -- Wp_Pre_KSES_Less_Than_Callback --
+   ------------------------------------
+
+   function Wp_Pre_KSES_Less_Than_Callback (Matches : List_Type)
+                                            return String
+   is
+      use Php.Strings;
+      use Hb_Common;
+   begin
+      if 0 = Strpos (-Matches (1), ">") then -- false, [0]
+         return ESC_HTML (-Matches (1)); -- [0]
+      end if;
+      return -Matches (1); -- [0]
+   end Wp_Pre_KSES_Less_Than_Callback;
 
 -- --
 -- -- Removes non-allowable HTML from parsed block attribute values when filtering
@@ -5374,37 +5376,28 @@ is
       return Trim (-Item_1);
    end Wp_Strip_All_Tags;
 
--- --
--- -- Sanitizes a string from user input or from the database.
--- --
--- -- - Checks for invalid UTF-8,
--- -- - Converts single `<` characters to entities
--- -- - Strips all tags
--- -- - Removes line breaks, tabs, and extra whitespace
--- -- - Strips octets
--- --
--- -- @since 2.9.0
--- --
--- -- @see sanitize_textarea_field()
--- -- @see wp_check_invalid_utf8()
--- -- @see wp_strip_all_tags()
--- --
--- -- @param string str String to sanitize.
--- -- @return string Sanitized string.
--- --
--- function sanitize_text_field( str ) then
---         filtered = _sanitize_text_fields( str, false );
+   -------------------------
+   -- Sanitize_Text_Field --
+   -------------------------
 
---         --
---         -- Filters a sanitized text field string.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string filtered The sanitized string.
---         -- @param string str      The string prior to being sanitized.
---         --
---         return apply_filters( "sanitize_text_field", filtered, str );
--- end;
+   function Sanitize_Text_Field (Str : String)
+                                 return String
+   is
+      use Inc_Plugins;
+
+      Filtered : constant String :=
+        X_Sanitize_Text_Fields (Str, False);
+   begin
+      --
+      -- Filters a sanitized text field string.
+      --
+      -- @since 2.9.0
+      --
+      -- @param string filtered The sanitized string.
+      -- @param string str      The string prior to being sanitized.
+      --
+      return Apply_Filters ("sanitize_text_field", Filtered, Str);
+   end Sanitize_Text_Field;
 
 -- --
 -- -- Sanitizes a multiline string from user input or from the database.
@@ -5434,53 +5427,55 @@ is
 --         return apply_filters( "sanitize_textarea_field", filtered, str );
 -- end;
 
--- --
--- -- Internal helper function to sanitize a string from user input or from the database.
--- --
--- -- @since 4.7.0
--- -- @access private
--- --
--- -- @param string str           String to sanitize.
--- -- @param bool   keep_newlines Optional. Whether to keep newlines. Default: false.
--- -- @return string Sanitized string.
--- --
--- function _sanitize_text_fields( str, keep_newlines = false ) then
---         if ( is_object( str ) || is_array( str ) ) then
---                 return "";
---         end;
+   ---------------------------
+   -- X_Sanitize_Text_Field --
+   ---------------------------
 
---         str = (string) str;
+   function X_Sanitize_Text_Fields (Str           : String;
+                                    Keep_Newlines : Boolean := False)
+                                    return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      -- if ( is_object( str ) || is_array( str ) ) then
+      --    return "";
+      -- end if;
 
---         filtered = wp_check_invalid_utf8( str );
+      -- str = (string) str;
 
---         if ( strpos( filtered, "<" ) !== false ) then
---                 filtered = wp_pre_kses_less_than( filtered );
---                 // This will strip extra whitespace for us.
---                 filtered = wp_strip_all_tags( filtered, false );
+      Filtered : Unbounded_String := +Wp_Check_Invalid_UTF8 (Str);
+      Found    : Boolean := False;
+      Match    : List_Type;
+   begin
+      if Strpos (-Filtered, "<") /= 0 then -- false
+         Filtered := +Wp_Pre_KSES_Less_Than (-Filtered);
+         -- This will strip extra whitespace for us.
+         Filtered := +Wp_Strip_All_Tags (-Filtered, False);
 
---                 // Use HTML entities in a special case to make sure no later
---                 // newline stripping stage could lead to a functional tag.
---                 filtered = str_replace( "<\n", "&lt;\n", filtered );
---         end;
+         -- Use HTML entities in a special case to make sure no later
+         -- newline stripping stage could lead to a functional tag.
+         Filtered := +Str_Replace ("<\n", "&lt;\n", -Filtered);
+      end if;
 
---         if ( ! keep_newlines ) then
---                 filtered = preg_replace( "/[\r\n\t ]+/", " ", filtered );
---         end;
---         filtered = trim( filtered );
+      if not Keep_Newlines then
+         Filtered := +Preg_Replace ("/[\r\n\t ]+/", " ", -Filtered);
+      end if;
+      Filtered := +Trim (-Filtered);
 
---         found = false;
---         while ( preg_match( "/%[a-f0-9]then2end;/i", filtered, match ) ) then
---                 filtered = str_replace( match[0], "", filtered );
---                 found    = true;
---         end;
+      while Preg_Match ("/%[a-f0-9]{2}/i", -Filtered, Match) /= 0 loop
+         Filtered := +Str_Replace (-Match (1), "", -Filtered); -- [0]
+         Found    := True;
+      end loop;
 
---         if ( found ) then
---                 // Strip out the whitespace that may now exist after removing the octets.
---                 filtered = trim( preg_replace( "/ +/", " ", filtered ) );
---         end;
+      if Found then
+         -- Strip out the whitespace that may now exist after removing the octets.
+         Filtered := +Trim (Preg_Replace ("/ +/", " ", -Filtered));
+      end if;
 
---         return filtered;
--- end;
+      return -Filtered;
+   end X_Sanitize_Text_Fields;
 
    -----------------
    -- Wp_Basename --

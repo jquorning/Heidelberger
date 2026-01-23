@@ -474,7 +474,7 @@ is
 
       Echo ("<li id=""collapse-menu"" class=""hide-if-no-js"">" &
             "<button type=""button"" id=""collapse-button"" aria-label=""" &
-            Esc_Attr_X ("Collapse Main menu") & """ aria-expanded=""true"">" &
+            ESC_Attr_XX ("Collapse Main menu") & """ aria-expanded=""true"">" &
             "<span class=""collapse-button-icon"" aria-hidden=""true""></span>" &
             "<span class=""collapse-button-label"">"" " & abs "Collapse menu" &
             "</span></button></li>");
@@ -492,7 +492,7 @@ is
    begin
 -- ?>
       Echo ("<div id=""adminmenumain"" role=""navigation"" aria-label=""");
-      Esc_Attr_E ("Main menu");
+      ESC_Attr_E ("Main menu");
       Echo (""">");
       Echo ("<a href=""#wpbody-content"" class=""screen-reader-shortcut"">");
       X_E ("Skip to main content");

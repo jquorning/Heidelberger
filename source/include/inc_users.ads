@@ -7,12 +7,58 @@
 
 with Arrays;
 
+with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Admin_Bar;
 
 package Inc_Users
 is
    use Arrays;
+
+   type User_Error_Type is record
+      Success : Boolean;
+      User    : Inc_Class_Wp_Users.Wp_User;
+      Error   : Inc_Class_Wp_Errors.Wp_Error;
+   end record;
+
+   type User_Id_Error_Type is record
+      Success : Boolean;
+      User_Id : Integer;
+      Error   : Inc_Class_Wp_Errors.Wp_Error;
+   end record;
+
+   type Success_Error_Type is record
+      Success : Boolean;
+      Error   : Inc_Class_Wp_Errors.Wp_Error;
+   end record;
+
+   --
+   -- Authenticates and logs a user in with 'remember' capability.
+   --
+   -- The credentials is an array that has 'user_login', 'user_password', and
+   -- 'remember' indices. If the credentials is not given, then the log in form
+   -- will be assumed and used if set.
+   --
+   -- The various authentication cookies will be set by this function and will be
+   -- set for a longer period depending on if the 'remember' credential is set to
+   -- true.
+   --
+   -- Note: wp_signon() doesn't handle setting the current user. This means that if the
+   -- function is called before the {@see "init"} hook is fired, is_user_logged_in()
+   -- will evaluate as false until that point. If is_user_logged_in() is needed in
+   -- conjunction with wp_signon(), wp_set_current_user() should be called explicitly.
+   --
+   -- @since 2.5.0
+   --
+   -- @global string auth_secure_cookie
+   --
+   -- @param array       credentials   Optional. User info in order to sign on.
+   -- @param string|bool secure_cookie Optional. Whether to use secure cookie.
+   -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
+   --
+   function Wp_Signon (Credentials   : Array_Type := Empty_Array;
+                       Secure_Cookie : Boolean    := False) -- String := ""
+                       return User_Error_Type;
 
    --
    -- Retrieves user option that can be either per Site or per Network.
@@ -205,6 +251,28 @@ is
                             return Integer;
 
    --
+   -- Retrieves a user row based on password reset key and login.
+   --
+   -- A key is considered "expired" if it exactly matches the value of the
+   -- user_activation_key field, rather than being matched after going through the
+   -- hashing process. This field is now hashed; old values are no longer accepted
+   -- but have a different WP_Error code so good user feedback can be provided.
+   --
+   -- @since 3.1.0
+   --
+   -- @global wpdb         wpdb      WordPress database object for queries.
+   -- @global PasswordHash wp_hasher Portable PHP password hashing framework instance.
+   --
+   -- @param string key       Hash to validate sending user"s password.
+   -- @param string login     The user login.
+   -- @return WP_User|WP_Error WP_User object on success, WP_Error object for invalid
+   --                          or expired keys.
+   --
+   function Check_Password_Reset_Key (Key   : String;
+                                      Login : String)
+                                      return User_Error_Type;
+
+   --
    -- Finds out whether a user is a member of a given blog.
    --
    -- @since MU (3.0.0)
@@ -223,6 +291,56 @@ is
                                     is (True);
 
    --
+   -- Gets the text suggesting how to create strong passwords.
+   --
+   -- @since 4.1.0
+   --
+   -- @return string The password hint text.
+   --
+   function Wp_Get_Password_Hint
+            return String;
+
+   --
+   -- Handles sending a password retrieval email to a user.
+   --
+   -- @since 2.5.0
+   -- @since 5.7.0 Added `user_login` parameter.
+   --
+   -- @global wpdb         wpdb       WordPress database abstraction object.
+   -- @global PasswordHash wp_hasher  Portable PHP password hashing framework.
+   --
+   -- @param string user_login Optional. Username to send a password retrieval email
+   --                           for. Defaults to `_POST["user_login"]` if not set.
+   -- @return true|WP_Error True when finished, WP_Error object on error.
+   --
+   function Retrieve_Password (User_Login : String := "") -- null
+                               return Success_Error_Type;
+
+   --
+   -- Handles resetting the user's password.
+   --
+   -- @since 2.5.0
+   --
+   -- @param WP_User user     The user
+   -- @param string  new_pass New password for the user in plaintext
+   --
+   procedure Reset_Password (User     : Inc_Class_Wp_Users.Wp_User;
+                             New_Pass : String);
+
+   --
+   -- Handles registering a new user.
+   --
+   -- @since 2.5.0
+   --
+   -- @param string user_login User's username for logging in
+   -- @param string user_email User's email address to send password and add
+   -- @return int|WP_Error Either user's ID or error on failure.
+   --
+   function Register_New_User (User_Login : String;
+                               User_Email : String)
+                               return User_Id_Error_Type;
+
+   --
    -- Retrieves the current session token from the logged_in cookie.
    --
    -- @since 4.0.0
@@ -231,6 +349,13 @@ is
    --
    function Wp_Get_Session_Token
             return String;
+
+   --
+   -- Removes the current session token from the database.
+   --
+   -- @since 4.0.0
+   --
+   procedure Wp_Destroy_Current_Session;
 
    --
    -- Gets the current user"s ID.
@@ -283,6 +408,25 @@ is
    --
    function X_Wp_Get_Current_User
             return Inc_Class_Wp_Users.Wp_User;
+
+   --
+   -- Sets up global user vars.
+   --
+   -- Used by wp_set_current_user() for back compat. Might be deprecated in the future.
+   --
+   -- @since 2.0.4
+   --
+   -- @global string  user_login    The user username for logging in
+   -- @global WP_User userdata      User data.
+   -- @global int     user_level    The level of the user
+   -- @global int     user_ID       The ID of the user
+   -- @global string  user_email    The email address of the user
+   -- @global string  user_url      The url in the user"s profile
+   -- @global string  user_identity The display name of the user
+   --
+   -- @param int for_user_id Optional. User ID to set up global data. Default 0.
+   --
+   procedure Setup_Userdata (For_User_Id : Integer := 0);
 
    --
    -- Updates all user caches.
@@ -391,5 +535,31 @@ is
    function Wp_Insert_User (Userdata : Array_Type)
                             return Integer
                             is (raise Program_Error with "not implemented");
+
+   --
+   -- Returns request confirmation message HTML.
+   --
+   -- @since 4.9.6
+   -- @access private
+   --
+   -- @param int request_id The request ID being confirmed.
+   -- @return string The confirmation message.
+   --
+   function X_Wp_Privacy_Account_Request_Confirmed_Message
+              (Request_Id : Integer)
+              return String;
+
+   --
+   -- Validates a user request by comparing the key with the request's key.
+   --
+   -- @since 4.9.6
+   --
+   -- @param string request_id ID of the request being confirmed.
+   -- @param string key        Provided key to validate.
+   -- @return true|WP_Error True on success, WP_Error on failure.
+   --
+   function Wp_Validate_User_Request_Key (Request_Id : String;
+                                          Key        : String)
+                                          return Success_Error_Type;
 
 end Inc_Users;

@@ -22,6 +22,7 @@ with Inc_Class_Wp_Users;
 with Inc_Media;
 with Inc_Posts;
 with Inc_Taxonomys;
+with Inc_Users;
 
 package Wp_Common
 is
@@ -389,6 +390,51 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name  : String;
+                           Value      : String;
+                           Item       : String;
+                           User       : Inc_Class_Wp_Users.Wp_User)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name   : String;
+                           Value       : Inc_Class_Wp_Errors.Wp_Error;
+                           Redirect_To : String)
+                           return Inc_Class_Wp_Errors.Wp_Error
+                           is (Value);
+
+   function Apply_Filters (Hook_Name   : String;
+                           Value       : String;
+                           Redirect_To : String;
+                           User        : Inc_Users.User_Error_Type)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name   : String;
+                           Value       : String;
+                           User        : Inc_Users.User_Id_Error_Type)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name   : String;
+                           Value       : Inc_Users.User_Error_Type;
+                           Username    : String;
+                           Password    : String)
+                           return Inc_Users.User_Error_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name   : String;
+                           Value       : String;
+                           Errors      : Inc_Class_Wp_Errors.Wp_Error)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name   : String;
+                           Value       : Boolean;
+                           Credentials : Array_Type)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name  : String;
                            Value      : Boolean;
                            Args       : Array_Type;
                            Typ        : String)
@@ -408,7 +454,6 @@ is
 
    procedure Do_Action (Hook_Name : String;
                         A1        : Inc_Class_Wp_Http.Response_Result;
-                        -- Inc_Class_Wp_Errors.Wp_Error;
                         A2        : String;
                         A3        : String;
                         Args      : Array_Type;
@@ -416,7 +461,21 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
+                        Error     : Inc_Class_Wp_Errors.Wp_Error)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
                         User      : Inc_Class_Wp_Users.Wp_User)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Login     : String;
+                        User      : Inc_Class_Wp_Users.Wp_User)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Username  : String;
+                        Error     : Inc_Class_Wp_Errors.Wp_Error)
                         is null;
 
    procedure Do_Action (Hook_Name : String;
@@ -454,6 +513,11 @@ is
                         Action    : String;
                         User      : Inc_Class_Wp_Users.Wp_User;
                         Token     : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Errors    : Inc_Class_Wp_Errors.Wp_Error;
+                        User      : Inc_Users.User_Error_Type)
                         is null;
 
 end Wp_Common;

@@ -244,9 +244,10 @@ is
 
    procedure Wp_Cookie_Constants
    is
-      use Hb_Common;
       use Php.Misc;
       use Php.Preg;
+      use Globals;
+      use Hb_Common;
       use Inc_Options;
    begin
       --
@@ -322,7 +323,7 @@ is
       --
       -- @since 2.0.0
       --
-      COOKIE_DOMAIN := False;
+      COOKIE_DOMAIN := +"False"; -- ???
 
       --
       -- @since 5.2.0

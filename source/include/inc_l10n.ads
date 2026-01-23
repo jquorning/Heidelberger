@@ -8,11 +8,13 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
+with Ada.Strings.Unbounded;
 
 with Arrays;
 with Lists;
 
 with Inc_Class_Wp_Textdomain_Registry;
+with Inc_Class_Wp_Users;
 with POMO_MO;
 with POMO_Translations;
 
@@ -38,6 +40,9 @@ is
    L10n                : String_Maps.Map;
    L10n_Unloaded       : String_Sets.Set;
 
+   Global_Locale           : Ada.Strings.Unbounded.Unbounded_String;
+   Global_Wp_Local_Package : Ada.Strings.Unbounded.Unbounded_String;
+
    function Array_Keys (Map : String_Maps.Map)
                         return List_Type;
 
@@ -62,8 +67,7 @@ is
    -- @return string The locale of the blog or from the {@see "locale"} hook.
    --
    function Get_Locale
-            return String
-            is ("XXX-704");
+            return String;
 
    --
    -- Retrieves the locale of a user.
@@ -73,10 +77,14 @@ is
    --
    -- @since 4.7.0
    --
-   -- @param int|WP_User user User"s ID or a WP_User object. Defaults to current user.
+   -- @param int|WP_User user User's ID or a WP_User object. Defaults to current user.
    -- @return string The locale of the user.
    --
    function Get_User_Locale (User : Integer := 0)
+                             return String
+                             is ("en_US");
+
+   function Get_User_Locale (User : Inc_Class_Wp_Users.Wp_User)
                              return String
                              is ("en_US");
 
@@ -116,12 +124,29 @@ is
                                             return String;
 
    --
-   -- Retrieves the translation of text.
+   -- Retrieves the translation of text and escapes it for safe use in an attribute.
    --
-   -- If there is no translation, or the text domain isn"t loaded, the original text
+   -- If there is no translation, or the text domain isn't loaded, the original text
    -- is returned.
    --
-   -- *Note:* Don"t use translate() directly, use __() or related functions.
+   -- @since 2.8.0
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                      translated strings. Default "default".
+   -- @return string Translated text on success, original text on failure.
+   --
+   function ESC_Attr_XX (Text   : String;
+                         Domain : String := "default")
+                         return String;
+
+   --
+   -- Retrieves the translation of text.
+   --
+   -- If there is no translation, or the text domain isn't loaded, the original text
+   -- is returned.
+   --
+   -- *Note:* Don't use translate() directly, use __() or related functions.
    --
    -- @since 2.2.0
    -- @since 5.5.0 Introduced gettext-thendomainend; filter.
@@ -157,22 +182,24 @@ is
    function "abs" (Item : String) return String;
 
    --
-   -- Retrieves the translation of text and escapes it for safe use in an attribute.
+   -- Translates string with gettext context, and escapes it for safe use in an
+   -- attribute.
    --
-   -- If there is no translation, or the text domain isn't loaded, the original text
-   -- is returned.
+   -- If there is no translation, or the text domain isn"t loaded, the original text
+   -- is escaped and returned.
    --
    -- @since 2.8.0
    --
-   -- @param string text   Text to translate.
-   -- @param string domain Optional. Text domain. Unique identifier for retrieving
-   --                       translated strings. Default "default".
-   -- @return string Translated text on success, original text on failure.
+   -- @param string text    Text to translate.
+   -- @param string context Context information for the translators.
+   -- @param string domain  Optional. Text domain. Unique identifier for retrieving
+   --                        translated strings. Default "default".
+   -- @return string Translated text.
    --
-   function Esc_Attr_X (Item   : String;
-                        Domain : String := "default")
-                        return String
-                        is (Item & "XXX-514");
+   function ESC_Attr_X (Text    : String;
+                        Context : String;
+                        Domain  : String := "default")
+                        return String;
 
    --
    -- Displays translated text.
@@ -200,7 +227,24 @@ is
    -- @param string domain Optional. Text domain. Unique identifier for retrieving
    --                       translated strings. Default "default".
    --
-   procedure Esc_Attr_E (Text   : String;
+   procedure ESC_Attr_E (Text   : String;
+                         Domain : String := "default");
+
+   --
+   -- Displays translated text that has been escaped for safe use in HTML output.
+   --
+   -- If there is no translation, or the text domain isn"t loaded, the original text
+   -- is escaped and displayed.
+   --
+   -- If you need the value for use in PHP, use esc_html__().
+   --
+   -- @since 2.8.0
+   --
+   -- @param string text   Text to translate.
+   -- @param string domain Optional. Text domain. Unique identifier for retrieving
+   --                       translated strings. Default "default".
+   --
+   procedure ESC_HTML_E (Text   : String;
                          Domain : String := "default");
 
    --
@@ -223,8 +267,7 @@ is
    function X_X (Text    : String;
                  Context : String;
                  Domain  : String := "default")
-                 return String
-                 is (Text & " XXX-231 " & Context);
+                 return String;
 
    --
    -- Displays translated string with gettext context.
@@ -442,6 +485,56 @@ is
    --
    function Get_Available_Languages (Dir : String := "") -- null
                                      return Array_Type;
+
+   --
+   -- Displays or returns a Language selector.
+   --
+   -- @since 4.0.0
+   -- @since 4.3.0 Introduced the `echo` argument.
+   -- @since 4.7.0 Introduced the `show_option_site_default` argument.
+   -- @since 5.1.0 Introduced the `show_option_en_us` argument.
+   -- @since 5.9.0 Introduced the `explicit_option_en_us` argument.
+   --
+   -- @see get_available_languages()
+   -- @see wp_get_available_translations()
+   --
+   -- @param string|array args {
+   --     Optional. Array or string of arguments for outputting the language selector.
+   --
+   --     @type string   id                           ID attribute of the select
+   --                                                 element. Default "locale".
+   --     @type string   name                         Name attribute of the select
+   --                                                 element. Default "locale".
+   --     @type array    languages                    List of installed languages,
+   --                                                 contain only the locales.
+   --                                                 Default empty array.
+   --     @type array    translations                 List of available translations.
+   --                                                 Default result of
+   --                                                 wp_get_available_translations().
+   --     @type string   selected                     Language which should be
+   --                                                 selected. Default empty.
+   --     @type bool|int echo                         Whether to echo the generated
+   --                                                 markup. Accepts 0, 1, or their
+   --                                                 boolean equivalents. Default 1.
+   --     @type bool     show_available_translations  Whether to show available
+   --                                                 translations. Default true.
+   --     @type bool     show_option_site_default     Whether to show an option to
+   --                                                 fall back to the site's locale.
+   --                                                 Default false.
+   --     @type bool     show_option_en_us            Whether to show an option for
+   --                                                 English (United States). Default
+   --                                                 true.
+   --     @type bool     explicit_option_en_us        Whether the English (United
+   --                                                 States) option uses an explicit
+   --                                                 value of en_US instead of an
+   --                                                 empty value. Default false.
+   -- }
+   -- @return string HTML dropdown list of languages.
+   --
+   function Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
+                                   return String;
+
+   procedure Wp_Dropdown_Languages (Args : Array_Type := Empty_Array);
 
    --
    -- Unloads translations for a text domain.

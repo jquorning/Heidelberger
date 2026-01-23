@@ -70,6 +70,68 @@ is
       return -Codes.First_Element;
    end Get_Error_Code;
 
+   -----------------------
+   -- Get_Error_Message --
+   -----------------------
+
+   function Get_Error_Messages (This : Wp_Error;
+                                Code : String := "")
+                                return List_Type
+   is
+      use Php.Strings;
+      use Hb_Common;
+   begin
+      -- Return all messages if no code specified.
+      if Empty (Code) then
+         declare
+            All_Messages : List_Type;
+         begin
+            for A in This.Errors.Iterate loop -- (array)
+               declare
+--                Code    : constant String := Key (A);
+                  Message : constant String := As_String (Element (A));
+               begin
+                  All_Messages.Append (+Message);
+--                All_Messages := array_merge( all_messages, messages );
+               end;
+            end loop;
+
+            return All_Messages;
+         end;
+      end if;
+
+      if Isset (This.Errors, Code) then
+         declare
+            Message : constant String := Get_As_String (This.Errors, Code);
+         begin
+            return To_List (Message);
+         end;
+      else
+         return Empty_List;
+      end if;
+   end Get_Error_Messages;
+
+   --------------------
+   -- Get_Error_Data --
+   --------------------
+
+   function Get_Error_Data (This : Wp_Error;
+                            Code : String := "")
+                            return String
+   is
+      use Php.Strings;
+
+      Code_2 : constant String :=
+        (if Empty (Code)
+         then This.Get_Error_Code
+         else Code);
+   begin
+      if Isset (This.Error_Data, Code_2) then
+         return Get_As_String (This.Error_Data, Code_2);
+      end if;
+      return "";
+   end Get_Error_Data;
+
    ----------------
    -- Has_Errors --
    ----------------

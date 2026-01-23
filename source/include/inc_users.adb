@@ -8,121 +8,135 @@
 
 with Php.Strings;
 
+with Binder;
 with Hb_Common;
 with Wp_Common;
 
 with Inc_Caches;
+-- with Inc_Class_Wp_Session_Tokens;
+-- with Inc_Class_Wp_Session_Tokens_Factory;
 with Inc_Formatting;
+with Inc_Load;
+with Inc_L10n;
 with Inc_Pluggables;
--- with Inc_Plugins;
+with Inc_Plugins;
 
 package body Inc_Users
 is
 
--- --
--- -- Authenticates and logs a user in with 'remember' capability.
--- --
--- -- The credentials is an array that has 'user_login', 'user_password', and
--- -- 'remember' indices. If the credentials is not given, then the log in form
--- -- will be assumed and used if set.
--- --
--- -- The various authentication cookies will be set by this function and will be
--- -- set for a longer period depending on if the 'remember' credential is set to
--- -- true.
--- --
--- -- Note: wp_signon() doesn't handle setting the current user. This means that if the
--- -- function is called before the {@see "init"} hook is fired, is_user_logged_in() will
--- -- evaluate as false until that point. If is_user_logged_in() is needed in conjunction
--- -- with wp_signon(), wp_set_current_user() should be called explicitly.
--- --
--- -- @since 2.5.0
--- --
--- -- @global string auth_secure_cookie
--- --
--- -- @param array       credentials   Optional. User info in order to sign on.
--- -- @param string|bool secure_cookie Optional. Whether to use secure cookie.
--- -- @return WP_User|WP_Error WP_User on success, WP_Error on failure.
--- --
--- function wp_signon( credentials = array(), secure_cookie = "" ) then
---         if ( empty( credentials ) ) then
---                 credentials = array(); -- Back-compat for plugins passing an empty string.
+   ---------------
+   -- Wp_Signon --
+   ---------------
 
---                 if ( ! empty( _POST["log"] ) ) then
---                         credentials["user_login"] = wp_unslash( _POST["log"] );
---                 end;
---                 if ( ! empty( _POST["pwd"] ) ) then
---                         credentials["user_password"] = _POST["pwd"];
---                 end;
---                 if ( ! empty( _POST["rememberme"] ) ) then
---                         credentials["remember"] = _POST["rememberme"];
---                 end;
---         end;
+   function Wp_Signon (Credentials   : Array_Type := Empty_Array;
+                       Secure_Cookie : Boolean    := False) -- String := ""
+                       return User_Error_Type
+   is
+      use Binder;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Load;
+      use Inc_Pluggables;
 
---         if ( ! empty( credentials["remember"] ) ) then
---                 credentials["remember"] = true;
---         end; else then
---                 credentials["remember"] = false;
---         end;
+      Credentials_2   : Array_Type := Credentials;
+      Secure_Cookie_2 : Boolean    := Secure_Cookie;
+   begin
+      if Credentials_2.Is_Empty then
+--       credentials = array(); -- Back-compat for plugins passing an empty string.
 
---         --
---         -- Fires before the user is authenticated.
---         --
---         -- The variables passed to the callbacks are passed by reference,
---         -- and can be modified by callback functions.
---         --
---         -- @since 1.5.1
---         --
---         -- @todo Decide whether to deprecate the wp_authenticate action.
---         --
---         -- @param string user_login    Username (passed by reference).
---         -- @param string user_password User password (passed by reference).
---         --
---         do_action_ref_array( "wp_authenticate", array( &credentials["user_login"], &credentials["user_password"] ) );
+         if not Empty (X_POST, "log") then
+            Set (Credentials_2, "user_login", From_String (
+                 Wp_Unslash (Get_As_String (X_POST, "log"))));
+         end if;
 
---         if ( "" === secure_cookie ) then
---                 secure_cookie = is_ssl();
---         end;
+         if not Empty (X_POST, "pwd") then
+            Set (Credentials_2, "user_password", From_String (
+                 Get_As_String (X_POST, "pwd")));
+         end if;
 
---         --
---         -- Filters whether to use a secure sign-on cookie.
---         --
---         -- @since 3.1.0
---         --
---         -- @param bool  secure_cookie Whether to use a secure sign-on cookie.
---         -- @param array credentials then
---         --     Array of entered sign-on data.
---         --
---         --     @type string user_login    Username.
---         --     @type string user_password Password entered.
---         --     @type bool   remember      Whether to "remember" the user. Increases the time
---         --                                 that the cookie will be kept. Default false.
---         -- end;
---         --
---         secure_cookie = apply_filters( "secure_signon_cookie", secure_cookie, credentials );
+         if not Empty (X_POST, "rememberme") then
+            Set (Credentials_2, "remember", From_String (
+                 Get_As_String (X_POST, "rememberme")));
+         end if;
+      end if;
 
---         global auth_secure_cookie; -- XXX ugly hack to pass this to wp_authenticate_cookie().
---         auth_secure_cookie = secure_cookie;
+      if not Empty (Credentials_2, "remember") then
+         Set (Credentials_2, "remember", From_Boolean (True));
+      else
+         Set (Credentials_2, "remember", From_Boolean (False));
+      end if;
 
---         add_filter( "authenticate", "wp_authenticate_cookie", 30, 3 );
+      --
+      -- Fires before the user is authenticated.
+      --
+      -- The variables passed to the callbacks are passed by reference,
+      -- and can be modified by callback functions.
+      --
+      -- @since 1.5.1
+      --
+      -- @todo Decide whether to deprecate the wp_authenticate action.
+      --
+      -- @param string user_login    Username (passed by reference).
+      -- @param string user_password User password (passed by reference).
+      --
+--    Do_Action_Ref_Array ("wp_authenticate", array( &credentials["user_login"], &credentials["user_password"]));
 
---         user = wp_authenticate( credentials["user_login"], credentials["user_password"] );
+      if not Secure_Cookie_2 then
+         Secure_Cookie_2 := Is_SSL;
+      end if;
 
---         if ( is_wp_error( user ) ) then
---                 return user;
---         end;
+      --
+      -- Filters whether to use a secure sign-on cookie.
+      --
+      -- @since 3.1.0
+      --
+      -- @param bool  secure_cookie Whether to use a secure sign-on cookie.
+      -- @param array credentials {
+      --     Array of entered sign-on data.
+      --
+      --     @type string user_login    Username.
+      --     @type string user_password Password entered.
+      --     @type bool   remember      Whether to "remember" the user. Increases
+      --                                the time that the cookie will be kept.
+      --                                Default false.
+      -- }
+      --
+      Secure_Cookie_2 :=
+         Apply_Filters ("secure_signon_cookie", Secure_Cookie_2, Credentials_2);
 
---         wp_set_auth_cookie( user->ID, credentials["remember"], secure_cookie );
---         --
---         -- Fires after the user has successfully logged in.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string  user_login Username.
---         -- @param WP_User user       WP_User object of the logged-in user.
---         --
---         do_action( "wp_login", user->user_login, user );
---         return user;
--- end;
+--    global auth_secure_cookie;
+      -- XXX ugly hack to pass this to wp_authenticate_cookie().
+--    Auth_Secure_Cookie := Secure_Cookie_2;
+
+--    Add_Filter ("authenticate", "wp_authenticate_cookie", 30, 3);
+
+      declare
+         User : constant User_Error_Type :=
+           Wp_Authenticate (Get_As_String (Credentials_2, "user_login"),
+                            Get_As_String (Credentials_2, "user_password"));
+      begin
+
+         if not User.Success then
+--       if Is_Wp_Error (User.User) then
+            return User;
+         end if;
+
+         Wp_Set_Auth_Cookie (User.User.Id,
+                             As_Boolean (Get (Credentials_2, "remember")),
+                             Secure_Cookie_2);
+         --
+         -- Fires after the user has successfully logged in.
+         --
+         -- @since 1.5.0
+         --
+         -- @param string  user_login Username.
+         -- @param WP_User user       WP_User object of the logged-in user.
+         --
+         Do_Action ("wp_login", -User.User.Prop.User_Login, User.User);
+         return User;
+      end;
+   end Wp_Signon;
 
 -- --
 -- -- Authenticates a user, confirming the username and password are valid.
@@ -1482,24 +1496,12 @@ is
 -- -- Private helper functions.
 -- --
 
--- --
--- -- Sets up global user vars.
--- --
--- -- Used by wp_set_current_user() for back compat. Might be deprecated in the future.
--- --
--- -- @since 2.0.4
--- --
--- -- @global string  user_login    The user username for logging in
--- -- @global WP_User userdata      User data.
--- -- @global int     user_level    The level of the user
--- -- @global int     user_ID       The ID of the user
--- -- @global string  user_email    The email address of the user
--- -- @global string  user_url      The url in the user"s profile
--- -- @global string  user_identity The display name of the user
--- --
--- -- @param int for_user_id Optional. User ID to set up global data. Default 0.
--- --
--- function setup_userdata( for_user_id = 0 ) then
+   --------------------
+   -- Setup_Userdata --
+   --------------------
+
+   procedure Setup_Userdata (For_User_Id : Integer := 0)
+   is null;
 --         global user_login, userdata, user_level, user_ID, user_email, user_url, user_identity;
 
 --         if ( ! for_user_id ) then
@@ -2828,25 +2830,28 @@ is
 --         return wp_get_user_contact_methods( user );
 -- end;
 
--- --
--- -- Gets the text suggesting how to create strong passwords.
--- --
--- -- @since 4.1.0
--- --
--- -- @return string The password hint text.
--- --
--- function wp_get_password_hint() then
---         hint = __( "Hint: The password should be at least twelve characters long. To make it stronger, use upper and lower case letters, numbers, and symbols like ! " ?  % ^ &amp; )." );
+   --------------------------
+   -- Wp_Get_Password_Hint --
+   --------------------------
 
---         --
---         -- Filters the text describing the site"s password complexity policy.
---         --
---         -- @since 4.1.0
---         --
---         -- @param string hint The password hint text.
---         --
---         return apply_filters( "password_hint", hint );
--- end;
+   function Wp_Get_Password_Hint
+            return String
+   is
+      use Inc_L10n;
+      use Inc_Plugins;
+
+      Hint : constant String :=
+        abs "Hint: The password should be at least twelve characters long. To make it stronger, use upper and lower case letters, numbers, and symbols like ! "" ?  % ^ &amp; ).""";
+   begin
+      --
+      -- Filters the text describing the site"s password complexity policy.
+      --
+      -- @since 4.1.0
+      --
+      -- @param string hint The password hint text.
+      --
+      return Apply_Filters ("password_hint", Hint);
+   end Wp_Get_Password_Hint;
 
 -- --
 -- -- Creates, stores, then returns a password reset key for user.
@@ -2942,24 +2947,14 @@ is
 --         return key;
 -- end;
 
--- --
--- -- Retrieves a user row based on password reset key and login.
--- --
--- -- A key is considered "expired" if it exactly matches the value of the
--- -- user_activation_key field, rather than being matched after going through the
--- -- hashing process. This field is now hashed; old values are no longer accepted
--- -- but have a different WP_Error code so good user feedback can be provided.
--- --
--- -- @since 3.1.0
--- --
--- -- @global wpdb         wpdb      WordPress database object for queries.
--- -- @global PasswordHash wp_hasher Portable PHP password hashing framework instance.
--- --
--- -- @param string key       Hash to validate sending user"s password.
--- -- @param string login     The user login.
--- -- @return WP_User|WP_Error WP_User object on success, WP_Error object for invalid or expired keys.
--- --
--- function check_password_reset_key( key, login ) then
+   ------------------------------
+   -- Check_Password_Reset_Key --
+   ------------------------------
+
+   function Check_Password_Reset_Key (Key   : String;
+                                      Login : String)
+                                      return User_Error_Type
+   is (raise Program_Error with "not implemented");
 --         global wpdb, wp_hasher;
 
 --         key = preg_replace( "/[^a-z0-9]/i", "", key );
@@ -3034,20 +3029,14 @@ is
 --         return new WP_Error( "invalid_key", __( "Invalid key." ) );
 -- end;
 
--- --
--- -- Handles sending a password retrieval email to a user.
--- --
--- -- @since 2.5.0
--- -- @since 5.7.0 Added `user_login` parameter.
--- --
--- -- @global wpdb         wpdb       WordPress database abstraction object.
--- -- @global PasswordHash wp_hasher  Portable PHP password hashing framework.
--- --
--- -- @param string user_login Optional. Username to send a password retrieval email for.
--- --                           Defaults to `_POST["user_login"]` if not set.
--- -- @return true|WP_Error True when finished, WP_Error object on error.
--- --
--- function retrieve_password( user_login = null ) then
+   -----------------------
+   -- Retrieve_Password --
+   -----------------------
+
+   function Retrieve_Password (User_Login : String := "") -- null
+                               return Success_Error_Type
+   is (raise Program_Error with "not implemented");
+
 --         errors    = new WP_Error();
 --         user_data = false;
 
@@ -3280,15 +3269,13 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Handles resetting the user"s password.
--- --
--- -- @since 2.5.0
--- --
--- -- @param WP_User user     The user
--- -- @param string  new_pass New password for the user in plaintext
--- --
--- function reset_password( user, new_pass ) then
+   --------------------
+   -- Reset_Password --
+   --------------------
+
+   procedure Reset_Password (User     : Inc_Class_Wp_Users.Wp_User;
+                             New_Pass : String)
+   is null;
 --         --
 --         -- Fires before the user"s password is reset.
 --         --
@@ -3313,16 +3300,15 @@ is
 --         do_action( "after_password_reset", user, new_pass );
 -- end;
 
--- --
--- -- Handles registering a new user.
--- --
--- -- @since 2.5.0
--- --
--- -- @param string user_login User"s username for logging in
--- -- @param string user_email User"s email address to send password and add
--- -- @return int|WP_Error Either user"s ID or error on failure.
--- --
--- function register_new_user( user_login, user_email ) then
+   -----------------------
+   -- Register_New_User --
+   -----------------------
+
+   function Register_New_User (User_Login : String;
+                               User_Email : String)
+                               return User_Id_Error_Type
+   is (raise Program_Error with "not implemented");
+
 --         errors = new WP_Error();
 
 --         sanitized_user_login = sanitize_user( user_login );
@@ -3485,18 +3471,25 @@ is
 --         return manager->get_all();
 -- end;
 
--- --
--- -- Removes the current session token from the database.
--- --
--- -- @since 4.0.0
--- --
--- function wp_destroy_current_session() then
---         token = wp_get_session_token();
---         if ( token ) then
---                 manager = WP_Session_Tokens::get_instance( get_current_user_id() );
---                 manager->destroy( token );
---         end;
--- end;
+   --------------------------------
+   -- Wp_Destroy_Current_Session --
+   --------------------------------
+
+   procedure Wp_Destroy_Current_Session
+   is
+      Token : constant String := Wp_Get_Session_Token;
+   begin
+      if Token /= "" then
+         declare
+--          Manager : Duration :=
+--            Inc_Class_Wp_Session_Tokens_Factory.Get_Instance (Get_Current_User_Id); -- ::
+--            Inc_Class_Wp_Session_Tokens.Get_Instance (Get_Current_User_Id); -- ::
+         begin
+            null;
+--          Manager.Destroy (Token);
+         end;
+      end if;
+   end Wp_Destroy_Current_Session;
 
 -- --
 -- -- Removes all but the current session token for the current user for the database.
@@ -4517,16 +4510,14 @@ is
 --         end;
 -- end;
 
--- --
--- -- Returns request confirmation message HTML.
--- --
--- -- @since 4.9.6
--- -- @access private
--- --
--- -- @param int request_id The request ID being confirmed.
--- -- @return string The confirmation message.
--- --
--- function _wp_privacy_account_request_confirmed_message( request_id ) then
+   ----------------------------------------------------
+   -- X_Wp_Privacy_Account_Request_Confirmed_Message --
+   ----------------------------------------------------
+
+   function X_Wp_Privacy_Account_Request_Confirmed_Message
+              (Request_Id : Integer)
+              return String
+   is (raise Program_Error with "not implemented");
 --         request = wp_get_user_request( request_id );
 
 --         message  = "<p class="success">" . __( "Action has been confirmed." ) . "</p>";
@@ -4844,16 +4835,14 @@ is
 --         return key;
 -- end;
 
--- --
--- -- Validates a user request by comparing the key with the request"s key.
--- --
--- -- @since 4.9.6
--- --
--- -- @param string request_id ID of the request being confirmed.
--- -- @param string key        Provided key to validate.
--- -- @return true|WP_Error True on success, WP_Error on failure.
--- --
--- function wp_validate_user_request_key( request_id, key ) then
+   ----------------------------------
+   -- Wp_Validate_User_Request_Key --
+   ----------------------------------
+
+   function Wp_Validate_User_Request_Key (Request_Id : String;
+                                          Key        : String)
+                                          return Success_Error_Type
+   is (raise Program_Error with "not implemented");
 --         global wp_hasher;
 
 --         request_id       = absint( request_id );

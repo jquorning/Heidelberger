@@ -95,31 +95,17 @@ is
    function Get_Error_Code (This : Wp_Error)
                             return String;
 
-        -- --
-        -- -- Retrieves all error messages, or the error messages for the given error code.
-        -- --
-        -- -- @since 2.1.0
-        -- --
-        -- -- @param string|int code Optional. Retrieve messages matching code, if exists.
-        -- -- @return string[] Error strings on success, or empty array if there are none.
-        -- --
-        -- public function get_error_messages( code = '' ) then
-        --         // Return all messages if no code specified.
-        --         if ( empty( code ) ) then
-        --                 all_messages = array();
-        --                 foreach ( (array) this->errors as code => messages ) then
-        --                         all_messages = array_merge( all_messages, messages );
-        --                 end;
-
-        --                 return all_messages;
-        --         end;
-
-        --         if ( isset( this->errors[ code ] ) ) then
-        --                 return this->errors[ code ];
-        --         end; else then
-        --                 return array();
-        --         end;
-        -- end;
+   --
+   -- Retrieves all error messages, or the error messages for the given error code.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string|int code Optional. Retrieve messages matching code, if exists.
+   -- @return string[] Error strings on success, or empty array if there are none.
+   --
+   function Get_Error_Messages (This : Wp_Error;
+                                Code : String := "")
+                                return List_Type;
 
         -- --
         -- -- Gets a single error message.
@@ -143,23 +129,17 @@ is
         --         return messages[0];
         -- end;
 
-        -- --
-        -- -- Retrieves the most recently added error data for an error code.
-        -- --
-        -- -- @since 2.1.0
-        -- --
-        -- -- @param string|int code Optional. Error code.
-        -- -- @return mixed Error data, if it exists.
-        -- --
-        -- public function get_error_data( code = '' ) then
-        --         if ( empty( code ) ) then
-        --                 code = this->get_error_code();
-        --         end;
-
-        --         if ( isset( this->error_data[ code ] ) ) then
-        --                 return this->error_data[ code ];
-        --         end;
-        -- end;
+   --
+   -- Retrieves the most recently added error data for an error code.
+   --
+   -- @since 2.1.0
+   --
+   -- @param string|int code Optional. Error code.
+   -- @return mixed Error data, if it exists.
+   --
+   function Get_Error_Data (This : Wp_Error;
+                            Code : String := "")
+                            return String;
 
    --
    -- Verifies if the instance contains errors.

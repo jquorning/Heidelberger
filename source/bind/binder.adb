@@ -25,8 +25,8 @@ with Adm_Load_Styles;
 with Adm_Post;
 with Adm_Privacy;
 with Adm_Upgrade;
-
-with Inc_Plugins;
+with Wp_Login;
+-- with Inc_Plugins;
 
 -- with Adi_Menu;
 -- with Adi_Nav_Menus;
@@ -98,17 +98,23 @@ is
       elsif Index (URL, "/wp-admin/upgrade.php") /= 0 then
          Adm_Upgrade.Render;
 
+      elsif Index (URL, "/wp-login.php") /= 0 then
+         Wp_Login.Render;
+
       end if;
 
       PHP_To_Web_Server;
 
-      Inc_Plugins.Dump_Hooks;
+--    Inc_Plugins.Dump_Hooks;
 
       Payload := +Php.Echoing.Get_Echo;
       return AWS.Response.Build ("text/html", Payload);
 
    exception
-      when Redirect_Signal | Php.Errors.Program_Termination =>
+      when Php.Errors.Program_Termination =>
+         return AWS.Response.Build ("text/html", Php.Echoing.Get_Echo);
+
+      when Redirect_Signal =>
          declare
             use Php.HTML;
 

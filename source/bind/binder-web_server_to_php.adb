@@ -31,12 +31,12 @@ begin
    Put_Line ("  Request_URI: " & Request_URI);
 
    Set (X_SERVER, "PHP_SELF",        From_String (PHP_Self));
-   -- "/wp-admin/edit.php"));
    Set (X_SERVER, "HTTP_USER_AGENT", From_String ("XXX-790"));
    Set (X_SERVER, "SERVER_SOFTWARE", From_String ("Apache"));
    Set (X_SERVER, "REQUEST_URI",     From_String (Request_URI));
-   -- "/edit.php"));
    Set (X_SERVER, "HTTP_HOST",       From_String ("XXX-902"));
+   Set (X_SERVER, "REQUEST_METHOD",
+        From_String (Request_Method'(Method (Status))'Image));
 
    XX_GET := Empty_Array;
    declare

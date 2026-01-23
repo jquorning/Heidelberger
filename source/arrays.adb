@@ -491,7 +491,11 @@ is
                  return Multi_Type
    is
    begin
-      return Element (Position);
+      if Has_Element (Position) then
+         return Element (Position);
+      else
+         return From_Null;
+      end if;
    end Get;
 
    function Get (Arry : Array_Type;

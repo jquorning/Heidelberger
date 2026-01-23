@@ -106,6 +106,27 @@ is
                            return String;
 
    --
+   -- Returns the URL that allows the user to register on the site.
+   --
+   -- @since 3.6.0
+   --
+   -- @return string User registration URL.
+   --
+   function Wp_Registration_URL
+            return String;
+
+   --
+   -- Returns the URL that allows the user to reset the lost password.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string redirect Path to redirect to on login.
+   -- @return string Lost password URL.
+   --
+   function Wp_Lostpassword_URL (Redirect : String := "")
+                                 return String;
+
+   --
    -- Retrieves the login URL.
    --
    -- @since 2.7.0
@@ -452,6 +473,21 @@ is
                            return String;
 
    --
+   -- Displays a referrer `strict-origin-when-cross-origin` meta tag.
+   --
+   -- Outputs a referrer `strict-origin-when-cross-origin` meta tag that tells the
+   -- browser not to send the full URL as a referrer to other sites when cross-origin
+   -- assets are loaded.
+   --
+   -- Typical usage is as a {@see "wp_head"} callback:
+   --
+   --     add_action( "wp_head", "wp_strict_cross_origin_referrer" );
+   --
+   -- @since 5.7.0
+   --
+   procedure Wp_Strict_Cross_Origin_Referrer;
+
+   --
    -- Retrieves post published or modified time as a `DateTimeImmutable` object
    -- instance.
    --
@@ -538,6 +574,11 @@ is
 
    function Checked (Checkd  : Integer;
                      Current : Integer;
+                     Echo    : Boolean := True)
+                     return String;
+
+   function Checked (Checkd  : Boolean := True;
+                     Current : Boolean := True;
                      Echo    : Boolean := True)
                      return String;
 

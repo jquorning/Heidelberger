@@ -227,7 +227,7 @@ is
                Echo ("                                        <input type=""password"" name=""admin_password"" id=""pass1"" class=""regular-text"" autocomplete=""new-password"" data-reveal=""1"" data-pw=""" & ESC_Attr (Initial_Password) & """ aria-describedby=""pass-strength-result"" />" & NL);
             end;
             Echo ("                                        <button type=""button"" class=""button wp-hide-pw hide-if-no-js"" data-start-masked=""" & Boolean'Image (Isset (X_POST, "admin_password")) & """ data-toggle=""0"" aria-label=""");
-            Esc_Attr_E ("Hide password");
+            ESC_Attr_E ("Hide password");
             Echo (""">" & NL); -- (int)
             Echo ("                                                <span class=""dashicons dashicons-hidden""></span>" & NL);
             Echo ("                                                <span class=""text"">");

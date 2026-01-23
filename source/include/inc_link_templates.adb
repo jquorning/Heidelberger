@@ -9,6 +9,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Php.Arrays;
+with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
 with Php.Misc;
@@ -42,6 +43,7 @@ with Inc_Ms_Networks;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Pluggables;
+with Inc_Post_Templates;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Users;
@@ -4957,86 +4959,108 @@ is
 --         return apply_filters( "parent_theme_file_path", path, file );
 -- end;
 
--- --
--- -- Retrieves the URL to the privacy policy page.
--- --
--- -- @since 4.9.6
--- --
--- -- @return string The URL to the privacy policy page. Empty string if it doesn"t exist.
--- --
--- function get_privacy_policy_url() then
---         url            = "";
---         policy_page_id = (int) get_option( "wp_page_for_privacy_policy" );
+   ----------------------------
+   -- Get_Privacy_Policy_URL --
+   ----------------------------
 
---         if ( ! empty( policy_page_id ) && get_post_status( policy_page_id ) === "publish" ) then
---                 url = (string) get_permalink( policy_page_id );
---         end;
+   function Get_Privacy_Policy_URL
+            return String
+   is
+      use Inc_Class_Wp_Posts;
+      use Inc_Options;
+      use Inc_Plugins;
+      use Inc_Posts;
 
---         --
---         -- Filters the URL of the privacy policy page.
---         --
---         -- @since 4.9.6
---         --
---         -- @param string url            The URL to the privacy policy page. Empty string
---         --                               if it doesn"t exist.
---         -- @param int    policy_page_id The ID of privacy policy page.
---         --
---         return apply_filters( "privacy_policy_url", url, policy_page_id );
--- end;
+      Policy_Page_Id : constant Integer :=
+        Get_Option ("wp_page_for_privacy_policy");
 
--- --
--- -- Displays the privacy policy link with formatting, when applicable.
--- --
--- -- @since 4.9.6
--- --
--- -- @param string before Optional. Display before privacy policy link. Default empty.
--- -- @param string after  Optional. Display after privacy policy link. Default empty.
--- --
--- function the_privacy_policy_link( before = "", after = "" ) then
---         echo get_the_privacy_policy_link( before, after );
--- end;
+      URL : constant String :=
+        (if
+           Policy_Page_Id /= 0 and then
+--         not Empty (Policy_Page_Id) and then
+           Get_Post_Status (Post_Id (Policy_Page_Id)) = "publish"
+         then String'(Get_Permalink (Post_Id (Policy_Page_Id)))
+         else "");
+   begin
+      --
+      -- Filters the URL of the privacy policy page.
+      --
+      -- @since 4.9.6
+      --
+      -- @param string url            The URL to the privacy policy page. Empty string
+      --                               if it doesn"t exist.
+      -- @param int    policy_page_id The ID of privacy policy page.
+      --
+      return Apply_Filters ("privacy_policy_url", URL, Policy_Page_Id);
+   end Get_Privacy_Policy_URL;
 
--- --
--- -- Returns the privacy policy link with formatting, when applicable.
--- --
--- -- @since 4.9.6
--- --
--- -- @param string before Optional. Display before privacy policy link. Default empty.
--- -- @param string after  Optional. Display after privacy policy link. Default empty.
--- -- @return string Markup for the link and surrounding elements. Empty string if it
--- --                doesn"t exist.
--- --
--- function get_the_privacy_policy_link( before = "", after = "" ) then
---         link               = "";
---         privacy_policy_url = get_privacy_policy_url();
---         policy_page_id     = (int) get_option( "wp_page_for_privacy_policy" );
---         page_title         = ( policy_page_id ) ? get_the_title( policy_page_id ) : "";
+   -----------------------------
+   -- The_Privacy_Policy_Link --
+   -----------------------------
 
---         if ( privacy_policy_url && page_title ) then
---                 link = sprintf(
---                         "<a class="privacy-policy-link" href="%s">%s</a>",
---                         esc_url( privacy_policy_url ),
---                         esc_html( page_title )
---                 );
---         end;
+   procedure The_Privacy_Policy_Link (Before : String := "";
+                                      After  : String := "")
+   is
+      use Php.Echoing;
+   begin
+      Echo (Get_The_Privacy_Policy_Link (Before, After));
+   end The_Privacy_Policy_Link;
 
---         --
---         -- Filters the privacy policy link.
---         --
---         -- @since 4.9.6
---         --
---         -- @param string link               The privacy policy link. Empty string if it
---         --                                   doesn"t exist.
---         -- @param string privacy_policy_url The URL of the privacy policy. Empty string
---         --                                   if it doesn"t exist.
---         --
---         link = apply_filters( "the_privacy_policy_link", link, privacy_policy_url );
+   ---------------------------------
+   -- Get_The_Privacy_Policy_Link --
+   ---------------------------------
 
---         if ( link ) then
---                 return before . link . after;
---         end;
+   function Get_The_Privacy_Policy_Link (Before : String := "";
+                                         After  : String := "")
+                                         return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Formatting;
+      use Inc_Options;
+      use Inc_Plugins;
+      use Inc_Post_Templates;
 
---         return "";
--- end;
+      Privacy_Policy_URL : constant String :=
+        Get_Privacy_Policy_URL;
+
+      Policy_Page_Id : constant Integer :=
+        Get_Option ("wp_page_for_privacy_policy");
+
+      Page_Title : constant String :=
+        (if Policy_Page_Id /= 0
+         then Get_The_Title (Policy_Page_Id) else "");
+
+      Link_2 : constant String :=
+        (if Privacy_Policy_URL /= "" and then Page_Title /= ""
+         then
+           Sprintf (
+             "<a class=""privacy-policy-link"" href=""%s"">%s</a>",
+             To_List (List => (
+               1 => +ESC_URL (Privacy_Policy_URL),
+               2 => +ESC_HTML (Page_Title)
+             )))
+         else "");
+
+      --
+      -- Filters the privacy policy link.
+      --
+      -- @since 4.9.6
+      --
+      -- @param string link               The privacy policy link. Empty string if it
+      --                                   doesn"t exist.
+      -- @param string privacy_policy_url The URL of the privacy policy. Empty string
+      --                                   if it doesn"t exist.
+      --
+      Link : constant String :=
+        Apply_Filters ("the_privacy_policy_link", Link_2, Privacy_Policy_URL);
+   begin
+      if Link /= "" then
+         return Before & Link & After;
+      end if;
+
+      return "";
+   end Get_The_Privacy_Policy_Link;
 
 end Inc_Link_Templates;

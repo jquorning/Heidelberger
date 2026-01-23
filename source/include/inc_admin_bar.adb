@@ -616,7 +616,7 @@ is
       end if;
 
       Customize_URL := +Add_Query_Arg ("url", URL_Encode (-Current_URL),
-                                       Wp_Customize_Url);
+                                       Wp_Customize_URL);
       if Is_Customize_Preview then
          Customize_URL :=
             +Add_Query_Arg (Arrays.To_Array ((1 =>

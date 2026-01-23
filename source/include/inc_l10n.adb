@@ -6,22 +6,25 @@
 -- @since 1.2.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
 with Php.Strings;
 with Php.Types;
 
+with Array_Vectors;
 with Binder;
 with Globals;
 with Hb_Common;
 
+with Adi_Translation_Install;
 with Inc_Class_Wp_Locale_Switchers;
 with Inc_Formatting;
+with Inc_Functions;
+with Inc_General_Templates;
 with Inc_Plugins;
 with Inc_Load;
+with Inc_Options;
 with Inc_Themes;
 
 package body Inc_L10n is
@@ -30,13 +33,13 @@ package body Inc_L10n is
 
    function "abs" (Item : String) return String is (Item);
 
-   function Apply_Filters (Name        : String;
-                           Translation : String;
-                           Text        : String;
-                           Context     : String;
-                           Domain      : String)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Text      : String;
+                           Context   : String;
+                           Domain    : String)
                            return String
-                           is ("XXX-001");
+                           is (Value);
 
    ----------------
    -- Array_Keys --
@@ -55,78 +58,82 @@ package body Inc_L10n is
       return List;
    end Array_Keys;
 
--- --
--- -- Retrieves the current locale.
--- --
--- -- If the locale is set, then it will filter the locale in the {@see "locale"}
--- -- filter hook and return the value.
--- --
--- -- If the locale is not set already, then the WPLANG constant is used if it is
--- -- defined. Then it is filtered through the {@see "locale"} filter hook and
--- -- the value for the locale global set and the locale is returned.
--- --
--- -- The process to get the locale should only be done once, but the locale will
--- -- always be filtered using the {@see "locale"} hook.
--- --
--- -- @since 1.5.0
--- --
--- -- @global string locale           The current locale.
--- -- @global string wp_local_package Locale code of the package.
--- --
--- -- @return string The locale of the blog or from the {@see "locale"} hook.
--- --
--- function get_locale() then
---         global locale, wp_local_package;
+   ----------------
+   -- Get_Locale --
+   ----------------
 
---         if ( isset( locale ) ) then
---                 -- This filter is documented in wp-includes/l10n.php--
---                 return apply_filters( "locale", locale );
---         end;
+   function Get_Locale
+            return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Load;
+      use Inc_Options;
+      use Inc_Plugins;
+--    global locale, wp_local_package;
+   begin
+      if Global_Locale /= "" then
+--    if Isset (Global_Locale) then
+         -- This filter is documented in wp-includes/l10n.php
+         return Apply_Filters ("locale", -Global_Locale);
+      end if;
 
---         if ( isset( wp_local_package ) ) then
---                 locale = wp_local_package;
---         end;
+      if Global_Wp_Local_Package /= "" then
+--    if Isset (Global_Wp_Local_Package) then
+         Global_Locale := Global_Wp_Local_Package;
+      end if;
 
---         // WPLANG was defined in wp-config.
---         if ( defined( "WPLANG" ) ) then
---                 locale = WPLANG;
---         end;
+      -- WPLANG was defined in wp-config.
+      if Globals.WPLANG /= "" then
+         Global_Locale := +Globals.WPLANG;
+      end if;
 
---         // If multisite, check options.
---         if ( is_multisite() ) then
---                 // Don"t check blog option when installing.
---                 if ( wp_installing() ) then
---                         ms_locale = get_site_option( "WPLANG" );
---                 end; else then
---                         ms_locale = get_option( "WPLANG" );
---                         if ( false === ms_locale ) then
---                                 ms_locale = get_site_option( "WPLANG" );
---                         end;
---                 end;
+      -- If multisite, check options.
+      if Is_Multisite then
+         declare
+            MS_Locale : Unbounded_String;
+         begin
+            -- Don't check blog option when installing.
+            if Wp_Installing then
+               MS_Locale := +As_String (Get_Site_Option ("WPLANG"));
+            else
+               MS_Locale := +Get_Option ("WPLANG");
+               if "" = MS_Locale then
+--             if False = MS_Locale then
+                  MS_Locale := +As_String (Get_Site_Option ("WPLANG"));
+               end if;
+            end if;
 
---                 if ( false !== ms_locale ) then
---                         locale = ms_locale;
---                 end;
---         end; else then
---                 db_locale = get_option( "WPLANG" );
---                 if ( false !== db_locale ) then
---                         locale = db_locale;
---                 end;
---         end;
+            if "" /= MS_Locale then
+--          if False /= MS_Locale then
+               Global_Locale := MS_Locale;
+            end if;
+         end;
+      else
+         declare
+            DB_Locale : constant String := Get_Option ("WPLANG");
+         begin
+            if "" /= DB_Locale then
+--          if False /= DB_Locale then
+               Global_Locale := +DB_Locale;
+            end if;
+         end;
+      end if;
 
---         if ( empty( locale ) ) then
---                 locale = "en_US";
---         end;
+      if Empty (-Global_Locale) then
+         Global_Locale := +"en_US";
+      end if;
 
---         --
---         -- Filters the locale ID of the WordPress installation.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string locale The locale ID.
---         --
---         return apply_filters( "locale", locale );
--- end;
+      --
+      -- Filters the locale ID of the WordPress installation.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string locale The locale ID.
+      --
+      return Apply_Filters ("locale", -Global_Locale);
+   end Get_Locale;
 
 -- --
 -- -- Retrieves the locale of a user.
@@ -319,9 +326,9 @@ package body Inc_L10n is
 --    use Inc_Plugins;
       use POMO_Translations;
 
-      Trans       : constant Translations := Get_Translations_For_Domain (Domain);
-      Translation : String       := Trans.Translate (Text, Context);
-   begin
+      Trans         : constant Translations := Get_Translations_For_Domain (Domain);
+      Translation_3 : constant String       := Trans.Translate (Text, Context);
+
       --
       -- Filters text with its translation based on context information.
       --
@@ -333,8 +340,8 @@ package body Inc_L10n is
       -- @param string domain      Text domain. Unique identifier for retrieving
       --                            translated strings.
       --
-      Translation :=
-        Apply_Filters ("gettext_with_context", Translation, Text, Context, Domain);
+      Translation_2 : constant String :=
+        Apply_Filters ("gettext_with_context", Translation_3, Text, Context, Domain);
 
       --
       -- Filters text with its translation based on context information for a domain.
@@ -349,10 +356,11 @@ package body Inc_L10n is
       -- @param string domain      Text domain. Unique identifier for retrieving
       --                            translated strings.
       --
-      Translation :=
+      Translation : constant String :=
         Apply_Filters ("gettext_with_context_" & Domain,
-                       Translation, Text, Context, Domain);
+                       Translation_2, Text, Context, Domain);
 
+   begin
       return Translation;
    end Translate_With_Gettext_Context;
 
@@ -372,21 +380,18 @@ package body Inc_L10n is
 --         return translate( text, domain );
 -- end;
 
--- --
--- -- Retrieves the translation of text and escapes it for safe use in an attribute.
--- --
--- -- If there is no translation, or the text domain isn"t loaded, the original text is returned.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text   Text to translate.
--- -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                       Default "default".
--- -- @return string Translated text on success, original text on failure.
--- --
--- function esc_attr__( text, domain = "default" ) then
---         return esc_attr( translate( text, domain ) );
--- end;
+   -----------------
+   -- ESC_Attr_XX --
+   -----------------
+
+   function ESC_Attr_XX (Text   : String;
+                         Domain : String := "default")
+                         return String
+   is
+      use Inc_Formatting;
+   begin
+      return ESC_Attr (Translate (Text, Domain));
+   end ESC_Attr_XX;
 
 -- --
 -- -- Retrieves the translation of text and escapes it for safe use in HTML output.
@@ -422,53 +427,40 @@ package body Inc_L10n is
    -- Esc_Attr_E --
    ----------------
 
-   procedure Esc_Attr_E (Text   : String;
+   procedure ESC_Attr_E (Text   : String;
                          Domain : String := "default")
    is
       use Php.Echoing;
       use Inc_Formatting;
    begin
       Echo (ESC_Attr (Translate (Text, Domain)));
-   end Esc_Attr_E;
+   end ESC_Attr_E;
 
--- --
--- -- Displays translated text that has been escaped for safe use in HTML output.
--- --
--- -- If there is no translation, or the text domain isn"t loaded, the original text
--- -- is escaped and displayed.
--- --
--- -- If you need the value for use in PHP, use esc_html__().
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text   Text to translate.
--- -- @param string domain Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                       Default "default".
--- --
--- function esc_html_e( text, domain = "default" ) then
---         echo esc_html( translate( text, domain ) );
--- end;
+   ----------------
+   -- ESC_HTML_E --
+   ----------------
 
--- --
--- -- Retrieves translated string with gettext context.
--- --
--- -- Quite a few times, there will be collisions with similar translatable text
--- -- found in more than two places, but with different translated context.
--- --
--- -- By including the context in the pot file, translators can translate the two
--- -- strings differently.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text    Text to translate.
--- -- @param string context Context information for the translators.
--- -- @param string domain  Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                        Default "default".
--- -- @return string Translated context string without pipe.
--- --
--- function _x( text, context, domain = "default" ) then
---         return translate_with_gettext_context( text, context, domain );
--- end;
+   procedure ESC_HTML_E (Text   : String;
+                         Domain : String := "default")
+   is
+      use Php.Echoing;
+      use Inc_Formatting;
+   begin
+      Echo (ESC_HTML (Translate (Text, Domain)));
+   end ESC_HTML_E;
+
+   ---------
+   -- X_X --
+   ---------
+
+   function X_X (Text    : String;
+                 Context : String;
+                 Domain  : String := "default")
+                 return String
+   is
+   begin
+      return Translate_With_Gettext_Context (Text, Context, Domain);
+   end X_X;
 
 -- --
 -- -- Displays translated string with gettext context.
@@ -484,23 +476,19 @@ package body Inc_L10n is
 --         echo _x( text, context, domain );
 -- end;
 
--- --
--- -- Translates string with gettext context, and escapes it for safe use in an attribute.
--- --
--- -- If there is no translation, or the text domain isn"t loaded, the original text
--- -- is escaped and returned.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string text    Text to translate.
--- -- @param string context Context information for the translators.
--- -- @param string domain  Optional. Text domain. Unique identifier for retrieving translated strings.
--- --                        Default "default".
--- -- @return string Translated text.
--- --
--- function esc_attr_x( text, context, domain = "default" ) then
---         return esc_attr( translate_with_gettext_context( text, context, domain ) );
--- end;
+   ----------------
+   -- ESC_Attr_X --
+   ----------------
+
+   function ESC_Attr_X (Text    : String;
+                        Context : String;
+                        Domain  : String := "default")
+                        return String
+   is
+      use Inc_Formatting;
+   begin
+      return ESC_Attr (Translate_With_Gettext_Context (Text, Context, Domain));
+   end ESC_Attr_X;
 
 -- --
 -- -- Translates string with gettext context, and escapes it for safe use in HTML output.
@@ -1633,165 +1621,227 @@ package body Inc_L10n is
 --         return headers;
 -- end;
 
--- --
--- -- Displays or returns a Language selector.
--- --
--- -- @since 4.0.0
--- -- @since 4.3.0 Introduced the `echo` argument.
--- -- @since 4.7.0 Introduced the `show_option_site_default` argument.
--- -- @since 5.1.0 Introduced the `show_option_en_us` argument.
--- -- @since 5.9.0 Introduced the `explicit_option_en_us` argument.
--- --
--- -- @see get_available_languages()
--- -- @see wp_get_available_translations()
--- --
--- -- @param string|array args then
--- --     Optional. Array or string of arguments for outputting the language selector.
--- --
--- --     @type string   id                           ID attribute of the select element. Default "locale".
--- --     @type string   name                         Name attribute of the select element. Default "locale".
--- --     @type array    languages                    List of installed languages, contain only the locales.
--- --                                                  Default empty array.
--- --     @type array    translations                 List of available translations. Default result of
--- --                                                  wp_get_available_translations().
--- --     @type string   selected                     Language which should be selected. Default empty.
--- --     @type bool|int echo                         Whether to echo the generated markup. Accepts 0, 1, or their
--- --                                                  boolean equivalents. Default 1.
--- --     @type bool     show_available_translations  Whether to show available translations. Default true.
--- --     @type bool     show_option_site_default     Whether to show an option to fall back to the site"s locale. Default false.
--- --     @type bool     show_option_en_us            Whether to show an option for English (United States). Default true.
--- --     @type bool     explicit_option_en_us        Whether the English (United States) option uses an explicit value of en_US
--- --                                                  instead of an empty value. Default false.
--- -- end;
--- -- @return string HTML dropdown list of languages.
--- --
--- function wp_dropdown_languages( args = array() ) then
+   ---------------------------
+   -- Wp_Dropdown_Languages --
+   ---------------------------
 
---         parsed_args = wp_parse_args(
---                 args,
---                 array(
---                         "id"                          => "locale",
---                         "name"                        => "locale",
---                         "languages"                   => array(),
---                         "translations"                => array(),
---                         "selected"                    => "",
---                         "echo"                        => 1,
---                         "show_available_translations" => true,
---                         "show_option_site_default"    => false,
---                         "show_option_en_us"           => true,
---                         "explicit_option_en_us"       => false,
---                 )
---         );
+   function Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
+                                   return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Echoing;
+      use Php.Strings;
+      use Array_Vectors;
+      use Hb_Common;
+      use Adi_Translation_Install;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_General_Templates;
 
---         // Bail if no ID or no name.
---         if ( ! parsed_args["id"] || ! parsed_args["name"] ) then
---                 return;
---         end;
+      Parsed_Args : Array_Type :=
+        Wp_Parse_Args (
+          Args,
+          To_Array (List => (
+            Build ("id",                          "locale"),
+            Build ("name",                        "locale"),
+            Build ("languages",                   Empty_List),
+            Build ("translations",                Empty_Array),
+            Build ("selected",                    ""),
+            Build ("echo",                        1),
+            Build ("show_available_translations", True),
+            Build ("show_option_site_default",    False),
+            Build ("show_option_en_us",           True),
+            Build ("explicit_option_en_us",       False)
+          ))
+        );
+   begin
+      -- Bail if no ID or no name.
+      if
+        not Isset (Parsed_Args, "id") or else
+        not Isset (Parsed_Args, "name")
+      then
+--    if not parsed_args["id"] or else not parsed_args["name"] then
+         return "";
+      end if;
 
---         // English (United States) uses an empty string for the value attribute.
---         if ( "en_US" === parsed_args["selected"] && ! parsed_args["explicit_option_en_us"] ) then
---                 parsed_args["selected"] = "";
---         end;
+      -- English (United States) uses an empty string for the value attribute.
+      if
+        "en_US" = Get_As_String (Parsed_Args, "selected") and then
+        not Isset (Parsed_Args, "explicit_option_en_us")
+      then
+         Set (Parsed_Args, "selected", From_String (""));
+      end if;
 
---         translations = parsed_args["translations"];
---         if ( empty( translations ) ) then
---                 require_once ABSPATH . "wp-admin/includes/translation-install.php";
---                 translations = wp_get_available_translations();
---         end;
+      declare
+         Translations_2 : constant Array_Type :=
+           As_Array (Get (Parsed_Args, "translations"));
 
---         /*
---         -- parsed_args["languages"] should only contain the locales. Find the locale in
---         -- translations to get the native name. Fall back to locale.
---         --
---         languages = array();
---         foreach ( parsed_args["languages"] as locale ) then
---                 if ( isset( translations[ locale ] ) ) then
---                         translation = translations[ locale ];
---                         languages[] = array(
---                                 "language"    => translation["language"],
---                                 "native_name" => translation["native_name"],
---                                 "lang"        => current( translation["iso"] ),
---                         );
+         Translations : Array_Type :=
+           (if Translations_2.Is_Empty
+            then Wp_Get_Available_Translations
+            else Translations_2);
 
---                         // Remove installed language from available translations.
---                         unset( translations[ locale ] );
---                 end; else then
---                         languages[] = array(
---                                 "language"    => locale,
---                                 "native_name" => locale,
---                                 "lang"        => "",
---                         );
---                 end;
---         end;
+         Languages : Array_Vector;
+      begin
+         --
+         -- parsed_args["languages"] should only contain the locales. Find the
+         -- locale in translations to get the native name. Fall back to locale.
+         --
+         for Locale of As_List (Get (Parsed_Args, "languages")) loop
+            if Isset (Translations, -Locale) then
+               declare
+                  Translation : constant Array_Type :=
+                    As_Array (Get (Translations, -Locale));
+               begin
+                  Languages.Append (To_Array (List => (
+                    Build ("language",    Get_As_String (Translation, "language")),
+                    Build ("native_name", Get_As_String (Translation, "native_name")),
+                    Build ("lang",        Get_As_String (Translation, "iso"))
+                    -- current ???
+                  )));
 
---         translations_available = ( ! empty( translations ) && parsed_args["show_available_translations"] );
+                  -- Remove installed language from available translations.
+                  Delete (Ref (Translations, -Locale));
+               end;
+            else
+               Languages.Append (To_Array (List => (
+                 Build ("language",    -Locale),
+                 Build ("native_name", -Locale),
+                 Build ("lang",        "")
+               )));
+            end if;
+         end loop;
 
---         // Holds the HTML markup.
---         structure = array();
+         declare
+            Translations_Available : constant Boolean :=
+              not Translations.Is_Empty and then
+              As_Boolean (Get (Parsed_Args, "show_available_translations"));
 
---         // List installed languages.
---         if ( translations_available ) then
---                 structure[] = "<optgroup label="" . esc_attr_x( "Installed", "translations" ) . "">";
---         end;
+            -- Holds the HTML markup.
+            Structure : List_Type;
+         begin
+            -- List installed languages.
+            if Translations_Available then
+               Structure.Append (+("<optgroup label=""" &
+                                   ESC_Attr_X ("Installed", "translations") & """>"));
+            end if;
 
---         // Site default.
---         if ( parsed_args["show_option_site_default"] ) then
---                 structure[] = sprintf(
---                         "<option value="site-default" data-installed="1"%s>%s</option>",
---                         selected( "site-default", parsed_args["selected"], false ),
---                         _x( "Site Default", "default site language" )
---                 );
---         end;
+            -- Site default.
+            if As_Boolean (Get (Parsed_Args, "show_option_site_default")) then
+               Structure.Append (
+                 +Sprintf (
+                   "<option value=""site-default"" data-installed=""1""%s>%s</option>",
+                   To_List (List => (
+                     1 => +Selected ("site-default",
+                                     Get_As_String (Parsed_Args, "selected"),
+                                     False),
+                     2 => +X_X ("Site Default", "default site language")
+                   ))
+                ));
+            end if;
 
---         if ( parsed_args["show_option_en_us"] ) then
---                 value       = ( parsed_args["explicit_option_en_us"] ) ? "en_US" : "";
---                 structure[] = sprintf(
---                         "<option value="%s" lang="en" data-installed="1"%s>English (United States)</option>",
---                         esc_attr( value ),
---                         selected( "", parsed_args["selected"], false )
---                 );
---         end;
+            if As_Boolean (Get (Parsed_Args, "show_option_en_us")) then
+               declare
+                  Value : constant String :=
+                    (if As_Boolean (Get (Parsed_Args, "explicit_option_en_us"))
+                     then "en_US" else "");
+               begin
+                  Structure.Append (
+                    +Sprintf (
+                      "<option value=""%s"" lang=""en"" data-installed=""1""%s>" &
+                      "English (United States)</option>",
+                      To_List (List => (
+                        1 => +ESC_Attr (Value),
+                        2 => +Selected ("",
+                                        Get_As_String (Parsed_Args, "selected"),
+                                        False)
+                      ))
+                    ));
+               end;
+            end if;
 
---         // List installed languages.
---         foreach ( languages as language ) then
---                 structure[] = sprintf(
---                         "<option value="%s" lang="%s"%s data-installed="1">%s</option>",
---                         esc_attr( language["language"] ),
---                         esc_attr( language["lang"] ),
---                         selected( language["language"], parsed_args["selected"], false ),
---                         esc_html( language["native_name"] )
---                 );
---         end;
---         if ( translations_available ) then
---                 structure[] = "</optgroup>";
---         end;
+            -- List installed languages.
+            for Language of Languages loop
+               Structure.Append (
+                 +Sprintf (
+                   "<option value=""%s"" lang=""%s""%s data-installed=""1"">" &
+                   "%s</option>",
+                   To_List (List => (
+                     1 => +ESC_Attr (Get_As_String (Language, "language")),
+                     2 => +ESC_Attr (Get_As_String (Language, "lang")),
+                     3 => +Selected (Get_As_String (Language, "language"),
+                                     Get_As_String (Parsed_Args, "selected"),
+                                     False),
+                     4 => +ESC_HTML (Get_As_String (Language, "native_name"))
+                   ))
+                 ));
+            end loop;
 
---         // List available translations.
---         if ( translations_available ) then
---                 structure[] = "<optgroup label="" . esc_attr_x( "Available", "translations" ) . "">";
---                 foreach ( translations as translation ) then
---                         structure[] = sprintf(
---                                 "<option value="%s" lang="%s"%s>%s</option>",
---                                 esc_attr( translation["language"] ),
---                                 esc_attr( current( translation["iso"] ) ),
---                                 selected( translation["language"], parsed_args["selected"], false ),
---                                 esc_html( translation["native_name"] )
---                         );
---                 end;
---                 structure[] = "</optgroup>";
---         end;
+            if Translations_Available then
+               Structure.Append (+"</optgroup>");
+            end if;
 
---         // Combine the output string.
---         output  = sprintf( "<select name="%s" id="%s">", esc_attr( parsed_args["name"] ), esc_attr( parsed_args["id"] ) );
---         output .= implode( "\n", structure );
---         output .= "</select>";
+            -- List available translations.
+            if Translations_Available then
+               Structure.Append (+("<optgroup label=""" &
+                                   ESC_Attr_X ("Available", "translations") & """>"));
 
---         if ( parsed_args["echo"] ) then
---                 echo output;
---         end;
+               for T in Translations.Iterate loop
+                  declare
+                     Translation : constant Array_Type := As_Array (Element (T));
+                  begin
+                     Structure.Append (
+                       +Sprintf (
+                         "<option value=""%s"" lang=""%s""%s>%s</option>",
+                         To_List (List => (
+                           1 => +ESC_Attr (Get_As_String (Translation, "language")),
+                           2 => +ESC_Attr (Get_As_String (Translation, "iso")),
+                           -- Current ???
+                           3 => +Selected (Get_As_String (Translation, "language"),
+                                           Get_As_String (Parsed_Args, "selected"),
+                                           False),
+                           4 => +ESC_HTML (Get_As_String (Translation, "native_name"))
+                         ))
+                       ));
+                  end;
+               end loop;
+               Structure.Append (+"</optgroup>");
+            end if;
 
---         return output;
--- end;
+            -- Combine the output string.
+            declare
+               Output : Unbounded_String :=
+                 +Sprintf (
+                   "<select name=""%s"" id=""%s"">",
+                   To_List (List => (
+                     1 => +ESC_Attr (Get_As_String (Parsed_Args, "name")),
+                     2 => +ESC_Attr (Get_As_String (Parsed_Args, "id"))
+                   ))
+                 );
+            begin
+               Append (Output, Implode ("\n", Structure));
+               Append (Output, "</select>");
+
+               if As_Boolean (Get (Parsed_Args, "echo")) then
+                  Echo (-Output);
+               end if;
+
+               return -Output;
+            end;
+         end;
+      end;
+   end Wp_Dropdown_Languages;
+
+   ---------------------------
+   -- Wp_Dropdown_Languages --
+   ---------------------------
+
+   procedure Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
+   is
+      Unused : constant String := Wp_Dropdown_Languages (Args);
+   begin
+      null;
+   end Wp_Dropdown_Languages;
 
 -- --
 -- -- Determines whether the current locale is right-to-left (RTL).
@@ -1890,7 +1940,6 @@ package body Inc_L10n is
    is
       use Php.Arrays;
       use Php.Strings;
-      use Hb_Common;
    begin
       if
         Empty (I18n_Schema) or else

@@ -38,8 +38,6 @@ package body Adi_Translation_Install
 is
    use Lists;
 
-   Global_Wp_Local_Package : Ada.Strings.Unbounded.Unbounded_String;
-
    ----------------------
    -- Translations_API --
    ----------------------

@@ -626,6 +626,42 @@ is
                              return Array_Type;
 
    --
+   -- Retrieves the URL to the privacy policy page.
+   --
+   -- @since 4.9.6
+   --
+   -- @return string The URL to the privacy policy page. Empty string if it doesn't
+   --                exist.
+   --
+   function Get_Privacy_Policy_URL
+            return String;
+
+   --
+   -- Displays the privacy policy link with formatting, when applicable.
+   --
+   -- @since 4.9.6
+   --
+   -- @param string before Optional. Display before privacy policy link. Default empty.
+   -- @param string after  Optional. Display after privacy policy link. Default empty.
+   --
+   procedure The_Privacy_Policy_Link (Before : String := "";
+                                      After  : String := "");
+
+   --
+   -- Returns the privacy policy link with formatting, when applicable.
+   --
+   -- @since 4.9.6
+   --
+   -- @param string before Optional. Display before privacy policy link. Default empty.
+   -- @param string after  Optional. Display after privacy policy link. Default empty.
+   -- @return string Markup for the link and surrounding elements. Empty string if it
+   --                doesn't exist.
+   --
+   function Get_The_Privacy_Policy_Link (Before : String := "";
+                                         After  : String := "")
+                                         return String;
+
+   --
    -- Sets the scheme for a URL.
    --
    -- @since 3.4.0

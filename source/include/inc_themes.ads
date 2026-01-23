@@ -378,7 +378,7 @@ is
    --                           The theme"s stylesheet will be urlencoded if necessary.
    -- @return string
    --
-   function Wp_Customize_Url (Stylesheet : String := "")
+   function Wp_Customize_URL (Stylesheet : String := "")
                               return String
                               is ("XXX-353");
 

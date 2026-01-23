@@ -133,6 +133,30 @@ is
                            Arry : out Array_Type);
 
    --
+   -- Converts lone less than signs.
+   --
+   -- KSES already converts lone greater than signs.
+   --
+   -- @since 2.3.0
+   --
+   -- @param string text Text to be converted.
+   -- @return string Converted text.
+   --
+   function Wp_Pre_KSES_Less_Than (Text : String)
+                                   return String;
+
+   --
+   -- Callback function used by preg_replace.
+   --
+   -- @since 2.3.0
+   --
+   -- @param string[] matches Populated by matches to preg_replace.
+   -- @return string The text returned after esc_html if needed.
+   --
+   function Wp_Pre_KSES_Less_Than_Callback (Matches : List_Type)
+                                            return String;
+
+   --
    -- Converts a number of special characters into their HTML entities.
    --
    -- Specifically deals with: `&`, `<`, `>`, `"`, and `"`.
@@ -1069,6 +1093,42 @@ is
    function Wp_Strip_All_Tags (Item          : String;
                                Remove_Breaks : Boolean := False)
                                return String;
+
+   --
+   -- Sanitizes a string from user input or from the database.
+   --
+   -- - Checks for invalid UTF-8,
+   -- - Converts single `<` characters to entities
+   -- - Strips all tags
+   -- - Removes line breaks, tabs, and extra whitespace
+   -- - Strips octets
+   --
+   -- @since 2.9.0
+   --
+   -- @see sanitize_textarea_field()
+   -- @see wp_check_invalid_utf8()
+   -- @see wp_strip_all_tags()
+   --
+   -- @param string str String to sanitize.
+   -- @return string Sanitized string.
+   --
+   function Sanitize_Text_Field (Str : String)
+                                 return String;
+
+   --
+   -- Internal helper function to sanitize a string from user input or from the
+   -- database.
+   --
+   -- @since 4.7.0
+   -- @access private
+   --
+   -- @param string str           String to sanitize.
+   -- @param bool   keep_newlines Optional. Whether to keep newlines. Default: false.
+   -- @return string Sanitized string.
+   --
+   function X_Sanitize_Text_Fields (Str           : String;
+                                    Keep_Newlines : Boolean := False)
+                                    return String;
 
    --
    -- Returns the regexp for common whitespace characters.

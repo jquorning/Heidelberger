@@ -410,6 +410,31 @@ is
                            is (Value);
 
    --
+   -- Calls the callback functions that have been added to a filter hook, specifying
+   -- arguments in an array.
+   --
+   -- @since 3.0.0
+   --
+   -- @see apply_filters() This function is identical, but the arguments passed to the
+   --                      functions hooked to `hook_name` are supplied using an array.
+   --
+   -- @global WP_Hook[] wp_filter         Stores all of the filters and actions.
+   -- @global int[]     wp_filters        Stores the number of times each filter was
+   --                                     triggered.
+   -- @global string[]  wp_current_filter Stores the list of current filters with the
+   --                                     current one last.
+   --
+   -- @param string hook_name The name of the filter hook.
+   -- @param array  args      The arguments supplied to the functions hooked to
+   --                         `hook_name`.
+   -- @return mixed The filtered value after all hooked functions are applied to it.
+   --
+   function Apply_Filters_Ref_Array (Hook_Name : String;
+                                     Args      : List_Type)
+                                     return String
+                                     is ("XXX-953");
+
+   --
    -- Checks if any filter has been registered for a hook.
    --
    -- When using the `callback` argument, this function may return a non-boolean value
@@ -713,6 +738,44 @@ is
    --
    function Did_Action (Hook_Name : String)
                         return Boolean;
+
+   --
+   -- Fires functions attached to a deprecated filter hook.
+   --
+   -- When a filter hook is deprecated, the apply_filters() call is replaced with
+   -- apply_filters_deprecated(), which triggers a deprecation notice and then fires
+   -- the original filter hook.
+   --
+   -- Note: the value and extra arguments passed to the original apply_filters() call
+   -- must be passed here to `args` as an array. For example:
+   --
+   --     -- Old filter.
+   --     return apply_filters( 'wpdocs_filter', value, extra_arg );
+   --
+   --     -- Deprecated.
+   --     return apply_filters_deprecated( 'wpdocs_filter', array( value, extra_arg ),
+   --                                     '4.9.0', 'wpdocs_new_filter' );
+   --
+   -- @since 4.6.0
+   --
+   -- @see _deprecated_hook()
+   --
+   -- @param string hook_name   The name of the filter hook.
+   -- @param array  args        Array of additional function arguments to be passed
+   --                           to apply_filters().
+   -- @param string version     The version of WordPress that deprecated the hook.
+   -- @param string replacement Optional. The hook that should have been used. Default
+   --                           empty.
+   -- @param string message     Optional. A message regarding the change. Default
+   --                           empty.
+   --
+   function Apply_Filters_Deprecated (Hook_Name   : String;
+                                      Args        : List_Type;
+                                      Version     : String;
+                                      Replacement : String := "";
+                                      Message     : String := "")
+                                      return String;
+   -- Is originally a procedure -- jq
 
    --
    -- Fires functions attached to a deprecated action hook.

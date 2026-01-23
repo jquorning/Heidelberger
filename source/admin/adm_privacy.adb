@@ -91,7 +91,7 @@ is
 
             elsif Var_Name = "VAR_privacy_secondary_menu" then
                Clear_Echo;
-               Esc_Attr_E ("Secondary menu");
+               ESC_Attr_E ("Secondary menu");
                Set ("VAR_privacy_secondary_menu", Get_Echo);
 
             elsif Var_Name = "VAR_privacy_about" then

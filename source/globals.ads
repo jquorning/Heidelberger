@@ -59,7 +59,22 @@ is
    MONTH_IN_SECONDS  : constant Natural := 30 * DAY_IN_SECONDS;
    YEAR_IN_SECONDS   : constant Natural := 365 * DAY_IN_SECONDS;
 
-   SITECOOKIEPATH : Unbounded_String;
+   COOKIE_DOMAIN        : Unbounded_String;
+   COOKIEHASH           : Unbounded_String;
+   USER_COOKIE          : Unbounded_String;
+   PASS_COOKIE          : Unbounded_String;
+   AUTH_COOKIE          : Unbounded_String;
+   SECURE_AUTH_COOKIE   : Unbounded_String;
+   LOGGED_IN_COOKIE     : Unbounded_String;
+   TEST_COOKIE          : Unbounded_String;
+   COOKIEPATH           : Unbounded_String;
+   SITECOOKIEPATH       : Unbounded_String;
+   ADMIN_COOKIE_PATH    : Unbounded_String;
+   PLUGINS_COOKIE_PATH  : Unbounded_String;
+   RECOVERY_MODE_COOKIE : Unbounded_String;
+
+   RELOCATE_DEF : constant Boolean := False;
+   RELOCATE     : constant Boolean := False;
 
    WPLANG : constant String := "en_US";
 

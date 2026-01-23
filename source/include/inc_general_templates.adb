@@ -23,6 +23,7 @@ with Wp_Common;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Post_Type;
+with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Styles;
 with Inc_Formatting;
 with Inc_Functions;
@@ -510,23 +511,27 @@ is
       return Apply_Filters ("login_url", -Login_URL, Redirect, Force_Reauth);
    end Wp_Login_URL;
 
--- --
--- -- Returns the URL that allows the user to register on the site.
--- --
--- -- @since 3.6.0
--- --
--- -- @return string User registration URL.
--- --
--- function wp_registration_url() then
---         --
---         -- Filters the user registration URL.
---         --
---         -- @since 3.6.0
---         --
---         -- @param string register The user registration URL.
---         --
---         return apply_filters( "register_url", site_url( "wp-login.php?action=register", "login" ) );
--- end;
+   -------------------------
+   -- Wp_Registration_URL --
+   -------------------------
+
+   function Wp_Registration_URL
+            return String
+   is
+      use Inc_Link_Templates;
+      use Inc_Plugins;
+   begin
+      --
+      -- Filters the user registration URL.
+      --
+      -- @since 3.6.0
+      --
+      -- @param string register The user registration URL.
+      --
+      return
+        Apply_Filters ("register_url",
+                       Site_URL ("wp-login.php?action=register", "login"));
+   end Wp_Registration_URL;
 
 -- --
 -- -- Provides a simple login form for use anywhere within WordPress.
@@ -679,42 +684,60 @@ is
 --         end;
 -- end;
 
--- --
--- -- Returns the URL that allows the user to reset the lost password.
--- --
--- -- @since 2.8.0
--- --
--- -- @param string redirect Path to redirect to on login.
--- -- @return string Lost password URL.
--- --
--- function wp_lostpassword_url( redirect = "" ) then
---         args = array(
---                 "action" => "lostpassword",
---         );
+   -------------------------
+   -- Wp_Lostpassword_URL --
+   -------------------------
 
---         if ( ! empty( redirect ) ) then
---                 args["redirect_to"] = urlencode( redirect );
---         end;
+   function Wp_Lostpassword_URL (Redirect : String := "")
+                                 return String
+   is
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Class_Wp_Sites;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
+      use Inc_Plugins;
 
---         if ( is_multisite() ) then
---                 blog_details  = get_blog_details();
---                 wp_login_path = blog_details->path . "wp-login.php";
---         end; else then
---                 wp_login_path = "wp-login.php";
---         end;
+      Args : Array_Type := To_Array (List => (1 =>
+        Build ("action", "lostpassword")
+      ));
 
---         lostpassword_url = add_query_arg( args, network_site_url( wp_login_path, "login" ) );
+      Wp_Login_Path : Unbounded_String;
+   begin
+      if not Empty (Redirect) then
+         Set (Args, "redirect_to", From_String (URL_Encode (Redirect)));
+      end if;
 
---         --
---         -- Filters the Lost Password URL.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string lostpassword_url The lost password page URL.
---         -- @param string redirect         The path to redirect to on login.
---         --
---         return apply_filters( "lostpassword_url", lostpassword_url, redirect );
--- end;
+      if Is_Multisite then
+         declare
+            Blog_Details : constant Wp_Site := Get_Blog_Details;
+         begin
+            Wp_Login_Path := Blog_Details.Path & "wp-login.php";
+         end;
+      else
+         Wp_Login_Path := +"wp-login.php";
+      end if;
+
+      declare
+         Lostpassword_URL : constant String :=
+           Add_Query_Arg (Args, Network_Site_URL (-Wp_Login_Path, "login"));
+      begin
+         --
+         -- Filters the Lost Password URL.
+         --
+         -- @since 2.8.0
+         --
+         -- @param string lostpassword_url The lost password page URL.
+         -- @param string redirect         The path to redirect to on login.
+         --
+         return
+           Apply_Filters ("lostpassword_url", Lostpassword_URL, Redirect);
+      end;
+   end Wp_Lostpassword_URL;
 
 -- --
 -- -- Displays the Registration or Admin link.
@@ -870,13 +893,14 @@ is
 --                 case "admin_email":
 --                         output = get_option( "admin_email" );
 --                         break;
+      if Show = "charset" then
 --                 case "charset":
---                         output = get_option( "blog_charset" );
---                         if ( "" === output ) then
---                                 output = "UTF-8";
---                         end;
+         Output := +Inc_Options.Get_Option ("blog_charset");
+         if "" = Output then
+            Output := +"UTF-8";
+         end if;
 --                         break;
-      if Show = "html_type" then
+      elsif Show = "html_type" then
          Output := +Inc_Options.Get_Option ("html_type");
 --                 case "html_type":
 --                         output = get_option( "html_type" );
@@ -920,9 +944,10 @@ is
 --                                 output = "ltr";
 --                         end;
 --                         break;
+      elsif Show = "name" or True then
 --                 case "name":
 --                 default:
---                         output = get_option( "blogname" );
+         Output := +Inc_Options.Get_Option ("blogname");
 --                         break;
       else
          Put_Line ("Unhandled show:" & Show);
@@ -3526,23 +3551,16 @@ is
 --         );
 -- end;
 
--- --
--- -- Displays a referrer `strict-origin-when-cross-origin` meta tag.
--- --
--- -- Outputs a referrer `strict-origin-when-cross-origin` meta tag that tells the browser not to send
--- -- the full URL as a referrer to other sites when cross-origin assets are loaded.
--- --
--- -- Typical usage is as a {@see "wp_head"} callback:
--- --
--- --     add_action( "wp_head", "wp_strict_cross_origin_referrer" );
--- --
--- -- @since 5.7.0
--- --
--- function wp_strict_cross_origin_referrer() then
---         ?>
---         <meta name="referrer" content="strict-origin-when-cross-origin" />
---         <?php
--- end;
+   -------------------------------------
+   -- Wp_Strict_Cross_Origin_Referrer --
+   -------------------------------------
+
+   procedure Wp_Strict_Cross_Origin_Referrer
+   is
+      use Php.Echoing;
+   begin
+      Echo ("<meta name=""referrer"" content=""strict-origin-when-cross-origin"" />");
+   end Wp_Strict_Cross_Origin_Referrer;
 
 -- --
 -- -- Displays site icon meta tags.
@@ -5295,6 +5313,21 @@ is
    is
    begin
       return X_Checked_Selected_Helper (Checkd, Current, Echo, "checked");
+   end Checked;
+
+   -------------
+   -- Checked --
+   -------------
+
+   function Checked (Checkd  : Boolean := True;
+                     Current : Boolean := True;
+                     Echo    : Boolean := True)
+                     return String
+   is
+   begin
+      return X_Checked_Selected_Helper (Boolean'Image (Checkd),
+                                        Boolean'Image (Current),
+                                        Echo, "checked");
    end Checked;
 
    --------------

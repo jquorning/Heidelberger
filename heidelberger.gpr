@@ -42,7 +42,8 @@ project Heidelberger is
          "-gnatwaCJ",
          "-gnatef",
          "-gnatf",
-         "-gnatyyduxCM0S"); -- 0-r
+         "-gnatyyduxCM0S" -- 0-r
+      );
    end Compiler;
 
    package Binder is

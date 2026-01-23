@@ -738,6 +738,15 @@ is
       end;
    end Wp_Parse_URL;
 
+   ------------------
+   -- Wp_Parse_URL --
+   ------------------
+
+   function Wp_Parse_URL (URL       : String;
+                          Component : Integer := -1)
+                          return String
+                          is ("XXX-952");
+
    -------------------------------------------
    -- X_Get_Component_From_Parsed_URL_Array --
    -------------------------------------------

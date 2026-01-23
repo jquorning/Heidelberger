@@ -625,41 +625,28 @@ is
       return Global_Wp_Actions (Hook_Name) /= 0;
    end Did_Action;
 
--- --
--- -- Fires functions attached to a deprecated filter hook.
--- --
--- -- When a filter hook is deprecated, the apply_filters() call is replaced with
--- -- apply_filters_deprecated(), which triggers a deprecation notice and then fires
--- -- the original filter hook.
--- --
--- -- Note: the value and extra arguments passed to the original apply_filters() call
--- -- must be passed here to `args` as an array. For example:
--- --
--- --     -- Old filter.
--- --     return apply_filters( 'wpdocs_filter', value, extra_arg );
--- --
--- --     -- Deprecated.
--- --     return apply_filters_deprecated( 'wpdocs_filter', array( value, extra_arg ), '4.9.0', 'wpdocs_new_filter' );
--- --
--- -- @since 4.6.0
--- --
--- -- @see _deprecated_hook()
--- --
--- -- @param string hook_name   The name of the filter hook.
--- -- @param array  args        Array of additional function arguments to be passed to apply_filters().
--- -- @param string version     The version of WordPress that deprecated the hook.
--- -- @param string replacement Optional. The hook that should have been used. Default empty.
--- -- @param string message     Optional. A message regarding the change. Default empty.
--- --
--- function apply_filters_deprecated( hook_name, args, version, replacement = '', message = '' ) then
---         if ( ! has_filter( hook_name ) ) then
---                 return args[0];
---         end;
+   -----------------------------
+   -- Apply_Filers_Deprecated --
+   -----------------------------
 
---         _deprecated_hook( hook_name, version, replacement, message );
+   function Apply_Filters_Deprecated (Hook_Name   : String;
+                                      Args        : List_Type;
+                                      Version     : String;
+                                      Replacement : String := "";
+                                      Message     : String := "")
+                                      return String
+   is
+      use Hb_Common;
+      use Inc_Functions;
+   begin
+      if not Has_Filter (Hook_Name) then
+         return -Args (1); -- [0]
+      end if;
 
---         return apply_filters_ref_array( hook_name, args );
--- end;
+      X_Deprecated_Hook (Hook_Name, Version, Replacement, Message);
+
+      return Apply_Filters_Ref_Array (Hook_Name, Args);
+   end Apply_Filters_Deprecated;
 
 -- --
 -- -- Fires functions attached to a deprecated action hook.

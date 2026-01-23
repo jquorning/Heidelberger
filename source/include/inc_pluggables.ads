@@ -10,11 +10,36 @@ with Arrays;
 with Lists;
 
 with Inc_Class_Wp_Users;
+with Inc_Users;
 
 package Inc_Pluggables
 is
    use Arrays;
    use Lists;
+
+   --
+   -- Changes the current user by ID or name.
+   --
+   -- Set id to null and specify a name if you do not know a user's ID.
+   --
+   -- Some WordPress functionality is based on the current user and not based on
+   -- the signed in user. Therefore, it opens the ability to edit and perform
+   -- actions on users who aren't signed in.
+   --
+   -- @since 2.0.3
+   --
+   -- @global WP_User current_user The current user object which holds the user data.
+   --
+   -- @param int|null id   User ID.
+   -- @param string   name User's username.
+   -- @return WP_User Current user User object.
+   --
+   function Wp_Set_Current_User (Id   : Integer;
+                                 Name : String := "")
+                                 return Inc_Class_Wp_Users.Wp_User;
+
+   procedure Wp_Set_Current_User (Id   : Integer;
+                                  Name : String := "");
 
    --
    -- Retrieves the current user object.
@@ -183,6 +208,28 @@ is
                            return Float;
 
    --
+   -- Authenticates a user, confirming the login credentials are valid.
+   --
+   -- @since 2.5.0
+   -- @since 4.5.0 `username` now accepts an email address.
+   --
+   -- @param string username User's username or email address.
+   -- @param string password User's password.
+   -- @return WP_User|WP_Error WP_User object if the credentials are valid,
+   --                          otherwise WP_Error.
+   --
+   function Wp_Authenticate (Username : String;
+                             Password : String)
+                             return Inc_Users.User_Error_Type;
+
+   --
+   -- Logs the current user out.
+   --
+   -- @since 2.5.0
+   --
+   procedure Wp_Logout;
+
+   --
    -- Validates authentication cookie.
    --
    -- The checks include making sure that the authentication cookie is set and
@@ -204,6 +251,13 @@ is
    function Wp_Validate_Auth_Cookie (Cookie : String := "";
                                      Scheme : String := "")
                                      return Integer;
+
+   --
+   -- Removes all of the cookies associated with authentication.
+   --
+   -- @since 2.5.0
+   --
+   procedure Wp_Clear_Auth_Cookie;
 
    --
    -- Parses a cookie into its components.
@@ -229,6 +283,29 @@ is
    function Wp_Parse_Auth_Cookie (Cookie : String := "";
                                   Scheme : String := "")
                                   return Array_Type;
+
+   --
+   -- Sets the authentication cookies based on user ID.
+   --
+   -- The remember parameter increases the time that the cookie will be kept. The
+   -- default the cookie is kept without remembering is two days. When remember is
+   -- set, the cookies will be kept for 14 days or two weeks.
+   --
+   -- @since 2.5.0
+   -- @since 4.3.0 Added the `token` parameter.
+   --
+   -- @param int         user_id  User ID.
+   -- @param bool        remember Whether to remember the user.
+   -- @param bool|string secure   Whether the auth cookie should only be sent over
+   --                             HTTPS. Default is an empty string which means the
+   --                             value of `is_ssl()` will be used.
+   -- @param string      token    Optional. User's session token to use for this
+   --                             cookie.
+   --
+   procedure Wp_Set_Auth_Cookie (User_Id  : Integer;
+                                 Remember : Boolean := False;
+                                 Secure   : Boolean := False; -- ""
+                                 Token    : String  := "");
 
    --
    -- Ensures intent by verifying that a user was referred from another admin page
@@ -325,6 +402,10 @@ is
                               Status        : Integer := 302;
                               X_Redirect_By : String := "WordPress")
                               return Boolean;
+
+   procedure Wp_Safe_Redirect (Location      : String;
+                               Status        : Integer := 302;
+                               X_Redirect_By : String := "WordPress");
 
    --
    -- Retrieves the avatar `<img>` tag for a user, email address, MD5 hash, comment,

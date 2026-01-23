@@ -2046,6 +2046,21 @@ is
       return -Nonce_Field;
    end Wp_Nonce_Field;
 
+   --------------------
+   -- Wp_Nonce_Field --
+   --------------------
+
+   procedure Wp_Nonce_Field (Action  : String  := "-1"; -- = -1
+                             Name    : String  := "_wpnonce";
+                             Referer : Boolean := True;
+                             Echo    : Boolean := True)
+   is
+      Unused : constant String :=
+        Wp_Nonce_Field (Action, Name, Referer, Echo);
+   begin
+      null;
+   end Wp_Nonce_Field;
+
    ----------------------
    -- Wp_Referer_Field --
    ----------------------
@@ -6248,6 +6263,7 @@ is
    ---------------------
    -- Force_SSL_Admin --
    ---------------------
+
    Static_Forced : Boolean := False;
 
    function Force_SSL_Admin (Force : Boolean := False) -- = null )
@@ -6264,6 +6280,17 @@ is
       end if;
 
       return Static_Forced;
+   end Force_SSL_Admin;
+
+   ---------------------
+   -- Force_SSL_Admin --
+   ---------------------
+
+   procedure Force_SSL_Admin (Force : Boolean := False)
+   is
+      Unused : constant Boolean := Force_SSL_Admin (Force);
+   begin
+      null;
    end Force_SSL_Admin;
 
    ------------------

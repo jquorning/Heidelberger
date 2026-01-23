@@ -110,6 +110,10 @@ is
                           Component : Integer := -1)
                           return Array_Type;
 
+   function Wp_Parse_URL (URL       : String;
+                          Component : Integer := -1)
+                          return String;
+
    --
    -- Retrieve a specific component from a parsed URL array.
    --

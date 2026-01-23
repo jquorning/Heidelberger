@@ -60,7 +60,7 @@ is
             Unused := Preg_Match ("#/wp-admin/?(.*?)#i", Php_Self, Self_Matches);
          end if;
 
-         Pagenow := +(if "" /= Self_Matches (1)
+         Pagenow := +(if Self_Matches.Length in 1
                      then -Self_Matches (1) else "");
          Pagenow := +Trim (-Pagenow, "/");
          Pagenow := +Preg_Replace ("#\?.*?#", "", -Pagenow);

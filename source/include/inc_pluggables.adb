@@ -25,10 +25,10 @@ with Helpers;
 with Globals;
 with Wp_Common;
 
+with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Session_Tokens;
 with Inc_Class_Wp_Session_Tokens_Factory;
 with Inc_Compat;
-with Inc_Default_Constants;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -39,55 +39,69 @@ with Inc_L10n;
 with Inc_Media;
 with Inc_Options;
 with Inc_Plugins;
-with Inc_Users;
 with Inc_Vars;
 
 package body Inc_Pluggables
 is
 
+   Global_Current_User : Inc_Class_Wp_Users.Wp_User :=
+     Inc_Class_Wp_Users.Null_User;
+
 -- if ( ! function_exists( 'wp_set_current_user' ) ) :
---         --
---         -- Changes the current user by ID or name.
---         --
---         -- Set id to null and specify a name if you do not know a user's ID.
---         --
---         -- Some WordPress functionality is based on the current user and not based on
---         -- the signed in user. Therefore, it opens the ability to edit and perform
---         -- actions on users who aren't signed in.
---         --
---         -- @since 2.0.3
---         --
---         -- @global WP_User current_user The current user object which holds the user data.
---         --
---         -- @param int|null id   User ID.
---         -- @param string   name User's username.
---         -- @return WP_User Current user User object.
---         --
---         function wp_set_current_user( id, name = '' ) then
---                 global current_user;
 
---                 -- If `id` matches the current user, there is nothing to do.
---                 if ( isset( current_user )
---                 && ( current_user instanceof WP_User )
---                 && ( id == current_user->ID )
---                 && ( null !== id )
---                 ) then
---                         return current_user;
---                 end;
+   -------------------------
+   -- Wp_Set_Current_User --
+   -------------------------
 
---                 current_user = new WP_User( id, name );
+   function Wp_Set_Current_User (Id   : Integer;
+                                 Name : String := "")
+                                 return Inc_Class_Wp_Users.Wp_User
+   is
+      use Inc_Class_Wp_Users;
+      use Inc_Plugins;
+      use Inc_Users;
+--    global current_user;
+   begin
+      -- If `id` matches the current user, there is nothing to do.
+      if
+        Global_Current_User /= Null_User and then
+--      Isset (Global_Current_User) and then
+        Global_Current_User in Wp_User and then -- instaceof
+        Id = Global_Current_User.Id -- and then
+--      ( null !== id )
+      then
+         return Global_Current_User;
+      end if;
 
---                 setup_userdata( current_user->ID );
+      Global_Current_User := X_Construct (Id, Name); -- new WP_User( id, name );
 
---                 --
---                 -- Fires after the current user is set.
---                 --
---                 -- @since 2.0.1
---                 --
---                 do_action( 'set_current_user' );
+      Setup_Userdata (Global_Current_User.Id);
 
---                 return current_user;
---         end;
+      --
+      -- Fires after the current user is set.
+      --
+      -- @since 2.0.1
+      --
+      Do_Action ("set_current_user");
+
+      return Global_Current_User;
+   end Wp_Set_Current_User;
+
+   -------------------------
+   -- Wp_Set_Current_User --
+   -------------------------
+
+   procedure Wp_Set_Current_User (Id   : Integer;
+                                  Name : String := "")
+   is
+      use Inc_Class_Wp_Users;
+
+      Unused : constant Wp_User :=
+        Wp_Set_Current_User (Id, Name);
+   begin
+      null;
+   end Wp_Set_Current_User;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_get_current_user' ) ) :
@@ -622,88 +636,118 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_authenticate' ) ) :
---         --
---         -- Authenticates a user, confirming the login credentials are valid.
---         --
---         -- @since 2.5.0
---         -- @since 4.5.0 `username` now accepts an email address.
---         --
---         -- @param string username User's username or email address.
---         -- @param string password User's password.
---         -- @return WP_User|WP_Error WP_User object if the credentials are valid,
---         --                          otherwise WP_Error.
---         --
---         function wp_authenticate( username, password ) then
---                 username = sanitize_user( username );
---                 password = trim( password );
 
---                 --
---                 -- Filters whether a set of user login credentials are valid.
---                 --
---                 -- A WP_User object is returned if the credentials authenticate a user.
---                 -- WP_Error or null otherwise.
---                 --
---                 -- @since 2.8.0
---                 -- @since 4.5.0 `username` now accepts an email address.
---                 --
---                 -- @param null|WP_User|WP_Error user     WP_User if the user is authenticated.
---                 --                                        WP_Error or null otherwise.
---                 -- @param string                username Username or email address.
---                 -- @param string                password User password.
---                 --
---                 user = apply_filters( 'authenticate', null, username, password );
+   ---------------------
+   -- Wp_Authenticate --
+   ---------------------
 
---                 if ( null == user ) then
---                         -- TODO: What should the error message be? (Or would these even happen?)
---                         -- Only needed if all authentication handlers fail to return anything.
---                         user = new WP_Error( 'authentication_failed', __( '<strong>Error:</strong> Invalid username, email address or incorrect password.' ) );
---                 end;
+   function Wp_Authenticate (Username : String;
+                             Password : String)
+                             return Inc_Users.User_Error_Type
+   is
+      use Php.Lists;
+      use Php.Strings;
+      use Hb_Common;
+      use Wp_Common;
+      use Inc_Class_Wp_Errors;
+      use Inc_Class_Wp_Users;
+      use Inc_Formatting;
+      use Inc_L10n;
+      use Inc_Users;
 
---                 ignore_codes = array( 'empty_username', 'empty_password' );
+      Username_2 : constant String := Sanitize_User (Username);
+      Password_2 : constant String := Trim (Password);
 
---                 if ( is_wp_error( user ) && ! in_array( user->get_error_code(), ignore_codes, true ) ) then
---                         error = user;
+      Ignore_Codes : constant List_Type :=
+        To_List (List => (+"empty_username", +"empty_password"));
 
---                         --
---                         -- Fires after a user login has failed.
---                         --
---                         -- @since 2.5.0
---                         -- @since 4.5.0 The value of `username` can now be an email address.
---                         -- @since 5.4.0 The `error` parameter was added.
---                         --
---                         -- @param string   username Username or email address.
---                         -- @param WP_Error error    A WP_Error object with the authentication failure details.
---                         --
---                         do_action( 'wp_login_failed', username, error );
---                 end;
+      --
+      -- Filters whether a set of user login credentials are valid.
+      --
+      -- A WP_User object is returned if the credentials authenticate a user.
+      -- WP_Error or null otherwise.
+      --
+      -- @since 2.8.0
+      -- @since 4.5.0 `username` now accepts an email address.
+      --
+      -- @param null|WP_User|WP_Error user     WP_User if the user is authenticated.
+      --                                        WP_Error or null otherwise.
+      -- @param string                username Username or email address.
+      -- @param string                password User password.
+      --
 
---                 return user;
---         end;
+      Null_User_Error : constant User_Error_Type :=
+        (Success => False,
+         User    => Null_User,
+         Error   => Null_Wp_Error);
+
+      User : User_Error_Type :=
+        Apply_Filters ("authenticate",
+                       Null_User_Error,
+                       Username_2, Password_2);
+   begin
+      if not User.Success then
+--    if null = User then
+         -- TODO: What should the error message be? (Or would these even happen?)
+         -- Only needed if all authentication handlers fail to return anything.
+         User.Error :=
+           X_Construct ("authentication_failed",
+                        abs "<strong>Error:</strong> Invalid username, email address or incorrect password.");
+      end if;
+
+      if
+        not User.Success and then
+--      Is_Wp_Error (User) and then
+        not In_List (User.Error.Get_Error_Code, Ignore_Codes, True)
+      then
+         --
+         -- Fires after a user login has failed.
+         --
+         -- @since 2.5.0
+         -- @since 4.5.0 The value of `username` can now be an email address.
+         -- @since 5.4.0 The `error` parameter was added.
+         --
+         -- @param string   username Username or email address.
+         -- @param WP_Error error    A WP_Error object with the authentication
+         --                          failure details.
+         --
+         Do_Action ("wp_login_failed", Username_2, User.Error);
+      end if;
+
+      return User;
+   end Wp_Authenticate;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_logout' ) ) :
---         --
---         -- Logs the current user out.
---         --
---         -- @since 2.5.0
---         --
---         function wp_logout() then
---                 user_id = get_current_user_id();
 
---                 wp_destroy_current_session();
---                 wp_clear_auth_cookie();
---                 wp_set_current_user( 0 );
+   ---------------
+   -- Wp_Logout --
+   ---------------
 
---                 --
---                 -- Fires after a user is logged out.
---                 --
---                 -- @since 1.5.0
---                 -- @since 5.5.0 Added the `user_id` parameter.
---                 --
---                 -- @param int user_id ID of the user that was logged out.
---                 --
---                 do_action( 'wp_logout', user_id );
---         end;
+   procedure Wp_Logout
+   is
+      use Wp_Common;
+--    use Inc_Plugins;
+      use Inc_Users;
+
+      User_Id : constant Integer := Get_Current_User_Id;
+   begin
+      Wp_Destroy_Current_Session;
+      Wp_Clear_Auth_Cookie;
+      Wp_Set_Current_User (0);
+
+      --
+      -- Fires after a user is logged out.
+      --
+      -- @since 1.5.0
+      -- @since 5.5.0 Added the `user_id` parameter.
+      --
+      -- @param int user_id ID of the user that was logged out.
+      --
+      Do_Action ("wp_logout", User_Id);
+   end Wp_Logout;
+
 -- endif;
 
 -- if ( ! function_exists( 'wp_validate_auth_cookie' ) ) :
@@ -976,7 +1020,6 @@ is
       use Ada.Strings.Unbounded;
       use Binder;
       use Hb_Common;
-      use Inc_Default_Constants;
       use Inc_Load;
 
       Cookie_Name : Unbounded_String;
@@ -987,20 +1030,20 @@ is
 --    if ( empty( cookie ) ) then
          if Scheme = "auth" then
             -- case 'auth':
-            Cookie_Name := AUTH_COOKIE;
+            Cookie_Name := Globals.AUTH_COOKIE;
 
          elsif Scheme = "secure_auth" then
-            Cookie_Name := SECURE_AUTH_COOKIE;
+            Cookie_Name := Globals.SECURE_AUTH_COOKIE;
 
          elsif Scheme = "logged_in" then
-            Cookie_Name := LOGGED_IN_COOKIE;
+            Cookie_Name := Globals.LOGGED_IN_COOKIE;
 
          else
             if Is_SSL then
-               Cookie_Name := SECURE_AUTH_COOKIE;
+               Cookie_Name := Globals.SECURE_AUTH_COOKIE;
                Scheme_2    := +"secure_auth";
             else
-               Cookie_Name := AUTH_COOKIE;
+               Cookie_Name := Globals.AUTH_COOKIE;
                Scheme_2    := +"auth";
             end if;
          end if;
@@ -1041,23 +1084,19 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_set_auth_cookie' ) ) :
---         --
---         -- Sets the authentication cookies based on user ID.
---         --
---         -- The remember parameter increases the time that the cookie will be kept. The
---         -- default the cookie is kept without remembering is two days. When remember is
---         -- set, the cookies will be kept for 14 days or two weeks.
---         --
---         -- @since 2.5.0
---         -- @since 4.3.0 Added the `token` parameter.
---         --
---         -- @param int         user_id  User ID.
---         -- @param bool        remember Whether to remember the user.
---         -- @param bool|string secure   Whether the auth cookie should only be sent over HTTPS. Default is an empty
---         --                              string which means the value of `is_ssl()` will be used.
---         -- @param string      token    Optional. User's session token to use for this cookie.
---         --
---         function wp_set_auth_cookie( user_id, remember = false, secure = '', token = '' ) then
+
+   ------------------------
+   -- Wp_Set_Auth_Cookie --
+   ------------------------
+
+   procedure Wp_Set_Auth_Cookie (User_Id  : Integer;
+                                 Remember : Boolean := False;
+                                 Secure   : Boolean := False; -- ""
+                                 Token    : String  := "")
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Wp_Set_Auth_Cookie;
 --                 if ( remember ) then
 --                         --
 --                         -- Filters the duration of the authentication cookie expiration period.
@@ -1180,51 +1219,61 @@ is
 -- endif;
 
 -- if ( ! function_exists( 'wp_clear_auth_cookie' ) ) :
---         --
---         -- Removes all of the cookies associated with authentication.
---         --
---         -- @since 2.5.0
---         --
---         function wp_clear_auth_cookie() then
---                 --
---                 -- Fires just before the authentication cookies are cleared.
---                 --
---                 -- @since 2.7.0
---                 --
---                 do_action( 'clear_auth_cookie' );
 
---                 -- This filter is documented in wp-includes/pluggable.php--
---                 if ( ! apply_filters( 'send_auth_cookies', true ) ) then
---                         return;
---                 end;
+   --------------------------
+   -- Wp_Clear_Auth_Cookie --
+   --------------------------
 
---                 -- Auth cookies.
---                 setcookie( AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN );
---                 setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN );
---                 setcookie( AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN );
---                 setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN );
---                 setcookie( LOGGED_IN_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( LOGGED_IN_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
+   procedure Wp_Clear_Auth_Cookie
+   is
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Misc;
+      use Globals;
+      use Hb_Common;
+      use Inc_Plugins;
+      use Inc_Users;
+   begin
+      --
+      -- Fires just before the authentication cookies are cleared.
+      --
+      -- @since 2.7.0
+      --
+      Do_Action ("clear_auth_cookie");
 
---                 -- Settings cookies.
---                 setcookie( 'wp-settings-' . get_current_user_id(), ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH );
---                 setcookie( 'wp-settings-time-' . get_current_user_id(), ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH );
+      -- This filter is documented in wp-includes/pluggable.php
+      if not Apply_Filters ("send_auth_cookies", True) then
+         return;
+      end if;
 
---                 -- Old cookies.
---                 setcookie( AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( SECURE_AUTH_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
+      -- Auth cookies.
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -ADMIN_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -ADMIN_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -PLUGINS_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -PLUGINS_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-LOGGED_IN_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-LOGGED_IN_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
 
---                 -- Even older cookies.
---                 setcookie( USER_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( PASS_COOKIE, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( USER_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
---                 setcookie( PASS_COOKIE, ' ', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN );
+      -- Settings cookies.
+      Set_Cookie ("wp-settings-" & Helpers.Image (Get_Current_User_Id), " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
+      Set_Cookie ("wp-settings-time-" & Helpers.Image (Get_Current_User_Id), " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
 
---                 -- Post password cookie.
---                 setcookie( 'wp-postpass_' . COOKIEHASH, ' ', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
---         end;
+      -- Old cookies.
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+
+      -- Even older cookies.
+      Set_Cookie (-USER_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-PASS_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-USER_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-PASS_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+
+      -- Post password cookie.
+      Set_Cookie ("wp-postpass_" & (-COOKIEHASH), " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+   end Wp_Clear_Auth_Cookie;
+
 -- endif;
 
 -- if ( ! function_exists( 'is_user_logged_in' ) ) :
@@ -1689,6 +1738,20 @@ is
            Apply_Filters ("wp_safe_redirect_fallback", Admin_URL, Status));
    begin
       return Wp_Redirect (Location_3, Status, X_Redirect_By);
+   end Wp_Safe_Redirect;
+
+   ----------------------
+   -- Wp_Safe_Redirect --
+   ----------------------
+
+   procedure Wp_Safe_Redirect (Location      : String;
+                               Status        : Integer := 302;
+                               X_Redirect_By : String := "WordPress")
+   is
+      Unused : constant Boolean :=
+        Wp_Safe_Redirect (Location, Status, X_Redirect_By);
+   begin
+      null;
    end Wp_Safe_Redirect;
 
 -- endif;

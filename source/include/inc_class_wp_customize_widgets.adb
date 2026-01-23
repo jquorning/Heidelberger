@@ -999,7 +999,7 @@ is
                 Build ("noAreasShown",     -No_Areas_Shown_Message),
                 Build ("reorderModeOn",    abs "Reorder mode enabled"),
                 Build ("reorderModeOff",   abs "Reorder mode closed"),
-                Build ("reorderLabelOn",   Esc_Attr_X ("Reorder widgets")),
+                Build ("reorderLabelOn",   ESC_Attr_XX ("Reorder widgets")),
                 -- translators: %d: The number of widgets found.
                 Build ("widgetsFound",     abs "Number of widgets found: %d"),
                 Build ("noWidgetsFound",   abs "No widgets found.")
@@ -1123,7 +1123,7 @@ is
       X_E ("Search Widgets");
       Echo ("</label>" & NL);
       Echo ("       <input type=""text"" id=""widgets-search"" placeholder=""");
-      Esc_Attr_E ("Search widgets&hellip;");
+      ESC_Attr_E ("Search widgets&hellip;");
       Echo (""" aria-describedby=""widgets-search-desc"" />" & NL);
       Echo ("       <div class=""search-icon"" aria-hidden=""true""></div>" & NL);
       Echo ("        <button type=""button"" class=""clear-results""><span class=""screen-reader-text"">");

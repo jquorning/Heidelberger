@@ -34,6 +34,7 @@ package body HB_Server is
       Register (Dispatcher, "/wp-admin/load-styles.php",  Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/post.php",         Binder.Render'Access);
       Register (Dispatcher, "/wp-admin/upgrade.php",      Binder.Render'Access);
+      Register (Dispatcher, "/wp-login.php",              Binder.Render'Access);
    end Register_Dispatcher;
 
    -----------
