@@ -350,7 +350,7 @@ is
 
          Echo ("<div id=""login"">" & NL);
          Echo ("  <h1><a href=""" &
-               ESC_URL (Login_Header_URL) & """" &
+               ESC_URL (Login_Header_URL) & """>" &
                Login_Header_Text & "</a></h1>" & NL);
       end;
 
@@ -443,7 +443,7 @@ is
    begin
       -- Don't allow interim logins to navigate away from the page.
       if not Interim_Login then
-         Echo ("       <p id=""backtoblog"">");
+         Echo ("<p id=""backtoblog"">");
          declare
             HTML_Link : constant String :=
               Sprintf (
@@ -1413,7 +1413,7 @@ is
          Die; -- exit;
       end if;
 
-      if not Get_Option ("users_can_register") then
+      if "" = Get_Option ("users_can_register") then
          Wp_Redirect (Site_URL ("wp-login.php?registration=disabled"));
          Die; -- exit;
       end if;
@@ -2081,7 +2081,7 @@ is
                Echo ("</label></p>" & NL);
                Echo ("<p class=""submit"">" & NL);
                Echo ("  <input type=""submit"" name=""wp-submit"" id=""wp-submit"" " &
-                     "class=""button button-primary button-large"" value=""""");
+                     "class=""button button-primary button-large"" value=""");
                ESC_Attr_E ("Log In");
                Echo (""" />" & NL);
 
