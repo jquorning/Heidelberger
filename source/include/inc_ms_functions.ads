@@ -6,7 +6,7 @@
 -- @since 3.0.0
 --
 
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 
 package Inc_Ms_Functions
 is
@@ -42,7 +42,7 @@ is
 -- @return WP_Site|void The blog object
 --
    function Get_Active_Blog_For_User (User_Id : Integer)
-                                      return Inc_Class_Wp_Sites.Wp_Site
-                                      is (Inc_Class_Wp_Sites.Null_Site);
+                                      return Class_Sites.Wp_Site
+                                      is (Class_Sites.Null_Site);
 
 end Inc_Ms_Functions;

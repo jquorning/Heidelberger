@@ -7,7 +7,7 @@
 -- @since 4.5.0
 --
 
-package body Inc_Class_Wp_Sites
+package body Class_Sites
 is
    procedure Dummy is null;
 --         --
@@ -217,4 +217,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_Sites;
+end Class_Sites;

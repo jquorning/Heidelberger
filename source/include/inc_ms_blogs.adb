@@ -127,7 +127,7 @@ is
 
    function Get_Blog_Details (Fields  : String  := ""; -- null
                               Get_All : Boolean := True)
-                              return Inc_Class_Wp_Sites.Wp_Site
+                              return Class_Sites.Wp_Site
    is (raise Program_Error with "not implemented");
 --         global wpdb;
 

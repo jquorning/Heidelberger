@@ -8,7 +8,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 
 package Inc_Ms_Blogs
 is
@@ -30,7 +30,7 @@ is
    --
    function Get_Blog_Details (Fields  : String  := ""; -- null
                               Get_All : Boolean := True)
-                              return Inc_Class_Wp_Sites.Wp_Site;
+                              return Class_Sites.Wp_Site;
 
    --
    -- Switch the current blog.

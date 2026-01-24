@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 
 package Inc_Class_Wp_Admin_Bar
 is
@@ -47,7 +47,7 @@ is
    type User_Type is
       record
          Blogs          : Blog_List;
-         Active_Blog    : Inc_Class_Wp_Sites.Wp_Site;
+         Active_Blog    : Class_Sites.Wp_Site;
          Domain         : Unbounded_String;
          Account_Domain : Unbounded_String;
       end record;

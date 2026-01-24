@@ -23,7 +23,7 @@ with Wp_Common;
 with Class_Terms;
 with Class_Users;
 with Class_Post_Type;
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 with Class_Styles;
 with Inc_Formatting;
 with Inc_Functions;
@@ -695,7 +695,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Sites;
+      use Class_Sites;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Load;

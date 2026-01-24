@@ -67,7 +67,7 @@ is
    procedure Initialize (This : in out Wp_Admin_Bar)
    is
       use Inc_Admin_Bar;
-      use Inc_Class_Wp_Sites;
+      use Class_Sites;
       use Inc_Ms_Functions;
       use Inc_Formatting;
       use Inc_Functions_Wp_Styles;

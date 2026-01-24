@@ -31,7 +31,7 @@ with Inc_Capabilities;
 with Class_Phpass;
 with Class_Errors;
 with Inc_Class_Wp_Recovery_Mode_Link_Services;
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 with Class_Users;
 with Inc_Formatting;
 with Inc_Functions;
@@ -1682,7 +1682,7 @@ is
       use Wp_Common;
       use Inc_Capabilities;
       use Class_Errors;
-      use Inc_Class_Wp_Sites;
+      use Class_Sites;
       use Class_Users;
       use Inc_Formatting;
       use Inc_Functions;

@@ -28,7 +28,7 @@ with Inc_Capabilities;
 with Inc_Class_Wp_Admin_Bar; -- ???
 with Inc_Class_Wp_Networks;
 with Class_Post_Type;
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 with Class_Taxonomy;
 with Class_Terms;
 with Class_Users;
@@ -4200,7 +4200,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Class_Wp_Admin_Bar; -- ???
-      use Inc_Class_Wp_Sites;
+      use Class_Sites;
       use Inc_Capabilities;
       use Inc_Load;
       use Inc_Ms_Functions;

@@ -28,7 +28,7 @@ with Adi_Screens;
 with Inc_Author_Templates;
 with Class_Post_Type;
 with Inc_Class_Wp_Recovery_Mode;
-with Inc_Class_Wp_Sites;
+with Class_Sites;
 with Class_Taxonomy;
 with Class_Users;
 with Inc_Comments;
@@ -648,7 +648,7 @@ is
       use Ada.Containers;
       use Php.Preg;
       use Php.Strings;
-      use Inc_Class_Wp_Sites;
+      use Class_Sites;
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Pluggables;

@@ -8,7 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
-package Inc_Class_Wp_Sites
+package Class_Sites
 is
    use Ada.Strings.Unbounded;
 
@@ -161,4 +161,4 @@ is
 
    Null_Site : constant Wp_Site := (Blog_Id => 0, others => Null_Unbounded_String);
 
-end Inc_Class_Wp_Sites;
+end Class_Sites;
