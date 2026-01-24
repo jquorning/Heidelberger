@@ -16,7 +16,7 @@ with Hb_Common;
 
 with Inc_Elab_Plugins;
 
-package body Inc_Class_Wp_Hooks
+package body Class_Hooks
 is
 
    ----------------
@@ -579,4 +579,4 @@ is
 
 -- end;
 
-end Inc_Class_Wp_Hooks;
+end Class_Hooks;

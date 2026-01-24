@@ -12,7 +12,7 @@ with Ada.Containers.Vectors;
 with Arrays;
 with Lists;
 
-package Inc_Class_Wp_Hooks
+package Class_Hooks
 is
    use Arrays;
    use Lists;
@@ -254,4 +254,4 @@ is
    function Next (This : in out Wp_Hook)
                   return String;
 
-end Inc_Class_Wp_Hooks;
+end Class_Hooks;

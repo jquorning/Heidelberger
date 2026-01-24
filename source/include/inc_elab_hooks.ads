@@ -3,7 +3,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Arrays;
 
-with Inc_Class_Wp_Hooks;
+with Class_Hooks;
 
 package Inc_Elab_Hooks
 is
@@ -15,8 +15,8 @@ is
    package Hook_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
         (Key_Type     => String,
-         Element_Type => Inc_Class_Wp_Hooks.Wp_Hook,
-         "="          => Inc_Class_Wp_Hooks."=");
+         Element_Type => Class_Hooks.Wp_Hook,
+         "="          => Class_Hooks."=");
 
    --
    -- Normalizes filters set up before WordPress has initialized to WP_Hook objects.

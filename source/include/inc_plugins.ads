@@ -24,7 +24,7 @@ with Lists;
 
 with Inc_Class_Wp_Admin_Bar;
 with Class_Errors;
-with Inc_Class_Wp_Hooks;
+with Class_Hooks;
 with Inc_Class_Wp_Roles;
 with Class_Styles;
 with Class_Taxonomy;
@@ -33,7 +33,7 @@ package Inc_Plugins
 is
    use Arrays;
    use Lists;
-   use Inc_Class_Wp_Hooks;
+   use Class_Hooks;
 
    type Callable_2 is access function return Array_Type;
    type Callable_3 is access function (New_Status      : String;

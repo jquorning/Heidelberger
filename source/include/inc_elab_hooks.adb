@@ -35,7 +35,7 @@ is
 --             end if;
 
             declare
-               use Inc_Class_Wp_Hooks;
+               use Class_Hooks;
 
                Hook : Wp_Hook; -- = new WP_Hook();
             begin
