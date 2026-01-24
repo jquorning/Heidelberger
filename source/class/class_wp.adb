@@ -5,7 +5,7 @@
 -- @since 2.0.0
 --
 
-package body Inc_Class_Wp
+package body Class_Wp
 is
    procedure Dummy is null;
 
@@ -724,4 +724,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp;
+end Class_Wp;

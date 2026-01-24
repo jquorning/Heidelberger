@@ -12,7 +12,7 @@ with Php.Lists;
 with Globals;
 with Hb_Common;
 
-with Inc_Class_Wp;
+with Class_Wp;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
@@ -325,7 +325,7 @@ is
 --    This.Label  := This.Labels.Name;
    end Set_Props;
 
-   Wp : Inc_Class_Wp.Wp;
+   Wp : Class_Wp.Wp;
 
    -----------------------
    -- Add_Rewrite_Rules --

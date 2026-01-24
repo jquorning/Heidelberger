@@ -11,7 +11,7 @@ with Arrays;
 with Hb_Common;
 with Lists;
 
-package Inc_Class_Wp
+package Class_Wp
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -112,4 +112,4 @@ is
                             Qv   : String)
                             is null;
 
-end Inc_Class_Wp;
+end Class_Wp;
