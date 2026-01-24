@@ -18,7 +18,7 @@ with Php.Strings;
 
 with Adi_Caches;
 
-with Inc_Class_Wp_Comments;
+with Class_Comments;
 with Class_Posts;
 with Class_Terms;
 with Class_Users;
@@ -1812,7 +1812,7 @@ is
 
       elsif Object_Type = "comment" then
          declare
-            use Inc_Class_Wp_Comments;
+            use Class_Comments;
             use Inc_Comments;
 
             Comment : constant Wp_Comment := Get_Comment (Object_Id);

@@ -14,7 +14,7 @@ with Hb_Common;
 with SQLite;
 with Lists;
 
-with Inc_Class_Wp_Comments;
+with Class_Comments;
 with Class_Errors;
 with Class_Posts;
 with Class_Users;
@@ -1512,8 +1512,8 @@ is
                      Output  : String         := ""; -- = OBJECT,
                      Y       : Natural        := 0;
                      Success : out Boolean)
-                     return Inc_Class_Wp_Comments.Wp_Comment
-                     is (Inc_Class_Wp_Comments.Null_Comment);
+                     return Class_Comments.Wp_Comment
+                     is (Class_Comments.Null_Comment);
 
    function Get_Row (Db      : in out Wpdb_Class;
                      Query   : Statement_Type; -- := ""; -- = null,

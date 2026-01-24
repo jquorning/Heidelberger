@@ -197,10 +197,10 @@ is
 
    function Get_Comment (Comment : Integer := 0; -- null
                          Output  : String  := "OBJECT")
-                         return Inc_Class_Wp_Comments.Wp_Comment
+                         return Class_Comments.Wp_Comment
    is
       use Hb_Common;
-      use Inc_Class_Wp_Comments;
+      use Class_Comments;
 
       Comment_2 : Integer := Comment;
       X_Comment : Wp_Comment;

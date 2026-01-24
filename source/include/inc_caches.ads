@@ -9,7 +9,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Comments;
+with Class_Comments;
 with Class_Posts;
 with Class_Users;
 with Inc_Comments;
@@ -109,7 +109,7 @@ is
    procedure Wp_Cache_Add is new Generic_Wp_Cache_Add (Multi_Type);
    procedure Wp_Cache_Add is new Generic_Wp_Cache_Add (Integer);
    procedure Wp_Cache_Add is new
-     Generic_Wp_Cache_Add (Inc_Class_Wp_Comments.Wp_Comment);
+     Generic_Wp_Cache_Add (Class_Comments.Wp_Comment);
 
    --
    -- Retrieves the cache contents from the cache by key and group.
@@ -176,7 +176,7 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Comments.Wp_Comment;
+                          return Class_Comments.Wp_Comment;
 
    function Wp_Cache_Get (Key   : Integer;         -- User_Id
                           Group : String  := "";

@@ -14,7 +14,7 @@ with Php.Types;
 with Globals;
 with Hb_Common;
 
-with Inc_Class_Wp_Comments;
+with Class_Comments;
 with Class_Post_Type;
 with Class_Taxonomy;
 with Class_Terms;
@@ -725,7 +725,7 @@ is
          end if;
 
          declare
-            use Inc_Class_Wp_Comments;
+            use Class_Comments;
             use Inc_Comments;
 
             Comment : constant Wp_Comment := Get_Comment (Args.Comment_Id);

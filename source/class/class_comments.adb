@@ -6,204 +6,75 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
+with Globals;
+with Hb_Common;
+with Lists;
 
-with Class_Posts;
+with Inc_Caches;
+with Class_WpDB;
 
-package Inc_Class_Wp_Comments
+package body Class_Comments
 is
-   use Ada.Strings.Unbounded;
 
-   --
-   -- Core class used to organize comments as instantiated objects with defined
-   -- members.
-   --
-   -- @since 4.4.0
-   --
-   -- #[AllowDynamicProperties]
-   type Wp_Comment is tagged
-      record
-         --
-         -- Comment ID.
-         --
-         -- A numeric string, for compatibility reasons.
-         --
-         -- @since 4.4.0
-         -- @var string
-         --
-         Comment_Id : Unbounded_String;
+   ------------------
+   -- Get_Instance --
+   ------------------
 
---         --
---         -- ID of the post the comment is associated with.
---         --
---         -- A numeric string, for compatibility reasons.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
-            Comment_Post_Id : Class_Posts.Post_Id := 0;
-
---         --
---         -- Comment author name.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_author = '';
-
---         --
---         -- Comment author email address.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_author_email = '';
-
---         --
---         -- Comment author URL.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_author_url = '';
-
---         --
---         -- Comment author IP address (IPv4 format).
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_author_IP = '';
-
---         --
---         -- Comment date in YYYY-MM-DD HH:MM:SS format.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_date = '0000-00-00 00:00:00';
-
---         --
---         -- Comment GMT date in YYYY-MM-DD HH::MM:SS format.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_date_gmt = '0000-00-00 00:00:00';
-
---         --
---         -- Comment content.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_content;
-
---         --
---         -- Comment karma count.
---         --
---         -- A numeric string, for compatibility reasons.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_karma = 0;
-
---         --
---         -- Comment approval status.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_approved = '1';
-
---         --
---         -- Comment author HTTP user agent.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_agent = '';
-
---         --
---         -- Comment type.
---         --
---         -- @since 4.4.0
---         -- @since 5.5.0 Default value changed to `comment`.
---         -- @var string
---         --
---         public comment_type = 'comment';
-
---         --
---         -- Parent comment ID.
---         --
---         -- A numeric string, for compatibility reasons.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_parent = 0;
-
---         --
---         -- Comment author ID.
---         --
---         -- A numeric string, for compatibility reasons.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public user_id = 0;
-
---         --
---         -- Comment children.
---         --
---         -- @since 4.4.0
---         -- @var array
---         --
---         protected children;
-
---         --
---         -- Whether children have been populated for this comment object.
---         --
---         -- @since 4.4.0
---         -- @var bool
---         --
---         protected populated_children = false;
-
---         --
---         -- Post fields.
---         --
---         -- @since 4.4.0
---         -- @var array
---         --
---         protected post_fields = array( 'post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_title', 'post_excerpt', 'post_status', 'comment_status', 'ping_status', 'post_name', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_content_filtered', 'post_parent', 'guid', 'menu_order', 'post_type', 'post_mime_type', 'comment_count' );
-      end record;
-
-   --
-   -- Retrieves a WP_Comment instance.
-   --
-   -- @since 4.4.0
-   --
-   -- @global wpdb wpdb WordPress database abstraction object.
-   --
-   -- @param int id Comment ID.
-   -- @return WP_Comment|false Comment object, otherwise false.
-   --
-   -- public static
    function Get_Instance (Id : Integer)
-                          return Wp_Comment;
+                          return Wp_Comment
+   is
+      use Globals;
+      use Hb_Common;
+      use Lists;
+      use Inc_Caches;
+      use Class_WpDB;
 
-   --
-   -- Constructor.
-   --
-   -- Populates properties with object vars.
-   --
-   -- @since 4.4.0
-   --
-   -- @param WP_Comment comment Comment object.
-   --
+      Comment_Id : constant Integer := Id; -- (int)
+   begin
+      if Comment_Id in 0 then
+         return Null_Comment; -- False;
+      end if;
+
+      declare
+         Found   : Boolean;
+         Success : Boolean;
+
+         X_Comment : Wp_Comment :=
+           Wp_Cache_Get (Comment_Id, "comment", Found => Found);
+      begin
+         if X_Comment = Null_Comment then -- not
+            X_Comment :=
+              WpDB.Get_Row (
+                WpDB.Prepare (
+                  "SELECT * FROM wpdb.comments WHERE comment_ID = %d LIMIT 1",
+                  To_List (Integer'Image (Comment_Id))),
+                  Success => Success);
+
+            if X_Comment = Null_Comment then -- not
+               return Null_Comment; -- False;
+            end if;
+
+            Wp_Cache_Add (-X_Comment.Comment_Id, X_Comment, "comment");
+         end if;
+
+         return X_Construct (X_Comment);
+      end;
+   end Get_Instance;
+
+   -----------------
+   -- X_Construct --
+   -----------------
+
    function X_Construct (Comment : Wp_Comment)
-                         return Wp_Comment;
+                         return Wp_Comment
+   is
+      This : Wp_Comment;
+   begin
+      -- for ( get_object_vars( comment ) as key => value ) loop
+      --                   this.key = value;
+      -- end loop;
+      return This;
+   end X_Construct;
 
 --         --
 --         -- Convert object to array.
@@ -364,9 +235,4 @@ is
 --                         return post.name;
 --                 end;
 --         end;
-
-   Null_Comment : constant Wp_Comment :=
-     (Comment_Id      => Null_Unbounded_String,
-      Comment_Post_Id => 0);
-
-end Inc_Class_Wp_Comments;
+end Class_Comments;

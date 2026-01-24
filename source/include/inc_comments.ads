@@ -6,7 +6,7 @@
 -- @subpackage Comment
 --
 
-with Inc_Class_Wp_Comments;
+with Class_Comments;
 
 package Inc_Comments
 is
@@ -43,7 +43,7 @@ is
    --
    function Get_Comment (Comment : Integer := 0; -- null
                          Output  : String  := "OBJECT")
-                         return Inc_Class_Wp_Comments.Wp_Comment;
+                         return Class_Comments.Wp_Comment;
 
    --
    -- Retrieves the total comment counts for the whole site or a single post.

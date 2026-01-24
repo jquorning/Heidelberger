@@ -243,16 +243,16 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Comments.Wp_Comment
+                          return Class_Comments.Wp_Comment
    is
       Result : constant Multi_Type :=
         Wp_Cache_Get (Helpers.Image (Key),
                       Group, Force, Found);
    begin
       if Result = From_Null then
-         return Inc_Class_Wp_Comments.Null_Comment;
+         return Class_Comments.Null_Comment;
       else
-         return Inc_Class_Wp_Comments.Null_Comment; -- Wp_Comment (Result);
+         return Class_Comments.Null_Comment; -- Wp_Comment (Result);
       end if;
    end Wp_Cache_Get;
 
