@@ -10,7 +10,7 @@
 -- require_once ABSPATH . WPINC . "/ms-network.php";
 
 with Inc_Capabilities;
-with Inc_Class_Wp_Roles;
+with Class_Roles;
 with Class_Users;
 with Inc_Load;
 with Inc_Options;
@@ -699,7 +699,7 @@ is
       end if;
 
       declare
-         use Inc_Class_Wp_Roles;
+         use Class_Roles;
 
          Roles : Wp_Roles := Wp_Roles_X;
       begin

@@ -8,7 +8,7 @@
 
 with Hb_Common;
 
-with Inc_Class_Wp_Roles;
+with Class_Roles;
 with Inc_Plugins;
 with Inc_Roles;
 
@@ -41,7 +41,7 @@ is
                       Grant : Boolean := True)
    is
       use Hb_Common;
-      use Inc_Class_Wp_Roles;
+      use Class_Roles;
       use Inc_Roles;
    begin
       Set (This.Capabilities, Cap, From_Boolean (Grant));

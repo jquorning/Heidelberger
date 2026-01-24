@@ -12,7 +12,7 @@ with Arrays;
 
 with Class_Role;
 
-package Inc_Class_Wp_Roles
+package Class_Roles
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -346,4 +346,4 @@ is
 --                 return get_option( this.role_key, array() );
 --         end;
 
-end Inc_Class_Wp_Roles;
+end Class_Roles;

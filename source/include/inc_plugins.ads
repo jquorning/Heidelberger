@@ -25,7 +25,7 @@ with Lists;
 with Inc_Class_Wp_Admin_Bar;
 with Class_Errors;
 with Class_Hooks;
-with Inc_Class_Wp_Roles;
+with Class_Roles;
 with Class_Styles;
 with Class_Taxonomy;
 
@@ -642,7 +642,7 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
-                        Role      : Inc_Class_Wp_Roles.Wp_Roles)
+                        Role      : Class_Roles.Wp_Roles)
                         is null;
 
    procedure Do_Action (Hook_Name : String;

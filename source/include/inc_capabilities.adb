@@ -1210,9 +1210,9 @@ is
    ----------------
 
    function Wp_Roles_X -- _X added
-            return Inc_Class_Wp_Roles.Wp_Roles
+            return Class_Roles.Wp_Roles
    is
-      use Inc_Class_Wp_Roles;
+      use Class_Roles;
       use Inc_Roles;
    begin
       -- if not Isset (Global_Wp_Roles) then
@@ -1243,7 +1243,7 @@ is
    is
       use Php.Strings;
       use Class_Role;
-      use Inc_Class_Wp_Roles;
+      use Class_Roles;
       use Inc_Roles;
 
       Unused : Wp_Role;

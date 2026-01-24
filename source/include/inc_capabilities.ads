@@ -9,7 +9,7 @@ with Arrays;
 with Lists;
 
 with Class_Role;
-with Inc_Class_Wp_Roles;
+with Class_Roles;
 with Class_Posts;
 with Class_Users;
 
@@ -233,6 +233,6 @@ is
    -- @return WP_Roles WP_Roles global instance if not already instantiated.
    --
    function Wp_Roles_X -- _X added
-            return Inc_Class_Wp_Roles.Wp_Roles;
+            return Class_Roles.Wp_Roles;
 
 end Inc_Capabilities;

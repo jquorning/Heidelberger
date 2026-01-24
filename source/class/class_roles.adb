@@ -18,7 +18,7 @@ with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
 
-package body Inc_Class_Wp_Roles
+package body Class_Roles
 is
 
    -----------------
@@ -250,4 +250,4 @@ is
       return Get_Option (-This.Role_Key, Empty_Array);
    end Get_Roles_Data;
 
-end Inc_Class_Wp_Roles;
+end Class_Roles;

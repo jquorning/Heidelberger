@@ -28,7 +28,7 @@ with Adi_Schemas;
 with Inc_Caches;
 with Inc_Capabilities;
 with Class_Errors;
-with Inc_Class_Wp_Roles;
+with Class_Roles;
 with Class_Users;
 with Class_WpDB;
 with Inc_Cron;
@@ -1613,7 +1613,7 @@ is
       use Globals;
       use Hb_Common;
       use Class_WpDB;
-      use Inc_Class_Wp_Roles;
+      use Class_Roles;
       use Inc_Roles;
 
       Options : constant Statement_Type := Statement_Type (-WpDB.Options);
