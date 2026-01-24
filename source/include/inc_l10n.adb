@@ -18,7 +18,7 @@ with Globals;
 with Hb_Common;
 
 with Adi_Translation_Install;
-with Inc_Class_Wp_Locale_Switchers;
+with Class_Locale_Switchers;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -29,7 +29,7 @@ with Inc_Themes;
 
 package body Inc_L10n is
 
-   Global_Wp_Locale_Switcher : Inc_Class_Wp_Locale_Switchers.Wp_Locale_Switcher;
+   Global_Wp_Locale_Switcher : Class_Locale_Switchers.Wp_Locale_Switcher;
 
    function "abs" (Item : String) return String is (Item);
 

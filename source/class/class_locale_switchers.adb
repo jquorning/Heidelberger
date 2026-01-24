@@ -15,7 +15,7 @@ with Class_Locales;
 with Inc_L10n;
 with Inc_Plugins;
 
-package body Inc_Class_Wp_Locale_Switchers
+package body Class_Locale_Switchers
 is
 
    Global_Wp_Locale : Class_Locales.Wp_Locale;
@@ -160,4 +160,4 @@ is
       Do_Action ("change_locale", Locale);
    end Change_Locale;
 
-end Inc_Class_Wp_Locale_Switchers;
+end Class_Locale_Switchers;

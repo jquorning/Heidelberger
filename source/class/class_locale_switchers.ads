@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Lists;
 
-package Inc_Class_Wp_Locale_Switchers
+package Class_Locale_Switchers
 is
    use Ada.Strings.Unbounded;
    use Lists;
@@ -222,4 +222,4 @@ is
    procedure Change_Locale (This   : Wp_Locale_Switcher;
                             Locale : String);
 
-end Inc_Class_Wp_Locale_Switchers;
+end Class_Locale_Switchers;
