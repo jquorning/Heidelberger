@@ -26,7 +26,7 @@ with Adi_Templates;
 -- with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Class_Wp_Querys;
 with Inc_Formatting;
 with Inc_Functions;
@@ -282,7 +282,7 @@ is
       if False = Inc_Users.Get_User_Option ("managenav-menuscolumnshidden") then
          declare
             use Inc_Pluggables;
-            use Inc_Class_Wp_Users;
+            use Class_Users;
             use Inc_Users;
 
             User : constant Wp_User := Wp_Get_Current_User; -- ();
@@ -340,7 +340,7 @@ is
          end loop;
 
          declare
-            use Inc_Class_Wp_Users;
+            use Class_Users;
             use Inc_Pluggables;
             use Inc_Users;
 

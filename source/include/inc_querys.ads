@@ -13,7 +13,7 @@
 
 with Class_Posts;
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Class_Wp_Querys;
 
 package Inc_Querys
@@ -60,7 +60,7 @@ is
    function Get_Queried_Object
             return Class_Terms.Wp_Term;
    function Get_Queried_Object
-            return Inc_Class_Wp_Users.Wp_User;
+            return Class_Users.Wp_User;
 
    --
    -- Retrieves the ID of the currently queried object.

@@ -44,8 +44,8 @@ with Inc_Vars;
 package body Inc_Pluggables
 is
 
-   Global_Current_User : Inc_Class_Wp_Users.Wp_User :=
-     Inc_Class_Wp_Users.Null_User;
+   Global_Current_User : Class_Users.Wp_User :=
+     Class_Users.Null_User;
 
 -- if ( ! function_exists( 'wp_set_current_user' ) ) :
 
@@ -55,9 +55,9 @@ is
 
    function Wp_Set_Current_User (Id   : Integer;
                                  Name : String := "")
-                                 return Inc_Class_Wp_Users.Wp_User
+                                 return Class_Users.Wp_User
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Plugins;
       use Inc_Users;
 --    global current_user;
@@ -94,7 +94,7 @@ is
    procedure Wp_Set_Current_User (Id   : Integer;
                                   Name : String := "")
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
 
       Unused : constant Wp_User :=
         Wp_Set_Current_User (Id, Name);
@@ -112,7 +112,7 @@ is
 
 -- function wp_get_current_user() then
    function Wp_Get_Current_User
-            return Inc_Class_Wp_Users.Wp_User
+            return Class_Users.Wp_User
    is
       use Inc_Users;
    begin
@@ -130,7 +130,7 @@ is
 --         -- @return WP_User|false WP_User object on success, false on failure.
 --         --
    function Get_Userdata (User_Id : Integer)
-                          return Inc_Class_Wp_Users.Wp_User
+                          return Class_Users.Wp_User
    is
    begin
       return Get_User_By ("id", User_Id);
@@ -146,9 +146,9 @@ is
 
    function Get_User_By (Field : String;
                          Value : Integer)
-                         return Inc_Class_Wp_Users.Wp_User
+                         return Class_Users.Wp_User
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
 
       Userdata : constant Wp_User := Get_Data_By (Field, Value);
    begin
@@ -171,9 +171,9 @@ is
 
    function Get_User_By (Field : String;
                          Value : String)
-                         return Inc_Class_Wp_Users.Wp_User
+                         return Class_Users.Wp_User
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
 
       Userdata : constant Wp_User := Get_Data_By (Field, Value);
    begin
@@ -676,7 +676,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Class_Errors;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Users;
@@ -791,7 +791,7 @@ is
       use Binder;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Compat;
       use Inc_Load;
       use Inc_Plugins;
@@ -1311,7 +1311,7 @@ is
    function Is_User_Logged_In
             return Boolean
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
 
       User : constant Wp_User := Wp_Get_Current_User;
    begin
@@ -2584,7 +2584,7 @@ is
       use Php.Strings;
       use Helpers;
       use Wp_Common;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Users;
 
 --    Nonce := (string) nonce;
@@ -2664,7 +2664,7 @@ is
    function Wp_Create_Nonce (Action : Integer := -1)
             return String
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Plugins;
       use Inc_Users;
 

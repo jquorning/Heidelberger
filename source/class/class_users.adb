@@ -27,7 +27,7 @@ with Inc_Ms_Blogs;
 -- with Inc_Plugins;
 with Inc_Users;
 
-package body Inc_Class_Wp_Users
+package body Class_Users
 is
 
    function Apply_Filters (Hook  : String;
@@ -123,7 +123,7 @@ is
 
    function Get_Data_By (Field : String;
                          Value : Integer)
-                         return Inc_Class_Wp_Users.Wp_User
+                         return Class_Users.Wp_User
    is
       use Php.Strings;
       use Hb_Common;
@@ -222,7 +222,7 @@ is
 
    function Get_Data_By (Field : String;
                          Value : String)
-                         return Inc_Class_Wp_Users.Wp_User
+                         return Class_Users.Wp_User
    is
       use Php.Strings;
       use Hb_Common;
@@ -951,7 +951,7 @@ is
    is
       use Globals;
       use Hb_Common;
---    use Inc_Class_Wp_Users;
+--    use Class_Users;
       use Inc_Load;
    begin
       if Site_Id = 0 then
@@ -1001,4 +1001,4 @@ is
       return Caps;
    end Get_Caps_Data;
 
-end Inc_Class_Wp_Users;
+end Class_Users;

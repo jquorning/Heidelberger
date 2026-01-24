@@ -3585,7 +3585,7 @@ is
       use Hb_Common;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
    begin
       if not This.Is_Author then
          return False;

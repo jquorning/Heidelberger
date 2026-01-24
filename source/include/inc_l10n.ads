@@ -14,7 +14,7 @@ with Arrays;
 with Lists;
 
 with Inc_Class_Wp_Textdomain_Registry;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with POMO_MO;
 with POMO_Translations;
 
@@ -84,7 +84,7 @@ is
                              return String
                              is ("en_US");
 
-   function Get_User_Locale (User : Inc_Class_Wp_Users.Wp_User)
+   function Get_User_Locale (User : Class_Users.Wp_User)
                              return String
                              is ("en_US");
 

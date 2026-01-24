@@ -31,7 +31,7 @@ with Class_Post_Type;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Taxonomy;
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Category_Templates;
 with Inc_Formatting;
 with Inc_Functions;
@@ -233,7 +233,7 @@ is
       use Wp_Common;
       use Class_Posts;
       use Class_Terms;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Class_Terms.Term_Vectors;
       use Inc_Category_Templates;
       use Inc_Load;
@@ -1959,7 +1959,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Functions;
       use Inc_Plugins;
       use Inc_Pluggables;

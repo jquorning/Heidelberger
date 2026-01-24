@@ -67,8 +67,8 @@ is
             is (Class_Posts.Null_Post);
 
    function Get_Queried_Object
-            return Inc_Class_Wp_Users.Wp_User
-            is (Inc_Class_Wp_Users.Null_User);
+            return Class_Users.Wp_User
+            is (Class_Users.Null_User);
 
    ---------------------------
    -- Get_Queried_Object_Id --

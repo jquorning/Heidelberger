@@ -18,7 +18,7 @@ with Inc_Class_Wp_Taxonomy;
 with Class_Terms;
 with Class_Posts;
 with Class_Post_Type;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Media;
 with Inc_Posts;
 with Inc_Taxonomys;
@@ -94,7 +94,7 @@ is
 
    function Apply_Filters (Hook  : String;
                            Value : Array_Type;
-                           User  : Inc_Class_Wp_Users.Wp_User)
+                           User  : Class_Users.Wp_User)
                            return Array_Type
                            is (Value);
 
@@ -392,7 +392,7 @@ is
    function Apply_Filters (Hook_Name  : String;
                            Value      : String;
                            Item       : String;
-                           User       : Inc_Class_Wp_Users.Wp_User)
+                           User       : Class_Users.Wp_User)
                            return String
                            is (Value);
 
@@ -465,12 +465,12 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
-                        User      : Inc_Class_Wp_Users.Wp_User)
+                        User      : Class_Users.Wp_User)
                         is null;
 
    procedure Do_Action (Hook_Name : String;
                         Login     : String;
-                        User      : Inc_Class_Wp_Users.Wp_User)
+                        User      : Class_Users.Wp_User)
                         is null;
 
    procedure Do_Action (Hook_Name : String;
@@ -505,13 +505,13 @@ is
 
    procedure Do_Action (Hook_Name : String;
                         Cookie    : Array_Type;
-                        User      : Inc_Class_Wp_Users.Wp_User)
+                        User      : Class_Users.Wp_User)
                         is null;
 
    procedure Do_Action (Hook_Name : String;
                         Nonce     : String;
                         Action    : String;
-                        User      : Inc_Class_Wp_Users.Wp_User;
+                        User      : Class_Users.Wp_User;
                         Token     : String)
                         is null;
 

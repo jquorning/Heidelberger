@@ -11,7 +11,7 @@ with Arrays;
 
 with Inc_Class_Wp_Comments;
 with Class_Posts;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Comments;
 
 package Inc_Caches
@@ -182,13 +182,13 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Users.Wp_User;
+                          return Class_Users.Wp_User;
 
    function Wp_Cache_Get (Key   : String;         -- User_Id
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Users.Wp_User;
+                          return Class_Users.Wp_User;
 
    --
    -- Saves the data to the cache.

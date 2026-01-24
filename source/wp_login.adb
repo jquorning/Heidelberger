@@ -32,7 +32,7 @@ with Class_Phpass;
 with Class_Errors;
 with Inc_Class_Wp_Recovery_Mode_Link_Services;
 with Inc_Class_Wp_Sites;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -911,7 +911,7 @@ is
       use Binder;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Functions;
       use Inc_General_Templates;
       use Inc_L10n;
@@ -1683,7 +1683,7 @@ is
       use Inc_Capabilities;
       use Class_Errors;
       use Inc_Class_Wp_Sites;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;

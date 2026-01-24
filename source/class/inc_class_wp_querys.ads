@@ -12,7 +12,7 @@ with Arrays;
 
 with Class_Posts;
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 
 package Inc_Class_Wp_Querys
 is
@@ -577,8 +577,8 @@ is
                                 is (Class_Terms.Null_Term);
 
    function Get_Queried_Object (This : Wp_Query)
-                                return Inc_Class_Wp_Users.Wp_User
-                                is (Inc_Class_Wp_Users.Null_User);
+                                return Class_Users.Wp_User
+                                is (Class_Users.Null_User);
 
    --
    -- Is the query for an existing post type archive page?

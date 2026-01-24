@@ -8,7 +8,7 @@ with Arrays;
 with Lists;
 
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 
 package Inc_Functions
 is
@@ -621,7 +621,7 @@ is
    --                  corresponding to those types.
    --
    function Get_Allowed_MIME_Types
-     (User : Inc_Class_Wp_Users.Wp_User := Inc_Class_Wp_Users.Null_User)
+     (User : Class_Users.Wp_User := Class_Users.Null_User)
       return Array_Type;
 
    --

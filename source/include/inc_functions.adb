@@ -3700,13 +3700,13 @@ is
    ----------------------------
 
    function Get_Allowed_MIME_Types
-     (User : Inc_Class_Wp_Users.Wp_User := Inc_Class_Wp_Users.Null_User)
+     (User : Class_Users.Wp_User := Class_Users.Null_User)
       return Array_Type
    is
       use Php.Misc;
       use Wp_Common;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
 
       T : constant Array_Type := Wp_Get_MIME_Types; -- ()
 

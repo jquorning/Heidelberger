@@ -29,7 +29,7 @@ with Inc_Caches;
 with Inc_Capabilities;
 with Class_Errors;
 with Inc_Class_Wp_Roles;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Class_WpDB;
 with Inc_Cron;
 with Inc_Formatting;
@@ -68,7 +68,7 @@ is
       use Wp_Common;
       use Adi_Schemas;
       use Inc_Caches;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Options;

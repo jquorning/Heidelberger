@@ -9,7 +9,7 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Users;
 
 package Inc_Pluggables
@@ -36,7 +36,7 @@ is
    --
    function Wp_Set_Current_User (Id   : Integer;
                                  Name : String := "")
-                                 return Inc_Class_Wp_Users.Wp_User;
+                                 return Class_Users.Wp_User;
 
    procedure Wp_Set_Current_User (Id   : Integer;
                                   Name : String := "");
@@ -56,7 +56,7 @@ is
    -- @return WP_User Current WP_User instance.
    --
    function Wp_Get_Current_User
-            return Inc_Class_Wp_Users.Wp_User;
+            return Class_Users.Wp_User;
 
    --
    -- Retrieves user info by user ID.
@@ -67,7 +67,7 @@ is
    -- @return WP_User|false WP_User object on success, false on failure.
    --
    function Get_Userdata (User_Id : Integer)
-                          return Inc_Class_Wp_Users.Wp_User;
+                          return Class_Users.Wp_User;
 
    --
    -- Retrieves user info by a given field.
@@ -85,11 +85,11 @@ is
    --
    function Get_User_By (Field : String;
                          Value : Integer)
-                         return Inc_Class_Wp_Users.Wp_User;
+                         return Class_Users.Wp_User;
 
    function Get_User_By (Field : String;
                          Value : String)
-                         return Inc_Class_Wp_Users.Wp_User;
+                         return Class_Users.Wp_User;
 
    --
    -- Redirects to another page.

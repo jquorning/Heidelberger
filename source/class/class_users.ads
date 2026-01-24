@@ -13,7 +13,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-package Inc_Class_Wp_Users
+package Class_Users
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -354,4 +354,4 @@ private
    -- private static
    Back_Compat_Keys : Array_Type;
 
-end Inc_Class_Wp_Users;
+end Class_Users;

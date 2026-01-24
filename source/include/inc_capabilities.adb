@@ -1173,7 +1173,7 @@ is
    -- User_Can --
    --------------
 
-   function User_Can (User       : Inc_Class_Wp_Users.Wp_User;
+   function User_Can (User       : Class_Users.Wp_User;
                       Capability : String)
                       -- , ...args)
                       return Boolean
@@ -1197,7 +1197,7 @@ is
                       -- , ...args)
                       return Boolean
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Pluggables;
 
       User_2 : constant Wp_User := Get_Userdata (User);
@@ -1296,7 +1296,7 @@ is
       use Php;
       use Php.Lists;
       use Php.Types;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Load;
       use Inc_Pluggables;
 

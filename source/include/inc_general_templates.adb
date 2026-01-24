@@ -21,7 +21,7 @@ with Lists;
 with Wp_Common;
 
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Class_Post_Type;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Styles;
@@ -1294,7 +1294,7 @@ is
 --      Get_Queried_Object
       then
          declare
-            use Inc_Class_Wp_Users;
+            use Class_Users;
 
             Author : constant Wp_User := Get_Queried_Object;
          begin

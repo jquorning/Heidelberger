@@ -8,7 +8,7 @@
 with Arrays;
 
 with Class_Errors;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Class_Wp_Admin_Bar;
 
 package Inc_Users
@@ -17,7 +17,7 @@ is
 
    type User_Error_Type is record
       Success : Boolean;
-      User    : Inc_Class_Wp_Users.Wp_User;
+      User    : Class_Users.Wp_User;
       Error   : Class_Errors.Wp_Error;
    end record;
 
@@ -222,11 +222,11 @@ is
    -- @return int|WP_Error The updated user's ID or a WP_Error object if the user
    --                       could not be updated.
    --
-   function Wp_Update_User (Userdata : Inc_Class_Wp_Users.Wp_User)
+   function Wp_Update_User (Userdata : Class_Users.Wp_User)
                             return Integer
                             is (raise Program_Error with "not implemented");
 
-   procedure Wp_Update_User (Userdata : Inc_Class_Wp_Users.Wp_User)
+   procedure Wp_Update_User (Userdata : Class_Users.Wp_User)
    is null;
 
    --
@@ -324,7 +324,7 @@ is
    -- @param WP_User user     The user
    -- @param string  new_pass New password for the user in plaintext
    --
-   procedure Reset_Password (User     : Inc_Class_Wp_Users.Wp_User;
+   procedure Reset_Password (User     : Class_Users.Wp_User;
                              New_Pass : String);
 
    --
@@ -407,7 +407,7 @@ is
    -- @return WP_User Current WP_User instance.
    --
    function X_Wp_Get_Current_User
-            return Inc_Class_Wp_Users.Wp_User;
+            return Class_Users.Wp_User;
 
    --
    -- Updates the total count of users on the site.
@@ -450,7 +450,7 @@ is
    -- @param object|WP_User user User object or database row to be cached
    -- @return void|false Void on success, false on failure.
    --
-   procedure Update_User_Caches (User : Inc_Class_Wp_Users.Wp_User);
+   procedure Update_User_Caches (User : Class_Users.Wp_User);
 
    --
    -- Determines whether the given username exists.

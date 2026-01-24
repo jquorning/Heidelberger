@@ -11,7 +11,7 @@ with Lists;
 with Inc_Class_Wp_Role;
 with Inc_Class_Wp_Roles;
 with Class_Posts;
-with Inc_Class_Wp_Users;
+with Class_Users;
 
 package Inc_Capabilities
 is
@@ -214,7 +214,7 @@ is
    --                                with an object ID.
    -- @return bool Whether the user has the given capability.
    --
-   function User_Can (User       : Inc_Class_Wp_Users.Wp_User;
+   function User_Can (User       : Class_Users.Wp_User;
                       Capability : String)
                       -- , ...args)
                       return Boolean;

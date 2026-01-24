@@ -34,7 +34,7 @@ with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Class_Posts;
 with Class_Post_Type;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Pluggables;
@@ -419,7 +419,7 @@ is
                   begin
                      if User_Id /= 0 then
                         declare
-                           use Inc_Class_Wp_Users;
+                           use Class_Users;
 
                            User : constant Wp_User := Get_Userdata (User_Id);
                         begin

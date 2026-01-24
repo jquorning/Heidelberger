@@ -21,7 +21,7 @@ with Adi_Caches;
 with Inc_Class_Wp_Comments;
 with Class_Posts;
 with Class_Terms;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Comments;
 with Inc_Pluggables;
 with Inc_Plugins;
@@ -1827,7 +1827,7 @@ is
 
       elsif Object_Type = "user" then
          declare
-            use Inc_Class_Wp_Users;
+            use Class_Users;
             use Inc_Pluggables;
 
             User : constant Wp_User := Get_User_By ("id", Object_Id);

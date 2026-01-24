@@ -30,7 +30,7 @@ with Class_Post_Type;
 with Inc_Class_Wp_Recovery_Mode;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Taxonomy;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Comments;
 with Inc_Capabilities;
 with Inc_Formatting;
@@ -291,7 +291,7 @@ is
    procedure Wp_Admin_Bar_My_Account_Item (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Php.Strings;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Pluggables;
@@ -342,7 +342,7 @@ is
 
    procedure Wp_Admin_Bar_My_Account_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_General_Templates;
       use Inc_Link_Templates;
       use Inc_Load;
@@ -1098,7 +1098,7 @@ is
             elsif "user-edit" = Current_Screen.Base or else User_Id /= 0 then
                declare
                   use Inc_Author_Templates;
-                  use Inc_Class_Wp_Users;
+                  use Class_Users;
                   use Inc_Pluggables;
 
                   User_Object : constant Wp_User := Get_Userdata (User_Id);

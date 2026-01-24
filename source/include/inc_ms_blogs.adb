@@ -11,7 +11,7 @@
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Roles;
-with Inc_Class_Wp_Users;
+with Class_Users;
 with Inc_Load;
 with Inc_Options;
 with Inc_Pluggables;
@@ -707,7 +707,7 @@ is
       end;
 
       declare
-         use Inc_Class_Wp_Users;
+         use Class_Users;
 
          User : Wp_User := Wp_Get_Current_User;
       begin

@@ -264,16 +264,16 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Users.Wp_User
+                          return Class_Users.Wp_User
    is
       Result : constant Multi_Type :=
         Wp_Cache_Get (Helpers.Image (Key),
                       Group, Force, Found);
    begin
       if Result = From_Null then
-         return Inc_Class_Wp_Users.Null_User;
+         return Class_Users.Null_User;
       else
-         return Inc_Class_Wp_Users.Null_User; -- Wp_Comment (Result);
+         return Class_Users.Null_User; -- Wp_Comment (Result);
       end if;
    end Wp_Cache_Get;
 
@@ -285,15 +285,15 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Users.Wp_User
+                          return Class_Users.Wp_User
    is
       Result : constant Multi_Type :=
         Wp_Cache_Get (Key, Group, Force, Found);
    begin
       if Result = From_Null then
-         return Inc_Class_Wp_Users.Null_User;
+         return Class_Users.Null_User;
       else
-         return Inc_Class_Wp_Users.Null_User; -- Wp_User (Result);
+         return Class_Users.Null_User; -- Wp_User (Result);
       end if;
    end Wp_Cache_Get;
 

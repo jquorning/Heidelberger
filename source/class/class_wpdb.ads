@@ -17,7 +17,7 @@ with Lists;
 with Inc_Class_Wp_Comments;
 with Class_Errors;
 with Class_Posts;
-with Inc_Class_Wp_Users;
+with Class_Users;
 
 package Class_WpDB
 is
@@ -1528,8 +1528,8 @@ is
                      Output  : String         := ""; -- = OBJECT,
                      Y       : Natural        := 0;
                      Success : out Boolean)
-                     return Inc_Class_Wp_Users.Wp_User
-                     is (Inc_Class_Wp_Users.Null_User);
+                     return Class_Users.Wp_User
+                     is (Class_Users.Null_User);
 
    --
    -- Retrieves the character set for the given column.

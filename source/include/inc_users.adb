@@ -1897,12 +1897,12 @@ is
    -- Update_User_Caches --
    ------------------------
 
-   procedure Update_User_Caches (User : Inc_Class_Wp_Users.Wp_User)
+   procedure Update_User_Caches (User : Class_Users.Wp_User)
    is
       use Php.Strings;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
 
       User_2 : Wp_User := User;
    begin
@@ -1967,7 +1967,7 @@ is
                              return Integer
    is
       use Wp_Common;
-      use Inc_Class_Wp_Users;
+      use Class_Users;
       use Inc_Pluggables;
 --    use Inc_Plugins;
 
@@ -3249,7 +3249,7 @@ is
    -- Reset_Password --
    --------------------
 
-   procedure Reset_Password (User     : Inc_Class_Wp_Users.Wp_User;
+   procedure Reset_Password (User     : Class_Users.Wp_User;
                              New_Pass : String)
    is null;
 --         --
@@ -3553,9 +3553,9 @@ is
 -- -- @return WP_User Current WP_User instance.
 -- --
    function X_Wp_Get_Current_User
-            return Inc_Class_Wp_Users.Wp_User
+            return Class_Users.Wp_User
    is
-      U : Inc_Class_Wp_Users.Wp_User;
+      U : Class_Users.Wp_User;
    begin
       return U;
    end X_Wp_Get_Current_User;
