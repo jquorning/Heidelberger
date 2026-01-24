@@ -12,7 +12,7 @@
 --
 
 with Class_Posts;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Querys;
 
@@ -58,7 +58,7 @@ is
    function Get_Queried_Object
             return Class_Posts.Wp_Post;
    function Get_Queried_Object
-            return Inc_Class_Wp_Terms.Wp_Term;
+            return Class_Terms.Wp_Term;
    function Get_Queried_Object
             return Inc_Class_Wp_Users.Wp_User;
 

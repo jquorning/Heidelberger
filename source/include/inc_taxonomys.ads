@@ -11,7 +11,7 @@ with Ada.Containers.Vectors;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Taxonomy;
 
 package Inc_Taxonomys
@@ -460,17 +460,17 @@ is
    --                                     WP_Error if `taxonomy` does not exist. Null
    --                                      for miscellaneous failure.
    --
-   function Get_Term (Term     : Integer; -- Inc_Class_Wp_Terms.Wp_Term;
+   function Get_Term (Term     : Integer; -- Class_Terms.Wp_Term;
                       Taxonomy : String := "";
                       Output   : String := "OBJECT";
                       Filter   : String := "raw")
-                      return Inc_Class_Wp_Terms.Wp_Term;
+                      return Class_Terms.Wp_Term;
 
-   function Get_Term (Term     : Inc_Class_Wp_Terms.Wp_Term;
+   function Get_Term (Term     : Class_Terms.Wp_Term;
                       Taxonomy : String := "";
                       Output   : String := "OBJECT";
                       Filter   : String := "raw")
-                      return Inc_Class_Wp_Terms.Wp_Term
+                      return Class_Terms.Wp_Term
                       is (raise Program_Error with "not implemented");
 
    --
@@ -555,14 +555,14 @@ is
 
    -- package Term_Vectors is new
    --    Ada.Containers.Vectors (Index_Type   => Positive,
-   --                            Element_Type => Inc_Class_Wp_Terms.Wp_Term,
-   --                            "="          => Inc_Class_Wp_Terms."=");
+   --                            Element_Type => Class_Terms.Wp_Term,
+   --                            "="          => Class_Terms."=");
    -- subtype Wp_Term_Array is Term_Vectors.Vector;
    -- Empty_Term_Array : constant Wp_Term_Array := Term_Vectors.Empty_Vector;
 
    function Get_Object_Term_Cache (Id       : Integer;
                                    Taxonomy : String)
-                                   return Inc_Class_Wp_Terms.Wp_Term_Array;
+                                   return Class_Terms.Wp_Term_Array;
    --
    -- Counts how many terms are in taxonomy.
    --
@@ -658,8 +658,8 @@ is
    --
    function Get_Terms (Args        : Array_Type := Empty_Array;
                        Deprectated : String     := "")
-                       return Inc_Class_Wp_Terms.Wp_Term_Array
-                       is (Inc_Class_Wp_Terms.Empty_Term_Array);
+                       return Class_Terms.Wp_Term_Array
+                       is (Class_Terms.Empty_Term_Array);
 
    --
    -- Retrieves the terms associated with the given object(s), in the supplied
@@ -689,13 +689,13 @@ is
                                  Taxonomies : String;
                                  Args       : List_Type := Empty_List)
                                  return Array_Type
-                                 -- Inc_Class_Wp_Terms.Wp_Term_Array;
+                                 -- Class_Terms.Wp_Term_Array;
                                  is (Empty_Array);
 
    function Wp_Get_Object_Terms (Object_Ids : Integer_Array;
                                  Taxonomies : Array_Type; -- String_Array;
                                  Args       : Array_Type := Empty_Array)
-                                 return Inc_Class_Wp_Terms.Wp_Term_Array;
+                                 return Class_Terms.Wp_Term_Array;
 
    --
    -- Adds any terms from the given IDs to the cache that do not already exist in
@@ -919,12 +919,12 @@ is
    -- @return string|WP_Error URL of the taxonomy term archive on success, WP_Error if
    --                          term does not exist.
    --
-   function Get_Term_Link (Term     : Inc_Class_Wp_Terms.Wp_Term;
+   function Get_Term_Link (Term     : Class_Terms.Wp_Term;
                            Taxonomy : String := "")
                            return String
                            is ("XXX-361");
 
-   function Get_Term_Link (Term     : Integer; -- Inc_Class_Wp_Terms.Wp_Term;
+   function Get_Term_Link (Term     : Integer; -- Class_Terms.Wp_Term;
                            Taxonomy : String := "")
                            return String
                            is (raise Program_Error with "not implemented");
@@ -939,7 +939,7 @@ is
    -- @param int|WP_Term term Term ID or term object.
    -- @return bool Whether the term is publicly viewable.
    --
-   function Is_Term_Publicly_Viewable (Term : Inc_Class_Wp_Terms.Wp_Term)
+   function Is_Term_Publicly_Viewable (Term : Class_Terms.Wp_Term)
                                        return Boolean
                                        is (True);
 

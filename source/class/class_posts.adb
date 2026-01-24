@@ -10,7 +10,7 @@ with Wp_Common;
 with Adi_Caches;
 
 with Inc_Category_Templates;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Class_WpDB;
 with Inc_Functions;
 with Inc_Meta;
@@ -143,7 +143,7 @@ is
                    Key  : String)
                    return Array_Type
    is
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Category_Templates;
       use Inc_Functions;
       use Inc_Taxonomys;

@@ -9,7 +9,7 @@
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
-package Inc_Class_Wp_Terms
+package Class_Terms
 is
    use Ada.Strings.Unbounded;
 
@@ -126,4 +126,4 @@ is
 
    procedure Dummy;
 
-end Inc_Class_Wp_Terms;
+end Class_Terms;

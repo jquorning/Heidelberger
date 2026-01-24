@@ -583,7 +583,7 @@ is
          -- Add default term.
          if not Empty (Taxonomy_Object.Default_Term) then
             declare
---             use Inc_Class_Wp_Terms;
+--             use Class_Terms;
 
                Term : Array_Type :=
                  Term_Exists (As_String (Get (Taxonomy_Object.Default_Term, "name")),
@@ -985,13 +985,13 @@ is
 --                                     WP_Error if `taxonomy` does not exist. Null for miscellaneous failure.
 --
 
-   function Get_Term (Term     : Integer; -- Inc_Class_Wp_Terms.Wp_Term;
+   function Get_Term (Term     : Integer; -- Class_Terms.Wp_Term;
                       Taxonomy : String := "";
                       Output   : String := "OBJECT";
                       Filter   : String := "raw")
-                      return Inc_Class_Wp_Terms.Wp_Term
+                      return Class_Terms.Wp_Term
    is
-      T : Inc_Class_Wp_Terms.Wp_Term;
+      T : Class_Terms.Wp_Term;
    begin
       return T;
    end Get_Term;
@@ -1617,8 +1617,8 @@ is
                                  Term, Taxonomy, Parent);
 
       declare
-         use Inc_Class_Wp_Terms;
-         use type Inc_Class_Wp_Terms.Wp_Term_Array;
+         use Class_Terms;
+         use type Class_Terms.Wp_Term_Array;
 
          Args  : Array_Type;
          Terms : Wp_Term_Array; -- Array_Type;
@@ -2286,7 +2286,7 @@ is
    function Wp_Get_Object_Terms (Object_Ids : Integer_Array;
                                  Taxonomies : Array_Type; -- String_Array;
                                  Args       : Array_Type := Empty_Array)
-                                 return Inc_Class_Wp_Terms.Wp_Term_Array
+                                 return Class_Terms.Wp_Term_Array
    is
       use Ada.Containers;
       use Php.Arrays;
@@ -2296,7 +2296,7 @@ is
       use Hb_Common;
       use Wp_Common;
 --    use Adi_Templates;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Formatting;
       use Integer_Vectors;
 
@@ -2402,7 +2402,7 @@ is
          Set (Args_3, "object_ids", From_List (Object_Ids_2));
 
          declare
-            use Inc_Class_Wp_Terms.Term_Vectors;
+            use Class_Terms.Term_Vectors;
 
             Terms_From_Remaining_Taxonomies : Wp_Term_Array := Get_Terms (Args);
          begin
@@ -3861,11 +3861,11 @@ is
 
    function Get_Object_Term_Cache (Id       : Integer;
                                    Taxonomy : String)
-                                   return Inc_Class_Wp_Terms.Wp_Term_Array
+                                   return Class_Terms.Wp_Term_Array
    is
       use Ada.Containers;
       use Adi_Caches;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
 --    use Array_Maps;
 
       Unused_Hit : Boolean;
@@ -5104,7 +5104,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Class_Wp_Taxonomy;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Load;
       use Inc_Posts;
 

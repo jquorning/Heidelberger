@@ -15,7 +15,7 @@ with Inc_Class_Wp_Dependency;
 with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Http;
 with Inc_Class_Wp_Taxonomy;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Class_Posts;
 with Class_Post_Type;
 with Inc_Class_Wp_Users;
@@ -44,14 +44,14 @@ is
 
    procedure Set (Item : Array_Type;
                   Key  : String;
-                  Term : Inc_Class_Wp_Terms.Wp_Term_Array) is null;
+                  Term : Class_Terms.Wp_Term_Array) is null;
 
-   function Array_Keys (Arry : Inc_Class_Wp_Terms.Wp_Term_Array)
+   function Array_Keys (Arry : Class_Terms.Wp_Term_Array)
                         return List_Type
                         is (Empty_List);
 
-   procedure Array_Unshift (Arry : in out Inc_Class_Wp_Terms.Wp_Term_Array;
-                            S    : Inc_Class_Wp_Terms.Wp_Term)
+   procedure Array_Unshift (Arry : in out Class_Terms.Wp_Term_Array;
+                            S    : Class_Terms.Wp_Term)
                             is null;
 
    function In_Array (Taxonomy   : String;
@@ -65,14 +65,14 @@ is
                       return Boolean
                       is (True);
 
-   function Get_Array (Arry : Inc_Class_Wp_Terms.Wp_Term_Array;
+   function Get_Array (Arry : Class_Terms.Wp_Term_Array;
                        Key  : String)
                        return Array_Type
                        is (Empty_Array);
 
-   function Get_Term_Array (Arry : Inc_Class_Wp_Terms.Wp_Term_Array;
+   function Get_Term_Array (Arry : Class_Terms.Wp_Term_Array;
                             Key  : String)
-                            return Inc_Class_Wp_Terms.Wp_Term;
+                            return Class_Terms.Wp_Term;
 
    function Get (Post_Type : Class_Post_Type.Wp_Post_Type;
                  Key       : String)
@@ -99,20 +99,20 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Value     : Class_Terms.Wp_Term_Array;
                            Id        : String;
                            Taxonomy  : String;
                            A4        : Array_Type := Empty_Array)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
-                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+                           return Class_Terms.Wp_Term_Array
+                           is (Class_Terms.Empty_Term_Array);
 
    function Apply_Filters (Hook_Name  : String;
-                           A1         : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           A1         : Class_Terms.Wp_Term_Array;
                            A2         : List_Type;
                            A3         : Array_Type;
                            A4         : Array_Type)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
-                           is (Inc_Class_Wp_Terms.Empty_Term_Array);
+                           return Class_Terms.Wp_Term_Array
+                           is (Class_Terms.Empty_Term_Array);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
@@ -160,10 +160,10 @@ is
                            is (Empty_Array);
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Class_Wp_Terms.Wp_Term;
-                           Cats      : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Value     : Class_Terms.Wp_Term;
+                           Cats      : Class_Terms.Wp_Term_Array;
                            Post      : Class_Posts.Wp_Post)
-                           return Inc_Class_Wp_Terms.Wp_Term
+                           return Class_Terms.Wp_Term
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
@@ -182,9 +182,9 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
+                           Value     : Class_Terms.Wp_Term_Array;
                            Post      : Class_Posts.Post_Id)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           return Class_Terms.Wp_Term_Array
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;

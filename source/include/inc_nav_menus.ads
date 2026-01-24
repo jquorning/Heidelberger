@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 
 package Inc_Nav_Menus
 is
@@ -119,8 +119,8 @@ is
    -- @return WP_Term[] An array of menu objects.
    --
    function Wp_Get_Nav_Menus (Args : Array_Type := Empty_Array)
-                              return Inc_Class_Wp_Terms.Wp_Term_Array
-                              is (Inc_Class_Wp_Terms.Empty_Term_Array);
+                              return Class_Terms.Wp_Term_Array
+                              is (Class_Terms.Empty_Term_Array);
 
 --
 -- Retrieves all registered navigation menu locations and the menus assigned to them.

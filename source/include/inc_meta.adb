@@ -20,7 +20,7 @@ with Adi_Caches;
 
 with Inc_Class_Wp_Comments;
 with Class_Posts;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Comments;
 with Inc_Pluggables;
@@ -1797,7 +1797,7 @@ is
 
       elsif Object_Type = "term" then
          declare
-            use Inc_Class_Wp_Terms;
+            use Class_Terms;
             use Inc_Taxonomys;
 
             Term : constant Wp_Term := Get_Term (Object_Id);

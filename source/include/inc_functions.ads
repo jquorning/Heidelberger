@@ -7,7 +7,7 @@ with Php.Calendar;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Users;
 
 package Inc_Functions
@@ -101,7 +101,7 @@ is
                            Index_Key : String := "")  -- null)
                            return Array_Type;
 
-   function Wp_List_Pluck (List      : Inc_Class_Wp_Terms.Wp_Term_Array;
+   function Wp_List_Pluck (List      : Class_Terms.Wp_Term_Array;
                            Field     : String;
                            Index_Key : String := "")  -- null)
                            return Array_Type

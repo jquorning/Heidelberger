@@ -56,7 +56,7 @@ is
    ------------------------
 
    function Get_Queried_Object
-            return Inc_Class_Wp_Terms.Wp_Term
+            return Class_Terms.Wp_Term
    is
    begin
       return Global_Wp_Query.Get_Queried_Object;

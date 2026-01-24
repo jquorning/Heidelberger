@@ -20,7 +20,7 @@ with Hb_Common;
 with Lists;
 with Wp_Common;
 
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Users;
 with Class_Post_Type;
 with Inc_Class_Wp_Sites;
@@ -1222,7 +1222,7 @@ is
       use Php.Arrays;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
 --    use Inc_Class_Wp_Querys;
       use Inc_L10n;
       use Inc_Plugins;
@@ -1688,11 +1688,11 @@ is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Plugins;
       use Inc_Querys;
 
-      Term      : constant Inc_Class_Wp_Terms.Wp_Term := Get_Queried_Object;
+      Term      : constant Class_Terms.Wp_Term := Get_Queried_Object;
       Term_Name : Unbounded_String;
    begin
 --    if not Term then

@@ -9,7 +9,7 @@
 with Arrays;
 -- with Lists;
 
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Class_Posts;
 
 package Inc_Category_Templates
@@ -58,7 +58,7 @@ is
    --                    the post.
    --
    function Get_The_Category (Post_Id : Class_Posts.Post_Id := 0) -- false
-                              return Inc_Class_Wp_Terms.Wp_Term_Array;
+                              return Class_Terms.Wp_Term_Array;
 
    --
    -- Displays or retrieves the HTML dropdown list of categories.
@@ -153,12 +153,12 @@ is
    --
    function Get_The_Terms (Post     : Class_Posts.Wp_Post;
                            Taxonomy : String)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array;
+                           return Class_Terms.Wp_Term_Array;
                            -- Inc_Class_Posts.Wp_Post;
 
    function Get_The_Terms (Post     : Class_Posts.Post_Id;
                            Taxonomy : String)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array;
+                           return Class_Terms.Wp_Term_Array;
 
    --
    -- Retrieves term parents with separator.
@@ -200,7 +200,7 @@ is
    -- @return string
    --
    function Walk_Category_Dropdown_Tree
-     (Categories : Array_Type; -- Inc_Class_Wp_Terms.Wp_Term_Array; -- ...$args
+     (Categories : Array_Type; -- Class_Terms.Wp_Term_Array; -- ...$args
       Depth      : Integer;
       Args       : Array_Type)
       return String;

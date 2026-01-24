@@ -25,7 +25,7 @@ with Adi_Templates;
 
 -- with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Querys;
 with Inc_Formatting;
@@ -121,7 +121,7 @@ is
 --                                              To_Array (Inc_Taxonomys.Get_Term (Object_Id, Object_Type))), 0, Args)); -- (object)
                   elsif "json" = Response_Format then
                      declare
-                        use Inc_Class_Wp_Terms;
+                        use Class_Terms;
                         use Inc_Taxonomys;
 
                         Post_Obj : constant Wp_Term :=
@@ -217,7 +217,7 @@ is
             end;
          elsif "taxonomy" = Matches (1) then
             declare
-               use Inc_Class_Wp_Terms;
+               use Class_Terms;
                use Inc_Nav_Menu_Templates;
 
                Terms : constant Wp_Term_Array :=
@@ -1018,7 +1018,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
    is
       use Inc_Formatting;
       use Inc_Class_Wp_Taxonomy;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Taxonomys;
       use Inc_General_Templates;
 

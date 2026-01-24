@@ -5,7 +5,7 @@
 -- @subpackage Taxonomy
 -- @since 4.4.0
 --
-package body Inc_Class_Wp_Terms
+package body Class_Terms
 is
    procedure Dummy is null;
 
@@ -153,4 +153,4 @@ is
         --         end;
         -- end;
 
-end Inc_Class_Wp_Terms;
+end Class_Terms;

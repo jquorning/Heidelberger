@@ -17,7 +17,7 @@ with Hb_Common;
 with Inc_Class_Wp_Comments;
 with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Comments;
 with Inc_Functions;
 with Inc_Load;
@@ -910,7 +910,7 @@ is
 
          declare
             use Inc_Class_Wp_Taxonomy;
-            use Inc_Class_Wp_Terms;
+            use Class_Terms;
             use Inc_Taxonomys;
 
             Term_Id  : constant Integer := Args.Term_Id;

@@ -129,7 +129,7 @@ is
    ----------
 
    function Walk (This      : in out Walker;
-                  Elements  : Array_Type; -- Inc_Class_Wp_Terms.Wp_Term_Array;
+                  Elements  : Array_Type; -- Class_Terms.Wp_Term_Array;
                   Max_Depth : Integer;
                   Args      : Array_Type)
                   return String

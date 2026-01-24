@@ -91,11 +91,11 @@ is
    ----------------------
 
    function Get_The_Category (Post_Id : Class_Posts.Post_Id := 0) -- false
-                              return Inc_Class_Wp_Terms.Wp_Term_Array
+                              return Class_Terms.Wp_Term_Array
    is
       use Wp_Common;
-      use Inc_Class_Wp_Terms;
-      use Inc_Class_Wp_Terms.Term_Vectors;
+      use Class_Terms;
+      use Class_Terms.Term_Vectors;
 --    use Inc_Load;
 --    use Inc_Plugins;
 
@@ -416,7 +416,7 @@ is
       Get_Terms_Args := Parsed_Args;
 --    unset( $get_terms_args["name"] );
       declare
-         use Inc_Class_Wp_Terms;
+         use Class_Terms;
          use Inc_Taxonomys;
 
          function Empty (Terms : Wp_Term_Array)
@@ -1211,7 +1211,7 @@ is
    ---------------------------------
 
    function Walk_Category_Dropdown_Tree
-     (Categories : Array_Type; -- Inc_Class_Wp_Terms.Wp_Term_Array; -- ...$args
+     (Categories : Array_Type; -- Class_Terms.Wp_Term_Array; -- ...$args
       Depth      : Integer;
       Args       : Array_Type)
       return String
@@ -1372,12 +1372,12 @@ is
 
    function Get_The_Terms (Post     : Class_Posts.Wp_Post;
                            Taxonomy : String)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           return Class_Terms.Wp_Term_Array
                            -- Inc_Class_Posts.Wp_Post
    is
       use Wp_Common;
       use Adi_Caches;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Taxonomys;
       use Inc_Load;
       use Inc_Functions;
@@ -1434,7 +1434,7 @@ is
 
    function Get_The_Terms (Post     : Class_Posts.Post_Id;
                            Taxonomy : String)
-                           return Inc_Class_Wp_Terms.Wp_Term_Array
+                           return Class_Terms.Wp_Term_Array
                            is (raise Program_Error with "not implemented");
 
 --
@@ -1506,7 +1506,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Inc_Class_Wp_Taxonomy;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

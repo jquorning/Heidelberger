@@ -25,7 +25,7 @@ with Wp_Common;
 with Inc_Admin_Bar;
 with Inc_Capabilities;
 with Inc_Class_Wp_Taxonomy;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -173,8 +173,8 @@ is
          use Php.Lists;
          use Inc_Capabilities;
          use Inc_Class_Wp_Taxonomy;
-         use Inc_Class_Wp_Terms;
-         use Inc_Class_Wp_Terms.Term_Vectors;
+         use Class_Terms;
+         use Class_Terms.Term_Vectors;
          use Inc_Taxonomys;
 
          Taxonomy : constant String  := As_String (Get (Parsed_Args, "taxonomy"));

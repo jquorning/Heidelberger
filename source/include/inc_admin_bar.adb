@@ -985,7 +985,7 @@ is
    is
       use Php.Strings;
       use Adi_Class_Wp_Screens;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Posts;

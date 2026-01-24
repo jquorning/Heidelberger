@@ -3,7 +3,7 @@ with Ada.Calendar;
 with Arrays;
 
 with Inc_Class_Wp_Errors;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 
 package Inc_Load
 is
@@ -378,7 +378,7 @@ is
                          return Boolean
                          is (False);
 
-   function Is_Wp_Error (Thing : Inc_Class_Wp_Terms.Wp_Term)
+   function Is_Wp_Error (Thing : Class_Terms.Wp_Term)
                          return Boolean
                          is (True);
 

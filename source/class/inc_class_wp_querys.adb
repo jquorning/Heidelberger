@@ -3641,7 +3641,7 @@ is
       end if;
 
       declare
-         use Inc_Class_Wp_Terms; -- Posts;
+         use Class_Terms; -- Posts;
 
          Cat_Obj : constant Wp_Term := This.Get_Queried_Object;
       begin
@@ -3676,7 +3676,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
    begin
       if not This.Is_Tag then
          return False;
@@ -3726,7 +3726,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
    begin
       if not This.Is_Tax then
          return False;

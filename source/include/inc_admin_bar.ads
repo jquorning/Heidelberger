@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Customize_Managers;
 with Class_Posts;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Querys;
 
 package Inc_Admin_Bar
@@ -21,7 +21,7 @@ is
 
    X_Wp_Admin_Bar : Wp_Admin_Bar; -- X_ added jq
 
-   Tag            : Inc_Class_Wp_Terms.Wp_Term;
+   Tag            : Class_Terms.Wp_Term;
    Wp_The_Query   : Inc_Class_Wp_Querys.Wp_Query;
    User_Id        : Integer;
    Id_Of_Post     : Class_Posts.Post_Id; -- was Post_Id : Integer

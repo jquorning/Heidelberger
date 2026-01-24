@@ -33,7 +33,7 @@ with Adi_Templates;
 with Inc_Capabilities;
 with Inc_Categories;
 with Inc_Category_Templates;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -82,7 +82,7 @@ is
       use Inc_Functions_Wp_Scripts;
       use Inc_Taxonomys;
 --    use Inc_Class_Wp_Taxonomy;
-      use Inc_Class_Wp_Terms;
+      use Class_Terms;
    begin
       Adm_Admin.Run;
 

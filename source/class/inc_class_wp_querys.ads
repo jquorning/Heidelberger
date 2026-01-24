@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 
 with Class_Posts;
-with Inc_Class_Wp_Terms;
+with Class_Terms;
 with Inc_Class_Wp_Users;
 
 package Inc_Class_Wp_Querys
@@ -573,8 +573,8 @@ is
                                 is (Class_Posts.Null_Post);
 
    function Get_Queried_Object (This : Wp_Query)
-                                return Inc_Class_Wp_Terms.Wp_Term
-                                is (Inc_Class_Wp_Terms.Null_Term);
+                                return Class_Terms.Wp_Term
+                                is (Class_Terms.Null_Term);
 
    function Get_Queried_Object (This : Wp_Query)
                                 return Inc_Class_Wp_Users.Wp_User
