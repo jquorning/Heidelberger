@@ -56,8 +56,8 @@ is
 
       for A of This.To_Do loop
          declare
-            use Inc_Class_Wp_Dependency;
-            use Inc_Class_Wp_Dependency.Dependency_Maps;
+            use Class_Dependency;
+            use Class_Dependency.Dependency_Maps;
 
 --          Key    : String := -A.Key;
             Handle : constant String := -A; -- .Value;
@@ -93,7 +93,7 @@ is
                      Group  : Integer := 0) -- false
                      return Boolean
    is
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency.Dependency_Maps;
    begin
       return This.Registered.Find (Handle) /= No_Element;
    end Do_Item;
@@ -130,8 +130,8 @@ is
             end if;
 
             declare
-               use Inc_Class_Wp_Dependency;
-               use Inc_Class_Wp_Dependency.Dependency_Maps;
+               use Class_Dependency;
+               use Class_Dependency.Dependency_Maps;
 --             use String_Vectors;
 
                Moved : constant Boolean := This.Set_Group (Handle_2, Recursion, Group);
@@ -216,8 +216,8 @@ is
                  return Boolean
    is
       use Php.Lists;
-      use Inc_Class_Wp_Dependency;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
 --    use String_Vectors;
       use List_Vectors;
    begin
@@ -270,14 +270,14 @@ is
 --                    Value  : Array_Type)
                       return Boolean
    is
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency.Dependency_Maps;
    begin
       if This.Registered.Find (Handle) = No_Element then
          return False;
       end if;
 
       declare
-         use Inc_Class_Wp_Dependency;
+         use Class_Dependency;
 
          S : X_Wp_Dependency renames This.Registered (Handle);
       begin
@@ -297,7 +297,7 @@ is
                       return String -- Array_Type
    is
       use Php.Strings;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency.Dependency_Maps;
    begin
       if This.Registered.Find (Handle) = No_Element then
          return ""; -- False;
@@ -334,8 +334,8 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Dependency;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
       use List_Vectors;
    begin
       for Handle of Handles loop
@@ -392,7 +392,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
---    use Inc_Class_Wp_Dependency;
+--    use Class_Dependency;
    begin
       for Handle of Handles loop
          declare
@@ -402,7 +402,7 @@ is
                List_Search (First, This.Queue, True);
 
             Position_1 : List_Vectors.Cursor;
-            Position_2 : Inc_Class_Wp_Dependency.String_Maps.Cursor;
+            Position_2 : Class_Dependency.String_Maps.Cursor;
          begin
             if "" /= Key then
                -- Reset all dependencies so they must be recalculated in
@@ -437,8 +437,8 @@ is
                           return Boolean
    is
       use Php.Lists;
-      use Inc_Class_Wp_Dependency;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
 --    use String_Vectors;
       use List_Vectors;
 
@@ -502,10 +502,10 @@ is
                    return Query_Result -- Boolean
    is
       use Php.Lists;
-      use Inc_Class_Wp_Dependency;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
 
-      Null_Deps : Inc_Class_Wp_Dependency.X_Wp_Dependency;
+      Null_Deps : Class_Dependency.X_Wp_Dependency;
    begin
 --                switch ( status ) then
 --                        case "registered":

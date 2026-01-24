@@ -11,7 +11,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Lists;
 
-with Inc_Class_Wp_Dependency;
+with Class_Dependency;
 
 package Class_Dependencies
 is
@@ -39,8 +39,8 @@ is
         --
         -- @var _WP_Dependency[]
         --
-        Registered : Inc_Class_Wp_Dependency.Dependency_Map; -- = array();
---      Registered : Inc_Class_Wp_Dependency.Dependency_Array; -- = array();
+        Registered : Class_Dependency.Dependency_Map; -- = array();
+--      Registered : Class_Dependency.Dependency_Array; -- = array();
 
         --
         -- An array of handles of queued dependencies.
@@ -78,7 +78,7 @@ is
         --
         -- @var array
         --
-        Args : Inc_Class_Wp_Dependency.String_Map;
+        Args : Class_Dependency.String_Map;
 
         --
         -- An array of dependency groups to enqueue.
@@ -398,7 +398,7 @@ is
    type Query_Result is
       record
          Success : Boolean;
-         Depend  : Inc_Class_Wp_Dependency.X_Wp_Dependency;
+         Depend  : Class_Dependency.X_Wp_Dependency;
       end record;
 
    function Query (This   : in out Wp_Dependencies;

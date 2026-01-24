@@ -21,7 +21,7 @@ with Lists;
 
 with Adi_Noop;
 -- with Class_Styles;
-with Inc_Class_Wp_Dependency;
+with Class_Dependency;
 with Inc_Script_Loader;
 with Inc_Versions;
 -- require ABSPATH . 'wp-admin/includes/noop.php';
@@ -53,7 +53,7 @@ is
       use Php.Misc;
       use Php.Preg;
       use Php.Strings;
-      use Inc_Class_Wp_Dependency;
+      use Class_Dependency;
 
       Protocol : Unbounded_String;
       Load     : Unbounded_String;

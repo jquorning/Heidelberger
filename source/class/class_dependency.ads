@@ -13,7 +13,7 @@ with Ada.Strings.Unbounded;
 
 with Lists;
 
-package Inc_Class_Wp_Dependency
+package Class_Dependency
 is
    use Ada.Strings.Unbounded;
    use Lists;
@@ -160,4 +160,4 @@ is
                                               Element_Type => X_Wp_Dependency);
 
    subtype Dependency_Map is Dependency_Maps.Map;
-end Inc_Class_Wp_Dependency;
+end Class_Dependency;

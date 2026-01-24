@@ -9,7 +9,7 @@
 
 with Hb_Common;
 
-package body Inc_Class_Wp_Dependency
+package body Class_Dependency
 is
    use Hb_Common;
 
@@ -74,4 +74,4 @@ is
       return True;
    end Set_Translations;
 
-end Inc_Class_Wp_Dependency;
+end Class_Dependency;

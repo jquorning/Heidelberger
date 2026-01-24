@@ -36,7 +36,7 @@ with Adm_Load_Styles;
 
 with Adi_Class_Wp_Screens;
 
-with Inc_Class_Wp_Dependency;
+with Class_Dependency;
 with Inc_Class_Wp_Theme_JSON_Resolver;
 with Inc_Formatting;
 with Inc_Functions;
@@ -323,7 +323,7 @@ is
       if
 --      not Defined ("SCRIPT_DEBUG") or else
         not Globals.SCRIPT_DEBUG
-        or else not Inc_Class_Wp_Dependency.Dependency_Maps.Has_Element (Scripts.Registered.Find ("react"))
+        or else not Class_Dependency.Dependency_Maps.Has_Element (Scripts.Registered.Find ("react"))
 --      or else Empty (Scripts.Registered, "react")
 --      or else Defined ("WP_RUN_CORE_TESTS")
         or else Globals.WP_RUN_CORE_TESTS
@@ -458,7 +458,7 @@ is
       use Php;
       use Php.Arrays;
       use Php.Strings;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency.Dependency_Maps;
       use Inc_Formatting;
       use Inc_Link_Templates;
       use Inc_REST_API;
@@ -3293,7 +3293,7 @@ is
       use Php.Files;
       use Php.Strings;
       use Inc_Plugins;
-      use Inc_Class_Wp_Dependency;
+      use Class_Dependency;
       use Inc_Functions_Wp_Styles;
       use Adm_Load_Styles;
 

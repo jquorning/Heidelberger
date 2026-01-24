@@ -11,7 +11,7 @@ with Adi_Class_Wp_Screens;
 with Adi_Translation_Install;
 
 with Inc_Class_Wp_Admin_Bar;
-with Inc_Class_Wp_Dependency;
+with Class_Dependency;
 with Class_Errors;
 with Inc_Class_Wp_Http;
 with Class_Taxonomy;
@@ -79,7 +79,7 @@ is
                  return String
                  is ("XXX-240");
 
-   function Array_Keys (Arry : Inc_Class_Wp_Dependency.Dependency_Map)
+   function Array_Keys (Arry : Class_Dependency.Dependency_Map)
                         return List_Type
                         is (Empty_List);
 

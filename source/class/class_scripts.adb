@@ -20,7 +20,7 @@ with Php.Types;
 with Globals;
 with Hb_Common;
 
-with Inc_Class_Wp_Dependency;
+with Class_Dependency;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
@@ -167,8 +167,8 @@ is
       use Php.Strings;
       use Inc_Functions;
       use Inc_Formatting;
-      use Inc_Class_Wp_Dependency;
-      use Inc_Class_Wp_Dependency.String_Maps;
+      use Class_Dependency;
+      use Class_Dependency.String_Maps;
    begin
 --      if not parent::Do_Item (handle) then
 --         return False;
@@ -204,7 +204,7 @@ is
 
             Conditional : constant Boolean :=
                Boolean'Value ((if Obj.Extra.Find ("conditional") /=
-                                  Inc_Class_Wp_Dependency.String_Maps.No_Element
+                                  Class_Dependency.String_Maps.No_Element
                                then Obj.Extra ("conditional") else "false"));
 
             Cond_Before : constant String :=
@@ -635,7 +635,7 @@ is
                               return Boolean
    is
       use Php.Lists;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency.Dependency_Maps;
    begin
 --      if not Isset (This.Registered (Handle)) then
       if This.Registered.Find (Handle) = No_Element then
@@ -644,7 +644,7 @@ is
 
       -- @var \_WP_Dependency obj
       declare
-         use Inc_Class_Wp_Dependency;
+         use Class_Dependency;
 --         use String_
          Obj : X_Wp_Dependency := This.Registered (Handle);
       begin
@@ -667,7 +667,7 @@ is
    is
       use Php.Strings;
 --    use Inc_Functions;
-      use Inc_Class_Wp_Dependency.Dependency_Maps;
+      use Class_Dependency.Dependency_Maps;
    begin
       if
         This.Registered.Find (Handle) /= No_Element or else
@@ -678,7 +678,7 @@ is
 
       declare
          use Inc_Formatting;
-         use Inc_Class_Wp_Dependency;
+         use Class_Dependency;
 
          Regist : constant Dependency_Maps.Cursor := This.Registered.Find (Handle);
          Domain : constant String := -Element (Regist).Textdomain;

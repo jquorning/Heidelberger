@@ -22,7 +22,7 @@ with Lists;
 
 with Adi_Noop;
 
-with Inc_Class_Wp_Dependency;
+with Class_Dependency;
 with Class_Scripts;
 with Inc_Script_Loader;
 with Inc_Versions;
@@ -111,7 +111,7 @@ is
 
       for Handle of Load_2 loop
          declare
-            use Inc_Class_Wp_Dependency.Dependency_Maps;
+            use Class_Dependency.Dependency_Maps;
 
             Path : Unbounded_String;
          begin
