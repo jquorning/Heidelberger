@@ -10,7 +10,7 @@ with Hb_Common;
 
 with Inc_Functions;
 
-package body Inc_Class_Wp_HTTP_Requests_Responses
+package body Class_HTTP_Requests_Responses
 is
 
    -----------------
@@ -122,4 +122,4 @@ is
         ));
    end To_Array;
 
-end Inc_Class_Wp_HTTP_Requests_Responses;
+end Class_HTTP_Requests_Responses;

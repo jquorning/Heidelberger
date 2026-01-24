@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-package Inc_Class_Wp_Http_Proxys
+package Class_HTTP_Proxys
 is
 
    --
@@ -236,4 +236,4 @@ is
         --         end;
         -- end;
 
-end Inc_Class_Wp_Http_Proxys;
+end Class_HTTP_Proxys;

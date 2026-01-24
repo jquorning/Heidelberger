@@ -20,14 +20,14 @@ with Php.Types;
 
 with Hb_Common;
 
-with Inc_Class_Wp_Http;
+with Class_HTTP;
 with Inc_Functions;
 with Inc_Load;
 
 package body Inc_HTTP
 is
 
-   subtype Wp_Http is Inc_Class_Wp_Http.Wp_Http;
+   subtype Wp_Http is Class_HTTP.Wp_Http;
 
    Static_HTTP : Wp_Http; -- = null;
 

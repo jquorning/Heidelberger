@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-package Inc_Class_Wp_Http_Responces
+package Class_HTTP_Responses
 is
 
    --
@@ -15,7 +15,7 @@ is
    -- @since 4.4.0
    --
    -- #[AllowDynamicProperties]
-   type Wp_Http_Response is tagged
+   type Wp_HTTP_Response is tagged
      record
         --
         -- Response data.
@@ -44,7 +44,6 @@ is
         null;
 
      end record;
-
 
         -- --
         -- -- Constructor.
@@ -159,4 +158,4 @@ is
         --         return this.get_data();
         -- end;
 
-end Inc_Class_Wp_Http_Responces;
+end Class_HTTP_Responses;

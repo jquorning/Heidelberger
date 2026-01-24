@@ -17,7 +17,7 @@ with Arrays;
 
 with Class_Errors;
 
-package Inc_Class_Wp_Http
+package Class_HTTP
 is
    use Arrays;
 
@@ -711,4 +711,4 @@ is
         --         return false;
         -- end;
 
-end Inc_Class_Wp_Http;
+end Class_HTTP;

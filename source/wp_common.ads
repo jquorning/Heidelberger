@@ -13,7 +13,7 @@ with Adi_Translation_Install;
 with Inc_Class_Wp_Admin_Bar;
 with Class_Dependency;
 with Class_Errors;
-with Inc_Class_Wp_Http;
+with Class_HTTP;
 with Class_Taxonomy;
 with Class_Terms;
 with Class_Posts;
@@ -438,22 +438,22 @@ is
                            Value      : Boolean;
                            Args       : Array_Type;
                            Typ        : String)
-                           return Inc_Class_Wp_Http.Response_Result
+                           return Class_HTTP.Response_Result
                            is ((Success => Value,
                                 Arry    => Empty_Array,
                                 Error   => Class_Errors.Null_Wp_Error));
 
    function Apply_Filters (Hook_Name  : String;
-                           Value      : Inc_Class_Wp_Http.Response_Result;
+                           Value      : Class_HTTP.Response_Result;
                            Args       : Array_Type;
                            URL        : String)
-                           return Inc_Class_Wp_Http.Response_Result
+                           return Class_HTTP.Response_Result
                            is ((Success => True,
                                 Arry    => Empty_Array,
                                 Error   => Class_Errors.Null_Wp_Error));
 
    procedure Do_Action (Hook_Name : String;
-                        A1        : Inc_Class_Wp_Http.Response_Result;
+                        A1        : Class_HTTP.Response_Result;
                         A2        : String;
                         A3        : String;
                         Args      : Array_Type;

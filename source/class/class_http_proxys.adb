@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Globals;
 
-package body Inc_Class_Wp_HTTP_Proxys
+package body Class_HTTP_Proxys
 is
 
    ----------------
@@ -28,4 +28,4 @@ is
 --    return defined( "WP_PROXY_HOST" ) && defined( "WP_PROXY_PORT" );
    end Is_Enabled;
 
-end Inc_Class_Wp_HTTP_Proxys;
+end Class_HTTP_Proxys;

@@ -21,8 +21,8 @@ with Lists;
 with Wp_Common;
 
 with Class_Requests;
-with Inc_Class_Wp_HTTP_Requests_Responses;
-with Inc_Class_Wp_HTTP_Proxys;
+with Class_HTTP_Requests_Responses;
+with Class_HTTP_Proxys;
 with Inc_Functions;
 with Inc_General_Templates;
 with Inc_Load;
@@ -32,7 +32,7 @@ with Inc_Plugins;
 
 with Req_Responses;
 
-package body Inc_Class_Wp_Http
+package body Class_HTTP
 is
    use Lists;
 
@@ -348,7 +348,7 @@ is
 
             -- Check for proxies.
             declare
-               use Inc_Class_Wp_HTTP_Proxys;
+               use Class_HTTP_Proxys;
 
                Proxy : Wp_HTTP_Proxy; --  := X_Construct;
             begin
@@ -372,7 +372,7 @@ is
 
             declare
 --             use Class_Requests;
-               use Inc_Class_Wp_HTTP_Requests_Responses;
+               use Class_HTTP_Requests_Responses;
                use Req_Responses;
 
                Requests_ResponseX : constant Requests_Response :=
@@ -734,4 +734,4 @@ is
       end;
    end Block_Request;
 
-end Inc_Class_Wp_Http;
+end Class_HTTP;

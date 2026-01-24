@@ -11,11 +11,11 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_HTTP_Responses;
+with Class_HTTP_Responses;
 
 with Req_Responses;
 
-package Inc_Class_Wp_HTTP_Requests_Responses
+package Class_HTTP_Requests_Responses
 is
    use Arrays;
    use Lists;
@@ -28,7 +28,7 @@ is
    -- @see WP_HTTP_Response
    --
    type Wp_HTTP_Requests_Response is
-     new Inc_Class_Wp_HTTP_Responses.Wp_HTTP_Response with
+     new Class_HTTP_Responses.Wp_HTTP_Response with
      record
         --
         -- Requests Response object.
@@ -186,4 +186,4 @@ is
         --         );
         -- end;
 
-end Inc_Class_Wp_HTTP_Requests_Responses;
+end Class_HTTP_Requests_Responses;
