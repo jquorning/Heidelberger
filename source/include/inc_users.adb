@@ -18,8 +18,8 @@ with Wp_Common;
 
 with Inc_Caches;
 with Class_WpDB;
--- with Inc_Class_Wp_Session_Tokens;
--- with Inc_Class_Wp_Session_Tokens_Factory;
+-- with Class_Session_Tokens;
+-- with Class_Session_Tokens_Factory;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -3458,8 +3458,8 @@ is
       if Token /= "" then
          declare
 --          Manager : Duration :=
---            Inc_Class_Wp_Session_Tokens_Factory.Get_Instance (Get_Current_User_Id); -- ::
---            Inc_Class_Wp_Session_Tokens.Get_Instance (Get_Current_User_Id); -- ::
+--            Class_Session_Tokens_Factory.Get_Instance (Get_Current_User_Id); -- ::
+--            Class_Session_Tokens.Get_Instance (Get_Current_User_Id); -- ::
          begin
             null;
 --          Manager.Destroy (Token);

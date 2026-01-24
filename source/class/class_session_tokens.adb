@@ -9,7 +9,7 @@
 with Php.Misc;
 with Php.Numerics;
 
-package body Inc_Class_Wp_Session_Tokens
+package body Class_Session_Tokens
 is
 
    -----------------
@@ -55,4 +55,4 @@ is
       return This.Get_Session (Verifier) /= Empty_Array; -- (bool)
    end Verify;
 
-end Inc_Class_Wp_Session_Tokens;
+end Class_Session_Tokens;

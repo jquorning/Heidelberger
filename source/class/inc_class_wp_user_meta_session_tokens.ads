@@ -8,7 +8,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Session_Tokens;
+with Class_Session_Tokens;
 
 package Inc_Class_Wp_User_Meta_Session_Tokens
 is
@@ -22,7 +22,7 @@ is
    -- @see WP_Session_Tokens
    --
    type Wp_User_Meta_Session_Tokens is
-      new Inc_Class_Wp_Session_Tokens.Wp_Session_Tokens
+      new Class_Session_Tokens.Wp_Session_Tokens
       with null record;
 
    --

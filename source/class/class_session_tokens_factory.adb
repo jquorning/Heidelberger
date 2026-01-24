@@ -5,7 +5,7 @@
 with Inc_Class_Wp_User_Meta_Session_Tokens;
 with Inc_Plugins;
 
-package body Inc_Class_Wp_Session_Tokens_Factory
+package body Class_Session_Tokens_Factory
 is
 
    ------------------
@@ -13,7 +13,7 @@ is
    ------------------
 
    function Get_Instance (User_Id : Integer)
-                          return Inc_Class_Wp_Session_Tokens.Wp_Session_Tokens'Class
+                          return Class_Session_Tokens.Wp_Session_Tokens'Class
    is
       use Inc_Class_Wp_User_Meta_Session_Tokens;
       use Inc_Plugins;
@@ -37,4 +37,4 @@ is
 --    return new Manager (User_Id);
    end Get_Instance;
 
-end Inc_Class_Wp_Session_Tokens_Factory;
+end Class_Session_Tokens_Factory;

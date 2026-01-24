@@ -26,8 +26,8 @@ with Globals;
 with Wp_Common;
 
 with Class_Errors;
-with Inc_Class_Wp_Session_Tokens;
-with Inc_Class_Wp_Session_Tokens_Factory;
+with Class_Session_Tokens;
+with Class_Session_Tokens_Factory;
 with Inc_Compat;
 with Inc_Formatting;
 with Inc_Functions;
@@ -920,8 +920,8 @@ is
             end;
 
             declare
-               use Inc_Class_Wp_Session_Tokens;
-               use Inc_Class_Wp_Session_Tokens_Factory;
+               use Class_Session_Tokens;
+               use Class_Session_Tokens_Factory;
 
                Manager : constant Wp_Session_Tokens'Class := Get_Instance (User.Id);
             begin

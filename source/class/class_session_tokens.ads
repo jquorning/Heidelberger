@@ -8,7 +8,7 @@
 
 with Arrays;
 
-package Inc_Class_Wp_Session_Tokens
+package Class_Session_Tokens
 is
    use Arrays;
 
@@ -294,4 +294,4 @@ is
 --         --
 --         public static function drop_sessions() thenend;
 
-end Inc_Class_Wp_Session_Tokens;
+end Class_Session_Tokens;

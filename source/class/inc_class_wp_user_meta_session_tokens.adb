@@ -22,7 +22,7 @@ is
    is
       This : Wp_User_Meta_Session_Tokens;
    begin
-      Inc_Class_Wp_Session_Tokens.X_Construct (This, User_Id);
+      Class_Session_Tokens.X_Construct (This, User_Id);
       return This;
    end X_Construct;
 
