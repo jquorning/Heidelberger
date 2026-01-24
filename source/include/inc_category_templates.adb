@@ -17,7 +17,7 @@ with Wp_Common;
 
 with Adi_Caches;
 
-with Inc_Class_Walker_Category_Dropdown;
+with Class_Walker_Category_Dropdown;
 with Class_Taxonomy;
 with Inc_Formatting;
 with Inc_Functions;
@@ -1216,7 +1216,7 @@ is
       Args       : Array_Type)
       return String
    is
-      use Inc_Class_Walker_Category_Dropdown;
+      use Class_Walker_Category_Dropdown;
 
       Walker : Walker_CategoryDropdown := X_Construct;
    begin

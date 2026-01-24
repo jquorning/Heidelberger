@@ -8,7 +8,7 @@
 
 with Class_Walker;
 
-package Inc_Class_Walker_Category_Dropdown
+package Class_Walker_Category_Dropdown
 is
 
    --
@@ -50,4 +50,4 @@ is
    function X_Construct
             return Walker_CategoryDropdown;
 
-end Inc_Class_Walker_Category_Dropdown;
+end Class_Walker_Category_Dropdown;

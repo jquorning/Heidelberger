@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package body Inc_Class_Walker_Category_Dropdown
+package body Class_Walker_Category_Dropdown
 is
 
    function X_Construct
@@ -74,4 +74,4 @@ is
 --         }
 -- }
 
-end Inc_Class_Walker_Category_Dropdown;
+end Class_Walker_Category_Dropdown;
