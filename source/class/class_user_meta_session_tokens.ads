@@ -10,7 +10,7 @@ with Arrays;
 
 with Class_Session_Tokens;
 
-package Inc_Class_Wp_User_Meta_Session_Tokens
+package Class_User_Meta_Session_Tokens
 is
    use Arrays;
 
@@ -142,4 +142,4 @@ is
         --         delete_metadata( "user", 0, "session_tokens", false, true );
         -- end;
 
-end Inc_Class_Wp_User_Meta_Session_Tokens;
+end Class_User_Meta_Session_Tokens;

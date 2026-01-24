@@ -2,7 +2,7 @@
 --
 --
 
-with Inc_Class_Wp_User_Meta_Session_Tokens;
+with Class_User_Meta_Session_Tokens;
 with Inc_Plugins;
 
 package body Class_Session_Tokens_Factory
@@ -15,7 +15,7 @@ is
    function Get_Instance (User_Id : Integer)
                           return Class_Session_Tokens.Wp_Session_Tokens'Class
    is
-      use Inc_Class_Wp_User_Meta_Session_Tokens;
+      use Class_User_Meta_Session_Tokens;
       use Inc_Plugins;
 
       --

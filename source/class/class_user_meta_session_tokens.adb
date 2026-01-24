@@ -10,7 +10,7 @@ with Php.Types;
 
 with Inc_Users;
 
-package body Inc_Class_Wp_User_Meta_Session_Tokens
+package body Class_User_Meta_Session_Tokens
 is
 
    -----------------
@@ -65,4 +65,4 @@ is
       return Empty_Array; -- null;
    end Get_Session;
 
-end Inc_Class_Wp_User_Meta_Session_Tokens;
+end Class_User_Meta_Session_Tokens;
