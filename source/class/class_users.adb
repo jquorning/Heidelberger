@@ -18,7 +18,7 @@ with Wp_Common;
 
 with Inc_Caches;
 with Inc_Capabilities;
-with Inc_Class_Wp_Role;
+with Class_Role;
 with Inc_Class_Wp_Roles;
 with Class_WpDB;
 with Inc_Formatting;
@@ -552,7 +552,7 @@ is
       use Php;
       use Php.Arrays;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Role;
+      use Class_Role;
       use Inc_Class_Wp_Roles;
       use Inc_Load;
       use Inc_Ms_Blogs;

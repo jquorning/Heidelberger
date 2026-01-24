@@ -45,11 +45,11 @@ is
                       Role         : String;
                       Display_Name : String;
                       Capabilities : Array_Type := Empty_Array)
-                      return Inc_Class_Wp_Role.Wp_Role
+                      return Class_Role.Wp_Role
    is
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Role;
+      use Class_Role;
       use Inc_Options;
    begin
       if Empty (Role) or else Isset (This.Roles, Role) then
@@ -68,7 +68,7 @@ is
 
       This.Role_Objects.Include (
         Key      => Role,
-        New_Item => Inc_Class_Wp_Role.X_Construct (Role, Capabilities));
+        New_Item => Class_Role.X_Construct (Role, Capabilities));
 
       Set (This.Role_Names, Role, From_String (Display_Name));
 
@@ -129,10 +129,10 @@ is
 
    function Get_Role (This : Wp_Roles;
                       Role : String)
-                      return Inc_Class_Wp_Role.Wp_Role
+                      return Class_Role.Wp_Role
    is
-      use Inc_Class_Wp_Role;
-      use Inc_Class_Wp_Role.Role_Maps;
+      use Class_Role;
+      use Class_Role.Role_Maps;
    begin
       if Has_Element (This.Role_Objects.Find (Role)) then
 --    if Isset (This.Role_Objects, Role) then
@@ -151,7 +151,7 @@ is
       use Php.Arrays;
       use Hb_Common;
       use Lists;
-      use Inc_Class_Wp_Role;
+      use Class_Role;
       use Inc_Plugins;
    begin
       if This.Roles.Is_Empty then

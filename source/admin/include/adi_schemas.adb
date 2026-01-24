@@ -21,7 +21,7 @@ with Hb_Common;
 
 with Adi_Upgrade;
 with Class_WpDB;
-with Inc_Class_Wp_Role;
+with Class_Role;
 with Inc_Class_Wp_Themes;
 with Inc_Capabilities;
 with Inc_Formatting;
@@ -37,8 +37,8 @@ package body Adi_Schemas
 is
    use Lists;
 
-   subtype Wp_Role is Inc_Class_Wp_Role.Wp_Role;
-   Null_Role : constant Wp_Role := Inc_Class_Wp_Role.Null_Role;
+   subtype Wp_Role is Class_Role.Wp_Role;
+   Null_Role : constant Wp_Role := Class_Role.Null_Role;
    use type Wp_Role;
 
    --

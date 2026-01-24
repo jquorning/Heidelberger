@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Role
+package Class_Role
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -98,11 +98,11 @@ is
    package Role_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
         (Key_Type     => String,
-         Element_Type => Inc_Class_Wp_Role.Wp_Role,
-         "="          => Inc_Class_Wp_Role."=");
+         Element_Type => Class_Role.Wp_Role,
+         "="          => Class_Role."=");
 
    Null_Role : constant Wp_Role :=
      (Name         => Null_Unbounded_String,
       Capabilities => Empty_Array);
 
-end Inc_Class_Wp_Role;
+end Class_Role;

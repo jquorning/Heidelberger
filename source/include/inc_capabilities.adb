@@ -1226,7 +1226,7 @@ is
    --------------
 
    function Get_Role (Role : String)
-                      return Inc_Class_Wp_Role.Wp_Role
+                      return Class_Role.Wp_Role
    is
    begin
       return Wp_Roles_X.Get_Role (Role);
@@ -1242,7 +1242,7 @@ is
                        Capabilities : Array_Type := Empty_Array)
    is
       use Php.Strings;
-      use Inc_Class_Wp_Role;
+      use Class_Role;
       use Inc_Class_Wp_Roles;
       use Inc_Roles;
 

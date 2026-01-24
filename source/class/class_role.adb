@@ -12,7 +12,7 @@ with Inc_Class_Wp_Roles;
 with Inc_Plugins;
 with Inc_Roles;
 
-package body Inc_Class_Wp_Role
+package body Class_Role
 is
 
    -----------------
@@ -94,4 +94,4 @@ is
       end if;
    end Has_Cap;
 
-end Inc_Class_Wp_Role;
+end Class_Role;

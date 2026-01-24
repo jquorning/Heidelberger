@@ -8,7 +8,7 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Role;
+with Class_Role;
 with Inc_Class_Wp_Roles;
 with Class_Posts;
 with Class_Users;
@@ -88,7 +88,7 @@ is
    -- @return WP_Role|null WP_Role object if found, null if the role does not exist.
    --
    function Get_Role (Role : String)
-                      return Inc_Class_Wp_Role.Wp_Role;
+                      return Class_Role.Wp_Role;
 
    --
    -- Adds a role, if it does not exist.

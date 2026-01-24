@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Role;
+with Class_Role;
 
 package Inc_Class_Wp_Roles
 is
@@ -52,7 +52,7 @@ is
          -- @since 2.0.0
          -- @var WP_Role[]
          --
-         Role_Objects : Inc_Class_Wp_Role.Role_Maps.Map; -- Array_Type;
+         Role_Objects : Class_Role.Role_Maps.Map; -- Array_Type;
 
          --
          -- List of role names.
@@ -178,7 +178,7 @@ is
                       Role         : String;
                       Display_Name : String;
                       Capabilities : Array_Type := Empty_Array)
-                      return Inc_Class_Wp_Role.Wp_Role;
+                      return Class_Role.Wp_Role;
 
 --         --
 --         -- Removes a role by name.
@@ -242,7 +242,7 @@ is
    --
    function Get_Role (This : Wp_Roles;
                       Role : String)
-                      return Inc_Class_Wp_Role.Wp_Role;
+                      return Class_Role.Wp_Role;
 
 --         --
 --         -- Retrieves a list of role names.
