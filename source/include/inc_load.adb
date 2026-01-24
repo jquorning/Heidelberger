@@ -24,7 +24,7 @@ with Wp_Config;
 with Adi_Class_Wp_Screens;
 
 with Class_WpDB;
-with Inc_Class_Wp_Networks;
+with Class_Networks;
 with Inc_Class_Wp_Textdomain_Registry;
 with Inc_Error_Protection;
 with Inc_Functions;
@@ -1310,7 +1310,7 @@ is
    function Get_Current_Network_Id
             return Integer
    is
-      use Inc_Class_Wp_Networks;
+      use Class_Networks;
       use Inc_Functions;
       use Inc_Ms_Networks;
    begin

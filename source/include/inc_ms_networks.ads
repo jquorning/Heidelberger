@@ -10,11 +10,11 @@ with Ada.Containers.Vectors;
 
 with Arrays;
 
-with Inc_Class_Wp_Networks;
+with Class_Networks;
 
 package Inc_Ms_Networks
 is
-   use Inc_Class_Wp_Networks;
+   use Class_Networks;
 
    package Network_Lists
      is new Ada.Containers.Vectors (Index_Type   => Positive,

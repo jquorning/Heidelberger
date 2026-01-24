@@ -26,7 +26,7 @@ with Wp_Common;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Admin_Bar; -- ???
-with Inc_Class_Wp_Networks;
+with Class_Networks;
 with Class_Post_Type;
 with Class_Sites;
 with Class_Taxonomy;
@@ -3925,7 +3925,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Networks;
+      use Class_Networks;
       use Inc_Load;
       use Inc_Ms_Networks;
       use Inc_Plugins;

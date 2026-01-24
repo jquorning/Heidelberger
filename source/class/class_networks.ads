@@ -8,7 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
-package Inc_Class_Wp_Networks
+package Class_Networks
 is
    use Ada.Strings.Unbounded;
 
@@ -104,4 +104,4 @@ is
       Prop   => (others => 0),
       others => Null_Unbounded_String);
 
-end Inc_Class_Wp_Networks;
+end Class_Networks;

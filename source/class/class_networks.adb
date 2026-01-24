@@ -5,7 +5,7 @@
 -- @subpackage Multisite
 -- @since 4.4.0
 --
-package body Inc_Class_Wp_Networks
+package body Class_Networks
 is
    procedure Dummy is null;
 --         --
@@ -398,4 +398,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_Networks;
+end Class_Networks;

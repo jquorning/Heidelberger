@@ -33,7 +33,7 @@ with Inc_Caches;
 with Inc_Capabilities;
 with Class_WpDB;
 with Inc_Class_Wp_List_Util;
-with Inc_Class_Wp_Networks;
+with Class_Networks;
 with Inc_Formatting;
 with Inc_General_Templates;
 with Inc_Link_Templates;
@@ -6418,7 +6418,7 @@ is
    function Get_Main_Site_Id (Network_Id : Integer := 0) -- null
                               return Integer
    is
-      use Inc_Class_Wp_Networks;
+      use Class_Networks;
       use Inc_Load;
       use Inc_Ms_Networks;
    begin
@@ -6468,7 +6468,7 @@ is
             return Integer
    is
       use Inc_Ms_Networks;
-      use Inc_Class_Wp_Networks;
+      use Class_Networks;
       use Inc_Load;
       use Inc_Plugins;
 
