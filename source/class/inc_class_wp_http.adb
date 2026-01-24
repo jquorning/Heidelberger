@@ -20,7 +20,7 @@ with Hb_Common;
 with Lists;
 with Wp_Common;
 
-with Inc_Class_Requests;
+with Class_Requests;
 with Inc_Class_Wp_HTTP_Requests_Responses;
 with Inc_Class_Wp_HTTP_Proxys;
 with Inc_Functions;
@@ -371,12 +371,12 @@ is
             MB_String_Binary_Safe_Encoding;
 
             declare
---             use Inc_Class_Requests;
+--             use Class_Requests;
                use Inc_Class_Wp_HTTP_Requests_Responses;
                use Req_Responses;
 
                Requests_ResponseX : constant Requests_Response :=
-                 Inc_Class_Requests.Request (URL, Headers, Data, Typ, Options);
+                 Class_Requests.Request (URL, Headers, Data, Typ, Options);
                  -- Requests::
 
                -- Convert the response into an array.

@@ -17,7 +17,7 @@ with Php.Strings;
 with Hb_Common;
 with Lists;
 
-package body Inc_Class_Requests
+package body Class_Requests
 is
    use Lists;
 
@@ -397,4 +397,4 @@ is
       return Return2;
    end Parse_Response;
 
-end Inc_Class_Requests;
+end Class_Requests;

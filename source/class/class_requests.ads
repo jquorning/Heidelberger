@@ -15,7 +15,7 @@ with Arrays;
 with Req_Responses;
 with Req_Transports;
 
-package Inc_Class_Requests
+package Class_Requests
 is
    use Arrays;
 
@@ -900,4 +900,4 @@ private
    -- protected static
    Certificate_Path : Ada.Strings.Unbounded.Unbounded_String;
 
-end Inc_Class_Requests;
+end Class_Requests;
