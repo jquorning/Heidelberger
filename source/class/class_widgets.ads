@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Widgets
+package Class_Widgets
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -651,4 +651,4 @@ is
         --         return settings;
         -- end;
 
-end Inc_Class_Wp_Widgets;
+end Class_Widgets;

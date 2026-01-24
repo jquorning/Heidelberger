@@ -33,7 +33,7 @@ with Class_Customize_Controls;
 with Class_Customize_Managers;
 with Class_Customize_Settings;
 with Class_Customize_Sections;
-with Inc_Class_Wp_Widget_Factories;
+with Class_Widget_Factories;
 with Inc_Block_Editors;
 with Inc_Formatting;
 with Inc_Functions_Wp_Scripts;
@@ -52,7 +52,7 @@ package body Class_Customize_Widgets
 is
 
    Global_Wp_Widget_Factory : -- Widget_Vectors.Vector;
-     Inc_Class_Wp_Widget_Factories.Wp_Widget_Factory;
+     Class_Widget_Factories.Wp_Widget_Factory;
 
    Global_Wp_Registered_Widget_Controls : Array_Type;
 

@@ -8,17 +8,17 @@
 
 with Ada.Containers.Vectors;
 
-with Inc_Class_Wp_Widgets;
+with Class_Widgets;
 
-package Inc_Class_Wp_Widget_Factories
+package Class_Widget_Factories
 is
    subtype Widget_Index is Positive;
 
    package Widget_Vectors is new
      Ada.Containers.Vectors
        (Index_Type   => Widget_Index,
-        Element_Type => Inc_Class_Wp_Widgets.Wp_Widget,
-        "="          => Inc_Class_Wp_Widgets."=");
+        Element_Type => Class_Widgets.Wp_Widget,
+        "="          => Class_Widgets."=");
 
    --
    -- Singleton that registers and instantiates WP_Widget classes.
@@ -153,4 +153,4 @@ is
         --         return "";
         -- end;
 
-end Inc_Class_Wp_Widget_Factories;
+end Class_Widget_Factories;
