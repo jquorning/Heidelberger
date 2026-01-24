@@ -11,7 +11,7 @@ with Lists;
 with Php.Preg;
 with Php.Strings;
 
-with Inc_Class_Wp_Customize_Widgets;
+with Class_Customize_Widgets;
 
 package body Adi_Widgets
 is
@@ -22,7 +22,7 @@ is
    -------------
 
    Wp_Registered_Widgets : Array_Type
-     renames Inc_Class_Wp_Customize_Widgets.Global_Wp_Registered_Widgets;
+     renames Class_Customize_Widgets.Global_Wp_Registered_Widgets;
 
    --------------------------
    -- X_Sort_Name_Callback --

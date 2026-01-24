@@ -6,8 +6,16 @@
 -- @since 4.0.0
 --
 
-package Inc_Class_Wp_Customize_Panels
+with Ada.Strings.Unbounded;
+
+with Arrays;
+
+limited with Class_Customize_Managers;
+
+package Class_Customize_Panels
 is
+   use Ada.Strings.Unbounded;
+   use Arrays;
 
    --
    -- Customize Panel class.
@@ -20,24 +28,14 @@ is
    --
    -- #[AllowDynamicProperties]
    type Wp_Customize_Panel is tagged
-         --
-         -- Incremented with each new class instantiation, then stored in
-         -- instance_number.
-         --
-         -- Used when sorting two instances whose priorities are equal.
-         --
-         -- @since 4.1.0
-         -- @var int
-         --
---         protected static instance_count = 0;
-
+      record
          --
          -- Order in which this instance was created in relation to other instances.
          --
          -- @since 4.1.0
          -- @var int
          --
---         public instance_number;
+         Instance_Number : Natural;
 
          --
          -- WP_Customize_Manager instance.
@@ -45,7 +43,7 @@ is
          -- @since 4.0.0
          -- @var WP_Customize_Manager
          --
---         public manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- Unique identifier.
@@ -53,7 +51,7 @@ is
          -- @since 4.0.0
          -- @var string
          --
---         public id;
+         Id : Unbounded_String;
 
          --
          -- Priority of the panel, defining the display order of panels and sections.
@@ -85,7 +83,7 @@ is
          -- @since 4.0.0
          -- @var string
          --
---         public title = "";
+         Title : Unbounded_String;
 
          --
          -- Description to show in the UI.
@@ -110,7 +108,7 @@ is
          -- @since 4.0.0
          -- @var array
          --
---         public sections;
+         Sections : Array_Type;
 
          --
          -- Type of this panel.
@@ -132,52 +130,40 @@ is
          --               the section is active (such as it relates to the URL
          --               currently being previewed).
          --
---         public active_callback = "";
+         Active_Callback : access Integer := null; --  = "";
 
-         null;
       end record;
 
---         --
---         -- Constructor.
---         --
---         -- Any supplied args override class property defaults.
---         --
---         -- @since 4.0.0
---         --
---         -- @param WP_Customize_Manager manager Customizer bootstrap instance.
---         -- @param string               id      A specific ID for the panel.
---         -- @param array                args    then
---         --     Optional. Array of properties for the new Panel object. Default empty array.
---         --
---         --     @type int             priority        Priority of the panel, defining the display order
---         --                                            of panels and sections. Default 160.
---         --     @type string          capability      Capability required for the panel.
---         --                                            Default `edit_theme_options`.
---         --     @type mixed[]         theme_supports  Theme features required to support the panel.
---         --     @type string          title           Title of the panel to show in UI.
---         --     @type string          description     Description to show in the UI.
---         --     @type string          type            Type of the panel.
---         --     @type callable        active_callback Active callback.
---         -- end;
---         --
---         public function __construct( manager, id, args = array() ) then
---                 keys = array_keys( get_object_vars( this ) );
---                 foreach ( keys as key ) then
---                         if ( isset( args[ key ] ) ) then
---                                 this.key = args[ key ];
---                         end;
---                 end;
-
---                 this.manager = manager;
---                 this.id      = id;
---                 if ( empty( this.active_callback ) ) then
---                         this.active_callback = array( this, "active_callback" );
---                 end;
---                 self::instance_count += 1;
---                 this.instance_number = self::instance_count;
-
---                 this.sections = array(); // Users cannot customize the sections array.
---         end;
+   --
+   -- Constructor.
+   --
+   -- Any supplied args override class property defaults.
+   --
+   -- @since 4.0.0
+   --
+   -- @param WP_Customize_Manager manager Customizer bootstrap instance.
+   -- @param string               id      A specific ID for the panel.
+   -- @param array                args    {
+   --     Optional. Array of properties for the new Panel object. Default empty array.
+   --
+   --     @type int             priority        Priority of the panel, defining the
+   --                                            display order of panels and sections.
+   --                                            Default 160.
+   --     @type string          capability      Capability required for the panel.
+   --                                            Default `edit_theme_options`.
+   --     @type mixed[]         theme_supports  Theme features required to support
+   --                                            the panel.
+   --     @type string          title           Title of the panel to show in UI.
+   --     @type string          description     Description to show in the UI.
+   --     @type string          type            Type of the panel.
+   --     @type callable        active_callback Active callback.
+   -- }
+   --
+   function X_Construct
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
+               Id      : String;
+               Args    : Array_Type := Empty_Array)
+               return Wp_Customize_Panel;
 
 --         --
 --         -- Check whether panel is active to current Customizer preview.
@@ -397,7 +383,27 @@ is
 --                 <?php
 --         end;
 
-end Inc_Class_Wp_Customize_Panels;
+   Null_Panel : constant Wp_Customize_Panel :=
+     (Instance_Number => 0,
+      Manager         => null,
+      Id              => Null_Unbounded_String,
+      Title           => Null_Unbounded_String,
+      Active_Callback => null,
+      Sections        => Empty_Array);
+
+private
+   --
+   -- Incremented with each new class instantiation, then stored in
+   -- instance_number.
+   --
+   -- Used when sorting two instances whose priorities are equal.
+   --
+   -- @since 4.1.0
+   -- @var int
+   --
+   Instance_Count : Natural := 0;
+
+end Class_Customize_Panels;
 
 -- -- WP_Customize_Nav_Menus_Panel class--
 -- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menus-panel.php";

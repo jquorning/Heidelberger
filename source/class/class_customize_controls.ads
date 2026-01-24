@@ -10,9 +10,9 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
-package Inc_Class_Wp_Customize_Controls
+package Class_Customize_Controls
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -44,7 +44,7 @@ is
          -- @since 3.4.0
          -- @var WP_Customize_Manager
          --
-         Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- Control ID.
@@ -238,7 +238,7 @@ is
    -- }
    --
    function X_Construct
-             (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+             (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
               Id      : String;
               Args    : Array_Type := Empty_Array)
               return Wp_Customize_Control;
@@ -741,7 +741,7 @@ private
    -- protected static
    Instance_Count : Natural := 0;
 
-end Inc_Class_Wp_Customize_Controls;
+end Class_Customize_Controls;
 
 -- --
 -- -- WP_Customize_Color_Control class.

@@ -6,7 +6,7 @@
 -- @since 4.5.0
 --
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
 package Cust_Class_Wp_Customize_Selective_Refresh
 is
@@ -32,7 +32,7 @@ is
          -- @since 4.5.0
          -- @var WP_Customize_Manager
          --
-         Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- Registered instances of WP_Customize_Partial.
@@ -68,7 +68,7 @@ is
    -- @param WP_Customize_Manager manager Customizer bootstrap instance.
    --
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.WP_Customize_Manager)
+              (Manager : access Class_Customize_Managers.WP_Customize_Manager)
                return Wp_Customize_Selective_Refresh;
 
 --         --

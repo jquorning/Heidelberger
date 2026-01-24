@@ -18,9 +18,9 @@ with Inc_Options;
 with Inc_Plugins;
 with Inc_Themes;
 
-with Inc_Class_Wp_Customize_Managers;
+with Class_Customize_Managers;
 
-package body Inc_Class_Wp_Customize_Settings
+package body Class_Customize_Settings
 is
 
    function Apply_Filters (Hook_Name : String;
@@ -738,4 +738,4 @@ is
 
    end Multidimensional_Get;
 
-end Inc_Class_Wp_Customize_Settings;
+end Class_Customize_Settings;

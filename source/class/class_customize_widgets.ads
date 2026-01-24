@@ -16,9 +16,9 @@ with Cust_Class_Wp_Customize_Partials;
 
 with Class_Dependencies;
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
-package Inc_Class_Wp_Customize_Widgets
+package Class_Customize_Widgets
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -51,9 +51,9 @@ is
          -- @var WP_Customize_Manager
          --
 --       Manager : access Wp_Customize_Manager;
-         Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
---       Manager : Inc_Class_Wp_Customize_Managers_Indirect.Customize_Manager;
---       Manager : Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
+--       Manager : Class_Customize_Managers_Indirect.Customize_Manager;
+--       Manager : Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- All id_bases for widgets defined in core.
@@ -202,7 +202,7 @@ is
    -- @param WP_Customize_Manager manager Customizer bootstrap instance.
    --
    function X_Construct
-               (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager)
+               (Manager : access Class_Customize_Managers.Wp_Customize_Manager)
                 return Wp_Customize_Widgets;
 
    --
@@ -1849,4 +1849,4 @@ is
         --         _deprecated_function( __METHOD__, "4.2.0", "customize_dynamic_setting_args" );
         -- end;
 
-end Inc_Class_Wp_Customize_Widgets;
+end Class_Customize_Widgets;

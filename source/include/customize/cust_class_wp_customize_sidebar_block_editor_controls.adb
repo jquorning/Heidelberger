@@ -14,14 +14,14 @@ is
    -----------------
 
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
                Id      : String;
                Args    : Array_Type := Empty_Array)
                return Wp_Sidebar_Block_Editor_Control
    is
    begin
       return
-        (Inc_Class_Wp_Customize_Controls.X_Construct (Manager, Id, Args)
+        (Class_Customize_Controls.X_Construct (Manager, Id, Args)
          with Typ => <>);
    end X_Construct;
 

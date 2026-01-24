@@ -8,9 +8,9 @@
 
 with Arrays;
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
-package Inc_Class_Wp_Customize_Nav_Menus
+package Class_Customize_Nav_Menus
 is
    use Arrays;
 
@@ -32,7 +32,7 @@ is
          -- @since 4.3.0
          -- @var WP_Customize_Manager
          --
-         Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- Original nav menu locations before the theme was switched.
@@ -53,7 +53,7 @@ is
    -- @param WP_Customize_Manager manager Customizer bootstrap instance.
    --
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager)
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager)
                return Wp_Customize_Nav_Menus;
 
         -- --
@@ -1570,4 +1570,4 @@ is
         --         return content;
         -- end;
 
-end Inc_Class_Wp_Customize_Nav_Menus;
+end Class_Customize_Nav_Menus;

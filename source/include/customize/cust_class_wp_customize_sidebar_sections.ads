@@ -10,8 +10,8 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Customize_Sections;
-limited with Inc_Class_Wp_Customize_Managers;
+with Class_Customize_Sections;
+limited with Class_Customize_Managers;
 
 package Cust_Class_Wp_Customize_Sidebar_Sections
 is
@@ -26,7 +26,7 @@ is
    -- @see WP_Customize_Section
    --
    type Wp_Customize_Sidebar_Section is
-      new Inc_Class_Wp_Customize_Sections.Wp_Customize_Section with
+      new Class_Customize_Sections.Wp_Customize_Section with
       record
          --
          -- Type of this section.
@@ -47,7 +47,7 @@ is
 
    overriding
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
                Id      : String;
                Args    : Array_Type := Empty_Array)
                return Wp_Customize_Sidebar_Section;

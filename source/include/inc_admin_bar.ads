@@ -9,7 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Inc_Class_Wp_Admin_Bar;
-with Inc_Class_Wp_Customize_Managers;
+with Class_Customize_Managers;
 with Class_Posts;
 with Class_Terms;
 with Class_Querys;
@@ -29,7 +29,7 @@ is
    X_Show_Admin_Bar : Boolean; -- X_ added
    Pagenow          : Unbounded_String;
 
-   Wp_Customize : Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+   Wp_Customize : Class_Customize_Managers.Wp_Customize_Manager;
 
    --
    -- Instantiates the admin bar object and set it up as a global for access elsewhere.

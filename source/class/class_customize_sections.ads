@@ -10,9 +10,9 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
-package Inc_Class_Wp_Customize_Sections
+package Class_Customize_Sections
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -47,7 +47,7 @@ is
          -- @since 3.4.0
          -- @var WP_Customize_Manager
          --
-         Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- Unique identifier.
@@ -181,7 +181,7 @@ is
    -- }
    --
    function X_Construct
-             (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+             (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
               Id      : String;
               Args    : Array_Type := Empty_Array)
               return Wp_Customize_Section;
@@ -420,7 +420,7 @@ private
    -- protected static
    Instance_Count : Natural := 0;
 
-end Inc_Class_Wp_Customize_Sections;
+end Class_Customize_Sections;
 
 -- -- WP_Customize_Themes_Section class--
 -- require_once ABSPATH . WPINC . "/customize/class-wp-customize-themes-section.php";

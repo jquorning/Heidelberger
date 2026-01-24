@@ -70,11 +70,11 @@ with Inc_Users;
 -- require_once ABSPATH . WPINC . "/customize/class-wp-customize-nav-menu-setting.php";
 
 -- with Cust_Class_Wp_Customize_Selective_Refresh;
--- with Inc_Class_Wp_Customize_Widgets;
--- with Inc_Class_Wp_Customize_Nav_Menus;
+-- with Class_Customize_Widgets;
+-- with Class_Customize_Nav_Menus;
 -- require_once ABSPATH . "wp-admin/includes/update.php";
 
-package body Inc_Class_Wp_Customize_Managers
+package body Class_Customize_Managers
 is
 
    function Apply_Filters (Hook  : String;
@@ -227,12 +227,12 @@ is
 
       if In_List ("widgets", Components, True) then
          This.Widgets :=
-           Inc_Class_Wp_Customize_Widgets.X_Construct (This_Ref);
+           Class_Customize_Widgets.X_Construct (This_Ref);
       end if;
 
       if In_List ("nav_menus", Components, True) then
          This.Nav_Menus :=
-           Inc_Class_Wp_Customize_Nav_Menus.X_Construct (This_Ref);
+           Class_Customize_Nav_Menus.X_Construct (This_Ref);
       end if;
 
       Add_Action ("setup_theme", To_Array (This, Setup_Theme'Access));
@@ -1789,7 +1789,7 @@ is
    is
       use Php;
       use Php.Arrays;
-      use Inc_Class_Wp_Customize_Settings;
+      use Class_Customize_Settings;
       use Inc_Load;
 
       Post_Values : constant Array_Type :=
@@ -3770,9 +3770,9 @@ is
    function Add_Setting (This : Wp_Customize_Manager;
                          Id   : String;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting
+                         return Class_Customize_Settings.Wp_Customize_Setting
    is
-      use Inc_Class_Wp_Customize_Settings;
+      use Class_Customize_Settings;
       use Inc_Plugins;
 
       Args_2 : Array_Type := Args;
@@ -3803,7 +3803,7 @@ is
                           Id   : String;
                           Args : Array_Type := Empty_Array)
    is
-      use Inc_Class_Wp_Customize_Settings;
+      use Class_Customize_Settings;
       Unused : constant Wp_Customize_Setting :=
         Add_Setting (This, Id, Args);
    begin
@@ -3823,7 +3823,7 @@ is
                                   Setting_Ids : List_Type)
                                   return Setting_Lists.Vector -- Array_Type;
    is
-      use Inc_Class_Wp_Customize_Settings;
+      use Class_Customize_Settings;
       use Inc_Plugins;
 
       New_Settings : Setting_Lists.Vector; -- Array_Type;
@@ -3893,9 +3893,9 @@ is
 
    function Get_Setting (This : Wp_Customize_Manager;
                          Id   : String)
-                         return Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting
+                         return Class_Customize_Settings.Wp_Customize_Setting
    is
-      use Inc_Class_Wp_Customize_Settings;
+      use Class_Customize_Settings;
    begin
       if Isset (This.Settings, Id) then
          return Null_Setting; -- This.Settings (Id);
@@ -3923,9 +3923,9 @@ is
    function Add_Panel (This : aliased Wp_Customize_Manager;
                        Id   : String;
                        Args : Array_Type := Empty_Array)
-                       return Inc_Class_Wp_Customize_Panels.Wp_Customize_Panel
+                       return Class_Customize_Panels.Wp_Customize_Panel
    is
-      use Inc_Class_Wp_Customize_Panels;
+      use Class_Customize_Panels;
 
       Panel : Wp_Customize_Panel;
    begin
@@ -3944,7 +3944,7 @@ is
                         Id   : String;
                         Args : Array_Type := Empty_Array)
    is
-      use Inc_Class_Wp_Customize_Panels;
+      use Class_Customize_Panels;
 
       Unused : constant Wp_Customize_Panel := Add_Panel (This, Id, Args);
    begin
@@ -3957,9 +3957,9 @@ is
 
    function Get_Panel (This : Wp_Customize_Manager;
                        Id   : String)
-                       return Inc_Class_Wp_Customize_Panels.Wp_Customize_Panel
+                       return Class_Customize_Panels.Wp_Customize_Panel
    is
-      use Inc_Class_Wp_Customize_Panels;
+      use Class_Customize_Panels;
    begin
       if Isset (This.Panels, Id) then
          return Null_Panel; -- This.Panels (Id);
@@ -4031,9 +4031,9 @@ is
    function Add_Section (This : aliased Wp_Customize_Manager;
                          Id   : String;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Sections.Wp_Customize_Section
+                         return Class_Customize_Sections.Wp_Customize_Section
    is
-      use Inc_Class_Wp_Customize_Sections;
+      use Class_Customize_Sections;
 
       Section : Wp_Customize_Section;
    begin
@@ -4049,11 +4049,11 @@ is
    end Add_Section;
 
    function Add_Section (This : aliased Wp_Customize_Manager;
-                         Id   : Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                         Id   : Class_Customize_Sections.Wp_Customize_Section;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Sections.Wp_Customize_Section
+                         return Class_Customize_Sections.Wp_Customize_Section
    is
-      use Inc_Class_Wp_Customize_Sections;
+      use Class_Customize_Sections;
 
       Section : Wp_Customize_Section;
    begin
@@ -4072,7 +4072,7 @@ is
                           Id   : String;
                           Args : Array_Type := Empty_Array)
    is
-      use Inc_Class_Wp_Customize_Sections;
+      use Class_Customize_Sections;
 
       Unused : constant Wp_Customize_Section := Add_Section (This, Id, Args);
    begin
@@ -4080,10 +4080,10 @@ is
    end Add_Section;
 
    procedure Add_Section (This : Wp_Customize_Manager;
-                          Id   : Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                          Id   : Class_Customize_Sections.Wp_Customize_Section;
                           Args : Array_Type := Empty_Array)
    is
-      use Inc_Class_Wp_Customize_Sections;
+      use Class_Customize_Sections;
 
       Unused : constant Wp_Customize_Section := Add_Section (This, Id, Args);
    begin
@@ -4151,9 +4151,9 @@ is
    function Add_Control (This : aliased Wp_Customize_Manager;
                          Id   : String;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Controls.Wp_Customize_Control
+                         return Class_Customize_Controls.Wp_Customize_Control
    is
-      use Inc_Class_Wp_Customize_Controls;
+      use Class_Customize_Controls;
 
       Control : Wp_Customize_Control;
    begin
@@ -4169,11 +4169,11 @@ is
    end Add_Control;
 
    function Add_Control (This : aliased Wp_Customize_Manager;
-                         Id   : Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                         Id   : Class_Customize_Controls.Wp_Customize_Control;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Controls.Wp_Customize_Control
+                         return Class_Customize_Controls.Wp_Customize_Control
    is
-      use Inc_Class_Wp_Customize_Controls;
+      use Class_Customize_Controls;
 
       Control : Wp_Customize_Control;
    begin
@@ -4189,10 +4189,10 @@ is
    end Add_Control;
 
    procedure Add_Control (This : Wp_Customize_Manager;
-                          Id   : Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                          Id   : Class_Customize_Controls.Wp_Customize_Control;
                           Args : Array_Type := Empty_Array)
    is
-      use Inc_Class_Wp_Customize_Controls;
+      use Class_Customize_Controls;
 
       Unused : constant Wp_Customize_Control := Add_Control (This, Id, Args);
    begin
@@ -6249,4 +6249,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_Customize_Managers;
+end Class_Customize_Managers;

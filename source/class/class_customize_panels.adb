@@ -8,9 +8,9 @@
 
 with Hb_Common;
 
-with Inc_Class_Wp_Customize_Managers;
+with Class_Customize_Managers;
 
-package body Inc_Class_Wp_Customize_Panels
+package body Class_Customize_Panels
 is
 
    -----------------
@@ -18,7 +18,7 @@ is
    -----------------
 
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
                Id      : String;
                Args    : Array_Type := Empty_Array)
                return Wp_Customize_Panel
@@ -50,4 +50,4 @@ is
       return This;
    end X_Construct;
 
-end Inc_Class_Wp_Customize_Panels;
+end Class_Customize_Panels;

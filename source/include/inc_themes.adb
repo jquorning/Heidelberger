@@ -18,7 +18,7 @@ with Php.Types;
 with Binder;
 with Globals;
 
--- with Inc_Class_Wp_Customize_Managers;
+-- with Class_Customize_Managers;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -3659,7 +3659,7 @@ is
 --       require_once ABSPATH . WPINC . "/class-wp-customize-manager.php";
          null;
 --       Set (Globals.GLOBALS, "wp_customize",
---            Inc_Class_Wp_Customize_Managers.X_Construct (Comp));
+--            Class_Customize_Managers.X_Construct (Comp));
       end;
    end X_Wp_Customize_Include;
 

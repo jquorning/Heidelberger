@@ -30,7 +30,7 @@ with Php.Types;
 
 with Hb_Common;
 
-with Inc_Class_Wp_Customize_Widgets;
+with Class_Customize_Widgets;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -48,7 +48,7 @@ is
    function Is_Registered_Sidebar (Sidebar_Id : String)
                                    return Boolean
    is
-      use Inc_Class_Wp_Customize_Widgets;
+      use Class_Customize_Widgets;
    begin
       return Isset (Global_Wp_Registered_Sidebars, Sidebar_Id);
    end Is_Registered_Sidebar;
@@ -67,7 +67,7 @@ is
       use Php.Echoing;
       use Php.Misc;
       use Php.Strings;
-      use Inc_Class_Wp_Customize_Widgets;
+      use Class_Customize_Widgets;
       use Inc_Formatting;
       use Inc_Load;
       use Inc_Plugins;
@@ -357,7 +357,7 @@ is
       use Php;
       use Php.Strings;
       use Php.Types;
-      use Inc_Class_Wp_Customize_Widgets;
+      use Class_Customize_Widgets;
 
       Sidebars_Widgets : constant Array_Type := Wp_Get_Sidebars_Widgets;
    begin
@@ -422,7 +422,7 @@ is
    is
       use Php;
       use Php.Types;
-      use Inc_Class_Wp_Customize_Widgets;
+      use Class_Customize_Widgets;
       use Inc_Functions;
       use Inc_Load;
       use Inc_Options;
@@ -512,7 +512,7 @@ is
       use Php.Sorting;
       use Php.Types;
       use List_Vectors;
-      use Inc_Class_Wp_Customize_Widgets;
+      use Class_Customize_Widgets;
 --    use Inc_Themes;
 
 --    global wp_registered_sidebars, sidebars_widgets, wp_registered_widgets;
@@ -605,7 +605,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use Inc_Class_Wp_Customize_Widgets;
+      use Class_Customize_Widgets;
       use Inc_Themes;
 --        global wp_registered_sidebars;
 

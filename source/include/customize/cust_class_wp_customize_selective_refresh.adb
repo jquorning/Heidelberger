@@ -11,7 +11,7 @@ with Binder;
 -- with Hb_Common;
 -- with Php;
 
-with Inc_Class_Wp_Customize_Managers;
+with Class_Customize_Managers;
 
 -- require_once ABSPATH . WPINC . "/customize/class-wp-customize-partial.php";
 
@@ -24,7 +24,7 @@ is
    -----------------
 
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager)
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager)
                return Wp_Customize_Selective_Refresh
    is
       This : Wp_Customize_Selective_Refresh;

@@ -10,9 +10,9 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Customize_Controls;
+with Class_Customize_Controls;
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
 package Cust_Class_Wp_Customize_Sidebar_Block_Editor_Controls
 is
@@ -28,7 +28,7 @@ is
    -- @see WP_Customize_Control
    --
    type Wp_Sidebar_Block_Editor_Control is
-      new Inc_Class_Wp_Customize_Controls.Wp_Customize_Control with
+      new Class_Customize_Controls.Wp_Customize_Control with
       record
          --
          -- The control type.
@@ -41,7 +41,7 @@ is
       end record;
 
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
                Id      : String;
                Args    : Array_Type := Empty_Array)
                return Wp_Sidebar_Block_Editor_Control;

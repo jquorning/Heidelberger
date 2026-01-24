@@ -13,18 +13,18 @@ with Arrays;
 with Hb_Common;
 with Lists;
 
-with Inc_Class_Wp_Customize_Controls;
-with Inc_Class_Wp_Customize_Nav_Menus;
-with Inc_Class_Wp_Customize_Panels;
-with Inc_Class_Wp_Customize_Sections;
-with Inc_Class_Wp_Customize_Settings;
-with Inc_Class_Wp_Customize_Widgets;
+with Class_Customize_Controls;
+with Class_Customize_Nav_Menus;
+with Class_Customize_Panels;
+with Class_Customize_Sections;
+with Class_Customize_Settings;
+with Class_Customize_Widgets;
 with Class_Posts;
 with Inc_Class_Wp_Themes;
 
 with Cust_Class_Wp_Customize_Selective_Refresh;
 
-package Inc_Class_Wp_Customize_Managers
+package Class_Customize_Managers
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -32,7 +32,7 @@ is
    use Lists;
 
    subtype Wp_Customize_Setting
-     is Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting;
+     is Class_Customize_Settings.Wp_Customize_Setting;
 
    subtype Post_Id is Class_Posts.Post_Id;
 
@@ -41,8 +41,8 @@ is
    package Setting_Lists is new
       Ada.Containers.Vectors
         (Index_Type   => Setting_Index,
-         Element_Type => Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting,
-         "="          => Inc_Class_Wp_Customize_Settings."=");
+         Element_Type => Class_Customize_Settings.Wp_Customize_Setting,
+         "="          => Class_Customize_Settings."=");
 
    type Wp_Customize_Manager;
    type Manager_Ref is access Wp_Customize_Manager;
@@ -95,7 +95,7 @@ is
          -- @since 3.9.0
          -- @var WP_Customize_Widgets
          --
-         Widgets : Inc_Class_Wp_Customize_Widgets.Wp_Customize_Widgets;
+         Widgets : Class_Customize_Widgets.Wp_Customize_Widgets;
 
          --
          -- Methods and properties dealing with managing nav menus in the Customizer.
@@ -103,7 +103,7 @@ is
          -- @since 4.3.0
          -- @var WP_Customize_Nav_Menus
          --
-         Nav_Menus : Inc_Class_Wp_Customize_Nav_Menus.Wp_Customize_Nav_Menus;
+         Nav_Menus : Class_Customize_Nav_Menus.Wp_Customize_Nav_Menus;
 
          --
          -- Methods and properties dealing with selective refresh in the Customizer
@@ -613,7 +613,7 @@ is
    function Add_Setting (This : Wp_Customize_Manager;
                          Id   : String;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting;
+                         return Class_Customize_Settings.Wp_Customize_Setting;
 
    procedure Add_Setting (This : Wp_Customize_Manager;
                           Id   : String;
@@ -661,19 +661,19 @@ is
    function Add_Section (This : aliased Wp_Customize_Manager;
                          Id   : String;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                         return Class_Customize_Sections.Wp_Customize_Section;
 
    function Add_Section (This : aliased Wp_Customize_Manager;
-                         Id   : Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                         Id   : Class_Customize_Sections.Wp_Customize_Section;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                         return Class_Customize_Sections.Wp_Customize_Section;
 
    procedure Add_Section (This : Wp_Customize_Manager;
                           Id   : String;
                           Args : Array_Type := Empty_Array);
 
    procedure Add_Section (This : Wp_Customize_Manager;
-                          Id   : Inc_Class_Wp_Customize_Sections.Wp_Customize_Section;
+                          Id   : Class_Customize_Sections.Wp_Customize_Section;
                           Args : Array_Type := Empty_Array);
 
    --
@@ -695,15 +695,15 @@ is
    function Add_Control (This : aliased Wp_Customize_Manager;
                          Id   : String;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                         return Class_Customize_Controls.Wp_Customize_Control;
 
    function Add_Control (This : aliased Wp_Customize_Manager;
-                         Id   : Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                         Id   : Class_Customize_Controls.Wp_Customize_Control;
                          Args : Array_Type := Empty_Array)
-                         return Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                         return Class_Customize_Controls.Wp_Customize_Control;
 
    procedure Add_Control (This : Wp_Customize_Manager;
-                          Id   : Inc_Class_Wp_Customize_Controls.Wp_Customize_Control;
+                          Id   : Class_Customize_Controls.Wp_Customize_Control;
                           Args : Array_Type := Empty_Array);
 
    --
@@ -716,7 +716,7 @@ is
    --
    function Get_Setting (This : Wp_Customize_Manager;
                          Id   : String)
-                         return Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting;
+                         return Class_Customize_Settings.Wp_Customize_Setting;
    --
    -- Adds a customize panel.
    --
@@ -736,7 +736,7 @@ is
    function Add_Panel (This : aliased Wp_Customize_Manager;
                        Id   : String;
                        Args : Array_Type := Empty_Array)
-                       return Inc_Class_Wp_Customize_Panels.Wp_Customize_Panel;
+                       return Class_Customize_Panels.Wp_Customize_Panel;
 
    procedure Add_Panel (This : Wp_Customize_Manager;
                         Id   : String;
@@ -752,6 +752,6 @@ is
    --
    function Get_Panel (This : Wp_Customize_Manager;
                        Id   : String)
-                       return Inc_Class_Wp_Customize_Panels.Wp_Customize_Panel;
+                       return Class_Customize_Panels.Wp_Customize_Panel;
 
-end Inc_Class_Wp_Customize_Managers;
+end Class_Customize_Managers;

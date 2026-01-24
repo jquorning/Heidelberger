@@ -15,14 +15,14 @@ is
 
    overriding
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
                Id      : String;
                Args    : Array_Type := Empty_Array)
                return Wp_Customize_Sidebar_Section
    is
    begin
       return
-        (Inc_Class_Wp_Customize_Sections.X_Construct (Manager, Id, Args)
+        (Class_Customize_Sections.X_Construct (Manager, Id, Args)
          with
            Typ        => <>,
            Sidebar_Id => <>);

@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-with Inc_Class_Wp_Customize_Controls;
+with Class_Customize_Controls;
 
 package Cust_Class_Wp_Widget_Form_Customize_Controls
 is
@@ -19,7 +19,7 @@ is
    -- @see WP_Customize_Control
    --
    type Wp_Widget_Form_Customize_Control is
-      new Inc_Class_Wp_Customize_Controls.Wp_Customize_Control with
+      new Class_Customize_Controls.Wp_Customize_Control with
       record
          --
          -- Customize control type.

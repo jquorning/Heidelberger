@@ -29,10 +29,10 @@ with Cust_Class_Wp_Widget_Form_Customize_Controls;
 
 with Inc_Capabilities;
 with Inc_Class_Wp_Block_Editor_Contexts;
-with Inc_Class_Wp_Customize_Controls;
-with Inc_Class_Wp_Customize_Managers;
-with Inc_Class_Wp_Customize_Settings;
-with Inc_Class_Wp_Customize_Sections;
+with Class_Customize_Controls;
+with Class_Customize_Managers;
+with Class_Customize_Settings;
+with Class_Customize_Sections;
 with Inc_Class_Wp_Widget_Factories;
 with Inc_Block_Editors;
 with Inc_Formatting;
@@ -48,7 +48,7 @@ with Inc_Plugins;
 with Inc_Themes;
 with Inc_Widgets;
 
-package body Inc_Class_Wp_Customize_Widgets
+package body Class_Customize_Widgets
 is
 
    Global_Wp_Widget_Factory : -- Widget_Vectors.Vector;
@@ -75,7 +75,7 @@ is
    -----------------
 
    function X_Construct
-               (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager)
+               (Manager : access Class_Customize_Managers.Wp_Customize_Manager)
                 return Wp_Customize_Widgets
    is
       use Inc_Capabilities;
@@ -240,7 +240,7 @@ is
       end if;
 
       declare
-         use Inc_Class_Wp_Customize_Managers;
+         use Class_Customize_Managers;
 
          Settings : constant Setting_Lists.Vector :=
            This.Manager.Add_Dynamic_Settings (List_Unique (Widget_Setting_Ids));
@@ -432,7 +432,7 @@ is
       --
       for Widget_Id of List_Type'(Array_Keys (Global_Wp_Registered_Widgets)) loop
          declare
-            use Inc_Class_Wp_Customize_Settings;
+            use Class_Customize_Settings;
 
             Setting_Id   : constant String     := This.Get_Setting_Id (-Widget_Id);
             Setting_Args : constant Array_Type := This.Get_Setting_Args (Setting_Id);
@@ -501,7 +501,7 @@ is
                -- Add setting for managing the sidebar's widgets.
                if Is_Registered_Sidebar or Is_Inactive_Widgets then
                   declare
-                     use Inc_Class_Wp_Customize_Settings;
+                     use Class_Customize_Settings;
 
                      Setting_Id : constant String :=
                        Sprintf ("sidebars_widgets[%s]", To_List (Sidebar_Id));
@@ -566,7 +566,7 @@ is
 
                               declare
                                  use Cust_Class_Wp_Customize_Sidebar_Sections;
-                                 use Inc_Class_Wp_Customize_Sections;
+                                 use Class_Customize_Sections;
 
                                  Section : constant Wp_Customize_Sidebar_Section :=
                                    X_Construct (This.Manager,
@@ -580,7 +580,7 @@ is
                               if Use_Widgets_Block_Editor then
                                  declare
                                     use Cust_Class_Wp_Customize_Sidebar_Block_Editor_Controls;
-                                    use Inc_Class_Wp_Customize_Controls;
+                                    use Class_Customize_Controls;
 
                                     Control : constant Wp_Sidebar_Block_Editor_Control :=
                                       X_Construct (
@@ -600,7 +600,7 @@ is
                               else
                                  declare
                                     use Cust_Class_Wp_Widget_Area_Customize_Controls;
-                                    use Inc_Class_Wp_Customize_Controls;
+                                    use Class_Customize_Controls;
 
                                     Control : constant Wp_Widget_Area_Customize_Control :=
                                       X_Construct (
@@ -643,7 +643,7 @@ is
 
                         declare
                            use Cust_Class_Wp_Widget_Form_Customize_Controls;
-                           use Inc_Class_Wp_Customize_Controls;
+                           use Class_Customize_Controls;
 
                            Registered_Widget : constant Array_Type :=
                              As_Array (Get (Global_Wp_Registered_Widgets, Widget_Id));
@@ -700,7 +700,7 @@ is
       if This.Manager.Settings_Previewed then -- ()
          for New_Setting_Id of New_Setting_Ids loop
             declare
-               use Inc_Class_Wp_Customize_Settings;
+               use Class_Customize_Settings;
 
                Setting : Wp_Customize_Setting :=
                  This.Manager.Get_Setting (-New_Setting_Id);
@@ -2117,4 +2117,4 @@ is
                (This : in out Wp_Customize_Widgets)
    is null;
 
-end Inc_Class_Wp_Customize_Widgets;
+end Class_Customize_Widgets;

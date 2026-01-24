@@ -13,9 +13,9 @@ with Lists;
 
 with Class_Errors;
 
-limited with Inc_Class_Wp_Customize_Managers;
+limited with Class_Customize_Managers;
 
-package Inc_Class_Wp_Customize_Settings
+package Class_Customize_Settings
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -40,7 +40,7 @@ is
          -- @since 3.4.0
          -- @var WP_Customize_Manager
          --
-         Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+         Manager : access Class_Customize_Managers.Wp_Customize_Manager;
 
          --
          -- Unique string identifier for the setting.
@@ -737,7 +737,7 @@ private
    -- protected static
    Aggregated_Multidimensionals : Array_Type;
 
-end Inc_Class_Wp_Customize_Settings;
+end Class_Customize_Settings;
 
 -- --
 -- -- WP_Customize_Filter_Setting class.

@@ -9,7 +9,7 @@
 with Inc_Capabilities;
 with Inc_Nav_Menus;
 
-package body Inc_Class_Wp_Customize_Nav_Menus
+package body Class_Customize_Nav_Menus
 is
 
    -----------------
@@ -17,7 +17,7 @@ is
    -----------------
 
    function X_Construct
-              (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager)
+              (Manager : access Class_Customize_Managers.Wp_Customize_Manager)
                return Wp_Customize_Nav_Menus
    is
       use Inc_Capabilities;
@@ -55,4 +55,4 @@ is
       return This;
    end X_Construct;
 
-end Inc_Class_Wp_Customize_Nav_Menus;
+end Class_Customize_Nav_Menus;

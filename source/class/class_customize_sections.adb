@@ -9,7 +9,7 @@
 with Hb_Common;
 -- with Php;
 
-package body Inc_Class_Wp_Customize_Sections
+package body Class_Customize_Sections
 is
 
    -----------------
@@ -17,7 +17,7 @@ is
    -----------------
 
    function X_Construct
-             (Manager : access Inc_Class_Wp_Customize_Managers.Wp_Customize_Manager;
+             (Manager : access Class_Customize_Managers.Wp_Customize_Manager;
               Id      : String;
               Args    : Array_Type := Empty_Array)
               return Wp_Customize_Section
@@ -62,4 +62,4 @@ is
       return True;
    end Active_Callback;
 
-end Inc_Class_Wp_Customize_Sections;
+end Class_Customize_Sections;
