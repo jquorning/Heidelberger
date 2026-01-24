@@ -1223,7 +1223,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Class_Terms;
---    use Inc_Class_Wp_Querys;
+--    use Class_Querys;
       use Inc_L10n;
       use Inc_Plugins;
       use Inc_Querys;

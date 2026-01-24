@@ -21,7 +21,7 @@ with Inc_Block_Editors;
 -- with Inc_Class_Wp_Block_Type;
 with Inc_Class_Wp_Block_Type_Registry;
 with Class_Posts;
-with Inc_Class_Wp_Querys;
+with Class_Querys;
 with Class_Theme_JSON_Data;
 with Inc_Functions;
 with Inc_L10n;
@@ -498,7 +498,7 @@ is
       use Php.Strings;
       use Class_Posts;
       use Inc_Class_Wp_Themes;
-      use Inc_Class_Wp_Querys;
+      use Class_Querys;
       use Inc_Posts;
       use Inc_Themes;
 

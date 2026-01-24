@@ -14,13 +14,13 @@
 with Class_Posts;
 with Class_Terms;
 with Class_Users;
-with Inc_Class_Wp_Querys;
+with Class_Querys;
 
 package Inc_Querys
 is
 
-   Global_Wp_Query : constant Inc_Class_Wp_Querys.Wp_Query :=
-     Inc_Class_Wp_Querys.Null_Query;
+   Global_Wp_Query : constant Class_Querys.Wp_Query :=
+     Class_Querys.Null_Query;
 
    --
    -- Retrieves the value of a query variable in the WP_Query class.

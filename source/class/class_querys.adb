@@ -17,7 +17,7 @@ with Class_Post_Type;
 with Inc_Options;
 with Inc_Posts;
 
-package body Inc_Class_Wp_Querys
+package body Class_Querys
 is
    use Lists;
 
@@ -4465,4 +4465,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_Querys;
+end Class_Querys;

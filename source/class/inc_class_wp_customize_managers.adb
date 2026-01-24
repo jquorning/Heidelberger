@@ -19,7 +19,7 @@ with Globals;
 with Helpers;
 
 with Inc_Caches;
-with Inc_Class_Wp_Querys;
+with Class_Querys;
 with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
@@ -898,7 +898,7 @@ is
    is
       use Inc_Caches;
       use Class_Posts;
-      use Inc_Class_Wp_Querys;
+      use Class_Querys;
       use Inc_Posts;
 
       Cache_Group       : constant String  := "customize_changeset_post";

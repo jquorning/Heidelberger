@@ -14,7 +14,7 @@ with Class_Posts;
 with Class_Terms;
 with Class_Users;
 
-package Inc_Class_Wp_Querys
+package Class_Querys
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -796,4 +796,4 @@ is
       Posts                 => Class_Posts.Post_Arrays.Empty_Vector,
       others                => False);
 
-end Inc_Class_Wp_Querys;
+end Class_Querys;

@@ -27,7 +27,7 @@ with Adi_Templates;
 with Class_Taxonomy;
 with Class_Terms;
 with Class_Users;
-with Inc_Class_Wp_Querys;
+with Class_Querys;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -173,7 +173,7 @@ is
                -- end if;
 
                declare
-                  use Inc_Class_Wp_Querys;
+                  use Class_Querys;
 
                   Search_Results_Query : Wp_Query; -- := new WP_Query (Args_2);
                begin
@@ -643,7 +643,7 @@ is
       -- @todo Transient caching of these results with proper invalidation on
       -- updating of a post of this type.
       declare
-         use Inc_Class_Wp_Querys;
+         use Class_Querys;
 
          Get_Posts : Wp_Query; -- := new WP_Query;
          Posts     : Array_Type; --  := Get_Posts.Query (Args);

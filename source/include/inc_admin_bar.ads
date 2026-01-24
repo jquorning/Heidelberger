@@ -12,7 +12,7 @@ with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Customize_Managers;
 with Class_Posts;
 with Class_Terms;
-with Inc_Class_Wp_Querys;
+with Class_Querys;
 
 package Inc_Admin_Bar
 is
@@ -22,7 +22,7 @@ is
    X_Wp_Admin_Bar : Wp_Admin_Bar; -- X_ added jq
 
    Tag            : Class_Terms.Wp_Term;
-   Wp_The_Query   : Inc_Class_Wp_Querys.Wp_Query;
+   Wp_The_Query   : Class_Querys.Wp_Query;
    User_Id        : Integer;
    Id_Of_Post     : Class_Posts.Post_Id; -- was Post_Id : Integer
 

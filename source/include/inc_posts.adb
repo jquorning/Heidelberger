@@ -22,7 +22,7 @@ with Wp_Common;
 with Adi_Plugins;
 
 with Inc_Caches;
-with Inc_Class_Wp_Querys;
+with Class_Querys;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
@@ -3175,7 +3175,7 @@ is
    function Get_Posts (Args : Array_Type := Empty_Array) -- null
                        return Class_Posts.Post_Array
    is
-      use Inc_Class_Wp_Querys;
+      use Class_Querys;
       use Inc_Functions;
 
       Defaults : constant Array_Type := To_Array (List => (

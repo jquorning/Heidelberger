@@ -24,17 +24,17 @@ package body Inc_Querys
 is
    use Lists;
 
-   function Isset (Query : Inc_Class_Wp_Querys.Wp_Query)
+   function Isset (Query : Class_Querys.Wp_Query)
                    return Boolean;
 
    -----------
    -- Isset --
    -----------
 
-   function Isset (Query : Inc_Class_Wp_Querys.Wp_Query)
+   function Isset (Query : Class_Querys.Wp_Query)
                    return Boolean
    is
-      use Inc_Class_Wp_Querys;
+      use Class_Querys;
    begin
       return Query = Null_Query;
    end Isset;
