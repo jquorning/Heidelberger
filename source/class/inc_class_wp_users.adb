@@ -20,7 +20,7 @@ with Inc_Caches;
 with Inc_Capabilities;
 with Inc_Class_Wp_Role;
 with Inc_Class_Wp_Roles;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Formatting;
 with Inc_Load;
 with Inc_Ms_Blogs;
@@ -128,7 +128,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Users;
 
@@ -227,7 +227,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Users;
 

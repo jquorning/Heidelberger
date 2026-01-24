@@ -45,7 +45,7 @@ with Adi_Translation_Install;
 with Adi_Upgrade;
 
 -- with Inc_Class_Wp_Locale;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -137,7 +137,7 @@ is
       use Hb_Common;
       use Lists;
       use Adi_Templates;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_L10n;

@@ -17,7 +17,7 @@ with Lists;
 with Wp_Common;
 
 with Inc_Caches;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 -- with Inc_Class_Wp_Session_Tokens;
 -- with Inc_Class_Wp_Session_Tokens_Factory;
 with Inc_Formatting;
@@ -1425,7 +1425,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Globals;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;

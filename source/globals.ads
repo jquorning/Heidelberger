@@ -8,7 +8,7 @@ with Arrays;
 
 with Adi_Class_Wp_Screens;
 
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Class_Wp_Locale;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Post_Type;
@@ -80,7 +80,7 @@ is
 
    WP_SETUP_CONFIG : constant Boolean := False;
 
-   WpDB : Inc_Class_Wpdb.Wpdb_Class;
+   WpDB : Class_WpDB.Wpdb_Class;
 
    XMLRPC_REQUEST : Boolean := False;
 

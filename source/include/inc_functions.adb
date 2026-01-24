@@ -31,7 +31,7 @@ with Wp_Common;
 
 with Inc_Caches;
 with Inc_Capabilities;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Class_Wp_List_Util;
 with Inc_Class_Wp_Networks;
 with Inc_Formatting;
@@ -1885,7 +1885,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Options;

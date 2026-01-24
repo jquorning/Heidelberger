@@ -11,7 +11,7 @@ with Hb_Common;
 with Lists;
 
 with Inc_Caches;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 
 package body Inc_Class_Wp_Comments
 is
@@ -27,7 +27,7 @@ is
       use Hb_Common;
       use Lists;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Comment_Id : constant Integer := Id; -- (int)
    begin

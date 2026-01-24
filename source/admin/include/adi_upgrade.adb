@@ -30,7 +30,7 @@ with Inc_Capabilities;
 with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Users;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Cron;
 with Inc_Formatting;
 with Inc_Functions;
@@ -1041,7 +1041,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Old_Options_Fields : constant List_Type :=
         To_List (List => (
@@ -1064,7 +1064,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Prefix : constant Statement_Type := Statement_Type (-WpDB.Prefix);
    begin
@@ -1081,7 +1081,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Postmeta : constant Statement_Type := Statement_Type (-WpDB.Postmeta);
    begin
@@ -1112,7 +1112,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Users : constant Statement_Type := Statement_Type (-WpDB.Users);
    begin
@@ -1141,7 +1141,7 @@ is
       use Globals;
       use Hb_Common;
       use Adi_Schemas;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Posts : constant Statement_Type := Statement_Type (-WpDB.Posts);
    begin
@@ -1334,7 +1334,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Options;
 
       Options  : constant Statement_Type := Statement_Type (-WpDB.Options);
@@ -1612,7 +1612,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Class_Wp_Roles;
       use Inc_Roles;
 
@@ -1645,7 +1645,7 @@ is
       use Inc_Cron;
       use Inc_Load;
       use Inc_Options;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Options : constant Statement_Type := Statement_Type (-WpDB.Options);
    begin
@@ -1882,7 +1882,7 @@ is
                          Index : String)
    is
       use Globals;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
    begin
       WpDB.Hide_Errors;
 
@@ -1909,7 +1909,7 @@ is
                               Index : String)
    is
       use Globals;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
    begin
       Drop_Index (Table, Index);
       WpDB.Query (Statement_Type (
@@ -1977,7 +1977,7 @@ is
       use Globals;
       use Hb_Common;
       use Adi_Schemas;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Plugins;
 
       List : constant List_Type := To_List (List => (+"", +"all", +"blog",
@@ -2702,7 +2702,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Load;
 --    global wp_current_db_version, wpdb;
    begin

@@ -23,7 +23,7 @@ with Wp_Config;
 
 with Adi_Class_Wp_Screens;
 
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Class_Wp_Networks;
 with Inc_Class_Wp_Textdomain_Registry;
 with Inc_Error_Protection;
@@ -576,7 +576,7 @@ is
    is
       use Globals;
       use Wp_Config;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
 
       Dbuser     : constant String := DB_USER;
       Dbpassword : constant String := DB_PASSWORD;
@@ -1346,7 +1346,7 @@ is
       use Php.Files;
       use Php.Lists;
       use Inc_L10n;
---    use Inc_Class_Wpdb;
+--    use Class_WpDB;
       use Inc_Class_Wp_Textdomain_Registry;
 
 --    global (wp_locale, Wp_Textdomain_Registry);

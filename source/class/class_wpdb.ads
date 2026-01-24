@@ -19,7 +19,7 @@ with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Posts;
 with Inc_Class_Wp_Users;
 
-package Inc_Class_Wpdb
+package Class_WpDB
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -1840,7 +1840,7 @@ is
    --
    -- To_Array
    --
-   function To_Array (Db : Inc_Class_Wpdb.Wpdb_Class;
+   function To_Array (Db : Wpdb_Class;
                       S  : String)
                       return Array_Type
                       is (Empty_Array);
@@ -1850,4 +1850,4 @@ is
                         Table : String;
                         Value : String);
 
-end Inc_Class_Wpdb;
+end Class_WpDB;

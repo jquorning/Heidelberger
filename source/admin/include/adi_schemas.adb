@@ -20,7 +20,7 @@ with Globals;
 with Hb_Common;
 
 with Adi_Upgrade;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Class_Wp_Role;
 with Inc_Class_Wp_Themes;
 with Inc_Capabilities;
@@ -426,7 +426,7 @@ is
       use Hb_Common;
       use Adi_Upgrade;
       use Inc_Class_Wp_Themes;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

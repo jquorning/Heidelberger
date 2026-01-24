@@ -11,7 +11,7 @@ with Adi_Caches;
 
 with Inc_Category_Templates;
 with Inc_Class_Wp_Terms;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Functions;
 with Inc_Meta;
 with Inc_Posts;
@@ -53,16 +53,16 @@ is
       if not Success then
          declare
             use Globals;
-            use Inc_Class_Wpdb;
+            use Class_WpDB;
 
             Statement : constant Statement_Type :=
               WpDB.Prepare (
                 "SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
                 To_List (Id'Image));
          begin
-            Post := Inc_Class_Wpdb.Get_Row (WpDB, -- Post,
-                                            Query   => Statement,
-                                            Success => Success);
+            Post := Class_WpDB.Get_Row (WpDB, -- Post,
+                                        Query   => Statement,
+                                        Success => Success);
          end;
 
          if not Success then

@@ -22,7 +22,7 @@ with Helpers;
 with Wp_Common;
 
 with Inc_Caches;
-with Inc_Class_Wpdb;
+with Class_WpDB;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -48,7 +48,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -428,7 +428,7 @@ is
    is
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -680,7 +680,7 @@ is
          Do_Action ("update_option", Option, Old_Value, Value_2);
 
          declare
-            use Inc_Class_Wpdb;
+            use Class_WpDB;
 
             Update_Args : Array_Type := To_Array (List => (1 =>
               Build ("option_value", As_String (Serialized_Value))
@@ -780,7 +780,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -966,7 +966,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Load;
       use Inc_Plugins;
    begin
@@ -1811,7 +1811,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Functions;
       use Inc_Load;
 --    use Inc_Plugins;
@@ -1984,7 +1984,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -2137,7 +2137,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -2255,7 +2255,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
-      use Inc_Class_Wpdb;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

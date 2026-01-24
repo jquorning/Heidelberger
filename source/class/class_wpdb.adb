@@ -36,7 +36,7 @@ with Inc_Load;
 with Inc_Plugins;
 with Inc_Versions;
 
-package body Inc_Class_Wpdb
+package body Class_WpDB
 is
 
    type Cb_Func is access function (This : Wpdb_Class;
@@ -4112,4 +4112,4 @@ begin
            --   Build ("termmeta",           ""),
            --   Build ("Commentmeta",        "")
            -- ]; -- ));
-end Inc_Class_Wpdb;
+end Class_WpDB;
