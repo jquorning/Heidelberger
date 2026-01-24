@@ -9,7 +9,7 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Themes;
+with Class_Themes;
 with Class_Theme_JSON;
 
 package Class_Theme_JSON_Resolver
@@ -277,7 +277,7 @@ is
    --
    -- public static
    function Get_User_Data_From_Wp_Global_Styles
-     (Theme              : Inc_Class_Wp_Themes.Wp_Theme;
+     (Theme              : Class_Themes.Wp_Theme;
       Create_Post        : Boolean   := False;
       Post_Status_Filter : List_Type := To_List ("publish"))
       return Array_Type;

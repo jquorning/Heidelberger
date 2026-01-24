@@ -24,7 +24,7 @@ with Inc_L10n;
 with Inc_Load;
 with Inc_Themes;
 
-package body Inc_Class_Wp_Themes
+package body Class_Themes
 is
    use Lists;
 
@@ -671,4 +671,4 @@ is
       return Null_Theme; -- False;
    end Get_Core_Default_Theme;
 
-end Inc_Class_Wp_Themes;
+end Class_Themes;

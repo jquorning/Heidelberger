@@ -11,7 +11,7 @@ with Arrays;
 
 with Class_Errors;
 
-package Inc_Class_Wp_Themes
+package Class_Themes
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -1607,4 +1607,4 @@ is
        Cache_Hash        => Null_Unbounded_String,
        M_Errors          => Class_Errors.Null_Wp_Error);
 
-end Inc_Class_Wp_Themes;
+end Class_Themes;

@@ -22,7 +22,7 @@ with Hb_Common;
 with Adi_Upgrade;
 with Class_WpDB;
 with Class_Role;
-with Inc_Class_Wp_Themes;
+with Class_Themes;
 with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
@@ -425,7 +425,7 @@ is
       use Globals;
       use Hb_Common;
       use Adi_Upgrade;
-      use Inc_Class_Wp_Themes;
+      use Class_Themes;
       use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;

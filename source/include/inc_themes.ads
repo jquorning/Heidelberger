@@ -9,7 +9,7 @@ with Arrays;
 with Hb_Common;
 with Lists;
 
-with Inc_Class_Wp_Themes;
+with Class_Themes;
 with Inc_Options;
 
 package Inc_Themes
@@ -41,7 +41,7 @@ is
    --
    function Wp_Get_Theme (Stylesheet : String := "";
                           Theme_Root : String := "")
-                          return Inc_Class_Wp_Themes.Wp_Theme;
+                          return Class_Themes.Wp_Theme;
 
    --
    -- Gets the header images uploaded for the active theme.

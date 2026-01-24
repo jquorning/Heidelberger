@@ -214,7 +214,7 @@ is
    is
 --    use Hb_Common;
       use Inc_Functions;
-      use Inc_Class_Wp_Themes;
+      use Class_Themes;
       use Class_Theme_JSON;
       use Class_Theme_JSON_Data;
       use Inc_Themes;
@@ -233,7 +233,7 @@ is
       then -- 2x ::static
          declare
             Theme_JSON_File : constant String  := Get_File_Path_From_Theme ("theme.json"); -- static::
-            Wp_Theme        : Inc_Class_Wp_Themes.Wp_Theme := Inc_Themes.Wp_Get_Theme;
+            Wp_Theme        : Class_Themes.Wp_Theme := Inc_Themes.Wp_Get_Theme;
             Theme_JSON_Data : Array_Type;
             Theme_JSON      : Wp_Theme_JSON_Data;
          begin
@@ -488,7 +488,7 @@ is
    -----------------------------------------
 
    function Get_User_Data_From_Wp_Global_Styles
-     (Theme              : Inc_Class_Wp_Themes.Wp_Theme;
+     (Theme              : Class_Themes.Wp_Theme;
       Create_Post        : Boolean   := False;
       Post_Status_Filter : List_Type := To_List ("publish"))
       return Array_Type
@@ -497,7 +497,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use Class_Posts;
-      use Inc_Class_Wp_Themes;
+      use Class_Themes;
       use Class_Querys;
       use Inc_Posts;
       use Inc_Themes;

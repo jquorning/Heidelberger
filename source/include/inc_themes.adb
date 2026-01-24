@@ -131,7 +131,7 @@ is
 
    function Wp_Get_Theme (Stylesheet : String := "";
                           Theme_Root : String := "")
-                          return Inc_Class_Wp_Themes.Wp_Theme
+                          return Class_Themes.Wp_Theme
    is
       use Php.Lists;
       use Php.Strings;
@@ -154,11 +154,11 @@ is
       end if;
 
       declare
-         use Inc_Class_Wp_Themes;
+         use Class_Themes;
 
          T : Wp_Theme := Null_Theme;
       begin
-         return Inc_Class_Wp_Themes.X_Construct (Stylesheet_2, Theme_Root, T);
+         return Class_Themes.X_Construct (Stylesheet_2, Theme_Root, T);
       end;
    end Wp_Get_Theme;
 

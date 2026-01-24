@@ -20,7 +20,7 @@ with Class_Customize_Sections;
 with Class_Customize_Settings;
 with Class_Customize_Widgets;
 with Class_Posts;
-with Inc_Class_Wp_Themes;
+with Class_Themes;
 
 with Cust_Class_Wp_Customize_Selective_Refresh;
 
@@ -70,7 +70,7 @@ is
          -- @var WP_Theme
          --
          -- protected
-         Theme : Inc_Class_Wp_Themes.Wp_Theme;
+         Theme : Class_Themes.Wp_Theme;
 
          --
          -- The directory name of the previously active theme (within the theme_root).
