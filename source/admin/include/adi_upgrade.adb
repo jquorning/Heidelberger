@@ -1158,7 +1158,8 @@ is
       use Hb_Common;
       use Inc_Options;
 
-      Plugins : constant List_Type := As_List (X_Get_Option ("active_plugins"));
+      Plugins : constant List_Type := Empty_List;  -- ???
+--      As_List (X_Get_Option ("active_plugins"));
    begin
       for Plugin of Plugins loop -- (array)
          if "widgets.php" = Basename (-Plugin) then

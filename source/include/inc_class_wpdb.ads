@@ -37,6 +37,13 @@ is
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
                                               Element_Type => String);
 
+   type Status_Type is (Create_Alter, Success, Error);
+
+   type Rows_Result_Type is record
+      Status : Status_Type;
+      Rows   : Natural;
+   end record;
+
    type Wpdb_Class is tagged  -- _class added jq
       record
          --
@@ -1015,7 +1022,7 @@ is
                     Table        : String;
                     Where        : Array_Type;
                     Where_Format : String := "") -- null
-                    return Integer;
+                    return Rows_Result_Type;
 
    --
    -- Processes arrays of field/value pairs and field formats.
@@ -1144,7 +1151,7 @@ is
                     Where        : Array_Type;
                     Format       : String := ""; -- null
                     Where_Format : String := "") -- null
-                    return Natural;
+                    return Rows_Result_Type;
 
    --
    -- Inserts a row into the table.
@@ -1180,7 +1187,7 @@ is
                     Table  : String;
                     Data   : Array_Type;
                     Format : String := "") -- null
-                    return Natural;
+                    return Rows_Result_Type;
 
    --
    -- Helper function for insert and replace.
@@ -1215,7 +1222,7 @@ is
                                      Data   : Array_Type;
                                      Format : String := ""; -- null
                                      Typ    : String := "INSERT")
-                                     return Natural;
+                                     return Rows_Result_Type;
 
    --
    -- Performs a database query, using current database connection.
@@ -1231,12 +1238,13 @@ is
    --                          Number of rows affected/selected for all other
    --                          queries. Boolean false on error.
    --
+
    function Query (This  : in out Wpdb_Class;
                    Query : Statement_Type)
-                   return Integer;
+                   return Rows_Result_Type;
 
-   procedure Query (Db    : in out Wpdb_Class;
-                    Query : Statement_Type);
+   procedure Query (Database : in out Wpdb_Class;
+                    Query    : Statement_Type);
 
    --
    -- Internal function to perform the mysql_query() call.
@@ -1611,9 +1619,16 @@ is
    --                         be found.
    --
    -- protected
+
+   type String_Error_Type is record
+      Success : Boolean;
+      Item    : Ada.Strings.Unbounded.Unbounded_String;
+      Error   : Inc_Class_Wp_Errors.Wp_Error;
+   end record;
+
    function Get_Table_Charset (This  : in out Wpdb_Class;
                                Table : String)
-                               return String;
+                               return String_Error_Type;
 
    --
    -- Finds the first table name referenced in a query.

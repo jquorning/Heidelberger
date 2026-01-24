@@ -125,9 +125,8 @@ is
                          Value : Integer)
                          return Inc_Class_Wp_Users.Wp_User
    is
-      use Hb_Common;
-      use Php;
       use Php.Strings;
+      use Hb_Common;
       use Inc_Caches;
       use Inc_Class_Wpdb;
       use Inc_Formatting;
@@ -162,6 +161,105 @@ is
 
       if Field_2 = "id" then
          User_Id  := Value;
+         DB_Field := +"ID";
+
+      elsif Field_2 = "slug" then
+         User_Id  := Wp_Cache_Get (-Value_2, "userslugs", Found => Unused_Found);
+         DB_Field := +"user_nicename";
+
+      elsif Field_2 = "email" then
+         User_Id  := Wp_Cache_Get (-Value_2, "useremail", Found => Unused_Found);
+         DB_Field := +"user_email";
+
+      elsif Field_2 = "login" then
+         Value_2  := +Sanitize_User (-Value_2);
+         User_Id  := Wp_Cache_Get (-Value_2, "userlogins", Found => Unused_Found);
+         DB_Field := +"user_login";
+
+      else
+         return Null_User; -- False;
+      end if;
+
+      if 0 /= User_Id then
+         declare
+            User : constant Wp_User :=
+              Wp_Cache_Get (User_Id, "users", Found => Unused_Found);
+         begin
+            if User /= Null_User then
+               return User;
+            end if;
+         end;
+      end if;
+
+      declare
+         use Globals;
+
+         Unused_Success : Boolean;
+
+         Statement : constant Statement_Type :=
+           WpDB.Prepare (
+             "SELECT * FROM wpdb->users " &
+             "WHERE " & (-DB_Field) & " = %s LIMIT 1",
+             To_List (-Value_2));
+
+         User : constant Wp_User :=
+           WpDB.Get_Row (Statement,
+                         Success => Unused_Success);
+      begin
+         if User = Null_User then
+            return Null_User; -- False;
+         end if;
+
+         Update_User_Caches (User);
+
+         return User;
+      end;
+   end Get_Data_By;
+
+   -----------------
+   -- Get_Data_By --
+   -----------------
+
+   function Get_Data_By (Field : String;
+                         Value : String)
+                         return Inc_Class_Wp_Users.Wp_User
+   is
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Caches;
+      use Inc_Class_Wpdb;
+      use Inc_Formatting;
+      use Inc_Users;
+
+      -- 'ID' is an alias of 'id'.
+      Field_2 : String :=
+        (if "ID" = Field then "id" else Field);
+
+      Value_2  : Unbounded_String := +Value;
+      User_Id  : Integer;
+      DB_Field : Unbounded_String;
+      Unused_Found : Boolean;
+   begin
+      if "id" = Field_2 then
+         -- Make sure the value is numeric to avoid casting objects, for example,
+         -- to int 1.
+         if not True then -- Is_Numeric (Value) then
+            return Null_User; -- False;
+         end if;
+--       Value_2 := +Value'Image; -- (int)
+         if False then -- Value < 1 then
+            return Null_User; -- False;
+         end if;
+      else
+         Value_2 := +Trim (-Value_2);
+      end if;
+
+      if Value_2 = "" then
+         return Null_User; -- False;
+      end if;
+
+      if Field_2 = "id" then
+         User_Id  := Integer'Value (Value);
          DB_Field := +"ID";
 
       elsif Field_2 = "slug" then

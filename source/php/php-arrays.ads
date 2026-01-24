@@ -10,6 +10,20 @@ is
    use Standard.Arrays;
    use Lists;
 
+   function Array_Combine (Keys   : Array_Type;
+                           Values : Array_Type)
+                           return Array_Type
+   is (raise Program_Error with "not implemented");
+
+   function Array_Combine (Keys   : List_Type;
+                           Values : List_Type)
+                           return Array_Type;
+
+   function Array_Column (Arry       : Array_Type;
+                          Column_Key : String)
+                          return Array_Type
+   is (raise Program_Error with "not implemented");
+
    function Array_Merge (Left  : Array_Type;
                          Right : Array_Type)
                          return Array_Type;
@@ -186,16 +200,6 @@ is
                           Callback : Reduce_Callback_2;
                           Initial  : Integer)
                           return Integer
-   is (raise Program_Error with "not implemented");
-
-   function Array_Combine (Keys   : Array_Type;
-                           Values : Array_Type)
-                           return Array_Type
-   is (raise Program_Error with "not implemented");
-
-   function Array_Column (Arry       : Array_Type;
-                          Column_Key : String)
-                          return Array_Type
    is (raise Program_Error with "not implemented");
 
    function Array_Pop (Arry : Array_Type)

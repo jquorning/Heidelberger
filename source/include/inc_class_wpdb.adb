@@ -9,7 +9,7 @@
 -- @since 0.71
 --
 
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Errors;
@@ -378,7 +378,6 @@ is
    procedure Set_SQL_Mode (This  : Wpdb_Class;
                            Modes : Array_Type := Empty_Array)
    is
-      use Ada.Text_IO;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
@@ -642,8 +641,14 @@ is
       use Inc_Load;
 
       function To_Array (List : List_Type)
+                         return Array_Type;
+
+      function To_Array (List : List_Type)
                          return Array_Type
-                         is (raise Program_Error with "not implemented");
+      is
+      begin
+         return Array_Combine (List, List);
+      end To_Array;
 
       Tables_2 : Array_Type;
    begin
@@ -737,7 +742,6 @@ is
                       DB   : String;
                       Dbh  : Integer) --  = null
    is
-      use Ada.Text_IO;
       use Php.HTML;
       use Php.Strings;
       use Databases;
@@ -1675,7 +1679,7 @@ is
 
    function Query (This  : in out Wpdb_Class;
                    Query : Statement_Type)
-                   return Integer
+                   return Rows_Result_Type
    is
       use Php.Preg;
 --    use Php.Types;
@@ -1688,7 +1692,8 @@ is
    begin
       if not This.Ready then
          This.Check_Current_Query := True;
-         return -1; -- false;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       --
@@ -1706,7 +1711,8 @@ is
       begin
          if Query_2 = "" then -- not
             This.Insert_Id := 0;
-            return -1; -- false;
+            return (Status => Error,
+                    Rows   => 0);
          end if;
 
          This.Flush;
@@ -1732,7 +1738,8 @@ is
                   This.Last_Error :=
                     +abs "WordPress database error: Could not perform query because it contains invalid data.";
 
-                  return -1; -- false;
+                  return (Status => Error,
+                          Rows   => 0);
                end if;
             end;
          end if;
@@ -1783,7 +1790,8 @@ is
                   This.X_Do_Query (Query_2);
                else
                   This.Insert_Id := 0;
-                  return -1; --  false;
+                  return (Status => Error,
+                          Rows   => 0);
                end if;
             end if;
 
@@ -1823,7 +1831,8 @@ is
                end if;
 
                This.Print_Error;
-               return -1; -- false;
+               return (Status => Error,
+                       Rows   => 0);
             end if;
 
             if Preg_Match ("/^\s*(create|alter|truncate|drop)\s/i", Query_2) then
@@ -1893,7 +1902,8 @@ is
                   Return_Val    := Num_Rows;
                end;
             end if;
-            return Return_Val;
+            return (Status => Success,
+                    Rows   => Return_Val);
          end;
       end;
    end Query;
@@ -1902,10 +1912,10 @@ is
    -- Query --
    -----------
 
-   procedure Query (Db    : in out Wpdb_Class;
-                    Query : Statement_Type)
+   procedure Query (Database : in out Wpdb_Class;
+                    Query    : Statement_Type)
    is
-      Unused : constant Integer := Db.Query (Query);
+      Unused : constant Rows_Result_Type := Database.Query (Query);
    begin
       null;
    end Query;
@@ -1917,7 +1927,6 @@ is
    procedure X_Do_Query (This  : in out Wpdb_Class;
                          Query : String)
    is
-      use Ada.Text_IO;
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
@@ -2085,7 +2094,7 @@ is
                     Table  : String;
                     Data   : Array_Type;
                     Format : String := "") -- null
-                    return Natural
+                    return Rows_Result_Type
    is
    begin
       return This.X_Insert_Replace_Helper (Table, Data, Format, "INSERT");
@@ -2130,7 +2139,7 @@ is
                                      Data   : Array_Type;
                                      Format : String := ""; -- null
                                      Typ    : String := "INSERT")
-                                     return Natural
+                                     return Rows_Result_Type
    is
       use Php.Arrays;
       use Php.Lists;
@@ -2144,12 +2153,14 @@ is
         not In_List (Strtoupper (Typ),
                       To_List (List => (+"REPLACE", +"INSERT")), True)
       then
-         return 0; -- false;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       Data_2 := This.Process_Fields (Table, Data, Format);
       if Empty_Array = Data_2 then -- false
-         return 0; -- false;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       declare
@@ -2197,7 +2208,7 @@ is
                     Where        : Array_Type;
                     Format       : String := ""; -- null
                     Where_Format : String := "") -- null
-                    return Natural
+                    return Rows_Result_Type
    is
       use Php.Strings;
       use Php.Types;
@@ -2206,25 +2217,28 @@ is
       Where_2 : Array_Type;
    begin
       if not Is_Array (Data) or not Is_Array (Where) then
-         return 0; -- False;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       Data_2 := This.Process_Fields (Table, Data, Format);
       if Empty_Array = Data_2 then -- false
-         return 0; -- False;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       Where_2 := This.Process_Fields (Table, Where, Where_Format);
       if Empty_Array = Where_2 then -- false
-         return 0; -- false;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       declare
-         Fields     : List_Type; -- = array();
-         Conditions : List_Type; -- = array();
-         Values     : List_Type; -- = array();
+         Fields     : List_Type;
+         Conditions : List_Type;
+         Values     : List_Type;
       begin
-         for A in Data.Iterate loop
+         for A in Data_2.Iterate loop
             declare
                Field : constant String := Key (A);
                Value : constant Array_Type := As_Array (Element (A));
@@ -2267,6 +2281,11 @@ is
             SQL : constant String :=
               "UPDATE `" & Table & "` SET " & Fields_2 & " WHERE " & Conditions_2;
          begin
+            Put_Line ("update:");
+            Put_Line ("  sql: " & SQL);
+            Put_Line ("  values: ");
+            Put_Line (Values'Image);
+
             This.Check_Current_Query := False;
             return This.Query (This.Prepare (SQL, Values));
          end;
@@ -2281,13 +2300,14 @@ is
                     Table        : String;
                     Where        : Array_Type;
                     Where_Format : String := "") -- null
-                    return Integer
+                    return Rows_Result_Type
    is
       use Php.Strings;
       use Php.Types;
    begin
       if not Is_Array (Where) then
-         return 0; -- False;
+         return (Status => Error,
+                 Rows   => 0);
       end if;
 
       declare
@@ -2295,7 +2315,8 @@ is
            This.Process_Fields (Table, Where, Where_Format);
       begin
          if Empty_Array = Where_2 then -- false
-            return 0; -- False;
+            return (Status => Error,
+                    Rows   => 0);
          end if;
 
          declare
@@ -2543,7 +2564,6 @@ is
                      Y     : Integer        := 1)
                      return String
    is
-      use Ada.Text_IO;
    begin
       This.Func_Call :=
         +("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
@@ -2594,7 +2614,7 @@ is
    is
 --    use Php.Strings;
 
-      Unused_Result : Integer;
+      Unused_Result : Rows_Result_Type;
    begin
       Success := True;
       Db.Func_Call := +("\db.get_row(\" & String (Query) & ",output,y)"); -- \
@@ -2751,7 +2771,6 @@ is
                          Output : String := "OBJECT")
                          return Array_Type
    is
-      use Ada.Text_IO;
    begin
       Put_Line ("get_results: ");
       Put_Line ("  output: " & Output);
@@ -2809,12 +2828,13 @@ is
 
    function Get_Table_Charset (This  : in out Wpdb_Class;
                                Table : String)
-                               return String
+                               return String_Error_Type
    is
       use Ada.Containers;
-      use Ada.Text_IO;
       use Php.Lists;
       use Php.Strings;
+      use Inc_Class_Wp_Errors;
+      use Inc_L10n;
       use Inc_Plugins;
 
       Tablekey : constant String := Strtolower (Table);
@@ -2840,11 +2860,15 @@ is
       Put_Line ("  charset: " & (-Charset));
 
       if "" /= Charset then -- null
-         return -Charset;
+         return (Success => True,
+                 Item    => Charset,
+                 Error   => Null_Wp_Error);
       end if;
 
       if Isset (This.Table_Charset, Tablekey) then
-         return Get_As_String (This.Table_Charset, Tablekey);
+         return (Success => True,
+                 Item    => +Get_As_String (This.Table_Charset, Tablekey),
+                 Error   => Null_Wp_Error);
       end if;
 
       declare
@@ -2858,9 +2882,14 @@ is
            This.Get_Results (Statement_Type ("SHOW FULL COLUMNS FROM " & Table));
       begin
          if Results = Empty_Array then -- not
-            return "";
-            -- new Wp_Error ("wpdb_get_table_charset_failure",
-            --               abs "Could not retrieve table charset.");
+            return
+              (Success => False,
+               Item    => +"",
+               Error   =>
+                 X_Construct (
+                   "wpdb_get_table_charset_failure",
+                   abs "Could not retrieve table charset."
+              ));
          end if;
 
          -- for A in Results.Iterate loop
@@ -2943,7 +2972,9 @@ is
             end if;
          end;
          Set (This.Table_Charset, Tablekey, From_String (-Charset));
-         return -Charset;
+         return (Success => True,
+                 Item    => Charset,
+                 Error   => Null_Wp_Error);
       end;
    end Get_Table_Charset;
 
@@ -2993,10 +3024,12 @@ is
       if Empty (This.Table_Charset, Tablekey) then
          -- This primes column information for us.
          declare
-            Table_Charset : constant String := This.Get_Table_Charset (Table);
+            Table_Charset : constant String_Error_Type :=
+              This.Get_Table_Charset (Table);
          begin
-            if Is_Wp_Error (Table_Charset) then
-               return Table_Charset;
+            if not Table_Charset.Success then
+--          if Is_Wp_Error (Table_Charset) then
+               return -Table_Charset.Item;
             end if;
          end;
       end if;
@@ -3057,9 +3090,11 @@ is
 --    if Empty (Get_As_String (This.Col_Meta, Tablekey)) then
          -- This primes column information for us.
          declare
-            Table_Charset : constant String := This.Get_Table_Charset (Table);
+            Table_Charset : constant String_Error_Type :=
+              This.Get_Table_Charset (Table);
          begin
-            if Is_Wp_Error (Table_Charset) then
+            if not Table_Charset.Success then
+--          if Is_Wp_Error (Table_Charset) then
                return Empty_Array; -- Table_Charset;
             end if;
          end;
@@ -3156,7 +3191,6 @@ is
                                   Query : Statement_Type)
                                   return Boolean
    is
-      use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
 
@@ -3191,12 +3225,13 @@ is
 
          This.Checking_Collation := True;
          declare
-            Collation : constant String := This.Get_Table_Charset (Table);
+            Collation : constant String_Error_Type :=
+              This.Get_Table_Charset (Table);
          begin
             This.Checking_Collation := False;
 
             -- Tables with no collation, or latin1 only, don't need extra checking.
-            if "" = Collation or else "latin1" = Collation then -- false =
+            if "" = Collation.Item or else "latin1" = Collation.Item then -- false =
                return True;
             end if;
          end;
@@ -3602,7 +3637,6 @@ is
                                   Query : Statement_Type)
                                   return String
    is
-      use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
 
@@ -4050,7 +4084,6 @@ is
                         Table : String;
                         Value : String)
    is
-      use Ada.Text_IO;
    begin
       if Table = "options" then
          This.Options := +Value;

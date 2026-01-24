@@ -30,6 +30,7 @@ is
    is
       use Php.Types;
       use Php.Strings;
+      use Hb_Common;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -58,9 +59,14 @@ is
       begin
          X_Doing_It_Wrong (
            Sprintf (
-             "%s::%s", To_List ("Typ")),
---           "__CLASS__",
---           "Debug_Backtrace (DEBUG_BACKTRACE_IGNORE_ARGS, 2 )[1][""function""]"),
+             "%s::%s",
+             To_List (List => (
+               1 => +"inc_class_wp_object_caches",
+               2 => +"is_valid_key"
+             ))
+           ),
+--         "__CLASS__",
+--         "Debug_Backtrace (DEBUG_BACKTRACE_IGNORE_ARGS, 2 )[1][""function""]"),
            Message,
            "6.1.0"
          );

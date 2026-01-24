@@ -195,8 +195,7 @@ is
 
    function Get_Data_By (Field : String;
                          Value : String)
-                         return Wp_User
-                         is (raise Program_Error with "not implemented");
+                         return Wp_User;
 
    --
    -- Determines whether the user exists in the database.

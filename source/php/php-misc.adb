@@ -34,17 +34,31 @@ is
    begin
       if Operator = ">=" then
          for A in List_1.First_Index .. Last loop
-            if Natural'Value (-List_1 (A)) >= Natural'Value (-List_2 (A)) then
-               return True;
-            end if;
+            declare
+               Left  : constant Natural := Natural'Value (-List_1 (A));
+               Right : constant Natural := Natural'Value (-List_2 (A));
+            begin
+               if Left >= Right then
+                  return True;
+               else
+                  return False;
+               end if;
+            end;
          end loop;
          return False;
 
       elsif Operator = "<" then
          for A in List_1.First_Index .. Last loop
-            if Natural'Value (-List_1 (A)) < Natural'Value (-List_2 (A)) then
-               return True;
-            end if;
+            declare
+               Left  : constant Natural := Natural'Value (-List_1 (A));
+               Right : constant Natural := Natural'Value (-List_2 (A));
+            begin
+               if Left < Right then
+                  return True;
+               elsif Left > Right then
+                  return False;
+               end if;
+            end;
          end loop;
          return False;
 

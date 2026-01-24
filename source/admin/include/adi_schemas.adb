@@ -727,7 +727,6 @@ is
 
                   Insert : Unbounded_String;
                begin
-
                   for A in Options_2.Iterate loop
                      declare
                         Option : constant String := Key (A);

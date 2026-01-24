@@ -376,7 +376,7 @@ is
 
    function Is_Wp_Error (Thing : Inc_Class_Wp_Errors.Wp_Error)
                          return Boolean
-                         is (True);
+                         is (False);
 
    function Is_Wp_Error (Thing : Inc_Class_Wp_Terms.Wp_Term)
                          return Boolean

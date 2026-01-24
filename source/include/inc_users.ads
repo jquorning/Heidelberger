@@ -533,8 +533,7 @@ is
    --                      user could not be created.
    --
    function Wp_Insert_User (Userdata : Array_Type)
-                            return Integer
-                            is (raise Program_Error with "not implemented");
+                            return Integer;
 
    --
    -- Returns request confirmation message HTML.

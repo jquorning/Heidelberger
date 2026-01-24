@@ -679,10 +679,12 @@ is
          Do_Action ("update_option", Option, Old_Value, Value_2);
 
          declare
+            use Inc_Class_Wpdb;
+
             Update_Args : Array_Type := To_Array (List => (1 =>
               Build ("option_value", As_String (Serialized_Value))
             ));
-            Result : Boolean;
+            Result : Rows_Result_Type;
          begin
             if not Autoload then -- ( null !== autoload ) then
                Set (Update_Args, "autoload", From_Boolean (Autoload));
@@ -694,8 +696,8 @@ is
                                    Update_Args,
                                    To_Array (List => (1 =>
                                      Build ("option_name", Option)
-                                  ))) /= 0;
-            if not Result then
+                                  )));
+            if Result.Status = Error then
                return False;
             end if;
          end;
@@ -881,10 +883,10 @@ is
                   2 => +As_String (Serialized_Value),
                   3 => +Boolean'Image (Autoload))));
 
-            Result : constant Boolean :=
-              Globals.WpDB.Query (Statement) /= 0;
+            Result : constant Rows_Result_Type :=
+              Globals.WpDB.Query (Statement);
          begin
-            if not Result then
+            if Result.Status = Error then
                return False;
             end if;
          end;
@@ -979,7 +981,7 @@ is
 
       -- Get the ID, if no ID then return.
       declare
-         Success : Boolean;
+         Success_2 : Boolean;
 
          Statement : constant Statement_Type :=
            Globals.WpDB.Prepare (
@@ -987,9 +989,9 @@ is
              "WHERE option_name = %s", To_List (Option));
 
          Row : constant Boolean :=
-           Globals.WpDB.Get_Row (Statement, Success => Success) /= 0;
+           Globals.WpDB.Get_Row (Statement, Success => Success_2) /= 0;
 
-         Result : Boolean;
+         Result : Rows_Result_Type;
       begin
          if not Row then -- Is_Null (Row) then
             return False;
@@ -1009,7 +1011,7 @@ is
              -Globals.WpDB.Options,
              To_Array (List => (1 =>
                Build ("option_name", Option)))
-           ) /= 0;
+           );
 
          if not Wp_Installing then
             if False then -- Row.Autoload then -- "yes"
@@ -1026,7 +1028,7 @@ is
             end if;
          end if;
 
-         if Result then
+         if Result.Status in Success | Create_Alter then
             --
             -- Fires after a specific option has been deleted.
             --
@@ -1950,6 +1952,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -1991,10 +1994,11 @@ is
          Notoptions_Key : constant String := "network_id:notoptions";
          Cache_Key      : constant String := "network_id:option";
 
-         Result : Boolean;
+         Unused   : Boolean;
+         Result_2 : Rows_Result_Type;
       begin
          if not Is_Multisite then
-            Result := Add_Option (Option, Value_2, "", Autoload => False); -- "no"
+            Unused := Add_Option (Option, Value_2, "", Autoload => False); -- "no"
          else
             declare
                Found : Boolean;
@@ -2023,7 +2027,7 @@ is
                Serialized_Value : constant Multi_Type :=
                  Maybe_Serialize (As_String (Value_2));
             begin
-               Result :=
+               Result_2 :=
                  Globals.WpDB.Insert (
                    -Globals.WpDB.Sitemeta,
                    To_Array (List => (
@@ -2031,10 +2035,10 @@ is
                      Build ("meta_key",   Option),
                      Build ("meta_value", As_String (Serialized_Value))
                    ))
-                 ) /= 0;
+                 );
             end;
 
-            if not Result then
+            if Result_2.Status = Error then
                return False;
             end if;
 
@@ -2055,11 +2059,12 @@ is
             end;
          end if;
 
-         if Result then
+         if Result_2.Status in Success | Create_Alter then
             --
             -- Fires after a specific network option has been successfully added.
             --
-            -- The dynamic portion of the hook name, `option`, refers to the option name.
+            -- The dynamic portion of the hook name, `option`, refers to the option
+            -- name.
             --
             -- @since 2.9.0 As "add_site_option_thenkeyend;"
             -- @since 3.0.0
@@ -2105,7 +2110,8 @@ is
       use Inc_Plugins;
 
       Network_Id_2 : Integer := Network_Id;
-      Result : Boolean;
+      Unused : Boolean;
+      Result : Rows_Result_Type;
    begin
       if Network_Id /= 0 and then not Is_Number (Network_Id) then
          return False;
@@ -2133,7 +2139,7 @@ is
       Do_Action ("pre_delete_site_option_" & Option, Option, Network_Id_2);
 
       if not Is_Multisite then
-         Result := Delete_Option (Option);
+         Unused := Delete_Option (Option);
       else
          declare
             Success : Boolean;
@@ -2168,11 +2174,11 @@ is
                   Build ("meta_key", Option),
                   Build ("site_id",  Network_Id_2)
                 ))
-              ) /= 0;
+              );
          end;
       end if;
 
-      if Result then
+      if Result.Status in Success | Create_Alter then
          --
          -- Fires after a specific network option has been deleted.
          --
@@ -2217,6 +2223,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Caches;
+      use Inc_Class_Wpdb;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -2290,7 +2297,8 @@ is
             Notoptions     : constant Array_Type :=
               Wp_Cache_Get (Notoptions_Key, "site-options", Found => Found);
 
-            Result : Boolean;
+            Result : Rows_Result_Type;
+            Unused : Boolean;
          begin
             if Is_Array (Notoptions) and then Isset (Notoptions, Option) then
                Delete (Ref (Notoptions, Option));
@@ -2298,7 +2306,7 @@ is
             end if;
 
             if not Is_Multisite then
-               Result := Update_Option (Option, Value_2, Autoload => False); -- "no"
+               Unused := Update_Option (Option, Value_2, Autoload => False); -- "no"
             else
                Value_2 := From_String (Sanitize_Option (Option, As_String (Value_2)));
 
@@ -2315,10 +2323,10 @@ is
                         Build ("site_id",  Network_Id_2),
                         Build ("meta_key", Option)
                       ))
-                    ) /= 0;
+                    );
                end;
 
-               if Result then
+               if Result.Status in Success | Create_Alter then
                   declare
                      Cache_Key : constant String := "network_id:option";
                   begin
@@ -2327,7 +2335,7 @@ is
                end if;
             end if;
 
-            if Result then
+            if Result.Status in Success | Create_Alter then
                --
                -- Fires after the value of a specific network option has been
                -- successfully updated.

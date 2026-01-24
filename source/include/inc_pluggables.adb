@@ -164,6 +164,32 @@ is
          return User;
       end;
    end Get_User_By;
+
+   -----------------
+   -- Get_User_By --
+   -----------------
+
+   function Get_User_By (Field : String;
+                         Value : String)
+                         return Inc_Class_Wp_Users.Wp_User
+   is
+      use Inc_Class_Wp_Users;
+
+      Userdata : constant Wp_User := Get_Data_By (Field, Value);
+   begin
+      if Userdata = Null_User then
+         return Null_User; -- False;
+      end if;
+
+      declare
+         User : Wp_User; --  = new WP_User;
+      begin
+         User.Init (Userdata);
+
+         return User;
+      end;
+   end Get_User_By;
+
 -- endif;
 
 -- if ( ! function_exists( 'cache_users' ) ) :

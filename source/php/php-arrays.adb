@@ -2,6 +2,7 @@
 --
 --
 
+with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Strings;
@@ -10,6 +11,27 @@ with Hb_Common;
 
 package body Php.Arrays
 is
+
+   -------------------
+   -- Array_Combine --
+   -------------------
+
+   function Array_Combine (Keys   : List_Type;
+                           Values : List_Type)
+                           return Array_Type
+   is
+      use Ada.Containers;
+      use Hb_Common;
+
+      Result : Array_Type;
+   begin
+      pragma Assert (Keys.Length = Values.Length);
+      for A in Keys.First_Index .. Keys.Last_Index loop
+         Result.Append (Key   => -Keys (A),
+                        Value => From_String (-Values (A)));
+      end loop;
+      return Result;
+   end Array_Combine;
 
    ------------------
    -- Array_Filter --

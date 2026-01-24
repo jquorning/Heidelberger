@@ -311,7 +311,8 @@ is
       when Kind_String  => return -Arry.Str;
       when Kind_Integer => return Helpers.Image (Arry.Int);
       when Kind_Boolean => return (if Arry.Bool then "true" else "false");
-      when Kind_Null    => return "";
+      when Kind_Null    => return "(null)";
+      when Kind_Array   => return "(array)";
       when others =>
          Put_Line ("as_string: ");
          Put_Line ("  kind: " & Kind_Of (Arry)'Image);
@@ -614,18 +615,36 @@ is
                     Key_3 : String;
                     Value : Multi_Type)
    is
-      Array_2 : constant Array_Access := Element (Arry.Find (Key_1)).Arry;
+      Level_1 : Cursor := Arry.Find (Key_1);
    begin
-      pragma Assert (Array_2 /= null);
+      if not Has_Element (Level_1) then
+         Arry.Insert (Key_1, From_Array (Empty_Array));
+         Level_1 := Arry.Find (Key_1);
+      end if;
+
       declare
-         Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
+         Array_1 : Array_Type := As_Array (Element (Level_1));
+         Level_2 : Cursor := Array_1.Find (Key_2);
       begin
-         pragma Assert (Array_3 /= null);
+         if not Has_Element (Level_2) then
+            Array_1.Insert (Key_2, From_Array (Empty_Array));
+            Level_2 := Array_1.Find (Key_2);
+         end if;
+
          declare
-            Array_4 : constant Array_Access := Element (Array_3.Find (Key_3)).Arry;
+            Array_2 : Array_Type := As_Array (Element (Level_2));
+            Level_3 : Cursor := Array_2.Find (Key_3);
          begin
-            pragma Assert (Array_4 /= null);
-            Set (Array_4.all, Value);
+            if not Has_Element (Level_3) then
+               Array_2.Insert (Key_3, From_Array (Empty_Array));
+               Level_3 := Array_2.Find (Key_3);
+            end if;
+
+            declare
+               Array_3 : Array_Type := As_Array (Element (Level_3));
+            begin
+               Set (Array_3, Value);
+            end;
          end;
       end;
    end Set_3;
