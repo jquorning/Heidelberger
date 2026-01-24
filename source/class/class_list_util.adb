@@ -5,7 +5,7 @@
 -- @since 4.7.0
 --
 
-package body Inc_Class_Wp_List_Util
+package body Class_List_Util
 is
    --
    -- Constructor.
@@ -259,4 +259,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_List_Util;
+end Class_List_Util;

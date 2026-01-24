@@ -1,6 +1,6 @@
 with Arrays;
 
-package Inc_Class_Wp_List_Util
+package Class_List_Util
 is
    use Arrays;
 --
@@ -73,4 +73,4 @@ is
                    return Array_Type
                    is (Empty_Array);
 
-end Inc_Class_Wp_List_Util;
+end Class_List_Util;

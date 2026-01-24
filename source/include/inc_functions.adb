@@ -32,7 +32,7 @@ with Wp_Common;
 with Inc_Caches;
 with Inc_Capabilities;
 with Class_WpDB;
-with Inc_Class_Wp_List_Util;
+with Class_List_Util;
 with Class_Networks;
 with Inc_Formatting;
 with Inc_General_Templates;
@@ -5450,7 +5450,7 @@ is
  --     end if;
 
       declare
-         use Inc_Class_Wp_List_Util;
+         use Class_List_Util;
 
          Util : constant Wp_List_Util := X_Construct (List);
          -- = new WP_List_Util( list );
