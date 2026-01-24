@@ -12,7 +12,7 @@ with Hb_Common;
 with Inc_Error_Protection;
 with Inc_Options;
 
-package body Inc_Class_Wp_Paused_Extensions_Storages
+package body Class_Paused_Extensions_Storages
 is
 
    -----------------
@@ -123,4 +123,4 @@ is
       end;
    end Get_Option_Name;
 
-end Inc_Class_Wp_Paused_Extensions_Storages;
+end Class_Paused_Extensions_Storages;

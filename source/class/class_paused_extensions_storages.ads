@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Paused_Extensions_Storages
+package Class_Paused_Extensions_Storages
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -230,4 +230,4 @@ is
    Null_Paused_Extensions_Storage : constant Wp_Paused_Extensions_Storage :=
      (Typ => Null_Unbounded_String);
 
-end Inc_Class_Wp_Paused_Extensions_Storages;
+end Class_Paused_Extensions_Storages;

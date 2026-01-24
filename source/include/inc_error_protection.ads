@@ -5,12 +5,12 @@
 -- @since 5.2.0
 --
 
-with Inc_Class_Wp_Paused_Extensions_Storages;
+with Class_Paused_Extensions_Storages;
 with Class_Recovery_Mode;
 
 package Inc_Error_Protection
 is
-   use Inc_Class_Wp_Paused_Extensions_Storages;
+   use Class_Paused_Extensions_Storages;
 
 -- --
 -- -- Get the instance for storing paused plugins.
