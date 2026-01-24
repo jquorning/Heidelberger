@@ -2,7 +2,7 @@ with Ada.Calendar;
 
 with Arrays;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Class_Terms;
 
 package Inc_Load
@@ -374,7 +374,7 @@ is
                          return Boolean
                          is (False);
 
-   function Is_Wp_Error (Thing : Inc_Class_Wp_Errors.Wp_Error)
+   function Is_Wp_Error (Thing : Class_Errors.Wp_Error)
                          return Boolean
                          is (False);
 

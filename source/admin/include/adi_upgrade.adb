@@ -27,7 +27,7 @@ with Adi_Schemas;
 
 with Inc_Caches;
 with Inc_Capabilities;
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Users;
 with Class_WpDB;
@@ -2640,7 +2640,7 @@ is
 
    procedure Wp_Check_MySQL_Version
    is
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Functions;
       use Inc_Load;
 

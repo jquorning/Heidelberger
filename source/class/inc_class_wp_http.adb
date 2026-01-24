@@ -48,7 +48,7 @@ is
       use Php.Files;
       use Php.HTML;
       use Wp_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Functions;
       use Inc_General_Templates;
       use Inc_Load;

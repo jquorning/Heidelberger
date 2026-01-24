@@ -12,7 +12,7 @@ with Adi_Translation_Install;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Inc_Class_Wp_Http;
 with Inc_Class_Wp_Taxonomy;
 with Class_Terms;
@@ -286,7 +286,7 @@ is
                            return Adi_Translation_Install.Trans_Result
                            is ((Success => True,
                                 Arry    => Empty_Array,
-                                Error   => Inc_Class_Wp_Errors.Null_Wp_Error));
+                                Error   => Class_Errors.Null_Wp_Error));
 
    function Apply_Filters (Hook_Name  : String;
                            Value      : Adi_Translation_Install.Trans_Result;
@@ -397,9 +397,9 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name   : String;
-                           Value       : Inc_Class_Wp_Errors.Wp_Error;
+                           Value       : Class_Errors.Wp_Error;
                            Redirect_To : String)
-                           return Inc_Class_Wp_Errors.Wp_Error
+                           return Class_Errors.Wp_Error
                            is (Value);
 
    function Apply_Filters (Hook_Name   : String;
@@ -424,7 +424,7 @@ is
 
    function Apply_Filters (Hook_Name   : String;
                            Value       : String;
-                           Errors      : Inc_Class_Wp_Errors.Wp_Error)
+                           Errors      : Class_Errors.Wp_Error)
                            return String
                            is (Value);
 
@@ -441,7 +441,7 @@ is
                            return Inc_Class_Wp_Http.Response_Result
                            is ((Success => Value,
                                 Arry    => Empty_Array,
-                                Error   => Inc_Class_Wp_Errors.Null_Wp_Error));
+                                Error   => Class_Errors.Null_Wp_Error));
 
    function Apply_Filters (Hook_Name  : String;
                            Value      : Inc_Class_Wp_Http.Response_Result;
@@ -450,7 +450,7 @@ is
                            return Inc_Class_Wp_Http.Response_Result
                            is ((Success => True,
                                 Arry    => Empty_Array,
-                                Error   => Inc_Class_Wp_Errors.Null_Wp_Error));
+                                Error   => Class_Errors.Null_Wp_Error));
 
    procedure Do_Action (Hook_Name : String;
                         A1        : Inc_Class_Wp_Http.Response_Result;
@@ -461,7 +461,7 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
-                        Error     : Inc_Class_Wp_Errors.Wp_Error)
+                        Error     : Class_Errors.Wp_Error)
                         is null;
 
    procedure Do_Action (Hook_Name : String;
@@ -475,7 +475,7 @@ is
 
    procedure Do_Action (Hook_Name : String;
                         Username  : String;
-                        Error     : Inc_Class_Wp_Errors.Wp_Error)
+                        Error     : Class_Errors.Wp_Error)
                         is null;
 
    procedure Do_Action (Hook_Name : String;
@@ -516,7 +516,7 @@ is
                         is null;
 
    procedure Do_Action (Hook_Name : String;
-                        Errors    : Inc_Class_Wp_Errors.Wp_Error;
+                        Errors    : Class_Errors.Wp_Error;
                         User      : Inc_Users.User_Error_Type)
                         is null;
 

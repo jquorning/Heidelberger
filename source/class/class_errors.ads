@@ -7,7 +7,7 @@
 with Arrays;
 with Lists;
 
-package Inc_Class_Wp_Errors
+package Class_Errors
 is
    use Arrays;
    use Lists;
@@ -272,4 +272,4 @@ is
       Error_Data      => Empty_Array,
       Additional_Data => Empty_Array);
 
-end Inc_Class_Wp_Errors;
+end Class_Errors;

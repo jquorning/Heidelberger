@@ -15,7 +15,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 
 package Inc_Class_Wp_Http
 is
@@ -188,7 +188,7 @@ is
    type Response_Result is record
       Success : Boolean;
       Arry    : Array_Type;
-      Error   : Inc_Class_Wp_Errors.Wp_Error;
+      Error   : Class_Errors.Wp_Error;
    end record;
 
    function Request (This : Wp_Http;

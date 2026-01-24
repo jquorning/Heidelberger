@@ -36,10 +36,10 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Class_Wp_Errors.Wp_Error;
+                           Value     : Class_Errors.Wp_Error;
                            Value_2   : Multi_Type;
                            This      : Wp_Customize_Setting)
-                           return Inc_Class_Wp_Errors.Wp_Error
+                           return Class_Errors.Wp_Error
                            is (Value);
 
    type Proc_Access is access procedure (This : in out Wp_Customize_Setting);
@@ -453,7 +453,7 @@ is
       use Hb_Common;
       use Inc_L10n;
       use Inc_Load;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
 --    use Inc_Plugins;
    begin
       -- if Is_Wp_Error (Value) then

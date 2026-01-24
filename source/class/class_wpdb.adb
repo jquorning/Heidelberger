@@ -2828,7 +2828,7 @@ is
       use Ada.Containers;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_L10n;
       use Inc_Plugins;
 
@@ -3883,11 +3883,11 @@ is
    ----------------------------
 
    function Check_Database_Version (This : Wpdb_Class)
-            return Inc_Class_Wp_Errors.Wp_Error
+            return Class_Errors.Wp_Error
    is
       use Php.Misc;
       use Php.Strings;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_L10n;
       use Inc_Versions;
 --    global wp_version, required_mysql_version;

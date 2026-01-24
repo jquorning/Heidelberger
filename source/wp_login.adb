@@ -29,7 +29,7 @@ with Wp_Load;
 
 with Inc_Capabilities;
 with Class_Phpass;
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Inc_Class_Wp_Recovery_Mode_Link_Services;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Users;
@@ -55,7 +55,7 @@ is
    use Arrays;
    use Lists;
 
-   Error         : Inc_Class_Wp_Errors.Wp_Error;
+   Error         : Class_Errors.Wp_Error;
    Interim_Login : Boolean;
    Action        : Ada.Strings.Unbounded.Unbounded_String;
    --
@@ -80,8 +80,8 @@ is
    --
    procedure Login_Header (Title      : String := "Log In";
                            Message    : String := "";
-                           Wp_Error_X : Inc_Class_Wp_Errors.Wp_Error :=
-                                          Inc_Class_Wp_Errors.Null_Wp_Error); -- null
+                           Wp_Error_X : Class_Errors.Wp_Error :=
+                                          Class_Errors.Null_Wp_Error); -- null
 
    --
    -- Outputs the footer for the login page.
@@ -110,7 +110,7 @@ is
    --
    procedure Wp_Login_Viewport_Meta;
 
-   procedure Action_Confirm_Admin_Email (Errors : Inc_Class_Wp_Errors.Wp_Error);
+   procedure Action_Confirm_Admin_Email (Errors : Class_Errors.Wp_Error);
    procedure Action_Postpass;
    procedure Action_Logout;
    procedure Action_Lostpassword (Login_Link_Separator : String;
@@ -128,8 +128,8 @@ is
 
    procedure Login_Header (Title      : String := "Log In";
                            Message    : String := "";
-                           Wp_Error_X : Inc_Class_Wp_Errors.Wp_Error :=
-                                          Inc_Class_Wp_Errors.Null_Wp_Error)
+                           Wp_Error_X : Class_Errors.Wp_Error :=
+                                          Class_Errors.Null_Wp_Error)
    is
       use Ada.Strings.Unbounded;
       use Php.Echoing;
@@ -137,7 +137,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Formatting;
       use Inc_Functions_Wp_Styles;
       use Inc_General_Templates;
@@ -599,7 +599,7 @@ is
    -- Action_Confirm_Admin_Email --
    --------------------------------
 
-   procedure Action_Confirm_Admin_Email (Errors : Inc_Class_Wp_Errors.Wp_Error)
+   procedure Action_Confirm_Admin_Email (Errors : Class_Errors.Wp_Error)
    is
       use Ada.Strings.Unbounded;
       use Php.Echoing;
@@ -1131,7 +1131,7 @@ is
       use Binder;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_Formatting;
@@ -1564,7 +1564,7 @@ is
       use Php.Strings;
       use Binder;
       use Wp_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_General_Templates;
       use Inc_Link_Templates;
       use Inc_L10n;
@@ -1681,7 +1681,7 @@ is
       use Lists.List_Vectors;
       use Wp_Common;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Class_Wp_Sites;
       use Inc_Class_Wp_Users;
       use Inc_Formatting;
@@ -2232,7 +2232,7 @@ is
       use Php.Strings;
       use Binder;
       use Hb_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_General_Templates;

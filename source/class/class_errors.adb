@@ -11,7 +11,7 @@ with Hb_Common;
 
 with Inc_Plugins;
 
-package body Inc_Class_Wp_Errors
+package body Class_Errors
 is
 
    -----------------
@@ -202,4 +202,4 @@ is
       Set (This.Error_Data, Code_2, From_String (Data));
    end Add_Data;
 
-end Inc_Class_Wp_Errors;
+end Class_Errors;

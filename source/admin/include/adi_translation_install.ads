@@ -7,7 +7,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 
 package Adi_Translation_Install
 is
@@ -27,7 +27,7 @@ is
    type Trans_Result is record
      Success : Boolean;
      Arry    : Array_Type;
-     Error   : Inc_Class_Wp_Errors.Wp_Error;
+     Error   : Class_Errors.Wp_Error;
    end record;
 
    function Translations_API (Typ  : String;

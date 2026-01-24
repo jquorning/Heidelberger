@@ -56,7 +56,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_HTTP;
       use Inc_Load;
       use Inc_L10n;

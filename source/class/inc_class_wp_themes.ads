@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 
 package Inc_Class_Wp_Themes
 is
@@ -87,7 +87,7 @@ is
          -- @var WP_Error
          --
          -- private
-         M_Errors : Inc_Class_Wp_Errors.Wp_Error;
+         M_Errors : Class_Errors.Wp_Error;
 
          --
          -- The directory name of the theme's files, inside the theme root.
@@ -461,7 +461,7 @@ is
    -- @return WP_Error|false WP_Error if there are errors, or false.
    --
    function Errors (This : Wp_Theme)
-                    return Inc_Class_Wp_Errors.Wp_Error;
+                    return Class_Errors.Wp_Error;
 --                 return is_wp_error( this->errors ) ? this->errors : false;
 --         end;
 
@@ -1605,6 +1605,6 @@ is
        Template          => Null_Unbounded_String,
        M_Parent          => null,
        Cache_Hash        => Null_Unbounded_String,
-       M_Errors          => Inc_Class_Wp_Errors.Null_Wp_Error);
+       M_Errors          => Class_Errors.Null_Wp_Error);
 
 end Inc_Class_Wp_Themes;

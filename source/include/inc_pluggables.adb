@@ -25,7 +25,7 @@ with Helpers;
 with Globals;
 with Wp_Common;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Inc_Class_Wp_Session_Tokens;
 with Inc_Class_Wp_Session_Tokens_Factory;
 with Inc_Compat;
@@ -675,7 +675,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Class_Wp_Users;
       use Inc_Formatting;
       use Inc_L10n;

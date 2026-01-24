@@ -53,7 +53,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Inc_Caches;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
       use Inc_Error_Protection;
       use Inc_Functions;
       use Inc_Formatting;
@@ -420,7 +420,7 @@ is
    ------------
 
    function Errors (This : Wp_Theme)
-                    return Inc_Class_Wp_Errors.Wp_Error
+                    return Class_Errors.Wp_Error
    is
    begin
       return This.M_Errors;
@@ -435,7 +435,7 @@ is
                     return Boolean
    is
       use Php.Lists;
-      use Inc_Class_Wp_Errors;
+      use Class_Errors;
    begin
       return not
         (This.Errors /= Null_Wp_Error and then

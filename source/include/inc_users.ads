@@ -7,7 +7,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Admin_Bar;
 
@@ -18,18 +18,18 @@ is
    type User_Error_Type is record
       Success : Boolean;
       User    : Inc_Class_Wp_Users.Wp_User;
-      Error   : Inc_Class_Wp_Errors.Wp_Error;
+      Error   : Class_Errors.Wp_Error;
    end record;
 
    type User_Id_Error_Type is record
       Success : Boolean;
       User_Id : Integer;
-      Error   : Inc_Class_Wp_Errors.Wp_Error;
+      Error   : Class_Errors.Wp_Error;
    end record;
 
    type Success_Error_Type is record
       Success : Boolean;
-      Error   : Inc_Class_Wp_Errors.Wp_Error;
+      Error   : Class_Errors.Wp_Error;
    end record;
 
    --

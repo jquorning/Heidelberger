@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 
 limited with Inc_Class_Wp_Customize_Managers;
 
@@ -470,7 +470,7 @@ is
    type Validate_Result is
       record
          Success : Boolean;
-         Error   : Inc_Class_Wp_Errors.Wp_Error;
+         Error   : Class_Errors.Wp_Error;
       end record;
 
    function Validate (This  : Wp_Customize_Setting;

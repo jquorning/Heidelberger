@@ -23,7 +23,7 @@ with Arrays;
 with Lists;
 
 with Inc_Class_Wp_Admin_Bar;
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Inc_Class_Wp_Hooks;
 with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Styles;
@@ -649,7 +649,7 @@ is
                         Code      : String;
                         Message   : String;
                         Data      : String;
-                        Error     : Inc_Class_Wp_Errors.Wp_Error)
+                        Error     : Class_Errors.Wp_Error)
                         is null;
 
    procedure Do_Action (Hook_Name  : String;

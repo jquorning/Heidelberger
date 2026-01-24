@@ -15,7 +15,7 @@ with SQLite;
 with Lists;
 
 with Inc_Class_Wp_Comments;
-with Inc_Class_Wp_Errors;
+with Class_Errors;
 with Class_Posts;
 with Inc_Class_Wp_Users;
 
@@ -1636,7 +1636,7 @@ is
    type String_Error_Type is record
       Success : Boolean;
       Item    : Ada.Strings.Unbounded.Unbounded_String;
-      Error   : Inc_Class_Wp_Errors.Wp_Error;
+      Error   : Class_Errors.Wp_Error;
    end record;
 
    function Get_Table_Charset (This  : in out Wpdb_Class;
@@ -1718,7 +1718,7 @@ is
    -- @return void|WP_Error
    --
    function Check_Database_Version (This : Wpdb_Class)
-            return Inc_Class_Wp_Errors.Wp_Error;
+            return Class_Errors.Wp_Error;
 
    --
    -- Sets the table prefix for the WordPress tables.
