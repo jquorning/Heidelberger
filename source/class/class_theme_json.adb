@@ -20,8 +20,8 @@ with Php.Types;
 with Block_Typography;
 
 with Inc_Blocks;
-with Inc_Class_Wp_Block_Type;
-with Inc_Class_Wp_Block_Type_Registry;
+with Class_Block_Type;
+with Class_Block_Type_Registry;
 with Class_Theme_JSON_Schema;
 with Inc_Formatting;
 with Inc_Functions;
@@ -306,10 +306,10 @@ is
       use Php.Arrays;
       use Php.Strings;
       use Php.Types;
-      use Inc_Class_Wp_Block_Type_Registry;
+      use Class_Block_Type_Registry;
 
       Registry : constant Wp_Block_Type_Registry :=
-        Inc_Class_Wp_Block_Type_Registry.Get_Instance;
+        Class_Block_Type_Registry.Get_Instance;
 
       Blocks_2 : constant Block_Type_Maps.Map := Registry.Get_All_Registered;
       Blocks   : constant Array_Type          := Array_Diff_Key (From_Map (Blocks_2),
@@ -622,7 +622,7 @@ is
       use Inc_Themes;
 
       Block_Rules : Unbounded_String;
-      Block_Type  : Inc_Class_Wp_Block_Type.Wp_Block_Type; -- = null;
+      Block_Type  : Class_Block_Type.Wp_Block_Type; -- = null;
    begin
       -- Skip outputting layout styles if explicitly disabled.
       if Current_Theme_Supports ("disable-layout-styles") then
@@ -631,7 +631,7 @@ is
 
       if Isset (Block_Metadata, "name") then
          Block_Type :=
-           Inc_Class_Wp_Block_Type_Registry.
+           Class_Block_Type_Registry.
              Get_Instance.Get_Registered (As_String (Get (Block_Metadata, "name")));
 
          if
@@ -674,7 +674,7 @@ is
          -- to blockGap with a `true` or `false` value.
          if Has_Block_Gap_Support or Has_Fallback_Gap_Support then
             declare
-               use Inc_Class_Wp_Block_Type;
+               use Class_Block_Type;
 
                Block_Gap_Value : Multi_Type; -- = null;
             begin

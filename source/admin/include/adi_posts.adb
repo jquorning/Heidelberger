@@ -5,8 +5,8 @@
 -- @subpackage Administration
 --
 
-with Inc_Class_Wp_Block_Type_Registry;
-with Inc_Class_Wp_Block_Type;
+with Class_Block_Type_Registry;
+with Class_Block_Type;
 
 package body Adi_Posts
 is
@@ -2169,7 +2169,7 @@ is
    function Get_Block_Editor_Server_Block_Settings
             return Array_Type
    is
-      use Inc_Class_Wp_Block_Type_Registry;
+      use Class_Block_Type_Registry;
 
       Block_Registry : constant Wp_Block_Type_Registry := Get_Instance;
 
@@ -2196,8 +2196,8 @@ is
    begin
       for A in Block_Registry.Get_All_Registered.Iterate loop
          declare
-            use Inc_Class_Wp_Block_Type_Registry.Block_Type_Maps;
-            use Inc_Class_Wp_Block_Type;
+            use Class_Block_Type_Registry.Block_Type_Maps;
+            use Class_Block_Type;
 
             Block_Name : constant String        := Key (A);
             Block_Type : constant Wp_Block_Type := Element (A);

@@ -8,7 +8,7 @@
 
 with Arrays;
 
-package Inc_Class_Wp_Block_Type
+package Class_Block_Type
 is
    use Arrays;
 
@@ -527,4 +527,4 @@ is
 
 -- type Wp_Block_Type_Array is array (Positive range <>) of Wp_Block_Type;
 
-end Inc_Class_Wp_Block_Type;
+end Class_Block_Type;

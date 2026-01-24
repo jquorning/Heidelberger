@@ -11,7 +11,7 @@ with Arrays;
 
 limited with Class_Posts;
 
-package Inc_Class_Wp_Block_Editor_Contexts
+package Class_Block_Editor_Contexts
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -72,4 +72,4 @@ is
  --                }
  --        }
 
-end Inc_Class_Wp_Block_Editor_Contexts;
+end Class_Block_Editor_Contexts;

@@ -9,7 +9,7 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Block_Editor_Contexts;
+with Class_Block_Editor_Contexts;
 
 package Inc_Block_Editors
 is
@@ -78,7 +78,7 @@ is
    --
    function Get_Block_Categories
               (Post_Or_Block_Editor_Context :
-                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+                 Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type;
 --         block_categories     = get_default_block_categories();
 --         block_editor_context = post_or_block_editor_context instanceof WP_Post ?
@@ -129,7 +129,7 @@ is
    --
    function Get_Allowed_Block_Types
               (Block_Editor_Context :
-                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+                 Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return List_Type;
 
    --
@@ -346,7 +346,7 @@ is
    function Get_Block_Editor_Settings
               (Custom_Settings      : Array_Type;
                Block_Editor_Context :
-                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+                 Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type;
 
 -- --

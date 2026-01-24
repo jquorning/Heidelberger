@@ -36,14 +36,14 @@ is
    function Apply_Filters
               (Hook_Name : String;
                Value     : Array_Type;
-               Item      : Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
                is (Value);
 
    function Apply_Filters
               (Hook_Name : String;
                Value     : List_Type; -- Boolean;
-               Item      : Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
                is (Value);
 
    function Apply_Filters_Deprecated
@@ -117,10 +117,10 @@ is
 
    function Get_Block_Categories
               (Post_Or_Block_Editor_Context :
-                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+                 Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
    is
-      use Inc_Class_Wp_Block_Editor_Contexts;
+      use Class_Block_Editor_Contexts;
       use Class_Posts;
 --    use Inc_Plugins;
 
@@ -178,7 +178,7 @@ is
 
    function Get_Allowed_Block_Types
               (Block_Editor_Context :
-                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+                 Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return List_Type
    is
       use Class_Posts;
@@ -455,7 +455,7 @@ is
    function Get_Block_Editor_Settings
               (Custom_Settings      : Array_Type;
                Block_Editor_Context :
-                 Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
+                 Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
    is
       use Php;

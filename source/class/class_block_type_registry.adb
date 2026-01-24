@@ -6,40 +6,8 @@
 -- @since 5.0.0
 --
 
-with Ada.Containers.Indefinite_Ordered_Maps;
-
-with Arrays;
-
-with Inc_Class_Wp_Block_Type;
-
-package Inc_Class_Wp_Block_Type_Registry
+package body Class_Block_Type_Registry
 is
-   use Arrays;
-
-   package Block_Type_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Inc_Class_Wp_Block_Type.Wp_Block_Type,
-         "="          => Inc_Class_Wp_Block_Type."="); -- Array_Type);
-
-   --
-   -- Core class used for interacting with block types.
-   --
-   -- @since 5.0.0
-   --
-   -- #[AllowDynamicProperties]
-   type Wp_Block_Type_Registry is tagged
-      record
-         --
-         -- Registered block types, as `$name => $instance` pairs.
-         --
-         -- @since 5.0.0
-         -- @var WP_Block_Type[]
-         --
-         -- private
-         Registered_Block_Types : Block_Type_Maps.Map; -- Array_Type;
-
-      end record;
 
 --         --
 --         -- Registers a block type.
@@ -140,49 +108,46 @@ is
 --                 return $unregistered_block_type;
 --         end;
 
-   --
-   -- Retrieves a registered block type.
-   --
-   -- @since 5.0.0
-   --
-   -- @param string $name Block type name including namespace.
-   -- @return WP_Block_Type|null The registered block type, or null if it is not
-   --                             registered.
-   --
+   --------------------
+   -- Get_Registered --
+   --------------------
+
    function Get_Registered (This : Wp_Block_Type_Registry;
                             Name : String)
-                            return Inc_Class_Wp_Block_Type.Wp_Block_Type;
---                 if ( ! $this->is_registered( $name ) ) then
---                         return null;
---                 end;
+                            return Class_Block_Type.Wp_Block_Type
+   is
+      use Class_Block_Type;
+   begin
+      if not This.Is_Registered (Name) then
+         return Null_Wp_Block_Type; -- null
+      end if;
 
---                 return $this->registered_block_types[ $name ];
---         end;
+      return This.Registered_Block_Types (Name);
+   end Get_Registered;
 
-   --
-   -- Retrieves all registered block types.
-   --
-   -- @since 5.0.0
-   --
-   -- @return WP_Block_Type[] Associative array of `$block_type_name => $block_type`
-   --                          pairs.
-   --
+   ------------------------
+   -- Get_All_Registered --
+   ------------------------
+
    function Get_All_Registered (This : Wp_Block_Type_Registry)
-            return Block_Type_Maps.Map; -- Wp_Block_Type_Array; -- Array_Type
---                 return $this->registered_block_types;
---         end;
+            return Block_Type_Maps.Map -- Array_Type
+   is
+   begin
+      return This.Registered_Block_Types;
+   end Get_All_Registered;
 
-   --
-   -- Checks if a block type is registered.
-   --
-   -- @since 5.0.0
-   --
-   -- @param string $name Block type name including namespace.
-   -- @return bool True if the block type is registered, false otherwise.
-   --
+   -------------------
+   -- Is_Registered --
+   -------------------
+
    function Is_Registered (This : Wp_Block_Type_Registry;
                            Name : String)
-                           return Boolean;
+                           return Boolean
+   is
+   begin
+      return Block_Type_Maps.Has_Element (This.Registered_Block_Types.Find (Name));
+--    return Isset (This.Registered_Block_Types, Name);
+   end Is_Registered;
 
 --         public function __wakeup() then
 --                 if ( ! $this->registered_block_types ) then
@@ -198,33 +163,32 @@ is
 --                 end;
 --         end;
 
-   --
-   -- Utility method to retrieve the main instance of the class.
-   --
-   -- The instance will be created if it does not exist yet.
-   --
-   -- @since 5.0.0
-   --
-   -- @return WP_Block_Type_Registry The main instance.
-   --
-   -- public static
-   function Get_Instance
-            return Wp_Block_Type_Registry;
+   ------------------
+   -- Get_Instance --
+   ------------------
 
-   Null_Wp_Block_Type_Registry : constant Wp_Block_Type_Registry :=
-     (Registered_Block_Types => Block_Type_Maps.Empty_Map);
+   function Get_Instance
+            return Wp_Block_Type_Registry
+   is
+      S : Wp_Block_Type_Registry;
+   begin
+      if Null_Wp_Block_Type_Registry = Static_Instance then -- null
+         Static_Instance := S; -- new self();
+      end if;
+
+      return Static_Instance;
+   end Get_Instance;
+
+   --------------
+   -- From_Map --
+   --------------
 
    function From_Map (Map : Block_Type_Maps.Map)
-                      return Array_Type;
+                      return Array_Type
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return Empty_Array;
+   end From_Map;
 
-   --
-   -- Container for the main instance of the class.
-   --
-   -- @since 5.0.0
-   -- @var WP_Block_Type_Registry|null
-   --
-   -- private static
-   Static_Instance : Wp_Block_Type_Registry :=
-     Null_Wp_Block_Type_Registry;
-
-end Inc_Class_Wp_Block_Type_Registry;
+end Class_Block_Type_Registry;

@@ -8,7 +8,7 @@
 
 with Lists;
 
-with Inc_Class_Wp_Block_Type;
+with Class_Block_Type;
 
 package Inc_Blocks
 is
@@ -1196,7 +1196,7 @@ is
    -- @param mixed         default    Optional. Fallback value for feature support. Default false.
    -- @return bool Whether the feature is supported.
    --
-   function Block_Has_Support (Block_Type : Inc_Class_Wp_Block_Type.Wp_Block_Type;
+   function Block_Has_Support (Block_Type : Class_Block_Type.Wp_Block_Type;
                                Feature    : List_Type;
                                Default    : Boolean := False)
                                return Boolean;

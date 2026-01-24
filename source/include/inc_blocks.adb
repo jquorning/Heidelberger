@@ -18,12 +18,12 @@ is
    -- Block_Has_Support --
    -----------------------
 
-   function Block_Has_Support (Block_Type : Inc_Class_Wp_Block_Type.Wp_Block_Type;
+   function Block_Has_Support (Block_Type : Class_Block_Type.Wp_Block_Type;
                                Feature    : List_Type;
                                Default    : Boolean := False)
                                return Boolean
    is
-      use Inc_Class_Wp_Block_Type;
+      use Class_Block_Type;
       use Inc_Functions;
 
       Block_Support : Multi_Type := From_Boolean (Default); -- Boolean := Default;

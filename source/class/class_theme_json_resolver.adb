@@ -18,8 +18,8 @@ with Globals;
 with Hb_Common;
 
 with Inc_Block_Editors;
--- with Inc_Class_Wp_Block_Type;
-with Inc_Class_Wp_Block_Type_Registry;
+-- with Class_Block_Type;
+with Class_Block_Type_Registry;
 with Class_Posts;
 with Class_Querys;
 with Class_Theme_JSON_Data;
@@ -168,8 +168,8 @@ is
    is
       use Php.Arrays;
       use Hb_Common;
---    use Inc_Class_Wp_Block_Type;
-      use Inc_Class_Wp_Block_Type_Registry;
+--    use Class_Block_Type;
+      use Class_Block_Type_Registry;
    begin
       -- Bail out if the origin is invalid.
       if not Isset (Static_Blocks_Cache, Origin) then
@@ -178,7 +178,7 @@ is
 
       declare
          Registry : constant Wp_Block_Type_Registry :=
-           Inc_Class_Wp_Block_Type_Registry.Get_Instance; -- :: ()
+           Class_Block_Type_Registry.Get_Instance; -- :: ()
 
          Blocks : constant Array_Type := From_Map (Registry.Get_All_Registered);
 --       Blocks : Wp_Block_Type_Array := Registry.Get_All_Registered;
@@ -380,13 +380,13 @@ is
             return Class_Theme_JSON.Wp_Theme_JSON
    is
       use Hb_Common;
-      use Inc_Class_Wp_Block_Type_Registry;
+      use Class_Block_Type_Registry;
       use Class_Theme_JSON;
       use Class_Theme_JSON_Data;
       use Inc_Functions;
 
       Registry : constant Wp_Block_Type_Registry :=
-        Inc_Class_Wp_Block_Type_Registry.Get_Instance;
+        Class_Block_Type_Registry.Get_Instance;
 
       Blocks   : constant Array_Type := From_Map (Registry.Get_All_Registered);
       Config   : Array_Type := To_Array (List => (1 => Build ("version", 2)));

@@ -28,7 +28,7 @@ with Cust_Class_Wp_Widget_Area_Customize_Controls;
 with Cust_Class_Wp_Widget_Form_Customize_Controls;
 
 with Inc_Capabilities;
-with Inc_Class_Wp_Block_Editor_Contexts;
+with Class_Block_Editor_Contexts;
 with Class_Customize_Controls;
 with Class_Customize_Managers;
 with Class_Customize_Settings;
@@ -1038,7 +1038,7 @@ is
             declare
                use Adi_Posts;
                use Inc_Block_Editors;
-               use Inc_Class_Wp_Block_Editor_Contexts;
+               use Class_Block_Editor_Contexts;
 
                Block_Editor_Context : constant Wp_Block_Editor_Context :=
                  X_Construct (

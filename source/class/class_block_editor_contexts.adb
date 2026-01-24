@@ -7,7 +7,7 @@
 
 with Hb_Common;
 
-package body Inc_Class_Wp_Block_Editor_Contexts
+package body Class_Block_Editor_Contexts
 is
 
    -----------------
@@ -32,4 +32,4 @@ is
       return This;
    end X_Construct;
 
-end Inc_Class_Wp_Block_Editor_Contexts;
+end Class_Block_Editor_Contexts;
