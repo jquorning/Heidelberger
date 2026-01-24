@@ -9,12 +9,12 @@
 
 with Helpers;
 
-with Inc_Class_Wp_Object_Caches;
+with Class_Object_Caches;
 
 package body Inc_Caches
 is
 
-   Global_Wp_Object_Cache : Inc_Class_Wp_Object_Caches.Wp_Object_Cache;
+   Global_Wp_Object_Cache : Class_Object_Caches.Wp_Object_Cache;
 
 -- --
 -- -- Sets up Object Cache Global and assigns it.

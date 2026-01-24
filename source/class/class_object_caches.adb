@@ -16,7 +16,7 @@ with Lists;
 with Inc_Functions;
 with Inc_L10n;
 
-package body Inc_Class_Wp_Object_Caches
+package body Class_Object_Caches
 is
    use Lists;
 
@@ -287,4 +287,4 @@ is
 --    return true;
    end Flush;
 
-end Inc_Class_Wp_Object_Caches;
+end Class_Object_Caches;

@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Object_Caches
+package Class_Object_Caches
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -574,4 +574,4 @@ is
 --                 echo "</ul>";
 --         end;
 
-end Inc_Class_Wp_Object_Caches;
+end Class_Object_Caches;
