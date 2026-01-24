@@ -32,7 +32,7 @@
 -- requirements (there can be none), but merely suggestions.
 --
 
-package Inc_Class_Phpass
+package Class_Phpass
 is
 
    --
@@ -244,4 +244,4 @@ is
         --         return hash === stored_hash;
         -- end;
 
-end Inc_Class_Phpass;
+end Class_Phpass;

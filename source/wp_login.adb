@@ -28,7 +28,7 @@ with Wp_Common;
 with Wp_Load;
 
 with Inc_Capabilities;
-with Inc_Class_Phpass;
+with Class_Phpass;
 with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Recovery_Mode_Link_Services;
 with Inc_Class_Wp_Sites;
@@ -855,7 +855,7 @@ is
       use Php.HTML;
       use Binder;
       use Hb_Common;
-      use Inc_Class_Phpass;
+      use Class_Phpass;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Plugins;

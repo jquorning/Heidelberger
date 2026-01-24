@@ -6,7 +6,7 @@
 -- @link https://www.openwall.com/phpass/
 --
 
-package body Inc_Class_Phpass
+package body Class_Phpass
 is
 
    -----------------
@@ -47,4 +47,4 @@ is
       return "XXX-953";
    end HashPassword;
 
-end Inc_Class_Phpass;
+end Class_Phpass;
