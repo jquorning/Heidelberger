@@ -33,7 +33,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Class_Posts;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Users;
 with Inc_L10n;
 with Inc_Link_Templates;
@@ -107,7 +107,7 @@ is
 --
 -- global post_type, post_type_object, post;
          declare
-            use Inc_Class_Wp_Post_Type;
+            use Class_Post_Type;
             use Inc_Comments;
             use Inc_Link_Templates;
             use Inc_Plugins;

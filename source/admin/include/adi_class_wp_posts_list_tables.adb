@@ -18,7 +18,7 @@ with Hb_Common;
 with Helpers;
 with Lists;
 
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Options;
 with Inc_Posts;
 -- with Inc_Capabilities;
@@ -41,7 +41,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Binder;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
 --    use Inc_Capabilities;
       use Inc_Posts;
       use Inc_Users;

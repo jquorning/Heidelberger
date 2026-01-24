@@ -12,7 +12,7 @@ with Ada.Containers.Ordered_Maps;
 with Arrays;
 
 with Class_Posts;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 
 package Adi_Nav_Menus
 is
@@ -176,7 +176,7 @@ is
                                            is (Empty_Array);
 
    function X_Wp_Nav_Menu_Meta_Box_Object
-     (Data_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+     (Data_Object : Class_Post_Type.Wp_Post_Type)
       return Class_Posts.Wp_Post
       is (Class_Posts.Null_Post);
 

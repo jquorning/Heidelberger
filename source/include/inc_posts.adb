@@ -38,8 +38,8 @@ is
    package Post_Type_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
          (Key_Type     => String,
-          Element_Type => Inc_Class_Wp_Post_Type.Wp_Post_Type,
-          "="          => Inc_Class_Wp_Post_Type."=");
+          Element_Type => Class_Post_Type.Wp_Post_Type,
+          "="          => Class_Post_Type."=");
 
    subtype Post_Type_Map is Post_Type_Maps.Map;
 
@@ -73,7 +73,7 @@ is
       use Hb_Common;
 --    use String_Vectors;
    begin
-      Inc_Class_Wp_Post_Type.Reset_Default_Labels; -- :: ();
+      Class_Post_Type.Reset_Default_Labels; -- :: ();
 
       Register_Post_Type (
                 "post",
@@ -2173,12 +2173,12 @@ is
 -- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
 --
    function Get_Post_Type_Object (Post_Type : String)
-                                  return Inc_Class_Wp_Post_Type.Wp_Post_Type
+                                  return Class_Post_Type.Wp_Post_Type
    is
 --      use List_Vectors;
       use Post_Type_Maps;
 --        global wp_post_types;
-      P : Inc_Class_Wp_Post_Type.Wp_Post_Type;
+      P : Class_Post_Type.Wp_Post_Type;
    begin
       if
 --        not Is_Scalar (Post_Type) or else
@@ -2219,9 +2219,9 @@ is
    function Get_Post_Types (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
                             Operator : String     := "and")
-                            return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array
+                            return Class_Post_Type.Wp_Post_Type_Array
    is
-      P : Inc_Class_Wp_Post_Type.Wp_Post_Type_Array;
+      P : Class_Post_Type.Wp_Post_Type_Array;
    begin
       return P;
    end Get_Post_Types;
@@ -2389,7 +2389,7 @@ is
 --                                return Wp_Post_Type
    is
       use Hb_Common;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Formatting;
 
       function Construct (Post_Type : String;
@@ -2851,7 +2851,7 @@ is
    is
       use Hb_Common;
       use Adi_Plugins;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
 
       Post_Types : constant List_Type :=
         Get_Post_Types (To_Array (List => (1 =>
@@ -3041,7 +3041,7 @@ is
                                    return Boolean
    is
       use Wp_Common;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
 
       Post_Type_2 : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
    begin
@@ -3085,7 +3085,7 @@ is
    -- Is_Post_Type_Viewable --
    ---------------------------
 
-   function Is_Post_Type_Viewable (Post_Type : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+   function Is_Post_Type_Viewable (Post_Type : Class_Post_Type.Wp_Post_Type)
                                    return Boolean
    is
    begin

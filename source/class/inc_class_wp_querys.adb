@@ -13,7 +13,7 @@ with Lists;
 with Php.Lists;
 with Php.Strings;
 
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Options;
 with Inc_Posts;
 
@@ -3514,7 +3514,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
 
    begin
       if Empty (Post_Types) or else not This.Is_Post_Type_Archive then
@@ -3526,7 +3526,7 @@ is
          -- if Is_Array (Post_Type) then
          --    Post_Type := Reset (Post_Type);
          -- end if;
-         Post_Type_Object : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+         Post_Type_Object : constant Class_Post_Type.Wp_Post_Type :=
            Inc_Posts.Get_Post_Type_Object (Post_Type);
       begin
          if Post_Type_Object = Null_Post_Type then

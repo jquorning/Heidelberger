@@ -11,7 +11,7 @@ with Adi_Class_Wp_Screens;
 with Class_WpDB;
 with Inc_Class_Wp_Locale;
 with Class_Posts;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 
 package Globals
@@ -139,7 +139,7 @@ is
    Update_Title       : Unbounded_String;
 
    Post_Type        : Unbounded_String;
-   Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
+   Post_Type_Object : Class_Post_Type.Wp_Post_Type;
    Post             : Class_Posts.Wp_Post;
 
    Action   : Unbounded_String;

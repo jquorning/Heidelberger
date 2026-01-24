@@ -6,7 +6,7 @@
 -- @since 4.6.0
 --
 
-package body Inc_Class_Wp_Post_Type
+package body Class_Post_Type
 is
 
 --         --
@@ -495,4 +495,4 @@ is
 -- end;
    procedure Dummy is null;
 
-end Inc_Class_Wp_Post_Type;
+end Class_Post_Type;

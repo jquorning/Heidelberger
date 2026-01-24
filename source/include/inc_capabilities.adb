@@ -15,7 +15,7 @@ with Globals;
 with Hb_Common;
 
 with Inc_Class_Wp_Comments;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Comments;
@@ -68,7 +68,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Class_Posts;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;

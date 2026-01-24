@@ -30,7 +30,7 @@ with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
 with Inc_Updates;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 
 package body Adm_Menu
 is
@@ -211,7 +211,7 @@ is
            "edit_posts", "edit-comments.php");
 
       declare
-         use Inc_Class_Wp_Post_Type;
+         use Class_Post_Type;
          use Inc_Posts;
 
          X_Wp_Last_Object_Menu : Natural := 25;
@@ -230,7 +230,7 @@ is
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
-               Ptype_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+               Ptype_Obj : constant Class_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (-Ptype);
                Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : Unbounded_String;

@@ -26,7 +26,7 @@ with Adi_Class_Wp_Screens;
 with Adi_Screens;
 
 with Inc_Author_Templates;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Recovery_Mode;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Taxonomy;
@@ -997,7 +997,7 @@ is
          declare
             use Adi_Screens;
             use Class_Posts;
-            use Inc_Class_Wp_Post_Type;
+            use Class_Post_Type;
             use Inc_Options;
 
             Current_Screen   : constant Wp_Screen := Get_Current_Screen;
@@ -1133,7 +1133,7 @@ is
 
             if not Empty (-Current_Object.Post_Type) then
                declare
-                  use Inc_Class_Wp_Post_Type;
+                  use Class_Post_Type;
 
                   Post_Type_Object : constant Wp_Post_Type :=
                      Get_Post_Type_Object (-Current_Object.Post_Type);
@@ -1219,8 +1219,8 @@ is
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Posts;
-      use Inc_Class_Wp_Post_Type;
-      use Inc_Class_Wp_Post_Type.Post_Type_Maps;
+      use Class_Post_Type;
+      use Class_Post_Type.Post_Type_Maps;
 
       package Action_Maps is new
          Ada.Containers.Indefinite_Ordered_Maps

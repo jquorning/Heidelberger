@@ -12,7 +12,7 @@ with Arrays;
 with Lists;
 
 with Class_Posts;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 
 package Inc_Posts
@@ -214,7 +214,7 @@ is
    -- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
    --
    function Get_Post_Type_Object (Post_Type : String)
-                                  return Inc_Class_Wp_Post_Type.Wp_Post_Type;
+                                  return Class_Post_Type.Wp_Post_Type;
 --   function Get_Post_Type_Object (Post_Type : String)
 --                                  return Boolean
 --                                  is (True);
@@ -243,7 +243,7 @@ is
    function Get_Post_Types (Args     : Array_Type := Empty_Array;
                             Output   : String     := "names";
                             Operator : String     := "and")
-                            return Inc_Class_Wp_Post_Type.Wp_Post_Type_Array;
+                            return Class_Post_Type.Wp_Post_Type_Array;
 
    -- function Get_Post_Types (Args     : Array_Type := Empty_Array;
    --                          Output   : String     := "names";
@@ -989,7 +989,7 @@ is
    function Is_Post_Type_Viewable (Post_Type : String)
                                    return Boolean;
 
-   function Is_Post_Type_Viewable (Post_Type : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+   function Is_Post_Type_Viewable (Post_Type : Class_Post_Type.Wp_Post_Type)
                                    return Boolean;
 
    --

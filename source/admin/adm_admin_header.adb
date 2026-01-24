@@ -27,7 +27,7 @@ with Adi_Plugins;
 
 with Inc_Admin_Bar;
 with Inc_Capabilities;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Formatting;
 with Inc_Functions_Wp_Scripts;
 with Inc_Functions_Wp_Styles;
@@ -148,7 +148,7 @@ is
             begin
                if not Empty (Post_Title) then
                   declare
-                     use Inc_Class_Wp_Post_Type;
+                     use Class_Post_Type;
                      use Inc_Posts;
 
                      Post_Type_Obj : constant Wp_Post_Type :=

@@ -27,7 +27,7 @@ with Wp_Common;
 with Inc_Capabilities;
 with Inc_Class_Wp_Admin_Bar; -- ???
 with Inc_Class_Wp_Networks;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
@@ -146,7 +146,7 @@ is
    is
       use Inc_Capabilities;
       use Class_Posts;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Posts;
 
       Sample_2 : Boolean := Sample;
@@ -462,7 +462,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Class_Posts;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Functions;
       use Inc_Posts;
 --    use Inc_Plugins;
@@ -1502,7 +1502,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Types;
       use Hb_Common;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Class_Posts;
       use Inc_Plugins;
       use Inc_Options;
@@ -1626,7 +1626,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Class_Posts;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Functions;
       use Inc_Posts;
 
@@ -1679,7 +1679,7 @@ is
       use Wp_Common;
       use Inc_Capabilities;
       use Class_Posts;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Posts;
 
       Post_2 : constant Wp_Post := Get_Post (Post_Id (Post));
@@ -4407,7 +4407,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Class_Posts;
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Options;
       use Inc_Plugins;
       use Inc_Posts;

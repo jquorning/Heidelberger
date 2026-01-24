@@ -22,7 +22,7 @@ with Wp_Common;
 
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Sites;
 with Inc_Class_Wp_Styles;
 with Inc_Formatting;
@@ -1623,7 +1623,7 @@ is
          -- end if;
 
          declare
-            Post_Type_Obj : constant Inc_Class_Wp_Post_Type.Wp_Post_Type :=
+            Post_Type_Obj : constant Class_Post_Type.Wp_Post_Type :=
               Get_Post_Type_Object (Post_Type);
 
             --

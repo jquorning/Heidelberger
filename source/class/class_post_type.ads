@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Post_Type
+package Class_Post_Type
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -513,4 +513,4 @@ is
    -- public static
    procedure Reset_Default_Labels is null;
 
-end Inc_Class_Wp_Post_Type;
+end Class_Post_Type;

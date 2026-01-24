@@ -23,7 +23,7 @@ with Wp_Common;
 
 with Adi_Templates;
 
--- with Inc_Class_Wp_Post_Type;
+-- with Class_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
@@ -149,7 +149,7 @@ is
            Inc_Posts.Get_Post_Type_Object (-Matches (2))
          then
             declare
-               use Inc_Class_Wp_Post_Type;
+               use Class_Post_Type;
 
                Post_Type_Obj : Wp_Post := -- Array_Type :=
                   X_Wp_Nav_Menu_Meta_Box_Object
@@ -357,7 +357,7 @@ is
 
    procedure Wp_Nav_Menu_Post_Type_Meta_Boxes
    is
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Posts;
 --    use String_Vectors;
       use Ada.Containers;
@@ -508,7 +508,7 @@ is
                                                  return Array_Type
    is
 --        global (x_nav_menu_placeholder, Nav_Menu_Selected_Id);
-      use Inc_Class_Wp_Post_Type;
+      use Class_Post_Type;
       use Inc_Formatting;
       use Inc_Posts;
       use Inc_Options;

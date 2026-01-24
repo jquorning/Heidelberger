@@ -17,7 +17,7 @@ with Inc_Class_Wp_Http;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
 with Class_Posts;
-with Inc_Class_Wp_Post_Type;
+with Class_Post_Type;
 with Inc_Class_Wp_Users;
 with Inc_Media;
 with Inc_Posts;
@@ -74,7 +74,7 @@ is
                             Key  : String)
                             return Inc_Class_Wp_Terms.Wp_Term;
 
-   function Get (Post_Type : Inc_Class_Wp_Post_Type.Wp_Post_Type;
+   function Get (Post_Type : Class_Post_Type.Wp_Post_Type;
                  Key       : String)
                  return String
                  is ("XXX-240");
@@ -203,7 +203,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean;
-                           Status    : Inc_Class_Wp_Post_Type.Wp_Post_Type)
+                           Status    : Class_Post_Type.Wp_Post_Type)
                            return Boolean
                            is (Value);
 
