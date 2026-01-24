@@ -23,7 +23,7 @@ with Lists;
 with Adi_Noop;
 
 with Inc_Class_Wp_Dependency;
-with Inc_Class_Wp_Scripts;
+with Class_Scripts;
 with Inc_Script_Loader;
 with Inc_Versions;
 -- require ABSPATH . "wp-admin/includes/noop.php";
@@ -58,7 +58,7 @@ is
       Load     : Unbounded_String;
       Outt     : Unbounded_String;
       Load_2   : List_Type;
-      Wp_Scripts : Inc_Class_Wp_Scripts.Wp_Scripts;
+      Wp_Scripts : Class_Scripts.Wp_Scripts;
       Expires_Offset : Natural;
    begin
       Error_Reporting (0);

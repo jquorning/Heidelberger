@@ -22,7 +22,7 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Scripts;
+with Class_Scripts;
 with Inc_Class_Wp_Styles;
 
 package Inc_Script_Loader
@@ -30,7 +30,7 @@ is
    use Arrays;
    use Lists;
 
-   Global_Wp_Scripts : Inc_Class_Wp_Scripts.Wp_Scripts; -- arbitrary position (jq)
+   Global_Wp_Scripts : Class_Scripts.Wp_Scripts; -- arbitrary position (jq)
 
    --
    -- Registers TinyMCE scripts.
@@ -46,7 +46,7 @@ is
    --                                      compression. Default false.
    --
    procedure Wp_Register_TinyMCE_Scripts
-     (Scripts            : in out Inc_Class_Wp_Scripts.Wp_Scripts;
+     (Scripts            : in out Class_Scripts.Wp_Scripts;
       Force_Uncompressed : Boolean := False);
 
    --
@@ -86,7 +86,7 @@ is
    --
    -- @param WP_Scripts scripts WP_Scripts object.
    --
-   procedure Wp_Default_Packages (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+   procedure Wp_Default_Packages (Scripts : in out Class_Scripts.Wp_Scripts);
 
    --
    -- Returns the suffix that can be used for the scripts.
@@ -112,7 +112,7 @@ is
    --
    -- @param WP_Scripts scripts WP_Scripts object.
    --
-   procedure Wp_Default_Scripts (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+   procedure Wp_Default_Scripts (Scripts : in out Class_Scripts.Wp_Scripts);
 
    --
    -- Registers all the WordPress vendor scripts that are in the standardized
@@ -127,7 +127,7 @@ is
    -- @param WP_Scripts scripts WP_Scripts object.
    --
    procedure Wp_Default_Packages_Vendor
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+     (Scripts : in out Class_Scripts.Wp_Scripts);
 
    --
    -- Registers development scripts that integrate with `@wordpress/scripts`.
@@ -139,7 +139,7 @@ is
    -- @param WP_Scripts scripts WP_Scripts object.
    --
    procedure Wp_Register_Development_Scripts
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+     (Scripts : in out Class_Scripts.Wp_Scripts);
 
    --
    -- Registers all the WordPress packages scripts that are in the standardized
@@ -152,7 +152,7 @@ is
    -- @param WP_Scripts scripts WP_Scripts object.
    --
    procedure Wp_Default_Packages_Scripts
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+     (Scripts : in out Class_Scripts.Wp_Scripts);
 
    --
    -- Adds inline scripts required for the WordPress JavaScript packages.
@@ -165,7 +165,7 @@ is
    -- @param WP_Scripts scripts WP_Scripts object.
    --
    procedure Wp_Default_Packages_Inline_Scripts
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts);
+     (Scripts : in out Class_Scripts.Wp_Scripts);
 
    --
    -- Loads classic theme styles on classic themes in the frontend.

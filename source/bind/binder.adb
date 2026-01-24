@@ -34,7 +34,7 @@ with Wp_Login;
 -- with Inc_Default_Filters;
 -- with Inc_Admin_Bar;
 -- with Inc_Class_Wp_Admin_Bar;
--- with Inc_Class_Wp_Scripts;
+-- with Class_Scripts;
 -- with Inc_Class_Wp_Posts;
 -- with Inc_Posts;
 

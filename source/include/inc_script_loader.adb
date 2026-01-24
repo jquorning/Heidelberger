@@ -85,7 +85,7 @@ is
    ---------------------------------
 
    procedure Wp_Register_TinyMCE_Scripts
-     (Scripts            : in out Inc_Class_Wp_Scripts.Wp_Scripts;
+     (Scripts            : in out Class_Scripts.Wp_Scripts;
       Force_Uncompressed : Boolean := False)
    is
 --    use Hb_Common;
@@ -146,7 +146,7 @@ is
    --------------------------------
 
    procedure Wp_Default_Packages_Vendor
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+     (Scripts : in out Class_Scripts.Wp_Scripts)
    is
       use Hb_Common;
       use Inc_L10n;
@@ -310,7 +310,7 @@ is
    -------------------------------------
 
    procedure Wp_Register_Development_Scripts
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+     (Scripts : in out Class_Scripts.Wp_Scripts)
    is
       use Hb_Common;
 
@@ -358,7 +358,7 @@ is
    ---------------------------------
 
    procedure Wp_Default_Packages_Scripts
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+     (Scripts : in out Class_Scripts.Wp_Scripts)
    is
       use Php;
 --    use Php.Files;
@@ -452,7 +452,7 @@ is
    ---------------------------------------
 
    procedure Wp_Default_Packages_Inline_Scripts
-     (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+     (Scripts : in out Class_Scripts.Wp_Scripts)
    is
       use Hb_Common;
       use Php;
@@ -775,7 +775,7 @@ is
    -- Wp_Default_Packages --
    -------------------------
 
-   procedure Wp_Default_Packages (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   procedure Wp_Default_Packages (Scripts : in out Class_Scripts.Wp_Scripts)
    is
       use Inc_Plugins;
    begin
@@ -845,7 +845,7 @@ is
    -- Wp_Default_Scripts --
    ------------------------
 
-   procedure Wp_Default_Scripts (Scripts : in out Inc_Class_Wp_Scripts.Wp_Scripts)
+   procedure Wp_Default_Scripts (Scripts : in out Class_Scripts.Wp_Scripts)
    is
       use Ada.Strings.Unbounded;
       use Binder;

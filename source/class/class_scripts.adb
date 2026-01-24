@@ -29,7 +29,7 @@ with Inc_Plugins;
 with Inc_Script_Loader;
 with Inc_Themes;
 
-package body Inc_Class_Wp_Scripts
+package body Class_Scripts
 is
    use Hb_Common;
    use Inc_L10n;
@@ -810,4 +810,4 @@ is
       This.Ext_Handles    := +"";
    end Reset;
 
-end Inc_Class_Wp_Scripts;
+end Class_Scripts;

@@ -14,7 +14,7 @@ with Lists;
 
 with Inc_Class_Wp_Dependencies;
 
-package Inc_Class_Wp_Scripts
+package Class_Scripts
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -428,4 +428,4 @@ is
    --
    procedure Reset (This : in out Wp_Scripts);
 
-end Inc_Class_Wp_Scripts;
+end Class_Scripts;

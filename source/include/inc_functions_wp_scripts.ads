@@ -9,7 +9,7 @@
 
 with Lists;
 
-with Inc_Class_Wp_Scripts;
+with Class_Scripts;
 with Inc_Script_Loader;
 
 package Inc_Functions_Wp_Scripts
@@ -25,10 +25,10 @@ is
    --
    -- @return WP_Scripts WP_Scripts instance.
    --
-   Wp_Scripts_X : Inc_Class_Wp_Scripts.Wp_Scripts
+   Wp_Scripts_X : Class_Scripts.Wp_Scripts
       renames Inc_Script_Loader.Global_Wp_Scripts;
 -- function Wp_Scripts_X
---          return Inc_Class_Wp_Scripts.Wp_Scripts;
+--          return Class_Scripts.Wp_Scripts;
 
    --
    -- Prints scripts in document head that are in the handles queue.

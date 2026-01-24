@@ -29,7 +29,7 @@ is
 --    ------------------
 
 --    function Wp_Scripts_X
---             return Inc_Class_Wp_Scripts.Wp_Scripts
+--             return Class_Scripts.Wp_Scripts
 --    is
 -- --    global wp_scripts;
 --    begin
@@ -37,7 +37,7 @@ is
 --       --           wp_scripts = new WP_Scripts();
 --       -- end if;
 
---       return Inc_Class_Wp_Scripts.Wp_Scripts;
+--       return Class_Scripts.Wp_Scripts;
 --    end Wp_Scripts_X;
 
    ---------------------------------------
@@ -96,7 +96,7 @@ is
                               return List_Type
    is
 --    global wp_scripts;
-      use Inc_Class_Wp_Scripts;
+      use Class_Scripts;
       use Inc_Plugins;
    begin
       --
@@ -112,7 +112,7 @@ is
 
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__");
 
---    if Wp_Scripts not in Inc_Class_Wp_Scripts.Wp_Scripts then -- instanceof
+--    if Wp_Scripts not in Class_Scripts.Wp_Scripts then -- instanceof
 --       if not Handles then
 --          return array(); -- No need to instantiate if nothing is there.
 --       end if;
@@ -140,7 +140,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use Inc_Class_Wp_Scripts;
+      use Class_Scripts;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -392,7 +392,7 @@ is
                                 In_Footer : Boolean      := False)
    is
       use Php.Strings;
-      use Inc_Class_Wp_Scripts;
+      use Class_Scripts;
       use Inc_Class_Wp_Dependencies;
 --    use String_Vectors;
    begin
