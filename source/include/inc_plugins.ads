@@ -22,7 +22,7 @@
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Admin_Bar;
+with Class_Admin_Bar;
 with Class_Errors;
 with Class_Hooks;
 with Class_Roles;
@@ -94,7 +94,7 @@ is
                                   Args      : Class_Styles.Wp_Styles)
                                   is null;
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
+                                  Args      : Class_Admin_Bar.Wp_Admin_Bar)
                                   is null;
 
    --

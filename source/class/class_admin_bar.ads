@@ -14,7 +14,7 @@ with Arrays;
 
 with Class_Sites;
 
-package Inc_Class_Wp_Admin_Bar
+package Class_Admin_Bar
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -349,4 +349,4 @@ is
    --
    procedure Add_Menus (This : Wp_Admin_Bar);
 
-end Inc_Class_Wp_Admin_Bar;
+end Class_Admin_Bar;

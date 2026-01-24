@@ -8,7 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Inc_Class_Wp_Admin_Bar;
+with Class_Admin_Bar;
 with Class_Customize_Managers;
 with Class_Posts;
 with Class_Terms;
@@ -17,7 +17,7 @@ with Class_Querys;
 package Inc_Admin_Bar
 is
    use Ada.Strings.Unbounded;
-   use Inc_Class_Wp_Admin_Bar;
+   use Class_Admin_Bar;
 
    X_Wp_Admin_Bar : Wp_Admin_Bar; -- X_ added jq
 

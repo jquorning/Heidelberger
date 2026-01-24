@@ -28,7 +28,7 @@ with Inc_Themes;
 with Inc_Users;
 with Inc_Vars;
 
-package body Inc_Class_Wp_Admin_Bar
+package body Class_Admin_Bar
 is
    use Hb_Common;
    use Inc_L10n;
@@ -875,4 +875,4 @@ is
       Do_Action ("add_admin_bar_menus");
    end Add_Menus;
 
-end Inc_Class_Wp_Admin_Bar;
+end Class_Admin_Bar;

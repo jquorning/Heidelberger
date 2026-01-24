@@ -25,7 +25,7 @@ with Lists;
 with Wp_Common;
 
 with Inc_Capabilities;
-with Inc_Class_Wp_Admin_Bar; -- ???
+with Class_Admin_Bar; -- ???
 with Class_Networks;
 with Class_Post_Type;
 with Class_Sites;
@@ -4199,7 +4199,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Admin_Bar; -- ???
+      use Class_Admin_Bar; -- ???
       use Class_Sites;
       use Inc_Capabilities;
       use Inc_Load;

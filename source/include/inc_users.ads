@@ -9,7 +9,7 @@ with Arrays;
 
 with Class_Errors;
 with Class_Users;
-with Inc_Class_Wp_Admin_Bar;
+with Class_Admin_Bar;
 
 package Inc_Users
 is
@@ -384,8 +384,8 @@ is
    --
    function Get_Blogs_Of_User (User_Id   : Integer;
                                All_Sites : Boolean := False)
-                               return Inc_Class_Wp_Admin_Bar.Blog_List -- String_Array
-                               is (Inc_Class_Wp_Admin_Bar.Empty_Blog_List); -- (Empty_String_Array);
+                               return Class_Admin_Bar.Blog_List -- String_Array
+                               is (Class_Admin_Bar.Empty_Blog_List); -- (Empty_String_Array);
 
    --
    -- Retrieves the current user object.

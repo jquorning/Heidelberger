@@ -10,7 +10,7 @@ with Lists;
 with Adi_Class_Wp_Screens;
 with Adi_Translation_Install;
 
-with Inc_Class_Wp_Admin_Bar;
+with Class_Admin_Bar;
 with Class_Dependency;
 with Class_Errors;
 with Class_HTTP;
@@ -88,7 +88,7 @@ is
                              return Array_Type
                              is (Empty_Array);
 
-   function Is_Object (Admin_Bar : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
+   function Is_Object (Admin_Bar : Class_Admin_Bar.Wp_Admin_Bar)
                       return Boolean
                       is (True);
 
