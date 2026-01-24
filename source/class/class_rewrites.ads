@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Rewrites
+package Class_Rewrites
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -1994,4 +1994,4 @@ is
 --                 this.init();
 --         end;
 
-end Inc_Class_Wp_Rewrites;
+end Class_Rewrites;

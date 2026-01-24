@@ -11,7 +11,7 @@ with Php.Strings;
 
 with Hb_Common;
 
-package body Inc_Class_Wp_Rewrites
+package body Class_Rewrites
 is
 
    ----------------------
@@ -94,4 +94,4 @@ is
       return -This.Page_Structure;
    end Get_Page_Permastruct;
 
-end Inc_Class_Wp_Rewrites;
+end Class_Rewrites;

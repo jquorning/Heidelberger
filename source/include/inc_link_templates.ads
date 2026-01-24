@@ -8,13 +8,13 @@
 with Arrays;
 
 with Class_Posts;
-with Inc_Class_Wp_Rewrites;
+with Class_Rewrites;
 
 package Inc_Link_Templates
 is
    use Arrays;
 
-   Global_Wp_Rewrite : Inc_Class_Wp_Rewrites.Wp_Rewrite;
+   Global_Wp_Rewrite : Class_Rewrites.Wp_Rewrite;
 
    --
    -- Retrieves a trailing-slashed string if the site is set for adding trailing
