@@ -12,7 +12,7 @@ with Lists;
 
 with Inc_Class_Wp_Dependencies;
 
-package Inc_Class_Wp_Styles
+package Class_Styles
 is
    use Ada.Strings.Unbounded;
    use Lists;
@@ -170,4 +170,4 @@ is
    --
    procedure Reset (This : in out Wp_Styles);
 
-end Inc_Class_Wp_Styles;
+end Class_Styles;

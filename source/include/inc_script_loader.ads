@@ -23,7 +23,7 @@ with Arrays;
 with Lists;
 
 with Class_Scripts;
-with Inc_Class_Wp_Styles;
+with Class_Styles;
 
 package Inc_Script_Loader
 is
@@ -66,7 +66,7 @@ is
    --
    -- @param WP_Styles styles
    --
-   procedure Wp_Default_Styles (Styles : in out Inc_Class_Wp_Styles.Wp_Styles);
+   procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles);
 
    --
    -- Prints scripts (internal use only)

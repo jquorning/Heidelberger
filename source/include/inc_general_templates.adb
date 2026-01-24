@@ -24,7 +24,7 @@ with Class_Terms;
 with Class_Users;
 with Class_Post_Type;
 with Inc_Class_Wp_Sites;
-with Inc_Class_Wp_Styles;
+with Class_Styles;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
@@ -5081,7 +5081,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Styles;
+      use Class_Styles;
       use Inc_Functions_Wp_Styles;
       use Inc_Plugins;
       use Inc_L10n;

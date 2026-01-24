@@ -1741,7 +1741,7 @@ is
    -- Wp_Default_Styles --
    -----------------------
 
-   procedure Wp_Default_Styles (Styles : in out Inc_Class_Wp_Styles.Wp_Styles)
+   procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles)
    is
       use Ada.Strings.Unbounded;
       use Hb_Common;
@@ -2571,8 +2571,8 @@ is
    is
       use Inc_Plugins;
 --         global concatenate_scripts;
-      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
---    Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles;
+      Wp_Styles : Class_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
+--    Wp_Styles : Class_Styles.Wp_Styles;
    begin
       Script_Concat_Settings;
       Wp_Styles.Do_Concat := Concatenate_Scripts;
@@ -2602,7 +2602,7 @@ is
    is
       use Inc_Plugins;
 --    global wp_styles, concatenate_scripts;
-      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
+      Wp_Styles : Class_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
    begin
       -- if not ( wp_styles instanceof WP_Styles ) ) then
       --         return;
@@ -2642,7 +2642,7 @@ is
       use Inc_Themes;
 --      global compress_css;
 
-      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles; -- := wp_styles();
+      Wp_Styles : Class_Styles.Wp_Styles; -- := wp_styles();
 
       Zip : constant String :=
         (if Compress_CSS and then Globals.ENFORCE_GZIP then "gzip" else "");

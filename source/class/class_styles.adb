@@ -13,7 +13,7 @@ with Inc_Themes;
 with Inc_Load;
 with Inc_Plugins;
 
-package body Inc_Class_Wp_Styles
+package body Class_Styles
 is
    use Hb_Common;
 
@@ -383,4 +383,4 @@ is
       This.Print_HTML     := +"";
    end Reset;
 
-end Inc_Class_Wp_Styles;
+end Class_Styles;

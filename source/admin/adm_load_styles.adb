@@ -20,7 +20,7 @@ with Hb_Common;
 with Lists;
 
 with Adi_Noop;
--- with Inc_Class_Wp_Styles;
+-- with Class_Styles;
 with Inc_Class_Wp_Dependency;
 with Inc_Script_Loader;
 with Inc_Versions;
@@ -61,7 +61,7 @@ is
       RTL      : Boolean;
       Outt     : Unbounded_String;
 
-      Wp_Styles : Inc_Class_Wp_Styles.Wp_Styles;
+      Wp_Styles : Class_Styles.Wp_Styles;
 
       Expires_Offset : Natural;
    begin

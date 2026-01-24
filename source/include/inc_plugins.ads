@@ -26,7 +26,7 @@ with Inc_Class_Wp_Admin_Bar;
 with Class_Errors;
 with Inc_Class_Wp_Hooks;
 with Inc_Class_Wp_Roles;
-with Inc_Class_Wp_Styles;
+with Class_Styles;
 with Class_Taxonomy;
 
 package Inc_Plugins
@@ -91,7 +91,7 @@ is
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Array_Type) is null;
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Inc_Class_Wp_Styles.Wp_Styles)
+                                  Args      : Class_Styles.Wp_Styles)
                                   is null;
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Inc_Class_Wp_Admin_Bar.Wp_Admin_Bar)
