@@ -29,7 +29,7 @@ with Inc_Class_Wp_Admin_Bar; -- ???
 with Inc_Class_Wp_Networks;
 with Class_Post_Type;
 with Inc_Class_Wp_Sites;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Class_Terms;
 with Class_Users;
 with Inc_Category_Templates;
@@ -1259,7 +1259,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Class_Terms;
       use Inc_Functions;
       use Inc_Load;

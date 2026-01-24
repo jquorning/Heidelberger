@@ -24,7 +24,7 @@ with Wp_Common;
 
 with Inc_Admin_Bar;
 with Inc_Capabilities;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Class_Terms;
 with Inc_Formatting;
 with Inc_Functions;
@@ -172,7 +172,7 @@ is
          use Php.Numerics;
          use Php.Lists;
          use Inc_Capabilities;
-         use Inc_Class_Wp_Taxonomy;
+         use Class_Taxonomy;
          use Class_Terms;
          use Class_Terms.Term_Vectors;
          use Inc_Taxonomys;

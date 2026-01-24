@@ -50,7 +50,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Hb_Common;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Inc_L10n;
       use Inc_Options;
       use Inc_Plugins;
@@ -342,7 +342,7 @@ is
    ------------------
 
    function Get_Taxonomy (Taxonomy : String)
-                          return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
+                          return Class_Taxonomy.Wp_Taxonomy
    is
       use Taxonomy_Maps;
    begin
@@ -522,7 +522,7 @@ is
                                 Object_Type : List_Type;
                                 Args        : Array_Type)
    is
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
 
       Unused : constant Wp_Taxonomy :=
          Register_Taxonomy (Taxonomy,
@@ -536,12 +536,12 @@ is
    function Register_Taxonomy (Taxonomy    : String;
                                Object_Type : List_Type;
                                Args        : Array_Type)
-                               return Inc_Class_Wp_Taxonomy.Wp_Taxonomy
+                               return Class_Taxonomy.Wp_Taxonomy
    is
       use Php.Arrays;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -698,7 +698,7 @@ is
    -- Get_Taxonomy_Labels --
    -------------------------
 
-   function Get_Taxonomy_Labels (Tax : in out Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
+   function Get_Taxonomy_Labels (Tax : in out Class_Taxonomy.Wp_Taxonomy)
                                  return Array_Type
    is
       use Ada.Strings.Unbounded;
@@ -724,7 +724,7 @@ is
 
       declare
          Nohier_Vs_Hier_Defaults : Array_Type :=
-           Inc_Class_Wp_Taxonomy.Get_Default_Labels;
+           Class_Taxonomy.Get_Default_Labels;
 --       Nohier_Vs_Hier_Defaults : Array_Type := WP_Taxonomy::Get_Default_Labels;
          Labels         : Array_Type;
          Default_Labels : Array_Type;
@@ -2358,7 +2358,7 @@ is
          -- those params override the `args` passed to this function.
          --
          Terms : Wp_Term_Array;
-         T     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+         T     : Class_Taxonomy.Wp_Taxonomy;
       begin
          if Taxonomies_2.Length > 1 then
             for X in Taxonomies_2.Iterate loop
@@ -5096,14 +5096,14 @@ is
    function Get_Ancestors (Object_Id     : Integer := 0;
                            Object_Type   : String  := "";
                            Resource_Type : String  := "")
-                           return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
+                           return Class_Taxonomy.Int_Arrays.Vector
 --                            return Int_Arrays.Vector -- ;Int_Array
    is
       use Ada.Strings.Unbounded;
 --    use Php.Arrays;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Class_Terms;
       use Inc_Load;
       use Inc_Posts;

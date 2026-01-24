@@ -18,7 +18,7 @@ with Wp_Common;
 with Adi_Caches;
 
 with Inc_Class_Walker_Category_Dropdown;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -1505,7 +1505,7 @@ is
                                    return String -- List_Type
    is
       use Ada.Strings.Unbounded;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Class_Terms;
       use Inc_Formatting;
       use Inc_Functions;

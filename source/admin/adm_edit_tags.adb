@@ -81,7 +81,7 @@ is
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_Taxonomys;
---    use Inc_Class_Wp_Taxonomy;
+--    use Class_Taxonomy;
       use Class_Terms;
    begin
       Adm_Admin.Run;

@@ -12,7 +12,7 @@ with Class_WpDB;
 with Inc_Class_Wp_Locale;
 with Class_Posts;
 with Class_Post_Type;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 
 package Globals
 is
@@ -144,7 +144,7 @@ is
 
    Action   : Unbounded_String;
    Taxonomy : Unbounded_String;
-   Tax      : Inc_Class_Wp_Taxonomy.Wp_Taxonomy; -- := Inc_Class_Wp_Taxonomy.X_Construct;
+   Tax      : Class_Taxonomy.Wp_Taxonomy; -- := Class_Taxonomy.X_Construct;
 
    KB_IN_BYTES : constant := 1024;
    MB_IN_BYTES : constant := 1024 * KB_IN_BYTES;

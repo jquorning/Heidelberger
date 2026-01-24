@@ -16,7 +16,7 @@ with Hb_Common;
 
 with Inc_Class_Wp_Comments;
 with Class_Post_Type;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Class_Terms;
 with Inc_Comments;
 with Inc_Functions;
@@ -909,7 +909,7 @@ is
          end if;
 
          declare
-            use Inc_Class_Wp_Taxonomy;
+            use Class_Taxonomy;
             use Class_Terms;
             use Inc_Taxonomys;
 

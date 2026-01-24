@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 
 package Inc_Media
 is
@@ -87,7 +87,7 @@ is
    --                                taxonomies for attachments.
    --
    type Wp_Taxonomy_Array is array (Positive range <>)
-     of Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+     of Class_Taxonomy.Wp_Taxonomy;
 
    Empty_Taxonomy_Array : constant Wp_Taxonomy_Array := (1 .. 0 => <>);
 

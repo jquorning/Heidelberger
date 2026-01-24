@@ -24,7 +24,7 @@ with Wp_Common;
 with Adi_Templates;
 
 -- with Class_Post_Type;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Class_Terms;
 with Class_Users;
 with Inc_Class_Wp_Querys;
@@ -416,7 +416,7 @@ is
       use Ada.Containers;
       use Adi_Templates;
       use Inc_Taxonomys;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Taxonomy_Vectors;
 
       Taxonomies : constant Taxonomy_Array :=
@@ -1017,7 +1017,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
                                                  Box         : Array_Type)
    is
       use Inc_Formatting;
-      use Inc_Class_Wp_Taxonomy;
+      use Class_Taxonomy;
       use Class_Terms;
       use Inc_Taxonomys;
       use Inc_General_Templates;

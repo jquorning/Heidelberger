@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-package Inc_Class_Wp_Taxonomy
+package Class_Taxonomy
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -389,4 +389,4 @@ is
      is new Ada.Containers.Vectors (Index_Type   => Positive,
                                     Element_Type => Integer);
 
-end Inc_Class_Wp_Taxonomy;
+end Class_Taxonomy;

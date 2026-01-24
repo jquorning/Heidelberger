@@ -22,7 +22,7 @@ with Inc_Plugins;
 with Inc_Rewrites;
 with Inc_Taxonomys;
 
-package body Inc_Class_Wp_Taxonomy
+package body Class_Taxonomy
 is
 
    -----------------
@@ -526,4 +526,4 @@ is
       Self_Default_Labels := Empty_Array;
    end Reset_Default_Labels;
 
-end Inc_Class_Wp_Taxonomy;
+end Class_Taxonomy;

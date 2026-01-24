@@ -13,7 +13,7 @@ with Lists;
 
 with Class_Posts;
 with Class_Post_Type;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 
 package Inc_Posts
 is
@@ -699,7 +699,7 @@ is
    -- @return object Object containing labels for the given custom-something object.
    --
    function X_Get_Custom_Object_Labels
-      (Object                 : in out Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+      (Object                 : in out Class_Taxonomy.Wp_Taxonomy;
       Nohier_Vs_Hier_Defaults : Array_Type)
       return Array_Type;
 
@@ -1291,7 +1291,7 @@ is
                                 return Array_Type;
 
    function Get_Post_Ancestors (Post : Class_Posts.Post_Id)
-                                return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
+                                return Class_Taxonomy.Int_Arrays.Vector
                                 is (raise Program_Error with "not implemented");
 
    --

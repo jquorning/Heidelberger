@@ -12,7 +12,7 @@ with Arrays;
 with Lists;
 
 with Class_Terms;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 
 package Inc_Taxonomys
 is
@@ -24,8 +24,8 @@ is
    package Taxonomy_Maps is new
       Ada.Containers.Indefinite_Ordered_maps
         (Key_Type     => String,
-         Element_Type => Inc_Class_Wp_Taxonomy.Wp_Taxonomy,
-         "="          => Inc_Class_Wp_Taxonomy."=");
+         Element_Type => Class_Taxonomy.Wp_Taxonomy,
+         "="          => Class_Taxonomy."=");
 
    Taxonomy_Map : Taxonomy_Maps.Map; -- Wp_Taxonomy
 
@@ -223,7 +223,7 @@ is
    function Register_Taxonomy (Taxonomy    : String;
                                Object_Type : List_Type;
                                Args        : Array_Type)
-                               return Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+                               return Class_Taxonomy.Wp_Taxonomy;
 
    -- procedure Register_Taxonomy (Taxonomy    : String;
    --                              Object_Type : String;
@@ -365,7 +365,7 @@ is
    --                                              a tag"/"A link to a category".
    -- }
    --
-   function Get_Taxonomy_Labels (Tax : in out Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
+   function Get_Taxonomy_Labels (Tax : in out Class_Taxonomy.Wp_Taxonomy)
                                  return Array_Type;
 
    --
@@ -395,8 +395,8 @@ is
    --
    package Taxonomy_Vectors is new
       Ada.Containers.Vectors (Index_Type   => Positive,
-                              Element_Type => Inc_Class_Wp_Taxonomy.Wp_Taxonomy,
-                              "="          => Inc_Class_Wp_Taxonomy."=");
+                              Element_Type => Class_Taxonomy.Wp_Taxonomy,
+                              "="          => Class_Taxonomy."=");
 
    subtype Taxonomy_Array is Taxonomy_Vectors.Vector;
    Empty_Taxonomy_Array : constant Taxonomy_Array := Taxonomy_Vectors.Empty_Vector;
@@ -532,7 +532,7 @@ is
    -- @return WP_Taxonomy|false The taxonomy object or false if taxonomy doesn't exist.
    --
    function Get_Taxonomy (Taxonomy : String)
-                          return Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+                          return Class_Taxonomy.Wp_Taxonomy;
 
    --
    -- Retrieves the cached term objects for the given object ID.
@@ -785,7 +785,7 @@ is
    function Get_Ancestors (Object_Id     : Integer := 0;
                            Object_Type   : String  := "";
                            Resource_Type : String  := "")
-                           return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector;
+                           return Class_Taxonomy.Int_Arrays.Vector;
 
    --
    -- Determines whether the taxonomy name exists.

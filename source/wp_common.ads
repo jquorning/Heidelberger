@@ -14,7 +14,7 @@ with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Dependency;
 with Class_Errors;
 with Inc_Class_Wp_Http;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Class_Terms;
 with Class_Posts;
 with Class_Post_Type;
@@ -30,7 +30,7 @@ is
    use Lists;
 
    function In_Array (T : Integer;
-                      A : Inc_Class_Wp_Taxonomy.Int_Arrays.Vector;
+                      A : Class_Taxonomy.Int_Arrays.Vector;
                       S : Boolean)
                       return Boolean
                       is (raise Program_Error with "not implemented");
@@ -188,11 +188,11 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : Inc_Class_Wp_Taxonomy.Int_Arrays.Vector;
+                           Value     : Class_Taxonomy.Int_Arrays.Vector;
                            Id        : Integer;
                            Obj       : String;
                            Res       : String)
-                           return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
+                           return Class_Taxonomy.Int_Arrays.Vector
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;

@@ -29,7 +29,7 @@ with Inc_Author_Templates;
 with Class_Post_Type;
 with Inc_Class_Wp_Recovery_Mode;
 with Inc_Class_Wp_Sites;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 with Class_Users;
 with Inc_Comments;
 with Inc_Capabilities;
@@ -1078,7 +1078,7 @@ is
 --             not Is_Wp_Error (Tag)
             then
                declare
-                  use Inc_Class_Wp_Taxonomy;
+                  use Class_Taxonomy;
 
                   Tax : constant Wp_Taxonomy := Get_Taxonomy (-Tag.Taxonomy);
                begin
@@ -1160,7 +1160,7 @@ is
 
             elsif Current_Object.Props.Taxonomy /= "" then
                declare
-                  use Inc_Class_Wp_Taxonomy;
+                  use Class_Taxonomy;
 
                   Tax : constant Wp_Taxonomy :=
                      Get_Taxonomy (-Current_Object.Props.Taxonomy);

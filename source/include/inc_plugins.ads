@@ -27,7 +27,7 @@ with Class_Errors;
 with Inc_Class_Wp_Hooks;
 with Inc_Class_Wp_Roles;
 with Inc_Class_Wp_Styles;
-with Inc_Class_Wp_Taxonomy;
+with Class_Taxonomy;
 
 package Inc_Plugins
 is
@@ -638,7 +638,7 @@ is
    procedure Do_Action (Hook_Name : String;
                         Tax       : String;
                         Arg_3     : List_Type;
-                        Tax_2     : Inc_Class_Wp_Taxonomy.Wp_Taxonomy)
+                        Tax_2     : Class_Taxonomy.Wp_Taxonomy)
                         is null;
 
    procedure Do_Action (Hook_Name : String;

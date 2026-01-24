@@ -2751,7 +2751,7 @@ is
    --------------------------------
 
    function X_Get_Custom_Object_Labels
-      (Object                 : in out Inc_Class_Wp_Taxonomy.Wp_Taxonomy;
+      (Object                 : in out Class_Taxonomy.Wp_Taxonomy;
       Nohier_Vs_Hier_Defaults : Array_Type)
       return Array_Type
    is
