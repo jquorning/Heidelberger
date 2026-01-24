@@ -4,7 +4,7 @@ with Arrays;
 
 -- with Class_Terms;
 
-package Inc_Class_Wp_Walker
+package Class_Walker
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -198,4 +198,4 @@ is
                   Args      : Array_Type)
                   return String;
 
-end Inc_Class_Wp_Walker;
+end Class_Walker;

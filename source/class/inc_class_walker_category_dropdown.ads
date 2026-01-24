@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-with Inc_Class_Wp_Walker;
+with Class_Walker;
 
 package Inc_Class_Walker_Category_Dropdown
 is
@@ -18,7 +18,7 @@ is
    --
    -- @see Walker
    --
-   type Walker_CategoryDropdown is new Inc_Class_Wp_Walker.Walker with
+   type Walker_CategoryDropdown is new Class_Walker.Walker with
       record
          --
          -- What the class handles.

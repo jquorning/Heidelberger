@@ -8,7 +8,7 @@ with Php.Arrays;
 
 with Hb_Common;
 
-package body Inc_Class_Wp_Walker
+package body Class_Walker
 is
 
    ---------------
@@ -433,4 +433,4 @@ is
 --                 unset( $children_elements[ $id ] );
 --         end;
 
-end Inc_Class_Wp_Walker;
+end Class_Walker;
