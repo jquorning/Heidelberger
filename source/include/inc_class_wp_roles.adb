@@ -102,6 +102,27 @@ is
       end if;
    end Add_Cap;
 
+   ----------------
+   -- Remove_Cap --
+   ----------------
+
+   procedure Remove_Cap (This : in out Wp_Roles;
+                         Role : String;
+                         Cap  : String)
+   is
+      use Hb_Common;
+      use Inc_Options;
+   begin
+      if not Isset (This.Roles, Role) then
+         return;
+      end if;
+
+      Delete (Ref_3 (This.Roles, Role, "capabilities", Cap));
+      if This.Use_DB then
+         Update_Option (-This.Role_Key, From_Array (This.Roles));
+      end if;
+   end Remove_Cap;
+
    --------------
    -- Get_Role --
    --------------

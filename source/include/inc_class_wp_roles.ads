@@ -220,24 +220,17 @@ is
                       Cap   : String;
                       Grant : Boolean := True);
 
---         --
---         -- Removes a capability from role.
---         --
---         -- @since 2.0.0
---         --
---         -- @param string role Role name.
---         -- @param string cap  Capability name.
---         --
---         public function remove_cap( role, cap ) then
---                 if ( ! isset( this.roles[ role ] ) ) then
---                         return;
---                 end;
-
---                 unset( this.roles[ role ]["capabilities"][ cap ] );
---                 if ( this.use_db ) then
---                         update_option( this.role_key, this.roles );
---                 end;
---         end;
+   --
+   -- Removes a capability from role.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string role Role name.
+   -- @param string cap  Capability name.
+   --
+   procedure Remove_Cap (This : in out Wp_Roles;
+                         Role : String;
+                         Cap  : String);
 
    --
    -- Retrieves a role object by name.

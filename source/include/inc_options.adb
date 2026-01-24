@@ -334,11 +334,12 @@ is
    -- Get_Option --
    ----------------
 
-   function Get_Option (Option : String)
+   function Get_Option (Option  : String;
+                        Default : String := "")
                         return List_Type
    is
       Result : constant Multi_Type :=
-        Get_Option (Option, From_String ("XXX-964"));
+        Get_Option (Option, From_String (Default));
    begin
       return As_List (Result);
    end Get_Option;
@@ -1541,41 +1542,49 @@ is
 --         return wp_set_all_user_settings( all_user_settings );
 -- end;
 
--- --
--- -- Deletes user interface settings.
--- --
--- -- Deleting settings would reset them to the defaults.
--- --
--- -- This function has to be used before any output has started as it calls `setcookie()`.
--- --
--- -- @since 2.7.0
--- --
--- -- @param string names The name or array of names of the setting to be deleted.
--- -- @return bool|null True if deleted successfully, false otherwise.
--- --                   Null if the current user is not a member of the site.
--- --
--- function delete_user_setting( names ) then
---         if ( headers_sent() ) then
---                 return false;
---         end;
+   -------------------------
+   -- Delete_User_Setting --
+   -------------------------
 
---         all_user_settings = get_all_user_settings();
---         names             = (array) names;
---         deleted           = false;
+   function Delete_User_Setting (Names : String)
+                                 return Boolean
+   is
+      use Php.HTML;
+      use Hb_Common;
+   begin
+      if Headers_Sent then
+         return False;
+      end if;
 
---         foreach ( names as name ) then
---                 if ( isset( all_user_settings[ name ] ) ) then
---                         unset( all_user_settings[ name ] );
---                         deleted = true;
---                 end;
---         end;
+      declare
+         All_User_Settings : constant Array_Type := Get_All_User_Settings;
+         Names_2           : constant List_Type  := To_List (Names); -- (array) names;
+         Deleted           : Boolean    := False;
+      begin
+         for Name of Names_2 loop
+            if Isset (All_User_Settings, -Name) then
+               Delete (Ref (All_User_Settings, -Name));
+               Deleted := True;
+            end if;
+         end loop;
 
---         if ( deleted ) then
---                 return wp_set_all_user_settings( all_user_settings );
---         end;
+         if Deleted then
+            return Wp_Set_All_User_Settings (All_User_Settings);
+         end if;
+      end;
+      return False;
+   end Delete_User_Setting;
 
---         return false;
--- end;
+   -------------------------
+   -- Delete_User_Setting --
+   -------------------------
+
+   procedure Delete_User_Setting (Names : String)
+   is
+      Unused : constant Boolean := Delete_User_Setting (Names);
+   begin
+      null;
+   end Delete_User_Setting;
 
    ---------------------------
    -- Get_All_User_Settings --
@@ -1635,48 +1644,71 @@ is
       end;
    end Get_All_User_Settings;
 
--- --
--- -- Private. Sets all user interface settings.
--- --
--- -- @since 2.8.0
--- -- @access private
--- --
--- -- @global array _updated_user_settings
--- --
--- -- @param array user_settings User settings.
--- -- @return bool|null True if set successfully, false if the current user could not be found.
--- --                   Null if the current user is not a member of the site.
--- --
--- function wp_set_all_user_settings( user_settings ) then
---         global _updated_user_settings;
+   ------------------------------
+   -- Wp_Set_All_User_Settings --
+   ------------------------------
 
---         user_id = get_current_user_id();
---         if ( ! user_id ) then
---                 return false;
---         end;
+   function Wp_Set_All_User_Settings (User_Settings : Array_Type)
+                                      return Boolean
+   is
+      use Ada.Strings.Unbounded;
+      use Php.HTML;
+      use Php.Preg;
+      use Php.Strings;
+      use Hb_Common;
+      use Inc_Users;
+--    global _updated_user_settings;
 
---         if ( ! is_user_member_of_blog() ) then
---                 return;
---         end;
+      User_Id  : constant Integer := Get_Current_User_Id;
+      Settings : Unbounded_String;
+   begin
+      if User_Id = 0 then
+         return False;
+      end if;
 
---         settings = "";
---         foreach ( user_settings as name => value ) then
---                 _name  = preg_replace( "/[^A-Za-z0-9_-]+/", "", name );
---                 _value = preg_replace( "/[^A-Za-z0-9_-]+/", "", value );
+      if not Is_User_Member_Of_Blog then
+         return False; -- was just return;
+      end if;
 
---                 if ( ! empty( _name ) ) then
---                         settings .= _name . "=" . _value . "&";
---                 end;
---         end;
+      for A in User_Settings.Iterate loop
+         declare
+            Name    : constant String := Key (A);
+            Value   : constant String := As_String (Element (A));
 
---         settings = rtrim( settings, "&" );
---         parse_str( settings, _updated_user_settings );
+            X_Name  : constant String :=
+              Preg_Replace ("/[^A-Za-z0-9_-]+/", "", Name);
 
---         update_user_option( user_id, "user-settings", settings, false );
---         update_user_option( user_id, "user-settings-time", time(), false );
+            X_Value : constant String :=
+              Preg_Replace ("/[^A-Za-z0-9_-]+/", "", Value);
+         begin
+            if not Empty (X_Name) then
+               Append (Settings, X_Name & "=" & X_Value & "&");
+            end if;
+         end;
+      end loop;
 
---         return true;
--- end;
+      Settings := +Rtrim (-Settings, "&");
+      Parse_Str (-Settings, Global_X_Updated_User_Settings);
+
+      Update_User_Option (User_Id, "user-settings",
+                          From_String (-Settings), False);
+      Update_User_Option (User_Id, "user-settings-time",
+                          From_Integer (Php.Misc.Time), False);
+
+      return True;
+   end Wp_Set_All_User_Settings;
+
+   ------------------------------
+   -- Wp_Set_All_User_Settings --
+   ------------------------------
+
+   procedure Wp_Set_All_User_Settings (User_Settings : Array_Type)
+   is
+      Unused : constant Boolean :=
+        Wp_Set_All_User_Settings (User_Settings);
+   begin
+      null;
+   end Wp_Set_All_User_Settings;
 
 -- --
 -- -- Deletes the user settings of the current user.

@@ -6,11 +6,14 @@
 --
 
 with Arrays;
+with Lists;
 
 package Adi_Plugins
 is
+   use Arrays;
+   use Lists;
 
-   X_Wp_Real_Parent_File : Arrays.Array_Type;
+   X_Wp_Real_Parent_File : Array_Type;
 
    --
    -- Adds a submenu page.
@@ -159,5 +162,28 @@ is
                                   is ("XXX-308");
 
    procedure Dummy;
+
+   --
+   -- Deactivates a single plugin or multiple plugins.
+   --
+   -- The deactivation hook is disabled by the plugin upgrader by using the silent
+   -- parameter.
+   --
+   -- @since 2.5.0
+   --
+   -- @param string|string[] plugins      Single plugin or list of plugins to
+   --                                     deactivate.
+   -- @param bool            silent       Prevent calling deactivation hooks. Default
+   --                                     false.
+   -- @param bool|null       network_wide Whether to deactivate the plugin for all
+   --                                     sites in the network. A value of null will
+   --                                     deactivate plugins for both the network and
+   --                                     the current site. Multisite only. Default
+   --                                     null.
+   --
+   procedure Deactivate_Plugins (Plugins      : List_Type;
+                                 Silent       : Boolean := False;
+                                 Network_Wide : Boolean := False) -- null
+                                 is null;
 
 end Adi_Plugins;

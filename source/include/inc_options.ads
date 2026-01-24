@@ -98,7 +98,8 @@ is
                         Default : Array_Type := Empty_Array)
                         return Array_Type;
 
-   function Get_Option (Option : String)
+   function Get_Option (Option  : String;
+                        Default : String := "")
                         return List_Type;
 
    function Get_Option (Option  : String;
@@ -472,6 +473,25 @@ is
                               return Multi_Type;
 
    --
+   -- Deletes user interface settings.
+   --
+   -- Deleting settings would reset them to the defaults.
+   --
+   -- This function has to be used before any output has started as it calls
+   -- `setcookie()`.
+   --
+   -- @since 2.7.0
+   --
+   -- @param string names The name or array of names of the setting to be deleted.
+   -- @return bool|null True if deleted successfully, false otherwise.
+   --                   Null if the current user is not a member of the site.
+   --
+   function Delete_User_Setting (Names : String)
+                                 return Boolean;
+
+   procedure Delete_User_Setting (Names : String);
+
+   --
    -- Retrieves all user interface settings.
    --
    -- @since 2.7.0
@@ -482,6 +502,24 @@ is
    --
    function Get_All_User_Settings
             return Array_Type;
+
+   --
+   -- Private. Sets all user interface settings.
+   --
+   -- @since 2.8.0
+   -- @access private
+   --
+   -- @global array _updated_user_settings
+   --
+   -- @param array user_settings User settings.
+   -- @return bool|null True if set successfully, false if the current user could
+   --                   not be found. Null if the current user is not a member of
+   --                   the site.
+   --
+   function Wp_Set_All_User_Settings (User_Settings : Array_Type)
+                                      return Boolean;
+
+   procedure Wp_Set_All_User_Settings (User_Settings : Array_Type);
 
    --
    -- Retrieves the value of a transient.

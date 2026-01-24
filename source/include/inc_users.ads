@@ -410,6 +410,20 @@ is
             return Inc_Class_Wp_Users.Wp_User;
 
    --
+   -- Updates the total count of users on the site.
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   -- @since 6.0.0
+   --
+   -- @param int|null network_id ID of the network. Defaults to the current network.
+   -- @return bool Whether the update was successful.
+   --
+   function Wp_Update_User_Counts (Network_Id : Integer := 0) -- null
+                                   return Boolean;
+
+   procedure Wp_Update_User_Counts (Network_Id : Integer := 0); -- null
+
+   --
    -- Sets up global user vars.
    --
    -- Used by wp_set_current_user() for back compat. Might be deprecated in the future.

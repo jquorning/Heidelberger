@@ -73,45 +73,27 @@ is
                       Cap   : String;
                       Grant : Boolean := True);
 
-        -- --
-        -- -- Removes a capability from a role.
-        -- --
-        -- -- @since 2.0.0
-        -- --
-        -- -- @param string cap Capability name.
-        -- --
-        -- public function remove_cap( cap ) then
-        --         unset( this->capabilities[ cap ] );
-        --         wp_roles()->remove_cap( this->name, cap );
-        -- end;
+   --
+   -- Removes a capability from a role.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string cap Capability name.
+   --
+   procedure Remove_Cap (This : in out Wp_Role;
+                         Cap  : String);
 
-        -- --
-        -- -- Determines whether the role has the given capability.
-        -- --
-        -- -- @since 2.0.0
-        -- --
-        -- -- @param string cap Capability name.
-        -- -- @return bool Whether the role has the given capability.
-        -- --
-        -- public function has_cap( cap ) then
-        --         --
-        --         -- Filters which capabilities a role has.
-        --         --
-        --         -- @since 2.0.0
-        --         --
-        --         -- @param bool[] capabilities Array of key/value pairs where keys represent a capability name and boolean values
-        --         --                             represent whether the role has that capability.
-        --         -- @param string cap          Capability name.
-        --         -- @param string name         Role name.
-        --         --
-        --         capabilities = apply_filters( "role_has_cap", this->capabilities, cap, this->name );
-
-        --         if ( ! empty( capabilities[ cap ] ) ) then
-        --                 return capabilities[ cap ];
-        --         end; else then
-        --                 return false;
-        --         end;
-        -- end;
+   --
+   -- Determines whether the role has the given capability.
+   --
+   -- @since 2.0.0
+   --
+   -- @param string cap Capability name.
+   -- @return bool Whether the role has the given capability.
+   --
+   function Has_Cap (This : Wp_Role;
+                     Cap  : String)
+                     return Boolean;
 
    package Role_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps

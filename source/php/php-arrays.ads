@@ -24,6 +24,11 @@ is
                           return Array_Type
    is (raise Program_Error with "not implemented");
 
+   function Array_Diff_Assoc (Left  : Array_Type;
+                              Right : Array_Type)
+                              return Array_Type
+   is (raise Program_Error with "not implemented");
+
    function Array_Merge (Left  : Array_Type;
                          Right : Array_Type)
                          return Array_Type;

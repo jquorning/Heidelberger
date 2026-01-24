@@ -6,23 +6,31 @@
 -- @subpackage Users
 --
 
+with Ada.Strings.Unbounded;
+
 with Php.Strings;
 
 with Binder;
+with Globals;
 with Hb_Common;
+with Lists;
 with Wp_Common;
 
 with Inc_Caches;
+with Inc_Class_Wpdb;
 -- with Inc_Class_Wp_Session_Tokens;
 -- with Inc_Class_Wp_Session_Tokens_Factory;
 with Inc_Formatting;
+with Inc_Functions;
 with Inc_Load;
 with Inc_L10n;
+with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
 
 package body Inc_Users
 is
+   use Lists;
 
    ---------------
    -- Wp_Signon --
@@ -1406,39 +1414,67 @@ is
 --         return wp_update_user_counts( network_id );
 -- end;
 
--- --
--- -- Updates the total count of users on the site.
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- -- @since 6.0.0
--- --
--- -- @param int|null network_id ID of the network. Defaults to the current network.
--- -- @return bool Whether the update was successful.
--- --
--- function wp_update_user_counts( network_id = null ) then
---         global wpdb;
+   ---------------------------
+   -- Wp_Update_User_Counts --
+   ---------------------------
 
---         if ( ! is_multisite() && null !== network_id ) then
---                 _doing_it_wrong(
---                         __FUNCTION__,
---                         sprintf(
---                                 /* translators: %s: network_id--
---                                 __( "Unable to pass %s if not using multisite." ),
---                                 "<code>network_id</code>"
---                         ),
---                         "6.0.0"
---                 );
---         end;
+   function Wp_Update_User_Counts (Network_Id : Integer := 0) -- null
+                                   return Boolean
+   is
+      use Ada.Strings.Unbounded;
+      use Php.Strings;
+      use Hb_Common;
+      use Globals;
+      use Inc_Class_Wpdb;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Options;
+   begin
+      if not Is_Multisite and then 0 /= Network_Id then -- null
+         X_Doing_It_Wrong (
+           "__FUNCTION__",
+           Sprintf (
+             -- translators: %s: network_id
+             abs "Unable to pass %s if not using multisite.",
+             To_List ("<code>network_id</code>")
+           ),
+           "6.0.0"
+         );
+      end if;
 
---         query = "SELECT COUNT(ID) as c FROM wpdb->users";
---         if ( is_multisite() ) then
---                 query .= " WHERE spam = "0" AND deleted = "0"";
---         end;
+      declare
+         Users : constant String := -WpDB.Users;
 
---         count = wpdb->get_var( query );
+         Query : Unbounded_String :=
+           +"SELECT COUNT(ID) as c FROM " & Users;
+      begin
+         if Is_Multisite then
+            Append (Query, " WHERE spam = '0' AND deleted = '0'");
+         end if;
 
---         return update_network_option( network_id, "user_count", count );
--- end;
+         declare
+            Count : constant String :=
+              WpDB.Get_Var (Statement_Type (-Query));
+         begin
+            return
+              Update_Network_Option (Network_Id, "user_count",
+                                     From_String (Count));
+         end;
+      end;
+   end Wp_Update_User_Counts;
+
+   ---------------------------
+   -- Wp_Update_User_Counts --
+   ---------------------------
+
+   procedure Wp_Update_User_Counts (Network_Id : Integer := 0)
+   is
+      Unused : constant Boolean :=
+        Wp_Update_User_Counts (Network_Id);
+   begin
+      null;
+   end Wp_Update_User_Counts;
 
 -- --
 -- -- Schedules a recurring recalculation of the total count of users.

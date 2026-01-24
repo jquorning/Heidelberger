@@ -13,6 +13,41 @@ package Adi_Schemas
 is
    use Arrays;
 
+   --
+   -- Create and modify WordPress roles for WordPress 2.5.
+   --
+   -- @since 2.5.0
+   --
+   procedure Populate_Roles_250;
+
+   --
+   -- Create and modify WordPress roles for WordPress 2.6.
+   --
+   -- @since 2.6.0
+   --
+   procedure Populate_Roles_260;
+
+   --
+   -- Create and modify WordPress roles for WordPress 2.7.
+   --
+   -- @since 2.7.0
+   --
+   procedure Populate_Roles_270;
+
+   --
+   -- Create and modify WordPress roles for WordPress 2.8.
+   --
+   -- @since 2.8.0
+   --
+   procedure Populate_Roles_280;
+
+   --
+   -- Create and modify WordPress roles for WordPress 3.0.
+   --
+   -- @since 3.0.0
+   --
+   procedure Populate_Roles_300;
+
 -- --
 -- -- Declare these as global in case schema.php is included from a function.
 -- --

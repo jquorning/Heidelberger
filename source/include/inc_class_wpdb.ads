@@ -1380,6 +1380,19 @@ is
                           Show : Boolean := True);
 
    --
+   -- Disables showing of database errors.
+   --
+   -- By default database errors are not shown.
+   --
+   -- @since 0.71
+   --
+   -- @see wpdb::show_errors()
+   --
+   -- @return bool Whether showing of errors was previously active.
+   --
+   procedure Hide_Errors (This : in out Wpdb_Class);
+
+   --
    -- First half of escaping for `LIKE` special characters `%` and `_` before
    -- preparing for SQL.
    --

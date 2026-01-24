@@ -1260,22 +1260,17 @@ is
       null;
    end Show_Errors;
 
-        --
-        -- Disables showing of database errors.
-        --
-        -- By default database errors are not shown.
-        --
-        -- @since 0.71
-        --
-        -- @see wpdb::show_errors()
-        --
-        -- @return bool Whether showing of errors was previously active.
-        --
-        -- public function hide_errors() then
-        --         show              = this.show_errors;
-        --         this.show_errors = false;
-        --         return show;
-        -- end;
+   -----------------
+   -- Hide_Errors --
+   -----------------
+
+   procedure Hide_Errors (This : in out Wpdb_Class)
+   is
+      Show : constant Boolean := This.Show_Errors;
+   begin
+      This.M_Show_Errors := False;
+--    return Show;
+   end Hide_Errors;
 
    ---------------------
    -- Suppress_Errors --
