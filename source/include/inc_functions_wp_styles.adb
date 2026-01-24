@@ -13,7 +13,7 @@ with Hb_Common;
 with Php.Preg;
 with Php.Strings;
 
-with Inc_Class_Wp_Dependencies;
+with Class_Dependencies;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
@@ -185,7 +185,7 @@ is
                                Media  : String    := "all")
    is
       use Php.Strings;
-      use Inc_Class_Wp_Dependencies;
+      use Class_Dependencies;
       use Inc_Functions_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
@@ -197,7 +197,7 @@ is
             declare
                X_Handle : constant List_Type := Explode ("?", Handle);
             begin
-               Unused := Inc_Class_Wp_Dependencies.Add
+               Unused := Class_Dependencies.Add
                  (Wp_Dependencies (Styles),
                   -(X_Handle.First_Element), Src, Deps, Ver, Media);
             end;

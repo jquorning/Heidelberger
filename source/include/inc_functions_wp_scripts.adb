@@ -14,7 +14,7 @@ with Php.Strings;
 
 with Hb_Common;
 
-with Inc_Class_Wp_Dependencies;
+with Class_Dependencies;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
@@ -393,7 +393,7 @@ is
    is
       use Php.Strings;
       use Class_Scripts;
-      use Inc_Class_Wp_Dependencies;
+      use Class_Dependencies;
 --    use String_Vectors;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
@@ -406,13 +406,13 @@ is
                Unused   : Boolean;
             begin
                if Src /= "" then
-                  Unused := Inc_Class_Wp_Dependencies.Add
+                  Unused := Class_Dependencies.Add
                     (Wp_Dependencies (Scripts),
                      -(X_Handle.First_Element), Src, Deps, Ver); -- (0)
                end if;
 
                if In_Footer then
-                  Unused := Inc_Class_Wp_Dependencies.Add_Data
+                  Unused := Class_Dependencies.Add_Data
                     (Wp_Dependencies (Scripts),
                      -(X_Handle.First_Element), "group", "1"); -- (0), 1 -> "1"
                end if;

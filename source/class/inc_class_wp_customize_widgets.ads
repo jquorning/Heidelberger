@@ -14,7 +14,7 @@ with Lists;
 
 with Cust_Class_Wp_Customize_Partials;
 
-with Inc_Class_Wp_Dependencies;
+with Class_Dependencies;
 
 limited with Inc_Class_Wp_Customize_Managers;
 
@@ -28,7 +28,7 @@ is
    Capability_Error : exception;
 
    Global_Wp_Registered_Widgets  : Array_Type;
-   Global_Wp_Scripts       : Inc_Class_Wp_Dependencies.Wp_Dependencies; -- Array_Type;
+   Global_Wp_Scripts       : Class_Dependencies.Wp_Dependencies; -- Array_Type;
    Global_Wp_Registered_Sidebars : Array_Type;
    Global_Sidebars_Widgets : Array_Type;
 

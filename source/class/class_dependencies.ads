@@ -13,7 +13,7 @@ with Lists;
 
 with Inc_Class_Wp_Dependency;
 
-package Inc_Class_Wp_Dependencies
+package Class_Dependencies
 is
    use Lists;
 
@@ -423,4 +423,4 @@ is
                        Group     : Integer)
                        return Boolean;
 
-end Inc_Class_Wp_Dependencies;
+end Class_Dependencies;

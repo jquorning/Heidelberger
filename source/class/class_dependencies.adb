@@ -16,7 +16,7 @@ with Php.Strings;
 with Hb_Common;
 with Wp_Common;
 
-package body Inc_Class_Wp_Dependencies
+package body Class_Dependencies
 is
    use Ada.Strings.Unbounded;
    use Hb_Common;
@@ -549,7 +549,7 @@ is
                        Group     : Integer)
                        return Boolean
    is
-      use Inc_Class_Wp_Dependencies.Integer_Maps;
+      use Class_Dependencies.Integer_Maps;
    begin
       if
         This.Groups.Find (Handle) /= No_Element and then
@@ -568,4 +568,4 @@ is
       return True;
    end Set_Group;
 
-end Inc_Class_Wp_Dependencies;
+end Class_Dependencies;

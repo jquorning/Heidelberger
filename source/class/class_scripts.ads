@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Dependencies;
+with Class_Dependencies;
 
 package Class_Scripts
 is
@@ -27,7 +27,7 @@ is
    --
    -- @see WP_Dependencies
    --
-   type Wp_Scripts is new Inc_Class_Wp_Dependencies.Wp_Dependencies
+   type Wp_Scripts is new Class_Dependencies.Wp_Dependencies
       with record
         --
         -- Base URL for scripts.
