@@ -19,7 +19,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 
 with Inc_Admin_Bar;
@@ -127,7 +127,7 @@ is
    is
       use Php.Echoing;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       Output : Unbounded_String;
@@ -2650,7 +2650,7 @@ is
 --    static (Header_Images);
       use Php.Arrays;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Themes;
       use Inc_Posts;
       use Class_Posts;
@@ -2856,7 +2856,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
 
       Typ_2            : List_Type;
@@ -2950,7 +2950,7 @@ is
    is
       use Php.Echoing;
       use Php.HTML;
-      use Hb_Common;
+      use UStrings;
       use Inc_General_Templates;
       use Inc_Options;
       use Inc_Plugins;
@@ -2989,7 +2989,7 @@ is
                                return Adi_Class_Wp_Screens.Wp_Screen
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
    begin
       if False then -- not Class_Exists ("WP_Screen") then

@@ -13,7 +13,7 @@
 
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Functions;
@@ -197,7 +197,7 @@ is
    function Is_Post_Type_Archive (Post_Types : String := "")
                                   return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -245,7 +245,7 @@ is
    function Is_Author (Author : String := "")
                        return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -267,7 +267,7 @@ is
    function Is_Category (Category : String := "")
                          return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -290,7 +290,7 @@ is
    function Is_Tag (Tag : String := "")
                     return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -313,7 +313,7 @@ is
                     Term     : String := "")
                     return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -359,7 +359,7 @@ is
    function Is_Day
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --    global wp_query;
@@ -428,7 +428,7 @@ is
    function Is_Front_Page
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --         global wp_query;
@@ -451,7 +451,7 @@ is
    function Is_Home
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --         global wp_query;
@@ -504,7 +504,7 @@ is
    function Is_Month
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --         global wp_query;
@@ -646,7 +646,7 @@ is
    function Is_Search
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -668,7 +668,7 @@ is
    function Is_Single (Post : String := "")
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -690,7 +690,7 @@ is
    function Is_Singular (Post_Types : String := "")
                          return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -760,7 +760,7 @@ is
    function Is_Year
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --         global wp_query;
@@ -783,7 +783,7 @@ is
    function Is_404
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --    global wp_query;
@@ -827,7 +827,7 @@ is
             return Boolean
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Plugins;

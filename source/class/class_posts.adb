@@ -3,7 +3,7 @@
 --
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -34,7 +34,7 @@ is
                            Post    : out Wp_Post;
                            Success : out Boolean)
    is
---    use Hb_Common;
+--    use UStrings;
 --           Success : Boolean;
 --           Post    : Post_Type;
    begin
@@ -250,7 +250,7 @@ is
    --
    function To_Array (Post : Wp_Post) return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 
       Post_2 : Array_Type := Get_Object_Vars (Post);

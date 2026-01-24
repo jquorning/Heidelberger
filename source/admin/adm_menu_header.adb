@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Php.Echoing;
 with Php.Files;
@@ -31,7 +31,7 @@ is
    use Globals;
    use Php;
    use Inc_L10n;
-   use Hb_Common;
+   use UStrings;
    use Lists;
 
    -------------

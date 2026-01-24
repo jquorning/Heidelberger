@@ -16,7 +16,7 @@ with Php.Strings;
 
 with Globals;
 with Helpers;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -481,7 +481,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Plugins;
@@ -694,7 +694,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Sites;
       use Inc_Functions;
       use Inc_Link_Templates;
@@ -826,7 +826,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
 
       Output : Unbounded_String := +"XXX-970";
@@ -998,7 +998,7 @@ is
                                return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Load;
       use Inc_Media;
@@ -1221,7 +1221,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Terms;
 --    use Class_Querys;
       use Inc_L10n;
@@ -1389,7 +1389,7 @@ is
 
    procedure X_Wp_Render_Title_Tag
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Inc_Themes;
@@ -1564,7 +1564,7 @@ is
                                return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 --    use Inc_Plugins;
       use Inc_Querys;
@@ -1687,7 +1687,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Terms;
       use Inc_Plugins;
       use Inc_Querys;
@@ -2851,7 +2851,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Calendar;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Posts;
       use Inc_Functions;
@@ -2937,7 +2937,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Calendar;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Posts;
       use Inc_Functions;
       use Inc_Posts;
@@ -4502,7 +4502,7 @@ is
                                      return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Options;
@@ -4566,7 +4566,7 @@ is
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Link_Templates;
@@ -5080,7 +5080,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Styles;
       use Inc_Functions_Wp_Styles;
       use Inc_Plugins;
@@ -5395,7 +5395,7 @@ is
                                        return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Result : Unbounded_String;
    begin
@@ -5423,7 +5423,7 @@ is
                                        return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Result : Unbounded_String;
    begin

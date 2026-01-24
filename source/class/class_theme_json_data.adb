@@ -6,7 +6,7 @@
 -- @since 6.1.0
 --
 
-with Hb_Common;
+with UStrings;
 
 package body Class_Theme_JSON_Data
 is
@@ -19,7 +19,7 @@ is
                          Origin : String     := "theme")
                          return Wp_Theme_JSON_Data
    is
-      use Hb_Common;
+      use UStrings;
       use Class_Theme_JSON;
 
       This  : Wp_Theme_JSON_Data;

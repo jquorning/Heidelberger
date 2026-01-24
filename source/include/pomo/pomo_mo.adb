@@ -6,7 +6,7 @@
 -- @subpackage mo
 --
 
-with Hb_Common;
+with UStrings;
 
 package body POMO_MO
 is
@@ -29,7 +29,7 @@ is
                               Filename : String)
                               return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use POMO_Streams;
 
       Reader : constant POMO_FileReader := X_Construct (Filename);

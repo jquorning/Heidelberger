@@ -5,7 +5,7 @@
 -- @subpackage Administration
 --
 
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Lists;
 with Php.Preg;
@@ -93,7 +93,7 @@ is
    function Next_Widget_Id_Number (Id_Base : String)
                                    return Natural
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
 

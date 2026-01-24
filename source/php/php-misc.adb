@@ -6,7 +6,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 package body Php.Misc
 is
@@ -24,7 +24,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       List_1 : constant List_Type := Explode (".", Version_1);
       List_2 : constant List_Type := Explode (".", Version_2);

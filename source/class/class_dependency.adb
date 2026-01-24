@@ -7,11 +7,11 @@
 -- @subpackage Dependencies
 --
 
-with Hb_Common;
+with UStrings;
 
 package body Class_Dependency
 is
-   use Hb_Common;
+   use UStrings;
 
    -----------------
    -- X_Construct --

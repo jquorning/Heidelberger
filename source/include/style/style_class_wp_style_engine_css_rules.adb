@@ -8,7 +8,7 @@
 -- @since 6.1.0
 --
 
-with Hb_Common;
+with UStrings;
 with Php.Strings;
 
 package body Style_Class_Wp_Style_Engine_CSS_Rules
@@ -36,7 +36,7 @@ is
    procedure Set_Selector (This     : in out Wp_Style_Engine_CSS_Rule;
                            Selector : String)
    is
-      use Hb_Common;
+      use UStrings;
    begin
       This.Selector := +Selector;
 --    return This;
@@ -112,7 +112,7 @@ is
    function Get_Selector (This : Wp_Style_Engine_CSS_Rule)
                           return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -This.Selector;
    end Get_Selector;
@@ -126,7 +126,7 @@ is
                      Indent_Count    : Natural := 0)
                      return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Strings;
 

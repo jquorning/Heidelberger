@@ -6,7 +6,7 @@ with Ada.Containers;
 
 with Php.Arrays;
 
-with Hb_Common;
+with UStrings;
 
 package body Class_Walker
 is
@@ -66,7 +66,7 @@ is
                               Args              : Array_Type;
                               Output            : in out Unbounded_String)
    is
---    use Hb_Common;
+--    use UStrings;
    begin
       if Element = Empty_Array then
          return;
@@ -136,7 +136,7 @@ is
    is
       use Ada.Containers;
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
 
       Output : Unbounded_String;
    begin

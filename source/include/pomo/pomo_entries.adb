@@ -9,7 +9,7 @@
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 package body POMO_Entries
@@ -28,7 +28,7 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Translation_Entry
    is
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Types;
 
@@ -78,7 +78,7 @@ is
    function Key (This : Translation_Entry)
                  return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Strings;
    begin

@@ -7,7 +7,7 @@
 -- @subpackage Dependencies
 --
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Themes;
 with Inc_Load;
@@ -15,7 +15,7 @@ with Inc_Plugins;
 
 package body Class_Styles
 is
-   use Hb_Common;
+   use UStrings;
 
    --
    -- Constructor.

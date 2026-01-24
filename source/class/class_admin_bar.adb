@@ -10,7 +10,7 @@ with Php.Echoing;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Admin_Bar;
@@ -30,7 +30,7 @@ with Inc_Vars;
 
 package body Class_Admin_Bar
 is
-   use Hb_Common;
+   use UStrings;
    use Inc_L10n;
    use Lists;
    use Php;

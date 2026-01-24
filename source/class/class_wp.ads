@@ -8,14 +8,14 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 package Class_Wp
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Lists;
 
    procedure Dummy;

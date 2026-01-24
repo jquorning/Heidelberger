@@ -16,7 +16,7 @@ with Templates_Parser;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -51,7 +51,7 @@ is
    use Arrays;
    use Inc_L10n;
    use Globals;
-   use Hb_Common;
+   use UStrings;
    use Php;
    use Lists;
 

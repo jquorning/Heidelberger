@@ -10,7 +10,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 with Php.Strings;
 
 with Inc_Formatting;
@@ -41,7 +41,7 @@ is
                              Value    : String)
                              return Wp_Style_Engine_CSS_Declarations
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Strings;
 
@@ -156,7 +156,7 @@ is
                return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Strings;
 

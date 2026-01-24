@@ -10,7 +10,7 @@ with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Hb_Common;
+with UStrings;
 
 package body Php.Strings
 is
@@ -177,7 +177,7 @@ is
                          return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Result : Unbounded_String;
       First  : Natural := Subject'First;
@@ -221,7 +221,7 @@ is
                          return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Result : Unbounded_String;
       First  : Natural := Subject'First;
@@ -609,7 +609,7 @@ is
                           return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Result : Unbounded_String;
    begin
@@ -683,7 +683,7 @@ is
                      return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Ret   : Unbounded_String;
       First : Boolean := True;
@@ -722,7 +722,7 @@ is
                      return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Buffer : Unbounded_String;
       First  : Boolean := True;
@@ -747,7 +747,7 @@ is
                      return List_Type
    is
       use Ada.Strings.Fixed;
-      use Hb_Common;
+      use UStrings;
 
       Count : Natural := 0;
       First : Natural := Item'First;
@@ -777,7 +777,7 @@ is
                      Limit     : Integer := Integer'Last)
                      return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       List : constant List_Type := Explode (Separator, Item, Limit);
       Result : Array_Type;

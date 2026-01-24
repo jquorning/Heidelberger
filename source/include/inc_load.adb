@@ -16,7 +16,7 @@ with Php.Strings;
 
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Wp_Config;
@@ -47,7 +47,7 @@ is
             return String
    is
       use Php.Lists;
-      use Hb_Common;
+      use UStrings;
 
       Protocol : constant String :=
         (if Isset (Binder.X_SERVER, "SERVER_PROTOCOL")
@@ -309,7 +309,7 @@ is
    procedure Wp_Maintenance
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -343,7 +343,7 @@ is
             return Boolean
 --         global upgrading;
    is
---    use Hb_Common;
+--    use UStrings;
    begin
       if
         not Php.Files.File_Exists (Globals.ABSPATH & ".maintenance") -- or else
@@ -603,7 +603,7 @@ is
    procedure Wp_Set_Wpdb_Vars
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --    global (Wpdb);
@@ -1341,7 +1341,7 @@ is
    procedure Wp_Load_Translations_Early
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Files;
       use Php.Lists;

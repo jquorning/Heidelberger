@@ -8,7 +8,7 @@
 
 with Php.Arrays;
 
-with Hb_Common;
+with UStrings;
 
 package body POMO_Translations
 is
@@ -99,7 +99,7 @@ is
                              Entri : POMO_Entries.Translation_Entry)
                              return POMO_Entries.Translation_Entry -- String
    is
---    use Hb_Common;
+--    use UStrings;
 
       Key : constant String := Entri.Key; -- ();
    begin
@@ -119,7 +119,7 @@ is
                        return String
    is
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
       use POMO_Entries;
 
       Entri : constant Translation_Entry :=

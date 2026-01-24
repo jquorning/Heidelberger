@@ -17,7 +17,7 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Lists;
 with Wp_Common;
@@ -54,7 +54,7 @@ with Inc_Users;
 package body Inc_Admin_Bar
 is
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Inc_L10n;
    use Wp_Common;
    use Lists;

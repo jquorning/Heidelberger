@@ -10,7 +10,7 @@ with Php.Arrays;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Functions;
@@ -30,7 +30,7 @@ is
    is
       use Php.Types;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -103,7 +103,7 @@ is
                   Success : out Boolean)
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
    begin
       Success := False;
@@ -150,7 +150,7 @@ is
                   Success : out Boolean)
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       Success := False;
 
@@ -192,7 +192,7 @@ is
                  return Multi_Type
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       Found := False;
 
@@ -241,7 +241,7 @@ is
                      Done       : out Boolean)
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Key_2   : Unbounded_String := +Key;
       Group_2 : Unbounded_String := +Group;

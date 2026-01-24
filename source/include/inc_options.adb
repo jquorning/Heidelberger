@@ -17,7 +17,7 @@ with Php.Types;
 
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Wp_Common;
 
@@ -45,7 +45,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Caches;
       use Class_WpDB;
@@ -426,7 +426,7 @@ is
    function Wp_Load_Alloptions (Force_Cache : Boolean := False)
             return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Load;
@@ -550,7 +550,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Caches;
       use Inc_Functions;
@@ -778,7 +778,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Formatting;
@@ -964,7 +964,7 @@ is
                            return Boolean
    is
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Load;
@@ -1359,7 +1359,7 @@ is
    procedure Delete_Expired_Transients (Force_DB : Boolean := False)
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_Load;
 --    global wpdb;
@@ -1426,7 +1426,7 @@ is
       use Php.Preg;
       use Binder;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Link_Templates;
       use Inc_Users;
@@ -1550,7 +1550,7 @@ is
                                  return Boolean
    is
       use Php.HTML;
-      use Hb_Common;
+      use UStrings;
    begin
       if Headers_Sent then
          return False;
@@ -1655,7 +1655,7 @@ is
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Users;
 --    global _updated_user_settings;
 
@@ -1808,7 +1808,7 @@ is
                                 return Multi_Type
    is
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Caches;
       use Class_WpDB;
@@ -1981,7 +1981,7 @@ is
                                 return Boolean
    is
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Caches;
       use Class_WpDB;
@@ -2135,7 +2135,7 @@ is
                                    return Boolean
    is
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Load;
@@ -2252,7 +2252,7 @@ is
                                    return Boolean
    is
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Caches;
       use Class_WpDB;
@@ -2488,7 +2488,7 @@ is
       use Php.Lists;
       use Php.Misc;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Inc_Load;
 

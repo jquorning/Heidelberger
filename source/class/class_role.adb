@@ -6,7 +6,7 @@
 -- @since 4.4.0
 --
 
-with Hb_Common;
+with UStrings;
 
 with Class_Roles;
 with Inc_Plugins;
@@ -23,7 +23,7 @@ is
                          Capabilities : Array_Type)
                          return Wp_Role
    is
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_Role;
    begin
@@ -40,7 +40,7 @@ is
                       Cap   : String;
                       Grant : Boolean := True)
    is
-      use Hb_Common;
+      use UStrings;
       use Class_Roles;
       use Inc_Roles;
    begin
@@ -55,7 +55,7 @@ is
    procedure Remove_Cap (This : in out Wp_Role;
                          Cap  : String)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Roles;
    begin
       Delete (Ref (This.Capabilities, Cap));
@@ -70,7 +70,7 @@ is
                      Cap  : String)
                      return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       --

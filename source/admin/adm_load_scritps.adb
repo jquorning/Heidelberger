@@ -4,11 +4,11 @@
 -- Set this to error_reporting( -1 ) for debugging.
 --
 
-with Hb_Common;
+with UStrings;
 
 package Adm_Load_Scripts
 is
-   use Hb_Common;
+   use UStrings;
 
    ---------
    -- Run --

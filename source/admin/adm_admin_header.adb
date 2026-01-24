@@ -16,7 +16,7 @@ with Php.Strings;
 
 with Arrays;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Adm_Menu;
@@ -61,7 +61,7 @@ is
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;

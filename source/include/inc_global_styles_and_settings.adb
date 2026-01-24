@@ -10,7 +10,7 @@ with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 with Globals;
 
 with Class_Theme_JSON;
@@ -33,7 +33,7 @@ is
                                     Context : Array_Type := Empty_Array)
                                     return Multi_Type -- Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Inc_Functions;
@@ -102,7 +102,7 @@ is
       use Ada.Strings.Unbounded;
       use Php;
       use Php.Lists;
-      use Hb_Common;
+      use UStrings;
       use Class_Theme_JSON;
 
       -- Return cached value if it can be used and exists.
@@ -269,7 +269,7 @@ is
    procedure Wp_Add_Global_Styles_For_Blocks
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Strings;

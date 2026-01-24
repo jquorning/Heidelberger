@@ -18,7 +18,7 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 
 with Class_HTTP;
 with Inc_Functions;
@@ -706,7 +706,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       To_Unset : Array_Type;
       URL_2 : Unbounded_String := +URL;

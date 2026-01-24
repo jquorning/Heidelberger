@@ -6,7 +6,7 @@
 -- @since 4.6.0
 --
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Functions;
 
@@ -21,7 +21,7 @@ is
                          Filename : String := "")
                          return Wp_HTTP_Requests_Response
    is
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_HTTP_Requests_Response;
    begin
@@ -70,7 +70,7 @@ is
    function Get_Data (This : Wp_HTTP_Requests_Response)
                       return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -This.Response.Bodi;
    end Get_Data;
@@ -106,7 +106,7 @@ is
    function To_Array (This : Wp_HTTP_Requests_Response)
                       return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
    begin
       return

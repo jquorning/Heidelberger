@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Databases;
-with Hb_Common;
+with UStrings;
 with SQLite;
 with Lists;
 
@@ -23,7 +23,7 @@ package Class_WpDB
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Lists;
 
    type Statement_Type is new String;

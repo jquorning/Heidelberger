@@ -9,7 +9,7 @@
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Cust_Class_Wp_Customize_Partials;
@@ -22,7 +22,7 @@ package Class_Customize_Widgets
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Lists;
 
    Capability_Error : exception;

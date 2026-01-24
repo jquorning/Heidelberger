@@ -20,7 +20,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Load;
@@ -28,7 +28,7 @@ with Inc_Plugins;
 
 package body Inc_Vars
 is
-   use Hb_Common;
+   use UStrings;
 
    ---------
    -- Run --

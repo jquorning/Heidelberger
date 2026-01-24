@@ -19,7 +19,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Lists;
 with Wp_Common;
@@ -83,7 +83,7 @@ is
                                     return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Plugins;
 
@@ -229,7 +229,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Posts;
       use Class_Terms;
@@ -459,7 +459,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
@@ -538,7 +538,7 @@ is
                            return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Posts;
       use Inc_Posts;
@@ -580,7 +580,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Posts;
       use Inc_Posts;
       use Inc_Plugins;
@@ -631,7 +631,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Class_Posts;
       use Inc_Formatting;
       use Inc_Options;
@@ -1256,7 +1256,7 @@ is
                                 return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
       use Class_Taxonomy;
@@ -1501,7 +1501,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Class_Post_Type;
       use Class_Posts;
       use Inc_Plugins;
@@ -1623,7 +1623,7 @@ is
        return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
@@ -1675,7 +1675,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
       use Class_Posts;
@@ -1957,7 +1957,7 @@ is
                                 return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Inc_Capabilities;
       use Class_Users;
       use Inc_Functions;
@@ -2621,7 +2621,7 @@ is
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -3635,7 +3635,7 @@ is
       use Php.HTML;
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
@@ -3710,7 +3710,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
@@ -3771,7 +3771,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 
       URL : Unbounded_String := +Get_Site_URL (Blog_Id, "wp-admin/", Scheme);
@@ -3809,7 +3809,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       URL : Unbounded_String := +Site_URL ("/" & (-WPINC) & "/", Scheme);
@@ -3924,7 +3924,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Networks;
       use Inc_Load;
       use Inc_Ms_Networks;
@@ -4030,7 +4030,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Plugins;
    begin
@@ -4074,7 +4074,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       URL : Unbounded_String :=
@@ -4140,7 +4140,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_Load;
       use Inc_Plugins;
@@ -4197,7 +4197,7 @@ is
                                return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Admin_Bar; -- ???
       use Class_Sites;
@@ -4405,7 +4405,7 @@ is
                               return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Class_Posts;
       use Class_Post_Type;
       use Inc_Options;
@@ -4617,7 +4617,7 @@ is
       use Php.Numerics;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -5016,7 +5016,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Options;
       use Inc_Plugins;

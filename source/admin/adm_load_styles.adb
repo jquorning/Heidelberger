@@ -16,7 +16,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Helpers;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Adi_Noop;
@@ -46,7 +46,7 @@ is
       use Binder;
       use Globals;
       use Helpers;
-      use Hb_Common;
+      use UStrings;
       use Php.Echoing;
       use Php.HTML;
       use Php.Lists;

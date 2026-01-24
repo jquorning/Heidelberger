@@ -6,7 +6,7 @@
 --
 
 with Arrays;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Class_Themes;

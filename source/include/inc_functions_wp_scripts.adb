@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 with Php.Preg;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 with Class_Dependencies;
 with Inc_Functions;
@@ -21,7 +21,7 @@ with Inc_Plugins;
 
 package body Inc_Functions_Wp_Scripts
 is
-   use Hb_Common;
+   use UStrings;
    use Php;
 
 --    ------------------

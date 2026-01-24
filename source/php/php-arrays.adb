@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 package body Php.Arrays
 is
@@ -21,7 +21,7 @@ is
                            return Array_Type
    is
       use Ada.Containers;
-      use Hb_Common;
+      use UStrings;
 
       Result : Array_Type;
    begin
@@ -129,7 +129,7 @@ is
    function Array_Values (Arry : Array_Type)
                           return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type;
    begin
@@ -146,7 +146,7 @@ is
    function Array_Keys (Arry : Array_Type)
                         return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type;
    begin

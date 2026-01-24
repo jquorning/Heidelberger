@@ -21,7 +21,7 @@ with Templates_Parser;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -70,7 +70,7 @@ is
    procedure Render
    is
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Php.Arrays;
       use Php.Echoing;
       use Php.Numerics;
@@ -833,7 +833,7 @@ is
                       Post_Type     : String) return String
    is
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
       use Php.Strings;

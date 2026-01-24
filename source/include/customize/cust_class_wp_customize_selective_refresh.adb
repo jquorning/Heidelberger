@@ -8,7 +8,7 @@
 
 with Arrays;
 with Binder;
--- with Hb_Common;
+-- with UStrings;
 -- with Php;
 
 with Class_Customize_Managers;
@@ -44,7 +44,7 @@ is
                                         return Boolean
    is
       use Binder;
---    use Hb_Common;
+--    use UStrings;
 --    use Php;
    begin
       return not Isset (X_POST, RENDER_QUERY_VAR);

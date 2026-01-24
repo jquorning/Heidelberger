@@ -17,7 +17,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -54,7 +54,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Errors;
       use Inc_HTTP;
@@ -256,7 +256,7 @@ is
       use Php.Arrays;
       use Php.Echoing;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_L10n;
 
@@ -415,7 +415,7 @@ is
    function Wp_Can_Install_Language_Pack
             return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
       use Adi_Class_Wp_Upgrader_Skins;

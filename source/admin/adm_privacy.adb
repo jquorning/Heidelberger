@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 with Php.Echoing;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Templates_Parser;
@@ -37,7 +37,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Echoing;
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
 
 --    Display_Version : List_Type;

@@ -20,7 +20,7 @@
 
 with Arrays;
 with Binder;
-with Hb_Common;
+with UStrings;
 with Globals;
 with Lists;
 
@@ -44,7 +44,7 @@ is
    procedure Run
    is
       use Arrays;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Plugins;
    begin

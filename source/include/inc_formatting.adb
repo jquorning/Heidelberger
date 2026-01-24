@@ -18,7 +18,7 @@ with Php.Types;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Inc_Functions;
 with Inc_HTTP;
@@ -45,7 +45,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
       use Inc_Plugins;
 
@@ -474,7 +474,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Spaces           : constant String := Wp_Spaces_Regexp;
       Flag             : constant String := "<!--wp-prime-or-quote-->";
@@ -896,7 +896,7 @@ is
                                            return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
    begin
       if Static_HTML_Regex = "" then
 --    if not Isset (Static_HTML_Regex) then
@@ -1154,7 +1154,7 @@ is
       use Php.HTML;
       use Php.Lists;
       use Php.Preg;
-      use Hb_Common;
+      use UStrings;
 
       Quote_Style_2 : Php.HTML.Flag_Type := Quote_Style;
       X_Quote_Style : Php.HTML.Flag_Type := Quote_Style_2;
@@ -1341,7 +1341,7 @@ is
                                    Strip : Boolean := False)
                                    return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Inc_Options;
@@ -2038,7 +2038,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       Sanitized_Key : Unbounded_String;
@@ -4219,7 +4219,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Sub   : Unbounded_String := +Subject;
       Count : Natural := 1;
@@ -4259,7 +4259,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_HTTP;
       use Inc_KSES;
@@ -5043,7 +5043,7 @@ is
                                             return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       if 0 = Strpos (-Matches (1), ">") then -- false, [0]
          return ESC_HTML (-Matches (1)); -- [0]
@@ -5361,7 +5361,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Item_3 : constant String :=
         Preg_Replace ("@<(script|style)[^>]*?>.*?</\\1>@si", "", Item);
@@ -5438,7 +5438,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       -- if ( is_object( str ) || is_array( str ) ) then
       --    return "";
       -- end if;
@@ -5488,7 +5488,7 @@ is
       use Php.Files;
       use Php.HTML;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       return
         URL_Decode (
@@ -5641,7 +5641,7 @@ is
             return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
    begin
       if Empty (-Static_Spaces) then

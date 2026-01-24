@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Formatting;
@@ -19,7 +19,7 @@ with Inc_Formatting;
 package body Class_Textdomain_Registry
 is
    use Ada.Strings.Unbounded;
-   use Hb_Common;
+   use UStrings;
    use Inc_Formatting;
    use Lists;
 

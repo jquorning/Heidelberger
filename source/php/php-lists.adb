@@ -5,7 +5,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 
 package body Php.Lists
 is
@@ -36,7 +36,7 @@ is
    function List_Merge (Left, Right : List_Type)
                         return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type := Left;
    begin
@@ -57,7 +57,7 @@ is
    function List_Diff (Left, Right : List_Type)
                        return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type := Left;
    begin
@@ -75,7 +75,7 @@ is
                        Right : String)
                        return List_Type
    is
-      use Hb_Common;
+      use UStrings;
       use List_Vectors;
 
       Result : List_Type := Left;
@@ -97,7 +97,7 @@ is
                          Callback : Filter_Callback := null)
                          return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type;
    begin
@@ -120,7 +120,7 @@ is
                        Value       : Multi_Type)
                        return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type;
    begin
@@ -147,7 +147,7 @@ is
    function List_Shift (List : in out List_Type)
                         return String
    is
-      use Hb_Common;
+      use UStrings;
 
       First : constant String := -List.First_Element;
    begin
@@ -162,7 +162,7 @@ is
    procedure List_Unshift (List : in out List_Type;
                            Item : String)
    is
-      use Hb_Common;
+      use UStrings;
    begin
       List.Append (+Item);
    end List_Unshift;
@@ -186,7 +186,7 @@ is
                              List : List_Type)
                              return Boolean
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return List_Vectors.Has_Element (List.Find (+Key));
    end List_Key_Exists;
@@ -200,7 +200,7 @@ is
                           return Array_Type
    is
       use type Ada.Containers.Count_Type;
-      use Hb_Common;
+      use UStrings;
 
       Result   : Array_Type;
       Keys_2   : List_Type := Keys;
@@ -223,7 +223,7 @@ is
    function List_Pop (List : in out List_Type)
                       return String
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : constant String := -List.Last_Element;
    begin
@@ -248,7 +248,7 @@ is
    procedure List_Push (List  : in out List_Type;
                         Value : String)
    is
-      use Hb_Common;
+      use UStrings;
    begin
       List.Append (+Value);
    end List_Push;
@@ -261,7 +261,7 @@ is
                        Value : String)
                        return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type := List;
    begin
@@ -277,7 +277,7 @@ is
                             List_2 : List_Type)
                             return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Result : List_Type;
    begin
@@ -312,7 +312,7 @@ is
                    Key  : String)
                    return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use List_Vectors;
    begin
       return Has_Element (List.Find (+Key));

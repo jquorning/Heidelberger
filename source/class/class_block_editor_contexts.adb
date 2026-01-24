@@ -5,7 +5,7 @@
 -- @since 5.8.0
 --
 
-with Hb_Common;
+with UStrings;
 
 package body Class_Block_Editor_Contexts
 is
@@ -17,7 +17,7 @@ is
    function X_Construct (Settings : Array_Type := Empty_Array)
                          return Wp_Block_Editor_Context
    is
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_Block_Editor_Context;
    begin

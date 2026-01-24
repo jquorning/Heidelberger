@@ -1163,7 +1163,7 @@ is
                                            Key  : String := "";
                                            Tag  : String := "h2")
    is
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Echoing;
    begin

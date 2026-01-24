@@ -13,7 +13,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Functions;
@@ -34,7 +34,7 @@ is
                return Array_Type
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Numerics;
       use Php.Preg;
@@ -286,7 +286,7 @@ is
       use Php.Arrays;
       use Php.Numerics;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Global_Styles_And_Settings;
    begin
       if not Isset (Preset, "size") then

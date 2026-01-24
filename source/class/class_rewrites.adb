@@ -9,7 +9,7 @@
 with Php.Preg;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 package body Class_Rewrites
 is
@@ -22,7 +22,7 @@ is
                               return Boolean
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       return not Empty (-This.Permalink_Structure);
    end Using_Permalinks;
@@ -36,7 +36,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       if Empty (-This.Permalink_Structure) then
          return False;
@@ -55,7 +55,7 @@ is
                                    return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       if Empty (-This.Permalink_Structure) then
          return ""; -- False;
@@ -78,7 +78,7 @@ is
                                   return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       if Isset (-This.Page_Structure) then
          return -This.Page_Structure;

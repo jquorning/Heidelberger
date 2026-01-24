@@ -29,7 +29,7 @@ with Php.Types;
 
 with Array_Vectors;
 with Binder;
-with Hb_Common;
+with UStrings;
 with Globals;
 
 with Adm_Load_Styles;
@@ -88,7 +88,7 @@ is
      (Scripts            : in out Class_Scripts.Wp_Scripts;
       Force_Uncompressed : Boolean := False)
    is
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Strings;
       use Inc_Link_Templates;
@@ -148,7 +148,7 @@ is
    procedure Wp_Default_Packages_Vendor
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
       use Inc_Functions;
       use Inc_Options;
@@ -312,7 +312,7 @@ is
    procedure Wp_Register_Development_Scripts
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use Hb_Common;
+      use UStrings;
 
       Development_Scripts : constant List_Type :=
         To_List (List => (
@@ -380,7 +380,7 @@ is
       for A in Assets.Iterate loop -- as file_name => package_data ) then
          declare
 --          use Array_Maps;
---          use Hb_Common;
+--          use UStrings;
 
             File_Name    : constant String := Key     (A);
             Package_Data : Array_Type;
@@ -454,7 +454,7 @@ is
    procedure Wp_Default_Packages_Inline_Scripts
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Strings;
@@ -805,7 +805,7 @@ is
                                    return String
    is
       use Globals;
---    use Hb_Common;
+--    use UStrings;
       use Inc_Versions;
 --         static suffixes;
    begin
@@ -849,7 +849,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -1744,7 +1744,7 @@ is
    procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles)
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Inc_General_Templates;
       use Inc_L10n;
@@ -2634,7 +2634,7 @@ is
    procedure X_Print_Styles
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Php.Strings;
@@ -2700,7 +2700,7 @@ is
    is
       use Php;
       use Php.Ini;
---    use Hb_Common;
+--    use UStrings;
 --    global concatenate_scripts, compress_scripts, compress_css;
 
       Compressed_Output : constant Boolean :=
@@ -2753,7 +2753,7 @@ is
    procedure Wp_Common_Block_Scripts_And_Styles
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Files;
       use Php.Strings;
@@ -2828,7 +2828,7 @@ is
 
    function Filter_Blocks (Node : String) return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Arrays;
    begin
@@ -2866,7 +2866,7 @@ is
    procedure Wp_Enqueue_Global_Styles
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions_Wp_Styles;
       use Inc_Global_Styles_And_Settings;
       use Inc_Plugins;
@@ -3289,7 +3289,7 @@ is
    procedure Wp_Maybe_Inline_Styles
    is
       use Array_Vectors;
-      use Hb_Common;
+      use UStrings;
       use Php.Files;
       use Php.Strings;
       use Inc_Plugins;
@@ -3413,7 +3413,7 @@ is
                                                return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Files;
       use Php.Preg;
@@ -3534,7 +3534,7 @@ is
    procedure Wp_Enqueue_Stored_Styles (Options : Array_Type := Empty_Array)
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php.Lists;
       use Php.Strings;
       use Inc_Functions_Wp_Styles;
@@ -4246,7 +4246,7 @@ is
    procedure Wp_Enqueue_Classic_Theme_Styles
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_Theme_JSON_Resolver;
       use Inc_Functions_Wp_Styles;
    begin

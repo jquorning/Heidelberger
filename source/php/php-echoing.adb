@@ -6,7 +6,7 @@ with Ada.Strings.Unbounded;
 
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 package body Php.Echoing
 is
@@ -58,7 +58,7 @@ is
    function Get_Echo
             return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -Echo_Buffer;
    end Get_Echo;

@@ -10,7 +10,7 @@ with Php.Arrays;
 with Php.Lists;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Class_Wp;
 with Inc_Formatting;
@@ -34,7 +34,7 @@ is
                          Args        : Array_Type := Empty_Array)
                          return Wp_Taxonomy
    is
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_Taxonomy;
    begin
@@ -52,7 +52,7 @@ is
                         Object_Type : List_Type;
                         Args        : Array_Type)
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Arrays;
       use Php.Lists;
       use Inc_Formatting;
@@ -333,7 +333,7 @@ is
 
    procedure Add_Rewrite_Rules (This : Wp_Taxonomy)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
 --    use Inc_Plugins;
       use Inc_Rewrites;
@@ -405,7 +405,7 @@ is
 
    procedure Add_Hooks (This : Wp_Taxonomy)
    is
---    use Hb_Common;
+--    use UStrings;
 --    use Inc_Plugins;
    begin
 --    Add_Filter ("wp_ajax_add-" & (-This.Name), "_wp_ajax_add_hierarchical_term");

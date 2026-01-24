@@ -9,12 +9,12 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 
 package POMO_Streams
 is
    use Ada.Strings.Unbounded;
-   use Hb_Common;
+   use UStrings;
 
    procedure Dummy;
 

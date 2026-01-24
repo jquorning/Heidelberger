@@ -12,7 +12,7 @@ with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Caches;
@@ -45,7 +45,7 @@ is
                          X_Child    : in out Wp_Theme) -- _Access := null)
                          return Wp_Theme
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Files;
@@ -465,7 +465,7 @@ is
                        Data : Array_Type)
                        return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
 
       Result : Boolean;
@@ -492,7 +492,7 @@ is
                        Key  : String)
                        return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
 
       Found : Boolean;
@@ -509,7 +509,7 @@ is
                  Header : String)
                  return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Types;
@@ -556,7 +556,7 @@ is
                              Value  : String)
                              return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Strings;
@@ -630,7 +630,7 @@ is
    function Get_Stylesheet (This : Wp_Theme)
                             return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -This.Stylesheet;
    end Get_Stylesheet;
@@ -642,7 +642,7 @@ is
    function Get_Template (This : Wp_Theme)
                           return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -This.Template;
    end Get_Template;

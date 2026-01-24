@@ -135,7 +135,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Stylesheet_2 : String := (if Empty (Stylesheet)
                                 then Get_Stylesheet
@@ -196,7 +196,7 @@ is
    function Get_Stylesheet
             return String
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Options;
       use Inc_Plugins;
    begin
@@ -217,7 +217,7 @@ is
    function Get_Stylesheet_Directory
             return String
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Plugins;
 
       Stylesheet     : constant String := Get_Stylesheet; -- ();
@@ -336,7 +336,7 @@ is
    function Get_Template
             return String
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Options;
       use Inc_Plugins;
    begin
@@ -357,7 +357,7 @@ is
    function Get_Template_Directory
             return String
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Plugins;
 
       Template     : constant String := Get_Template; -- ();
@@ -454,7 +454,7 @@ is
                                       return Boolean
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Files;
       use Php.Lists;
@@ -640,7 +640,7 @@ is
                             return String
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Inc_Plugins;
@@ -749,7 +749,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Inc_Options;
-      use Hb_Common;
+      use UStrings;
 
 --    global wp_theme_directories;
       Theme_Root : Unbounded_String;
@@ -2622,7 +2622,7 @@ is
                                 List    : List_Type  := Empty_List;
                                 Arry    : Array_Type := Empty_Array) -- ...args
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Lists;
@@ -2977,7 +2977,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use List_Vectors;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
    begin
       if
@@ -3248,7 +3248,7 @@ is
    procedure Register_Theme_Feature (Feature : String;
                                      Args    : Array_Type)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Lists;
@@ -3541,7 +3541,7 @@ is
    procedure X_Wp_Customize_Include
    is
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Files;
@@ -3970,7 +3970,7 @@ is
 
    procedure Create_Initial_Theme_Features
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
    begin
       Register_Theme_Feature (
@@ -4389,7 +4389,7 @@ is
 
    procedure X_Add_Default_Theme_Supports
    is
-      use Hb_Common;
+      use UStrings;
 --    use Inc_Functions;
 --    use Inc_Plugins;
    begin

@@ -16,7 +16,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -462,7 +462,7 @@ is
       use Php.Lists;
 --    use Php.Misc;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 --    use Inc_Plugins;
 
@@ -542,7 +542,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       -- -- Split headers, one per array element.
       -- if ( is_string( headers ) ) then
@@ -659,7 +659,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use Inc_Options;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
    begin
       -- We don't need to block requests, because nothing is blocked.

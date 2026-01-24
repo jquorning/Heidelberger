@@ -6,7 +6,7 @@
 -- @since 3.4.0
 --
 
-with Hb_Common;
+with UStrings;
 -- with Php;
 
 package body Class_Customize_Sections
@@ -22,7 +22,7 @@ is
               Args    : Array_Type := Empty_Array)
               return Wp_Customize_Section
    is
-      use Hb_Common;
+      use UStrings;
 --    use Php;
 
       This : Wp_Customize_Section;

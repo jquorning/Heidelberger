@@ -9,7 +9,7 @@
 with Php.Lists;
 with Php.Misc;
 
-with Hb_Common;
+with UStrings;
 
 with Class_Locales;
 with Inc_L10n;
@@ -28,7 +28,7 @@ is
                               Locale : String)
                               return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Inc_L10n;
@@ -67,7 +67,7 @@ is
    function Restore_Previous_Locale (This : in out Wp_Locale_Switcher)
                                      return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Misc;
@@ -113,7 +113,7 @@ is
    procedure Load_Translations (This   : Wp_Locale_Switcher;
                                 Locale : String)
    is
-      use Hb_Common;
+      use UStrings;
 --    use Php;
       use Inc_L10n;
 

@@ -13,13 +13,13 @@ with Ada.Text_IO;
 with Php.Lists;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 
 package body Class_Dependencies
 is
    use Ada.Strings.Unbounded;
-   use Hb_Common;
+   use UStrings;
    use Php;
    use Wp_Common;
 

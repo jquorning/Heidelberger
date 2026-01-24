@@ -37,7 +37,7 @@ with Php.Types;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Adi_Templates;
@@ -88,7 +88,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.HTML;
-      use Hb_Common;
+      use UStrings;
       use Inc_General_Templates;
       use Inc_L10n;
 
@@ -134,7 +134,7 @@ is
       use Php.Strings;
       use Arrays;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Lists;
       use Adi_Templates;
       use Class_WpDB;
@@ -353,7 +353,7 @@ is
       use Php.Types;
       use Arrays;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Lists;
 --    use Class_Locales;
       use Inc_Formatting;
@@ -586,7 +586,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Arrays;
-      use Hb_Common;
+      use UStrings;
       use Adi_Translation_Install;
    begin
       if Wp_Can_Install_Language_Pack and then Empty (Language) then
@@ -615,7 +615,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Lists;
       use Adi_Translation_Install;
       use Inc_L10n;
@@ -662,7 +662,7 @@ is
       use Php.Strings;
       use Arrays;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Lists;
       use Adi_Upgrade;
       use Inc_Formatting;

@@ -14,7 +14,7 @@ with Php.Strings;
 
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Lists;
 
@@ -39,7 +39,7 @@ is
       use Php.Lists;
       use Php.Numerics;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Binder;
       use Class_Post_Type;
 --    use Inc_Capabilities;

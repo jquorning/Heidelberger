@@ -1,7 +1,7 @@
 -- with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
-with Hb_Common;
+with UStrings;
 with Helpers;
 
 package body Arrays.IO
@@ -14,7 +14,7 @@ is
             return String
    is
 --    use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Buffer : Unbounded_String;
       First  : Boolean := True;

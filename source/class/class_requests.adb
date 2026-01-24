@@ -14,7 +14,7 @@ with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 
 package body Class_Requests
@@ -131,7 +131,7 @@ is
    is
       use Php.Files;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       if not Empty (-Certificate_Path) then -- self::
          return -Certificate_Path; -- self::
@@ -154,7 +154,7 @@ is
 --    use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       -- if (!preg_match("/^http(s)?:\/\//i", url, matches)) then
       --    throw new Requests_Exception
@@ -225,7 +225,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Options_2 : Array_Type := Options;
 

@@ -16,7 +16,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
-with Hb_Common;
+with UStrings;
 with Globals;
 with Lists;
 
@@ -44,7 +44,7 @@ is
       use Arrays;
       use Binder;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Php.Errors;

@@ -16,7 +16,7 @@ with Php.Misc;
 with Php.Strings;
 
 with Binder;
-with Hb_Common;
+with UStrings;
 
 with Adi_Screens;
 with Adi_Templates;
@@ -40,7 +40,7 @@ is
                          return Wp_List_Table
    is
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
       use Adi_Templates;
       use Inc_Formatting;
       use Inc_Functions;
@@ -272,7 +272,7 @@ is
                          Input_Id : String)
    is
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Adi_Templates;
@@ -409,7 +409,7 @@ is
 
    procedure Views (This : Wp_List_Table)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Php.Strings;
@@ -468,7 +468,7 @@ is
    procedure Bulk_Actions (This  : in out Wp_List_Table;
                            Which : String := "")
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Arrays;
       use Php.Echoing;
       use Inc_Formatting;
@@ -923,7 +923,7 @@ is
                          Which : String)
    is
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Php.Strings;
@@ -1139,7 +1139,7 @@ is
    function Get_Default_Primary_Column_Name (This : Wp_List_Table)
                                              return String
    is
-      use Hb_Common;
+      use UStrings;
 
       Columns : constant Array_Type := This.Get_Columns;
       Column  : Unbounded_String := +"";
@@ -1188,7 +1188,7 @@ is
                                      return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       Columns   : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
@@ -1228,7 +1228,7 @@ is
    function Get_Column_Info (This : in out Wp_List_Table)
                              return Columns_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
    begin
       -- _column_headers is already set / cached.
@@ -1331,7 +1331,7 @@ is
                               return Natural
    is
       use type Ada.Containers.Count_Type;
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Lists;
@@ -1364,7 +1364,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -1508,7 +1508,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Singular : constant String := As_String (Get (This.X_Args, "singular"));
    begin
@@ -1556,7 +1556,7 @@ is
    function Get_Table_Classes (This : Wp_List_Table)
                                return List_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Options;
 
@@ -1576,7 +1576,7 @@ is
    procedure Display_Tablenav (This  : in out Wp_List_Table;
                                Which : String)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
       use Inc_Functions;
@@ -1629,7 +1629,7 @@ is
 
    procedure Display_Rows_Or_Placeholder (This : in out Wp_List_Table)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
    begin
@@ -1664,7 +1664,7 @@ is
    procedure Single_Row (This : in out Wp_List_Table;
                          Item : Array_Type)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Echoing;
    begin
@@ -1703,7 +1703,7 @@ is
    procedure Single_Row_Columns (This : in out Wp_List_Table;
                                  Item : Array_Type)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Echoing;

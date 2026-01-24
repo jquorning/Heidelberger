@@ -9,7 +9,7 @@ with Php.Misc;
 
 with Arrays;
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Inc_Themes;
 with Inc_Options;
@@ -168,7 +168,7 @@ is
    procedure Wp_Plugin_Directory_Constants
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
    begin
 --    if ( ! defined( "WP_CONTENT_URL" ) ) then
@@ -247,7 +247,7 @@ is
       use Php.Misc;
       use Php.Preg;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
    begin
       --
@@ -399,7 +399,7 @@ is
    procedure Wp_Templating_Constants
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Themes;
    begin
       --

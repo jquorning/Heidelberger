@@ -12,7 +12,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Class_Comments;
 with Class_Post_Type;
@@ -63,7 +63,7 @@ is
                           return List_Type
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Strings;
@@ -1292,7 +1292,7 @@ is
    function Is_Super_Admin (User_Id : Integer := 0) -- false
                             return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Types;

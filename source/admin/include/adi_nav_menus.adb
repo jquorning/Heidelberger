@@ -16,7 +16,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded;
 
 with Binder;
-with Hb_Common;
+with UStrings;
 with Globals;
 with Php;
 with Wp_Common;
@@ -47,7 +47,7 @@ is
    use Ada.Strings.Unbounded;
    use Binder;
    use Globals;
-   use Hb_Common;
+   use UStrings;
    use Inc_L10n;
    use Php;
    use Inc_Class_Wp_Posts;

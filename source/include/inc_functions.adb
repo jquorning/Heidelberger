@@ -25,7 +25,7 @@ with Php.Types;
 
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Wp_Common;
 
@@ -1106,7 +1106,7 @@ is
       use Php.Ini;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
 
       Ret : Array_Type;
    begin
@@ -1172,7 +1172,7 @@ is
       use Ada.Text_IO;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
 
       Protocol : Unbounded_String;
@@ -1291,7 +1291,7 @@ is
                            URL   : String := "")
                            return String
    is
-      use Hb_Common;
+      use UStrings;
 
       Res : Unbounded_String := +URL;
    begin
@@ -1309,7 +1309,7 @@ is
                               Query : String := "")
                               return String
    is
-      use Hb_Common;
+      use UStrings;
 
       Query_2 : Unbounded_String := +Query;
    begin
@@ -1384,7 +1384,7 @@ is
    function Add_Magic_Quotes (Arry : Array_Type)
             return Array_Type
    is
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Strings;
 
@@ -1470,7 +1470,7 @@ is
    function Get_Status_Header_Desc (Code : Integer)
                                     return String
    is
-      use Hb_Common;
+      use UStrings;
 --        global wp_header_to_desc;
 
 --        code = absint( code );
@@ -1883,7 +1883,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Load;
@@ -2027,7 +2027,7 @@ is
    is
       use Inc_Formatting;
       use Inc_Pluggables;
-      use Hb_Common;
+      use UStrings;
 
       Name_2 : constant String := ESC_Attr (Name);
       Nonce_Field : Unbounded_String :=
@@ -2322,7 +2322,7 @@ is
    function Wp_Normalize_Path (Path : String)
                                return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
       use Php.Strings;
@@ -2369,7 +2369,7 @@ is
       use Php.Files;
       use Php.Ini;
       use Php.Misc;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
    begin
       if Globals.WP_TEMP_DIR /= "" then
@@ -3749,7 +3749,7 @@ is
    is
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_L10n;
@@ -4750,7 +4750,7 @@ is
                                  Options  : Array_Type := Empty_Array)
                                  return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Errors;
       use Php.Files;
@@ -5146,7 +5146,7 @@ is
                                   Keys : List_Type)
                                   return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       Slice : Array_Type;
    begin
@@ -5169,7 +5169,7 @@ is
                             return Multi_Type
    is
       use Ada.Containers;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Types;
@@ -5207,7 +5207,7 @@ is
                              Path  : List_Type;
                              Value : Multi_Type)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
 
@@ -5265,7 +5265,7 @@ is
    function X_Wp_To_Kebab_Case (Item : String)
                                 return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
       use Php.Strings;
@@ -6039,7 +6039,7 @@ is
       use Php.Errors;
       use Php.Misc;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
@@ -6300,7 +6300,7 @@ is
    function Wp_Guess_URL
             return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Strings;
 
@@ -6896,7 +6896,7 @@ is
                            Context         : String := "")
                            return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Files;
@@ -7166,7 +7166,7 @@ is
             return List_Type
    is
       use Php.Lists;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
    begin
       if Static_Protocols.Is_Empty then
@@ -7525,7 +7525,7 @@ is
       use Php.Ini;
       use Php.Lists;
       use Php.Multibyte;
-      use Hb_Common;
+      use UStrings;
    begin
       if not Static_Overloaded_Bool then -- is_null
          Static_Overloaded_Bool := True;
@@ -7826,7 +7826,7 @@ is
             return String
    is
       use Helpers;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Numerics;
       use Php.Strings;
@@ -8262,7 +8262,7 @@ is
    is
       use Php.Misc;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       Default_URL : constant String := Wp_Get_Default_Update_PHP_URL;

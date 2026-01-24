@@ -20,7 +20,7 @@ with Arrays;
 with Binder;
 with Databases;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Adi_Upgrade;
@@ -60,7 +60,7 @@ is
       use Php.Files;
       use Php.Misc;
       use Databases;
-      use Hb_Common;
+      use UStrings;
       use Adi_Upgrade;
       use Inc_Formatting;
       use Inc_Functions;
@@ -260,7 +260,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

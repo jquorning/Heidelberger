@@ -12,7 +12,7 @@ with Php.Strings;
 
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -41,7 +41,7 @@ is
                        return User_Error_Type
    is
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Load;
@@ -1423,7 +1423,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Globals;
       use Class_WpDB;
       use Inc_Functions;
@@ -1900,7 +1900,7 @@ is
    procedure Update_User_Caches (User : Class_Users.Wp_User)
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_Users;
 
@@ -3426,7 +3426,7 @@ is
    function Wp_Get_Session_Token
             return String
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Pluggables;
 
       Cookie : constant Array_Type := Wp_Parse_Auth_Cookie ("", "logged_in");

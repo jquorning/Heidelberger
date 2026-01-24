@@ -18,7 +18,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Class_Dependency;
 with Inc_Formatting;
@@ -31,7 +31,7 @@ with Inc_Themes;
 
 package body Class_Scripts
 is
-   use Hb_Common;
+   use UStrings;
    use Inc_L10n;
    use Php;
 

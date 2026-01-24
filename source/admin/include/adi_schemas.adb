@@ -17,7 +17,7 @@ with Php.Types;
 
 with Lists;
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Adi_Upgrade;
 with Class_WpDB;
@@ -72,7 +72,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Globals;
-      use Hb_Common;
+      use UStrings;
 
       Charset_Collate : constant String :=
         WpDB.Get_Charset_Collate;
@@ -423,7 +423,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Adi_Upgrade;
       use Class_Themes;
       use Class_WpDB;
@@ -971,7 +971,7 @@ is
 
    procedure Populate_Roles_210
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Capabilities;
 
       Roles : constant List_Type :=

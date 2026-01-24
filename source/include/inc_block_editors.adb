@@ -14,7 +14,7 @@ with Php.Lists;
 with Php.Misc;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Class_Posts;
 with Inc_Functions;
@@ -240,7 +240,7 @@ is
    function Get_Default_Block_Editor_Settings
             return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Files;
@@ -406,7 +406,7 @@ is
    function Get_Legacy_Widget_Block_Editor_Settings
             return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       Editor_Settings : Array_Type;

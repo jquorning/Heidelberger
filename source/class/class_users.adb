@@ -13,7 +13,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 
 with Inc_Caches;
@@ -47,7 +47,7 @@ is
                          return Wp_User
    is
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_User;
    begin
@@ -126,7 +126,7 @@ is
                          return Class_Users.Wp_User
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Formatting;
@@ -225,7 +225,7 @@ is
                          return Class_Users.Wp_User
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Caches;
       use Class_WpDB;
       use Inc_Formatting;
@@ -548,7 +548,7 @@ is
    function Get_Role_Caps (This : in out Wp_User)
                            return Array_Type -- Boolean_Maps.Map
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Inc_Capabilities;
@@ -672,7 +672,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Users;
    begin
@@ -747,7 +747,7 @@ is
                              return Integer
    is
       use Php.Preg;
-      use Hb_Common;
+      use UStrings;
 
       Matches : List_Type;
    begin
@@ -840,7 +840,7 @@ is
                      -- ...args )
                      return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Lists;
       use Php.Strings;
       use Inc_Capabilities;
@@ -950,7 +950,7 @@ is
                        Site_Id : Integer := 0) -- ''
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
 --    use Class_Users;
       use Inc_Load;
    begin
@@ -986,7 +986,7 @@ is
    function Get_Caps_Data (This : Wp_User)
                            return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Types;
       use Inc_Users;

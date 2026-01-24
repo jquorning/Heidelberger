@@ -6,7 +6,7 @@
 -- @since 3.4.0
 --
 
-with Hb_Common;
+with UStrings;
 with Php.Types;
 
 with Class_Customize_Managers;
@@ -24,7 +24,7 @@ is
               Args    : Array_Type := Empty_Array)
               return Wp_Customize_Control
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Types;
 

@@ -17,7 +17,7 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Adi_Plugins;
@@ -61,7 +61,7 @@ is
       use Php.Strings;
       use Binder;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Adi_Plugins;
       use Inc_Formatting;
       use Inc_Functions;

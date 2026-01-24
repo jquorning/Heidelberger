@@ -1,4 +1,4 @@
--- with Hb_Common;
+-- with UStrings;
 -- with Php;
 
 package body Inc_Elab_Hooks
@@ -12,7 +12,7 @@ is
    function Build_Preinitialized_Hooks (Filters : Array_Type)
                                         return Hook_Maps.Map
    is
---    use Hb_Common;
+--    use UStrings;
 --    use Php;
 
       -- @var WP_Hook[] normalized

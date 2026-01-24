@@ -11,7 +11,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 with Lists;
 
@@ -35,7 +35,7 @@ with Class_Post_Type;
 package body Adm_Menu
 is
    use Inc_L10n;
-   use Hb_Common;
+   use UStrings;
    use Arrays;
    use Php;
    use Inc_Functions;

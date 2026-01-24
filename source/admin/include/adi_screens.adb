@@ -7,7 +7,7 @@
 
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 
 with Inc_Plugins;
@@ -26,7 +26,7 @@ is
    function Get_Column_Headers (Screen : Adi_Class_Wp_Screens.Wp_Screen)
                                 return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 --    static column_headers = array();
    begin
@@ -62,7 +62,7 @@ is
    function Get_Hidden_Columns (Screen : Adi_Class_Wp_Screens.Wp_Screen)
                                 return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Php;
       use Php.Types;

@@ -8,7 +8,7 @@
 -- @since 6.1.0
 --
 
-with Hb_Common;
+with UStrings;
 
 package body Style_Class_Wp_Style_Engine_CSS_Rules_Stores
 is
@@ -46,7 +46,7 @@ is
    procedure Set_Name (This : in out Wp_Style_Engine_CSS_Rules_Store;
                        Name : String)
    is
-      use Hb_Common;
+      use UStrings;
    begin
       This.Name := +Name;
    end Set_Name;

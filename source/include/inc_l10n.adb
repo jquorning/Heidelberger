@@ -15,7 +15,7 @@ with Php.Types;
 with Array_Vectors;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Adi_Translation_Install;
 with Class_Locale_Switchers;
@@ -48,7 +48,7 @@ package body Inc_L10n is
    function Array_Keys (Map : String_Maps.Map)
                         return List_Type
    is
-      use Hb_Common;
+      use UStrings;
 
       List : List_Type;
    begin
@@ -67,7 +67,7 @@ package body Inc_L10n is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Options;
       use Inc_Plugins;
@@ -176,7 +176,7 @@ package body Inc_L10n is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Load;
       use Inc_Plugins;
@@ -770,7 +770,7 @@ package body Inc_L10n is
                              return Boolean
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Files;
       use Inc_Plugins;
@@ -874,7 +874,7 @@ package body Inc_L10n is
                                Reloadable : Boolean := False)
                                return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Plugins;
 
 --         global l10n, l10n_unloaded;
@@ -1362,7 +1362,7 @@ package body Inc_L10n is
                                             return Boolean
    is
 --    use Ada.Strings.Unbounded;
---    use Hb_Common;
+--    use UStrings;
       use Php;
       use Php.Strings;
       use Class_Textdomain_Registry;
@@ -1428,7 +1428,7 @@ package body Inc_L10n is
    function Get_Translations_For_Domain (Domain : String)
                                          return POMO_Translations.Translations
    is
---    use Hb_Common;
+--    use UStrings;
       use POMO_Translations;
 --    global l10n;
    begin
@@ -1505,7 +1505,7 @@ package body Inc_L10n is
    is
       use Php.Files;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       Languages  : Array_Type;
@@ -1632,7 +1632,7 @@ package body Inc_L10n is
       use Php.Echoing;
       use Php.Strings;
       use Array_Vectors;
-      use Hb_Common;
+      use UStrings;
       use Adi_Translation_Install;
       use Inc_Formatting;
       use Inc_Functions;

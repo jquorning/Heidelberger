@@ -12,7 +12,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 with Php.Preg;
 with Php.Strings;
 
@@ -30,7 +30,7 @@ with Inc_Taxonomys;
 
 package body Inc_Meta
 is
-   use Hb_Common;
+   use UStrings;
 --   use Arrays;
 --
 -- Adds metadata for the specified object.

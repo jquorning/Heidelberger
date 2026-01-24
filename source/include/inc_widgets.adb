@@ -28,7 +28,7 @@ with Php.Sorting;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 
 with Class_Customize_Widgets;
 with Inc_Formatting;
@@ -61,7 +61,7 @@ is
                              return Boolean
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Echoing;
@@ -599,7 +599,7 @@ is
    function Wp_Map_Sidebars_Widgets (Existing_Sidebars_Widgets : Array_Type)
                                      return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Lists;

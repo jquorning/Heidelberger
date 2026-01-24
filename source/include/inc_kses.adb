@@ -38,7 +38,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Functions;
 with Inc_Plugins;
@@ -977,7 +977,7 @@ is
    function Wp_KSES_URI_Attributes
             return List_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
 
       URI_Attributes_2 : constant List_Type := To_List (List => (
@@ -1024,7 +1024,7 @@ is
    function X_Wp_KSES_Split_Callback (Match : List_Type)
                                       return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return
         Wp_KSES_Split2 (-Match.First_Element, -- (0),
@@ -1043,7 +1043,7 @@ is
                             return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
       use Php.Strings;
@@ -1127,7 +1127,7 @@ is
    function Filter_Limits (Required_Attr_Limits : Array_Type)
                            return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
    begin
       return
          Isset (Required_Attr_Limits, "required") and then
@@ -1145,7 +1145,7 @@ is
                           return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Preg;
@@ -1254,7 +1254,7 @@ is
                                 Allowed_HTML : Array_Type)
                                 return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
       use Php.Strings;
@@ -1362,7 +1362,7 @@ is
                           return Array_Type
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Lists;
@@ -1713,7 +1713,7 @@ is
                                   return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       Item_2          : Unbounded_String := +Wp_KSES_No_Null (Item);
       Iterations      : Natural := 0;
@@ -1824,7 +1824,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Count_2 : Natural := Count;
 
@@ -1873,7 +1873,7 @@ is
                                         Allowed_Protocols : List_Type)
                                         return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Preg;
       use Php.Strings;
@@ -2085,7 +2085,7 @@ is
    function X_Wp_KSES_Decode_Entities_Chr (Match : List_Type)
                                            return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return Integer'Image (Integer'Value (-Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr;
@@ -2097,7 +2097,7 @@ is
    function X_Wp_KSES_Decode_Entities_Chr_Hexdec (Match : List_Type)
                                                   return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Numerics;
    begin
@@ -2310,7 +2310,7 @@ is
                                  return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Preg;

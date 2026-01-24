@@ -16,7 +16,7 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Wp_Common;
 
@@ -56,7 +56,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Globals;
       use Wp_Common;
       use Adm_Menu;

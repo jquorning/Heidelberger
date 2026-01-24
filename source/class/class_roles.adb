@@ -10,7 +10,7 @@ with Php.Arrays;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Load;
@@ -48,7 +48,7 @@ is
                       return Class_Role.Wp_Role
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Role;
       use Inc_Options;
    begin
@@ -84,7 +84,7 @@ is
                       Cap   : String;
                       Grant : Boolean := True)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
    begin
       if not Isset (This.Roles, Role) then
@@ -110,7 +110,7 @@ is
                          Role : String;
                          Cap  : String)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
    begin
       if not Isset (This.Roles, Role) then
@@ -149,7 +149,7 @@ is
    procedure Init_Roles (This : in out Wp_Roles)
    is
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
       use Lists;
       use Class_Role;
       use Inc_Plugins;
@@ -192,7 +192,7 @@ is
    procedure For_Site (This    : in out Wp_Roles;
                        Site_Id : Integer := 0)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
 --    global wpdb;
    begin
@@ -225,7 +225,7 @@ is
    function Get_Roles_Data (This : Wp_Roles)
                             return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;

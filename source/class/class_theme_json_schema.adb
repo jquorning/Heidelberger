@@ -9,7 +9,7 @@
 with Php.Lists;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 with Class_Theme_JSON;
 with Inc_Functions;
@@ -132,7 +132,7 @@ is
    procedure Unset_Setting_By_Path (Settings : in out Array_Type;
                                     Path     : List_Type)
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
 

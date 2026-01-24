@@ -15,7 +15,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Inc_Elab_Hooks;
 with Inc_Functions;
@@ -155,7 +155,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
-      use Hb_Common;
+      use UStrings;
       use Inc_Elab_Hooks;
 
       Args_2 : Array_Type := Args;
@@ -353,7 +353,7 @@ is
    function Current_Filter
             return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -Global_Wp_Current_Filter.Last_Element; -- end()
    end Current_Filter;
@@ -430,7 +430,7 @@ is
                         Arg_3     : String := "")
    is
       use Php.Lists;
-      use Hb_Common;
+      use UStrings;
       use Count_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
 
@@ -636,7 +636,7 @@ is
                                       Message     : String := "")
                                       return String
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
    begin
       if not Has_Filter (Hook_Name) then
@@ -692,7 +692,7 @@ is
       use Php.Arrays;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
 
       -- wp_plugin_paths contains normalized paths.
@@ -901,7 +901,7 @@ is
 
    procedure Dump_Hooks
    is
-      use Hb_Common;
+      use UStrings;
       use Count_Maps;
       use Natural_Maps;
       use Inc_Elab_Hooks.Hook_Maps;

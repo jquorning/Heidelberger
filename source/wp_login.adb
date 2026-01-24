@@ -23,7 +23,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Lists;
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 with Wp_Load;
 
@@ -135,7 +135,7 @@ is
       use Php.Echoing;
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Errors;
       use Inc_Formatting;
@@ -433,7 +433,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_Link_Templates;
@@ -577,7 +577,7 @@ is
    procedure Wp_Shake_JS
    is
       use Php.Echoing;
-      use Hb_Common;
+      use UStrings;
    begin
       Echo ("  <script type=""text/javascript"">" & NL);
       Echo ("    document.querySelector('form').classList.add('shake');" & NL);
@@ -606,7 +606,7 @@ is
       use Php.Errors;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
       use Inc_Formatting;
@@ -854,7 +854,7 @@ is
       use Php.Errors;
       use Php.HTML;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Class_Phpass;
       use Inc_Formatting;
       use Inc_Functions;
@@ -909,7 +909,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Errors;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Users;
       use Inc_Functions;
@@ -975,7 +975,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_General_Templates;
@@ -1129,7 +1129,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Errors;
       use Inc_Functions;
@@ -1388,7 +1388,7 @@ is
       use Php.Errors;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_General_Templates;
@@ -1677,7 +1677,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Lists.List_Vectors;
       use Wp_Common;
       use Inc_Capabilities;
@@ -2231,7 +2231,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Class_Errors;
       use Inc_Formatting;
       use Inc_Functions;

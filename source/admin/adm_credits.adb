@@ -11,7 +11,7 @@ with Php.Echoing;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with GNATCOLL.JSON;
@@ -41,7 +41,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
 
       List : constant List_Type :=

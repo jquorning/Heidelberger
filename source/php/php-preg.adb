@@ -5,7 +5,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Hb_Common;
+with UStrings;
 
 with GNAT.Regpat;
 
@@ -91,7 +91,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use GNAT.Regpat;
-      use Hb_Common;
+      use UStrings;
 
       Buffer : Unbounded_String;
       Index  : Natural := Replacement'First;
@@ -188,7 +188,7 @@ is
                         return Integer
    is
       use GNAT.Regpat;
-      use Hb_Common;
+      use UStrings;
 
       Marks : constant Marks_Type :=
         Find_Marks (Pattern);
@@ -343,7 +343,7 @@ is
                         return List_Type
    is
       use GNAT.Regpat;
-      use Hb_Common;
+      use UStrings;
 
       Marks : constant Marks_Type := Find_Marks (Pattern);
 

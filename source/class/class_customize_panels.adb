@@ -6,7 +6,7 @@
 -- @since 4.0.0
 --
 
-with Hb_Common;
+with UStrings;
 
 with Class_Customize_Managers;
 
@@ -23,7 +23,7 @@ is
                Args    : Array_Type := Empty_Array)
                return Wp_Customize_Panel
    is
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_Customize_Panel;
 --    Keys := Array_Keys (Get_Object_Vars (This));

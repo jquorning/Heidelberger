@@ -7,7 +7,7 @@
 --
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Caches;
@@ -24,7 +24,7 @@ is
                           return Wp_Comment
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Lists;
       use Inc_Caches;
       use Class_WpDB;

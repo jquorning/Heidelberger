@@ -20,7 +20,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Binder;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Globals;
 with Wp_Common;
@@ -673,7 +673,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Errors;
       use Class_Users;
@@ -789,7 +789,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Users;
       use Inc_Compat;
@@ -1045,7 +1045,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
 
       Cookie_Name : Unbounded_String;
@@ -1256,7 +1256,7 @@ is
       use Php.HTML;
       use Php.Misc;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Plugins;
       use Inc_Users;
    begin
@@ -1676,7 +1676,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_KSES;
 
@@ -1724,7 +1724,7 @@ is
                                             return String
    is
       use Php.HTML;
-      use Hb_Common;
+      use UStrings;
    begin
       return URL_Encode (-Matches.First_Element); -- [0]
    end X_Wp_Sanitize_UTF8_In_Redirect;
@@ -1798,7 +1798,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Binder;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
@@ -2715,7 +2715,7 @@ is
    function Wp_Salt (Scheme : String := "auth")
                      return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Inc_L10n;
@@ -2968,7 +2968,7 @@ is
                                   return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Strings;
       use Inc_Plugins;
@@ -3162,7 +3162,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;

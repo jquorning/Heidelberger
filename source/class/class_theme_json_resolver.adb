@@ -15,7 +15,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Inc_Block_Editors;
 -- with Class_Block_Type;
@@ -49,7 +49,7 @@ is
    is
       use Php.Arrays;
       use Php.Types;
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
    begin
       if File_Path /= "" then
@@ -167,7 +167,7 @@ is
                                         return Boolean
    is
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
 --    use Class_Block_Type;
       use Class_Block_Type_Registry;
    begin
@@ -212,7 +212,7 @@ is
                             Options    : Array_Type := Empty_Array)
                             return Class_Theme_JSON.Wp_Theme_JSON
    is
---    use Hb_Common;
+--    use UStrings;
       use Inc_Functions;
       use Class_Themes;
       use Class_Theme_JSON;
@@ -379,7 +379,7 @@ is
    function Get_Block_Data
             return Class_Theme_JSON.Wp_Theme_JSON
    is
-      use Hb_Common;
+      use UStrings;
       use Class_Block_Type_Registry;
       use Class_Theme_JSON;
       use Class_Theme_JSON_Data;
@@ -463,7 +463,7 @@ is
    function Remove_JSON_Comments (Arry : Array_Type)
                                   return Array_Type
    is
---    use Hb_Common;
+--    use UStrings;
 
       Arry_2 : Array_Type := Arry;
    begin
@@ -493,7 +493,7 @@ is
       Post_Status_Filter : List_Type := To_List ("publish"))
       return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php.HTML;
       use Php.Strings;
       use Class_Posts;
@@ -590,7 +590,7 @@ is
    function Get_User_Data
             return Class_Theme_JSON.Wp_Theme_JSON
    is
---    use Hb_Common;
+--    use UStrings;
       use Php.Arrays;
       use Php.Errors;
       use Php.JSON;
@@ -732,7 +732,7 @@ is
    function Theme_Has_Support
             return Boolean
    is
---    use Hb_Common;
+--    use UStrings;
    begin
       if not Theme_Has_Support then -- static::
          Static_Theme_Has_Support :=

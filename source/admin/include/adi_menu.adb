@@ -10,7 +10,7 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded.Less_Case_Insensitive;
 
 with Arrays;
-with Hb_Common;
+with UStrings;
 with Php;
 
 with Adm_Menu;
@@ -27,7 +27,7 @@ package body Adi_Menu
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Php;
 
    --

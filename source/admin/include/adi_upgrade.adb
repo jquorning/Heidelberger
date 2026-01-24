@@ -17,7 +17,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Helpers;
 with Lists;
 with Wp_Common;
@@ -64,7 +64,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Adi_Schemas;
       use Inc_Caches;
@@ -488,7 +488,7 @@ is
    procedure Upgrade_101
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
    begin
       -- Clean up indices, add a few.
       Add_Clean_Index (-WpDB.Posts, "post_name");
@@ -1040,7 +1040,7 @@ is
    procedure Upgrade_230_Options_Table
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
 
       Old_Options_Fields : constant List_Type :=
@@ -1063,7 +1063,7 @@ is
    procedure Upgrade_230_Old_Tables
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
 
       Prefix : constant Statement_Type := Statement_Type (-WpDB.Prefix);
@@ -1080,7 +1080,7 @@ is
    procedure Upgrade_Old_Slugs
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
 
       Postmeta : constant Statement_Type := Statement_Type (-WpDB.Postmeta);
@@ -1111,7 +1111,7 @@ is
    procedure Upgrade_252
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
 
       Users : constant Statement_Type := Statement_Type (-WpDB.Users);
@@ -1139,7 +1139,7 @@ is
    procedure Upgrade_270
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Adi_Schemas;
       use Class_WpDB;
 
@@ -1333,7 +1333,7 @@ is
    procedure Upgrade_340
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
       use Inc_Options;
 
@@ -1611,7 +1611,7 @@ is
    procedure Upgrade_440
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
       use Class_Roles;
       use Inc_Roles;
@@ -1641,7 +1641,7 @@ is
    procedure Upgrade_450
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Inc_Cron;
       use Inc_Load;
       use Inc_Options;
@@ -1926,7 +1926,7 @@ is
                           return Arrays.Multi_Type
    is
       use Php.Lists;
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
    begin
@@ -1975,7 +1975,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Adi_Schemas;
       use Class_WpDB;
       use Inc_Plugins;
@@ -2660,7 +2660,7 @@ is
    is
       use Php.Arrays;
       use Php.Files;
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
 
       Plugins : constant List_Type := Empty_List;  -- ???
@@ -2701,7 +2701,7 @@ is
    procedure Pre_Schema_Upgrade
    is
       use Globals;
-      use Hb_Common;
+      use UStrings;
       use Class_WpDB;
       use Inc_Load;
 --    global wp_current_db_version, wpdb;

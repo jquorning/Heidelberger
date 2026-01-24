@@ -10,7 +10,7 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Arrays;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Class_Customize_Controls;
@@ -28,7 +28,7 @@ package Class_Customize_Managers
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Lists;
 
    subtype Wp_Customize_Setting

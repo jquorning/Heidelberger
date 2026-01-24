@@ -11,7 +11,7 @@ with Ada.Text_IO;
 
 with Arrays;
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Php.Echoing;
 with Php.Strings;
@@ -28,7 +28,7 @@ is
    use Ada.Strings.Unbounded;
    use Ada.Text_IO;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Inc_L10n;
    use Lists;
    use Php;

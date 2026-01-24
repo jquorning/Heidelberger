@@ -7,7 +7,7 @@
 with Php.Arrays;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Plugins;
 
@@ -59,7 +59,7 @@ is
    function Get_Error_Code (This : Wp_Error)
                             return String
    is
-      use Hb_Common;
+      use UStrings;
 
       Codes : constant List_Type := This.Get_Error_Codes;
    begin
@@ -79,7 +79,7 @@ is
                                 return List_Type
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       -- Return all messages if no code specified.
       if Empty (Code) then

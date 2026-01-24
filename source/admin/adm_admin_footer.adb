@@ -7,7 +7,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 with Globals;
 with Lists;
 with Php.Echoing;
@@ -24,7 +24,7 @@ with Inc_Plugins;
 package body Adm_Admin_Footer
 is
    use Ada.Strings.Unbounded;
-   use Hb_Common;
+   use UStrings;
    use Lists;
    use Php;
 

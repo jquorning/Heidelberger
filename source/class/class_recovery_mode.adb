@@ -5,7 +5,7 @@
 -- @since 5.2.0
 --
 
-with Hb_Common;
+with UStrings;
 
 package body Class_Recovery_Mode
 is
@@ -74,7 +74,7 @@ is
    function Get_Session_Id (This : Wp_Recovery_Mode)
                             return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       return -This.Session_Id;
    end Get_Session_Id;

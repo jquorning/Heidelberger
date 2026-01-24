@@ -9,7 +9,7 @@
 with Ada.Containers;
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 with Php.Echoing;
 with Php.Strings;
 with Lists;
@@ -32,7 +32,7 @@ with Inc_Taxonomys;
 package body Inc_Category_Templates
 is
    use Ada.Containers;
-   use Hb_Common;
+   use UStrings;
    use Lists;
 
 --

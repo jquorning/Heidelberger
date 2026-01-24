@@ -10,7 +10,7 @@ with Php.Lists;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 
 with Inc_Functions;
 with Inc_Taxonomys;
@@ -27,7 +27,7 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_Terms_List_Table
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Strings;
       use Inc_L10n;
 --    use Inc_Posts;

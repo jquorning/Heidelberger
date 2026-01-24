@@ -14,7 +14,7 @@ with Php.Numerics;
 with Php.Strings;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 
 with Adi_Caches;
@@ -49,7 +49,7 @@ is
    procedure Create_Initial_Taxonomies
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Class_Taxonomy;
       use Inc_L10n;
       use Inc_Options;
@@ -540,7 +540,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Taxonomy;
       use Inc_Formatting;
       use Inc_Functions;
@@ -702,7 +702,7 @@ is
                                  return Array_Type
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php.Arrays;
       use Inc_Plugins;
    begin
@@ -1566,7 +1566,7 @@ is
                          Parent   : Integer := 0) -- null
                          return Array_Type -- Integer
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Strings;
       use Inc_Functions;
       use Inc_Plugins;
@@ -2293,7 +2293,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 --    use Adi_Templates;
       use Class_Terms;
@@ -5101,7 +5101,7 @@ is
    is
       use Ada.Strings.Unbounded;
 --    use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Class_Taxonomy;
       use Class_Terms;

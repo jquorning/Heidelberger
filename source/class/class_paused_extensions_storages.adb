@@ -7,7 +7,7 @@
 
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Error_Protection;
 with Inc_Options;
@@ -22,7 +22,7 @@ is
    function X_Construct (Extension_Type : String)
                          return Wp_Paused_Extensions_Storage
    is
-      use Hb_Common;
+      use UStrings;
 
       This : Wp_Paused_Extensions_Storage;
    begin
@@ -61,7 +61,7 @@ is
    function Get_All (This : Wp_Paused_Extensions_Storage)
                      return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Options;
    begin
       if not This.Is_API_Loaded then
@@ -105,7 +105,7 @@ is
                              return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Inc_Error_Protection;
    begin
       if not X_Wp_Recovery_Mode.Is_Active then

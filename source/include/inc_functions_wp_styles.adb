@@ -9,7 +9,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Hb_Common;
+with UStrings;
 with Php.Preg;
 with Php.Strings;
 
@@ -20,7 +20,7 @@ with Inc_L10n;
 
 package body Inc_Functions_Wp_Styles
 is
-   use Hb_Common;
+   use UStrings;
    use Php;
 
 --    function Wp_Styles_X

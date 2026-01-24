@@ -16,7 +16,7 @@ with Php.Numerics;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Wp_Common;
 
 with Adi_Plugins;
@@ -31,7 +31,7 @@ with Inc_Plugins;
 
 package body Inc_Posts
 is
--- use Hb_Common;
+-- use UStrings;
    use Php;
    use Inc_L10n;
 
@@ -70,7 +70,7 @@ is
    --
    procedure Create_Initial_Post_Types
    is
-      use Hb_Common;
+      use UStrings;
 --    use String_Vectors;
    begin
       Class_Post_Type.Reset_Default_Labels; -- :: ();
@@ -1720,7 +1720,7 @@ is
                                 return Array_Type  -- return Post_Id_List;
    is
       use Php.Arrays;
---    use Hb_Common;
+--    use UStrings;
 --    use Class_Posts;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
@@ -1824,7 +1824,7 @@ is
    function Get_Post_Status (Post : Wp_Post := Null_Post)
                              return String
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Lists;
 --    use Inc_Plugins;
 
@@ -1959,7 +1959,7 @@ is
                                   Args        : Status_Type)
                                   return Status_Type -- Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Formatting;
 --    use Inc_Functions;
 
@@ -2067,7 +2067,7 @@ is
    function Get_Post_Status_Object (Post_Status : String)
                                     return Status_Type
    is
---    use Hb_Common;
+--    use UStrings;
       use Status_Maps;
    begin
       if not Has_Element (Global_Wp_Post_Statuses.Find (Post_Status)) then
@@ -2388,7 +2388,7 @@ is
                                  Args      : Args_Type) -- Array_Type := Empty_Array)
 --                                return Wp_Post_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Class_Post_Type;
       use Inc_Formatting;
 
@@ -2757,7 +2757,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
 --      object.labels = (array) object.labels;
 
@@ -2849,7 +2849,7 @@ is
 
    procedure X_Add_Post_Type_Submenus
    is
-      use Hb_Common;
+      use UStrings;
       use Adi_Plugins;
       use Class_Post_Type;
 
@@ -3538,7 +3538,7 @@ is
                            return Class_Posts.Wp_Post
    is
       use Php.Arrays;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 
       Post_2 : Class_Posts.Wp_Post := Post;
@@ -3606,7 +3606,7 @@ is
       use Php.Lists;
       use Php.Numerics;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
 --    use Inc_Formatting;
 
@@ -6563,7 +6563,7 @@ is
                               return Wp_Post
    is
       use Ada.Containers;
-      use Hb_Common;
+      use UStrings;
       use Php.HTML;
       use Php.JSON;
       use Php.Strings;
@@ -6843,7 +6843,7 @@ is
    function Get_Page_URI (Page : Wp_Post) -- Integer := 0)
                           return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       -- if Page not in Wp_Post then instanceof
       --    Page := Get_Post (Page);

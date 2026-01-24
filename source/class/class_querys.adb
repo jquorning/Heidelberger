@@ -8,7 +8,7 @@
 
 with Ada.Containers;
 
-with Hb_Common;
+with UStrings;
 with Lists;
 with Php.Lists;
 with Php.Strings;
@@ -1337,7 +1337,7 @@ is
                  Default_Value : String := "")
                  return String
    is
---    use Hb_Common;
+--    use UStrings;
    begin
       if Isset (This.Query_Vars, Query_Var) then
          return As_String (Get (This.Query_Vars, Query_Var));
@@ -3513,7 +3513,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Post_Type;
 
    begin
@@ -3582,7 +3582,7 @@ is
                        Author : String := "")
                        return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Lists;
       use Php.Strings;
       use Class_Users;
@@ -3630,7 +3630,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
    begin
       if not This.M_Is_Category then
          return False;
@@ -3675,7 +3675,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Terms;
    begin
       if not This.Is_Tag then
@@ -3725,7 +3725,7 @@ is
       use Ada.Containers;
       use Php.Lists;
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
       use Class_Terms;
    begin
       if not This.Is_Tax then
@@ -3934,7 +3934,7 @@ is
                      Page : String := "")
                      return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Strings;
@@ -4056,7 +4056,7 @@ is
                        Post : String := "")
                        return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Lists;
       use Php.Strings;
@@ -4121,7 +4121,7 @@ is
                          Post_Types : String := "")
                          return Boolean
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Lists;
       use Php.Strings;
       use Class_Posts;

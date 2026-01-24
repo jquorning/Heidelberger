@@ -9,7 +9,7 @@ with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
 
-with Hb_Common;
+with UStrings;
 
 -- with Adm_Admin;
 -- with Adm_Admin_Header;
@@ -64,7 +64,7 @@ is
    is
       use Ada.Strings.Fixed;
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
 
       URL     : constant String := AWS.Status.URL (Request);
       Payload : Unbounded_String;

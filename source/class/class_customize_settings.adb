@@ -10,7 +10,7 @@ with Php.Arrays;
 with Php.Lists;
 with Php.Types;
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Load;
 with Inc_L10n;
@@ -84,7 +84,7 @@ is
 
    procedure Preview (This : in out Wp_Customize_Setting)
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_Load;
       use Inc_Plugins;
    begin
@@ -253,7 +253,7 @@ is
                               Original : String)
                               return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       if not This.Is_Current_Blog_Previewed then
          return Original;
@@ -309,7 +309,7 @@ is
                Original : String)
                return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       if not This.Is_Current_Blog_Previewed then
          return Original;
@@ -428,7 +428,7 @@ is
                       Value : Multi_Type)
                       return Multi_Type
    is
-      use Hb_Common;
+      use UStrings;
 --    use Inc_Plugins;
    begin
       --
@@ -450,7 +450,7 @@ is
                       Value : Multi_Type)
                       return Validate_Result
    is
-      use Hb_Common;
+      use UStrings;
       use Inc_L10n;
       use Inc_Load;
       use Class_Errors;
@@ -505,7 +505,7 @@ is
    function Value (This : Wp_Customize_Setting)
                    return String
    is
-      use Hb_Common;
+      use UStrings;
 --    use Inc_Plugins;
 
       Id_Base      : constant String := Get_As_String (This.Id_Data, "base");
@@ -609,7 +609,7 @@ is
                               Create : Boolean := False)
                               return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php.Arrays;
       use Php.Lists;
       use Php.Types;

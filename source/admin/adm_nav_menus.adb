@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Binder;
-with Hb_Common;
+with UStrings;
 with Php;
 with Globals;
 
@@ -34,7 +34,7 @@ package body Adm_Nav_Menus
 is
    use Ada.Strings.Unbounded;
    use Arrays;
-   use Hb_Common;
+   use UStrings;
    use Inc_L10n;
    use Php;
    use Globals;

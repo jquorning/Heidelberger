@@ -5,7 +5,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Hb_Common;
+with UStrings;
 
 package body Php.HTML
 is
@@ -19,7 +19,7 @@ is
    function Get_Header
             return String
    is
-      use Hb_Common;
+      use UStrings;
    begin
       Put_Line ("get_header:");
       Put_Line ("  " & (-Static_Header));
@@ -34,7 +34,7 @@ is
                      Replace       : Boolean := True;
                      Response_Code : Integer := 0)
    is
-      use Hb_Common;
+      use UStrings;
    begin
       Static_Header := +Header;
    end Header;

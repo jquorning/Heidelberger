@@ -11,7 +11,7 @@ with Php.Ini;
 with Php.Lists;
 with Php.Strings;
 
-with Hb_Common;
+with UStrings;
 with Globals;
 with Wp_Common;
 
@@ -859,7 +859,7 @@ is
    function Get_Intermediate_Image_Sizes
             return List_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Lists;
@@ -895,7 +895,7 @@ is
    function Wp_Get_Registered_Image_Subsizes
             return Array_Type
    is
-      use Hb_Common;
+      use UStrings;
 --    use Php;
       use Inc_Options;
 
@@ -976,7 +976,7 @@ is
                return Image_Src_Type
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Plugins;
@@ -1186,7 +1186,7 @@ is
                return String
    is
       use Php.Strings;
-      use Hb_Common;
+      use UStrings;
 
       Image : constant Image_Src_Type :=
         Wp_Get_Attachment_Image_Src (Attachment_Id, Size, Icon);

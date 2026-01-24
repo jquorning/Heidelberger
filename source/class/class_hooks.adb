@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded;
 with Php.Arrays;
 with Php.Misc;
 
-with Hb_Common;
+with UStrings;
 
 with Inc_Elab_Plugins;
 
@@ -26,7 +26,7 @@ is
    function Array_Keys (Map : Priority_Maps.Map)
                         return List_Type
    is
-      use Hb_Common;
+      use UStrings;
       use Priority_Maps;
 
       Result : List_Type;
@@ -48,7 +48,7 @@ is
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
---    use Hb_Common;
+--    use UStrings;
 --    use Php;
       use Inc_Elab_Plugins;
 --    use Inc_Plugins;
@@ -276,7 +276,7 @@ is
                            return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Misc;
@@ -401,7 +401,7 @@ is
                           Args : Array_Type)
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Misc;
 

@@ -19,7 +19,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 with Binder;
-with Hb_Common;
+with UStrings;
 with Lists;
 with Php.HTML;
 with Php.Strings;
@@ -40,7 +40,7 @@ is
 
    procedure Run
    is
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.HTML;
       use Php.Strings;

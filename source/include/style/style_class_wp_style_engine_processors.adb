@@ -16,7 +16,7 @@ with Php.Sorting;
 with Php.Strings;
 
 with Globals;
-with Hb_Common;
+with UStrings;
 with Lists;
 
 with Inc_Functions;
@@ -80,7 +80,7 @@ is
                      return String
    is
       use Ada.Strings.Unbounded;
-      use Hb_Common;
+      use UStrings;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Rules_Stores;
 
@@ -126,7 +126,7 @@ is
    procedure Combine_Rules_Selectors (This : in out Wp_Style_Engine_Processor)
    is
       use Ada.Containers;
-      use Hb_Common;
+      use UStrings;
       use Php;
       use Php.Arrays;
       use Php.Sorting;
