@@ -2644,7 +2644,7 @@ is
 --
    Header_Images : Array_Type; -- Unbounded_String;  -- static
 
-   function Get_Media_States (Post : Inc_Class_Wp_Posts.Wp_Post)
+   function Get_Media_States (Post : Class_Posts.Wp_Post)
                               return List_Type
    is
 --    static (Header_Images);
@@ -2653,7 +2653,7 @@ is
       use Hb_Common;
       use Inc_Themes;
       use Inc_Posts;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
 
       Media_States : Unbounded_String; -- Array_Type := Empty_Array;
       Stylesheet   : constant Array_Type := Inc_Options.Get_Option ("stylesheet");

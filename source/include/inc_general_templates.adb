@@ -1569,7 +1569,7 @@ is
 --    use Inc_Plugins;
       use Inc_Querys;
 
-      X_Post : constant Inc_Class_Wp_Posts.Wp_Post :=
+      X_Post : constant Class_Posts.Wp_Post :=
         Get_Queried_Object;
    begin
       if not Isset (-X_Post.Post_Title) then
@@ -2680,7 +2680,7 @@ is
    is
       use Php.Strings;
       use Wp_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Options;
 --    use Inc_Plugins;
 
@@ -2845,7 +2845,7 @@ is
 
    function Get_Post_Time (Format    : String  := "U";
                            GMT       : Boolean := False;
-                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Post      : Class_Posts.Wp_Post;
                            Translate : Boolean := False)
                            return String
    is
@@ -2853,7 +2853,7 @@ is
       use Php.Calendar;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Functions;
       use Inc_Plugins;
       use Inc_Posts;
@@ -2929,7 +2929,7 @@ is
    -- Get_Post_Datetime --
    -----------------------
 
-   function Get_Post_Datetime (Post   : Inc_Class_Wp_Posts.Wp_Post; -- = null,
+   function Get_Post_Datetime (Post   : Class_Posts.Wp_Post; -- = null,
                                Field  : String := "date";
                                Source : String := "local")
                                return Php.Calendar.Date_Time_Immutable
@@ -2938,7 +2938,7 @@ is
       use Php.Calendar;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Functions;
       use Inc_Posts;
 

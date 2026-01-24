@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Posts
+package Class_Posts
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -342,4 +342,4 @@ is
 
    Empty_Post_Array : constant Post_Array := Post_Arrays.Empty_Vector;
 
-end Inc_Class_Wp_Posts;
+end Class_Posts;

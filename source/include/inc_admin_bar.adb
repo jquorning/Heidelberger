@@ -996,7 +996,7 @@ is
       if Is_Admin then
          declare
             use Adi_Screens;
-            use Inc_Class_Wp_Posts;
+            use Class_Posts;
             use Inc_Class_Wp_Post_Type;
             use Inc_Options;
 
@@ -1122,7 +1122,7 @@ is
          end;
       else
          declare
-            use Inc_Class_Wp_Posts;
+            use Class_Posts;
 
             Current_Object : constant Wp_Post := Wp_The_Query.Get_Queried_Object;
          begin

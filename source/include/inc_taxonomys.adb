@@ -19,7 +19,7 @@ with Wp_Common;
 
 with Adi_Caches;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -5142,7 +5142,7 @@ is
             end loop;
          end;
       elsif "post_type" = Resource_Type_2 then
-         Ancestors := Get_Post_Ancestors (Inc_Class_Wp_Posts.Post_Id (Object_Id));
+         Ancestors := Get_Post_Ancestors (Class_Posts.Post_Id (Object_Id));
       end if;
 
       --

@@ -3409,14 +3409,14 @@ is
    ---------------------------
 
    function Get_Queried_Object_Id (This : Wp_Query)
-                                   return Inc_Class_Wp_Posts.Post_Id -- Integer
+                                   return Class_Posts.Post_Id -- Integer
    is
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
 
       Unused : constant Wp_Post := This.Get_Queried_Object;
    begin
       if This.Queried_Object_Id /= 0 then -- isset
-         return Inc_Class_Wp_Posts.Post_Id (This.Queried_Object_Id);
+         return Class_Posts.Post_Id (This.Queried_Object_Id);
       end if;
 
       return 0;
@@ -3938,7 +3938,7 @@ is
       use Php;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Posts;
    begin
       if not This.Is_Page then
@@ -4060,7 +4060,7 @@ is
       use Php;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Posts;
    begin
       if not This.Is_Single then
@@ -4124,7 +4124,7 @@ is
       use Hb_Common;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
    begin
       if
         Empty (Post_Types) or else

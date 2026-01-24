@@ -10,7 +10,7 @@ with Adi_Class_Wp_Screens;
 
 with Class_WpDB;
 with Inc_Class_Wp_Locale;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 
@@ -140,7 +140,7 @@ is
 
    Post_Type        : Unbounded_String;
    Post_Type_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type;
-   Post             : Inc_Class_Wp_Posts.Wp_Post;
+   Post             : Class_Posts.Wp_Post;
 
    Action   : Unbounded_String;
    Taxonomy : Unbounded_String;

@@ -11,7 +11,7 @@ with Ada.Containers.Ordered_Maps;
 
 with Arrays;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Post_Type;
 
 package Adi_Nav_Menus
@@ -171,14 +171,14 @@ is
    function X_Wp_Nav_Menu_Meta_Box_Object (Data_Object : Array_Type) -- := null)
                                            return Array_Type;
 
-   function X_Wp_Nav_Menu_Meta_Box_Object (Data_Object : Inc_Class_Wp_Posts.Wp_Post)
+   function X_Wp_Nav_Menu_Meta_Box_Object (Data_Object : Class_Posts.Wp_Post)
                                            return Array_Type
                                            is (Empty_Array);
 
    function X_Wp_Nav_Menu_Meta_Box_Object
      (Data_Object : Inc_Class_Wp_Post_Type.Wp_Post_Type)
-      return Inc_Class_Wp_Posts.Wp_Post
-      is (Inc_Class_Wp_Posts.Null_Post);
+      return Class_Posts.Wp_Post
+      is (Class_Posts.Null_Post);
 
    --
    -- Returns the menu formatted to edit.

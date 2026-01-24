@@ -507,7 +507,7 @@ is
       use Php;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Functions;
       use Inc_Load;
       use Inc_Posts;
@@ -897,7 +897,7 @@ is
                                     return Post_Id -- Natural
    is
       use Inc_Caches;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Querys;
       use Inc_Posts;
 
@@ -946,7 +946,7 @@ is
 
    function Get_Changeset_Posts (This : Wp_Customize_Manager;
                                  Args : Array_Type)
-                                 return Inc_Class_Wp_Posts.Post_Array
+                                 return Class_Posts.Post_Array
    is
       use Php;
       use Php.Arrays;

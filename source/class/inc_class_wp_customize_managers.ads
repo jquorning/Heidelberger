@@ -19,7 +19,7 @@ with Inc_Class_Wp_Customize_Panels;
 with Inc_Class_Wp_Customize_Sections;
 with Inc_Class_Wp_Customize_Settings;
 with Inc_Class_Wp_Customize_Widgets;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Themes;
 
 with Cust_Class_Wp_Customize_Selective_Refresh;
@@ -34,7 +34,7 @@ is
    subtype Wp_Customize_Setting
      is Inc_Class_Wp_Customize_Settings.Wp_Customize_Setting;
 
-   subtype Post_Id is Inc_Class_Wp_Posts.Post_Id;
+   subtype Post_Id is Class_Posts.Post_Id;
 
    subtype Setting_Index is Positive;
 
@@ -465,7 +465,7 @@ is
    -- protected
    function Get_Changeset_Posts (This : Wp_Customize_Manager;
                                  Args : Array_Type)
-                                 return Inc_Class_Wp_Posts.Post_Array;
+                                 return Class_Posts.Post_Array;
 
    --
    -- Gets the changeset post ID for the loaded changeset.

@@ -140,12 +140,12 @@ is
    -----------------------------------
 
    function Wp_Force_Plain_Post_Permalink
-              (Post   : Inc_Class_Wp_Posts.Wp_Post; -- null
+              (Post   : Class_Posts.Wp_Post; -- null
                Sample : Boolean := False) -- null
                return Boolean
    is
       use Inc_Capabilities;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Posts;
 
@@ -219,10 +219,10 @@ is
    -- Get_Permalink --
    -------------------
 
-   function Get_Permalink (Post      : Inc_Class_Wp_Posts.Wp_Post;
+   function Get_Permalink (Post      : Class_Posts.Wp_Post;
                            Leavename : Boolean := False)
                            return String
---   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+--   function Get_Permalink (Id        : Class_Posts.Post_Id := 0;
 --                           Leavename : Boolean := False)
 --                           return String
    is
@@ -231,7 +231,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Terms;
       use Inc_Class_Wp_Users;
       use Inc_Class_Wp_Terms.Term_Vectors;
@@ -436,11 +436,11 @@ is
    -- Get_Permalink --
    -------------------
 
-   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+   function Get_Permalink (Id        : Class_Posts.Post_Id := 0;
                            Leavename : Boolean := False)
                            return String
    is
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Posts;
 
       Post : constant Wp_Post := Get_Post (Id);
@@ -452,7 +452,7 @@ is
    -- Get_Post_Permalink --
    ------------------------
 
-   function Get_Post_Permalink (Id        : Inc_Class_Wp_Posts.Wp_Post; -- = 0,
+   function Get_Post_Permalink (Id        : Class_Posts.Wp_Post; -- = 0,
                                 Leavename : Boolean := False;
                                 Sample    : Boolean := False)
                                 return String
@@ -461,7 +461,7 @@ is
       use Php.Strings;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Functions;
       use Inc_Posts;
@@ -532,7 +532,7 @@ is
    -- Get_Page_Link --
    -------------------
 
-   function Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post;
+   function Get_Page_Link (Post      : Class_Posts.Wp_Post;
                            Leavename : Boolean := False;
                            Sample    : Boolean := False)
                            return String
@@ -540,7 +540,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Posts;
 --    use Inc_Plugins;
       use Inc_Options;
@@ -573,7 +573,7 @@ is
    -- X_Get_Page_Link --
    ---------------------
 
-   function X_Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- = false,
+   function X_Get_Page_Link (Post      : Class_Posts.Wp_Post; -- = false,
                              Leavename : Boolean := False;
                              Sample    : Boolean := False)
                              return String
@@ -581,7 +581,7 @@ is
       use Ada.Strings.Unbounded;
       use Php.Strings;
       use Hb_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Posts;
       use Inc_Plugins;
 
@@ -624,7 +624,7 @@ is
    -- Get_Attachment_Link --
    -------------------------
 
-   function Get_Attachment_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- null
+   function Get_Attachment_Link (Post      : Class_Posts.Wp_Post; -- null
                                  Leavename : Boolean := False)
                                  return String
    is
@@ -632,7 +632,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Hb_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Formatting;
       use Inc_Options;
       use Inc_Posts;
@@ -1503,7 +1503,7 @@ is
       use Php.Types;
       use Hb_Common;
       use Inc_Class_Wp_Post_Type;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Plugins;
       use Inc_Options;
       use Inc_Posts;
@@ -1519,8 +1519,8 @@ is
          declare
             Show_On_Front  : constant String  := Get_Option ("show_on_front");
 
-            Page_For_Posts : constant Inc_Class_Wp_Posts.Post_Id :=
-              Inc_Class_Wp_Posts.Post_Id (Integer'(Get_Option ("page_for_posts")));
+            Page_For_Posts : constant Class_Posts.Post_Id :=
+              Class_Posts.Post_Id (Integer'(Get_Option ("page_for_posts")));
          begin
             if "page" = Show_On_Front and then Page_For_Posts /= 0 then
                Link := +Get_Permalink (Page_For_Posts);
@@ -1617,7 +1617,7 @@ is
    ---------------------------
 
    function Get_Preview_Post_Link
-      (Post         : Inc_Class_Wp_Posts.Wp_Post := Inc_Class_Wp_Posts.Null_Post;
+      (Post         : Class_Posts.Wp_Post := Class_Posts.Null_Post;
        Query_Args   : Array_Type := Empty_Array;
        Preview_Link : String     := "")
        return String
@@ -1625,7 +1625,7 @@ is
       use Ada.Strings.Unbounded;
       use Hb_Common;
       use Wp_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Functions;
       use Inc_Posts;
@@ -1678,7 +1678,7 @@ is
       use Hb_Common;
       use Wp_Common;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Posts;
 
@@ -4406,7 +4406,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Hb_Common;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Options;
       use Inc_Plugins;
@@ -4431,7 +4431,7 @@ is
       Shortlink : Unbounded_String :=
         +Apply_Filters ("pre_get_shortlink", "False", Id, Context, Allow_Slugs);
 
-      Post_Id : Inc_Class_Wp_Posts.Post_Id := 0;
+      Post_Id : Class_Posts.Post_Id := 0;
       Post    : Wp_Post;
    begin
 
@@ -4443,7 +4443,7 @@ is
          Post_Id := Get_Queried_Object_Id;
          Post    := Get_Post (Post_Id);
       elsif "post" = Context then
-         Post := Get_Post (Inc_Class_Wp_Posts.Post_Id (Id));
+         Post := Get_Post (Class_Posts.Post_Id (Id));
          if Post.Id /= 0 then
 --       if not Empty (Post.Id) then
             Post_Id := Post.Id;
@@ -4966,7 +4966,7 @@ is
    function Get_Privacy_Policy_URL
             return String
    is
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Options;
       use Inc_Plugins;
       use Inc_Posts;

@@ -32,7 +32,7 @@ with Inc_Comments;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Users;
 with Inc_L10n;
@@ -61,7 +61,7 @@ is
       use Wp_Common;
       use Adm_Menu;
       use Adi_Posts;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;

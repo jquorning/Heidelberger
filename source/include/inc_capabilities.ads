@@ -10,7 +10,7 @@ with Lists;
 
 with Inc_Class_Wp_Role;
 with Inc_Class_Wp_Roles;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Users;
 
 package Inc_Capabilities
@@ -60,7 +60,7 @@ is
       record
          Comment_Id : Integer := 0;
          Object_Id  : Integer := 0;
-         Post_Id    : Inc_Class_Wp_Posts.Post_Id := 0;
+         Post_Id    : Class_Posts.Post_Id := 0;
          Term_Id    : Integer := 0;
          User_Id    : Integer := 0;
          Meta_Key   : Boolean := False;
@@ -185,7 +185,7 @@ is
    function Current_User_Can (Capability : String)
                               return Boolean
                               is (True);
-   function Current_User_Can (Capability : String; Val : Inc_Class_Wp_Posts.Wp_Post)
+   function Current_User_Can (Capability : String; Val : Class_Posts.Wp_Post)
                               return Boolean
                               is (True);
 

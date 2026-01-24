@@ -9,7 +9,7 @@ with Php.Calendar;
 
 with Arrays;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 
 package Inc_General_Templates
 is
@@ -468,7 +468,7 @@ is
    --
    function Get_Post_Time (Format    : String  := "U";
                            GMT       : Boolean := False;
-                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Post      : Class_Posts.Wp_Post;
                            Translate : Boolean := False)
                            return String;
 
@@ -510,7 +510,7 @@ is
    --                           Accepts "local" or "gmt". Default "local".
    -- @return DateTimeImmutable|false Time object on success, false on failure.
    --
-   function Get_Post_Datetime (Post   : Inc_Class_Wp_Posts.Wp_Post; -- = null,
+   function Get_Post_Datetime (Post   : Class_Posts.Wp_Post; -- = null,
                                Field  : String := "date";
                                Source : String := "local")
                                return Php.Calendar.Date_Time_Immutable;

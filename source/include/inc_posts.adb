@@ -1685,7 +1685,7 @@ is
 --         return null;
 --      end if;
 
-      X_Post := Inc_Class_Wp_Posts.Filter (X_Post, Filter);
+      X_Post := Class_Posts.Filter (X_Post, Filter);
 
       if "ARRAY_A" = Output then
          return X_Post; -- .To_Array; -- ();
@@ -1716,12 +1716,12 @@ is
    --
    -- function get_post_ancestors( post ) then
 
-   function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
+   function Get_Post_Ancestors (Post : Class_Posts.Wp_Post)
                                 return Array_Type  -- return Post_Id_List;
    is
       use Php.Arrays;
 --    use Hb_Common;
---    use Inc_Class_Wp_Posts;
+--    use Class_Posts;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
    begin
@@ -3173,7 +3173,7 @@ is
    ---------------
 
    function Get_Posts (Args : Array_Type := Empty_Array) -- null
-                       return Inc_Class_Wp_Posts.Post_Array
+                       return Class_Posts.Post_Array
    is
       use Inc_Class_Wp_Querys;
       use Inc_Functions;
@@ -3309,7 +3309,7 @@ is
    --               value). An empty string if a valid but non-existing post ID is
    --               passed.
    --
-   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type -- Post_Id_List;
@@ -3318,7 +3318,7 @@ is
       return Inc_Meta.Get_Metadata ("post", Integer (Post_Id), Key, Single);
    end Get_Post_Meta;
 
-   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return String
@@ -3533,15 +3533,15 @@ is
 --
 -- function sanitize_post( post, context = "display" )
 
-   function Sanitize_Post (Post    : Inc_Class_Wp_Posts.Wp_Post;
+   function Sanitize_Post (Post    : Class_Posts.Wp_Post;
                            Context : String := "display")
-                           return Inc_Class_Wp_Posts.Wp_Post
+                           return Class_Posts.Wp_Post
    is
       use Php.Arrays;
       use Hb_Common;
       use Wp_Common;
 
-      Post_2 : Inc_Class_Wp_Posts.Wp_Post := Post;
+      Post_2 : Class_Posts.Wp_Post := Post;
    begin
 --      if Is_Object (Post_2) then
          -- Check if post already filtered for this context.
@@ -3598,7 +3598,7 @@ is
 
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
-                                 Post_Id : Inc_Class_Wp_Posts.Post_Id;
+                                 Post_Id : Class_Posts.Post_Id;
                                  Context : String := "display")
                                  return Array_Type
    is
@@ -6572,7 +6572,7 @@ is
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;
---    use type Inc_Class_Wp_Posts.Post_Id;
+--    use type Class_Posts.Post_Id;
 
       Last_Changed : constant String := Wp_Cache_Get_Last_Changed ("posts");
 

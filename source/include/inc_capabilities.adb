@@ -67,7 +67,7 @@ is
       use Php;
       use Php.Lists;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Functions;
       use Inc_Load;

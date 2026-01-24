@@ -190,14 +190,14 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Posts.Wp_Post
+                          return Class_Posts.Wp_Post
    is
       Result : constant Multi_Type := Wp_Cache_Get (Key, Group, Force, Found);
    begin
       if Result = From_Null then
-         return Inc_Class_Wp_Posts.Null_Post;
+         return Class_Posts.Null_Post;
       else
-         return Inc_Class_Wp_Posts.Null_Post;
+         return Class_Posts.Null_Post;
       end if;
    end Wp_Cache_Get;
 

@@ -20,7 +20,7 @@ with Hb_Common;
 with Inc_Block_Editors;
 -- with Inc_Class_Wp_Block_Type;
 with Inc_Class_Wp_Block_Type_Registry;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Querys;
 with Inc_Class_Wp_Theme_JSON_Data;
 with Inc_Functions;
@@ -496,7 +496,7 @@ is
       use Hb_Common;
       use Php.HTML;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Themes;
       use Inc_Class_Wp_Querys;
       use Inc_Posts;

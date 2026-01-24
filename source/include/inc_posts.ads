@@ -11,7 +11,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Taxonomy;
 
@@ -20,7 +20,7 @@ is
    use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
-   use Inc_Class_Wp_Posts;
+   use Class_Posts;
 
    --
    -- Post Type registration.
@@ -848,7 +848,7 @@ is
    -- @return WP_Post[]|int[] Array of post objects or post IDs.
    --
    function Get_Posts (Args : Array_Type := Empty_Array) -- null
-                       return Inc_Class_Wp_Posts.Post_Array;
+                       return Class_Posts.Post_Array;
 
    --
    -- Checks a post type"s support for a given feature.
@@ -1013,8 +1013,8 @@ is
    --
    function Wp_Delete_Attachment (Post_Id      : Integer;
                                   Force_Delete : Boolean := False)
-                                  return Inc_Class_Wp_Posts.Wp_Post
-                                  is (Inc_Class_Wp_Posts.Null_Post);
+                                  return Class_Posts.Wp_Post
+                                  is (Class_Posts.Null_Post);
 
    --
    -- Updates a post with new post data.
@@ -1070,9 +1070,9 @@ is
    -- @return object|WP_Post|array The now sanitized post object or array (will be the
    --                              same type as `$post`).
    --
-   function Sanitize_Post (Post    : Inc_Class_Wp_Posts.Wp_Post;
+   function Sanitize_Post (Post    : Class_Posts.Wp_Post;
                            Context : String := "display")
-                           return Inc_Class_Wp_Posts.Wp_Post;
+                           return Class_Posts.Wp_Post;
 --   function Sanitize_Post (Key    : String;
 --                           Post   : Array_Type;
 --                           Id     : Integer; -- Inc_Class_Posts.Post_Id;
@@ -1099,7 +1099,7 @@ is
    --
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
-                                 Post_Id : Inc_Class_Wp_Posts.Post_Id;
+                                 Post_Id : Class_Posts.Post_Id;
                                  Context : String := "display")
                                  return Array_Type;
    --
@@ -1137,7 +1137,7 @@ is
                              return Boolean
                              is (True);
 
-   function Wp_Untrash_Post (Item : Inc_Class_Wp_Posts.Wp_Post)
+   function Wp_Untrash_Post (Item : Class_Posts.Wp_Post)
                              return Boolean
                              is (True);
 
@@ -1287,10 +1287,10 @@ is
    -- @param int|WP_Post $post Post ID or post object.
    -- @return int[] Array of ancestor IDs or empty array if there are none.
    --
-   function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Wp_Post)
+   function Get_Post_Ancestors (Post : Class_Posts.Wp_Post)
                                 return Array_Type;
 
-   function Get_Post_Ancestors (Post : Inc_Class_Wp_Posts.Post_Id)
+   function Get_Post_Ancestors (Post : Class_Posts.Post_Id)
                                 return Inc_Class_Wp_Taxonomy.Int_Arrays.Vector
                                 is (raise Program_Error with "not implemented");
 
@@ -1328,11 +1328,11 @@ is
    --               value). An empty string if a valid but non-existing post ID is
    --               passed.
    --
-   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type; -- Post_Id_List;
-   function Get_Post_Meta (Post_Id : Inc_Class_Wp_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return String;
@@ -1359,14 +1359,14 @@ is
    --                  false on failure or if the value passed to the function
    --                  is the same as the one that is already in the database.
    --
-   function Update_Post_Meta (Post_Id    : Inc_Class_Wp_Posts.Post_Id; -- Integer;
+   function Update_Post_Meta (Post_Id    : Class_Posts.Post_Id; -- Integer;
                               Meta_Key   : String;
                               Meta_Value : Array_Type;
                               Prev_Value : Array_Type := Empty_Array) -- = '' )
                               return Integer
                               is (1);
 
-   procedure Update_Post_Meta (Post_Id    : Inc_Class_Wp_Posts.Post_Id;
+   procedure Update_Post_Meta (Post_Id    : Class_Posts.Post_Id;
                                Meta_Key   : String;
                                Meta_Value : String;
                                Prev_Value : Array_Type := Empty_Array) -- = '' )

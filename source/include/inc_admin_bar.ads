@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Inc_Class_Wp_Admin_Bar;
 with Inc_Class_Wp_Customize_Managers;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Querys;
 
@@ -24,7 +24,7 @@ is
    Tag            : Inc_Class_Wp_Terms.Wp_Term;
    Wp_The_Query   : Inc_Class_Wp_Querys.Wp_Query;
    User_Id        : Integer;
-   Id_Of_Post     : Inc_Class_Wp_Posts.Post_Id; -- was Post_Id : Integer
+   Id_Of_Post     : Class_Posts.Post_Id; -- was Post_Id : Integer
 
    X_Show_Admin_Bar : Boolean; -- X_ added
    Pagenow          : Unbounded_String;

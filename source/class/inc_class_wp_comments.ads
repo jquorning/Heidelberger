@@ -8,7 +8,7 @@
 
 with Ada.Strings.Unbounded;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 
 package Inc_Class_Wp_Comments
 is
@@ -41,7 +41,7 @@ is
 --         -- @since 4.4.0
 --         -- @var string
 --         --
-            Comment_Post_Id : Inc_Class_Wp_Posts.Post_Id := 0;
+            Comment_Post_Id : Class_Posts.Post_Id := 0;
 
 --         --
 --         -- Comment author name.

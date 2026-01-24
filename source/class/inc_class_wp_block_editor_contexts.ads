@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-limited with Inc_Class_Wp_Posts;
+limited with Class_Posts;
 
 package Inc_Class_Wp_Block_Editor_Contexts
 is
@@ -47,7 +47,7 @@ is
          --
          -- @var WP_Post|null
          --
-         Post : access Inc_Class_Wp_Posts.Wp_Post := null;
+         Post : access Class_Posts.Wp_Post := null;
 
       end record;
 

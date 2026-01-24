@@ -11,7 +11,7 @@
 -- @subpackage Query
 --
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Class_Wp_Querys;
@@ -56,7 +56,7 @@ is
    -- @return WP_Term|WP_Post_Type|WP_Post|WP_User|null The queried object.
    --
    function Get_Queried_Object
-            return Inc_Class_Wp_Posts.Wp_Post;
+            return Class_Posts.Wp_Post;
    function Get_Queried_Object
             return Inc_Class_Wp_Terms.Wp_Term;
    function Get_Queried_Object
@@ -74,7 +74,7 @@ is
    -- @return int ID of the queried object.
    --
    function Get_Queried_Object_Id
-            return Inc_Class_Wp_Posts.Post_Id; -- Integer;
+            return Class_Posts.Post_Id; -- Integer;
 
    --
    -- Determines whether the query is for an existing post type archive page.

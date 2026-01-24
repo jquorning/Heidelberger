@@ -17,7 +17,7 @@ with Inc_Meta;
 with Inc_Posts;
 with Inc_Taxonomys;
 
-package body Inc_Class_Wp_Posts
+package body Class_Posts
 is
    use Lists;
 
@@ -266,4 +266,4 @@ is
       return Post_2;
    end To_Array;
 
-end Inc_Class_Wp_Posts;
+end Class_Posts;

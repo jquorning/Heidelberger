@@ -16,7 +16,7 @@ with Php.Misc;
 with Globals;
 with Hb_Common;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
 with Inc_L10n;
@@ -121,7 +121,7 @@ is
                return Array_Type
    is
       use Inc_Class_Wp_Block_Editor_Contexts;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
 --    use Inc_Plugins;
 
       Block_Categories     : Array_Type := Get_Default_Block_Categories;
@@ -181,7 +181,7 @@ is
                  Inc_Class_Wp_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return List_Type
    is
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
 --    use Inc_Plugins;
 
       Allowed_Block_Types : List_Type; -- Boolean := True;

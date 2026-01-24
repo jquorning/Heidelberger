@@ -36,7 +36,7 @@ with Adi_Posts;
 with Adi_Screens;
 
 with Inc_Capabilities;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Formatting;
 with Inc_Functions;
@@ -78,7 +78,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Inc_Capabilities;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Class_Wp_Post_Type;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
@@ -906,7 +906,7 @@ is
                      declare
                         use Inc_Formatting;
                         use Inc_Link_Templates;
-                        use Inc_Class_Wp_Posts;
+                        use Class_Posts;
 
                         Id   : constant Post_Id := Post_Id'Value (-Ids.First_Element);
 

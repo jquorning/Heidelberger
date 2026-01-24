@@ -90,7 +90,7 @@ is
    -- Get_The_Category --
    ----------------------
 
-   function Get_The_Category (Post_Id : Inc_Class_Wp_Posts.Post_Id := 0) -- false
+   function Get_The_Category (Post_Id : Class_Posts.Post_Id := 0) -- false
                               return Inc_Class_Wp_Terms.Wp_Term_Array
    is
       use Wp_Common;
@@ -1370,7 +1370,7 @@ is
    -- Get_The_Terms --
    -------------------
 
-   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Wp_Post;
+   function Get_The_Terms (Post     : Class_Posts.Wp_Post;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            -- Inc_Class_Posts.Wp_Post
@@ -1382,7 +1382,7 @@ is
       use Inc_Load;
       use Inc_Functions;
 
-      Post_2 : constant Inc_Class_Wp_Posts.Wp_Post := Inc_Posts.Get_Post (Post);
+      Post_2 : constant Class_Posts.Wp_Post := Inc_Posts.Get_Post (Post);
    begin
 --        if ( ! $post ) then
 --                return false;
@@ -1432,7 +1432,7 @@ is
       end;
    end Get_The_Terms;
 
-   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Post_Id;
+   function Get_The_Terms (Post     : Class_Posts.Post_Id;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (raise Program_Error with "not implemented");

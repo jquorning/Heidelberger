@@ -16,7 +16,7 @@ with Inc_Class_Wp_Errors;
 with Inc_Class_Wp_Http;
 with Inc_Class_Wp_Taxonomy;
 with Inc_Class_Wp_Terms;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Post_Type;
 with Inc_Class_Wp_Users;
 with Inc_Media;
@@ -35,11 +35,11 @@ is
                       return Boolean
                       is (raise Program_Error with "not implemented");
 
-   function Is_Object (Post : Inc_Class_Wp_Posts.Wp_Post)
+   function Is_Object (Post : Class_Posts.Wp_Post)
                        return Boolean
                        is (True);
 
-   function Get_Object_Vars (Object : Inc_Class_Wp_Posts.Wp_Post)
+   function Get_Object_Vars (Object : Class_Posts.Wp_Post)
                              return Array_Type is (Empty_Array);
 
    procedure Set (Item : Array_Type;
@@ -116,39 +116,39 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
-                           Id        : Inc_Class_Wp_Posts.Wp_Post)
+                           Id        : Class_Posts.Wp_Post)
                            return Boolean
                            is (True);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
-                           Id        : Inc_Class_Wp_Posts.Post_Id)
+                           Id        : Class_Posts.Post_Id)
                            return Array_Type
                            is (Empty_Array);
 
    function Apply_Filters (Hook_Name : String;
                            B         : String;
-                           C         : Inc_Class_Wp_Posts.Wp_Post)
+                           C         : Class_Posts.Wp_Post)
                            return List_Type
                            is (Empty_List);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
-                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Post      : Class_Posts.Wp_Post;
                            B         : Boolean)
                            return String
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            B         : String;
-                           C         : Inc_Class_Wp_Posts.Wp_Post)
+                           C         : Class_Posts.Wp_Post)
                            return String
                            is ("XXX-980");
 
    function Apply_Filters (Hook_Name : String;
                            B         : String;
                            A         : String;
-                           C         : Inc_Class_Wp_Posts.Wp_Post)
+                           C         : Class_Posts.Wp_Post)
                            return String
                            is ("XXX-981");
 
@@ -162,13 +162,13 @@ is
    function Apply_Filters (Hook_Name : String;
                            Value     : Inc_Class_Wp_Terms.Wp_Term;
                            Cats      : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           Post      : Inc_Class_Wp_Posts.Wp_Post)
+                           Post      : Class_Posts.Wp_Post)
                            return Inc_Class_Wp_Terms.Wp_Term
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
-                           Post      : Inc_Class_Wp_Posts.Wp_Post;
+                           Post      : Class_Posts.Wp_Post;
                            A         : Boolean;
                            B         : Boolean)
                            return String
@@ -176,14 +176,14 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
-                           Post      : Inc_Class_Wp_Posts.Post_Id;
+                           Post      : Class_Posts.Post_Id;
                            B         : Boolean)
                            return String
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Inc_Class_Wp_Terms.Wp_Term_Array;
-                           Post      : Inc_Class_Wp_Posts.Post_Id)
+                           Post      : Class_Posts.Post_Id)
                            return Inc_Class_Wp_Terms.Wp_Term_Array
                            is (Value);
 

@@ -10,7 +10,7 @@ with Arrays;
 -- with Lists;
 
 with Inc_Class_Wp_Terms;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 
 package Inc_Category_Templates
 is
@@ -57,7 +57,7 @@ is
    -- @return WP_Term[] Array of WP_Term objects, one for each category assigned to
    --                    the post.
    --
-   function Get_The_Category (Post_Id : Inc_Class_Wp_Posts.Post_Id := 0) -- false
+   function Get_The_Category (Post_Id : Class_Posts.Post_Id := 0) -- false
                               return Inc_Class_Wp_Terms.Wp_Term_Array;
 
    --
@@ -151,12 +151,12 @@ is
    --                                  there are no terms or the post does not exist,
    --                                  WP_Error on failure.
    --
-   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Wp_Post;
+   function Get_The_Terms (Post     : Class_Posts.Wp_Post;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array;
                            -- Inc_Class_Posts.Wp_Post;
 
-   function Get_The_Terms (Post     : Inc_Class_Wp_Posts.Post_Id;
+   function Get_The_Terms (Post     : Class_Posts.Post_Id;
                            Taxonomy : String)
                            return Inc_Class_Wp_Terms.Wp_Term_Array;
 

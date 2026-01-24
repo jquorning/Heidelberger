@@ -63,8 +63,8 @@ is
    end Get_Queried_Object;
 
    function Get_Queried_Object
-            return Inc_Class_Wp_Posts.Wp_Post
-            is (Inc_Class_Wp_Posts.Null_Post);
+            return Class_Posts.Wp_Post
+            is (Class_Posts.Null_Post);
 
    function Get_Queried_Object
             return Inc_Class_Wp_Users.Wp_User
@@ -75,7 +75,7 @@ is
    ---------------------------
 
    function Get_Queried_Object_Id
-            return Inc_Class_Wp_Posts.Post_Id
+            return Class_Posts.Post_Id
    is
 --    global wp_query;
    begin

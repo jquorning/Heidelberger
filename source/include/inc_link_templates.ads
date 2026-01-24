@@ -7,7 +7,7 @@
 
 with Arrays;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Rewrites;
 
 package Inc_Link_Templates
@@ -53,7 +53,7 @@ is
    -- @return bool Whether to use a plain permalink structure.
    --
    function Wp_Force_Plain_Post_Permalink
-              (Post   : Inc_Class_Wp_Posts.Wp_Post; -- null
+              (Post   : Class_Posts.Wp_Post; -- null
                Sample : Boolean := False) -- null
                return Boolean;
 
@@ -83,11 +83,11 @@ is
    --                               Default false.
    -- @return string|false The permalink URL. False if the post does not exist.
    --
-   function Get_Permalink (Id        : Inc_Class_Wp_Posts.Post_Id := 0;
+   function Get_Permalink (Id        : Class_Posts.Post_Id := 0;
                            Leavename : Boolean := False)
                            return String;
 
-   function Get_Permalink (Post      : Inc_Class_Wp_Posts.Wp_Post;
+   function Get_Permalink (Post      : Class_Posts.Wp_Post;
                            Leavename : Boolean := False)
                            return String;
 
@@ -105,7 +105,7 @@ is
    -- @param bool        sample    Optional. Is it a sample permalink. Default false.
    -- @return string|false The post permalink URL. False if the post does not exist.
    --
-   function Get_Post_Permalink (Id        : Inc_Class_Wp_Posts.Wp_Post; -- Post, 0,
+   function Get_Post_Permalink (Id        : Class_Posts.Wp_Post; -- Post, 0,
                                 Leavename : Boolean := False;
                                 Sample    : Boolean := False)
                                 return String;
@@ -125,12 +125,12 @@ is
    --                               permalink. Default false.
    -- @return string The page permalink.
    --
---   function Get_Page_Link (Post      : Inc_Class_Wp_Posts.Post_Id := 0; -- false
+--   function Get_Page_Link (Post      : Class_Posts.Post_Id := 0; -- false
 --                           Leavename : Boolean := False;
 --                           Sample    : Boolean := False)
 --                           return String;
 
-   function Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post;
+   function Get_Page_Link (Post      : Class_Posts.Wp_Post;
                            Leavename : Boolean := False;
                            Sample    : Boolean := False)
                            return String;
@@ -153,12 +153,12 @@ is
    --                               permalink. Default false.
    -- @return string The page permalink.
    --
-   function X_Get_Page_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- = false,
+   function X_Get_Page_Link (Post      : Class_Posts.Wp_Post; -- = false,
                              Leavename : Boolean := False;
                              Sample    : Boolean := False)
                              return String;
 
-   function X_Get_Page_Link (Post      : Inc_Class_Wp_Posts.Post_Id; -- = false,
+   function X_Get_Page_Link (Post      : Class_Posts.Post_Id; -- = false,
                              Leavename : Boolean := False;
                              Sample    : Boolean := False)
                              return String
@@ -179,7 +179,7 @@ is
    --                              false.
    -- @return string The attachment permalink.
    --
-   function Get_Attachment_Link (Post      : Inc_Class_Wp_Posts.Wp_Post; -- null
+   function Get_Attachment_Link (Post      : Class_Posts.Wp_Post; -- null
                                  Leavename : Boolean := False)
                                  return String;
 
@@ -696,7 +696,7 @@ is
    --                      exist.
    --
    function Get_Preview_Post_Link
-      (Post         : Inc_Class_Wp_Posts.Wp_Post := Inc_Class_Wp_Posts.Null_Post;
+      (Post         : Class_Posts.Wp_Post := Class_Posts.Null_Post;
        Query_Args   : Array_Type := Empty_Array;
        Preview_Link : String     := "")
        return String;

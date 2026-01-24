@@ -19,7 +19,7 @@ with Php.Strings;
 with Adi_Caches;
 
 with Inc_Class_Wp_Comments;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 with Inc_Comments;
@@ -1780,7 +1780,7 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use Inc_Class_Wp_Posts;
+      use Class_Posts;
       use Inc_Posts;
       use Inc_Plugins;
 

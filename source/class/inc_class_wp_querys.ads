@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Terms;
 with Inc_Class_Wp_Users;
 
@@ -102,7 +102,7 @@ is
         -- @since 1.5.0
         -- @var WP_Post[]|int[]
         --
-        Posts : Inc_Class_Wp_Posts.Post_Array;
+        Posts : Class_Posts.Post_Array;
 
         --
         -- The number of posts for the current query.
@@ -500,8 +500,8 @@ is
    -- @return WP_Post Next post.
    --
    function Next_Post (This : Wp_Query)
-                       return Inc_Class_Wp_Posts.Wp_Post -- Inc_Class_Wp_Posts
-                       is (Inc_Class_Wp_Posts.Null_Post);
+                       return Class_Posts.Wp_Post -- Class_Posts
+                       is (Class_Posts.Null_Post);
 
    --
    -- Retrieves the value of a query variable.
@@ -541,7 +541,7 @@ is
    -- @return int
    --
    function Get_Queried_Object_Id (This : Wp_Query)
-                                   return Inc_Class_Wp_Posts.Post_Id; -- Integer;
+                                   return Class_Posts.Post_Id; -- Integer;
 
    --
    -- Constructor.
@@ -569,8 +569,8 @@ is
    -- @return WP_Term|WP_Post_Type|WP_Post|WP_User|null The queried object.
    --
    function Get_Queried_Object (This : Wp_Query)
-                                return Inc_Class_Wp_Posts.Wp_Post
-                                is (Inc_Class_Wp_Posts.Null_Post);
+                                return Class_Posts.Wp_Post
+                                is (Class_Posts.Null_Post);
 
    function Get_Queried_Object (This : Wp_Query)
                                 return Inc_Class_Wp_Terms.Wp_Term
@@ -778,8 +778,8 @@ is
    --
    function Query (This  : Wp_Query;
                    Query : Array_Type)
-                   return Inc_Class_Wp_Posts.Post_Array -- Wp_Post_Array
-                   is (Inc_Class_Wp_Posts.Empty_Post_Array); -- Empty_Wp_Post_Array);
+                   return Class_Posts.Post_Array -- Wp_Post_Array
+                   is (Class_Posts.Empty_Post_Array); -- Empty_Wp_Post_Array);
 
    Null_Query : constant Wp_Query :=
      (M_Query               => Empty_Array,
@@ -793,7 +793,7 @@ is
       Found_Posts           => 0,
       Max_Num_Pages         => 0,
       Max_Num_Comment_Pages => 0,
-      Posts                 => Inc_Class_Wp_Posts.Post_Arrays.Empty_Vector,
+      Posts                 => Class_Posts.Post_Arrays.Empty_Vector,
       others                => False);
 
 end Inc_Class_Wp_Querys;

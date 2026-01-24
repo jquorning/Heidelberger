@@ -16,7 +16,7 @@ with Lists;
 
 with Inc_Class_Wp_Comments;
 with Inc_Class_Wp_Errors;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Users;
 
 package Class_WpDB
@@ -1520,8 +1520,8 @@ is
                      Output  : String         := ""; -- = OBJECT,
                      Y       : Natural        := 0;
                      Success : out Boolean)
-                     return Inc_Class_Wp_Posts.Wp_Post
-                     is (Inc_Class_Wp_Posts.Null_Post);
+                     return Class_Posts.Wp_Post
+                     is (Class_Posts.Null_Post);
 
    function Get_Row (Db      : in out Wpdb_Class;
                      Query   : Statement_Type; --  := ""; -- = null,
@@ -1619,8 +1619,8 @@ is
    function Get_Results (This   : Wpdb_Class;
                          Query  : String := ""; -- null
                          Output : String := "OBJECT")
-                         return Inc_Class_Wp_Posts.Post_Array
-                         is (Inc_Class_Wp_Posts.Empty_Post_Array);
+                         return Class_Posts.Post_Array
+                         is (Class_Posts.Empty_Post_Array);
 
    --
    -- Retrieves the character set for the given table.

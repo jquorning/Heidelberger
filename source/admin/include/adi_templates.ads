@@ -7,7 +7,7 @@ with Lists;
 
 with Adi_Class_Wp_Screens;
 
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 
 package Adi_Templates
 is
@@ -77,7 +77,7 @@ is
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String;
 
-   function Get_Media_States (Post : Inc_Class_Wp_Posts.Wp_Post) return List_Type;
+   function Get_Media_States (Post : Class_Posts.Wp_Post) return List_Type;
 
    -- package Term_Arrays is new
    --    Ada.Containers.Vectors (Index_Type   => Positive,

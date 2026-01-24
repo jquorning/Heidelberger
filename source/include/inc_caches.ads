@@ -10,7 +10,7 @@
 with Arrays;
 
 with Inc_Class_Wp_Comments;
-with Inc_Class_Wp_Posts;
+with Class_Posts;
 with Inc_Class_Wp_Users;
 with Inc_Comments;
 
@@ -152,7 +152,7 @@ is
                           Group : String  := "";
                           Force : Boolean := False;
                           Found : out Boolean)
-                          return Inc_Class_Wp_Posts.Wp_Post;
+                          return Class_Posts.Wp_Post;
 
    function Wp_Cache_Get (Key   : String;
                           Group : String  := "";
