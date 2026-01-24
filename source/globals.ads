@@ -9,7 +9,7 @@ with Arrays;
 with Adi_Class_Wp_Screens;
 
 with Class_WpDB;
-with Inc_Class_Wp_Locale;
+with Class_Locales;
 with Class_Posts;
 with Class_Post_Type;
 with Class_Taxonomy;
@@ -134,7 +134,7 @@ is
    Post_New_File : Unbounded_String;
 
    Current_Screen     : Adi_Class_Wp_Screens.Wp_Screen;
-   Wp_Locale          : Inc_Class_Wp_Locale.Wp_Locale;
+   Wp_Locale          : Class_Locales.Wp_Locale;
    Total_Update_Count : Natural;
    Update_Title       : Unbounded_String;
 

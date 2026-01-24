@@ -10,7 +10,7 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-package Inc_Class_Wp_Locale
+package Class_Locales
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -156,4 +156,4 @@ is
    --
    procedure Register_Globals (This : Wp_Locale);
 
-end Inc_Class_Wp_Locale;
+end Class_Locales;

@@ -11,14 +11,14 @@ with Php.Misc;
 
 with Hb_Common;
 
-with Inc_Class_Wp_Locale;
+with Class_Locales;
 with Inc_L10n;
 with Inc_Plugins;
 
 package body Inc_Class_Wp_Locale_Switchers
 is
 
-   Global_Wp_Locale : Inc_Class_Wp_Locale.Wp_Locale;
+   Global_Wp_Locale : Class_Locales.Wp_Locale;
 
    ----------------------
    -- Switch_To_Locale --
@@ -148,7 +148,7 @@ is
    begin
       This.Load_Translations (Locale);
 
-      Global_Wp_Locale := Inc_Class_Wp_Locale.X_Construct; -- ()
+      Global_Wp_Locale := Class_Locales.X_Construct; -- ()
 
       --
       -- Fires when the locale is switched to or restored.

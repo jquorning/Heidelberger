@@ -44,7 +44,7 @@ with Adi_Templates;
 with Adi_Translation_Install;
 with Adi_Upgrade;
 
--- with Inc_Class_Wp_Locale;
+-- with Class_Locales;
 with Class_WpDB;
 with Inc_Formatting;
 with Inc_Functions;
@@ -355,7 +355,7 @@ is
       use Binder;
       use Hb_Common;
       use Lists;
---    use Inc_Class_Wp_Locale;
+--    use Class_Locales;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;

@@ -6,7 +6,7 @@
 -- @since 4.6.0
 --
 
-package body Inc_Class_Wp_Locale
+package body Class_Locales
 is
 
    -----------------
@@ -288,4 +288,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_Locale;
+end Class_Locales;
