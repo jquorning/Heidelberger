@@ -10,9 +10,9 @@ with Arrays;
 with Lists;
 
 with Inc_Class_Wp_Themes;
-with Inc_Class_Wp_Theme_JSON;
+with Class_Theme_JSON;
 
-package Inc_Class_Wp_Theme_JSON_Resolver
+package Class_Theme_JSON_Resolver
 is
    use Arrays;
    use Lists;
@@ -106,8 +106,8 @@ is
    -- @var WP_Theme_JSON
    --
    -- protected
-   Static_Core : Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON :=
-     Inc_Class_Wp_Theme_JSON.Null_Theme_JSON; -- = null;
+   Static_Core : Class_Theme_JSON.Wp_Theme_JSON :=
+     Class_Theme_JSON.Null_Theme_JSON; -- = null;
 
    --
    -- Container for data coming from the blocks.
@@ -116,8 +116,8 @@ is
    -- @var WP_Theme_JSON
    --
    -- protected static
-   Static_Blocks : Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON :=
-     Inc_Class_Wp_Theme_JSON.Null_Theme_JSON;
+   Static_Blocks : Class_Theme_JSON.Wp_Theme_JSON :=
+     Class_Theme_JSON.Null_Theme_JSON;
 
    --
    -- Whether or not the theme supports theme.json.
@@ -135,8 +135,8 @@ is
    -- @var WP_Theme_JSON
    --
    -- protected static
-   Static_User : Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON :=
-     Inc_Class_Wp_Theme_JSON.Null_Theme_JSON;
+   Static_User : Class_Theme_JSON.Wp_Theme_JSON :=
+     Class_Theme_JSON.Null_Theme_JSON;
 
    --
    -- Container for data coming from the theme.
@@ -145,8 +145,8 @@ is
    -- @var WP_Theme_JSON
    --
    -- protected
-   Static_Theme : Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON :=
-     Inc_Class_Wp_Theme_JSON.Null_Theme_JSON;
+   Static_Theme : Class_Theme_JSON.Wp_Theme_JSON :=
+     Class_Theme_JSON.Null_Theme_JSON;
 
    --
    -- Container to keep loaded i18n schema for `theme.json`.
@@ -206,7 +206,7 @@ is
    --
    -- public static
    function Get_Core_Data
-            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON;
+            return Class_Theme_JSON.Wp_Theme_JSON;
 
    --
    -- Returns the theme's data.
@@ -234,7 +234,7 @@ is
    -- public static
    function Get_Theme_Data (Deprecated : Array_Type := Empty_Array;
                             Options    : Array_Type := Empty_Array)
-                            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON;
+                            return Class_Theme_JSON.Wp_Theme_JSON;
 
    --
    -- Gets the styles for blocks from the block.json file.
@@ -245,7 +245,7 @@ is
    --
    -- public static
    function Get_Block_Data
-            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON;
+            return Class_Theme_JSON.Wp_Theme_JSON;
 
    --
    -- When given an array, this will remove any keys with the name `//`.
@@ -304,7 +304,7 @@ is
    --
    -- public static
    function Get_User_Data
-            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON;
+            return Class_Theme_JSON.Wp_Theme_JSON;
 
    --
    -- Returns the data merged from multiple origins.
@@ -336,7 +336,7 @@ is
    --
    -- public static
    function Get_Merged_Data (Origin : String := "custom")
-                             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON;
+                             return Class_Theme_JSON.Wp_Theme_JSON;
 
    --
    -- Determines whether the active theme has a theme.json file.
@@ -369,4 +369,4 @@ is
 
 -- Static : Wp_Theme_JSON_Resolver;
 
-end Inc_Class_Wp_Theme_JSON_Resolver;
+end Class_Theme_JSON_Resolver;

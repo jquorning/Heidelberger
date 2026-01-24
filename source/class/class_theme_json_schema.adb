@@ -11,10 +11,10 @@ with Php.Strings;
 
 with Hb_Common;
 
-with Inc_Class_Wp_Theme_JSON;
+with Class_Theme_JSON;
 with Inc_Functions;
 
-package body Inc_Class_Wp_Theme_JSON_Schema
+package body Class_Theme_JSON_Schema
 is
 
    -------------
@@ -28,7 +28,7 @@ is
    begin
       if not Isset (Theme_JSON, "version") then
          Theme_JSON_2 := To_Array (List => (1 =>
-           Build ("version", Inc_Class_Wp_Theme_JSON.LATEST_SCHEMA)
+           Build ("version", Class_Theme_JSON.LATEST_SCHEMA)
          ));
       end if;
 
@@ -150,4 +150,4 @@ is
 --    unset( $tmp_settings[ $last_key ] );
    end Unset_Setting_By_Path;
 
-end Inc_Class_Wp_Theme_JSON_Schema;
+end Class_Theme_JSON_Schema;

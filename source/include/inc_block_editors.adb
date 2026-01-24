@@ -24,7 +24,7 @@ with Inc_Media;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Themes;
-with Inc_Class_Wp_Theme_JSON_Resolver;
+with Class_Theme_JSON_Resolver;
 
 package body Inc_Block_Editors
 is
@@ -498,7 +498,7 @@ is
          end;
       end loop;
 
-      if Inc_Class_Wp_Theme_JSON_Resolver.Theme_Has_Support then
+      if Class_Theme_JSON_Resolver.Theme_Has_Support then
          declare
             Block_Classes : Array_Type := To_Array (List => (
               Build ("css",            "styles"),

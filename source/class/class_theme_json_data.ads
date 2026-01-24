@@ -10,9 +10,9 @@ with Ada.Strings.Unbounded;
 
 with Arrays;
 
-with Inc_Class_Wp_Theme_JSON;
+with Class_Theme_JSON;
 
-package Inc_Class_Wp_Theme_JSON_Data
+package Class_Theme_JSON_Data
 is
    use Ada.Strings.Unbounded;
    use Arrays;
@@ -30,8 +30,8 @@ is
          -- @var WP_Theme_JSON
          --
          -- private
-         Theme_JSON : Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON := -- null
-           Inc_Class_Wp_Theme_JSON.Null_Theme_JSON;
+         Theme_JSON : Class_Theme_JSON.Wp_Theme_JSON := -- null
+           Class_Theme_JSON.Null_Theme_JSON;
          --
          -- The origin of the data: default, theme, user, etc.
          --
@@ -84,4 +84,4 @@ is
 --                 return $this->theme_json->get_raw_data();
 --         end;
 
-end Inc_Class_Wp_Theme_JSON_Data;
+end Class_Theme_JSON_Data;

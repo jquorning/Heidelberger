@@ -13,8 +13,8 @@ with Php.Strings;
 with Hb_Common;
 with Globals;
 
-with Inc_Class_Wp_Theme_JSON;
-with Inc_Class_Wp_Theme_JSON_Resolver;
+with Class_Theme_JSON;
+with Class_Theme_JSON_Resolver;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
 with Inc_Load;
@@ -53,7 +53,7 @@ is
          else "custom");
 
       Settings : constant Multi_Type :=
-        Inc_Class_Wp_Theme_JSON_Resolver.Get_Merged_Data (Origin).Get_Settings; -- ()
+        Class_Theme_JSON_Resolver.Get_Merged_Data (Origin).Get_Settings; -- ()
 
    begin
       return X_Wp_Array_Get (As_Array (Settings), Path_2, Settings);
@@ -103,7 +103,7 @@ is
       use Php;
       use Php.Lists;
       use Hb_Common;
-      use Inc_Class_Wp_Theme_JSON;
+      use Class_Theme_JSON;
 
       -- Return cached value if it can be used and exists.
       -- It's cached by theme to make sure that theme switching clears the cache.
@@ -130,10 +130,10 @@ is
 
       declare
          Tree : constant Wp_Theme_JSON :=
-           Inc_Class_Wp_Theme_JSON_Resolver.Get_Merged_Data;
+           Class_Theme_JSON_Resolver.Get_Merged_Data;
 
          Supports_Theme_JSON : constant Boolean :=
-           Inc_Class_Wp_Theme_JSON_Resolver.Theme_Has_Support;
+           Class_Theme_JSON_Resolver.Theme_Has_Support;
 
          Types_2 : List_Type :=
            (if Types.Is_Empty and then not Supports_Theme_JSON
@@ -273,12 +273,12 @@ is
       use Php;
       use Php.Arrays;
       use Php.Strings;
-      use Inc_Class_Wp_Theme_JSON;
+      use Class_Theme_JSON;
       use Inc_Functions_Wp_Styles;
       use Inc_Script_Loader;
 
       Tree        : constant Wp_Theme_JSON :=
-        Inc_Class_Wp_Theme_JSON_Resolver.Get_Merged_Data;
+        Class_Theme_JSON_Resolver.Get_Merged_Data;
 
       Block_Nodes : constant Array_Type := Tree.Get_Styles_Block_Nodes;
    begin

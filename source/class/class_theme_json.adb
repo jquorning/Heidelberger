@@ -22,7 +22,7 @@ with Block_Typography;
 with Inc_Blocks;
 with Inc_Class_Wp_Block_Type;
 with Inc_Class_Wp_Block_Type_Registry;
-with Inc_Class_Wp_Theme_JSON_Schema;
+with Class_Theme_JSON_Schema;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_KSES;
@@ -30,7 +30,7 @@ with Inc_L10n;
 with Inc_Plugins;
 with Inc_Themes;
 
-package body Inc_Class_Wp_Theme_JSON
+package body Class_Theme_JSON
 is
 
    -----------------
@@ -45,7 +45,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
---    use Inc_Class_Wp_Theme_JSON;
+--    use Class_Theme_JSON;
       use Inc_Functions;
 
       This : Wp_Theme_JSON;
@@ -56,7 +56,7 @@ is
          else Origin);
 
    begin
-      This.Theme_JSON := Inc_Class_Wp_Theme_JSON_Schema.Migrate (Theme_JSON);
+      This.Theme_JSON := Class_Theme_JSON_Schema.Migrate (Theme_JSON);
       declare
          Valid_Block_Names : constant List_Type :=
            Array_Keys (Get_Blocks_Metadata);
@@ -3000,4 +3000,4 @@ is
       end;
    end Set_Spacing_Sizes;
 
-end Inc_Class_Wp_Theme_JSON;
+end Class_Theme_JSON;

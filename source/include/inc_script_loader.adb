@@ -37,7 +37,7 @@ with Adm_Load_Styles;
 with Adi_Class_Wp_Screens;
 
 with Class_Dependency;
-with Inc_Class_Wp_Theme_JSON_Resolver;
+with Class_Theme_JSON_Resolver;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
@@ -4247,7 +4247,7 @@ is
    is
       use Globals;
       use Hb_Common;
-      use Inc_Class_Wp_Theme_JSON_Resolver;
+      use Class_Theme_JSON_Resolver;
       use Inc_Functions_Wp_Styles;
    begin
       if not Theme_Has_Support then

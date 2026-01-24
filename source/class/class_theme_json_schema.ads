@@ -9,7 +9,7 @@
 with Arrays;
 with Lists;
 
-package Inc_Class_Wp_Theme_JSON_Schema
+package Class_Theme_JSON_Schema
 is
    use Arrays;
    use Lists;
@@ -116,4 +116,4 @@ is
    procedure Unset_Setting_By_Path (Settings : in out Array_Type;
                                     Path     : List_Type);
 
-end Inc_Class_Wp_Theme_JSON_Schema;
+end Class_Theme_JSON_Schema;

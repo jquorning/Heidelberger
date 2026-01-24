@@ -22,18 +22,18 @@ with Inc_Block_Editors;
 with Inc_Class_Wp_Block_Type_Registry;
 with Class_Posts;
 with Inc_Class_Wp_Querys;
-with Inc_Class_Wp_Theme_JSON_Data;
+with Class_Theme_JSON_Data;
 with Inc_Functions;
 with Inc_L10n;
 -- with Inc_Plugins;
 with Inc_Posts;
 with Inc_Themes;
 
-package body Inc_Class_Wp_Theme_JSON_Resolver
+package body Class_Theme_JSON_Resolver
 is
    use Php;
 
-   package JSON_Data renames Inc_Class_Wp_Theme_JSON_Data;
+   package JSON_Data renames Class_Theme_JSON_Data;
 
    function Apply_Filters (Name : String;
                            Item : JSON_Data.Wp_Theme_JSON_Data)
@@ -119,10 +119,10 @@ is
    -------------------
 
    function Get_Core_Data
-            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
+            return Class_Theme_JSON.Wp_Theme_JSON
    is
-      use Inc_Class_Wp_Theme_JSON;
-      use Inc_Class_Wp_Theme_JSON_Data;
+      use Class_Theme_JSON;
+      use Class_Theme_JSON_Data;
 --    use Inc_Plugins;
    begin
       if
@@ -210,13 +210,13 @@ is
 
    function Get_Theme_Data (Deprecated : Array_Type := Empty_Array;
                             Options    : Array_Type := Empty_Array)
-                            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
+                            return Class_Theme_JSON.Wp_Theme_JSON
    is
 --    use Hb_Common;
       use Inc_Functions;
       use Inc_Class_Wp_Themes;
-      use Inc_Class_Wp_Theme_JSON;
-      use Inc_Class_Wp_Theme_JSON_Data;
+      use Class_Theme_JSON;
+      use Class_Theme_JSON_Data;
       use Inc_Themes;
 
       Options_2 : constant Array_Type :=
@@ -307,7 +307,7 @@ is
       --
       declare
          Theme_Support_Data : Array_Type :=
-           Inc_Class_Wp_Theme_JSON.Get_From_Editor_Settings (
+           Class_Theme_JSON.Get_From_Editor_Settings (
              Inc_Block_Editors.Get_Default_Block_Editor_Settings);
       begin
          if not Theme_Has_Support then -- static::
@@ -377,12 +377,12 @@ is
    --------------------
 
    function Get_Block_Data
-            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
+            return Class_Theme_JSON.Wp_Theme_JSON
    is
       use Hb_Common;
       use Inc_Class_Wp_Block_Type_Registry;
-      use Inc_Class_Wp_Theme_JSON;
-      use Inc_Class_Wp_Theme_JSON_Data;
+      use Class_Theme_JSON;
+      use Class_Theme_JSON_Data;
       use Inc_Functions;
 
       Registry : constant Wp_Block_Type_Registry :=
@@ -557,7 +557,7 @@ is
                  Wp_Insert_Post (To_Array (List => (
                    Build ("post_content",
                           "{""version"": " &
-                          Inc_Class_Wp_Theme_JSON.LATEST_SCHEMA'Image &
+                          Class_Theme_JSON.LATEST_SCHEMA'Image &
                           ", ""isGlobalStylesUserThemeJSON"": true }"),
                    Build ("post_status",  "publish"),
                    Build ("post_title",   "Custom Styles"),
@@ -588,15 +588,15 @@ is
    -------------------
 
    function Get_User_Data
-            return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
+            return Class_Theme_JSON.Wp_Theme_JSON
    is
 --    use Hb_Common;
       use Php.Arrays;
       use Php.Errors;
       use Php.JSON;
       use Php.Types;
-      use Inc_Class_Wp_Theme_JSON;
-      use Inc_Class_Wp_Theme_JSON_Data;
+      use Class_Theme_JSON;
+      use Class_Theme_JSON_Data;
       use Inc_Themes;
    begin
       if
@@ -679,9 +679,9 @@ is
    ---------------------
 
    function Get_Merged_Data (Origin : String := "custom")
-                             return Inc_Class_Wp_Theme_JSON.Wp_Theme_JSON
+                             return Class_Theme_JSON.Wp_Theme_JSON
    is
-      use Inc_Class_Wp_Theme_JSON;
+      use Class_Theme_JSON;
 
       Result : Wp_Theme_JSON := Get_Core_Data; -- static::
    begin
@@ -820,4 +820,4 @@ is
 
 -- end;
 
-end Inc_Class_Wp_Theme_JSON_Resolver;
+end Class_Theme_JSON_Resolver;

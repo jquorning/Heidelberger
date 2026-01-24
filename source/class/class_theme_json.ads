@@ -10,7 +10,7 @@ with Arrays;
 with Hb_Common;
 with Lists;
 
-package Inc_Class_Wp_Theme_JSON
+package Class_Theme_JSON
 is
    use Arrays;
    use Hb_Common;
@@ -2557,4 +2557,4 @@ is
    Null_Theme_JSON : constant Wp_Theme_JSON :=
      (others => Empty_Array);
 
-end Inc_Class_Wp_Theme_JSON;
+end Class_Theme_JSON;

@@ -8,7 +8,7 @@
 
 with Hb_Common;
 
-package body Inc_Class_Wp_Theme_JSON_Data
+package body Class_Theme_JSON_Data
 is
 
    -----------------
@@ -20,7 +20,7 @@ is
                          return Wp_Theme_JSON_Data
    is
       use Hb_Common;
-      use Inc_Class_Wp_Theme_JSON;
+      use Class_Theme_JSON;
 
       This  : Wp_Theme_JSON_Data;
       Theme : constant Wp_Theme_JSON := X_Construct (Data, Origin);
@@ -41,4 +41,4 @@ is
       return This.Theme_JSON.Get_Raw_Data;
    end Get_Data;
 
-end Inc_Class_Wp_Theme_JSON_Data;
+end Class_Theme_JSON_Data;
