@@ -16,7 +16,7 @@ with Lists;
 
 with Inc_Formatting;
 
-package body Inc_Class_Wp_Textdomain_Registry
+package body Class_Textdomain_Registry
 is
    use Ada.Strings.Unbounded;
    use Hb_Common;
@@ -165,4 +165,4 @@ is
       end if;
    end Set_Cached_Mo_Files;
 
-end Inc_Class_Wp_Textdomain_Registry;
+end Class_Textdomain_Registry;

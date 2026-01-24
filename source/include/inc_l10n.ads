@@ -13,7 +13,7 @@ with Ada.Strings.Unbounded;
 with Arrays;
 with Lists;
 
-with Inc_Class_Wp_Textdomain_Registry;
+with Class_Textdomain_Registry;
 with Class_Users;
 with POMO_MO;
 with POMO_Translations;
@@ -36,7 +36,7 @@ is
    package String_Sets is new
       Ada.Containers.Indefinite_Ordered_Sets (Element_Type => String);
 
-   Textdomain_Registry : Inc_Class_Wp_Textdomain_Registry.Wp_Textdomain_Registry;
+   Textdomain_Registry : Class_Textdomain_Registry.Wp_Textdomain_Registry;
    L10n                : String_Maps.Map;
    L10n_Unloaded       : String_Sets.Set;
 

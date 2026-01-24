@@ -25,7 +25,7 @@ with Adi_Class_Wp_Screens;
 
 with Class_WpDB;
 with Class_Networks;
-with Inc_Class_Wp_Textdomain_Registry;
+with Class_Textdomain_Registry;
 with Inc_Error_Protection;
 with Inc_Functions;
 with Inc_L10n;
@@ -1347,7 +1347,7 @@ is
       use Php.Lists;
       use Inc_L10n;
 --    use Class_WpDB;
-      use Inc_Class_Wp_Textdomain_Registry;
+      use Class_Textdomain_Registry;
 
 --    global (wp_locale, Wp_Textdomain_Registry);
 --    static loaded = false;

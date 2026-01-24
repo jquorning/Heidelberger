@@ -1365,7 +1365,7 @@ package body Inc_L10n is
 --    use Hb_Common;
       use Php;
       use Php.Strings;
-      use Inc_Class_Wp_Textdomain_Registry;
+      use Class_Textdomain_Registry;
       use Inc_Formatting;
       use Inc_Themes;
       -- @var WP_Textdomain_Registry wp_textdomain_registry

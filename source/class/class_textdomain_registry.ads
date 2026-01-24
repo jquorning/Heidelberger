@@ -10,7 +10,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 
 -- with Arrays;
 
-package Inc_Class_Wp_Textdomain_Registry
+package Class_Textdomain_Registry
 is
 -- use Arrays;
 
@@ -171,4 +171,4 @@ private
    procedure Set_Cached_Mo_Files (This : in out Wp_Textdomain_Registry;
                                   Path : String);
 
-end Inc_Class_Wp_Textdomain_Registry;
+end Class_Textdomain_Registry;
