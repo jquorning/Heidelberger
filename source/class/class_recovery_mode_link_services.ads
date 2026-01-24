@@ -5,7 +5,7 @@
 -- @since 5.2.0
 --
 
-package Inc_Class_Wp_Recovery_Mode_Link_Services
+package Class_Recovery_Mode_Link_Services
 is
 
    LOGIN_ACTION_ENTER   : constant String := "enter_recovery_mode";
@@ -133,4 +133,4 @@ is
         --         return apply_filters( 'recovery_mode_begin_url', url, token, key );
         -- end;
 
-end Inc_Class_Wp_Recovery_Mode_Link_Services;
+end Class_Recovery_Mode_Link_Services;

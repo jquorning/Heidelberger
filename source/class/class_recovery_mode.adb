@@ -7,7 +7,7 @@
 
 with Hb_Common;
 
-package body Inc_Class_Wp_Recovery_Mode
+package body Class_Recovery_Mode
 is
 
 --         --
@@ -409,4 +409,4 @@ is
 --         end;
 -- end;
 
-end Inc_Class_Wp_Recovery_Mode;
+end Class_Recovery_Mode;

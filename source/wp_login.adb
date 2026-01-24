@@ -30,7 +30,7 @@ with Wp_Load;
 with Inc_Capabilities;
 with Class_Phpass;
 with Class_Errors;
-with Inc_Class_Wp_Recovery_Mode_Link_Services;
+with Class_Recovery_Mode_Link_Services;
 with Class_Sites;
 with Class_Users;
 with Inc_Formatting;
@@ -1953,7 +1953,7 @@ is
                elsif 0 /= Strpos (-Redirect_To, "about.php?updated") then
                   Errors.Add ("updated", abs "<strong>You have successfully updated WordPress!</strong> Please log back in to see what&#8217;s new.", "message");
                elsif
-                 Inc_Class_Wp_Recovery_Mode_Link_Services.LOGIN_ACTION_ENTERED =  -- ::
+                 Class_Recovery_Mode_Link_Services.LOGIN_ACTION_ENTERED =  -- ::
                  Action
                then
                   Errors.Add ("enter_recovery_mode", abs "Recovery Mode Initialized. Please log in to continue.", "message");
@@ -2283,7 +2283,7 @@ is
            +"checkemail",
            +"confirmaction",
            +"login",
-           +Inc_Class_Wp_Recovery_Mode_Link_Services.LOGIN_ACTION_ENTERED -- ::
+           +Class_Recovery_Mode_Link_Services.LOGIN_ACTION_ENTERED -- ::
          ));
       begin
          if Isset (XX_GET, "key") then

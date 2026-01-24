@@ -6,7 +6,7 @@
 --
 
 with Inc_Class_Wp_Paused_Extensions_Storages;
-with Inc_Class_Wp_Recovery_Mode;
+with Class_Recovery_Mode;
 
 package Inc_Error_Protection
 is
@@ -146,6 +146,6 @@ is
    -- @return WP_Recovery_Mode
    --
    function X_Wp_Recovery_Mode    -- X_ added
-            return Inc_Class_Wp_Recovery_Mode.Wp_Recovery_Mode;
+            return Class_Recovery_Mode.Wp_Recovery_Mode;
 
 end Inc_Error_Protection;

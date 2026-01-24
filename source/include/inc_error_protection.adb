@@ -26,16 +26,16 @@ is
       return Static_Storage;
    end Wp_Paused_Themes;
 
-   Static_Wp_Recovery_Mode : Inc_Class_Wp_Recovery_Mode.Wp_Recovery_Mode;
+   Static_Wp_Recovery_Mode : Class_Recovery_Mode.Wp_Recovery_Mode;
 
    ------------------------
    -- X_Wp_Recovery_Mode --
    ------------------------
 
    function X_Wp_Recovery_Mode
-            return Inc_Class_Wp_Recovery_Mode.Wp_Recovery_Mode
+            return Class_Recovery_Mode.Wp_Recovery_Mode
    is
-      use Inc_Class_Wp_Recovery_Mode;
+      use Class_Recovery_Mode;
    begin
       if Static_Wp_Recovery_Mode = Null_Recovery_Mode then
          Static_Wp_Recovery_Mode := Wp_Recovery_Mode'(Default_Recovery_Mode);

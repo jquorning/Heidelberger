@@ -7,7 +7,7 @@
 
 with Ada.Strings.Unbounded;
 
-package Inc_Class_Wp_Recovery_Mode
+package Class_Recovery_Mode
 is
    use Ada.Strings.Unbounded;
 
@@ -102,4 +102,4 @@ is
       Is_Active      => False,
       Session_Id     => Null_Unbounded_String);
 
-end Inc_Class_Wp_Recovery_Mode;
+end Class_Recovery_Mode;
