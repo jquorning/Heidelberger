@@ -23,12 +23,16 @@ with Wp_Common;
 with Adi_Plugins;
 with Adi_Schemas;
 
-with Inc_Caches;
-with Inc_Capabilities;
+with Class_Categories;
 with Class_Errors;
+with Class_Posts;
+with Class_Post2cat;
 with Class_Roles;
 with Class_Users;
 with Class_WpDB;
+
+with Inc_Caches;
+with Inc_Capabilities;
 with Inc_Cron;
 with Inc_Formatting;
 with Inc_Functions;
@@ -421,62 +425,147 @@ is
    -----------------
 
    procedure Upgrade_100
-   is null;
---         global wpdb;
+   is
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Class_Categories;
+      use Class_Posts;
+      use Class_Post2cat;
+      use Class_WpDB;
+      use Inc_Formatting;
 
---         -- Get the title and ID of every post, post_name to check if it already has a value.
---         posts = wpdb->get_results( "SELECT ID, post_title, post_name FROM wpdb->posts WHERE post_name = """ );
---         if ( posts ) then
---                 foreach ( posts as post ) then
---                         if ( "" === post->post_name ) then
---                                 newtitle = sanitize_title( post->post_title );
---                                 wpdb->query( wpdb->prepare( "UPDATE wpdb->posts SET post_name = %s WHERE ID = %d", newtitle, post->ID ) );
---                         end;
---                 end;
---         end;
+      Posts    : constant Statement_Type := Statement_Type (-WpDB.Posts);
+      Options  : constant Statement_Type := Statement_Type (-WpDB.Options);
+      Post2cat : constant Statement_Type := Statement_Type (-WpDB.Post2cat);
 
---         categories = wpdb->get_results( "SELECT cat_ID, cat_name, category_nicename FROM wpdb->categories" );
---         foreach ( categories as category ) then
---                 if ( "" === category->category_nicename ) then
---                         newtitle = sanitize_title( category->cat_name );
---                         wpdb->update( wpdb->categories, array( "category_nicename" => newtitle ), array( "cat_ID" => category->cat_ID ) );
---                 end;
---         end;
+      -- Get the title and ID of every post, post_name to check if it already
+      -- has a value.
+      Posts_2 : constant Post_Array := -- Array_Type :=
+        WpDB.Get_Results ("SELECT ID, post_title, post_name FROM " & Posts &
+                          " WHERE post_name = ''");
+   begin
+      if not Posts_2.Is_Empty then
+         for Post of Posts_2 loop
+            if "" = Post.Post_Name then
+               declare
+                  Newtitle : constant String := Sanitize_Title (-Post.Post_Title);
+               begin
+                  WpDB.Query (WpDB.Prepare (
+                    "UPDATE " & Posts & " SET post_name = %s WHERE ID = %d",
+                    To_List (List => (
+                      1 => +Newtitle,
+                      2 => +Helpers.Image (Integer (Post.Id))
+                    ))
+                  ));
+               end;
+            end if;
+         end loop;
+      end if;
 
---         sql = "UPDATE wpdb->options
---                 SET option_value = REPLACE(option_value, "wp-links/links-images/", "wp-images/links/")
---                 WHERE option_name LIKE %s
---                 AND option_value LIKE %s";
---         wpdb->query( wpdb->prepare( sql, wpdb->esc_like( "links_rating_image" ) . "%", wpdb->esc_like( "wp-links/links-images/" ) . "%" ) );
+      declare
+         Categories_2 : constant Statement_Type := Statement_Type (-WpDB.Categories);
 
---         done_ids = wpdb->get_results( "SELECT DISTINCT post_id FROM wpdb->post2cat" );
---         if ( done_ids ) :
---                 done_posts = array();
---                 foreach ( done_ids as done_id ) :
---                         done_posts[] = done_id->post_id;
---                 endforeach;
---                 catwhere = " AND ID NOT IN (" . implode( ",", done_posts ) . ")";
---         else :
---                 catwhere = "";
---         endif;
+         Categories : constant Categories_List :=
+           WpDB.Get_Results (
+             "SELECT cat_ID, cat_name, category_nicename FROM " & Categories_2);
+      begin
+         for Category of Categories loop
+            if "" = Category.Category_Nicename then
+               declare
+                  Newtitle : constant String := Sanitize_Title (-Category.Cat_Name);
+               begin
+                  WpDB.Update
+                    (-WpDB.Categories,
+                     Data  => To_Array (List => (1 =>
+                       Build ("category_nicename", Newtitle))),
+                     Where => To_Array (List => (1 =>
+                       Build ("cat_ID", Category.Cat_Id))));
+               end;
+            end if;
+         end loop;
+      end;
 
---         allposts = wpdb->get_results( "SELECT ID, post_category FROM wpdb->posts WHERE post_category != "0" catwhere" );
---         if ( allposts ) :
---                 foreach ( allposts as post ) then
---                         -- Check to see if it"s already been imported.
---                         cat = wpdb->get_row( wpdb->prepare( "SELECT-- FROM wpdb->post2cat WHERE post_id = %d AND category_id = %d", post->ID, post->post_category ) );
---                         if ( ! cat && 0 != post->post_category ) then -- If there"s no result.
---                                 wpdb->insert(
---                                         wpdb->post2cat,
---                                         array(
---                                                 "post_id"     => post->ID,
---                                                 "category_id" => post->post_category,
---                                         )
---                                 );
---                         end;
---                 end;
---         endif;
--- end;
+      declare
+         SQL : constant Statement_Type :=
+           "UPDATE " & Options &
+           " SET option_value =" &
+           " REPLACE(option_value, 'wp-links/links-images/', 'wp-images/links/')" &
+           " WHERE option_name LIKE %S" &
+           " AND option_value LIKE %s";
+
+         Cat_Where : UString;
+      begin
+         WpDB.Query (WpDB.Prepare (SQL,
+           To_List (List => (
+             1 => +WpDB.ESC_Like ("links_rating_image") & "%",
+             2 => +WpDB.ESC_Like ("wp-links/links-images/") & "%"
+           ))
+         ));
+
+         declare
+            Done_Ids : constant Post2cat_List :=
+              WpDB.Get_Results ("SELECT DISTINCT post_id FROM " & Post2cat);
+         begin
+            if not Done_Ids.Is_Empty then
+               declare
+                  Done_Posts : List_Type; --  = array();
+               begin
+                  for Done_Id of Done_Ids loop
+                     Done_Posts.Append (+Helpers.Image (Done_Id.Post_Id));
+                  end loop;
+                  Cat_Where := +" AND ID NOT IN (" & Implode (",", Done_Posts) & ")";
+               end;
+            else
+               Cat_Where := +"";
+            end if;
+         end;
+
+         declare
+            Cat_Where_2 : constant Statement_Type := Statement_Type (-Cat_Where);
+
+            All_Posts : constant Post_Array := -- Array_Type :=
+              WpDB.Get_Results ("SELECT ID, post_category FROM " & Posts &
+                                " WHERE post_category != '0' " & Cat_Where_2);
+         begin
+            if not All_Posts.Is_Empty then
+               for Post of All_Posts loop
+                  -- Check to see if it's already been imported.
+                  declare
+                     Success : Boolean;
+
+                     Cat : constant Post2cat_List := -- Duration :=
+                       WpDB.Get_Row (WpDB.Prepare (
+                         "SELECT * FROM " & Post2cat &
+                         " WHERE post_id = %d AND category_id = %d",
+                         To_List (List => (
+                           1 => +Helpers.Image (Integer (Post.Id)),
+                           2 => Post.Post_Category
+                         ))
+                       ),
+                       Success => Success
+                     );
+                  begin
+                     -- If there's no result.
+                     if
+                       not Cat.Is_Empty and then
+--                     not Cat and then
+                       "" /= Post.Post_Category
+                     then
+                        WpDB.Insert (
+                          -WpDB.Post2cat,
+                          To_Array (List => (
+                            Build ("post_id",     Integer (Post.Id)),
+                            Build ("category_id", -Post.Post_Category)
+                          ))
+                        );
+                     end if;
+                  end;
+               end loop;
+            end if;
+         end;
+      end;
+   end Upgrade_100;
 
    -----------------
    -- Upgrade_101 --
@@ -1924,8 +2013,11 @@ is
    is
       use Php.Lists;
       use UStrings;
+      use Class_WpDB;
       use Inc_Formatting;
       use Inc_Functions;
+
+      Options : constant Statement_Type := Statement_Type (-Globals.WpDB.Options);
    begin
       if "home" = Setting and then Globals.WP_HOME_DEF then
          return From_String (Un_Trailing_Slash_It (Globals.WP_HOME));
@@ -1939,7 +2031,7 @@ is
          Option : constant String :=
            Globals.WpDB.Get_Var (
              Globals.WpDB.Prepare (
-               "SELECT option_value FROM " & (-Globals.WpDB.Options) &
+               "SELECT option_value FROM " & Options &
                " WHERE option_name = %s", To_List (Setting)));
       begin
          if "home" = Setting and then Option = "" then -- not
@@ -2654,7 +2746,6 @@ is
 
    procedure Maybe_Disable_Automattic_Widgets
    is
-      use Php.Arrays;
       use Php.Files;
       use UStrings;
       use Inc_Options;
@@ -2700,18 +2791,29 @@ is
       use UStrings;
       use Class_WpDB;
       use Inc_Load;
---    global wp_current_db_version, wpdb;
+
+      Options     : constant Statement_Type := Statement_Type (-WpDB.Options);
+      Signups     : constant Statement_Type := Statement_Type (-WpDB.Signups);
+      Blogs       : constant Statement_Type := Statement_Type (-WpDB.Blogs);
+      Usermeta    : constant Statement_Type := Statement_Type (-WpDB.Usermeta);
+      Terms       : constant Statement_Type := Statement_Type (-WpDB.Terms);
+      Commentmeta : constant Statement_Type := Statement_Type (-WpDB.Commentmeta);
+      Postmeta    : constant Statement_Type := Statement_Type (-WpDB.Postmeta);
+      Termmeta    : constant Statement_Type := Statement_Type (-WpDB.Termmeta);
+      Posts       : constant Statement_Type := Statement_Type (-WpDB.Posts);
    begin
       -- Upgrade versions prior to 2.9.
       if Wp_Current_DB_Version < 11557 then
          -- Delete duplicate options. Keep the option with the highest option_id.
-         WpDB.Query ("DELETE o1 FROM wpdb->options AS o1 JOIN wpdb->options AS o2 USING (`option_name`) WHERE o2.option_id > o1.option_id");
+         WpDB.Query ("DELETE o1 FROM " & Options & " AS o1 JOIN " & Options &
+                     " AS o2 USING (`option_name`) WHERE o2.option_id > o1.option_id");
 
          -- Drop the old primary key and add the new.
-         WpDB.Query ("ALTER TABLE wpdb->options DROP PRIMARY KEY, ADD PRIMARY KEY(option_id)");
+         WpDB.Query ("ALTER TABLE " & Options &
+                     " DROP PRIMARY KEY, ADD PRIMARY KEY(option_id)");
 
          -- Drop the old option_name index. dbDelta() Doesn't do the drop.
-         WpDB.Query ("ALTER TABLE wpdb->options DROP INDEX option_name");
+         WpDB.Query ("ALTER TABLE " & Options & " DROP INDEX option_name");
       end if;
 
       -- Multisite schema upgrades.
@@ -2723,14 +2825,20 @@ is
          -- Upgrade versions prior to 3.7.
          if Wp_Current_DB_Version < 25179 then
             -- New primary key for signups.
-            WpDB.Query ("ALTER TABLE wpdb->signups ADD signup_id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
-            WpDB.Query ("ALTER TABLE wpdb->signups DROP INDEX domain");
+            WpDB.Query
+              ("ALTER TABLE " & Signups &
+               " ADD signup_id BIGINT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST");
+            WpDB.Query ("ALTER TABLE " & Signups & " DROP INDEX domain");
          end if;
 
          if Wp_Current_DB_Version < 25448 then
             -- Convert archived from enum to tinyint.
-            WpDB.Query ("ALTER TABLE wpdb->blogs CHANGE COLUMN archived archived varchar(1) NOT NULL default '0'");
-            WpDB.Query ("ALTER TABLE wpdb->blogs CHANGE COLUMN archived archived tinyint(2) NOT NULL default 0");
+            WpDB.Query
+              ("ALTER TABLE " & Blogs &
+               " CHANGE COLUMN archived archived varchar(1) NOT NULL default '0'");
+            WpDB.Query
+              ("ALTER TABLE " & Blogs &
+               " CHANGE COLUMN archived archived tinyint(2) NOT NULL default 0");
          end if;
       end if;
 
@@ -2740,13 +2848,25 @@ is
            not Is_Multisite and then
            Wp_Should_Upgrade_Global_Tables
          then
-            WpDB.Query ("ALTER TABLE wpdb->usermeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+            WpDB.Query
+              ("ALTER TABLE " & Usermeta &
+               " DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
          end if;
-         WpDB.Query ("ALTER TABLE wpdb->terms DROP INDEX slug, ADD INDEX slug(slug(191))");
-         WpDB.Query ("ALTER TABLE wpdb->terms DROP INDEX name, ADD INDEX name(name(191))");
-         WpDB.Query ("ALTER TABLE wpdb->commentmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
-         WpDB.Query ("ALTER TABLE wpdb->postmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
-         WpDB.Query ("ALTER TABLE wpdb->posts DROP INDEX post_name, ADD INDEX post_name(post_name(191))");
+         WpDB.Query
+           ("ALTER TABLE " & Terms &
+            " DROP INDEX slug, ADD INDEX slug(slug(191))");
+         WpDB.Query
+           ("ALTER TABLE " & Terms &
+            " DROP INDEX name, ADD INDEX name(name(191))");
+         WpDB.Query
+           ("ALTER TABLE " & Commentmeta &
+            " DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+         WpDB.Query
+           ("ALTER TABLE " & Postmeta &
+            " DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+         WpDB.Query
+           ("ALTER TABLE " & Posts &
+            " DROP INDEX post_name, ADD INDEX post_name(post_name(191))");
       end if;
 
       -- Upgrade versions prior to 4.4.
@@ -2754,14 +2874,16 @@ is
          -- If compatible termmeta table is found, use it, but enforce a proper
          -- index and update collation.
          if
-           "" /= WpDB.Get_Var
-             (Statement_Type ("SHOW TABLES LIKE '" & (-WpDB.Termmeta) & "'"))
+           "" /= WpDB.Get_Var ("SHOW TABLES LIKE '" & Termmeta & "'")
          and then
-           WpDB.Get_Results (Statement_Type (
-             "SHOW INDEX FROM " & (-WpDB.Termmeta) &
-             " WHERE Column_name = 'meta_key'")) /= Empty_Array
+           WpDB.Get_Results (
+             "SHOW INDEX FROM " & Termmeta &
+             " WHERE Column_name = 'meta_key'") /= Empty_Array
          then
-            WpDB.Query ("ALTER TABLE wpdb->termmeta DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+            WpDB.Query
+              ("ALTER TABLE " & Termmeta &
+               " DROP INDEX meta_key, ADD INDEX meta_key(meta_key(191))");
+
             Maybe_Convert_Table_To_Utf8mb4 (-WpDB.Termmeta);
          end if;
       end if;

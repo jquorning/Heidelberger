@@ -34,9 +34,10 @@ with Adi_List_Tables;
 with Adi_Posts;
 with Adi_Screens;
 
-with Inc_Capabilities;
 with Class_Posts;
 with Class_Post_Type;
+with Class_WpDB;
+with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -66,17 +67,18 @@ is
 
    procedure Render
    is
-      use Binder;
-      use UStrings;
       use Php.Arrays;
       use Php.Echoing;
       use Php.Numerics;
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use Binder;
+      use UStrings;
       use Inc_Capabilities;
       use Class_Posts;
       use Class_Post_Type;
+      use Class_WpDB;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Link_Templates;
@@ -218,7 +220,7 @@ is
                               --
                               Post_Ids := Globals.WpDB.Get_Col (
                                  Globals.WpDB.Prepare (
-                                   "SELECT ID FROM " & (-Post_Type) &
+                                   "SELECT ID FROM " & Statement_Type (-Post_Type) &
                                    " WHERE post_type=%s AND post_status = %s",
                                    To_List (List => (
                                      1 => Post_Type,

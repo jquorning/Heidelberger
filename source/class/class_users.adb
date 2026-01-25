@@ -195,10 +195,12 @@ is
 
          Unused_Success : Boolean;
 
+         DB_Field_2 : constant Statement_Type := Statement_Type (-DB_Field);
+
          Statement : constant Statement_Type :=
            WpDB.Prepare (
              "SELECT * FROM wpdb->users " &
-             "WHERE " & (-DB_Field) & " = %s LIMIT 1",
+             "WHERE " & DB_Field_2 & " = %s LIMIT 1",
              To_List (-Value_2));
 
          User : constant Wp_User :=
@@ -294,10 +296,12 @@ is
 
          Unused_Success : Boolean;
 
+         DB_Field_2 : constant Statement_Type := Statement_Type (-DB_Field);
+
          Statement : constant Statement_Type :=
            WpDB.Prepare (
              "SELECT * FROM wpdb->users " &
-             "WHERE " & (-DB_Field) & " = %s LIMIT 1",
+             "WHERE " & DB_Field_2 & " = %s LIMIT 1",
              To_List (-Value_2));
 
          User : constant Wp_User :=

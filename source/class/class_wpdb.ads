@@ -13,9 +13,11 @@ with UStrings;
 with SQLite;
 with Lists;
 
+with Class_Categories;
 with Class_Comments;
 with Class_Errors;
 with Class_Posts;
+with Class_Post2cat;
 with Class_Users;
 
 package Class_WpDB
@@ -301,7 +303,7 @@ is
            UStrings.To_UString ("term_taxonomy"),
            UStrings.To_UString ("term_relationships"),
            UStrings.To_UString ("termmeta"),
-           UStrings.To_UString ("Commentmeta")
+           UStrings.To_UString ("commentmeta")
          ));
 
          -- String_Maps.Map; --  :=
@@ -734,6 +736,10 @@ is
          --
          Error : UStrings.UString; --  = null;
 
+         -- added -- jq
+         Categories : UStrings.UString;
+         Post2cat   : UStrings.UString;
+
       end record;
 
    --
@@ -1157,6 +1163,13 @@ is
                     Where_Format : String := "") -- null
                     return Rows_Result_Type;
 
+   procedure Update (This         : in out Wpdb_Class;
+                     Table        : String;
+                     Data         : Array_Type;
+                     Where        : Array_Type;
+                     Format       : String := ""; -- null
+                     Where_Format : String := ""); -- null
+
    --
    -- Inserts a row into the table.
    --
@@ -1192,6 +1205,11 @@ is
                     Data   : Array_Type;
                     Format : String := "") -- null
                     return Rows_Result_Type;
+
+   procedure Insert (This   : in out Wpdb_Class;
+                     Table  : String;
+                     Data   : Array_Type;
+                     Format : String := ""); -- null
 
    --
    -- Helper function for insert and replace.
@@ -1359,7 +1377,7 @@ is
    -- @return string|void Sanitized query string, if there is a query to prepare.
    --
    function Prepare (Db    : Wpdb_Class;
-                     Query : String;
+                     Query : Statement_Type;
                      Args  : List_Type) --, ...$args )
                      return Statement_Type; -- String;
 
@@ -1535,6 +1553,14 @@ is
                      return Class_Users.Wp_User
                      is (Class_Users.Null_User);
 
+   function Get_Row (Db      : in out Wpdb_Class;
+                     Query   : Statement_Type; --  := ""; -- = null,
+                     Output  : String         := ""; -- = OBJECT,
+                     Y       : Natural        := 0;
+                     Success : out Boolean)
+                     return Class_Post2cat.Post2cat_List
+                     is (Class_Post2cat.Empty_Post2cat_List);
+
    --
    -- Retrieves the character set for the given column.
    --
@@ -1621,10 +1647,22 @@ is
                          return Array_Type;
 
    function Get_Results (This   : Wpdb_Class;
-                         Query  : String := ""; -- null
+                         Query  : Statement_Type; -- := ""; -- null
                          Output : String := "OBJECT")
                          return Class_Posts.Post_Array
                          is (Class_Posts.Empty_Post_Array);
+
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : Statement_Type; -- := ""; -- null
+                         Output : String := "OBJECT")
+                         return Class_Categories.Categories_List
+                         is (Class_Categories.Empty_Categories_List);
+
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : Statement_Type; -- := ""; -- null
+                         Output : String := "OBJECT")
+                         return Class_Post2cat.Post2cat_List
+                         is (Class_Post2cat.Empty_Post2cat_List);
 
    --
    -- Retrieves the character set for the given table.

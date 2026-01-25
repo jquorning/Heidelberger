@@ -17,6 +17,7 @@ with Helpers;
 with Lists;
 
 with Class_Post_Type;
+with Class_WpDB;
 with Inc_Options;
 with Inc_Posts;
 -- with Inc_Capabilities;
@@ -39,6 +40,7 @@ is
       use UStrings;
       use Binder;
       use Class_Post_Type;
+      use Class_WpDB;
 --    use Inc_Capabilities;
       use Inc_Posts;
       use Inc_Users;
@@ -63,6 +65,8 @@ is
           Build ("show_in_admin_all_list", "false")
         ))
       );
+
+      Posts : constant Statement_Type := Statement_Type (-Globals.WpDB.Posts);
    begin
       Globals.Post_Type        := List_Table.Screen.Post_Type;
       Globals.Post_Type_Object := Get_Post_Type_Object (-Globals.Post_Type);
@@ -70,11 +74,11 @@ is
       List_Table.User_Posts_Count := Natural'Value (
         Globals.WpDB.Get_Var ( -- (int)
           Globals.WpDB.Prepare (
-            "SELECT COUNT( 1 )"              &
-            " FROM " & (-Globals.WpDB.Posts) &
-            " WHERE post_type = %s"          &
-            " AND post_status NOT IN ( '"    &
-            Implode ("','", Exclude_States) & "' )" &
+            "SELECT COUNT( 1 )"           &
+            " FROM " & Posts              &
+            " WHERE post_type = %s"       &
+            " AND post_status NOT IN ( '" &
+            Statement_Type (Implode ("','", Exclude_States) & "' )") &
             " AND post_author = %d",
             To_List (List => (
               1 => Globals.Post_Type,
@@ -100,15 +104,16 @@ is
       begin
          if "post" = Globals.Post_Type and not Sticky_Posts.Is_Empty then
             declare
-               Sticky_Posts_2 : constant String :=
-                 Implode (", ", List_Map (Absint'Access, Sticky_Posts)); -- (array)
+               Sticky_Posts_2 : constant Statement_Type :=
+                 Statement_Type (Implode (", ", List_Map (Absint'Access,
+                                                          Sticky_Posts))); -- (array)
             begin
                List_Table.Sticky_Posts_Count := Natural'Value (
                  Globals.WpDB.Get_Var ( -- (int)
                    Globals.WpDB.Prepare (
-                     "SELECT COUNT( 1 )"              &
-                     " FROM " & (-Globals.WpDB.Posts) &
-                     " WHERE post_type = %s"          &
+                     "SELECT COUNT( 1 )"     &
+                     " FROM " & Posts        &
+                     " WHERE post_type = %s" &
                      " AND post_status NOT IN (""trash"", ""auto-draft"")" &
                      " AND ID IN (" & Sticky_Posts_2 & ")",
                      To_List (-Globals.Post_Type)

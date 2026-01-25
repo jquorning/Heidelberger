@@ -247,8 +247,8 @@ is
          Filter : UStrings.UString;
 
          -- Added by jq
-         Props : Property_Type;
-
+         Props         : Property_Type;
+         Post_Category : UStrings.UString; -- obsolete
       end record;
 
    --

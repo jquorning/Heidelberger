@@ -974,7 +974,7 @@ is
    -------------
 
    function Prepare (Db    : Wpdb_Class;
-                     Query : String;
+                     Query : Statement_Type;
                      Args  : List_Type) --, ...args)
                      return Statement_Type
    is
@@ -993,7 +993,7 @@ is
       end Func;
 
    begin
-      Ada.Text_IO.Put_Line ("inc_class_wpdb.prepare: " & Query);
+      Put_Line ("inc_class_wpdb.prepare: " & String (Query));
 
       if Query = "" then
          return "";  -- "" added jq
@@ -1001,7 +1001,7 @@ is
 
       -- This is not meant to be foolproof
       -- but it will catch obviously incorrect usage.
-      if Strpos (Query, "%") = 0 then
+      if Strpos (String (Query), "%") = 0 then
          Inc_Load.Wp_Load_Translations_Early;  -- ();
          X_Doing_It_Wrong (
             "wpdb::prepare",
@@ -1058,7 +1058,7 @@ is
             -- placeholders like %1s, which are frequently used in the middle of
             -- longer strings, or as table name placeholders.
             --
-            Query_3 : constant String := Str_Replace ("'%s'", "%s", Query);
+            Query_3 : constant String := Str_Replace ("'%s'", "%s", String (Query));
             -- Strip any existing single quotes.
 
             Query_4 : constant String := Str_Replace ("""%s""", "%s", Query_3);
@@ -2112,6 +2112,21 @@ is
       return This.X_Insert_Replace_Helper (Table, Data, Format, "INSERT");
    end Insert;
 
+   ------------
+   -- Insert --
+   ------------
+
+   procedure Insert (This   : in out Wpdb_Class;
+                     Table  : String;
+                     Data   : Array_Type;
+                     Format : String := "")
+   is
+      Unused : constant Rows_Result_Type :=
+        Insert (This, Table, Data, Format);
+   begin
+      null;
+   end Insert;
+
         --
         -- Replaces a row in the table.
         --
@@ -2196,14 +2211,15 @@ is
          end loop;
 
          declare
-            Fields_2 : constant String :=
-              "`" & Implode ("`, `", List_Type'(Array_Keys (Data_2))) & "`";
+            Fields_2 : constant Statement_Type := Statement_Type (
+              "`" & Implode ("`, `", List_Type'(Array_Keys (Data_2))) & "`");
 
-            Formats_2 : constant String := Implode (", ", Formats);
+            Formats_2 : constant Statement_Type :=
+              Statement_Type (Implode (", ", Formats));
 
-            SQL : constant String :=
-              Typ & " INTO `" & Table & "` (" & Fields_2 &
-              ") VALUES (" & Formats_2 & ")";
+            SQL : constant Statement_Type :=
+              Statement_Type (Typ) & " INTO `" & Statement_Type (Table) &
+              "` (" & Fields_2 & ") VALUES (" & Formats_2 & ")";
          begin
             This.Check_Current_Query := False;
             return This.Query (This.Prepare (SQL, Values));
@@ -2289,14 +2305,18 @@ is
          end loop;
 
          declare
-            Fields_2     : constant String := Implode (", ", Fields);
-            Conditions_2 : constant String := Implode (" AND ", Conditions);
+            Fields_2     : constant Statement_Type :=
+              Statement_Type (Implode (", ", Fields));
 
-            SQL : constant String :=
-              "UPDATE `" & Table & "` SET " & Fields_2 & " WHERE " & Conditions_2;
+            Conditions_2 : constant Statement_Type :=
+              Statement_Type (Implode (" AND ", Conditions));
+
+            SQL : constant Statement_Type :=
+              "UPDATE `" & Statement_Type (Table) &
+              "` SET " & Fields_2 & " WHERE " & Conditions_2;
          begin
             Put_Line ("update:");
-            Put_Line ("  sql: " & SQL);
+            Put_Line ("  sql: " & String (SQL));
             Put_Line ("  values: ");
             Put_Line (Values'Image);
 
@@ -2304,6 +2324,23 @@ is
             return This.Query (This.Prepare (SQL, Values));
          end;
       end;
+   end Update;
+
+   ------------
+   -- Update --
+   ------------
+
+   procedure Update (This         : in out Wpdb_Class;
+                     Table        : String;
+                     Data         : Array_Type;
+                     Where        : Array_Type;
+                     Format       : String := "";
+                     Where_Format : String := "")
+   is
+      Unused : constant Rows_Result_Type :=
+        Update (This, Table, Data, Where, Format, Where_Format);
+   begin
+      null;
    end Update;
 
    ------------
@@ -2355,10 +2392,12 @@ is
             end loop;
 
             declare
-               Conditions_2 : constant String := Implode (" AND ", Conditions);
+               Conditions_2 : constant Statement_Type :=
+                 Statement_Type (Implode (" AND ", Conditions));
 
-               SQL : constant String :=
-                 "DELETE FROM `" & Table & "` WHERE " & Conditions_2;
+               SQL : constant Statement_Type :=
+                 "DELETE FROM `" & Statement_Type (Table) &
+                 "` WHERE " & Conditions_2;
             begin
                This.Check_Current_Query := False;
                return This.Query (This.Prepare (SQL, Values));
@@ -3011,7 +3050,6 @@ is
       use Php.Strings;
       use Databases;
       use UStrings;
-      use Inc_Load;
       use Inc_Plugins;
 
       Tablekey  : constant String := Strtolower (Table);
@@ -3097,7 +3135,6 @@ is
    is
       use Php.Strings;
       use UStrings;
-      use Inc_Load;
 
       Tablekey  : constant String := Strtolower (Table);
       Columnkey : constant String := Strtolower (Column);
@@ -3479,33 +3516,53 @@ is
 
                         if Kind_Of (Get (Value, "length")) = Kind_Array then
                            declare
-                              Length : constant String :=
-                                Sprintf ("%.0f",
-                                         To_List (As_String (Get (Ref_2 (Value,
-                                                                Key_1 => "length",
-                                                                Key_2 => "length")))));
+                              Length : constant Statement_Type :=
+                                Statement_Type (Sprintf (
+                                  "%.0f",
+                                  To_List (As_String (Get (Ref_2 (Value,
+                                    Key_1 => "length",
+                                    Key_2 => "length"
+                                  ))))
+                                ));
+
+                              Charset_2 : constant Statement_Type :=
+                                Statement_Type (-Charset);
+
+                              Connection_Charset_2 : constant Statement_Type :=
+                                Statement_Type (-Connection_Charset);
+
+                              SQL : constant Statement_Type :=
+                                "CONVERT(LEFT(CONVERT(%s USING " &
+                                Charset_2 & "), " & Length &
+                                ") USING " & Connection_Charset_2 & ")";
                            begin
                               Set (Queries, Col, From_String (String (
-                                   This.Prepare (
-                                     "CONVERT(LEFT(CONVERT(%s USING " &
-                                     (-Charset) & "), " & Length &
-                                     ") USING " & (-Connection_Charset) &
-                                     ")",
+                                   This.Prepare (SQL,
                                      To_List (Get_As_String (Value, "value"))
                                    )
                                   )));
                            end;
+
                         elsif "binary" /= Charset then
                            -- If we don't have a length, there's no need to convert
                            -- binary - it will always return the same result.
-                           Set (Queries, Col, From_String (String (
-                                This.Prepare (
-                                  "CONVERT(CONVERT(%s USING " &
-                                  (-Charset) & ") USING " &
-                                  (-Connection_Charset) & ")",
-                                  To_List (Get_As_String (Value, "value"))
-                                )
-                               )));
+                           declare
+                              Charset_2 : constant Statement_Type :=
+                                Statement_Type (-Charset);
+
+                              Connection_Charset_2 : constant Statement_Type :=
+                                Statement_Type (-Connection_Charset);
+
+                              SQL : constant Statement_Type :=
+                                "CONVERT(CONVERT(%s USING " &
+                                Charset_2 & ") USING " &
+                                Connection_Charset_2 & ")";
+                           begin
+                              Set (Queries, Col, From_String (String (
+                                   This.Prepare (SQL,
+                                     To_List (Get_As_String (Value, "value"))
+                                   ))));
+                           end;
                         end if;
                      end;
                      Delete (Ref_2 (Data_2, Key_1 => Col, Key_2 => "db"));

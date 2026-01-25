@@ -213,10 +213,13 @@ is
                      declare
                         Success : Boolean;
 
+                        Options : constant Statement_Type :=
+                          Statement_Type (-Globals.WpDB.Options);
+
                         Statement : constant Statement_Type :=
                           Globals.WpDB.Prepare (
-                            "SELECT option_value"              &
-                            " FROM " & (-Globals.WpDB.Options) &
+                            "SELECT option_value" &
+                            " FROM " & Options    &
                             " WHERE option_name = %s LIMIT 1",
                             To_List (Option));
 
@@ -255,10 +258,14 @@ is
             Success  : Boolean;
             Suppress : constant Boolean := Globals.WpDB.Suppress_Errors; -- ();
 
+            Options : constant Statement_Type :=
+              Statement_Type (-Globals.WpDB.Options);
+
             Statement : constant Statement_Type :=
               Globals.WpDB.Prepare (
-                "SELECT option_value FROM " & (-Globals.WpDB.Options) & " " &
-                "WHERE option_name = %s LIMIT 1", To_List (Option));
+                "SELECT option_value FROM " & Options &
+                " WHERE option_name = %s LIMIT 1",
+                To_List (Option));
 
             Row : constant Array_Type :=
               Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -1359,9 +1366,12 @@ is
    is
       use Globals;
       use UStrings;
+      use Class_WpDB;
       use Inc_Functions;
       use Inc_Load;
---    global wpdb;
+
+      Options  : constant Statement_Type := Statement_Type (-WpDB.Options);
+      Sitemeta : constant Statement_Type := Statement_Type (-WpDB.Sitemeta);
    begin
       if not Force_DB and then Wp_Using_Ext_Object_Cache then
          return;
@@ -1369,10 +1379,11 @@ is
 
       WpDB.Query (
         WpDB.Prepare (
-          "DELETE a, b FROM {wpdb->options} a, {wpdb->options} b " &
+          "DELETE a, b FROM " & Options & " a, " & Options & " b " &
           "WHERE a.option_name LIKE %s " &
           "AND a.option_name NOT LIKE %s " &
-          "AND b.option_name = CONCAT( '_transient_timeout_', SUBSTRING( a.option_name, 12 ) ) " &
+          "AND b.option_name = " &
+          "CONCAT( '_transient_timeout_', SUBSTRING( a.option_name, 12 ) ) " &
           "AND b.option_value < %d",
           To_List (List => (
             1 => +(WpDB.ESC_Like ("_transient_") & "%"),
@@ -1385,10 +1396,11 @@ is
          -- Single site stores site transients in the options table.
          WpDB.Query (
            WpDB.Prepare (
-             "DELETE a, b FROM {wpdb->options} a, {wpdb->options} b " &
+             "DELETE a, b FROM " & Options & " a, " & Options & " b " &
              "WHERE a.option_name LIKE %s " &
              "AND a.option_name NOT LIKE %s " &
-             "AND b.option_name = CONCAT('_site_transient_timeout_', SUBSTRING( a.option_name, 17 ) ) " &
+             "AND b.option_name = " &
+             "CONCAT('_site_transient_timeout_', SUBSTRING( a.option_name, 17 ) ) " &
              "AND b.option_value < %d",
              To_List (List => (
                1 => +(WpDB.ESC_Like ("_site_transient_") & "%"),
@@ -1396,14 +1408,16 @@ is
                3 => +Helpers.Image (Php.Misc.Time)
              ))
            ));
+
       elsif Is_Multisite and then Is_Main_Site and then Is_Main_Network then
          -- Multisite stores site transients in the sitemeta table.
          WpDB.Query (
            WpDB.Prepare (
-             "DELETE a, b FROM {wpdb->sitemeta} a, {wpdb->sitemeta} b " &
+             "DELETE a, b FROM " & Sitemeta & " a, " & Sitemeta & " b " &
              "WHERE a.meta_key LIKE %s " &
              "AND a.meta_key NOT LIKE %s " &
-             "AND b.meta_key = CONCAT('_site_transient_timeout_', SUBSTRING( a.meta_key, 17 ) ) " &
+             "AND b.meta_key = " &
+             "CONCAT('_site_transient_timeout_', SUBSTRING( a.meta_key, 17 ) ) " &
              "AND b.meta_value < %d",
              To_List (List => (
                1 => +(WpDB.ESC_Like ("_site_transient_") & "%"),

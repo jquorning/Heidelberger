@@ -20,8 +20,9 @@ with Wp_Common;
 
 with Adi_Plugins;
 
-with Inc_Caches;
 with Class_Querys;
+with Class_WpDB;
+with Inc_Caches;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
@@ -6561,12 +6562,13 @@ is
                               return Wp_Post
    is
       use Ada.Containers;
-      use UStrings;
       use Php.HTML;
       use Php.JSON;
       use Php.Strings;
       use Php.Lists;
       use Php.Misc;
+      use UStrings;
+      use Class_WpDB;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;
@@ -6606,7 +6608,8 @@ is
 
          Escaped_Parts : constant List_Type := ESC_SQL (Parts);
 
-         In_String : constant String := """" & Implode (",", Escaped_Parts) & """";
+         In_String : constant Statement_Type :=
+           Statement_Type ("""" & Implode (",", Escaped_Parts) & """");
 
          -- if Is_Array (Post_Type) then
          --    Post_Types_2 := Post_Type;
@@ -6618,10 +6621,10 @@ is
 
          Post_Types_3 : constant List_Type := ESC_SQL (Post_Types_2);
 
-         Post_Type_In_String : constant String :=
-           """" & Implode (",", Post_Types_3) & """";
+         Post_Type_In_String : constant Statement_Type :=
+           Statement_Type ("""" & Implode (",", Post_Types_3) & """");
 
-         SQL : constant String :=
+         SQL : constant Statement_Type :=
                 "SELECT ID, post_name, post_parent, post_type " &
                 "FROM wpdb.posts " &
                 "WHERE post_name IN (" & In_String & ") " &
