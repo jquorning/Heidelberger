@@ -7,9 +7,10 @@
 -- @subpackage Dependencies
 --
 
-with UStrings;
 with Php.Preg;
 with Php.Strings;
+
+with UStrings;
 
 with Class_Dependencies;
 with Inc_Functions;
@@ -18,7 +19,6 @@ with Inc_L10n;
 
 package body Inc_Functions_Wp_Styles
 is
-   use UStrings;
 
 --    function Wp_Styles_X
 --             return Wp_Styles
@@ -182,6 +182,7 @@ is
                                Media  : String    := "all")
    is
       use Php.Strings;
+      use UStrings;
       use Class_Dependencies;
       use Inc_Functions_Wp_Scripts;
    begin

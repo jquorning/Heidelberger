@@ -1563,7 +1563,6 @@ is
                          Parent   : Integer := 0) -- null
                          return Array_Type -- Integer
    is
-      use UStrings;
       use Php.Strings;
       use Inc_Functions;
       use Inc_Plugins;
@@ -2290,7 +2289,6 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use UStrings;
       use Wp_Common;
 --    use Adi_Templates;
       use Class_Terms;

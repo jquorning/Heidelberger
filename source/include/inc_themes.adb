@@ -16,6 +16,7 @@ with Php.Types;
 
 with Binder;
 with Globals;
+with UStrings;
 
 -- with Class_Customize_Managers;
 with Inc_Formatting;
@@ -28,7 +29,6 @@ with Inc_REST_API;
 
 package body Inc_Themes
 is
-   use UStrings;
 
    Global_Wp_Theme_Features : Array_Type;
 

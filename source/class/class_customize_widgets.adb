@@ -402,8 +402,8 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
-      use Inc_Plugins;
       use Inc_L10n;
+      use Inc_Plugins;
       use Inc_Widgets;
 
       Use_Widgets_Block_Editor : constant Boolean :=

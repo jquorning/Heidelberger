@@ -125,7 +125,6 @@ is
                      Indent_Count    : Natural := 0)
                      return String
    is
-      use UStrings;
       use Php;
       use Php.Strings;
 

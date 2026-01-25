@@ -167,7 +167,6 @@ is
                                         return Boolean
    is
       use Php.Arrays;
-      use UStrings;
 --    use Class_Block_Type;
       use Class_Block_Type_Registry;
    begin

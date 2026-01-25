@@ -53,11 +53,9 @@ with Inc_Users;
 package body Inc_Admin_Bar
 is
    use Arrays;
-   use UStrings;
    use Inc_L10n;
    use Wp_Common;
    use Lists;
-   use Php;
    use Inc_Capabilities;
 
    -- static
@@ -268,6 +266,7 @@ is
 
    procedure Wp_Admin_Bar_Sidebar_Toggle (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Inc_Load;
    begin
       if Is_Admin then
@@ -290,6 +289,7 @@ is
    procedure Wp_Admin_Bar_My_Account_Item (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Php.Strings;
+      use UStrings;
       use Class_Users;
       use Inc_Link_Templates;
       use Inc_Load;
@@ -341,6 +341,7 @@ is
 
    procedure Wp_Admin_Bar_My_Account_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Class_Users;
       use Inc_General_Templates;
       use Inc_Link_Templates;
@@ -428,6 +429,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_Link_Templates;
@@ -535,11 +537,12 @@ is
 
    procedure Wp_Admin_Bar_Edit_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Themes;
    begin
-      -- Don"t show if a block theme is not activated.
+      -- Don't show if a block theme is not activated.
       if not Wp_Is_Block_Theme then
          return;
       end if;
@@ -566,8 +569,9 @@ is
 
    procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
-      use Binder;
       use Php.HTML;
+      use Binder;
+      use UStrings;
       use Inc_Functions;
       use Inc_Load;
 --    use Inc_Pluggables;
@@ -647,6 +651,7 @@ is
       use Ada.Containers;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
       use Class_Sites;
       use Inc_Link_Templates;
       use Inc_Load;
@@ -950,6 +955,7 @@ is
    procedure Wp_Admin_Bar_Shortlink_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Link_Templates;
 
@@ -983,10 +989,15 @@ is
    procedure Wp_Admin_Bar_Edit_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Php.Strings;
+      use UStrings;
       use Adi_Class_Wp_Screens;
+      use Adi_Screens;
+      use Class_Posts;
+      use Class_Post_Type;
       use Class_Terms;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_Options;
       use Inc_Posts;
       use Inc_Taxonomys;
 
@@ -994,11 +1005,6 @@ is
    begin
       if Is_Admin then
          declare
-            use Adi_Screens;
-            use Class_Posts;
-            use Class_Post_Type;
-            use Inc_Options;
-
             Current_Screen   : constant Wp_Screen := Get_Current_Screen;
             Post             : Wp_Post   := Get_Post;
             Post_Type_Object : Wp_Post_Type; -- = null;
@@ -1121,8 +1127,6 @@ is
          end;
       else
          declare
-            use Class_Posts;
-
             Current_Object : constant Wp_Post := Wp_The_Query.Get_Queried_Object;
          begin
             if Current_Object = Null_Post then
@@ -1132,8 +1136,6 @@ is
 
             if not Empty (-Current_Object.Post_Type) then
                declare
-                  use Class_Post_Type;
-
                   Post_Type_Object : constant Wp_Post_Type :=
                      Get_Post_Type_Object (-Current_Object.Post_Type);
 
@@ -1215,6 +1217,7 @@ is
 
    procedure Wp_Admin_Bar_New_Content_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Posts;
@@ -1370,6 +1373,7 @@ is
    procedure Wp_Admin_Bar_Comments_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Php.Strings;
+      use UStrings;
       use Inc_Comments;
       use Inc_Functions;
       use Inc_Link_Templates;
@@ -1411,6 +1415,7 @@ is
 
    procedure Wp_Admin_Bar_Appearance_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Inc_Link_Templates;
       use Inc_Themes;
    begin
@@ -1507,6 +1512,7 @@ is
    procedure Wp_Admin_Bar_Updates_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Updates;
@@ -1552,6 +1558,7 @@ is
 
    procedure Wp_Admin_Bar_Search_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Inc_Formatting;
       use Inc_Link_Templates;
       use Inc_Load;
@@ -1588,6 +1595,7 @@ is
 
    procedure Wp_Admin_Bar_Recovery_Mode_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Class_Recovery_Mode;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -1621,6 +1629,7 @@ is
 
    procedure Wp_Admin_Bar_Add_Secondary_Groups (Admin_Bar : in out Wp_Admin_Bar)
    is
+      use UStrings;
    begin
       declare
          Node : Node_Args;
@@ -1666,6 +1675,7 @@ is
    procedure X_Admin_Bar_Bump_Cb
    is
       use Php.Echoing;
+      use UStrings;
       use Inc_Themes;
 
       Type_Attr : constant String :=
@@ -1699,6 +1709,7 @@ is
             return Boolean
    is
       use Globals;
+      use UStrings;
       use Inc_Load;
       use Inc_Pluggables;
       use Inc_Plugins;

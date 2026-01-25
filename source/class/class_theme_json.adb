@@ -39,10 +39,10 @@ is
                          Origin     : String     := "theme")
                          return Wp_Theme_JSON
    is
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
 --    use Class_Theme_JSON;
       use Inc_Functions;
 
@@ -150,8 +150,8 @@ is
                       Valid_Element_Names : List_Type)
                       return Array_Type
    is
-      use Php;
       use Php.Arrays;
+      use UStrings;
 
       Output : Array_Type;
       Styles_Non_Top_Level   : constant Array_Type := VALID_STYLES;
@@ -278,8 +278,8 @@ is
                                 Position  : String := "right")
                                 return String
    is
-      use Php;
       use Php.Strings;
+      use UStrings;
 
       New_Selectors : List_Type;
       Selectors     : constant List_Type := Explode (",", Selector);
@@ -488,11 +488,11 @@ is
    -- Get_Stylesheet --
    --------------------
 
-   function Get_Stylesheet (This    : Wp_Theme_JSON;
-                            Types   : List_Type :=
-                              To_List (List => (+"variables", +"styles", +"presets"));
-                            Origins : List_Type := Empty_List) -- null
-                            return String
+   function Get_Stylesheet
+              (This    : Wp_Theme_JSON;
+               Types   : List_Type := Variables_Styles_Present;
+               Origins : List_Type := Empty_List) -- null
+               return String
    is
       use Php.Arrays;
       use Php.Lists;
@@ -1156,8 +1156,8 @@ is
                             Selector : String)
                             return String
    is
-      use Php;
       use Php.Strings;
+      use UStrings;
 
       Scopes    : constant List_Type := Explode (",", Scope);
       Selectors : constant List_Type := Explode (",", Selector);
@@ -1296,6 +1296,7 @@ is
                                 Origins         : List_Type := Empty_List) -- null
                                 return Array_Type
    is
+      use UStrings;
       use Inc_Functions;
       use List_Vectors;
 
@@ -1474,8 +1475,8 @@ is
                              Selectors  : Array_Type := Empty_Array)
                              return Array_Type
    is
-      use Php;
       use Php.Arrays;
+      use UStrings;
       use Inc_Plugins;
 
       Nodes : Array_Type;
@@ -2106,9 +2107,9 @@ is
                                 Theme_JSON : Array_Type := Empty_Array) -- null
                                 return Multi_Type
    is
-      use Php;
       use Php.JSON;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -2493,6 +2494,7 @@ is
                                return Array_Type
    is
       use Php.Arrays;
+      use UStrings;
       use Inc_Functions;
 
       Slugs : Array_Type;
@@ -2545,6 +2547,7 @@ is
                                     Base_Path : List_Type)
                                     return String
    is
+      use UStrings;
       use Inc_Functions;
 
       Path : List_Type := Base_Path;
@@ -2641,8 +2644,8 @@ is
    function Get_From_Editor_Settings (Settings : Array_Type)
                                       return Array_Type
    is
-      use Php;
       use Php.Types;
+      use UStrings;
 
       Theme_Settings : Array_Type := To_Array (List => (
         Build ("version",  LATEST_SCHEMA),
@@ -2811,12 +2814,12 @@ is
 
    procedure Set_Spacing_Sizes (This : in out Wp_Theme_JSON)
    is
-      use Php;
       use Php.Arrays;
       use Php.Errors;
       use Php.Numerics;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

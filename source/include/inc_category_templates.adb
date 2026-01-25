@@ -31,7 +31,6 @@ with Inc_Taxonomys;
 package body Inc_Category_Templates
 is
    use Ada.Containers;
-   use UStrings;
    use Lists;
 
 --

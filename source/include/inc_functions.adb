@@ -45,7 +45,6 @@ with Inc_Pluggables;
 
 package body Inc_Functions
 is
-   use UStrings;
 
 --
 -- Converts given MySQL date string into a different format.

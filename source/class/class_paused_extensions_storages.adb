@@ -103,7 +103,6 @@ is
                              return String
    is
       use Php.Strings;
-      use UStrings;
       use Inc_Error_Protection;
    begin
       if not X_Wp_Recovery_Mode.Is_Active then

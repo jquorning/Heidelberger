@@ -2859,7 +2859,6 @@ is
    procedure Wp_Enqueue_Global_Styles
    is
       use Php.Strings;
-      use UStrings;
       use Inc_Functions_Wp_Styles;
       use Inc_Global_Styles_And_Settings;
       use Inc_Plugins;

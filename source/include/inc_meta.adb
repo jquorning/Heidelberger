@@ -28,8 +28,7 @@ with Inc_Taxonomys;
 
 package body Inc_Meta
 is
-   use UStrings;
---   use Arrays;
+
 --
 -- Adds metadata for the specified object.
 --

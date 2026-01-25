@@ -26,7 +26,6 @@ with Class_Theme_JSON_Resolver;
 
 package body Inc_Block_Editors
 is
-   use UStrings;
 
    Static_Default_Editor_Styles_File_Contents_Bool : Boolean := False;
    Static_Default_Editor_Styles_File_Contents      : UStrings.UString;
@@ -238,12 +237,11 @@ is
    function Get_Default_Block_Editor_Settings
             return Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Files;
       use Php.Lists;
       use Php.Misc;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Media;

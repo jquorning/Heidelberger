@@ -8,8 +8,6 @@
 
 with Php.Arrays;
 
-with UStrings;
-
 package body POMO_Translations
 is
    procedure Dummy is null;
@@ -119,7 +117,6 @@ is
                        return String
    is
       use Php.Arrays;
-      use UStrings;
       use POMO_Entries;
 
       Entri : constant Translation_Entry :=

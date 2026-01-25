@@ -39,8 +39,6 @@ is
                              Value    : String)
                              return Wp_Style_Engine_CSS_Declarations
    is
-      use UStrings;
-      use Php;
       use Php.Strings;
 
       -- Sanitizes the property.

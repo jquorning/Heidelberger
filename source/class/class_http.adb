@@ -651,7 +651,6 @@ is
                            URI  : String)
                            return Boolean
    is
-      use UStrings;
       use Php.Lists;
       use Php.HTML;
       use Php.Preg;

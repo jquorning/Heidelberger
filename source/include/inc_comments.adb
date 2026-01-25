@@ -7,7 +7,6 @@
 
 with Arrays;
 with Globals;
-with UStrings;
 
 with Inc_Caches;
 -- with Inc_Plugins;
@@ -199,7 +198,6 @@ is
                          Output  : String  := "OBJECT")
                          return Class_Comments.Wp_Comment
    is
-      use UStrings;
       use Class_Comments;
 
       Comment_2 : Integer := Comment;

@@ -16,7 +16,6 @@ with Inc_Formatting;
 
 package body Class_Textdomain_Registry
 is
-   use UStrings;
    use Inc_Formatting;
    use Lists;
 

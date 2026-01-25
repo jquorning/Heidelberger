@@ -37,8 +37,6 @@ project Heidelberger is
          "-gnat2022",
          "-g",
          "-O0",
---       "-gnatE", -- inc_capabilities
---       "-gnatd_F",
          "-gnata",
          "-gnatwaCJ",
          "-gnatef",
@@ -49,7 +47,6 @@ project Heidelberger is
 
    package Binder is
       for Switches ("Ada") use (
---      "-d_C",  --  Diagnose circularities
         "-Es"    --  Symbolic traceback
       );
    end Binder;

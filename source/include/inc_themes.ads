@@ -6,7 +6,6 @@
 --
 
 with Arrays;
-with UStrings;
 with Lists;
 
 with Class_Themes;
