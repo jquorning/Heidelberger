@@ -579,7 +579,7 @@ is
       -- Clean up indices, add a few.
       Add_Clean_Index (-WpDB.Posts, "post_name");
       Add_Clean_Index (-WpDB.Posts, "post_status");
---    Add_Clean_Index (-WpDB.Categories, "category_nicename"); ???
+      Add_Clean_Index (-WpDB.Categories, "category_nicename");
       Add_Clean_Index (-WpDB.Comments, "comment_approved");
       Add_Clean_Index (-WpDB.Comments, "comment_post_ID");
       Add_Clean_Index (-WpDB.Links, "link_category");
@@ -591,62 +591,142 @@ is
    -----------------
 
    procedure Upgrade_110
-   is null;
---         global wpdb;
+   is
+      use Php.Preg;
+      use Globals;
+      use UStrings;
+      use Class_Users;
+      use Class_WpDB;
+      use Inc_Formatting;
+      use Inc_Options;
 
---         -- Set user_nicename.
---         users = wpdb->get_results( "SELECT ID, user_nickname, user_nicename FROM wpdb->users" );
---         foreach ( users as user ) then
---                 if ( "" === user->user_nicename ) then
---                         newname = sanitize_title( user->user_nickname );
---                         wpdb->update( wpdb->users, array( "user_nicename" => newname ), array( "ID" => user->ID ) );
---                 end;
---         end;
+      Users_2 : constant Statement_Type := Statement_Type (-WpDB.Users);
 
---         users = wpdb->get_results( "SELECT ID, user_pass from wpdb->users" );
---         foreach ( users as row ) then
---                 if ( ! preg_match( "/^[A-Fa-f0-9]then32end;/", row->user_pass ) ) then
---                         wpdb->update( wpdb->users, array( "user_pass" => md5( row->user_pass ) ), array( "ID" => row->ID ) );
---                 end;
---         end;
+      Diff_GMT_Weblogger : Integer;
+   begin
+      declare
+         -- Set user_nicename.
+         Users : constant User_List :=
+           WpDB.Get_Results (
+             "SELECT ID, user_nickname, user_nicename FROM " & Users_2);
+      begin
+         for User of Users loop
+            if "" = User.Prop.User_Nicename then
+               declare
+                  Newname : constant String := Sanitize_Title (-User.Prop.Nickname);
+--                Newname : String := Sanitize_Title (User.Prop.User_Nickname);
+               begin
+                  WpDB.Update
+                    (-WpDB.Users,
+                     To_Array (List => (1 => Build ("user_nicename", Newname))),
+                     To_Array (List => (1 => Build ("ID", User.Id)))
+                  );
+               end;
+            end if;
+         end loop;
+      end;
 
---         -- Get the GMT offset, we"ll use that later on.
---         all_options = get_alloptions_110();
+      declare
+         Users : constant User_List :=
+           WpDB.Get_Results ("SELECT ID, user_pass from " & Users_2);
+      begin
+         for Row of Users loop
+            if not Preg_Match ("/^[A-Fa-f0-9]{32}/", -Row.Prop.User_Pass) then
+               WpDB.Update
+                 (-WpDB.Users,
+                  To_Array (List => (1 =>
+                    Build ("user_pass", Php.Misc.MD5 (-Row.Prop.User_Pass)))),
+                  To_Array (List => (1 =>
+                    Build ("ID", Row.Id)))
+                 );
+            end if;
+         end loop;
+      end;
 
---         time_difference = all_options->time_difference;
+      declare
+         -- Get the GMT offset, we'll use that later on.
+         All_Options : constant Array_Type := Get_Alloptions_110;
 
---                 server_time = time() + gmdate( "Z" );
---         weblogger_time  = server_time + time_difference-- HOUR_IN_SECONDS;
---         gmt_time        = time();
+         Time_Difference : constant Integer := 999; -- All_Options.Time_Difference;
 
---         diff_gmt_server       = ( gmt_time - server_time ) / HOUR_IN_SECONDS;
---         diff_weblogger_server = ( weblogger_time - server_time ) / HOUR_IN_SECONDS;
---         diff_gmt_weblogger    = diff_gmt_server - diff_weblogger_server;
---         gmt_offset            = -diff_gmt_weblogger;
+         Server_Time : constant Integer := Php.Misc.Time + 0;
+         -- + Php.Misc.GMdate ("Z");  -- returns string ???
 
---         -- Add a gmt_offset option, with value gmt_offset.
---         add_option( "gmt_offset", gmt_offset );
+         Weblogger_Time : constant Integer :=
+           Server_Time + Time_Difference * HOUR_IN_SECONDS;
 
---         /*
---         -- Check if we already set the GMT fields. If we did, then
---         -- MAX(post_date_gmt) can"t be "0000-00-00 00:00:00".
---         -- <michel_v> I just slapped myself silly for not thinking about it earlier.
---         --
---         got_gmt_fields = ( "0000-00-00 00:00:00" !== wpdb->get_var( "SELECT MAX(post_date_gmt) FROM wpdb->posts" ) );
+         GMT_Time : constant Integer := Php.Misc.Time;
 
---         if ( ! got_gmt_fields ) then
+         Diff_GMT_Server : constant Integer :=
+           (GMT_Time - Server_Time) / HOUR_IN_SECONDS;
 
---                 -- Add or subtract time to all dates, to get GMT dates.
---                 add_hours   = (int) diff_gmt_weblogger;
---                 add_minutes = (int) ( 60-- ( diff_gmt_weblogger - add_hours ) );
---                 wpdb->query( "UPDATE wpdb->posts SET post_date_gmt = DATE_ADD(post_date, INTERVAL "add_hours:add_minutes" HOUR_MINUTE)" );
---                 wpdb->query( "UPDATE wpdb->posts SET post_modified = post_date" );
---                 wpdb->query( "UPDATE wpdb->posts SET post_modified_gmt = DATE_ADD(post_modified, INTERVAL "add_hours:add_minutes" HOUR_MINUTE) WHERE post_modified != "0000-00-00 00:00:00"" );
---                 wpdb->query( "UPDATE wpdb->comments SET comment_date_gmt = DATE_ADD(comment_date, INTERVAL "add_hours:add_minutes" HOUR_MINUTE)" );
---                 wpdb->query( "UPDATE wpdb->users SET user_registered = DATE_ADD(user_registered, INTERVAL "add_hours:add_minutes" HOUR_MINUTE)" );
---         end;
+         Diff_Weblogger_Server : constant Integer :=
+           (Weblogger_Time - Server_Time) / HOUR_IN_SECONDS;
 
--- end;
+         GMT_Offset : Integer;
+      begin
+         Diff_GMT_Weblogger :=
+           Diff_GMT_Server - Diff_Weblogger_Server;
+
+         GMT_Offset := -Diff_GMT_Weblogger;
+
+         -- Add a gmt_offset option, with value gmt_offset.
+         Add_Option ("gmt_offset", From_Integer (GMT_Offset));
+      end;
+
+      --
+      -- Check if we already set the GMT fields. If we did, then
+      -- MAX(post_date_gmt) can't be "0000-00-00 00:00:00".
+      -- <michel_v> I just slapped myself silly for not thinking about it earlier.
+      --
+      declare
+         Posts    : constant Statement_Type := Statement_Type (-WpDB.Posts);
+         Comments : constant Statement_Type := Statement_Type (-WpDB.Comments);
+         Users    : constant Statement_Type := Statement_Type (-WpDB.Users);
+
+         Got_GMT_Fields : constant Boolean :=
+           "0000-00-00 00:00:00" /=
+           WpDB.Get_Var ("SELECT MAX(post_date_gmt) FROM " & Posts);
+      begin
+         if not Got_GMT_Fields then
+            -- Add or subtract time to all dates, to get GMT dates.
+            declare
+               Add_Hours   : constant Integer := Diff_GMT_Weblogger; -- (int)
+
+               Add_Minutes : constant Integer :=
+                 (60 * (Diff_GMT_Weblogger - Add_Hours));
+
+               Hours : constant Statement_Type :=
+                 Statement_Type (Helpers.Image (Add_Hours));
+
+               Minutes : constant Statement_Type :=
+                 Statement_Type (Helpers.Image (Add_Minutes));
+            begin
+               WpDB.Query ("UPDATE " & Posts &
+                           " SET post_date_gmt = DATE_ADD(post_date, INTERVAL " &
+                           Hours & ":" & Minutes & " HOUR_MINUTE)");
+
+               WpDB.Query ("UPDATE " & Posts & " SET post_modified = post_date");
+
+               WpDB.Query
+                 ("UPDATE " & Posts &
+                  " SET post_modified_gmt = DATE_ADD(post_modified, INTERVAL '" &
+                  Hours & ":" & Minutes &
+                  "' HOUR_MINUTE) WHERE post_modified != '0000-00-00 00:00:00'");
+
+               WpDB.Query
+                 ("UPDATE " & Comments &
+                  " SET comment_date_gmt = DATE_ADD(comment_date, INTERVAL '" &
+                  Hours & ":" & Minutes & "' HOUR_MINUTE)");
+
+               WpDB.Query
+                 ("UPDATE " & Users &
+                  " SET user_registered = DATE_ADD(user_registered, INTERVAL '" &
+                  Hours & ":" & Minutes & "' HOUR_MINUTE)");
+            end;
+         end if;
+      end;
+   end Upgrade_110;
 
    -----------------
    -- Upgrade_130 --

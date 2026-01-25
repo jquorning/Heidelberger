@@ -35,7 +35,7 @@ is
    is (9999);
 
    function GMdate (Format    : String;
-                    Timestamp : Integer)
+                    Timestamp : Integer := 0)
                     return String
                     is ("XXX-025");
 

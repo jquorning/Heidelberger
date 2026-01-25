@@ -1655,6 +1655,12 @@ is
    function Get_Results (This   : Wpdb_Class;
                          Query  : Statement_Type; -- := ""; -- null
                          Output : String := "OBJECT")
+                         return Class_Users.User_List
+                         is (Class_Users.Empty_User_List);
+
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : Statement_Type; -- := ""; -- null
+                         Output : String := "OBJECT")
                          return Class_Categories.Categories_List
                          is (Class_Categories.Empty_Categories_List);
 

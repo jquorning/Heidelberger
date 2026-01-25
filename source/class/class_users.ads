@@ -8,6 +8,7 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Vectors;
 
 with Arrays;
 with Lists;
@@ -344,6 +345,14 @@ is
       Site_Id => 0,
       Prop    => (User_Level => 0,
                   others     => UStrings.Null_UString));
+
+   package User_Vectors is new
+     Ada.Containers.Vectors (Index_Type   => Positive,
+                             Element_Type => Wp_User);
+
+   subtype User_List is User_Vectors.Vector;
+
+   Empty_User_List : constant User_List := User_Vectors.Empty_Vector;
 
 private
    --

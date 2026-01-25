@@ -1267,16 +1267,18 @@ is
 --         return wpdb->query( "ALTER TABLE table CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" );
 -- end;
 
--- --
--- -- Retrieve all options as it was for 1.2.
--- --
--- -- @since 1.2.0
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @return stdClass List of options.
--- --
--- function get_alloptions_110() then
+   --
+   -- Retrieve all options as it was for 1.2.
+   --
+   -- @since 1.2.0
+   --
+   -- @global wpdb wpdb WordPress database abstraction object.
+   --
+   -- @return stdClass List of options.
+   --
+   function Get_Alloptions_110
+            return Array_Type
+            is (Empty_Array);
 --         global wpdb;
 --         all_options = new stdClass;
 --         options     = wpdb->get_results( "SELECT option_name, option_value FROM wpdb->options" );
