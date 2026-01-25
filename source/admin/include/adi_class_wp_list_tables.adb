@@ -16,7 +16,6 @@ with Php.Misc;
 with Php.Strings;
 
 with Binder;
-with UStrings;
 
 with Adi_Screens;
 with Adi_Templates;

@@ -9,8 +9,6 @@
 with Php.Preg;
 with Php.Strings;
 
-with UStrings;
-
 package body Class_Rewrites
 is
 

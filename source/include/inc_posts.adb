@@ -16,7 +16,6 @@ with Php.Numerics;
 with Php.Strings;
 
 with Globals;
-with UStrings;
 with Wp_Common;
 
 with Adi_Plugins;

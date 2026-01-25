@@ -6,8 +6,6 @@
 -- @since 4.4.0
 --
 
-with UStrings;
-
 with Class_Roles;
 with Inc_Plugins;
 with Inc_Roles;

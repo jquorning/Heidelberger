@@ -7,8 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with UStrings;
-
 with Inc_Themes;
 with Inc_Load;
 with Inc_Plugins;

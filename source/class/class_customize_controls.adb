@@ -6,7 +6,6 @@
 -- @since 3.4.0
 --
 
-with UStrings;
 with Php.Types;
 
 with Class_Customize_Managers;

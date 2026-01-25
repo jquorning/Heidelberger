@@ -6,8 +6,6 @@
 -- @since 4.0.0
 --
 
-with UStrings;
-
 with Class_Customize_Managers;
 
 package body Class_Customize_Panels

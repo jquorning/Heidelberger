@@ -16,7 +16,6 @@ with Php.Types;
 
 with Binder;
 with Globals;
-with UStrings;
 
 -- with Class_Customize_Managers;
 with Inc_Formatting;

@@ -7,7 +7,6 @@
 --
 
 with Globals;
-with UStrings;
 with Lists;
 
 with Inc_Caches;

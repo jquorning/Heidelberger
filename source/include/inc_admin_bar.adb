@@ -17,7 +17,6 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Globals;
-with UStrings;
 with Helpers;
 with Lists;
 with Wp_Common;

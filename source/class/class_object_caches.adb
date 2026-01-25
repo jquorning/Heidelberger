@@ -10,7 +10,6 @@ with Php.Arrays;
 with Php.Strings;
 with Php.Types;
 
-with UStrings;
 with Lists;
 
 with Inc_Functions;

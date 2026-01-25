@@ -8,7 +8,6 @@
 -- @since 6.1.0
 --
 
-with UStrings;
 with Php.Strings;
 
 package body Style_Class_Wp_Style_Engine_CSS_Rules

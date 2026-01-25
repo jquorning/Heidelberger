@@ -6,8 +6,6 @@ with Ada.Containers;
 
 with Php.Arrays;
 
-with UStrings;
-
 package body Class_Walker
 is
 

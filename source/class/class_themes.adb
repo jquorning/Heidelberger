@@ -12,7 +12,6 @@ with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
-with UStrings;
 with Lists;
 
 with Inc_Caches;

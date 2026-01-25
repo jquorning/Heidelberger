@@ -18,7 +18,6 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with UStrings;
 
 with Class_Dependency;
 with Inc_Formatting;

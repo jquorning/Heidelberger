@@ -5,8 +5,6 @@
 -- @since 5.2.0
 --
 
-with UStrings;
-
 package body Class_Recovery_Mode
 is
 

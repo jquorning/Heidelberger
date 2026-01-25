@@ -9,8 +9,6 @@
 with Php.Lists;
 with Php.Misc;
 
-with UStrings;
-
 with Class_Locales;
 with Inc_L10n;
 with Inc_Plugins;

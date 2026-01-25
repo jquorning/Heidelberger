@@ -7,8 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with UStrings;
-
 package body Class_Dependency
 is
    use UStrings;

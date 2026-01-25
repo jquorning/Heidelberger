@@ -3,7 +3,6 @@
 --
 
 with Globals;
-with UStrings;
 with Lists;
 with Wp_Common;
 

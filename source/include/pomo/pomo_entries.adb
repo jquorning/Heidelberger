@@ -9,7 +9,6 @@
 with Php.Strings;
 with Php.Types;
 
-with UStrings;
 with Lists;
 
 package body POMO_Entries

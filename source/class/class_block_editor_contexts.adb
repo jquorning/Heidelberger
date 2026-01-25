@@ -5,8 +5,6 @@
 -- @since 5.8.0
 --
 
-with UStrings;
-
 package body Class_Block_Editor_Contexts
 is
 

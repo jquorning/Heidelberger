@@ -6,8 +6,6 @@
 -- @subpackage mo
 --
 
-with UStrings;
-
 package body POMO_MO
 is
 --                 --

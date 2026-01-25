@@ -6,9 +6,6 @@
 -- @since 3.4.0
 --
 
-with UStrings;
--- with Php;
-
 package body Class_Customize_Sections
 is
 

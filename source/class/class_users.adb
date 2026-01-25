@@ -13,7 +13,6 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
-with UStrings;
 with Wp_Common;
 
 with Inc_Caches;

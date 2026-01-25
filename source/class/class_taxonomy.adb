@@ -10,7 +10,6 @@ with Php.Arrays;
 with Php.Lists;
 
 with Globals;
-with UStrings;
 
 with Class_Wp;
 with Inc_Formatting;

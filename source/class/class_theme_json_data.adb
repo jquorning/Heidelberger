@@ -6,8 +6,6 @@
 -- @since 6.1.0
 --
 
-with UStrings;
-
 package body Class_Theme_JSON_Data
 is
 

@@ -11,7 +11,6 @@ with Php.Ini;
 with Php.Lists;
 with Php.Strings;
 
-with UStrings;
 with Globals;
 with Wp_Common;
 

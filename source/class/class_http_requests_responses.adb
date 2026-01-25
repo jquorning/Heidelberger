@@ -6,8 +6,6 @@
 -- @since 4.6.0
 --
 
-with UStrings;
-
 with Inc_Functions;
 
 package body Class_HTTP_Requests_Responses
