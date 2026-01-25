@@ -13,7 +13,6 @@ with Inc_Plugins;
 
 package body Class_Styles
 is
-   use UStrings;
 
    --
    -- Constructor.
@@ -23,6 +22,8 @@ is
    function X_Construct
       return Wp_Styles
    is
+      use UStrings;
+
       This : Wp_Styles;
    begin
       if
@@ -215,6 +216,7 @@ is
                               return Boolean
    is
       use Lists.List_Vectors;
+      use UStrings;
 
       After : List_Type;
    begin
@@ -374,6 +376,7 @@ is
 
    procedure Reset (This : in out Wp_Styles)
    is
+      use UStrings;
    begin
       This.Do_Concat      := False;
       This.Concat         := +"";

@@ -16,7 +16,6 @@ with Inc_Formatting;
 
 package body Class_Textdomain_Registry
 is
-   use Inc_Formatting;
    use Lists;
 
    ---------
@@ -62,6 +61,8 @@ is
                   Locale : String;
                   Path   : String)
    is
+      use Inc_Formatting;
+
       Path_2 : constant String :=
         (if Path /= ""
          then Trailing_Slash_It (Path) else ""); -- False
@@ -86,6 +87,7 @@ is
                               Domain : String;
                               Path   : String)
    is
+      use Inc_Formatting;
    begin
       This.Custom_Paths (Domain) := Un_Trailing_Slash_It (Path);
    end Set_Custom_Path;
@@ -101,6 +103,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Inc_Formatting;
 
       Locations : List_Type := To_List (List => (
          +Globals.WP_LANG_DIR & "/plugins",

@@ -53,10 +53,10 @@ with Inc_Users;
 package body Inc_Admin_Bar
 is
    use Arrays;
-   use Inc_L10n;
-   use Wp_Common;
+--   use Inc_L10n;
+--   use Wp_Common;
    use Lists;
-   use Inc_Capabilities;
+--   use Inc_Capabilities;
 
    -- static
    Rendered : Boolean := False;
@@ -114,6 +114,7 @@ is
 
    procedure Wp_Admin_Bar_Render
    is
+      use Wp_Common;
       use Inc_Plugins;
 --    global wp_admin_bar;
    begin
@@ -160,10 +161,14 @@ is
    -- Wp_Admin_Bar_Wp_Menu --
    --------------------------
 
-   procedure Wp_Admin_Bar_Wp_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Wp_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Link_Templates;
       use Inc_Users;
 
@@ -264,10 +269,13 @@ is
    -- Wp_Admin_Bar_Sidebar_Toggle --
    ---------------------------------
 
-   procedure Wp_Admin_Bar_Sidebar_Toggle (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Sidebar_Toggle
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
       use Inc_Load;
+      use Inc_L10n;
    begin
       if Is_Admin then
          declare
@@ -286,13 +294,17 @@ is
    -- Wp_Admin_Bar_My_Account_Item --
    ----------------------------------
 
-   procedure Wp_Admin_Bar_My_Account_Item (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_My_Account_Item
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
       use Class_Users;
+      use Inc_Capabilities;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Pluggables;
       use Inc_Users;
 
@@ -339,13 +351,17 @@ is
    -- Wp_Admin_Bar_My_Account_Menu --
    ----------------------------------
 
-   procedure Wp_Admin_Bar_My_Account_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_My_Account_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
       use Class_Users;
+      use Inc_Capabilities;
       use Inc_General_Templates;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Pluggables;
       use Inc_Users;
 
@@ -425,15 +441,19 @@ is
    -- Wp_Admin_Bar_Site_Menu --
    ----------------------------
 
-   procedure Wp_Admin_Bar_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Site_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Pluggables;
       use Inc_Users;
       use Inc_Ms_Networks;
@@ -535,11 +555,15 @@ is
    -- Wp_Admin_Bar_Edit_Site_Menu --
    ---------------------------------
 
-   procedure Wp_Admin_Bar_Edit_Site_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Edit_Site_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Themes;
    begin
       -- Don't show if a block theme is not activated.
@@ -567,13 +591,17 @@ is
    -- Wp_Admin_Bar_Customize_Menu --
    ---------------------------------
 
-   procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Customize_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.HTML;
       use Binder;
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Load;
+      use Inc_L10n;
 --    use Inc_Pluggables;
       use Inc_Plugins;
       use Inc_Posts;
@@ -646,15 +674,19 @@ is
    -- Wp_Admin_Bar_My_Sites_Menu --
    --------------------------------
 
-   procedure Wp_Admin_Bar_My_Sites_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_My_Sites_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Ada.Containers;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
       use Class_Sites;
+      use Inc_Capabilities;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Pluggables;
       use Inc_Posts;
       use Blog_Vectors;
@@ -952,12 +984,15 @@ is
    -- Wp_Admin_Bar_Shortlink_Menu --
    ---------------------------------
 
-   procedure Wp_Admin_Bar_Shortlink_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Shortlink_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
       use Inc_Formatting;
       use Inc_Link_Templates;
+      use Inc_L10n;
 
       Short : constant String := Wp_Get_Shortlink (0, "query");
       Id    : constant String := "get-shortlink";
@@ -986,17 +1021,21 @@ is
    -- Wp_Admin_Bar_Edit_Menu --
    ----------------------------
 
-   procedure Wp_Admin_Bar_Edit_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Edit_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
       use Adi_Class_Wp_Screens;
       use Adi_Screens;
       use Class_Posts;
       use Class_Post_Type;
       use Class_Terms;
+      use Inc_Capabilities;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Options;
       use Inc_Posts;
       use Inc_Taxonomys;
@@ -1215,11 +1254,15 @@ is
    -- Wp_Admin_Bar_New_Content_Menu --
    -----------------------------------
 
-   procedure Wp_Admin_Bar_New_Content_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_New_Content_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
       use Inc_Posts;
       use Class_Post_Type;
       use Class_Post_Type.Post_Type_Maps;
@@ -1370,13 +1413,17 @@ is
    -- Wp_Admin_Bar_Comments_Menu --
    --------------------------------
 
-   procedure Wp_Admin_Bar_Comments_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Comments_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Comments;
       use Inc_Functions;
       use Inc_Link_Templates;
+      use Inc_L10n;
 
       Counts        : constant Comment_Counts := Wp_Count_Comments;
       Awaiting_Mod  : constant Natural := Counts.Moderated;
@@ -1413,10 +1460,14 @@ is
    -- Wp_Admin_Bar_Appearance_Menu --
    ----------------------------------
 
-   procedure Wp_Admin_Bar_Appearance_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Appearance_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
+      use Inc_Capabilities;
       use Inc_Link_Templates;
+      use Inc_L10n;
       use Inc_Themes;
    begin
       declare
@@ -1509,12 +1560,15 @@ is
    -- Wp_Admin_Bar_Updates_Menu --
    -------------------------------
 
-   procedure Wp_Admin_Bar_Updates_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Updates_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
       use UStrings;
+      use Class_Admin_Bar;
       use Inc_Functions;
       use Inc_Link_Templates;
+      use Inc_L10n;
       use Inc_Updates;
 
       Update_Data  : constant Update_Counts := Wp_Get_Update_Data;
@@ -1556,12 +1610,15 @@ is
    -- Wp_Admin_Bar_Search_Menu --
    ------------------------------
 
-   procedure Wp_Admin_Bar_Search_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Search_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
       use Inc_Formatting;
       use Inc_Link_Templates;
       use Inc_Load;
+      use Inc_L10n;
 
       Form : UString;
    begin
@@ -1593,31 +1650,32 @@ is
    -- Wp_Admin_Bar_Recovery_Mode_Menu --
    -------------------------------------
 
-   procedure Wp_Admin_Bar_Recovery_Mode_Menu (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Recovery_Mode_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
       use Class_Recovery_Mode;
       use Inc_Functions;
       use Inc_General_Templates;
       use Inc_Load;
-
-      URL : UString;
+      use Inc_L10n;
    begin
       if not Wp_Is_Recovery_Mode then
          return;
       end if;
 
-      URL := +Wp_Login_URL;
-      URL := +Add_Query_Arg ("action", EXIT_ACTION, -URL); -- ::
-      URL := +Wp_Nonce_URL (-URL, EXIT_ACTION); -- ::
-
       declare
+         URL_3 : constant String := Wp_Login_URL;
+         URL_2 : constant String := Add_Query_Arg ("action", EXIT_ACTION, URL_3);
+         URL   : constant String := Wp_Nonce_URL (URL_2, EXIT_ACTION);
+
          Node : Node_Args;
       begin
          Node.Parent := +"top-secondary";
          Node.Id     := +"recovery-mode";
          Node.Title  := +abs "Exit Recovery Mode";
-         Node.Href   := URL;
+         Node.Href   := +URL;
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1627,9 +1685,11 @@ is
    -- Wp_Admin_Bar_Add_Secondary_Groups --
    ---------------------------------------
 
-   procedure Wp_Admin_Bar_Add_Secondary_Groups (Admin_Bar : in out Wp_Admin_Bar)
+   procedure Wp_Admin_Bar_Add_Secondary_Groups
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Class_Admin_Bar;
    begin
       declare
          Node : Node_Args;

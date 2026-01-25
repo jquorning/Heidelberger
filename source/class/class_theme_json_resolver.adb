@@ -31,7 +31,6 @@ with Inc_Themes;
 
 package body Class_Theme_JSON_Resolver
 is
-   use Php;
 
    package JSON_Data renames Class_Theme_JSON_Data;
 

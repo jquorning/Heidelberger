@@ -135,10 +135,10 @@ is
    function X_Construct (Args : Array_Type)
                          return Wp_Customize_Manager
    is
-      use Binder;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
+      use Binder;
+      use UStrings;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;
@@ -504,9 +504,9 @@ is
 
    procedure Establish_Loaded_Changeset (This : in out Wp_Customize_Manager)
    is
-      use Php;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Class_Posts;
       use Inc_Functions;
       use Inc_Load;
@@ -729,6 +729,7 @@ is
                             return String
    is
       use Php.Strings;
+      use UStrings;
    begin
       if Empty (-This.X_Changeset_UUID) then
          This.Establish_Loaded_Changeset;
@@ -812,6 +813,7 @@ is
    function Is_Theme_Active (This : Wp_Customize_Manager)
                              return Boolean
    is
+      use UStrings;
    begin
       return This.Get_Stylesheet = This.Original_Stylesheet;
    end Is_Theme_Active;
@@ -1787,8 +1789,8 @@ is
                         Default_Value : String := "") -- null
                         return String
    is
-      use Php;
       use Php.Arrays;
+      use UStrings;
       use Class_Customize_Settings;
       use Inc_Load;
 
@@ -3218,9 +3220,9 @@ is
                                  Changeset_Post_Id : Post_Id; -- Integer;
                                  Take_Over         : Boolean := False)
    is
-      use Php;
       use Php.Misc;
       use Php.Strings;
+      use UStrings;
       use Inc_Posts;
       use Inc_Users;
    begin
@@ -3258,9 +3260,9 @@ is
    procedure Refresh_Changeset_Lock (This              : Wp_Customize_Manager;
                                      Changeset_Post_Id : Post_Id) -- Integer)
    is
-      use Php;
       use Php.Misc;
       use Php.Strings;
+      use UStrings;
       use Inc_Posts;
       use Inc_Users;
    begin
@@ -3823,6 +3825,7 @@ is
                                   Setting_Ids : List_Type)
                                   return Setting_Lists.Vector -- Array_Type;
    is
+      use UStrings;
       use Class_Customize_Settings;
       use Inc_Plugins;
 

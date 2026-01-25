@@ -16,9 +16,8 @@ with Class_Querys;
 
 package Inc_Admin_Bar
 is
-   use Class_Admin_Bar;
 
-   X_Wp_Admin_Bar : Wp_Admin_Bar; -- X_ added jq
+   X_Wp_Admin_Bar : Class_Admin_Bar.Wp_Admin_Bar; -- X_ added jq
 
    Tag            : Class_Terms.Wp_Term;
    Wp_The_Query   : Class_Querys.Wp_Query;
@@ -77,7 +76,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Wp_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Wp_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the sidebar toggle button.
@@ -86,7 +86,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Sidebar_Toggle (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Sidebar_Toggle
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the "My Account" item.
@@ -95,7 +96,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_My_Account_Item (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_My_Account_Item
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the "My Account" submenu items.
@@ -104,7 +106,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_My_Account_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_My_Account_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the "Site Name" menu.
@@ -113,7 +116,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Site_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Site_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the "Edit site" link to the Toolbar.
@@ -122,7 +126,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Edit_Site_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Edit_Site_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the "Customize" link to the Toolbar.
@@ -132,7 +137,8 @@ is
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    -- @global WP_Customize_Manager wp_customize
    --
-   procedure Wp_Admin_Bar_Customize_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Customize_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds the "My Sites/[Site Name]" menu and all submenus.
@@ -141,7 +147,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_My_Sites_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_My_Sites_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Provides a shortlink.
@@ -150,7 +157,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Shortlink_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Shortlink_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Provides an edit link for posts and terms.
@@ -168,7 +176,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Edit_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Edit_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds "Add New" menu.
@@ -177,7 +186,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_New_Content_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_New_Content_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds edit comments link with awaiting moderation count bubble.
@@ -186,7 +196,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Comments_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Comments_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds appearance submenu items to the "Site Name" menu.
@@ -195,7 +206,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Appearance_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Appearance_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Provides an update link if theme/plugin/core updates are available.
@@ -204,7 +216,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Updates_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Updates_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds search form.
@@ -213,7 +226,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Search_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Search_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds a link to exit recovery mode when Recovery Mode is active.
@@ -222,7 +236,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Recovery_Mode_Menu (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Recovery_Mode_Menu
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Adds secondary menus.
@@ -231,7 +246,8 @@ is
    --
    -- @param WP_Admin_Bar wp_admin_bar The WP_Admin_Bar instance.
    --
-   procedure Wp_Admin_Bar_Add_Secondary_Groups (Admin_Bar : in out Wp_Admin_Bar);
+   procedure Wp_Admin_Bar_Add_Secondary_Groups
+               (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Prints style and scripts for the admin bar.

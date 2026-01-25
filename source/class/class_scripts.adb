@@ -30,9 +30,6 @@ with Inc_Themes;
 
 package body Class_Scripts
 is
-   use UStrings;
-   use Inc_L10n;
-   use Php;
 
    -----------------
    -- X_Construct --
@@ -56,6 +53,7 @@ is
 
    procedure Init (This : in out Wp_Scripts)
    is
+      use UStrings;
 --    use Inc_Plugins;
    begin
       if
@@ -117,6 +115,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
 
       Output : constant UString := +This.Get_Data (Handle, "data");
@@ -164,6 +163,7 @@ is
       use Php.Echoing;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Inc_Formatting;
       use Class_Dependency;
@@ -427,6 +427,8 @@ is
                                Position : String := "after")
                                return Boolean
    is
+      use UStrings;
+
       Position_2 : UString := +Position;
    begin
       if Data /= "" then
@@ -458,6 +460,7 @@ is
                                  return String
    is
       use Php.Strings;
+      use UStrings;
 --    use Inc_Functions;
       use Inc_Formatting;
 
@@ -507,7 +510,9 @@ is
       use Php.HTML;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Inc_Functions;
+      use Inc_L10n;
 
       L10n_2   : Array_Type := L10n;
       After    : Array_Type;
@@ -634,6 +639,7 @@ is
                               return Boolean
    is
       use Php.Lists;
+      use UStrings;
       use Class_Dependency.Dependency_Maps;
    begin
 --      if not Isset (This.Registered (Handle)) then
@@ -665,8 +671,10 @@ is
                                 return String
    is
       use Php.Strings;
+      use UStrings;
 --    use Inc_Functions;
       use Class_Dependency.Dependency_Maps;
+      use Inc_L10n;
    begin
       if
         This.Registered.Find (Handle) /= No_Element or else
@@ -774,8 +782,9 @@ is
                             Src  : String)
                             return Boolean
    is
-      use Globals;
       use Php.Strings;
+      use Globals;
+      use UStrings;
    begin
       if This.Default_Dirs.Is_Empty then
          return True;
@@ -799,6 +808,7 @@ is
 
    procedure Reset (This : in out Wp_Scripts)
    is
+      use UStrings;
    begin
       This.Do_Concat      := False;
       This.Print_Code     := +"";

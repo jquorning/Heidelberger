@@ -29,10 +29,7 @@ with Inc_Vars;
 
 package body Class_Admin_Bar
 is
-   use UStrings;
-   use Inc_L10n;
    use Lists;
-   use Php;
 
    -----------
    -- X_Get --
@@ -65,6 +62,7 @@ is
 
    procedure Initialize (This : in out Wp_Admin_Bar)
    is
+      use UStrings;
       use Inc_Admin_Bar;
       use Class_Sites;
       use Inc_Ms_Functions;
@@ -166,8 +164,10 @@ is
                        Args : Node_Args) -- Array_Type)
    is
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
+      use Inc_L10n;
 
       Args_2 : Node_Args := Args;
 
@@ -262,6 +262,7 @@ is
    procedure X_Set_Node (This : in out Wp_Admin_Bar;
                          Args : Node_Args) -- Array_Type)
    is
+      use UStrings;
    begin
       This.Nodes.Include (Key      => -Args.Id,
                           New_Item => Args); -- (object)
@@ -291,6 +292,7 @@ is
                         Id   : String)
                         return Node_Args -- String
    is
+      use UStrings;
       use Node_Maps;
 
       Id_2 : UString := +Id;
@@ -408,6 +410,8 @@ is
    function X_Bind (This : in out Wp_Admin_Bar)
             return Node_Args
    is
+      use UStrings;
+
       Parent : Node_Args;
    begin
       if This.Bound then
@@ -615,6 +619,8 @@ is
    procedure X_Render (This : Wp_Admin_Bar;
                        Root : Node_Args) -- Array_Type)
    is
+      use UStrings;
+
       Class : UString := +"nojq nojs";
    begin
       -- Add browser classes.
@@ -649,6 +655,7 @@ is
                                  Node : Node_Args) -- Array_Type)
    is
       use Php.Echoing;
+      use UStrings;
       use Inc_Formatting;
    begin
       if Typ_Container /= Node.Typ or else Node.Children = null then
@@ -674,6 +681,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
 
       Class : UString;
@@ -717,6 +725,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Inc_Formatting;
 
       Is_Parent             : constant Boolean := Node.Children /= null;

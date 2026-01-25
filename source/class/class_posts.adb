@@ -19,7 +19,6 @@ with Inc_Taxonomys;
 package body Class_Posts
 is
    use Lists;
-   use Adi_Caches;
 
    ------------------
    -- Get_Instance --
@@ -30,6 +29,7 @@ is
                            Success : out Boolean)
    is
       use UStrings;
+      use Adi_Caches;
 --           Success : Boolean;
 --           Post    : Post_Type;
    begin

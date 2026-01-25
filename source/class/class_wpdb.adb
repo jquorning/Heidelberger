@@ -102,6 +102,8 @@ is
                          Dbhost     : String)
                          return Wpdb_Class
    is
+      use UStrings;
+
       This   : Wpdb_Class;
       Unused : Boolean;
    begin
@@ -198,6 +200,7 @@ is
 
    procedure Init_Charset (This : in out Wpdb_Class)
    is
+      use UStrings;
       use Inc_Load;
 
       Charset : UString;
@@ -241,6 +244,7 @@ is
                                return Array_Type
    is
       use Php.Strings;
+      use UStrings;
 
       Charset_2 : UString := +Charset;
       Collate_2 : UString := +Collate;
@@ -299,6 +303,7 @@ is
                           Collate : String := "") -- = null
    is
       use Php.Strings;
+      use UStrings;
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
@@ -384,6 +389,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
       use Inc_Plugins;
 
       Res       : Array_Type;
@@ -490,6 +496,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       Old_Prefix   : UString;
       Unused_Match : List_Type;
@@ -561,6 +568,7 @@ is
                          Network_Id : Integer := 0)
                          return Integer
    is
+      use UStrings;
    begin
       if Network_Id /= 0 then
 --    if not Empty (Network_Id) then
@@ -604,6 +612,7 @@ is
                              Blog_Id : Integer := 0)
                              return String
    is
+      use UStrings;
       use Inc_Load;
    begin
       if Is_Multisite then
@@ -638,6 +647,7 @@ is
    is
       use Php.Arrays;
       use Php.Lists;
+      use UStrings;
       use Inc_Load;
 
       function To_Array (List : List_Type)
@@ -747,6 +757,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Plugins;
@@ -848,6 +859,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;
@@ -968,6 +980,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -1303,6 +1316,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
    begin
       This.Last_Result   := String_Vectors.Empty_Vector;
 --      This.Col_Info      := null;
@@ -1361,6 +1375,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
       use Inc_Load;
       use Inc_L10n;
    begin
@@ -1681,6 +1696,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Plugins;
@@ -2007,13 +2023,14 @@ is
    -- Placeholder_Escape --
    ------------------------
 
-   Static_Placeholder : UString;
+   Static_Placeholder : UStrings.UString;
 
    function Placeholder_Escape (This : Wpdb_Class)
                                 return String
    is
       use Php.Numerics;
       use Inc_Plugins;
+      use UStrings;
 --                static_placeholder;
    begin
       if Static_Placeholder = "" then -- not
@@ -2139,6 +2156,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
 
       Data_2 : Array_Type;
    begin
@@ -2207,6 +2225,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
+      use UStrings;
 
       Data_2  : Array_Type;
       Where_2 : Array_Type;
@@ -2299,6 +2318,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
+      use UStrings;
    begin
       if not Is_Array (Where) then
          return (Status => Error,
@@ -2358,6 +2378,7 @@ is
                             return Array_Type
    is
       use Php.Strings;
+      use UStrings;
       use Inc_Load;
       use Inc_L10n;
 
@@ -2433,6 +2454,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
 
       Data_2           : Array_Type := Data;
       Formats          : List_Type  := To_List (Format); -- (array)
@@ -2559,6 +2581,7 @@ is
                      Y     : Integer        := 1)
                      return String
    is
+      use UStrings;
    begin
       This.Func_Call :=
         +("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
@@ -2608,6 +2631,7 @@ is
 --                     return String
    is
 --    use Php.Strings;
+      use UStrings;
 
       Unused_Result : Rows_Result_Type;
    begin
@@ -2739,6 +2763,7 @@ is
    procedure Get_Results (This  : in out Wpdb_Class;
                           Query : Statement_Type) --  ""; -- null
    is
+      use UStrings;
    begin
       This.Func_Call := +"\db.get_results(""" & String (Query) & """";
       --  & Output & ")";
@@ -2828,6 +2853,7 @@ is
       use Ada.Containers;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Class_Errors;
       use Inc_L10n;
       use Inc_Plugins;
@@ -2984,6 +3010,7 @@ is
    is
       use Php.Strings;
       use Databases;
+      use UStrings;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -3069,6 +3096,7 @@ is
                             return Array_Type
    is
       use Php.Strings;
+      use UStrings;
       use Inc_Load;
 
       Tablekey  : constant String := Strtolower (Table);
@@ -3188,6 +3216,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       Query_2 : constant Statement_Type :=
         Statement_Type (Ltrim (String (Query), "\r\n\t ("));
@@ -3282,6 +3311,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Databases;
+      use UStrings;
       use Inc_Functions;
 
       Data_2          : Array_Type := Data;
@@ -3634,6 +3664,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       -- Remove characters that can legally trail the table name.
       Query_2 : constant String := Rtrim (String (Query), ";/-#");
@@ -3804,6 +3835,7 @@ is
       use Databases;
       use MySQL_Bind;
       use MySQLi_Bind;
+      use UStrings;
       use Inc_Functions;
    begin
       if This.Show_Errors then
@@ -3887,6 +3919,7 @@ is
    is
       use Php.Misc;
       use Php.Strings;
+      use UStrings;
       use Class_Errors;
       use Inc_L10n;
       use Inc_Versions;
@@ -3933,6 +3966,7 @@ is
                                  return String
    is
       use Php.Strings;
+      use UStrings;
 
       Charset_Collate : UString;
    begin
@@ -4079,6 +4113,7 @@ is
                         Table : String;
                         Value : String)
    is
+      use UStrings;
    begin
       if Table = "options" then
          This.Options := +Value;

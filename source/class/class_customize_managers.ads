@@ -26,7 +26,6 @@ with Cust_Class_Wp_Customize_Selective_Refresh;
 package Class_Customize_Managers
 is
    use Arrays;
-   use UStrings;
    use Lists;
 
    subtype Wp_Customize_Setting
@@ -77,7 +76,7 @@ is
          -- @var string
          --
          -- protected
-         Original_Stylesheet : UString;
+         Original_Stylesheet : UStrings.UString;
 
          --
          -- Whether this is a Customizer pageload.
@@ -147,7 +146,9 @@ is
          -- @var array
          --
          -- protected
-         Components : List_Type := To_List (List => (+"widgets", +"nav_menus"));
+         Components : List_Type :=
+           To_List (List => (UStrings.To_UString ("widgets"),
+                             UStrings.To_UString ("nav_menus")));
 
          --
          -- Registered instances of WP_Customize_Section.
@@ -223,7 +224,7 @@ is
          -- @var string
          --
          -- protected
-         Messenger_Channel : UString;
+         Messenger_Channel : UStrings.UString;
 
          --
          -- Whether the autosave revision of the changeset should be loaded.
@@ -274,7 +275,7 @@ is
          -- @var string
          --
 --        private _changeset_uuid;
-         X_Changeset_UUID : UString;
+         X_Changeset_UUID : UStrings.UString;
 
          --
          -- Changeset post ID.

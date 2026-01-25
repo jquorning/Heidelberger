@@ -21,7 +21,6 @@ with Class_Users;
 package Class_WpDB
 is
    use Arrays;
-   use UStrings;
    use Lists;
 
    type Statement_Type is new String;
@@ -73,7 +72,7 @@ is
          --
          -- @var string
          --
-         Last_Error : UString;
+         Last_Error : UStrings.UString;
 
          --
          -- The number of queries made.
@@ -119,7 +118,7 @@ is
          --
          -- @var string
          --
-         Last_Query : UString;
+         Last_Query : UStrings.UString;
 
          --
          -- Results of the last query.
@@ -246,7 +245,7 @@ is
          --
          -- @var string
          --
-         Prefix : UString;
+         Prefix : UStrings.UString;
 
          --
          -- WordPress base table prefix.
@@ -255,7 +254,7 @@ is
          --
          -- @var string
          --
-         Base_Prefix : UString;
+         Base_Prefix : UStrings.UString;
 
          --
          -- Whether the database queries are ready to start executing.
@@ -293,16 +292,17 @@ is
          -- @var string[]
          --
          M_Tables : List_Type := To_List (List => (
-              +"posts",
-              +"comments",
-              +"links",
-              +"options",
-              +"postmeta",
-              +"terms",
-              +"term_taxonomy",
-              +"term_relationships",
-              +"termmeta",
-              +"Commentmeta"));
+           UStrings.To_UString ("posts"),
+           UStrings.To_UString ("comments"),
+           UStrings.To_UString ("links"),
+           UStrings.To_UString ("options"),
+           UStrings.To_UString ("postmeta"),
+           UStrings.To_UString ("terms"),
+           UStrings.To_UString ("term_taxonomy"),
+           UStrings.To_UString ("term_relationships"),
+           UStrings.To_UString ("termmeta"),
+           UStrings.To_UString ("Commentmeta")
+         ));
 
          -- String_Maps.Map; --  :=
            -- [ -- String_Maps.To_Map ((
@@ -330,7 +330,11 @@ is
          -- @var string[]
          --
          Old_Tables : List_Type :=
-           To_List (List => (+"categories", +"post2cat", +"link2cat"));
+           To_List (List => (
+             UStrings.To_UString ("categories"),
+             UStrings.To_UString ("post2cat"),
+             UStrings.To_UString ("link2cat")
+           ));
 
          --
          -- List of WordPress global tables.
@@ -341,7 +345,10 @@ is
          -- @var string[]
          --
          Global_Tables : List_Type :=
-           To_List (List => (+"users", +"usermeta"));
+           To_List (List => (
+             UStrings.To_UString ("users"),
+             UStrings.To_UString ("usermeta")
+           ));
 
          --
          -- List of Multisite global tables.
@@ -353,12 +360,12 @@ is
          --
          MS_Global_Tables : List_Type :=
            To_List (List => (
-             +"blogs",
-             +"blogmeta",
-             +"signups",
-             +"site",
-             +"sitemeta",
-             +"registration_log"
+             UStrings.To_UString ("blogs"),
+             UStrings.To_UString ("blogmeta"),
+             UStrings.To_UString ("signups"),
+             UStrings.To_UString ("site"),
+             UStrings.To_UString ("sitemeta"),
+             UStrings.To_UString ("registration_log")
            ));
 
          --
@@ -379,7 +386,7 @@ is
          --
          -- @var string
          --
-         Comments : UString;
+         Comments : UStrings.UString;
 
          --
          -- WordPress Comment Metadata table.
@@ -388,7 +395,7 @@ is
          --
          -- @var string
          --
-         Commentmeta : UString;
+         Commentmeta : UStrings.UString;
 
          --
          -- WordPress Links table.
@@ -397,7 +404,7 @@ is
          --
          -- @var string
          --
-         Links : UString;
+         Links : UStrings.UString;
 
          --
          -- WordPress Options table.
@@ -406,9 +413,8 @@ is
          --
          -- @var string
          --
-         Options : UString :=
-           To_UString ("options"); -- added
---         To_UString ("XXX-968"); -- added
+         Options : UStrings.UString :=
+           UStrings.To_UString ("options"); -- added
 
          --
          -- WordPress Post Metadata table.
@@ -417,7 +423,7 @@ is
          --
          -- @var string
          --
-         Postmeta : UString;
+         Postmeta : UStrings.UString;
 
          --
          -- WordPress Posts table.
@@ -426,7 +432,7 @@ is
          --
          -- @var string
          --
-         Posts : UString;
+         Posts : UStrings.UString;
 
          --
          -- WordPress Terms table.
@@ -435,7 +441,7 @@ is
          --
          -- @var string
          --
-         Terms : UString;
+         Terms : UStrings.UString;
 
          --
          -- WordPress Term Relationships table.
@@ -444,7 +450,7 @@ is
          --
          -- @var string
          --
-         Term_Relationships : UString;
+         Term_Relationships : UStrings.UString;
 
          --
          -- WordPress Term Taxonomy table.
@@ -453,7 +459,7 @@ is
          --
          -- @var string
          --
-         Term_Taxonomy : UString;
+         Term_Taxonomy : UStrings.UString;
 
          --
          -- WordPress Term Meta table.
@@ -462,7 +468,7 @@ is
          --
          -- @var string
          --
-         Termmeta : UString;
+         Termmeta : UStrings.UString;
 
          ---------------------------------
          -- Global and Multisite tables --
@@ -475,7 +481,7 @@ is
          --
          -- @var string
          --
-         Usermeta : UString;
+         Usermeta : UStrings.UString;
 
          --
          -- WordPress Users table.
@@ -484,7 +490,7 @@ is
          --
          -- @var string
          --
-         Users : UString;
+         Users : UStrings.UString;
 
          --
          -- Multisite Blogs table.
@@ -493,7 +499,7 @@ is
          --
          -- @var string
          --
-         Blogs : UString;
+         Blogs : UStrings.UString;
 
          --
          -- Multisite Blog Metadata table.
@@ -502,7 +508,7 @@ is
          --
          -- @var string
          --
-         Blogmeta : UString;
+         Blogmeta : UStrings.UString;
 
          --
          -- Multisite Registration Log table.
@@ -511,7 +517,7 @@ is
          --
          -- @var string
          --
-         Registration_Log : UString;
+         Registration_Log : UStrings.UString;
 
          --
          -- Multisite Signups table.
@@ -520,7 +526,7 @@ is
          --
          -- @var string
          --
-         Signups : UString;
+         Signups : UStrings.UString;
 
          --
          -- Multisite Sites table.
@@ -529,7 +535,7 @@ is
          --
          -- @var string
          --
-         Site : UString;
+         Site : UStrings.UString;
 
          --
          -- Multisite Sitewide Terms table.
@@ -538,7 +544,7 @@ is
          --
          -- @var string
          --
-         Sitecategories : UString;
+         Sitecategories : UStrings.UString;
 
          --
          -- Multisite Site Metadata table.
@@ -547,7 +553,7 @@ is
          --
          -- @var string
          --
-         Sitemeta : UString;
+         Sitemeta : UStrings.UString;
 
          --
          -- Format specifiers for DB columns.
@@ -573,7 +579,7 @@ is
          --
          -- @var string
          --
-         Charset : UString;
+         Charset : UStrings.UString;
 
          --
          -- Database table columns collate.
@@ -582,7 +588,7 @@ is
          --
          -- @var string
          --
-         Collate : UString;
+         Collate : UStrings.UString;
 
          --
          -- Database Username.
@@ -592,7 +598,7 @@ is
          -- @var string
          --
 --        protected
-         Dbuser : UString;
+         Dbuser : UStrings.UString;
 
          --
          -- Database Password.
@@ -602,7 +608,7 @@ is
          -- @var string
          --
 --        protected
-         Dbpassword : UString;
+         Dbpassword : UStrings.UString;
 
          --
          -- Database Name.
@@ -612,7 +618,7 @@ is
          -- @var string
          --
 --        protected
-         Dbname : UString;
+         Dbname : UStrings.UString;
 
          --
          -- Database Host.
@@ -622,7 +628,7 @@ is
          -- @var string
          --
 --        protected
-         Dbhost : UString;
+         Dbhost : UStrings.UString;
 
          --
          -- Database handle.
@@ -649,7 +655,7 @@ is
          --
          -- @var string
          --
-         Func_Call : UString;
+         Func_Call : UStrings.UString;
 
          --
          -- Whether MySQL is used as the database engine.
@@ -675,13 +681,13 @@ is
 --        protected
          Incompatible_Modes : List_Type :=
            To_List (List => (
-               +"NO_ZERO_DATE",
-               +"ONLY_FULL_GROUP_BY",
-               +"STRICT_TRANS_TABLES",
-               +"STRICT_ALL_TABLES",
-               +"TRADITIONAL",
-               +"ANSI"
-         ));
+             UStrings.To_UString ("NO_ZERO_DATE"),
+             UStrings.To_UString ("ONLY_FULL_GROUP_BY"),
+             UStrings.To_UString ("STRICT_TRANS_TABLES"),
+             UStrings.To_UString ("STRICT_ALL_TABLES"),
+             UStrings.To_UString ("TRADITIONAL"),
+             UStrings.To_UString ("ANSI")
+           ));
 
          --
          -- Added by jq
@@ -726,7 +732,7 @@ is
          --
          -- @var WP_Error|string
          --
-         Error : UString; --  = null;
+         Error : UStrings.UString; --  = null;
 
       end record;
 
