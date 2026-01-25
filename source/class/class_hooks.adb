@@ -7,7 +7,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Misc;
@@ -275,16 +274,14 @@ is
                            Args  : Array_Type) -- Args_Type) -- Array_Type)
                            return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Misc;
 
       Args_2        : constant Array_Type := Args;
       Nesting_Level : Nesting_Type;
       Num_Args      : Natural;
-      Value_2       : Unbounded_String := +Value;
+      Value_2       : UString := +Value;
    begin
       if This.Callbacks.Is_Empty then
          return Value;
@@ -400,9 +397,7 @@ is
    procedure Do_All_Hook (This : in out Wp_Hook;
                           Args : Array_Type)
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
-      use Php;
       use Php.Misc;
 
       Nesting_Level : constant Nesting_Type := This.Nesting_Level;
@@ -417,7 +412,7 @@ is
          begin
             for The_X of This.Callbacks (Priority) loop
                declare
-                  Unused : Unbounded_String;
+                  Unused : UString;
                   Func   : constant Callable := As_Callable (Get (The_X, "function"));
                begin
                   Unused := +Call_User_Func_Array (Func, Args);

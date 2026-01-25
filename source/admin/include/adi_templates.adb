@@ -8,8 +8,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
@@ -39,10 +37,6 @@ with Inc_Vars;
 
 package body Adi_Templates
 is
-   use Ada.Strings.Unbounded;
-   use Inc_L10n;
-   use Php;
-   use Wp_Common;
 
 -- -- Walker_Category_Checklist class
 -- -- require_once ABSPATH . 'wp-admin/includes/class-walker-category-checklist.php';
@@ -126,11 +120,19 @@ is
                                 Args    : Array_Type) return String
    is
       use Php.Echoing;
+      use Php.Numerics;
+      use Php.Lists;
       use Php.Types;
       use UStrings;
+      use Wp_Common;
+      use Class_Taxonomy;
+      use Class_Terms;
+      use Class_Terms.Term_Vectors;
+      use Inc_Capabilities;
       use Inc_Plugins;
+      use Inc_Taxonomys;
 
-      Output : Unbounded_String;
+      Output : UString;
 
       Defaults : constant Array_Type := To_Array (List => (
                 Build ("descendants_and_self", "0"),
@@ -169,14 +171,6 @@ is
       end if;
 
       declare
-         use Php.Numerics;
-         use Php.Lists;
-         use Inc_Capabilities;
-         use Class_Taxonomy;
-         use Class_Terms;
-         use Class_Terms.Term_Vectors;
-         use Inc_Taxonomys;
-
          Taxonomy : constant String  := As_String (Get (Parsed_Args, "taxonomy"));
 
          Descendants_And_Self : constant Integer
@@ -421,7 +415,7 @@ is
 -- --
 -- procedure Get_Inline_Data (Post : Hb_Post_2)
 -- is
---         Title : Unbounded_String;
+--         Title : UString;
 
 --         Post_Type_Object : Post_Rec := Get_Post_Type_Object (-Post.Post_Type);
 -- begin
@@ -748,7 +742,7 @@ is
 -- function X_List_Meta_Row (Entr  : Array_Type;
 --                           Count : Integer) return String
 -- is
---             R : Unbounded_String;
+--             R : UString;
 --                           Count_2 : Natural := Count;
 -- begin
 -- --        static Update_Nonce := "";
@@ -1113,7 +1107,7 @@ is
 --    --
 --    procedure Wp_Dropdown_Roles (Selected : String := "")
 --    is
---       R : Unbounded_String;
+--       R : UString;
 
 --       Editable_Roles : Array_Type := Array_Reverse (Get_Editable_Roles);  -- ()
 --    begin
@@ -2188,7 +2182,7 @@ is
 --                               Sanitize       : Boolean := False;
 --                               Hide_On_Update : Boolean := False)
 --    is
---       Output : Unbounded_String;
+--       Output : UString;
 
 --       Settings_Errors : Array_Type;
 --    begin
@@ -2304,7 +2298,7 @@ is
 --    --
 --    function X_Draft_Or_Post_Title (Post : Integer := 0) return String
 --    is
---       Title : Unbounded_String := +Get_The_Title (Post);
+--       Title : UString := +Get_The_Title (Post);
 --    begin
 --       if Empty (Title) then
 --          Title := +abs "(no title)";
@@ -2474,7 +2468,7 @@ is
 -- function X_Post_States (Post    : Hb_Post_2;
 --                         Display : Boolean := True) return String
 -- is
---     Post_States_String : Unbounded_String;
+--     Post_States_String : UString;
 
 --     State_Count : Natural;
 --     I           : Natural := 0;
@@ -2605,7 +2599,7 @@ is
 --    function X_Media_States (Post    : Hb_Post_2;
 --                             Display : Boolean := True) return String
 --    is
---       Media_States_String : Unbounded_String;
+--       Media_States_String : UString;
 
 --       State_Count  : Natural;
 --       I            : Natural   := 0;
@@ -2642,7 +2636,7 @@ is
 -- @param WP_Post post The attachment to retrieve states for.
 -- @return string() Array of media state labels keyed by their state.
 --
-   Header_Images : Array_Type; -- Unbounded_String;  -- static
+   Header_Images : Array_Type; -- UString;  -- static
 
    function Get_Media_States (Post : Class_Posts.Wp_Post)
                               return List_Type
@@ -2651,11 +2645,13 @@ is
       use Php.Arrays;
       use Php.Strings;
       use UStrings;
-      use Inc_Themes;
-      use Inc_Posts;
+      use Wp_Common;
       use Class_Posts;
+      use Inc_Themes;
+      use Inc_L10n;
+      use Inc_Posts;
 
-      Media_States : Unbounded_String; -- Array_Type := Empty_Array;
+      Media_States : UString; -- Array_Type := Empty_Array;
       Stylesheet   : constant Array_Type := Inc_Options.Get_Option ("stylesheet");
    begin
       if Current_Theme_Supports ("custom-header") then
@@ -2678,7 +2674,7 @@ is
                end if;
             else
                declare
-                  Header_Image : constant Unbounded_String := +Get_Header_Image; -- ();
+                  Header_Image : constant UString := +Get_Header_Image; -- ();
                begin
                   -- Display "Header Image" if the image was ever used as a
                   -- header image.
@@ -2858,6 +2854,7 @@ is
       use Php.Types;
       use UStrings;
       use Inc_Formatting;
+      use Inc_L10n;
 
       Typ_2            : List_Type;
 
@@ -2888,7 +2885,7 @@ is
          Text_2 : String := (if Text /= "" then Text else abs "Save Changes");
          -- Default the id attribute to name unless an id was specifically
          -- provided in other_attributes.
-         Id : Unbounded_String := +Name;
+         Id : UString := +Name;
       begin
          if Is_Array (Other_Attributes) and then Isset (Other_Attributes, "id") then
             Id := +As_String (Get (Other_Attributes, "id"));
@@ -2897,7 +2894,7 @@ is
          end if;
 
          declare
-            Attributes : Unbounded_String;
+            Attributes : UString;
          begin
             if Is_Array (Other_Attributes) then
                for A in Other_Attributes.Iterate loop
@@ -2925,7 +2922,7 @@ is
                                       then " id="""   & ESC_Attr (-Id)   & """"
                                       else """");
 
-               Button : Unbounded_String;
+               Button : UString;
             begin
                Append (Button, "<input type=""submit""" & Name_Attr & Id_Attr &
                                " class=""" & ESC_Attr (Class));
@@ -2933,7 +2930,7 @@ is
                                " />");
 
                if Wrap then
-                  Button := To_Unbounded_String ("<p class=""submit"">" & (-Button) &
+                  Button := To_UString ("<p class=""submit"">" & (-Button) &
                                                  "</p>");
                end if;
                return -Button;
@@ -2991,6 +2988,7 @@ is
       use Php.Strings;
       use UStrings;
       use Inc_Functions;
+      use Inc_L10n;
    begin
       if False then -- not Class_Exists ("WP_Screen") then
          X_Doing_It_Wrong (
@@ -3064,9 +3062,9 @@ is
 -- --
 -- function Hb_Star_Rating (Args : Array_Type := Empty_Array) return String
 -- is
---          Output : Unbounded_String;
---          Title  : Unbounded_String;
---          Format : Unbounded_String;
+--          Output : UString;
+--          Title  : UString;
+--          Format : UString;
 
 --          Rating      : Float;
 --          Full_Stars  : Natural;

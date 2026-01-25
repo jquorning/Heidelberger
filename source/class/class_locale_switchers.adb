@@ -81,7 +81,7 @@ is
       end if;
 
       declare
-         Locale : Unbounded_String;
+         Locale : UString;
       begin
          Locale := +Endd (This.Locales);
 

@@ -29,8 +29,6 @@
 -- @subpackage KSES
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Lists;
 with Php.Numerics;
@@ -1042,15 +1040,13 @@ is
                             Allowed_Protocols : List_Type)
                             return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
-      use Php;
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
 
-      String_2  : Unbounded_String := +Wp_KSES_Stripslashes (Item);
-      Newstring : Unbounded_String;
+      String_2  : UString := +Wp_KSES_Stripslashes (Item);
+      Newstring : UString;
    begin
       -- It matched a ">" character.
       if "<" /= Substr (-String_2, 0, 1) then
@@ -1144,7 +1140,6 @@ is
                           Allowed_Protocols : List_Type)
                           return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Arrays;
@@ -1190,7 +1185,7 @@ is
          Stripped_Tag : constant String := (if Empty (XHTML_Slash)
                                             then "<" & Element & ">" else "");
 
-         Attr2 : Unbounded_String;
+         Attr2 : UString;
       begin
          -- Go through $attrarr, and save the allowed attributes for this element in
          -- $attr2.
@@ -1361,7 +1356,6 @@ is
                           Allowed_Protocols : List_Type)
                           return Array_Type
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Arrays;
@@ -1369,10 +1363,10 @@ is
       use Php.Preg;
       use Php.Strings;
 
-      Attr_2   : Unbounded_String := +Attr;
+      Attr_2   : UString := +Attr;
       Attrarr  : Array_Type;
       Mode     : Natural range 0 .. 2 := 0;
-      Attrname : Unbounded_String;
+      Attrname : UString;
       URIs     : constant List_Type := Wp_KSES_URI_Attributes;
       Working  : Boolean;
    begin
@@ -1418,7 +1412,7 @@ is
          when 2 =>
             declare
                Match   : List_Type;
-               Thisval : Unbounded_String;
+               Thisval : UString;
             begin
                if 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
                   -- "value"
@@ -1712,12 +1706,11 @@ is
                                   Allowed_Protocols : List_Type)
                                   return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Item_2          : Unbounded_String := +Wp_KSES_No_Null (Item);
+      Item_2          : UString := +Wp_KSES_No_Null (Item);
       Iterations      : Natural := 0;
-      Original_String : Unbounded_String;
+      Original_String : UString;
    begin
       loop
          Original_String := Item_2;
@@ -1821,7 +1814,6 @@ is
                                        Count             : Natural := 1)
                                        return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
@@ -1834,7 +1826,7 @@ is
       Item_2 : constant List_Type :=
         Preg_Split ("/:|&#0*58;|&#x0*3a;|&colon;/i", Item_3, Limit => 2);
 
-      Item_4 : Unbounded_String := +Item_3;
+      Item_4 : UString := +Item_3;
    begin
       if
         Item_2.Length in 2 and then
@@ -2309,7 +2301,6 @@ is
                                  Deprecated : String := "")
                                  return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Lists;
@@ -2506,7 +2497,7 @@ is
                 +"background-image"
       ));
 
-      CSS_4 : Unbounded_String;
+      CSS_4 : UString;
    begin
       if Allowed_Attr.Is_Empty then
          return CSS_3;
@@ -2519,7 +2510,7 @@ is
 
          declare
             CSS_Item        : constant String  := Trim (-CSS_Item_2);
-            CSS_Test_String : Unbounded_String := +CSS_Item;
+            CSS_Test_String : UString := +CSS_Item;
             Found           : Boolean := False;
             URL_Attr        : Boolean := False;
             Gradient_Attr   : Boolean := False;

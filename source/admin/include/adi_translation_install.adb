@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
@@ -46,8 +44,6 @@ is
                               Args : Array_Type := Empty_Array) -- null
                               return Trans_Result -- Array_Type
    is
-      use Ada.Strings.Unbounded;
---    use Php.Arrays;
       use Php.Errors;
       use Php.HTML;
       use Php.JSON;
@@ -91,7 +87,7 @@ is
       begin
          if False = Res.Success then
             declare
-               URL : Unbounded_String :=
+               URL : UString :=
                  +"http://api.wordpress.org/translations/" & Typ & "/1.0/";
 
                HTTP_URL : constant String := -URL;
@@ -260,7 +256,7 @@ is
       use Inc_Formatting;
       use Inc_L10n;
 
-      Wp_Local_Package : Ada.Strings.Unbounded.Unbounded_String
+      Wp_Local_Package : UString
         renames Global_Wp_Local_Package;
 
       Installed_Languages : constant Array_Type := Get_Available_Languages;

@@ -20,10 +20,6 @@ with Inc_Taxonomys;
 package body Class_Posts
 is
    use Lists;
-
-   function "-" (Item : Unbounded_String) return String
-      renames To_String;
-
    use Adi_Caches;
 
    ------------------
@@ -34,7 +30,7 @@ is
                            Post    : out Wp_Post;
                            Success : out Boolean)
    is
---    use UStrings;
+      use UStrings;
 --           Success : Boolean;
 --           Post    : Post_Type;
    begin
@@ -143,6 +139,7 @@ is
                    Key  : String)
                    return Array_Type
    is
+      use UStrings;
       use Class_Terms;
       use Inc_Category_Templates;
       use Inc_Functions;
@@ -222,6 +219,7 @@ is
                     Filter : String)
                     return Wp_Post
    is
+      use UStrings;
    begin
       if Post.Filter = Filter then
          return Post;

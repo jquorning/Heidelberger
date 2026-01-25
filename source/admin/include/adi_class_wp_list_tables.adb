@@ -475,7 +475,7 @@ is
       use Inc_L10n;
       use Inc_Plugins;
 
-      Two : Unbounded_String;
+      Two : UString;
    begin
       if This.X_Actions.Is_Empty then
 --    if Is_Null (This.X_Actions) then
@@ -944,13 +944,13 @@ is
            As_Integer (Get (This.X_Pagination_Args, "total_pages"));
 
          Infinite_Scroll : Boolean := False;
-         Output  : Unbounded_String;
+         Output  : UString;
          Current : Natural;
-         Current_URL : Unbounded_String;
-         Page_Links  : Unbounded_String; -- Array_Type;
+         Current_URL : UString;
+         Page_Links  : UString; -- Array_Type;
 
-         Total_Pages_Before : Unbounded_String := +"<span class=""paging-input"">";
-         Total_Pages_After  : constant Unbounded_String := +"</span></span>";
+         Total_Pages_Before : UString := +"<span class=""paging-input"">";
+         Total_Pages_After  : constant UString := +"</span></span>";
 
          Removable_Query_Args : constant List_Type := Wp_Removable_Query_Args;
 
@@ -959,8 +959,8 @@ is
          Disable_Prev  : Boolean := False;
          Disable_Next  : Boolean := False;
 
-         HTML_Current_Page : Unbounded_String;
-         HTML_Total_Pages  : Unbounded_String;
+         HTML_Current_Page : UString;
+         HTML_Total_Pages  : UString;
       begin
          if Isset (This.X_Pagination_Args, "infinite_scroll") then
             Infinite_Scroll := As_Boolean (Get (This.X_Pagination_Args, "infinite_scroll"));
@@ -1083,8 +1083,8 @@ is
          end if;
 
          declare
-            Pagination_Links_Class : Unbounded_String := +"pagination-links";
-            Page_Class             : Unbounded_String;
+            Pagination_Links_Class : UString := +"pagination-links";
+            Page_Class             : UString;
          begin
             if Infinite_Scroll then
 --          if not Empty (Infinite_Scroll) then
@@ -1142,7 +1142,7 @@ is
       use UStrings;
 
       Columns : constant Array_Type := This.Get_Columns;
-      Column  : Unbounded_String := +"";
+      Column  : UString := +"";
    begin
       if Columns.Is_Empty then
          return -Column;
@@ -1449,7 +1449,7 @@ is
                     As_String (Get (As_Array (Get (Sortable, Column_Key)), "desc_first"));
 
 --                List (orderby, desc_first) := Sortable (Column_Key);
-                  Order : Unbounded_String;
+                  Order : UString;
                begin
                   if Current_Orderby = Orderby then
                      Order := +(if "asc" = Current_Order then "desc" else "asc");
@@ -1582,7 +1582,7 @@ is
       use Inc_Functions;
       use Inc_Formatting;
 
-      Unused : Unbounded_String;
+      Unused : UString;
    begin
       declare
          Unused : constant String := As_String (Get (This.X_Args, "plural"));
@@ -1722,9 +1722,9 @@ is
             Column_Display_Name : constant String := As_String (Get (Columns, Column_Name));
             -- Array_Maps.Element (A);
 
-            Classes    : Unbounded_String := +"column_name column-column_name";
-            Data       : Unbounded_String;
-            Attributes : Unbounded_String;
+            Classes    : UString := +"column_name column-column_name";
+            Data       : UString;
+            Attributes : UString;
          begin
             if Primary = Column_Name then
                Append (Classes, " has-row-actions column-primary");

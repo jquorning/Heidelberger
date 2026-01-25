@@ -13,7 +13,6 @@
 -- require_once ABSPATH . "wp-admin/includes/class-walker-nav-menu-checklist.php";
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Binder;
 with UStrings;
@@ -44,13 +43,6 @@ with Inc_Users;
 
 package body Adi_Nav_Menus
 is
-   use Ada.Strings.Unbounded;
-   use Binder;
-   use Globals;
-   use UStrings;
-   use Inc_L10n;
-   use Php;
-   use Inc_Class_Wp_Posts;
 
    ---------------------------------
    -- X_Wp_Ajax_Menu_Quick_Search --
@@ -58,8 +50,6 @@ is
 
    procedure X_Wp_Ajax_Menu_Quick_Search (Request : Array_Type := Empty_Array)
    is
---    use Array_Maps;
-
       Args : constant Array_Type := Empty_Array;
 
       Typ         : String := (if Isset (Request, "type")
@@ -71,7 +61,7 @@ is
       Query       : String := (if Isset (Request, "q")
                                then As_String (Get (Request, "q")) else "");
 
-      Response_Format : Unbounded_String :=
+      Response_Format : UString :=
          +(if Isset (Request, "response-format")
            then As_String (Get (Request, "response-format")) else "");
 
@@ -710,7 +700,7 @@ is
       end;
 
       declare
-         Current_Tab : Unbounded_String := +"most-recent";
+         Current_Tab : UString := +"most-recent";
       begin
          if
            Isset (X_REQUEST, Tab_Name) -- and then
@@ -735,9 +725,9 @@ is
                 +"_wpnonce"
             ));
 
-            Most_Recent_URL : Unbounded_String;
-            View_All_URL    : Unbounded_String;
-            Search_URL      : Unbounded_String;
+            Most_Recent_URL : UString;
+            View_All_URL    : UString;
+            Search_URL      : UString;
          begin
             if Nav_Menu_Selected_Id then
                Most_Recent_URL := +ESC_URL (Add_Query_Arg (Tab_Name, "most-recent",
@@ -844,7 +834,7 @@ is
             pragma Style_Checks (On);
 
             declare
-               Searched       : Unbounded_String;
+               Searched       : UString;
                Search_Results : Array_Type;
             begin
                if Isset (X_REQUEST, "quick-search-posttype-" & Post_Type_Name) then
@@ -1055,8 +1045,8 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
 
       Terms       : Wp_Term; --  := Get_Terms (Args);
       Num_Pages   : Natural;
-      Page_Links  : Unbounded_String;
-      Current_Tab : Unbounded_String;
+      Page_Links  : UString;
+      Current_Tab : UString;
    begin
       if Terms = Null_Term then -- or else Is_Wp_Error (Terms) then
          Echo ("<p>" & abs "No items." & "</p>");
@@ -1133,9 +1123,9 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
                 +"_wpnonce"
          ));
 
-         Most_Used_URL : Unbounded_String;
-         View_All_URL  : Unbounded_String;
-         Search_URL    : Unbounded_String;
+         Most_Used_URL : UString;
+         View_All_URL  : UString;
+         Search_URL    : UString;
       begin
          if Nav_Menu_Selected_Id then
             Most_Used_URL := +ESC_URL (Add_Query_Arg (Tab_Name, "most-used",
@@ -1444,7 +1434,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
 
       Menu       : constant Integer := Wp_Get_Nav_Menu_Object (Menu_Id);
 --      Menu_Items : Array_Type;
-      Result     : Unbounded_String;
+      Result     : UString;
    begin
       -- If the menu exists, get its items.
       if Is_Nav_Menu (Menu) then
@@ -1612,7 +1602,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                Build ("post_status", "draft,publish")
             )));
 
-      Messages   : Unbounded_String; -- Array_Type := Empty_Array;
+      Messages   : UString; -- Array_Type := Empty_Array;
       Menu_Items : Array_Type;       -- := Empty_Array;
 
       Post_Fields : constant List_Type :=

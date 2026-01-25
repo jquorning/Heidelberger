@@ -28,7 +28,7 @@ is
          --
          -- @see Walker::$tree_type
          --
---       Tree_Type : Unbounded_String := To_Unbounded_String ("category");
+--       Tree_Type : UString := To_UString ("category");
 
          --
          -- Database fields to use.

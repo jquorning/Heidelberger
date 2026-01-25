@@ -5,15 +5,13 @@
 -- @since 5.8.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 limited with Class_Posts;
 
 package Class_Block_Editor_Contexts
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -38,7 +36,8 @@ is
          --
          -- @var string
          --
-         Name : Unbounded_String := To_Unbounded_String ("core/edit-post");
+         Name : UStrings.UString :=
+           UStrings.To_UString ("core/edit-post");
 
          --
          -- The post being edited by the block editor. Optional.

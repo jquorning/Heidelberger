@@ -15,8 +15,6 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Binder;
 with UStrings;
@@ -40,10 +38,9 @@ is
 
    procedure Run
    is
-      use UStrings;
-      use Php;
       use Php.HTML;
       use Php.Strings;
+      use UStrings;
       use Inc_L10n;
    begin
 
@@ -91,10 +88,8 @@ is
 
       else
          declare
-            use Ada.Strings.Unbounded;
-
-            Die  : Unbounded_String;
-            Path : Unbounded_String;
+            Die  : UString;
+            Path : UString;
          begin
             -- A config file doesn't exist.
 

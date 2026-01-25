@@ -7,14 +7,13 @@
 --
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with Lists;
+with UStrings;
 
 package Class_Taxonomy
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -32,7 +31,7 @@ is
          -- @since 4.7.0
          -- @var string
          --
-         Name : Unbounded_String;
+         Name : UStrings.UString;
 
          --
          -- Name of the taxonomy shown in the menu. Usually plural.
@@ -40,7 +39,7 @@ is
          -- @since 4.7.0
          -- @var string
          --
-         Label : Unbounded_String;
+         Label : UStrings.UString;
 
          --
          -- Labels object for this taxonomy.
@@ -69,7 +68,7 @@ is
          -- @since 4.7.0
          -- @var string
          --
-         Description : Unbounded_String;
+         Description : UStrings.UString;
 
          --
          -- Whether a taxonomy is intended for use -- publicly either via the admin interface or by front-end users.
@@ -192,7 +191,7 @@ is
          -- @since 4.7.0
          -- @var string|false
          --
-         Query_Var : Unbounded_String;
+         Query_Var : UStrings.UString;
 
          --
          -- Function that will be called when the count is updated.
@@ -256,7 +255,7 @@ is
          -- @since 5.5.0
          -- @var array|string
          --
-         Default_Term : Array_Type; -- Unbounded_String;
+         Default_Term : Array_Type; -- UString;
 
          --
          -- Whether terms in this taxonomy should be sorted in the order they are provided to `wp_set_object_terms()`.
@@ -355,7 +354,7 @@ is
        Default_Term       => Empty_Array,
        Args               => Empty_Array,
        Rewrite            => Empty_Array,
-       others             => Null_Unbounded_String);
+       others             => UStrings.Null_UString);
 
    --
    -- Default labels.

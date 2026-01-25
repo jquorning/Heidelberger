@@ -8,7 +8,6 @@
 
 with Ada.Containers;
 with Ada.Numerics.Discrete_Random;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Errors;
@@ -1043,14 +1042,13 @@ is
                                   Scheme : String := "")
                                   return Array_Type
    is
-      use Ada.Strings.Unbounded;
       use Binder;
       use UStrings;
       use Inc_Load;
 
-      Cookie_Name : Unbounded_String;
-      Cookie_2    : Unbounded_String := +Cookie;
-      Scheme_2    : Unbounded_String := +Scheme;
+      Cookie_Name : UString;
+      Cookie_2    : UString := +Cookie;
+      Scheme_2    : UString := +Scheme;
    begin
       if Cookie = "" then
 --    if ( empty( cookie ) ) then
@@ -1252,7 +1250,6 @@ is
 
    procedure Wp_Clear_Auth_Cookie
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Misc;
       use Globals;
@@ -1792,7 +1789,6 @@ is
                                   Default  : String := "")
                                   return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Files;
       use Php.HTML;
       use Php.Lists;
@@ -1806,7 +1802,7 @@ is
       Location_2 : constant String :=
         Wp_Sanitize_Redirect (Trim (Location, " \t\n\r\0\x08\x0B"));
 
-      Location_3 : Unbounded_String := +Location_2;
+      Location_3 : UString := +Location_2;
    begin
       -- Browsers will assume 'http' is your protocol, and will obey a redirect
       -- to a URL starting with '//'.
@@ -1843,7 +1839,7 @@ is
            '/' /= Get_As_String (Lp, "path") (1)
          then
             declare
-               Path : Unbounded_String;
+               Path : UString;
             begin
                if not Empty (X_SERVER, "REQUEST_URI") then
                   Path :=
@@ -2967,15 +2963,13 @@ is
                                   Extra_Special_Chars : Boolean := False)
                                   return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
-      use Php;
       use Php.Strings;
       use Inc_Plugins;
 
-      Chars : Unbounded_String :=
+      Chars : UString :=
         +"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      Password : Unbounded_String;
+      Password : UString;
    begin
       if Special_Chars then
          Append (Chars, "!@#%^&*()");
@@ -2987,7 +2981,7 @@ is
 
       declare
          subtype Result_Type is Positive
-           range 1 .. Ada.Strings.Unbounded.Length (Chars);
+           range 1 .. UStrings.Length (Chars);
 
          package Rand is new
            Ada.Numerics.Discrete_Random (Result_Subtype => Result_Type);
@@ -3157,7 +3151,6 @@ is
                         Args        : Array_Type := Empty_Array)
                         return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Lists;
       use Php.Preg;
@@ -3298,7 +3291,7 @@ is
 
                -- Add `loading` attribute.
                declare
-                  Extra_Attr : Unbounded_String :=
+                  Extra_Attr : UString :=
                     +Get_As_String (Args_3, "extra_attr");
 
                   Loading : constant String :=

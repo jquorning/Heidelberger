@@ -23,8 +23,6 @@
 --         <?php
 -- }
 
-with Ada.Strings.Unbounded;
-
 with Php.Echoing;
 with Php.Errors;
 with Php.Files;
@@ -85,14 +83,13 @@ is
 
    procedure Display_Header (Body_Classes : String := "")
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.HTML;
       use UStrings;
       use Inc_General_Templates;
       use Inc_L10n;
 
-      Body_Classes_2 : Unbounded_String := +Body_Classes;
+      Body_Classes_2 : UString := +Body_Classes;
    begin
       Header ("Content-Type: text/html; charset=utf-8");
       if Is_RTL then
@@ -344,7 +341,6 @@ is
 
    procedure Run
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Errors;
       use Php.Files;
@@ -427,14 +423,14 @@ is
            To_List (Sanitize_Title (Wp_Version))
          );
 
-         Php_Update_Message : Unbounded_String := +"</p><p>" & Sprintf (
+         Php_Update_Message : UString := +"</p><p>" & Sprintf (
            -- translators: %s: URL to Update PHP page.
            abs "<a href=""%s"">Learn more about updating PHP</a>.",
            To_List (ESC_URL (Wp_Get_Update_PHP_URL))
          );
 
          Annotation : constant String := Wp_Get_Update_PHP_Annotation;
-         Compat : Unbounded_String;
+         Compat : UString;
       begin
          if Annotation /= "" then
             Append (Php_Update_Message, "</p><p><em>" & Annotation & "</em>");
@@ -524,7 +520,7 @@ is
 
             Scripts_To_Print : List_Type := To_List ("jquery");
 
-            Language : Unbounded_String;
+            Language : UString;
             Step : constant Integer :=
               (if Isset (XX_GET, "step")
                then As_Integer (Get (XX_GET, "step"))
@@ -657,7 +653,6 @@ is
    procedure Step_2 (Language : String;
                      Scripts  : in out Lists.List_Type)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Strings;
       use Arrays;
@@ -670,7 +665,7 @@ is
       use Inc_General_Templates;
       use Inc_L10n;
 
-      Loaded_Language : Unbounded_String;
+      Loaded_Language : UString;
    begin
       if
         not Empty (Language) and then

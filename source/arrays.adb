@@ -4,12 +4,7 @@ with Helpers;
 
 package body Arrays
 is
-
-   function "+" (Item : String) return Unbounded_String
-      renames To_Unbounded_String;
-
-   function "-" (Item : Unbounded_String) return String
-      renames To_String;
+   use UStrings;
 
    ---------
    -- "=" --

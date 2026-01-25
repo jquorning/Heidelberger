@@ -7,8 +7,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Files;
 with Php.Lists;
@@ -62,7 +60,6 @@ is
                         Language      : String := "")
                         return Arrays.Array_Type
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
@@ -119,7 +116,7 @@ is
             Email_Password  : Boolean := False;
             User_Created    : Boolean := False;
 
-            Message : Unbounded_String;
+            Message : UString;
          begin
             if User_Id = 0 and then Empty (User_Password_2) then
                declare
@@ -1494,9 +1491,9 @@ is
 
    procedure Upgrade_430
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Globals;
+      use UStrings;
       use Inc_Cron;
       use Inc_Load;
       use Inc_Options;
@@ -1968,7 +1965,6 @@ is
                       Execute : Boolean := True)
                       return Array_Type
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
@@ -2246,7 +2242,7 @@ is
                                              -- phpcs:enable
                                              declare
                                                 -- Escape the column name with backticks.
-                                                Index_Column : Unbounded_String :=
+                                                Index_Column : UString :=
                                                   +("`" & Get_As_String (Index_Column_Matches, "column_name") & "`");
                                              begin
                                                 -- We don't need to add the subpart to index_columns_without_subparts
@@ -2517,8 +2513,8 @@ is
                                     Index_Data : constant Array_Type :=
                                       As_Array (Element (F));
 
-                                    Index_String  : Unbounded_String;
-                                    Index_Columns : Unbounded_String;
+                                    Index_String  : UString;
+                                    Index_Columns : UString;
                                  begin
                                     -- Build a create string to compare to the query.
                                     if "primary" = Index_Name then

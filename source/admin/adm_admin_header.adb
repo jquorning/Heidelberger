@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
@@ -55,7 +53,6 @@ is
 
    procedure Run
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Ini;
       use Php.HTML;
@@ -83,9 +80,9 @@ is
          return (if RTL then "1" else "0");
       end RTL_To_String;
 
-      Admin_Body_Class : Unbounded_String;
-      Admin_Title      : Unbounded_String;
-      Screen_Title     : Unbounded_String;
+      Admin_Body_Class : UString;
+      Admin_Title      : UString;
+      Screen_Title     : UString;
    begin
       Header ("Content-Type: " & Get_Option ("html_type") &
               "; charset=" & Get_Option ("blog_charset"));

@@ -6,7 +6,6 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Php.Arrays;
@@ -471,7 +470,6 @@ is
                                 Close_Quote : String)
                                 return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
@@ -487,7 +485,7 @@ is
       Flag_No_Digit    : constant String := "/(?<!\\d)" & Flag & "/";
 
       Sentences : constant List_Type := Explode (Open_Quote, Haystack);
-      Sentence_6 : Unbounded_String;
+      Sentence_6 : UString;
    begin
       for A in Sentences.First_Index .. Sentences.Last_Index loop
          declare
@@ -507,7 +505,7 @@ is
                      -- Attempt Vulcan logic.
                      declare
                         Count_2    : Natural;
-                        Sentence_3 : Unbounded_String :=
+                        Sentence_3 : UString :=
                           +Preg_Replace (Flag_No_Digit, Close_Quote,
                                          Sentence_2, -1, Count_2);
                      begin
@@ -589,9 +587,9 @@ is
                 Stack             : in out List_Type;
                 Disabled_Elements : List_Type)
    is
-      use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
 
       Opening_Tag : Boolean;
       Name_Offset : Integer;
@@ -890,12 +888,11 @@ is
    -- X_Get_Wptexturize_Split_Regex --
    -----------------------------------
 
-   Static_HTML_Regex : Ada.Strings.Unbounded.Unbounded_String;
+   Static_HTML_Regex : UStrings.UString;
 
    function X_Get_Wptexturize_Split_Regex (Shortcode_Regex : String := "")
                                            return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
    begin
       if Static_HTML_Regex = "" then
@@ -1137,7 +1134,7 @@ is
 -- end;
 
    Static_X_Charset_Set : Boolean := False;
-   Static_X_Charset     : Ada.Strings.Unbounded.Unbounded_String;
+   Static_X_Charset     : UStrings.UString;
 
    -----------------------
    -- X_Wp_Specialchars --
@@ -1150,7 +1147,6 @@ is
                Double_Encode : Boolean := False)
                return String
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Lists;
       use Php.Preg;
@@ -1158,8 +1154,8 @@ is
 
       Quote_Style_2 : Php.HTML.Flag_Type := Quote_Style;
       X_Quote_Style : Php.HTML.Flag_Type := Quote_Style_2;
-      Charset_2     : Unbounded_String := +Charset;
-      Item_2        : Unbounded_String := +Item;
+      Charset_2     : UString := +Charset;
+      Item_2        : UString := +Item;
    begin
       if 0 = Item'Length then
          return "";
@@ -2035,13 +2031,12 @@ is
    function Sanitize_Key (Key : String)
                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
       use Inc_Plugins;
 
-      Sanitized_Key : Unbounded_String;
+      Sanitized_Key : UString;
    begin
 --    if Is_Scalar (Key) then
       Sanitized_Key := +Strtolower (Key);
@@ -4217,11 +4212,10 @@ is
                             Subject : String)
                             return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
 
-      Sub   : Unbounded_String := +Subject;
+      Sub   : UString := +Subject;
       Count : Natural := 1;
    begin
       while Count /= 0 loop
@@ -4255,7 +4249,6 @@ is
                      X_Context : String    := "display")
                     return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
@@ -4288,7 +4281,7 @@ is
 
          URL_5 : constant String := Str_Replace (";//", "://", URL_4);
 
-         URL_6 : Unbounded_String := +URL_5;
+         URL_6 : UString := +URL_5;
       begin
          if "" = URL_3 then
             return URL_3;
@@ -4321,7 +4314,7 @@ is
          then
             declare
                Parsed : constant Array_Type := Wp_Parse_URL (-URL_6);
-               Front  : Unbounded_String;
+               Front  : UString;
             begin
                if Isset (Parsed, "scheme") then
                   Append (Front, Get_As_String (Parsed, "scheme") & "://");
@@ -4361,7 +4354,7 @@ is
          end if;
 
          declare
-            Good_Protocol_URL : Unbounded_String;
+            Good_Protocol_URL : UString;
          begin
             if '/' = Element (URL_6, 1) then -- [0]
                Good_Protocol_URL := URL_6;
@@ -5358,7 +5351,6 @@ is
                                Remove_Breaks : Boolean := False)
                                return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
@@ -5367,7 +5359,7 @@ is
         Preg_Replace ("@<(script|style)[^>]*?>.*?</\\1>@si", "", Item);
 
       Item_2 : constant String := Strip_Tags (Item_3);
-      Item_1 : Unbounded_String := +Item_2;
+      Item_1 : UString := +Item_2;
    begin
       if Remove_Breaks then
          Item_1 := +Preg_Replace ("/[\r\n\t ]+/", " ", Item_2);
@@ -5435,7 +5427,6 @@ is
                                     Keep_Newlines : Boolean := False)
                                     return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
@@ -5445,7 +5436,7 @@ is
 
       -- str = (string) str;
 
-      Filtered : Unbounded_String := +Wp_Check_Invalid_UTF8 (Str);
+      Filtered : UString := +Wp_Check_Invalid_UTF8 (Str);
       Found    : Boolean := False;
       Match    : List_Type;
    begin
@@ -5635,7 +5626,7 @@ is
    -- Wp_Spaces_Regexp --
    ----------------------
 
-   Static_Spaces : Ada.Strings.Unbounded.Unbounded_String;
+   Static_Spaces : UStrings.UString;
 
    function Wp_Spaces_Regexp
             return String

@@ -256,6 +256,7 @@ is
                       return Boolean
    is
       use Php.Strings;
+      use UStrings;
    begin
       if Empty (Admin) then
          return This.M_In_Admin /= ""; -- (bool)

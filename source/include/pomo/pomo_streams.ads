@@ -7,13 +7,10 @@
 -- @subpackage streams
 --
 
-with Ada.Strings.Unbounded;
-
 with UStrings;
 
 package POMO_Streams
 is
-   use Ada.Strings.Unbounded;
    use UStrings;
 
    procedure Dummy;
@@ -22,7 +19,7 @@ is
 --        #[AllowDynamicProperties]
    type POMO_Reader is tagged
       record
-         endian        : Unbounded_String := +"little";
+         endian        : UString := +"little";
          X_Pos         : Integer;
          Is_Overloaded : Boolean;
       end record;

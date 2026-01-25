@@ -7,8 +7,6 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
@@ -57,7 +55,7 @@ is
 
    Error         : Class_Errors.Wp_Error;
    Interim_Login : Boolean;
-   Action        : Ada.Strings.Unbounded.Unbounded_String;
+   Action        : UStrings.UString;
    --
    -- Output the login page header.
    --
@@ -131,7 +129,6 @@ is
                            Wp_Error_X : Class_Errors.Wp_Error :=
                                           Class_Errors.Null_Wp_Error)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Lists;
       use Php.Strings;
@@ -378,8 +375,8 @@ is
 
       if Wp_Error_2.Has_Errors then
          declare
-            Errors   : Unbounded_String;
-            Messages : Unbounded_String;
+            Errors   : UString;
+            Messages : UString;
          begin
             for Code of Wp_Error_2.Get_Error_Codes loop
                declare
@@ -601,7 +598,6 @@ is
 
    procedure Action_Confirm_Admin_Email (Errors : Class_Errors.Wp_Error)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Errors;
       use Php.Strings;
@@ -618,7 +614,7 @@ is
       use Inc_Pluggables;
       use Inc_Plugins;
 
-      Admin_Email : Unbounded_String;
+      Admin_Email : UString;
    begin
       --
       -- Note that `is_user_logged_in()` will return false immediately after logging in
@@ -906,7 +902,6 @@ is
 
    procedure Action_Logout
    is
-      use Ada.Strings.Unbounded;
       use Php.Errors;
       use Binder;
       use UStrings;
@@ -921,8 +916,8 @@ is
       declare
          User : constant Wp_User := Wp_Get_Current_User;
 
-         Redirect_To           : Unbounded_String;
-         Requested_Redirect_To : Unbounded_String;
+         Redirect_To           : UString;
+         Requested_Redirect_To : UString;
       begin
          Wp_Logout;
 
@@ -970,7 +965,6 @@ is
    procedure Action_Lostpassword (Login_Link_Separator : String;
                                   HTTP_Post            : Boolean)
    is
-      use Ada.Strings.Unbounded;
       use Php.Errors;
       use Php.Echoing;
       use Php.Strings;
@@ -1031,7 +1025,7 @@ is
          Redirect_To : constant String :=
            Apply_Filters ("lostpassword_redirect", Lostpassword_Redirect);
 
-         User_Login : Unbounded_String;
+         User_Login : UString;
       begin
          --
          -- Fires before the lost password form.
@@ -1123,7 +1117,6 @@ is
 
    procedure Action_Resetpass (Login_Link_Separator : String)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Errors;
       use Php.HTML;
@@ -1149,8 +1142,8 @@ is
 
       RP_Path   : constant String := -List (1);
       RP_Cookie : constant String := "wp-resetpass-" & (-Globals.COOKIEHASH);
-      RP_Login  : Unbounded_String;
-      RP_Key    : Unbounded_String;
+      RP_Login  : UString;
+      RP_Key    : UString;
 
       User   : User_Error_Type;
       Errors : Wp_Error;
@@ -1383,7 +1376,6 @@ is
    procedure Action_Register (Login_Link_Separator : String;
                               HTTP_Post            : Boolean)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Errors;
       use Php.Strings;
@@ -1419,8 +1411,8 @@ is
       end if;
 
       declare
-         User_Login : Unbounded_String;
-         User_Email : Unbounded_String;
+         User_Login : UString;
+         User_Email : UString;
          Errors     : User_Id_Error_Type;
       begin
          if HTTP_Post then
@@ -1670,7 +1662,6 @@ is
 
    procedure Action_Login (Login_Link_Separator : String)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Errors;
       use Php.HTML;
@@ -1701,9 +1692,9 @@ is
 
       Secure_Cookie   : Boolean;
       Customize_Login : constant Boolean := Isset (X_REQUEST, "customize-login");
-      Redirect_To     : Unbounded_String;
+      Redirect_To     : UString;
       Errors          : Wp_Error;
-      User_Login      : Unbounded_String;
+      User_Login      : UString;
    begin
       if Customize_Login then
          Wp_Enqueue_Script ("customize-base");
@@ -1968,7 +1959,7 @@ is
                                      PHP_URL_QUERY);
 
                      Query   : Array_Type;
-                     Message : Unbounded_String;
+                     Message : UString;
                   begin
                      if Query_Component /= "" then
                         Parse_Str (Query_Component, Query);
@@ -2020,7 +2011,7 @@ is
             declare
                Rememberme : constant Boolean := not Empty (X_POST, "rememberme");
 
-               Aria_Describedby : Unbounded_String;
+               Aria_Describedby : UString;
                Has_Errors       : constant Boolean := Errors.Has_Errors;
             begin
                if Has_Errors then
@@ -2146,7 +2137,7 @@ is
                end if;
 
                declare
-                  Login_Script : Unbounded_String;
+                  Login_Script : UString;
                begin
                   Append (Login_Script, "function wp_attempt_focus() {");
                   Append (Login_Script, "setTimeout( function() {");
@@ -2225,7 +2216,6 @@ is
 
    procedure Render
    is
-      use Ada.Strings.Unbounded;
       use Php.Files;
       use Php.HTML;
       use Php.Lists;

@@ -6,7 +6,7 @@
 -- @since 3.1.0
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 with Class_Admin_Bar;
 with Class_Customize_Managers;
@@ -16,7 +16,6 @@ with Class_Querys;
 
 package Inc_Admin_Bar
 is
-   use Ada.Strings.Unbounded;
    use Class_Admin_Bar;
 
    X_Wp_Admin_Bar : Wp_Admin_Bar; -- X_ added jq
@@ -27,7 +26,7 @@ is
    Id_Of_Post     : Class_Posts.Post_Id; -- was Post_Id : Integer
 
    X_Show_Admin_Bar : Boolean; -- X_ added
-   Pagenow          : Unbounded_String;
+   Pagenow          : UStrings.UString;
 
    Wp_Customize : Class_Customize_Managers.Wp_Customize_Manager;
 

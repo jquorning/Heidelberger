@@ -6,10 +6,9 @@
 -- @since 3.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_Errors;
 
@@ -17,7 +16,6 @@ limited with Class_Customize_Managers;
 
 package Class_Customize_Settings
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -48,7 +46,7 @@ is
          -- @since 3.4.0
          -- @var string
          --
-         Id : Unbounded_String;
+         Id : UStrings.UString;
 
          --
          -- Type of customize settings.
@@ -56,7 +54,8 @@ is
          -- @since 3.4.0
          -- @var string
          --
-         Typ : Unbounded_String := To_Unbounded_String ("theme_mod");
+         Typ : UStrings.UString :=
+           UStrings.To_UString ("theme_mod");
 
          --
          -- Capability required to edit this setting.
@@ -80,7 +79,7 @@ is
          -- @since 3.4.0
          -- @var string
          --
-         Default : Unbounded_String;
+         Default : UStrings.UString;
 
          --
          -- Options for rendering the live preview of changes in Customizer.
@@ -718,9 +717,9 @@ is
 
    Null_Setting : constant Wp_Customize_Setting :=
      (Manager             => null,
-      Id                  => Null_Unbounded_String,
-      Typ                 => Null_Unbounded_String,
-      Default             => Null_Unbounded_String,
+      Id                  => UStrings.Null_UString,
+      Typ                 => UStrings.Null_UString,
+      Default             => UStrings.Null_UString,
       Id_Data             => Empty_Array,
       Is_Previewed        => False,
       Is_Multidimensional_Aggregated => False,

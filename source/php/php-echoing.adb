@@ -12,7 +12,7 @@ package body Php.Echoing
 is
    use Lists;
 
-   Echo_Buffer : Ada.Strings.Unbounded.Unbounded_String;
+   Echo_Buffer : UStrings.UString;
 
    ----------
    -- Echo --
@@ -46,9 +46,9 @@ is
 
    procedure Clear_Echo
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
    begin
-      Echo_Buffer := Null_Unbounded_String;
+      Echo_Buffer := Null_UString;
    end Clear_Echo;
 
    ----------

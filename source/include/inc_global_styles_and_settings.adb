@@ -4,8 +4,6 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
@@ -99,8 +97,6 @@ is
    function Wp_Get_Global_Stylesheet (Types : List_Type := Empty_List)
                                       return String
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Lists;
       use UStrings;
       use Class_Theme_JSON;
@@ -148,8 +144,8 @@ is
          -- they can override the default presets.
          -- See https://core.trac.wordpress.org/ticket/54782
          --
-         Styles_Variables : Unbounded_String;
-         Styles_REST      : Unbounded_String;
+         Styles_Variables : UString;
+         Styles_REST      : UString;
       begin
          if In_List ("variables", Types_2, True) then
             --
@@ -268,11 +264,9 @@ is
 
    procedure Wp_Add_Global_Styles_For_Blocks
    is
-      use Ada.Strings.Unbounded;
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Strings;
+      use UStrings;
       use Class_Theme_JSON;
       use Inc_Functions_Wp_Styles;
       use Inc_Script_Loader;
@@ -293,7 +287,7 @@ is
             end if;
 
             declare
-               Stylesheet_Handle : Unbounded_String := +"global-styles";
+               Stylesheet_Handle : UString := +"global-styles";
             begin
                if Isset (Metadata, "name") then
                   --

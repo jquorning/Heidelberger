@@ -6,8 +6,6 @@
 -- @since 3.1.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Lists;
 with Php.Numerics;
 with Php.Strings;
@@ -35,7 +33,6 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_Posts_List_Table
    is
-      use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Numerics;
       use Php.Strings;

@@ -5,15 +5,13 @@
 -- @subpackage Theme
 -- @since 3.4.0
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Class_Errors;
 
 package Class_Themes
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    type Wp_Theme;
@@ -50,7 +48,7 @@ is
          -- @var string
          --
          -- private
-         Theme_Root : Unbounded_String;
+         Theme_Root : UStrings.UString;
 
          --
          -- Header data from the theme's style.css file.
@@ -99,7 +97,7 @@ is
          -- @var string
          --
          -- private
-         Stylesheet : Unbounded_String;
+         Stylesheet : UStrings.UString;
 
          --
          -- The directory name of the theme's files, inside the theme root.
@@ -111,7 +109,7 @@ is
          -- @var string
          --
          -- private
-         Template : Unbounded_String;
+         Template : UStrings.UString;
 
          --
          -- A reference to the parent theme, in the case of a child theme.
@@ -145,7 +143,7 @@ is
          -- @var string
          --
          -- private
-         Cache_Hash : Unbounded_String;
+         Cache_Hash : UStrings.UString;
 
       end record;
 
@@ -1598,13 +1596,13 @@ is
 --         end;
 
    Null_Theme : constant Wp_Theme :=
-      (Theme_Root        => Null_Unbounded_String,
+      (Theme_Root        => UStrings.Null_UString,
        Headers           => Empty_Array,
        Headers_Sanitized => Empty_Array,
-       Stylesheet        => Null_Unbounded_String,
-       Template          => Null_Unbounded_String,
+       Stylesheet        => UStrings.Null_UString,
+       Template          => UStrings.Null_UString,
        M_Parent          => null,
-       Cache_Hash        => Null_Unbounded_String,
+       Cache_Hash        => UStrings.Null_UString,
        M_Errors          => Class_Errors.Null_Wp_Error);
 
 end Class_Themes;

@@ -5,7 +5,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Php.Arrays;
@@ -46,7 +45,7 @@ with Inc_Pluggables;
 
 package body Inc_Functions
 is
-   use Ada.Strings.Unbounded;
+   use UStrings;
 
 --
 -- Converts given MySQL date string into a different format.
@@ -1112,9 +1111,9 @@ is
    begin
       for A in Data.Iterate loop
          declare
-            K   : Unbounded_String    := +Arrays.Key (A);
+            K   : UString    := +Arrays.Key (A);
             V   : constant Multi_Type := Arrays.Element (A);
-            V_2 : Unbounded_String    := +As_String (V);
+            V_2 : UString    := +As_String (V);
          begin
             if URLencode then
                K := +Php.HTML.URL_Encode (-K);
@@ -1175,9 +1174,9 @@ is
       use UStrings;
       use Inc_Formatting;
 
-      Protocol : Unbounded_String;
-      Frag     : Unbounded_String;
-      Base     : Unbounded_String;
+      Protocol : UString;
+      Frag     : UString;
+      Base     : UString;
       Querys   : Array_Type;
 
         -- if is_array( args[0] ) then
@@ -1194,7 +1193,7 @@ is
         --         end if;
         -- end if;
       URI   : constant String  := As_String (Get (Binder.X_SERVER, "REQUEST_URI"));
-      URI_2 : Unbounded_String := +URI;
+      URI_2 : UString := +URI;
    begin
       Put_Line ("add_query_arg: " & URI);
 
@@ -1221,7 +1220,7 @@ is
 
       declare
          URI_3 : constant String := -URI_2;
-         Query : Unbounded_String;
+         Query : UString;
       begin
          if Strpos (URI_3, "?") /= 0 then
             declare
@@ -1293,7 +1292,7 @@ is
    is
       use UStrings;
 
-      Res : Unbounded_String := +URL;
+      Res : UString := +URL;
    begin
       for A in Key.Iterate loop
          Res := +Add_Query_Arg (Arrays.Key (A), As_String (Element (A)), -Res);
@@ -1311,7 +1310,7 @@ is
    is
       use UStrings;
 
-      Query_2 : Unbounded_String := +Query;
+      Query_2 : UString := +Query;
    begin
       for K of Key loop
          Query_2 := +Add_Query_Arg (-K, "", -Query_2); -- "" was False
@@ -1478,7 +1477,7 @@ is
 --        if ( ! isset( wp_header_to_desc ) ) then
       type List_Entry is record
          Code : Integer;
-         Desc : Unbounded_String;
+         Desc : UString;
       end record;
 
 --    Array_Type := To_Array (List => (
@@ -1908,7 +1907,7 @@ is
             then Wp_Load_Alloptions
             else Empty_Array);
 
-         Installed_Site : Unbounded_String;
+         Installed_Site : UString;
          Installed      : Boolean;
       begin
          -- If siteurl is not set to autoload, check it specifically.
@@ -2030,7 +2029,7 @@ is
       use UStrings;
 
       Name_2 : constant String := ESC_Attr (Name);
-      Nonce_Field : Unbounded_String :=
+      Nonce_Field : UString :=
         +"<input type=""hidden"" id=""" & Name_2 & """ name=""" & Name_2 &
         """ value=""" & "XXX-864" & """ />";
 --      """ value=""" & Wp_Create_Nonce (Action) & """ />";
@@ -2327,8 +2326,8 @@ is
       use Php.Preg;
       use Php.Strings;
 
-      Path_2  : Unbounded_String := +Path;
-      Wrapper : Unbounded_String;
+      Path_2  : UString := +Path;
+      Wrapper : UString;
    begin
       if Wp_Is_Stream (-Path_2) then
          declare
@@ -2361,7 +2360,7 @@ is
    -- Get_Temp_Dir --
    ------------------
 
-   Static_Temp : Unbounded_String;
+   Static_Temp : UStrings.UString;
 
    function Get_Temp_Dir
             return String
@@ -3756,9 +3755,9 @@ is
       use Inc_Pluggables;
 
       -- Default title and response code.
-      Title         : Unbounded_String := +abs "Something went wrong.";
+      Title         : UString := +abs "Something went wrong.";
       Response_Code : constant Integer := 403;
-      HTML          : Unbounded_String;
+      HTML          : UString;
    begin
       if "log-out" = Action then
          Title := +Sprintf (
@@ -6044,8 +6043,8 @@ is
       use Inc_L10n;
       use Inc_Plugins;
 
-      Message_2 : Unbounded_String := +Message;
-      Version_2 : Unbounded_String := +Version;
+      Message_2 : UString := +Message;
+      Version_2 : UString := +Version;
    begin
       --
       -- Fires when the given function is being used incorrectly.
@@ -6304,7 +6303,7 @@ is
       use Php;
       use Php.Strings;
 
-      URL : Unbounded_String;
+      URL : UString;
    begin
       if -- defined( "WP_SITEURL" ) and then
         "" /= Globals.WP_SITEURL
@@ -8266,7 +8265,7 @@ is
       use Inc_Plugins;
 
       Default_URL : constant String := Wp_Get_Default_Update_PHP_URL;
-      Update_URL  : Unbounded_String := +Default_URL;
+      Update_URL  : UString := +Default_URL;
    begin
       if Env_Exists ("WP_UPDATE_PHP_URL") then
          Update_URL := +Get_Env ("WP_UPDATE_PHP_URL");

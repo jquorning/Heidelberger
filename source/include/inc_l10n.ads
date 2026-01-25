@@ -8,10 +8,10 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Indefinite_Ordered_Sets;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_Textdomain_Registry;
 with Class_Users;
@@ -40,8 +40,8 @@ is
    L10n                : String_Maps.Map;
    L10n_Unloaded       : String_Sets.Set;
 
-   Global_Locale           : Ada.Strings.Unbounded.Unbounded_String;
-   Global_Wp_Local_Package : Ada.Strings.Unbounded.Unbounded_String;
+   Global_Locale           : UStrings.UString;
+   Global_Wp_Local_Package : UStrings.UString;
 
    function Array_Keys (Map : String_Maps.Map)
                         return List_Type;

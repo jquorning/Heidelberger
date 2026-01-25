@@ -6,13 +6,12 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 with Class_Posts;
 
 package Class_Comments
 is
-   use Ada.Strings.Unbounded;
 
    --
    -- Core class used to organize comments as instantiated objects with defined
@@ -31,7 +30,7 @@ is
          -- @since 4.4.0
          -- @var string
          --
-         Comment_Id : Unbounded_String;
+         Comment_Id : UStrings.UString;
 
 --         --
 --         -- ID of the post the comment is associated with.
@@ -366,7 +365,7 @@ is
 --         end;
 
    Null_Comment : constant Wp_Comment :=
-     (Comment_Id      => Null_Unbounded_String,
+     (Comment_Id      => UStrings.Null_UString,
       Comment_Post_Id => 0);
 
 end Class_Comments;

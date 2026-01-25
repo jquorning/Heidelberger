@@ -5,13 +5,11 @@
 -- @since 5.2.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package Class_Paused_Extensions_Storages
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -29,7 +27,7 @@ is
          -- @var string
          --
          -- protected
-         Typ : Unbounded_String;
+         Typ : UStrings.UString;
 
       end record;
 
@@ -228,6 +226,6 @@ is
 --         end;
 
    Null_Paused_Extensions_Storage : constant Wp_Paused_Extensions_Storage :=
-     (Typ => Null_Unbounded_String);
+     (Typ => UStrings.Null_UString);
 
 end Class_Paused_Extensions_Storages;

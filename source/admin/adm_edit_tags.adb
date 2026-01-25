@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Echoing;
 with Php.Errors;
 with Php.Strings;
@@ -47,12 +45,7 @@ with Inc_Vars;
 
 package body Adm_Edit_Tags
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-   use Inc_L10n;
-   use Globals;
-   use UStrings;
-   use Php;
    use Lists;
 
 -- /** WordPress Administration Bootstrap */
@@ -71,15 +64,18 @@ is
 
    procedure Render
    is
-      use Binder;
       use Php.Echoing;
       use Php.Strings;
+      use Binder;
+      use Globals;
+      use UStrings;
       use Wp_Common;
       use Adi_Screens;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
+      use Inc_L10n;
       use Inc_Taxonomys;
 --    use Class_Taxonomy;
       use Class_Terms;
@@ -135,8 +131,8 @@ is
 
          Pagenum : constant Natural := X_Wp_List_Table.Get_Pagenum;  -- ();
 
-         Location : Unbounded_String;  -- jq
-         Referer  : Unbounded_String;  -- jq
+         Location : UString;  -- jq
+         Referer  : UString;  -- jq
       begin
          Parent_File :=
             +Slug_Type ((if "post" /= Post_Type then (if "attachment" = Post_Type
@@ -204,7 +200,7 @@ is
             end if;
 
             declare
-               Taxonomy : Unbounded_String;  --  Added by jq. Not declared anywhere
+               Taxonomy : UString;  --  Added by jq. Not declared anywhere
                Ret : constant Array_Type := Wp_Insert_Term (As_String (Get (X_POST, "tag-name")),
                                                          -Taxonomy, X_POST);
             begin
@@ -227,7 +223,7 @@ is
             end if;
 
             declare
-               Taxonomy : Unbounded_String;  -- Added by jq
+               Taxonomy : UString;  -- Added by jq
                Tag_ID   : constant Integer := Integer'Value (As_String (Get (X_REQUEST, "tag_ID")));
             begin
                Inc_Pluggables.Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
@@ -267,7 +263,7 @@ is
             end if;
 
             declare
-               Taxonomy : Unbounded_String;
+               Taxonomy : UString;
                Tags : constant List_Type :=
                  To_List (Item => As_String (Get (X_REQUEST, "delete_tags")));
             begin
@@ -286,7 +282,7 @@ is
             declare
                use Inc_Link_Templates;
 
-               Taxonomy : Unbounded_String;
+               Taxonomy : UString;
 
                Term_Id  : constant Integer :=
                  Integer'Value (As_String (Get (X_REQUEST, "tag_ID")));
@@ -307,7 +303,7 @@ is
 
          elsif "editedtag" = X_Wp_List_Table.Current_Action then
             declare
-               Taxonomy : Unbounded_String;
+               Taxonomy : UString;
                Tag_ID   : constant Integer := Integer'Value (As_String (Get (X_POST, "tag_ID")));
             begin
                Inc_Pluggables.Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
@@ -427,8 +423,8 @@ is
 
          Label_2 :
          declare
-            Taxonomy : Unbounded_String;
-            Help : Unbounded_String := Null_Unbounded_String;
+            Taxonomy : UString;
+            Help : UString := Null_UString;
          begin
             if
               "category" = Taxonomy or else
@@ -437,15 +433,15 @@ is
             then
 
                if "category" = Taxonomy then
-                  Set_Unbounded_String (Help, "<p>" & Sprintf (
+                  Set_UString (Help, "<p>" & Sprintf (
                         -- translators: %s: URL to Writing Settings screen.
                         abs "You can use categories to define sections of your site and group related posts. The default category is &#8220;Uncategorized&#8221; until you change it in your <a href=""%s"">writing settings</a>.",
                         To_List ("options-writing.php")
                ) & "</p>");
                elsif "link_category" = Taxonomy then
-                  Set_Unbounded_String (Help, "<p>" & abs "You can create groups of links by using Link Categories. Link Category names must be unique and Link Categories are separate from the categories you use for posts." & "</p>");
+                  Set_UString (Help, "<p>" & abs "You can create groups of links by using Link Categories. Link Category names must be unique and Link Categories are separate from the categories you use for posts." & "</p>");
                else
-                  Set_Unbounded_String (Help, "<p>" & abs "You can assign keywords to your posts using <strong>tags</strong>. Unlike categories, tags have no hierarchy, meaning there is no relationship from one tag to another." & "</p>");
+                  Set_UString (Help, "<p>" & abs "You can assign keywords to your posts using <strong>tags</strong>. Unlike categories, tags have no hierarchy, meaning there is no relationship from one tag to another." & "</p>");
                end if;
 
                if "link_category" = Taxonomy then
@@ -463,9 +459,9 @@ is
 
                if "category" = Taxonomy or else "post_tag" = Taxonomy then
                   if "category" = Taxonomy then
-                     Set_Unbounded_String (Help, "<p>" & abs "When adding a new category on this screen, you&#8217;ll fill in the following fields:" & "</p>");
+                     Set_UString (Help, "<p>" & abs "When adding a new category on this screen, you&#8217;ll fill in the following fields:" & "</p>");
                   else
-                     Set_Unbounded_String (Help, "<p>" & abs "When adding a new tag on this screen, you&#8217;ll fill in the following fields:" & "</p>");
+                     Set_UString (Help, "<p>" & abs "When adding a new tag on this screen, you&#8217;ll fill in the following fields:" & "</p>");
                   end if;
 
                   Help := Help & "<ul>" &
@@ -491,7 +487,7 @@ is
                        )));
                end if;  -- ???
 
-               Set_Unbounded_String (Help, "<p><strong>" & abs "For more information:" & "</strong></p>");
+               Set_UString (Help, "<p><strong>" & abs "For more information:" & "</strong></p>");
 
                if "category" = Taxonomy then
                   Help := Help & "<p>" & abs "<a href=""https://wordpress.org/support/article/posts-categories-screen/"">Documentation on Categories</a>" & "</p>";
@@ -519,7 +515,7 @@ is
 
             Class : String :=  (if Isset (X_REQUEST, "error")
                                 then "error" else "updated");
-            Import_Link : Unbounded_String;
+            Import_Link : UString;
          begin
             if Is_Plugin_Active ("wpcat2tag-importer/wpcat2tag-importer.php") then
                Import_Link := +Admin_URL ("admin.php?import=wpcat2tag");
@@ -863,7 +859,7 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         -- @param string context  Filter context. Accepts "new" or "edit".
                         --
-                        Unused : Unbounded_String;
+                        Unused : UString;
                      begin
                         Dropdown_Args :=
                           Apply_Filters ("taxonomy_parent_dropdown_args",
@@ -879,7 +875,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_h1_sub" then
                      declare
-                        R : Unbounded_String;
+                        R : UString;
                      begin
                         if
                           Isset (X_REQUEST, "s") and then
@@ -985,7 +981,7 @@ is
                end Value;
 
                Lazy    : aliased My_Lazy;
-               Payload : constant Unbounded_String
+               Payload : constant UString
                  := Templates_Parser.Parse ("page/admin/edit-tags.thtml",
                                              Translation,
                                              Lazy_Tag => Lazy'Unchecked_Access);

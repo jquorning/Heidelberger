@@ -16,7 +16,7 @@ is
    ---------------
 
    procedure Start_LVL (This   : Walker;
-                        Output : in out Unbounded_String;
+                        Output : in out UStrings.UString;
                         Depth  : Integer    := 0;
                         Args   : Array_Type := Empty_Array)
    is null;
@@ -26,7 +26,7 @@ is
    -------------
 
    procedure End_LVL (This   : Walker;
-                      Output : in out Unbounded_String;
+                      Output : in out UStrings.UString;
                       Depth  : Integer    := 0;
                       Args   : Array_Type := Empty_Array)
    is null;
@@ -36,7 +36,7 @@ is
    --------------
 
    procedure Start_EL (This              : Walker;
-                       Output            : in out Unbounded_String;
+                       Output            : in out UStrings.UString;
                        Data_Object       : Array_Type;
                        Depth             : Integer    := 0;
                        Args              : Array_Type := Empty_Array;
@@ -48,7 +48,7 @@ is
    ------------
 
    procedure End_EL (This              : Walker;
-                     Output            : in out Unbounded_String;
+                     Output            : in out UStrings.UString;
                      Data_Object       : Array_Type;
                      Depth             : Integer    := 0;
                      Args              : Array_Type := Empty_Array)
@@ -64,7 +64,7 @@ is
                               Max_Depth         : Integer;
                               Depth             : Integer;
                               Args              : Array_Type;
-                              Output            : in out Unbounded_String)
+                              Output            : in out UStrings.UString)
    is
 --    use UStrings;
    begin
@@ -138,7 +138,7 @@ is
       use Php.Arrays;
       use UStrings;
 
-      Output : Unbounded_String;
+      Output : UString;
    begin
       -- Invalid parameter or nothing to walk.
       if

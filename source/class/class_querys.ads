@@ -6,9 +6,8 @@
 -- @since 4.7.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Class_Posts;
 with Class_Terms;
@@ -16,7 +15,6 @@ with Class_Users;
 
 package Class_Querys
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -94,7 +92,7 @@ is
         -- @since 2.0.1
         -- @var string
         --
-        Request : Unbounded_String;
+        Request : UStrings.UString;
 
         --
         -- Array of post objects or post IDs.
@@ -785,7 +783,7 @@ is
      (M_Query               => Empty_Array,
       Query_Vars            => Empty_Array,
       Queried_Object_Id     => 0,
-      Request               => Null_Unbounded_String,
+      Request               => UStrings.Null_UString,
       Post_Count            => 0,
       Current_Post          => 0,
       Comment_Count         => 0,

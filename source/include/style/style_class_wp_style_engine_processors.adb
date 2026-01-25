@@ -9,7 +9,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Sorting;
@@ -79,7 +78,6 @@ is
                      Options : Array_Type := Empty_Array)
                      return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Rules_Stores;
@@ -108,7 +106,7 @@ is
 
       -- Build the CSS.
       declare
-         CSS : Unbounded_String;
+         CSS : UString;
       begin
          for Rule of This.CSS_Rules loop
             Append (CSS, Rule.Get_CSS (As_Boolean (Get (Options_2, "prettify"))));

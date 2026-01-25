@@ -1,12 +1,14 @@
-with Ada.Strings.Unbounded;
+--
+--
+--
 
 with Arrays;
+with UStrings;
 
 -- with Class_Terms;
 
 package Class_Walker
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -30,7 +32,7 @@ is
          -- @since 2.1.0
          -- @var string
          --
-         Tree_Type : Unbounded_String;
+         Tree_Type : UStrings.UString;
 
          --
          -- DB fields to use.
@@ -74,7 +76,7 @@ is
    -- @param array  $args   An array of additional arguments.
    --
    procedure Start_LVL (This   : Walker;
-                        Output : in out Unbounded_String;
+                        Output : in out UStrings.UString;
                         Depth  : Integer    := 0;
                         Args   : Array_Type := Empty_Array);
 
@@ -93,7 +95,7 @@ is
    -- @param array  $args   An array of additional arguments.
    --
    procedure End_LVL (This   : Walker;
-                      Output : in out Unbounded_String;
+                      Output : in out UStrings.UString;
                       Depth  : Integer    := 0;
                       Args   : Array_Type := Empty_Array);
 
@@ -116,7 +118,7 @@ is
    -- @param int    $current_object_id Optional. ID of the current item. Default 0.
    --
    procedure Start_EL (This              : Walker;
-                       Output            : in out Unbounded_String;
+                       Output            : in out UStrings.UString;
                        Data_Object       : Array_Type;
                        Depth             : Integer    := 0;
                        Args              : Array_Type := Empty_Array;
@@ -140,7 +142,7 @@ is
    -- @param array  $args        An array of additional arguments.
    --
    procedure End_EL (This              : Walker;
-                     Output            : in out Unbounded_String;
+                     Output            : in out UStrings.UString;
                      Data_Object       : Array_Type;
                      Depth             : Integer    := 0;
                      Args              : Array_Type := Empty_Array);
@@ -172,7 +174,7 @@ is
                               Max_Depth         : Integer;
                               Depth             : Integer;
                               Args              : Array_Type;
-                              Output            : in out Unbounded_String);
+                              Output            : in out UStrings.UString);
 
    --
    -- Displays array of elements hierarchically.

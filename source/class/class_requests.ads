@@ -8,9 +8,8 @@
 -- @package Requests
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Req_Responses;
 with Req_Transports;
@@ -898,6 +897,6 @@ private
    -- @var string
    --
    -- protected static
-   Certificate_Path : Ada.Strings.Unbounded.Unbounded_String;
+   Certificate_Path : UStrings.UString;
 
 end Class_Requests;

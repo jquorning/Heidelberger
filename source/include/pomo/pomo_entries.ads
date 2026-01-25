@@ -6,12 +6,11 @@
 -- @subpackage entry
 --
 
-with Ada.Strings.Unbounded;
 with Arrays;
+with UStrings;
 
 package POMO_Entries
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
 -- if ( ! class_exists( "Translation_Entry", false ) ) :
@@ -29,12 +28,12 @@ is
          --
          Is_Plural : Boolean := False;
 
-         Context             : Unbounded_String; -- null;
-         Singular            : Unbounded_String; -- null;
-         Plural              : Unbounded_String; -- null;
+         Context             : UStrings.UString; -- null;
+         Singular            : UStrings.UString; -- null;
+         Plural              : UStrings.UString; -- null;
          Translations        : Array_Type;
-         Translator_Comments : Unbounded_String;
-         Extracted_Comments  : Unbounded_String;
+         Translator_Comments : UStrings.UString;
+         Extracted_Comments  : UStrings.UString;
          References          : Array_Type;
          Flags               : Array_Type;
       end record;
@@ -130,10 +129,10 @@ is
 
    Null_Translation_Entry : constant Translation_Entry :=
      (Is_Plural                   => False,
-      Context | Singular | Plural => Null_Unbounded_String,
+      Context | Singular | Plural => UStrings.Null_UString,
       Translations                => Empty_Array,
-      Translator_Comments         => Null_Unbounded_String,
-      Extracted_Comments          => Null_Unbounded_String,
+      Translator_Comments         => UStrings.Null_UString,
+      Extracted_Comments          => UStrings.Null_UString,
       References | Flags          => Empty_Array
    );
 

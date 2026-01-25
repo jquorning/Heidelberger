@@ -119,7 +119,7 @@ is
          Needs_Preview : Boolean  :=
            As_String (Undefined) /= This.Post_Value (As_String (Undefined));
 
-         Value : Multi_Type; -- Unbounded_String; --  := null;
+         Value : Multi_Type; -- UString; --  := null;
       begin
          -- Since no post value was defined, check if we have an initial value set.
          if not Needs_Preview then
@@ -262,7 +262,7 @@ is
       declare
          Undefined  : constant String := "XXX-021"; -- new stdClass(); -- Symbol hack.
          Post_Value : constant String := This.Post_Value (Undefined);
-         Value      : Unbounded_String;
+         Value      : UString;
       begin
          if Undefined /= Post_Value then
             Value := +Post_Value;
@@ -510,7 +510,7 @@ is
 
       Id_Base      : constant String := Get_As_String (This.Id_Data, "base");
       Is_Core_Type : constant Boolean := -This.Typ in "option" | "theme_mod";
-      Value_2 : Unbounded_String;
+      Value_2 : UString;
    begin
       if
         not Is_Core_Type and then
@@ -580,6 +580,7 @@ is
                             Default_Value : String := "") -- null
                             return String
    is
+      use UStrings;
       use Inc_Options;
       use Inc_Themes;
 

@@ -5,15 +5,12 @@
 -- @since 2.0.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with UStrings;
 with Lists;
 
 package Class_Wp
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use UStrings;
    use Lists;
@@ -65,7 +62,7 @@ is
          -- @since 2.0.0
          -- @var string
          --
-         Query_String : Unbounded_String;
+         Query_String : UString;
 
          --
          -- The request path, e.g. 2015/05/06.
@@ -73,7 +70,7 @@ is
          -- @since 2.0.0
          -- @var string
          --
-         Request : Unbounded_String;
+         Request : UString;
 
          --
          -- Rewrite rule the request matched.
@@ -89,7 +86,7 @@ is
          -- @since 2.0.0
          -- @var string
          --
-         Matched_Query : Unbounded_String;
+         Matched_Query : UString;
 
          --
          -- Whether already did the permalink.

@@ -6,7 +6,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Echoing;
@@ -82,12 +81,11 @@ is
                                     Type_Of_URL : String := "")
                                     return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Inc_Formatting;
       use Inc_Plugins;
 
-      Item_2 : Unbounded_String;
+      Item_2 : UString;
    begin
       if Global_Wp_Rewrite.Use_Trailing_Slashes then
          Item_2 := +Trailing_Slash_It (Item);
@@ -226,7 +224,6 @@ is
 --                           Leavename : Boolean := False)
 --                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Strings;
       use UStrings;
@@ -258,7 +255,7 @@ is
       ));
 
       Sample : Boolean;
-      Permalink : Unbounded_String;
+      Permalink : UString;
    begin
       if
 --      Is_Object (Post)    and then
@@ -307,7 +304,7 @@ is
         not Wp_Force_Plain_Post_Permalink (Post)
       then
          declare
-            Category : List_Type; -- Unbounded_String;
+            Category : List_Type; -- UString;
          begin
             if Strpos (-Permalink, "%category%") /= 0 then
                declare
@@ -370,7 +367,7 @@ is
                end;
 
                declare
-                  Author : Unbounded_String;
+                  Author : UString;
                begin
                   if Strpos (-Permalink, "%author%") /= 0 then
                      declare
@@ -457,7 +454,6 @@ is
                                 Sample    : Boolean := False)
                                 return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
@@ -474,7 +470,7 @@ is
       end if;
 
       declare
-         Post_Link : Unbounded_String :=
+         Post_Link : UString :=
            +Global_Wp_Rewrite.Get_Extra_Permastruct (-Post.Post_Type);
 
          Slug : String := -Post.Post_Name;
@@ -537,7 +533,6 @@ is
                            Sample    : Boolean := False)
                            return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Wp_Common;
       use Class_Posts;
@@ -546,7 +541,7 @@ is
       use Inc_Options;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
-      Link   : Unbounded_String;
+      Link   : UString;
    begin
       if
         "page" = Get_Option ("show_on_front") and then
@@ -578,7 +573,6 @@ is
                              Sample    : Boolean := False)
                              return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Class_Posts;
@@ -591,7 +585,7 @@ is
 
       Force_Plain_Link : constant Boolean := Wp_Force_Plain_Post_Permalink (Post_2);
 
-      Link : Unbounded_String := +Global_Wp_Rewrite.Get_Page_Permastruct;
+      Link : UString := +Global_Wp_Rewrite.Get_Page_Permastruct;
    begin
       if
         not Empty (-Link) and then
@@ -628,7 +622,6 @@ is
                                  Leavename : Boolean := False)
                                  return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use Php.Types;
       use UStrings;
@@ -638,7 +631,7 @@ is
       use Inc_Posts;
       use Inc_Plugins;
 
-      Link : Unbounded_String; -- Boolean := false;
+      Link : UString; -- Boolean := false;
 
       Post_2           : constant Wp_Post := Get_Post (Post);
       Force_Plain_Link : constant Boolean := Wp_Force_Plain_Post_Permalink (Post_2);
@@ -647,8 +640,8 @@ is
                                      then Get_Post (Parent_Id)
                                      else Null_Post); -- False);
       Parent_Valid     : Boolean := True; -- Default for no parent.
-      Parentlink       : Unbounded_String;
-      Name             : Unbounded_String;
+      Parentlink       : UString;
+      Name             : UString;
    begin
       if
         Parent_Id /= 0 and then
@@ -1255,7 +1248,6 @@ is
                                 Object_Type : String := "")
                                 return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
@@ -1293,7 +1285,7 @@ is
               Build ("tag_ID",   Term_Id)
             ));
 
-            Location : Unbounded_String;
+            Location : UString;
          begin
             if Object_Type /= "" then
                Set (Args, "post_type", From_String (Object_Type));
@@ -1499,7 +1491,6 @@ is
    function Get_Post_Type_Archive_Link (Post_Type : String)
                                         return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Types;
       use UStrings;
       use Class_Post_Type;
@@ -1509,7 +1500,7 @@ is
       use Inc_Posts;
 
       Post_Type_Obj : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
-      Link          : Unbounded_String;
+      Link          : UString;
    begin
       if Post_Type_Obj = Null_Post_Type then -- !
          return ""; -- false;
@@ -1622,7 +1613,6 @@ is
        Preview_Link : String     := "")
        return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Wp_Common;
       use Class_Posts;
@@ -1641,7 +1631,7 @@ is
          Post_Type_Object : constant Wp_Post_Type :=
            Get_Post_Type_Object (-Post_2.Post_Type);
 
-         Preview_Link_2 : Unbounded_String;
+         Preview_Link_2 : UString;
       begin
          if Is_Post_Type_Viewable (Post_Type_Object) then
             if Preview_Link = "" then
@@ -1673,7 +1663,6 @@ is
                                 Context : String  := "display")
                                 return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
@@ -1683,8 +1672,8 @@ is
       use Inc_Posts;
 
       Post_2 : constant Wp_Post := Get_Post (Post_Id (Post));
-      Action : Unbounded_String;
-      Link   : Unbounded_String;
+      Action : UString;
+      Link   : UString;
    begin
       if Post_2 = Null_Post then
          return "";
@@ -1956,7 +1945,6 @@ is
    function Get_Edit_User_Link (User_Id : Integer := 0) -- = null
                                 return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Inc_Capabilities;
       use Class_Users;
@@ -1970,7 +1958,7 @@ is
          then Get_Current_User_Id
          else User_Id);
 
-      Link : Unbounded_String;
+      Link : UString;
    begin
       if
         User_Id_2 = 0 or else -- Empty (User_Id_2) or else
@@ -2617,7 +2605,6 @@ is
                               return String
    is
       use Ada.Containers;
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
@@ -2646,7 +2633,7 @@ is
 
       Request   : String := Preg_Replace ("|^/+|", "", Request_2);
 
-      Result : Unbounded_String;
+      Result : UString;
    begin
       if
         not Global_Wp_Rewrite.Using_Permalinks or else
@@ -2667,7 +2654,7 @@ is
          declare
             Qs_Regex : constant String := "|\?.*?|";
             Qs_Match : List_Type;
-            Query_String : Unbounded_String;
+            Query_String : UString;
          begin
             Preg_Match (Qs_Regex, Request, Qs_Match);
 
@@ -2691,9 +2678,9 @@ is
 
                Request_6 : constant String := Ltrim (Request_5, "/");
 
-               Base : Unbounded_String := +Trailing_Slash_It (Get_Bloginfo ("url"));
+               Base : UString := +Trailing_Slash_It (Get_Bloginfo ("url"));
 
-               Request_7 : Unbounded_String;
+               Request_7 : UString;
             begin
                if
                  Global_Wp_Rewrite.Using_Index_Permalinks and then
@@ -3631,7 +3618,6 @@ is
                           Scheme  : String  := "")
                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Lists;
       use Php.Strings;
@@ -3642,8 +3628,8 @@ is
       use Inc_Plugins;
 
       Orig_Scheme : constant String := Scheme;
-      URL      : Unbounded_String;
-      Scheme_2 : Unbounded_String;
+      URL      : UString;
+      Scheme_2 : UString;
    begin
       if
         Blog_Id = 0 or else -- Empty (Blog_Id) or else
@@ -3708,7 +3694,6 @@ is
                           Scheme  : String  := "") -- null
                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Inc_Load;
@@ -3716,7 +3701,7 @@ is
       use Inc_Options;
       use Inc_Plugins;
 
-      URL : Unbounded_String;
+      URL : UString;
    begin
       if Blog_Id = 0 or else not Is_Multisite then
          URL := +Get_Option ("siteurl");
@@ -3769,12 +3754,11 @@ is
                            Scheme  : String  := "admin")
                            return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
 
-      URL : Unbounded_String := +Get_Site_URL (Blog_Id, "wp-admin/", Scheme);
+      URL : UString := +Get_Site_URL (Blog_Id, "wp-admin/", Scheme);
    begin
       if Path /= "" then --  && is_string( path ) ) then
          Append (URL, Ltrim (Path, "/"));
@@ -3806,13 +3790,12 @@ is
                           Scheme : String := "") -- null
                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use Globals;
       use UStrings;
       use Inc_Plugins;
 
-      URL : Unbounded_String := +Site_URL ("/" & (-WPINC) & "/", Scheme);
+      URL : UString := +Site_URL ("/" & (-WPINC) & "/", Scheme);
    begin
       if Path /= "" then -- and then is_string( path ) ) then
          Append (URL, Ltrim (Path, "/"));
@@ -3922,7 +3905,6 @@ is
                               Scheme : String := "") -- null
                               return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Class_Networks;
@@ -3930,7 +3912,7 @@ is
       use Inc_Ms_Networks;
       use Inc_Plugins;
 
-      URL : Unbounded_String;
+      URL : UString;
    begin
       if not Is_Multisite then
          return Site_URL (Path, Scheme);
@@ -4028,7 +4010,6 @@ is
                                Scheme : String := "admin")
                                return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Inc_Load;
@@ -4039,7 +4020,7 @@ is
       end if;
 
       declare
-         URL : Unbounded_String :=
+         URL : UString :=
            +Network_Site_URL ("wp-admin/network/", Scheme);
       begin
          if Path /= "" then --  && is_string( path ) ) then
@@ -4072,12 +4053,11 @@ is
                             Scheme : String := "admin")
                             return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Inc_Plugins;
 
-      URL : Unbounded_String :=
+      URL : UString :=
         +Network_Site_URL ("wp-admin/user/", Scheme);
    begin
       if Path /= "" then -- and then Is_String (Path) then
@@ -4137,7 +4117,6 @@ is
                             Scheme : String := "") -- null
                             return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
@@ -4147,8 +4126,8 @@ is
 
       Orig_Scheme : constant String := Scheme;
 
-      Scheme_2 : Unbounded_String := +Scheme;
-      URL_2    : Unbounded_String := +Trim (URL);
+      Scheme_2 : UString := +Scheme;
+      URL_2    : UString := +Trim (URL);
    begin
       if -Scheme_2 = "" then
          Scheme_2 := +(if Is_SSL then "https" else "http");
@@ -4196,7 +4175,6 @@ is
                                Scheme  : String  := "admin")
                                return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Wp_Common;
       use Class_Admin_Bar; -- ???
@@ -4229,7 +4207,7 @@ is
          else Get_Current_User_Id);
 
       Blogs : constant Blog_List := Get_Blogs_Of_User (User_Id_2);
-      URL : Unbounded_String;
+      URL : UString;
    begin
       if
         Is_Multisite and then
@@ -4404,7 +4382,6 @@ is
                               Allow_Slugs : Boolean := True)
                               return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Class_Posts;
       use Class_Post_Type;
@@ -4428,7 +4405,7 @@ is
       --                                  "query",
       -- @param bool         allow_slugs Whether to allow post slugs in the shortlink.
       --
-      Shortlink : Unbounded_String :=
+      Shortlink : UString :=
         +Apply_Filters ("pre_get_shortlink", "False", Id, Context, Allow_Slugs);
 
       Post_Id : Class_Posts.Post_Id := 0;
@@ -4611,7 +4588,6 @@ is
                              Args        : Array_Type) -- = null
                              return Array_Type
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Misc;
       use Php.Numerics;
@@ -4718,10 +4694,10 @@ is
       end if;
 
       declare
-         Id_Or_Email_2 : constant Unbounded_String := +Id_Or_Email;
-         Email_Hash    : Unbounded_String;
-         User       : Unbounded_String; -- Boolean := False;
-         Email      : Unbounded_String; -- Boolean := False;
+         Id_Or_Email_2 : constant UString := +Id_Or_Email;
+         Email_Hash    : UString;
+         User       : UString; -- Boolean := False;
+         Email      : UString; -- Boolean := False;
          Gravatar_Server : Natural;
       begin
 --       if Is_Object (Id_Or_Email) and then Isset (Id_Or_Email.Comment_Id) then
@@ -5014,7 +4990,6 @@ is
                                          After  : String := "")
                                          return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Inc_Formatting;

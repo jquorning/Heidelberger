@@ -4,9 +4,6 @@
 -- Set this to error_reporting( -1 ) for debugging.
 --
 
-with Ada.Strings.Unbounded;
-
--- with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
 with Php.HTML;
@@ -40,23 +37,21 @@ is
 
    procedure Run
    is
-      use Ada.Strings.Unbounded;
-      use Arrays;
-      use Binder;
-      use Globals;
-      use UStrings;
-      use Php;
       use Php.Echoing;
       use Php.Errors;
       use Php.HTML;
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use Arrays;
+      use Binder;
+      use Globals;
+      use UStrings;
       use Inc_Script_Loader;
 
-      Protocol : Unbounded_String;
-      Load     : Unbounded_String;
-      Outt     : Unbounded_String;
+      Protocol : UString;
+      Load     : UString;
+      Outt     : UString;
       Load_2   : List_Type;
       Wp_Scripts : Class_Scripts.Wp_Scripts;
       Expires_Offset : Natural;
@@ -113,7 +108,7 @@ is
          declare
             use Class_Dependency.Dependency_Maps;
 
-            Path : Unbounded_String;
+            Path : UString;
          begin
             if not Has_Element (Wp_Scripts.Registered.Find (-Handle)) then
                goto Continue;

@@ -5,13 +5,12 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Iterator_Interfaces;
-with Ada.Strings.Unbounded;
 
 with Lists;
+with UStrings;
 
 package Arrays
 is
-   use Ada.Strings.Unbounded;
 
    package Integer_Vectors is new
       Ada.Containers.Vectors (Index_Type   => Positive,
@@ -19,8 +18,8 @@ is
    subtype Integer_Array is Integer_Vectors.Vector;
    Empty_Integer_Array : constant Integer_Array := Integer_Vectors.Empty_Vector;
 
-   subtype Key_Type   is Unbounded_String;
-   subtype Value_Type is Unbounded_String;
+   subtype Key_Type   is UStrings.UString;
+   subtype Value_Type is UStrings.UString;
 
    type Callable is access procedure;
 
@@ -375,7 +374,7 @@ private
    type Multi_Type is
       record
          Kind : Array_Kind       := Kind_Null;
-         Str  : Unbounded_String;
+         Str  : UStrings.UString;
          Int  : Integer          := 0;
          Arry : Array_Access     := null;
          List : List_Access      := null;
@@ -396,7 +395,7 @@ private
 
    Null_Multi_Type : constant Multi_Type :=
       (Kind => Kind_Null,
-       Str  => Null_Unbounded_String,
+       Str  => UStrings.Null_UString,
        Int  => 0,
        Arry => null,
        List => null,

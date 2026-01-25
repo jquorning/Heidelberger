@@ -63,8 +63,8 @@ is
 
       This  : Wp_Theme;
       Cache : Array_Type;
-      Theme_File          : Unbounded_String;
-      Theme_Root_Template : Unbounded_String;
+      Theme_File          : UString;
+      Theme_Root_Template : UString;
    begin
       -- Initialize caching on first run.
       if not Static_Persistently_Cache then
@@ -563,7 +563,7 @@ is
       use Inc_Formatting;
       use Inc_KSES;
 
-      Value_2 : Unbounded_String;
+      Value_2 : UString;
       Value_3 : List_Type;
    begin
       if Header in "Status" | "Name" then

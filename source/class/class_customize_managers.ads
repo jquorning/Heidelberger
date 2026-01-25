@@ -7,7 +7,6 @@
 --
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with UStrings;
@@ -26,7 +25,6 @@ with Cust_Class_Wp_Customize_Selective_Refresh;
 
 package Class_Customize_Managers
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use UStrings;
    use Lists;
@@ -79,7 +77,7 @@ is
          -- @var string
          --
          -- protected
-         Original_Stylesheet : Unbounded_String;
+         Original_Stylesheet : UString;
 
          --
          -- Whether this is a Customizer pageload.
@@ -225,7 +223,7 @@ is
          -- @var string
          --
          -- protected
-         Messenger_Channel : Unbounded_String;
+         Messenger_Channel : UString;
 
          --
          -- Whether the autosave revision of the changeset should be loaded.
@@ -276,7 +274,7 @@ is
          -- @var string
          --
 --        private _changeset_uuid;
-         X_Changeset_UUID : Unbounded_String;
+         X_Changeset_UUID : UString;
 
          --
          -- Changeset post ID.

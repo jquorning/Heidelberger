@@ -6,7 +6,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Lists;
@@ -48,7 +47,6 @@ is
 
    procedure Create_Initial_Taxonomies
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Class_Taxonomy;
       use Inc_L10n;
@@ -56,7 +54,7 @@ is
       use Inc_Plugins;
 --         global wp_rewrite;
       Rewrite          : Array_Type;
-      Post_Format_Base : Unbounded_String;
+      Post_Format_Base : UString;
    begin
       Reset_Default_Labels; -- WP_Taxonomy::reset_default_labels();
 
@@ -701,7 +699,6 @@ is
    function Get_Taxonomy_Labels (Tax : in out Class_Taxonomy.Wp_Taxonomy)
                                  return Array_Type
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php.Arrays;
       use Inc_Plugins;
@@ -728,7 +725,7 @@ is
 --       Nohier_Vs_Hier_Defaults : Array_Type := WP_Taxonomy::Get_Default_Labels;
          Labels         : Array_Type;
          Default_Labels : Array_Type;
-         Taxonomy       : Unbounded_String;
+         Taxonomy       : UString;
       begin
          Set (Nohier_Vs_Hier_Defaults,
               Key   => "menu_name",
@@ -5099,7 +5096,6 @@ is
                            return Class_Taxonomy.Int_Arrays.Vector
 --                            return Int_Arrays.Vector -- ;Int_Array
    is
-      use Ada.Strings.Unbounded;
 --    use Php.Arrays;
       use UStrings;
       use Wp_Common;
@@ -5110,7 +5106,7 @@ is
 
 --        object_id = (int) object_id;
       Ancestors       : Int_Arrays.Vector; -- Array_Type; -- array();
-      Resource_Type_2 : Unbounded_String := +Resource_Type;
+      Resource_Type_2 : UString := +Resource_Type;
    begin
       if Object_Id = 0 then
 --    if Empty (Object_Id) then

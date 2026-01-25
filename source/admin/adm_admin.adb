@@ -7,7 +7,6 @@
 --
 
 with Ada.Numerics.Discrete_Random;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Files;
@@ -54,7 +53,6 @@ is
 
    procedure Run
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Files;
       use Php.HTML;
@@ -239,7 +237,7 @@ is
       declare
          use Adm_Menu;
 
-         Page_Hook : Unbounded_String; -- = null;
+         Page_Hook : UString; -- = null;
          Unused    : Integer;
       begin
          if Isset (XX_GET, "page") then
@@ -298,7 +296,7 @@ is
 
          if Plugin_Page /= "" then
             declare
-               The_Parent : Unbounded_String;
+               The_Parent : UString;
             begin
                if Typenow /= "" then
                   The_Parent := Pagenow & "?post_type=" & Typenow;
@@ -321,12 +319,12 @@ is
                      -- There could be plugin specific params on the URL, so we need
                      -- the whole query string.
                      declare
-                        Query_String : Unbounded_String;
+                        Query_String : UString;
                      begin
                         if As_String (Get (X_SERVER, "QUERY_STRING")) /= "" then
                            Query_String := +As_String (Get (X_SERVER, "QUERY_STRING"));
                         else
-                           Query_String := "page=" & Unbounded_String (Plugin_Page);
+                           Query_String := "page=" & UString (Plugin_Page);
                         end if;
                         Wp_Redirect
                            (Admin_URL ("tools.php?" & (-Query_String)));
@@ -342,7 +340,7 @@ is
          if Page_Hook /= "" then
             Hook_Suffix := Page_Hook;
          elsif Plugin_Page /= "" then
-            Hook_Suffix := Unbounded_String (Plugin_Page);
+            Hook_Suffix := UString (Plugin_Page);
          elsif Pagenow /= "" then
             Hook_Suffix := Pagenow;
          end if;

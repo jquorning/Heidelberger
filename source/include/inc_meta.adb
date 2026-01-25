@@ -10,8 +10,6 @@
 -- @subpackage Meta
 --
 
-with Ada.Strings.Unbounded;
-
 with UStrings;
 with Php.Preg;
 with Php.Strings;
@@ -1778,13 +1776,13 @@ is
                                 Object_Id   : Integer)
                                 return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
+      use UStrings;
       use Class_Posts;
       use Inc_Posts;
       use Inc_Plugins;
 
-      Object_Subtype : Unbounded_String;
+      Object_Subtype : UString;
    begin
       if Object_Type = "post" then
          declare

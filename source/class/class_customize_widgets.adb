@@ -398,10 +398,10 @@ is
 
    procedure Customize_Register (This : in out Wp_Customize_Widgets)
    is
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Inc_Plugins;
       use Inc_L10n;
       use Inc_Widgets;
@@ -496,7 +496,7 @@ is
                Is_Active_Sidebar     : constant Boolean :=
                  Is_Registered_Sidebar and not Is_Inactive_Widgets;
 
-               Section_Id : Unbounded_String;
+               Section_Id : UString;
             begin
                -- Add setting for managing the sidebar's widgets.
                if Is_Registered_Sidebar or Is_Inactive_Widgets then
@@ -730,15 +730,15 @@ is
                             Widget_Id : String)
                             return String
    is
-      use Php;
       use Php.Strings;
+      use UStrings;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
 
       Id_Base : constant String := As_String (Get (Parsed_Widget_Id, "id_base"));
       Number  : constant String := As_String (Get (Parsed_Widget_Id, "number"));
 
-      Setting_Id : Unbounded_String := +Sprintf ("widget_%s", To_List (Id_Base));
+      Setting_Id : UString := +Sprintf ("widget_%s", To_List (Id_Base));
    begin
       if "" /= Number then -- not is_null
          Append (Setting_Id, Sprintf ("[%d]", To_List (Number)));
@@ -845,10 +845,10 @@ is
 
    procedure Enqueue_Scripts (This : in out Wp_Customize_Widgets)
    is
-      use Php;
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Functions;
@@ -922,7 +922,7 @@ is
          --
          Some_Non_Rendered_Areas_Messages : Array_Type;
          Registered_Sidebar_Count : Natural;
-         No_Areas_Shown_Message : Unbounded_String;
+         No_Areas_Shown_Message : UString;
       begin
          Set (Some_Non_Rendered_Areas_Messages, "(1)", -- [1]
               From_String (HTML_Entity_Decode (
@@ -1354,7 +1354,7 @@ is
                                    Key_Id, "id_base") and then
                           Isset_3 (Widget, "params", "[0]", "number");
 
-                        Id_Base : Unbounded_String;
+                        Id_Base : UString;
                      begin
                         if Is_Multi_Widget then
                            Id_Base := +As_String (

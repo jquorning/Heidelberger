@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Echoing;
 with Php.Errors;
 with Php.Files;
@@ -54,7 +52,6 @@ is
 
    procedure Render
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.HTML;
       use Php.Files;
@@ -257,7 +254,6 @@ is
                                    PHP_Version   : String;
                                    MySQL_Version : String)
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Strings;
       use UStrings;
@@ -288,7 +284,7 @@ is
            then PHP_Update_Message_2 & "</p><p><em>" & Annotation & "</em>"
          else PHP_Update_Message_2);
 
-      Message : Unbounded_String;
+      Message : UString;
    begin
       if not MySQL_Compat and not PHP_Compat then
          Message :=

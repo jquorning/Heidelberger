@@ -7,7 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Php.Lists;
@@ -18,9 +17,7 @@ with Wp_Common;
 
 package body Class_Dependencies
 is
-   use Ada.Strings.Unbounded;
    use UStrings;
-   use Php;
    use Wp_Common;
 
    --------------

@@ -8,27 +8,26 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with Lists;
+with UStrings;
 
 package Class_Users
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
    -- By jq
    type Property_Type is
       record
-         Nickname      : Unbounded_String;
-         User_Login    : Unbounded_String;
-         User_Pass     : Unbounded_String;
-         User_Nicename : Unbounded_String;
-         User_Email    : Unbounded_String;
-         User_URL      : Unbounded_String;
-         Display_Name  : Unbounded_String;
+         Nickname      : UStrings.UString;
+         User_Login    : UStrings.UString;
+         User_Pass     : UStrings.UString;
+         User_Nicename : UStrings.UString;
+         User_Email    : UStrings.UString;
+         User_URL      : UStrings.UString;
+         Display_Name  : UStrings.UString;
          User_Level    : Natural;
       end record;
 
@@ -103,7 +102,7 @@ is
          -- @since 2.0.0
          -- @var string
          --
-         Cap_Key : Unbounded_String;
+         Cap_Key : UStrings.UString;
 
          --
          -- The roles the user is part of.
@@ -339,12 +338,12 @@ is
      (Data    => null,
       Id      => 0,
       Caps    => Empty_Array, -- Boolean_Maps.Empty_Map,
-      Cap_Key => Null_Unbounded_String,
+      Cap_Key => UStrings.Null_UString,
       Roles   => Empty_List,
       Allcaps => Empty_Array,
       Site_Id => 0,
       Prop    => (User_Level => 0,
-                  others     => Null_Unbounded_String));
+                  others     => UStrings.Null_UString));
 
 private
    --

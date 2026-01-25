@@ -2,7 +2,6 @@
 --
 --
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Echoing;
@@ -63,11 +62,10 @@ is
                     return AWS.Response.Data
    is
       use Ada.Strings.Fixed;
-      use Ada.Strings.Unbounded;
       use UStrings;
 
       URL     : constant String := AWS.Status.URL (Request);
-      Payload : Unbounded_String;
+      Payload : UString;
    begin
       Web_Server_To_PHP (Status => Request);
 

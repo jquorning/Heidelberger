@@ -176,10 +176,9 @@ is
                          Subject : String)
                          return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Result : Unbounded_String;
+      Result : UString;
       First  : Natural := Subject'First;
    begin
       while First <= Subject'Last loop
@@ -189,8 +188,9 @@ is
             E : Natural;
          begin
             for A in Search.First_Index .. Search.Last_Index loop
-               E := Index (Source  => +Subject (First .. Subject'Last),
-                           Pattern => -Search (A));
+               E := Ada.Strings.Unbounded.Index
+                      (Source  => +Subject (First .. Subject'Last),
+                       Pattern => -Search (A));
                if E /= 0 and then E < B then
                   B := E;
                   I := A;
@@ -198,12 +198,12 @@ is
             end loop;
 
             if E = Natural'Last then
-               Append (Result, Subject);
+               UStrings.Append (Result, Subject);
                exit;
             else
-               Append (Result, Subject (First .. B - 1));
-               Append (Result, Replace (I));
-               First := First + Length (Search (I));
+               UStrings.Append (Result, Subject (First .. B - 1));
+               UStrings.Append (Result, Replace (I));
+               First := First + Ada.Strings.Unbounded.Length (Search (I));
             end if;
          end;
       end loop;
@@ -220,10 +220,9 @@ is
                          Count   : out Natural)
                          return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Result : Unbounded_String;
+      Result : UString;
       First  : Natural := Subject'First;
    begin
       Put_Line ("str_replace:");
@@ -265,7 +264,7 @@ is
                Append (Result, Subject (First .. Found_Position - 1));
                Append (Result, Replace);
                Count := Count + 1;
-               First := Position + Length (Search (Found_Index));
+               First := Position + Ada.Strings.Unbounded.Length (Search (Found_Index));
             end if;
          end;
       end loop;
@@ -608,10 +607,9 @@ is
    function Strip_Slashes (Item : String)
                           return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Result : Unbounded_String;
+      Result : UString;
    begin
       for A of Item loop
          if A = '/' then
@@ -631,9 +629,9 @@ is
                     Args   : List_Type)
                     return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
 
-      Buffer : Unbounded_String;
+      Buffer : UString;
       A : Natural := Format'First;
       B : Natural := Args.First_Index;
    begin
@@ -682,10 +680,9 @@ is
                      Arry      : Array_Type)
                      return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Ret   : Unbounded_String;
+      Ret   : UString;
       First : Boolean := True;
    begin
       for A in Arry.Iterate loop
@@ -721,10 +718,9 @@ is
                      List      : List_Type)
                      return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Buffer : Unbounded_String;
+      Buffer : UString;
       First  : Boolean := True;
    begin
       for A of List loop

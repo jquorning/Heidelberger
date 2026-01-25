@@ -8,7 +8,6 @@ with UStrings;
 
 package Adm_Load_Scripts
 is
-   use UStrings;
 
    ---------
    -- Run --
@@ -16,10 +15,12 @@ is
 
    procedure Run
    is
-      Protocol : Unbounded_String;
-      Load     : Unbounded_String;
+      use UStrings;
+
+      Protocol : UString;
+      Load     : UString;
       Expires_Offset : Natural;
-      Outt     : Unbounded_String;
+      Outt     : UString;
    begin
       Error_Reporting (0);
 

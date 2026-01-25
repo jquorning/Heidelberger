@@ -5,7 +5,6 @@
 -- @subpackage Template
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
@@ -478,7 +477,6 @@ is
                           Force_Reauth : Boolean := False)
                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Strings;
       use UStrings;
@@ -486,7 +484,7 @@ is
       use Inc_Link_Templates;
       use Inc_Plugins;
 
-      Login_URL : Unbounded_String := +Site_URL ("wp-login.php", "login");
+      Login_URL : UString := +Site_URL ("wp-login.php", "login");
    begin
       if not Empty (Redirect) then
          Login_URL :=
@@ -691,7 +689,6 @@ is
    function Wp_Lostpassword_URL (Redirect : String := "")
                                  return String
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Strings;
       use UStrings;
@@ -706,7 +703,7 @@ is
         Build ("action", "lostpassword")
       ));
 
-      Wp_Login_Path : Unbounded_String;
+      Wp_Login_Path : UString;
    begin
       if not Empty (Redirect) then
          Set (Args, "redirect_to", From_String (URL_Encode (Redirect)));
@@ -823,13 +820,12 @@ is
                           Filter : String := "raw")
                           return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
       use UStrings;
       use Inc_L10n;
 
-      Output : Unbounded_String := +"XXX-970";
+      Output : UString := +"XXX-970";
    begin
       Put_Line ("get_bloginfo:");
       Put_Line ("  show  : " & Show);
@@ -997,7 +993,6 @@ is
                                Blog_Id : Integer := 0)
                                return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Wp_Common;
       use Inc_Load;
@@ -1006,7 +1001,7 @@ is
       use Inc_Options;
 
       Switched_Blog : Boolean := False;
-      URL_2 : Unbounded_String := +URL;
+      URL_2 : UString := +URL;
    begin
       if
         Is_Multisite and then
@@ -1019,7 +1014,7 @@ is
 
       declare
          Site_Icon_Id : constant Integer := Get_Option ("site_icon");
-         Size_Data : Unbounded_String;
+         Size_Data : UString;
       begin
          if Site_Icon_Id /= 0 then
             if Size >= 512 then
@@ -1685,7 +1680,6 @@ is
                                Display : Boolean := True)
                                return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Class_Terms;
@@ -1693,7 +1687,7 @@ is
       use Inc_Querys;
 
       Term      : constant Class_Terms.Wp_Term := Get_Queried_Object;
-      Term_Name : Unbounded_String;
+      Term_Name : UString;
    begin
 --    if not Term then
       if Term = Null_Term then
@@ -2849,7 +2843,6 @@ is
                            Translate : Boolean := False)
                            return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Calendar;
       use UStrings;
       use Wp_Common;
@@ -2872,7 +2865,7 @@ is
            Get_Post_Datetime (Post_2, "date", Source);
 
          Time_1   : Time_Type;
-         Time_2   : Unbounded_String;
+         Time_2   : UString;
          Use_Time_2 : Boolean;
       begin
          if False = Datetime then
@@ -2934,7 +2927,6 @@ is
                                Source : String := "local")
                                return Php.Calendar.Date_Time_Immutable
    is
-      use Ada.Strings.Unbounded;
       use Php.Calendar;
       use Php.Strings;
       use UStrings;
@@ -2952,7 +2944,7 @@ is
       declare
          Wp_Timezone_2 : constant Date_Time_Zone := Wp_Timezone;
 
-         Time     : Unbounded_String;
+         Time     : UString;
          Timezone : Date_Time_Zone;
       begin
          if "gmt" = Source then
@@ -4562,7 +4554,6 @@ is
    function Paginate_Links (Args : Array_Type := Empty_Array) -- ""
                             return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
@@ -4686,7 +4677,7 @@ is
          Mid_Size : Integer := As_Integer (Get (Args_2, "mid_size"));
 
          Add_Args   : constant Array_Type := As_Array (Get (Args_2, "add_args"));
-         Page_Links : Unbounded_String; -- Array_Type;
+         Page_Links : UString; -- Array_Type;
          Dots       : Boolean := False;
       begin
          if Total < 2 then
@@ -4718,7 +4709,7 @@ is
                Link_2 : constant String :=
                  Str_Replace ("%#%", Helpers.Image (Current - 1), Link_3);
 
-               Link : Unbounded_String;
+               Link : UString;
             begin
                if Add_Args /= Empty_Array then
 --             if Add_Args then
@@ -4777,7 +4768,7 @@ is
                      Link_2 : constant String :=
                        Str_Replace ("%#%", Helpers.Image (N), Link_3);
 
-                     Link : Unbounded_String;
+                     Link : UString;
                   begin
                      if Add_Args /= Empty_Array then
                         Link := +Add_Query_Arg (Add_Args, Link_2);
@@ -4825,7 +4816,7 @@ is
                Link_2 : constant String :=
                  Str_Replace ("%#%", Helpers.Image (Current + 1), Link_3);
 
-               Link : Unbounded_String;
+               Link : UString;
             begin
                if Add_Args /= Empty_Array then
                   Link := +Add_Query_Arg (Add_Args, Link_2);
@@ -4847,7 +4838,7 @@ is
 
          declare
             Typ : constant String := Get_As_String (Args_2, "type");
-            R   : Unbounded_String;
+            R   : UString;
          begin
             if Typ in "array" then
                return -Page_Links;
@@ -5394,10 +5385,9 @@ is
                                        Typ     : String)
                                        return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Result : Unbounded_String;
+      Result : UString;
    begin
       if Helper = Current then -- 2x (string)
          Result := +" type=""" & Typ & """";
@@ -5422,10 +5412,9 @@ is
                                        Typ     : String)
                                        return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
 
-      Result : Unbounded_String;
+      Result : UString;
    begin
       if Helper = Current then -- 2x (string)
          Result := +" type=""" & Typ & """";

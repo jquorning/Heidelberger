@@ -6,13 +6,11 @@
 -- @since 4.6.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package Class_Locales
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -96,7 +94,8 @@ is
          -- @since 2.1.0
          -- @var string
          --
-         Text_Direction : Unbounded_String := To_Unbounded_String ("ltr");
+         Text_Direction : UStrings.UString :=
+           UStrings.To_UString ("ltr");
 
          --
          -- The thousands separator and decimal point values used for localizing
@@ -113,7 +112,7 @@ is
          -- @since 6.0.0
          -- @var string
          --
-         List_Item_Separator : Unbounded_String;
+         List_Item_Separator : UStrings.UString;
 
       end record;
 

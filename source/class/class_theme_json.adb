@@ -6,8 +6,6 @@
 -- @since 5.8.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Errors;
 with Php.JSON;
@@ -301,11 +299,10 @@ is
    function Get_Blocks_Metadata
             return Array_Type
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Arrays;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Class_Block_Type_Registry;
 
       Registry : constant Wp_Block_Type_Registry :=
@@ -497,10 +494,9 @@ is
                             Origins : List_Type := Empty_List) -- null
                             return String
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
+      use UStrings;
       use List_Vectors;
 
       Origins_2 : List_Type :=
@@ -528,7 +524,7 @@ is
       Setting_Nodes : constant Array_Type :=
         Get_Setting_Nodes (This.Theme_JSON, Blocks_Metadata);
 
-      Stylesheet : Unbounded_String;
+      Stylesheet : UString;
    begin
       if In_List ("variables", Types, True) then
          Append (Stylesheet, This.Get_CSS_Variables (Setting_Nodes, Origins_2));
@@ -586,9 +582,9 @@ is
                                Style_Nodes : Array_Type)
                                return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
 
-      Block_Rules : Unbounded_String;
+      Block_Rules : UString;
    begin
       for Metadata_2 in Style_Nodes.Iterate loop
          declare
@@ -613,7 +609,7 @@ is
                                Block_Metadata : Array_Type)
                                return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Php.Arrays;
       use Php.Lists;
       use Php.Preg;
@@ -621,7 +617,7 @@ is
       use Inc_Functions;
       use Inc_Themes;
 
-      Block_Rules : Unbounded_String;
+      Block_Rules : UString;
       Block_Type  : Class_Block_Type.Wp_Block_Type; -- = null;
    begin
       -- Skip outputting layout styles if explicitly disabled.
@@ -805,8 +801,8 @@ is
                                        end loop;
 
                                        declare
-                                          Format          : Unbounded_String;
-                                          Layout_Selector : Unbounded_String;
+                                          Format          : UString;
+                                          Layout_Selector : UString;
                                        begin
                                           if not Has_Block_Gap_Support then
                                              -- For fallback gap styles, use lower specificity, to
@@ -972,10 +968,10 @@ is
                                 Origins       : List_Type)
                                 return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Inc_Functions;
 
-      Preset_Rules : Unbounded_String;
+      Preset_Rules : UString;
    begin
       for Metadata_2 in Setting_Nodes.Iterate loop
          declare
@@ -1012,10 +1008,10 @@ is
                                Origins : List_Type)
                                return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Inc_Functions;
 
-      Stylesheet : Unbounded_String;
+      Stylesheet : UString;
    begin
       for Metadata_2 in Nodes.Iterate loop
          declare
@@ -1101,7 +1097,7 @@ is
                                     Origins  : List_Type)
                                     return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
 
       Selector_2 : constant String :=
         (if ROOT_BLOCK_SELECTOR = Selector
@@ -1110,7 +1106,7 @@ is
       -- Classes at the global level do not need any CSS prefixed,
       -- and we don't want to increase its specificity.
 
-      Stylesheet : Unbounded_String;
+      Stylesheet : UString;
    begin
       for Preset_Metadata of PRESETS_METADATA loop
          declare
@@ -1240,8 +1236,7 @@ is
                                          Origins         : List_Type)
                                          return Array_Type
    is
-      use Ada.Strings.Unbounded;
---    use Php;
+      use UStrings;
       use Inc_Functions;
 
       Preset_Per_Origin : constant Multi_Type :=
@@ -1258,7 +1253,7 @@ is
             declare
                Preset : Array_Type renames As_Array (Element (Preset_2));
                Slug   : constant String := X_Wp_To_Kebab_Case (As_String (Get (Preset, "slug")));
-               Value  : Unbounded_String;
+               Value  : UString;
             begin
                if
                  Isset (As_Array (Get (Preset_Metadata, "value_key")),
@@ -1426,7 +1421,7 @@ is
                                Selectors  : Array_Type := Empty_Array)
                                return Array_Type
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
 
       Nodes : Array_Type;
    begin
@@ -1454,7 +1449,7 @@ is
                Name : constant String := Key (A);
                Node : Multi_Type      := Element (A);
 
-               Selector : Unbounded_String; -- null
+               Selector : UString; -- null
             begin
                if Isset_2 (Selectors, Name, "selector") then
                   Selector := +As_String (Get (Ref_2 (Selectors, Name, "selector")));
@@ -1574,10 +1569,10 @@ is
    function Update_Separator_Declarations (Declarations : Array_Type)
                                            return Array_Type
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
 
       Declarations_2       : Array_Type := Declarations;
-      Background_Color     : Unbounded_String;
+      Background_Color     : UString;
       Border_Color_Matches : Boolean := False;
       Text_Color_Matches   : Boolean := False;
    begin
@@ -1642,9 +1637,8 @@ is
    function Get_Block_Nodes (Theme_JSON : Array_Type)
                              return Array_Type
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Arrays;
+      use UStrings;
 
       Selectors : constant Array_Type := Get_Blocks_Metadata;
       Nodes     : Array_Type;
@@ -1663,9 +1657,9 @@ is
             Name : constant String := Key (A);
             Node : Multi_Type      := Element (A);
 
-            Selector          : Unbounded_String; -- null
-            Duotone_Selector  : Unbounded_String; -- null
-            Feature_Selectors : Unbounded_String; -- null
+            Selector          : UString; -- null
+            Duotone_Selector  : UString; -- null
+            Feature_Selectors : UString; -- null
          begin
             if Isset_2 (Selectors, Name, "selector") then
                Selector := +As_String (Get (Ref_2 (Selectors, Name, "selector")));
@@ -1765,11 +1759,10 @@ is
                                   Block_Metadata : Array_Type)
                                   return String
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
 
       Node : constant Array_Type :=
@@ -1903,7 +1896,7 @@ is
          end if;
 
          declare
-            Block_Rules : Unbounded_String;
+            Block_Rules : UString;
             Declarations_Duotone : Array_Type;
          begin
             --
@@ -1980,11 +1973,10 @@ is
                Use_Root_Padding : Boolean    := False)       -- null
                                       return Array_Type
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Arrays;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Inc_Functions;
 
       Properties_2 : Array_Type :=
@@ -2063,7 +2055,7 @@ is
             declare
                use Block_Typography;
 
-               Value_2 : Unbounded_String := +As_String (Value);
+               Value_2 : UString := +As_String (Value);
             begin
                -- Calculates fluid typography rules where available.
                if "font-size" = CSS_Property then
@@ -2206,10 +2198,10 @@ is
                                    Block_Metadata : Array_Type)
                                    return String
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Inc_Functions;
 
-      CSS              : Unbounded_String;
+      CSS              : UString;
 
       Settings : constant Array_Type :=
         As_Array (X_Wp_Array_Get (This.Theme_JSON, To_List ("settings")));
@@ -2347,9 +2339,8 @@ is
    procedure Merge (This     : in out Wp_Theme_JSON;
                     Incoming : Wp_Theme_JSON)
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Arrays;
+      use UStrings;
       use Inc_Functions;
 
       Incoming_Data : constant Array_Type := Incoming.Get_Raw_Data;
@@ -2361,15 +2352,15 @@ is
       -- but we don"t want leaf arrays to be merged, so we overwrite it.
       --
       -- For leaf values that are sequential arrays it will use the numeric indexes for
-      -- replacement. We rather replace the existing with the incoming value, if it exists.
-      -- This is the case of spacing.units.
+      -- replacement. We rather replace the existing with the incoming value, if it
+      -- exists. This is the case of spacing.units.
       --
       -- For leaf values that are associative arrays it will merge them as expected.
-      -- This is also not the behavior we want for the current associative arrays (presets).
-      -- We rather replace the existing with the incoming value, if it exists.
-      -- This happens, for example, when we merge data from theme.json upon existing
-      -- theme supports or when we merge anything coming from the same source twice.
-      -- This is the case of color.palette, color.gradients, color.duotone,
+      -- This is also not the behavior we want for the current associative arrays
+      -- (presets). We rather replace the existing with the incoming value, if it
+      -- exists. This happens, for example, when we merge data from theme.json upon
+      -- existing theme supports or when we merge anything coming from the same source
+      -- twice. This is the case of color.palette, color.gradients, color.duotone,
       -- typography.fontSizes, or typography.fontFamilies.
       --
       -- Additionally, for some preset types, we also want to make sure the
@@ -2387,7 +2378,7 @@ is
             declare
                Node    : constant Multi_Type := Element (Node_2);
                -- Replace the spacing.units.
-               Path    : Unbounded_String := +As_String (Get (As_Array (Node), "path"));
+               Path    : UString := +As_String (Get (As_Array (Node), "path"));
                Content : Multi_Type;
             begin
                Append (Path, "spacing");
@@ -2410,7 +2401,7 @@ is
                   begin
                      for Origin of VALID_ORIGINS loop
                         declare
-                           Base_Path : Unbounded_String :=
+                           Base_Path : UString :=
                              +As_String (Get (As_Array (Node), "path"));
                         begin
                            for Leaf in As_Array (Get (Preset, "path")).Iterate loop

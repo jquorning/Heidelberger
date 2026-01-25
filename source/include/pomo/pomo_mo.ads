@@ -6,7 +6,7 @@
 -- @subpackage mo
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 with POMO_Streams;
 with POMO_Translations;
@@ -16,7 +16,6 @@ with POMO_Translations;
 
 package POMO_MO
 is
-   use Ada.Strings.Unbounded;
 
 -- if ( ! class_exists( 'MO', false ) ) :
    type MO is new POMO_Translations.Gettext_Translations with
@@ -34,7 +33,7 @@ is
          -- @var string
          --
          -- private
-         Filename : Unbounded_String;
+         Filename : UStrings.UString;
 
       end record;
 

@@ -2,7 +2,6 @@
 --
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with UStrings;
@@ -10,7 +9,7 @@ with UStrings;
 package body Php.HTML
 is
 
-   Static_Header : Ada.Strings.Unbounded.Unbounded_String;
+   Static_Header : UStrings.UString;
 
    ----------------
    -- Get_Header --

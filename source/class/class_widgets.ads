@@ -6,13 +6,11 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package Class_Widgets
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -36,7 +34,7 @@ is
          -- @since 2.8.0
          -- @var mixed|string
          --
-         Id_Base : Unbounded_String;
+         Id_Base : UStrings.UString;
 
          --
          -- Name for this widget type.

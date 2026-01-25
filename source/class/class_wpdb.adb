@@ -200,8 +200,8 @@ is
    is
       use Inc_Load;
 
-      Charset : Unbounded_String;
-      Collate : Unbounded_String;
+      Charset : UString;
+      Collate : UString;
    begin
       if
 --      Function_Exists ("is_multisite") and then
@@ -242,8 +242,8 @@ is
    is
       use Php.Strings;
 
-      Charset_2 : Unbounded_String := +Charset;
-      Collate_2 : Unbounded_String := +Collate;
+      Charset_2 : UString := +Charset;
+      Collate_2 : UString := +Collate;
    begin
 --      if
 --        (This.Engine = engine_Mysqli and then not
@@ -329,7 +329,7 @@ is
 
                if Set_Charset_Succeeded then
                   declare
-                     Query : Unbounded_String :=
+                     Query : UString :=
                        +String (This.Prepare ("SET NAMES %s", To_List (Charset_2)));
                   begin
                      if not Empty (Collate_2) then
@@ -351,7 +351,7 @@ is
 
                if Set_Charset_Succeeded then
                   declare
-                     Query : Unbounded_String :=
+                     Query : UString :=
                        +String (This.Prepare ("SET NAMES %s", To_List (Charset_2)));
                   begin
                      if not Empty (Collate_2) then
@@ -387,7 +387,7 @@ is
       use Inc_Plugins;
 
       Res       : Array_Type;
-      Modes_Str : Unbounded_String;
+      Modes_Str : UString;
       Modes_2   : Array_Type := Modes;
    begin
       if Modes_2.Is_Empty then
@@ -491,7 +491,7 @@ is
       use Php.Preg;
       use Php.Strings;
 
-      Old_Prefix   : Unbounded_String;
+      Old_Prefix   : UString;
       Unused_Match : List_Type;
    begin
       if 0 = Preg_Match ("|[^a-z0-9_]|i", Prefix, Unused_Match) then
@@ -852,7 +852,7 @@ is
       use Inc_Load;
       use Inc_L10n;
 
-      Escaped : Unbounded_String;
+      Escaped : UString;
    begin
 --    if not Is_Scalar (Item) then
 --       return "";
@@ -1391,7 +1391,7 @@ is
             This.Dbh := Mysqli_Init; -- ();
 
             declare
-               Host    : Unbounded_String := This.Dbhost;
+               Host    : UString := This.Dbhost;
                Port    : constant Natural  := 0;   -- Duration := null;
                Socket  : constant String   := ""; -- Duration := null;
                Is_IPv6 : constant Boolean  := False;
@@ -2007,7 +2007,7 @@ is
    -- Placeholder_Escape --
    ------------------------
 
-   Static_Placeholder : Unbounded_String;
+   Static_Placeholder : UString;
 
    function Placeholder_Escape (This : Wpdb_Class)
                                 return String
@@ -2846,7 +2846,7 @@ is
       --                                      if it couldn't be found. Default null.
       -- @param string               table   The name of the table being checked.
       --
-      Charset : Unbounded_String :=
+      Charset : UString :=
         +Apply_Filters ("pre_get_table_charset", "", -- null,
                         Table);
    begin
@@ -3359,7 +3359,7 @@ is
 --            Function_Exists ("mb_strlen")
             then
                declare
-                  Regex : Unbounded_String := -- +"/
+                  Regex : UString := -- +"/
                    +"(" &
                     "        (?: [\x00-\x7F]                  # single-byte sequences   0xxxxxxx " &
                     "        |   [\xC2-\xDF][\x80-\xBF]       # double-byte sequences   110xxxxx 10xxxxxx " &
@@ -3415,8 +3415,8 @@ is
                   if Kind_Of (Get (Value, "db")) not in Kind_Null then
 --                if not Empty (Value, "db") then
                      declare
-                        Charset            : Unbounded_String;
-                        Connection_Charset : Unbounded_String;
+                        Charset            : UString;
+                        Connection_Charset : UString;
                      begin
                         -- We're going to need to truncate by characters or bytes,
                         -- depending on the length value we have.
@@ -3808,7 +3808,7 @@ is
    begin
       if This.Show_Errors then
          declare
-            Error : Unbounded_String;
+            Error : UString;
          begin
             case This.Engine is
 
@@ -3934,7 +3934,7 @@ is
    is
       use Php.Strings;
 
-      Charset_Collate : Unbounded_String;
+      Charset_Collate : UString;
    begin
       if not Empty (-This.Charset) then
          Charset_Collate := +"DEFAULT CHARACTER SET " & This.Charset;

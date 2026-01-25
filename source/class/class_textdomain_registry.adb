@@ -6,8 +6,6 @@
 -- @since 6.1.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Strings;
 
 with Globals;
@@ -18,7 +16,6 @@ with Inc_Formatting;
 
 package body Class_Textdomain_Registry
 is
-   use Ada.Strings.Unbounded;
    use UStrings;
    use Inc_Formatting;
    use Lists;
@@ -104,13 +101,14 @@ is
                                     return String
    is
       use Php.Strings;
+      use UStrings;
 
       Locations : List_Type := To_List (List => (
          +Globals.WP_LANG_DIR & "/plugins",
          +Globals.WP_LANG_DIR & "/themes"
       ));
-      Mofile : Unbounded_String;
-      Path   : Unbounded_String;
+      Mofile : UString;
+      Path   : UString;
    begin
       if Isset (This.Custom_Paths (Domain)) then
          Locations.Append (+This.Custom_Paths (Domain));

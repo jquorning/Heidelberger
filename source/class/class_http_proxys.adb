@@ -6,9 +6,8 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Globals;
+with UStrings;
 
 package body Class_HTTP_Proxys
 is
@@ -20,7 +19,7 @@ is
    function Is_Enabled (This : Wp_HTTP_Proxy)
                         return Boolean
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
    begin
       return
         Globals.WP_PROXY_HOST /= "" and then

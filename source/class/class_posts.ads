@@ -7,25 +7,21 @@
 --
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
+with UStrings;
 
 package Class_Posts
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-
-   function To_Us (Item : String) return Unbounded_String
-      renames To_Unbounded_String;
 
    type Property_Type is
       record
-         Taxonomy : Unbounded_String;
+         Taxonomy : UStrings.UString;
          Term_Id  : Integer;
       end record;
 
-   Null_Property_Type : constant Property_Type := (Null_Unbounded_String, 0);
+   Null_Property_Type : constant Property_Type := (UStrings.Null_UString, 0);
 
    type Post_Id is new Natural;
 
@@ -59,7 +55,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Author : Integer; -- Unbounded_String;
+         Post_Author : Integer; -- UString;
 
          --
          -- The post's local publication time.
@@ -67,7 +63,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Date : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         Post_Date : UStrings.UString :=
+           UStrings.To_UString ("0000-00-00 00:00:00");
 
          --
          -- The post's GMT publication time.
@@ -75,7 +72,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Date_GMT : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         Post_Date_GMT : UStrings.UString :=
+           UStrings.To_UString ("0000-00-00 00:00:00");
 
          --
          -- The post's content.
@@ -83,7 +81,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Content : Unbounded_String;
+         Post_Content : UStrings.UString;
 
          --
          -- The post's title.
@@ -91,7 +89,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Title : Unbounded_String;
+         Post_Title : UStrings.UString;
 
          --
          -- The post's excerpt.
@@ -99,7 +97,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Excerpt : Unbounded_String;
+         Post_Excerpt : UStrings.UString;
 
          --
          -- The post's status.
@@ -107,7 +105,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Status : Unbounded_String := To_Us ("publish");
+         Post_Status : UStrings.UString :=
+           UStrings.To_UString ("publish");
 
          --
          -- Whether comments are allowed.
@@ -115,7 +114,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Comment_Status : Unbounded_String := To_Us ("open");
+         Comment_Status : UStrings.UString :=
+           UStrings.To_UString ("open");
 
          --
          -- Whether pings are allowed.
@@ -123,7 +123,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Ping_Status : Unbounded_String := To_Us ("open");
+         Ping_Status : UStrings.UString :=
+           UStrings.To_UString ("open");
 
          --
          -- The post's password in plain text.
@@ -131,7 +132,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Password : Unbounded_String;
+         Post_Password : UStrings.UString;
 
          --
          -- The post's slug.
@@ -139,7 +140,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Name : Unbounded_String;
+         Post_Name : UStrings.UString;
 
          --
          -- URLs queued to be pinged.
@@ -147,7 +148,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         To_Ping : Unbounded_String;
+         To_Ping : UStrings.UString;
 
          --
          -- URLs that have been pinged.
@@ -155,7 +156,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Pinged : Unbounded_String;
+         Pinged : UStrings.UString;
 
          --
          -- The post's local modified time.
@@ -163,7 +164,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Modified : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         Post_Modified : UStrings.UString :=
+           UStrings.To_UString ("0000-00-00 00:00:00");
 
          --
          -- The post's GMT modified time.
@@ -171,7 +173,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Modified_GMT : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+         Post_Modified_GMT : UStrings.UString :=
+           UStrings.To_UString ("0000-00-00 00:00:00");
 
          --
          -- A utility DB field for post content.
@@ -179,7 +182,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Content_Filtered : Unbounded_String;
+         Post_Content_Filtered : UStrings.UString;
 
          --
          -- ID of a post's parent post.
@@ -196,7 +199,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         GUID : Unbounded_String;
+         GUID : UStrings.UString;
 
          --
          -- A field used for ordering posts.
@@ -212,7 +215,8 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Type : Unbounded_String := To_Us ("post");
+         Post_Type : UStrings.UString :=
+           UStrings.To_UString ("post");
 
          --
          -- An attachment's mime type.
@@ -220,7 +224,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Mime_Type : Unbounded_String;
+         Post_Mime_Type : UStrings.UString;
 
          --
          -- Cached comment count.
@@ -230,7 +234,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Comment_Count : Unbounded_String;
+         Comment_Count : UStrings.UString;
 
          --
          -- Stores the post object's sanitization level.
@@ -240,7 +244,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Filter : Unbounded_String;
+         Filter : UStrings.UString;
 
          -- Added by jq
          Props : Property_Type;
@@ -324,7 +328,7 @@ is
       Post_Parent => 0,
       Menu_Order  => 0,
       Props       => Null_Property_Type,
-      others      => Null_Unbounded_String);
+      others      => UStrings.Null_UString);
 
 -- type Wp_Post_Array is array (Positive range <>) of Wp_Post;
 

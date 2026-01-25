@@ -7,16 +7,14 @@
 -- @subpackage Dependencies
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_Dependencies;
 
 package Class_Scripts
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -37,7 +35,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Base_URL : Unbounded_String;
+        Base_URL : UStrings.UString;
 
         --
         -- URL of the content directory.
@@ -45,7 +43,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Content_URL : Unbounded_String;
+        Content_URL : UStrings.UString;
 
         --
         -- Default version string for scripts.
@@ -53,7 +51,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Default_Version : Unbounded_String;
+        Default_Version : UStrings.UString;
 
         --
         -- Holds handles of scripts which are enqueued in footer.
@@ -69,7 +67,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Concat : Unbounded_String;
+        Concat : UStrings.UString;
 
         --
         -- Holds a string which contains script handles and their version.
@@ -78,7 +76,7 @@ is
         -- @deprecated 3.4.0
         -- @var string
         --
-        Concat_Version : Unbounded_String;
+        Concat_Version : UStrings.UString;
 
         --
         -- Whether to perform concatenation.
@@ -95,7 +93,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Print_HTML : Unbounded_String;
+        Print_HTML : UStrings.UString;
 
         --
         -- Holds inline code if concatenation is enabled.
@@ -103,7 +101,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Print_Code : Unbounded_String;
+        Print_Code : UStrings.UString;
 
         --
         -- Holds a list of script handles which are not in the default directory
@@ -114,7 +112,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Ext_Handles : Unbounded_String;
+        Ext_Handles : UStrings.UString;
 
         --
         -- Holds a string which contains handles and versions of scripts which
@@ -125,7 +123,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Ext_Version : Unbounded_String;
+        Ext_Version : UStrings.UString;
 
         --
         -- List of default directories.
@@ -145,7 +143,7 @@ is
         -- @var string
         --
         -- private
-        Type_Attr : Unbounded_String;
+        Type_Attr : UStrings.UString;
 
       end record;
 

@@ -136,9 +136,9 @@ is
       Field_2 : String :=
         (if "ID" = Field then "id" else Field);
 
-      Value_2  : Unbounded_String := +Value'Image;
+      Value_2  : UString := +Value'Image;
       User_Id  : Integer;
-      DB_Field : Unbounded_String;
+      DB_Field : UString;
       Unused_Found : Boolean;
    begin
       if "id" = Field_2 then
@@ -235,9 +235,9 @@ is
       Field_2 : String :=
         (if "ID" = Field then "id" else Field);
 
-      Value_2  : Unbounded_String := +Value;
+      Value_2  : UString := +Value;
       User_Id  : Integer;
-      DB_Field : Unbounded_String;
+      DB_Field : UString;
       Unused_Found : Boolean;
    begin
       if "id" = Field_2 then

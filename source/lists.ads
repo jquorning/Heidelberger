@@ -3,16 +3,17 @@
 --
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
+
+with UStrings;
 
 package Lists is
 
-   subtype Item_Type is Ada.Strings.Unbounded.Unbounded_String;
+   subtype Item_Type is UStrings.UString;
 
    package List_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Item_Type,
-                                  "="          => Ada.Strings.Unbounded."=");
+                                  "="          => UStrings."=");
 
    subtype List_Type is List_Vectors.Vector;
 

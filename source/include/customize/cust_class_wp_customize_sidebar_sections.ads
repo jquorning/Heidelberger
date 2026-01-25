@@ -6,16 +6,14 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Class_Customize_Sections;
 limited with Class_Customize_Managers;
 
 package Cust_Class_Wp_Customize_Sidebar_Sections
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -34,7 +32,8 @@ is
          -- @since 4.1.0
          -- @var string
          --
-         Typ : Unbounded_String := To_Unbounded_String ("sidebar");
+         Typ : UStrings.UString :=
+           UStrings.To_UString ("sidebar");
 
          --
          -- Unique identifier.
@@ -42,7 +41,7 @@ is
          -- @since 4.1.0
          -- @var string
          --
-         Sidebar_Id : Unbounded_String;
+         Sidebar_Id : UStrings.UString;
       end record;
 
    overriding

@@ -6,16 +6,14 @@
 -- @since 3.0.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_Terms;
 
 package Inc_Nav_Menus
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -167,9 +165,9 @@ is
    -- Added nby jq
    type Menu_Item is
       record
-         Post_Status : Unbounded_String;
+         Post_Status : UStrings.UString;
          X_Invalid   : Boolean;
-         DB_Id       : Unbounded_String;
+         DB_Id       : UStrings.UString;
       end record;
 
    type Menu_Item_Array is array (Positive range <>) of Menu_Item;

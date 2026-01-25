@@ -15,8 +15,6 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
@@ -191,14 +189,13 @@ is
    begin
       for A in Vendor_Scripts.Iterate loop
          declare
-            use Ada.Strings.Unbounded;
 --          use Array_Maps;
 
             Handle       : constant String := Key     (A);
             Dependencies : constant String := As_String (Get (Vendor_Scripts, Handle));
             -- Element (A);
-            Path    : Unbounded_String;
-            Version : Unbounded_String;
+            Path    : UString;
+            Version : UString;
          begin
             -- if ( is_string( dependencies ) ) then
             --         handle       = dependencies;
@@ -847,7 +844,6 @@ is
 
    procedure Wp_Default_Scripts (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use Ada.Strings.Unbounded;
       use Binder;
       use UStrings;
       use Inc_Formatting;
@@ -860,7 +856,7 @@ is
 
       Suffix      : constant String := Wp_Scripts_Get_Suffix;
       Dev_Suffix  : constant String := Wp_Scripts_Get_Suffix ("dev");
-      GuessURL    : Unbounded_String := +Site_URL;
+      GuessURL    : UString := +Site_URL;
       Guessed_URL : Boolean := False;
    begin
       if GuessURL = "" then
@@ -1743,7 +1739,6 @@ is
 
    procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles)
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -1751,11 +1746,11 @@ is
       use Inc_Link_Templates;
 
 --         global editor_styles;
-      GuessURL           : Unbounded_String;
-      Open_Sans_Font_URL : Unbounded_String;
-      Fonts_URL          : Unbounded_String;
-      Font_Family        : Unbounded_String;
---    Suffix             : Unbounded_String;
+      GuessURL           : UString;
+      Open_Sans_Font_URL : UString;
+      Fonts_URL          : UString;
+      Font_Family        : UString;
+--    Suffix             : UString;
    begin
       -- -- Include an unmodified wp_version.
       -- require ABSPATH . WPINC . "/version.php";
@@ -1789,8 +1784,8 @@ is
       --
       if "off" /= X_X ("on", "Open Sans font: on or off") then
          declare
-            Subsets : Unbounded_String := +"latin,latin-ext";
-            Subset  : Unbounded_String;
+            Subsets : UString := +"latin,latin-ext";
+            Subset  : UString;
          begin
             --
             -- translators: To add an additional Open Sans character subset specific
@@ -2633,7 +2628,6 @@ is
 
    procedure X_Print_Styles
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Echoing;
@@ -2659,7 +2653,7 @@ is
             Ver : constant String := -Wp_Styles.Default_Version;
 
             Concat_2     : constant Array_Type := Str_Split (Concat, 128);
-            Concatenated : Unbounded_String := +"";
+            Concatenated : UString := +"";
          begin
             for A in Concat_2.Iterate loop
                declare
@@ -2752,7 +2746,6 @@ is
 
    procedure Wp_Common_Block_Scripts_And_Styles
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Files;
@@ -2784,7 +2777,7 @@ is
                for Path of Files loop
                   declare
                      Block_Name : constant String := Basename (Dirname (-Path));
-                     Path_2     : Unbounded_String := Path;
+                     Path_2     : UString := Path;
                      Unused     : Boolean;
                   begin
                      if
@@ -3412,7 +3405,6 @@ is
                                                Stylesheet_URL : String)
                                                return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Files;
@@ -3420,7 +3412,7 @@ is
       use Php.Strings;
       use Inc_Formatting;
 
-      CSS_2 : Unbounded_String := +CSS;
+      CSS_2 : UString := +CSS;
 
       Src_Results     : Array_Type;
       Src_Results_1   : Array_Type;
@@ -3533,7 +3525,6 @@ is
 
    procedure Wp_Enqueue_Stored_Styles (Options : Array_Type := Empty_Array)
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php.Lists;
       use Php.Strings;
@@ -3559,8 +3550,8 @@ is
 
       declare
          Core_Styles_Keys         : constant List_Type := To_List ("block-supports");
-         Compiled_Core_Stylesheet : Unbounded_String;
-         Style_Tag_Id             : Unbounded_String := +"core";
+         Compiled_Core_Stylesheet : UString;
+         Style_Tag_Id             : UString := +"core";
          -- Adds comment if code is prettified to identify core styles sections in
          -- debugging.
          Should_Prettify : constant Boolean :=

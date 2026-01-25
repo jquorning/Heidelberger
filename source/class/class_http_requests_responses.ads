@@ -6,10 +6,9 @@
 -- @since 4.6.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_HTTP_Responses;
 
@@ -46,7 +45,7 @@ is
         -- @var string|null
         --
         -- protected
-        Filename : Ada.Strings.Unbounded.Unbounded_String;
+        Filename : UStrings.UString;
 
      end record;
 

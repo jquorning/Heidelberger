@@ -6,16 +6,12 @@
 -- @since 4.5.0
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 package Class_Sites
 is
-   use Ada.Strings.Unbounded;
 
    procedure Dummy;
-
-   function To_Us (Item : String) return Unbounded_String
-      renames To_Unbounded_String;
 
 --
 -- Core class used for interacting with a multisite site.
@@ -47,7 +43,7 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Blog_Id : Integer; -- Unbounded_String;
+        Blog_Id : Integer; -- UString;
 
         --
         -- Domain of the site.
@@ -55,7 +51,7 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Domain : Unbounded_String;
+        Domain : UStrings.UString;
 
         --
         -- Path of the site.
@@ -63,7 +59,7 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Path : Unbounded_String;
+        Path : UStrings.UString;
 
         --
         -- The ID of the site"s parent network.
@@ -76,7 +72,8 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Site_Id : Unbounded_String := To_Us ("0");
+        Site_Id : UStrings.UString :=
+          UStrings.To_UString ("0");
 
         --
         -- The date and time on which the site was created or registered.
@@ -84,7 +81,8 @@ is
         -- @since 4.5.0
         -- @var string Date in MySQL"s datetime format.
         --
-        Registered : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+        Registered : UStrings.UString :=
+          UStrings.To_UString ("0000-00-00 00:00:00");
 
         --
         -- The date and time on which site settings were last updated.
@@ -92,7 +90,8 @@ is
         -- @since 4.5.0
         -- @var string Date in MySQL"s datetime format.
         --
-        Last_Updated : Unbounded_String := To_Us ("0000-00-00 00:00:00");
+        Last_Updated : UStrings.UString :=
+          UStrings.To_UString ("0000-00-00 00:00:00");
 
         --
         -- Whether the site should be treated as public.
@@ -102,7 +101,8 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Xx : Unbounded_String := To_Us ("1");
+        Xx : UStrings.UString :=
+          UStrings.To_UString ("1");
 
         --
         -- Whether the site should be treated as archived.
@@ -112,7 +112,8 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Archived : Unbounded_String := To_Us ("0");
+        Archived : UStrings.UString :=
+          UStrings.To_UString ("0");
 
         --
         -- Whether the site should be treated as mature.
@@ -125,7 +126,8 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Mature : Unbounded_String := To_Us ("0");
+        Mature : UStrings.UString :=
+          UStrings.To_UString ("0");
 
         --
         -- Whether the site should be treated as spam.
@@ -135,7 +137,8 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Spam : Unbounded_String := To_Us ("0");
+        Spam : UStrings.UString :=
+          UStrings.To_UString ("0");
 
         --
         -- Whether the site should be treated as deleted.
@@ -145,7 +148,8 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Deleted : Unbounded_String := To_Us ("0");
+        Deleted : UStrings.UString :=
+          UStrings.To_UString ("0");
 
         --
         -- The language pack associated with this site.
@@ -155,10 +159,13 @@ is
         -- @since 4.5.0
         -- @var string
         --
-        Lang_Id : Unbounded_String := To_Us ("0");
+        Lang_Id : UStrings.UString :=
+          UStrings.To_UString ("0");
 
       end record;
 
-   Null_Site : constant Wp_Site := (Blog_Id => 0, others => Null_Unbounded_String);
+   Null_Site : constant Wp_Site :=
+     (Blog_Id => 0,
+      others  => UStrings.Null_UString);
 
 end Class_Sites;

@@ -6,15 +6,13 @@
 -- @since 4.0.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 limited with Class_Customize_Managers;
 
 package Class_Customize_Panels
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -51,7 +49,7 @@ is
          -- @since 4.0.0
          -- @var string
          --
-         Id : Unbounded_String;
+         Id : UStrings.UString;
 
          --
          -- Priority of the panel, defining the display order of panels and sections.
@@ -83,7 +81,7 @@ is
          -- @since 4.0.0
          -- @var string
          --
-         Title : Unbounded_String;
+         Title : UStrings.UString;
 
          --
          -- Description to show in the UI.
@@ -386,8 +384,8 @@ is
    Null_Panel : constant Wp_Customize_Panel :=
      (Instance_Number => 0,
       Manager         => null,
-      Id              => Null_Unbounded_String,
-      Title           => Null_Unbounded_String,
+      Id              => UStrings.Null_UString,
+      Title           => UStrings.Null_UString,
       Active_Callback => null,
       Sections        => Empty_Array);
 

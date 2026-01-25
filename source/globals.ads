@@ -2,9 +2,8 @@
 --
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Adi_Class_Wp_Screens;
 
@@ -16,7 +15,6 @@ with Class_Taxonomy;
 
 package Globals
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    procedure Dummy;
@@ -25,18 +23,18 @@ is
 
    X_DIR_X         : constant String := "";
    ABSPATH         : constant String := "";
-   WPINC           : Unbounded_String;
-   WP_PLUGIN_DIR   : Unbounded_String;
-   WPMU_PLUGIN_DIR : Unbounded_String;
-   WP_CONTENT_DIR  : Unbounded_String;
+   WPINC           : UStrings.UString;
+   WP_PLUGIN_DIR   : UStrings.UString;
+   WPMU_PLUGIN_DIR : UStrings.UString;
+   WP_CONTENT_DIR  : UStrings.UString;
    WP_LANG_DIR     : constant String := "";
-   WP_TEMP_DIR     : Unbounded_String;
+   WP_TEMP_DIR     : UStrings.UString;
 
-   WP_CONTENT_URL  : Unbounded_String;
-   WP_PLUGIN_URL   : Unbounded_String;
-   PLUGINDIR       : Unbounded_String;
-   WPMU_PLUGIN_URL : Unbounded_String;
-   MUPLUGINDIR     : Unbounded_String;
+   WP_CONTENT_URL  : UStrings.UString;
+   WP_PLUGIN_URL   : UStrings.UString;
+   PLUGINDIR       : UStrings.UString;
+   WPMU_PLUGIN_URL : UStrings.UString;
+   MUPLUGINDIR     : UStrings.UString;
 
    AUTOSAVE_INTERVAL    : Natural;
    EMPTY_TRASH_DAYS     : Natural;
@@ -49,9 +47,9 @@ is
    COMPRESS_CSS         : Boolean;
    MULTISITE            : constant Boolean := False;
 
-   TEMPLATEPATH     : Unbounded_String;
-   STYLESHEETPATH   : Unbounded_String;
-   WP_DEFAULT_THEME : Unbounded_String;
+   TEMPLATEPATH     : UStrings.UString;
+   STYLESHEETPATH   : UStrings.UString;
+   WP_DEFAULT_THEME : UStrings.UString;
 
    MINUTE_IN_SECONDS : constant Natural := 60;
    HOUR_IN_SECONDS   : constant Natural := 60 * MINUTE_IN_SECONDS;
@@ -59,19 +57,19 @@ is
    MONTH_IN_SECONDS  : constant Natural := 30 * DAY_IN_SECONDS;
    YEAR_IN_SECONDS   : constant Natural := 365 * DAY_IN_SECONDS;
 
-   COOKIE_DOMAIN        : Unbounded_String;
-   COOKIEHASH           : Unbounded_String;
-   USER_COOKIE          : Unbounded_String;
-   PASS_COOKIE          : Unbounded_String;
-   AUTH_COOKIE          : Unbounded_String;
-   SECURE_AUTH_COOKIE   : Unbounded_String;
-   LOGGED_IN_COOKIE     : Unbounded_String;
-   TEST_COOKIE          : Unbounded_String;
-   COOKIEPATH           : Unbounded_String;
-   SITECOOKIEPATH       : Unbounded_String;
-   ADMIN_COOKIE_PATH    : Unbounded_String;
-   PLUGINS_COOKIE_PATH  : Unbounded_String;
-   RECOVERY_MODE_COOKIE : Unbounded_String;
+   COOKIE_DOMAIN        : UStrings.UString;
+   COOKIEHASH           : UStrings.UString;
+   USER_COOKIE          : UStrings.UString;
+   PASS_COOKIE          : UStrings.UString;
+   AUTH_COOKIE          : UStrings.UString;
+   SECURE_AUTH_COOKIE   : UStrings.UString;
+   LOGGED_IN_COOKIE     : UStrings.UString;
+   TEST_COOKIE          : UStrings.UString;
+   COOKIEPATH           : UStrings.UString;
+   SITECOOKIEPATH       : UStrings.UString;
+   ADMIN_COOKIE_PATH    : UStrings.UString;
+   PLUGINS_COOKIE_PATH  : UStrings.UString;
+   RECOVERY_MODE_COOKIE : UStrings.UString;
 
    RELOCATE_DEF : constant Boolean := False;
    RELOCATE     : constant Boolean := False;
@@ -112,10 +110,10 @@ is
    WP_INSTALLING_NETWORK : Boolean := False;
 
    WP_HTTP_BLOCK_EXTERNAL : Boolean := False;
-   WP_ACCESSIBLE_HOSTS : Unbounded_String;
+   WP_ACCESSIBLE_HOSTS : UStrings.UString;
 
-   WP_PROXY_HOST : Unbounded_String;
-   WP_PROXY_PORT : Unbounded_String;
+   WP_PROXY_HOST : UStrings.UString;
+   WP_PROXY_PORT : UStrings.UString;
 
    WP_HOME_DEF : constant Boolean := False;
    WP_HOME     : constant String  := "";
@@ -125,25 +123,25 @@ is
 
    Wp_Importers : Array_Type;
 
-   Typenow     : Unbounded_String;
-   Taxnow      : Unbounded_String;
-   Pagenow     : Unbounded_String;
-   Hook_Suffix : Unbounded_String;
+   Typenow     : UStrings.UString;
+   Taxnow      : UStrings.UString;
+   Pagenow     : UStrings.UString;
+   Hook_Suffix : UStrings.UString;
 
-   Title         : Unbounded_String;
-   Post_New_File : Unbounded_String;
+   Title         : UStrings.UString;
+   Post_New_File : UStrings.UString;
 
    Current_Screen     : Adi_Class_Wp_Screens.Wp_Screen;
    Wp_Locale          : Class_Locales.Wp_Locale;
    Total_Update_Count : Natural;
-   Update_Title       : Unbounded_String;
+   Update_Title       : UStrings.UString;
 
-   Post_Type        : Unbounded_String;
+   Post_Type        : UStrings.UString;
    Post_Type_Object : Class_Post_Type.Wp_Post_Type;
    Post             : Class_Posts.Wp_Post;
 
-   Action   : Unbounded_String;
-   Taxonomy : Unbounded_String;
+   Action   : UStrings.UString;
+   Taxonomy : UStrings.UString;
    Tax      : Class_Taxonomy.Wp_Taxonomy; -- := Class_Taxonomy.X_Construct;
 
    KB_IN_BYTES : constant := 1024;

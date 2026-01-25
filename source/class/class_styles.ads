@@ -6,15 +6,14 @@
 -- @package WordPress
 -- @subpackage Dependencies
 --
-with Ada.Strings.Unbounded;
 
 with Lists;
+with UStrings;
 
 with Class_Dependencies;
 
 package Class_Styles
 is
-   use Ada.Strings.Unbounded;
    use Lists;
 
    --
@@ -34,7 +33,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Base_URL : Unbounded_String;
+        Base_URL : UStrings.UString;
 
         --
         -- URL of the content directory.
@@ -42,7 +41,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Content_URL : Unbounded_String;
+        Content_URL : UStrings.UString;
 
         --
         -- Default version string for stylesheets.
@@ -50,7 +49,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Default_Version : Unbounded_String;
+        Default_Version : UStrings.UString;
 
         --
         -- The current text direction.
@@ -58,7 +57,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Text_Direction : Unbounded_String := To_Unbounded_String ("ltr");
+        Text_Direction : UStrings.UString := UStrings.To_UString ("ltr");
 
         --
         -- Holds a list of style handles which will be concatenated.
@@ -66,7 +65,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Concat : Unbounded_String;
+        Concat : UStrings.UString;
 
         --
         -- Holds a string which contains style handles and their version.
@@ -75,7 +74,7 @@ is
         -- @deprecated 3.4.0
         -- @var string
         --
-        Concat_Version : Unbounded_String;
+        Concat_Version : UStrings.UString;
 
         --
         -- Whether to perform concatenation.
@@ -92,7 +91,7 @@ is
         -- @since 2.8.0
         -- @var string
         --
-        Print_HTML : Unbounded_String;
+        Print_HTML : UStrings.UString;
 
         --
         -- Holds inline styles if concatenation is enabled.
@@ -100,7 +99,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Print_Code : Unbounded_String;
+        Print_Code : UStrings.UString;
 
         --
         -- List of default directories.
@@ -120,7 +119,7 @@ is
         -- @var string
         --
         -- private
-        Type_Attr : Unbounded_String;
+        Type_Attr : UStrings.UString;
 
       end record;
 

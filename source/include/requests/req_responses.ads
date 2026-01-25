@@ -5,14 +5,12 @@
 -- @package Requests
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 package Req_Responses
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -29,14 +27,14 @@ is
         --
         -- @var string
         --
-        Bodi : Unbounded_String;
+        Bodi : UStrings.UString;
 
         --
         -- Raw HTTP data from the transport
         --
         -- @var string
         --
-        Raw : Unbounded_String;
+        Raw : UStrings.UString;
 
         --
         -- Headers, as an associative array
@@ -57,7 +55,7 @@ is
         --
         -- @var float|boolean
         --
-        Protocol_Version : Unbounded_String; --  = false;
+        Protocol_Version : UStrings.UString; --  = false;
 
         --
         -- Whether the request succeeded or not
@@ -78,7 +76,7 @@ is
         --
         -- @var string
         --
-        URL : Unbounded_String;
+        URL : UStrings.UString;
 
         --
         -- Previous requests (from redirects)

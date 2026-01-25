@@ -7,7 +7,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
 
 with Php.Lists;
@@ -53,7 +52,6 @@ is
 
    procedure Render
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use Binder;
       use UStrings;
@@ -69,7 +67,7 @@ is
       use Inc_Pluggables;
       use Inc_Posts;
 
-      Post_New_File : Unbounded_String;
+      Post_New_File : UString;
       pragma Unreferenced (Post_New_File);
    begin
       Parent_File   := +Slug_Type'("edit.php");
@@ -112,8 +110,8 @@ is
             use Inc_Link_Templates;
             use Inc_Plugins;
 
-            Action   : Unbounded_String;
-            Sendback : Unbounded_String;
+            Action   : UString;
+            Sendback : UString;
          begin
             if Id /= 0 then
                Post := Inc_Posts.Get_Post (Id);
@@ -173,7 +171,7 @@ is
                   declare
                      -- Check nonce and capabilities.
                      Nonce     : constant String  := As_String (Get (X_REQUEST, "_wpnonce"));
-                     Error_Msg : Unbounded_String; -- Boolean := false;
+                     Error_Msg : UString; -- Boolean := false;
                   begin
                      -- For output of the Quick Draft dashboard widget.
    --                require_once ABSPATH . "wp-admin/includes/dashboard.php";

@@ -6,16 +6,14 @@
 -- @since 3.1.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 with Adi_Class_Wp_Screens;
 
 package Adi_Class_Wp_List_Tables
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -24,7 +22,7 @@ is
          Columns  : Array_Type;
          Hidden   : Array_Type;
          Sortable : Array_Type;
-         Primary  : Unbounded_String;
+         Primary  : UStrings.UString;
       end record;
 
    --
@@ -86,7 +84,7 @@ is
          -- @since 3.1.0
          -- @var string
          --
-         X_Pagination : Unbounded_String;
+         X_Pagination : UStrings.UString;
 
          --
          -- The view switcher modes.

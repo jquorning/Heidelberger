@@ -6,13 +6,11 @@
 -- @since 4.7.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Lists;
+with UStrings;
 
 package Class_Locale_Switchers
 is
-   use Ada.Strings.Unbounded;
    use Lists;
 
    --
@@ -39,7 +37,7 @@ is
          -- @var string
          --
          -- private
-         Original_Locale : Unbounded_String;
+         Original_Locale : UStrings.UString;
 
          --
          -- Holds all available languages.

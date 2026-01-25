@@ -6,15 +6,13 @@
 -- @since 6.1.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Class_Theme_JSON;
 
 package Class_Theme_JSON_Data
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -39,7 +37,7 @@ is
          -- @var string
          --
          -- private
-         Origin : Unbounded_String;
+         Origin : UStrings.UString;
 
       end record;
 

@@ -9,13 +9,12 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Lists;
+with UStrings;
 
 package Class_Dependency
 is
-   use Ada.Strings.Unbounded;
    use Lists;
 
    package String_Maps is new
@@ -40,7 +39,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Handle : Unbounded_String;
+        Handle : UStrings.UString;
 
         --
         -- The handle source.
@@ -48,7 +47,7 @@ is
         -- @since 2.6.0
         -- @var string
         --
-        Src : Unbounded_String;
+        Src : UStrings.UString;
 
         --
         -- An array of handle dependencies.
@@ -66,7 +65,7 @@ is
         -- @since 2.6.0
         -- @var bool|string
         --
-        Ver : Unbounded_String; --  = false;
+        Ver : UStrings.UString; --  = false;
 
         --
         -- Additional arguments for the handle.
@@ -90,7 +89,7 @@ is
         -- @since 5.0.0
         -- @var string
         --
-        Textdomain : Unbounded_String;
+        Textdomain : UStrings.UString;
 
         --
         -- Translation path set for this dependency.
@@ -98,7 +97,7 @@ is
         -- @since 5.0.0
         -- @var string
         --
-        Translations_Path : Unbounded_String;
+        Translations_Path : UStrings.UString;
 
       end record;
 

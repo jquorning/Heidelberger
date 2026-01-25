@@ -6,8 +6,6 @@
 -- @subpackage Users
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Strings;
 
 with Binder;
@@ -1421,7 +1419,6 @@ is
    function Wp_Update_User_Counts (Network_Id : Integer := 0) -- null
                                    return Boolean
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Globals;
@@ -1446,7 +1443,7 @@ is
       declare
          Users : constant String := -WpDB.Users;
 
-         Query : Unbounded_String :=
+         Query : UString :=
            +"SELECT COUNT(ID) as c FROM " & Users;
       begin
          if Is_Multisite then

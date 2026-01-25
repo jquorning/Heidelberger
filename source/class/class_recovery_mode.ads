@@ -5,11 +5,10 @@
 -- @since 5.2.0
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 package Class_Recovery_Mode
 is
-   use Ada.Strings.Unbounded;
 
    EXIT_ACTION : constant String := "exit_recovery_mode";
 
@@ -78,7 +77,7 @@ is
          -- @var string
          --
 --        private
-         Session_Id : Unbounded_String;
+         Session_Id : UStrings.UString;
 
       end record;
 
@@ -95,11 +94,11 @@ is
    Default_Recovery_Mode : constant Wp_Recovery_Mode :=
      (Is_Initialized => False,
       Is_Active      => False,
-      Session_Id     => Null_Unbounded_String);
+      Session_Id     => UStrings.Null_UString);
 
    Null_Recovery_Mode : constant Wp_Recovery_Mode :=
      (Is_Initialized => False,
       Is_Active      => False,
-      Session_Id     => Null_Unbounded_String);
+      Session_Id     => UStrings.Null_UString);
 
 end Class_Recovery_Mode;

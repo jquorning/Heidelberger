@@ -7,7 +7,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with UStrings;
 with Php.Echoing;
@@ -330,10 +329,9 @@ is
    function Wp_Dropdown_Categories (Args : Array_Type := Empty_Array) -- := "")
                                     return String
    is
-      use Ada.Strings.Unbounded;
-      use Php;
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -366,10 +364,10 @@ is
 
       Parsed_Args       : Array_Type;
       Get_Terms_Args    : Array_Type;
-      Option_None_Value : Unbounded_String;
+      Option_None_Value : UString;
       Tab_Index         : Integer;
-      Tab_Index_Attribute : Unbounded_String;
-      Output            : Unbounded_String;
+      Tab_Index_Attribute : UString;
+      Output            : UString;
    begin
       Set (Defaults, "selected",
            From_Integer (if Inc_Querys.Is_Category
@@ -1504,7 +1502,7 @@ is
                                    Args     : Array_Type := Empty_Array)
                                    return String -- List_Type
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Class_Taxonomy;
       use Class_Terms;
       use Inc_Formatting;
@@ -1512,7 +1510,7 @@ is
       use Inc_Load;
       use Inc_Taxonomys;
 
-      List : Unbounded_String;
+      List : UString;
       Term : constant Wp_Term := Get_Term (Term_Id, Taxonomy);
    begin
       if Is_Wp_Error (Term) then

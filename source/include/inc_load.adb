@@ -4,8 +4,6 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Errors;
 with Php.Files;
@@ -308,7 +306,6 @@ is
 
    procedure Wp_Maintenance
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Inc_Functions;
       use Inc_L10n;
@@ -602,13 +599,12 @@ is
 
    procedure Wp_Set_Wpdb_Vars
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 --    global (Wpdb);
 --    global (Table_Prefix);
-      Prefix : Unbounded_String;
+      Prefix : UString;
    begin
       -- if not Empty (Wpdb.error) then
       --    Dead_DB; -- ()
@@ -1340,9 +1336,7 @@ is
 
    procedure Wp_Load_Translations_Early
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
-      use Php;
       use Php.Files;
       use Php.Lists;
       use Inc_L10n;

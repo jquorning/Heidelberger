@@ -975,7 +975,6 @@ is
                Icon          : Boolean := False)
                return Image_Src_Type
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -990,7 +989,7 @@ is
       if Image.Source = "" then
 --    if not Image then
          declare
-            Src : Unbounded_String; -- Boolean := False;
+            Src : UString; -- Boolean := False;
          begin
             if Icon then
                Src := +Wp_MIME_Type_Icon (Attachment_Id);

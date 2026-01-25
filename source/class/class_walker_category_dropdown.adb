@@ -6,22 +6,25 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package body Class_Walker_Category_Dropdown
 is
 
+   -----------------
+   -- X_Construct --
+   -----------------
+
    function X_Construct
             return Walker_CategoryDropdown
    is
-      use Ada.Strings.Unbounded;
       use Arrays;
+      use UStrings;
 
       This : Walker_CategoryDropdown;
    begin
-      This.Tree_Type := To_Unbounded_String ("category");
+      This.Tree_Type := To_UString ("category");
       This.DB_Fields := To_Array ((
                 Build ("parent", "parent"),
                 Build ("id",     "term_id")

@@ -8,17 +8,16 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
+with UStrings;
 
 package Adm_Menu
 is
-   use Ada.Strings.Unbounded;
 
    X_Wp_Real_Parent_File : Arrays.Array_Type;
 
-   type Unbounded_Slug is new Unbounded_String;
+   type Unbounded_Slug is new UStrings.UString;
 
    --
    -- Constructs the admin menu.
@@ -38,13 +37,13 @@ is
       -- 3 := page_title, 4 := classes, 5 := hookname, 6 := icon_url.
    type Menu_Item is
       record
-         Menu_Title : Unbounded_String;
-         Capability : Unbounded_String;
+         Menu_Title : UStrings.UString;
+         Capability : UStrings.UString;
          Menu_Slug  : Unbounded_Slug;
-         Page_Title : Unbounded_String;
-         Classes    : Unbounded_String;
-         Hookname   : Unbounded_String;
-         Icon_Url   : Unbounded_String;
+         Page_Title : UStrings.UString;
+         Classes    : UStrings.UString;
+         Hookname   : UStrings.UString;
+         Icon_Url   : UStrings.UString;
       end record;
 
    type Menu_Index is range 0 .. 99;
@@ -59,11 +58,11 @@ is
    -- 3 := page_title, 4 := classes.
    type Submenu_Item is
       record
-         Menu_Title : Unbounded_String;
-         Capability : Unbounded_String;
+         Menu_Title : UStrings.UString;
+         Capability : UStrings.UString;
          Menu_Slug  : Unbounded_Slug;
-         Page_Title : Unbounded_String;
-         Classes    : Unbounded_String;
+         Page_Title : UStrings.UString;
+         Classes    : UStrings.UString;
       end record;
 
    type Submenu_Index is new Natural;
@@ -81,10 +80,10 @@ is
    subtype Submenu_Type is Submenu_Maps.Map;
 
    function "-" (Item : Unbounded_Slug) return Slug_Type
-     is (Slug_Type (To_String (Unbounded_String (Item))));
+     is (Slug_Type (UStrings.To_String (UStrings.UString (Item))));
 
    function "+" (Item : Slug_Type) return Unbounded_Slug
-     is (Unbounded_Slug (Ada.Strings.Unbounded.To_Unbounded_String (String (Item))));
+     is (Unbounded_Slug (UStrings.To_UString (String (Item))));
 
    function "<" (Left, Right : Slug_Type) return Boolean is (True);
 

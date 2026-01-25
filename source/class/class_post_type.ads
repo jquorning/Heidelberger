@@ -7,13 +7,12 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
 with Arrays;
+with UStrings;
 
 package Class_Post_Type
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    procedure Dummy;
@@ -34,7 +33,7 @@ is
         -- @since 4.6.0
         -- @var string name
         --
-        Name : Unbounded_String;
+        Name : UStrings.UString;
 
         --
         -- Name of the post type shown in the menu. Usually plural.
@@ -42,7 +41,7 @@ is
         -- @since 4.6.0
         -- @var string label
         --
-        Label : Unbounded_String;
+        Label : UStrings.UString;
 
         --
         -- Labels object for this post type.
@@ -73,7 +72,7 @@ is
         -- @since 4.6.0
         -- @var string description
         --
-        Description : Unbounded_String;
+        Description : UStrings.UString;
 
         --
         -- Whether a post type is intended for use -- publicly either via the admin interface or by front-end users.
@@ -152,7 +151,7 @@ is
         --
         -- public show_in_menu = null;
         Show_In_Menu_Bool : Boolean;
-        Show_In_Menu      : Unbounded_String;
+        Show_In_Menu      : UStrings.UString;
 
         --
         -- Makes this post type available for selection in navigation menus.
@@ -200,7 +199,7 @@ is
         -- @since 4.6.0
         -- @var string menu_icon
         --
-        Menu_Icon : Unbounded_String; --  = null;
+        Menu_Icon : UStrings.UString; --  = null;
 
         --
         -- The string to use to build the read, edit, and delete capabilities.
@@ -212,7 +211,8 @@ is
         -- @since 4.6.0
         -- @var string capability_type
         --
-        Capability_Type : Unbounded_String := To_Unbounded_String ("post");
+        Capability_Type : UStrings.UString :=
+          UStrings.To_UString ("post");
 
         --
         -- Whether to use the internal default meta capability handling.
@@ -267,7 +267,7 @@ is
         -- @since 4.6.0
         -- @var string|bool query_var
         --
-        Query_Var : Unbounded_String;
+        Query_Var : UStrings.UString;
 
         --
         -- Whether to allow this post type to be exported.
@@ -343,8 +343,8 @@ is
         -- @since 4.6.0
         -- @var string _edit_link
         --
-        X_Edit_Link : Unbounded_String :=
-          To_Unbounded_String ("post.php?post=%d");
+        X_Edit_Link : UStrings.UString :=
+          UStrings.To_UString ("post.php?post=%d");
 
         --
         -- Post type capabilities.
@@ -498,7 +498,7 @@ is
       Has_Archive       => False,
       Rewrite           => Empty_Array,
       X_Builtin         => False,
-      others            => Null_Unbounded_String);
+      others            => UStrings.Null_UString);
 
    package Post_Type_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,

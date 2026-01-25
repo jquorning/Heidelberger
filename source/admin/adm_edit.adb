@@ -6,7 +6,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Echoing;
@@ -51,8 +50,6 @@ with Inc_Posts;
 
 package body Adm_Edit
 is
-   use Ada.Containers;
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
 
@@ -92,7 +89,7 @@ is
 --
 --  global $post_type, $post_type_object;
 
-      Post_Type        : Unbounded_String renames Globals.Post_Type;
+      Post_Type        : UString renames Globals.Post_Type;
       Post_Type_Object : Wp_Post_Type     renames Globals.Post_Type_Object;
 --         := Inc_Posts.Get_Post_Type_Object (Post_Type);
    begin
@@ -180,7 +177,7 @@ is
                        To_List (List => (+"trashed", +"untrashed", +"deleted",
                                          +"locked",  +"ids"));
 
-                     Sendback : Unbounded_String
+                     Sendback : UString
                        := +Remove_Query_Arg (List_2, Wp_Get_Referer);
                   begin
                      if Sendback = "" then   -- not
@@ -188,7 +185,7 @@ is
                      end if;
 
                      Sendback := +Add_Query_Arg ("paged", Pagenum'Image, -Sendback);
-                     if Index (Sendback, "post") /= 0 then
+                     if Strpos (-Sendback, "post.php") /= 0 then
                         Sendback := +Admin_URL (-Globals.Post_New_File);
                      end if;
 
@@ -196,7 +193,7 @@ is
 --                      use Array_Maps;
 
                         Post_Ids    : List_Type; --  := To_Array; -- ()
-                        Post_Status : Unbounded_String;
+                        Post_Status : UString;
                      begin
                         if "delete_all" = Doaction then
                         -- Prepare for deletion of all posts with a specified post status
@@ -787,7 +784,7 @@ is
                   end Value;
 
                   Lazy    : aliased My_Lazy;
-                  Payload : constant Unbounded_String
+                  Payload : constant UString
                      := Templates_Parser.Parse ("page/admin/edit.thtml",
                                                 Translation,
                                                 Lazy_Tag => Lazy'Unchecked_Access);
@@ -832,15 +829,15 @@ is
                       Bulk_Counts   : Array_Type;
                       Post_Type     : String) return String
    is
-      use Binder;
-      use UStrings;
-      use Php;
+      use Ada.Containers;
       use Php.Preg;
       use Php.Strings;
+      use Binder;
+      use UStrings;
       use Inc_Capabilities;
       use Inc_L10n;
 
-      Messages : Unbounded_String;
+      Messages : UString;
       -- Messages := array();
    begin
       -- If we have a bulk message to issue:

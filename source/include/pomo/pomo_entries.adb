@@ -82,7 +82,7 @@ is
       use Php;
       use Php.Strings;
    begin
-      if Null_Unbounded_String = This.Singular then
+      if Null_UString = This.Singular then
          return ""; -- False;
       end if;
 

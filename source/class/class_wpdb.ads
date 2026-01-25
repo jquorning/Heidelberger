@@ -6,7 +6,6 @@
 
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with Databases;
@@ -21,7 +20,6 @@ with Class_Users;
 
 package Class_WpDB
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use UStrings;
    use Lists;
@@ -75,7 +73,7 @@ is
          --
          -- @var string
          --
-         Last_Error : Unbounded_String;
+         Last_Error : UString;
 
          --
          -- The number of queries made.
@@ -121,7 +119,7 @@ is
          --
          -- @var string
          --
-         Last_Query : Unbounded_String;
+         Last_Query : UString;
 
          --
          -- Results of the last query.
@@ -248,7 +246,7 @@ is
          --
          -- @var string
          --
-         Prefix : Unbounded_String;
+         Prefix : UString;
 
          --
          -- WordPress base table prefix.
@@ -257,7 +255,7 @@ is
          --
          -- @var string
          --
-         Base_Prefix : Unbounded_String;
+         Base_Prefix : UString;
 
          --
          -- Whether the database queries are ready to start executing.
@@ -381,7 +379,7 @@ is
          --
          -- @var string
          --
-         Comments : Unbounded_String;
+         Comments : UString;
 
          --
          -- WordPress Comment Metadata table.
@@ -390,7 +388,7 @@ is
          --
          -- @var string
          --
-         Commentmeta : Unbounded_String;
+         Commentmeta : UString;
 
          --
          -- WordPress Links table.
@@ -399,7 +397,7 @@ is
          --
          -- @var string
          --
-         Links : Unbounded_String;
+         Links : UString;
 
          --
          -- WordPress Options table.
@@ -408,9 +406,9 @@ is
          --
          -- @var string
          --
-         Options : Unbounded_String :=
-           To_Unbounded_String ("options"); -- added
---         To_Unbounded_String ("XXX-968"); -- added
+         Options : UString :=
+           To_UString ("options"); -- added
+--         To_UString ("XXX-968"); -- added
 
          --
          -- WordPress Post Metadata table.
@@ -419,7 +417,7 @@ is
          --
          -- @var string
          --
-         Postmeta : Unbounded_String;
+         Postmeta : UString;
 
          --
          -- WordPress Posts table.
@@ -428,7 +426,7 @@ is
          --
          -- @var string
          --
-         Posts : Unbounded_String;
+         Posts : UString;
 
          --
          -- WordPress Terms table.
@@ -437,7 +435,7 @@ is
          --
          -- @var string
          --
-         Terms : Unbounded_String;
+         Terms : UString;
 
          --
          -- WordPress Term Relationships table.
@@ -446,7 +444,7 @@ is
          --
          -- @var string
          --
-         Term_Relationships : Unbounded_String;
+         Term_Relationships : UString;
 
          --
          -- WordPress Term Taxonomy table.
@@ -455,7 +453,7 @@ is
          --
          -- @var string
          --
-         Term_Taxonomy : Unbounded_String;
+         Term_Taxonomy : UString;
 
          --
          -- WordPress Term Meta table.
@@ -464,7 +462,7 @@ is
          --
          -- @var string
          --
-         Termmeta : Unbounded_String;
+         Termmeta : UString;
 
          ---------------------------------
          -- Global and Multisite tables --
@@ -477,7 +475,7 @@ is
          --
          -- @var string
          --
-         Usermeta : Unbounded_String;
+         Usermeta : UString;
 
          --
          -- WordPress Users table.
@@ -486,7 +484,7 @@ is
          --
          -- @var string
          --
-         Users : Unbounded_String;
+         Users : UString;
 
          --
          -- Multisite Blogs table.
@@ -495,7 +493,7 @@ is
          --
          -- @var string
          --
-         Blogs : Unbounded_String;
+         Blogs : UString;
 
          --
          -- Multisite Blog Metadata table.
@@ -504,7 +502,7 @@ is
          --
          -- @var string
          --
-         Blogmeta : Unbounded_String;
+         Blogmeta : UString;
 
          --
          -- Multisite Registration Log table.
@@ -513,7 +511,7 @@ is
          --
          -- @var string
          --
-         Registration_Log : Unbounded_String;
+         Registration_Log : UString;
 
          --
          -- Multisite Signups table.
@@ -522,7 +520,7 @@ is
          --
          -- @var string
          --
-         Signups : Unbounded_String;
+         Signups : UString;
 
          --
          -- Multisite Sites table.
@@ -531,7 +529,7 @@ is
          --
          -- @var string
          --
-         Site : Unbounded_String;
+         Site : UString;
 
          --
          -- Multisite Sitewide Terms table.
@@ -540,7 +538,7 @@ is
          --
          -- @var string
          --
-         Sitecategories : Unbounded_String;
+         Sitecategories : UString;
 
          --
          -- Multisite Site Metadata table.
@@ -549,7 +547,7 @@ is
          --
          -- @var string
          --
-         Sitemeta : Unbounded_String;
+         Sitemeta : UString;
 
          --
          -- Format specifiers for DB columns.
@@ -575,7 +573,7 @@ is
          --
          -- @var string
          --
-         Charset : Unbounded_String;
+         Charset : UString;
 
          --
          -- Database table columns collate.
@@ -584,7 +582,7 @@ is
          --
          -- @var string
          --
-         Collate : Unbounded_String;
+         Collate : UString;
 
          --
          -- Database Username.
@@ -594,7 +592,7 @@ is
          -- @var string
          --
 --        protected
-         Dbuser : Unbounded_String;
+         Dbuser : UString;
 
          --
          -- Database Password.
@@ -604,7 +602,7 @@ is
          -- @var string
          --
 --        protected
-         Dbpassword : Unbounded_String;
+         Dbpassword : UString;
 
          --
          -- Database Name.
@@ -614,7 +612,7 @@ is
          -- @var string
          --
 --        protected
-         Dbname : Unbounded_String;
+         Dbname : UString;
 
          --
          -- Database Host.
@@ -624,7 +622,7 @@ is
          -- @var string
          --
 --        protected
-         Dbhost : Unbounded_String;
+         Dbhost : UString;
 
          --
          -- Database handle.
@@ -651,7 +649,7 @@ is
          --
          -- @var string
          --
-         Func_Call : Unbounded_String;
+         Func_Call : UString;
 
          --
          -- Whether MySQL is used as the database engine.
@@ -728,7 +726,7 @@ is
          --
          -- @var WP_Error|string
          --
-         Error : Unbounded_String; --  = null;
+         Error : UString; --  = null;
 
       end record;
 
@@ -1635,7 +1633,7 @@ is
 
    type String_Error_Type is record
       Success : Boolean;
-      Item    : Ada.Strings.Unbounded.Unbounded_String;
+      Item    : UStrings.UString;
       Error   : Class_Errors.Wp_Error;
    end record;
 

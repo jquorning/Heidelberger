@@ -8,8 +8,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Binder;
 with UStrings;
@@ -32,24 +30,26 @@ with Inc_Vars;
 
 package body Adm_Nav_Menus
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-   use UStrings;
-   use Inc_L10n;
-   use Php;
-   use Globals;
 -- -- Load WordPress Administration Bootstrap
 -- require_once __DIR__ . '/admin.php';
 
 -- -- Load all the nav menu interface functions.
 -- require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
 
+   ---------
+   -- Run --
+   ---------
+
    procedure Run
    is
       use Binder;
+      use Globals;
+      use UStrings;
       use Inc_Themes;
       use Inc_Nav_Menus;
       use Inc_Capabilities;
+      use Inc_L10n;
    begin
 
       if
@@ -81,7 +81,7 @@ is
          Messages : Array_Type := Empty_Array;
 
          -- Container that stores the name of the active menu.
-         Nav_Menu_Selected_Title : Unbounded_String;
+         Nav_Menu_Selected_Title : UString;
 
          -- The menu id of the current menu being edited.
          Nav_Menu_Selected_Id : constant Integer :=

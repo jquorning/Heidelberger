@@ -120,8 +120,8 @@ is
       use Php.Strings;
       use Inc_Formatting;
 
-      Output : constant Unbounded_String := +This.Get_Data (Handle, "data");
-      Unused : Unbounded_String;
+      Output : constant UString := +This.Get_Data (Handle, "data");
+      Unused : UString;
    begin
       if Output = "" then
          return "";  -- "" added jq
@@ -185,7 +185,7 @@ is
 
       declare
          Obj : X_Wp_Dependency := This.Registered (Handle);
-         Ver : Unbounded_String;
+         Ver : UString;
       begin
          if "" = Obj.Ver then
             Ver := +"";
@@ -200,7 +200,7 @@ is
 
          Label_2 :
          declare
-            Src : Unbounded_String := Obj.Src;
+            Src : UString := Obj.Src;
 
             Conditional : constant Boolean :=
                Boolean'Value ((if Obj.Extra.Find ("conditional") /=
@@ -213,10 +213,10 @@ is
             Cond_After  : constant String :=
                (if Conditional then "<![endif]-->\n" else "");
 
-            Before_Handle : Unbounded_String :=
+            Before_Handle : UString :=
                +This.Print_Inline_Script (Handle, "before", False);
 
-            After_Handle  : Unbounded_String :=
+            After_Handle  : UString :=
                +This.Print_Inline_Script (Handle, "after",  False);
 
             Unused_Matches : List_Type;
@@ -242,7 +242,7 @@ is
             end if;
 
             declare
-               Inline_Script_Tag : Unbounded_String;
+               Inline_Script_Tag : UString;
             begin
                if Before_Handle /= "" or else After_Handle /= "" then
                   Inline_Script_Tag :=
@@ -260,7 +260,7 @@ is
                   Translations_Stop_Concat : constant Boolean :=
                      Obj.Textdomain /= "";
 
-                  Translations : Unbounded_String :=
+                  Translations : UString :=
                      +This.Print_Translations (Handle, False);
                begin
                   if Translations /= "" then
@@ -315,7 +315,7 @@ is
                   end if;
 
                   declare
-                     Unused : Unbounded_String;
+                     Unused : UString;
                      Has_Conditional_Data : constant Boolean :=
                         Conditional and then
                         "" = This.Get_Data (Handle, "data");
@@ -368,7 +368,7 @@ is
                   declare
                      use Inc_Plugins;
 
-                     Tag : Unbounded_String :=
+                     Tag : UString :=
                         Translations & Cond_Before & Before_Handle;
                   begin
                      Append (Tag,
@@ -428,7 +428,7 @@ is
                                Position : String := "after")
                                return Boolean
    is
-      Position_2 : Unbounded_String := +Position;
+      Position_2 : UString := +Position;
    begin
       if Data /= "" then
          return False;
@@ -441,7 +441,7 @@ is
       declare
 --       use Array_Maps;
 
-         Script : Unbounded_String := +This.Get_Data (Handle, -Position_2); -- (array)
+         Script : UString := +This.Get_Data (Handle, -Position_2); -- (array)
       begin
          Append (Script, Data);  -- ()
          return This.Add_Data (Handle, -Position_2, -Script);
@@ -462,8 +462,8 @@ is
 --    use Inc_Functions;
       use Inc_Formatting;
 
-      Output : Unbounded_String := +This.Get_Data (Handle, Position);
-      Unused : Unbounded_String;
+      Output : UString := +This.Get_Data (Handle, Position);
+      Unused : UString;
    begin
       if Output = "" then
          return ""; -- False;
@@ -512,7 +512,7 @@ is
 
       L10n_2   : Array_Type := L10n;
       After    : Array_Type;
-      Handle_2 : Unbounded_String := +Handle;
+      Handle_2 : UString := +Handle;
    begin
       if "jquery" = Handle_2 then
          Handle_2 := +"jquery-core";
@@ -563,7 +563,7 @@ is
 --      end if;
 
       declare
-         Script : Unbounded_String :=
+         Script : UString :=
             +"var object_name = " & Wp_JSON_Encode (From_Array (L10n_2)) & ";";
       begin
          if not Empty (After) then
@@ -683,13 +683,13 @@ is
          Regist : constant Dependency_Maps.Cursor := This.Registered.Find (Handle);
          Domain : constant String := -Element (Regist).Textdomain;
 --       Domain : String   := -This.Registered (Handle).Textdomain;
---         Path   : Unbounded_String;
+--         Path   : UString;
          Path   : String   := (if Element (Regist).Translations_Path /= ""
                                then -Element (Regist).Translations_Path else "");
          Json_Translations : constant String :=
             Load_Script_Textdomain (Handle, Domain, Path);
-         Output : Unbounded_String;
-         Unused : Unbounded_String;
+         Output : UString;
+         Unused : UString;
       begin
          if Json_Translations = "" then
             return "";

@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Echoing;
 
 with Globals;
@@ -35,13 +33,12 @@ is
 
    procedure Run
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use UStrings;
       use Inc_L10n;
 
 --    Display_Version : List_Type;
-      Admin_Header : Unbounded_String;
+      Admin_Header : UString;
    begin
       Adm_Admin.Run;
 
@@ -148,7 +145,7 @@ is
          end Value;
 
          Lazy : aliased My_Lazy;
-         Payload : constant Unbounded_String :=
+         Payload : constant UString :=
             Templates_Parser.Parse ("page/admin/privacy.thtml",
 --                                  Translation,
                                     Lazy_Tag => Lazy'Unchecked_Access);

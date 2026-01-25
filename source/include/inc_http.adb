@@ -10,7 +10,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.HTML;
@@ -703,13 +702,12 @@ is
                           Component : Integer := -1)
                           return Array_Type
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Strings;
       use UStrings;
 
       To_Unset : Array_Type;
-      URL_2 : Unbounded_String := +URL;
+      URL_2 : UString := +URL;
    begin
       if "//" = Substr (-URL_2, 0, 2) then
          To_Unset.Append (From_String ("scheme"));

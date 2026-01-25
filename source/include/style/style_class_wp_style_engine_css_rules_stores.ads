@@ -9,16 +9,13 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
--- with Arrays;
+with UStrings;
 
 with Style_Class_Wp_Style_Engine_CSS_Rules;
 
 package Style_Class_Wp_Style_Engine_CSS_Rules_Stores
 is
-   use Ada.Strings.Unbounded;
--- use Arrays;
 
    --
    -- Class WP_Style_Engine_CSS_Rules_Store.
@@ -47,7 +44,7 @@ is
          -- @var string
          --
          -- protected
-         Name : Unbounded_String;
+         Name : UStrings.UString;
 
          --
          -- An array of CSS Rules objects assigned to the store.

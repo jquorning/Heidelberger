@@ -514,7 +514,7 @@ is
    begin
       if Empty (-This.X_Changeset_UUID) then
          declare
-            Changeset_UUID : Unbounded_String; -- null
+            Changeset_UUID : UString; -- null
          begin
             if not This.Branching and then This.Is_Theme_Active then
                declare

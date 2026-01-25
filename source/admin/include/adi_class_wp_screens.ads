@@ -6,13 +6,11 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package Adi_Class_Wp_Screens
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    procedure Dummy;
@@ -32,7 +30,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Action : Unbounded_String;
+        Action : UStrings.UString;
 
         --
         -- The base type of the screen.
@@ -43,7 +41,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Base : Unbounded_String;
+        Base : UStrings.UString;
 
         --
         -- The number of columns to display. Access with get_columns().
@@ -59,7 +57,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Id : Unbounded_String;
+        Id : UStrings.UString;
 
         --
         -- Which admin the screen is in. network | user | site | false
@@ -68,7 +66,7 @@ is
         -- @var string
         --
 --        protected
-        M_In_Admin : Unbounded_String;
+        M_In_Admin : UStrings.UString;
 
         --
         -- Whether the screen is in the network admin.
@@ -102,7 +100,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Parent_Base : Unbounded_String;
+        Parent_Base : UStrings.UString;
 
         --
         -- The parent_file for the screen per the admin menu system.
@@ -112,7 +110,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Parent_File : Unbounded_String;
+        Parent_File : UStrings.UString;
 
         --
         -- The post type associated with the screen, if any.
@@ -123,7 +121,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Post_Type : Unbounded_String;
+        Post_Type : UStrings.UString;
 
         --
         -- The taxonomy associated with the screen, if any.
@@ -133,7 +131,7 @@ is
         -- @since 3.3.0
         -- @var string
         --
-        Taxonomy : Unbounded_String;
+        Taxonomy : UStrings.UString;
 
         --
         -- The help tab data associated with the screen, if any.

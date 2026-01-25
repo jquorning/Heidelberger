@@ -6,9 +6,8 @@
 -- @since 5.8.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Class_Customize_Controls;
 
@@ -16,7 +15,6 @@ limited with Class_Customize_Managers;
 
 package Cust_Class_Wp_Customize_Sidebar_Block_Editor_Controls
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -37,7 +35,8 @@ is
          --
          -- @var string
          --
-         Typ : Unbounded_String := To_Unbounded_String ("sidebar_block_editor");
+         Typ : UStrings.UString :=
+           UStrings.To_UString ("sidebar_block_editor");
       end record;
 
    function X_Construct

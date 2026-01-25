@@ -4,10 +4,7 @@
 
 package body Lists
 is
-   use Ada.Strings.Unbounded;
-
-   function "+" (Item : String) return Unbounded_String
-      renames To_Unbounded_String;
+   use UStrings;
 
    ------------
    -- Append --

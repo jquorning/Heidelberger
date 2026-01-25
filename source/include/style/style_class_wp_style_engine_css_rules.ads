@@ -9,15 +9,14 @@
 --
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
+with UStrings;
 
 with Style_Class_Wp_Style_Engine_CSS_Declarations;
 
 package Style_Class_Wp_Style_Engine_CSS_Rules
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    package Decls renames Style_Class_Wp_Style_Engine_CSS_Declarations;
@@ -39,7 +38,7 @@ is
          -- @var string
          --
          -- protected
-         Selector : Unbounded_String;
+         Selector : UStrings.UString;
 
          --
          -- The selector declarations.

@@ -293,13 +293,11 @@ is
 
          for Header of Headers_4 loop
             declare
-               use Ada.Strings.Unbounded;
-
                List : List_Type := Explode (":", -Header, 2);
                -- list(key, value)
                Key   : constant String := -List (1);
                Value : constant String := Trim (-List (2));
-               Unused : Unbounded_String;
+               Unused : UString;
             begin
                Unused := +Preg_Replace ("#(\s+)#i", " ", Value);
                Set (Return2.Headers, Key, From_String (Value));

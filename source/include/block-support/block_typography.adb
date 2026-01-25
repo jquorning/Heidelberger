@@ -5,8 +5,6 @@
 -- @since 5.6.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Numerics;
 with Php.Preg;
@@ -33,13 +31,11 @@ is
                Options   : Array_Type := Empty_Array)
                return Array_Type
    is
-      use Ada.Strings.Unbounded;
-      use UStrings;
-      use Php;
       use Php.Numerics;
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -91,7 +87,7 @@ is
 
          declare
             Value : Float  := Float'Value (-Matches (2)); -- (1)
-            Unit  : Unbounded_String := Matches (3);      -- (2)
+            Unit  : UString := Matches (3);      -- (2)
 
             Coerce_To : constant String :=
               As_String (Get (Options_2, "coerce_to"));
@@ -282,7 +278,6 @@ is
                Should_Use_Fluid_Typography : Boolean := False)
                return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Numerics;
       use Php.Strings;
@@ -361,8 +356,8 @@ is
                 ))
               );
 
-            Maximum_Font_Size_Raw_String : Unbounded_String;
-            Minimum_Font_Size_Raw_String : Unbounded_String;
+            Maximum_Font_Size_Raw_String : UString;
+            Minimum_Font_Size_Raw_String : UString;
          begin
             -- Protects against unsupported units.
             if Empty (Preferred_Size, "unit") then

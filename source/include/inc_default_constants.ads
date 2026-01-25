@@ -5,11 +5,8 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
-
 package Inc_Default_Constants
 is
-   use Ada.Strings.Unbounded;
 
    --
    -- Defines initial WordPress constants.

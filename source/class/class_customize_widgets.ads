@@ -6,8 +6,6 @@
 -- @since 3.9.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with UStrings;
 with Lists;
@@ -20,10 +18,9 @@ limited with Class_Customize_Managers;
 
 package Class_Customize_Widgets
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-   use UStrings;
    use Lists;
+   use UStrings;
 
    Capability_Error : exception;
 
@@ -181,7 +178,7 @@ is
          -- @var string|null
          --
          -- protected
-         Rendering_Widget_Id : Unbounded_String;
+         Rendering_Widget_Id : UStrings.UString;
 
          --
          -- Current widget being rendered.
@@ -190,7 +187,7 @@ is
          -- @var string|null
          --
          -- protected
-         Rendering_Sidebar_Id : Unbounded_String;
+         Rendering_Sidebar_Id : UStrings.UString;
 
       end record;
 

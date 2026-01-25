@@ -8,15 +8,14 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 
 with Arrays;
+with UStrings;
 
 with Class_Sites;
 
 package Class_Admin_Bar
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    ---------------
@@ -26,7 +25,7 @@ is
    type Blog_Type is
       record
          Userblog_Id : Integer;
-         Blogname    : Unbounded_String;
+         Blogname    : UStrings.UString;
       end record;
 
    ---------------
@@ -48,8 +47,8 @@ is
       record
          Blogs          : Blog_List;
          Active_Blog    : Class_Sites.Wp_Site;
-         Domain         : Unbounded_String;
-         Account_Domain : Unbounded_String;
+         Domain         : UStrings.UString;
+         Account_Domain : UStrings.UString;
       end record;
 
    type Typ_Type is (Typ_Item, Typ_Group, Typ_Container);
@@ -63,16 +62,16 @@ is
 
    type Node_Args is
       record
-         Id     : Unbounded_String;
+         Id     : UStrings.UString;
          --  ID of the item.
 
-         Title  : Unbounded_String;
+         Title  : UStrings.UString;
          --  Title of the node.
 
-         Parent : Unbounded_String;
+         Parent : UStrings.UString;
          --  Optional. ID of the parent node.
 
-         Href   : Unbounded_String;
+         Href   : UStrings.UString;
          --  Optional. Link for the item.
 
          Group  : Boolean;
@@ -94,7 +93,7 @@ is
       Meta     => Empty_Array,
       Typ      => Typ_Item,
       Children => null,
-      others   => Ada.Strings.Unbounded.Null_Unbounded_String);
+      others   => UStrings.Null_UString);
 
    ----------------
    -- Node_Array --

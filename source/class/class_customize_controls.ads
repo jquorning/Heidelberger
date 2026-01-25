@@ -6,15 +6,13 @@
 -- @since 3.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 limited with Class_Customize_Managers;
 
 package Class_Customize_Controls
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    type Wp_Customize_Control;
@@ -52,7 +50,7 @@ is
          -- @since 3.4.0
          -- @var string
          --
-         Id : Unbounded_String;
+         Id : UStrings.UString;
 
          --
          -- All settings tied to the control.

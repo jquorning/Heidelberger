@@ -2,7 +2,6 @@
 --
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with UStrings;
@@ -89,11 +88,10 @@ is
                      Matches     : GNAT.Regpat.Match_Array)
                      return String
    is
-      use Ada.Strings.Unbounded;
       use GNAT.Regpat;
       use UStrings;
 
-      Buffer : Unbounded_String;
+      Buffer : UString;
       Index  : Natural := Replacement'First;
    begin
       while Index <= Replacement'Last loop

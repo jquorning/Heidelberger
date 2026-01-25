@@ -6,8 +6,6 @@
 -- @since 2.7.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Files;
 with Php.HTML;
@@ -647,13 +645,13 @@ is
    -------------------
 
    Static_Accessible_Hosts : List_Type; -- null;
-   Static_Wildcard_Regex   : Ada.Strings.Unbounded.Unbounded_String; -- array();
+   Static_Wildcard_Regex   : UStrings.UString; -- array();
 
    function Block_Request (This : Wp_Http;
                            URI  : String)
                            return Boolean
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Php.Lists;
       use Php.HTML;
       use Php.Preg;

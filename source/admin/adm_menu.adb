@@ -11,7 +11,6 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
-with UStrings;
 with Wp_Common;
 with Lists;
 
@@ -34,11 +33,7 @@ with Class_Post_Type;
 
 package body Adm_Menu
 is
-   use Inc_L10n;
-   use UStrings;
    use Arrays;
-   use Php;
-   use Inc_Functions;
    use Lists;
 
    function To_Menu (Menu_Title : String;
@@ -65,18 +60,21 @@ is
 
    procedure Run
    is
-      use Binder;
       use Php.HTML;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Binder;
+      use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
+      use Inc_Functions;
       use Inc_Formatting;
+      use Inc_L10n;
       use Inc_Updates;
 
       Is_Multisite : constant Boolean := Inc_Load.Is_Multisite;
-      Cap          : Unbounded_String;
+      Cap          : UString;
       I            : Adm_Menu.Submenu_Index; -- Natural;
       Update_Data  : Update_Counts; -- Array_Type;
       Counts_Total : Integer;
@@ -233,13 +231,13 @@ is
                Ptype_Obj : constant Class_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (-Ptype);
                Ptype_Menu_Position : Menu_Index;
-               Ptype_For_Id        : Unbounded_String;
-               Menu_Icon           : Unbounded_String;
-               Menu_Class          : Unbounded_String;
+               Ptype_For_Id        : UString;
+               Menu_Icon           : UString;
+               Menu_Class          : UString;
                Ptype_File          : Unbounded_Slug;
-               Post_New_File       : Unbounded_String;
-               Edit_Tags_File      : Unbounded_String;
-               Ptype_Menu_Id       : Unbounded_String;
+               Post_New_File       : UString;
+               Edit_Tags_File      : UString;
+               Ptype_Menu_Id       : UString;
             begin
 
                -- Check if it should be a submenu.
@@ -350,7 +348,7 @@ is
                                "dashicons-admin-appearance");
 
          declare
-            Count       : Unbounded_String;
+            Count       : UString;
             Update_Date : Update_Counts; -- Array_Type;
          begin
             if not Is_Multisite and then Current_User_Can ("update_themes") then
@@ -484,9 +482,9 @@ is
          end if;
 
          declare
-            Count        : Unbounded_String;
+            Count        : UString;
             Update_Date  : Update_Counts; -- Array_Type;
-            Plugin_Count : Unbounded_String;
+            Plugin_Count : UString;
          begin
             if not Is_Multisite and then Current_User_Can ("update_plugins") then
                if True then -- not Isset (Update_Data) then
@@ -568,7 +566,7 @@ is
          end if;
 
          declare
-            Site_Health_Count : Unbounded_String;
+            Site_Health_Count : UString;
          begin
             if not Is_Multisite and then
                Current_User_Can ("view_site_health_checks")
@@ -711,6 +709,8 @@ is
                      Icon_Url   : String := "")
                      return Menu_Item
    is
+      use UStrings;
+
       Item : constant Menu_Item :=
          (Menu_Title  =>  +Menu_Title,
           Capability  =>  +Capability,
@@ -736,6 +736,7 @@ is
                   Unknown    : String := "";
                   Classes    : String := "")
    is
+      use UStrings;
       -- Submenu (position : int) (menu_slug : map) of submenu_item
 
       Sub_Item : constant Submenu_Item :=
@@ -782,8 +783,9 @@ is
 
    procedure X_Add_Themes_Utility_Last
    is
-      use Inc_Themes;
       use Adi_Plugins;
+      use Inc_Themes;
+      use Inc_L10n;
    begin
       Add_Submenu_Page (
         (if Wp_Is_Block_Theme then "tools.php" else "themes.php"),
@@ -799,8 +801,9 @@ is
 
    procedure X_Add_Plugin_File_Editor_To_Tools
    is
-      use Inc_Themes;
       use Adi_Plugins;
+      use Inc_Themes;
+      use Inc_L10n;
    begin
       if not Wp_Is_Block_Theme then
          return;

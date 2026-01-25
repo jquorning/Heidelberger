@@ -7,8 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with Ada.Strings.Unbounded;
-
 with UStrings;
 with Php.Preg;
 with Php.Strings;
@@ -21,7 +19,6 @@ with Inc_L10n;
 package body Inc_Functions_Wp_Styles
 is
    use UStrings;
-   use Php;
 
 --    function Wp_Styles_X
 --             return Wp_Styles
@@ -84,15 +81,15 @@ is
                                  Data   : String)
                                  return Boolean
    is
-      use Ada.Strings.Unbounded;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
       use Adm_Load_Styles;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_L10n;
 
-      Data_2 : Unbounded_String := +Data;
+      Data_2 : UString := +Data;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 

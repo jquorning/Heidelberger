@@ -165,12 +165,12 @@ is
 
    procedure Wp_Admin_Bar_Wp_Menu (Admin_Bar : in out Wp_Admin_Bar)
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Inc_Load;
       use Inc_Link_Templates;
       use Inc_Users;
 
-      About_URL : Unbounded_String;
+      About_URL : UString;
    begin
       if Current_User_Can ("read") then
          About_URL := +Self_Admin_URL ("about.php");
@@ -299,7 +299,7 @@ is
 
       User_Id      : constant Integer := Get_Current_User_Id;
       Current_User : constant Wp_User := Wp_Get_Current_User;
-      Profile_Url  : Unbounded_String;
+      Profile_Url  : UString;
    begin
       if User_Id = 0 then
          return;
@@ -351,8 +351,8 @@ is
 
       User_Id      : constant Integer := Get_Current_User_Id;
       Current_User : constant Wp_User := Wp_Get_Current_User;
-      Profile_Url  : Unbounded_String;
-      User_Info    : Unbounded_String;
+      Profile_Url  : UString;
+      User_Info    : UString;
    begin
       if User_Id = 0 then
          return;
@@ -437,7 +437,7 @@ is
       use Inc_Users;
       use Inc_Ms_Networks;
 
-      Blogname : Unbounded_String;
+      Blogname : UString;
    begin
       -- Don"t show for logged out users.
       if not Is_User_Logged_In then
@@ -578,8 +578,8 @@ is
 --    use Globals;
 
 --    global wp_customize;
-      Current_URL   : Unbounded_String;
-      Customize_URL : Unbounded_String;
+      Current_URL   : UString;
+      Customize_URL : UString;
    begin
       -- Don't show if a block theme is activated and no plugins use the customizer.
       if Wp_Is_Block_Theme and then not Has_Action ("customize_register") then
@@ -655,7 +655,7 @@ is
       use Inc_Posts;
       use Blog_Vectors;
 
-      My_Sites_Url : Unbounded_String;
+      My_Sites_Url : UString;
       Unused       : Boolean;
    begin
       -- Don"t show for logged out users or single site mode.
@@ -825,8 +825,8 @@ is
                use Inc_Media;
                use Inc_Ms_Blogs;
 
-               Blavatar : Unbounded_String;
-               Blogname : Unbounded_String;
+               Blavatar : UString;
+               Blogname : UString;
                Unused   : Boolean;
             begin
                Unused := Switch_To_Blog (Blog.Userblog_Id);
@@ -956,7 +956,7 @@ is
 
       Short : constant String := Wp_Get_Shortlink (0, "query");
       Id    : constant String := "get-shortlink";
-      Html  : Unbounded_String;
+      Html  : UString;
    begin
       if Empty (Short) then
          return;
@@ -1383,8 +1383,8 @@ is
                   X_N ("%s Comment in moderation",
                        "%s Comments in moderation", Awaiting_Mod),
                   To_List (Number_Format_I18n (Float (Awaiting_Mod))));
-      Icon  : Unbounded_String;
-      Title : Unbounded_String;
+      Icon  : UString;
+      Title : UString;
       Node  : Node_Args;
    begin
       if not Current_User_Can ("edit_posts") then
@@ -1515,9 +1515,9 @@ is
       Update_Data  : constant Update_Counts := Wp_Get_Update_Data;
       Counts_Total : constant Integer       := Update_Data.Total;
       -- ("counts") ("total");
-      Updates_Text : Unbounded_String;
-      Icon         : Unbounded_String;
-      Title        : Unbounded_String;
+      Updates_Text : UString;
+      Icon         : UString;
+      Title        : UString;
    begin
       if Counts_Total = 0 then -- not update_data ("counts") ("total")
          return;
@@ -1557,7 +1557,7 @@ is
       use Inc_Link_Templates;
       use Inc_Load;
 
-      Form : Unbounded_String;
+      Form : UString;
    begin
       if Is_Admin then
          return;
@@ -1594,7 +1594,7 @@ is
       use Inc_General_Templates;
       use Inc_Load;
 
-      URL : Unbounded_String;
+      URL : UString;
    begin
       if not Wp_Is_Recovery_Mode then
          return;

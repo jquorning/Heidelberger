@@ -106,7 +106,7 @@ is
 
       declare
          Admin_Bar_Args  : List_Type;
-         Header_Callback : Unbounded_String;
+         Header_Callback : UString;
       begin
          if Current_Theme_Supports ("admin-bar") then
             --
@@ -237,8 +237,8 @@ is
             Build ("my-blogs",
                    Arrays.To_Array ((1 => Build ("my-sites",   "3.3"))))
          ));
-         New_Parent : Unbounded_String;
-         Version    : Unbounded_String;
+         New_Parent : UString;
+         Version    : UString;
       begin
          if Isset (Back_Compat_Parents, -Args_2.Parent) then
 --          New_Parent := Back_Compat_Parents (-Args_2.Parent) (New_Parent);
@@ -294,7 +294,7 @@ is
    is
       use Node_Maps;
 
-      Id_2 : Unbounded_String := +Id;
+      Id_2 : UString := +Id;
    begin
       if This.Bound then
          return Null_Node_Args;
@@ -616,7 +616,7 @@ is
    procedure X_Render (This : Wp_Admin_Bar;
                        Root : Node_Args) -- Array_Type)
    is
-      Class : Unbounded_String := +"nojq nojs";
+      Class : UString := +"nojq nojs";
    begin
       -- Add browser classes.
       -- We have to do this here since admin bar shows on the front end.
@@ -677,7 +677,7 @@ is
       use Php.Strings;
       use Inc_Formatting;
 
-      Class : Unbounded_String;
+      Class : UString;
    begin
       if Typ_Container = Node.Typ then
          This.X_Render_Container (Node);
@@ -732,12 +732,12 @@ is
                                Is_Numeric (As_String (Get (Node.Meta, "tabindex")))
                              then Integer'Value (As_String (Get (Node.Meta, "tabindex"))) else 0);
 
-      Aria_Attributes : Unbounded_String :=
+      Aria_Attributes : UString :=
          +(if 0 /= Tabindex
            then " tabindex=""" & Tabindex'Image & """" else "");
 
-      Menuclass : Unbounded_String;
-      Arrow     : Unbounded_String;
+      Menuclass : UString;
+      Arrow     : UString;
 
       Attributes : List_Type;
    begin

@@ -171,8 +171,8 @@ is
 
    -- type Args_Type is
    --    record
-   --       Text_1    : Unbounded_String;
-   --       Text_2    : Unbounded_String;
+   --       Text_1    : UString;
+   --       Text_2    : UString;
    --       Array_1   : Array_Type;
    --       Array_2   : Array_Type;
    --       Integer_1 : Integer;

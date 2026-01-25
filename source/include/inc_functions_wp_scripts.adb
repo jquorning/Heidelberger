@@ -7,8 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Preg;
 with Php.Strings;
 
@@ -21,8 +19,6 @@ with Inc_Plugins;
 
 package body Inc_Functions_Wp_Scripts
 is
-   use UStrings;
-   use Php;
 
 --    ------------------
 --    -- Wp_Scripts_X --
@@ -47,13 +43,13 @@ is
    procedure X_Wp_Scripts_Maybe_Doing_It_Wrong (Funct  : String;
                                                 Handle : String := "")
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Plugins;
 
-      Message : Unbounded_String;
+      Message : UString;
    begin
       if
         Did_Action ("init")                  or else
@@ -140,6 +136,7 @@ is
    is
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
       use Class_Scripts;
       use Inc_Functions;
       use Inc_L10n;
@@ -383,18 +380,16 @@ is
    -- Wp_Enqueue_Script --
    -----------------------
 
--- function wp_enqueue_script( handle, src = '', deps = array(), ver = false, in_footer = false ) then
    procedure Wp_Enqueue_Script (Handle    : String;
-                                Src       : String       := "";
+                                Src       : String    := "";
                                 Deps      : List_Type := Empty_List;
-                                -- String_Array := Empty_String_Array;
-                                Ver       : String       := ""; -- Boolean    := False;
-                                In_Footer : Boolean      := False)
+                                Ver       : String    := "";
+                                In_Footer : Boolean   := False)
    is
       use Php.Strings;
+      use UStrings;
       use Class_Scripts;
       use Class_Dependencies;
---    use String_Vectors;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
       declare

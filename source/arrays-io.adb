@@ -1,4 +1,6 @@
--- with Ada.Strings.Unbounded;
+--
+--
+--
 with Ada.Text_IO;
 
 with UStrings;
@@ -13,10 +15,9 @@ is
    function Dump_Array (Arry : Array_Type)
             return String
    is
---    use Ada.Strings.Unbounded;
       use UStrings;
 
-      Buffer : Unbounded_String;
+      Buffer : UString;
       First  : Boolean := True;
    begin
       Append (Buffer, "[");

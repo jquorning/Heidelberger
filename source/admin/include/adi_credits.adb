@@ -6,8 +6,7 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-with Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Arrays;
 with Globals;
@@ -25,16 +24,11 @@ with Inc_HTTP;
 
 package body Adi_Credits
 is
-   use Ada.Strings.Unbounded;
-   use Ada.Text_IO;
    use Arrays;
-   use UStrings;
-   use Inc_L10n;
    use Lists;
-   use Php;
 
    function Get_File (Filename : String)
-                      return Unbounded_String;
+                      return UStrings.UString;
 
    --
    -- Retrieve the contributor credits.
@@ -50,10 +44,12 @@ is
                         Locale  : String := "")
                         return JSON_Value
    is
+      use UStrings;
+      use Inc_L10n;
       use Inc_Options;
 
-      Version_2 : Unbounded_String := +Version;
-      Locale_2  : Unbounded_String := +Locale;
+      Version_2 : UString := +Version;
+      Locale_2  : UString := +Locale;
       Results   : Inc_Options.String_Maps.Map; -- Array_Type;
    begin
       if Version = "" then
@@ -76,7 +72,7 @@ is
 --                 Strpos (-Version_2, Results ("data") ("version")) /= 0)
       then
          declare
-            URL : constant Unbounded_String :=
+            URL : constant UString :=
                +"http://api.wordpress.org/core/credits/1.1/?version=" &
                (-Version_2) & "&locale=" & (-Locale_2) & """";
 
@@ -172,7 +168,9 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
+      use Inc_L10n;
    begin
 --      if 0 = Count (Group_Data) then
 --         return;
@@ -216,7 +214,9 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
+      use Inc_L10n;
 
       Group : constant JSON_Value := Get (Credits, "groups");
       Slugs : constant JSON_Value := Get (Group,   Slug);
@@ -349,10 +349,12 @@ is
    --------------
 
    function Get_File (Filename : String)
-                      return Unbounded_String
+                      return UStrings.UString
    is
+      use UStrings;
+
       File   : File_Type;
-      Buffer : Unbounded_String;
+      Buffer : UString;
    begin
       Open (File, In_File, Filename);
       while not End_Of_File (File) loop

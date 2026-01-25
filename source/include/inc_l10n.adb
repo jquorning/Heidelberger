@@ -15,7 +15,6 @@ with Php.Types;
 with Array_Vectors;
 with Binder;
 with Globals;
-with UStrings;
 
 with Adi_Translation_Install;
 with Class_Locale_Switchers;
@@ -65,7 +64,6 @@ package body Inc_L10n is
    function Get_Locale
             return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use UStrings;
       use Inc_Load;
@@ -92,7 +90,7 @@ package body Inc_L10n is
       -- If multisite, check options.
       if Is_Multisite then
          declare
-            MS_Locale : Unbounded_String;
+            MS_Locale : UString;
          begin
             -- Don't check blog option when installing.
             if Wp_Installing then
@@ -173,7 +171,6 @@ package body Inc_L10n is
    function Determine_Locale
             return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
       use Binder;
       use UStrings;
@@ -208,7 +205,7 @@ package body Inc_L10n is
            (if Is_Admin then Get_User_Locale
             else             Get_Locale);
 
-         Determined_Locale_3 : Unbounded_String := +Determined_Locale_2;
+         Determined_Locale_3 : UString := +Determined_Locale_2;
       begin
          if
            Isset (XX_GET, "_locale") and then
@@ -769,7 +766,6 @@ package body Inc_L10n is
                              Locale : String := "") -- null
                              return Boolean
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
       use Php;
       use Php.Files;
@@ -777,9 +773,9 @@ package body Inc_L10n is
 
 -- @var WP_Textdomain_Registry wp_textdomain_registry
 --    global (l10n, l10n_unloaded, Wp_Textdomain_Registry);
-      Mofile_2        : Unbounded_String;
+      Mofile_2        : UString;
       Plugin_Override : Boolean;
-      Locale_2        : Unbounded_String := +Locale;
+      Locale_2        : UString := +Locale;
    begin
 --    l10n_unloaded := (array) l10n_unloaded;
 
@@ -1361,7 +1357,6 @@ package body Inc_L10n is
    function X_Load_Textdomain_Just_In_Time (Domain : String)
                                             return Boolean
    is
---    use Ada.Strings.Unbounded;
 --    use UStrings;
       use Php;
       use Php.Strings;
@@ -1628,7 +1623,6 @@ package body Inc_L10n is
    function Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
                                    return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Strings;
       use Array_Vectors;
@@ -1810,7 +1804,7 @@ package body Inc_L10n is
 
             -- Combine the output string.
             declare
-               Output : Unbounded_String :=
+               Output : UString :=
                  +Sprintf (
                    "<select name=""%s"" id=""%s"">",
                    To_List (List => (

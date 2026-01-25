@@ -7,11 +7,11 @@
 --
 
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
+
+with UStrings;
 
 package Class_Terms
 is
-   use Ada.Strings.Unbounded;
 
    --
    -- Core class used to implement the WP_Term object.
@@ -39,7 +39,7 @@ is
          -- @since 4.4.0
          -- @var string
          --
-         Name : Unbounded_String;
+         Name : UStrings.UString;
 
          --
          -- The term's slug.
@@ -47,7 +47,7 @@ is
          -- @since 4.4.0
          -- @var string
          --
-         Slug : Unbounded_String;
+         Slug : UStrings.UString;
 
          --
          -- The term's term_group.
@@ -71,7 +71,7 @@ is
          -- @since 4.4.0
          -- @var string
          --
-         Taxonomy : Unbounded_String;
+         Taxonomy : UStrings.UString;
 
          --
          -- The term's description.
@@ -79,7 +79,7 @@ is
          -- @since 4.4.0
          -- @var string
          --
-         Description : Unbounded_String;
+         Description : UStrings.UString;
 
          --
          -- ID of a term's parent term.
@@ -105,7 +105,8 @@ is
          -- @since 4.4.0
          -- @var string
          --
-         Filter : Unbounded_String := To_Unbounded_String ("raw");
+         Filter : UStrings.UString :=
+           UStrings.To_UString ("raw");
 
       end record;
 
@@ -115,7 +116,7 @@ is
       Term_Taxonomy_Id => 0,
       Parent           => 0,
       Count            => 0,
-      others           => Null_Unbounded_String);
+      others           => UStrings.Null_UString);
 
    package Term_Vectors is new
       Ada.Containers.Vectors (Index_Type   => Positive,

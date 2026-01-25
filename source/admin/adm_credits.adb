@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Echoing;
 with Php.Strings;
 
@@ -38,7 +36,6 @@ is
 
    procedure Render
    is
-      use Ada.Strings.Unbounded;
       use Php.Echoing;
       use Php.Strings;
       use UStrings;
@@ -47,7 +44,7 @@ is
       List : constant List_Type :=
          Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
 
-      Admin_Header    : Unbounded_String;
+      Admin_Header    : UString;
       Display_Version : constant String     := -List.First_Element;
       Credits         : constant JSON_Value := Adi_Credits.Wp_Credits;
    begin
@@ -216,7 +213,7 @@ is
          end Value;
 
          Lazy    : aliased My_Lazy;
-         Payload : constant Unbounded_String :=
+         Payload : constant UString :=
             Templates_Parser.Parse ("page/admin/credits.thtml",
                                     Translation,
                                     Lazy_Tag => Lazy'Unchecked_Access);

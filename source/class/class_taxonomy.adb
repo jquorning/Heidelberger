@@ -353,7 +353,7 @@ is
         (Inc_Load.Is_Admin or else Get_Option ("permalink_structure"))
       then
          declare
-            Tag : Unbounded_String;
+            Tag : UString;
          begin
             if
               This.Hierarchical and then

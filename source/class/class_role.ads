@@ -7,13 +7,12 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
 with Arrays;
+with UStrings;
 
 package Class_Role
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -30,7 +29,7 @@ is
          -- @since 2.0.0
          -- @var string
          --
-         Name : Unbounded_String;
+         Name : UStrings.UString;
 
          --
          -- List of capabilities the role contains.
@@ -102,7 +101,7 @@ is
          "="          => Class_Role."=");
 
    Null_Role : constant Wp_Role :=
-     (Name         => Null_Unbounded_String,
+     (Name         => UStrings.Null_UString,
       Capabilities => Empty_Array);
 
 end Class_Role;

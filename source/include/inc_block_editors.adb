@@ -6,8 +6,6 @@
 -- @since 5.8.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Files;
 with Php.Lists;
@@ -28,10 +26,10 @@ with Class_Theme_JSON_Resolver;
 
 package body Inc_Block_Editors
 is
-   use Ada.Strings.Unbounded;
+   use UStrings;
 
    Static_Default_Editor_Styles_File_Contents_Bool : Boolean := False;
-   Static_Default_Editor_Styles_File_Contents      : Unbounded_String;
+   Static_Default_Editor_Styles_File_Contents      : UStrings.UString;
 
    function Apply_Filters
               (Hook_Name : String;

@@ -6,11 +6,10 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 package Class_Networks
 is
-   use Ada.Strings.Unbounded;
 
    procedure Dummy;
 
@@ -54,7 +53,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        Domain : Unbounded_String;
+        Domain : UStrings.UString;
 
         --
         -- Path of the network.
@@ -62,7 +61,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        Path : Unbounded_String;
+        Path : UStrings.UString;
 
         --
         -- The ID of the network's main site.
@@ -76,7 +75,8 @@ is
         -- @var string
         --
 --        private
-        Blog_Id : Unbounded_String := To_Unbounded_String ("0");
+        Blog_Id : UStrings.UString :=
+          UStrings.To_UString ("0");
 
         --
         -- Domain used to set cookies for this network.
@@ -84,7 +84,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        Cookie_Domain : Unbounded_String;
+        Cookie_Domain : UStrings.UString;
 
         --
         -- Name of this network.
@@ -94,7 +94,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        Site_Name : Unbounded_String;
+        Site_Name : UStrings.UString;
 
         Prop : Prop_Type;
    end record;
@@ -102,6 +102,6 @@ is
    Null_Network : constant Wp_Network :=
      (Id     => 0,
       Prop   => (others => 0),
-      others => Null_Unbounded_String);
+      others => UStrings.Null_UString);
 
 end Class_Networks;

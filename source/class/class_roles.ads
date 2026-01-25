@@ -6,15 +6,13 @@
 -- @since 4.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 with Class_Role;
 
 package Class_Roles
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    Global_Wp_User_Roles : Array_Type;
@@ -68,7 +66,7 @@ is
          -- @since 2.0.0
          -- @var string
          --
-         Role_Key : Unbounded_String;
+         Role_Key : UStrings.UString;
 
          --
          -- Whether to use the database for retrieval and storage.

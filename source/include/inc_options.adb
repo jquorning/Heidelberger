@@ -5,7 +5,6 @@
 -- @subpackage Option
 --
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Php.HTML;
@@ -1651,7 +1650,6 @@ is
    function Wp_Set_All_User_Settings (User_Settings : Array_Type)
                                       return Boolean
    is
-      use Ada.Strings.Unbounded;
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
@@ -1660,7 +1658,7 @@ is
 --    global _updated_user_settings;
 
       User_Id  : constant Integer := Get_Current_User_Id;
-      Settings : Unbounded_String;
+      Settings : UString;
    begin
       if User_Id = 0 then
          return False;
@@ -2484,7 +2482,6 @@ is
    function Get_Site_Transient (Transient : String)
                                 return String_Maps.Map
    is
-      use Ada.Strings.Unbounded;
       use Php.Lists;
       use Php.Misc;
       use Php.Strings;
@@ -2493,7 +2490,7 @@ is
       use Inc_Load;
 
       Found : Boolean;
-      Value : Unbounded_String; -- Array_Type;
+      Value : UString; -- Array_Type;
    begin
       --
       -- Filters the value of an existing site transient before it is retrieved.

@@ -11,7 +11,6 @@ with Ada.Strings.Unbounded.Less_Case_Insensitive;
 
 with Arrays;
 with UStrings;
-with Php;
 
 with Adm_Menu;
 
@@ -25,10 +24,7 @@ with Inc_Plugins;
 
 package body Adi_Menu
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
-   use UStrings;
-   use Php;
 
    --
    -- Adds a CSS class to a string.
@@ -145,7 +141,7 @@ is
             Pos : constant Integer :=
               Strpos (String (-Menu_Page.Menu_Slug), "?"); -- (2)
 
-            Hook_Name : Unbounded_String;
+            Hook_Name : UString;
          begin
             if 0 /= Pos then
                -- Handle post_type=post|page|foo pages.
@@ -340,7 +336,7 @@ is
                Slug : constant Slug_Type := -Data.Menu_Slug;
             begin
                if not Inc_Capabilities.Current_User_Can (-Data.Capability) then -- (1)
-                  X_Wp_Menu_Nopriv.Append (Unbounded_String (Data.Menu_Slug)); -- := True; -- (2)
+                  X_Wp_Menu_Nopriv.Append (UString (Data.Menu_Slug)); -- := True; -- (2)
                end if;
 
                --
@@ -367,7 +363,7 @@ is
                -- If submenu is empty...
                if Submenu (Slug).Is_Empty then  -- (2)
                   -- And user Doesn't have privs, remove menu.
-                  if X_Wp_Menu_Nopriv.Contains (Unbounded_String (Data.Menu_Slug)) then  -- (2)
+                  if X_Wp_Menu_Nopriv.Contains (UString (Data.Menu_Slug)) then  -- (2)
 --                if Isset (X_Wp_Menu_Nopriv (Data.Menu_Slug)) then  -- (2)
                      Menu.Delete (Id);
 --                   Unset (Menu (Id));
@@ -536,7 +532,7 @@ is
 
       -- Remove the last menu item if it is a separator.
 --       declare
---          Last_Menu_Key : Unbounded_String;
+--          Last_Menu_Key : UString;
 --       begin
 --          Last_Menu_Key := Array_Keys (Menu);
 --          Last_Menu_Key := Array_Pop (Last_Menu_Key);

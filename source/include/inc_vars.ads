@@ -14,13 +14,12 @@
 -- @package WordPress
 --
 
-with Ada.Strings.Unbounded;
+with UStrings;
 
 package Inc_Vars
 is
-   use Ada.Strings.Unbounded;
 
-   Pagenow : Unbounded_String;
+   Pagenow : UStrings.UString;
 
    Is_Lynx   : Boolean;
    Is_Gecko  : Boolean;

@@ -6,13 +6,11 @@
 -- @since 5.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package Class_Object_Caches
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -74,7 +72,7 @@ is
         -- @var string
         --
         -- private
-        Blog_Prefix : Unbounded_String;
+        Blog_Prefix : UStrings.UString;
 
         --
         -- Holds the value of is_multisite().

@@ -6,13 +6,11 @@
 -- @since 1.5.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 package Class_Rewrites
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    --
@@ -39,7 +37,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         Permalink_Structure : Unbounded_String;
+         Permalink_Structure : UStrings.UString;
 
          --
          -- Whether to add trailing slashes.
@@ -80,7 +78,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         Page_Structure : Unbounded_String;
+         Page_Structure : UStrings.UString;
 
          --
          -- Base of the search permalink structure (example.com/search_base/query).
@@ -112,8 +110,8 @@ is
          -- @since 3.1.0
          -- @var string
          --
-         Pagination_Base : Unbounded_String :=
-           To_Unbounded_String ("page");
+         Pagination_Base : UStrings.UString :=
+           UStrings.To_UString ("page");
 
          --
          -- Comments pagination permalink base.
@@ -159,7 +157,7 @@ is
          --
          -- @see WP_Rewrite::init()
          --
-         Front : Unbounded_String;
+         Front : UStrings.UString;
 
          --
          -- The prefix for all permalink structures.
@@ -174,7 +172,7 @@ is
          -- @see WP_Rewrite::init()
          -- @see WP_Rewrite::using_index_permalinks()
          --
-         Root : Unbounded_String;
+         Root : UStrings.UString;
 
          --
          -- The name of the index file which is the entry point to all requests.
@@ -182,8 +180,8 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         Index : Unbounded_String :=
-           To_Unbounded_String ("index.php");
+         Index : UStrings.UString :=
+           UStrings.To_UString ("index.php");
 
          --
          -- Variable name to use for regex matches in the rewritten query.

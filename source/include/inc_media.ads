@@ -5,10 +5,9 @@
 -- @subpackage Media
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_Taxonomy;
 
@@ -19,7 +18,7 @@ is
 
    type Image_Src_Type is
      record
-        Source  : Ada.Strings.Unbounded.Unbounded_String;
+        Source  : UStrings.UString;
         Width   : Integer;
         Height  : Integer;
         Resized : Boolean;
@@ -66,7 +65,7 @@ is
    function Image_Downsize (Id   : Integer;
                             Size : String := "medium")
                             return Image_Src_Type
-   is (Source  => Ada.Strings.Unbounded.Null_Unbounded_String,
+   is (Source  => UStrings.Null_UString,
        Width   => 0,
        Height  => 0,
        Resized => False);

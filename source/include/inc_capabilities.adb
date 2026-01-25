@@ -5,8 +5,6 @@
 -- @subpackage Users
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Lists;
 with Php.Strings;
 with Php.Types;
@@ -62,11 +60,9 @@ is
                           Args    : Args_Type := Null_Args_Type)
                           return List_Type
    is
-      use Ada.Strings.Unbounded;
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Class_Posts;
       use Class_Post_Type;
       use Inc_Functions;
@@ -77,7 +73,7 @@ is
       use Inc_Posts;
 
       Caps  : List_Type;
-      Cap_2 : Unbounded_String;
+      Cap_2 : UString;
       Publish_Future : constant List_Type := To_List (List => (+"publish", +"future"));
    begin
       -- switch ( cap ) then
@@ -130,7 +126,7 @@ is
       then
          if Args.Post_Id = 0 then
             declare
-               Message : Unbounded_String;
+               Message : UString;
             begin
                if "delete_post" = Cap then
                   -- translators: %s: Capability name.
@@ -154,7 +150,7 @@ is
          declare
             Post      : Wp_Post      := Null_Post;
             Post_Type : Wp_Post_Type := Null_Post_Type;
-            Message   : Unbounded_String;
+            Message   : UString;
          begin
             Post := Get_Post (Args.Post_Id);
             if Post = Null_Post then
@@ -269,7 +265,7 @@ is
       then
          if Args.Post_Id = 0 then
             declare
-               Message : Unbounded_String;
+               Message : UString;
             begin
                if "edit_post" = Cap then
                   -- translators: %s: Capability name.
@@ -293,7 +289,7 @@ is
          declare
             Post      : Wp_Post      := Null_Post;
             Post_Type : Wp_Post_Type := Null_Post_Type;
-            Message   : Unbounded_String;
+            Message   : UString;
          begin
             Post := Get_Post (Args.Post_Id);
             if Post = Null_Post then
@@ -397,7 +393,7 @@ is
       then
          if Args.Post_Id = 0 then
             declare
-               Message : Unbounded_String;
+               Message : UString;
             begin
                if "read_post" = Cap then
                   -- translators: %s: Capability name.
@@ -570,7 +566,7 @@ is
          declare
             Expl_Cap    : constant List_Type := Explode ("_", Cap);
             Object_Type : constant String    := -Expl_Cap (2); -- [1]
-            Message     : Unbounded_String;
+            Message     : UString;
          begin
             if Args.Object_Id = 0 then
                if "post" = Object_Type then
@@ -605,7 +601,7 @@ is
                Object_Subtype : constant String :=
                  Get_Object_Subtype (Object_Type, Object_Id);
 
-               Meta_Key : Unbounded_String;
+               Meta_Key : UString;
                Allowed  : Boolean;
             begin
                if Empty (Object_Subtype) then
@@ -916,7 +912,7 @@ is
             Term_Id  : constant Integer := Args.Term_Id;
             Term     : constant Wp_Term := Get_Term (Term_Id);
             Tax      : Wp_Taxonomy := Null_Taxonomy;
-            Taxo_Cap : Unbounded_String;
+            Taxo_Cap : UString;
          begin
             if Term = Null_Term or else Is_Wp_Error (Term) then
                Append (Caps, "do_not_allow");

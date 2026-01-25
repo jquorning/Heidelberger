@@ -5,8 +5,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with UStrings;
 with Globals;
 with Lists;
@@ -23,7 +21,6 @@ with Inc_Plugins;
 
 package body Adm_Admin_Footer
 is
-   use Ada.Strings.Unbounded;
    use UStrings;
    use Lists;
    use Php;
@@ -42,7 +39,7 @@ is
       -- @global string $hook_suffix
       --
 --    global $hook_suffix;
-      Text : Unbounded_String;
+      Text : UString;
    begin
       Echo ("<div class=""clear""></div></div><!-- wpbody-content -->" & NL);
       Echo ("<div class=""clear""></div></div><!-- wpbody -->" & NL);

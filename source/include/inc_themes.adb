@@ -6,7 +6,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 with Php.Arrays;
 with Php.Echoing;
@@ -17,6 +16,7 @@ with Php.Types;
 
 with Binder;
 with Globals;
+with UStrings;
 
 -- with Class_Customize_Managers;
 with Inc_Formatting;
@@ -29,7 +29,7 @@ with Inc_REST_API;
 
 package body Inc_Themes
 is
-   use Ada.Strings.Unbounded;
+   use UStrings;
 
    Global_Wp_Theme_Features : Array_Type;
 
@@ -143,7 +143,7 @@ is
    begin
       if Empty (Theme_Root) then
          declare
-            Theme_Root : Unbounded_String := +Get_Raw_Theme_Root (Stylesheet_2);
+            Theme_Root : UString := +Get_Raw_Theme_Root (Stylesheet_2);
          begin
             if "" = Theme_Root then -- False =
                Theme_Root := Globals.WP_CONTENT_DIR & "/themes";
@@ -461,8 +461,8 @@ is
       use Php.Strings;
       use Inc_Formatting;
 
-      Directory_2 : Unbounded_String;
-      Untrailed   : Unbounded_String;
+      Directory_2 : UString;
+      Untrailed   : UString;
    begin
       if not File_Exists (Directory) then
          -- Try prepending as the theme directory could be relative to the content
@@ -647,7 +647,7 @@ is
 
 --      global wp_theme_directories;
 
-      Theme_Root : Unbounded_String; --  = "";
+      Theme_Root : UString; --  = "";
    begin
       if Stylesheet_Or_Template /= "" then
          Theme_Root := +Get_Raw_Theme_Root (Stylesheet_Or_Template);
@@ -752,7 +752,7 @@ is
       use UStrings;
 
 --    global wp_theme_directories;
-      Theme_Root : Unbounded_String;
+      Theme_Root : UString;
    begin
       if
         not Is_Array (Wp_Theme_Directories) or else
@@ -2613,10 +2613,10 @@ is
    NO_HEADER_TEXT      : Boolean;
    HEADER_IMAGE_WIDTH  : Natural;
    HEADER_IMAGE_HEIGHT : Natural;
-   HEADER_TEXTCOLOR    : Unbounded_String;
-   HEADER_IMAGE        : Unbounded_String;
-   BACKGROUND_COLOR    : Unbounded_String;
-   BACKGROUND_IMAGE    : Unbounded_String;
+   HEADER_TEXTCOLOR    : UStrings.UString;
+   HEADER_IMAGE        : UStrings.UString;
+   BACKGROUND_COLOR    : UStrings.UString;
+   BACKGROUND_IMAGE    : UStrings.UString;
 
    procedure Add_Theme_Support (Feature : String;
                                 List    : List_Type  := Empty_List;

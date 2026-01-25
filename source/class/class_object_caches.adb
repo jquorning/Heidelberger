@@ -121,7 +121,7 @@ is
                                        then "default"
                                        else Group);
 
-         Id : Unbounded_String := +Key;
+         Id : UString := +Key;
       begin
          if
            This.Multisite and then
@@ -162,7 +162,7 @@ is
          Group_2 : constant String := (if Empty (Group)
                                        then "default"
                                        else Group);
-         Key_2 : Unbounded_String := +Key;
+         Key_2 : UString := +Key;
       begin
          if
            This.Multisite and then
@@ -205,7 +205,7 @@ is
                                        then "default"
                                        else Group);
 
-         Key_2 : Unbounded_String := +Key;
+         Key_2 : UString := +Key;
       begin
          if
            This.Multisite and then
@@ -243,8 +243,8 @@ is
       use Php.Strings;
       use UStrings;
 
-      Key_2   : Unbounded_String := +Key;
-      Group_2 : Unbounded_String := +Group;
+      Key_2   : UString := +Key;
+      Group_2 : UString := +Group;
    begin
       if not This.Is_Valid_Key (Key) then
          Done := False;

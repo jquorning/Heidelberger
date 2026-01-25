@@ -7,8 +7,6 @@
 -- @subpackage Administration
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Lists;
 with Php.Misc;
@@ -39,7 +37,6 @@ is
 
    subtype Wp_Role is Class_Role.Wp_Role;
    Null_Role : constant Wp_Role := Class_Role.Null_Role;
-   use type Wp_Role;
 
    --
    -- Create the roles for WordPress 2.0
@@ -70,7 +67,6 @@ is
                               Blog_Id : Integer := 0)
                               return String
    is
-      use Ada.Strings.Unbounded;
       use Globals;
       use UStrings;
 
@@ -377,7 +373,7 @@ is
 "        KEY domain_path (domain(140),path(51)) " &
 ") " & Charset_Collate & ";";
 
-      Queries : Unbounded_String;
+      Queries : UString;
    begin
       if Scope in "blog" then
          Queries := +Blog_Tables;
@@ -416,7 +412,6 @@ is
 
    procedure Populate_Options (Options : Array_Type := Empty_Array)
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
@@ -449,8 +444,8 @@ is
       -- If WP_DEFAULT_THEME doesn't exist, fall back to the latest core
       -- default theme.
       declare
-         Stylesheet : Unbounded_String := WP_DEFAULT_THEME;
-         Template   : Unbounded_String := WP_DEFAULT_THEME;
+         Stylesheet : UString := WP_DEFAULT_THEME;
+         Template   : UString := WP_DEFAULT_THEME;
          Theme      : Wp_Theme := Wp_Get_Theme (-WP_DEFAULT_THEME);
       begin
          if not Theme.Exists then
@@ -466,7 +461,7 @@ is
          end if;
 
          declare
-            Timezone_String : Unbounded_String;
+            Timezone_String : UString;
             GMT_Offset      : Integer := 0;
             --
             -- translators: default GMT offset or timezone string. Must be either a
@@ -690,13 +685,13 @@ is
                       " WHERE option_name in (" & Keys & ")"));
                   -- phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
-                  Insert : Unbounded_String;
+                  Insert : UString;
                begin
                   for A in Options_2.Iterate loop
                      declare
                         Option : constant String := Key (A);
                         Value  : Multi_Type      := Element (A);
-                        Autoload : Unbounded_String;
+                        Autoload : UString;
                      begin
                         if In_List (Option, Existing_Options, True) then
                            goto Continue;
@@ -973,6 +968,7 @@ is
    is
       use UStrings;
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Roles : constant List_Type :=
         To_List (List => (+"administrator", +"editor"));
@@ -1038,6 +1034,7 @@ is
    procedure Populate_Roles_230
    is
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Role : Wp_Role := Get_Role ("administrator");
    begin
@@ -1053,6 +1050,7 @@ is
    procedure Populate_Roles_250
    is
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Role : Wp_Role := Get_Role ("administrator");
    begin
@@ -1068,6 +1066,7 @@ is
    procedure Populate_Roles_260
    is
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Role : Wp_Role := Get_Role ("administrator");
    begin
@@ -1084,6 +1083,7 @@ is
    procedure Populate_Roles_270
    is
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Role : Wp_Role := Get_Role ("administrator");
    begin
@@ -1100,6 +1100,7 @@ is
    procedure Populate_Roles_280
    is
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Role : Wp_Role := Get_Role ("administrator");
    begin
@@ -1115,6 +1116,7 @@ is
    procedure Populate_Roles_300
    is
       use Inc_Capabilities;
+      use type Wp_Role;
 
       Role : Wp_Role := Get_Role ("administrator");
    begin

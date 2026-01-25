@@ -6,17 +6,17 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
+
+with Php.Echoing;
+with Php.Files;
+with Php.Preg;
+with Php.Strings;
 
 with Arrays;
 with Binder;
 with Globals;
 with UStrings;
 with Lists;
-with Php.Echoing;
-with Php.Files;
-with Php.Preg;
-with Php.Strings;
 
 with Adi_Plugins;
 with Inc_Capabilities;
@@ -28,17 +28,13 @@ with Inc_Plugins;
 package body Adm_Menu_Header
 is
    use Arrays;
-   use Globals;
-   use Php;
-   use Inc_L10n;
-   use UStrings;
    use Lists;
 
    -------------
    -- Globals --
    -------------
 
-   Self : Ada.Strings.Unbounded.Unbounded_String;
+   Self : UStrings.UString;
 
    --
    -- The current page.
@@ -47,13 +43,13 @@ is
    --
    procedure Top
    is
-      use Ada.Strings.Unbounded;
-      use Binder;
       use Php.Preg;
+      use Binder;
+      use UStrings;
 --    use Adm_Menu;
 
 --    Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
-      Unused : Unbounded_String;
+      Unused : UString;
       Self_2 : constant String := As_String (Get (X_SERVER, "PHP_SELF"));
       Self_3 : constant String := Preg_Replace ("|^.*/wp-admin/network/|i",
                                                 "", Self_2);
@@ -106,14 +102,16 @@ is
       Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True)
    is
-      use Ada.Strings.Unbounded;
+      use UStrings;
       use Php.Echoing;
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use Globals;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Formatting;
+      use Inc_L10n;
 
 --        global self, parent_file, submenu_file, plugin_page, typenow;
       First : Boolean := True;
@@ -130,8 +128,8 @@ is
 
             Admin_Is_Parent : Boolean    := False;
             Class           : List_Type  := Empty_List;
-            Aria_Attributes : Unbounded_String;
-            Aria_Hidden     : Unbounded_String;
+            Aria_Attributes : UString;
+            Aria_Hidden     : UString;
             Is_Separator    : Boolean    := False;
 
             Submenu_Items : Adm_Menu.Inner_Maps.Map;
@@ -183,9 +181,9 @@ is
                                                  -Item.Hookname) & """"
                    else "");
 
-               Img       : Unbounded_String;
-               Img_Style : Unbounded_String;
-               Img_Class : Unbounded_String := +" dashicons-before";
+               Img       : UString;
+               Img_Style : UString;
+               Img_Class : UString := +" dashicons-before";
             begin
                if 0 /= Strpos (Class_2, "wp-menu-separator") then
                   Is_Separator := True;
@@ -338,7 +336,7 @@ is
                         declare
                            Sub_Item        : constant Adm_Menu.Submenu_Item := Sub;
                            Class           : List_Type := Empty_List;
-                           Aria_Attributes : Unbounded_String;
+                           Aria_Attributes : UString;
                         begin
                            if Current_User_Can (-Sub_Item.Capability) then
                               goto Continue_1;
@@ -425,7 +423,7 @@ is
                                      not File_Exists (ABSPATH & "/wp-admin/sub_file"))
                                  then
                                     declare
-                                       Sub_Item_Url : Unbounded_String;
+                                       Sub_Item_Url : UString;
                                     begin
                                        -- If admin.php is the current page or if the
                                        -- parent exists as a file in the plugins or
@@ -489,8 +487,8 @@ is
       use Php.Echoing;
       use Adm_Menu;
       use Inc_Plugins;
+      use Inc_L10n;
    begin
--- ?>
       Echo ("<div id=""adminmenumain"" role=""navigation"" aria-label=""");
       ESC_Attr_E ("Main menu");
       Echo (""">");
@@ -503,8 +501,6 @@ is
           "<div id=""adminmenuback""></div>" &
           "<div id=""adminmenuwrap"">" &
           "<ul id=""adminmenu"">");
-
--- <?php
 
       X_Wp_Menu_Output (Menu, Submenu);
       --

@@ -6,10 +6,10 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 
 with Arrays;
 with Lists;
+with UStrings;
 
 with Class_Posts;
 with Class_Post_Type;
@@ -17,7 +17,6 @@ with Class_Taxonomy;
 
 package Inc_Posts
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
    use Lists;
    use Class_Posts;
@@ -73,7 +72,7 @@ is
       record
 
 --       @type bool|string
-         Label : Unbounded_String;
+         Label : UStrings.UString;
          -- A descriptive name for the post status marked
          -- for translation. Defaults to value of post_status.
 
@@ -265,7 +264,7 @@ is
          -- rewrite rules, an array can be passed with any of these keys:
 
 --       @type string
-         Slug : Unbounded_String;
+         Slug : UStrings.UString;
          -- Customize the permastruct slug. Defaults to post_type key.
 
 --       @type bool
@@ -290,7 +289,7 @@ is
       end record;
 
    Empty_Rewrite : constant Rewrite_Rec :=
-     (Slug       => Null_Unbounded_String,
+     (Slug       => UStrings.Null_UString,
       With_Front => False,
       Feeds      => False,
       Pages      => False,
@@ -305,7 +304,7 @@ is
    type Args_Type is
       record
 --       @type string
-         Label : Unbounded_String;
+         Label : UStrings.UString;
          -- Name of the post type shown in the menu. Usually plural.
          -- Default is value of labels["name"].
 
@@ -317,7 +316,7 @@ is
          -- list of supported labels.
 
 --       @type string
-         Description : Unbounded_String;
+         Description : UStrings.UString;
          -- A short descriptive summary of what the post type is.
          -- Default empty.
 
@@ -355,7 +354,7 @@ is
 
 --       @type bool|string
          Show_In_Menu_Bool : Boolean;
-         Show_In_Menu : Unbounded_String;
+         Show_In_Menu : UStrings.UString;
          -- Where to show the post type in the admin menu. To work, show_ui
          -- must be true. If true, the post type is shown in its own top level
          -- menu. If false, no menu is shown. If a string of an existing top
@@ -379,15 +378,15 @@ is
          -- for the post type to be available in the block editor.
 
 --       @type string
-         REST_Base : Unbounded_String;
+         REST_Base : UStrings.UString;
          -- To change the base URL of REST API route. Default is post_type.
 
 --       @type string
-         REST_Namespace : Unbounded_String;
+         REST_Namespace : UStrings.UString;
          -- To change the namespace URL of REST API route. Default is wp/v2.
 
 --       @type string
-         REST_Controller_Class : Unbounded_String;
+         REST_Controller_Class : UStrings.UString;
          -- REST API controller class name. Default is "WP_REST_Posts_Controller".
 
 --       @type int
@@ -396,7 +395,7 @@ is
          -- show_in_menu must be true. Default null (at the bottom).
 
 --       @type string
-         Menu_Icon : Unbounded_String;
+         Menu_Icon : UStrings.UString;
          -- The URL to the icon to be used for this menu. Pass a base64-encoded
          -- SVG using a data URI, which will be colored to match the color scheme
          -- -- this should begin with "data:image/svg+xml;base64,". Pass the name
@@ -405,7 +404,7 @@ is
          -- so an icon can be added via CSS. Defaults to use the posts icon.
 
 --       @type string|array
-         Capability_Type_String : Unbounded_String;
+         Capability_Type_String : UStrings.UString;
          Capability_Type_Array  : Array_Type;
          -- The string to use to build the read, edit, and delete capabilities.
          -- May be passed as an array to allow for alternative plurals when using
@@ -452,7 +451,7 @@ is
 
 --       @type bool|string
          Has_Archive_Bool : Boolean;
-         Has_Archive : Unbounded_String;
+         Has_Archive : UStrings.UString;
          -- Whether there should be post type archives, or if a string, the
          -- archive slug to use. Will generate the proper rewrite rules if
          -- rewrite is enabled. Default false.
@@ -478,7 +477,7 @@ is
 
 --       @type string|bool
          Query_Var_Bool : Boolean;
-         Query_Var : Unbounded_String;
+         Query_Var : UStrings.UString;
          -- Sets the query_var key for this post type. Defaults to post_type
          -- key. If false, a post type cannot be loaded at
          -- ?thenquery_varend;=thenpost_slugend;. If specified as a string, the query
@@ -507,7 +506,7 @@ is
 
 --       @type string|false
          Template_Lock_Bool : Boolean;
-         Template_Lock : Unbounded_String;
+         Template_Lock : UStrings.UString;
          -- Whether the block template should be locked if template is set.
          -- -- If set to "all", the user is unable to insert new blocks,
          -- move existing blocks and delete blocks.
@@ -521,7 +520,7 @@ is
          -- "built-in" post_type. Default false.
 
 --       @type string
-         X_Edit_Link : Unbounded_String;
+         X_Edit_Link : UStrings.UString;
          -- FOR INTERNAL USE ONLY! URL segment to use for edit link of
          -- this post type. Default "post.php?post=%d".
       end record;
@@ -1459,7 +1458,7 @@ is
                   Value : String) is null;
 
    Null_Status : constant Status_Type :=
-     (Label       => Null_Unbounded_String,
+     (Label       => UStrings.Null_UString,
       Label_Count => Empty_Array,
       others      => False);
          -- Exclude_From_Search : Boolean;

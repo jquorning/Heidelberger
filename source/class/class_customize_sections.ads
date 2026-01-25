@@ -6,15 +6,13 @@
 -- @since 3.4.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Arrays;
+with UStrings;
 
 limited with Class_Customize_Managers;
 
 package Class_Customize_Sections
 is
-   use Ada.Strings.Unbounded;
    use Arrays;
 
    type Wp_Customize_Section;
@@ -55,7 +53,7 @@ is
          -- @since 3.4.0
          -- @var string
          --
-         Id : Unbounded_String;
+         Id : UStrings.UString;
 
          --
          -- Priority of the section which informs load order of sections.

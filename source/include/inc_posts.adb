@@ -31,8 +31,6 @@ with Inc_Plugins;
 
 package body Inc_Posts
 is
--- use UStrings;
-   use Php;
    use Inc_L10n;
 
    package Post_Type_Maps is new
@@ -94,7 +92,7 @@ is
                         Rewrite_Bool          => False,
                         Rewrite               => Empty_Rewrite,
                         Query_Var_Bool        => False,
-                        Query_Var             => Null_Unbounded_String,
+                        Query_Var             => Null_UString,
                         Delete_With_User      => True,
                         Supports              =>
                           To_List (List => (+"title", +"editor", +"author",
@@ -106,25 +104,25 @@ is
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
 
                         -- Added
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
                         Capabilities         => Empty_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String
+                        Template_Lock        => Null_UString
                 )
         );
 
@@ -146,7 +144,7 @@ is
                         Menu_Icon             => +"dashicons-admin-page",
                         Hierarchical          => True,
                         Rewrite               => Empty_Rewrite,
-                        Query_Var             => Null_Unbounded_String,
+                        Query_Var             => Null_UString,
                         Delete_With_User      => True,
                         Supports              =>
                           To_List (List => (+"title", +"editor", +"author",
@@ -158,27 +156,27 @@ is
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
 
                         -- Added
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
 --                      Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
                         Capabilities         => Empty_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String
+                        Template_Lock        => Null_UString
                 )
         );
 
@@ -206,7 +204,7 @@ is
                         Menu_Icon             => +"dashicons-admin-media",
                         Hierarchical          => False,
                         Rewrite               => Empty_Rewrite,
-                        Query_Var             => Null_Unbounded_String,
+                        Query_Var             => Null_UString,
                         Show_In_Nav_Menus     => False,
                         Delete_With_User      => True,
                         Supports              =>
@@ -216,29 +214,29 @@ is
                         REST_Controller_Class => +"WP_REST_Attachments_Controller",
 
                         -- Added
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
 --                        Show_Ui              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
 --                        Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
-                        REST_Namespace       => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0
---                        Capability_Type      => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
                 )
         );
       Add_Post_Type_Support ("attachment:audio", "thumbnail");
@@ -259,39 +257,39 @@ is
                         Map_Meta_Cap     => True,
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
-                        Query_Var        => Null_Unbounded_String,
+                        Query_Var        => Null_UString,
                         Can_Export       => False,
                         Delete_With_User => True,
                         Supports         => To_List ("author"),
 
                         -- Added
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
                         Show_In_REST         => False,
-                        REST_Namespace       => Null_Unbounded_String,
-                        REST_Base            => Null_Unbounded_String,
-                        REST_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+                        REST_Base            => Null_UString,
+                        REST_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
                         Capabilities         => Empty_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
 --                      Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0
---                        Capability_Type      => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
                 )
         );
 
@@ -307,9 +305,9 @@ is
                         Hierarchical          => False,
                         Rewrite               => Empty_Rewrite,
                         Delete_With_User      => False,
-                        Query_Var             => Null_Unbounded_String,
+                        Query_Var             => Null_UString,
                         Map_Meta_Cap          => True,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  =>
                            Arrays.To_Array ((1 => Build ("edit_theme_options",
                                                          "edit_theme_options"))),
@@ -337,34 +335,34 @@ is
 
                         -- Added
                         Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        REST_Namespace       => Null_Unbounded_String,
---                        Rest_Base            => Null_Unbounded_String,
---                        Rest_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+--                        Rest_Base            => Null_UString,
+--                        Rest_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -378,7 +376,7 @@ is
                         Public           => False,
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
-                        Query_Var        => Null_Unbounded_String,
+                        Query_Var        => Null_UString,
                         Delete_With_User => False,
                         Can_Export       => True,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
@@ -400,37 +398,37 @@ is
 
                         -- Added
                         Map_Meta_Cap           => False,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
                         Show_In_REST         => False,
-                        REST_Namespace       => Null_Unbounded_String,
-                        REST_Base            => Null_Unbounded_String,
-                        REST_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+                        REST_Base            => Null_UString,
+                        REST_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
 --                        Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -455,7 +453,7 @@ is
                         Map_Meta_Cap     => True,
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
-                        Query_Var        => Null_Unbounded_String,
+                        Query_Var        => Null_UString,
                         Can_Export       => False,
                         Delete_With_User => False,
                         Supports         => To_List (List => (+"title", +"author")),
@@ -481,37 +479,37 @@ is
 
                         -- Added
 --                        Map_Meta_Cap           => False,
---                        Capability_Type_String => Null_Unbounded_String,
+--                        Capability_Type_String => Null_UString,
 --                        Capability_Type_Array  => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
                         Show_In_REST         => False,
-                        REST_Namespace       => Null_Unbounded_String,
-                        REST_Base            => Null_Unbounded_String,
-                        REST_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+                        REST_Base            => Null_UString,
+                        REST_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
 --                        Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -525,7 +523,7 @@ is
                         Public           => False,
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
-                        Query_Var        => Null_Unbounded_String,
+                        Query_Var        => Null_UString,
                         Delete_With_User => False,
                         Can_Export       => False,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
@@ -533,38 +531,38 @@ is
 
                         -- Added
                         Map_Meta_Cap           => False,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
                         Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
                         Show_In_REST         => False,
-                        REST_Namespace       => Null_Unbounded_String,
-                        REST_Base            => Null_Unbounded_String,
-                        REST_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+                        REST_Base            => Null_UString,
+                        REST_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
 --                        Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -579,45 +577,45 @@ is
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
-                        Query_Var        => Null_Unbounded_String,
+                        Query_Var        => Null_UString,
                         Can_Export       => False,
                         Delete_With_User => False,
                         Supports         => Empty_List,
 
                         -- Added
                         Map_Meta_Cap           => False,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
                         Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
                         Show_UI              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
                         Show_In_REST         => False,
-                        REST_Namespace       => Null_Unbounded_String,
-                        REST_Base            => Null_Unbounded_String,
-                        REST_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+                        REST_Base            => Null_UString,
+                        REST_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
 --                        Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -648,7 +646,7 @@ is
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
                         Show_UI               => True,
-                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_Menu          => Null_UString,
                         Rewrite               => Empty_Rewrite,
                         Show_In_REST          => True,
                         REST_Base              => +"blocks",
@@ -674,41 +672,41 @@ is
 
                         -- Added
                         Hierarchical           => False,
-                        Query_Var              => Null_Unbounded_String,
+                        Query_Var              => Null_UString,
 --                        Map_Meta_Cap           => False,
---                        Capability_Type_String => Null_Unbounded_String,
+--                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
 --                        Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
-                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
 --                        Show_Ui              => False,
                         Show_In_Menu_Bool    => False,
---                        Show_In_Menu         => Null_Unbounded_String,
+--                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        REST_Namespace       => Null_Unbounded_String,
---                        Rest_Base            => Null_Unbounded_String,
---                        Rest_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+--                        Rest_Base            => Null_UString,
+--                        Rest_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Delete_With_User     => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -738,14 +736,14 @@ is
                         Description           => +abs "Templates to include in your theme.",
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        Has_Archive           => Null_Unbounded_String,
+                        Has_Archive           => Null_UString,
                         Show_UI               => False,
-                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_Menu          => Null_UString,
                         Show_In_REST          => True,
                         Rewrite               => Empty_Rewrite,
                         REST_Base             => +"templates",
                         REST_Controller_Class => +"WP_REST_Templates_Controller",
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Arrays.To_Array ((1 =>  Build ("template", "templates"))),
                         Capabilities          => Arrays.To_Array ((
                                 Build ("create_posts",           "edit_theme_options"),
@@ -773,41 +771,41 @@ is
 
                         -- Added
                         Hierarchical           => False,
-                        Query_Var              => Null_Unbounded_String,
+                        Query_Var              => Null_UString,
 --                        Map_Meta_Cap           => False,
---                        Capability_Type_String => Null_Unbounded_String,
+--                        Capability_Type_String => Null_UString,
 --                        Capability_Type_Array  => Empty_Array,
 --                        Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
---                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+--                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
 --                        Show_Ui              => False,
                         Show_In_Menu_Bool    => False,
---                        Show_In_Menu         => Null_Unbounded_String,
+--                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        REST_Namespace       => Null_Unbounded_String,
---                        Rest_Base            => Null_Unbounded_String,
---                        Rest_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+--                        Rest_Base            => Null_UString,
+--                        Rest_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
---                        Has_Archive          => Null_Unbounded_String,
+--                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Delete_With_User     => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -837,9 +835,9 @@ is
                         Description           => +abs "Template parts to include in your templates.",
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
-                        Has_Archive           => Null_Unbounded_String,
+                        Has_Archive           => Null_UString,
                         Show_UI               => False,
-                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_Menu          => Null_UString,
                         Show_In_REST          => True,
                         Rewrite               => Empty_Rewrite,
                         REST_Base             => +"template-parts",
@@ -870,41 +868,41 @@ is
 
                         -- Added
                         Hierarchical           => False,
-                        Query_Var              => Null_Unbounded_String,
+                        Query_Var              => Null_UString,
 --                        Map_Meta_Cap           => False,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
 --                        Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
-                        Label                => Null_Unbounded_String,
---                        Description          => Null_Unbounded_String,
+                        Label                => Null_UString,
+--                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
 --                        Show_Ui              => False,
                         Show_In_Menu_Bool    => False,
---                        Show_In_Menu         => Null_Unbounded_String,
+--                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        REST_Namespace       => Null_Unbounded_String,
---                        Rest_Base            => Null_Unbounded_String,
---                        Rest_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+--                        Rest_Base            => Null_UString,
+--                        Rest_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
---                        Has_Archive          => Null_Unbounded_String,
+--                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Delete_With_User     => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -937,41 +935,41 @@ is
                         -- Added
                         Labels                 => Empty_Array,
                         Hierarchical           => False,
-                        Query_Var              => Null_Unbounded_String,
+                        Query_Var              => Null_UString,
 --                        Map_Meta_Cap           => False,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
 --                        Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
---                        Label                => Null_Unbounded_String,
---                        Description          => Null_Unbounded_String,
+--                        Label                => Null_UString,
+--                        Description          => Null_UString,
                         Exclude_From_Search  => True,
                         Publicly_Queryable   => False,
 --                        Show_Ui              => False,
                         Show_In_Menu_Bool    => False,
-                        Show_In_Menu         => Null_Unbounded_String,
+                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
                         Show_In_Admin_Bar    => False,
 --                        Show_In_Rest         => False,
-                        REST_Namespace       => Null_Unbounded_String,
-                        REST_Base            => Null_Unbounded_String,
-                        REST_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+                        REST_Base            => Null_UString,
+                        REST_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
-                        Has_Archive          => Null_Unbounded_String,
+                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Delete_With_User     => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -1001,9 +999,9 @@ is
                         Description           => +abs "Navigation menus that can be inserted into your site.",
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don't use this when registering your own post type.
-                        Has_Archive           => Null_Unbounded_String,
+                        Has_Archive           => Null_UString,
                         Show_UI               => True,
-                        Show_In_Menu          => Null_Unbounded_String,
+                        Show_In_Menu          => Null_UString,
                         Show_In_Admin_Bar     => False,
                         Show_In_REST          => True,
                         Rewrite               => Empty_Rewrite,
@@ -1034,47 +1032,47 @@ is
 --                        Protect                => False,
 --                        Privat                 => False,
 --                        Publicly_Queryable     => False,
-                        Label                  => Null_Unbounded_String,
+                        Label                  => Null_UString,
 --                        Labels                 => Empty_Array,
                         Hierarchical           => False,
-                        Query_Var              => Null_Unbounded_String,
+                        Query_Var              => Null_UString,
 --                        Map_Meta_Cap           => False,
-                        Capability_Type_String => Null_Unbounded_String,
+                        Capability_Type_String => Null_UString,
                         Capability_Type_Array  => Empty_Array,
 --                        Capabilities         => Empty_Array,
 --                        Supports             => Empty_List,
---                        Label                => Null_Unbounded_String,
---                        Description          => Null_Unbounded_String,
+--                        Label                => Null_UString,
+--                        Description          => Null_UString,
                         Exclude_From_Search  => False,
                         Publicly_Queryable   => False,
 --                        Show_Ui              => False,
                         Show_In_Menu_Bool    => False,
---                        Show_In_Menu         => Null_Unbounded_String,
+--                        Show_In_Menu         => Null_UString,
                         Show_In_Nav_Menus    => False,
 --                        Show_In_Admin_Bar    => False,
 --                        Show_In_Admin_All_List => False,
 --                        Show_In_Admin_Status_List => False,
 --                        Date_Floating             => False,
 --                        Show_In_Rest         => False,
-                        REST_Namespace       => Null_Unbounded_String,
---                        Rest_Base            => Null_Unbounded_String,
---                        Rest_Controller_Class => Null_Unbounded_String,
-                        Menu_Icon            => Null_Unbounded_String,
+                        REST_Namespace       => Null_UString,
+--                        Rest_Base            => Null_UString,
+--                        Rest_Controller_Class => Null_UString,
+                        Menu_Icon            => Null_UString,
 --                        Capabilities         => Empty_String_Array,
                         Register_Meta_Box_CB => Null_Callable,
                         Taxonomies           => Empty_List,
                         Has_Archive_Bool     => False,
---                        Has_Archive          => Null_Unbounded_String,
+--                        Has_Archive          => Null_UString,
                         Rewrite_Bool         => False,
                         Query_Var_Bool       => False,
                         Delete_With_User     => False,
                         Can_Export           => False,
                         Template             => Empty_Array,
                         Template_Lock_Bool   => False,
-                        Template_Lock        => Null_Unbounded_String,
+                        Template_Lock        => Null_UString,
                         Menu_Position        => 0,
---                        Capability_Type      => Null_Unbounded_String
-                        X_Edit_Link          => Null_Unbounded_String
+--                        Capability_Type      => Null_UString
+                        X_Edit_Link          => Null_UString
                 )
         );
 
@@ -1653,6 +1651,7 @@ is
                       return Wp_Post
    is
       use Wp_Common;
+      use UStrings;
 
       Post_2 : constant Wp_Post := Post;
       X_Post : Wp_Post;
@@ -1830,7 +1829,7 @@ is
 
       Post_2 : constant Wp_Post := Get_Post (Post);
 
-      Post_Status : Unbounded_String := Post_2.Post_Status;
+      Post_Status : UString := Post_2.Post_Status;
    begin
 --    if ( ! is_object( Post_2 ) ) then
 --       return False;
@@ -3635,7 +3634,7 @@ is
          use Inc_Plugins;
 
          Prefixed        : Boolean    := False;
-         Field_No_Prefix : Unbounded_String;
+         Field_No_Prefix : UString;
 --         Value_2         : Array_Type := Value_2;
          Format_To_Edit  : List_Type;
       begin
@@ -6854,7 +6853,7 @@ is
       end if;
 
       declare
-         URI : Unbounded_String := Page.Post_Name;
+         URI : UString := Page.Post_Name;
       begin
          raise Program_Error with "not implemented";
 --       for Parent of Page.Ancestors loop

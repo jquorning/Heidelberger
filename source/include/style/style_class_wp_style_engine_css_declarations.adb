@@ -8,8 +8,6 @@
 -- @since 6.1.0
 --
 
-with Ada.Strings.Unbounded;
-
 with UStrings;
 with Php.Strings;
 
@@ -155,13 +153,11 @@ is
                Indent_Count    : Natural := 0)
                return String
    is
-      use Ada.Strings.Unbounded;
       use UStrings;
-      use Php;
       use Php.Strings;
 
       Declarations_Array  : constant Array_Type := This.Get_Declarations;
-      Declarations_Output : Unbounded_String;
+      Declarations_Output : UString;
 
       Indent : constant String :=
         (if Should_Prettify then Str_Repeat ("\t", Indent_Count) else "");

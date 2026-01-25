@@ -17,8 +17,6 @@
 -- @since 2.2.0
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.Lists;
@@ -60,20 +58,18 @@ is
    function Dynamic_Sidebar (Index : String := "1") -- 1
                              return Boolean
    is
-      use Ada.Strings.Unbounded;
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Echoing;
       use Php.Misc;
       use Php.Strings;
+      use UStrings;
       use Class_Customize_Widgets;
       use Inc_Formatting;
       use Inc_Load;
       use Inc_Plugins;
 --    Global_wp_registered_sidebars
 --    Global_wp_registered_widgets;
-      Index_2 : Unbounded_String;
+      Index_2 : UString;
    begin
 --    if Is_Int (Index) then
 --       Index_2 := +"sidebar-index";
@@ -171,7 +167,7 @@ is
                     );
 
                   -- Substitute HTML `id` and `class` attributes into `before_widget`.
-                  Classname_X : Unbounded_String;
+                  Classname_X : UString;
                   Callback : Arrays.Callable;
                begin
                   for

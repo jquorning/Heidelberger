@@ -5,7 +5,6 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
@@ -151,7 +150,6 @@ is
                            Args      : Array_Type)
                            return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
@@ -200,7 +198,7 @@ is
       Array_Unshift (Args_2, Value);
 
       declare
-         Unused   : Unbounded_String;
+         Unused   : UString;
          Filter   : Wp_Hook renames Global_Wp_Filter (Hook_Name);
          Filtered : constant String :=
            Filter.Apply_Filters (Value, Args_2);
@@ -688,7 +686,6 @@ is
    function Plugin_Basename (File : String)
                              return String
    is
-      use Ada.Strings.Unbounded;
       use Php.Arrays;
       use Php.Preg;
       use Php.Strings;
@@ -696,7 +693,7 @@ is
       use Inc_Functions;
 
       -- wp_plugin_paths contains normalized paths.
-      File_2 : Unbounded_String := +Wp_Normalize_Path (File);
+      File_2 : UString := +Wp_Normalize_Path (File);
    begin
       Arsort (Global_Wp_Plugin_Paths);
 

@@ -2,9 +2,6 @@
 --
 --
 
-with Ada.Strings.Unbounded;
-
--- with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
@@ -41,7 +38,6 @@ is
 
    procedure Run
    is
-      use Ada.Strings.Unbounded;
       use Arrays;
       use Binder;
       use Globals;
@@ -55,11 +51,11 @@ is
       use Php.Strings;
       use Class_Dependency;
 
-      Protocol : Unbounded_String;
-      Load     : Unbounded_String;
+      Protocol : UString;
+      Load     : UString;
       Load_2   : List_Type;
       RTL      : Boolean;
-      Outt     : Unbounded_String;
+      Outt     : UString;
 
       Wp_Styles : Class_Styles.Wp_Styles;
 
@@ -122,8 +118,8 @@ is
             use Dependency_Maps;
 
             Style   : X_Wp_Dependency renames Wp_Styles.Registered (-Handle);
-            Content : Unbounded_String;
-            Path    : Unbounded_String;
+            Content : UString;
+            Path    : UString;
          begin
 
             if not Has_Element (Wp_Styles.Registered.Find (-Handle)) then
