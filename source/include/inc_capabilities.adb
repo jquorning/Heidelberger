@@ -11,6 +11,7 @@ with Php.Types;
 
 with Globals;
 with UStrings;
+with Wp_Common;
 
 with Class_Comments;
 with Class_Post_Type;
@@ -34,23 +35,6 @@ is
    Global_Super_Admins        : List_Type;
    Global_Post_Type_Meta_Caps : Array_Type;
 
-   function Apply_Filters (Hook  : String;
-                           Value : List_Type;
-                           S     : String;
-                           U     : Integer;
-                           Args  : Args_Type)
-                           return List_Type
-                           is (Value);
-
-   function Apply_Filters (Hook  : String;
-                           Value : Boolean;
-                           S     : String;
-                           O_Id  : Integer;
-                           U_Id  : Integer;
-                           C     : String;
-                           L     : List_Type)
-                           return Boolean
-                           is (Value);
    ------------------
    -- Map_Meta_Cap --
    ------------------
@@ -63,6 +47,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
       use Inc_Functions;

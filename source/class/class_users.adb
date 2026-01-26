@@ -29,13 +29,6 @@ with Inc_Users;
 package body Class_Users
 is
 
-   function Apply_Filters (Hook  : String;
-                           Value : Array_Type;
-                           Caps  : List_Type;
-                           -- Args,
-                           This  : Wp_User)
-                           return Array_Type
-                           is (Value);
    -----------------
    -- X_Construct --
    -----------------
@@ -844,9 +837,10 @@ is
                      -- ...args )
                      return Boolean
    is
-      use UStrings;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use Inc_Capabilities;
       use Inc_Load;
    begin

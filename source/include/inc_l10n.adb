@@ -15,6 +15,7 @@ with Php.Types;
 with Array_Vectors;
 with Binder;
 with Globals;
+with Wp_Common;
 
 with Adi_Translation_Install;
 with Class_Locale_Switchers;
@@ -31,14 +32,6 @@ package body Inc_L10n is
    Global_Wp_Locale_Switcher : Class_Locale_Switchers.Wp_Locale_Switcher;
 
    function "abs" (Item : String) return String is (Item);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : String;
-                           Text      : String;
-                           Context   : String;
-                           Domain    : String)
-                           return String
-                           is (Value);
 
    ----------------
    -- Array_Keys --
@@ -320,6 +313,7 @@ package body Inc_L10n is
                                             Domain  : String := "default")
                                             return String
    is
+      use Wp_Common;
 --    use Inc_Plugins;
       use POMO_Translations;
 

@@ -31,12 +31,6 @@ with Inc_Themes;
 package body Inc_Taxonomys
 is
 
-   function Apply_Filters (Hook  : String;
-                           Value : Array_Type;
-                           Oi    : List_Type;
-                           Tax   : Array_Type)
-                           return Array_Type
-                           is (Value);
    --
    -- Taxonomy registration.
    --

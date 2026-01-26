@@ -10,6 +10,8 @@ with Php.Arrays;
 with Php.Lists;
 with Php.Types;
 
+with Wp_Common;
+
 with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
@@ -20,25 +22,6 @@ with Class_Customize_Managers;
 
 package body Class_Customize_Settings
 is
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : String;
-                           This      : Wp_Customize_Setting)
-                           return String
-                           is (Value);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Multi_Type;
-                           This      : Wp_Customize_Setting)
-                           return Multi_Type
-                           is (Value);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Class_Errors.Wp_Error;
-                           Value_2   : Multi_Type;
-                           This      : Wp_Customize_Setting)
-                           return Class_Errors.Wp_Error
-                           is (Value);
 
    type Proc_Access is access procedure (This : in out Wp_Customize_Setting);
 
@@ -427,6 +410,7 @@ is
                       return Multi_Type
    is
       use UStrings;
+      use Wp_Common;
 --    use Inc_Plugins;
    begin
       --
@@ -449,9 +433,10 @@ is
                       return Validate_Result
    is
       use UStrings;
+      use Wp_Common;
+      use Class_Errors;
       use Inc_L10n;
       use Inc_Load;
-      use Class_Errors;
 --    use Inc_Plugins;
    begin
       -- if Is_Wp_Error (Value) then
@@ -504,6 +489,7 @@ is
                    return String
    is
       use UStrings;
+      use Wp_Common;
 --    use Inc_Plugins;
 
       Id_Base      : constant String := Get_As_String (This.Id_Data, "base");

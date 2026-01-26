@@ -45,12 +45,6 @@ is
    Wp_Post_Types           : Post_Type_Map; -- List_Type;
    Global_Wp_Post_Statuses : Status_Maps.Map; -- Array_Type;
 
-   function Apply_Filters (Hook  : String;
-                           Value : String;
-                           Post  : Wp_Post)
-                           return String
-                           is (Value);
-
    function Wp_Parse_Args_2 (Args     : Status_Type;
                              Defaults : Array_Type)
                              return Status_Type
@@ -1841,8 +1835,9 @@ is
    function Get_Post_Status (Post : Wp_Post := Null_Post)
                              return String
    is
-      use UStrings;
       use Php.Lists;
+      use UStrings;
+      use Wp_Common;
 --    use Inc_Plugins;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
@@ -6873,6 +6868,7 @@ is
                           return String
    is
       use UStrings;
+      use Wp_Common;
    begin
       -- if Page not in Wp_Post then instanceof
       --    Page := Get_Post (Page);

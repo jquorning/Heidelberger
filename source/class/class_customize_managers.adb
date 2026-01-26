@@ -17,6 +17,7 @@ with Php.Types;
 with Binder;
 with Globals;
 with Helpers;
+with Wp_Common;
 
 with Inc_Caches;
 with Class_Querys;
@@ -77,32 +78,6 @@ with Inc_Users;
 package body Class_Customize_Managers
 is
 
-   function Apply_Filters (Hook  : String;
-                           Value : List_Type;
-                           T     : Wp_Customize_Manager)
-                           return List_Type
-                           is (Value);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Wp_Customize_Setting;
-                           Id        : String;
-                           A         : Array_Type)
-                           return Wp_Customize_Setting
-                           is (Value);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Wp_Customize_Setting;
-                           Id        : String;
-                           Setting   : Boolean)
-                           return Wp_Customize_Setting
-                           is (Value);
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Boolean;
-                           T         : Wp_Customize_Manager)
-                           return Boolean
-                           is (Value);
-
    procedure Do_Action (Hook_Name : String;
                         Value     : Array_Type;
                         This      : Wp_Customize_Manager)
@@ -139,6 +114,7 @@ is
       use Php.Lists;
       use Binder;
       use UStrings;
+      use Wp_Common;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;
@@ -713,6 +689,7 @@ is
    -- @param WP_Customize_Manager wp_customize    Manager instance.
    --
    is
+      use Wp_Common;
 --    use Inc_Plugins;
    begin
       This.M_Branching :=
@@ -3775,6 +3752,7 @@ is
                          Args : Array_Type := Empty_Array)
                          return Class_Customize_Settings.Wp_Customize_Setting
    is
+      use Wp_Common;
       use Class_Customize_Settings;
       use Inc_Plugins;
 
@@ -3827,6 +3805,7 @@ is
                                   return Setting_Lists.Vector -- Array_Type;
    is
       use UStrings;
+      use Wp_Common;
       use Class_Customize_Settings;
       use Inc_Plugins;
 

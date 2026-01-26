@@ -7,6 +7,7 @@
 
 with Arrays;
 with Globals;
+with Wp_Common;
 
 with Inc_Caches;
 -- with Inc_Plugins;
@@ -14,12 +15,6 @@ with Inc_Caches;
 package body Inc_Comments
 is
    use Arrays;
-
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Comment_Counts;
-                           Post_Id   : Integer)
-                           return Comment_Counts
-                           is (Value);
 
 -- --
 -- -- Checks whether a comment passes internal checks to be allowed to add.
@@ -1406,6 +1401,7 @@ is
    function Wp_Count_Comments (Post_Id : Integer := 0)
                                return Comment_Counts
    is
+      use Wp_Common;
       use Inc_Caches;
 --    use Inc_Plugins;
 

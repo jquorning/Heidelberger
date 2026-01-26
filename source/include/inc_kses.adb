@@ -37,31 +37,13 @@ with Php.Strings;
 with Php.Types;
 
 with UStrings;
+with Wp_Common;
 
 with Inc_Functions;
 with Inc_Plugins;
 
 package body Inc_KSES
 is
-
-   function Apply_Filters (Hook      : String;
-                           Value     : String;
-                           HTML      : Array_Type;
-                           Protocols : List_Type)
-                           return String
-                           is (Value);
-
-   function Apply_Filters (Hook    : String;
-                           HTML    : Array_Type;
-                           Context : String)
-                           return Array_Type
-                           is (HTML);
-
-   function Apply_Filters (Hook  : String;
-                           Value : Boolean;
-                           A     : String)
-                           return Boolean
-                           is (Value);
 
 -- --
 -- -- Specifies the default allowable HTML tags.
@@ -831,8 +813,8 @@ is
    function Wp_KSES_Allowed_HTML (Context : Array_Type := Empty_Array) -- ""
                                   return Array_Type
    is
-      use Php;
       use Php.Types;
+      use Inc_Plugins;
 --        global $allowedposttags, $allowedtags, $allowedentitynames;
    begin
       if Is_Array (Context) then
@@ -917,6 +899,7 @@ is
                           Allowed_Protocols : List_Type)
                           return String
    is
+      use Wp_Common;
 --    use Inc_Plugins;
    begin
       --

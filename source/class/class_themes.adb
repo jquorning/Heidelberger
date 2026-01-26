@@ -21,17 +21,12 @@ with Inc_Formatting;
 with Inc_KSES;
 with Inc_L10n;
 with Inc_Load;
+with Inc_Plugins;
 with Inc_Themes;
 
 package body Class_Themes
 is
    use Lists;
-
-   function Apply_Filters (Name  : String;
-                           Value : Boolean;
-                           S     : String)
-                           return Boolean
-                           is (False);
 
    Wp_Theme_Directories : Array_Type;
 
@@ -44,13 +39,12 @@ is
                          X_Child    : in out Wp_Theme) -- _Access := null)
                          return Wp_Theme
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Files;
       use Php.Misc;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Inc_Caches;
       use Class_Errors;
       use Inc_Error_Protection;
@@ -58,6 +52,7 @@ is
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Load;
+      use Inc_Plugins;
       use Inc_Themes;
 
       This  : Wp_Theme;

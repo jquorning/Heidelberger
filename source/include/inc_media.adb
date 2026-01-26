@@ -26,13 +26,6 @@ is
 
    Global_Wp_Additional_Image_Sizes : Array_Type;
 
-   function Apply_Filters (Hook  : String;
-                           Value : Natural;
-                           U     : Natural;
-                           P     : Natural)
-                           return Natural
-                           is (Value);
-
    -----------------------------------
    -- Wp_Get_Additional_Image_Sizes --
    -----------------------------------
@@ -3893,9 +3886,9 @@ is
    function Wp_Max_Upload_Size
             return Natural
    is
-      use Php;
       use Php.Ini;
       use Inc_Load;
+      use Wp_Common;
 --    use Inc_Plugins;
 
       U_Bytes : constant Natural :=

@@ -13,6 +13,7 @@ with Php.Misc;
 
 with Globals;
 with UStrings;
+with Wp_Common;
 
 with Class_Posts;
 with Inc_Functions;
@@ -29,35 +30,6 @@ is
 
    Static_Default_Editor_Styles_File_Contents_Bool : Boolean := False;
    Static_Default_Editor_Styles_File_Contents      : UStrings.UString;
-
-   function Apply_Filters
-              (Hook_Name : String;
-               Value     : Array_Type;
-               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
-               return Array_Type
-               is (Value);
-
-   function Apply_Filters
-              (Hook_Name : String;
-               Value     : List_Type; -- Boolean;
-               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
-               is (Value);
-
-   function Apply_Filters_Deprecated
-              (Hook_Name : String;
-               Value     : Array_Type;
-               Version   : String;
-               X         : String)
-               return Array_Type
-               is (Value);
-
-   function Apply_Filters_Deprecated
-              (Hook_Name : String;
-               Value     : List_Type; -- Boolean;
-               Version   : String;
-               X         : String)
-               return List_Type -- Boolean
-               is (Value);
 
    ----------------------------------
    -- Get_Default_Block_Categories --
@@ -117,6 +89,7 @@ is
                  Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
    is
+      use Wp_Common;
       use Class_Block_Editor_Contexts;
       use Class_Posts;
 --    use Inc_Plugins;
@@ -178,6 +151,7 @@ is
                  Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return List_Type
    is
+      use Wp_Common;
       use Class_Posts;
 --    use Inc_Plugins;
 

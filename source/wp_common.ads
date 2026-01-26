@@ -11,6 +11,9 @@ with Adi_Class_Wp_Screens;
 with Adi_Translation_Install;
 
 with Class_Admin_Bar;
+with Class_Block_Editor_Contexts;
+with Class_Customize_Managers;
+with Class_Customize_Settings;
 with Class_Dependency;
 with Class_Errors;
 with Class_HTTP;
@@ -19,6 +22,8 @@ with Class_Terms;
 with Class_Posts;
 with Class_Post_Type;
 with Class_Users;
+with Inc_Capabilities;
+with Inc_Comments;
 with Inc_Media;
 with Inc_Posts;
 with Inc_Taxonomys;
@@ -460,6 +465,141 @@ is
                            Delete_All : Boolean)
                            return Boolean
                            is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : List_Type;
+                           T     : Class_Customize_Managers.Wp_Customize_Manager)
+                           return List_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Class_Customize_Managers.Wp_Customize_Setting;
+                           Id        : String;
+                           A         : Array_Type)
+                           return Class_Customize_Managers.Wp_Customize_Setting
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Class_Customize_Managers.Wp_Customize_Setting;
+                           Id        : String;
+                           Setting   : Boolean)
+                           return Class_Customize_Managers.Wp_Customize_Setting
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           T         : Class_Customize_Managers.Wp_Customize_Manager)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           This      : Class_Customize_Settings.Wp_Customize_Setting)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Multi_Type;
+                           This      : Class_Customize_Settings.Wp_Customize_Setting)
+                           return Multi_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Class_Errors.Wp_Error;
+                           Value_2   : Multi_Type;
+                           This      : Class_Customize_Settings.Wp_Customize_Setting)
+                           return Class_Errors.Wp_Error
+                           is (Value);
+
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Array_Type;
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return Array_Type
+               is (Value);
+
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : List_Type; -- Boolean;
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
+               is (Value);
+
+   function Apply_Filters (Hook      : String;
+                           Value     : String;
+                           HTML      : Array_Type;
+                           Protocols : List_Type)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : List_Type;
+                           S     : String;
+                           U     : Integer;
+                           Args  : Inc_Capabilities.Args_Type)
+                           return List_Type
+                           is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Boolean;
+                           S     : String;
+                           O_Id  : Integer;
+                           U_Id  : Integer;
+                           C     : String;
+                           L     : List_Type)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Array_Type;
+                           Caps  : List_Type;
+                           -- Args,
+                           This  : Class_Users.Wp_User)
+                           return Array_Type
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Text      : String;
+                           Context   : String;
+                           Domain    : String)
+                           return String
+                           is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Natural;
+                           U     : Natural;
+                           P     : Natural)
+                           return Natural
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Inc_Comments.Comment_Counts;
+                           Post_Id   : Integer)
+                           return Inc_Comments.Comment_Counts
+                           is (Value);
+
+   function Apply_Filters (Hook  : String;
+                           Value : Array_Type;
+                           Oi    : List_Type;
+                           Tax   : Array_Type)
+                           return Array_Type
+                           is (Value);
+
+   function Apply_Filters_Deprecated
+              (Hook_Name : String;
+               Value     : Array_Type;
+               Version   : String;
+               X         : String)
+               return Array_Type
+               is (Value);
+
+   function Apply_Filters_Deprecated
+              (Hook_Name : String;
+               Value     : List_Type;
+               Version   : String;
+               X         : String)
+               return List_Type
+               is (Value);
 
    procedure Do_Action (Hook_Name : String;
                         A1        : Class_HTTP.Response_Result;
