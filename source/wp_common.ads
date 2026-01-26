@@ -756,181 +756,148 @@ is
 
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;
-                        Arg_3     : Boolean)
-                        is null;
+                        Arg_3     : Boolean);
 
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;
-                        Arg_3     : Integer)
-                        is null;
+                        Arg_3     : Integer);
 
    procedure Do_Action (Hook_Name : String;
                         Option    : String;
                         Arg_3     : Multi_Type;
-                        Arg_4     : Multi_Type)
-                        is null;
+                        Arg_4     : Multi_Type);
 
    procedure Do_Action (Hook_Name : String;
                         Option    : String;
-                        Arg_3     : Multi_Type)
-                        is null;
+                        Arg_3     : Multi_Type);
 
    procedure Do_Action (Hook_Name : String;
                         Option    : String;
                         Arg_3     : Multi_Type;
-                        Net       : Natural)
-                        is null;
+                        Net       : Natural);
 
    procedure Do_Action (Hook_Name : String;
                         Arg_3     : Multi_Type;
                         Arg_4     : Multi_Type;
-                        Option    : String)
-                        is null;
+                        Option    : String);
 
    procedure Do_Action (Hook_Name : String;
                         Arg_3     : Multi_Type;
                         Arg_4     : Natural;
-                        Option    : String)
-                        is null;
+                        Option    : String);
 
    procedure Do_Action (Hook_Name : String;
                         Option    : String;
                         Arg_3     : Multi_Type;
                         Arg_4     : Multi_Type;
-                        Net       : Natural)
-                        is null;
+                        Net       : Natural);
 
    procedure Do_Action (Hook_Name : String;
-                        Args      : Array_Type)
-                        is null;
+                        Args      : Array_Type);
 
    procedure Do_Action (Hook_Name : String;
                         Tax       : String;
                         Arg_3     : List_Type;
-                        Tax_2     : Class_Taxonomy.Wp_Taxonomy)
-                        is null;
+                        Tax_2     : Class_Taxonomy.Wp_Taxonomy);
 
    procedure Do_Action (Hook_Name : String;
-                        Role      : Class_Roles.Wp_Roles)
-                        is null;
+                        Role      : Class_Roles.Wp_Roles);
 
    procedure Do_Action (Hook_Name : String;
                         Code      : String;
                         Message   : String;
                         Data      : String;
-                        Error     : Class_Errors.Wp_Error)
-                        is null;
+                        Error     : Class_Errors.Wp_Error);
 
    procedure Do_Action (Hook_Name  : String;
                         Value      : Array_Type;
                         Expiration : Integer;
-                        Transient  : String)
-                        is null;
+                        Transient  : String);
 
    procedure Do_Action (Hook_Name  : String;
                         Transient  : String;
                         Value      : Array_Type;
-                        Expiration : Integer)
-                        is null;
+                        Expiration : Integer);
 
    procedure Do_Action (Hook_Name  : String;
                         Arg_1      : String;
                         Arg_2      : String;
-                        Arg_3      : String)
-                        is null;
+                        Arg_3      : String);
 
    procedure Do_Action (Hook_Name : String;
                         A1        : Class_HTTP.Response_Result;
                         A2        : String;
                         A3        : String;
                         Args      : Array_Type;
-                        Url       : String)
-                        is null;
+                        Url       : String);
 
    procedure Do_Action (Hook_Name : String;
-                        Error     : Class_Errors.Wp_Error)
-                        is null;
+                        Error     : Class_Errors.Wp_Error);
 
    procedure Do_Action (Hook_Name : String;
-                        User      : Class_Users.Wp_User)
-                        is null;
+                        User      : Class_Users.Wp_User);
 
    procedure Do_Action (Hook_Name : String;
                         Login     : String;
-                        User      : Class_Users.Wp_User)
-                        is null;
+                        User      : Class_Users.Wp_User);
 
    procedure Do_Action (Hook_Name : String;
                         Username  : String;
-                        Error     : Class_Errors.Wp_Error)
-                        is null;
+                        Error     : Class_Errors.Wp_Error);
 
    procedure Do_Action (Hook_Name : String;
                         User      : Integer;
-                        Role      : String)
-                        is null;
+                        Role      : String);
 
    procedure Do_Action (Hook_Name : String;
                         User      : Integer;
                         Role      : String;
-                        Roles     : List_Type)
-                        is null;
+                        Roles     : List_Type);
 
    procedure Do_Action (Hook_Name : String;
-                        User      : Integer)
-                        is null;
+                        User      : Integer);
 
    procedure Do_Action (Hook_Name : String;
                         Action    : Integer;
-                        Result    : Boolean)
-                        is null;
+                        Result    : Boolean);
 
    procedure Do_Action (Hook_Name : String;
                         Version_1 : Integer;
-                        Version_2 : Integer)
-                        is null;
+                        Version_2 : Integer);
 
    procedure Do_Action (Hook_Name : String;
                         Cookie    : Array_Type;
-                        User      : Class_Users.Wp_User)
-                        is null;
+                        User      : Class_Users.Wp_User);
 
    procedure Do_Action (Hook_Name : String;
                         Nonce     : String;
                         Action    : String;
                         User      : Class_Users.Wp_User;
-                        Token     : String)
-                        is null;
+                        Token     : String);
 
    procedure Do_Action (Hook_Name : String;
                         Errors    : Class_Errors.Wp_Error;
-                        User      : Inc_Users.User_Error_Type)
-                        is null;
+                        User      : Inc_Users.User_Error_Type);
 
    procedure Do_Action (Hook_Name  : String;
                         Meta_Ids   : List_Type;
                         Object_Is  : Integer;
                         Meta_Key   : String;
-                        Meta_Value : String)
-                        is null;
+                        Meta_Value : String);
 
    procedure Do_Action (Hook_Name  : String;
-                        Meta_Ids   : List_Type)
-                        is null;
+                        Meta_Ids   : List_Type);
 
    procedure Do_Action (Hook_Name : String;
                         Value     : Array_Type;
-                        This      : Class_Customize_Managers.Wp_Customize_Manager)
-   is null;
+                        This      : Class_Customize_Managers.Wp_Customize_Manager);
 
    procedure Do_Action (Hook_Name : String;
                         Value     : String;
                         Value_2   : Array_Type;
-                        This      : Class_Customize_Managers.Wp_Customize_Manager)
-   is null;
+                        This      : Class_Customize_Managers.Wp_Customize_Manager);
 
    procedure Do_Action (Hook_Name : String;
-                        This      : Class_Customize_Settings.Wp_Customize_Setting)
-   is null;
+                        This      : Class_Customize_Settings.Wp_Customize_Setting);
 
 end Wp_Common;
