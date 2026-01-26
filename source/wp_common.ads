@@ -680,4 +680,19 @@ is
                         Meta_Ids   : List_Type)
                         is null;
 
+   procedure Do_Action (Hook_Name : String;
+                        Value     : Array_Type;
+                        This      : Class_Customize_Managers.Wp_Customize_Manager)
+   is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        Value     : String;
+                        Value_2   : Array_Type;
+                        This      : Class_Customize_Managers.Wp_Customize_Manager)
+   is null;
+
+   procedure Do_Action (Hook_Name : String;
+                        This      : Class_Customize_Settings.Wp_Customize_Setting)
+   is null;
+
 end Wp_Common;

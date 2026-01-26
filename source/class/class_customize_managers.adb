@@ -78,17 +78,6 @@ with Inc_Users;
 package body Class_Customize_Managers
 is
 
-   procedure Do_Action (Hook_Name : String;
-                        Value     : Array_Type;
-                        This      : Wp_Customize_Manager)
-   is null;
-
-   procedure Do_Action (Hook_Name : String;
-                        Value     : String;
-                        Value_2   : Array_Type;
-                        This      : Wp_Customize_Manager)
-   is null;
-
    type Proc_Access is access procedure (This : in out Wp_Customize_Manager);
 
    function To_Array (This : Wp_Customize_Manager;
@@ -1803,6 +1792,7 @@ is
                              Setting_Id : String;
                              Value      : Array_Type)
    is
+      use Wp_Common;
 --    use Inc_Plugins;
    begin
       This.Unsanitized_Post_Values; -- Populate _post_values from _POST["customized"].

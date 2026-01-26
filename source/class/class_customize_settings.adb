@@ -55,10 +55,6 @@ is
       return From_Null;
    end From_Object;
 
-   procedure Do_Action (Hook_Name : String;
-                        This      : Wp_Customize_Setting)
-   is null;
-
    -------------
    -- Preview --
    -------------
@@ -66,6 +62,7 @@ is
    procedure Preview (This : in out Wp_Customize_Setting)
    is
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_Plugins;
    begin
