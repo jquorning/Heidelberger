@@ -30,6 +30,11 @@ is
                      Needle   : String)
                      return Natural;
 
+   function Strripos (Haystack : String;
+                      Needle   : String)
+                      return Natural
+   is (raise Program_Error with "not implemented");
+
    function Stripos (Haystack : String;
                      Needle   : String)
                      return Natural;
@@ -48,6 +53,12 @@ is
                          Replace : String;
                          Subject : String)
                          return String;
+
+   function Str_Ireplace (Search  : String;
+                          Replace : String;
+                          Subject : String)
+                          return String
+   is (raise Program_Error with "not implemented");
 
    function Str_Replace (Search  : List_Type;
                          Replace : List_Type;
@@ -143,6 +154,10 @@ is
                      Needle        : String;
                      Before_Needle : Boolean := False)
                      return Boolean;  -- string|false
+
+   function Strcasecmp (Left, Right : String)
+                        return Natural
+   is (raise Program_Error with "not implemented");
 
    function Strip_Tags (Item         : String;
                         Allowed_Tags : Array_Type := Empty_Array)

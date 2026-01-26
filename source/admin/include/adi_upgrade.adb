@@ -20,11 +20,15 @@ with Helpers;
 with Lists;
 with Wp_Common;
 
+with Adi_Files;
 with Adi_Plugins;
 with Adi_Schemas;
 
 with Class_Categories;
+with Class_Comments;
 with Class_Errors;
+with Class_Links;
+with Class_Options;
 with Class_Posts;
 with Class_Post2cat;
 with Class_Roles;
@@ -36,6 +40,7 @@ with Inc_Capabilities;
 with Inc_Cron;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Ms_Sites;
@@ -733,85 +738,203 @@ is
    -----------------
 
    procedure Upgrade_130
-   is null;
---         global wpdb;
+   is
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Class_Comments;
+      use Class_Links;
+      use Class_Options;
+      use Class_Posts;
+      use Class_WpDB;
+      use Inc_Link_Templates;
+   begin
+      -- Remove extraneous backslashes.
+      declare
+         Posts_2 : constant Statement_Type := Statement_Type (-WpDB.Posts);
 
---         -- Remove extraneous backslashes.
---         posts = wpdb->get_results( "SELECT ID, post_title, post_content, post_excerpt, guid, post_date, post_name, post_status, post_author FROM wpdb->posts" );
---         if ( posts ) then
---                 foreach ( posts as post ) then
---                         post_content = addslashes( deslash( post->post_content ) );
---                         post_title   = addslashes( deslash( post->post_title ) );
---                         post_excerpt = addslashes( deslash( post->post_excerpt ) );
---                         if ( empty( post->guid ) ) then
---                                 guid = get_permalink( post->ID );
---                         end; else then
---                                 guid = post->guid;
---                         end;
+         Posts : constant Post_Array :=
+           WpDB.Get_Results (
+             "SELECT ID, post_title, post_content, post_excerpt, guid, post_date, " &
+             "post_name, post_status, post_author FROM " & Posts_2);
+      begin
+         if not Posts.Is_Empty then
+            for Post of Posts loop
+               declare
+                  Post_Content : constant String :=
+                    Add_Slashes (Deslash (-Post.Post_Content));
 
---                         wpdb->update( wpdb->posts, compact( "post_title", "post_content", "post_excerpt", "guid" ), array( "ID" => post->ID ) );
+                  Post_Title   : constant String :=
+                    Add_Slashes (Deslash (-Post.Post_Title));
 
---                 end;
---         end;
+                  Post_Excerpt : constant String :=
+                    Add_Slashes (Deslash (-Post.Post_Excerpt));
 
---         -- Remove extraneous backslashes.
---         comments = wpdb->get_results( "SELECT comment_ID, comment_author, comment_content FROM wpdb->comments" );
---         if ( comments ) then
---                 foreach ( comments as comment ) then
---                         comment_content = deslash( comment->comment_content );
---                         comment_author  = deslash( comment->comment_author );
+                  GUID : constant String :=
+                    (if Empty (-Post.GUID)
+                     then Get_Permalink (Post.Id)
+                     else -Post.GUID);
 
---                         wpdb->update( wpdb->comments, compact( "comment_content", "comment_author" ), array( "comment_ID" => comment->comment_ID ) );
---                 end;
---         end;
+                  Update : constant Array_Type :=
+                    To_Array (List => (
+                      Build ("post_title",   Post_Title),
+                      Build ("post_content", Post_Content),
+                      Build ("post_exerpt",  Post_Excerpt),
+                      Build ("guid",         GUID)
+                    ));
+               begin
+                  WpDB.Update
+                    (-WpDB.Posts, Update,
+                     To_Array (List => (1 =>
+                       Build ("ID", Integer (Post.Id))))
+                    );
+               end;
+            end loop;
+         end if;
+      end;
 
---         -- Remove extraneous backslashes.
---         links = wpdb->get_results( "SELECT link_id, link_name, link_description FROM wpdb->links" );
---         if ( links ) then
---                 foreach ( links as link ) then
---                         link_name        = deslash( link->link_name );
---                         link_description = deslash( link->link_description );
+      -- Remove extraneous backslashes.
+      declare
+         Comments_2 : constant Statement_Type := Statement_Type (-WpDB.Comments);
 
---                         wpdb->update( wpdb->links, compact( "link_name", "link_description" ), array( "link_id" => link->link_id ) );
---                 end;
---         end;
+         Comments : constant Comments_List :=
+           WpDB.Get_Results (
+             "SELECT comment_ID, comment_author, comment_content FROM " & Comments_2);
+      begin
+         if not Comments.Is_Empty then
+            for Comment of Comments loop
+               declare
+                  Comment_Content : constant String :=
+                    Deslash (-Comment.Comment_Content);
 
---         active_plugins = __get_option( "active_plugins" );
+                  Comment_Author : constant String :=
+                    Deslash (-Comment.Comment_Author);
 
---         /*
---         -- If plugins are not stored in an array, they"re stored in the old
---         -- newline separated format. Convert to new format.
---         --
---         if ( ! is_array( active_plugins ) ) then
---                 active_plugins = explode( "\n", trim( active_plugins ) );
---                 update_option( "active_plugins", active_plugins );
---         end;
+                  Update : constant Array_Type :=
+                    To_Array (List => (
+                      Build ("comment_content", Comment_Content),
+                      Build ("comment_author",  Comment_Author)
+                    ));
+               begin
+                  WpDB.Update (-WpDB.Comments, Update,
+                               To_Array (List => (1 =>
+                                 Build ("comment_ID", -Comment.Comment_Id))));
+               end;
+            end loop;
+         end if;
+      end;
 
---         -- Obsolete tables.
---         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "optionvalues" );
---         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "optiontypes" );
---         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "optiongroups" );
---         wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "optiongroup_options" );
+      -- Remove extraneous backslashes.
+      declare
+         Links_2 : constant Statement_Type := Statement_Type (-WpDB.Links);
 
---         -- Update comments table to use comment_type.
---         wpdb->query( "UPDATE wpdb->comments SET comment_type="trackback", comment_content = REPLACE(comment_content, "<trackback />", "") WHERE comment_content LIKE "<trackback />%"" );
---         wpdb->query( "UPDATE wpdb->comments SET comment_type="pingback", comment_content = REPLACE(comment_content, "<pingback />", "") WHERE comment_content LIKE "<pingback />%"" );
+         Links : constant Links_List :=
+           WpDB.Get_Results (
+             "SELECT link_id, link_name, link_description FROM " & Links_2);
+      begin
+         if not Links.Is_Empty then
+            for Link of Links loop
+               declare
+                  Link_Name : constant String :=
+                    Deslash (-Link.Link_Name);
 
---         -- Some versions have multiple duplicate option_name rows with the same values.
---         options = wpdb->get_results( "SELECT option_name, COUNT(option_name) AS dupes FROM `wpdb->options` GROUP BY option_name" );
---         foreach ( options as option ) then
---                 if ( 1 != option->dupes ) then -- Could this be done in the query?
---                         limit    = option->dupes - 1;
---                         dupe_ids = wpdb->get_col( wpdb->prepare( "SELECT option_id FROM wpdb->options WHERE option_name = %s LIMIT %d", option->option_name, limit ) );
---                         if ( dupe_ids ) then
---                                 dupe_ids = implode( ",", dupe_ids );
---                                 wpdb->query( "DELETE FROM wpdb->options WHERE option_id IN (dupe_ids)" );
---                         end;
---                 end;
---         end;
+                  Link_Description : constant String :=
+                    Deslash (-Link.Link_Description);
 
---         make_site_theme();
--- end;
+                  Update : constant Array_Type :=
+                    To_Array (List => (
+                      Build ("link_name",        Link_Name),
+                      Build ("link_description", Link_Description)
+                    ));
+               begin
+                  WpDB.Update (-WpDB.Links, Update, To_Array (List => (1 =>
+                    Build ("link_id", Link.Link_Id))));
+               end;
+            end loop;
+         end if;
+      end;
+
+      -- declare
+      --    Active_Plugins : Duration := X_Get_Option ("active_plugins");
+      -- begin
+      --    --
+      --    -- If plugins are not stored in an array, they're stored in the old
+      --    -- newline separated format. Convert to new format.
+      --    --
+      --    if ( ! is_array( active_plugins ) ) then
+      --           active_plugins = explode( "\n", trim( active_plugins ) );
+      --           update_option( "active_plugins", active_plugins );
+      --    end if;
+      -- end;
+
+      -- Obsolete tables.
+      declare
+         Prefix : constant Statement_Type := Statement_Type (-WpDB.Prefix);
+      begin
+         WpDB.Query ("DROP TABLE IF EXISTS " & Prefix & "optionvalues");
+         WpDB.Query ("DROP TABLE IF EXISTS " & Prefix & "optiontypes");
+         WpDB.Query ("DROP TABLE IF EXISTS " & Prefix & "optiongroups");
+         WpDB.Query ("DROP TABLE IF EXISTS " & Prefix & "optiongroup_options");
+      end;
+
+      -- Update comments table to use comment_type.
+      declare
+         Comments : constant Statement_Type := Statement_Type (-WpDB.Comments);
+      begin
+         WpDB.Query (
+           "UPDATE " & Comments &
+           " SET comment_type='trackback', comment_content = " &
+           "REPLACE(comment_content, '<trackback />', '') " &
+           "WHERE comment_content LIKE '<trackback />%'");
+
+         WpDB.Query (
+           "UPDATE " & Comments &
+           " SET comment_type='pingback', comment_content = " &
+           "REPLACE(comment_content, '<pingback />', '') " &
+           "WHERE comment_content LIKE '<pingback />%'");
+      end;
+
+      -- Some versions have multiple duplicate option_name rows with the same values.
+      declare
+         Options_2 : constant Statement_Type := Statement_Type (-WpDB.Options);
+
+         Options : constant Options_List :=
+           WpDB.Get_Results (
+             "SELECT option_name, COUNT(option_name) AS dupes FROM `" & Options_2 &
+             "` GROUP BY option_name");
+      begin
+         for Option of Options loop
+            if 1 /= Option.Dupes then -- Could this be done in the query?
+               declare
+                  Limit    : constant Integer := Option.Dupes - 1;
+
+                  Dupe_Ids : constant List_Type :=
+                    WpDB.Get_Col (WpDB.Prepare (
+                      "SELECT option_id FROM " & Options_2 &
+                      " WHERE option_name = %s LIMIT %d",
+                      To_List (List => (
+                        1 => Option.Option_Name,
+                        2 => +Helpers.Image (Limit)
+                      ))
+                    ));
+               begin
+                  if not Dupe_Ids.Is_Empty then
+                     declare
+                        Dupe_Ids_2 : constant Statement_Type :=
+                          Statement_Type (Implode (",", Dupe_Ids));
+                     begin
+                        WpDB.Query (
+                          "DELETE FROM " & Options_2 &
+                          " WHERE option_id IN (" & Dupe_Ids_2 & ")");
+                     end;
+                  end if;
+               end;
+            end if;
+         end loop;
+      end;
+
+      Make_Site_Theme;
+   end Upgrade_130;
 
    -----------------
    -- Upgrade_160 --
@@ -2129,6 +2252,35 @@ is
       end;
    end X_Get_Option;
 
+   -------------
+   -- Deslash --
+   -------------
+
+   function Deslash (Content : String)
+                     return String
+   is
+      use Php.Preg;
+
+      -- Note: \\\ inside a regex denotes a single backslash.
+
+      --
+      -- Replace one or more backslashes followed by a single quote with
+      -- a single quote.
+      --
+      Content_2 : constant String := Preg_Replace ("/\\\+'/", "'", Content);
+
+      --
+      -- Replace one or more backslashes followed by a double quote with
+      -- a double quote.
+      --
+      Content_3 : constant String := Preg_Replace ("/\\\+'/", "'", Content_2);
+
+      -- Replace one or more backslashes with one backslash.
+      Content_4 : constant String := Preg_Replace ("/\\\+/", "\\", Content_3);
+   begin
+      return Content_4;
+   end Deslash;
+
    --------------
    -- DB_Delta --
    --------------
@@ -2801,6 +2953,341 @@ is
    begin
       null;
    end Make_DB_Current_Silent;
+
+   ------------------------------------
+   -- Make_Site_Theme_From_Oldschool --
+   ------------------------------------
+
+   function Make_Site_Theme_From_Oldschool (Theme_Name : String;
+                                            Template   : String)
+                                            return Boolean
+   is
+      use Php.Files;
+      use Php.Preg;
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Adi_Files;
+
+      Home_Path : constant String := Get_Home_Path;
+      Site_Dir  : constant String := -(WP_CONTENT_DIR & "/themes/template");
+   begin
+      if not File_Exists (Home_Path & "/index.php") then
+         return False;
+      end if;
+
+      --
+      -- Copy files from the old locations to the site theme.
+      -- TODO: This does not copy arbitrary include dependencies. Only the standard
+      -- WP files are copied.
+      --
+      declare
+         Files : constant Array_Type := To_Array (List => (
+           Build ("index.php",             "index.php"),
+           Build ("wp-layout.css",         "style.css"),
+           Build ("wp-comments.php",       "comments.php"),
+           Build ("wp-comments-popup.php", "comments-popup.php")
+         ));
+      begin
+         for A in Files.Iterate loop
+            declare
+               Oldfile : constant String := Key (A);
+               Newfile : constant String := As_String (Element (A));
+
+               Oldpath : constant String :=
+                 (if "index.php" = Oldfile then Home_Path
+                  else ABSPATH);
+            begin
+               -- Check to make sure it's not a new index.
+               if "index.php" = Oldfile then
+                  declare
+                     Index : constant String :=
+                       Implode ("", File (Oldpath & "/" & Oldfile));
+                  begin
+                     if Strpos (Index, "WP_USE_THEMES") /= 0 then
+                        if
+                          not Copy (-(WP_CONTENT_DIR & "/themes/" &
+                                    WP_DEFAULT_THEME & "/index.php"),
+                                    Site_Dir & "/" & Newfile)
+                        then
+                           return False;
+                        end if;
+
+                        -- Don't copy anything.
+                        raise Program_Error with "do not know how to goto continue";
+--                      goto Continue;
+                     end if;
+                  end;
+               end if;
+
+               if
+                 not Copy (Oldpath & "/" & Oldfile,
+                           Site_Dir & "/" & Newfile)
+               then
+                  return False;
+               end if;
+
+               Chmod (Site_Dir & "/" & Newfile, 8#777#);
+
+               -- Update the blog header include in each file.
+               declare
+                  Lines : constant List_Type :=
+                    Explode ("\n", Implode ("", File (Site_Dir & "/" & Newfile)));
+               begin
+                  if not Lines.Is_Empty then
+                     declare
+                        F : File_Type := Fopen (Site_Dir & "/" & Newfile, "w");
+                     begin
+                        for L of Lines loop
+                           declare
+                              Line : constant String := -L;
+
+                              Line_2 : String :=
+                                (if Preg_Match ("/require.*wp-blog-header/", Line)
+                                 then "//" & Line
+                                 else Line);
+
+                              -- Update stylesheet references.
+                              Line_3 : constant String :=
+                                Str_Replace (
+                                  "<?php __get_option( ""siteurl"") ?>" &
+                                  "/wp-layout.css",
+                                  "<?php bloginfo( ""stylesheet_url"" ) ?>", Line_2);
+
+                              -- Update comments template inclusion.
+                              Line_4 : constant String :=
+                                Str_Replace (
+                                  "<?php include(ABSPATH . ""wp-comments.php""); ?>",
+                                  "<?php comments_template(); ?>", Line_3);
+                           begin
+                              Fwrite (F, Line_4 & NL);
+                           end;
+                           << Continue >>
+                        end loop;
+                        Fclose (F);
+                     end;
+                  end if;
+               end;
+            end;
+         end loop;
+      end;
+
+      -- Add a theme header.
+      declare
+         Header : constant String :=
+           "/*" & NL & "Theme Name: " & Theme_Name & NL & "Theme URI: " &
+           As_String (X_Get_Option ("siteurl")) & NL &
+           "Description: A theme automatically created by the update." & NL &
+           "Version: 1.0" & NL & "Author: Moi" & NL & "*/" & NL;
+
+         Stylelines : constant String :=
+           File_Get_Contents (Site_Dir & "/style.css");
+      begin
+         if Stylelines /= "" then
+            declare
+               F : File_Type := Fopen (Site_Dir & "/style.css", "w");
+            begin
+               Fwrite (F, Header);
+               Fwrite (F, Stylelines);
+               Fclose (F);
+            end;
+         end if;
+      end;
+      return True;
+   end Make_Site_Theme_From_Oldschool;
+
+   ----------------------------------
+   -- Make_Site_Theme_From_Default --
+   ----------------------------------
+
+   function Make_Site_Theme_From_Default (Theme_Name : String;
+                                          Template   : String)
+                                          return Boolean
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+
+      Site_Dir : constant String :=
+        (-WP_CONTENT_DIR) & "/themes/template";
+
+      Default_Dir : constant String :=
+        -(WP_CONTENT_DIR & "/themes/" & WP_DEFAULT_THEME);
+   begin
+
+      -- Copy files from the default theme to the site theme.
+      -- files = array( "index.php", "comments.php", "comments-popup.php",
+      -- "footer.php", "header.php", "sidebar.php", "style.css" );
+      declare
+         Theme_Dir : Dir_Handle := Opendir (Default_Dir); -- @
+      begin
+         if Theme_Dir.Is_Good then
+            loop
+            -- while ( ( theme_file = readdir( theme_dir ) ) !== false ) then
+               declare
+                  Theme_File : constant String := Readdir (Theme_Dir);
+               begin
+                  exit when Theme_File = "";
+
+                  if Is_Dir (Default_Dir & "/" & Theme_File) then
+                     goto Continue;
+                  end if;
+
+                  if
+                    not Copy (Default_Dir & "/" & Theme_File,
+                              Site_Dir & "/" & Theme_File)
+                  then
+                     return False; -- false added
+                  end if;
+                  Chmod (Site_Dir & "/" & Theme_File, 8#777#);
+               end;
+               << Continue >>
+            end loop;
+
+            Closedir (Theme_Dir);
+         end if;
+      end;
+
+      -- Rewrite the theme header.
+      declare
+         Stylelines : constant List_Type :=
+           Explode ("\n", Implode ("", File (Site_Dir & "/style.css")));
+      begin
+         if not Stylelines.Is_Empty then
+            declare
+               F : File_Type := Fopen (Site_Dir & "/style.css", "w");
+            begin
+               for L of Stylelines loop
+                  declare
+                     Line : constant String := -L;
+
+                     Line_2 : constant String :=
+                       (if Strpos (Line, "Theme Name:") /= 0
+                          then "Theme Name: " & Theme_Name
+                        elsif Strpos (Line, "Theme URI:") /= 0
+                          then "Theme URI: " & As_String (X_Get_Option ("url"))
+                        elsif Strpos (Line, "Description:") /= 0
+                          then "Description: Your theme."
+                        elsif Strpos (Line, "Version:") /= 0
+                          then "Version: 1"
+                        elsif Strpos (Line, "Author:") /= 0
+                          then "Author: You"
+                        else "");
+                  begin
+                     Fwrite (F, Line_2 & NL);
+                  end;
+               end loop;
+               Fclose (F);
+            end;
+         end if;
+      end;
+
+      -- Copy the images.
+      Umask (0);
+      if not Mkdir (Site_Dir & "/images", 8#777#) then
+         return False;
+      end if;
+
+      declare
+         Images_Dir : Dir_Handle :=
+           Opendir (Default_Dir & "/images"); -- @
+      begin
+         if Images_Dir.Is_Good then
+            loop
+               -- while ( ( image = readdir( images_dir ) ) !== false ) then
+               declare
+                  Image : constant String :=
+                    Readdir (Images_Dir);
+               begin
+                  if Is_Dir (Default_Dir & "/images/" & Image) then
+                     goto Continue_2;
+                  end if;
+
+                  if
+                    not Copy (Default_Dir & "/images/" & Image,
+                              Site_Dir & "/images/" & Image)
+                  then
+                     return False; -- false added
+                  end if;
+                  Chmod (Site_Dir & "/images/" & Image, 8#777#);
+               end;
+               << Continue_2 >>
+            end loop;
+
+            Closedir (Images_Dir);
+         end if;
+      end;
+      return True; -- added
+   end Make_Site_Theme_From_Default;
+
+   ---------------------
+   -- Make_Site_Theme --
+   ---------------------
+
+   function Make_Site_Theme
+            return String
+   is
+      use Php.Files;
+      use UStrings;
+      use Inc_Formatting;
+      use Inc_Options;
+
+      -- Name the theme after the blog.
+      Theme_Name : constant String := As_String (X_Get_Option ("blogname"));
+      Template   : constant String := Sanitize_Title (Theme_Name);
+      Site_Dir   : constant String := (-Globals.WP_CONTENT_DIR) & "/themes/template";
+   begin
+      -- If the theme already exists, nothing to do.
+      if Is_Dir (Site_Dir) then
+         return ""; -- False;
+      end if;
+
+      -- We must be able to write to the themes dir.
+      if not Is_Writable ((-Globals.WP_CONTENT_DIR) & "/themes") then
+         return ""; -- False;
+      end if;
+
+      Umask (0);
+      if not Mkdir (Site_Dir, 8#777#) then
+         return ""; -- False;
+      end if;
+
+      if File_Exists (Globals.ABSPATH & "wp-layout.css") then
+         if not Make_Site_Theme_From_Oldschool (Theme_Name, Template) then
+            -- TODO: rm -rf the site theme directory.
+            return ""; -- False;
+         end if;
+      else
+         if not Make_Site_Theme_From_Default (Theme_Name, Template) then
+            -- TODO: rm -rf the site theme directory.
+            return ""; -- False;
+         end if;
+      end if;
+
+      -- Make the new site theme active.
+      declare
+         Current_Template : constant String :=
+           As_String (X_Get_Option ("template"));
+      begin
+         if Globals.WP_DEFAULT_THEME = Current_Template then
+            Update_Option ("template",   From_String (Template));
+            Update_Option ("stylesheet", From_String (Template));
+         end if;
+      end;
+      return Template;
+   end Make_Site_Theme;
+
+   ---------------------
+   -- Make_Site_Theme --
+   ---------------------
+
+   procedure Make_Site_Theme
+   is
+      Unused : constant String := Make_Site_Theme;
+   begin
+      null;
+   end Make_Site_Theme;
 
    ----------------------------
    -- Wp_Check_MySQL_Version --

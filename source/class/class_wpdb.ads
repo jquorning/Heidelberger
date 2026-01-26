@@ -16,6 +16,8 @@ with Lists;
 with Class_Categories;
 with Class_Comments;
 with Class_Errors;
+with Class_Links;
+with Class_Options;
 with Class_Posts;
 with Class_Post2cat;
 with Class_Users;
@@ -1657,6 +1659,24 @@ is
                          Output : String := "OBJECT")
                          return Class_Users.User_List
                          is (Class_Users.Empty_User_List);
+
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : Statement_Type; -- := ""; -- null
+                         Output : String := "OBJECT")
+                         return Class_Comments.Comments_List
+                         is (Class_Comments.Empty_Comments_List);
+
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : Statement_Type; -- := ""; -- null
+                         Output : String := "OBJECT")
+                         return Class_Options.Options_List
+                         is (Class_Options.Empty_Options_List);
+
+   function Get_Results (This   : Wpdb_Class;
+                         Query  : Statement_Type; -- := ""; -- null
+                         Output : String := "OBJECT")
+                         return Class_Links.Links_List
+                         is (Class_Links.Empty_Links_List);
 
    function Get_Results (This   : Wpdb_Class;
                          Query  : Statement_Type; -- := ""; -- null

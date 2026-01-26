@@ -6,6 +6,8 @@
 -- @since 4.4.0
 --
 
+with Ada.Containers.Vectors;
+
 with UStrings;
 
 with Class_Posts;
@@ -21,34 +23,34 @@ is
    --
    -- #[AllowDynamicProperties]
    type Wp_Comment is tagged
-      record
-         --
-         -- Comment ID.
-         --
-         -- A numeric string, for compatibility reasons.
-         --
-         -- @since 4.4.0
-         -- @var string
-         --
-         Comment_Id : UStrings.UString;
+     record
+        --
+        -- Comment ID.
+        --
+        -- A numeric string, for compatibility reasons.
+        --
+        -- @since 4.4.0
+        -- @var string
+        --
+        Comment_Id : UStrings.UString;
 
---         --
---         -- ID of the post the comment is associated with.
---         --
---         -- A numeric string, for compatibility reasons.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
-            Comment_Post_Id : Class_Posts.Post_Id := 0;
+        --
+        -- ID of the post the comment is associated with.
+        --
+        -- A numeric string, for compatibility reasons.
+        --
+        -- @since 4.4.0
+        -- @var string
+        --
+        Comment_Post_Id : Class_Posts.Post_Id := 0;
 
---         --
---         -- Comment author name.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_author = '';
+        --
+        -- Comment author name.
+        --
+        -- @since 4.4.0
+        -- @var string
+        --
+        Comment_Author : UStrings.UString;
 
 --         --
 --         -- Comment author email address.
@@ -90,13 +92,13 @@ is
 --         --
 --         public comment_date_gmt = '0000-00-00 00:00:00';
 
---         --
---         -- Comment content.
---         --
---         -- @since 4.4.0
---         -- @var string
---         --
---         public comment_content;
+        --
+        -- Comment content.
+        --
+        -- @since 4.4.0
+        -- @var string
+        --
+        Comment_Content : UStrings.UString;
 
 --         --
 --         -- Comment karma count.
@@ -366,6 +368,16 @@ is
 
    Null_Comment : constant Wp_Comment :=
      (Comment_Id      => UStrings.Null_UString,
+      Comment_Author  => UStrings.Null_UString,
+      Comment_Content => UStrings.Null_UString,
       Comment_Post_Id => 0);
+
+   package Comments_Vectors is new
+     Ada.Containers.Vectors (Index_Type   => Positive,
+                             Element_Type => Wp_Comment);
+
+   subtype Comments_List is Comments_Vectors.Vector;
+
+   Empty_Comments_List : constant Comments_List := Comments_Vectors.Empty_Vector;
 
 end Class_Comments;

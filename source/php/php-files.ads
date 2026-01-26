@@ -42,6 +42,37 @@ is
                      return String
                      is ("XXX-702");
 
+   function Mkdir (Directoy   : String;
+                   Permission : Integer)
+                   return Boolean
+   is (raise Program_Error with "not implemented");
+
+   function Copy (From : String;
+                  To   : String)
+                  return Boolean
+   is (raise Program_Error with "not implemented");
+
+   function File (Filename : String)
+                  return List_Type
+   is (raise Program_Error with "not implemented");
+
+   type Dir_Handle is tagged null record;
+
+   function Is_Good (Handle : Dir_Handle)
+                     return Boolean
+   is (raise Program_Error with "not implemented");
+
+   function Opendir (Directory : String)
+                     return Dir_Handle
+   is (raise Program_Error with "not implemented");
+
+   function Readdir (Handle : in out Dir_Handle)
+                     return String
+   is (raise Program_Error with "not implemented");
+
+   procedure Closedir (Handle : in out Dir_Handle)
+   is null;
+
    function Realpath (Path : String)
             return String
             is ("XXX-779");
@@ -64,5 +95,26 @@ is
    function Sys_Get_Temp_Dir
             return String
             is ("XXX-977");
+
+   procedure Umask (Make : Integer)
+   is null;
+
+   procedure Chmod (Filename   : String;
+                    Permission : Integer)
+   is null;
+
+   type File_Type is null record;
+
+   function Fopen (Filename : String;
+                   Mode     : String)
+                   return File_Type
+   is (raise Program_Error with "not implemented");
+
+   procedure Fwrite (File : in out File_Type;
+                     Data : String)
+   is null;
+
+   procedure Fclose (File : in out File_Type)
+   is null;
 
 end Php.Files;

@@ -1308,34 +1308,16 @@ is
    function X_Get_Option (Setting : String)
                           return Arrays.Multi_Type;
 
--- --
--- -- Filters for content to remove unnecessary slashes.
--- --
--- -- @since 1.5.0
--- --
--- -- @param string content The content to modify.
--- -- @return string The de-slashed content.
--- --
--- function deslash( content ) then
---         -- Note: \\\ inside a regex denotes a single backslash.
-
---         /*
---         -- Replace one or more backslashes followed by a single quote with
---         -- a single quote.
---         --
---         content = preg_replace( "/\\\+"/", """, content );
-
---         /*
---         -- Replace one or more backslashes followed by a double quote with
---         -- a double quote.
---         --
---         content = preg_replace( "/\\\+"/", """, content );
-
---         -- Replace one or more backslashes with one backslash.
---         content = preg_replace( "/\\\+/", "\\", content );
-
---         return content;
--- end;
+   --
+   -- Filters for content to remove unnecessary slashes.
+   --
+   -- @since 1.5.0
+   --
+   -- @param string content The content to modify.
+   -- @return string The de-slashed content.
+   --
+   function Deslash (Content : String)
+                     return String;
 
    --
    -- Modifies the database based on specified SQL statements.
@@ -1394,226 +1376,49 @@ is
    --
    procedure Make_DB_Current_Silent (Tables : String := "all");
 
--- --
--- -- Creates a site theme from an existing theme.
--- --
--- -- then@internal Missing Long Descriptionend;end;
--- --
--- -- @since 1.5.0
--- --
--- -- @param string theme_name The name of the theme.
--- -- @param string template   The directory name of the theme.
--- -- @return bool
--- --
--- function make_site_theme_from_oldschool( theme_name, template ) then
---         home_path = get_home_path();
---         site_dir  = WP_CONTENT_DIR . "/themes/template";
+   --
+   -- Creates a site theme from an existing theme.
+   --
+   -- then@internal Missing Long Descriptionend;end;
+   --
+   -- @since 1.5.0
+   --
+   -- @param string theme_name The name of the theme.
+   -- @param string template   The directory name of the theme.
+   -- @return bool
+   --
+   function Make_Site_Theme_From_Oldschool (Theme_Name : String;
+                                            Template   : String)
+                                            return Boolean;
 
---         if ( ! file_exists( "home_path/index.php" ) ) then
---                 return false;
---         end;
+   --
+   -- Creates a site theme from the default theme.
+   --
+   -- then@internal Missing Long Descriptionend;end;
+   --
+   -- @since 1.5.0
+   --
+   -- @param string theme_name The name of the theme.
+   -- @param string template   The directory name of the theme.
+   -- @return void|false
+   --
+   function Make_Site_Theme_From_Default (Theme_Name : String;
+                                          Template   : String)
+                                          return Boolean;
 
---         /*
---         -- Copy files from the old locations to the site theme.
---         -- TODO: This does not copy arbitrary include dependencies. Only the standard WP files are copied.
---         --
---         files = array(
---                 "index.php"             => "index.php",
---                 "wp-layout.css"         => "style.css",
---                 "wp-comments.php"       => "comments.php",
---                 "wp-comments-popup.php" => "comments-popup.php",
---         );
+   --
+   -- Creates a site theme.
+   --
+   -- {@internal Missing Long Description}
+   --
+   -- @since 1.5.0
+   --
+   -- @return string|false
+   --
+   function Make_Site_Theme
+            return String;
 
---         foreach ( files as oldfile => newfile ) then
---                 if ( "index.php" === oldfile ) then
---                         oldpath = home_path;
---                 end; else then
---                         oldpath = ABSPATH;
---                 end;
-
---                 -- Check to make sure it"s not a new index.
---                 if ( "index.php" === oldfile ) then
---                         index = implode( "", file( "oldpath/oldfile" ) );
---                         if ( strpos( index, "WP_USE_THEMES" ) !== false ) then
---                                 if ( ! copy( WP_CONTENT_DIR . "/themes/" . WP_DEFAULT_THEME . "/index.php", "site_dir/newfile" ) ) then
---                                         return false;
---                                 end;
-
---                                 -- Don"t copy anything.
---                                 continue;
---                         end;
---                 end;
-
---                 if ( ! copy( "oldpath/oldfile", "site_dir/newfile" ) ) then
---                         return false;
---                 end;
-
---                 chmod( "site_dir/newfile", 0777 );
-
---                 -- Update the blog header include in each file.
---                 lines = explode( "\n", implode( "", file( "site_dir/newfile" ) ) );
---                 if ( lines ) then
---                         f = fopen( "site_dir/newfile", "w" );
-
---                         foreach ( lines as line ) then
---                                 if ( preg_match( "/require.*wp-blog-header/", line ) ) then
---                                         line = "//" . line;
---                                 end;
-
---                                 -- Update stylesheet references.
---                                 line = str_replace( "<?php echo __get_option("siteurl"); ?>/wp-layout.css", "<?php bloginfo("stylesheet_url"); ?>", line );
-
---                                 -- Update comments template inclusion.
---                                 line = str_replace( "<?php include(ABSPATH . "wp-comments.php"); ?>", "<?php comments_template(); ?>", line );
-
---                                 fwrite( f, "thenlineend;\n" );
---                         end;
---                         fclose( f );
---                 end;
---         end;
-
---         -- Add a theme header.
---         header = "/*\nTheme Name: theme_name\nTheme URI: " . __get_option( "siteurl" ) . "\nDescription: A theme automatically created by the update.\nVersion: 1.0\nAuthor: Moi\n*/\n";
-
---         stylelines = file_get_contents( "site_dir/style.css" );
---         if ( stylelines ) then
---                 f = fopen( "site_dir/style.css", "w" );
-
---                 fwrite( f, header );
---                 fwrite( f, stylelines );
---                 fclose( f );
---         end;
-
---         return true;
--- end;
-
--- --
--- -- Creates a site theme from the default theme.
--- --
--- -- then@internal Missing Long Descriptionend;end;
--- --
--- -- @since 1.5.0
--- --
--- -- @param string theme_name The name of the theme.
--- -- @param string template   The directory name of the theme.
--- -- @return void|false
--- --
--- function make_site_theme_from_default( theme_name, template ) then
---         site_dir    = WP_CONTENT_DIR . "/themes/template";
---         default_dir = WP_CONTENT_DIR . "/themes/" . WP_DEFAULT_THEME;
-
---         -- Copy files from the default theme to the site theme.
---         -- files = array( "index.php", "comments.php", "comments-popup.php", "footer.php", "header.php", "sidebar.php", "style.css" );
-
---         theme_dir = @opendir( default_dir );
---         if ( theme_dir ) then
---                 while ( ( theme_file = readdir( theme_dir ) ) !== false ) then
---                         if ( is_dir( "default_dir/theme_file" ) ) then
---                                 continue;
---                         end;
---                         if ( ! copy( "default_dir/theme_file", "site_dir/theme_file" ) ) then
---                                 return;
---                         end;
---                         chmod( "site_dir/theme_file", 0777 );
---                 end;
-
---                 closedir( theme_dir );
---         end;
-
---         -- Rewrite the theme header.
---         stylelines = explode( "\n", implode( "", file( "site_dir/style.css" ) ) );
---         if ( stylelines ) then
---                 f = fopen( "site_dir/style.css", "w" );
-
---                 foreach ( stylelines as line ) then
---                         if ( strpos( line, "Theme Name:" ) !== false ) then
---                                 line = "Theme Name: " . theme_name;
---                         end; elseif ( strpos( line, "Theme URI:" ) !== false ) then
---                                 line = "Theme URI: " . __get_option( "url" );
---                         end; elseif ( strpos( line, "Description:" ) !== false ) then
---                                 line = "Description: Your theme.";
---                         end; elseif ( strpos( line, "Version:" ) !== false ) then
---                                 line = "Version: 1";
---                         end; elseif ( strpos( line, "Author:" ) !== false ) then
---                                 line = "Author: You";
---                         end;
---                         fwrite( f, line . "\n" );
---                 end;
---                 fclose( f );
---         end;
-
---         -- Copy the images.
---         umask( 0 );
---         if ( ! mkdir( "site_dir/images", 0777 ) ) then
---                 return false;
---         end;
-
---         images_dir = @opendir( "default_dir/images" );
---         if ( images_dir ) then
---                 while ( ( image = readdir( images_dir ) ) !== false ) then
---                         if ( is_dir( "default_dir/images/image" ) ) then
---                                 continue;
---                         end;
---                         if ( ! copy( "default_dir/images/image", "site_dir/images/image" ) ) then
---                                 return;
---                         end;
---                         chmod( "site_dir/images/image", 0777 );
---                 end;
-
---                 closedir( images_dir );
---         end;
--- end;
-
--- --
--- -- Creates a site theme.
--- --
--- -- then@internal Missing Long Descriptionend;end;
--- --
--- -- @since 1.5.0
--- --
--- -- @return string|false
--- --
--- function make_site_theme() then
---         -- Name the theme after the blog.
---         theme_name = __get_option( "blogname" );
---         template   = sanitize_title( theme_name );
---         site_dir   = WP_CONTENT_DIR . "/themes/template";
-
---         -- If the theme already exists, nothing to do.
---         if ( is_dir( site_dir ) ) then
---                 return false;
---         end;
-
---         -- We must be able to write to the themes dir.
---         if ( ! is_writable( WP_CONTENT_DIR . "/themes" ) ) then
---                 return false;
---         end;
-
---         umask( 0 );
---         if ( ! mkdir( site_dir, 0777 ) ) then
---                 return false;
---         end;
-
---         if ( file_exists( ABSPATH . "wp-layout.css" ) ) then
---                 if ( ! make_site_theme_from_oldschool( theme_name, template ) ) then
---                         -- TODO: rm -rf the site theme directory.
---                         return false;
---                 end;
---         end; else then
---                 if ( ! make_site_theme_from_default( theme_name, template ) ) then
---                         -- TODO: rm -rf the site theme directory.
---                         return false;
---                 end;
---         end;
-
---         -- Make the new site theme active.
---         current_template = __get_option( "template" );
---         if ( WP_DEFAULT_THEME == current_template ) then
---                 update_option( "template", template );
---                 update_option( "stylesheet", template );
---         end;
---         return template;
--- end;
+   procedure Make_Site_Theme;
 
 -- --
 -- -- Translate user level to user role name.
