@@ -251,9 +251,9 @@ is
                       return Boolean
                       is (True);
 
-   function Apply_Filters (Hook  : String;
-                           Value : Array_Type;
-                           User  : Class_Users.Wp_User)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           User      : Class_Users.Wp_User)
                            return Array_Type
                            is (Value);
 
@@ -620,9 +620,9 @@ is
                            return Boolean
                            is (Value);
 
-   function Apply_Filters (Hook  : String;
-                           Value : List_Type;
-                           T     : Class_Customize_Managers.Wp_Customize_Manager)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : List_Type;
+                           T         : Class_Customize_Managers.Wp_Customize_Manager)
                            return List_Type
                            is (Value);
 
@@ -678,36 +678,35 @@ is
                Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
                is (Value);
 
-   function Apply_Filters (Hook      : String;
+   function Apply_Filters (Hook_Name : String;
                            Value     : String;
                            HTML      : Array_Type;
                            Protocols : List_Type)
                            return String
                            is (Value);
 
-   function Apply_Filters (Hook  : String;
-                           Value : List_Type;
-                           S     : String;
-                           U     : Integer;
-                           Args  : Inc_Capabilities.Args_Type)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : List_Type;
+                           S         : String;
+                           U         : Integer;
+                           Args      : Inc_Capabilities.Args_Type)
                            return List_Type
                            is (Value);
 
-   function Apply_Filters (Hook  : String;
-                           Value : Boolean;
-                           S     : String;
-                           O_Id  : Integer;
-                           U_Id  : Integer;
-                           C     : String;
-                           L     : List_Type)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           S         : String;
+                           O_Id      : Integer;
+                           U_Id      : Integer;
+                           C         : String;
+                           L         : List_Type)
                            return Boolean
                            is (Value);
 
-   function Apply_Filters (Hook  : String;
-                           Value : Array_Type;
-                           Caps  : List_Type;
-                           -- Args,
-                           This  : Class_Users.Wp_User)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           Caps      : List_Type;
+                           This      : Class_Users.Wp_User)
                            return Array_Type
                            is (Value);
 
@@ -719,10 +718,10 @@ is
                            return String
                            is (Value);
 
-   function Apply_Filters (Hook  : String;
-                           Value : Natural;
-                           U     : Natural;
-                           P     : Natural)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Natural;
+                           U         : Natural;
+                           P         : Natural)
                            return Natural
                            is (Value);
 
@@ -732,10 +731,10 @@ is
                            return Inc_Comments.Comment_Counts
                            is (Value);
 
-   function Apply_Filters (Hook  : String;
-                           Value : Array_Type;
-                           Oi    : List_Type;
-                           Tax   : Array_Type)
+   function Apply_Filters (Hook_Name : String;
+                           Value     : Array_Type;
+                           Oi        : List_Type;
+                           Tax       : Array_Type)
                            return Array_Type
                            is (Value);
 
