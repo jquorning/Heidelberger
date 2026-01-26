@@ -8,6 +8,7 @@ with Php.Arrays;
 with Php.Strings;
 
 with UStrings;
+with Wp_Common;
 
 with Inc_Plugins;
 
@@ -156,6 +157,7 @@ is
                   Data    : String := "")
    is
       use Php.Strings;
+      use Wp_Common;
       use Inc_Plugins;
    begin
       Set (This.Errors, Code, From_String (Message));

@@ -533,6 +533,7 @@ is
       use Php.Arrays;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Taxonomy;
       use Inc_Formatting;
       use Inc_Functions;

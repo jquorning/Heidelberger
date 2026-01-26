@@ -785,8 +785,9 @@ is
       use Php.Strings;
       use Php.Types;
       use UStrings;
-      use Inc_Caches;
+      use Wp_Common;
       use Class_WpDB;
+      use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -2148,8 +2149,9 @@ is
    is
       use Php.Types;
       use UStrings;
-      use Inc_Caches;
+      use Wp_Common;
       use Class_WpDB;
+      use Inc_Caches;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -2601,6 +2603,7 @@ is
                                 return Boolean
    is
       use Php.Misc;
+      use Wp_Common;
       use Inc_Caches;
       use Inc_Load;
       use Inc_Plugins;

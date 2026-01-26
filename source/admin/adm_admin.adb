@@ -16,8 +16,9 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
+with Wp_Common;
 
 with Adi_Plugins;
 with Adi_Screens;
@@ -60,6 +61,7 @@ is
       use Binder;
       use Globals;
       use UStrings;
+      use Wp_Common;
       use Adi_Plugins;
       use Inc_Formatting;
       use Inc_Functions;

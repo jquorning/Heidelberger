@@ -11,6 +11,7 @@ with Php.Strings;
 
 with Globals;
 with Lists;
+with Wp_Common;
 
 with Inc_Load;
 with Inc_Ms_Blogs;
@@ -149,6 +150,7 @@ is
    is
       use Php.Arrays;
       use UStrings;
+      use Wp_Common;
       use Lists;
       use Class_Role;
       use Inc_Plugins;

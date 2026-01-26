@@ -860,11 +860,16 @@ package body Inc_L10n is
       null;
    end Unload_Textdomain;
 
+   -----------------------
+   -- Unload_Textdomain --
+   -----------------------
+
    function Unload_Textdomain (Domain     : String;
                                Reloadable : Boolean := False)
                                return Boolean
    is
 --    use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
 --         global l10n, l10n_unloaded;

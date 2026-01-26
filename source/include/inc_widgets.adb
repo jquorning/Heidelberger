@@ -27,6 +27,7 @@ with Php.Strings;
 with Php.Types;
 
 with UStrings;
+with Wp_Common;
 
 with Class_Customize_Widgets;
 with Inc_Formatting;
@@ -63,6 +64,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Customize_Widgets;
       use Inc_Formatting;
       use Inc_Load;

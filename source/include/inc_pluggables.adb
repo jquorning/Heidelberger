@@ -1446,6 +1446,7 @@ is
       use Php.Errors;
       use Php.Strings;
       use Binder;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_L10n;
