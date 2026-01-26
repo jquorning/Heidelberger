@@ -431,6 +431,7 @@ is
       use Php.Strings;
       use Binder;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_Link_Templates;
@@ -851,6 +852,7 @@ is
       use Php.HTML;
       use Binder;
       use UStrings;
+      use Wp_Common;
       use Class_Phpass;
       use Inc_Formatting;
       use Inc_Functions;
@@ -2222,6 +2224,7 @@ is
       use Php.Strings;
       use Binder;
       use UStrings;
+      use Wp_Common;
       use Class_Errors;
       use Inc_Formatting;
       use Inc_Functions;

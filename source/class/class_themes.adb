@@ -13,6 +13,7 @@ with Php.Strings;
 with Php.Types;
 
 with Lists;
+with Wp_Common;
 
 with Inc_Caches;
 with Inc_Error_Protection;
@@ -45,6 +46,7 @@ is
       use Php.Strings;
       use Php.Types;
       use UStrings;
+      use Wp_Common;
       use Inc_Caches;
       use Class_Errors;
       use Inc_Error_Protection;

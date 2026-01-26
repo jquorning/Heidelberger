@@ -18,6 +18,7 @@ with Php.Strings;
 
 with Globals;
 with UStrings;
+with Wp_Common;
 
 with Inc_Functions;
 with Inc_HTTP;
@@ -45,6 +46,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
 
@@ -1984,9 +1986,9 @@ is
                            Strict   : Boolean := False)
                            return String
    is
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Raw_Username : constant String := Username;
@@ -2034,6 +2036,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Sanitized_Key : UString;
@@ -2063,6 +2066,7 @@ is
                             Context        : String := "save")
                             return String
    is
+      use Wp_Common;
       use Inc_Plugins;
 
       Raw_Title : constant String := Title;
@@ -2273,6 +2277,7 @@ is
                                  return String
    is
       use Php.Preg;
+      use Wp_Common;
       use Inc_Plugins;
 
       -- Strip out any %-encoded octets.
@@ -2307,6 +2312,7 @@ is
                                   return String
    is
       use Php.Preg;
+      use Wp_Common;
       use Inc_Plugins;
 
       -- Limit to A-Z, a-z, 0-9, "_", "-".
@@ -4253,6 +4259,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_HTTP;
       use Inc_KSES;
@@ -4438,6 +4445,7 @@ is
       use Php.Strings;
       use Php.HTML;
       use Php.Preg;
+      use Wp_Common;
       use Inc_Plugins;
 
       Safe_Text_5 : constant String := Wp_Check_Invalid_UTF8 (Text);
@@ -4505,6 +4513,7 @@ is
    function ESC_Attr (Text : String)
                       return String
    is
+      use Wp_Common;
       use Inc_Plugins;
 
       Safe_Text_2 : constant String := Wp_Check_Invalid_UTF8 (Text);
@@ -5375,6 +5384,7 @@ is
    function Sanitize_Text_Field (Str : String)
                                  return String
    is
+      use Wp_Common;
       use Inc_Plugins;
 
       Filtered : constant String :=
@@ -5633,6 +5643,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
    begin
       if Empty (-Static_Spaces) then

@@ -10,10 +10,11 @@
 -- require_once ABSPATH . WPINC . "/ms-network.php";
 
 with Globals;
+with Wp_Common;
 
-with Inc_Capabilities;
 with Class_Roles;
 with Class_Users;
+with Inc_Capabilities;
 with Inc_Load;
 with Inc_Options;
 with Inc_Pluggables;
@@ -350,6 +351,7 @@ is
                              Default : Array_Type := Empty_Array) -- false
                              return Array_Type
    is
+      use Wp_Common;
       use Inc_Load;
       use Inc_Options;
       use Inc_Plugins;

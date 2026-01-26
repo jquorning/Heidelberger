@@ -17,6 +17,7 @@ with Php.Types;
 with Binder;
 with Globals;
 with UStrings;
+with Wp_Common;
 
 -- with Class_Customize_Managers;
 with Inc_Formatting;
@@ -196,6 +197,7 @@ is
             return String
    is
 --    use UStrings;
+      use Wp_Common;
       use Inc_Options;
       use Inc_Plugins;
    begin
@@ -217,6 +219,7 @@ is
             return String
    is
 --    use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Stylesheet     : constant String := Get_Stylesheet; -- ();
@@ -336,6 +339,7 @@ is
             return String
    is
 --    use UStrings;
+      use Wp_Common;
       use Inc_Options;
       use Inc_Plugins;
    begin
@@ -357,6 +361,7 @@ is
             return String
    is
 --    use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Template     : constant String := Get_Template; -- ();
@@ -638,10 +643,10 @@ is
    function Get_Theme_Root (Stylesheet_Or_Template : String := "")
                             return String
    is
+      use Php.Lists;
       use Globals;
       use UStrings;
-      use Php;
-      use Php.Lists;
+      use Wp_Common;
       use Inc_Plugins;
 
 --      global wp_theme_directories;

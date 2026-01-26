@@ -418,8 +418,8 @@ is
    function Wp_Get_Sidebars_Widgets (Deprecated : Boolean := True)
                                      return Array_Type
    is
-      use Php;
       use Php.Types;
+      use Wp_Common;
       use Class_Customize_Widgets;
       use Inc_Functions;
       use Inc_Load;
@@ -923,6 +923,7 @@ is
    function Wp_Use_Widgets_Block_Editor
             return Boolean
    is
+      use Wp_Common;
       use Inc_Plugins;
       use Inc_Themes;
    begin

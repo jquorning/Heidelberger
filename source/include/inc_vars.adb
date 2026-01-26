@@ -21,6 +21,7 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Lists;
+with Wp_Common;
 
 with Inc_Load;
 with Inc_Plugins;
@@ -35,12 +36,12 @@ is
 
    procedure Run
    is
-      use Arrays;
-      use Binder;
-      use Php;
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
+      use Arrays;
+      use Binder;
+      use Wp_Common;
       use Inc_Load;
 
       Php_Self : constant String := As_String (Get (X_SERVER, "PHP_SELF"));
@@ -213,9 +214,9 @@ is
    function Wp_Is_Mobile
             return Boolean
    is
-      use Arrays;
-      use Php;
       use Php.Strings;
+      use Arrays;
+      use Wp_Common;
 
       Http_User_Agent : constant String := As_String (Get (Binder.X_SERVER, "HTTP_USER_AGENT"));
       Is_Mobile : Boolean;
@@ -244,7 +245,7 @@ is
       --
       -- @param bool is_mobile Whether the request is from a mobile device or not.
       --
-      return Inc_Plugins.Apply_Filters ("wp_is_mobile", Is_Mobile);
+      return Apply_Filters ("wp_is_mobile", Is_Mobile);
    end Wp_Is_Mobile;
 
 end Inc_Vars;

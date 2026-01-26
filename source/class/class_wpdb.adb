@@ -29,6 +29,7 @@ with MySQLi_Bind;
 with Arrays.IO;
 with Globals;
 with Helpers;
+with Wp_Common;
 
 with Inc_Functions;
 with Inc_L10n;
@@ -390,6 +391,7 @@ is
       use MySQL_Bind;
       use MySQLi_Bind;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Res       : Array_Type;
@@ -1697,6 +1699,7 @@ is
       use MySQL_Bind;
       use MySQLi_Bind;
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Plugins;
@@ -2893,6 +2896,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Errors;
       use Inc_L10n;
       use Inc_Plugins;
@@ -3050,6 +3054,7 @@ is
       use Php.Strings;
       use Databases;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Tablekey  : constant String := Strtolower (Table);

@@ -331,6 +331,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;

@@ -14,8 +14,9 @@ with Php.Strings;
 
 with Binder;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
+with Wp_Common;
 
 with Wp_Config;
 
@@ -1584,6 +1585,7 @@ is
             return Boolean
    is
       use Globals;
+      use Wp_Common;
       use Inc_Plugins;
    begin
       --
@@ -1670,6 +1672,7 @@ is
    function Wp_Is_File_Mod_Allowed (Context : String)
                                     return Boolean
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       --

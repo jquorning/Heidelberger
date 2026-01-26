@@ -2810,6 +2810,7 @@ is
    function Wp_Get_Password_Hint
             return String
    is
+      use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
 

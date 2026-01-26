@@ -399,8 +399,8 @@ is
             -- @param WP_Taxonomy tax      The taxonomy object.
             --
             Inc_Pluggables.Wp_Redirect (
-              Inc_Plugins.Apply_Filters ("redirect_term_location",
-                                         -Location, -Tax.Name));  -- .name added
+              Apply_Filters ("redirect_term_location",
+                             -Location, -Tax.Name));  -- .name added
             goto Bailout; -- return;  --  exit;
          end if;
 

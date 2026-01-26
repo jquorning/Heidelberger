@@ -441,6 +441,7 @@ is
    is
       use Php.HTML;
       use Php.Strings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Plugins;
@@ -480,6 +481,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Plugins;
@@ -516,6 +518,7 @@ is
    function Wp_Registration_URL
             return String
    is
+      use Wp_Common;
       use Inc_Link_Templates;
       use Inc_Plugins;
    begin
@@ -692,6 +695,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Sites;
       use Inc_Functions;
       use Inc_Link_Templates;
@@ -1217,6 +1221,7 @@ is
       use Php.Arrays;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Terms;
 --    use Class_Querys;
       use Inc_L10n;
@@ -1601,6 +1606,7 @@ is
                                      return String
    is
       use Php.Echoing;
+      use Wp_Common;
       use Inc_Plugins;
       use Inc_Posts;
       use Inc_Querys;
@@ -1682,6 +1688,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Terms;
       use Inc_Plugins;
       use Inc_Querys;
@@ -4446,6 +4453,7 @@ is
    function Get_Search_Query (Escaped : Boolean := True)
                               return String
    is
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Plugins;
       use Inc_Querys;
@@ -4495,6 +4503,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Options;
@@ -4558,6 +4567,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Link_Templates;
@@ -5040,6 +5050,7 @@ is
    function Wp_Admin_CSS_URI (File : String := "wp-admin")
                               return String
    is
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_Plugins;
@@ -5072,6 +5083,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Styles;
       use Inc_Functions_Wp_Styles;
       use Inc_Plugins;

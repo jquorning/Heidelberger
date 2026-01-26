@@ -814,6 +814,7 @@ is
                                   return Array_Type
    is
       use Php.Types;
+      use Wp_Common;
       use Inc_Plugins;
 --        global $allowedposttags, $allowedtags, $allowedentitynames;
    begin
@@ -941,8 +942,8 @@ is
                            Allowed_Protocols : List_Type)
                            return String
    is
-      use Php;
       use Php.Preg;
+      use Wp_Common;
    begin
       Pass_Allowed_HTML      := Allowed_HTML;
       Pass_Allowed_Protocols := Allowed_Protocols;
@@ -959,6 +960,7 @@ is
             return List_Type
    is
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       URI_Attributes_2 : constant List_Type := To_List (List => (
@@ -2284,11 +2286,11 @@ is
                                  Deprecated : String := "")
                                  return String
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Plugins;
 

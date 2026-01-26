@@ -681,6 +681,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Admin_Bar;
       use Class_Sites;
       use Inc_Capabilities;
@@ -1770,6 +1771,7 @@ is
    is
       use Globals;
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_Pluggables;
       use Inc_Plugins;

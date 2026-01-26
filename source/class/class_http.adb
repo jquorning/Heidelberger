@@ -655,8 +655,9 @@ is
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
-      use Inc_Options;
       use UStrings;
+      use Wp_Common;
+      use Inc_Options;
       use Inc_Plugins;
    begin
       -- We don't need to block requests, because nothing is blocked.

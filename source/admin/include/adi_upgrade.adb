@@ -2384,6 +2384,7 @@ is
       use Php.Strings;
       use Globals;
       use UStrings;
+      use Wp_Common;
       use Adi_Schemas;
       use Class_WpDB;
       use Inc_Plugins;
@@ -3570,6 +3571,7 @@ is
    function Wp_Should_Upgrade_Global_Tables
             return Boolean
    is
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Plugins;
 

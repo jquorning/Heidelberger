@@ -18,6 +18,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
+with Wp_Common;
 
 with Class_Dependency;
 with Inc_Formatting;
@@ -164,6 +165,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Formatting;
       use Class_Dependency;
@@ -357,8 +359,8 @@ is
 
                   -- This filter is documented in wp-includes/class-wp-scripts.php
                   Src := +ESC_URL (
-                    Inc_Plugins.Apply_Filters ("script_loader_src", -Src,
-                                               Handle));
+                    Apply_Filters ("script_loader_src", -Src,
+                                   Handle));
 
                   if Src = "" then
                      return True;
@@ -731,6 +733,7 @@ is
                       Group     : Boolean := False)
                       return Boolean
    is
+      use Wp_Common;
       use Inc_Plugins;
 
       R : constant Boolean := False; -- Parent::All_Deps (Handles, Recursion, Group);

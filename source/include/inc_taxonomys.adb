@@ -42,6 +42,7 @@ is
    procedure Create_Initial_Taxonomies
    is
       use UStrings;
+      use Wp_Common;
       use Class_Taxonomy;
       use Inc_L10n;
       use Inc_Options;
@@ -694,8 +695,9 @@ is
    function Get_Taxonomy_Labels (Tax : in out Class_Taxonomy.Wp_Taxonomy)
                                  return Array_Type
    is
-      use UStrings;
       use Php.Arrays;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
    begin
 --    tax.labels = (array) tax.labels;
@@ -1559,6 +1561,7 @@ is
                          return Array_Type -- Integer
    is
       use Php.Strings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Plugins;
 

@@ -835,6 +835,7 @@ is
                              Meta_Key  : String)
                              return Boolean
    is
+      use Wp_Common;
    begin
       if Meta_Type = "" then -- or else not Is_Numeric (Object_Id) then
          return False;
@@ -1394,9 +1395,9 @@ is
                                Meta_Type : String := "")
                                return Boolean
    is
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Sanitized_Key : constant String :=
@@ -1862,6 +1863,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Posts;
       use Inc_Posts;
       use Inc_Plugins;

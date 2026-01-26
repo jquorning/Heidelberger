@@ -2,6 +2,8 @@
 --
 --
 
+with Wp_Common;
+
 with Class_User_Meta_Session_Tokens;
 with Inc_Plugins;
 
@@ -15,6 +17,7 @@ is
    function Get_Instance (User_Id : Integer)
                           return Class_Session_Tokens.Wp_Session_Tokens'Class
    is
+      use Wp_Common;
       use Class_User_Meta_Session_Tokens;
       use Inc_Plugins;
 

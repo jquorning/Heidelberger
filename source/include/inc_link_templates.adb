@@ -82,6 +82,7 @@ is
                                     return String
    is
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Plugins;
 
@@ -575,6 +576,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Posts;
       use Inc_Posts;
       use Inc_Plugins;
@@ -625,6 +627,7 @@ is
       use Php.Strings;
       use Php.Types;
       use UStrings;
+      use Wp_Common;
       use Class_Posts;
       use Inc_Formatting;
       use Inc_Options;
@@ -1493,6 +1496,7 @@ is
    is
       use Php.Types;
       use UStrings;
+      use Wp_Common;
       use Class_Post_Type;
       use Class_Posts;
       use Inc_Plugins;
@@ -1946,8 +1950,9 @@ is
                                 return String
    is
       use UStrings;
-      use Inc_Capabilities;
+      use Wp_Common;
       use Class_Users;
+      use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Plugins;
       use Inc_Pluggables;
@@ -2609,6 +2614,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -3622,6 +3628,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
@@ -3696,6 +3703,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
@@ -3793,6 +3801,7 @@ is
       use Php.Strings;
       use Globals;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       URL : UString := +Site_URL ("/" & (-WPINC) & "/", Scheme);
@@ -3907,6 +3916,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Class_Networks;
       use Inc_Load;
       use Inc_Ms_Networks;
@@ -4012,6 +4022,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_Plugins;
    begin
@@ -4055,6 +4066,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       URL : UString :=
@@ -4088,6 +4100,7 @@ is
                             Scheme : String := "admin")
                             return String
    is
+      use Wp_Common;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -4120,6 +4133,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Load;
       use Inc_Plugins;
@@ -4383,6 +4397,7 @@ is
                               return String
    is
       use UStrings;
+      use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
       use Inc_Options;
@@ -4594,6 +4609,7 @@ is
       use Php.Strings;
       use Php.Types;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -4942,6 +4958,7 @@ is
    function Get_Privacy_Policy_URL
             return String
    is
+      use Wp_Common;
       use Class_Posts;
       use Inc_Options;
       use Inc_Plugins;
@@ -4992,6 +5009,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Options;
       use Inc_Plugins;

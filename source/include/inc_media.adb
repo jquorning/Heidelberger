@@ -851,10 +851,10 @@ is
    function Get_Intermediate_Image_Sizes
             return List_Type
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Default_Sizes_2 : constant List_Type := To_List (List => (
@@ -5549,6 +5549,7 @@ is
    function Wp_Omit_Loading_Attr_Threshold (Force : Boolean := False)
                                             return Integer
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       -- This function may be called multiple times. Run the filter only once per

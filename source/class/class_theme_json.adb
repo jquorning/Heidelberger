@@ -15,12 +15,14 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Wp_Common;
+
 with Block_Typography;
 
-with Inc_Blocks;
 with Class_Block_Type;
 with Class_Block_Type_Registry;
 with Class_Theme_JSON_Schema;
+with Inc_Blocks;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_KSES;
@@ -1477,6 +1479,7 @@ is
    is
       use Php.Arrays;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Nodes : Array_Type;

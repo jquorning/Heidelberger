@@ -433,8 +433,9 @@ is
             return Array_Type
    is
       use UStrings;
-      use Inc_Caches;
+      use Wp_Common;
       use Class_WpDB;
+      use Inc_Caches;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -2502,6 +2503,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Caches;
       use Inc_Load;
 

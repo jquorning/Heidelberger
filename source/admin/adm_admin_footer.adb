@@ -5,11 +5,13 @@
 -- @subpackage Administration
 --
 
-with UStrings;
-with Globals;
-with Lists;
 with Php.Echoing;
 with Php.Strings;
+
+with Globals;
+with Lists;
+with UStrings;
+with Wp_Common;
 
 with Inc_L10n;
 with Inc_Plugins;
@@ -33,6 +35,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
       --

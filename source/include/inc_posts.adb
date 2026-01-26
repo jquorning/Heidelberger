@@ -1424,6 +1424,7 @@ is
                                   File          : String)
                                   return Boolean
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       if Get_Post (Attachment_Id).Is_Empty then
@@ -1476,6 +1477,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_Plugins;
 
@@ -3775,11 +3777,11 @@ is
                --                        Accepts "raw", "edit", "db", "display",
                --                        "attribute", or "js". Default "display".
                --
-               Value_2 := Inc_Plugins.Apply_Filters (Field, Value_2, Post_Id'Image,
-                                                    Context);
+               Value_2 := Apply_Filters (Field, Value_2, Post_Id'Image,
+                                         Context);
             else
-               Value_2 := Inc_Plugins.Apply_Filters ("post_" & Field, Value_2,
-                                                     Post_Id'Image, Context);
+               Value_2 := Apply_Filters ("post_" & Field, Value_2,
+                                         Post_Id'Image, Context);
             end if;
 
             -- if "attribute" = Context then

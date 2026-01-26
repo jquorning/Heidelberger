@@ -6,6 +6,8 @@
 -- @since 4.4.0
 --
 
+with Wp_Common;
+
 with Class_Roles;
 with Inc_Plugins;
 with Inc_Roles;
@@ -69,6 +71,7 @@ is
                      return Boolean
    is
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       --

@@ -16,6 +16,7 @@ with Php.Strings;
 
 with Binder;
 with Globals;
+with Wp_Common;
 
 with Adi_Posts;
 with Adi_Widgets;
@@ -402,6 +403,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
       use Inc_Widgets;
@@ -732,6 +734,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
 
@@ -754,8 +757,8 @@ is
                             Widget_Id : String)
                             return Boolean
    is
-      use Php;
       use Php.Lists;
+      use Wp_Common;
       use Inc_Plugins;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
@@ -1190,9 +1193,9 @@ is
                               Overrides : Array_Type := Empty_Array)
                               return Array_Type
    is
-      use Php;
       use Php.Arrays;
       use Php.Preg;
+      use Wp_Common;
       use Inc_Plugins;
       use Inc_Themes;
 

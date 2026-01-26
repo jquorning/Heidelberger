@@ -27,8 +27,9 @@ with Php.Types;
 
 with Array_Vectors;
 with Binder;
-with UStrings;
 with Globals;
+with UStrings;
+with Wp_Common;
 
 with Adm_Load_Styles;
 
@@ -846,6 +847,7 @@ is
    is
       use Binder;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -2564,6 +2566,7 @@ is
    function Print_Admin_Styles
             return List_Type
    is
+      use Wp_Common;
       use Inc_Plugins;
 --         global concatenate_scripts;
       Wp_Styles : Class_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
@@ -2595,6 +2598,7 @@ is
    function Print_Late_Styles
             return List_Type
    is
+      use Wp_Common;
       use Inc_Plugins;
 --    global wp_styles, concatenate_scripts;
       Wp_Styles : Class_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
@@ -2944,6 +2948,7 @@ is
    function Wp_Should_Load_Block_Editor_Scripts_And_Styles
             return Boolean
    is
+      use Wp_Common;
       use Inc_Plugins;
 --    global current_screen;
       Is_Block_Editor_Screen : constant Boolean :=
@@ -3281,9 +3286,10 @@ is
    procedure Wp_Maybe_Inline_Styles
    is
       use Array_Vectors;
-      use UStrings;
       use Php.Files;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
       use Class_Dependency;
       use Inc_Functions_Wp_Styles;

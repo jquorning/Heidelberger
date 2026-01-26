@@ -1254,6 +1254,7 @@ is
       use Php.Misc;
       use Globals;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
       use Inc_Users;
    begin
@@ -1740,6 +1741,7 @@ is
                               X_Redirect_By : String := "WordPress")
                               return Boolean
    is
+      use Wp_Common;
       use Inc_Link_Templates;
       use Inc_Plugins;
 
@@ -2545,6 +2547,7 @@ is
                            return Float
    is
       use Globals;
+      use Wp_Common;
       use Inc_Plugins;
 
       Nonce_Life : Integer;
@@ -2661,6 +2664,7 @@ is
    function Wp_Create_Nonce (Action : Integer := -1)
             return String
    is
+      use Wp_Common;
       use Class_Users;
       use Inc_Plugins;
       use Inc_Users;
@@ -2712,9 +2716,9 @@ is
    function Wp_Salt (Scheme : String := "auth")
                      return String
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
+      use UStrings;
+      use Wp_Common;
       use Inc_L10n;
       use Inc_Options;
       use Inc_Plugins;
@@ -2964,8 +2968,9 @@ is
                                   Extra_Special_Chars : Boolean := False)
                                   return String
    is
-      use UStrings;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Chars : UString :=

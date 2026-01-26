@@ -216,6 +216,7 @@ is
       use Php.Lists;
       use Php.Misc;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Media;
@@ -377,6 +378,7 @@ is
             return Array_Type
    is
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Editor_Settings : Array_Type;

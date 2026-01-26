@@ -14,8 +14,9 @@ with Php.Strings;
 
 with Arrays;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
+with Wp_Common;
 
 with Adm_Menu;
 with Adm_Menu_Header;
@@ -59,6 +60,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;

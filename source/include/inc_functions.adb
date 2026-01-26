@@ -1616,6 +1616,7 @@ is
    function Wp_Get_Nocache_Headers
             return Array_Type
    is
+      use Wp_Common;
       use Inc_Plugins;
 
       Headers : constant Array_Type := To_Array (List => (
@@ -2515,6 +2516,7 @@ is
       use Php.Strings;
       use Globals;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Load;
       use Inc_L10n;
@@ -3548,6 +3550,7 @@ is
    function Wp_Get_MIME_Types
             return Array_Type
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       --
@@ -6518,8 +6521,9 @@ is
    function Get_Main_Network_Id
             return Integer
    is
-      use Inc_Ms_Networks;
+      use Wp_Common;
       use Class_Networks;
+      use Inc_Ms_Networks;
       use Inc_Load;
       use Inc_Plugins;
 
@@ -6947,12 +6951,12 @@ is
                            Context         : String := "")
                            return Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       -- Pull only the first 8 KB of the file in.
@@ -7218,6 +7222,7 @@ is
    is
       use Php.Lists;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
    begin
       if Static_Protocols.Is_Empty then
@@ -8314,6 +8319,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Default_URL : constant String := Wp_Get_Default_Update_PHP_URL;

@@ -16,6 +16,7 @@ with Php.Misc;
 with Php.Strings;
 
 with Binder;
+with Wp_Common;
 
 with Adi_Screens;
 with Adi_Templates;
@@ -408,10 +409,10 @@ is
 
    procedure Views (This : Wp_List_Table)
    is
-      use UStrings;
-      use Php;
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Views : Array_Type := This.Get_Views;
@@ -467,9 +468,10 @@ is
    procedure Bulk_Actions (This  : in out Wp_List_Table;
                            Which : String := "")
    is
-      use UStrings;
       use Php.Arrays;
       use Php.Echoing;
+      use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Plugins;
@@ -1188,6 +1190,7 @@ is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Columns   : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
@@ -1228,6 +1231,7 @@ is
                              return Columns_Type
    is
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
    begin
       -- _column_headers is already set / cached.

@@ -75,10 +75,11 @@ is
       use Php.Types;
       use Binder;
       use UStrings;
-      use Inc_Capabilities;
+      use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
       use Class_WpDB;
+      use Inc_Capabilities;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Link_Templates;

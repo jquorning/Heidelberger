@@ -59,6 +59,7 @@ package body Inc_L10n is
    is
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Load;
       use Inc_Options;
       use Inc_Plugins;
@@ -167,6 +168,7 @@ package body Inc_L10n is
       use Php.Strings;
       use Binder;
       use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Load;
       use Inc_Plugins;
@@ -760,9 +762,9 @@ package body Inc_L10n is
                              Locale : String := "") -- null
                              return Boolean
    is
-      use UStrings;
-      use Php;
       use Php.Files;
+      use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
 -- @var WP_Textdomain_Registry wp_textdomain_registry
@@ -1500,6 +1502,7 @@ package body Inc_L10n is
       use Php.Files;
       use Php.Strings;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Languages  : Array_Type;

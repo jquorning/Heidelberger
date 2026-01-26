@@ -10,6 +10,7 @@ with Php.Arrays;
 with Php.Lists;
 
 with Globals;
+with Wp_Common;
 
 with Class_Wp;
 with Inc_Formatting;
@@ -51,9 +52,10 @@ is
                         Object_Type : List_Type;
                         Args        : Array_Type)
    is
-      use UStrings;
       use Php.Arrays;
       use Php.Lists;
+      use UStrings;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Plugins;
