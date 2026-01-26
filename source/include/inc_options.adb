@@ -2158,7 +2158,10 @@ is
 
       Network_Id_2 : Integer := Network_Id;
       Unused : Boolean;
-      Result : Rows_Result_Type;
+
+      Result : Rows_Result_Type :=
+        (Status => Error,
+         Rows   => 0);
    begin
       if Network_Id /= 0 and then not Is_Number (Network_Id) then
          return False;
