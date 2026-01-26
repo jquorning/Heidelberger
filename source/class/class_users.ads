@@ -208,8 +208,7 @@ is
    -- @return bool True if user exists in the database, false if not.
    --
    function Exists (This : Wp_User)
-                    return Boolean
-                    is (True);
+                    return Boolean;
 
    --
    -- Retrieves all of the capabilities of the user's roles, and merges them with

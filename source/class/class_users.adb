@@ -447,16 +447,17 @@ is
 --                 end;
 --         end;
 
---         --
---         -- Determines whether the user exists in the database.
---         --
---         -- @since 3.4.0
---         --
---         -- @return bool True if user exists in the database, false if not.
---         --
---         public function exists() then
---                 return ! empty( this->ID );
---         end;
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists (This : Wp_User)
+                    return Boolean
+   is
+   begin
+      return This.Id /= 0;
+--    return not Empty (This.Id);
+   end Exists;
 
 --         --
 --         -- Retrieves the value of a property or meta key.
