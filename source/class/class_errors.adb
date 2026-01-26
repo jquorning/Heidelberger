@@ -7,6 +7,7 @@
 with Php.Arrays;
 with Php.Strings;
 
+with Logging;
 with UStrings;
 with Wp_Common;
 
@@ -160,6 +161,8 @@ is
       use Wp_Common;
       use Inc_Plugins;
    begin
+      Logging.Log ("class_errors.add", Message);
+
       Set (This.Errors, Code, From_String (Message));
 --    This.Errors [ code ][] := Message;
 

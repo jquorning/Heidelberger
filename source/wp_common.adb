@@ -4,6 +4,8 @@
 
 with Logging;
 
+with Inc_Plugins;
+
 package body Wp_Common
 is
 
@@ -22,6 +24,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -30,6 +33,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -39,6 +43,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -47,6 +52,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -56,6 +62,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -65,6 +72,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -74,6 +82,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -84,6 +93,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -91,6 +101,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -100,6 +111,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -107,6 +119,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -117,6 +130,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name  : String;
@@ -126,6 +140,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name  : String;
@@ -135,6 +150,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name  : String;
@@ -144,6 +160,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -155,6 +172,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -162,6 +180,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -169,6 +188,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -177,6 +197,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -185,6 +206,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -193,6 +215,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -202,6 +225,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -209,6 +233,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -217,6 +242,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -225,6 +251,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -233,6 +260,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -243,6 +271,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -251,6 +280,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name  : String;
@@ -261,6 +291,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name  : String;
@@ -268,6 +299,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -276,6 +308,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -285,6 +318,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
    procedure Do_Action (Hook_Name : String;
@@ -292,6 +326,7 @@ is
    is
    begin
       Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
 end Wp_Common;
