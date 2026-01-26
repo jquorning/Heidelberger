@@ -38,6 +38,7 @@ with Inc_General_Templates;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
+with Inc_Ms_Blogs;
 with Inc_Ms_Networks;
 with Inc_Options;
 with Inc_Plugins;
@@ -89,40 +90,38 @@ is
 --         return datetime->format( format );
 -- end;
 
---
--- Retrieves the current time based on specified type.
---
---  - The "mysql" type will return the time in the format for MySQL DATETIME field.
---  - The "timestamp" or "U" types will return the current timestamp or a sum of timestamp
---    and timezone offset, depending on `gmt`.
---  - Other strings will be interpreted as PHP date formats (e.g. "Y-m-d").
---
--- If `gmt` is a truthy value then both types will use GMT time, otherwise the
--- output is adjusted with the GMT offset for the site.
---
--- @since 1.0.0
--- @since 5.3.0 Now returns an integer if `type` is "U". Previously a string was returned.
---
--- @param string   type Type of time to retrieve. Accepts "mysql", "timestamp", "U",
---                       or PHP date format string (e.g. "Y-m-d").
--- @param int|bool gmt  Optional. Whether to use GMT timezone. Default false.
--- @return int|string Integer if `type` is "timestamp" or "U", string otherwise.
---
--- function current_time( type, gmt = 0 ) then
---         // Don"t use non-GMT timestamp, unless you know the difference and really need to.
---         if ( "timestamp" === type || "U" === type ) then
---                 return gmt ? time() : time() + (int) ( get_option( "gmt_offset" )-- HOUR_IN_SECONDS );
---         end;
+   ------------------
+   -- Current_Time --
+   ------------------
 
---         if ( "mysql" === type ) then
---                 type = "Y-m-d H:i:s";
---         end;
+   function Current_Time (Typ : String;
+                          GMT : Boolean := False) -- 0
+                          return String
+   is
+      use Php.Calendar;
+      use Inc_Options;
+   begin
+      -- Don't use non-GMT timestamp, unless you know the difference and really
+      -- need to.
+      if Typ in "timestamp" | "U" then
+         return
+           Integer'Image (if GMT
+            then Php.Misc.Time
+            else Php.Misc.Time + Get_Option ("gmt_offset") * Globals.HOUR_IN_SECONDS);
+      end if;
 
---         timezone = gmt ? new DateTimeZone( "UTC" ) : wp_timezone();
---         datetime = new DateTime( "now", timezone );
+      declare
+         Type_2 : constant String :=
+           (if "mysql" = Typ then "Y-m-d H:i:s" else Typ);
 
---         return datetime->format( type );
--- end;
+         Timezone : constant Date_Time_Zone :=
+           (if GMT then X_Construct ("UTC") else Wp_Timezone);
+
+         Datetime : constant Date_Time := X_Construct ("now", Timezone);
+      begin
+         return Datetime.Format (Type_2);
+      end;
+   end Current_Time;
 
 --
 -- Retrieves the current time as an object using the site"s timezone.
@@ -2176,142 +2175,175 @@ is
 --         return false;
 -- end;
 
---
--- Recursive directory creation based on full path.
---
--- Will attempt to set permissions on folders.
---
--- @since 2.0.1
---
--- @param string target Full path to attempt to create.
--- @return bool Whether the path was created. True if path already exists.
---
--- function wp_mkdir_p( target ) then
---         wrapper = null;
+   ----------------
+   -- Wp_Mkdir_P --
+   ----------------
 
---         // Strip the protocol.
---         if ( wp_is_stream( target ) ) then
---                 list( wrapper, target ) = explode( "://", target, 2 );
---         end;
+   function Wp_Mkdir_P (Target : String)
+                        return Boolean
+   is
+      use Php.Files;
+      use Php.Lists;
+      use Php.Strings;
+      use UStrings;
+      use Globals;
 
---         // From php.net/mkdir user contributed notes.
---         target = str_replace( "//", "/", target );
+      Wrapper  : UString;
+      Target_2 : UString;
+   begin
+      -- Strip the protocol.
+      if Wp_Is_Stream (Target) then
+         declare
+            List : constant List_Type := Explode ("://", Target, Limit => 2);
+         begin
+            Wrapper  := List (1);
+            Target_2 := List (2);
+         end;
+      end if;
 
---         // Put the wrapper back on the target.
---         if ( null !== wrapper ) then
---                 target = wrapper . "://" . target;
---         end;
+      -- From php.net/mkdir user contributed notes.
+      Target_2 := +Str_Replace ("//", "/", -Target_2);
 
---         /*
---         -- Safe mode fails with a trailing slash under certain PHP versions.
---         -- Use rtrim() instead of untrailingslashit to avoid formatting.php dependency.
---         --
---         target = rtrim( target, "/" );
---         if ( empty( target ) ) then
---                 target = "/";
---         end;
+      -- Put the wrapper back on the target.
+      if "" /= Wrapper then -- null
+         Target_2 := Wrapper & "://" & Target_2;
+      end if;
 
---         if ( file_exists( target ) ) then
---                 return @is_dir( target );
---         end;
+      --
+      -- Safe mode fails with a trailing slash under certain PHP versions.
+      -- Use rtrim() instead of untrailingslashit to avoid formatting.php dependency.
+      --
+      Target_2 := +Rtrim (-Target_2, "/");
+      if Empty (-Target_2) then
+         Target_2 := +"/";
+      end if;
 
---         // Do not allow path traversals.
---         if ( false !== strpos( target, "../" ) || false !== strpos( target, ".." . DIRECTORY_SEPARATOR ) ) then
---                 return false;
---         end;
+      if File_Exists (-Target_2) then
+         return Is_Dir (-Target_2); -- @
+      end if;
 
---         // We need to find the permissions of the parent folder that exists and inherit that.
---         target_parent = dirname( target );
---         while ( "." !== target_parent && ! is_dir( target_parent ) && dirname( target_parent ) !== target_parent ) then
---                 target_parent = dirname( target_parent );
---         end;
+      -- Do not allow path traversals.
+      if
+        0 /= Strpos (-Target_2, "../") or else
+        0 /= Strpos (-Target_2, ".." & DIRECTORY_SEPARATOR)
+      then
+         return False;
+      end if;
 
---         // Get the permission bits.
---         stat = @stat( target_parent );
---         if ( stat ) then
---                 dir_perms = stat["mode"] & 0007777;
---         end; else then
---                 dir_perms = 0777;
---         end;
+      -- We need to find the permissions of the parent folder that exists and
+      -- inherit that.
+      declare
+         Target_Parent : UString := +Dirname (-Target_2);
+         Dir_Perms : Permission_Mask;
+      begin
+         while
+           "." /= Target_Parent and then
+           not Is_Dir (-Target_Parent) and then
+           Dirname (-Target_Parent) /= Target_Parent
+         loop
+            Target_Parent := +Dirname (-Target_Parent);
+         end loop;
 
---         if ( @mkdir( target, dir_perms, true ) ) then
+         -- Get the permission bits.
+         declare
+            Stat_2 : constant Array_Type := Stat (-Target_Parent); -- @
+         begin
+            if not Stat_2.Is_Empty then
+               Dir_Perms :=
+                 Permission_Mask (As_Integer (Get (Stat_2, "mode"))) and
+                 8#007777#;
+            else
+               Dir_Perms := 8#777#;
+            end if;
+         end;
 
---                 /*
---                 -- If a umask is set that modifies dir_perms, we"ll have to re-set
---                 -- the dir_perms correctly with chmod()
---                 --
---                 if ( ( dir_perms & ~umask() ) != dir_perms ) then
---                         folder_parts = explode( "/", substr( target, strlen( target_parent ) + 1 ) );
---                         for ( i = 1, c = count( folder_parts ); i <= c; i++ ) then
---                                 chmod( target_parent . "/" . implode( "/", array_slice( folder_parts, 0, i ) ), dir_perms );
---                         end;
---                 end;
+         if Mkdir (-Target_2, Dir_Perms, True) then -- @
+            --
+            -- If a umask is set that modifies dir_perms, we"ll have to re-set
+            -- the dir_perms correctly with chmod()
+            --
+            if (Dir_Perms and not Umask) /= Dir_Perms then -- ~
+               declare
+                  use List_Vectors;
 
---                 return true;
---         end;
+                  Folder_Parts : constant List_Type :=
+                    Explode ("/", Substr (-Target_2, Strlen (-Target_Parent) + 1));
+               begin
+                  for I in 1 .. Natural (Folder_Parts.Length) loop
+--                for ( i = 1, c = count( folder_parts ); i <= c; i++ ) then
+                     Chmod ((-Target_Parent) & "/" &
+                            Implode ("/", List_Slice (Folder_Parts, 1, I)),
+--                          Implode ("/", Array_Slice (Folder_Parts, 0, I)),
+                            Dir_Perms);
+                  end loop;
+               end;
+            end if;
 
---         return false;
--- end;
+            return True;
+         end if;
+      end;
+      return False;
+   end Wp_Mkdir_P;
 
---
--- Tests if a given filesystem path is absolute.
---
--- For example, "/foo/bar", or "c:\windows".
---
--- @since 2.5.0
---
--- @param string path File path.
--- @return bool True if path is absolute, false is not absolute.
---
--- function path_is_absolute( path ) then
---         /*
---         -- Check to see if the path is a stream and check to see if its an actual
---         -- path or file as realpath() does not support stream wrappers.
---         --
---         if ( wp_is_stream( path ) && ( is_dir( path ) || is_file( path ) ) ) then
---                 return true;
---         end;
+   ----------------------
+   -- Path_Is_Absolute --
+   ----------------------
 
---         /*
---         -- This is definitive if true but fails if path does not exist or contains
---         -- a symbolic link.
---         --
---         if ( realpath( path ) === path ) then
---                 return true;
---         end;
+   function Path_Is_Absolute (Path : String)
+                              return Boolean
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Php.Preg;
+   begin
+      --
+      -- Check to see if the path is a stream and check to see if its an actual
+      -- path or file as realpath() does not support stream wrappers.
+      --
+      if
+        Wp_Is_Stream (Path) and then
+        (Is_Dir (Path) or else Is_File (Path))
+      then
+         return True;
+      end if;
 
---         if ( strlen( path ) === 0 || "." === path[0] ) then
---                 return false;
---         end;
+      --
+      -- This is definitive if true but fails if path does not exist or contains
+      -- a symbolic link.
+      --
+      if Realpath (Path) = Path then
+         return True;
+      end if;
 
---         // Windows allows absolute paths like this.
---         if ( preg_match( "#^[a-zA-Z]:\\\\#", path ) ) then
---                 return true;
---         end;
+      if Strlen (Path) = 0 or else '.' = Path (Path'First) then
+         return False;
+      end if;
 
---         // A path starting with / or \ is absolute; anything else is relative.
---         return ( "/" === path[0] || "\\" === path[0] );
--- end;
+      -- Windows allows absolute paths like this.
+      if Preg_Match ("#^[a-zA-Z]:\\\\#", Path) then
+         return True;
+      end if;
 
---
--- Joins two filesystem paths together.
---
--- For example, "give me path relative to base". If the path is absolute,
--- then it the full path is returned.
---
--- @since 2.5.0
---
--- @param string base Base path.
--- @param string path Path relative to base.
--- @return string The path with the base or absolute path.
---
--- function path_join( base, path ) then
---         if ( path_is_absolute( path ) ) then
---                 return path;
---         end;
+      -- A path starting with / or \ is absolute; anything else is relative.
+      return Path (Path'First) in '/' | '\';
+   end Path_Is_Absolute;
 
---         return rtrim( base, "/" ) . "/" . path;
--- end;
+   ---------------
+   -- Path_Join --
+   ---------------
+
+   function Path_Join (Base : String;
+                       Path : String)
+                       return String
+   is
+      use Php.Strings;
+   begin
+      if Path_Is_Absolute (Path) then
+         return Path;
+      end if;
+
+      return Rtrim (Base, "/") & "/" & Path;
+   end Path_Join;
 
    -----------------------
    -- Wp_Normalize_Path --
@@ -2456,226 +2488,247 @@ is
 --         return true;
 -- end;
 
---
--- Retrieves uploads directory information.
---
--- Same as wp_upload_dir() but "light weight" as it doesn"t attempt to create the uploads directory.
--- Intended for use in themes, when only "basedir" and "baseurl" are needed, generally in all cases
--- when not uploading files.
---
--- @since 4.5.0
---
--- @see wp_upload_dir()
---
--- @return array See wp_upload_dir() for description.
---
--- function wp_get_upload_dir() then
---         return wp_upload_dir( null, false );
--- end;
+   -----------------------
+   -- Wp_Get_Upload_Dir --
+   -----------------------
 
---
--- Returns an array containing the current upload directory"s path and URL.
---
--- Checks the "upload_path" option, which should be from the web root folder,
--- and if it isn"t empty it will be used. If it is empty, then the path will be
--- "WP_CONTENT_DIR/uploads". If the "UPLOADS" constant is defined, then it will
--- override the "upload_path" option and "WP_CONTENT_DIR/uploads" path.
---
--- The upload URL path is set either by the "upload_url_path" option or by using
--- the "WP_CONTENT_URL" constant and appending "/uploads" to the path.
---
--- If the "uploads_use_yearmonth_folders" is set to true (checkbox if checked in
--- the administration settings panel), then the time will be used. The format
--- will be year first and then month.
---
--- If the path couldn"t be created, then an error will be returned with the key
--- "error" containing the error message. The error suggests that the parent
--- directory is not writable by the server.
---
--- @since 2.0.0
--- @uses _wp_upload_dir()
---
--- @param string time Optional. Time formatted in "yyyy/mm". Default null.
--- @param bool   create_dir Optional. Whether to check and create the uploads directory.
---                           Default true for backward compatibility.
--- @param bool   refresh_cache Optional. Whether to refresh the cache. Default false.
--- @return array then
---     Array of information about the upload directory.
---
---     @type string       path    Base directory and subdirectory or full path to upload directory.
---     @type string       url     Base URL and subdirectory or absolute URL to upload directory.
---     @type string       subdir  Subdirectory if uploads use year/month folders option is on.
---     @type string       basedir Path without subdir.
---     @type string       baseurl URL path without subdir.
---     @type string|false error   False or error message.
--- end;
---
--- function wp_upload_dir( time = null, create_dir = true, refresh_cache = false ) then
---         static cache = array(), tested_paths = array();
+   function Wp_Get_Upload_Dir
+            return Array_Type
+   is
+   begin
+      return Wp_Upload_Dir ("", False); -- null
+   end Wp_Get_Upload_Dir;
 
---         key = sprintf( "%d-%s", get_current_blog_id(), (string) time );
+   -------------------
+   -- Wp_Upload_Dir --
+   -------------------
 
---         if ( refresh_cache || empty( cache[ key ] ) ) then
---                 cache[ key ] = _wp_upload_dir( time );
---         end;
+   Static_Cache        : Array_Type;
+   Static_Tested_Paths : Array_Type;
 
---         --
---         -- Filters the uploads directory data.
---         --
---         -- @since 2.0.0
---         --
---         -- @param array uploads then
---         --     Array of information about the upload directory.
---         --
---         --     @type string       path    Base directory and subdirectory or full path to upload directory.
---         --     @type string       url     Base URL and subdirectory or absolute URL to upload directory.
---         --     @type string       subdir  Subdirectory if uploads use year/month folders option is on.
---         --     @type string       basedir Path without subdir.
---         --     @type string       baseurl URL path without subdir.
---         --     @type string|false error   False or error message.
---         -- end;
---         --
---         uploads = apply_filters( "upload_dir", cache[ key ] );
+   function Wp_Upload_Dir (Time          : String  := ""; -- null
+                           Create_Dir    : Boolean := True;
+                           Refresh_Cache : Boolean := False)
+                           return Array_Type
+   is
+      use Php.Arrays;
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Inc_Formatting;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
 
---         if ( create_dir ) then
---                 path = uploads["path"];
+      Key : constant String :=
+        Sprintf ("%d-%s", To_List (List => (
+          1 => +Helpers.Image (Get_Current_Blog_Id),
+          2 => +Time                      -- (string)
+        )));
+   begin
+      if Refresh_Cache or else Empty (Static_Cache, Key) then
+         Set (Static_Cache, Key, From_Array (X_Wp_Upload_Dir (Time)));
+      end if;
 
---                 if ( array_key_exists( path, tested_paths ) ) then
---                         uploads["error"] = tested_paths[ path ];
---                 end; else then
---                         if ( ! wp_mkdir_p( path ) ) then
---                                 if ( 0 === strpos( uploads["basedir"], ABSPATH ) ) then
---                                         error_path = str_replace( ABSPATH, "", uploads["basedir"] ) . uploads["subdir"];
---                                 end; else then
---                                         error_path = wp_basename( uploads["basedir"] ) . uploads["subdir"];
---                                 end;
+      --
+      -- Filters the uploads directory data.
+      --
+      -- @since 2.0.0
+      --
+      -- @param array uploads {
+      --     Array of information about the upload directory.
+      --
+      --     @type string       path    Base directory and subdirectory or full path
+      --                                to upload directory.
+      --     @type string       url     Base URL and subdirectory or absolute URL to
+      --                                upload directory.
+      --     @type string       subdir  Subdirectory if uploads use year/month folders
+      --                                option is on.
+      --     @type string       basedir Path without subdir.
+      --     @type string       baseurl URL path without subdir.
+      --     @type string|false error   False or error message.
+      -- }
+      --
+      declare
+         Uploads : Array_Type :=
+           Apply_Filters ("upload_dir", As_Array (Get (Static_Cache, Key)));
+      begin
+         if Create_Dir then
+            declare
+               Path : constant String := Get_As_String (Uploads, "path");
+            begin
+               if Array_Key_Exists (Path, Static_Tested_Paths) then
+                  Set (Uploads, "error",
+                       From_String (Get_As_String (Static_Tested_Paths, Path)));
+               else
+                  if not Wp_Mkdir_P (Path) then
+                     declare
+                        Error_Path : constant String :=
+                          (if 0 = Strpos (Get_As_String (Uploads, "basedir"), ABSPATH)
+                           then Str_Replace (ABSPATH, "",
+                                             Get_As_String (Uploads, "basedir")) &
+                                Get_As_String (Uploads, "subdir")
+                           else Wp_Basename (Get_As_String (Uploads, "basedir")) &
+                                Get_As_String (Uploads, "subdir"));
+                     begin
+                        Set (Uploads, "error", From_String (
+                             Sprintf (
+                               -- translators: %s: Directory path.
+                               abs "Unable to create directory %s. Is its parent directory writable by the server?",
+                               To_List (ESC_HTML (Error_Path))
+                             )));
+                     end;
+                  end if;
 
---                                 uploads["error"] = sprintf(
---                                         /* translators: %s: Directory path.--
---                                         __( "Unable to create directory %s. Is its parent directory writable by the server?" ),
---                                         esc_html( error_path )
---                                 );
---                         end;
+                  Set (Static_Tested_Paths, Path,
+                       From_String (Get_As_String (Uploads, "error")));
+               end if;
+            end;
+         end if;
 
---                         tested_paths[ path ] = uploads["error"];
---                 end;
---         end;
+         return Uploads;
+      end;
+   end Wp_Upload_Dir;
 
---         return uploads;
--- end;
+   ---------------------
+   -- X_Wp_Upload_Dir --
+   ---------------------
 
---
--- A non-filtered, non-cached version of wp_upload_dir() that doesn"t check the path.
---
--- @since 4.5.0
--- @access private
---
--- @param string time Optional. Time formatted in "yyyy/mm". Default null.
--- @return array See wp_upload_dir()
---
--- function _wp_upload_dir( time = null ) then
---         siteurl     = get_option( "siteurl" );
---         upload_path = trim( get_option( "upload_path" ) );
+   function X_Wp_Upload_Dir (Time : String := "") -- null
+                             return Array_Type
+   is
+      use Php.Strings;
+--    use Globals;
+      use UStrings;
+      use Inc_Formatting;
+      use Inc_Load;
+      use Inc_Ms_Blogs;
+      use Inc_Options;
 
---         if ( empty( upload_path ) || "wp-content/uploads" === upload_path ) then
---                 dir = WP_CONTENT_DIR . "/uploads";
---         end; elseif ( 0 !== strpos( upload_path, ABSPATH ) ) then
---                 // dir is absolute, upload_path is (maybe) relative to ABSPATH.
---                 dir = path_join( ABSPATH, upload_path );
---         end; else then
---                 dir = upload_path;
---         end;
+      Site_URL    : constant String := Get_Option ("siteurl");
+      Upload_Path : constant String := Trim (Get_Option ("upload_path"));
 
---         url = get_option( "upload_url_path" );
---         if ( ! url ) then
---                 if ( empty( upload_path ) || ( "wp-content/uploads" === upload_path ) || ( upload_path == dir ) ) then
---                         url = WP_CONTENT_URL . "/uploads";
---                 end; else then
---                         url = trailingslashit( siteurl ) . upload_path;
---                 end;
---         end;
+      Dir : UString;
+      URL : UString;
+   begin
+      if Empty (Upload_Path) or else "wp-content/uploads" = Upload_Path then
+         Dir := Globals.WP_CONTENT_DIR & "/uploads";
+      elsif 0 /= Strpos (Upload_Path, Globals.ABSPATH) then
+         -- dir is absolute, upload_path is (maybe) relative to ABSPATH.
+         Dir := +Path_Join (Globals.ABSPATH, Upload_Path);
+      else
+         Dir := +Upload_Path;
+      end if;
 
---         /*
---         -- Honor the value of UPLOADS. This happens as long as ms-files rewriting is disabled.
---         -- We also sometimes obey UPLOADS when rewriting is enabled -- see the next block.
---         --
---         if ( defined( "UPLOADS" ) && ! ( is_multisite() && get_site_option( "ms_files_rewriting" ) ) ) then
---                 dir = ABSPATH . UPLOADS;
---                 url = trailingslashit( siteurl ) . UPLOADS;
---         end;
+      URL := +Get_Option ("upload_url_path");
+      if URL = "" then
+         if
+           Empty (Upload_Path)                or else
+           "wp-content/uploads" = Upload_Path or else
+           Upload_Path = Dir
+         then
+            URL := Globals.WP_CONTENT_URL & "/uploads";
+         else
+            URL := +Trailing_Slash_It (Site_URL) & Upload_Path;
+         end if;
+      end if;
 
---         // If multisite (and if not the main site in a post-MU network).
---         if ( is_multisite() && ! ( is_main_network() && is_main_site() && defined( "MULTISITE" ) ) ) then
+      --
+      -- Honor the value of UPLOADS. This happens as long as ms-files rewriting is
+      -- disabled. We also sometimes obey UPLOADS when rewriting is enabled -- see
+      -- the next block.
+      --
+      if
+        Globals.UPLOADS /= "" and then
+        not (Is_Multisite and then
+             As_Boolean (Get_Site_Option ("ms_files_rewriting")))
+      then
+         Dir := +Globals.ABSPATH & Globals.UPLOADS;
+         URL := +Trailing_Slash_It (Site_URL) & Globals.UPLOADS;
+      end if;
 
---                 if ( ! get_site_option( "ms_files_rewriting" ) ) then
---                         /*
---                         -- If ms-files rewriting is disabled (networks created post-3.5), it is fairly
---                         -- straightforward: Append sites/%d if we"re not on the main site (for post-MU
---                         -- networks). (The extra directory prevents a four-digit ID from conflicting with
---                         -- a year-based directory for the main site. But if a MU-era network has disabled
---                         -- ms-files rewriting manually, they don"t need the extra directory, as they never
---                         -- had wp-content/uploads for the main site.)
---                         --
+      -- If multisite (and if not the main site in a post-MU network).
+      if
+        Is_Multisite and then
+        not (Is_Main_Network and then Is_Main_Site and then Globals.MULTISITE)
+      then
+         if not As_Boolean (Get_Site_Option ("ms_files_rewriting")) then
+            --
+            -- If ms-files rewriting is disabled (networks created post-3.5), it is
+            -- fairly straightforward: Append sites/%d if we"re not on the main site
+            -- (for post-MU networks). (The extra directory prevents a four-digit ID
+            -- from conflicting with a year-based directory for the main site. But if
+            -- a MU-era network has disabled ms-files rewriting manually, they don't
+            -- need the extra directory, as they never had wp-content/uploads for the
+            -- main site.)
+            --
+            declare
+               MS_Dir : constant String :=
+                 (if Globals.MULTISITE
+                  then "/sites/" & Helpers.Image (Get_Current_Blog_Id)
+                  else "/" & Helpers.Image (Get_Current_Blog_Id));
+            begin
+               Append (Dir, MS_Dir);
+               Append (URL, MS_Dir);
+            end;
 
---                         if ( defined( "MULTISITE" ) ) then
---                                 ms_dir = "/sites/" . get_current_blog_id();
---                         end; else then
---                                 ms_dir = "/" . get_current_blog_id();
---                         end;
+         elsif Globals.UPLOADS /= "" and then not MS_Is_Switched then
+            --
+            -- Handle the old-form ms-files.php rewriting if the network still has
+            -- that enabled. When ms-files rewriting is enabled, then we only listen
+            -- to UPLOADS when:
+            -- 1) We are not on the main site in a post-MU network, as
+            --    wp-content/uploads is used there, and
+            -- 2) We are not switched, as ms_upload_constants() hardcodes these
+            --    constants to reflect the original blog ID.
+            --
+            -- Rather than UPLOADS, we actually use BLOGUPLOADDIR if it is set, as it
+            -- is absolute. (And it will be set, see ms_upload_constants().)
+            -- Otherwise, UPLOADS can be used, as as it is relative to ABSPATH. For
+            -- the final piece: when UPLOADS is used with ms-files rewriting in
+            -- multisite, the resulting URL is /files. (#WP22702 for background.)
+            --
+            if Globals.BLOGUPLOADDIR /= "" then
+               Dir := +Un_Trailing_Slash_It (Globals.BLOGUPLOADDIR);
+            else
+               Dir := +Globals.ABSPATH & Globals.UPLOADS;
+            end if;
+            URL := +Trailing_Slash_It (Site_URL) & "files";
+         end if;
+      end if;
 
---                         dir .= ms_dir;
---                         url .= ms_dir;
+      declare
+         Base_Dir : constant String := -Dir;
+         Base_URL : constant String := -URL;
 
---                 end; elseif ( defined( "UPLOADS" ) && ! ms_is_switched() ) then
---                         /*
---                         -- Handle the old-form ms-files.php rewriting if the network still has that enabled.
---                         -- When ms-files rewriting is enabled, then we only listen to UPLOADS when:
---                         -- 1) We are not on the main site in a post-MU network, as wp-content/uploads is used
---                         --    there, and
---                         -- 2) We are not switched, as ms_upload_constants() hardcodes these constants to reflect
---                         --    the original blog ID.
---                         --
---                         -- Rather than UPLOADS, we actually use BLOGUPLOADDIR if it is set, as it is absolute.
---                         -- (And it will be set, see ms_upload_constants().) Otherwise, UPLOADS can be used, as
---                         -- as it is relative to ABSPATH. For the final piece: when UPLOADS is used with ms-files
---                         -- rewriting in multisite, the resulting URL is /files. (#WP22702 for background.)
---                         --
+         Sub_Dir : UString;
+      begin
+         if Get_Option ("uploads_use_yearmonth_folders") then
+            -- Generate the yearly and monthly directories.
+            declare
+               Time_2 : constant String :=
+                 (if Time = ""  then Current_Time ("mysql") else Time);
 
---                         if ( defined( "BLOGUPLOADDIR" ) ) then
---                                 dir = untrailingslashit( BLOGUPLOADDIR );
---                         end; else then
---                                 dir = ABSPATH . UPLOADS;
---                         end;
---                         url = trailingslashit( siteurl ) . "files";
---                 end;
---         end;
+               Y : constant String := Substr (Time_2, 0, 4);
+               M : constant String := Substr (Time_2, 5, 2);
+            begin
+               Sub_Dir := +"/" & Y & "/" & M;
+            end;
+         end if;
 
---         basedir = dir;
---         baseurl = url;
+         Append (Dir, Sub_Dir);
+         Append (URL, Sub_Dir);
 
---         subdir = "";
---         if ( get_option( "uploads_use_yearmonth_folders" ) ) then
---                 // Generate the yearly and monthly directories.
---                 if ( ! time ) then
---                         time = current_time( "mysql" );
---                 end;
---                 y      = substr( time, 0, 4 );
---                 m      = substr( time, 5, 2 );
---                 subdir = "/y/m";
---         end;
-
---         dir .= subdir;
---         url .= subdir;
-
---         return array(
---                 "path"    => dir,
---                 "url"     => url,
---                 "subdir"  => subdir,
---                 "basedir" => basedir,
---                 "baseurl" => baseurl,
---                 "error"   => false,
---         );
--- end;
+         return To_Array (List => (
+           Build ("path",    -Dir),
+           Build ("url",     -URL),
+           Build ("subdir",  -Sub_Dir),
+           Build ("basedir", Base_Dir),
+           Build ("baseurl", Base_URL),
+           Build ("error",   False)
+          ));
+      end;
+   end X_Wp_Upload_Dir;
 
 --
 -- Gets a filename that is sanitized and unique for the given directory.

@@ -47,6 +47,7 @@ with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
+with Inc_Posts;
 with Inc_Rewrites;
 with Inc_Roles;
 with Inc_Users;
@@ -941,115 +942,202 @@ is
    -----------------
 
    procedure Upgrade_160
-   is null;
---         global wpdb, wp_current_db_version;
+   is
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Adi_Schemas;
+      use Class_Comments;
+      use Class_Posts;
+      use Class_Users;
+      use Class_WpDB;
+      use Inc_Formatting;
+      use Inc_Posts;
+      use Inc_Users;
 
---         populate_roles_160();
+      Users_2 : constant Statement_Type := Statement_Type (-WpDB.Users);
+   begin
+      Populate_Roles_160;
 
---         users = wpdb->get_results( "SELECT-- FROM wpdb->users" );
---         foreach ( users as user ) :
---                 if ( ! empty( user->user_firstname ) ) then
---                         update_user_meta( user->ID, "first_name", wp_slash( user->user_firstname ) );
---                 end;
---                 if ( ! empty( user->user_lastname ) ) then
---                         update_user_meta( user->ID, "last_name", wp_slash( user->user_lastname ) );
---                 end;
---                 if ( ! empty( user->user_nickname ) ) then
---                         update_user_meta( user->ID, "nickname", wp_slash( user->user_nickname ) );
---                 end;
---                 if ( ! empty( user->user_level ) ) then
---                         update_user_meta( user->ID, wpdb->prefix . "user_level", user->user_level );
---                 end;
---                 if ( ! empty( user->user_icq ) ) then
---                         update_user_meta( user->ID, "icq", wp_slash( user->user_icq ) );
---                 end;
---                 if ( ! empty( user->user_aim ) ) then
---                         update_user_meta( user->ID, "aim", wp_slash( user->user_aim ) );
---                 end;
---                 if ( ! empty( user->user_msn ) ) then
---                         update_user_meta( user->ID, "msn", wp_slash( user->user_msn ) );
---                 end;
---                 if ( ! empty( user->user_yim ) ) then
---                         update_user_meta( user->ID, "yim", wp_slash( user->user_icq ) );
---                 end;
---                 if ( ! empty( user->user_description ) ) then
---                         update_user_meta( user->ID, "description", wp_slash( user->user_description ) );
---                 end;
+      declare
+         Users : constant User_List :=
+           WpDB.Get_Results ("SELECT * FROM " & Users_2);
+      begin
+         for User of Users loop
+            if not Empty (-User.Prop.User_Firstname) then
+               Update_User_Meta (User.Id, "first_name",
+                                 Wp_Slash (-User.Prop.User_Firstname));
+            end if;
 
---                 if ( isset( user->user_idmode ) ) :
---                         idmode = user->user_idmode;
---                         if ( "nickname" === idmode ) then
---                                 id = user->user_nickname;
---                         end;
---                         if ( "login" === idmode ) then
---                                 id = user->user_login;
---                         end;
---                         if ( "firstname" === idmode ) then
---                                 id = user->user_firstname;
---                         end;
---                         if ( "lastname" === idmode ) then
---                                 id = user->user_lastname;
---                         end;
---                         if ( "namefl" === idmode ) then
---                                 id = user->user_firstname . " " . user->user_lastname;
---                         end;
---                         if ( "namelf" === idmode ) then
---                                 id = user->user_lastname . " " . user->user_firstname;
---                         end;
---                         if ( ! idmode ) then
---                                 id = user->user_nickname;
---                         end;
---                         wpdb->update( wpdb->users, array( "display_name" => id ), array( "ID" => user->ID ) );
---                 endif;
+            if not Empty (-User.Prop.User_Lastname) then
+               Update_User_Meta (User.Id, "last_name",
+                                 Wp_Slash (-User.Prop.User_Lastname));
+            end if;
 
---                 -- FIXME: RESET_CAPS is temporary code to reset roles and caps if flag is set.
---                 caps = get_user_meta( user->ID, wpdb->prefix . "capabilities" );
---                 if ( empty( caps ) || defined( "RESET_CAPS" ) ) then
---                         level = get_user_meta( user->ID, wpdb->prefix . "user_level", true );
---                         role  = translate_level_to_role( level );
---                         update_user_meta( user->ID, wpdb->prefix . "capabilities", array( role => true ) );
---                 end;
+            if not Empty (-User.Prop.Nickname) then
+--          if not Empty (-User.Prop.User_Nickname) then
+               Update_User_Meta (User.Id, "nickname",
+                                 Wp_Slash (-User.Prop.Nickname));
+--                               Wp_Slash (-User.Prop.User_Nickname));
+            end if;
 
---         endforeach;
---         old_user_fields = array( "user_firstname", "user_lastname", "user_icq", "user_aim", "user_msn", "user_yim", "user_idmode", "user_ip", "user_domain", "user_browser", "user_description", "user_nickname", "user_level" );
---         wpdb->hide_errors();
---         foreach ( old_user_fields as old ) then
---                 wpdb->query( "ALTER TABLE wpdb->users DROP old" );
---         end;
---         wpdb->show_errors();
+            if User.Prop.User_Level /= 0 then
+--          if not Empty (User.Prop.User_Level) then
+               Update_User_Meta (User.Id, (-WpDB.Prefix) & "user_level",
+                                 User.Prop.User_Level);
+            end if;
 
---         -- Populate comment_count field of posts table.
---         comments = wpdb->get_results( "SELECT comment_post_ID, COUNT(*) as c FROM wpdb->comments WHERE comment_approved = "1" GROUP BY comment_post_ID" );
---         if ( is_array( comments ) ) then
---                 foreach ( comments as comment ) then
---                         wpdb->update( wpdb->posts, array( "comment_count" => comment->c ), array( "ID" => comment->comment_post_ID ) );
---                 end;
---         end;
+            -- if not Empty (User.User_ICQ) then
+            --    Update_User_Meta (User.Id, "icq", Wp_Slash (User.User_ICQ));
+            -- end if;
 
---         /*
---         -- Some alpha versions used a post status of object instead of attachment
---         -- and put the mime type in post_type instead of post_mime_type.
---         --
---         if ( wp_current_db_version > 2541 && wp_current_db_version <= 3091 ) then
---                 objects = wpdb->get_results( "SELECT ID, post_type FROM wpdb->posts WHERE post_status = "object"" );
---                 foreach ( objects as object ) then
---                         wpdb->update(
---                                 wpdb->posts,
---                                 array(
---                                         "post_status"    => "attachment",
---                                         "post_mime_type" => object->post_type,
---                                         "post_type"      => "",
---                                 ),
---                                 array( "ID" => object->ID )
---                         );
+            -- if not Empty (User.User_AIM) then
+            --    Update_User_Meta (User.Id, "aim", Wp_Slash (User.User_AIM));
+            -- end if;
 
---                         meta = get_post_meta( object->ID, "imagedata", true );
---                         if ( ! empty( meta["file"] ) ) then
---                                 update_attached_file( object->ID, meta["file"] );
---                         end;
---                 end;
---         end;
--- end;
+            -- if not Empty (User.User_MSN) then
+            --    Update_User_Meta  (User.Id, "msn", Wp_Slash (User.User_MSN));
+            -- end if;
+
+            -- if not Empty (User.User_YIM) then
+            --    Update_User_Meta (User.Id, "yim", Wp_Slash (User.User_ICQ));
+            -- end if;
+
+            if not Empty (-User.Prop.User_Description) then
+               Update_User_Meta (User.Id, "description",
+                                 Wp_Slash (-User.Prop.User_Description));
+            end if;
+
+            -- if Isset (User.User_Idmode) then
+            --    declare
+            --       Idmode : String := User.User_Idmode;
+            --       Id     : Ustring;
+            --    begin
+            --       if "nickname" = Idmode then
+            --          Id := User.User_Nickname;
+            --       end if;
+            --       if "login" = Idmode then
+            --          Id := User.User_Login;
+            --       end if;
+            --       if "firstname" = Idmode then
+            --          Id := User.User_Firstname;
+            --       end if;
+            --       if "lastname" = Idmode then
+            --          Id := User.User_Lastname;
+            --       end if;
+            --       if "namefl" = Idmode then
+            --          Id := User.User_Firstname & " " & User.User_Lastname;
+            --       end if;
+            --       if "namelf" = Idmode then
+            --          Id := User.User_Lastname & " " & User.User_Firstname;
+            --       end if;
+            --       if not Idmode then
+            --          Id := User.User_Nickname;
+            --       end if;
+
+            --       WpDB.Update (WpDB.Users,
+            --                    To_Array (List => (1 =>
+            --                      Build ("display_name", Id))),
+            --                    To_Array (List => (1 =>
+            --                      Build ("ID", User.Id)))
+            --                   );
+            --    end;
+            -- end if;
+
+            -- FIXME: RESET_CAPS is temporary code to reset roles and caps if flag
+            -- is set.
+            declare
+               Caps : constant Array_Type :=
+                 Get_User_Meta (User.Id, (-WpDB.Prefix) & "capabilities");
+            begin
+               if Caps.Is_Empty or else RESET_CAPS then
+                  declare
+                     Level : constant Integer :=
+                       Get_User_Meta (User.Id, (-WpDB.Prefix) & "user_level", True);
+
+                     Role : constant String := Translate_Level_To_Role (Level);
+                  begin
+                     Update_User_Meta (User.Id, (-WpDB.Prefix) & "capabilities",
+                                       To_Array (List => (1 =>
+                                         Build (Role, True))));
+                  end;
+               end if;
+            end;
+         end loop;
+      end;
+
+      declare
+         Old_User_Fields : constant List_Type :=
+           To_List (List => (
+             +"user_firstname", +"user_lastname", +"user_icq", +"user_aim",
+             +"user_msn", +"user_yim", +"user_idmode", +"user_ip", +"user_domain",
+             +"user_browser", +"user_description", +"user_nickname", +"user_level"));
+      begin
+         WpDB.Hide_Errors;
+         for Old of Old_User_Fields loop
+            WpDB.Query ("ALTER TABLE " & Users_2 & " DROP " & Statement_Type (-Old));
+         end loop;
+         WpDB.Show_Errors;
+      end;
+
+      -- Populate comment_count field of posts table.
+      declare
+         Comments_2 : constant Statement_Type := Statement_Type (-WpDB.Comments);
+
+         Comments : constant Comments_List :=
+           WpDB.Get_Results (
+             "SELECT comment_post_ID, COUNT(*) as c FROM " & Comments_2 &
+             " WHERE comment_approved = '1' GROUP BY comment_post_ID");
+      begin
+         if True then -- Is_Array (Comments) then
+            for Comment of Comments loop
+               WpDB.Update (
+                 -WpDB.Posts,
+                 To_Array (List => (1 =>
+                   Build ("comment_count", -Comment.C))),
+                 To_Array (List => (1 =>
+                   Build ("ID", Integer (Comment.Comment_Post_Id)))));
+            end loop;
+         end if;
+      end;
+
+      --
+      -- Some alpha versions used a post status of object instead of attachment
+      -- and put the mime type in post_type instead of post_mime_type.
+      --
+      if Wp_Current_DB_Version > 2541 and Wp_Current_DB_Version <= 3091 then
+         declare
+            Posts_2 : constant Statement_Type := Statement_Type (-WpDB.Posts);
+
+            Objects : constant Post_Array :=
+              WpDB.Get_Results (
+                "SELECT ID, post_type FROM " & Posts_2 &
+                " WHERE post_status = 'object'");
+         begin
+            for Object of Objects loop
+               WpDB.Update (
+                 -WpDB.Posts,
+                 To_Array (List => (
+                   Build ("post_status",    "attachment"),
+                   Build ("post_mime_type", -Object.Post_Type),
+                   Build ("post_type",      "")
+                 )),
+                 To_Array (List => (1 =>
+                   Build ("ID", Integer (Object.Id))))
+               );
+
+               declare
+                  Meta : constant Array_Type :=
+                    Get_Post_Meta (Object.Id, "imagedata", True);
+               begin
+                  if not Empty (Meta, "file") then
+                     Update_Attached_File (Object.Id, Get_As_String (Meta, "file"));
+                  end if;
+               end;
+            end loop;
+         end;
+      end if;
+   end Upgrade_160;
 
    -----------------
    -- Upgrade_210 --
@@ -1057,15 +1145,15 @@ is
 
    procedure Upgrade_210
    is null;
---         global wp_current_db_version, wpdb;
+--         global wp_current_db_version, WpDB;
 
 --         if ( wp_current_db_version < 3506 ) then
 --                 -- Update status and type.
---                 posts = wpdb->get_results( "SELECT ID, post_status FROM wpdb->posts" );
+--                 posts = WpDB.get_results( "SELECT ID, post_status FROM WpDB.posts" );
 
 --                 if ( ! empty( posts ) ) then
 --                         foreach ( posts as post ) then
---                                 status = post->post_status;
+--                                 status = post.post_status;
 --                                 type   = "post";
 
 --                                 if ( "static" === status ) then
@@ -1076,7 +1164,7 @@ is
 --                                         type   = "attachment";
 --                                 end;
 
---                                 wpdb->query( wpdb->prepare( "UPDATE wpdb->posts SET post_status = %s, post_type = %s WHERE ID = %d", status, type, post->ID ) );
+--                                 WpDB.query( WpDB.prepare( "UPDATE WpDB.posts SET post_status = %s, post_type = %s WHERE ID = %d", status, type, post.ID ) );
 --                         end;
 --                 end;
 --         end;
@@ -1088,12 +1176,12 @@ is
 --         if ( wp_current_db_version < 3531 ) then
 --                 -- Give future posts a post_status of future.
 --                 now = gmdate( "Y-m-d H:i:59" );
---                 wpdb->query( "UPDATE wpdb->posts SET post_status = "future" WHERE post_status = "publish" AND post_date_gmt > "now"" );
+--                 WpDB.query( "UPDATE WpDB.posts SET post_status = "future" WHERE post_status = "publish" AND post_date_gmt > "now"" );
 
---                 posts = wpdb->get_results( "SELECT ID, post_date FROM wpdb->posts WHERE post_status ="future"" );
+--                 posts = WpDB.get_results( "SELECT ID, post_date FROM WpDB.posts WHERE post_status ="future"" );
 --                 if ( ! empty( posts ) ) then
 --                         foreach ( posts as post ) then
---                                 wp_schedule_single_event( mysql2date( "U", post->post_date, false ), "publish_future_post", array( post->ID ) );
+--                                 wp_schedule_single_event( mysql2date( "U", post.post_date, false ), "publish_future_post", array( post.ID ) );
 --                         end;
 --                 end;
 --         end;
@@ -1105,7 +1193,7 @@ is
 
    procedure Upgrade_230
    is null;
---         global wp_current_db_version, wpdb;
+--         global wp_current_db_version, WpDB;
 
 --         if ( wp_current_db_version < 5200 ) then
 --                 populate_roles_230();
@@ -1114,38 +1202,38 @@ is
 --         -- Convert categories to terms.
 --         tt_ids     = array();
 --         have_tags  = false;
---         categories = wpdb->get_results( "SELECT-- FROM wpdb->categories ORDER BY cat_ID" );
+--         categories = WpDB.get_results( "SELECT-- FROM WpDB.categories ORDER BY cat_ID" );
 --         foreach ( categories as category ) then
---                 term_id     = (int) category->cat_ID;
---                 name        = category->cat_name;
---                 description = category->category_description;
---                 slug        = category->category_nicename;
---                 parent      = category->category_parent;
+--                 term_id     = (int) category.cat_ID;
+--                 name        = category.cat_name;
+--                 description = category.category_description;
+--                 slug        = category.category_nicename;
+--                 parent      = category.category_parent;
 --                 term_group  = 0;
 
 --                 -- Associate terms with the same slug in a term group and make slugs unique.
---                 exists = wpdb->get_results( wpdb->prepare( "SELECT term_id, term_group FROM wpdb->terms WHERE slug = %s", slug ) );
+--                 exists = WpDB.get_results( WpDB.prepare( "SELECT term_id, term_group FROM WpDB.terms WHERE slug = %s", slug ) );
 --                 if ( exists ) then
---                         term_group = exists[0]->term_group;
---                         id         = exists[0]->term_id;
+--                         term_group = exists[0].term_group;
+--                         id         = exists[0].term_id;
 --                         num        = 2;
 --                         do then
 --                                 alt_slug = slug . "-num";
 --                                 num++;
---                                 slug_check = wpdb->get_var( wpdb->prepare( "SELECT slug FROM wpdb->terms WHERE slug = %s", alt_slug ) );
+--                                 slug_check = WpDB.get_var( WpDB.prepare( "SELECT slug FROM WpDB.terms WHERE slug = %s", alt_slug ) );
 --                         end; while ( slug_check );
 
 --                         slug = alt_slug;
 
 --                         if ( empty( term_group ) ) then
---                                 term_group = wpdb->get_var( "SELECT MAX(term_group) FROM wpdb->terms GROUP BY term_group" ) + 1;
---                                 wpdb->query( wpdb->prepare( "UPDATE wpdb->terms SET term_group = %d WHERE term_id = %d", term_group, id ) );
+--                                 term_group = WpDB.get_var( "SELECT MAX(term_group) FROM WpDB.terms GROUP BY term_group" ) + 1;
+--                                 WpDB.query( WpDB.prepare( "UPDATE WpDB.terms SET term_group = %d WHERE term_id = %d", term_group, id ) );
 --                         end;
 --                 end;
 
---                 wpdb->query(
---                         wpdb->prepare(
---                                 "INSERT INTO wpdb->terms (term_id, name, slug, term_group) VALUES
+--                 WpDB.query(
+--                         WpDB.prepare(
+--                                 "INSERT INTO WpDB.terms (term_id, name, slug, term_group) VALUES
 --                 (%d, %s, %s, %d)",
 --                                 term_id,
 --                                 name,
@@ -1155,33 +1243,33 @@ is
 --                 );
 
 --                 count = 0;
---                 if ( ! empty( category->category_count ) ) then
---                         count    = (int) category->category_count;
+--                 if ( ! empty( category.category_count ) ) then
+--                         count    = (int) category.category_count;
 --                         taxonomy = "category";
---                         wpdb->query( wpdb->prepare( "INSERT INTO wpdb->term_taxonomy (term_id, taxonomy, description, parent, count) VALUES ( %d, %s, %s, %d, %d)", term_id, taxonomy, description, parent, count ) );
---                         tt_ids[ term_id ][ taxonomy ] = (int) wpdb->insert_id;
+--                         WpDB.query( WpDB.prepare( "INSERT INTO WpDB.term_taxonomy (term_id, taxonomy, description, parent, count) VALUES ( %d, %s, %s, %d, %d)", term_id, taxonomy, description, parent, count ) );
+--                         tt_ids[ term_id ][ taxonomy ] = (int) WpDB.insert_id;
 --                 end;
 
---                 if ( ! empty( category->link_count ) ) then
---                         count    = (int) category->link_count;
+--                 if ( ! empty( category.link_count ) ) then
+--                         count    = (int) category.link_count;
 --                         taxonomy = "link_category";
---                         wpdb->query( wpdb->prepare( "INSERT INTO wpdb->term_taxonomy (term_id, taxonomy, description, parent, count) VALUES ( %d, %s, %s, %d, %d)", term_id, taxonomy, description, parent, count ) );
---                         tt_ids[ term_id ][ taxonomy ] = (int) wpdb->insert_id;
+--                         WpDB.query( WpDB.prepare( "INSERT INTO WpDB.term_taxonomy (term_id, taxonomy, description, parent, count) VALUES ( %d, %s, %s, %d, %d)", term_id, taxonomy, description, parent, count ) );
+--                         tt_ids[ term_id ][ taxonomy ] = (int) WpDB.insert_id;
 --                 end;
 
---                 if ( ! empty( category->tag_count ) ) then
+--                 if ( ! empty( category.tag_count ) ) then
 --                         have_tags = true;
---                         count     = (int) category->tag_count;
+--                         count     = (int) category.tag_count;
 --                         taxonomy  = "post_tag";
---                         wpdb->insert( wpdb->term_taxonomy, compact( "term_id", "taxonomy", "description", "parent", "count" ) );
---                         tt_ids[ term_id ][ taxonomy ] = (int) wpdb->insert_id;
+--                         WpDB.insert( WpDB.term_taxonomy, compact( "term_id", "taxonomy", "description", "parent", "count" ) );
+--                         tt_ids[ term_id ][ taxonomy ] = (int) WpDB.insert_id;
 --                 end;
 
 --                 if ( empty( count ) ) then
 --                         count    = 0;
 --                         taxonomy = "category";
---                         wpdb->insert( wpdb->term_taxonomy, compact( "term_id", "taxonomy", "description", "parent", "count" ) );
---                         tt_ids[ term_id ][ taxonomy ] = (int) wpdb->insert_id;
+--                         WpDB.insert( WpDB.term_taxonomy, compact( "term_id", "taxonomy", "description", "parent", "count" ) );
+--                         tt_ids[ term_id ][ taxonomy ] = (int) WpDB.insert_id;
 --                 end;
 --         end;
 
@@ -1190,12 +1278,12 @@ is
 --                 select .= ", rel_type";
 --         end;
 
---         posts = wpdb->get_results( "SELECT select FROM wpdb->post2cat GROUP BY post_id, category_id" );
+--         posts = WpDB.get_results( "SELECT select FROM WpDB.post2cat GROUP BY post_id, category_id" );
 --         foreach ( posts as post ) then
---                 post_id  = (int) post->post_id;
---                 term_id  = (int) post->category_id;
+--                 post_id  = (int) post.post_id;
+--                 term_id  = (int) post.category_id;
 --                 taxonomy = "category";
---                 if ( ! empty( post->rel_type ) && "tag" === post->rel_type ) then
+--                 if ( ! empty( post.rel_type ) && "tag" === post.rel_type ) then
 --                         taxonomy = "tag";
 --                 end;
 --                 tt_id = tt_ids[ term_id ][ taxonomy ];
@@ -1203,8 +1291,8 @@ is
 --                         continue;
 --                 end;
 
---                 wpdb->insert(
---                         wpdb->term_relationships,
+--                 WpDB.insert(
+--                         WpDB.term_relationships,
 --                         array(
 --                                 "object_id"        => post_id,
 --                                 "term_taxonomy_id" => tt_id,
@@ -1221,31 +1309,31 @@ is
 --                 link_cat_id_map  = array();
 --                 default_link_cat = 0;
 --                 tt_ids           = array();
---                 link_cats        = wpdb->get_results( "SELECT cat_id, cat_name FROM " . wpdb->prefix . "linkcategories" );
+--                 link_cats        = WpDB.get_results( "SELECT cat_id, cat_name FROM " . WpDB.prefix . "linkcategories" );
 --                 foreach ( link_cats as category ) then
---                         cat_id     = (int) category->cat_id;
+--                         cat_id     = (int) category.cat_id;
 --                         term_id    = 0;
---                         name       = wp_slash( category->cat_name );
+--                         name       = wp_slash( category.cat_name );
 --                         slug       = sanitize_title( name );
 --                         term_group = 0;
 
 --                         -- Associate terms with the same slug in a term group and make slugs unique.
---                         exists = wpdb->get_results( wpdb->prepare( "SELECT term_id, term_group FROM wpdb->terms WHERE slug = %s", slug ) );
+--                         exists = WpDB.get_results( WpDB.prepare( "SELECT term_id, term_group FROM WpDB.terms WHERE slug = %s", slug ) );
 --                         if ( exists ) then
---                                 term_group = exists[0]->term_group;
---                                 term_id    = exists[0]->term_id;
+--                                 term_group = exists[0].term_group;
+--                                 term_id    = exists[0].term_id;
 --                         end;
 
 --                         if ( empty( term_id ) ) then
---                                 wpdb->insert( wpdb->terms, compact( "name", "slug", "term_group" ) );
---                                 term_id = (int) wpdb->insert_id;
+--                                 WpDB.insert( WpDB.terms, compact( "name", "slug", "term_group" ) );
+--                                 term_id = (int) WpDB.insert_id;
 --                         end;
 
 --                         link_cat_id_map[ cat_id ] = term_id;
 --                         default_link_cat           = term_id;
 
---                         wpdb->insert(
---                                 wpdb->term_taxonomy,
+--                         WpDB.insert(
+--                                 WpDB.term_taxonomy,
 --                                 array(
 --                                         "term_id"     => term_id,
 --                                         "taxonomy"    => "link_category",
@@ -1254,29 +1342,29 @@ is
 --                                         "count"       => 0,
 --                                 )
 --                         );
---                         tt_ids[ term_id ] = (int) wpdb->insert_id;
+--                         tt_ids[ term_id ] = (int) WpDB.insert_id;
 --                 end;
 
 --                 -- Associate links to categories.
---                 links = wpdb->get_results( "SELECT link_id, link_category FROM wpdb->links" );
+--                 links = WpDB.get_results( "SELECT link_id, link_category FROM WpDB.links" );
 --                 if ( ! empty( links ) ) then
 --                         foreach ( links as link ) then
---                                 if ( 0 == link->link_category ) then
+--                                 if ( 0 == link.link_category ) then
 --                                         continue;
 --                                 end;
---                                 if ( ! isset( link_cat_id_map[ link->link_category ] ) ) then
+--                                 if ( ! isset( link_cat_id_map[ link.link_category ] ) ) then
 --                                         continue;
 --                                 end;
---                                 term_id = link_cat_id_map[ link->link_category ];
+--                                 term_id = link_cat_id_map[ link.link_category ];
 --                                 tt_id   = tt_ids[ term_id ];
 --                                 if ( empty( tt_id ) ) then
 --                                         continue;
 --                                 end;
 
---                                 wpdb->insert(
---                                         wpdb->term_relationships,
+--                                 WpDB.insert(
+--                                         WpDB.term_relationships,
 --                                         array(
---                                                 "object_id"        => link->link_id,
+--                                                 "object_id"        => link.link_id,
 --                                                 "term_taxonomy_id" => tt_id,
 --                                         )
 --                                 );
@@ -1286,17 +1374,17 @@ is
 --                 -- Set default to the last category we grabbed during the upgrade loop.
 --                 update_option( "default_link_category", default_link_cat );
 --         end; else then
---                 links = wpdb->get_results( "SELECT link_id, category_id FROM wpdb->link2cat GROUP BY link_id, category_id" );
+--                 links = WpDB.get_results( "SELECT link_id, category_id FROM WpDB.link2cat GROUP BY link_id, category_id" );
 --                 foreach ( links as link ) then
---                         link_id  = (int) link->link_id;
---                         term_id  = (int) link->category_id;
+--                         link_id  = (int) link.link_id;
+--                         term_id  = (int) link.category_id;
 --                         taxonomy = "link_category";
 --                         tt_id    = tt_ids[ term_id ][ taxonomy ];
 --                         if ( empty( tt_id ) ) then
 --                                 continue;
 --                         end;
---                         wpdb->insert(
---                                 wpdb->term_relationships,
+--                         WpDB.insert(
+--                                 WpDB.term_relationships,
 --                                 array(
 --                                         "object_id"        => link_id,
 --                                         "term_taxonomy_id" => tt_id,
@@ -1307,18 +1395,18 @@ is
 
 --         if ( wp_current_db_version < 4772 ) then
 --                 -- Obsolete linkcategories table.
---                 wpdb->query( "DROP TABLE IF EXISTS " . wpdb->prefix . "linkcategories" );
+--                 WpDB.query( "DROP TABLE IF EXISTS " . WpDB.prefix . "linkcategories" );
 --         end;
 
 --         -- Recalculate all counts.
---         terms = wpdb->get_results( "SELECT term_taxonomy_id, taxonomy FROM wpdb->term_taxonomy" );
+--         terms = WpDB.get_results( "SELECT term_taxonomy_id, taxonomy FROM WpDB.term_taxonomy" );
 --         foreach ( (array) terms as term ) then
---                 if ( "post_tag" === term->taxonomy || "category" === term->taxonomy ) then
---                         count = wpdb->get_var( wpdb->prepare( "SELECT COUNT(*) FROM wpdb->term_relationships, wpdb->posts WHERE wpdb->posts.ID = wpdb->term_relationships.object_id AND post_status = "publish" AND post_type = "post" AND term_taxonomy_id = %d", term->term_taxonomy_id ) );
+--                 if ( "post_tag" === term.taxonomy || "category" === term.taxonomy ) then
+--                         count = WpDB.get_var( WpDB.prepare( "SELECT COUNT(*) FROM WpDB.term_relationships, WpDB.posts WHERE WpDB.posts.ID = WpDB.term_relationships.object_id AND post_status = "publish" AND post_type = "post" AND term_taxonomy_id = %d", term.term_taxonomy_id ) );
 --                 end; else then
---                         count = wpdb->get_var( wpdb->prepare( "SELECT COUNT(*) FROM wpdb->term_relationships WHERE term_taxonomy_id = %d", term->term_taxonomy_id ) );
+--                         count = WpDB.get_var( WpDB.prepare( "SELECT COUNT(*) FROM WpDB.term_relationships WHERE term_taxonomy_id = %d", term.term_taxonomy_id ) );
 --                 end;
---                 wpdb->update( wpdb->term_taxonomy, array( "count" => count ), array( "term_taxonomy_id" => term->term_taxonomy_id ) );
+--                 WpDB.update( WpDB.term_taxonomy, array( "count" => count ), array( "term_taxonomy_id" => term.term_taxonomy_id ) );
 --         end;
 -- end;
 
@@ -1452,21 +1540,21 @@ is
 
    procedure Upgrade_280
    is null;
---         global wp_current_db_version, wpdb;
+--         global wp_current_db_version, WpDB;
 
 --         if ( wp_current_db_version < 10360 ) then
 --                 populate_roles_280();
 --         end;
 --         if ( is_multisite() ) then
 --                 start = 0;
---                 while ( rows = wpdb->get_results( "SELECT option_name, option_value FROM wpdb->options ORDER BY option_id LIMIT start, 20" ) ) then
+--                 while ( rows = WpDB.get_results( "SELECT option_name, option_value FROM WpDB.options ORDER BY option_id LIMIT start, 20" ) ) then
 --                         foreach ( rows as row ) then
---                                 value = maybe_unserialize( row->option_value );
---                                 if ( value === row->option_value ) then
+--                                 value = maybe_unserialize( row.option_value );
+--                                 if ( value === row.option_value ) then
 --                                         value = stripslashes( value );
 --                                 end;
---                                 if ( value !== row->option_value ) then
---                                         update_option( row->option_name, value );
+--                                 if ( value !== row.option_value ) then
+--                                         update_option( row.option_name, value );
 --                                 end;
 --                         end;
 --                         start += 20;
@@ -1499,7 +1587,7 @@ is
 
    procedure Upgrade_300
    is null;
---         global wp_current_db_version, wpdb;
+--         global wp_current_db_version, WpDB;
 
 --         if ( wp_current_db_version < 15093 ) then
 --                 populate_roles_300();
@@ -1511,7 +1599,7 @@ is
 
 --         -- 3.0 screen options key name changes.
 --         if ( wp_should_upgrade_global_tables() ) then
---                 sql    = "DELETE FROM wpdb->usermeta
+--                 sql    = "DELETE FROM WpDB.usermeta
 --                         WHERE meta_key LIKE %s
 --                         OR meta_key LIKE %s
 --                         OR meta_key LIKE %s
@@ -1524,16 +1612,16 @@ is
 --                         OR meta_key = "manageeditcolumnshidden"
 --                         OR meta_key = "categories_per_page"
 --                         OR meta_key = "edit_tags_per_page"";
---                 prefix = wpdb->esc_like( wpdb->base_prefix );
---                 wpdb->query(
---                         wpdb->prepare(
+--                 prefix = WpDB.esc_like( WpDB.base_prefix );
+--                 WpDB.query(
+--                         WpDB.prepare(
 --                                 sql,
---                                 prefix . "%" . wpdb->esc_like( "meta-box-hidden" ) . "%",
---                                 prefix . "%" . wpdb->esc_like( "closedpostboxes" ) . "%",
---                                 prefix . "%" . wpdb->esc_like( "manage-" ) . "%" . wpdb->esc_like( "-columns-hidden" ) . "%",
---                                 prefix . "%" . wpdb->esc_like( "meta-box-order" ) . "%",
---                                 prefix . "%" . wpdb->esc_like( "metaboxorder" ) . "%",
---                                 prefix . "%" . wpdb->esc_like( "screen_layout" ) . "%"
+--                                 prefix . "%" . WpDB.esc_like( "meta-box-hidden" ) . "%",
+--                                 prefix . "%" . WpDB.esc_like( "closedpostboxes" ) . "%",
+--                                 prefix . "%" . WpDB.esc_like( "manage-" ) . "%" . WpDB.esc_like( "-columns-hidden" ) . "%",
+--                                 prefix . "%" . WpDB.esc_like( "meta-box-order" ) . "%",
+--                                 prefix . "%" . WpDB.esc_like( "metaboxorder" ) . "%",
+--                                 prefix . "%" . WpDB.esc_like( "screen_layout" ) . "%"
 --                         )
 --                 );
 --         end;
@@ -1546,10 +1634,10 @@ is
 
    procedure Upgrade_330
    is null;
---         global wp_current_db_version, wpdb, wp_registered_widgets, sidebars_widgets;
+--         global wp_current_db_version, WpDB, wp_registered_widgets, sidebars_widgets;
 
 --         if ( wp_current_db_version < 19061 && wp_should_upgrade_global_tables() ) then
---                 wpdb->query( "DELETE FROM wpdb->usermeta WHERE meta_key IN ("show_admin_bar_admin", "plugins_last_view")" );
+--                 WpDB.query( "DELETE FROM WpDB.usermeta WHERE meta_key IN ("show_admin_bar_admin", "plugins_last_view")" );
 --         end;
 
 --         if ( wp_current_db_version >= 11548 ) then
@@ -1674,9 +1762,9 @@ is
 
    procedure Upgrade_350
    is null;
---         global wp_current_db_version, wpdb;
+--         global wp_current_db_version, WpDB;
 
---         if ( wp_current_db_version < 22006 && wpdb->get_var( "SELECT link_id FROM wpdb->links LIMIT 1" ) ) then
+--         if ( wp_current_db_version < 22006 && WpDB.get_var( "SELECT link_id FROM WpDB.links LIMIT 1" ) ) then
 --                 update_option( "link_manager_enabled", 1 ); -- Previously set to 0 by populate_options().
 --         end;
 
@@ -1689,14 +1777,14 @@ is
 --                 end;
 --                 if ( meta_keys ) then
 --                         meta_keys = implode( "", "", meta_keys );
---                         wpdb->query( "DELETE FROM wpdb->usermeta WHERE meta_key IN ("meta_keys")" );
+--                         WpDB.query( "DELETE FROM WpDB.usermeta WHERE meta_key IN ("meta_keys")" );
 --                 end;
 --         end;
 
 --         if ( wp_current_db_version < 22422 ) then
 --                 term = get_term_by( "slug", "post-format-standard", "post_format" );
 --                 if ( term ) then
---                         wp_delete_term( term->term_id, "post_format" );
+--                         wp_delete_term( term.term_id, "post_format" );
 --                 end;
 --         end;
 -- end;
@@ -1836,9 +1924,9 @@ is
 
    procedure Upgrade_430_Fix_Comments
    is null;
---         global wpdb;
+--         global WpDB;
 
---         content_length = wpdb->get_col_length( wpdb->comments, "comment_content" );
+--         content_length = WpDB.get_col_length( WpDB.comments, "comment_content" );
 
 --         if ( is_wp_error( content_length ) ) then
 --                 return;
@@ -1864,15 +1952,15 @@ is
 
 --         allowed_length = (int) content_length["length"] - 10;
 
---         comments = wpdb->get_results(
---                 "SELECT `comment_ID` FROM `thenwpdb->commentsend;`
+--         comments = WpDB.get_results(
+--                 "SELECT `comment_ID` FROM `thenWpDB.commentsend;`
 --                         WHERE `comment_date_gmt` > "2015-04-26"
 --                         AND LENGTH( `comment_content` ) >= thenallowed_lengthend;
 --                         AND ( `comment_content` LIKE "%<%" OR `comment_content` LIKE "%>%" )"
 --         );
 
 --         foreach ( comments as comment ) then
---                 wp_delete_comment( comment->comment_ID, true );
+--                 wp_delete_comment( comment.comment_ID, true );
 --         end;
 -- end;
 
@@ -2078,16 +2166,16 @@ is
 
    procedure Upgrade_560
    is null;
---         global wp_current_db_version, wpdb;
+--         global wp_current_db_version, WpDB;
 
 --         if ( wp_current_db_version < 49572 ) then
 --                 /*
 --                 -- Clean up the `post_category` column removed from schema in version 2.8.0.
 --                 -- Its presence may conflict with `WP_Post::__get()`.
 --                 --
---                 post_category_exists = wpdb->get_var( "SHOW COLUMNS FROM wpdb->posts LIKE "post_category"" );
+--                 post_category_exists = WpDB.get_var( "SHOW COLUMNS FROM WpDB.posts LIKE "post_category"" );
 --                 if ( ! is_null( post_category_exists ) ) then
---                         wpdb->query( "ALTER TABLE wpdb->posts DROP COLUMN `post_category`" );
+--                         WpDB.query( "ALTER TABLE WpDB.posts DROP COLUMN `post_category`" );
 --                 end;
 
 --                 /*
@@ -2111,9 +2199,9 @@ is
 --         end;
 
 --         if ( wp_current_db_version < 49752 ) then
---                 results = wpdb->get_results(
---                         wpdb->prepare(
---                                 "SELECT 1 FROM thenwpdb->usermetaend; WHERE meta_key = %s LIMIT 1",
+--                 results = WpDB.get_results(
+--                         WpDB.prepare(
+--                                 "SELECT 1 FROM thenWpDB.usermetaend; WHERE meta_key = %s LIMIT 1",
 --                                 WP_Application_Passwords::USERMETA_KEY_APPLICATION_PASSWORDS
 --                         )
 --                 );
@@ -3289,6 +3377,26 @@ is
       null;
    end Make_Site_Theme;
 
+   -----------------------------
+   -- Translate_Level_To_Role --
+   -----------------------------
+
+   function Translate_Level_To_Role (Level : Integer)
+                                     return String
+   is
+   begin
+      case Level is
+
+      when 8 .. 10 =>  return "administrator";
+      when 5 .. 7  =>  return "editor";
+      when 2 .. 4  =>  return "author";
+      when 1       =>  return "contributor";
+      when 0       =>  return "subscriber";
+      when others  =>  return "subscriber";
+
+      end case;
+   end Translate_Level_To_Role;
+
    ----------------------------
    -- Wp_Check_MySQL_Version --
    ----------------------------
@@ -3337,12 +3445,11 @@ is
    is
       use Globals;
       use Inc_Options;
---    global wp_current_db_version, wpdb;
    begin
       if
         Wp_Current_DB_Version >= 22006 and then
         Get_Option ("link_manager_enabled") and then
-        "" = WpDB.Get_Var ("SELECT link_id FROM wpdb->links LIMIT 1") -- not
+        "" = WpDB.Get_Var ("SELECT link_id FROM WpDB.links LIMIT 1") -- not
       then
          Update_Option ("link_manager_enabled", From_Integer (0));
       end if;

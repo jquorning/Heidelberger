@@ -28,6 +28,7 @@ with Inc_Functions;
 with Inc_L10n;
 with Inc_Meta;
 with Inc_Plugins;
+with Inc_Revisions;
 
 package body Inc_Posts
 is
@@ -1421,71 +1422,88 @@ is
 --         return apply_filters( "get_attached_file", file, attachment_id );
 -- end;
 
---
--- Updates attachment file path based on attachment ID.
---
--- Used to update the file path of the attachment, which uses post meta name
--- "_wp_attached_file" to store the path of the attachment.
---
--- @since 2.1.0
---
--- @param int    attachment_id Attachment ID.
--- @param string file          File path for the attachment.
--- @return bool True on success, False on failure.
---
--- function update_attached_file( attachment_id, file ) then
---         if ( ! get_post( attachment_id ) ) then
---                 return False;
---         end;
+   --------------------------
+   -- Update_Attached_File --
+   --------------------------
 
---         --
---         -- Filters the path to the attached file to update.
---         --
---         -- @since 2.1.0
---         --
---         -- @param string file          Path to the attached file to update.
---         -- @param int    attachment_id Attachment ID.
---         --
---         file = apply_filters( "update_attached_file", file, attachment_id );
+   function Update_Attached_File (Attachment_Id : Post_Id;
+                                  File          : String)
+                                  return Boolean
+   is
+      use Inc_Plugins;
+   begin
+      if Get_Post (Attachment_Id).Is_Empty then
+--    if not Get_Post (Attachment_Id) then
+         return False;
+      end if;
 
---         file = _wp_relative_upload_path( file );
---         if ( file ) then
---                 return update_post_meta( attachment_id, "_wp_attached_file", file );
---         end; else then
---                 return delete_post_meta( attachment_id, "_wp_attached_file" );
---         end;
--- end;
+      declare
+         --
+         -- Filters the path to the attached file to update.
+         --
+         -- @since 2.1.0
+         --
+         -- @param string file          Path to the attached file to update.
+         -- @param int    attachment_id Attachment ID.
+         --
+         File_2 : constant String :=
+           Apply_Filters ("update_attached_file", File, Integer (Attachment_Id));
 
---
--- Returns relative path to an uploaded file.
---
--- The path is relative to the current upload dir.
---
--- @since 2.9.0
--- @access private
---
--- @param string path Full path to the file.
--- @return string Relative path on success, unchanged path on failure.
---
--- function _wp_relative_upload_path( path ) then
---         new_path = path;
+         File_3 : constant String := X_Wp_Relative_Upload_Path (File_2);
+      begin
+         if File_3 /= "" then
+            return Update_Post_Meta (Attachment_Id, "_wp_attached_file",
+                                     From_String (File_3));
+         else
+            return
+              Delete_Post_Meta (Integer (Attachment_Id), "_wp_attached_file");
+         end if;
+      end;
+   end Update_Attached_File;
 
---         uploads = wp_get_upload_dir();
---         if ( 0 === strpos( new_path, uploads["basedir"] ) ) then
---                         new_path = str_replace( uploads["basedir"], "", new_path );
---                         new_path = ltrim( new_path, "/" );
---         end;
+   --------------------------
+   -- Update_Attached_File --
+   --------------------------
 
---         --
---         -- Filters the relative path to an uploaded file.
---         --
---         -- @since 2.9.0
---         --
---         -- @param string new_path Relative path to the file.
---         -- @param string path     Full path to the file.
---         --
---         return apply_filters( "_wp_relative_upload_path", new_path, path );
--- end;
+   procedure Update_Attached_File (Attachment_Id : Post_Id;
+                                   File          : String)
+   is
+      Unused : constant Boolean := Update_Attached_File (Attachment_Id, File);
+   begin
+      null;
+   end Update_Attached_File;
+
+   -------------------------------
+   -- X_Wp_Relative_Upload_Path --
+   -------------------------------
+
+   function X_Wp_Relative_Upload_Path (Path : String)
+                                       return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Inc_Functions;
+      use Inc_Plugins;
+
+      New_Path : UString := +Path;
+
+      Uploads : constant Array_Type := Wp_Get_Upload_Dir;
+   begin
+      if 0 = Strpos (-New_Path, Get_As_String (Uploads, "basedir")) then
+         New_Path := +Str_Replace (Get_As_String (Uploads, "basedir"), "", -New_Path);
+         New_Path := +Ltrim (-New_Path, "/");
+      end if;
+
+      --
+      -- Filters the relative path to an uploaded file.
+      --
+      -- @since 2.9.0
+      --
+      -- @param string new_path Relative path to the file.
+      -- @param string path     Full path to the file.
+      --
+      return Apply_Filters ("_wp_relative_upload_path", -New_Path, Path);
+   end X_Wp_Relative_Upload_Path;
 
 --
 -- Retrieves all children of the post parent ID.
@@ -3265,31 +3283,41 @@ is
 --         return add_metadata( "post", post_id, meta_key, meta_value, unique );
 -- end;
 
---
--- Deletes a post meta field for the given post ID.
---
--- You can match based on the key, or key and value. Removing based on key and
--- value, will keep from removing duplicate metadata with the same key. It also
--- allows removing all metadata matching the key, if needed.
---
--- @since 1.5.0
---
--- @param int    post_id    Post ID.
--- @param string meta_key   Metadata name.
--- @param mixed  meta_value Optional. Metadata value. If provided,
---                           rows will only be removed that match the value.
---                           Must be serializable if non-scalar. Default empty.
--- @return bool True on success, False on failure.
---
--- function delete_post_meta( post_id, meta_key, meta_value = "" ) then
---         // Make sure meta is deleted from the post, not from a revision.
---         the_post = wp_is_post_revision( post_id );
---         if ( the_post ) then
---                 post_id = the_post;
---         end;
+   ----------------------
+   -- Delete_Post_Meta --
+   ----------------------
 
---         return delete_metadata( "post", post_id, meta_key, meta_value );
--- end;
+   function Delete_Post_Meta (Post_Id    : Integer;
+                              Meta_Key   : String;
+                              Meta_Value : Multi_Type := From_String (""))
+                              return Boolean
+   is
+      use Inc_Meta;
+      use Inc_Revisions;
+
+      -- Make sure meta is deleted from the post, not from a revision.
+      The_Post : constant Integer :=
+        Wp_Is_Post_Revision (Post_Id);
+
+      Post_Id_2 : constant Integer :=
+        (if The_Post /= 0 then The_Post else Post_Id);
+   begin
+      return Delete_Metadata ("post", Post_Id_2, Meta_Key, Meta_Value);
+   end Delete_Post_Meta;
+
+   ----------------------
+   -- Delete_Post_Meta --
+   ----------------------
+
+   procedure Delete_Post_Meta (Post_Id    : Integer;
+                               Meta_Key   : String;
+                               Meta_Value : Multi_Type := From_String (""))
+   is
+      Unused : constant Boolean :=
+        Delete_Post_Meta (Post_Id, Meta_Key, Meta_Value);
+   begin
+      null;
+   end Delete_Post_Meta;
 
    --
    -- Retrieves a post meta field for the given post ID.

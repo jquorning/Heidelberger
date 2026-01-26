@@ -35,6 +35,39 @@ is
    procedure Create_Initial_Post_Types;
 
    --
+   -- Updates attachment file path based on attachment ID.
+   --
+   -- Used to update the file path of the attachment, which uses post meta name
+   -- "_wp_attached_file" to store the path of the attachment.
+   --
+   -- @since 2.1.0
+   --
+   -- @param int    attachment_id Attachment ID.
+   -- @param string file          File path for the attachment.
+   -- @return bool True on success, False on failure.
+   --
+   function Update_Attached_File (Attachment_Id : Post_Id;
+                                  File          : String)
+                                  return Boolean;
+
+   procedure Update_Attached_File (Attachment_Id : Post_Id;
+                                   File          : String);
+
+   --
+   -- Returns relative path to an uploaded file.
+   --
+   -- The path is relative to the current upload dir.
+   --
+   -- @since 2.9.0
+   -- @access private
+   --
+   -- @param string path Full path to the file.
+   -- @return string Relative path on success, unchanged path on failure.
+   --
+   function X_Wp_Relative_Upload_Path (Path : String)
+                                       return String;
+
+   --
    -- Retrieves the post type of the current post or of a given post.
    --
    -- @since 2.1.0
@@ -850,6 +883,31 @@ is
                        return Class_Posts.Post_Array;
 
    --
+   -- Deletes a post meta field for the given post ID.
+   --
+   -- You can match based on the key, or key and value. Removing based on key and
+   -- value, will keep from removing duplicate metadata with the same key. It also
+   -- allows removing all metadata matching the key, if needed.
+   --
+   -- @since 1.5.0
+   --
+   -- @param int    post_id    Post ID.
+   -- @param string meta_key   Metadata name.
+   -- @param mixed  meta_value Optional. Metadata value. If provided,
+   --                           rows will only be removed that match the value.
+   --                           Must be serializable if non-scalar. Default empty.
+   -- @return bool True on success, False on failure.
+   --
+   function Delete_Post_Meta (Post_Id    : Integer;
+                              Meta_Key   : String;
+                              Meta_Value : Multi_Type := From_String (""))
+                              return Boolean;
+
+   procedure Delete_Post_Meta (Post_Id    : Integer;
+                               Meta_Key   : String;
+                               Meta_Value : Multi_Type := From_String (""));
+
+   --
    -- Checks a post type"s support for a given feature.
    --
    -- @since 3.0.0
@@ -1360,15 +1418,15 @@ is
    --
    function Update_Post_Meta (Post_Id    : Class_Posts.Post_Id; -- Integer;
                               Meta_Key   : String;
-                              Meta_Value : Array_Type;
-                              Prev_Value : Array_Type := Empty_Array) -- = '' )
-                              return Integer
-                              is (1);
+                              Meta_Value : Multi_Type;
+                              Prev_Value : Multi_Type := From_String (""))
+                              return Boolean
+                              is (False);
 
    procedure Update_Post_Meta (Post_Id    : Class_Posts.Post_Id;
                                Meta_Key   : String;
-                               Meta_Value : String;
-                               Prev_Value : Array_Type := Empty_Array) -- = '' )
+                               Meta_Value : Multi_Type;
+                               Prev_Value : Multi_Type := From_String (""))
    is null;
 
    --

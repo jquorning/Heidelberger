@@ -452,6 +452,15 @@ is
                                 Arry    => Empty_Array,
                                 Error   => Class_Errors.Null_Wp_Error));
 
+   function Apply_Filters (Hook_Name  : String;
+                           Value      : Boolean;
+                           Object     : Integer;
+                           Meta_Key   : String;
+                           Meta_Value : String;
+                           Delete_All : Boolean)
+                           return Boolean
+                           is (Value);
+
    procedure Do_Action (Hook_Name : String;
                         A1        : Class_HTTP.Response_Result;
                         A2        : String;
@@ -518,6 +527,17 @@ is
    procedure Do_Action (Hook_Name : String;
                         Errors    : Class_Errors.Wp_Error;
                         User      : Inc_Users.User_Error_Type)
+                        is null;
+
+   procedure Do_Action (Hook_Name  : String;
+                        Meta_Ids   : List_Type;
+                        Object_Is  : Integer;
+                        Meta_Key   : String;
+                        Meta_Value : String)
+                        is null;
+
+   procedure Do_Action (Hook_Name  : String;
+                        Meta_Ids   : List_Type)
                         is null;
 
 end Wp_Common;

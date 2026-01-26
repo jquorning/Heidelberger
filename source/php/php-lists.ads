@@ -71,6 +71,12 @@ is
                       return List_Type
    is (raise Program_Error with "not implemented");
 
+   function List_Slice (List : List_Type;
+                        First : Natural;
+                        Last  : Natural)
+                        return List_Type
+   is (raise Program_Error with "not implemented");
+
    procedure List_Shift (List : in out List_Type);
 
    function List_Shift (List : in out List_Type)

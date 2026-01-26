@@ -22,14 +22,17 @@ is
    -- By jq
    type Property_Type is
       record
-         Nickname      : UStrings.UString;
-         User_Login    : UStrings.UString;
-         User_Pass     : UStrings.UString;
-         User_Nicename : UStrings.UString;
-         User_Email    : UStrings.UString;
-         User_URL      : UStrings.UString;
-         Display_Name  : UStrings.UString;
-         User_Level    : Natural;
+         Nickname         : UStrings.UString;
+         User_Description : UStrings.UString;
+         User_Firstname   : UStrings.UString;
+         User_Lastname    : UStrings.UString;
+         User_Login       : UStrings.UString;
+         User_Pass        : UStrings.UString;
+         User_Nicename    : UStrings.UString;
+         User_Email       : UStrings.UString;
+         User_URL         : UStrings.UString;
+         Display_Name     : UStrings.UString;
+         User_Level       : Natural;
       end record;
 
    package Boolean_Maps is new

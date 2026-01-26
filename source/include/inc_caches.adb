@@ -326,10 +326,8 @@ is
                              Group : String := "")
                              return Boolean
    is
-      Done : Boolean;
    begin
-      Global_Wp_Object_Cache.Delete (Key, Group, Done => Done);
-      return Done;
+      return Global_Wp_Object_Cache.Delete (Key, Group);
    end Wp_Cache_Delete;
 
    ---------------------
@@ -344,24 +342,32 @@ is
       null;
    end Wp_Cache_Delete;
 
--- --
--- -- Deletes multiple values from the cache in one call.
--- --
--- -- @since 6.0.0
--- --
--- -- @see WP_Object_Cache::delete_multiple()
--- -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
--- --
--- -- @param array  $keys  Array of keys under which the cache to deleted.
--- -- @param string $group Optional. Where the cache contents are grouped. Default empty.
--- -- @return bool[] Array of return values, grouped by key. Each value is either
--- --                true on success, or false if the contents were not deleted.
--- --
--- function wp_cache_delete_multiple( array $keys, $group = '' ) then
---         global $wp_object_cache;
+   ------------------------------
+   -- Wp_Cache_Delete_Multiple --
+   ------------------------------
 
---         return $wp_object_cache->delete_multiple( $keys, $group );
--- end;
+   function Wp_Cache_Delete_Multiple (Keys  : List_Type;
+                                      Group : String := "")
+                                      return Array_Type
+   is
+      use Class_Object_Caches;
+--         global $wp_object_cache;
+   begin
+      return Global_Wp_Object_Cache.Delete_Multiple (Keys, Group);
+   end Wp_Cache_Delete_Multiple;
+
+   ------------------------------
+   -- Wp_Cache_Delete_Multiple --
+   ------------------------------
+
+   procedure Wp_Cache_Delete_Multiple (Keys  : List_Type;
+                                       Group : String := "")
+   is
+      Unused : constant Array_Type :=
+        Wp_Cache_Delete_Multiple (Keys, Group);
+   begin
+      null;
+   end Wp_Cache_Delete_Multiple;
 
 -- --
 -- -- Increments numeric cache item's value.

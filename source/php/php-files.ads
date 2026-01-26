@@ -2,10 +2,12 @@
 --
 --
 
+with Arrays;
 with Lists;
 
 package Php.Files
 is
+   use Arrays;
    use Lists;
 
    function File_Exists (Filename : String)
@@ -41,11 +43,6 @@ is
                      Levels : Positive := 1)
                      return String
                      is ("XXX-702");
-
-   function Mkdir (Directoy   : String;
-                   Permission : Integer)
-                   return Boolean
-   is (raise Program_Error with "not implemented");
 
    function Copy (From : String;
                   To   : String)
@@ -96,12 +93,24 @@ is
             return String
             is ("XXX-977");
 
-   procedure Umask (Make : Integer)
+   type Permission_Mask is mod 8 ** 6;
+
+   procedure Umask (Mask : Permission_Mask)
    is null;
 
+   function Umask
+            return Permission_Mask
+   is (raise Program_Error with "not implemented");
+
    procedure Chmod (Filename   : String;
-                    Permission : Integer)
+                    Permission : Permission_Mask)
    is null;
+
+   function Mkdir (Directoy   : String;
+                   Permission : Permission_Mask;
+                   Recursive  : Boolean := False)
+                   return Boolean
+   is (raise Program_Error with "not implemented");
 
    type File_Type is null record;
 
@@ -116,5 +125,9 @@ is
 
    procedure Fclose (File : in out File_Type)
    is null;
+
+   function Stat (Filename : String)
+                  return Array_Type
+   is (raise Program_Error with "not implemented");
 
 end Php.Files;

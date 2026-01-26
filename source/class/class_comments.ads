@@ -178,7 +178,11 @@ is
 --         -- @var array
 --         --
 --         protected post_fields = array( 'post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_title', 'post_excerpt', 'post_status', 'comment_status', 'ping_status', 'post_name', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_content_filtered', 'post_parent', 'guid', 'menu_order', 'post_type', 'post_mime_type', 'comment_count' );
-      end record;
+
+         -- Added
+         C : UStrings.UString; -- Pseudo
+
+     end record;
 
    --
    -- Retrieves a WP_Comment instance.
@@ -370,7 +374,8 @@ is
      (Comment_Id      => UStrings.Null_UString,
       Comment_Author  => UStrings.Null_UString,
       Comment_Content => UStrings.Null_UString,
-      Comment_Post_Id => 0);
+      Comment_Post_Id => 0,
+      C               => UStrings.Null_UString);
 
    package Comments_Vectors is new
      Ada.Containers.Vectors (Index_Type   => Positive,

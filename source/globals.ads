@@ -71,6 +71,8 @@ is
    PLUGINS_COOKIE_PATH  : UStrings.UString;
    RECOVERY_MODE_COOKIE : UStrings.UString;
 
+   RESET_CAPS : constant Boolean := False;
+
    RELOCATE_DEF : constant Boolean := False;
    RELOCATE     : constant Boolean := False;
 
@@ -172,5 +174,10 @@ is
 
    Global_Page  : Natural;
    Global_Paged : Natural;
+
+   DIRECTORY_SEPARATOR : constant String := "/";
+
+   UPLOADS       : constant String := "";
+   BLOGUPLOADDIR : constant String := "";
 
 end Globals;

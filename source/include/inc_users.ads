@@ -159,6 +159,12 @@ is
    function Get_User_Meta (User_Id : Integer;
                            Key     : String  := "";
                            Single  : Boolean := False)
+                           return Integer
+                           is (999);
+
+   function Get_User_Meta (User_Id : Integer;
+                           Key     : String  := "";
+                           Single  : Boolean := False)
                            return Array_Type
                            is (Empty_Array);
 
@@ -188,20 +194,26 @@ is
    function Update_User_Meta (User_Id    : Integer;
                               Meta_Key   : String;
                               Meta_Value : Boolean;
-                              prev_value : String := "")
+                              Prev_Value : String := "")
                               return Integer
                               is (0);
 
    procedure Update_User_Meta (User_Id    : Integer;
                                Meta_Key   : String;
                                Meta_Value : Array_Type; -- Boolean;
-                               prev_value : String := "")
+                               Prev_Value : String := "")
                                is null;
 
    procedure Update_User_Meta (User_Id    : Integer;
                                Meta_Key   : String;
                                Meta_Value : Integer;
-                               prev_value : String := "")
+                               Prev_Value : String := "")
+                               is null;
+
+   procedure Update_User_Meta (User_Id    : Integer;
+                               Meta_Key   : String;
+                               Meta_Value : String;
+                               Prev_Value : String := "")
                                is null;
 
    --

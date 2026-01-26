@@ -1420,35 +1420,16 @@ is
 
    procedure Make_Site_Theme;
 
--- --
--- -- Translate user level to user role name.
--- --
--- -- @since 2.0.0
--- --
--- -- @param int level User level.
--- -- @return string User role name.
--- --
--- function translate_level_to_role( level ) then
---         switch ( level ) then
---                 case 10:
---                 case 9:
---                 case 8:
---                         return "administrator";
---                 case 7:
---                 case 6:
---                 case 5:
---                         return "editor";
---                 case 4:
---                 case 3:
---                 case 2:
---                         return "author";
---                 case 1:
---                         return "contributor";
---                 case 0:
---                 default:
---                         return "subscriber";
---         end;
--- end;
+   --
+   -- Translate user level to user role name.
+   --
+   -- @since 2.0.0
+   --
+   -- @param int level User level.
+   -- @return string User role name.
+   --
+   function Translate_Level_To_Role (Level : Integer)
+                                     return String;
 
    --
    -- Checks the version of the installed MySQL binary.

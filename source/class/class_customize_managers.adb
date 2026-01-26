@@ -3244,7 +3244,8 @@ is
                                2 => +Helpers.Image (Get_Current_User_Id)
                             )));
                begin
-                  Update_Post_Meta (Changeset_Post_Id, "_edit_lock", Lock);
+                  Update_Post_Meta (Changeset_Post_Id, "_edit_lock",
+                                    From_String (Lock));
                end;
             else
                This.Refresh_Changeset_Lock (Changeset_Post_Id);
@@ -3294,7 +3295,7 @@ is
                          2 => +Helpers.Image (User_Id))));
                   begin
                      Update_Post_Meta (Changeset_Post_Id,
-                                       "_edit_lock", Lock_2);
+                                       "_edit_lock", From_String (Lock_2));
                   end;
                end if;
             end;

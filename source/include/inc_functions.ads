@@ -18,6 +18,30 @@ is
    Program_Die : exception;
 
    --
+   -- Retrieves the current time based on specified type.
+   --
+   --  - The "mysql" type will return the time in the format for MySQL DATETIME field.
+   --  - The "timestamp" or "U" types will return the current timestamp or a sum of
+   --    timestamp and timezone offset, depending on `gmt`.
+   --  - Other strings will be interpreted as PHP date formats (e.g. "Y-m-d").
+   --
+   -- If `gmt` is a truthy value then both types will use GMT time, otherwise the
+   -- output is adjusted with the GMT offset for the site.
+   --
+   -- @since 1.0.0
+   -- @since 5.3.0 Now returns an integer if `type` is "U". Previously a string was
+   --              returned.
+   --
+   -- @param string   type Type of time to retrieve. Accepts "mysql", "timestamp", "U",
+   --                       or PHP date format string (e.g. "Y-m-d").
+   -- @param int|bool gmt  Optional. Whether to use GMT timezone. Default false.
+   -- @return int|string Integer if `type` is "timestamp" or "U", string otherwise.
+   --
+   function Current_Time (Typ : String;
+                          GMT : Boolean := False) -- 0
+                          return String;
+
+   --
    -- Retrieves the timezone of the site as a string.
    --
    -- Uses the `timezone_string` option to get a proper timezone name if available,
@@ -546,6 +570,48 @@ is
             return String;
 
    --
+   -- Recursive directory creation based on full path.
+   --
+   -- Will attempt to set permissions on folders.
+   --
+   -- @since 2.0.1
+   --
+   -- @param string target Full path to attempt to create.
+   -- @return bool Whether the path was created. True if path already exists.
+   --
+   function Wp_Mkdir_P (Target : String)
+                        return Boolean;
+
+   --
+   -- Tests if a given filesystem path is absolute.
+   --
+   -- For example, "/foo/bar", or "c:\windows".
+   --
+   -- @since 2.5.0
+   --
+   -- @param string path File path.
+   -- @return bool True if path is absolute, false is not absolute.
+   --
+   function Path_Is_Absolute (Path : String)
+                              return Boolean;
+
+   --
+   -- Joins two filesystem paths together.
+   --
+   -- For example, "give me path relative to base". If the path is absolute,
+   -- then it the full path is returned.
+   --
+   -- @since 2.5.0
+   --
+   -- @param string base Base path.
+   -- @param string path Path relative to base.
+   -- @return string The path with the base or absolute path.
+   --
+   function Path_Join (Base : String;
+                       Path : String)
+                       return String;
+
+   --
    -- Normalizes a filesystem path.
    --
    -- On windows systems, replaces backslashes with forward slashes
@@ -596,6 +662,81 @@ is
    --
    function Wp_Is_Writable (Path : String)
                             return Boolean;
+
+   --
+   -- Retrieves uploads directory information.
+   --
+   -- Same as wp_upload_dir() but "light weight" as it doesn"t attempt to create the
+   -- uploads directory. Intended for use in themes, when only "basedir" and "baseurl"
+   -- are needed, generally in all cases when not uploading files.
+   --
+   -- @since 4.5.0
+   --
+   -- @see wp_upload_dir()
+   --
+   -- @return array See wp_upload_dir() for description.
+   --
+   function Wp_Get_Upload_Dir
+            return Array_Type;
+
+   --
+   -- Returns an array containing the current upload directory"s path and URL.
+   --
+   -- Checks the "upload_path" option, which should be from the web root folder,
+   -- and if it isn"t empty it will be used. If it is empty, then the path will be
+   -- "WP_CONTENT_DIR/uploads". If the "UPLOADS" constant is defined, then it will
+   -- override the "upload_path" option and "WP_CONTENT_DIR/uploads" path.
+   --
+   -- The upload URL path is set either by the "upload_url_path" option or by using
+   -- the "WP_CONTENT_URL" constant and appending "/uploads" to the path.
+   --
+   -- If the "uploads_use_yearmonth_folders" is set to true (checkbox if checked in
+   -- the administration settings panel), then the time will be used. The format
+   -- will be year first and then month.
+   --
+   -- If the path couldn"t be created, then an error will be returned with the key
+   -- "error" containing the error message. The error suggests that the parent
+   -- directory is not writable by the server.
+   --
+   -- @since 2.0.0
+   -- @uses _wp_upload_dir()
+   --
+   -- @param string time Optional. Time formatted in "yyyy/mm". Default null.
+   -- @param bool   create_dir Optional. Whether to check and create the uploads
+   --                          directory. Default true for backward compatibility.
+   -- @param bool   refresh_cache Optional. Whether to refresh the cache. Default
+   --                             false.
+   -- @return array {
+   --     Array of information about the upload directory.
+   --
+   --     @type string       path    Base directory and subdirectory or full path to
+   --                                upload directory.
+   --     @type string       url     Base URL and subdirectory or absolute URL to
+   --                                upload directory.
+   --     @type string       subdir  Subdirectory if uploads use year/month folders
+   --                                option is on.
+   --     @type string       basedir Path without subdir.
+   --     @type string       baseurl URL path without subdir.
+   --     @type string|false error   False or error message.
+   -- }
+   --
+   function Wp_Upload_Dir (Time          : String  := ""; -- null
+                           Create_Dir    : Boolean := True;
+                           Refresh_Cache : Boolean := False)
+                           return Array_Type;
+
+   --
+   -- A non-filtered, non-cached version of wp_upload_dir() that doesn't check
+   -- the path.
+   --
+   -- @since 4.5.0
+   -- @access private
+   --
+   -- @param string time Optional. Time formatted in "yyyy/mm". Default null.
+   -- @return array See wp_upload_dir()
+   --
+   function X_Wp_Upload_Dir (Time : String := "") -- null
+                             return Array_Type;
 
    --
    -- Retrieves the list of mime types and file extensions.

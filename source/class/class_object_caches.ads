@@ -7,11 +7,13 @@
 --
 
 with Arrays;
+with Lists;
 with UStrings;
 
 package Class_Object_Caches
 is
    use Arrays;
+   use Lists;
 
    --
    -- Core class that implements an object cache.
@@ -366,31 +368,32 @@ is
    -- @param bool       deprecated Optional. Unused. Default false.
    -- @return bool True on success, false if the contents were not deleted.
    --
+   function Delete (This       : in out Wp_Object_Cache;
+                    Key        : String;
+                    Group      : String := "default";
+                    Deprecated : Boolean := False)
+                    return Boolean;
+
    procedure Delete (This       : in out Wp_Object_Cache;
                      Key        : String;
                      Group      : String := "default";
-                     Deprecated : Boolean := False;
-                     Done       : out Boolean);
+                     Deprecated : Boolean := False);
 
---         --
---         -- Deletes multiple values from the cache in one call.
---         --
---         -- @since 6.0.0
---         --
---         -- @param array  keys  Array of keys to be deleted.
---         -- @param string group Optional. Where the cache contents are grouped. Default empty.
---         -- @return bool[] Array of return values, grouped by key. Each value is either
---         --                true on success, or false if the contents were not deleted.
---         --
---         public function delete_multiple( array keys, group = "" ) then
---                 values = array();
-
---                 foreach ( keys as key ) then
---                         values[ key ] = this->delete( key, group );
---                 end;
-
---                 return values;
---         end;
+   --
+   -- Deletes multiple values from the cache in one call.
+   --
+   -- @since 6.0.0
+   --
+   -- @param array  keys  Array of keys to be deleted.
+   -- @param string group Optional. Where the cache contents are grouped. Default
+   --                     empty.
+   -- @return bool[] Array of return values, grouped by key. Each value is either
+   --                true on success, or false if the contents were not deleted.
+   --
+   function Delete_Multiple (This  : in out Wp_Object_Cache;
+                             Keys  : List_Type;
+                             Group : String := "")
+                             return Array_Type;
 
 --         --
 --         -- Increments numeric cache item"s value.

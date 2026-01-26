@@ -17,7 +17,8 @@ is
    -- Date_Time --
    ---------------
 
-   function X_Construct (Datetime : String := "now")
+   function X_Construct (Datetime : String := "now";
+                         Timezone : Date_Time_Zone := Null_Date_Time_Zone)
                          return Date_Time
    is (raise Program_Error with "not implemented");
 

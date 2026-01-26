@@ -9,6 +9,8 @@
 -- require_once ABSPATH . WPINC . "/ms-site.php";
 -- require_once ABSPATH . WPINC . "/ms-network.php";
 
+with Globals;
+
 with Inc_Capabilities;
 with Class_Roles;
 with Class_Users;
@@ -715,18 +717,16 @@ is
       end;
    end Wp_Switch_Roles_And_User;
 
--- --
--- -- Determines if switch_to_blog() is in effect
--- --
--- -- @since 3.5.0
--- --
--- -- @global array _wp_switched_stack
--- --
--- -- @return bool True if switched, false otherwise.
--- --
--- function ms_is_switched() then
---         return ! empty( GLOBALS["_wp_switched_stack"] );
--- end;
+   --------------------
+   -- MS_Is_Switched --
+   --------------------
+
+   function MS_Is_Switched
+            return Boolean
+   is
+   begin
+      return not Empty (Globals.GLOBALS, "_wp_switched_stack");
+   end MS_Is_Switched;
 
 -- --
 -- -- Check if a particular blog is archived.

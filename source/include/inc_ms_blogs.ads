@@ -98,6 +98,18 @@ is
                                        Old_Site_Id : Integer);
 
    --
+   -- Determines if switch_to_blog() is in effect
+   --
+   -- @since 3.5.0
+   --
+   -- @global array _wp_switched_stack
+   --
+   -- @return bool True if switched, false otherwise.
+   --
+   function MS_Is_Switched
+            return Boolean;
+
+   --
    -- Retrieve option value for a given blog id based on name of option.
    --
    -- If the option does not exist or does not have a value, then the return value

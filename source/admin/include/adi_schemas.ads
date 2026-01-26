@@ -14,6 +14,27 @@ is
    use Arrays;
 
    --
+   -- Create the roles for WordPress 2.0
+   --
+   -- @since 2.0.0
+   --
+   procedure Populate_Roles_160;
+
+   --
+   -- Create and modify WordPress roles for WordPress 2.1.
+   --
+   -- @since 2.1.0
+   --
+   procedure Populate_Roles_210;
+
+   --
+   -- Create and modify WordPress roles for WordPress 2.3.
+   --
+   -- @since 2.3.0
+   --
+   procedure Populate_Roles_230;
+
+   --
    -- Create and modify WordPress roles for WordPress 2.5.
    --
    -- @since 2.5.0

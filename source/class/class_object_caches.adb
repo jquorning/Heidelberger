@@ -10,14 +10,11 @@ with Php.Arrays;
 with Php.Strings;
 with Php.Types;
 
-with Lists;
-
 with Inc_Functions;
 with Inc_L10n;
 
 package body Class_Object_Caches
 is
-   use Lists;
 
    ------------------
    -- Is_Valid_Key --
@@ -233,11 +230,11 @@ is
    -- Delete --
    ------------
 
-   procedure Delete (This       : in out Wp_Object_Cache;
-                     Key        : String;
-                     Group      : String := "default";
-                     Deprecated : Boolean := False;
-                     Done       : out Boolean)
+   function Delete (This       : in out Wp_Object_Cache;
+                    Key        : String;
+                    Group      : String := "default";
+                    Deprecated : Boolean := False)
+                    return Boolean
    is
       use Php.Strings;
       use UStrings;
@@ -246,8 +243,7 @@ is
       Group_2 : UString := +Group;
    begin
       if not This.Is_Valid_Key (Key) then
-         Done := False;
-         return;
+         return False;
       end if;
 
       if Empty (Group) then
@@ -266,13 +262,49 @@ is
       end if;
 
       if not This.X_Exists (-Key_2, -Group_2) then
-         Done := False;
-         return;
+         return False;
       end if;
 
       Delete (Ref_2 (This.Cache, -Group_2, -Key_2));
-      Done := True;
+      return True;
    end Delete;
+
+   ------------
+   -- Delete --
+   ------------
+
+   procedure Delete (This       : in out Wp_Object_Cache;
+                     Key        : String;
+                     Group      : String := "default";
+                     Deprecated : Boolean := False)
+   is
+      Unused : constant Boolean := This.Delete (Key, Group, Deprecated);
+   begin
+      null;
+   end Delete;
+
+   ---------------------
+   -- Delete_Multiple --
+   ---------------------
+
+   function Delete_Multiple (This  : in out Wp_Object_Cache;
+                             Keys  : List_Type;
+                             Group : String := "")
+                             return Array_Type
+   is
+      use UStrings;
+
+      Values      : Array_Type;
+      Unused_Done : Boolean;
+   begin
+      for Key of Keys loop
+         Set (Values, -Key,
+              From_Boolean (
+                This.Delete (-Key, Group)));
+      end loop;
+
+      return Values;
+   end Delete_Multiple;
 
    -----------
    -- Flush --

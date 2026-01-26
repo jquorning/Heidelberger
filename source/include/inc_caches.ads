@@ -8,6 +8,7 @@
 --
 
 with Arrays;
+with Lists;
 
 with Class_Comments;
 with Class_Posts;
@@ -17,6 +18,7 @@ with Inc_Comments;
 package Inc_Caches
 is
    use Arrays;
+   use Lists;
 
    --
    -- Removes the cache contents matching key and group.
@@ -37,6 +39,27 @@ is
 
    procedure Wp_Cache_Delete (Key   : String;
                               Group : String := "");
+
+   --
+   -- Deletes multiple values from the cache in one call.
+   --
+   -- @since 6.0.0
+   --
+   -- @see WP_Object_Cache::delete_multiple()
+   -- @global WP_Object_Cache $wp_object_cache Object cache global instance.
+   --
+   -- @param array  $keys  Array of keys under which the cache to deleted.
+   -- @param string $group Optional. Where the cache contents are grouped. Default
+   --                      empty.
+   -- @return bool[] Array of return values, grouped by key. Each value is either
+   --                true on success, or false if the contents were not deleted.
+   --
+   function Wp_Cache_Delete_Multiple (Keys  : List_Type;
+                                      Group : String := "")
+                                      return Array_Type;
+
+   procedure Wp_Cache_Delete_Multiple (Keys  : List_Type;
+                                       Group : String := "");
 
    --
    -- Removes all cache items.
