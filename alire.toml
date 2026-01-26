@@ -15,8 +15,5 @@ executables = ["heidelberger"]
 runner = "alire"
 
 [[depends-on]]
-aws = "=24"
-xmlada = "^24.0.0"
-gnatcoll = "^24.0.0"
+aws = "^25.2.0"
 simple_components = "^4.68.0"
-
