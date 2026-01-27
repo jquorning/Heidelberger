@@ -12,10 +12,10 @@ with Php.Strings;
 
 with UStrings;
 
-with Class_Dependencies;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
+with Inc_Plugins;
 
 package body Inc_Functions_Wp_Styles
 is
@@ -40,20 +40,21 @@ is
                              return List_Type
    is
       use Inc_Functions_Wp_Scripts;
+      use Inc_Plugins;
 --    global wp_styles;
    begin
       -- if "" = handles then -- For 'wp_head'.
       --    Handles := False;
       -- end if;
 
-      -- if not Handles then
-      --    --
-      --    -- Fires before styles in the handles queue are printed.
-      --    --
-      --    -- @since 2.6.0
-      --    --
-      --    Do_Action ("wp_print_styles");
-      -- end if;
+      if Handles = "" then
+         --
+         -- Fires before styles in the handles queue are printed.
+         --
+         -- @since 2.6.0
+         --
+         Do_Action ("wp_print_styles");
+      end if;
 
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__");
 
@@ -65,6 +66,10 @@ is
 
       return Wp_Styles_X.Do_Items (To_List (Handles)); -- to_list added
    end Wp_Print_Styles;
+
+   ---------------------
+   -- Wp_Print_Styles --
+   ---------------------
 
    procedure Wp_Print_Styles (Handles : String)
    is
@@ -183,27 +188,22 @@ is
    is
       use Php.Strings;
       use UStrings;
-      use Class_Dependencies;
       use Class_Styles;
       use Inc_Functions_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
-      declare
-         Styles : Wp_Styles := X_Construct;
-         Unused : Boolean;
-      begin
-         if Src /= "" then
-            declare
-               X_Handle : constant List_Type := Explode ("?", Handle);
-            begin
-               Unused := Class_Dependencies.Add
-                 (Wp_Dependencies (Styles),
-                  -(X_Handle.First_Element), Src, Deps, Ver, Media);
-            end;
-         end if;
 
-         Styles.Enqueue (To_List (Handle));
-      end;
+      if Src /= "" then
+         declare
+            Unused : Boolean;
+            X_Handle : constant List_Type := Explode ("?", Handle);
+         begin
+            Unused :=
+              Wp_Styles_X.Add (-X_Handle.First_Element, Src, Deps, Ver, Media);
+         end;
+      end if;
+
+      Wp_Styles_X.Enqueue (To_List (Handle));
    end Wp_Enqueue_Style;
 
 -- --

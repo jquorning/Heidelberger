@@ -886,72 +886,82 @@ is
          );
       end if;
 
-      Scripts.Add ("common", "/wp-admin/js/commonsuffix.js", To_List (List => (+"jquery", +"hoverIntent", +"utils")), False, 1);
+      Scripts.Add ("common", "/wp-admin/js/commonsuffix.js",
+                   To_List (List => (+"jquery", +"hoverIntent", +"utils")), False, 1);
       Scripts.Set_Translations ("common");
 
-      Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js", Empty_List, False, 1);
+      Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js",
+                   Empty_List, False, 1);
 
-      Scripts.Add ("sack", "/wp-includes/js/tw-sacksuffix.js", Empty_List, "1.6.1", 1);
+      Scripts.Add ("sack", "/wp-includes/js/tw-sacksuffix.js",
+                   Empty_List, "1.6.1", 1);
 
-      Scripts.Add ("quicktags", "/wp-includes/js/quicktagssuffix.js", Empty_List, False, 1);
-      if Did_Action ("init") then
-         Scripts.Localize (
-                "quicktags",
-                "quicktagsL10n",
-                To_Array ((
-                        Build ("closeAllOpenTags",      abs "Close all open tags"),
-                        Build ("closeTags",             abs "close tags"),
-                        Build ("enterURL",              abs "Enter the URL"),
-                        Build ("enterImageURL",         abs "Enter the URL of the image"),
-                        Build ("enterImageDescription", abs "Enter a description of the image"),
-                        Build ("textdirection",         abs "text direction"),
-                        Build ("toggleTextdirection",   abs "Toggle Editor Text Direction"),
-                        Build ("dfw",                   abs "Distraction-free writing mode"),
-                        Build ("strong",                abs "Bold"),
-                        Build ("strongClose",           abs "Close bold tag"),
-                        Build ("em",                    abs "Italic"),
-                        Build ("emClose",               abs "Close italic tag"),
-                        Build ("link",                  abs "Insert link"),
-                        Build ("blockquote",            abs "Blockquote"),
-                        Build ("blockquoteClose",       abs "Close blockquote tag"),
-                        Build ("del",                   abs "Deleted text (strikethrough)"),
-                        Build ("delClose",              abs "Close deleted text tag"),
-                        Build ("ins",                   abs "Inserted text"),
-                        Build ("insClose",              abs "Close inserted text tag"),
-                        Build ("image",                 abs "Insert image"),
-                        Build ("ul",                    abs "Bulleted list"),
-                        Build ("ulClose",               abs "Close bulleted list tag"),
-                        Build ("ol",                    abs "Numbered list"),
-                        Build ("olClose",               abs "Close numbered list tag"),
-                        Build ("li",                    abs "List item"),
-                        Build ("liClose",               abs "Close list item tag"),
-                        Build ("code",                  abs "Code"),
-                        Build ("codeClose",             abs "Close code tag"),
-                        Build ("more",                  abs "Insert Read More tag")
-                ))
-         );
-      end if;
-
-      Scripts.Add ("colorpicker", "/wp-includes/js/colorpickersuffix.js", To_List ("prototype"), "3517m");
-
-      Scripts.Add ("editor", "/wp-admin/js/editorsuffix.js", To_List (List => (+"utils", +"jquery")), False, 1);
-
-      Scripts.Add ("clipboard", "/wp-includes/js/clipboardsuffix.js", Empty_List, "2.0.11", 1);
-
-      Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js", To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+      Scripts.Add ("quicktags", "/wp-includes/js/quicktagssuffix.js",
+                   Empty_List, False, 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
-                "wp-ajax-response",
-                "wpAjax",
-                To_Array ((
-                        Build ("noPerm", abs "Sorry, you are not allowed to do that."),
-                        Build ("broken", abs "Something went wrong.")
-                ))
+           "quicktags",
+           "quicktagsL10n",
+           To_Array ((
+             Build ("closeAllOpenTags",      abs "Close all open tags"),
+             Build ("closeTags",             abs "close tags"),
+             Build ("enterURL",              abs "Enter the URL"),
+             Build ("enterImageURL",         abs "Enter the URL of the image"),
+             Build ("enterImageDescription", abs "Enter a description of the image"),
+             Build ("textdirection",         abs "text direction"),
+             Build ("toggleTextdirection",   abs "Toggle Editor Text Direction"),
+             Build ("dfw",                   abs "Distraction-free writing mode"),
+             Build ("strong",                abs "Bold"),
+             Build ("strongClose",           abs "Close bold tag"),
+             Build ("em",                    abs "Italic"),
+             Build ("emClose",               abs "Close italic tag"),
+             Build ("link",                  abs "Insert link"),
+             Build ("blockquote",            abs "Blockquote"),
+             Build ("blockquoteClose",       abs "Close blockquote tag"),
+             Build ("del",                   abs "Deleted text (strikethrough)"),
+             Build ("delClose",              abs "Close deleted text tag"),
+             Build ("ins",                   abs "Inserted text"),
+             Build ("insClose",              abs "Close inserted text tag"),
+             Build ("image",                 abs "Insert image"),
+             Build ("ul",                    abs "Bulleted list"),
+             Build ("ulClose",               abs "Close bulleted list tag"),
+             Build ("ol",                    abs "Numbered list"),
+             Build ("olClose",               abs "Close numbered list tag"),
+             Build ("li",                    abs "List item"),
+             Build ("liClose",               abs "Close list item tag"),
+             Build ("code",                  abs "Code"),
+             Build ("codeClose",             abs "Close code tag"),
+             Build ("more",                  abs "Insert Read More tag")
+           ))
          );
       end if;
 
-      Scripts.Add ("wp-api-request", "/wp-includes/js/api-requestsuffix.js", To_List ("jquery"), False, 1);
+      Scripts.Add ("colorpicker", "/wp-includes/js/colorpickersuffix.js",
+                   To_List ("prototype"), "3517m");
+
+      Scripts.Add ("editor", "/wp-admin/js/editorsuffix.js",
+                   To_List (List => (+"utils", +"jquery")), False, 1);
+
+      Scripts.Add ("clipboard", "/wp-includes/js/clipboardsuffix.js",
+                   Empty_List, "2.0.11", 1);
+
+      Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js",
+                   To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+
+      if Did_Action ("init") then
+         Scripts.Localize (
+           "wp-ajax-response",
+           "wpAjax",
+           To_Array ((
+             Build ("noPerm", abs "Sorry, you are not allowed to do that."),
+             Build ("broken", abs "Something went wrong.")
+           ))
+         );
+      end if;
+
+      Scripts.Add ("wp-api-request", "/wp-includes/js/api-requestsuffix.js",
+                   To_List ("jquery"), False, 1);
 
       -- `wpApiSettings` is also used by `wp-api`, which depends on this script.
       if Did_Action ("init") then
@@ -967,45 +977,63 @@ is
          );
       end if;
 
-      Scripts.Add ("wp-pointer", "/wp-includes/js/wp-pointersuffix.js", To_List ("jquery-ui-core"), False, 1);
+      Scripts.Add ("wp-pointer", "/wp-includes/js/wp-pointersuffix.js",
+                   To_List ("jquery-ui-core"), False, 1);
+
       Scripts.Set_Translations ("wp-pointer");
 
-      Scripts.Add ("autosave", "/wp-includes/js/autosavesuffix.js", To_List ("heartbeat"), False, 1);
+      Scripts.Add ("autosave", "/wp-includes/js/autosavesuffix.js",
+                   To_List ("heartbeat"), False, 1);
 
-      Scripts.Add ("heartbeat", "/wp-includes/js/heartbeatsuffix.js", To_List (List => (+"jquery", +"wp-hooks")), False, 1);
+      Scripts.Add ("heartbeat", "/wp-includes/js/heartbeatsuffix.js",
+                   To_List (List => (+"jquery", +"wp-hooks")), False, 1);
+
       if Did_Action ("init") then
          Scripts.Localize (
-                "heartbeat",
-                "heartbeatSettings",
-                --
-                -- Filters the Heartbeat settings.
-                --
-                -- @since 3.6.0
-                --
-                -- @param array settings Heartbeat settings array.
-                --
-                Apply_Filters ("heartbeat_settings", Empty_Array)
+           "heartbeat",
+           "heartbeatSettings",
+           --
+           -- Filters the Heartbeat settings.
+           --
+           -- @since 3.6.0
+           --
+           -- @param array settings Heartbeat settings array.
+           --
+           Apply_Filters ("heartbeat_settings", Empty_Array)
          );
       end if;
 
-      Scripts.Add ("wp-auth-check", "/wp-includes/js/wp-auth-checksuffix.js", To_List ("heartbeat"), False, 1);
+      Scripts.Add ("wp-auth-check", "/wp-includes/js/wp-auth-checksuffix.js",
+                   To_List ("heartbeat"), False, 1);
+
       Scripts.Set_Translations ("wp-auth-check");
 
-      Scripts.Add ("wp-lists", "/wp-includes/js/wp-listssuffix.js", To_List (List => (+"wp-ajax-response", +"jquery-color")), False, 1);
+      Scripts.Add ("wp-lists", "/wp-includes/js/wp-listssuffix.js",
+                   To_List (List => (+"wp-ajax-response", +"jquery-color")), False, 1);
 
-      -- WordPress no longer uses or bundles Prototype or script.aculo.us. These are now pulled from an external source.
+      -- WordPress no longer uses or bundles Prototype or script.aculo.us. These
+      -- are now pulled from an external source.
       Scripts.Add ("prototype", "https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js", Empty_List, "1.7.1");
-      Scripts.Add ("scriptaculous-root", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js", To_List ("prototype"), "1.9.0");
-      Scripts.Add ("scriptaculous-builder", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js", To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous-dragdrop", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js", To_List (List => (+"scriptaculous-builder", +"scriptaculous-effects")), "1.9.0");
-      Scripts.Add ("scriptaculous-effects", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js", To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous-slider", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js", To_List ("scriptaculous-effects"), "1.9.0");
-      Scripts.Add ("scriptaculous-sound", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js", To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous-controls", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js", To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous", False, To_List (List => (+"scriptaculous-dragdrop", +"scriptaculous-slider", +"scriptaculous-controls")));
+      Scripts.Add ("scriptaculous-root", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js",
+                   To_List ("prototype"), "1.9.0");
+      Scripts.Add ("scriptaculous-builder", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js",
+                   To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous-dragdrop", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js",
+                   To_List (List => (+"scriptaculous-builder", +"scriptaculous-effects")), "1.9.0");
+      Scripts.Add ("scriptaculous-effects", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js",
+                   To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous-slider", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js",
+                   To_List ("scriptaculous-effects"), "1.9.0");
+      Scripts.Add ("scriptaculous-sound", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js",
+                   To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous-controls", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js",
+                   To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add ("scriptaculous", False,
+                   To_List (List => (+"scriptaculous-dragdrop", +"scriptaculous-slider", +"scriptaculous-controls")));
 
       -- Not used in core, replaced by Jcrop.js.
-      Scripts.Add ("cropper", "/wp-includes/js/crop/cropper.js", To_List ("scriptaculous-dragdrop"));
+      Scripts.Add ("cropper", "/wp-includes/js/crop/cropper.js",
+                   To_List ("scriptaculous-dragdrop"));
 
       -- jQuery.
       -- The unminified jquery.js and jquery-migrate.js are included to facilitate debugging.
@@ -1073,16 +1101,16 @@ is
       -- Strings for "jquery-ui-autocomplete" live region messages.
       if Did_Action ("init") then
          Scripts.Localize (
-                "jquery-ui-autocomplete",
-                "uiAutocompleteL10n",
-                To_Array ((
-                        Build ("noResults",    abs "No results found."),
-                        -- translators: Number of results found when using jQuery UI Autocomplete.
-                        Build ("oneResult",    abs "1 result found. Use up and down arrow keys to navigate."),
-                        -- translators: %d: Number of results found when using jQuery UI Autocomplete.
-                        Build ("manyResults",  abs "%d results found. Use up and down arrow keys to navigate."),
-                        Build ("itemSelected", abs "Item selected.")
-                ))
+           "jquery-ui-autocomplete",
+           "uiAutocompleteL10n",
+           To_Array ((
+             Build ("noResults",    abs "No results found."),
+             -- translators: Number of results found when using jQuery UI Autocomplete.
+             Build ("oneResult",    abs "1 result found. Use up and down arrow keys to navigate."),
+             -- translators: %d: Number of results found when using jQuery UI Autocomplete.
+             Build ("manyResults",  abs "%d results found. Use up and down arrow keys to navigate."),
+             Build ("itemSelected", abs "Item selected.")
+           ))
          );
       end if;
 
@@ -1110,17 +1138,17 @@ is
       Scripts.Add ("thickbox", "/wp-includes/js/thickbox/thickbox.js", To_List ("jquery"), "3.1-20121105", 1);
       if Did_Action ("init") then
          Scripts.Localize (
-                "thickbox",
-                "thickboxL10n",
-                To_Array ((
-                        Build ("next",             abs "Next &gt;"),
-                        Build ("prev",             abs "&lt; Prev"),
-                        Build ("image",            abs "Image"),
-                        Build ("of",               abs "of"),
-                        Build ("close",            abs "Close"),
-                        Build ("noiframes",        abs "This feature requires inline frames. You have iframes disabled or your browser does not support them."),
-                        Build ("loadingAnimation", Includes_URL ("js/thickbox/loadingAnimation.gif"))
-                ))
+           "thickbox",
+           "thickboxL10n",
+           To_Array ((
+             Build ("next",             abs "Next &gt;"),
+             Build ("prev",             abs "&lt; Prev"),
+             Build ("image",            abs "Image"),
+             Build ("of",               abs "of"),
+             Build ("close",            abs "Close"),
+             Build ("noiframes",        abs "This feature requires inline frames. You have iframes disabled or your browser does not support them."),
+             Build ("loadingAnimation", Includes_URL ("js/thickbox/loadingAnimation.gif"))
+           ))
          );
       end if;
 
@@ -1132,40 +1160,41 @@ is
       -- Error messages for Plupload.
       declare
          Uploader_L10n : constant Array_Type := To_Array ((
-                Build ("queue_limit_exceeded",      abs "You have attempted to queue too many files."),
-                -- translators: %s: File name.
-                Build ("file_exceeds_size_limit",   abs "%s exceeds the maximum upload size for this site."),
-                Build ("zero_byte_file",            abs "This file is empty. Please try another."),
-                Build ("invalid_filetype",          abs "Sorry, you are not allowed to upload this file type."),
-                Build ("not_an_image",              abs "This file is not an image. Please try another."),
-                Build ("image_memory_exceeded",     abs "Memory exceeded. Please try another smaller file."),
-                Build ("image_dimensions_exceeded", abs "This is larger than the maximum size. Please try another."),
-                Build ("default_error",             abs "An error occurred in the upload. Please try again later."),
-                Build ("missing_upload_url",        abs "There was a configuration error. Please contact the server administrator."),
-                Build ("upload_limit_exceeded",     abs "You may only upload 1 file."),
-                Build ("http_error",                abs "Unexpected response from the server. The file may have been uploaded successfully. Check in the Media Library or reload the page."),
-                Build ("http_error_image",          abs "The server cannot process the image. This can happen if the server is busy or does not have enough resources to complete the task. Uploading a smaller image may help. Suggested maximum size is 2560 pixels."),
-                Build ("upload_failed",             abs "Upload failed."),
-                -- translators: 1: Opening link tag, 2: Closing link tag.
-                Build ("big_upload_failed",         abs "Please try uploading this file with the %1sbrowser uploader%2s."),
-                -- translators: %s: File name.
-                Build ("big_upload_queued",         abs "%s exceeds the maximum upload size for the multi-file uploader when used in your browser."),
-                Build ("io_error",                  abs "IO error."),
-                Build ("security_error",            abs "Security error."),
-                Build ("file_cancelled",            abs "File canceled."),
-                Build ("upload_stopped",            abs "Upload stopped."),
-                Build ("dismiss",                   abs "Dismiss"),
-                Build ("crunching",                 abs "Crunching&hellip;"),
-                Build ("deleted",                   abs "moved to the Trash."),
-                -- translators: %s: File name.
-                Build ("error_uploading",           abs "&#8220;%s&#8221; has failed to upload."),
-                Build ("unsupported_image",         abs "This image cannot be displayed in a web browser. For best results convert it to JPEG before uploading."),
-                Build ("noneditable_image",         abs "This image cannot be processed by the web server. Convert it to JPEG or PNG before uploading."),
-                Build ("file_url_copied",           abs "The file URL has been copied to your clipboard")
+           Build ("queue_limit_exceeded",      abs "You have attempted to queue too many files."),
+           -- translators: %s: File name.
+           Build ("file_exceeds_size_limit",   abs "%s exceeds the maximum upload size for this site."),
+           Build ("zero_byte_file",            abs "This file is empty. Please try another."),
+           Build ("invalid_filetype",          abs "Sorry, you are not allowed to upload this file type."),
+           Build ("not_an_image",              abs "This file is not an image. Please try another."),
+           Build ("image_memory_exceeded",     abs "Memory exceeded. Please try another smaller file."),
+           Build ("image_dimensions_exceeded", abs "This is larger than the maximum size. Please try another."),
+           Build ("default_error",             abs "An error occurred in the upload. Please try again later."),
+           Build ("missing_upload_url",        abs "There was a configuration error. Please contact the server administrator."),
+           Build ("upload_limit_exceeded",     abs "You may only upload 1 file."),
+           Build ("http_error",                abs "Unexpected response from the server. The file may have been uploaded successfully. Check in the Media Library or reload the page."),
+           Build ("http_error_image",          abs "The server cannot process the image. This can happen if the server is busy or does not have enough resources to complete the task. Uploading a smaller image may help. Suggested maximum size is 2560 pixels."),
+           Build ("upload_failed",             abs "Upload failed."),
+           -- translators: 1: Opening link tag, 2: Closing link tag.
+           Build ("big_upload_failed",         abs "Please try uploading this file with the %1sbrowser uploader%2s."),
+           -- translators: %s: File name.
+           Build ("big_upload_queued",         abs "%s exceeds the maximum upload size for the multi-file uploader when used in your browser."),
+           Build ("io_error",                  abs "IO error."),
+           Build ("security_error",            abs "Security error."),
+           Build ("file_cancelled",            abs "File canceled."),
+           Build ("upload_stopped",            abs "Upload stopped."),
+           Build ("dismiss",                   abs "Dismiss"),
+           Build ("crunching",                 abs "Crunching&hellip;"),
+           Build ("deleted",                   abs "moved to the Trash."),
+           -- translators: %s: File name.
+           Build ("error_uploading",           abs "&#8220;%s&#8221; has failed to upload."),
+           Build ("unsupported_image",         abs "This image cannot be displayed in a web browser. For best results convert it to JPEG before uploading."),
+           Build ("noneditable_image",         abs "This image cannot be processed by the web server. Convert it to JPEG or PNG before uploading."),
+           Build ("file_url_copied",           abs "The file URL has been copied to your clipboard")
          ));
       begin
          Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", Empty_List, "1.3.5");
          Scripts.Add ("plupload", "/wp-includes/js/plupload/pluploadsuffix.js", To_List ("moxiejs"), "2.1.9");
+
          -- Back compat handles:
          for Handle of To_List (List => (+"all", +"html5", +"flash", +"silverlight", +"html4")) loop
             Scripts.Add ("plupload-" & (-Handle), False, To_List ("plupload"), "2.1.1");
@@ -1173,11 +1202,13 @@ is
 
          Scripts.Add ("plupload-handlers", "/wp-includes/js/plupload/handlerssuffix.js",
                       To_List (List => (+"clipboard", +"jquery", +"plupload", +"underscore", +"wp-a11y", +"wp-i18n")));
+
          if Did_Action ("init") then
             Scripts.Localize ("plupload-handlers", "pluploadL10n", Uploader_L10n);
          end if;
 
          Scripts.Add ("wp-plupload", "/wp-includes/js/plupload/wp-pluploadsuffix.js", To_List (List => (+"plupload", +"jquery", +"json2", +"media-models")), False, 1);
+
          if Did_Action ("init") then
             Scripts.Localize ("wp-plupload", "pluploadL10n", Uploader_L10n);
          end if;
@@ -1348,23 +1379,23 @@ is
 
       declare
          Mejs_Settings : constant Array_Type := To_Array ((
-                Build ("pluginPath",  Includes_URL ("js/mediaelement/", "relative")),
-                Build ("classPrefix", "mejs-"),
-                Build ("stretching",  "responsive")
+           Build ("pluginPath",  Includes_URL ("js/mediaelement/", "relative")),
+           Build ("classPrefix", "mejs-"),
+           Build ("stretching",  "responsive")
          ));
       begin
          if Did_Action ("init") then
             Scripts.Localize (
-                "mediaelement",
-                "_wpmejsSettings",
-                --
-                -- Filters the MediaElement configuration settings.
-                --
-                -- @since 4.4.0
-                --
-                -- @param array mejs_settings MediaElement settings array.
-                --
-                Apply_Filters ("mejs_settings", Mejs_Settings)
+              "mediaelement",
+              "_wpmejsSettings",
+              --
+              -- Filters the MediaElement configuration settings.
+              --
+              -- @since 4.4.0
+              --
+              -- @param array mejs_settings MediaElement settings array.
+              --
+              Apply_Filters ("mejs_settings", Mejs_Settings)
             );
          end if;
       end;
@@ -1386,29 +1417,29 @@ is
       Scripts.Add ("zxcvbn-async", "/wp-includes/js/zxcvbn-asyncsuffix.js", Empty_List, "1.0");
       if Did_Action ("init") then
          Scripts.Localize (
-                "zxcvbn-async",
-                "_zxcvbnSettings",
-                To_Array ((1 =>
-                        Build ("src", (if not Guessed_URL
-                                       then Includes_URL ("/js/zxcvbn.min.js")
-                                       else -Scripts.Base_URL & "/wp-includes/js/zxcvbn.min.js"))
-                ))
+           "zxcvbn-async",
+           "_zxcvbnSettings",
+           To_Array ((1 =>
+             Build ("src", (if not Guessed_URL
+                            then Includes_URL ("/js/zxcvbn.min.js")
+                            else -Scripts.Base_URL & "/wp-includes/js/zxcvbn.min.js"))
+           ))
          );
       end if;
 
       Scripts.Add ("password-strength-meter", "/wp-admin/js/password-strength-metersuffix.js", To_List (List => (+"jquery", +"zxcvbn-async")), False, 1);
       if Did_Action ("init") then
          Scripts.Localize (
-                "password-strength-meter",
-                "pwsL10n",
-                To_Array ((
-                        Build ("unknown",  X_X ("Password strength unknown", "password strength")),
-                        Build ("short",    X_X ("Very weak", "password strength")),
-                        Build ("bad",      X_X ("Weak", "password strength")),
-                        Build ("good",     X_X ("Medium", "password strength")),
-                        Build ("strong",   X_X ("Strong", "password strength")),
-                        Build ("mismatch", X_X ("Mismatch", "password mismatch"))
-                ))
+           "password-strength-meter",
+           "pwsL10n",
+           To_Array ((
+             Build ("unknown",  X_X ("Password strength unknown", "password strength")),
+             Build ("short",    X_X ("Very weak", "password strength")),
+             Build ("bad",      X_X ("Weak", "password strength")),
+             Build ("good",     X_X ("Medium", "password strength")),
+             Build ("strong",   X_X ("Strong", "password strength")),
+             Build ("mismatch", X_X ("Mismatch", "password mismatch"))
+           ))
          );
       end if;
 
@@ -1425,17 +1456,18 @@ is
 
       declare
          User_Id : constant Integer :=
-           (if Isset (XX_GET, "user_id") then As_Integer (Get (XX_GET, "user_id")) else 0);
+           (if Isset (XX_GET, "user_id")
+            then As_Integer (Get (XX_GET, "user_id")) else 0);
       begin
          if Did_Action ("init") then
             Scripts.Localize (
-                "user-profile",
-                "userProfileL10n",
-                To_Array ((
-                        Build ("user_id", User_Id),
-                        Build ("nonce",   (if Wp_Installing then ""
-                                           else Inc_Pluggables.Wp_Create_Nonce ("reset-password-for-" & User_Id'Image)))
-                ))
+              "user-profile",
+              "userProfileL10n",
+              To_Array ((
+                Build ("user_id", User_Id),
+                Build ("nonce",   (if Wp_Installing then ""
+                                   else Inc_Pluggables.Wp_Create_Nonce ("reset-password-for-" & User_Id'Image)))
+              ))
             );
          end if;
       end;
@@ -1449,19 +1481,19 @@ is
       Scripts.Add ("wplink", "/wp-includes/js/wplinksuffix.js", To_List (List => (+"jquery", +"wp-a11y")), False, 1);
       if Did_Action ("init") then
          Scripts.Localize (
-                "wplink",
-                "wpLinkL10n",
-                To_Array ((
-                        Build ("title",          abs "Insert/edit link"),
-                        Build ("update",         abs "Update"),
-                        Build ("save",           abs "Add Link"),
-                        Build ("noTitle",        abs "(no title)"),
-                        Build ("noMatchesFound", abs "No results found."),
-                        Build ("linkSelected",   abs "Link selected."),
-                        Build ("linkInserted",   abs "Link inserted."),
-                        -- translators: Minimum input length in characters to start searching posts in the "Insert/edit link" modal.
-                        Build ("minInputLength", Integer'Value (X_X ("3", "minimum input length for searching post links")))
-                ))
+           "wplink",
+           "wpLinkL10n",
+           To_Array ((
+             Build ("title",          abs "Insert/edit link"),
+             Build ("update",         abs "Update"),
+             Build ("save",           abs "Add Link"),
+             Build ("noTitle",        abs "(no title)"),
+             Build ("noMatchesFound", abs "No results found."),
+             Build ("linkSelected",   abs "Link selected."),
+             Build ("linkInserted",   abs "Link inserted."),
+             -- translators: Minimum input length in characters to start searching posts in the "Insert/edit link" modal.
+             Build ("minInputLength", Integer'Value (X_X ("3", "minimum input length for searching post links")))
+           ))
          );
       end if;
 
@@ -1484,87 +1516,90 @@ is
       Scripts.Add ("customize-controls", "/wp-admin/js/customize-controlssuffix.js", To_List (List => (+"customize-base", +"wp-a11y", +"wp-util", +"jquery-ui-core")), False, 1);
       if Did_Action ("init") then
          Scripts.Localize (
-                "customize-controls",
-                "_wpCustomizeControlsL10n",
-                To_Array ((
-                        Build ("activate",                abs "Activate &amp; Publish"),
-                        Build ("save",                    abs "Save &amp; Publish"), -- @todo Remove as not required.
-                        Build ("publish",                 abs "Publish"),
-                        Build ("published",               abs "Published"),
-                        Build ("saveDraft",               abs "Save Draft"),
-                        Build ("draftSaved",              abs "Draft Saved"),
-                        Build ("updating",                abs "Updating"),
-                        Build ("schedule",                X_X ("Schedule", "customizer changeset action/button label")),
-                        Build ("scheduled",               X_X ("Scheduled", "customizer changeset status")),
-                        Build ("invalid",                 abs "Invalid"),
-                        Build ("saveBeforeShare",         abs "Please save your changes in order to share the preview."),
-                        Build ("futureDateError",         abs "You must supply a future date to schedule."),
-                        Build ("saveAlert",               abs "The changes you made will be lost if you navigate away from this page."),
-                        Build ("saved",                   abs "Saved"),
-                        Build ("cancel",                  abs "Cancel"),
-                        Build ("close",                   abs "Close"),
-                        Build ("action",                  abs "Action"),
-                        Build ("discardChanges",          abs "Discard changes"),
-                        Build ("cheatin",                 abs "Something went wrong."),
-                        Build ("notAllowedHeading",       abs "You need a higher level of permission."),
-                        Build ("notAllowed",              abs "Sorry, you are not allowed to customize this site."),
-                        Build ("previewIframeTitle",      abs "Site Preview"),
-                        Build ("loginIframeTitle",        abs "Session expired"),
-                        Build ("collapseSidebar",         X_X ("Hide Controls", "label for hide controls button without length constraints")),
-                        Build ("expandSidebar",           X_X ("Show Controls", "label for hide controls button without length constraints")),
-                        Build ("untitledBlogName",        abs "(Untitled)"),
-                        Build ("unknownRequestFail",      abs "Looks like something&#8217;s gone wrong. Wait a couple seconds, and then try again."),
-                        Build ("themeDownloading",        abs "Downloading your new theme&hellip;"),
-                        Build ("themePreviewWait",        abs "Setting up your live preview. This may take a bit."),
-                        Build ("revertingChanges",        abs "Reverting unpublished changes&hellip;"),
-                        Build ("trashConfirm",            abs "Are you sure you want to discard your unpublished changes?"),
-                        -- translators: %s: Display name of the user who has taken over the changeset in customizer.
-                        Build ("takenOverMessage",        abs "%s has taken over and is currently customizing."),
-                        -- translators: %s: URL to the Customizer to load the autosaved version.
-                        Build ("autosaveNotice",          abs "There is a more recent autosave of your changes than the one you are previewing. <a href=""%s"">Restore the autosave</a>"),
-                        Build ("videoHeaderNotice",       abs "This theme does not support video headers on this page. Navigate to the front page or another page that supports video headers."),
-                        -- Used for overriding the file types allowed in Plupload.
-                        Build ("allowedFiles",            abs "Allowed Files"),
-                        Build ("customCssError",          To_Array ((
-                                -- translators: %d: Error count.
-                                Build ("singular", X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 1)),
-                                -- translators: %d: Error count.
-                                Build ("plural",   X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 2))
-                                -- @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
-                       ))),
-                        Build ("pageOnFrontError",        abs "Homepage and posts page must be different."),
-                        Build ("saveBlockedError",        To_Array ((
-                                -- translators: %s: Number of invalid settings.
-                                Build ("singular", X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 1)),
-                                -- translators: %s: Number of invalid settings.
-                                Build ("plural",   X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 2))
-                                -- @todo This is lacking, as some languages have a dedicated dual form. For proper handling of plurals in JS, see #20491.
-                        ))),
-                        Build ("scheduleDescription",     abs "Schedule your customization changes to publish ('go live') at a future date."),
-                        Build ("themePreviewUnavailable", abs "Sorry, you cannot preview new themes when you have changes scheduled or saved as a draft. Please publish your changes, or wait until they publish to preview new themes."),
-                        Build ("themeInstallUnavailable", Php.Strings.Sprintf (
-                                -- translators: %s: URL to Add Themes admin screen.
-                                abs "You will not be able to install new themes from here yet since your install requires SFTP credentials. For now, please <a href=""%s"">add themes in the admin</a>.",
-                                To_List (ESC_URL (Admin_URL ("theme-install.php"))))
-                        ),
-                        Build ("publishSettings",         abs "Publish Settings"),
-                        Build ("invalidDate",             abs "Invalid date."),
-                        Build ("invalidValue",            abs "Invalid value."),
-                        Build ("blockThemeNotification",
-                          Php.Strings.Sprintf (
-                            -- translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
-                            abs "Hurray! Your theme supports site editing with blocks. <a href=""%1s"">Tell me more</a>. %2s",
-                            To_List (List => (
-                              1 => +abs "https://wordpress.org/support/article/site-editor/",
-                              2 => +Php.Strings.Sprintf (
-                                        "<button type=""button"" data-action=""%1s"" class=""button switch-to-editor"">%2s</button>",
-                                      To_List (List => (
-                                          1 => +ESC_URL (Admin_URL ("site-editor.php")),
-                                          2 => +abs "Use Site Editor"
-                                      ))
-                                   )
-                            ))
-                       ))
+           "customize-controls",
+           "_wpCustomizeControlsL10n",
+           To_Array ((
+             Build ("activate",                abs "Activate &amp; Publish"),
+             Build ("save",                    abs "Save &amp; Publish"),
+             -- @todo Remove as not required.
+             Build ("publish",                 abs "Publish"),
+             Build ("published",               abs "Published"),
+             Build ("saveDraft",               abs "Save Draft"),
+             Build ("draftSaved",              abs "Draft Saved"),
+             Build ("updating",                abs "Updating"),
+             Build ("schedule",                X_X ("Schedule", "customizer changeset action/button label")),
+             Build ("scheduled",               X_X ("Scheduled", "customizer changeset status")),
+             Build ("invalid",                 abs "Invalid"),
+             Build ("saveBeforeShare",         abs "Please save your changes in order to share the preview."),
+             Build ("futureDateError",         abs "You must supply a future date to schedule."),
+             Build ("saveAlert",               abs "The changes you made will be lost if you navigate away from this page."),
+             Build ("saved",                   abs "Saved"),
+             Build ("cancel",                  abs "Cancel"),
+             Build ("close",                   abs "Close"),
+             Build ("action",                  abs "Action"),
+             Build ("discardChanges",          abs "Discard changes"),
+             Build ("cheatin",                 abs "Something went wrong."),
+             Build ("notAllowedHeading",       abs "You need a higher level of permission."),
+             Build ("notAllowed",              abs "Sorry, you are not allowed to customize this site."),
+             Build ("previewIframeTitle",      abs "Site Preview"),
+             Build ("loginIframeTitle",        abs "Session expired"),
+             Build ("collapseSidebar",         X_X ("Hide Controls", "label for hide controls button without length constraints")),
+             Build ("expandSidebar",           X_X ("Show Controls", "label for hide controls button without length constraints")),
+             Build ("untitledBlogName",        abs "(Untitled)"),
+             Build ("unknownRequestFail",      abs "Looks like something&#8217;s gone wrong. Wait a couple seconds, and then try again."),
+             Build ("themeDownloading",        abs "Downloading your new theme&hellip;"),
+             Build ("themePreviewWait",        abs "Setting up your live preview. This may take a bit."),
+             Build ("revertingChanges",        abs "Reverting unpublished changes&hellip;"),
+             Build ("trashConfirm",            abs "Are you sure you want to discard your unpublished changes?"),
+             -- translators: %s: Display name of the user who has taken over the changeset in customizer.
+             Build ("takenOverMessage",        abs "%s has taken over and is currently customizing."),
+             -- translators: %s: URL to the Customizer to load the autosaved version.
+             Build ("autosaveNotice",          abs "There is a more recent autosave of your changes than the one you are previewing. <a href=""%s"">Restore the autosave</a>"),
+             Build ("videoHeaderNotice",       abs "This theme does not support video headers on this page. Navigate to the front page or another page that supports video headers."),
+             -- Used for overriding the file types allowed in Plupload.
+             Build ("allowedFiles",            abs "Allowed Files"),
+             Build ("customCssError",          To_Array ((
+               -- translators: %d: Error count.
+               Build ("singular", X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 1)),
+               -- translators: %d: Error count.
+               Build ("plural",   X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 2))
+               -- @todo This is lacking, as some languages have a dedicated dual
+               -- form. For proper handling of plurals in JS, see #20491.
+             ))),
+             Build ("pageOnFrontError",        abs "Homepage and posts page must be different."),
+             Build ("saveBlockedError",        To_Array ((
+                -- translators: %s: Number of invalid settings.
+                Build ("singular", X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 1)),
+                -- translators: %s: Number of invalid settings.
+                Build ("plural",   X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 2))
+                -- @todo This is lacking, as some languages have a dedicated dual
+                -- form. For proper handling of plurals in JS, see #20491.
+              ))),
+              Build ("scheduleDescription",     abs "Schedule your customization changes to publish ('go live') at a future date."),
+              Build ("themePreviewUnavailable", abs "Sorry, you cannot preview new themes when you have changes scheduled or saved as a draft. Please publish your changes, or wait until they publish to preview new themes."),
+              Build ("themeInstallUnavailable", Php.Strings.Sprintf (
+                -- translators: %s: URL to Add Themes admin screen.
+                abs "You will not be able to install new themes from here yet since your install requires SFTP credentials. For now, please <a href=""%s"">add themes in the admin</a>.",
+                To_List (ESC_URL (Admin_URL ("theme-install.php"))))
+              ),
+              Build ("publishSettings",         abs "Publish Settings"),
+              Build ("invalidDate",             abs "Invalid date."),
+              Build ("invalidValue",            abs "Invalid value."),
+              Build ("blockThemeNotification",
+                Php.Strings.Sprintf (
+                  -- translators: 1: Link to Site Editor documentation on HelpHub, 2: HTML button.--
+                  abs "Hurray! Your theme supports site editing with blocks. <a href=""%1s"">Tell me more</a>. %2s",
+                  To_List (List => (
+                    1 => +abs "https://wordpress.org/support/article/site-editor/",
+                    2 => +Php.Strings.Sprintf (
+                      "<button type=""button"" data-action=""%1s"" class=""button switch-to-editor"">%2s</button>",
+                      To_List (List => (
+                        1 => +ESC_URL (Admin_URL ("site-editor.php")),
+                        2 => +abs "Use Site Editor"
+                      ))
+                    )
+                  ))
+                ))
                 ))
          );
       end if;
@@ -1687,13 +1722,14 @@ is
 
          Scripts.Add ("updates", "/wp-admin/js/updatessuffix.js", To_List (List => (+"common", +"jquery", +"wp-util", +"wp-a11y", +"wp-sanitize", +"wp-i18n")), False, 1);
          Scripts.Set_Translations ("updates");
+
          if Did_Action ("init") then
             Scripts.Localize (
-                        "updates",
-                        "_wpUpdatesSettings",
-                        To_Array ((1 =>
-                                Build ("ajax_nonce", (if Wp_Installing then "" else Inc_Pluggables.Wp_Create_Nonce ("updates")))
-                        ))
+              "updates",
+              "_wpUpdatesSettings",
+              To_Array ((1 =>
+                Build ("ajax_nonce", (if Wp_Installing then "" else Inc_Pluggables.Wp_Create_Nonce ("updates")))
+              ))
             );
          end if;
 
@@ -1733,7 +1769,7 @@ is
       end if;
    end Wp_Default_Scripts;
 
-   Editor_Styles : Array_Type;
+   Global_Editor_Styles : Array_Type;
 
    -----------------------
    -- Wp_Default_Styles --
@@ -1748,11 +1784,12 @@ is
       use Inc_Link_Templates;
 
 --         global editor_styles;
-      GuessURL           : UString;
+      Guess_URL : constant String :=
+        (if Site_URL = ""
+         then Wp_Guess_URL
+         else Site_URL);
+
       Open_Sans_Font_URL : UString;
-      Fonts_URL          : UString;
-      Font_Family        : UString;
---    Suffix             : UString;
    begin
       -- -- Include an unmodified wp_version.
       -- require ABSPATH . WPINC . "/version.php";
@@ -1761,13 +1798,7 @@ is
       --         define( "SCRIPT_DEBUG", False !== strpos( wp_version, "-src" ));
       -- end;
 
-      GuessURL := +Site_URL; -- ();
-
-      if GuessURL = "" then
-         GuessURL := +Wp_Guess_URL; -- ();
-      end if;
-
-      Styles.Base_URL        := GuessURL;
+      Styles.Base_URL        := +Guess_URL;
       Styles.Content_URL     := Globals.WP_CONTENT_URL; --  ) ? WP_CONTENT_URL : "";
       Styles.Default_Version := +Get_Bloginfo ("version");
       Styles.Text_Direction  := +(if Is_RTL then "rtl" else "ltr");
@@ -1786,27 +1817,29 @@ is
       --
       if "off" /= X_X ("on", "Open Sans font: on or off") then
          declare
-            Subsets : UString := +"latin,latin-ext";
-            Subset  : UString;
-         begin
             --
             -- translators: To add an additional Open Sans character subset specific
             -- to your language, translate this to "greek", "cyrillic" or
             -- "vietnamese". Do not translate into your own language.
             --
-            Subset := +X_X ("no-subset",
-               "Open Sans font: add new subset (greek, cyrillic, vietnamese)");
+            Subset : constant String :=
+               X_X ("no-subset",
+                    "Open Sans font: add new subset (greek, cyrillic, vietnamese)");
 
-            if "cyrillic" = Subset then
-               Append (Subsets, ",cyrillic,cyrillic-ext");
-            elsif "greek" = Subset then
-               Append (Subsets, ",greek,greek-ext");
-            elsif "vietnamese" = Subset then
-               Append (Subsets, ",vietnamese");
-            end if;
-
+            Subsets : constant String :=
+              (if "cyrillic" = Subset
+                 then "latin,latin-ext,cyrillic,cyrillic-ext"
+               elsif "greek" = Subset
+                 then "latin,latin-ext,greek,greek-ext"
+               elsif "vietnamese" = Subset
+                 then "latin,latin-ext,vietnamese"
+               else   "latin,latin-ext");
+         begin
             -- Hotlink Open Sans, for now.
-            Open_Sans_Font_URL := +"https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,300,400,600&subset=" & (-Subsets) & "&display=fallback";
+            Open_Sans_Font_URL :=
+              +"https://fonts.googleapis.com/css?" &
+              "family=Open+Sans:300italic,400italic,600italic,300,400,600&" &
+              "subset=" & Subsets & "&display=fallback";
          end;
       end if;
 
@@ -1921,20 +1954,24 @@ is
 
          -- Noto Serif is no longer used by core, but may be relied upon by themes
          -- and plugins.
-         Fonts_URL := +"";
+         declare
+            --
+            -- translators: Use this to specify the proper Google Font name and
+            -- variants to load that is supported by your language. Do not translate.
+            -- Set to "off" to disable loading.
+            --
+            Font_Family : constant String :=
+              X_X ("Noto Serif:400,400i,700,700i",
+                   "Google Font Name and Variants");
 
-         --
-         -- translators: Use this to specify the proper Google Font name and variants
-         -- to load that is supported by your language. Do not translate.
-         -- Set to "off" to disable loading.
-         --
-         Font_Family := +X_X ("Noto Serif:400,400i,700,700i",
-                              "Google Font Name and Variants");
-         if "off" /= Font_Family then
-            Fonts_URL := +"https://fonts.googleapis.com/css?family=" &
-                          Php.HTML.URL_Encode (-Font_Family);
-         end if;
-         Styles.Add ("wp-editor-font", -Fonts_URL);
+            Fonts_URL : constant String :=
+              (if "off" /= Font_Family
+               then "https://fonts.googleapis.com/css?family=" &
+                             Php.HTML.URL_Encode (Font_Family)
+               else "");
+         begin
+            Styles.Add ("wp-editor-font", Fonts_URL);
+         end;
          -- No longer used in core as of 5.7.
 
          declare
@@ -1979,8 +2016,8 @@ is
             end if;
 
             if
-              not Php.Types.Is_Array (Editor_Styles) or else
-              Arrays.Count (Editor_Styles) = 0
+              not Php.Types.Is_Array (Global_Editor_Styles) or else
+              Arrays.Count (Global_Editor_Styles) = 0
             then
                -- Include opinionated block styles if no editor_styles are declared,
                -- so the editor never appears broken.
@@ -2130,6 +2167,16 @@ is
             end loop;
          end;
       end;
+   end Wp_Default_Styles;
+
+   -----------------------
+   -- Wp_Default_Styles --
+   -----------------------
+
+   procedure Wp_Default_Styles
+   is
+   begin
+      Wp_Default_Styles (Adm_Load_Styles.Styles);
    end Wp_Default_Styles;
 
 -- --

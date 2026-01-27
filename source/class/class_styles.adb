@@ -14,23 +14,25 @@ with Inc_Plugins;
 package body Class_Styles
 is
 
-   --
-   -- Constructor.
-   --
-   -- @since 2.6.0
-   --
+   -----------------
+   -- X_Construct --
+   -----------------
+
    function X_Construct
       return Wp_Styles
    is
       use UStrings;
+      use Inc_Load;
+      use Inc_Themes;
+      use Inc_Plugins;
 
       This : Wp_Styles;
    begin
       if
 --      function_exists( "is_admin" ) and then
-        not Inc_Load.Is_Admin and then
+        not Is_Admin and then
 --      function_exists( "current_theme_supports" ) and then
-        not Inc_Themes.Current_Theme_Supports ("html5", "style")
+        not Current_Theme_Supports ("html5", "style")
       then
          This.Type_Attr := +" type=""text/css""";
       end if;
@@ -42,7 +44,7 @@ is
       --
       -- @param WP_Styles wp_styles WP_Styles instance (passed by reference).
       --
-      Inc_Plugins.Do_Action_Ref_Array ("wp_default_styles", This);
+      Do_Action_Ref_Array ("wp_default_styles", This);
       return This;
    end X_Construct;
 

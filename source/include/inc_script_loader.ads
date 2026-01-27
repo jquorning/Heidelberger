@@ -69,6 +69,11 @@ is
    procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles);
 
    --
+   -- Added by jq
+   --
+   procedure Wp_Default_Styles;
+
+   --
    -- Prints scripts (internal use only)
    --
    -- @ignore

@@ -724,8 +724,8 @@ is
 --    Add_Action ("wp_body_open", Wp_Global_Styles_Render_Svg_Filters'Access);
 --    Add_Action ("in_admin_header", Wp_Global_Styles_Render_Svg_Filters'Access);
 
---    Add_Action ("wp_default_styles",
---                Inc_Script_Loader.Wp_Default_Styles'Access);
+      Add_Action ("wp_default_styles",
+                  Inc_Script_Loader.Wp_Default_Styles'Access);
 --    Add_Filter ("style_loader_src",
 --                Inc_Script_Loader.Wp_Style_Loader_Src'Access, 10, 2);
 

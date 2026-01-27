@@ -289,7 +289,6 @@ is
                       Value  : List_Type)
                       return Boolean
    is
-      use Wp_Common;
       use Class_Dependency.Dependency_Maps;
    begin
       if This.Registered.Find (Handle) = No_Element then
@@ -371,48 +370,53 @@ is
       use Php.Lists;
       use Php.Strings;
       use UStrings;
-      use Class_Dependency;
-      use Class_Dependency.Dependency_Maps;
       use List_Vectors;
+      use Class_Dependency.Dependency_Maps;
    begin
       for Handle of Handles loop
          declare
-            Handle_2 : constant List_Type := Explode ("?", -Handle);
-            First    : constant String    := -Handle_2 (Handle_2.First_Index);
-
-            Position : List_Vectors.Cursor;
+            List  : constant List_Type := Explode ("?", -Handle);
+            First : constant String    := -List (1);
          begin
             if
               not In_List (First, This.Queue, True) and then
               Has_Element (This.Registered.Find (First))
             then
-               This.Queue.Append (+First); -- Handle_2 (Handle_2.First_Index)); -- ()
+               This.Queue.Append (+First);
 
                -- Reset all dependencies so they must be recalculated in
                -- recurse_deps().
-               This.All_Queued_Deps.Clear; --  := null;
+               This.All_Queued_Deps.Clear;
 
-               if Handle_2.Last_Index > 1 then
-                  This.Args (First) := -Handle_2 (Handle_2.First_Index + 1);
+               if List.Length in 2 then
+                  This.Args (First) := -List (2);
                end if;
 
             elsif not Has_Element (This.Registered.Find (First)) then
-               Position := This.Queued_Before_Register.Find (+First);
-
-               if Has_Element (Position) then
-                  This.Queued_Before_Register.Delete (Position);
-               end if;
-
-               if Handle_2.Last_Index > 1 then
-                  Position := This.Queued_Before_Register.Find (+First);
-
+               declare
+                  Position : List_Vectors.Cursor :=
+                    This.Queued_Before_Register.Find (+First);
+               begin
                   if Has_Element (Position) then
-                     This.Queued_Before_Register.Replace_Element
-                       (Position, New_Item => Handle_2 (Handle_2.First_Index + 1));
-                  else
-                     This.Queued_Before_Register.Append
-                       (New_Item => Handle_2 (Handle_2.First_Index + 1));
+                     This.Queued_Before_Register.Delete (Position);
                   end if;
+               end;
+
+               if List.Length in 2 then
+                  declare
+                     Position : constant List_Vectors.Cursor :=
+                       This.Queued_Before_Register.Find (+First);
+
+                     Second : constant UString := List (2);
+                  begin
+                     if Has_Element (Position) then
+                        This.Queued_Before_Register.Replace_Element
+                          (Position, New_Item => Second);
+                     else
+                        This.Queued_Before_Register.Append
+                          (New_Item => Second);
+                     end if;
+                  end;
                end if;
             end if;
          end;

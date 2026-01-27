@@ -117,6 +117,10 @@ is
       return Wp_Scripts_X.Do_Items (Handles); -- ()
    end Wp_Print_Scripts;
 
+   ----------------------
+   -- Wp_Print_Scripts --
+   ----------------------
+
    procedure Wp_Print_Scripts (Handles : List_Type := Empty_List)
    is
       Unused : constant List_Type :=

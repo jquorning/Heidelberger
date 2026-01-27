@@ -14,6 +14,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Globals;
+with Logging;
 with UStrings;
 
 with Inc_Elab_Hooks;
@@ -431,8 +432,6 @@ is
       use UStrings;
       use Count_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
-
---    global wp_filter, wp_actions, wp_current_filter;
    begin
       Put_Line ("do_action: " & Hook_Name & ": '" & Arg_2 & "' '" & Arg_3 & "'");
 
@@ -451,7 +450,6 @@ is
          declare
             All_Args : Array_Type; --            := Func_Get_Args;
          begin
-            -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
             X_Wp_Call_All_Hook (All_Args);
          end;
       end if;
@@ -487,53 +485,75 @@ is
       List_Pop (Global_Wp_Current_Filter);
    end Do_Action;
 
--- --
--- -- Calls the callback functions that have been added to an action hook, specifying arguments in an array.
--- --
--- -- @since 2.1.0
--- --
--- -- @see do_action() This function is identical, but the arguments passed to the
--- --                  functions hooked to `hook_name` are supplied using an array.
--- --
--- -- @global WP_Hook[] wp_filter         Stores all of the filters and actions.
--- -- @global int[]     wp_actions        Stores the number of times each action was triggered.
--- -- @global string[]  wp_current_filter Stores the list of current filters with the current one last.
--- --
--- -- @param string hook_name The name of the action to be executed.
--- -- @param array  args      The arguments supplied to the functions hooked to `hook_name`.
--- --
--- function do_action_ref_array( hook_name, args ) then
---         global wp_filter, wp_actions, wp_current_filter;
+   -------------------------
+   -- Do_Action_Ref_Array --
+   -------------------------
 
---         if ( ! isset( wp_actions[ hook_name ] ) ) then
---                 wp_actions[ hook_name ] = 1;
---         end; else then
---                 ++wp_actions[ hook_name ];
---         end;
+   procedure Do_Action_Ref_Array (Hook_Name : String;
+                                  Args      : Array_Type)
+   is
+      use Php.Lists;
+      use UStrings;
+      use Count_Maps;
+      use Inc_Elab_Hooks.Hook_Maps;
+   begin
+      Logging.Log ("do_action_ref_array", Hook_Name);
 
---         -- Do 'all' actions first.
---         if ( isset( wp_filter['all'] ) ) then
---                 wp_current_filter[] = hook_name;
---                 all_args            = func_get_args(); -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
---                 _wp_call_all_hook( all_args );
---         end;
+      if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
+         Global_Wp_Actions.Include (Hook_Name, 1);
+      else
+         Global_Wp_Actions.Include (Hook_Name,
+                                    Global_Wp_Actions (Hook_Name) + 1);
+      end if;
 
---         if ( ! isset( wp_filter[ hook_name ] ) ) then
---                 if ( isset( wp_filter['all'] ) ) then
---                         array_pop( wp_current_filter );
---                 end;
+      -- Do 'all' actions first.
+      if Has_Element (Global_Wp_Filter.Find ("all")) then
+         Global_Wp_Current_Filter.Append (+Hook_Name);
+         declare
+            All_Args : Array_Type; --            := Func_Get_Args;
+         begin
+            X_Wp_Call_All_Hook (All_Args);
+         end;
+      end if;
 
---                 return;
---         end;
+      if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
+         if Has_Element (Global_Wp_Filter.Find ("all")) then
+            List_Pop (Global_Wp_Current_Filter);
+         end if;
 
---         if ( ! isset( wp_filter['all'] ) ) then
---                 wp_current_filter[] = hook_name;
---         end;
+         return;
+      end if;
 
---         wp_filter[ hook_name ]->do_action( args );
+      if not Has_Element (Global_Wp_Filter.Find ("all")) then
+         Global_Wp_Current_Filter.Append (+Hook_Name);
+      end if;
 
---         array_pop( wp_current_filter );
--- end;
+      Global_Wp_Filter (Hook_Name).Do_Action (Args);
+
+      List_Pop (Global_Wp_Current_Filter);
+   end Do_Action_Ref_Array;
+
+   -------------------------
+   -- Do_Action_Ref_Array --
+   -------------------------
+
+   procedure Do_Action_Ref_Array (Hook_Name : String;
+                                  Args      : Class_Styles.Wp_Styles)
+   is
+   begin
+      Do_Action_Ref_Array (Hook_Name, Empty_Array);
+   end Do_Action_Ref_Array;
+
+   -------------------------
+   -- Do_Action_Ref_Array --
+   -------------------------
+
+   procedure Do_Action_Ref_Array (Hook_Name : String;
+                                  Args      : Class_Admin_Bar.Wp_Admin_Bar)
+   is
+   begin
+      Do_Action_Ref_Array (Hook_Name, Empty_Array);
+   end Do_Action_Ref_Array;
 
    ----------------
    -- Has_Action --

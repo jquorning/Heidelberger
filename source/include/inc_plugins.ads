@@ -89,13 +89,13 @@ is
    --                         `hook_name`.
    --
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Array_Type) is null;
+                                  Args      : Array_Type);
+
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Class_Styles.Wp_Styles)
-                                  is null;
+                                  Args      : Class_Styles.Wp_Styles);
+
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Class_Admin_Bar.Wp_Admin_Bar)
-                                  is null;
+                                  Args      : Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Gets the basename of a plugin.
