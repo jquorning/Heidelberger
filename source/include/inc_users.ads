@@ -299,8 +299,7 @@ is
    --
    function Is_User_Member_Of_Blog (User_Id : Integer := 0;
                                     Blog_Id : Integer := 0)
-                                    return Boolean
-                                    is (True);
+                                    return Boolean;
 
    --
    -- Gets the text suggesting how to create strong passwords.

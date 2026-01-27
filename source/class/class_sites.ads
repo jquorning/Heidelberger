@@ -164,6 +164,19 @@ is
 
       end record;
 
+   --
+   -- Creates a new WP_Site object.
+   --
+   -- Will populate object properties from the object provided and assign other
+   -- default properties based on that information.
+   --
+   -- @since 4.5.0
+   --
+   -- @param WP_Site|object site A site object.
+   --
+   function X_Construct (Site : Integer)
+                         return Wp_Site;
+
    Null_Site : constant Wp_Site :=
      (Blog_Id => 0,
       others  => UStrings.Null_UString);

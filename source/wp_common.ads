@@ -22,6 +22,7 @@ with Class_Taxonomy;
 with Class_Terms;
 with Class_Posts;
 with Class_Post_Type;
+with Class_Sites;
 with Class_Users;
 with Inc_Capabilities;
 with Inc_Comments;
@@ -737,6 +738,12 @@ is
                            Tax       : Array_Type)
                            return Array_Type
                            is (Value);
+
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Class_Sites.Wp_Site)
+               return Class_Sites.Wp_Site
+               is (Value);
 
    function Apply_Filters_Deprecated
               (Hook_Name : String;

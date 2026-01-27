@@ -10,11 +10,13 @@ with Php.Strings;
 
 with Binder;
 with Globals;
-with UStrings;
+with Helpers;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Inc_Caches;
+with Class_Sites;
 with Class_WpDB;
 -- with Class_Session_Tokens;
 -- with Class_Session_Tokens_Factory;
@@ -22,6 +24,7 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_L10n;
+with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
 with Inc_Plugins;
@@ -1066,71 +1069,91 @@ is
 --         return apply_filters( "get_blogs_of_user", sites, user_id, all );
 -- end;
 
--- --
--- -- Finds out whether a user is a member of a given blog.
--- --
--- -- @since MU (3.0.0)
--- --
--- -- @global wpdb wpdb WordPress database abstraction object.
--- --
--- -- @param int user_id Optional. The unique ID of the user. Defaults to the current user.
--- -- @param int blog_id Optional. ID of the blog to check. Defaults to the current site.
--- -- @return bool
--- --
--- function is_user_member_of_blog( user_id = 0, blog_id = 0 ) then
---         global wpdb;
+   ----------------------------
+   -- Is_User_Member_Of_Blog --
+   ----------------------------
 
---         user_id = (int) user_id;
---         blog_id = (int) blog_id;
+   function Is_User_Member_Of_Blog (User_Id : Integer := 0;
+                                    Blog_Id : Integer := 0)
+                                    return Boolean
+   is
+      use Php.Strings;
+      use Globals;
+      use UStrings;
+      use Class_Sites;
+      use Inc_Load;
+      use Inc_Ms_Sites;
+      -- global wpdb;
 
---         if ( empty( user_id ) ) then
---                 user_id = get_current_user_id();
---         end;
+      -- user_id = (int) user_id;
+      -- blog_id = (int) blog_id;
 
---         -- Technically not needed, but does save calls to get_site() and get_user_meta()
---         -- in the event that the function is called when a user isn"t logged in.
---         if ( empty( user_id ) ) then
---                 return false;
---         end; else then
---                 user = get_userdata( user_id );
---                 if ( ! user instanceof WP_User ) then
---                         return false;
---                 end;
---         end;
+      User_Id_2 : constant Integer :=
+        (if User_Id = 0
+         then Get_Current_User_Id
+         else User_Id);
+   begin
+      -- Technically not needed, but does save calls to get_site() and get_user_meta()
+      -- in the event that the function is called when a user isn"t logged in.
+      if User_Id_2 = 0 then
+         return False;
+      -- else
+      --     user = get_userdata( user_id );
+      --     if ( ! user instanceof WP_User ) then
+      --        return false;
+      --     end if;
+      end if;
 
---         if ( ! is_multisite() ) then
---                 return true;
---         end;
+      if not Is_Multisite then
+         return True;
+      end if;
 
---         if ( empty( blog_id ) ) then
---                 blog_id = get_current_blog_id();
---         end;
+      declare
+         Blog_Id_2 : constant Natural :=
+           (if Blog_Id = 2
+            then Get_Current_Blog_Id
+            else Blog_Id);
 
---         blog = get_site( blog_id );
+         Blog : constant Wp_Site := Get_Site (Blog_Id_2);
+      begin
+         if
+           Blog = Null_Site or else
+--         not Blog      or else
+           not Isset (-Blog.Domain) or else
+           Blog.Archived /= "" or else
+           Blog.Spam     /= "" or else
+           Blog.Deleted  /= ""
+         then
+            return False;
+         end if;
 
---         if ( ! blog || ! isset( blog->domain ) || blog->archived || blog->spam || blog->deleted ) then
---                 return false;
---         end;
+         declare
+            Keys : constant Array_Type := Get_User_Meta (User_Id_2);
+         begin
+            if Keys.Is_Empty then
+               return False;
+            end if;
 
---         keys = get_user_meta( user_id );
---         if ( empty( keys ) ) then
---                 return false;
---         end;
+            declare
+               -- No underscore before capabilities in base_capabilities_key.
+               Base_Capabilities_Key : constant String :=
+                 (-WpDB.Base_Prefix) & "capabilities";
 
---         -- No underscore before capabilities in base_capabilities_key.
---         base_capabilities_key = wpdb->base_prefix . "capabilities";
---         site_capabilities_key = wpdb->base_prefix . blog_id . "_capabilities";
+               Site_Capabilities_Key : constant String :=
+                 (-WpDB.Base_Prefix) & Helpers.Image (Blog_Id_2) & "_capabilities";
+            begin
+               if Isset (Keys, Base_Capabilities_Key) and then 1 = Blog_Id_2 then
+                  return True;
+               end if;
 
---         if ( isset( keys[ base_capabilities_key ] ) && 1 == blog_id ) then
---                 return true;
---         end;
-
---         if ( isset( keys[ site_capabilities_key ] ) ) then
---                 return true;
---         end;
-
---         return false;
--- end;
+               if Isset (Keys, Site_Capabilities_Key) then
+                  return True;
+               end if;
+            end;
+         end;
+      end;
+      return False;
+   end Is_User_Member_Of_Blog;
 
 -- --
 -- -- Adds meta data to a user.

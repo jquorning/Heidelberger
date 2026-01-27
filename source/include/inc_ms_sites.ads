@@ -8,6 +8,8 @@
 
 with Arrays;
 
+with Class_Sites;
+
 package Inc_Ms_Sites
 is
    use Arrays;
@@ -299,18 +301,20 @@ is
 --         return old_site;
 -- end;
 
--- --
--- -- Retrieves site data given a site ID or site object.
--- --
--- -- Site data will be cached and returned after being passed through a filter.
--- -- If the provided site is empty, the current site global will be used.
--- --
--- -- @since 4.6.0
--- --
--- -- @param WP_Site|int|null site Optional. Site to retrieve. Default is the current site.
--- -- @return WP_Site|null The site object or null if not found.
--- --
--- function get_site( site = null ) then
+   --
+   -- Retrieves site data given a site ID or site object.
+   --
+   -- Site data will be cached and returned after being passed through a filter.
+   -- If the provided site is empty, the current site global will be used.
+   --
+   -- @since 4.6.0
+   --
+   -- @param WP_Site|int|null site Optional. Site to retrieve. Default is the current
+   --                              site.
+   -- @return WP_Site|null The site object or null if not found.
+   --
+   function Get_Site (Site : Integer) -- null
+                      return Class_Sites.Wp_Site;
 --         if ( empty( site ) ) then
 --                 site = get_current_blog_id();
 --         end;

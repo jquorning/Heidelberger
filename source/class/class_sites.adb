@@ -47,21 +47,21 @@ is
 --                 return new WP_Site( _site );
 --         end;
 
---         --
---         -- Creates a new WP_Site object.
---         --
---         -- Will populate object properties from the object provided and assign other
---         -- default properties based on that information.
---         --
---         -- @since 4.5.0
---         --
---         -- @param WP_Site|object site A site object.
---         --
---         public function __construct( site ) then
---                 foreach ( get_object_vars( site ) as key => value ) then
---                         this->key = value;
---                 end;
---         end;
+   -----------------
+   -- X_Construct --
+   -----------------
+
+   function X_Construct (Site : Integer)
+                         return Wp_Site
+   is
+      This : Wp_Site;
+   begin
+--    foreach ( get_object_vars( site ) as key => value ) then
+--       this->key = value;
+--    end;
+      This.Blog_Id := Site;
+      return This;
+   end X_Construct;
 
 --         --
 --         -- Converts an object to array.
