@@ -17,7 +17,6 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
-with Constants;
 with Globals;
 with UStrings;
 with Helpers;
@@ -3805,12 +3804,13 @@ is
       use Wp_Common;
       use Inc_Plugins;
 
-      URL : UString := +Site_URL ("/" & (-WPINC) & "/", Scheme);
-   begin
-      if Path /= "" then -- and then is_string( path ) ) then
-         Append (URL, Ltrim (Path, "/"));
-      end if;
+      URL_2 : constant String := Site_URL ("/" & (-WPINC) & "/", Scheme);
 
+      URL : constant String :=
+        (if Path /= ""
+         then URL_2 & Ltrim (Path, "/")
+         else URL_2);
+   begin
       --
       -- Filters the URL to the includes directory.
       --
@@ -3824,7 +3824,7 @@ is
       -- @param string|null scheme Scheme to give the includes URL context. Accepts
       --                            "http", "https", "relative", or null. Default null.
       --
-      return Apply_Filters ("includes_url", -URL, Path, Scheme);
+      return Apply_Filters ("includes_url", URL, Path, Scheme);
    end Includes_URL;
 
 -- --
