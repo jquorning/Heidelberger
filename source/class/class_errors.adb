@@ -11,8 +11,6 @@ with Logging;
 with UStrings;
 with Wp_Common;
 
-with Inc_Plugins;
-
 package body Class_Errors
 is
 
@@ -158,7 +156,6 @@ is
    is
       use Php.Strings;
       use Wp_Common;
-      use Inc_Plugins;
    begin
       Logging.Log ("class_errors.add", Message);
 

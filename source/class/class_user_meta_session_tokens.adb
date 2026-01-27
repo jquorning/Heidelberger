@@ -17,7 +17,7 @@ is
    -- X_Construct --
    -----------------
 
-   function X_Construct (User_Id : Integer)
+   function X_Construct (User_Id : Class_Users.User_Id_Type)
                          return Wp_User_Meta_Session_Tokens
    is
       This : Wp_User_Meta_Session_Tokens;

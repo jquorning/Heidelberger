@@ -17,7 +17,6 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Constants;
-with Globals;
 with Helpers;
 with Lists;
 with Wp_Common;
@@ -25,12 +24,11 @@ with Wp_Common;
 with Adi_Class_Wp_Screens;
 with Adi_Screens;
 
-with Inc_Author_Templates;
 with Class_Post_Type;
 with Class_Recovery_Mode;
 with Class_Sites;
 with Class_Taxonomy;
-with Class_Users;
+with Inc_Author_Templates;
 with Inc_Comments;
 with Inc_Capabilities;
 with Inc_Formatting;
@@ -309,8 +307,8 @@ is
       use Inc_Pluggables;
       use Inc_Users;
 
-      User_Id      : constant Integer := Get_Current_User_Id;
-      Current_User : constant Wp_User := Wp_Get_Current_User;
+      User_Id      : constant User_Id_Type := Get_Current_User_Id;
+      Current_User : constant Wp_User      := Wp_Get_Current_User;
       Profile_Url  : UString;
    begin
       if User_Id = 0 then
@@ -326,7 +324,8 @@ is
       end if;
 
       declare
-         Avatar : constant String := Get_Avatar (Helpers.Image (User_Id), 26);
+         Avatar : constant String :=
+           Get_Avatar (Helpers.Image (Integer (User_Id)), 26);
 
          -- translators: %s: Current user"s display name.
          Howdy : constant String :=
@@ -366,8 +365,8 @@ is
       use Inc_Pluggables;
       use Inc_Users;
 
-      User_Id      : constant Integer := Get_Current_User_Id;
-      Current_User : constant Wp_User := Wp_Get_Current_User;
+      User_Id      : constant User_Id_Type := Get_Current_User_Id;
+      Current_User : constant Wp_User      := Wp_Get_Current_User;
       Profile_Url  : UString;
       User_Info    : UString;
    begin
@@ -392,7 +391,7 @@ is
          Admin_Bar.Add_Group (Node);
       end;
 
-      User_Info := +Get_Avatar (Helpers.Image (User_Id), 64);
+      User_Info := +Get_Avatar (Helpers.Image (Integer (User_Id)), 64);
       User_Info := User_Info & "<span class=""display-name"">" &
                                Current_User.Prop.Display_Name & "</span>";
 
@@ -851,7 +850,6 @@ is
       --
       declare
          use Inc_Formatting;
-         use Inc_Plugins;
 
          Show_Site_Icons : constant Boolean :=
             Apply_Filters ("wp_admin_bar_show_site_icons", True);
@@ -1033,6 +1031,7 @@ is
       use Adi_Screens;
       use Class_Posts;
       use Class_Post_Type;
+      use Class_Users;
       use Class_Terms;
       use Inc_Capabilities;
       use Inc_Link_Templates;
@@ -1141,7 +1140,7 @@ is
                   end if;
                end;
 
-            elsif "user-edit" = Current_Screen.Base or else User_Id /= 0 then
+            elsif "user-edit" = Current_Screen.Base or else User_Id not in 0 then
                declare
                   use Inc_Author_Templates;
                   use Class_Users;
@@ -1150,7 +1149,7 @@ is
                   User_Object : constant Wp_User := Get_Userdata (User_Id);
 
                   View_Link   : constant String :=
-                     Get_Author_Posts_Url (User_Object.Id);
+                     Get_Author_Posts_Url (Integer (User_Object.Id));
                begin
                   if User_Object.Exists or else View_Link /= "" then
                      declare
@@ -1233,7 +1232,7 @@ is
             then
                declare
                   Edit_User_Link : constant String :=
-                     Get_Edit_User_Link (Integer (Current_Object.Id));
+                     Get_Edit_User_Link (User_Id_Type (Current_Object.Id)); -- ???
                begin
                   if Edit_User_Link /= "" then
                      declare
@@ -1775,7 +1774,6 @@ is
       use Wp_Common;
       use Inc_Load;
       use Inc_Pluggables;
-      use Inc_Plugins;
 
 --    global show_admin_bar, pagenow;
    begin
@@ -1823,8 +1821,8 @@ is
    -- X_Get_Admin_Bar_Pref --
    --------------------------
 
-   function X_Get_Admin_Bar_Pref (Context : String  := "front";
-                                  User    : Integer := 0)
+   function X_Get_Admin_Bar_Pref (Context : String                   := "front";
+                                  User    : Class_Users.User_Id_Type := 0)
                                   return Boolean
    is
       use Inc_Users;

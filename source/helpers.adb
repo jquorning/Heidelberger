@@ -6,22 +6,6 @@ with Ada.Text_IO;
 
 package body Helpers is
 
-   -----------
-   -- Image --
-   -----------
-
-   function Image (Value : Natural)
-                   return String
-   is
-      Img : constant String := Natural'Image (Value);
-   begin
-      if Img (Img'First) = ' ' then
-         return Img (Img'First + 1 .. Img'Last);
-      else
-         return Img;
-      end if;
-   end Image;
-
    -----------------
    -- Image_Hex_4 --
    -----------------

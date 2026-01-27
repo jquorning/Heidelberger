@@ -9,6 +9,8 @@
 
 with Arrays;
 
+with Class_Users;
+
 package Adi_Upgrade
 is
    use Arrays;
@@ -80,7 +82,7 @@ is
    --
    -- @param int user_id User ID.
    --
-   procedure Wp_Install_Defaults (User_Id : Integer)
+   procedure Wp_Install_Defaults (User_Id : Class_Users.User_Id_Type)
    is null;
 --                 global wpdb, wp_rewrite, table_prefix;
 
@@ -480,7 +482,7 @@ is
    --
    procedure Wp_New_Blog_Notification (Blog_Title : String;
                                        Blog_URL   : String;
-                                       User_Id    : Integer;
+                                       User_Id    : Class_Users.User_Id_Type;
                                        Password   : String)
    is null;
 --                 user      = new WP_User( user_id );

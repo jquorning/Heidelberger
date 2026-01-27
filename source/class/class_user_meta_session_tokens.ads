@@ -9,6 +9,7 @@
 with Arrays;
 
 with Class_Session_Tokens;
+with Class_Users;
 
 package Class_User_Meta_Session_Tokens
 is
@@ -28,7 +29,7 @@ is
    --
    --
    --
-   function X_Construct (User_Id : Integer)
+   function X_Construct (User_Id : Class_Users.User_Id_Type)
                          return Wp_User_Meta_Session_Tokens;
 
    --

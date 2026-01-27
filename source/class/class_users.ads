@@ -11,6 +11,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
 with Arrays;
+with Helpers_2;
 with Lists;
 with UStrings;
 
@@ -18,6 +19,8 @@ package Class_Users
 is
    use Arrays;
    use Lists;
+
+   type User_Id_Type is new Natural;
 
    -- By jq
    type Property_Type is
@@ -87,7 +90,7 @@ is
          -- @since 2.1.0
          -- @var int
          --
-         Id : Integer := 0;
+         Id : User_Id_Type := 0;
 
          --
          -- Capabilities that the individual user has been granted outside of those
@@ -161,7 +164,7 @@ is
    -- @param int                         site_id Optional Site ID, defaults to
    --                                             current site.
    --
-   function X_Construct (Id      : Integer := 0;
+   function X_Construct (Id      : User_Id_Type := 0;
                          Name    : String  := "";
                          Site_Id : Integer := 0) -- ""
                          return Wp_User;
@@ -336,6 +339,8 @@ is
    -- private
    function Get_Caps_Data (This : Wp_User)
                            return Array_Type;
+
+   function Image is new Helpers_2.Generic_Image (User_Id_Type);
 
    Null_User : constant Wp_User :=
      (Data    => null,

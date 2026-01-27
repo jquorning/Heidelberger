@@ -62,7 +62,7 @@ is
          Object_Id  : Integer := 0;
          Post_Id    : Class_Posts.Post_Id := 0;
          Term_Id    : Integer := 0;
-         User_Id    : Integer := 0;
+         User_Id    : Class_Users.User_Id_Type := 0;
          Meta_Key   : Boolean := False;
       end record;
 
@@ -75,7 +75,7 @@ is
       Meta_Key   => False);
 
    function Map_Meta_Cap (Cap     : String;
-                          User_Id : Integer;
+                          User_Id : Class_Users.User_Id_Type;
                           Args    : Args_Type := Null_Args_Type)
                           return List_Type;
 
@@ -127,7 +127,7 @@ is
    --                           the current user.
    -- @return bool Whether the user is a site admin.
    --
-   function Is_Super_Admin (User_Id : Integer := 0) -- false
+   function Is_Super_Admin (User_Id : Class_Users.User_Id_Type := 0) -- false
                             return Boolean;
 
    --
@@ -218,7 +218,7 @@ is
                       Capability : String)
                       -- , ...args)
                       return Boolean;
-   function User_Can (User       : Integer;
+   function User_Can (User       : Class_Users.User_Id_Type;
                       Capability : String)
                       -- , ...args)
                       return Boolean;

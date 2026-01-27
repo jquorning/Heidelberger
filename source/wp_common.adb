@@ -329,4 +329,12 @@ is
       Inc_Plugins.Do_Action (Hook_Name, "", "");
    end Do_Action;
 
+   procedure Do_Action (Hook_Name : String;
+                        User      : Class_Users.User_Id_Type)
+   is
+   begin
+      Logging.Log ("do_action", Hook_Name);
+      Inc_Plugins.Do_Action (Hook_Name, "", "");
+   end Do_Action;
+
 end Wp_Common;

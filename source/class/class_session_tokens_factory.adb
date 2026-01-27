@@ -14,7 +14,7 @@ is
    -- Get_Instance --
    ------------------
 
-   function Get_Instance (User_Id : Integer)
+   function Get_Instance (User_Id : Class_Users.User_Id_Type)
                           return Class_Session_Tokens.Wp_Session_Tokens'Class
    is
       use Wp_Common;

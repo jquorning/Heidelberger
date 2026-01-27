@@ -34,11 +34,11 @@ is
    -- @param string   name User's username.
    -- @return WP_User Current user User object.
    --
-   function Wp_Set_Current_User (Id   : Integer;
+   function Wp_Set_Current_User (Id   : Class_Users.User_Id_Type;
                                  Name : String := "")
                                  return Class_Users.Wp_User;
 
-   procedure Wp_Set_Current_User (Id   : Integer;
+   procedure Wp_Set_Current_User (Id   : Class_Users.User_Id_Type;
                                   Name : String := "");
 
    --
@@ -66,7 +66,7 @@ is
    -- @param int user_id User ID
    -- @return WP_User|false WP_User object on success, false on failure.
    --
-   function Get_Userdata (User_Id : Integer)
+   function Get_Userdata (User_Id : Class_Users.User_Id_Type)
                           return Class_Users.Wp_User;
 
    --
@@ -249,7 +249,7 @@ is
    --
    function Wp_Validate_Auth_Cookie (Cookie : String := "";
                                      Scheme : String := "")
-                                     return Integer;
+                                     return Class_Users.User_Id_Type;
 
    --
    -- Removes all of the cookies associated with authentication.
@@ -301,7 +301,7 @@ is
    -- @param string      token    Optional. User's session token to use for this
    --                             cookie.
    --
-   procedure Wp_Set_Auth_Cookie (User_Id  : Integer;
+   procedure Wp_Set_Auth_Cookie (User_Id  : Class_Users.User_Id_Type;
                                  Remember : Boolean := False;
                                  Secure   : Boolean := False; -- ""
                                  Token    : String  := "");

@@ -11,6 +11,8 @@ with Ada.Containers.Vectors;
 with Arrays;
 with UStrings;
 
+with Class_Users;
+
 package Class_Posts
 is
    use Arrays;
@@ -55,7 +57,7 @@ is
          -- @since 3.5.0
          -- @var string
          --
-         Post_Author : Integer; -- UString;
+         Post_Author : Class_Users.User_Id_Type; -- Integer; -- UString;
 
          --
          -- The post's local publication time.

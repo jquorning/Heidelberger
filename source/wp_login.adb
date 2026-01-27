@@ -20,7 +20,6 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Constants;
-with Globals;
 with Lists;
 with UStrings;
 with Wp_Common;
@@ -857,7 +856,6 @@ is
       use Class_Phpass;
       use Inc_Formatting;
       use Inc_Functions;
-      use Inc_Plugins;
       use Inc_Pluggables;
    begin
       if not Array_Key_Exists ("post_password", X_POST) then
@@ -1135,7 +1133,6 @@ is
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_L10n;
-      use Inc_Plugins;
       use Inc_Pluggables;
       use Inc_Options;
       use Inc_Users;
@@ -1885,7 +1882,8 @@ is
                   -- If the user can't edit posts, send them to their profile.
                   if
                     Is_Multisite and then
-                    Get_Active_Blog_For_User (User.User.Id) = Null_Site and then -- not
+                    Get_Active_Blog_For_User (User.User.Id) =
+                      Null_Site and then -- not
                     not Is_Super_Admin (User.User.Id)
                   then
                      Redirect_To := +User_Admin_URL;

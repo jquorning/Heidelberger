@@ -82,7 +82,8 @@ is
          -- Populate settings we need for the menu based on the current user.
          This.User.Blogs := Get_Blogs_Of_User (Get_Current_User_Id);
          if Is_Multisite then
-            This.User.Active_Blog    := Get_Active_Blog_For_User (Get_Current_User_Id);
+            This.User.Active_Blog :=
+              Get_Active_Blog_For_User (Get_Current_User_Id);
 
             This.User.Domain         :=
               +(if This.User.Active_Blog = Null_Site

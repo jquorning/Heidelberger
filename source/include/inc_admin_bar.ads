@@ -13,6 +13,7 @@ with Class_Customize_Managers;
 with Class_Posts;
 with Class_Terms;
 with Class_Querys;
+with Class_Users;
 
 package Inc_Admin_Bar
 is
@@ -21,7 +22,7 @@ is
 
    Tag            : Class_Terms.Wp_Term;
    Wp_The_Query   : Class_Querys.Wp_Query;
-   User_Id        : Integer;
+   User_Id        : Class_Users.User_Id_Type;
    Id_Of_Post     : Class_Posts.Post_Id; -- was Post_Id : Integer
 
    X_Show_Admin_Bar : Boolean; -- X_ added
@@ -306,8 +307,8 @@ is
    --                       current user.
    -- @return bool Whether the admin bar should be showing for this user.
    --
-   function X_Get_Admin_Bar_Pref (Context : String  := "front";
-                                  User    : Integer := 0)
+   function X_Get_Admin_Bar_Pref (Context : String                   := "front";
+                                  User    : Class_Users.User_Id_Type := 0)
                                   return Boolean;
 
 end Inc_Admin_Bar;

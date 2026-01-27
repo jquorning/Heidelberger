@@ -262,7 +262,7 @@ is
                                       (abs "Sorry, you are not allowed to move this item to the Trash.");
                                  end if;
 
-                                 if 0 /= Wp_Check_Post_Lock (-Post_Id) then
+                                 if Wp_Check_Post_Lock (-Post_Id) not in 0 then
                                     Locked := Locked + 1;
                                     goto Continue;
                                  end if;

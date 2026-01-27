@@ -354,8 +354,6 @@ is
             Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
             declare
-               use Inc_Plugins;
-
                Screen : constant String := -Get_Current_Screen.Id;
                Tags   : constant List_Type :=
                  To_List (Item => As_String (Get (X_REQUEST, "delete_tags")));

@@ -122,7 +122,7 @@ is
          -- being shared among sites. Just set the role in that case.
          --
          declare
-            User_Id         : Integer := Username_Exists (User_Name);
+            User_Id         : User_Id_Type := Username_Exists (User_Name);
             User_Password_2 : constant String  := Trim (User_Password);
             Email_Password  : Boolean := False;
             User_Created    : Boolean := False;
@@ -132,7 +132,8 @@ is
             if User_Id = 0 and then Empty (User_Password_2) then
                declare
                   User_Password : constant String := Wp_Generate_Password (12, False);
-                  User_Id       : constant Integer :=
+
+                  User_Id : constant User_Id_Type :=
                     Wp_Create_User (User_Name, User_Password, User_Email);
                begin
                   Update_User_Meta (User_Id,
@@ -186,7 +187,7 @@ is
                return
                  To_Array (List => (
                    Build ("url",              Guess_URL),
-                   Build ("user_id",          User_Id),
+                   Build ("user_id",          Integer (User_Id)),
                    Build ("password",         User_Password),
                    Build ("password_message", -Message)
                  ));
@@ -627,7 +628,7 @@ is
                   WpDB.Update
                     (-WpDB.Users,
                      To_Array (List => (1 => Build ("user_nicename", Newname))),
-                     To_Array (List => (1 => Build ("ID", User.Id)))
+                     To_Array (List => (1 => Build ("ID", Integer (User.Id))))
                   );
                end;
             end if;
@@ -645,7 +646,7 @@ is
                   To_Array (List => (1 =>
                     Build ("user_pass", Php.Misc.MD5 (-Row.Prop.User_Pass)))),
                   To_Array (List => (1 =>
-                    Build ("ID", Row.Id)))
+                    Build ("ID", Integer (Row.Id))))
                  );
             end if;
          end loop;
@@ -1056,11 +1057,13 @@ is
                if Caps.Is_Empty or else RESET_CAPS then
                   declare
                      Level : constant Integer :=
-                       Get_User_Meta (User.Id, (-WpDB.Prefix) & "user_level", True);
+                       Get_User_Meta (User.Id,
+                                      (-WpDB.Prefix) & "user_level", True);
 
                      Role : constant String := Translate_Level_To_Role (Level);
                   begin
-                     Update_User_Meta (User.Id, (-WpDB.Prefix) & "capabilities",
+                     Update_User_Meta (User.Id,
+                                       (-WpDB.Prefix) & "capabilities",
                                        To_Array (List => (1 =>
                                          Build (Role, True))));
                   end;

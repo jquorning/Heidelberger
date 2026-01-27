@@ -9,6 +9,7 @@ with Arrays;
 
 with Class_Posts;
 with Class_Rewrites;
+with Class_Users;
 
 package Inc_Link_Templates
 is
@@ -257,9 +258,9 @@ is
    --                        passed to force those schemes.
    -- @return string Dashboard URL link with optional path appended.
    --
-   function Get_Dashboard_URL (User_Id : Integer := 0;
-                               Path    : String  := "";
-                               Scheme  : String  := "admin")
+   function Get_Dashboard_URL (User_Id : Class_Users.User_Id_Type := 0;
+                               Path    : String                   := "";
+                               Scheme  : String                   := "admin")
                                return String;
 
    --
@@ -354,8 +355,8 @@ is
    --                        can be passed to force those schemes.
    -- @return string Dashboard URL link with optional path appended.
    --
-   function Get_Edit_Profile_URL (User_Id : Integer := 0;
-                                  Scheme  : String  := "admin")
+   function Get_Edit_Profile_URL (User_Id : Class_Users.User_Id_Type := 0;
+                                  Scheme  : String                   := "admin")
                                   return String;
 
    --
@@ -366,7 +367,7 @@ is
    -- @param int user_id Optional. User ID. Defaults to the current user.
    -- @return string URL to edit user page or empty string.
    --
-   function Get_Edit_User_Link (User_Id : Integer := 0) -- = null
+   function Get_Edit_User_Link (User_Id : Class_Users.User_Id_Type := 0) -- = null
                                 return String;
 
    --

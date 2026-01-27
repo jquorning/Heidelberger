@@ -7,6 +7,7 @@
 --
 
 with Class_Sites;
+with Class_Users;
 
 package Inc_Ms_Functions
 is
@@ -41,7 +42,7 @@ is
 -- @param int user_id The unique ID of the user
 -- @return WP_Site|void The blog object
 --
-   function Get_Active_Blog_For_User (User_Id : Integer)
+   function Get_Active_Blog_For_User (User_Id : Class_Users.User_Id_Type)
                                       return Class_Sites.Wp_Site
                                       is (Class_Sites.Null_Site);
 

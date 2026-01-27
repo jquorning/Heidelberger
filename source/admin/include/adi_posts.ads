@@ -7,6 +7,8 @@
 
 with Arrays;
 
+with Class_Users;
+
 package Adi_Posts
 is
    use Arrays;
@@ -99,7 +101,9 @@ is
    --
 -- function Wp_Check_Post_Lock (Post_Id : Array_Type) return Boolean is (True);
 -- function Wp_Check_Post_Lock (Post_Id : Assoc_Type) return Boolean is (True);
-   function Wp_Check_Post_Lock (Post_Id : String)     return Integer is (1);
+   function Wp_Check_Post_Lock (Post_Id : String)
+                                return Class_Users.User_Id_Type
+                                is (1);
 
    --
    -- Saves a draft or manually autosaves for the purpose of showing a post preview.

@@ -21,8 +21,9 @@ with UStrings;
 with Helpers;
 with Wp_Common;
 
-with Inc_Caches;
+with Class_Users;
 with Class_WpDB;
+with Inc_Caches;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
@@ -438,7 +439,6 @@ is
       use Class_WpDB;
       use Inc_Caches;
       use Inc_Load;
-      use Inc_Plugins;
 
       Unused_Found : Boolean;
       Alloptions   : Array_Type;
@@ -565,7 +565,6 @@ is
       use Inc_Formatting;
       use Inc_Load;
       use Inc_L10n;
-      use Inc_Plugins;
    begin
       -- if Is_Scalar (Option) then
       --    Option := Trim (Option);
@@ -794,7 +793,6 @@ is
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Value_2 : Multi_Type;
    begin
@@ -1229,7 +1227,6 @@ is
       use Wp_Common;
       use Inc_Caches;
       use Inc_Load;
-      use Inc_Plugins;
 
 --    expiration = (int) expiration;
 
@@ -1443,6 +1440,7 @@ is
       use Binder;
       use Constants;
       use UStrings;
+      use Class_Users;
       use Inc_Load;
       use Inc_Link_Templates;
       use Inc_Users;
@@ -1452,8 +1450,11 @@ is
       end if;
 
       declare
-         User_Id : constant Integer := Get_Current_User_Id;
-         User    : constant String  := Helpers.Image (User_Id);
+         User_Id : constant Class_Users.User_Id_Type :=
+           Get_Current_User_Id;
+
+         User : constant String :=
+           Helpers.Image (Integer (User_Id));
       begin
          if User_Id = 0 then -- not
             return;
@@ -1615,10 +1616,13 @@ is
       use Php.Types;
       use Php.Strings;
       use Binder;
+      use Class_Users;
       use Inc_Users;
 
-      User_Id : constant Natural := Get_Current_User_Id;
-      User    : constant String  := Helpers.Image (User_Id);
+      User_Id : constant Class_Users.User_Id_Type :=
+        Get_Current_User_Id;
+
+      User : constant String := Helpers.Image (Integer (User_Id));
    begin
       if User_Id = 0 then
          return Empty_Array;
@@ -1671,10 +1675,13 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
+      use Class_Users;
       use Inc_Users;
 --    global _updated_user_settings;
 
-      User_Id  : constant Integer := Get_Current_User_Id;
+      User_Id  : constant Class_Users.User_Id_Type :=
+        Get_Current_User_Id;
+
       Settings : UString;
    begin
       if User_Id = 0 then

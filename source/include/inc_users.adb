@@ -27,7 +27,6 @@ with Inc_L10n;
 with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
-with Inc_Plugins;
 
 package body Inc_Users
 is
@@ -1073,14 +1072,15 @@ is
    -- Is_User_Member_Of_Blog --
    ----------------------------
 
-   function Is_User_Member_Of_Blog (User_Id : Integer := 0;
-                                    Blog_Id : Integer := 0)
+   function Is_User_Member_Of_Blog (User_Id : Class_Users.User_Id_Type := 0;
+                                    Blog_Id : Integer      := 0)
                                     return Boolean
    is
       use Php.Strings;
       use Globals;
       use UStrings;
       use Class_Sites;
+      use Class_Users;
       use Inc_Load;
       use Inc_Ms_Sites;
       -- global wpdb;
@@ -1088,7 +1088,7 @@ is
       -- user_id = (int) user_id;
       -- blog_id = (int) blog_id;
 
-      User_Id_2 : constant Integer :=
+      User_Id_2 : constant User_Id_Type :=
         (if User_Id = 0
          then Get_Current_User_Id
          else User_Id);
@@ -1556,7 +1556,7 @@ is
    -- Setup_Userdata --
    --------------------
 
-   procedure Setup_Userdata (For_User_Id : Integer := 0)
+   procedure Setup_Userdata (For_User_Id : Class_Users.User_Id_Type := 0)
    is null;
 --         global user_login, userdata, user_level, user_ID, user_email, user_url, user_identity;
 
@@ -1935,11 +1935,11 @@ is
       end if;
 
 --    Wp_Cache_Add (User_2.Id'Image, User_2, "users");
-      Wp_Cache_Add (-User_2.Prop.User_Login, User_2.Id, "userlogins");
-      Wp_Cache_Add (-User_2.Prop.User_Nicename, User_2.Id, "userslugs");
+      Wp_Cache_Add (-User_2.Prop.User_Login,    Integer (User_2.Id), "userlogins");
+      Wp_Cache_Add (-User_2.Prop.User_Nicename, Integer (User_2.Id), "userslugs");
 
       if not Empty (-User_2.Prop.User_Email) then
-         Wp_Cache_Add (-User_2.Prop.User_Email, User_2.Id, "useremail");
+         Wp_Cache_Add (-User_2.Prop.User_Email, Integer (User_2.Id), "useremail");
       end if;
    end Update_User_Caches;
 
@@ -1984,7 +1984,7 @@ is
    ---------------------
 
    function Username_Exists (Username : String)
-                             return Integer
+                             return Class_Users.User_Id_Type
    is
       use Wp_Common;
       use Class_Users;
@@ -1992,14 +1992,10 @@ is
 --    use Inc_Plugins;
 
       User    : constant Wp_User := Get_User_By ("login", Username);
-      User_Id : Integer;
-   begin
-      if User /= Null_User then
-         User_Id := User.Id;
-      else
-         User_Id := 0; -- False;
-      end if;
 
+      User_Id : constant User_Id_Type :=
+        (if User /= Null_User then User.Id else 0); -- False;
+   begin
       --
       -- Filters whether the given username exists.
       --
@@ -2073,7 +2069,7 @@ is
    ---------------------
 
    function Wp_Insert_User (Userdata : Array_Type)
-                            return Integer
+                            return Class_Users.User_Id_Type
                             is (999);
 --         global wpdb;
 
@@ -2745,7 +2741,7 @@ is
    function Wp_Create_User (Username : String;
                             Password : String;
                             Email    : String := "")
-                            return Integer
+                            return Class_Users.User_Id_Type
    is
       use Inc_Formatting;
 
@@ -2835,7 +2831,6 @@ is
    is
       use Wp_Common;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Hint : constant String :=
         abs "Hint: The password should be at least twelve characters long. To make it stronger, use upper and lower case letters, numbers, and symbols like ! "" ?  % ^ &amp; ).""";

@@ -62,6 +62,7 @@ is
       use Adm_Menu;
       use Adi_Posts;
       use Class_Posts;
+      use Class_Users;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
@@ -415,12 +416,11 @@ is
                   end if;
 
                   declare
-                     User_Id : constant Integer := Wp_Check_Post_Lock (Id'Image);
+                     User_Id : constant User_Id_Type :=
+                       Wp_Check_Post_Lock (Id'Image);
                   begin
                      if User_Id /= 0 then
                         declare
-                           use Class_Users;
-
                            User : constant Wp_User := Get_Userdata (User_Id);
                         begin
                            -- translators: %s: User"s display name.
@@ -528,9 +528,11 @@ is
 
                      Unused   : Boolean;
                      Unused_2 : Integer;
-                     Current_User_Id : constant Integer := Get_Current_User_Id;
+
+                     Current_User_Id : constant Class_Users.User_Id_Type :=
+                       Get_Current_User_Id;
                   begin
-                     if 0 /= Current_User_Id then
+                     if Current_User_Id not in 0 then
                         declare
                            Enable_Custom_Fields : constant Boolean
                               := Get_User_Meta (Current_User_Id,

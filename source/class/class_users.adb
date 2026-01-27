@@ -33,9 +33,9 @@ is
    -- X_Construct --
    -----------------
 
-   function X_Construct (Id      : Integer := 0;
-                         Name    : String  := "";
-                         Site_Id : Integer := 0) -- ""
+   function X_Construct (Id      : User_Id_Type := 0;
+                         Name    : String       := "";
+                         Site_Id : Integer      := 0) -- ""
                          return Wp_User
    is
       use Php.Arrays;
@@ -75,7 +75,7 @@ is
       declare
          Data : Wp_User :=
            (if Id /= 0
-            then Get_Data_By ("id",    Id)     -- self::
+            then Get_Data_By ("id",    Integer (Id))     -- self::
             else Get_Data_By ("login", Name));  -- self::
       begin
          if Data /= Null_User then
@@ -710,13 +710,13 @@ is
             end if;
 
             -- This action is documented in wp-includes/class-wp-user.php
-            Do_Action ("remove_user_role", This.Id, -Old_Role);
+            Do_Action ("remove_user_role", Integer (This.Id), -Old_Role);
             << Continue >>
          end loop;
 
          if Role /= "" and then not In_List (Role, Old_Roles, True) then
             -- This action is documented in wp-includes/class-wp-user.php
-            Do_Action ("add_user_role", This.Id, Role);
+            Do_Action ("add_user_role", Integer (This.Id), Role);
          end if;
 
          --
@@ -730,7 +730,7 @@ is
          -- @param string   role      The new role.
          -- @param string[] old_roles An array of the user's previous roles.
          --
-         Do_Action ("set_user_role", This.Id, Role, Old_Roles);
+         Do_Action ("set_user_role", Integer (This.Id), Role, Old_Roles);
       end;
    end Set_Role;
 
@@ -775,7 +775,8 @@ is
 --                    To_array (This, "level_reduction"),
                       0);
 
-      Update_User_Meta (This.Id, Globals.WpDB.Get_Blog_Prefix & "user_level",
+      Update_User_Meta (This.Id,
+                        Globals.WpDB.Get_Blog_Prefix & "user_level",
                         This.Prop.User_Level);
 
    end Update_User_Level_From_Caps;
@@ -851,7 +852,8 @@ is
       --     Cap_2 := This.Translate_Level_To_Cap (Cap);
       -- end if;
       declare
-         Caps : constant List_Type := Map_Meta_Cap (Cap, This.Id); -- , ...args );
+         Caps : constant List_Type := Map_Meta_Cap (Cap, This.Id);
+         -- , ...args );
       begin
          -- Multisite super admin has all caps by definition, Unless specifically
          -- denied.

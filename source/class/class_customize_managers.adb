@@ -19,8 +19,9 @@ with Globals;
 with Helpers;
 with Wp_Common;
 
-with Inc_Caches;
+with Class_Users;
 with Class_Querys;
+with Inc_Caches;
 with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
@@ -936,8 +937,8 @@ is
 
       Args_2 : Array_Type;
    begin
-      if Get_Current_User_Id /= 0 then
-         Set (Default_Args, "author", From_Integer (Get_Current_User_Id));
+      if Get_Current_User_Id not in 0 then
+         Set (Default_Args, "author", From_Integer (Integer (Get_Current_User_Id)));
       end if;
 
       Args_2 := Array_Merge (Default_Args, Args);
@@ -3188,6 +3189,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use UStrings;
+      use Class_Users;
       use Inc_Posts;
       use Inc_Users;
    begin
@@ -3206,7 +3208,7 @@ is
                     Sprintf ("%s:%s",
                              To_List (List => (
                                1 => +Helpers.Image (Time),        -- time()
-                               2 => +Helpers.Image (Get_Current_User_Id)
+                               2 => +Image (Get_Current_User_Id)
                             )));
                begin
                   Update_Post_Meta (Changeset_Post_Id, "_edit_lock",
@@ -3229,6 +3231,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use UStrings;
+      use Class_Users;
       use Inc_Posts;
       use Inc_Users;
    begin
@@ -3247,17 +3250,17 @@ is
            not Empty (-Lock (1))        -- [1]
          then
             declare
-               User_Id : constant Integer :=
-                 Integer'Value (-Lock (1));  -- (int) [1]
+               User_Id : constant User_Id_Type :=
+                 User_Id_Type'Value (-Lock (1));  -- (int) [1]
 
-               Current_User_Id : constant Integer := Get_Current_User_Id;
+               Current_User_Id : constant User_Id_Type := Get_Current_User_Id;
             begin
                if User_Id = Current_User_Id then
                   declare
                      Lock_2 : constant String :=
                        Sprintf ("%s:%s", To_List (List => (
                          1 => +Helpers.Image (Time),
-                         2 => +Helpers.Image (User_Id))));
+                         2 => +Image (User_Id))));
                   begin
                      Update_Post_Meta (Changeset_Post_Id,
                                        "_edit_lock", From_String (Lock_2));

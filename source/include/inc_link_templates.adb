@@ -30,7 +30,6 @@ with Class_Post_Type;
 with Class_Sites;
 with Class_Taxonomy;
 with Class_Terms;
-with Class_Users;
 with Inc_Category_Templates;
 with Inc_Formatting;
 with Inc_Functions;
@@ -84,7 +83,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
-      use Inc_Plugins;
 
       Item_2 : UString;
    begin
@@ -579,7 +577,6 @@ is
       use Wp_Common;
       use Class_Posts;
       use Inc_Posts;
-      use Inc_Plugins;
 
 --        global wp_rewrite;
 
@@ -632,7 +629,6 @@ is
       use Inc_Formatting;
       use Inc_Options;
       use Inc_Posts;
-      use Inc_Plugins;
 
       Link : UString; -- Boolean := false;
 
@@ -1499,7 +1495,6 @@ is
       use Wp_Common;
       use Class_Post_Type;
       use Class_Posts;
-      use Inc_Plugins;
       use Inc_Options;
       use Inc_Posts;
 
@@ -1946,7 +1941,7 @@ is
    -- Get_Edit_User_Link --
    ------------------------
 
-   function Get_Edit_User_Link (User_Id : Integer := 0) -- = null
+   function Get_Edit_User_Link (User_Id : Class_Users.User_Id_Type := 0) -- = null
                                 return String
    is
       use UStrings;
@@ -1954,11 +1949,10 @@ is
       use Class_Users;
       use Inc_Capabilities;
       use Inc_Functions;
-      use Inc_Plugins;
       use Inc_Pluggables;
       use Inc_Users;
 
-      User_Id_2 : constant Integer :=
+      User_Id_2 : constant Class_Users.User_Id_Type :=
         (if User_Id = 0
          then Get_Current_User_Id
          else User_Id);
@@ -1967,7 +1961,7 @@ is
    begin
       if
         User_Id_2 = 0 or else -- Empty (User_Id_2) or else
-        not Current_User_Can ("edit_user", User_Id_2)
+        not Current_User_Can ("edit_user", Integer (User_Id_2))
       then
          return "";
       end if;
@@ -1983,7 +1977,7 @@ is
             Link := +Get_Edit_Profile_URL (User.Id);
          else
             Link :=
-              +Add_Query_Arg ("user_id", Helpers.Image (User.Id), -- ???
+              +Add_Query_Arg ("user_id", Helpers.Image (Integer (User.Id)), -- ???
                               Self_Admin_URL ("user-edit.php"));
          end if;
 
@@ -1995,7 +1989,7 @@ is
          -- @param string link    The edit link.
          -- @param int    user_id User ID.
          --
-         return Apply_Filters ("get_edit_user_link", -Link, User.Id);
+         return Apply_Filters ("get_edit_user_link", -Link, Integer (User.Id));
       end;
    end Get_Edit_User_Link;
 
@@ -2619,7 +2613,6 @@ is
       use Inc_Functions;
       use Inc_General_Templates;
       use Inc_Load;
-      use Inc_Plugins;
 --    global wp_rewrite;
 
 --    pagenum = (int) pagenum;
@@ -3632,7 +3625,6 @@ is
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
-      use Inc_Plugins;
 
       Orig_Scheme : constant String := Scheme;
       URL      : UString;
@@ -3707,7 +3699,6 @@ is
       use Inc_Load;
       use Inc_Ms_Blogs;
       use Inc_Options;
-      use Inc_Plugins;
 
       URL : UString;
    begin
@@ -3802,7 +3793,6 @@ is
       use Globals;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       URL_2 : constant String := Site_URL ("/" & (-WPINC) & "/", Scheme);
 
@@ -3921,7 +3911,6 @@ is
       use Class_Networks;
       use Inc_Load;
       use Inc_Ms_Networks;
-      use Inc_Plugins;
 
       URL : UString;
    begin
@@ -4025,7 +4014,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_Load;
-      use Inc_Plugins;
    begin
       if not Is_Multisite then
          return Admin_URL (Path, Scheme);
@@ -4068,7 +4056,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       URL : UString :=
         +Network_Site_URL ("wp-admin/user/", Scheme);
@@ -4103,7 +4090,6 @@ is
    is
       use Wp_Common;
       use Inc_Load;
-      use Inc_Plugins;
 
       URL : constant String :=
         (if Is_Network_Admin then Network_Admin_URL (Path, Scheme)
@@ -4137,7 +4123,6 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_Load;
-      use Inc_Plugins;
 
       Orig_Scheme : constant String := Scheme;
 
@@ -4185,7 +4170,7 @@ is
    -- Get_Dashboard_URL --
    -----------------------
 
-   function Get_Dashboard_URL (User_Id : Integer := 0;
+   function Get_Dashboard_URL (User_Id : Class_Users.User_Id_Type := 0;
                                Path    : String  := "";
                                Scheme  : String  := "admin")
                                return String
@@ -4194,6 +4179,7 @@ is
       use Wp_Common;
       use Class_Admin_Bar; -- ???
       use Class_Sites;
+      use Class_Users;
       use Inc_Capabilities;
       use Inc_Load;
       use Inc_Ms_Functions;
@@ -4216,8 +4202,8 @@ is
          return False;
       end Blog_In_Blogs;
 
-      User_Id_2 : constant Integer :=
-        (if User_Id /= 0
+      User_Id_2 : constant User_Id_Type :=
+        (if User_Id not in 0
          then User_Id
          else Get_Current_User_Id);
 
@@ -4272,22 +4258,24 @@ is
       --                       "https", "login", "login_post", "admin", "relative"
       --                       or null.
       --
-      return Apply_Filters ("user_dashboard_url", -URL, User_Id_2, Path, Scheme);
+      return Apply_Filters ("user_dashboard_url", -URL,
+                            Integer (User_Id_2), Path, Scheme);
    end Get_Dashboard_URL;
 
    --------------------------
    -- Get_Edit_Profile_URL --
    --------------------------
 
-   function Get_Edit_Profile_URL (User_Id : Integer := 0;
+   function Get_Edit_Profile_URL (User_Id : Class_Users.User_Id_Type := 0;
                                   Scheme  : String  := "admin")
                                   return String
    is
       use Wp_Common;
+      use Class_Users;
       use Inc_Load;
       use Inc_Users;
 
-      User_Id_2 : constant Integer :=
+      User_Id_2 : constant User_Id_Type :=
         (if User_Id /= 0
          then User_Id
          else Get_Current_User_Id);
@@ -4308,7 +4296,7 @@ is
       --                       "https", "login", "login_post", "admin", "relative"
       --                       or null.
       --
-      return Apply_Filters ("edit_profile_url", URL, User_Id_2, Scheme);
+      return Apply_Filters ("edit_profile_url", URL, Integer (User_Id_2), Scheme);
    end Get_Edit_Profile_URL;
 
 -- --

@@ -44,6 +44,8 @@ with Inc_Vars;
 package body Inc_Pluggables
 is
 
+   subtype User_Id_Type is Class_Users.User_Id_Type;
+
    Global_Current_User : Class_Users.Wp_User :=
      Class_Users.Null_User;
 
@@ -53,7 +55,7 @@ is
    -- Wp_Set_Current_User --
    -------------------------
 
-   function Wp_Set_Current_User (Id   : Integer;
+   function Wp_Set_Current_User (Id   : User_Id_Type;
                                  Name : String := "")
                                  return Class_Users.Wp_User
    is
@@ -73,7 +75,8 @@ is
          return Global_Current_User;
       end if;
 
-      Global_Current_User := X_Construct (Id, Name); -- new WP_User( id, name );
+      Global_Current_User := X_Construct (User_Id_Type (Id), Name);
+      -- new WP_User( id, name );
 
       Setup_Userdata (Global_Current_User.Id);
 
@@ -91,7 +94,7 @@ is
    -- Wp_Set_Current_User --
    -------------------------
 
-   procedure Wp_Set_Current_User (Id   : Integer;
+   procedure Wp_Set_Current_User (Id   : User_Id_Type;
                                   Name : String := "")
    is
       use Class_Users;
@@ -129,11 +132,11 @@ is
 --         -- @param int user_id User ID
 --         -- @return WP_User|false WP_User object on success, false on failure.
 --         --
-   function Get_Userdata (User_Id : Integer)
+   function Get_Userdata (User_Id : User_Id_Type)
                           return Class_Users.Wp_User
    is
    begin
-      return Get_User_By ("id", User_Id);
+      return Get_User_By ("id", Integer (User_Id));
    end Get_Userdata;
 
 -- endif;
@@ -757,7 +760,7 @@ is
 --    use Inc_Plugins;
       use Inc_Users;
 
-      User_Id : constant Integer := Get_Current_User_Id;
+      User_Id : constant User_Id_Type := Get_Current_User_Id;
    begin
       Wp_Destroy_Current_Session;
       Wp_Clear_Auth_Cookie;
@@ -784,7 +787,7 @@ is
 
    function Wp_Validate_Auth_Cookie (Cookie : String := "";
                                      Scheme : String := "")
-                                     return Integer
+                                     return Class_Users.User_Id_Type
    is
       use Php.Misc;
       use Php.Strings;
@@ -923,7 +926,8 @@ is
                use Class_Session_Tokens;
                use Class_Session_Tokens_Factory;
 
-               Manager : constant Wp_Session_Tokens'Class := Get_Instance (User.Id);
+               Manager : constant Wp_Session_Tokens'Class :=
+                 Get_Instance (User.Id);
             begin
                if not Manager.Verify (Token) then
                   --
@@ -1114,7 +1118,7 @@ is
    -- Wp_Set_Auth_Cookie --
    ------------------------
 
-   procedure Wp_Set_Auth_Cookie (User_Id  : Integer;
+   procedure Wp_Set_Auth_Cookie (User_Id  : User_Id_Type;
                                  Remember : Boolean := False;
                                  Secure   : Boolean := False; -- ""
                                  Token    : String  := "")
@@ -1286,9 +1290,9 @@ is
                   -SITECOOKIEPATH, -COOKIE_DOMAIN);
 
       -- Settings cookies.
-      Set_Cookie ("wp-settings-" & Helpers.Image (Get_Current_User_Id), " ",
+      Set_Cookie ("wp-settings-" & Helpers.Image (Integer (Get_Current_User_Id)), " ",
                   Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
-      Set_Cookie ("wp-settings-time-" & Helpers.Image (Get_Current_User_Id), " ",
+      Set_Cookie ("wp-settings-time-" & Helpers.Image (Integer (Get_Current_User_Id)), " ",
                   Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
 
       -- Old cookies.
@@ -1348,6 +1352,7 @@ is
       use Php.Strings;
       use Binder;
       use Wp_Common;
+      use Class_Users;
       use Inc_Functions;
       use Inc_General_Templates;
       use Inc_Link_Templates;
@@ -1394,8 +1399,11 @@ is
       -- @param string scheme Authentication redirect scheme. Default empty.
       --
       declare
-         Scheme  : constant String  := Apply_Filters ("auth_redirect_scheme", "");
-         User_Id : constant Integer := Wp_Validate_Auth_Cookie ("", Scheme);
+         Scheme  : constant String  :=
+           Apply_Filters ("auth_redirect_scheme", "");
+
+         User_Id : constant User_Id_Type :=
+           Wp_Validate_Auth_Cookie ("", Scheme);
       begin
          if User_Id /= 0 then
             --
@@ -2607,7 +2615,7 @@ is
 
 --    Nonce := (string) nonce;
       User : constant Wp_User := Wp_Get_Current_User;
-      Uid  : Integer := User.Id; -- (int)
+      Uid  : Integer := Integer (User.Id); -- (int)
    begin
       if Uid = 0 then
          --
@@ -2688,7 +2696,7 @@ is
       use Inc_Users;
 
       User : constant Wp_User := Wp_Get_Current_User;
-      Uid  : Integer := User.Id; -- (int)
+      Uid  : Integer := Integer (User.Id); -- (int)
    begin
       if Uid = 0 then
          -- This filter is documented in wp-includes/pluggable.php

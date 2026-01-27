@@ -10,7 +10,6 @@ with Php.Strings;
 with Php.Types;
 
 with Constants;
-with Globals;
 with UStrings;
 with Wp_Common;
 
@@ -41,7 +40,7 @@ is
    ------------------
 
    function Map_Meta_Cap (Cap     : String;
-                          User_Id : Integer;
+                          User_Id : Class_Users.User_Id_Type;
                           Args    : Args_Type := Null_Args_Type)
                           return List_Type
    is
@@ -51,6 +50,7 @@ is
       use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
+      use Class_Users;
       use Inc_Functions;
       use Inc_Load;
       use Inc_L10n;
@@ -60,7 +60,9 @@ is
 
       Caps  : List_Type;
       Cap_2 : UString;
-      Publish_Future : constant List_Type := To_List (List => (+"publish", +"future"));
+
+      Publish_Future : constant List_Type :=
+        To_List (List => (+"publish", +"future"));
    begin
       -- switch ( cap ) then
       if Cap in "remove_user" then
@@ -481,6 +483,7 @@ is
             else
                Caps := Map_Meta_Cap ("edit_post", User_Id, (Post_Id  => Post.Id,
                                                             Meta_Key => False,
+                                                            User_Id  => 0,
                                                             others   => 0));
             end if;
          end;
@@ -599,6 +602,7 @@ is
                                      (Object_Id => Object_Id,
                                       Meta_Key  => False,
                                       Post_Id   => 0,
+                                      User_Id   => 0,
                                       others    => 0));
 
                Meta_Key :=
@@ -627,7 +631,7 @@ is
                      -- @param string   cap       Capability name.
                      -- @param string[] caps      Array of the user"s capabilities.
                      --
-                     Allowed := Apply_Filters ("auth_{object_type}_meta_{meta_key}_for_{object_subtype}", Allowed, -Meta_Key, Object_Id, User_Id, Cap, Caps);
+                     Allowed := Apply_Filters ("auth_{object_type}_meta_{meta_key}_for_{object_subtype}", Allowed, -Meta_Key, Object_Id, Integer (User_Id), Cap, Caps);
                   else
 
                      --
@@ -648,7 +652,7 @@ is
                      -- @param string   cap       Capability name.
                      -- @param string[] caps      Array of the user"s capabilities.
                      --
-                     Allowed := Apply_Filters ("auth_{object_type}_meta_{meta_key}", Allowed, -Meta_Key, Object_Id, User_Id, Cap, Caps);
+                     Allowed := Apply_Filters ("auth_{object_type}_meta_{meta_key}", Allowed, -Meta_Key, Object_Id, Integer (User_Id), Cap, Caps);
                   end if;
 
                   -- if not Empty (Object_Subtype) then
@@ -727,6 +731,7 @@ is
             if Post /= Null_Post then
                Caps := Map_Meta_Cap ("edit_post", User_Id, (Post_Id  => Post.Id,
                                                             Meta_Key => False,
+                                                            User_Id  => 0,
                                                             others   => 0));
             else
                Caps := Map_Meta_Cap ("edit_posts", User_Id);
@@ -926,6 +931,7 @@ is
                                   User_Id, (Term_Id  => Term_Id,
                                             Meta_Key => False,
                                             Post_Id  => 0,
+                                            User_Id  => 0,
                                             others   => 0));
          end;
          << Break_9 >>
@@ -1041,7 +1047,7 @@ is
       -- @param array    args    Adds context to the capability check, typically
       --                          starting with an object ID.
       --
-      return Apply_Filters ("map_meta_cap", Caps, -Cap_2, User_Id, Args);
+      return Apply_Filters ("map_meta_cap", Caps, -Cap_2, Integer (User_Id), Args);
    end Map_Meta_Cap;
 
 -- --
@@ -1174,7 +1180,11 @@ is
       return User.Has_Cap (Capability); -- , ...args );
    end User_Can;
 
-   function User_Can (User       : Integer;
+   --------------
+   -- User_Can --
+   --------------
+
+   function User_Can (User       : Class_Users.User_Id_Type;
                       Capability : String)
                       -- , ...args)
                       return Boolean
@@ -1271,7 +1281,7 @@ is
    -- Is_Super_Admin --
    --------------------
 
-   function Is_Super_Admin (User_Id : Integer := 0) -- false
+   function Is_Super_Admin (User_Id : Class_Users.User_Id_Type := 0) -- false
                             return Boolean
    is
       use Php.Lists;

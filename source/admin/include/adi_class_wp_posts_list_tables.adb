@@ -82,7 +82,7 @@ is
             " AND post_author = %d",
             To_List (List => (
               1 => Globals.Post_Type,
-              2 => +Helpers.Image (Get_Current_User_Id)
+              2 => +Helpers.Image (Integer (Get_Current_User_Id))
             ))
           )));
 
@@ -95,7 +95,7 @@ is
         and then Empty (X_REQUEST, "show_sticky")
       then
          Set (XX_GET, "author",
-              From_String (Helpers.Image (Get_Current_User_Id)));
+              From_String (Helpers.Image (Integer (Get_Current_User_Id))));
       end if;
 
       declare

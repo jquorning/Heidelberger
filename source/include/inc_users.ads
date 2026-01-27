@@ -23,7 +23,7 @@ is
 
    type User_Id_Error_Type is record
       Success : Boolean;
-      User_Id : Integer;
+      User_Id : Class_Users.User_Id_Type;
       Error   : Class_Errors.Wp_Error;
    end record;
 
@@ -81,26 +81,26 @@ is
    -- @return mixed User option value on success, false on failure.
    --
    function Get_User_Option (Option     : String;
-                             User       : Integer := 0;
-                             Deprecated : String := "")
+                             User       : Class_Users.User_Id_Type := 0;
+                             Deprecated : String                   := "")
                              return Boolean
                              is (True);
 
    function Get_User_Option (Option     : String;
-                             User       : Integer := 0;
-                             Deprecated : String := "")
+                             User       : Class_Users.User_Id_Type := 0;
+                             Deprecated : String       := "")
                              return String
                              is ("XXX-601");
 
    function Get_User_Option (Option     : String;
-                             User       : Integer := 0;
-                             Deprecated : String := "")
+                             User       : Class_Users.User_Id_Type := 0;
+                             Deprecated : String       := "")
                              return Natural
                              is (999);
 
    function Get_User_Option (Option     : String;
-                             User       : Integer := 0;
-                             Deprecated : String := "")
+                             User       : Class_Users.User_Id_Type := 0;
+                             Deprecated : String       := "")
                              return Array_Type
                              is (Empty_Array);
 
@@ -125,7 +125,7 @@ is
    -- @return int|bool User meta ID if the option didn't exist, true on successful
    --                  update, false on failure.
    --
-   procedure Update_User_Option (User_Id     : Integer;
+   procedure Update_User_Option (User_Id     : Class_Users.User_Id_Type;
                                  Option_Name : String;
                                  Newvalue    : Multi_Type;
                                  Global      : Boolean := False)
@@ -150,19 +150,19 @@ is
    --               value). An empty string if a valid but non-existing user ID is
    --               passed.
    --
-   function Get_User_Meta (User_Id : Integer;
+   function Get_User_Meta (User_Id : Class_Users.User_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Boolean
                            is (True);
 
-   function Get_User_Meta (User_Id : Integer;
+   function Get_User_Meta (User_Id : Class_Users.User_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Integer
                            is (999);
 
-   function Get_User_Meta (User_Id : Integer;
+   function Get_User_Meta (User_Id : Class_Users.User_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type
@@ -191,26 +191,26 @@ is
    --                  false on failure or if the value passed to the function
    --                  is the same as the one that is already in the database.
    --
-   function Update_User_Meta (User_Id    : Integer;
+   function Update_User_Meta (User_Id    : Class_Users.User_Id_Type;
                               Meta_Key   : String;
                               Meta_Value : Boolean;
                               Prev_Value : String := "")
                               return Integer
                               is (0);
 
-   procedure Update_User_Meta (User_Id    : Integer;
+   procedure Update_User_Meta (User_Id    : Class_Users.User_Id_Type;
                                Meta_Key   : String;
                                Meta_Value : Array_Type; -- Boolean;
                                Prev_Value : String := "")
                                is null;
 
-   procedure Update_User_Meta (User_Id    : Integer;
+   procedure Update_User_Meta (User_Id    : Class_Users.User_Id_Type;
                                Meta_Key   : String;
                                Meta_Value : Integer;
                                Prev_Value : String := "")
                                is null;
 
-   procedure Update_User_Meta (User_Id    : Integer;
+   procedure Update_User_Meta (User_Id    : Class_Users.User_Id_Type;
                                Meta_Key   : String;
                                Meta_Value : String;
                                Prev_Value : String := "")
@@ -235,7 +235,7 @@ is
    --                       could not be updated.
    --
    function Wp_Update_User (Userdata : Class_Users.Wp_User)
-                            return Integer
+                            return Class_Users.User_Id_Type
                             is (raise Program_Error with "not implemented");
 
    procedure Wp_Update_User (Userdata : Class_Users.Wp_User)
@@ -260,7 +260,7 @@ is
    function Wp_Create_User (Username : String;
                             Password : String;
                             Email    : String := "")
-                            return Integer;
+                            return Class_Users.User_Id_Type;
 
    --
    -- Retrieves a user row based on password reset key and login.
@@ -297,8 +297,8 @@ is
    --                               current site.
    -- @return bool
    --
-   function Is_User_Member_Of_Blog (User_Id : Integer := 0;
-                                    Blog_Id : Integer := 0)
+   function Is_User_Member_Of_Blog (User_Id : Class_Users.User_Id_Type := 0;
+                                    Blog_Id : Integer      := 0)
                                     return Boolean;
 
    --
@@ -376,7 +376,7 @@ is
    -- @return int The current user"s ID, or 0 if no user is logged in.
    --
    function Get_Current_User_Id
-            return Integer
+            return Class_Users.User_Id_Type
             is (1);
 
    --
@@ -393,7 +393,7 @@ is
    -- @return object[] A list of the user"s sites. An empty array if the user doesn't
    --                  exist or belongs to no sites.
    --
-   function Get_Blogs_Of_User (User_Id   : Integer;
+   function Get_Blogs_Of_User (User_Id   : Class_Users.User_Id_Type;
                                All_Sites : Boolean := False)
                                return Class_Admin_Bar.Blog_List -- String_Array
                                is (Class_Admin_Bar.Empty_Blog_List); -- (Empty_String_Array);
@@ -451,7 +451,7 @@ is
    --
    -- @param int for_user_id Optional. User ID to set up global data. Default 0.
    --
-   procedure Setup_Userdata (For_User_Id : Integer := 0);
+   procedure Setup_Userdata (For_User_Id : Class_Users.User_Id_Type := 0);
 
    --
    -- Updates all user caches.
@@ -476,7 +476,7 @@ is
    -- @return int|false The user ID on success, false on failure.
    --
    function Username_Exists (Username : String)
-                             return Integer;
+                             return Class_Users.User_Id_Type;
 
    --
    -- Inserts a user into the database.
@@ -558,7 +558,7 @@ is
    --                      user could not be created.
    --
    function Wp_Insert_User (Userdata : Array_Type)
-                            return Integer;
+                            return Class_Users.User_Id_Type;
 
    --
    -- Returns request confirmation message HTML.

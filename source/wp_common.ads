@@ -745,6 +745,13 @@ is
                return Class_Sites.Wp_Site
                is (Value);
 
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Class_Users.User_Id_Type;
+               Name      : String)
+               return Class_Users.User_Id_Type
+               is (Value);
+
    function Apply_Filters_Deprecated
               (Hook_Name : String;
                Value     : Array_Type;
@@ -906,5 +913,8 @@ is
 
    procedure Do_Action (Hook_Name : String;
                         This      : Class_Customize_Settings.Wp_Customize_Setting);
+
+   procedure Do_Action (Hook_Name : String;
+                        User      : Class_Users.User_Id_Type);
 
 end Wp_Common;

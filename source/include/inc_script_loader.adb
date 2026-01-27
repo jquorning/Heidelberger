@@ -38,6 +38,7 @@ with Adi_Class_Wp_Screens;
 
 with Class_Dependency;
 with Class_Theme_JSON_Resolver;
+with Class_Users;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
@@ -453,6 +454,7 @@ is
       use Php.Strings;
       use UStrings;
       use Class_Dependency.Dependency_Maps;
+      use Class_Users;
       use Inc_Formatting;
       use Inc_Link_Templates;
       use Inc_REST_API;
@@ -500,7 +502,7 @@ is
          Meta_Key : constant String  :=
            Globals.WpDB.Get_Blog_Prefix & "persisted_preferences";
 
-         User_Id      : constant Integer := Get_Current_User_Id;
+         User_Id      : constant User_Id_Type := Get_Current_User_Id;
          Preload_Data : constant Boolean := Get_User_Meta (User_Id, Meta_Key, True);
       begin
          Scripts.Add_Inline_Script (
@@ -874,7 +876,7 @@ is
            "userSettings",
            To_Array ((
              Build ("url",    -Constants.SITECOOKIEPATH), -- (string)
-             Build ("uid",    Inc_Users.Get_Current_User_Id), -- (string)
+             Build ("uid",    Integer (Inc_Users.Get_Current_User_Id)), -- (string)
 --           Build ("time",   (string) time(),
              Build ("secure", Boolean'Image ("https" = Php.HTML.Parse_URL (Site_URL, Php.HTML.PHP_URL_SCHEME)))
            ))

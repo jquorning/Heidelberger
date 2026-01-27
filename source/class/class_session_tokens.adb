@@ -17,7 +17,7 @@ is
    -----------------
 
    procedure X_Construct (This    : out Wp_Session_Tokens'Class;
-                          User_Id : Integer)
+                          User_Id : Class_Users.User_Id_Type)
    is
    begin
       This.User_Id := User_Id;

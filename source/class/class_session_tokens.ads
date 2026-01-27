@@ -8,6 +8,8 @@
 
 with Arrays;
 
+with Class_Users;
+
 package Class_Session_Tokens
 is
    use Arrays;
@@ -27,7 +29,7 @@ is
         -- @var int User ID.
         --
         -- protected
-        User_Id : Integer;
+        User_Id : Class_Users.User_Id_Type; -- Integer;
 
      end record;
 
@@ -40,7 +42,7 @@ is
    --
    -- protected
    procedure X_Construct (This    : out Wp_Session_Tokens'Class;
-                          User_Id : Integer);
+                          User_Id : Class_Users.User_Id_Type);
 
    --
    -- Retrieves a session manager instance for a user.
