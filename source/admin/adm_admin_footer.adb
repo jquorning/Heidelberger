@@ -23,9 +23,7 @@ with Inc_Plugins;
 
 package body Adm_Admin_Footer
 is
-   use UStrings;
    use Lists;
-   use Php;
 
    ---------
    -- Run --
@@ -35,6 +33,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;

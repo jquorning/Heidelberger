@@ -30,7 +30,6 @@ with Inc_Taxonomys;
 
 package body Inc_Category_Templates
 is
-   use Ada.Containers;
    use Lists;
 
 --
@@ -1373,6 +1372,7 @@ is
                            return Class_Terms.Wp_Term_Array
                            -- Inc_Class_Posts.Wp_Post
    is
+      use Ada.Containers;
       use Wp_Common;
       use Adi_Caches;
       use Class_Terms;

@@ -14,6 +14,7 @@ with Lists;
 with Class_Dependency;
 
 package Class_Dependencies
+   with SPARK_Mode => On
 is
    use Lists;
 
@@ -143,13 +144,15 @@ is
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : List_Type := Empty_List; -- = false,
                       Group   : Integer   := 0) --  = false
-                      return List_Type;
+                      return List_Type
+                      with Side_Effects;
 
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : Boolean;
                       Group   : Integer := 0) --  = false
                       return List_Type
-                      is (Empty_List);
+                      with Side_Effects;
+--                    is (Empty_List);
 
    procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : Boolean;
@@ -194,7 +197,8 @@ is
                       Handles   : List_Type; -- String_Array;
                       Recursion : Boolean := False;
                       Group     : Integer := 0) -- = false
-                      return Boolean;
+                      return Boolean
+                      with Side_Effects;
 
    -- function All_Deps (This      : in out Wp_Dependencies;
    --                    Handles   : String_Array;
@@ -239,7 +243,8 @@ is
                  -- String_Array := Empty_String_Array;
                  Ver    : String    := ""; -- Boolean      := False;
                  Args   : String    := "") -- = null
-                 return Boolean;
+                 return Boolean
+                 with Side_Effects;
 
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
@@ -288,14 +293,15 @@ is
                       Handle : String;
                       Key    : String;
                       Value  : String)
-                      return Boolean;
+                      return Boolean
+                      with Side_Effects;
 
    function Add_Data (This   : in out Wp_Dependencies;
                       Handle : String;
                       Key    : String;
                       Value  : List_Type)
                       return Boolean
-                      is (True);
+                      with Side_Effects;
 
    procedure Add_Data (This   : in out Wp_Dependencies;
                        Handle : String;
@@ -382,7 +388,8 @@ is
    function Recurse_Deps (This   : in out Wp_Dependencies;
                           Queue  : List_Type; -- String_Array;
                           Handle : String)
-                          return Boolean;
+                          return Boolean
+                          with Side_Effects;
 
    --
    -- Query the list for an item.
@@ -404,7 +411,8 @@ is
    function Query (This   : in out Wp_Dependencies;
                    Handle : String;
                    Status : String := "registered")
-                   return Query_Result;
+                   return Query_Result
+                   with Side_Effects;
 
    --
    -- Set item group, unless already in a lower group.
@@ -421,6 +429,7 @@ is
                        Handle    : String;
                        Recursion : Boolean;
                        Group     : Integer)
-                       return Boolean;
+                       return Boolean
+                       with Side_Effects;
 
 end Class_Dependencies;

@@ -182,8 +182,9 @@ is
    --
    function Print_Scripts (This    : in out Wp_Scripts;
                            Handles : List_Type := Empty_List;
-                           Group   : Integer      := 0) -- False)
-                           return List_Type;
+                           Group   : Integer   := 0) -- False
+                           return List_Type
+                           with Side_Effects;
 
    --
    -- Prints extra scripts of a registered script.
@@ -237,7 +238,8 @@ is
    function Do_Item (This   : in out Wp_Scripts;
                      Handle : String;
                      Group  : Boolean := False)
-                     return Boolean;
+                     return Boolean
+                     with Side_Effects;
 
    --
    -- Adds extra code to a registered script.
@@ -255,7 +257,8 @@ is
                                Handle   : String;
                                Data     : String;
                                Position : String := "after")
-                              return Boolean;
+                               return Boolean
+                               with Side_Effects;
 
    procedure Add_Inline_Script (This     : in out Wp_Scripts;
                                 Handle   : String;
@@ -295,7 +298,8 @@ is
                       Handle      : String;
                       Object_Name : String;
                       L10n        : Array_Type)
-                      return Boolean;
+                      return Boolean
+                      with Side_Effects;
 
    procedure Localize (This        : in out Wp_Scripts;
                        Handle      : String;
@@ -320,7 +324,8 @@ is
                        Handle    : String;
                        Recursion : Boolean;
                        Group     : Integer := 0) -- Boolean := False)
-                       return Boolean;
+                       return Boolean
+                       with Side_Effects;
 
    --
    -- Sets a translation textdomain.
@@ -381,7 +386,8 @@ is
                       Handles   : String;
                       Recursion : Boolean := False;
                       Group     : Boolean := False)
-                      return Boolean;
+                      return Boolean
+                      with Side_Effects;
 
    --
    -- Processes items and dependencies for the head group.
@@ -393,7 +399,8 @@ is
    -- @return string() Handles of items that have been processed.
    --
    function Do_Head_Items (This : in out Wp_Scripts)
-                           return List_Type;
+                           return List_Type
+                           with Side_Effects;
 
    --
    -- Processes items and dependencies for the footer group.
@@ -405,7 +412,8 @@ is
    -- @return string() Handles of items that have been processed.
    --
    function Do_Footer_Items (This : in out Wp_Scripts)
-                             return List_Type;
+                             return List_Type
+                             with Side_Effects;
 
    --
    -- Whether a handle"s source is in a default directory.

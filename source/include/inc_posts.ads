@@ -19,7 +19,6 @@ package Inc_Posts
 is
    use Arrays;
    use Lists;
-   use Class_Posts;
 
    --
    -- Post Type registration.
@@ -46,11 +45,11 @@ is
    -- @param string file          File path for the attachment.
    -- @return bool True on success, False on failure.
    --
-   function Update_Attached_File (Attachment_Id : Post_Id;
+   function Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
                                   File          : String)
                                   return Boolean;
 
-   procedure Update_Attached_File (Attachment_Id : Post_Id;
+   procedure Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
                                    File          : String);
 
    --
@@ -76,9 +75,9 @@ is
    --                               global $post.
    -- @return string|false          Post type on success, false on failure.
    --
-   function Get_Post_Type (Post : Post_Id := 0) -- Integer := 0) -- := null )
+   function Get_Post_Type (Post : Class_Posts.Post_Id := 0)  -- := null )
                            return String is ("XXX-250");
-   function Get_Post_Type (Post : Wp_Post) -- := null )
+   function Get_Post_Type (Post : Class_Posts.Wp_Post) -- := null )
                            return String is ("XXX-251");
 
    --
@@ -946,8 +945,8 @@ is
    --
    function Wp_Delete_Post (Postid       : Integer := 0;
                             Force_Delete : Boolean := False)
-                            return Wp_Post
-                            is (Null_Post);
+                            return Class_Posts.Wp_Post
+                            is (Class_Posts.Null_Post);
 
    --
    -- Retrieves a post status object by name.
@@ -991,23 +990,23 @@ is
    --                            failure. When $output is OBJECT, a `WP_Post`
    --                            instance is returned.
    --
-   function Get_Post (Post   : Wp_Post; -- = null,
+   function Get_Post (Post   : Class_Posts.Wp_Post; -- = null,
                       Output : String := "OBJECT"; --  = OBJECT,
                       Filter : String := "raw")
-                      return Wp_Post;
+                      return Class_Posts.Wp_Post;
 
-   function Get_Post (Post   : Post_Id := 0;
+   function Get_Post (Post   : Class_Posts.Post_Id := 0;
                       Output : String  := "OBJECT"; --  = OBJECT,
                       Filter : String  := "raw")
-                      return Wp_Post;
+                      return Class_Posts.Wp_Post;
 
-   function Get_Post (Post   : Post_Id := 0;
+   function Get_Post (Post   : Class_Posts.Post_Id := 0;
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
                       is (Empty_Array);
 
-   function Get_Post (Post   : Wp_Post;
+   function Get_Post (Post   : Class_Posts.Wp_Post;
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
@@ -1025,7 +1024,7 @@ is
    --                                 global post.
    -- @return string|False Page URI, False on error.
    --
-   function Get_Page_URI (Page : Wp_Post) -- Integer := 0)
+   function Get_Page_URI (Page : Class_Posts.Wp_Post) -- Integer := 0)
                           return String;
 
    --
@@ -1188,7 +1187,7 @@ is
    -- @return WP_Post|false|null Post data on success, false or null on failure.
    --
    function Wp_Untrash_Post (Post_Id : Integer := 0)
-                             return Wp_Post;
+                             return Class_Posts.Wp_Post;
 
    function Wp_Untrash_Post (Item : String)
                              return Boolean
@@ -1301,7 +1300,7 @@ is
    function Wp_Insert_Post (Postarr          : Array_Type;
                             Wp_Error         : Boolean := False;
                             Fire_After_Hooks : Boolean := True)
-                            return Post_Id
+                            return Class_Posts.Post_Id
                             is (0);
 
    --
@@ -1334,7 +1333,7 @@ is
    function Get_Page_By_Path (Page_Path : String;
                               Output    : String := "OBJECT";
                               Post_Type : String := "page")
-                              return Wp_Post;
+                              return Class_Posts.Wp_Post;
 
    --
    -- Retrieves the IDs of the ancestors of a post.
@@ -1363,9 +1362,9 @@ is
    --                          post.
    -- @return string|False Post status on success, False on failure.
    --
-   function Get_Post_Status (Post : Wp_Post := Null_Post)
+   function Get_Post_Status (Post : Class_Posts.Wp_Post := Class_Posts.Null_Post)
                              return String;
-   function Get_Post_Status (Post : Post_Id := 0)
+   function Get_Post_Status (Post : Class_Posts.Post_Id := 0)
                              return String;
 
    --
@@ -1479,7 +1478,7 @@ is
    -- @param int|WP_Post post Post ID or WP_Post object.
    -- @return bool Whether the post can be edited in the block editor.
    --
-   function Use_Block_Editor_For_Post (Post : Wp_Post)
+   function Use_Block_Editor_For_Post (Post : Class_Posts.Wp_Post)
                                        return Boolean
                                        is (True);
 
@@ -1503,15 +1502,15 @@ is
                                                  is ("XXX-611");
 
    -- By jq
-   function Get (Post  : Wp_Post;
+   function Get (Post  : Class_Posts.Wp_Post;
                  Field : String)
                  return Array_Type is (Empty_Array);
 
-   procedure Set (Post  : in out Wp_Post;
+   procedure Set (Post  : in out Class_Posts.Wp_Post;
                   Field : String;
                   Value : Array_Type) is null;
 
-   procedure Set (Post  : in out Wp_Post;
+   procedure Set (Post  : in out Class_Posts.Wp_Post;
                   Field : String;
                   Value : String) is null;
 

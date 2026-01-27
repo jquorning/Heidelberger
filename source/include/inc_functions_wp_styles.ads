@@ -16,7 +16,6 @@ with Class_Styles;
 package Inc_Functions_Wp_Styles
 is
    use Lists;
-   use Class_Styles;
 
    --
    -- Initialize wp_styles if it has not been set.

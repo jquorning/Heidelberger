@@ -128,7 +128,7 @@ is
    --
    function Add_Data (This : in out X_Wp_Dependency;
                       Name : String;
-                      Data : String) -- Boolean)
+                      Data : List_Type) -- String) -- Boolean)
                       return Boolean;
 
    --
@@ -137,7 +137,8 @@ is
    -- @since 5.0.0
    --
    -- @param string domain The translation textdomain.
-   -- @param string path   Optional. The full file path to the directory containing translation files.
+   -- @param string path   Optional. The full file path to the directory containing
+   --                       translation files.
    -- @return bool False if domain is not a string, true otherwise.
    --
    function Set_Translations (This   : in out X_Wp_Dependency;

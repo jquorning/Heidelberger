@@ -9,7 +9,6 @@
 
 package body Class_Dependency
 is
-   use UStrings;
 
    -----------------
    -- X_Construct --
@@ -22,6 +21,8 @@ is
                          Args   : String) -- Array_Type) --  ...args )
                          return X_Wp_Dependency
    is
+      use UStrings;
+
       This : X_Wp_Dependency;
    begin
       -- list ()
@@ -42,15 +43,18 @@ is
 
    function Add_Data (This : in out X_Wp_Dependency;
                       Name : String;
-                      Data : String)
+                      Data : List_Type) -- String)
                       return Boolean
    is
+      use UStrings;
 --    use Array_Vectors;
    begin
 --      if not Is_Scalar (Name) then
 --         return False;
 --      end if;
-      This.Extra.Insert (Name, Data); -- (Name)
+      for A of Data loop
+         This.Extra.Insert (Name, -A); -- (Name)
+      end loop;
       return True;
    end Add_Data;
 
@@ -63,6 +67,7 @@ is
                               Path   : String := "")
                               return Boolean
    is
+      use UStrings;
    begin
 --      if not Is_String (Domain) then
 --         return False;

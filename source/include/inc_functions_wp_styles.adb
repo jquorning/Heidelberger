@@ -184,6 +184,7 @@ is
       use Php.Strings;
       use UStrings;
       use Class_Dependencies;
+      use Class_Styles;
       use Inc_Functions_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);

@@ -17,22 +17,10 @@ with Wp_Common;
 
 package body Class_Dependencies
 is
-   use UStrings;
-   use Wp_Common;
 
    --------------
    -- Do_Items --
    --------------
-
-   procedure Do_Items (This    : in out Wp_Dependencies;
-                       Handles : Boolean;
-                       Group   : Integer := 0)
-   is
-      Unused : constant List_Type :=
-        Do_Items (This, Handles, Group);
-   begin
-      null;
-   end Do_Items;
 
    function Do_Items (This    : in out Wp_Dependencies;
                       Handles : List_Type := Empty_List; -- = false,
@@ -40,11 +28,13 @@ is
                       return List_Type
    is
       use Php.Lists;
+      use UStrings;
       use List_Vectors;
-                --
-                -- If nothing is passed, print the queue. If a string is passed,
-                -- print that item. If an array is passed, print those items.
-                --
+
+      --
+      -- If nothing is passed, print the queue. If a string is passed,
+      -- print that item. If an array is passed, print those items.
+      --
       Handles_2 : List_Type := (if Empty_List = Handles
                                 then This.Queue else Handles); -- (array)
       Unused : Boolean;
@@ -81,6 +71,33 @@ is
       return This.Done;
    end Do_Items;
 
+   --------------
+   -- Do_Items --
+   --------------
+
+   function Do_Items (This    : in out Wp_Dependencies;
+                      Handles : Boolean;
+                      Group   : Integer := 0) --  = false
+                      return List_Type
+   is
+   begin
+      return Do_Items (This, Empty_List, Group);
+   end Do_Items;
+
+   --------------
+   -- Do_Items --
+   --------------
+
+   procedure Do_Items (This    : in out Wp_Dependencies;
+                       Handles : Boolean;
+                       Group   : Integer := 0)
+   is
+      Unused : constant List_Type :=
+        Do_Items (This, Handles, Group);
+   begin
+      null;
+   end Do_Items;
+
    -------------
    -- Do_Item --
    -------------
@@ -107,6 +124,8 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
+      use Wp_Common;
       use List_Vectors;
 --    use Array_Maps;
 
@@ -213,6 +232,7 @@ is
                  return Boolean
    is
       use Php.Lists;
+      use UStrings;
       use Class_Dependency;
       use Class_Dependency.Dependency_Maps;
 --    use String_Vectors;
@@ -249,24 +269,27 @@ is
    -- Add_Data --
    --------------
 
-   procedure Add_Data (This   : in out Wp_Dependencies;
-                       Handle : String;
-                       Key    : String;
-                       Value  : String)
+   function Add_Data (This   : in out Wp_Dependencies;
+                      Handle : String;
+                      Key    : String;
+                      Value  : String)
+                      return Boolean
    is
-      Unused : constant Boolean :=
-        Add_Data (This, Handle, Key, Value);
    begin
-      null;
+      return Add_Data (This, Handle, Key, To_List (Value));
    end Add_Data;
+
+   --------------
+   -- Add_Data --
+   --------------
 
    function Add_Data (This   : in out Wp_Dependencies;
                       Handle : String;
                       Key    : String;
-                      Value  : String) -- Array_Type)
---                    Value  : Array_Type)
+                      Value  : List_Type)
                       return Boolean
    is
+      use Wp_Common;
       use Class_Dependency.Dependency_Maps;
    begin
       if This.Registered.Find (Handle) = No_Element then
@@ -281,6 +304,21 @@ is
          return S.Add_Data (Key, Value);
 --       return This.Registered (Handle).Add_Data (Key, Value);
       end;
+   end Add_Data;
+
+   --------------
+   -- Add_Data --
+   --------------
+
+   procedure Add_Data (This   : in out Wp_Dependencies;
+                       Handle : String;
+                       Key    : String;
+                       Value  : String)
+   is
+      Unused : constant Boolean :=
+        Add_Data (This, Handle, Key, Value);
+   begin
+      null;
    end Add_Data;
 
    --------------
@@ -315,6 +353,7 @@ is
    procedure Remove (This    : in out Wp_Dependencies;
                      Handles : List_Type)
    is
+      use UStrings;
    begin
       for Handle of Handles loop
          This.Registered.Delete (-Handle);
@@ -331,6 +370,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Class_Dependency;
       use Class_Dependency.Dependency_Maps;
       use List_Vectors;
@@ -389,6 +429,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
 --    use Class_Dependency;
    begin
       for Handle of Handles loop
@@ -434,6 +475,7 @@ is
                           return Boolean
    is
       use Php.Lists;
+      use UStrings;
       use Class_Dependency;
       use Class_Dependency.Dependency_Maps;
 --    use String_Vectors;

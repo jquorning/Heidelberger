@@ -10,7 +10,6 @@ with Class_Recovery_Mode;
 
 package Inc_Error_Protection
 is
-   use Class_Paused_Extensions_Storages;
 
 -- --
 -- -- Get the instance for storing paused plugins.
@@ -33,7 +32,7 @@ is
    -- @return WP_Paused_Extensions_Storage
    --
    function Wp_Paused_Themes
-            return Wp_Paused_Extensions_Storage;
+            return Class_Paused_Extensions_Storages.Wp_Paused_Extensions_Storage;
 
 -- --
 -- -- Get a human readable description of an extension"s error.

@@ -32,7 +32,6 @@ with Inc_Revisions;
 
 package body Inc_Posts
 is
-   use Inc_L10n;
 
    package Post_Type_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps
@@ -64,7 +63,7 @@ is
    procedure Create_Initial_Post_Types
    is
       use UStrings;
---    use String_Vectors;
+      use Inc_L10n;
    begin
       Class_Post_Type.Reset_Default_Labels; -- :: ();
 
@@ -1420,7 +1419,7 @@ is
    -- Update_Attached_File --
    --------------------------
 
-   function Update_Attached_File (Attachment_Id : Post_Id;
+   function Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
                                   File          : String)
                                   return Boolean
    is
@@ -1460,7 +1459,7 @@ is
    -- Update_Attached_File --
    --------------------------
 
-   procedure Update_Attached_File (Attachment_Id : Post_Id;
+   procedure Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
                                    File          : String)
    is
       Unused : constant Boolean := Update_Attached_File (Attachment_Id, File);
@@ -1659,13 +1658,14 @@ is
    -- Get_Post --
    --------------
 
-   function Get_Post (Post   : Wp_Post; -- = null,
+   function Get_Post (Post   : Class_Posts.Wp_Post; -- = null,
                       Output : String := "OBJECT"; --  = OBJECT,
                       Filter : String := "raw")
-                      return Wp_Post
+                      return Class_Posts.Wp_Post
    is
       use Wp_Common;
       use UStrings;
+      use Class_Posts;
 
       Post_2 : constant Wp_Post := Post;
       X_Post : Wp_Post;
@@ -1709,11 +1709,13 @@ is
       return X_Post;
    end Get_Post;
 
-   function Get_Post (Post   : Post_Id := 0;
+   function Get_Post (Post   : Class_Posts.Post_Id := 0;
                       Output : String  := "OBJECT"; --  = OBJECT,
                       Filter : String  := "raw")
-                      return Wp_Post
+                      return Class_Posts.Wp_Post
    is
+      use Class_Posts;
+
       P : Wp_Post;
    begin
       return P;
@@ -1733,8 +1735,7 @@ is
                                 return Array_Type  -- return Post_Id_List;
    is
       use Php.Arrays;
---    use UStrings;
---    use Class_Posts;
+      use Class_Posts;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
    begin
@@ -1834,12 +1835,13 @@ is
    -- Get_Post_Status --
    ---------------------
 
-   function Get_Post_Status (Post : Wp_Post := Null_Post)
+   function Get_Post_Status (Post : Class_Posts.Wp_Post := Class_Posts.Null_Post)
                              return String
    is
       use Php.Lists;
       use UStrings;
       use Wp_Common;
+      use Class_Posts;
 --    use Inc_Plugins;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
@@ -1900,7 +1902,7 @@ is
       return Apply_Filters ("get_post_status", -Post_Status, Post_2);
    end Get_Post_Status;
 
-   function Get_Post_Status (Post : Post_Id := 0)
+   function Get_Post_Status (Post : Class_Posts.Post_Id := 0)
                              return String
    is
    begin
@@ -1975,7 +1977,7 @@ is
    is
       use UStrings;
       use Inc_Formatting;
---    use Inc_Functions;
+      use Inc_L10n;
 
 --         global wp_post_statuses;
       -- Args prefixed with an underscore are reserved for internal use.
@@ -3564,6 +3566,7 @@ is
       use Php.Arrays;
       use UStrings;
       use Wp_Common;
+      use Class_Posts;
 
       Post_2 : Class_Posts.Wp_Post := Post;
    begin
@@ -4534,8 +4537,10 @@ is
 -- @return WP_Post|False|null Post data on success, False or null on failure.
 --
    function Wp_Untrash_Post (Post_Id : Integer := 0)
-                             return Wp_Post
+                             return Class_Posts.Wp_Post
    is
+      use Class_Posts;
+
       P : Wp_Post;
    begin
       return P;
@@ -6584,7 +6589,7 @@ is
    function Get_Page_By_Path (Page_Path : String;
                               Output    : String := "OBJECT";
                               Post_Type : String := "page")
-                              return Wp_Post
+                              return Class_Posts.Wp_Post
    is
       use Ada.Containers;
       use Php.HTML;
@@ -6593,11 +6598,11 @@ is
       use Php.Lists;
       use Php.Misc;
       use UStrings;
+      use Class_Posts;
       use Class_WpDB;
       use Inc_Caches;
       use Inc_Formatting;
       use Inc_Functions;
---    use type Class_Posts.Post_Id;
 
       Last_Changed : constant String := Wp_Cache_Get_Last_Changed ("posts");
 
@@ -6866,11 +6871,12 @@ is
    -- Get_Page_URI --
    ------------------
 
-   function Get_Page_URI (Page : Wp_Post) -- Integer := 0)
+   function Get_Page_URI (Page : Class_Posts.Wp_Post) -- Integer := 0)
                           return String
    is
       use UStrings;
       use Wp_Common;
+      use Class_Posts;
    begin
       -- if Page not in Wp_Post then instanceof
       --    Page := Get_Post (Page);

@@ -8,16 +8,17 @@
 package body Inc_Error_Protection
 is
 
-   Static_Storage : Wp_Paused_Extensions_Storage :=
-     Null_Paused_Extensions_Storage;
+   Static_Storage : Class_Paused_Extensions_Storages.Wp_Paused_Extensions_Storage :=
+     Class_Paused_Extensions_Storages.Null_Paused_Extensions_Storage;
 
    ----------------------
    -- Wp_Paused_Themes --
    ----------------------
 
    function Wp_Paused_Themes
-            return Wp_Paused_Extensions_Storage
+            return Class_Paused_Extensions_Storages.Wp_Paused_Extensions_Storage
    is
+      use Class_Paused_Extensions_Storages;
    begin
       if Static_Storage = Null_Paused_Extensions_Storage then
          Static_Storage := Wp_Paused_Extensions_Storage'(X_Construct ("theme"));

@@ -28,7 +28,6 @@ with Inc_Plugins;
 
 package body Inc_Vars
 is
-   use UStrings;
 
    ---------
    -- Run --
@@ -41,6 +40,7 @@ is
       use Php.Strings;
       use Arrays;
       use Binder;
+      use UStrings;
       use Wp_Common;
       use Inc_Load;
 
@@ -218,7 +218,9 @@ is
       use Arrays;
       use Wp_Common;
 
-      Http_User_Agent : constant String := As_String (Get (Binder.X_SERVER, "HTTP_USER_AGENT"));
+      Http_User_Agent : constant String :=
+        As_String (Get (Binder.X_SERVER, "HTTP_USER_AGENT"));
+
       Is_Mobile : Boolean;
    begin
       if Empty (Http_User_Agent) then

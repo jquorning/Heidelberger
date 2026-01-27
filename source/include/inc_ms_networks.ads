@@ -14,11 +14,13 @@ with Class_Networks;
 
 package Inc_Ms_Networks
 is
-   use Class_Networks;
+--   use Class_Networks;
 
    package Network_Lists
      is new Ada.Containers.Vectors (Index_Type   => Positive,
-                                    Element_Type => Wp_Network);
+                                    Element_Type => Class_Networks.Wp_Network,
+                                    "="          => Class_Networks."=");
+
    subtype Network_List is Network_Lists.Vector;
 
    procedure Dummy;
@@ -37,13 +39,13 @@ is
    --                                     the current network.
    -- @return WP_Network|null The network object or null if not found.
    --
-   function Get_Network (Network : Wp_Network := Null_Network) --  := null)
-                         return Wp_Network
-                         is (Null_Network);
+   function Get_Network (Network : Class_Networks.Wp_Network := Class_Networks.Null_Network) --  := null)
+                         return Class_Networks.Wp_Network
+                         is (Class_Networks.Null_Network);
 
    function Get_Network (Network : Integer) --  := null)
-                         return Wp_Network
-                         is (Null_Network);
+                         return Class_Networks.Wp_Network
+                         is (Class_Networks.Null_Network);
 
    --
    -- Retrieves a list of networks.
