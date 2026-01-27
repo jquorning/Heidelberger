@@ -44,8 +44,6 @@ is
                                         return Boolean
    is
       use Binder;
---    use UStrings;
---    use Php;
    begin
       return not Isset (X_POST, RENDER_QUERY_VAR);
 --    return not Empty (X_POST, RENDER_QUERY_VAR);

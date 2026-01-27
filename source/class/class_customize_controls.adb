@@ -23,9 +23,8 @@ is
               Args    : Array_Type := Empty_Array)
               return Wp_Customize_Control
    is
-      use UStrings;
-      use Php;
       use Php.Types;
+      use UStrings;
 
       This : Wp_Customize_Control;
 --    Keys : List_Type := Array_Keys (Get_Object_Vars (This));

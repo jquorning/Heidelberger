@@ -189,7 +189,6 @@ is
                               Setting_Id : String)
                               return String
    is
-      use Php;
       use Php.Preg;
    begin
       if Isset (Static_Cache, Setting_Id) then
@@ -791,7 +790,6 @@ is
                              Widget_Id : String)
                              return Array_Type
    is
-      use Php;
       use Php.Preg;
 
       Parsed : Array_Type := To_Array (List => (
@@ -1098,7 +1096,6 @@ is
 
    procedure Output_Widget_Control_Templates (This : in out Wp_Customize_Widgets)
    is
-      use Php;
       use Php.Echoing;
       use Inc_Formatting;
       use Inc_L10n;
@@ -1292,7 +1289,6 @@ is
    function Get_Available_Widgets (This : in out Wp_Customize_Widgets)
                                    return Array_Type
    is
-      use Php;
       use Php.Arrays;
       use Php.Sorting;
       use Adi_Widgets;
@@ -1570,7 +1566,6 @@ is
 
    procedure Print_Preview_CSS (This : in out Wp_Customize_Widgets)
    is
-      use Php;
       use Php.Echoing;
    begin
       Echo ("<style>" & NL);
@@ -1590,7 +1585,6 @@ is
 
    procedure Export_Preview_Data (This : in out Wp_Customize_Widgets)
    is
-      use Php;
       use Php.Arrays;
       use Php.Echoing;
       use Inc_Functions;
@@ -1731,7 +1725,6 @@ is
                                                   Widget_Ids : Array_Type)
                                                   return Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       Widget_Ids_2 : constant Array_Type :=
@@ -1755,7 +1748,6 @@ is
                                             Partial_Id   : String)
                                             return Array_Type
    is
-      use Php;
       use Php.Arrays;
       use Php.Preg;
       use Inc_Themes;
@@ -1931,7 +1923,6 @@ is
                Allowed_HTML : Array_Type)
                return Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       Allowed_HTML_2 : Array_Type := Allowed_HTML;
@@ -1971,7 +1962,6 @@ is
    procedure Start_Dynamic_Sidebar (This  : in out Wp_Customize_Widgets;
                                     Index : String)
    is
-      use Php;
       use Php.Echoing;
       use Php.Lists;
       use Inc_Formatting;
@@ -2004,7 +1994,6 @@ is
    procedure End_Dynamic_Sidebar (This  : in out Wp_Customize_Widgets;
                                   Index : String)
    is
-      use Php;
       use Php.Echoing;
       use Php.Lists;
       use Inc_Formatting;
@@ -2057,7 +2046,6 @@ is
                Context : Array_Type)
                return String
    is
-      use Php;
       use Php.Echoing;
       use Php.Lists;
       use Inc_Plugins;

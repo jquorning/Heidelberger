@@ -102,7 +102,6 @@ is
    procedure Rename_Settings (Settings        : in out Array_Type;
                               Paths_To_Rename : Array_Type)
    is
-      use Php;
       use Php.Strings;
       use Inc_Functions;
    begin
@@ -132,9 +131,8 @@ is
    procedure Unset_Setting_By_Path (Settings : in out Array_Type;
                                     Path     : List_Type)
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
+      use UStrings;
 
       Path_2       : List_Type  := Path;
       Tmp_Settings : Array_Type := Settings;

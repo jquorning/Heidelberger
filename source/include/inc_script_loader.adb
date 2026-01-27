@@ -87,8 +87,6 @@ is
      (Scripts            : in out Class_Scripts.Wp_Scripts;
       Force_Uncompressed : Boolean := False)
    is
---    use UStrings;
-      use Php;
       use Php.Strings;
       use Inc_Link_Templates;
       use Inc_Versions;
@@ -358,8 +356,6 @@ is
    procedure Wp_Default_Packages_Scripts
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use Php;
---    use Php.Files;
       use Php.Lists;
       use Php.Strings;
 
@@ -452,10 +448,9 @@ is
    procedure Wp_Default_Packages_Inline_Scripts
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Strings;
+      use UStrings;
       use Class_Dependency.Dependency_Maps;
       use Inc_Formatting;
       use Inc_Link_Templates;
@@ -2679,10 +2674,9 @@ is
 
    procedure X_Print_Styles
    is
-      use UStrings;
-      use Php;
       use Php.Echoing;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Themes;
 --      global compress_css;
@@ -2743,9 +2737,7 @@ is
 
    procedure Script_Concat_Settings
    is
-      use Php;
       use Php.Ini;
---    use UStrings;
 --    global concatenate_scripts, compress_scripts, compress_css;
 
       Compressed_Output : constant Boolean :=
@@ -2797,10 +2789,9 @@ is
 
    procedure Wp_Common_Block_Scripts_And_Styles
    is
-      use UStrings;
-      use Php;
       use Php.Files;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions_Wp_Styles;
       use Inc_L10n;
       use Inc_Plugins;
@@ -2872,8 +2863,6 @@ is
 
    function Filter_Blocks (Node : String) return Boolean
    is
---    use UStrings;
-      use Php;
       use Php.Arrays;
    begin
       return
@@ -2889,7 +2878,6 @@ is
    function Wp_Filter_Out_Block_Nodes (Nodes : Array_Type)
                                        return Array_Type
    is
-      use Php;
       use Php.Arrays;
    begin
       return
@@ -3457,11 +3445,10 @@ is
                                                Stylesheet_URL : String)
                                                return String
    is
-      use UStrings;
-      use Php;
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
 
       CSS_2 : UString := +CSS;

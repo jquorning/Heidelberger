@@ -420,7 +420,6 @@ is
             return Inc_Options.String_Maps.Map
    is
       use Ada.Containers;
-      use Php;
       use Php.Types;
       use Inc_Options;
 
@@ -457,12 +456,11 @@ is
    function Register_Theme_Directory (Directory : String)
                                       return Boolean
    is
-      use Globals;
-      use UStrings;
-      use Php;
       use Php.Files;
       use Php.Lists;
       use Php.Strings;
+      use Globals;
+      use UStrings;
       use Inc_Formatting;
 
       Directory_2 : UString;
@@ -2626,12 +2624,11 @@ is
                                 List    : List_Type  := Empty_List;
                                 Arry    : Array_Type := Empty_Array) -- ...args
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use List_Vectors;
+      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Plugins;
@@ -3252,11 +3249,10 @@ is
    procedure Register_Theme_Feature (Feature : String;
                                      Args    : Array_Type)
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Inc_REST_API;
 
@@ -3544,12 +3540,11 @@ is
 
    procedure X_Wp_Customize_Include
    is
-      use Binder;
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Files;
       use Php.Strings;
+      use Binder;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

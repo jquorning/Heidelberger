@@ -26,9 +26,8 @@ is
                               Locale : String)
                               return Boolean
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
+      use UStrings;
       use Inc_L10n;
       use Inc_Plugins;
 
@@ -65,10 +64,9 @@ is
    function Restore_Previous_Locale (This : in out Wp_Locale_Switcher)
                                      return String
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Misc;
+      use UStrings;
       use Inc_Plugins;
 
       Previous_Locale : constant String := List_Pop (This.Locales);
@@ -112,7 +110,6 @@ is
                                 Locale : String)
    is
       use UStrings;
---    use Php;
       use Inc_L10n;
 
       Domains : constant List_Type := (if L10n.Is_Empty

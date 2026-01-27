@@ -1125,9 +1125,8 @@ is
 
    procedure Wp_Magic_Quotes
    is
-      use Binder;
-      use Php;
       use Php.Arrays;
+      use Binder;
       use Inc_Functions;
    begin
       -- Escape with wpdb.
@@ -1524,9 +1523,8 @@ is
    function Wp_Convert_Hr_To_Bytes (Value : String)
                                     return Natural
    is
-      use Globals;
-      use Php;
       use Php.Strings;
+      use Globals;
 
       Value_2 : constant String := Strtolower (Trim (Value));
       Bytes   : Natural := Natural'Value (Value_2);

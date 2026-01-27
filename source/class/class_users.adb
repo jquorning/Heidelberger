@@ -545,9 +545,8 @@ is
    function Get_Role_Caps (This : in out Wp_User)
                            return Array_Type -- Boolean_Maps.Map
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
+      use UStrings;
       use Inc_Capabilities;
       use Class_Role;
       use Class_Roles;
@@ -984,9 +983,8 @@ is
    function Get_Caps_Data (This : Wp_User)
                            return Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Types;
+      use UStrings;
       use Inc_Users;
 
       Caps : constant Array_Type :=

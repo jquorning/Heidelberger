@@ -44,7 +44,6 @@ is
    function Get_Error_Codes (This : Wp_Error)
                              return List_Type
    is
-      use Php;
       use Php.Arrays;
    begin
       if not This.Has_Errors then

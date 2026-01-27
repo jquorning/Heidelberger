@@ -31,9 +31,8 @@ is
                                     Context : Array_Type := Empty_Array)
                                     return Multi_Type -- Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
+      use UStrings;
       use Inc_Functions;
 
       Path_2 : constant List_Type :=

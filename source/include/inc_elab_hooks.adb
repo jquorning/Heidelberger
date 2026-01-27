@@ -12,9 +12,6 @@ is
    function Build_Preinitialized_Hooks (Filters : Array_Type)
                                         return Hook_Maps.Map
    is
---    use UStrings;
---    use Php;
-
       -- @var WP_Hook[] normalized
       Normalized : Hook_Maps.Map;
    begin

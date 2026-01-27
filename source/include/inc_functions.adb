@@ -1381,8 +1381,6 @@ is
    function Add_Magic_Quotes (Arry : Array_Type)
             return Array_Type
    is
---    use UStrings;
-      use Php;
       use Php.Strings;
 
       Array_2 : Array_Type := Arry;
@@ -2353,10 +2351,9 @@ is
    function Wp_Normalize_Path (Path : String)
                                return String
    is
-      use UStrings;
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       Path_2  : UString := +Path;
       Wrapper : UString;
@@ -4804,12 +4801,11 @@ is
                                  Options  : Array_Type := Empty_Array)
                                  return Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Errors;
       use Php.Files;
       use Php.JSON;
       use Php.Strings;
+      use UStrings;
       use Inc_L10n;
 
       Result     : Array_Type;
@@ -5091,7 +5087,6 @@ is
                            Defaults : Array_Type := Empty_Array)
                            return Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       Parsed_Args : Array_Type;
@@ -5105,7 +5100,6 @@ is
                            Defaults : Array_Type := Empty_Array)
                            return Array_Type
    is
-      use Php;
       use Php.Arrays;
       use Php.Misc;
       use Php.Types;
@@ -5223,10 +5217,9 @@ is
                             return Multi_Type
    is
       use Ada.Containers;
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Types;
+      use UStrings;
 
       Arry_2 : Array_Type := Arry;
    begin
@@ -5261,9 +5254,8 @@ is
                              Path  : List_Type;
                              Value : Multi_Type)
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
+      use UStrings;
 
       Arry_2 : Array_Type := Arry;
 
@@ -5319,10 +5311,9 @@ is
    function X_Wp_To_Kebab_Case (Item : String)
                                 return String
    is
-      use UStrings;
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       -- phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
       -- ignore the camelCase names for variables so the names are the same as lodash
@@ -6354,9 +6345,8 @@ is
    function Wp_Guess_URL
             return String
    is
-      use UStrings;
-      use Php;
       use Php.Strings;
+      use UStrings;
 
       URL : UString;
    begin
@@ -6883,7 +6873,6 @@ is
    function X_Cleanup_Header_Comment (Str : String)
                                       return String
    is
-      use Php;
       use Php.Preg;
       use Php.Strings;
    begin
@@ -7363,7 +7352,6 @@ is
    function Wp_Is_Stream (Path : String)
                           return Boolean
    is
-      use Php;
       use Php.Lists;
       use Php.Misc;
       use Php.Strings;
@@ -7881,11 +7869,10 @@ is
    function Wp_Generate_UUID4
             return String
    is
-      use Helpers;
-      use UStrings;
-      use Php;
       use Php.Numerics;
       use Php.Strings;
+      use Helpers;
+      use UStrings;
    begin
       return
         Sprintf (
@@ -7910,7 +7897,6 @@ is
                         Version : Integer := 0) -- null
                         return Boolean
    is
-      use Php;
       use Php.Preg;
       use Php.Types;
       use Inc_L10n;

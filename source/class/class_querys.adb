@@ -3934,10 +3934,9 @@ is
                      Page : String := "")
                      return Boolean
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Class_Posts;
       use Inc_Posts;
    begin
@@ -4056,10 +4055,9 @@ is
                        Post : String := "")
                        return Boolean
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Class_Posts;
       use Inc_Posts;
    begin

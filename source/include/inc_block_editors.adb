@@ -430,7 +430,6 @@ is
                  Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
    is
-      use Php;
       use Php.Arrays;
       use Inc_Global_Styles_And_Settings;
 

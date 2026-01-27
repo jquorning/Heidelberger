@@ -31,7 +31,6 @@ is
    function X_Sort_Name_Callback (A, B : Multi_Type)
                                   return Integer
    is
-      use Php;
       use Php.Strings;
 
       Left  : constant String := As_String (Get (As_Array (A), "name"));
@@ -93,9 +92,8 @@ is
    function Next_Widget_Id_Number (Id_Base : String)
                                    return Natural
    is
-      use UStrings;
-      use Php;
       use Php.Preg;
+      use UStrings;
 
 --    global wp_registered_widgets;
       Number : Natural := 1;

@@ -1125,12 +1125,11 @@ is
                           Allowed_Protocols : List_Type)
                           return String
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
 
       Allowed_HTML_2 : constant Array_Type :=
         (if not Is_Array (Allowed_HTML)
@@ -1234,10 +1233,9 @@ is
                                 Allowed_HTML : Array_Type)
                                 return Boolean
    is
-      use UStrings;
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       Name_Low    : constant String := Strtolower (Name);
       Element_Low : constant String := Strtolower (Element);
@@ -1341,12 +1339,11 @@ is
                           Allowed_Protocols : List_Type)
                           return Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       Attr_2   : UString := +Attr;
       Attrarr  : Array_Type;
@@ -1596,7 +1593,6 @@ is
                                     Checkvalue : String)
                                     return Boolean
    is
-      use Php;
       use Php.Preg;
       use Php.Strings;
 
@@ -1746,7 +1742,6 @@ is
    function Wp_KSES_Stripslashes (Item : String)
                                   return String
    is
-      use Php;
       use Php.Preg;
    begin
       return Preg_Replace ("%\\\\'%", """", Item);
@@ -1783,7 +1778,6 @@ is
    function Wp_KSES_HTML_Error (Item : String)
                                 return String
    is
-      use Php;
       use Php.Preg;
    begin
       return Preg_Replace ("/^(""[^""]*(""|$)|\""[^\""]*(\""|$)|\S)*\s*/",
@@ -1850,10 +1844,9 @@ is
                                         Allowed_Protocols : List_Type)
                                         return String
    is
-      use UStrings;
-      use Php;
       use Php.Preg;
       use Php.Strings;
+      use UStrings;
 
       String_5 : constant String := Wp_KSES_Decode_Entities (Item);
       String_4 : constant String := Preg_Replace ("/\s/", "", String_5);
@@ -2039,7 +2032,6 @@ is
    function Wp_KSES_Decode_Entities (Item : String)
                                      return String
    is
-      use Php;
       use Php.Preg;
 
       String_3 : constant String :=
@@ -2074,9 +2066,8 @@ is
    function X_Wp_KSES_Decode_Entities_Chr_Hexdec (Match : List_Type)
                                                   return String
    is
-      use UStrings;
-      use Php;
       use Php.Numerics;
+      use UStrings;
    begin
       return Integer'Image (Hexdec (-Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr_Hexdec;

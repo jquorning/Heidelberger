@@ -1339,9 +1339,8 @@ is
                                    Strip : Boolean := False)
                                    return String
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
+      use UStrings;
       use Inc_Options;
 
    begin

@@ -101,7 +101,6 @@ is
    function Get_File (Path : String)
             return String
    is
-      use Php;
       use Php.Files;
 
       Path_2 : constant String := Realpath (Path);

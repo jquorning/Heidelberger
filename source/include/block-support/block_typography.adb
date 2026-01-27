@@ -145,7 +145,6 @@ is
                (Args : Array_Type := Empty_Array)
                return String
    is
-      use Php;
       use Php.Numerics;
       use Php.Strings;
 

@@ -352,7 +352,6 @@ is
                               Skip_Inactive : Boolean := True)
                               return String
    is
-      use Php;
       use Php.Strings;
       use Php.Types;
       use Class_Customize_Widgets;
@@ -492,7 +491,6 @@ is
    function X_Get_Widget_Id_Base (Id : String)
                                   return String
    is
-      use Php;
       use Php.Preg;
    begin
       return Preg_Replace ("/-[0-9]+/", "", Id);
@@ -597,12 +595,11 @@ is
    function Wp_Map_Sidebars_Widgets (Existing_Sidebars_Widgets : Array_Type)
                                      return Array_Type
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use UStrings;
       use Class_Customize_Widgets;
       use Inc_Themes;
 --        global wp_registered_sidebars;
@@ -891,7 +888,6 @@ is
                Allowed_Widget_Ids : List_Type := Empty_List)
                return Array_Type
    is
-      use Php;
       use Php.Lists;
 
       Sidebars_Widgets_2 : Array_Type := Sidebars_Widgets;

@@ -364,7 +364,6 @@ is
    function Doing_Filter (Hook_Name : String := "") -- null
                           return Boolean
    is
-      use Php;
       use Php.Lists;
    begin
       if "" = Hook_Name then

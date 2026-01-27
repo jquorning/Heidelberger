@@ -1273,10 +1273,9 @@ is
    function Is_Super_Admin (User_Id : Integer := 0) -- false
                             return Boolean
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Types;
+      use UStrings;
       use Class_Users;
       use Inc_Load;
       use Inc_Pluggables;

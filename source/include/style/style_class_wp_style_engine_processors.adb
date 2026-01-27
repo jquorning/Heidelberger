@@ -124,11 +124,10 @@ is
    procedure Combine_Rules_Selectors (This : in out Wp_Style_Engine_Processor)
    is
       use Ada.Containers;
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Sorting;
       use Php.Strings;
+      use UStrings;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Declarations;
 

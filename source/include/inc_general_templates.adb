@@ -1389,9 +1389,8 @@ is
 
    procedure X_Wp_Render_Title_Tag
    is
-      use UStrings;
-      use Php;
       use Php.Echoing;
+      use UStrings;
       use Inc_Themes;
    begin
       if not Current_Theme_Supports ("title-tag") then

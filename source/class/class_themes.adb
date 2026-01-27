@@ -505,10 +505,9 @@ is
                  Header : String)
                  return String
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Types;
+      use UStrings;
    begin
       if not Isset (This.Headers, Header) then
          return ""; -- False;
@@ -552,10 +551,9 @@ is
                              Value  : String)
                              return String
    is
-      use UStrings;
-      use Php;
       use Php.Lists;
       use Php.Strings;
+      use UStrings;
       use Inc_Formatting;
       use Inc_KSES;
 

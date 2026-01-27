@@ -27,8 +27,6 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Translation_Entry
    is
---    use UStrings;
-      use Php;
       use Php.Types;
 
       This : Translation_Entry;
@@ -77,9 +75,8 @@ is
    function Key (This : Translation_Entry)
                  return String
    is
-      use UStrings;
-      use Php;
       use Php.Strings;
+      use UStrings;
    begin
       if Null_UString = This.Singular then
          return ""; -- False;

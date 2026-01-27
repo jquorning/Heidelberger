@@ -1164,8 +1164,6 @@ is
                                            Key  : String := "";
                                            Tag  : String := "h2")
    is
---    use UStrings;
-      use Php;
       use Php.Echoing;
    begin
       if not Isset (This.X_Screen_Reader_Content, Key) then

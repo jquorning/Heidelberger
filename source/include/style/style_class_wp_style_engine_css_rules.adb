@@ -125,7 +125,6 @@ is
                      Indent_Count    : Natural := 0)
                      return String
    is
-      use Php;
       use Php.Strings;
 
       Rule_Indent : constant String :=

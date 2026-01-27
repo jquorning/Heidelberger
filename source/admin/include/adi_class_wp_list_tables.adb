@@ -257,7 +257,6 @@ is
 
    procedure No_Items (This : Wp_List_Table)
    is
---    use Php;
       use Inc_L10n;
    begin
       X_E ("No items found.");
@@ -271,10 +270,9 @@ is
                          Text     : String;
                          Input_Id : String)
    is
+      use Php.Echoing;
       use Binder;
       use UStrings;
-      use Php;
-      use Php.Echoing;
       use Adi_Templates;
       use Inc_Formatting;
 
@@ -923,11 +921,10 @@ is
    procedure Pagination (This  : in out Wp_List_Table;
                          Which : String)
    is
-      use Binder;
-      use UStrings;
-      use Php;
       use Php.Echoing;
       use Php.Strings;
+      use Binder;
+      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -1333,11 +1330,9 @@ is
    function Get_Column_Count (This : in out Wp_List_Table)
                               return Natural
    is
-      use type Ada.Containers.Count_Type;
---    use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Lists;
+      use type Ada.Containers.Count_Type;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
 --    Columns  : constant List_Type  := Column_Info.Columns;
@@ -1579,9 +1574,8 @@ is
    procedure Display_Tablenav (This  : in out Wp_List_Table;
                                Which : String)
    is
-      use UStrings;
-      use Php;
       use Php.Echoing;
+      use UStrings;
       use Inc_Functions;
       use Inc_Formatting;
 
@@ -1632,9 +1626,8 @@ is
 
    procedure Display_Rows_Or_Placeholder (This : in out Wp_List_Table)
    is
-      use UStrings;
-      use Php;
       use Php.Echoing;
+      use UStrings;
    begin
       if This.Has_Items then
          This.Display_Rows;
@@ -1667,9 +1660,8 @@ is
    procedure Single_Row (This : in out Wp_List_Table;
                          Item : Array_Type)
    is
-      use UStrings;
-      use Php;
       use Php.Echoing;
+      use UStrings;
    begin
       Echo ("<tr>" & NL);
       This.Single_Row_Columns (Item);
@@ -1706,10 +1698,9 @@ is
    procedure Single_Row_Columns (This : in out Wp_List_Table;
                                  Item : Array_Type)
    is
-      use UStrings;
-      use Php;
       use Php.Arrays;
       use Php.Echoing;
+      use UStrings;
       use Inc_Formatting;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;

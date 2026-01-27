@@ -430,7 +430,6 @@ is
                                        Schema : Array_Type)
                                        return Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       Tree_2 : Array_Type := Array_Intersect_Key (Tree, Schema);
@@ -1071,7 +1070,6 @@ is
                         Declarations : Array_Type)
                         return String
    is
-      use Php;
       use Php.Arrays;
    begin
       if Empty (Declarations) then
@@ -1339,7 +1337,6 @@ is
    function Compute_Theme_Vars (Settings : Array_Type)
                                 return Array_Type
    is
---    use Php;
       use Inc_Functions;
 
       Declarations  : Array_Type;
@@ -1374,7 +1371,6 @@ is
                           Token  : String := "--")
                           return Array_Type
    is
-      use Php;
       use Php.Strings;
       use Inc_Functions;
 
@@ -1747,7 +1743,6 @@ is
    function Filter_Pseudo_Selector (Pseudo_Selector : String)
                                     return Boolean --  use ( selector )
    is
-      use Php;
       use Php.Strings;
 
       Selector : constant String := "XXX-002";
@@ -2585,7 +2580,6 @@ is
                           Slugs : Array_Type)
                           return List_Type -- Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       New_Node : List_Type;
@@ -2618,7 +2612,6 @@ is
                                      Property_Value : String)
                                      return Boolean
    is
-      use Php;
       use Php.Strings;
       use Inc_Formatting;
       use Inc_KSES;

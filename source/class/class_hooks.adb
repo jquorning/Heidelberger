@@ -47,8 +47,6 @@ is
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
---    use UStrings;
---    use Php;
       use Inc_Elab_Plugins;
 --    use Inc_Plugins;
 

@@ -20,7 +20,6 @@ is
               return Wp_Customize_Section
    is
       use UStrings;
---    use Php;
 
       This : Wp_Customize_Section;
 --    Keys : List_Type := Array_Keys (Get_Object_Vars (This));

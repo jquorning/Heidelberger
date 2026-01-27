@@ -63,10 +63,9 @@ is
    function Get_Hidden_Columns (Screen : Adi_Class_Wp_Screens.Wp_Screen)
                                 return Array_Type
    is
+      use Php.Types;
       use UStrings;
       use Wp_Common;
-      use Php;
-      use Php.Types;
 --    use Inc_Plugins;
 
       Hidden : Array_Type :=

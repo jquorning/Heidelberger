@@ -888,7 +888,6 @@ is
             return Array_Type
    is
       use UStrings;
---    use Php;
       use Inc_Options;
 
       Additional_Sizes : constant Array_Type :=

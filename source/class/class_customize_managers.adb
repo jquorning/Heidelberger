@@ -916,7 +916,6 @@ is
                                  Args : Array_Type)
                                  return Class_Posts.Post_Array
    is
-      use Php;
       use Php.Arrays;
       use Inc_Posts;
       use Inc_Users;
@@ -1634,12 +1633,11 @@ is
                                      Args : Array_Type := Empty_Array)
                                      return Array_Type
    is
-      use Binder;
-      use Php;
       use Php.Arrays;
       use Php.JSON;
       use Php.Preg;
       use Php.Types;
+      use Binder;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;

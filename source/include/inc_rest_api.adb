@@ -3048,7 +3048,6 @@ is
               (Schema : Array_Type)
                return Array_Type
    is
-      use Php;
       use Php.Arrays;
 
       Schema_2 : Array_Type := Schema;

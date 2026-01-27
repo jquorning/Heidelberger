@@ -45,7 +45,6 @@ is
    function Get_Post_Format_Slugs
             return List_Type
    is
-      use Php;
       use Php.Arrays;
 
       Slugs : constant List_Type :=

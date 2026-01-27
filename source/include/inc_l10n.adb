@@ -410,7 +410,6 @@ package body Inc_L10n is
    procedure X_E (Text   : String;
                   Domain : String := "default")
    is
-      use Php;
       use Php.Echoing;
    begin
       Echo (Translate (Text, Domain));
@@ -1358,8 +1357,6 @@ package body Inc_L10n is
    function X_Load_Textdomain_Just_In_Time (Domain : String)
                                             return Boolean
    is
---    use UStrings;
-      use Php;
       use Php.Strings;
       use Class_Textdomain_Registry;
       use Inc_Formatting;
