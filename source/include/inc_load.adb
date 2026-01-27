@@ -13,6 +13,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Binder;
+with Constants;
 with Globals;
 with Lists;
 with UStrings;
@@ -344,7 +345,7 @@ is
 --    use UStrings;
    begin
       if
-        not Php.Files.File_Exists (Globals.ABSPATH & ".maintenance") -- or else
+        not Php.Files.File_Exists (Constants.ABSPATH & ".maintenance") -- or else
 --      Wp_Installing
       then
          return False;
@@ -1222,8 +1223,8 @@ is
    begin
       if Isset (Globals.GLOBALS, "current_screen") then
          return Globals.Current_Screen.In_Admin ("site");
-      elsif Globals.WP_BLOG_ADMIN_DEF then
-         return Globals.WP_BLOG_ADMIN;
+      elsif Constants.WP_BLOG_ADMIN_DEF then
+         return Constants.WP_BLOG_ADMIN;
       end if;
 
       return False;
@@ -1239,8 +1240,8 @@ is
    begin
       if Isset (Globals.GLOBALS, "current_screen") then
          return Globals.Current_Screen.In_Admin ("network");
-      elsif Globals.WP_NETWORK_ADMIN_DEF then
-         return Globals.WP_NETWORK_ADMIN;
+      elsif Constants.WP_NETWORK_ADMIN_DEF then
+         return Constants.WP_NETWORK_ADMIN;
       end if;
 
       return False;
@@ -1256,8 +1257,8 @@ is
    begin
       if Isset (Globals.GLOBALS, "current_screen") then
          return Globals.Current_Screen.In_Admin ("user");
-      elsif Globals.WP_USER_ADMIN_DEF then
-         return Globals.WP_USER_ADMIN;
+      elsif Constants.WP_USER_ADMIN_DEF then
+         return Constants.WP_USER_ADMIN;
       end if;
 
       return False;
@@ -1377,10 +1378,10 @@ is
 
       loop
 --         if Defined ("WPLANG") then
-            if "" = Globals.WPLANG then
+            if "" = Constants.WPLANG then
                exit;
             end if;
-            Locales.Append (+Globals.WPLANG);
+            Locales.Append (+Constants.WPLANG);
 --         end if;
 
          -- if Isset (Wp_Local_Package) then
@@ -1391,9 +1392,9 @@ is
 
          if
 --         Defined ("WP_LANG_DIR") and then
-           Is_Dir (Globals.WP_LANG_DIR)          -- @
+           Is_Dir (Constants.WP_LANG_DIR)          -- @
          then
-            Locations.Append (+Globals.WP_LANG_DIR);
+            Locations.Append (+Constants.WP_LANG_DIR);
          end if;
 
          if
@@ -1403,12 +1404,12 @@ is
             Locations.Append ((Globals.WP_CONTENT_DIR) & "/languages");
          end if;
 
-         if Is_Dir (Globals.ABSPATH & "wp-content/languages") then -- @
-            Locations.Append ((+Globals.ABSPATH) & "wp-content/languages");
+         if Is_Dir (Constants.ABSPATH & "wp-content/languages") then -- @
+            Locations.Append ((+Constants.ABSPATH) & "wp-content/languages");
          end if;
 
-         if Is_Dir (Globals.ABSPATH & (-Globals.WPINC) & "/languages") then -- @
-            Locations.Append ((+Globals.ABSPATH) & Globals.WPINC & "/languages");
+         if Is_Dir (Constants.ABSPATH & (-Globals.WPINC) & "/languages") then -- @
+            Locations.Append ((+Constants.ABSPATH) & Globals.WPINC & "/languages");
          end if;
 
          exit when Locations.Is_Empty;
@@ -1524,7 +1525,7 @@ is
                                     return Natural
    is
       use Php.Strings;
-      use Globals;
+      use Constants;
 
       Value_2 : constant String := Strtolower (Trim (Value));
       Bytes   : Natural := Natural'Value (Value_2);
@@ -1582,7 +1583,7 @@ is
    function Wp_Doing_AJAX
             return Boolean
    is
-      use Globals;
+      use Constants;
       use Wp_Common;
       use Inc_Plugins;
    begin
@@ -1682,7 +1683,7 @@ is
       -- @param string context          The usage context.
       --
       return
-        Apply_Filters ("file_mod_allowed", not Globals.DISALLOW_FILE_MODS, Context);
+        Apply_Filters ("file_mod_allowed", not Constants.DISALLOW_FILE_MODS, Context);
    end Wp_Is_File_Mod_Allowed;
 
 -- --

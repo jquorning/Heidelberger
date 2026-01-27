@@ -34,6 +34,7 @@ with Php.Types;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 with Lists;
@@ -499,7 +500,7 @@ is
 
          -- Set error message if DO_NOT_UPGRADE_GLOBAL_TABLES isn't set as it will
          -- break install.
-         if Globals.DO_NOT_UPGRADE_GLOBAL_TABLES then -- defined
+         if Constants.DO_NOT_UPGRADE_GLOBAL_TABLES then -- defined
             Display_Header;
             Die (
               "<h1>" & abs "Configuration Error" & "</h1>" &

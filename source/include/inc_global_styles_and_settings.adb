@@ -8,8 +8,9 @@ with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
 
-with UStrings;
+with Constants;
 with Globals;
+with UStrings;
 
 with Class_Theme_JSON;
 with Class_Theme_JSON_Resolver;
@@ -104,9 +105,9 @@ is
       -- It's cached by theme to make sure that theme switching clears the cache.
       Can_Use_Cached : constant Boolean :=
                 Types.Is_Empty   and then
-                not Globals.WP_DEBUG     and then
-                not Globals.SCRIPT_DEBUG and then
-                not Globals.REST_REQUEST and then
+                not Constants.WP_DEBUG     and then
+                not Constants.SCRIPT_DEBUG and then
+                not Constants.REST_REQUEST and then
                 not Inc_Load.Is_Admin;
 
       Transient_Name : constant String :=
@@ -196,7 +197,7 @@ is
                -- This cache doesn't need to be any longer, we only want to avoid
                -- spikes on high-traffic sites.
                Inc_Options.Set_Transient (Transient_Name, From_String (Stylesheet),
-                                          Globals.MINUTE_IN_SECONDS);
+                                          Constants.MINUTE_IN_SECONDS);
             end if;
 
             return Stylesheet;

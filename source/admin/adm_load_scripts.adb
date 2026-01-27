@@ -13,6 +13,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with UStrings;
 with Globals;
 with Lists;
@@ -45,6 +46,7 @@ is
       use Php.Strings;
       use Arrays;
       use Binder;
+      use Constants;
       use Globals;
       use UStrings;
       use Inc_Script_Loader;

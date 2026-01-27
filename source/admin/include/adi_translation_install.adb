@@ -14,6 +14,7 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Constants;
 with Globals;
 with UStrings;
 with Lists;
@@ -126,7 +127,7 @@ is
                          abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
                          To_List (abs "https://wordpress.org/support/forums/")
                        ) & " " & abs "(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)",
-                       (if Headers_Sent or else Globals.WP_DEBUG
+                       (if Headers_Sent or else Constants.WP_DEBUG
                         then E_USER_WARNING
                         else E_USER_NOTICE)
                      );
@@ -235,7 +236,7 @@ is
             if not Globals.WP_INSTALLING then
 --          if not Defined ("WP_INSTALLING") then
                Set_Site_Transient ("available_translations", Translations,
-                                   3 * Globals.HOUR_IN_SECONDS);
+                                   3 * Constants.HOUR_IN_SECONDS);
             end if;
 
             return Translations;
@@ -433,7 +434,7 @@ is
          declare
             Check : constant Boolean :=
               Upgrader.FS_Connect (To_List (List => (Globals.WP_CONTENT_DIR,
-                                                     +Globals.WP_LANG_DIR)));
+                                                     +Constants.WP_LANG_DIR)));
          begin
             if not Check or else Is_Wp_Error (Check) then
                return False;

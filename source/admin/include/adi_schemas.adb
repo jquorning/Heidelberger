@@ -13,8 +13,9 @@ with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
-with Lists;
+with Constants;
 with Globals;
+with Lists;
 with UStrings;
 
 with Adi_Upgrade;
@@ -396,6 +397,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use Php.Types;
+      use Constants;
       use Globals;
       use UStrings;
       use Adi_Upgrade;

@@ -27,6 +27,7 @@ with MySQL_Bind;
 with MySQLi_Bind;
 
 with Arrays.IO;
+with Constants;
 with Globals;
 with Helpers;
 with Wp_Common;
@@ -212,18 +213,18 @@ is
         Is_Multisite
       then
          Charset := +"utf8";
-         if Globals.DB_COLLATE /= "" then
-            Collate := +Globals.DB_COLLATE;
+         if Constants.DB_COLLATE /= "" then
+            Collate := +Constants.DB_COLLATE;
          else
             Collate := +"utf8_general_ci";
          end if;
       elsif True then -- Defined ("DB_COLLATE") then
-         Collate := +Globals.DB_COLLATE;
+         Collate := +Constants.DB_COLLATE;
       end if;
 
-      if Globals.DB_CHARSET /= "" then
+      if Constants.DB_CHARSET /= "" then
 --    if Defined ("DB_CHARSET") then
-         Charset := +Globals.DB_CHARSET;
+         Charset := +Constants.DB_CHARSET;
       end if;
 
       declare
@@ -624,7 +625,7 @@ is
                                              else 0);
          begin
             if
-              Globals.MULTISITE and then
+              Constants.MULTISITE and then
               Blog_Id_2 in 0 | 1
             then
                return -This.Base_Prefix;
@@ -727,18 +728,18 @@ is
 
             if
               Isset (Tables_2, "users") and then
-              Globals.CUSTOM_USER_TABLE /= ""
+              Constants.CUSTOM_USER_TABLE /= ""
             then
                Set (Tables_2, "users",
-                    From_String (Globals.CUSTOM_USER_TABLE));
+                    From_String (Constants.CUSTOM_USER_TABLE));
             end if;
 
             if
               Isset (Tables_2, "usermeta") and then
-              Globals.CUSTOM_USER_META_TABLE /= ""
+              Constants.CUSTOM_USER_META_TABLE /= ""
             then
                Set (Tables_2, "usermeta",
-                    From_String (Globals.CUSTOM_USER_META_TABLE));
+                    From_String (Constants.CUSTOM_USER_META_TABLE));
             end if;
          end;
       end if;
@@ -1429,7 +1430,7 @@ is
                   Host := +"[host]";
                end if;
 
-               if Globals.WP_DEBUG then
+               if Constants.WP_DEBUG then
                   Mysqli_Real_Connect
                     (This.Dbh, -Host, -This.Dbuser, -This.Dbpassword,
                      "", -- null,
@@ -1475,7 +1476,7 @@ is
 
          when Engine_MySQL =>
 --       else
-            if Globals.WP_DEBUG then
+            if Constants.WP_DEBUG then
                This.Dbh :=
                  Mysql_Connect (-This.Dbhost, -This.Dbuser, -This.Dbpassword,
                                 New_Link, Client_Flags);
@@ -2047,7 +2048,7 @@ is
             -- Old WP installs may not have AUTH_SALT defined.
             Salt : constant String :=
               (if True -- Defined ("AUTH_SALT") and then AUTH_SALT
-               then Globals.AUTH_SALT else Rand'Image); -- (string)
+               then Constants.AUTH_SALT else Rand'Image); -- (string)
          begin
             Static_Placeholder :=
               +"{" & Hash_HMAC (Algo, Uniqid (Salt, True), Salt) & "}";

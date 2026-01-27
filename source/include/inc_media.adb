@@ -11,6 +11,7 @@ with Php.Ini;
 with Php.Lists;
 with Php.Strings;
 
+with Constants;
 with Globals;
 with Wp_Common;
 
@@ -990,7 +991,7 @@ is
                      -- This filter is documented in wp-includes/post.php
                      Icon_Dir : constant String :=
                        Apply_Filters ("icon_dir",
-                                      -(Globals.ABSPATH & Globals.WPINC) &
+                                      -(Constants.ABSPATH & Globals.WPINC) &
                                       "/images/media");
 
                      Src_File : constant String :=

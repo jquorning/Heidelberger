@@ -13,6 +13,7 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
+with Constants;
 with Globals;
 with Logging;
 with UStrings;
@@ -729,10 +730,10 @@ is
 
       declare
          Plugin_Dir    : constant String :=
-           Wp_Normalize_Path (-Globals.WP_PLUGIN_DIR);
+           Wp_Normalize_Path (-Constants.WP_PLUGIN_DIR);
 
          MU_Plugin_Dir : constant String :=
-           Wp_Normalize_Path (-Globals.WPMU_PLUGIN_DIR);
+           Wp_Normalize_Path (-Constants.WPMU_PLUGIN_DIR);
       begin
          -- Get relative path from plugins directory.
          File_2 :=

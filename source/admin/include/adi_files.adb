@@ -14,6 +14,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 
@@ -34,7 +35,7 @@ is
    is
       use Php.Strings;
       use Binder;
-      use Globals;
+      use Constants;
       use UStrings;
       use Inc_Formatting;
       use Inc_Link_Templates;

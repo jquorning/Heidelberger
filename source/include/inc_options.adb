@@ -15,6 +15,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 with Helpers;
@@ -1440,7 +1441,7 @@ is
       use Php.Misc;
       use Php.Preg;
       use Binder;
-      use Globals;
+      use Constants;
       use UStrings;
       use Inc_Load;
       use Inc_Link_Templates;

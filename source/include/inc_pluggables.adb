@@ -19,6 +19,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Binder;
+with Constants;
 with UStrings;
 with Helpers;
 with Globals;
@@ -825,7 +826,7 @@ is
            Wp_Doing_AJAX or else
            "POST" = Get_As_String (X_SERVER, "REQUEST_METHOD")
          then
-            Expired := Expired + Globals.HOUR_IN_SECONDS;
+            Expired := Expired + Constants.HOUR_IN_SECONDS;
          end if;
 
          -- Quick check to see if an honest cookie has expired.
@@ -1054,20 +1055,20 @@ is
 --    if ( empty( cookie ) ) then
          if Scheme = "auth" then
             -- case 'auth':
-            Cookie_Name := Globals.AUTH_COOKIE;
+            Cookie_Name := Constants.AUTH_COOKIE;
 
          elsif Scheme = "secure_auth" then
-            Cookie_Name := Globals.SECURE_AUTH_COOKIE;
+            Cookie_Name := Constants.SECURE_AUTH_COOKIE;
 
          elsif Scheme = "logged_in" then
-            Cookie_Name := Globals.LOGGED_IN_COOKIE;
+            Cookie_Name := Constants.LOGGED_IN_COOKIE;
 
          else
             if Is_SSL then
-               Cookie_Name := Globals.SECURE_AUTH_COOKIE;
+               Cookie_Name := Constants.SECURE_AUTH_COOKIE;
                Scheme_2    := +"secure_auth";
             else
-               Cookie_Name := Globals.AUTH_COOKIE;
+               Cookie_Name := Constants.AUTH_COOKIE;
                Scheme_2    := +"auth";
             end if;
          end if;
@@ -1252,7 +1253,7 @@ is
    is
       use Php.HTML;
       use Php.Misc;
-      use Globals;
+      use Constants;
       use UStrings;
       use Wp_Common;
       use Inc_Plugins;
@@ -1271,31 +1272,48 @@ is
       end if;
 
       -- Auth cookies.
-      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -ADMIN_COOKIE_PATH, -COOKIE_DOMAIN);
-      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -ADMIN_COOKIE_PATH, -COOKIE_DOMAIN);
-      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -PLUGINS_COOKIE_PATH, -COOKIE_DOMAIN);
-      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -PLUGINS_COOKIE_PATH, -COOKIE_DOMAIN);
-      Set_Cookie (-LOGGED_IN_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-LOGGED_IN_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -ADMIN_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -ADMIN_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -PLUGINS_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -PLUGINS_COOKIE_PATH, -COOKIE_DOMAIN);
+      Set_Cookie (-LOGGED_IN_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-LOGGED_IN_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -SITECOOKIEPATH, -COOKIE_DOMAIN);
 
       -- Settings cookies.
-      Set_Cookie ("wp-settings-" & Helpers.Image (Get_Current_User_Id), " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
-      Set_Cookie ("wp-settings-time-" & Helpers.Image (Get_Current_User_Id), " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
+      Set_Cookie ("wp-settings-" & Helpers.Image (Get_Current_User_Id), " ",
+                  Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
+      Set_Cookie ("wp-settings-time-" & Helpers.Image (Get_Current_User_Id), " ",
+                  Time - YEAR_IN_SECONDS, -SITECOOKIEPATH);
 
       -- Old cookies.
-      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-SECURE_AUTH_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -SITECOOKIEPATH, -COOKIE_DOMAIN);
 
       -- Even older cookies.
-      Set_Cookie (-USER_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-PASS_COOKIE, " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-USER_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
-      Set_Cookie (-PASS_COOKIE, " ", Time - YEAR_IN_SECONDS, -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-USER_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-PASS_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-USER_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -SITECOOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie (-PASS_COOKIE, " ", Time - YEAR_IN_SECONDS,
+                  -SITECOOKIEPATH, -COOKIE_DOMAIN);
 
       -- Post password cookie.
-      Set_Cookie ("wp-postpass_" & (-COOKIEHASH), " ", Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
+      Set_Cookie ("wp-postpass_" & (-COOKIEHASH), " ",
+                  Time - YEAR_IN_SECONDS, -COOKIEPATH, -COOKIE_DOMAIN);
    end Wp_Clear_Auth_Cookie;
 
 -- endif;
@@ -2546,7 +2564,7 @@ is
    function Wp_Nonce_Tick (Action : Integer := -1)
                            return Float
    is
-      use Globals;
+      use Constants;
       use Wp_Common;
       use Inc_Plugins;
 

@@ -14,10 +14,11 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
+with Constants;
 with Globals;
-with UStrings;
 with Helpers;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Adi_Files;
@@ -599,6 +600,7 @@ is
    procedure Upgrade_110
    is
       use Php.Preg;
+      use Constants;
       use Globals;
       use UStrings;
       use Class_Users;
@@ -944,6 +946,7 @@ is
    procedure Upgrade_160
    is
       use Php.Strings;
+      use Constants;
       use Globals;
       use UStrings;
       use Adi_Schemas;
@@ -1835,7 +1838,7 @@ is
    procedure Upgrade_400
    is
       use Php.Arrays;
-      use Globals;
+      use Constants;
       use Inc_Load;
       use Inc_L10n;
       use Inc_Options;
@@ -1872,6 +1875,7 @@ is
    procedure Upgrade_430
    is
       use Php.Arrays;
+      use Constants;
       use Globals;
       use UStrings;
       use Inc_Cron;
@@ -2155,7 +2159,7 @@ is
 
       if Wp_Current_DB_Version < 48748 then
          Update_Option ("finished_updating_comment_type", From_Integer (0));
-         Wp_Schedule_Single_Event (Php.Misc.Time + (1 * Globals.MINUTE_IN_SECONDS),
+         Wp_Schedule_Single_Event (Php.Misc.Time + (1 * Constants.MINUTE_IN_SECONDS),
                                    "wp_update_comment_type_batch");
       end if;
    end Upgrade_550;
@@ -2310,12 +2314,12 @@ is
 
       Options : constant Statement_Type := Statement_Type (-Globals.WpDB.Options);
    begin
-      if "home" = Setting and then Globals.WP_HOME_DEF then
-         return From_String (Un_Trailing_Slash_It (Globals.WP_HOME));
+      if "home" = Setting and then Constants.WP_HOME_DEF then
+         return From_String (Un_Trailing_Slash_It (Constants.WP_HOME));
       end if;
 
-      if "siteurl" = Setting and then Globals.WP_SITEURL_DEF then
-         return From_String (Un_Trailing_Slash_It (Globals.WP_SITEURL));
+      if "siteurl" = Setting and then Constants.WP_SITEURL_DEF then
+         return From_String (Un_Trailing_Slash_It (Constants.WP_SITEURL));
       end if;
 
       declare
@@ -3054,6 +3058,7 @@ is
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use Constants;
       use Globals;
       use UStrings;
       use Adi_Files;
@@ -3195,6 +3200,7 @@ is
    is
       use Php.Files;
       use Php.Strings;
+      use Constants;
       use Globals;
       use UStrings;
 
@@ -3342,7 +3348,7 @@ is
          return ""; -- False;
       end if;
 
-      if File_Exists (Globals.ABSPATH & "wp-layout.css") then
+      if File_Exists (Constants.ABSPATH & "wp-layout.css") then
          if not Make_Site_Theme_From_Oldschool (Theme_Name, Template) then
             -- TODO: rm -rf the site theme directory.
             return ""; -- False;
@@ -3359,7 +3365,7 @@ is
          Current_Template : constant String :=
            As_String (X_Get_Option ("template"));
       begin
-         if Globals.WP_DEFAULT_THEME = Current_Template then
+         if Constants.WP_DEFAULT_THEME = Current_Template then
             Update_Option ("template",   From_String (Template));
             Update_Option ("stylesheet", From_String (Template));
          end if;
@@ -3579,7 +3585,7 @@ is
       Should_Upgrade : Boolean := True;
    begin
       -- Return false early if explicitly not upgrading.
-      if Globals.DO_NOT_UPGRADE_GLOBAL_TABLES then
+      if Constants.DO_NOT_UPGRADE_GLOBAL_TABLES then
          return False;
       end if;
 

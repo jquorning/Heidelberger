@@ -23,6 +23,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 with Helpers;
@@ -99,6 +100,7 @@ is
                           return String
    is
       use Php.Calendar;
+      use Constants;
       use Inc_Options;
    begin
       -- Don't use non-GMT timestamp, unless you know the difference and really
@@ -107,7 +109,8 @@ is
          return
            Integer'Image (if GMT
             then Php.Misc.Time
-            else Php.Misc.Time + Get_Option ("gmt_offset") * Globals.HOUR_IN_SECONDS);
+            else Php.Misc.Time +
+              Get_Option ("gmt_offset") * Constants.HOUR_IN_SECONDS);
       end if;
 
       declare
@@ -1946,11 +1949,11 @@ is
             begin
                -- The existence of custom user tables Shouldn't suggest an unwise
                -- state or prevent a clean installation.
-               if Globals.CUSTOM_USER_TABLE = Table then
+               if Constants.CUSTOM_USER_TABLE = Table then
                   goto Continue;
                end if;
 
-               if Globals.CUSTOM_USER_META_TABLE = Table then
+               if Constants.CUSTOM_USER_META_TABLE = Table then
                   goto Continue;
                end if;
 
@@ -2184,8 +2187,8 @@ is
       use Php.Files;
       use Php.Lists;
       use Php.Strings;
+      use Constants;
       use UStrings;
-      use Globals;
 
       Wrapper  : UString;
       Target_2 : UString;
@@ -2400,9 +2403,9 @@ is
       use UStrings;
       use Inc_Formatting;
    begin
-      if Globals.WP_TEMP_DIR /= "" then
+      if Constants.WP_TEMP_DIR /= "" then
 --    if Defined ("WP_TEMP_DIR") then
-         return Trailing_Slash_It (-Globals.WP_TEMP_DIR);
+         return Trailing_Slash_It (-Constants.WP_TEMP_DIR);
       end if;
 
       if Static_Temp /= "" then
@@ -2511,7 +2514,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
-      use Globals;
+      use Constants;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -2612,9 +2615,9 @@ is
    begin
       if Empty (Upload_Path) or else "wp-content/uploads" = Upload_Path then
          Dir := Globals.WP_CONTENT_DIR & "/uploads";
-      elsif 0 /= Strpos (Upload_Path, Globals.ABSPATH) then
+      elsif 0 /= Strpos (Upload_Path, Constants.ABSPATH) then
          -- dir is absolute, upload_path is (maybe) relative to ABSPATH.
-         Dir := +Path_Join (Globals.ABSPATH, Upload_Path);
+         Dir := +Path_Join (Constants.ABSPATH, Upload_Path);
       else
          Dir := +Upload_Path;
       end if;
@@ -2626,7 +2629,7 @@ is
            "wp-content/uploads" = Upload_Path or else
            Upload_Path = Dir
          then
-            URL := Globals.WP_CONTENT_URL & "/uploads";
+            URL := Constants.WP_CONTENT_URL & "/uploads";
          else
             URL := +Trailing_Slash_It (Site_URL) & Upload_Path;
          end if;
@@ -2638,18 +2641,18 @@ is
       -- the next block.
       --
       if
-        Globals.UPLOADS /= "" and then
+        Constants.UPLOADS /= "" and then
         not (Is_Multisite and then
              As_Boolean (Get_Site_Option ("ms_files_rewriting")))
       then
-         Dir := +Globals.ABSPATH & Globals.UPLOADS;
-         URL := +Trailing_Slash_It (Site_URL) & Globals.UPLOADS;
+         Dir := +Constants.ABSPATH & Constants.UPLOADS;
+         URL := +Trailing_Slash_It (Site_URL) & Constants.UPLOADS;
       end if;
 
       -- If multisite (and if not the main site in a post-MU network).
       if
         Is_Multisite and then
-        not (Is_Main_Network and then Is_Main_Site and then Globals.MULTISITE)
+        not (Is_Main_Network and then Is_Main_Site and then Constants.MULTISITE)
       then
          if not As_Boolean (Get_Site_Option ("ms_files_rewriting")) then
             --
@@ -2663,7 +2666,7 @@ is
             --
             declare
                MS_Dir : constant String :=
-                 (if Globals.MULTISITE
+                 (if Constants.MULTISITE
                   then "/sites/" & Helpers.Image (Get_Current_Blog_Id)
                   else "/" & Helpers.Image (Get_Current_Blog_Id));
             begin
@@ -2671,7 +2674,7 @@ is
                Append (URL, MS_Dir);
             end;
 
-         elsif Globals.UPLOADS /= "" and then not MS_Is_Switched then
+         elsif Constants.UPLOADS /= "" and then not MS_Is_Switched then
             --
             -- Handle the old-form ms-files.php rewriting if the network still has
             -- that enabled. When ms-files rewriting is enabled, then we only listen
@@ -2687,10 +2690,10 @@ is
             -- the final piece: when UPLOADS is used with ms-files rewriting in
             -- multisite, the resulting URL is /files. (#WP22702 for background.)
             --
-            if Globals.BLOGUPLOADDIR /= "" then
-               Dir := +Un_Trailing_Slash_It (Globals.BLOGUPLOADDIR);
+            if Constants.BLOGUPLOADDIR /= "" then
+               Dir := +Un_Trailing_Slash_It (Constants.BLOGUPLOADDIR);
             else
-               Dir := +Globals.ABSPATH & Globals.UPLOADS;
+               Dir := +Constants.ABSPATH & Constants.UPLOADS;
             end if;
             URL := +Trailing_Slash_It (Site_URL) & "files";
          end if;
@@ -6116,7 +6119,7 @@ is
       -- @param string version  The version of WordPress where the message was added.
       --
       if
-        Globals.WP_DEBUG and then
+        Constants.WP_DEBUG and then
         Apply_Filters ("doing_it_wrong_trigger_error", True,
                        Funct, -Message_2, -Version_2)
       then
@@ -6351,9 +6354,9 @@ is
       URL : UString;
    begin
       if -- defined( "WP_SITEURL" ) and then
-        "" /= Globals.WP_SITEURL
+        "" /= Constants.WP_SITEURL
       then
-         URL := +Globals.WP_SITEURL;
+         URL := +Constants.WP_SITEURL;
       else
          null;
 --                 abspath_fix         = str_replace( "\\", "/", ABSPATH );
@@ -6950,7 +6953,7 @@ is
 
       -- Pull only the first 8 KB of the file in.
       File_Data_2 : constant String :=
-        File_Get_Contents (File, False, null, 0, 8 * Globals.KB_IN_BYTES);
+        File_Get_Contents (File, False, null, 0, 8 * Constants.KB_IN_BYTES);
 
       -- if ( false === file_data ) then
       --         file_data = "";

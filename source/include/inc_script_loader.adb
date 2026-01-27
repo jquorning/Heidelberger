@@ -27,6 +27,7 @@ with Php.Types;
 
 with Array_Vectors;
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -318,11 +319,11 @@ is
    begin
       if
 --      not Defined ("SCRIPT_DEBUG") or else
-        not Globals.SCRIPT_DEBUG
+        not Constants.SCRIPT_DEBUG
         or else not Class_Dependency.Dependency_Maps.Has_Element (Scripts.Registered.Find ("react"))
 --      or else Empty (Scripts.Registered, "react")
 --      or else Defined ("WP_RUN_CORE_TESTS")
-        or else Globals.WP_RUN_CORE_TESTS
+        or else Constants.WP_RUN_CORE_TESTS
       then
          return;
       end if;
@@ -359,7 +360,7 @@ is
       use Php.Lists;
       use Php.Strings;
 
-      Suffix : String := (if Globals.WP_RUN_CORE_TESTS then ".min"
+      Suffix : String := (if Constants.WP_RUN_CORE_TESTS then ".min"
                           else Wp_Scripts_Get_Suffix);
       --
       -- Expects multidimensional array like:
@@ -797,8 +798,7 @@ is
    function Wp_Scripts_Get_Suffix (Typ : String := "")
                                    return String
    is
-      use Globals;
---    use UStrings;
+      use Constants;
       use Inc_Versions;
 --         static suffixes;
    begin
@@ -862,7 +862,7 @@ is
       end if;
 
       Scripts.Base_URL        := GuessURL;
-      Scripts.Content_URL     := Globals.WP_CONTENT_URL; -- defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
+      Scripts.Content_URL     := Constants.WP_CONTENT_URL; -- defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
       Scripts.Default_Version := +Get_Bloginfo ("version");
       Scripts.Default_Dirs    :=
         To_List (List => (+"/wp-admin/js/", +"/wp-includes/js/"));
@@ -873,7 +873,7 @@ is
            "utils",
            "userSettings",
            To_Array ((
-             Build ("url",    -Globals.SITECOOKIEPATH), -- (string)
+             Build ("url",    -Constants.SITECOOKIEPATH), -- (string)
              Build ("uid",    Inc_Users.Get_Current_User_Id), -- (string)
 --           Build ("time",   (string) time(),
              Build ("secure", Boolean'Image ("https" = Php.HTML.Parse_URL (Site_URL, Php.HTML.PHP_URL_SCHEME)))
@@ -1794,7 +1794,7 @@ is
       -- end;
 
       Styles.Base_URL        := +Guess_URL;
-      Styles.Content_URL     := Globals.WP_CONTENT_URL; --  ) ? WP_CONTENT_URL : "";
+      Styles.Content_URL     := Constants.WP_CONTENT_URL; --  ) ? WP_CONTENT_URL : "";
       Styles.Default_Version := +Get_Bloginfo ("version");
       Styles.Text_Direction  := +(if Is_RTL then "rtl" else "ltr");
 --    Styles.Text_Direction  := function_exists( "is_rtl" ) && (if is_rtl then "rtl" else "ltr");
@@ -1843,7 +1843,8 @@ is
                   To_List (List => (+"wp-admin", +"buttons")));
 
       declare
-         Suffix : constant String := (if Globals.SCRIPT_DEBUG then "" else ".min");
+         Suffix : constant String :=
+           (if Constants.SCRIPT_DEBUG then "" else ".min");
       begin
          -- Admin CSS.
          Styles.Add ("common",      "/wp-admin/css/common" & Suffix & ".css");
@@ -1975,7 +1976,7 @@ is
          begin
             Styles.Add ("wp-block-library-theme", "/block_library_theme_path");
             Styles.Add_Data ("wp-block-library-theme", "path",
-                             Globals.ABSPATH & Block_Library_Theme_Path);
+                             Constants.ABSPATH & Block_Library_Theme_Path);
          end;
 
          Styles.Add (
@@ -2091,7 +2092,7 @@ is
                     else "/style" & Suffix & ".css");
                begin
                   Styles.Add (Handle, Path, Dependencies);
-                  Styles.Add_Data (Handle, "path", Globals.ABSPATH & (Path));
+                  Styles.Add_Data (Handle, "path", Constants.ABSPATH & (Path));
                end;
             end loop;
          end;
@@ -2684,7 +2685,7 @@ is
       Wp_Styles : Class_Styles.Wp_Styles; -- := wp_styles();
 
       Zip : constant String :=
-        (if Compress_CSS and then Globals.ENFORCE_GZIP then "gzip" else "");
+        (if Compress_CSS and then Constants.ENFORCE_GZIP then "gzip" else "");
 
       Concat : constant String := Php.Strings.Trim (-Wp_Styles.Concat, ", ");
 
@@ -2750,20 +2751,20 @@ is
 
    begin
       if not Concatenate_Scripts then
-         Concatenate_Scripts := Globals.CONCATENATE_SCRIPTS;
+         Concatenate_Scripts := Constants.CONCATENATE_SCRIPTS;
 --       Concatenate_Scripts :=
 --         defined( "CONCATENATE_SCRIPTS" ) ? CONCATENATE_SCRIPTS : true;
          if
            (not Inc_Load.Is_Admin and then
             not Inc_Plugins.Did_Action ("login_init")) or else
-           Globals.SCRIPT_DEBUG
+           Constants.SCRIPT_DEBUG
          then
             Concatenate_Scripts := False;
          end if;
       end if;
 
       if not Compress_Scripts then
-         Compress_Scripts := Globals.COMPRESS_SCRIPTS;
+         Compress_Scripts := Constants.COMPRESS_SCRIPTS;
          if
            Compress_Scripts and then
            (not Can_Compress_Scripts or else Compressed_Output)
@@ -2773,7 +2774,7 @@ is
       end if;
 
       if not Compress_CSS then
-         Compress_CSS := Globals.COMPRESS_CSS;
+         Compress_CSS := Constants.COMPRESS_CSS;
          if
            Compress_CSS and then
            (not Can_Compress_Scripts or else Compressed_Output)
@@ -2796,7 +2797,7 @@ is
       use Inc_L10n;
       use Inc_Plugins;
 
-      X_DIR_X : String renames Globals.X_DIR_X;
+      X_DIR_X : String renames Constants.X_DIR_X;
    begin
       if
         Inc_Load.Is_Admin and then
@@ -2810,7 +2811,8 @@ is
       if Inc_Themes.Current_Theme_Supports ("wp-block-styles") then
          if Wp_Should_Load_Separate_Core_Block_Assets then
             declare
-               Suffix : String := (if Globals.SCRIPT_DEBUG then "css" else "min.css");
+               Suffix : String :=
+                 (if Constants.SCRIPT_DEBUG then "css" else "min.css");
 --             Suffix := defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG ? "css" : "min.css";
 
                Files  : constant List_Type :=
@@ -3594,9 +3596,9 @@ is
          -- Adds comment if code is prettified to identify core styles sections in
          -- debugging.
          Should_Prettify : constant Boolean :=
-           (if Isset (Options, "prettify") then
-            True = As_Boolean (Get (Options, "prettify"))
-            else Globals.SCRIPT_DEBUG); --  defined( "SCRIPT_DEBUG" ) && SCRIPT_DEBUG;
+           (if Isset (Options, "prettify")
+            then True = As_Boolean (Get (Options, "prettify"))
+            else Constants.SCRIPT_DEBUG);
       begin
          for Style_Key of Core_Styles_Keys loop
             if Should_Prettify then

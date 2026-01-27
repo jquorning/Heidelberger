@@ -11,6 +11,7 @@ with Php.Files;
 with Php.Lists;
 with Php.Misc;
 
+with Constants;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -290,7 +291,7 @@ is
       -- These styles are used if the "no theme styles" options is triggered
       -- or on themes without their own editor styles.
       Default_Editor_Styles_File : constant String :=
-        Globals.ABSPATH & (-Globals.WPINC) &
+        Constants.ABSPATH & (-Globals.WPINC) &
         "/css/dist/block-editor/default-editor-styles.css";
 
       Default_Editor_Styles : Array_Type;

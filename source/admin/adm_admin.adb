@@ -15,6 +15,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with Lists;
 with UStrings;
@@ -59,6 +60,7 @@ is
       use Php.HTML;
       use Php.Strings;
       use Binder;
+      use Constants;
       use Globals;
       use UStrings;
       use Wp_Common;

@@ -14,6 +14,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 with Lists;
@@ -102,12 +103,13 @@ is
       Submenu           : Adm_Menu.Submenu_Type;
       Submenu_As_Parent : Boolean := True)
    is
-      use UStrings;
       use Php.Echoing;
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use Constants;
       use Globals;
+      use UStrings;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Formatting;

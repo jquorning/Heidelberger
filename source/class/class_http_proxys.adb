@@ -6,6 +6,7 @@
 -- @since 4.4.0
 --
 
+with Constants;
 with Globals;
 with UStrings;
 
@@ -22,8 +23,8 @@ is
       use UStrings;
    begin
       return
-        Globals.WP_PROXY_HOST /= "" and then
-        Globals.WP_PROXY_PORT /= "";
+        Constants.WP_PROXY_HOST /= "" and then
+        Constants.WP_PROXY_PORT /= "";
 --    return defined( "WP_PROXY_HOST" ) && defined( "WP_PROXY_PORT" );
    end Is_Enabled;
 

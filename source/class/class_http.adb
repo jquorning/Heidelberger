@@ -13,6 +13,7 @@ with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
+with Constants;
 with Globals;
 with UStrings;
 with Lists;
@@ -663,7 +664,7 @@ is
       -- We don't need to block requests, because nothing is blocked.
       if
 --     not defined( "WP_HTTP_BLOCK_EXTERNAL" ) or else
-        not Globals.WP_HTTP_BLOCK_EXTERNAL
+        not Constants.WP_HTTP_BLOCK_EXTERNAL
       then
          return False;
       end if;
@@ -697,16 +698,16 @@ is
                return Apply_Filters ("block_local_requests", False);
             end if;
 
-            if Globals.WP_ACCESSIBLE_HOSTS /= "" then
+            if Constants.WP_ACCESSIBLE_HOSTS /= "" then
 --          if not Defined ("WP_ACCESSIBLE_HOSTS") then
                return True;
             end if;
 
             if Static_Accessible_Hosts.Is_Empty then -- null =
                Static_Accessible_Hosts :=
-                 Preg_Split ("|,\s*|", -Globals.WP_ACCESSIBLE_HOSTS);
+                 Preg_Split ("|,\s*|", -Constants.WP_ACCESSIBLE_HOSTS);
 
-               if 0 /= Strpos (-Globals.WP_ACCESSIBLE_HOSTS, "*") then
+               if 0 /= Strpos (-Constants.WP_ACCESSIBLE_HOSTS, "*") then
                   declare
                      Wildcard_Regex : List_Type;
                   begin

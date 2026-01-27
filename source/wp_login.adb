@@ -19,6 +19,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with Lists;
 with UStrings;
@@ -656,7 +657,7 @@ is
             --
             Remind_Interval :=
               Integer'(Apply_Filters ("admin_email_remind_interval",
-                                      3 * Globals.DAY_IN_SECONDS));
+                                      3 * Constants.DAY_IN_SECONDS));
 
             if not Empty (XX_GET, "remind_me_later") then
                if
@@ -706,7 +707,7 @@ is
                declare
                   Admin_Email_Check_Interval : constant Integer :=
                     Integer'(Apply_Filters ("admin_email_check_interval",
-                                            6 * Globals.MONTH_IN_SECONDS));
+                                            6 * Constants.MONTH_IN_SECONDS));
                begin
                   if Admin_Email_Check_Interval > 0 then
                      Update_Option
@@ -880,7 +881,7 @@ is
          --
          Expire : constant Integer :=
            Apply_Filters ("post_password_expires",
-                          Php.Misc.Time + 10 * Globals.DAY_IN_SECONDS);
+                          Php.Misc.Time + 10 * Constants.DAY_IN_SECONDS);
 
          Referer : constant String := Wp_Get_Referer;
 
@@ -890,9 +891,9 @@ is
             else False);
       begin
          Set_Cookie
-           ("wp-postpass_" & (-Globals.COOKIEHASH),
+           ("wp-postpass_" & (-Constants.COOKIEHASH),
             Hasher.HashPassword (Wp_Unslash (Get_As_String (X_POST, "post_password"))),
-            Expire, -Globals.COOKIEPATH, -Globals.COOKIE_DOMAIN, Secure);
+            Expire, -Constants.COOKIEPATH, -Constants.COOKIE_DOMAIN, Secure);
       end;
       Wp_Safe_Redirect (Wp_Get_Referer);
       Die; -- exit;
@@ -1143,7 +1144,7 @@ is
         Explode ("?", Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")));
 
       RP_Path   : constant String := -List (1);
-      RP_Cookie : constant String := "wp-resetpass-" & (-Globals.COOKIEHASH);
+      RP_Cookie : constant String := "wp-resetpass-" & (-Constants.COOKIEHASH);
       RP_Login  : UString;
       RP_Key    : UString;
 
@@ -1160,7 +1161,7 @@ is
                       )));
          begin
             Set_Cookie (RP_Cookie, Value, 0, RP_Path,
-                        -Globals.COOKIE_DOMAIN, Is_SSL, True);
+                        -Constants.COOKIE_DOMAIN, Is_SSL, True);
 
             Wp_Safe_Redirect (Remove_Query_Arg (To_List (List => (+"key", +"login"))));
             Die; -- exit;
@@ -1195,8 +1196,8 @@ is
       if not User.Success then
 --    if not User or else Is_Wp_Error (User) then
          Set_Cookie (RP_Cookie, " ",
-                     Php.Misc.Time - Globals.YEAR_IN_SECONDS,
-                     RP_Path, -Globals.COOKIE_DOMAIN, Is_SSL, True);
+                     Php.Misc.Time - Constants.YEAR_IN_SECONDS,
+                     RP_Path, -Constants.COOKIE_DOMAIN, Is_SSL, True);
 
          if
            not User.Success and then
@@ -1254,8 +1255,8 @@ is
       then
          Reset_Password (User.User, Get_As_String (X_POST, "pass1"));
          Set_Cookie (RP_Cookie, " ",
-                     Php.Misc.Time - Globals.YEAR_IN_SECONDS,
-                     RP_Path, -Globals.COOKIE_DOMAIN, Is_SSL, True);
+                     Php.Misc.Time - Constants.YEAR_IN_SECONDS,
+                     RP_Path, -Constants.COOKIE_DOMAIN, Is_SSL, True);
 
          Login_Header (abs "Password Reset",
                        "<p class=""message reset-pass"">" &
@@ -1749,7 +1750,7 @@ is
 
          User : User_Error_Type := Wp_Signon (Empty_Array, Secure_Cookie);
       begin
-         if Empty (X_COOKIE, -Globals.LOGGED_IN_COOKIE) then
+         if Empty (X_COOKIE, -Constants.LOGGED_IN_COOKIE) then
             if Headers_Sent then -- ()
                User.Success := False;
                User.Error := X_Construct ( -- new Wp_Error (
@@ -1765,7 +1766,7 @@ is
                );
             elsif
               Isset (X_POST, "testcookie") and then
-              Empty (X_COOKIE, -Globals.TEST_COOKIE)
+              Empty (X_COOKIE, -Constants.TEST_COOKIE)
             then
                -- If cookies are disabled, we can't log in even with a valid user
                -- and password.
@@ -1857,7 +1858,7 @@ is
                      -- This filter is documented in wp-login.php
                      Admin_Email_Check_Interval : constant Integer :=
                        Apply_Filters ("admin_email_check_interval",
-                                      6 * Globals.MONTH_IN_SECONDS);
+                                      6 * Constants.MONTH_IN_SECONDS);
                   begin
                      if
                        Admin_Email_Check_Interval > 0 and then
@@ -2301,7 +2302,10 @@ is
                  Get_Bloginfo ("html_type") & "; charset=" &
                  Get_Bloginfo ("charset"));
 
-         if Globals.RELOCATE_DEF and then Globals.RELOCATE then -- Move flag is set.
+         if
+           Constants.RELOCATE_DEF and then      -- Move flag is set.
+           Constants.RELOCATE
+         then
             if
               Isset (X_SERVER, "PATH_INFO") and then
               (Get_As_String (X_SERVER, "PATH_INFO") /=
@@ -2329,18 +2333,19 @@ is
             Secure : constant Boolean :=
               "https" = Parse_URL (Wp_Login_URL, PHP_URL_SCHEME);
          begin
-            Set_Cookie (-Globals.TEST_COOKIE, "WP Cookie check", 0,
-                        -Globals.COOKIEPATH, -Globals.COOKIE_DOMAIN, Secure);
+            Set_Cookie (-Constants.TEST_COOKIE, "WP Cookie check", 0,
+                        -Constants.COOKIEPATH, -Constants.COOKIE_DOMAIN, Secure);
 
-            if Globals.SITECOOKIEPATH /= Globals.COOKIEPATH then
-               Set_Cookie (-Globals.TEST_COOKIE, "WP Cookie check", 0,
-                           -Globals.SITECOOKIEPATH, -Globals.COOKIE_DOMAIN, Secure);
+            if Constants.SITECOOKIEPATH /= Constants.COOKIEPATH then
+               Set_Cookie (-Constants.TEST_COOKIE, "WP Cookie check", 0,
+                           -Constants.SITECOOKIEPATH,
+                           -Constants.COOKIE_DOMAIN, Secure);
             end if;
 
             if Isset (XX_GET, "wp_lang") then
                Set_Cookie ("wp_lang",
                            Sanitize_Text_Field (Get_As_String (XX_GET, "wp_lang")), 0,
-                           -Globals.COOKIEPATH, -Globals.COOKIE_DOMAIN, Secure);
+                           -Constants.COOKIEPATH, -Constants.COOKIE_DOMAIN, Secure);
             end if;
          end;
 

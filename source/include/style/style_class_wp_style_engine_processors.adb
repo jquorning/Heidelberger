@@ -14,9 +14,10 @@ with Php.Arrays;
 with Php.Sorting;
 with Php.Strings;
 
+with Constants;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
 
 with Inc_Functions;
 
@@ -84,7 +85,7 @@ is
 
       Defaults : constant Array_Type := To_Array (List => (
         Build ("optimize", True),
-        Build ("prettify", Globals.SCRIPT_DEBUG)
+        Build ("prettify", Constants.SCRIPT_DEBUG)
         -- defined( "SCRIPT_DEBUG" ) &&
       ));
       Options_2 : constant Array_Type := Wp_Parse_Args (Options, Defaults);

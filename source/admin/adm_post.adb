@@ -14,9 +14,10 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Adm_Menu;
@@ -54,8 +55,9 @@ is
    is
       use Php.Strings;
       use Binder;
-      use UStrings;
       use Globals;
+      use Constants;
+      use UStrings;
       use Wp_Common;
       use Adm_Menu;
       use Adi_Posts;

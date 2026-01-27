@@ -11,6 +11,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with Helpers;
 with UStrings;
@@ -41,6 +42,7 @@ is
       use Arrays;
       use Binder;
       use Globals;
+      use Constants;
       use Helpers;
       use UStrings;
       use Php.Echoing;

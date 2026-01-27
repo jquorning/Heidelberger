@@ -20,6 +20,7 @@
 
 with Arrays;
 with Binder;
+with Constants;
 with UStrings;
 with Globals;
 with Lists;
@@ -475,7 +476,7 @@ is
 --    Add_Action ("rss2_head", Rss2_Site_Icon'Access);
 
       -- WP Cron.
-      if not Globals.DOING_CRON then
+      if not Constants.DOING_CRON then
 --    if not Defined ("DOING_CRON") then
 --       Add_Action ("init", Wp_Cron'Access);
          null;

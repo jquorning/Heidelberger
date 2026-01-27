@@ -16,6 +16,7 @@ with Php.Strings;
 
 with Arrays;
 with Binder;
+with Constants;
 with Globals;
 with Helpers;
 with Lists;
@@ -1769,7 +1770,7 @@ is
    function Is_Admin_Bar_Showing
             return Boolean
    is
-      use Globals;
+      use Constants;
       use UStrings;
       use Wp_Common;
       use Inc_Load;

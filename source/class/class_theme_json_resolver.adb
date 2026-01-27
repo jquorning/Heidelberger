@@ -14,6 +14,7 @@ with Php.JSON;
 with Php.Strings;
 with Php.Types;
 
+with Constants;
 with Globals;
 with UStrings;
 
@@ -98,7 +99,7 @@ is
       if Empty_Array = Static_I18n_Schema then
          declare
             I18n_Schema : Array_Type :=
-              Wp_JSON_File_Decode (Globals.X_DIR_X & "/theme-i18n.json");
+              Wp_JSON_File_Decode (Constants.X_DIR_X & "/theme-i18n.json");
          begin
             Static_I18n_Schema := (if Empty_Array = I18n_Schema
                                    then Empty_Array else I18n_Schema);
@@ -133,7 +134,7 @@ is
 
       declare
          Config_3 : constant Array_Type :=
-           Read_JSON_File (Globals.X_DIR_X & "/theme.json");     -- static::
+           Read_JSON_File (Constants.X_DIR_X & "/theme.json");     -- static::
 
          Config_2 : constant Array_Type := Translate (Config_3); -- static::
 

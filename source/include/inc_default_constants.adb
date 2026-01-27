@@ -1,5 +1,6 @@
 --
--- Defines constants and global variables that can be overridden, generally in wp-config.php.
+-- Defines constants and global variables that can be overridden, generally in
+-- wp-config.php.
 --
 -- @package WordPress
 --
@@ -8,6 +9,7 @@ with Php.Preg;
 with Php.Misc;
 
 with Arrays;
+with Constants;
 with Globals;
 with UStrings;
 
@@ -167,6 +169,7 @@ is
 
    procedure Wp_Plugin_Directory_Constants
    is
+      use Constants;
       use Globals;
       use UStrings;
       use Inc_Options;
@@ -246,7 +249,7 @@ is
    is
       use Php.Misc;
       use Php.Preg;
-      use Globals;
+      use Constants;
       use UStrings;
       use Inc_Options;
    begin
@@ -318,7 +321,7 @@ is
       -- @since 2.6.0
       --
       PLUGINS_COOKIE_PATH := +Preg_Replace ("|https?://[^/]+|i", "",
-                                            -Globals.WP_PLUGIN_URL);
+                                            -Constants.WP_PLUGIN_URL);
 
       --
       -- @since 2.0.0
@@ -364,7 +367,7 @@ is
 
    procedure Wp_Functionality_Constants
    is
-      use Globals;
+      use Constants;
    begin
       --
       -- @since 2.5.0
@@ -398,7 +401,7 @@ is
 
    procedure Wp_Templating_Constants
    is
-      use Globals;
+      use Constants;
       use UStrings;
       use Inc_Themes;
    begin

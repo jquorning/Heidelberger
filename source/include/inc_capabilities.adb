@@ -9,6 +9,7 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Constants;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -735,7 +736,7 @@ is
 
       elsif Cap in "unfiltered_upload" then
          if
-           Globals.ALLOW_UNFILTERED_UPLOADS and then
+           Constants.ALLOW_UNFILTERED_UPLOADS and then
            (not Is_Multisite or else
             Is_Super_Admin (User_Id))
          then
@@ -748,7 +749,7 @@ is
                  | "unfiltered_html"
       then
          -- Disallow unfiltered_html for all users, even admins and super admins.
-         if Globals.DISALLOW_UNFILTERED_HTML then
+         if Constants.DISALLOW_UNFILTERED_HTML then
             Append (Caps, "do_not_allow");
          elsif Is_Multisite and then not Is_Super_Admin (User_Id) then
             Append (Caps, "do_not_allow");
@@ -761,7 +762,7 @@ is
                  | "edit_themes"
       then
          -- Disallow the file editors.
-         if Globals.DISALLOW_FILE_EDIT then
+         if Constants.DISALLOW_FILE_EDIT then
             Append (Caps, "do_not_allow");
          elsif Wp_Is_File_Mod_Allowed ("capability_edit_themes") then
             Append (Caps, "do_not_allow");

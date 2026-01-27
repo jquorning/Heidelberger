@@ -13,6 +13,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Arrays;
+with Constants;
 with Globals;
 with Lists;
 with UStrings;
@@ -337,8 +338,8 @@ is
       begin
          -- Print a CSS class to make PHP errors visible.
          if
-           Error_Get_Last.Is_Empty and then Globals.WP_DEBUG and then
-           Globals.WP_DEBUG_DISPLAY and then "" /= Ini_Get ("display_errors")
+           Error_Get_Last.Is_Empty and then Constants.WP_DEBUG and then
+           Constants.WP_DEBUG_DISPLAY and then "" /= Ini_Get ("display_errors")
            -- Don't print the class for PHP notices in wp-config.php, as they happen
            -- before WP_DEBUG takes effect, and should not be displayed with the
            -- `error_reporting` level previously set in wp-load.php.

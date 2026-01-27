@@ -14,6 +14,7 @@ with Php.Types;
 
 with Array_Vectors;
 with Binder;
+with Constants;
 with Globals;
 with Wp_Common;
 
@@ -77,8 +78,8 @@ package body Inc_L10n is
       end if;
 
       -- WPLANG was defined in wp-config.
-      if Globals.WPLANG /= "" then
-         Global_Locale := +Globals.WPLANG;
+      if Constants.WPLANG /= "" then
+         Global_Locale := +Constants.WPLANG;
       end if;
 
       -- If multisite, check options.
@@ -947,6 +948,7 @@ package body Inc_L10n is
    function Load_Default_Textdomain (Locale : String := "") -- null
                                      return Boolean
    is
+      use Constants;
       use Globals;
       use Inc_Load;
 
@@ -1503,9 +1505,11 @@ package body Inc_L10n is
       use Inc_Plugins;
 
       Languages  : Array_Type;
-      Lang_Files : constant List_Type := Glob ((if Dir = "" -- Is_Null (Dir)
-                                                then Globals.WP_LANG_DIR
-                                                else Dir) & "/*.mo");
+
+      Lang_Files : constant List_Type :=
+        Glob ((if Dir = "" -- Is_Null (Dir)
+               then Constants.WP_LANG_DIR
+               else Dir) & "/*.mo");
    begin
       if not Lang_Files.Is_Empty then
          for Lang_File of Lang_Files loop
