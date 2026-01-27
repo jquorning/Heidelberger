@@ -1,3 +1,9 @@
+--
+-- These functions are needed to load WordPress.
+--
+-- @package WordPress
+--
+
 with Ada.Calendar;
 
 with Arrays;

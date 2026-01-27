@@ -76,9 +76,10 @@ is
    -- @return string|false          Post type on success, false on failure.
    --
    function Get_Post_Type (Post : Class_Posts.Post_Id := 0)  -- := null )
-                           return String is ("XXX-250");
+                           return String;
+
    function Get_Post_Type (Post : Class_Posts.Wp_Post) -- := null )
-                           return String is ("XXX-251");
+                           return String;
 
    --
    -- Determines whether a post type is registered.
@@ -95,8 +96,7 @@ is
    -- @return bool Whether post type is registered.
    --
    function Post_Type_Exists (Post_Type : String)
-                              return Boolean
-                              is (True);
+                              return Boolean;
 
    -- @param array|string args {
    --     Optional. Array or string of post status arguments.
@@ -193,43 +193,56 @@ is
    -- @param array|string args {
    --     Optional. Array or string of post status arguments.
    --
-   --     @type bool|string label                     A descriptive name for the post status marked
-   --                                                  for translation. Defaults to value of post_status.
-   --     @type array|false label_count               Nooped plural text from _n_noop() to provide the singular
-   --                                                  and plural forms of the label for counts. Default false
-   --                                                  which means the `label` argument will be used for both
-   --                                                  the singular and plural forms of this label.
-   --     @type bool        exclude_from_search       Whether to exclude posts with this post status
-   --                                                  from search results. Default is value of internal.
-   --     @type bool        _builtin                  Whether the status is built-in. Core-use only.
-   --                                                  Default false.
-   --     @type bool        public                    Whether posts of this status should be shown
-   --                                                  in the front end of the site. Default false.
-   --     @type bool        internal                  Whether the status is for internal use only.
-   --                                                  Default false.
-   --     @type bool        protected                 Whether posts with this status should be protected.
-   --                                                  Default false.
-   --     @type bool        private                   Whether posts with this status should be private.
-   --                                                  Default false.
-   --     @type bool        publicly_queryable        Whether posts with this status should be publicly-
-   --                                                  queryable. Default is value of public.
-   --     @type bool        show_in_admin_all_list    Whether to include posts in the edit listing for
-   --                                                  their post type. Default is the opposite value
-   --                                                  of internal.
-   --     @type bool        show_in_admin_status_list Show in the list of statuses with post counts at
-   --                                                  the top of the edit listings,
-   --                                                  e.g. All (12) | Published (9) | My Custom Status (2)
-   --                                                  Default is the opposite value of internal.
-   --     @type bool        date_floating             Whether the post has a floating creation date.
-   --                                                  Default to false.
+   --     @type bool|string label                     A descriptive name for the post
+   --                                                 status marked for translation.
+   --                                                 Defaults to value of post_status.
+   --     @type array|false label_count               Nooped plural text from
+   --                                                 _n_noop() to provide the singular
+   --                                                 and plural forms of the label
+   --                                                 for counts. Default false which
+   --                                                 means the `label` argument will
+   --                                                 be used for both the singular
+   --                                                 and plural forms of this label.
+   --     @type bool        exclude_from_search       Whether to exclude posts with
+   --                                                 this post status from search
+   --                                                 results. Default is value of
+   --                                                 internal.
+   --     @type bool        _builtin                  Whether the status is built-in.
+   --                                                 Core-use only. Default false.
+   --     @type bool        public                    Whether posts of this status
+   --                                                 should be shown in the front end
+   --                                                 of the site. Default false.
+   --     @type bool        internal                  Whether the status is for
+   --                                                 internal use only. Default false.
+   --     @type bool        protected                 Whether posts with this status
+   --                                                 should be protected. Default
+   --                                                 false.
+   --     @type bool        private                   Whether posts with this status
+   --                                                 should be private. Default false.
+   --     @type bool        publicly_queryable        Whether posts with this status
+   --                                                 should be publicly-queryable.
+   --                                                 Default is value of public.
+   --     @type bool        show_in_admin_all_list    Whether to include posts in the
+   --                                                 edit listing for their post
+   --                                                 type. Default is the opposite
+   --                                                 value of internal.
+   --     @type bool        show_in_admin_status_list Show in the list of statuses
+   --                                                 with post counts at the top of
+   --                                                 the edit listings, e.g. All (12)
+   --                                                 | Published (9) | My Custom
+   --                                                 Status (2) Default is the
+   --                                                 opposite value of internal.
+   --     @type bool        date_floating             Whether the post has a floating
+   --                                                 creation date. Default to false.
    -- }
    -- @return object
    --
    function Register_Post_Status (Post_Status : String;
                                   Args        : Status_Type)
-                                  return Status_Type; -- Array_Type;
+                                  return Status_Type;
+
    procedure Register_Post_Status (Post_Status : String;
-                                   Args        : Status_Type); --  = to_array ()
+                                   Args        : Status_Type);
 
    --
    -- Retrieves a post type object by name.
@@ -246,6 +259,7 @@ is
    --
    function Get_Post_Type_Object (Post_Type : String)
                                   return Class_Post_Type.Wp_Post_Type;
+
 --   function Get_Post_Type_Object (Post_Type : String)
 --                                  return Boolean
 --                                  is (True);
@@ -286,7 +300,7 @@ is
                             Output   : String     := "names";
                             Operator : String     := "and")
                             return List_Type
-                            is (Empty_List);
+   is (raise Program_Error with "not implemented");
 
 --     @type bool|array   rewrite               {
    type Rewrite_Rec is
@@ -730,9 +744,9 @@ is
    -- @return object Object containing labels for the given custom-something object.
    --
    function X_Get_Custom_Object_Labels
-      (Object                 : in out Class_Taxonomy.Wp_Taxonomy;
-      Nohier_Vs_Hier_Defaults : Array_Type)
-      return Array_Type;
+      (Object                  : in out Class_Taxonomy.Wp_Taxonomy;
+       Nohier_Vs_Hier_Defaults : Array_Type)
+       return Array_Type;
 
    --
    -- Adds submenus for post types.
@@ -781,8 +795,7 @@ is
    -- @return bool Whether post type is hierarchical.
    --
    function Is_Post_Type_Hierarchical (Post_Type : String)
-                                       return Boolean
-                                       is (False);
+                                       return Boolean;
 
    --
    -- Registers support of certain features for a post type.
@@ -907,7 +920,7 @@ is
                                Meta_Value : Multi_Type := From_String (""));
 
    --
-   -- Checks a post type"s support for a given feature.
+   -- Checks a post type's support for a given feature.
    --
    -- @since 3.0.0
    --
@@ -919,8 +932,7 @@ is
    --
    function Post_Type_Supports (Post_Type : String;
                                 Feature   : String)
-                                return Boolean
-                                is (True);
+                                return Boolean;
 
    --
    -- Trashes or deletes a post or page.
@@ -946,7 +958,7 @@ is
    function Wp_Delete_Post (Postid       : Integer := 0;
                             Force_Delete : Boolean := False)
                             return Class_Posts.Wp_Post
-                            is (Class_Posts.Null_Post);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Retrieves a post status object by name.
@@ -961,8 +973,7 @@ is
    -- @return stdClass|null A post status object.
    --
    function Get_Post_Status_Object (Post_Status : String)
-                                    return Status_Type; -- Array_Type
-                                    -- is (Empty_Array);
+                                    return Status_Type;
 
    --
    -- Retrieves post data given a post ID or post object.
@@ -1004,13 +1015,13 @@ is
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
-                      is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    function Get_Post (Post   : Class_Posts.Wp_Post;
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
-                      is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Builds the URI path for a page.
@@ -1070,7 +1081,7 @@ is
    function Wp_Delete_Attachment (Post_Id      : Integer;
                                   Force_Delete : Boolean := False)
                                   return Class_Posts.Wp_Post
-                                  is (Class_Posts.Null_Post);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Updates a post with new post data.
@@ -1079,21 +1090,25 @@ is
    -- not be overridden.
    --
    -- @since 1.0.0
-   -- @since 3.5.0 Added the `$wp_error` parameter to allow a WP_Error to be returned on failure.
+   -- @since 3.5.0 Added the `$wp_error` parameter to allow a WP_Error to be returned
+   --              on failure.
    -- @since 5.6.0 Added the `$fire_after_hooks` parameter.
    --
-   -- @param array|object $postarr          Optional. Post data. Arrays are expected to be escaped,
-   --                                       objects are not. See wp_insert_post() for accepted arguments.
+   -- @param array|object $postarr          Optional. Post data. Arrays are expected
+   --                                       to be escaped, objects are not. See
+   --                                       wp_insert_post() for accepted arguments.
    --                                       Default array.
-   -- @param bool         $wp_error         Optional. Whether to return a WP_Error on failure. Default false.
-   -- @param bool         $fire_after_hooks Optional. Whether to fire the after insert hooks. Default true.
+   -- @param bool         $wp_error         Optional. Whether to return a WP_Error on
+   --                                       failure. Default false.
+   -- @param bool         $fire_after_hooks Optional. Whether to fire the after insert
+   --                                       hooks. Default true.
    -- @return int|WP_Error The post ID on success. The value 0 or WP_Error on failure.
    --
    function Wp_Update_Post (Postarr          : Array_Type := Empty_Array;
-                            wp_error         : Boolean    := False;
+                            Wp_Error         : Boolean    := False;
                             Fire_After_Hooks : Boolean    := True)
                             return Integer
-                            is (1);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Updates metadata for an attachment.
@@ -1107,7 +1122,7 @@ is
    function Wp_Update_Attachment_Metadata (Attachment_Id : Integer;
                                            Data          : Array_Type)
                                            return Integer
-                                           is (1);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Sanitizes every post field.
@@ -1129,6 +1144,7 @@ is
    function Sanitize_Post (Post    : Class_Posts.Wp_Post;
                            Context : String := "display")
                            return Class_Posts.Wp_Post;
+
 --   function Sanitize_Post (Key    : String;
 --                           Post   : Array_Type;
 --                           Id     : Integer; -- Inc_Class_Posts.Post_Id;
@@ -1173,7 +1189,7 @@ is
    --
    function Wp_Trash_Post (Post_Id : String)
                            return Boolean
-                           is (True);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Restores a post from the Trash.
@@ -1191,11 +1207,11 @@ is
 
    function Wp_Untrash_Post (Item : String)
                              return Boolean
-                             is (True);
+   is (raise Program_Error with "not implemented");
 
    function Wp_Untrash_Post (Item : Class_Posts.Wp_Post)
                              return Boolean
-                             is (True);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Inserts or update a post.
@@ -1301,7 +1317,7 @@ is
                             Wp_Error         : Boolean := False;
                             Fire_After_Hooks : Boolean := True)
                             return Class_Posts.Post_Id
-                            is (0);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Retrieves the icon for a MIME type or attachment.
@@ -1348,7 +1364,7 @@ is
 
    function Get_Post_Ancestors (Post : Class_Posts.Post_Id)
                                 return Class_Taxonomy.Int_Arrays.Vector
-                                is (raise Program_Error with "not implemented");
+   is (raise Program_Error with "not implemented");
 
    --
    -- Retrieves the post status based on the post ID.
@@ -1364,6 +1380,7 @@ is
    --
    function Get_Post_Status (Post : Class_Posts.Wp_Post := Class_Posts.Null_Post)
                              return String;
+
    function Get_Post_Status (Post : Class_Posts.Post_Id := 0)
                              return String;
 
@@ -1388,6 +1405,7 @@ is
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type; -- Post_Id_List;
+
    function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
                            Key     : String  := "";
                            Single  : Boolean := False)
@@ -1420,7 +1438,7 @@ is
                               Meta_Value : Multi_Type;
                               Prev_Value : Multi_Type := From_String (""))
                               return Boolean
-                              is (False);
+   is (raise Program_Error with "not implemented");
 
    procedure Update_Post_Meta (Post_Id    : Class_Posts.Post_Id;
                                Meta_Key   : String;
@@ -1438,9 +1456,9 @@ is
    -- @param int $attachment_id Optional. Attachment post ID. Defaults to global $post.
    -- @return string|false Attachment URL, otherwise false.
    --
-   function Wp_Get_Attachment_Url (Attachment_Id : Integer := 0)
+   function Wp_Get_Attachment_URL (Attachment_Id : Integer := 0)
                                    return String
-                                   is ("XXX-209");
+   is (raise Program_Error with "not implemented");
 
    --
    -- Retrieves attachment metadata for attachment ID.
@@ -1467,7 +1485,7 @@ is
    function Wp_Get_Attachment_Metadata (Attachment_Id : Integer := 0;
                                         Unfiltered    : Boolean := False)
                                         return Array_Type
-                                        is (Empty_Array);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Returns whether the post can be edited in the block editor.
@@ -1480,7 +1498,7 @@ is
    --
    function Use_Block_Editor_For_Post (Post : Class_Posts.Wp_Post)
                                        return Boolean
-                                       is (True);
+   is (raise Program_Error with "not implemented");
 
    --
    -- Filters callback which sets the status of an untrashed post to its previous
@@ -1499,20 +1517,23 @@ is
                                                  Post_Id         : Integer;
                                                  Previous_Status : String)
                                                  return String
-                                                 is ("XXX-611");
+   is (raise Program_Error with "not implemented");
 
    -- By jq
    function Get (Post  : Class_Posts.Wp_Post;
                  Field : String)
-                 return Array_Type is (Empty_Array);
+                 return Array_Type
+                 is (Empty_Array);
 
    procedure Set (Post  : in out Class_Posts.Wp_Post;
                   Field : String;
-                  Value : Array_Type) is null;
+                  Value : Array_Type)
+                  is null;
 
    procedure Set (Post  : in out Class_Posts.Wp_Post;
                   Field : String;
-                  Value : String) is null;
+                  Value : String)
+                  is null;
 
    Null_Status : constant Status_Type :=
      (Label       => UStrings.Null_UString,

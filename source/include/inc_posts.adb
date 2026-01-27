@@ -43,6 +43,7 @@ is
 
    Wp_Post_Types           : Post_Type_Map; -- List_Type;
    Global_Wp_Post_Statuses : Status_Maps.Map; -- Array_Type;
+   Global_X_Wp_Post_Type_Features : Array_Type;
 
    function Wp_Parse_Args_2 (Args     : Status_Type;
                              Defaults : Array_Type)
@@ -2119,86 +2120,91 @@ is
 --         return wp_filter_object_list( wp_post_statuses, args, operator, field );
 -- end;
 
---
--- Determines whether the post type is hierarchical.
---
--- A False return value might also mean that the post type does not exist.
---
--- @since 3.0.0
---
--- @see get_post_type_object()
---
--- @param string post_type Post type name
--- @return bool Whether post type is hierarchical.
---
--- function is_post_type_hierarchical( post_type ) then
---         if ( ! post_type_exists( post_type ) ) then
---                 return False;
---         end;
+   -------------------------------
+   -- Is_Post_Type_Hierarchical --
+   -------------------------------
 
---         post_type = get_post_type_object( post_type );
---         return post_type.hierarchical;
--- end;
+   function Is_Post_Type_Hierarchical (Post_Type : String)
+                                       return Boolean
+   is
+      use Class_Post_Type;
+   begin
+      if not Post_Type_Exists (Post_Type) then
+         return False;
+      end if;
 
---
--- Determines whether a post type is registered.
---
--- For more information on this and similar theme functions, check out
--- the {@link https://developer.wordpress.org/themes/basics/conditional-tags/
--- Conditional Tags} article in the Theme Developer Handbook.
---
--- @since 3.0.0
---
--- @see get_post_type_object()
---
--- @param string post_type Post type name.
--- @return bool Whether post type is registered.
---
--- function post_type_exists( post_type ) then
---         return (bool) get_post_type_object( post_type );
--- end;
+      declare
+         Post_Type_2 : constant Wp_Post_Type :=
+           Get_Post_Type_Object (Post_Type);
+      begin
+         return Post_Type_2.Hierarchical;
+      end;
+   end Is_Post_Type_Hierarchical;
 
---
--- Retrieves the post type of the current post or of a given post.
---
--- @since 2.1.0
---
--- @param int|WP_Post|null post Optional. Post ID or post object. Default is global post.
--- @return string|False          Post type on success, False on failure.
---
--- function get_post_type( post = null ) then
---         post = get_post( post );
---         if ( post ) then
---                 return post.post_type;
---         end;
+   ----------------------
+   -- Post_Type_Exists --
+   ----------------------
 
---         return False;
--- end;
+   function Post_Type_Exists (Post_Type : String)
+                              return Boolean
+   is
+      use Class_Post_Type;
+   begin
+      return Get_Post_Type_Object (Post_Type) /= Null_Post_Type; -- (bool)
+   end Post_Type_Exists;
 
---
--- Retrieves a post type object by name.
---
--- @since 3.0.0
--- @since 4.6.0 Object returned is now an instance of `WP_Post_Type`.
---
--- @global array wp_post_types List of post types.
---
--- @see register_post_type()
---
--- @param string post_type The name of a registered post type.
--- @return WP_Post_Type|null WP_Post_Type object if it exists, null otherwise.
---
+   -------------------
+   -- Get_Post_Type --
+   -------------------
+
+   function Get_Post_Type (Post : Class_Posts.Post_Id := 0)
+                           return String
+   is
+      use UStrings;
+      use Class_Posts;
+
+      Post_2 : constant Wp_Post := Get_Post (Post);
+   begin
+      if Post_2 /= Null_Post then
+         return -Post_2.Post_Type;
+      end if;
+
+      return ""; -- False;
+   end Get_Post_Type;
+
+   -------------------
+   -- Get_Post_Type --
+   -------------------
+
+   function Get_Post_Type (Post : Class_Posts.Wp_Post) -- := null )
+                           return String
+   is
+      use UStrings;
+      use Class_Posts;
+
+      Post_2 : constant Wp_Post := Get_Post (Post);
+   begin
+      if Post_2 /= Null_Post then
+         return -Post_2.Post_Type;
+      end if;
+
+      return ""; -- False;
+   end Get_Post_Type;
+
+   --------------------------
+   -- Get_Post_Type_Object --
+   --------------------------
+
    function Get_Post_Type_Object (Post_Type : String)
                                   return Class_Post_Type.Wp_Post_Type
    is
---      use List_Vectors;
       use Post_Type_Maps;
 --        global wp_post_types;
       P : Class_Post_Type.Wp_Post_Type;
    begin
       if
 --        not Is_Scalar (Post_Type) or else
-        Wp_Post_Types.Find (Post_Type) = No_Element  -- empty
+        Has_Element (Wp_Post_Types.Find (Post_Type))  -- empty
       then
          null;
 --         return null;
@@ -2985,22 +2991,18 @@ is
 --         return to_array ();
 -- end;
 
---
--- Checks a post type"s support for a given feature.
---
--- @since 3.0.0
---
--- @global array _wp_post_type_features
---
--- @param string post_type The post type being checked.
--- @param string feature   The feature being checked.
--- @return bool Whether the post type supports the given feature.
---
--- function post_type_supports( post_type, feature ) then
---         global _wp_post_type_features;
+   ------------------------
+   -- Post_Type_Supports --
+   ------------------------
 
---         return ( isset( _wp_post_type_features[ post_type ][ feature ] ) );
--- end;
+   function Post_Type_Supports (Post_Type : String;
+                                Feature   : String)
+                                return Boolean
+   is
+--      global _wp_post_type_features;
+   begin
+      return Isset_2 (Global_X_Wp_Post_Type_Features, Post_Type, Feature);
+   end Post_Type_Supports;
 
 --
 -- Retrieves a list of post type names that support a specific feature.

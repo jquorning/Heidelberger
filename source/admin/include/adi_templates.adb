@@ -2681,7 +2681,7 @@ is
                   if
                     not Empty (Meta_Header) and then
                     Meta_Header = Stylesheet and then
-                    Wp_Get_Attachment_Url (Integer (Post.Id)) /= Header_Image
+                    Wp_Get_Attachment_URL (Integer (Post.Id)) /= Header_Image
                   then
                      Media_States := +abs "Header Image";
                   end if;
@@ -2690,7 +2690,7 @@ is
                   -- the header image.
                   if
                     Header_Image /= "" and then
-                    Wp_Get_Attachment_Url (Integer (Post.Id)) = Header_Image
+                    Wp_Get_Attachment_URL (Integer (Post.Id)) = Header_Image
                   then
                      Media_States := +abs "Current Header Image";
                   end if;
@@ -2726,7 +2726,7 @@ is
                begin
                   if
                     Background_Image /= "" and then
-                    Wp_Get_Attachment_Url (Integer (Post.Id)) = Background_Image
+                    Wp_Get_Attachment_URL (Integer (Post.Id)) = Background_Image
                   then
                      Media_States := +abs "Current Background Image";
                   end if;
