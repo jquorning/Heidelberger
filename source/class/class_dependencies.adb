@@ -22,7 +22,7 @@ is
    --------------
 
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := Empty_List; -- = false,
+                      Handles : List_Type := []; -- = false,
                       Group   : Integer   := 0) --  = false
                       return List_Type
    is
@@ -33,7 +33,7 @@ is
       -- If nothing is passed, print the queue. If a string is passed,
       -- print that item. If an array is passed, print those items.
       --
-      Handles_2 : List_Type := (if Empty_List = Handles
+      Handles_2 : List_Type := (if Handles = []
                                 then This.Queue else Handles); -- (array)
       Unused : Boolean;
    begin
@@ -79,7 +79,7 @@ is
                       return List_Type
    is
    begin
-      return Do_Items (This, Empty_List, Group);
+      return Do_Items (This, [], Group);
    end Do_Items;
 
    --------------
@@ -127,7 +127,7 @@ is
 
       Handles_2 : constant List_Type := Handles; -- (array)
    begin
-      if Handles_2 = Empty_List then
+      if Handles_2 = [] then
          return False;
       end if;
 
@@ -159,8 +159,8 @@ is
                elsif
                  not This.Registered (Handle_2).Deps.Is_Empty and then
 --               This.Registered (Handle_2).Deps /= Empty_String_Array and then
-                 Empty_List = List_Diff (This.Registered (Handle_2).Deps,
-                                         Array_Keys (This.Registered))
+                 List_Diff (This.Registered (Handle_2).Deps,
+                            Array_Keys (This.Registered)) = []
                then
                   Keep_Going := False; -- Item requires dependencies that don't exist.
                elsif
@@ -207,7 +207,7 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := Empty_List;
+                  Deps   : List_Type := [];
                   Ver    : String       := "";
                   Args   : String       := "")
    is
@@ -220,10 +220,9 @@ is
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
-                 Deps   : List_Type := Empty_List;
-                 -- String_Array := Empty_String_Array;
-                 Ver    : String       := ""; -- Boolean      := False;
-                 Args   : String       := "") -- = null
+                 Deps   : List_Type := [];
+                 Ver    : String    := ""; -- Boolean      := False;
+                 Args   : String    := "") -- = null
 --               Args   : Array_Type   := Empty_Array) -- = null
                  return Boolean
    is

@@ -2146,7 +2146,7 @@ is
             -- Account for sites that have this key present when the original key
             -- does not exist.
             --
-            if Disallowed_List = Empty_List then
+            if Disallowed_List = [] then
 --          if False = Disallowed_List then
                Disallowed_List := Get_Option ("blocklist_keys");
             end if;
@@ -3431,7 +3431,7 @@ is
       use Php.Files;
       use Inc_Options;
 
-      Plugins : constant List_Type := Empty_List;  -- ???
+      Plugins : constant List_Type := [];  -- ???
 --      As_List (X_Get_Option ("active_plugins"));
    begin
       for Plugin of Plugins loop -- (array)

@@ -20,6 +20,4 @@ package Lists is
                      Item : String);
    -- Append Item to List.
 
-   Empty_List : List_Type renames List_Vectors.Empty_Vector;
-
 end Lists;

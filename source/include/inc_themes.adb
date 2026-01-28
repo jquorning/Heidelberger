@@ -2621,7 +2621,7 @@ is
    BACKGROUND_IMAGE    : UStrings.UString;
 
    procedure Add_Theme_Support (Feature : String;
-                                List    : List_Type  := Empty_List;
+                                List    : List_Type  := [];
                                 Arry    : Array_Type := Empty_Array) -- ...args
    is
       use Php.Arrays;
@@ -2638,13 +2638,13 @@ is
       List_2 : List_Type;
       Args_2 : Boolean := False;
    begin
-      if List = Empty_List and Arry = Empty_Array then
+      if List = [] and Arry = Empty_Array then
          Args_2 := True;
       end if;
 
       if Feature = "post-thumbnails" then
          -- All post types are already supported.
-         if Empty_List /= Get_Theme_Support ("post-thumbnails") then
+         if [] /= Get_Theme_Support ("post-thumbnails") then
             return;
          end if;
 
@@ -2688,7 +2688,7 @@ is
 
       elsif Feature = "html5" then
          -- You can't just pass "html5", you need to pass an array of types.
-         if List = Empty_List then
+         if List = [] then
 --       if ( empty( args[0] ) || ! is_array( args[0] ) ) then
             X_Doing_It_Wrong (
               "add_theme_support('html5')",
@@ -2983,7 +2983,7 @@ is
    begin
       if
         not Current_Theme_Supports ("custom-header", "header-text")    and then
-        Empty_List /= Get_Theme_Support ("custom-logo", "header-text") and then
+        [] /= Get_Theme_Support ("custom-logo", "header-text") and then
         0 = Get_Theme_Mod ("header_text", True)
       then
          declare

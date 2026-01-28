@@ -197,7 +197,7 @@ is
             Allowed_Block_Types :=
               Apply_Filters_Deprecated (
                 "allowed_block_types",
-                Empty_List, -- array( allowed_block_types, post ),
+                [], -- array( allowed_block_types, post ),
                 "5.8.0", "allowed_block_types_all");
          end;
       end if;

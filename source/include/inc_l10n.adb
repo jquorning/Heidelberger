@@ -1638,7 +1638,7 @@ package body Inc_L10n is
           To_Array (List => (
             Build ("id",                          "locale"),
             Build ("name",                        "locale"),
-            Build ("languages",                   Empty_List),
+            Build ("languages",                   List_Type'[]),
             Build ("translations",                Empty_Array),
             Build ("selected",                    ""),
             Build ("echo",                        1),

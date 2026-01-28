@@ -77,7 +77,7 @@ is
    function Glob (Pattern : String;
                   Flags   : Integer := 0)
                   return List_Type
-                  is (Empty_List);
+                  is ([]);
 
    type Resource is access all Integer;
 

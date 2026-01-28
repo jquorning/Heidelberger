@@ -108,7 +108,7 @@ is
    --
    function Wp_Register_Style (Handle : String;
                                Src    : String;
-                               Deps   : List_Type := Empty_List;
+                               Deps   : List_Type := [];
                                -- Array_Type := Empty_Array;
                                Ver    : String    := ""; -- Boolean    := False;
                                Media  : String    := "all")
@@ -116,7 +116,7 @@ is
 
    procedure Wp_Register_Style (Handle : String;
                                 Src    : Boolean;
-                                Deps   : List_Type := Empty_List;
+                                Deps   : List_Type := [];
                                 Ver    : Boolean   := False;
                                 Media  : Boolean   := False);
 
@@ -154,8 +154,7 @@ is
    -- function wp_enqueue_style( handle, src = '', deps = array(), ver = false, media = 'all' ) then
    procedure Wp_Enqueue_Style (Handle : String;
                                Src    : String    := "";
-                               Deps   : List_Type := Empty_List;
-                               -- String_Array := Empty_String_Array;
+                               Deps   : List_Type := [];
                                Ver    : String    := ""; -- Boolean      := False;
                                Media  : String    := "all");
 

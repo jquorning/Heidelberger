@@ -74,7 +74,6 @@ is
    -- @return bool
    --
    function Wp_HTTP_Supports (Capabilities : Array_Type := Empty_Array;
-   -- List_Type := Empty_List;
                               URL          : String := "") -- null
                               return Boolean;
 

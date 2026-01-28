@@ -1295,7 +1295,7 @@ is
            Apply_Filters ("manage_" & (-This.Screen.Id) & "_sortable_columns",
                           Sortable_Columns);
 
---       Sortable : constant List_Type := Empty_List;
+--       Sortable : constant List_Type := [];
          Sortable : constant Array_Type := Empty_Array;
       begin
          -- for A in X_Sortable.Iterate loop --  as id => data ) then

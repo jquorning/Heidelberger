@@ -346,8 +346,7 @@ is
    function Get_Theme_Support (Feature : String;
                                T       : String := "")
                                return List_Type -- String_Array
-                               is (Empty_List);
---                             is (Empty_String_Array);
+                               is ([]);
 
    function Get_Theme_Support (Feature : String;
                                T       : String := "")
@@ -561,7 +560,7 @@ is
    Support_Error : exception;
 
    procedure Add_Theme_Support (Feature : String;
-                                List    : List_Type  := Empty_List;
+                                List    : List_Type  := [];
                                 Arry    : Array_Type := Empty_Array); -- ...args
 
    --

@@ -780,7 +780,7 @@ is
                             Output   : String     := "names";
                             Operator : String     := "and")
                             return List_Type
-                            is (Empty_List);
+                            is ([]);
 
    --
    -- Determines whether the post type is hierarchical.

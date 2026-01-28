@@ -142,7 +142,7 @@ is
    -- @return string[] Array of handles of items that have been processed.
    --
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := Empty_List; -- = false,
+                      Handles : List_Type := []; -- = false,
                       Group   : Integer   := 0) --  = false
                       return List_Type
                       with Side_Effects;
@@ -152,7 +152,7 @@ is
                       Group   : Integer := 0) --  = false
                       return List_Type
                       with Side_Effects;
---                    is (Empty_List);
+--                    is ([]);
 
    procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : Boolean;
@@ -239,7 +239,7 @@ is
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
-                 Deps   : List_Type := Empty_List;
+                 Deps   : List_Type := [];
                  -- String_Array := Empty_String_Array;
                  Ver    : String    := ""; -- Boolean      := False;
                  Args   : String    := "") -- = null
@@ -249,14 +249,14 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := Empty_List;
+                  Deps   : List_Type := [];
                   Ver    : String    := "";
                   Args   : String    := "");
 
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := Empty_List;
+                  Deps   : List_Type := [];
                   Ver    : String    := "";
                   Args   : Integer)
                   is null;
@@ -264,7 +264,7 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := Empty_List;
+                  Deps   : List_Type := [];
                   Ver    : Boolean;
                   Args   : Integer)
                   is null;
@@ -272,7 +272,7 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : Boolean;
-                  Deps   : List_Type := Empty_List;
+                  Deps   : List_Type := [];
                   Ver    : String    := "";
                   Args   : Integer   := 0)
                   is null;
@@ -328,7 +328,7 @@ is
                       Handle : String;
                       Key    : String)
                       return List_Type
-                      is (Empty_List);
+                      is ([]);
 
    --
    -- Un-register an item or items.

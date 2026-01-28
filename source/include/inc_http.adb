@@ -378,7 +378,6 @@ is
    ----------------------
 
    function Wp_HTTP_Supports (Capabilities : Array_Type := Empty_Array;
-   -- List_Type := Empty_List;
                               URL          : String    := "")
                               return Boolean
    is

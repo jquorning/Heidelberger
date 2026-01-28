@@ -338,7 +338,7 @@ is
    procedure Add_Hooks (This : Wp_Taxonomy);
 
    Null_Taxonomy : constant Wp_Taxonomy :=
-      (Labels             => Empty_Array, -- Empty_List,
+      (Labels             => Empty_Array, -- []
        Show_Admin_Column  => False,
        Show_In_Quick_Edit => False,
        Show_Tagcloud      => False,
@@ -349,7 +349,7 @@ is
        Publicly_Queryable => False,
        Public             => False,
        Cap                => Empty_Array,
-       Object_Type        => Empty_List, -- Empty_String_Array,
+       Object_Type        => [],
        Show_In_REST       => False,
        Default_Term       => Empty_Array,
        Args               => Empty_Array,

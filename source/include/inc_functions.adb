@@ -5518,9 +5518,9 @@ is
    is
    begin
       raise Program_Error with "not implemented";
-      return Empty_List;
+      return [];
       -- if not Is_Array (List) then
-      --    return Empty_List;
+      --    return [];
       -- end if;
 
       -- util = new WP_List_Util( list );

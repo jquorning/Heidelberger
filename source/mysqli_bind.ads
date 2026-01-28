@@ -88,7 +88,7 @@ is
 
    function Mysqli_Fetch_Array (Res : Arrays.Array_Type)
                                 return Lists.List_Type
-                                is (Lists.Empty_List);
+                                is (Lists.List_Type'[]);
 
    function Mysqli_Select_DB (Dbh : Integer;
                                DB : String)

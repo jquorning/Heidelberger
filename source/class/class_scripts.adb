@@ -81,7 +81,7 @@ is
    -------------------
 
    function Print_Scripts (This    : in out Wp_Scripts;
-                           Handles : List_Type := Empty_List;
+                           Handles : List_Type := [];
                            Group   : Integer      := 0) -- False)
                            return List_Type -- String_Array
    is

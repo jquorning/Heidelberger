@@ -950,7 +950,7 @@ is
               +HTML_Entity_Decode (
                 Sprintf (
                   abs "Your theme has 1 widget area, but this particular page does not display it.",
-                  Args => Empty_List
+                  Args => []
                 ),
                 ENT_QUOTES,
                 Get_Bloginfo ("charset")

@@ -4246,7 +4246,7 @@ is
    -------------
 
    function ESC_URL (URL       : String;
-                     Protocols : List_Type := Empty_List;
+                     Protocols : List_Type := [];
                      X_Context : String    := "display")
                     return String
    is
@@ -4363,7 +4363,7 @@ is
             else
                declare
                   Protocols_2 : constant List_Type :=
-                    (if Protocols in Empty_List -- not Is_Array (Protocols)
+                    (if Protocols in [] -- not Is_Array (Protocols)
                      then Wp_Allowed_Protocols
                      else Protocols);
                begin
@@ -4395,7 +4395,7 @@ is
    -----------------
 
    function ESC_URL_Raw (URL       : String;
-                         Protocols : List_Type := Empty_List) -- null
+                         Protocols : List_Type := []) -- null
                          return String
    is
    begin
@@ -4407,7 +4407,7 @@ is
    ------------------
 
    function Sanitize_URL (URL       : String;
-                          Protocols : List_Type := Empty_List)
+                          Protocols : List_Type := [])
                           return String
    is
    begin

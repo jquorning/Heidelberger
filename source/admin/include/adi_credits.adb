@@ -187,7 +187,7 @@ is
             elsif Placeholders.Kind = JSON_Array_Type then  -- Isset
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
                Globals.Title := +Vsprintf (Translate (Name.Get), ["XXX-913"]); -- Placeholders.Get);
---             Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_List); -- Placeholders.Get);
+--             Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_Array); -- Placeholders.Get);
             else
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
                Globals.Title := +Translate (Name.Get);

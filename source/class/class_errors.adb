@@ -44,7 +44,7 @@ is
       use Php.Arrays;
    begin
       if not This.Has_Errors then
-         return Empty_List;
+         return [];
       end if;
 
       return Array_Keys (This.Errors);
@@ -102,7 +102,7 @@ is
             return [Message];
          end;
       else
-         return Empty_List;
+         return [];
       end if;
    end Get_Error_Messages;
 

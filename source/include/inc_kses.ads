@@ -63,7 +63,7 @@ is
    --
    function Wp_KSES (Item              : String;
                      Allowed_HTML      : Array_Type;
-                     Allowed_Protocols : List_Type := Empty_List)
+                     Allowed_Protocols : List_Type := [])
                      return String;
 
    --

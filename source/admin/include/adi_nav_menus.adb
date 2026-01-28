@@ -536,7 +536,7 @@ is
       -- If we"re dealing with pages, let's prioritize the Front Page,
       -- Posts Page and Privacy Policy Page at the top of the list.
       --
-      Important_Pages   : constant List_Type  := Empty_List; -- List_Array;
+      Important_Pages   : constant List_Type  := []; -- List_Array;
       Suppress_Page_Ids : Array_Type := Empty_Array;
       Front_Page        : Post_Id    := 0;
       Front_Page_Obj    : Wp_Post;

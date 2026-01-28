@@ -663,7 +663,7 @@ is
 --    if not Isset (Value) then
          return Root_2;
       when Kind_List =>
---      elsif Keys = Empty_List then -- If there are no keys, we're replacing the root.
+--      elsif Keys = [] then -- If there are no keys, we're replacing the root.
          return As_Array (Value);
 --    end if;
       when others =>

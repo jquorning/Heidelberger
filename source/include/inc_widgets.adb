@@ -884,7 +884,7 @@ is
 
    function X_Wp_Remove_Unregistered_Widgets
               (Sidebars_Widgets   : Array_Type;
-               Allowed_Widget_Ids : List_Type := Empty_List)
+               Allowed_Widget_Ids : List_Type := [])
                return Array_Type
    is
       use Php.Lists;

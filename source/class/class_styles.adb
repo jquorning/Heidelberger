@@ -226,9 +226,9 @@ is
       end if;
 
       After := This.Get_Data (Handle, "after");
-      if After = Empty_List then
+      if After = [] then
 --    if not After then
-         After := Empty_List; -- Empty_Array;
+         After := []; -- Empty_Array;
       end if;
 
       After.Append (Code);

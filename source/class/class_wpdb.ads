@@ -1621,7 +1621,7 @@ is
                      Query : Statement_Type := "";  -- null;
                      X     : Integer        := 0)
                      return List_Type
-                     is (Empty_List);
+                     is ([]);
 
    --
    -- Retrieves an entire SQL result set from the database (i.e., many rows).

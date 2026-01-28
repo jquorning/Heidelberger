@@ -103,7 +103,7 @@ is
 --
    function Get_Registered_Nav_Menus
             return List_Type -- String_Array
-            is (Empty_List);
+            is ([]);
 
    --
    -- Returns all navigation menu objects.

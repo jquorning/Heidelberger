@@ -55,7 +55,7 @@ is
 
    function Array_Keys (Arry : Class_Terms.Wp_Term_Array)
                         return List_Type
-                        is (Empty_List);
+                        is ([]);
 
    procedure Array_Unshift (Arry : in out Class_Terms.Wp_Term_Array;
                             S    : Class_Terms.Wp_Term)
@@ -88,7 +88,7 @@ is
 
    function Array_Keys (Arry : Class_Dependency.Dependency_Map)
                         return List_Type
-                        is (Empty_List);
+                        is ([]);
 
    function Array_Fill_Keys (Keys  : List_Type;
                              Value : Boolean)
@@ -290,7 +290,7 @@ is
                            B         : String;
                            C         : Class_Posts.Wp_Post)
                            return List_Type
-                           is (Empty_List);
+                           is ([]);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;

@@ -27,7 +27,7 @@ is
    -- Wp_Get_Global_Settings --
    ----------------------------
 
-   function Wp_Get_Global_Settings (Path    : List_Type  := Empty_List;
+   function Wp_Get_Global_Settings (Path    : List_Type  := [];
                                     Context : Array_Type := Empty_Array)
                                     return Multi_Type -- Array_Type
    is
@@ -92,7 +92,7 @@ is
    -- Wp_Get_Global_Stylesheet --
    ------------------------------
 
-   function Wp_Get_Global_Stylesheet (Types : List_Type := Empty_List)
+   function Wp_Get_Global_Stylesheet (Types : List_Type := [])
                                       return String
    is
       use Php.Lists;

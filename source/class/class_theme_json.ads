@@ -880,7 +880,7 @@ is
    function Get_Stylesheet
               (This    : Wp_Theme_JSON;
                Types   : List_Type := Variables_Styles_Present;
-               Origins : List_Type := Empty_List) -- null
+               Origins : List_Type := []) -- null
                return String;
 --                 if ( null === $origins ) then
 --                         $origins = static::VALID_ORIGINS;
@@ -1388,7 +1388,7 @@ is
    -- protected static
    function Get_Settings_Slugs (Settings        : Array_Type;
                                 Preset_Metadata : Array_Type;
-                                Origins         : List_Type := Empty_List) -- null
+                                Origins         : List_Type := []) -- null
                                 return Array_Type;
 
    --

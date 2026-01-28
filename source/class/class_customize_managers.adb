@@ -3244,7 +3244,7 @@ is
          Lock : constant List_Type := Explode (":", Lock_0);
       begin
          if
-           Lock not in Empty_List and then
+           Lock not in [] and then
            not Empty (Lock (1))        -- [1]
          then
             declare

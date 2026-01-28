@@ -79,7 +79,7 @@ is
 
    function Get_Cookies (This : Wp_HTTP_Requests_Response)
                          return List_Type
-                         is (Empty_List);
+                         is ([]);
         --         cookies = array();
         --         foreach ( this.response.cookies as cookie ) then
         --                 cookies[] = new WP_Http_Cookie(

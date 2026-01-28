@@ -47,7 +47,7 @@ is
 
    function Stream_Get_Wrappers
             return List_Type
-            is (Empty_List);
+            is ([]);
 
    function Call_User_Func (Callback : Callable;
                             Args     : String := "")
@@ -85,7 +85,7 @@ is
 
    function Timezone_Identifiers_List (A : String)
             return List_Type
-            is (Empty_List);
+            is ([]);
 
    function Hash_Equals (Hash_1 : String;
                          Hash_2 : String)

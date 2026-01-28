@@ -920,7 +920,7 @@ is
    -- function Get_List (Arry : Array_Type;
    --                    Key  : String)
    --                    return List_Type
-   --                    is (Empty_List);
+   --                    is ([]);
 
    -----------
    -- Empty --

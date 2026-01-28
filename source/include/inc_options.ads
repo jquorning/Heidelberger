@@ -204,10 +204,10 @@ is
    -- function Get_Site_Option (Option  : String;
    --                           Default : List_Type)
    --                           return List_Type
-   --                           is (Empty_List);
+   --                           is ([]);
 
    -- function Get_Site_Option (Option  : String;
-   --                           Default : List_Type := Empty_List)
+   --                           Default : List_Type := [])
    --                           return Natural
    --                           is (999);
 
