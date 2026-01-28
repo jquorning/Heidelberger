@@ -7,7 +7,6 @@
 --
 
 with Arrays;
-with UStrings;
 with Lists;
 
 package Class_Theme_JSON
@@ -15,8 +14,8 @@ is
    use Arrays;
    use Lists;
 
-   function To_UString (Item : String) return UStrings.UString
-     renames UStrings.To_UString;
+--   function To_UString (Item : String) return UStrings.UString
+--     renames UStrings.To_UString;
 
    --
    -- Class that encapsulates the processing of structures that adhere to the theme.json spec.
@@ -69,12 +68,8 @@ is
    -- @since 6.1.0 Added "blocks".
    -- @var string[]
    --
-   VALID_ORIGINS : constant List_Type := To_List (List => (
-     To_UString ("DEFAULT"),
-     To_UString ("blocks"),
-     To_UString ("theme"),
-     To_UString ("custom")
-   ));
+   VALID_ORIGINS : constant List_Type :=
+     ["DEFAULT", "blocks", "theme", "custom"];
 
    --
    -- Presets are a set of values that serve
@@ -212,53 +207,53 @@ is
    -- @var array
    --
    PROPERTIES_METADATA : constant Array_Type := To_Array (List => (
-     Build ("background",                        To_List (List => (To_UString ("color"), To_UString ("gradient")))),
-     Build ("background-color",                  To_List (List => (To_UString ("color"), To_UString ("background")))),
-     Build ("border-radius",                     To_List (List => (To_UString ("border"), To_UString ("radius")))),
-     Build ("border-top-left-radius",            To_List (List => (To_UString ("border"), To_UString ("radius"), To_UString ("topLeft")))),
-     Build ("border-top-right-radius",           To_List (List => (To_UString ("border"), To_UString ("radius"), To_UString ("topRight")))),
-     Build ("border-bottom-left-radius",         To_List (List => (To_UString ("border"), To_UString ("radius"), To_UString ("bottomLeft")))),
-     Build ("border-bottom-right-radius",        To_List (List => (To_UString ("border"), To_UString ("radius"), To_UString ("bottomRight")))),
-     Build ("border-color",                      To_List (List => (To_UString ("border"), To_UString ("color")))),
-     Build ("border-width",                      To_List (List => (To_UString ("border"), To_UString ("width")))),
-     Build ("border-style",                      To_List (List => (To_UString ("border"), To_UString ("style")))),
-     Build ("border-top-color",                  To_List (List => (To_UString ("border"), To_UString ("top"), To_UString ("color")))),
-     Build ("border-top-width",                  To_List (List => (To_UString ("border"), To_UString ("top"), To_UString ("width")))),
-     Build ("border-top-style",                  To_List (List => (To_UString ("border"), To_UString ("top"), To_UString ("style")))),
-     Build ("border-right-color",                To_List (List => (To_UString ("border"), To_UString ("right"), To_UString ("color")))),
-     Build ("border-right-width",                To_List (List => (To_UString ("border"), To_UString ("right"), To_UString ("width")))),
-     Build ("border-right-style",                To_List (List => (To_UString ("border"), To_UString ("right"), To_UString ("style")))),
-     Build ("border-bottom-color",               To_List (List => (To_UString ("border"), To_UString ("bottom"), To_UString ("color")))),
-     Build ("border-bottom-width",               To_List (List => (To_UString ("border"), To_UString ("bottom"), To_UString ("width")))),
-     Build ("border-bottom-style",               To_List (List => (To_UString ("border"), To_UString ("bottom"), To_UString ("style")))),
-     Build ("border-left-color",                 To_List (List => (To_UString ("border"), To_UString ("left"), To_UString ("color")))),
-     Build ("border-left-width",                 To_List (List => (To_UString ("border"), To_UString ("left"), To_UString ("width")))),
-     Build ("border-left-style",                 To_List (List => (To_UString ("border"), To_UString ("left"), To_UString ("style")))),
-     Build ("color",                             To_List (List => (To_UString ("color"), To_UString ("text")))),
-     Build ("font-family",                       To_List (List => (To_UString ("typography"), To_UString ("fontFamily")))),
-     Build ("font-size",                         To_List (List => (To_UString ("typography"), To_UString ("fontSize")))),
-     Build ("font-style",                        To_List (List => (To_UString ("typography"), To_UString ("fontStyle")))),
-     Build ("font-weight",                       To_List (List => (To_UString ("typography"), To_UString ("fontWeight")))),
-     Build ("letter-spacing",                    To_List (List => (To_UString ("typography"), To_UString ("letterSpacing")))),
-     Build ("line-height",                       To_List (List => (To_UString ("typography"), To_UString ("lineHeight")))),
-     Build ("margin",                            To_List (List => (To_UString ("spacing"), To_UString ("margin")))),
-     Build ("margin-top",                        To_List (List => (To_UString ("spacing"), To_UString ("margin"), To_UString ("top")))),
-     Build ("margin-right",                      To_List (List => (To_UString ("spacing"), To_UString ("margin"), To_UString ("right")))),
-     Build ("margin-bottom",                     To_List (List => (To_UString ("spacing"), To_UString ("margin"), To_UString ("bottom")))),
-     Build ("margin-left",                       To_List (List => (To_UString ("spacing"), To_UString ("margin"), To_UString ("left")))),
-     Build ("padding",                           To_List (List => (To_UString ("spacing"), To_UString ("padding")))),
-     Build ("padding-top",                       To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("top")))),
-     Build ("padding-right",                     To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("right")))),
-     Build ("padding-bottom",                    To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("bottom")))),
-     Build ("padding-left",                      To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("left")))),
-     Build ("--wp--style--root--padding",        To_List (List => (To_UString ("spacing"), To_UString ("padding")))),
-     Build ("--wp--style--root--padding-top",    To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("top")))),
-     Build ("--wp--style--root--padding-right",  To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("right")))),
-     Build ("--wp--style--root--padding-bottom", To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("bottom")))),
-     Build ("--wp--style--root--padding-left",   To_List (List => (To_UString ("spacing"), To_UString ("padding"), To_UString ("left")))),
-     Build ("text-decoration",                   To_List (List => (To_UString ("typography"), To_UString ("textDecoration")))),
-     Build ("text-transform",                    To_List (List => (To_UString ("typography"), To_UString ("textTransform")))),
-     Build ("filter",                            To_List (List => (To_UString ("filter"), To_UString ("duotone")))),
+     Build ("background",                        List_Type'["color", "gradient"]),
+     Build ("background-color",                  List_Type'["color", "background"]),
+     Build ("border-radius",                     List_Type'["border", "radius"]),
+     Build ("border-top-left-radius",            List_Type'["border", "radius", "topLeft"]),
+     Build ("border-top-right-radius",           List_Type'["border", "radius", "topRight"]),
+     Build ("border-bottom-left-radius",         List_Type'["border", "radius", "bottomLeft"]),
+     Build ("border-bottom-right-radius",        List_Type'["border", "radius", "bottomRight"]),
+     Build ("border-color",                      List_Type'["border", "color"]),
+     Build ("border-width",                      List_Type'["border", "width"]),
+     Build ("border-style",                      List_Type'["border", "style"]),
+     Build ("border-top-color",                  List_Type'["border", "top", "color"]),
+     Build ("border-top-width",                  List_Type'["border", "top", "width"]),
+     Build ("border-top-style",                  List_Type'["border", "top", "style"]),
+     Build ("border-right-color",                List_Type'["border", "right", "color"]),
+     Build ("border-right-width",                List_Type'["border", "right", "width"]),
+     Build ("border-right-style",                List_Type'["border", "right", "style"]),
+     Build ("border-bottom-color",               List_Type'["border", "bottom", "color"]),
+     Build ("border-bottom-width",               List_Type'["border", "bottom", "width"]),
+     Build ("border-bottom-style",               List_Type'["border", "bottom", "style"]),
+     Build ("border-left-color",                 List_Type'["border", "left", "color"]),
+     Build ("border-left-width",                 List_Type'["border", "left", "width"]),
+     Build ("border-left-style",                 List_Type'["border", "left", "style"]),
+     Build ("color",                             List_Type'["color", "text"]),
+     Build ("font-family",                       List_Type'["typography", "fontFamily"]),
+     Build ("font-size",                         List_Type'["typography", "fontSize"]),
+     Build ("font-style",                        List_Type'["typography", "fontStyle"]),
+     Build ("font-weight",                       List_Type'["typography", "fontWeight"]),
+     Build ("letter-spacing",                    List_Type'["typography", "letterSpacing"]),
+     Build ("line-height",                       List_Type'["typography", "lineHeight"]),
+     Build ("margin",                            List_Type'["spacing", "margin"]),
+     Build ("margin-top",                        List_Type'["spacing", "margin", "top"]),
+     Build ("margin-right",                      List_Type'["spacing", "margin", "right"]),
+     Build ("margin-bottom",                     List_Type'["spacing", "margin", "bottom"]),
+     Build ("margin-left",                       List_Type'["spacing", "margin", "left"]),
+     Build ("padding",                           List_Type'["spacing", "padding"]),
+     Build ("padding-top",                       List_Type'["spacing", "padding", "top"]),
+     Build ("padding-right",                     List_Type'["spacing", "padding", "right"]),
+     Build ("padding-bottom",                    List_Type'["spacing", "padding", "bottom"]),
+     Build ("padding-left",                      List_Type'["spacing", "padding", "left"]),
+     Build ("--wp--style--root--padding",        List_Type'["spacing", "padding"]),
+     Build ("--wp--style--root--padding-top",    List_Type'["spacing", "padding", "top"]),
+     Build ("--wp--style--root--padding-right",  List_Type'["spacing", "padding", "right"]),
+     Build ("--wp--style--root--padding-bottom", List_Type'["spacing", "padding", "bottom"]),
+     Build ("--wp--style--root--padding-left",   List_Type'["spacing", "padding", "left"]),
+     Build ("text-decoration",                   List_Type'["typography", "textDecoration"]),
+     Build ("text-transform",                    List_Type'["typography", "textTransform"]),
+     Build ("filter",                            List_Type'["filter", "duotone"]),
      Build ("box-shadow",                        To_List ("shadow"))
   ));
 
@@ -274,7 +269,7 @@ is
    -- @since 5.9.0
    --
    PROTECTED_PROPERTIES : constant Array_Type := To_Array (List => (1 =>
-     Build ("spacing.blockGap", To_List (List => (To_UString ("spacing"), To_UString ("blockGap"))))
+     Build ("spacing.blockGap", List_Type'["spacing", "blockGap"])
    ));
 
    --
@@ -285,15 +280,15 @@ is
    --              added the `customTemplates` and `templateParts` values.
    -- @var string[]
    --
-   VALID_TOP_LEVEL_KEYS : constant List_Type := To_List (List => (
-     To_UString ("customTemplates"),
-     To_UString ("patterns"),
-     To_UString ("settings"),
-     To_UString ("styles"),
-     To_UString ("templateParts"),
-     To_UString ("version"),
-     To_UString ("title")
-   ));
+   VALID_TOP_LEVEL_KEYS : constant List_Type := List_Type'[
+     "customTemplates",
+     "patterns",
+     "settings",
+     "styles",
+     "templateParts",
+     "version",
+     "title"
+   ];
 
    --
    -- The valid properties under the settings key.
@@ -422,12 +417,8 @@ is
    --
 -- VALID_ELEMENT_PSEUDO_SELECTORS : constant array (Positive range <>) of Array_Type := (
    VALID_ELEMENT_PSEUDO_SELECTORS : constant Array_Type := To_Array (List => (
-     Build ("link",   To_List (List => (
-       To_UString (":visited"), To_UString (":hover"),
-       To_UString (":focus"),   To_UString (":active")))),
-     Build ("button", To_List (List => (
-       To_UString (":visited"), To_UString (":hover"),
-       To_UString (":focus"),   To_UString (":active"))))
+     Build ("link",   List_Type'[":visited", ":hover", ":focus", ":active"]),
+     Build ("button", List_Type'[":visited", ":hover", ":focus", ":active"])
    ));
 
    --
@@ -884,9 +875,7 @@ is
    --
 
    Variables_Styles_Present : constant List_Type :=
-     To_List (List => (To_UString ("variables"),
-                       To_UString ("styles"),
-                       To_UString ("presets")));
+     ["variables", "styles", "presets"];
 
    function Get_Stylesheet
               (This    : Wp_Theme_JSON;
@@ -1059,7 +1048,7 @@ is
 --                 $has_fallback_gap_support = ! $has_block_gap_support; -- This setting isn"t useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
 --                 $node                     = _wp_array_get( $this->theme_json, $block_metadata["path"], array() );
 --                 $layout_definitions       = _wp_array_get( $this->theme_json, array( "settings", "layout", "definitions" ), array() );
---                 $layout_selector_pattern  = "/^[a-zA-Z0-9\-\.\--To_UString (>:\(\)]*$/"; -- Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
+--                 $layout_selector_pattern  = "/^[a-zA-Z0-9\-\.\-->:\(\)]*$/"; -- Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
 
 --                 -- Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
 --                 -- Default layout gap styles will be skipped for themes that do not explicitly opt-in to blockGap with a `true` or `false` value.
@@ -1932,7 +1921,7 @@ is
 --                 if ( $has_block_gap_support ) then
 --                         $block_gap_value = static::get_property_value( $this->theme_json, array( "styles", "spacing", "blockGap" ) );
 --                         $css            .= ".wp-site-blocks >-- then margin-block-start: 0; margin-block-end: 0; end;";
---                         $css            .= ".wp-site-blocks >-- To_UString (-- then margin-block-start: $block_gap_value; end;";
+--                         $css            .= ".wp-site-blocks >-- -- then margin-block-start: $block_gap_value; end;";
 
 --                         -- For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 --                         $css .= "$selector then --wp--style--block-gap: $block_gap_value; end;";

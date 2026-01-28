@@ -162,8 +162,7 @@ is
                else
                   declare
                      List : constant List_Type :=
-                       To_List (List => (+"trashed", +"untrashed",
-                                         +"deleted", +"ids"));
+                       ["trashed", "untrashed", "deleted", "ids"];
                   begin
                      Sendback := +Remove_Query_Arg (List, -Sendback);
                   end;
@@ -209,12 +208,11 @@ is
                                               "<!-- wp:paragraph -->") = 0
                   then
                      declare
-                        Value_2 : constant String := As_String (Get (X_POST, "content"));
+                        Value_2 : constant String :=
+                          Get_As_String (X_POST, "content");
 
-                        Needle  : constant List_Type := To_List (List => (
-                          +"\r\n",
-                          +"\r",
-                          +"\n"));
+                        Needle  : constant List_Type :=
+                          ["\r\n", "\r", "\n"];
 
                         Value : constant String :=
                           Sprintf (

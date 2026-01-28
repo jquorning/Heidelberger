@@ -158,10 +158,10 @@ is
 
       -- Shake it!
       declare
-         Shake_Error_Codes_2 : constant List_Type := To_List (List => (
-           +"empty_password", +"empty_email", +"invalid_email", +"invalidcombo",
-           +"empty_username", +"invalid_username", +"incorrect_password",
-           +"retrieve_password_email_failure"));
+         Shake_Error_Codes_2 : constant List_Type :=
+           ["empty_password", "empty_email", "invalid_email", "invalidcombo",
+            "empty_username", "invalid_username", "incorrect_password",
+            "retrieve_password_email_failure"];
 
          --
          -- Filters the error codes array for shaking the login form.
@@ -190,10 +190,10 @@ is
          -- translators: Login screen title. 1: Login screen name, 2: Network or site name.
          Login_Title_3 : constant String :=
            Sprintf (abs "%1s &lsaquo; %2s &#8212; WordPress",
-                    To_List (List => (
-                      1 => +Title,
-                      2 => +Login_Title_4
-                    )));
+                    [
+                      1 => Title,
+                      2 => Login_Title_4
+                    ]);
 
          Login_Title_2 : constant String :=
            (if Wp_Is_Recovery_Mode
@@ -297,7 +297,7 @@ is
            Apply_Filters ("login_headertext", Login_Header_Text_2);
 
          Classes : List_Type :=
-           To_List (List => (+"login-action-" & Action, +"wp-core-ui"));
+           ["login-action-" & (-Action), "wp-core-ui"];
       begin
          if Is_RTL then
             Classes.Append ("rtl");
@@ -446,14 +446,14 @@ is
             HTML_Link : constant String :=
               Sprintf (
                 "<a href=""%s"">%s</a>",
-                To_List (List => (
-                  1 => +ESC_URL (Home_URL ("/")),
-                  2 => +Sprintf (
+                [
+                  1 => ESC_URL (Home_URL ("/")),
+                  2 => Sprintf (
                           -- translators: %s: Site title.
                           X_X ("&larr; Go to %s", "site"),
                           To_List (Get_Bloginfo ("title", "display"))
                         )
-                )));
+                ]);
          begin
             --
             -- Filter the "Go to site" link displayed in the login page footer.
@@ -768,11 +768,11 @@ is
          begin
             Printf (
               "<a href=""%s"" rel=""noopener"" target=""_blank"">%s%s</a>",
-              To_List (List => (
-                1 => +ESC_URL (Admin_Email_Help_URL),
-                2 => +abs "Why is this important?",
-                3 => +Accessibility_Text
-              ))
+              [
+                1 => ESC_URL (Admin_Email_Help_URL),
+                2 => abs "Why is this important?",
+                3 => Accessibility_Text
+              ]
             );
          end;
 
@@ -1095,10 +1095,10 @@ is
          declare
             Registration_URL : constant String :=
               Sprintf ("<a href=""%s"">%s</a>",
-                       To_List (List => (
-                         1 => +ESC_URL (Wp_Registration_URL),
-                         2 => +abs "Register"
-                       )));
+                       [
+                         1 => ESC_URL (Wp_Registration_URL),
+                         2 => abs "Register"
+                       ]);
          begin
             Echo (ESC_HTML (Login_Link_Separator));
 
@@ -1152,15 +1152,15 @@ is
          declare
             Value : constant String :=
               Sprintf ("%s:%s",
-                       To_List (List => (
-                         1 => +Wp_Unslash (Get_As_String (XX_GET, "login")),
-                         2 => +Wp_Unslash (Get_As_String (XX_GET, "key"))
-                      )));
+                       [
+                         1 => Wp_Unslash (Get_As_String (XX_GET, "login")),
+                         2 => Wp_Unslash (Get_As_String (XX_GET, "key"))
+                       ]);
          begin
             Set_Cookie (RP_Cookie, Value, 0, RP_Path,
                         -Constants.COOKIE_DOMAIN, Is_SSL, True);
 
-            Wp_Safe_Redirect (Remove_Query_Arg (To_List (List => (+"key", +"login"))));
+            Wp_Safe_Redirect (Remove_Query_Arg (List_Type'["key", "login"]));
             Die; -- exit;
          end;
       end if;
@@ -1353,10 +1353,10 @@ is
          declare
             Registration_URL : constant String :=
               Sprintf ("<a href=""%s"">%s</a>",
-                       To_List (List => (
-                         1 => +ESC_URL (Wp_Registration_URL),
-                         2 => +abs "Register"
-                      )));
+                       [
+                         1 => ESC_URL (Wp_Registration_URL),
+                         2 => abs "Register"
+                       ]);
          begin
             Echo (ESC_HTML (Login_Link_Separator));
             -- This filter is documented in wp-includes/general-template.php
@@ -1531,10 +1531,10 @@ is
             declare
                HTML_Link : constant String :=
                  Sprintf ("<a href=""%s"">%s</a>",
-                          To_List (List => (
-                            1 => +ESC_URL (Wp_Lostpassword_URL),
-                            2 => +abs "Lost your password?"
-                         )));
+                          [
+                            1 => ESC_URL (Wp_Lostpassword_URL),
+                            2 => abs "Lost your password?"
+                          ]);
             begin
                -- This filter is documented in wp-login.php
                Echo (Apply_Filters ("lost_password_html_link", HTML_Link) & NL);
@@ -1755,10 +1755,10 @@ is
                  Sprintf (
                    -- translators: 1: Browser cookie documentation URL, 2: Support forums URL.
                    abs "<strong>Error:</strong> Cookies are blocked due to unexpected output. For help, please see <a href=""%1s"">this documentation</a> or try the <a href=""%2s"">support forums</a>.",
-                   To_List (List => (
-                     1 => +abs "https://wordpress.org/support/article/cookies/",
-                     2 => +abs "https://wordpress.org/support/forums/"
-                   ))
+                   [
+                     1 => abs "https://wordpress.org/support/article/cookies/",
+                     2 => abs "https://wordpress.org/support/forums/"
+                   ]
                  )
                );
             elsif
@@ -1919,7 +1919,7 @@ is
               X_POST.Is_Empty and then
 --            Empty (X_POST) and then
               Errors.Get_Error_Codes =
-                To_List (List => (+"empty_username", +"empty_password"))
+                ["empty_username", "empty_password"]
             then
                Errors := X_Construct ("", ""); -- new Wp_Error ("", "");
             end if;
@@ -1969,10 +1969,10 @@ is
                      if not Empty (Query, "app_name") then
                         -- translators: 1: Website name, 2: Application name.
                         Message := +Sprintf ("Please log in to %1s to authorize %2s to connect to your account.",
-                          To_List (List => (
-                            1 => +Get_Bloginfo ("name", "display"),
-                            2 => +"<strong>" & ESC_HTML (Get_As_String (Query, "app_name")) & "</strong>"
-                          )));
+                          [
+                            1 => Get_Bloginfo ("name", "display"),
+                            2 => "<strong>" & ESC_HTML (Get_As_String (Query, "app_name")) & "</strong>"
+                          ]);
                      else
                         -- translators: %s: Website name.
                         Message := +Sprintf ("Please log in to %s to proceed with authorization.",
@@ -2102,10 +2102,10 @@ is
                      declare
                         Registration_URL : constant String :=
                           Sprintf ("<a href=""%s"">%s</a>",
-                                   To_List (List => (
-                                     1 => +ESC_URL (Wp_Registration_URL),
-                                     2 => +abs "Register"
-                                   )));
+                                   [
+                                     1 => ESC_URL (Wp_Registration_URL),
+                                     2 => abs "Register"
+                                   ]);
                      begin
                         -- This filter is documented in
                         -- wp-includes/general-template.php
@@ -2118,10 +2118,10 @@ is
                   declare
                      HTML_Link : constant String :=
                        Sprintf ("<a href=""%s"">%s</a>",
-                         To_List (List => (
-                           1 => +ESC_URL (Wp_Lostpassword_URL),
-                           2 => +abs "Lost your password?"
-                         )));
+                         [
+                           1 => ESC_URL (Wp_Lostpassword_URL),
+                           2 => abs "Lost your password?"
+                         ]);
                   begin
                      --
                      -- Filters the link that allows the user to reset the lost
@@ -2263,20 +2263,21 @@ is
       declare
          Errors : Wp_Error; -- = new WP_Error();
 
-         Default_Actions : constant List_Type := To_List (List => (
-           +"confirm_admin_email",
-           +"postpass",
-           +"logout",
-           +"lostpassword",
-           +"retrievepassword",
-           +"resetpass",
-           +"rp",
-           +"register",
-           +"checkemail",
-           +"confirmaction",
-           +"login",
-           +Class_Recovery_Mode_Link_Services.LOGIN_ACTION_ENTERED -- ::
-         ));
+         Default_Actions : constant List_Type :=
+           [
+             "confirm_admin_email",
+             "postpass",
+             "logout",
+             "lostpassword",
+             "retrievepassword",
+             "resetpass",
+             "rp",
+             "register",
+             "checkemail",
+             "confirmaction",
+             "login",
+             Class_Recovery_Mode_Link_Services.LOGIN_ACTION_ENTERED -- ::
+           ];
       begin
          if Isset (XX_GET, "key") then
             Action := +"resetpass";

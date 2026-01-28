@@ -15,8 +15,6 @@ with Php.Strings;
 with Php.Types;
 
 with Constants;
-with Globals;
-with UStrings;
 
 with Inc_Block_Editors;
 -- with Class_Block_Type;
@@ -378,7 +376,6 @@ is
    function Get_Block_Data
             return Class_Theme_JSON.Wp_Theme_JSON
    is
-      use UStrings;
       use Class_Block_Type_Registry;
       use Class_Theme_JSON;
       use Class_Theme_JSON_Data;
@@ -416,9 +413,10 @@ is
               Isset_3 (As_Array (Block_Type), "spacing", "blockGap", "__experimentalDefault")
               and then -- supports
               "" = As_String (X_Wp_Array_Get (Config,
-                                              To_List (List => (+"styles", +"blocks", +Block_Name,
-                                                                +"spacing", +"blockGap"))))
---            null = X_Wp_Array_Get (Config, To_List (List => (+"styles", +"blocks", +Block_Name, +"spacing", +"blockGap")), null)
+                                              List_Type'["styles", "blocks",
+                                                         Block_Name,
+                                                         "spacing", "blockGap"]))
+--            null = X_Wp_Array_Get (Config, list_type'["styles", "blocks", Block_Name, "spacing", "blockGap"], null)
             then
                -- Ensure an empty placeholder value exists for the block, if it
                -- provides a default blockGap value. The real blockGap value to be

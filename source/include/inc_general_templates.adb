@@ -4735,10 +4735,10 @@ is
                          --
                          -- @param string link The paginated link URL.
                          --
-                         To_List (List => (
-                           1 => +ESC_URL (Apply_Filters ("paginate_links", -Link)),
-                           2 => +Get_As_String (Args_2, "prev_text")
-                         ))
+                         [
+                           1 => ESC_URL (Apply_Filters ("paginate_links", -Link)),
+                           2 => Get_As_String (Args_2, "prev_text")
+                         ]
                        ));
             end;
          end if;
@@ -4749,12 +4749,12 @@ is
                  (Page_Links,
                   Sprintf (
                     "<span aria-current=""%s"" class=""page-numbers current"">%s</span>",
-                    To_List (List => (
-                      1 => +ESC_Attr (Get_As_String (Args_2, "aria_current")),
-                      2 => +Get_As_String (Args_2, "before_page_number") &
-                            Number_Format_I18n (Float (N)) &
-                            Get_As_String (Args, "after_page_number")
-                    ))
+                    [
+                      1 => ESC_Attr (Get_As_String (Args_2, "aria_current")),
+                      2 => Get_As_String (Args_2, "before_page_number") &
+                             Number_Format_I18n (Float (N)) &
+                             Get_As_String (Args, "after_page_number")
+                    ]
                   ));
 
                Dots := True;
@@ -4789,12 +4789,12 @@ is
                          "<a class=""page-numbers"" href=""%s"">%s</a>",
                          -- This filter is documented in
                          -- wp-includes/general-template.php
-                         To_List (List => (
-                           1 => +ESC_URL (Apply_Filters ("paginate_links", -Link)),
-                           2 => +Get_As_String (Args_2, "before_page_number") &
-                                Number_Format_I18n (Float (N)) &
-                                Get_As_String (Args_2, "after_page_number")
-                         ))
+                         [
+                           1 => ESC_URL (Apply_Filters ("paginate_links", -Link)),
+                           2 => Get_As_String (Args_2, "before_page_number") &
+                                  Number_Format_I18n (Float (N)) &
+                                  Get_As_String (Args_2, "after_page_number")
+                         ]
                        ));
                   end;
                   Dots := True;
@@ -4836,10 +4836,10 @@ is
                   Sprintf (
                     "<a class=""next page-numbers"" href=""%s"">%s</a>",
                     -- This filter is documented in wp-includes/general-template.php
-                    To_List (List => (
-                      1 => +ESC_URL (Apply_Filters ("paginate_links", -Link)),
-                      2 => +Get_As_String (Args_2, "next_text")
-                    ))
+                    [
+                      1 => ESC_URL (Apply_Filters ("paginate_links", -Link)),
+                      2 => Get_As_String (Args_2, "next_text")
+                    ]
                   ));
             end;
          end if;

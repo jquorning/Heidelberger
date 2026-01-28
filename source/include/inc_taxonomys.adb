@@ -222,7 +222,7 @@ is
 
       Register_Taxonomy (
          "wp_theme",
-         To_List (List => (+"wp_template", +"wp_template_part", +"wp_global_styles")),
+         ["wp_template", "wp_template_part", "wp_global_styles"],
          Arrays.To_Array ((
             Build ("public",            False),
             Build ("hierarchical",      False),

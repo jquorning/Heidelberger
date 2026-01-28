@@ -13,7 +13,6 @@
 
 with Php.Strings;
 
-with UStrings;
 with Lists;
 
 with Inc_Functions;
@@ -827,7 +826,6 @@ is
             return Boolean
    is
       use Php.Strings;
-      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Plugins;
@@ -848,12 +846,12 @@ is
            Sprintf (
              -- translators: 1: pre_get_posts, 2: WP_Query->is_main_query(), 3: is_main_query(), 4: Documentation URL.
              abs "In %1s, use the %2s method, not the %3s function. See %4s.",
-             To_List (List => (
-               1 => +"<code>pre_get_posts</code>",
-               2 => +"<code>WP_Query->is_main_query()</code>",
-               3 => +"<code>is_main_query()</code>",
-               4 => +abs "https://developer.wordpress.org/reference/functions/is_main_query/"
-             ))
+             [
+               1 => "<code>pre_get_posts</code>",
+               2 => "<code>WP_Query->is_main_query()</code>",
+               3 => "<code>is_main_query()</code>",
+               4 => abs "https://developer.wordpress.org/reference/functions/is_main_query/"
+             ]
            ),
            "3.7.0"
          );

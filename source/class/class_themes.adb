@@ -98,7 +98,7 @@ is
       Cache := This.Cache_Get ("theme");
 
       if Is_Array (Cache) then
-         for Key of To_List (List => (+"errors", +"headers", +"template")) loop
+         for Key of List_Type'["errors", "headers", "template"] loop
             if Isset (Cache, Key) then
 --             Append (Ref (This, -Key), Ref (Cache, -Key)); -- []
                null;
@@ -240,13 +240,13 @@ is
                   Error_Message : constant String := Sprintf (
                     -- translators: 1: templates/index.html, 2: index.php, 3: Documentation URL, 4: Template, 5: style.css
                     abs "Template is missing. Standalone themes need to have a %1s or %2s template file. <a href=""%3s"">Child themes</a> need to have a %4s header in the %5s stylesheet.",
-                    To_List (List => (
-                      1 => +"<code>templates/index.html</code>",
-                      2 => +"<code>index.php</code>",
-                      3 => +abs "https://developer.wordpress.org/themes/advanced-topics/child-themes/",
-                      4 => +"<code>Template</code>",
-                      5 => +"<code>style.css</code>"
-                    ))
+                    [
+                      1 => "<code>templates/index.html</code>",
+                      2 => "<code>index.php</code>",
+                      3 => abs "https://developer.wordpress.org/themes/advanced-topics/child-themes/",
+                      4 => "<code>Template</code>",
+                      5 => "<code>style.css</code>"
+                    ]
                   );
                begin
                   This.M_Errors := Wp_Error'(X_Construct ("theme_no_index",

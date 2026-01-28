@@ -150,10 +150,8 @@ is
                           Options : in out Array_Type)
                           return Array_Type
    is
---    use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
    begin
       -- if (!preg_match("/^http(s)?:\/\//i", url, matches)) then
       --    throw new Requests_Exception
@@ -198,9 +196,8 @@ is
 
       if not Isset (Options, "data_format") then
          if
-           In_List (Typ, To_List (List => (+HEAD, +GET_Method, +DELETE_Method)),
+           In_List (Typ, [HEAD, GET_Method, DELETE_Method], True)
            -- 3x self::
-                     True)
          then
             Set (Options, "data_format", From_String ("query"));
          else

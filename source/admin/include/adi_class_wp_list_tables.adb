@@ -1004,11 +1004,12 @@ is
          else
             Append (Page_Links, Sprintf (
               "<a class=""first-page button"" href=""%s""><span class=""screen-reader-text"">%s</span><span aria-hidden=""true"">%s</span></a>",
-              To_List (List => (
-                1 => +ESC_URL (Remove_Query_Arg ("paged", -Current_URL)),
-                2 => +abs "First page",
-                3 => +"&laquo;"
-            ))));
+              [
+                1 => ESC_URL (Remove_Query_Arg ("paged", -Current_URL)),
+                2 => abs "First page",
+                3 => "&laquo;"
+              ]
+            ));
          end if;
 
          if Disable_Prev then
@@ -1016,14 +1017,15 @@ is
          else
             Append (Page_Links, Sprintf (
               "<a class=""prev-page button"" href=""%s""><span class=""screen-reader-text"">%s</span><span aria-hidden=""true"">%s</span></a>",
-              To_List (List => (
-                1 => +ESC_URL (
-                         Add_Query_Arg ("paged",
+              [
+                1 => ESC_URL (
+                       Add_Query_Arg ("paged",
                                Natural'Max (1, Current - 1)'Image,
                                -Current_URL)),
-                2 => +abs "Previous page",
-                3 => +"&lsaquo;"
-            ))));
+                2 => abs "Previous page",
+                3 => "&lsaquo;"
+              ]
+            ));
          end if;
 
          if "bottom" = Which then
@@ -1034,11 +1036,12 @@ is
          else
             HTML_Current_Page := +Sprintf (
               "%s<input class=""current-page"" id=""current-page-selector"" type=""text"" name=""paged"" value=""%s"" size=""%d"" aria-describedby=""table-paging"" /><span class=""tablenav-paging-text"">",
-              To_List (List => (
-              1 => +"<label for=""current-page-selector"" class=""screen-reader-text"">" & abs "Current Page" & "</label>",
-              2 => +Current'Image,
-              3 => +String'(Total_Pages'Image)'Length'Image
-            )));
+              [
+                1 => "<label for=""current-page-selector"" class=""screen-reader-text"">" & abs "Current Page" & "</label>",
+                2 => Current'Image,
+                3 => String'(Total_Pages'Image)'Length'Image
+              ]
+            );
          end if;
 
          HTML_Total_Pages :=
@@ -1048,24 +1051,24 @@ is
          Append (Page_Links, Total_Pages_Before & Sprintf (
            -- translators: 1: Current page, 2: Total pages.
            X_X ("%1s of %2s", "paging"),
-           To_List (List => (
-             1 => HTML_Current_Page,
-             2 => HTML_Total_Pages
-         ))) & Total_Pages_After);
+           [
+             1 => -HTML_Current_Page,
+             2 => -HTML_Total_Pages
+           ]) & Total_Pages_After);
 
          if Disable_Next then
             Append (Page_Links, "<span class=""tablenav-pages-navspan button disabled"" aria-hidden=""true"">&rsaquo;</span>");
          else
             Append (Page_Links, Sprintf (
               "<a class=""next-page button"" href=""%s""><span class=""screen-reader-text"">%s</span><span aria-hidden=""true"">%s</span></a>",
-              To_List (List => (
-                1 => +ESC_URL (
+              [
+                1 => ESC_URL (
                           Add_Query_Arg ("paged",
                                Natural'Min (Total_Pages, Current + 1)'Image,
                                -Current_URL)),
-                2 => +abs "Next page",
-                3 => +"&rsaquo;"
-            ))));
+                2 => abs "Next page",
+                3 => "&rsaquo;"
+              ]));
          end if;
 
          if Disable_Last then
@@ -1073,11 +1076,12 @@ is
          else
             Append (Page_Links, Sprintf (
               "<a class=""last-page button"" href=""%s""><span class=""screen-reader-text"">%s</span><span aria-hidden=""true"">%s</span></a>",
-              To_List (List => (
-                1 => +ESC_URL (Add_Query_Arg ("paged", Total_Pages'Image, -Current_URL)),
-                2 => +abs "Last page",
-                3 => +"&raquo;"
-            ))));
+              [
+                1 => ESC_URL (
+                       Add_Query_Arg ("paged", Total_Pages'Image, -Current_URL)),
+                2 => abs "Last page",
+                3 => "&raquo;"
+              ]));
          end if;
 
          declare
@@ -1416,8 +1420,7 @@ is
 --          Column_Display_Name : String := -Columns (Column_Key); -- Element (A);
             Column_Display_Name : String := As_String (Get (Columns, Column_Key));
             -- Array_Maps.Element (A);
-            Class : List_Type := To_List (List => (+"manage-column",
-                                                   +"column-column_key"));
+            Class : List_Type := ["manage-column", "column-column_key"];
          begin
             if In_Array (Column_Key, Hidden, True) then
                Class.Append ("hidden");
@@ -1426,9 +1429,7 @@ is
             if "cb" = Column_Key then
                Class.Append ("check-column");
             elsif
-               In_List (Column_Key, To_List (List => (+"posts",
-                                                      +"comments",
-                                                      +"links")), True)
+               In_List (Column_Key, List_Type'["posts", "comments", "links"], True)
             then
                Class.Append ("num");
             end if;
@@ -1458,8 +1459,7 @@ is
                      Order := +Php.Strings.Strtolower (Desc_First);
 
                      if
-                       not In_List (-Order, To_List (List => (+"desc",
-                                                              +"asc")), True)
+                       not In_List (-Order, ["desc", "asc"], True)
                      then
                         Order := +(if Desc_First /= "" then "desc" else "asc");
                      end if;
@@ -1470,11 +1470,11 @@ is
 
                   Column_Display_Name := Php.Strings.Sprintf (
                     "<a href=""%s""><span>%s</span><span class=""sorting-indicator""></span></a>",
-                    To_List (List => (
-                      1 => +ESC_URL (Add_Query_Arg (Compact ("orderby", "order"),
+                    [
+                      1 => ESC_URL (Add_Query_Arg (Compact ("orderby", "order"),
                                             Current_URL)),
-                      2 => +Column_Display_Name
-                  )));
+                      2 => Column_Display_Name
+                    ]);
                end;
             end if;
 
@@ -1554,7 +1554,6 @@ is
    function Get_Table_Classes (This : Wp_List_Table)
                                return List_Type
    is
-      use UStrings;
       use Inc_Formatting;
       use Inc_Options;
 
@@ -1563,8 +1562,8 @@ is
 
       Mode_Class : constant String := ESC_Attr ("table-view-" & Mode);
    begin
-      return To_List (List => (+"widefat", +"fixed", +"striped",
-                               +Mode_Class, +As_String (Get (This.X_Args, "plural"))));
+      return ["widefat", "fixed", "striped",
+              Mode_Class, As_String (Get (This.X_Args, "plural"))];
    end Get_Table_Classes;
 
    ----------------------

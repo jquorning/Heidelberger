@@ -959,29 +959,29 @@ is
    function Wp_KSES_URI_Attributes
             return List_Type
    is
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
 
-      URI_Attributes_2 : constant List_Type := To_List (List => (
-                +"action",
-                +"archive",
-                +"background",
-                +"cite",
-                +"classid",
-                +"codebase",
-                +"data",
-                +"formaction",
-                +"href",
-                +"icon",
-                +"longdesc",
-                +"manifest",
-                +"poster",
-                +"profile",
-                +"src",
-                +"usemap",
-                +"xmlns"
-      ));
+      URI_Attributes_2 : constant List_Type :=
+        [
+          "action",
+          "archive",
+          "background",
+          "cite",
+          "classid",
+          "codebase",
+          "data",
+          "formaction",
+          "href",
+          "icon",
+          "longdesc",
+          "manifest",
+          "poster",
+          "profile",
+          "src",
+          "usemap",
+          "xmlns"
+        ];
 
       --
       -- Filters the list of attributes that are required to contain a URL.
@@ -1039,7 +1039,7 @@ is
 
       -- Allow HTML comments.
       if "<!--" = Substr (-String_2, 0, 4) then
-         String_2 := +Str_Replace (To_List (List => (+"<!--", +"-->")), "", -String_2);
+         String_2 := +Str_Replace (List_Type'["<!--", "-->"], "", -String_2);
 
          loop
             Newstring := +Wp_KSES (-String_2, Allowed_HTML, Allowed_Protocols);
@@ -2286,7 +2286,7 @@ is
 
       CSS_2 : constant String := Wp_KSES_No_Null (CSS);
       CSS_3 : constant String :=
-        Str_Replace (To_List (List => (+"\n", +"\r", +"\t")), "", CSS_2);
+        Str_Replace (List_Type'["\n", "\r", "\t"], "", CSS_2);
 
       Allowed_Protocols : constant List_Type := Wp_Allowed_Protocols;
 
@@ -2301,144 +2301,144 @@ is
       --
       Allowed_Attr : List_Type := Apply_Filters (
         "safe_style_css",
-        To_List (List => (
-                        +"background",
-                        +"background-color",
-                        +"background-image",
-                        +"background-position",
-                        +"background-size",
-                        +"background-attachment",
-                        +"background-blend-mode",
+        [
+          "background",
+          "background-color",
+          "background-image",
+          "background-position",
+          "background-size",
+          "background-attachment",
+          "background-blend-mode",
 
-                        +"border",
-                        +"border-radius",
-                        +"border-width",
-                        +"border-color",
-                        +"border-style",
-                        +"border-right",
-                        +"border-right-color",
-                        +"border-right-style",
-                        +"border-right-width",
-                        +"border-bottom",
-                        +"border-bottom-color",
-                        +"border-bottom-left-radius",
-                        +"border-bottom-right-radius",
-                        +"border-bottom-style",
-                        +"border-bottom-width",
-                        +"border-bottom-right-radius",
-                        +"border-bottom-left-radius",
-                        +"border-left",
-                        +"border-left-color",
-                        +"border-left-style",
-                        +"border-left-width",
-                        +"border-top",
-                        +"border-top-color",
-                        +"border-top-left-radius",
-                        +"border-top-right-radius",
-                        +"border-top-style",
-                        +"border-top-width",
-                        +"border-top-left-radius",
-                        +"border-top-right-radius",
+          "border",
+          "border-radius",
+          "border-width",
+          "border-color",
+          "border-style",
+          "border-right",
+          "border-right-color",
+          "border-right-style",
+          "border-right-width",
+          "border-bottom",
+          "border-bottom-color",
+          "border-bottom-left-radius",
+          "border-bottom-right-radius",
+          "border-bottom-style",
+          "border-bottom-width",
+          "border-bottom-right-radius",
+          "border-bottom-left-radius",
+          "border-left",
+          "border-left-color",
+          "border-left-style",
+          "border-left-width",
+          "border-top",
+          "border-top-color",
+          "border-top-left-radius",
+          "border-top-right-radius",
+          "border-top-style",
+          "border-top-width",
+          "border-top-left-radius",
+          "border-top-right-radius",
 
-                        +"border-spacing",
-                        +"border-collapse",
-                        +"caption-side",
+          "border-spacing",
+          "border-collapse",
+          "caption-side",
 
-                        +"columns",
-                        +"column-count",
-                        +"column-fill",
-                        +"column-gap",
-                        +"column-rule",
-                        +"column-span",
-                        +"column-width",
+          "columns",
+          "column-count",
+          "column-fill",
+          "column-gap",
+          "column-rule",
+          "column-span",
+          "column-width",
 
-                        +"color",
-                        +"filter",
-                        +"font",
-                        +"font-family",
-                        +"font-size",
-                        +"font-style",
-                        +"font-variant",
-                        +"font-weight",
-                        +"letter-spacing",
-                        +"line-height",
-                        +"text-align",
-                        +"text-decoration",
-                        +"text-indent",
-                        +"text-transform",
+          "color",
+          "filter",
+          "font",
+          "font-family",
+          "font-size",
+          "font-style",
+          "font-variant",
+          "font-weight",
+          "letter-spacing",
+          "line-height",
+          "text-align",
+          "text-decoration",
+          "text-indent",
+          "text-transform",
 
-                        +"height",
-                        +"min-height",
-                        +"max-height",
+          "height",
+          "min-height",
+          "max-height",
 
-                        +"width",
-                        +"min-width",
-                        +"max-width",
+          "width",
+          "min-width",
+          "max-width",
 
-                        +"margin",
-                        +"margin-right",
-                        +"margin-bottom",
-                        +"margin-left",
-                        +"margin-top",
-                        +"margin-block-start",
-                        +"margin-block-end",
-                        +"margin-inline-start",
-                        +"margin-inline-end",
+          "margin",
+          "margin-right",
+          "margin-bottom",
+          "margin-left",
+          "margin-top",
+          "margin-block-start",
+          "margin-block-end",
+          "margin-inline-start",
+          "margin-inline-end",
 
-                        +"padding",
-                        +"padding-right",
-                        +"padding-bottom",
-                        +"padding-left",
-                        +"padding-top",
-                        +"padding-block-start",
-                        +"padding-block-end",
-                        +"padding-inline-start",
-                        +"padding-inline-end",
+          "padding",
+          "padding-right",
+          "padding-bottom",
+          "padding-left",
+          "padding-top",
+          "padding-block-start",
+          "padding-block-end",
+          "padding-inline-start",
+          "padding-inline-end",
 
-                        +"flex",
-                        +"flex-basis",
-                        +"flex-direction",
-                        +"flex-flow",
-                        +"flex-grow",
-                        +"flex-shrink",
-                        +"flex-wrap",
+          "flex",
+          "flex-basis",
+          "flex-direction",
+          "flex-flow",
+          "flex-grow",
+          "flex-shrink",
+          "flex-wrap",
 
-                        +"gap",
-                        +"column-gap",
-                        +"row-gap",
+          "gap",
+          "column-gap",
+          "row-gap",
 
-                        +"grid-template-columns",
-                        +"grid-auto-columns",
-                        +"grid-column-start",
-                        +"grid-column-end",
-                        +"grid-column-gap",
-                        +"grid-template-rows",
-                        +"grid-auto-rows",
-                        +"grid-row-start",
-                        +"grid-row-end",
-                        +"grid-row-gap",
-                        +"grid-gap",
+          "grid-template-columns",
+          "grid-auto-columns",
+          "grid-column-start",
+          "grid-column-end",
+          "grid-column-gap",
+          "grid-template-rows",
+          "grid-auto-rows",
+          "grid-row-start",
+          "grid-row-end",
+          "grid-row-gap",
+          "grid-gap",
 
-                        +"justify-content",
-                        +"justify-items",
-                        +"justify-self",
-                        +"align-content",
-                        +"align-items",
-                        +"align-self",
+          "justify-content",
+          "justify-items",
+          "justify-self",
+          "align-content",
+          "align-items",
+          "align-self",
 
-                        +"clear",
-                        +"cursor",
-                        +"direction",
-                        +"float",
-                        +"list-style-type",
-                        +"object-fit",
-                        +"object-position",
-                        +"overflow",
-                        +"vertical-align",
+          "clear",
+          "cursor",
+          "direction",
+          "float",
+          "list-style-type",
+          "object-fit",
+          "object-position",
+          "overflow",
+          "vertical-align",
 
-                        -- Custom CSS properties.
-                        +"--*"
-        ))
+          -- Custom CSS properties.
+          "--*"
+        ]
       );
 
       --
@@ -2449,24 +2449,26 @@ is
       --
       -- See: https://developer.mozilla.org/en-US/docs/Web/CSS/url
       --
-      CSS_URL_Data_Types : constant List_Type := To_List (List => (
-                +"background",
-                +"background-image",
+      CSS_URL_Data_Types : constant List_Type :=
+        [
+          "background",
+          "background-image",
 
-                +"cursor",
+          "cursor",
 
-                +"list-style",
-                +"list-style-image"
-      ));
+          "list-style",
+          "list-style-image"
+        ];
 
       --
       -- CSS attributes that accept gradient data types.
       --
       --
-      CSS_Gradient_Data_Types : constant List_Type := To_List (List => (
-                +"background",
-                +"background-image"
-      ));
+      CSS_Gradient_Data_Types : constant List_Type :=
+        [
+          "background",
+          "background-image"
+        ];
 
       CSS_4 : UString;
    begin

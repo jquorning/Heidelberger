@@ -80,10 +80,10 @@ is
             " AND post_status NOT IN ( '" &
             Statement_Type (Implode ("','", Exclude_States) & "' )") &
             " AND post_author = %d",
-            To_List (List => (
-              1 => Globals.Post_Type,
-              2 => +Helpers.Image (Integer (Get_Current_User_Id))
-            ))
+            [
+              1 => -Globals.Post_Type,
+              2 => Helpers.Image (Integer (Get_Current_User_Id))
+            ]
           )));
 
       if

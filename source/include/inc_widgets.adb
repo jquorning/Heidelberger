@@ -116,10 +116,10 @@ is
             Set (Sidebar, "before_sidebar", From_String (
                  Sprintf (
                    Get_As_String (Sidebar, "before_sidebar"),
-                   To_List (List => (
-                     1 => +Get_As_String (Sidebar, "id"),
-                     2 => +Get_As_String (Sidebar, "class")
-                   ))
+                   [
+                     1 => Get_As_String (Sidebar, "id"),
+                     2 => Get_As_String (Sidebar, "class")
+                   ]
                  )));
 
             --
@@ -196,10 +196,10 @@ is
                            As_String (Get (Ref_2 (Params,
                                            Key_1 => "[0]",
                                            Key_2 => "before_widget"))),
-                           To_List (List => (
-                             1 => +Str_Replace ("\\", "_", Id),
-                             2 => Classname_X
-                           )))
+                           [
+                             1 => Str_Replace ("\\", "_", Id),
+                             2 => -Classname_X
+                           ])
                       ));
 
                   --
@@ -599,7 +599,6 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
-      use UStrings;
       use Class_Customize_Widgets;
       use Inc_Themes;
 --        global wp_registered_sidebars;
@@ -678,10 +677,10 @@ is
             Common_Slug_Groups : constant array (Positive range <>) of List_Type :=
             -- Array_Type := To_Array (List => (
               (
-              1 => To_List (List => (+"sidebar", +"primary", +"main", +"right")),
-              2 => To_List (List => (+"second", +"left")),
-              3 => To_List (List => (+"sidebar-2", +"footer", +"bottom")),
-              4 => To_List (List => (+"header", +"top"))
+              1 => ["sidebar", "primary", "main", "right"],
+              2 => ["second", "left"],
+              3 => ["sidebar-2", "footer", "bottom"],
+              4 => ["header", "top"]
               );
          begin
             -- Go through each group...

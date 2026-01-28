@@ -118,9 +118,9 @@ is
 
       Args_2 : Array_Type :=
         Array_Merge (
-          Array_Fill_Keys (To_List (List => (
-            +"changeset_uuid", +"theme", +"messenger_channel", +"settings_previewed",
-            +"autosaved", +"branching")), From_Null),
+          Array_Fill_Keys (List_Type'[
+            "changeset_uuid", "theme", "messenger_channel", "settings_previewed",
+            "autosaved", "branching"], From_Null),
           Args
         );
       Components : List_Type;
@@ -162,7 +162,7 @@ is
       This.X_Changeset_UUID    := +As_String (Get (Args_2, "changeset_uuid"));
 
       for
-        Key of To_List (List => (+"settings_previewed", +"autosaved", +"branching"))
+        Key of List_Type'["settings_previewed", "autosaved", "branching"]
       loop
          if In_Array (Key, Args_2) then -- Isset (Args_2, Key) then
             null;
@@ -488,9 +488,9 @@ is
                     This.Get_Changeset_Posts (
                       To_Array (List => (
                         Build ("post_status",
-                               List_Diff (Get_Post_Stati, To_List (List => (
-                                 +"auto-draft", +"publish", +"trash",
-                                 +"inherit", +"private")))),
+                               List_Diff (Get_Post_Stati, List_Type'[
+                                 "auto-draft", "publish", "trash",
+                                 "inherit", "private"])),
                         Build ("exclude_restore_dismissed", False),
                         Build ("author",                    "any"),
                         Build ("posts_per_page",            1),
@@ -3188,7 +3188,6 @@ is
    is
       use Php.Misc;
       use Php.Strings;
-      use UStrings;
       use Class_Users;
       use Inc_Posts;
       use Inc_Users;
@@ -3206,10 +3205,10 @@ is
                declare
                   Lock : constant String :=
                     Sprintf ("%s:%s",
-                             To_List (List => (
-                               1 => +Helpers.Image (Time),        -- time()
-                               2 => +Image (Get_Current_User_Id)
-                            )));
+                             [
+                               1 => Helpers.Image (Time),        -- time()
+                               2 => Image (Get_Current_User_Id)
+                            ]);
                begin
                   Update_Post_Meta (Changeset_Post_Id, "_edit_lock",
                                     From_String (Lock));
@@ -3230,7 +3229,6 @@ is
    is
       use Php.Misc;
       use Php.Strings;
-      use UStrings;
       use Class_Users;
       use Inc_Posts;
       use Inc_Users;
@@ -3258,9 +3256,9 @@ is
                if User_Id = Current_User_Id then
                   declare
                      Lock_2 : constant String :=
-                       Sprintf ("%s:%s", To_List (List => (
-                         1 => +Helpers.Image (Time),
-                         2 => +Image (User_Id))));
+                       Sprintf ("%s:%s", [
+                         1 => Helpers.Image (Time),
+                         2 => Image (User_Id)]);
                   begin
                      Update_Post_Meta (Changeset_Post_Id,
                                        "_edit_lock", From_String (Lock_2));

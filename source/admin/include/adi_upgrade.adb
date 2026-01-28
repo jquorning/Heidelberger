@@ -460,10 +460,10 @@ is
                begin
                   WpDB.Query (WpDB.Prepare (
                     "UPDATE " & Posts & " SET post_name = %s WHERE ID = %d",
-                    To_List (List => (
-                      1 => +Newtitle,
-                      2 => +Helpers.Image (Integer (Post.Id))
-                    ))
+                    [
+                      1 => Newtitle,
+                      2 => Helpers.Image (Integer (Post.Id))
+                    ]
                   ));
                end;
             end if;
@@ -504,10 +504,10 @@ is
          Cat_Where : UString;
       begin
          WpDB.Query (WpDB.Prepare (SQL,
-           To_List (List => (
-             1 => +WpDB.ESC_Like ("links_rating_image") & "%",
-             2 => +WpDB.ESC_Like ("wp-links/links-images/") & "%"
-           ))
+           [
+             1 => WpDB.ESC_Like ("links_rating_image") & "%",
+             2 => WpDB.ESC_Like ("wp-links/links-images/") & "%"
+           ]
          ));
 
          declare
@@ -545,10 +545,10 @@ is
                        WpDB.Get_Row (WpDB.Prepare (
                          "SELECT * FROM " & Post2cat &
                          " WHERE post_id = %d AND category_id = %d",
-                         To_List (List => (
-                           1 => +Helpers.Image (Integer (Post.Id)),
-                           2 => Post.Post_Category
-                         ))
+                         [
+                           1 => Helpers.Image (Integer (Post.Id)),
+                           2 => -Post.Post_Category
+                         ]
                        ),
                        Success => Success
                      );
@@ -909,16 +909,16 @@ is
          for Option of Options loop
             if 1 /= Option.Dupes then -- Could this be done in the query?
                declare
-                  Limit    : constant Integer := Option.Dupes - 1;
+                  Limit : constant Integer := Option.Dupes - 1;
 
                   Dupe_Ids : constant List_Type :=
                     WpDB.Get_Col (WpDB.Prepare (
                       "SELECT option_id FROM " & Options_2 &
                       " WHERE option_name = %s LIMIT %d",
-                      To_List (List => (
-                        1 => Option.Option_Name,
-                        2 => +Helpers.Image (Limit)
-                      ))
+                      [
+                        1 => -Option.Option_Name,
+                        2 => Helpers.Image (Limit)
+                      ]
                     ));
                begin
                   if not Dupe_Ids.Is_Empty then
@@ -1073,10 +1073,9 @@ is
 
       declare
          Old_User_Fields : constant List_Type :=
-           To_List (List => (
-             +"user_firstname", +"user_lastname", +"user_icq", +"user_aim",
-             +"user_msn", +"user_yim", +"user_idmode", +"user_ip", +"user_domain",
-             +"user_browser", +"user_description", +"user_nickname", +"user_level"));
+           ["user_firstname", "user_lastname", "user_icq", "user_aim",
+            "user_msn", "user_yim", "user_idmode", "user_ip", "user_domain",
+            "user_browser", "user_description", "user_nickname", "user_level"];
       begin
          WpDB.Hide_Errors;
          for Old of Old_User_Fields loop
@@ -1426,9 +1425,8 @@ is
       use Class_WpDB;
 
       Old_Options_Fields : constant List_Type :=
-        To_List (List => (
-          +"option_can_override", +"option_type", +"option_width",
-          +"option_height", +"option_description", +"option_admin_level"));
+        ["option_can_override", "option_type", "option_width",
+         "option_height", "option_description", "option_admin_level"];
    begin
       WpDB.Hide_Errors;
       for Old of Old_Options_Fields loop
@@ -2336,8 +2334,7 @@ is
          end if;
 
          if
-           In_List (Setting, To_List (List => (+"siteurl", +"home",
-                                               +"category_base", +"tag_base")), True)
+           In_List (Setting, ["siteurl", "home", "category_base", "tag_base"], True)
          then
             return Maybe_Unserialize (Un_Trailing_Slash_It (Option));
          end if;
@@ -2395,8 +2392,9 @@ is
       use Class_WpDB;
       use Inc_Plugins;
 
-      List : constant List_Type := To_List (List => (+"", +"all", +"blog",
-                                                     +"global", +"ms_global"));
+      List : constant List_Type :=
+        ["", "all", "blog", "global", "ms_global"];
+
       Queries_2 : constant String :=
          (if In_List (Queries, List, True)
           then Wp_Get_DB_Schema (Queries)
@@ -2472,14 +2470,14 @@ is
 
       declare
          Text_Fields : constant List_Type :=
-           To_List (List => (+"tinytext", +"text", +"mediumtext", +"longtext"));
+           ["tinytext", "text", "mediumtext", "longtext"];
 
          Blob_Fields : constant List_Type :=
-           To_List (List => (+"tinyblob", +"blob", +"mediumblob", +"longblob"));
+           ["tinyblob", "blob", "mediumblob", "longblob"];
 
          Int_Fields  : constant List_Type :=
-           To_List (List => (+"tinyint", +"smallint", +"mediumint",
-                             +"int", +"integer", +"bigint"));
+           ["tinyint", "smallint", "mediumint",
+            "int", "integer", "bigint"];
 
          Global_Tables  : constant Array_Type := WpDB.Tables ("global");
          DB_Version     : constant String     := WpDB.DB_Version;

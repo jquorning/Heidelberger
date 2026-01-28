@@ -175,14 +175,14 @@ is
          end if;
 
          declare
---          use String_Vectors;
-
-            List : constant List_Type := To_List (List => (
-                                          +"_wp_http_referer",
-                                          +"_wpnonce",
-                                          +"error",
-                                          +"message",
-                                          +"paged"));
+            List : constant List_Type :=
+              [
+                "_wp_http_referer",
+                "_wpnonce",
+                "error",
+                "message",
+                "paged"
+              ];
          begin
             Referer := +Remove_Query_Arg (List, -Referer);
          end;
@@ -245,7 +245,7 @@ is
 --                use String_Vectors;
 
                   List : constant List_Type :=
-                    To_List (List => (+"tag_ID", +"action"));
+                    ["tag_ID", "action"];
                begin
                   Location := +Remove_Query_Arg (List, -Location);
                end;
@@ -376,7 +376,7 @@ is
 --             use String_Vectors;
 
                List : constant List_Type :=
-                 To_List (List => (+"_wp_http_referer", +"_wpnonce"));
+                 ["_wp_http_referer", "_wpnonce"];
             begin
                Location := +Remove_Query_Arg
                   (List, Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI"))));
@@ -924,7 +924,7 @@ is
 --                      use String_Vectors;
 
                         List : constant List_Type :=
-                          To_List (List => (+"message", +"error"));
+                          ["message", "error"];
 
                         Request : constant String :=
                           Remove_Query_Arg (List, As_String (Get (X_SERVER, "REQUEST_URI")));

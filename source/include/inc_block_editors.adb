@@ -378,7 +378,6 @@ is
    function Get_Legacy_Widget_Block_Editor_Settings
             return Array_Type
    is
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
 
@@ -397,24 +396,24 @@ is
       Set (Editor_Settings, "widgetTypesToHideFromLegacyWidgetBlock",
            From_List (Apply_Filters (
              "widget_types_to_hide_from_legacy_widget_block",
-             To_List (List => (
-                        +"pages",
-                        +"calendar",
-                        +"archives",
-                        +"media_audio",
-                        +"media_image",
-                        +"media_gallery",
-                        +"media_video",
-                        +"search",
-                        +"text",
-                        +"categories",
-                        +"recent-posts",
-                        +"recent-comments",
-                        +"rss",
-                        +"tag_cloud",
-                        +"custom_html",
-                        +"block"
-             ))
+             List_Type'[
+               "pages",
+               "calendar",
+               "archives",
+               "media_audio",
+               "media_image",
+               "media_gallery",
+               "media_video",
+               "search",
+               "text",
+               "categories",
+               "recent-posts",
+               "recent-comments",
+               "rss",
+               "tag_cloud",
+               "custom_html",
+               "block"
+             ]
            ))
           );
 

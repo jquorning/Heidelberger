@@ -1725,12 +1725,12 @@ package body Inc_L10n is
                Structure.Append (
                  Sprintf (
                    "<option value=""site-default"" data-installed=""1""%s>%s</option>",
-                   To_List (List => (
-                     1 => +Selected ("site-default",
-                                     Get_As_String (Parsed_Args, "selected"),
-                                     False),
-                     2 => +X_X ("Site Default", "default site language")
-                   ))
+                   [
+                     1 => Selected ("site-default",
+                                    Get_As_String (Parsed_Args, "selected"),
+                                    False),
+                     2 => X_X ("Site Default", "default site language")
+                   ]
                 ));
             end if;
 
@@ -1744,12 +1744,12 @@ package body Inc_L10n is
                     Sprintf (
                       "<option value=""%s"" lang=""en"" data-installed=""1""%s>" &
                       "English (United States)</option>",
-                      To_List (List => (
-                        1 => +ESC_Attr (Value),
-                        2 => +Selected ("",
-                                        Get_As_String (Parsed_Args, "selected"),
-                                        False)
-                      ))
+                      [
+                        1 => ESC_Attr (Value),
+                        2 => Selected ("",
+                                       Get_As_String (Parsed_Args, "selected"),
+                                       False)
+                      ]
                     ));
                end;
             end if;
@@ -1760,14 +1760,14 @@ package body Inc_L10n is
                  Sprintf (
                    "<option value=""%s"" lang=""%s""%s data-installed=""1"">" &
                    "%s</option>",
-                   To_List (List => (
-                     1 => +ESC_Attr (Get_As_String (Language, "language")),
-                     2 => +ESC_Attr (Get_As_String (Language, "lang")),
-                     3 => +Selected (Get_As_String (Language, "language"),
-                                     Get_As_String (Parsed_Args, "selected"),
-                                     False),
-                     4 => +ESC_HTML (Get_As_String (Language, "native_name"))
-                   ))
+                   [
+                     1 => ESC_Attr (Get_As_String (Language, "language")),
+                     2 => ESC_Attr (Get_As_String (Language, "lang")),
+                     3 => Selected (Get_As_String (Language, "language"),
+                                    Get_As_String (Parsed_Args, "selected"),
+                                    False),
+                     4 => ESC_HTML (Get_As_String (Language, "native_name"))
+                   ]
                  ));
             end loop;
 
@@ -1787,15 +1787,15 @@ package body Inc_L10n is
                      Structure.Append (
                        Sprintf (
                          "<option value=""%s"" lang=""%s""%s>%s</option>",
-                         To_List (List => (
-                           1 => +ESC_Attr (Get_As_String (Translation, "language")),
-                           2 => +ESC_Attr (Get_As_String (Translation, "iso")),
+                         [
+                           1 => ESC_Attr (Get_As_String (Translation, "language")),
+                           2 => ESC_Attr (Get_As_String (Translation, "iso")),
                            -- Current ???
-                           3 => +Selected (Get_As_String (Translation, "language"),
-                                           Get_As_String (Parsed_Args, "selected"),
-                                           False),
-                           4 => +ESC_HTML (Get_As_String (Translation, "native_name"))
-                         ))
+                           3 => Selected (Get_As_String (Translation, "language"),
+                                          Get_As_String (Parsed_Args, "selected"),
+                                          False),
+                           4 => ESC_HTML (Get_As_String (Translation, "native_name"))
+                         ]
                        ));
                   end;
                end loop;
@@ -1807,10 +1807,10 @@ package body Inc_L10n is
                Output : UString :=
                  +Sprintf (
                    "<select name=""%s"" id=""%s"">",
-                   To_List (List => (
-                     1 => +ESC_Attr (Get_As_String (Parsed_Args, "name")),
-                     2 => +ESC_Attr (Get_As_String (Parsed_Args, "id"))
-                   ))
+                   [
+                     1 => ESC_Attr (Get_As_String (Parsed_Args, "name")),
+                     2 => ESC_Attr (Get_As_String (Parsed_Args, "id"))
+                   ]
                  );
             begin
                Append (Output, Implode ("\n", Structure));

@@ -2859,7 +2859,7 @@ is
       Typ_2            : List_Type;
 
       Button_Shorthand : constant List_Type :=
-         To_List (List => (+"primary", +"small", +"large"));
+         ["primary", "small", "large"];
 
       Classes          : List_Type := To_List ("button");
    begin
@@ -2986,7 +2986,6 @@ is
                                return Adi_Class_Wp_Screens.Wp_Screen
    is
       use Php.Strings;
-      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
    begin
@@ -2996,10 +2995,11 @@ is
            Sprintf (
              -- translators: 1: wp-admin/includes/template.php, 2: add_meta_box(), 3: add_meta_boxes
              abs "Likely direct inclusion of %1s in order to use %2s. This is very wrong. Hook the %2s call into the %3s action instead.",
-             To_List (List => (
-               1 => +"<code>wp-admin/includes/template.php</code>",
-               2 => +"<code>add_meta_box()</code>",
-               3 => +"<code>add_meta_boxes</code>"))
+             [
+               1 => "<code>wp-admin/includes/template.php</code>",
+               2 => "<code>add_meta_box()</code>",
+               3 => "<code>add_meta_boxes</code>"
+             ]
            ),
            "3.3.0"
          );

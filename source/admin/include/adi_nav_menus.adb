@@ -308,8 +308,9 @@ is
 
       declare
          Initial_Meta_Boxes : List_Type :=
-            To_List (List => (+"add-post-type-page", +"add-post-type-post",
-                              +"add-custom-links",   +"add-category"));
+            ["add-post-type-page", "add-post-type-post",
+             "add-custom-links",   "add-category"];
+
          Hidden_Meta_Boxes : constant Array_Type := Empty_Array;
       begin
          for Context of Wp_Meta_Boxes ("nav-menus") loop
@@ -716,14 +717,14 @@ is
          declare
             use Inc_Functions;
 
-            Removed_Args : constant List_Type := To_List (List => (
-                +"action",
-                +"customlink-tab",
-                +"edit-menu-item",
-                +"menu-item",
-                +"page-tab",
-                +"_wpnonce"
-            ));
+            Removed_Args : constant List_Type :=
+              ["action",
+               "customlink-tab",
+               "edit-menu-item",
+               "menu-item",
+               "page-tab",
+               "_wpnonce"
+              ];
 
             Most_Recent_URL : UString;
             View_All_URL    : UString;
@@ -1114,14 +1115,14 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
       declare
          use Inc_Functions;
 
-         Removed_Args : constant List_Type := To_List (List => (
-                +"action",
-                +"customlink-tab",
-                +"edit-menu-item",
-                +"menu-item",
-                +"page-tab",
-                +"_wpnonce"
-         ));
+         Removed_Args : constant List_Type :=
+           ["action",
+            "customlink-tab",
+            "edit-menu-item",
+            "menu-item",
+            "page-tab",
+            "_wpnonce"
+           ];
 
          Most_Used_URL : UString;
          View_All_URL  : UString;
@@ -1606,21 +1607,20 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       Menu_Items : Array_Type;       -- := Empty_Array;
 
       Post_Fields : constant List_Type :=
-         To_List (List => (
-                +"menu-item-db-id",
-                +"menu-item-object-id",
-                +"menu-item-object",
-                +"menu-item-parent-id",
-                +"menu-item-position",
-                +"menu-item-type",
-                +"menu-item-title",
-                +"menu-item-url",
-                +"menu-item-description",
-                +"menu-item-attr-title",
-                +"menu-item-target",
-                +"menu-item-classes",
-                +"menu-item-xfn"
-         ));
+         ["menu-item-db-id",
+          "menu-item-object-id",
+          "menu-item-object",
+          "menu-item-parent-id",
+          "menu-item-position",
+          "menu-item-type",
+          "menu-item-title",
+          "menu-item-url",
+          "menu-item-description",
+          "menu-item-attr-title",
+          "menu-item-target",
+          "menu-item-classes",
+          "menu-item-xfn"];
+
       Unused : Boolean;
    begin
       -- Index menu items by DB ID.

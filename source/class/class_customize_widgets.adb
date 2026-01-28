@@ -886,20 +886,19 @@ is
          Widget_Reorder_Nav_TPL : constant String :=
            Sprintf (
              "<div class=""widget-reorder-nav""><span class=""move-widget"" tabindex=""0"">%1s</span><span class=""move-widget-down"" tabindex=""0"">%2s</span><span class=""move-widget-up"" tabindex=""0"">%3s</span></div>",
-             To_List (List => (
-               1 => +abs "Move to another area&hellip;",
-               2 => +abs "Move down",
-               3 => +abs "Move up"
-           )));
+             [
+               1 => abs "Move to another area&hellip;",
+               2 => abs "Move down",
+               3 => abs "Move up"
+             ]);
 
          Move_Widget_Area_TPL : constant String :=
            Str_Replace (
-             To_List (List => (1 => +"{description}",
-                               2 => +"{btn}")),
-             To_List (List => (
-               1 => +abs "Select an area to move this widget into:",
-               2 => +X_X ("Move", "Move widget")
-             )),
+             List_Type'["{description}", "{btn}"],
+             List_Type'[
+               1 => abs "Select an area to move this widget into:",
+               2 => X_X ("Move", "Move widget")
+             ],
              "<div class=""move-widget-area"">" & NL &
              "    <p class=""description"">{description}</p>" & NL &
              "    <ul class=""widget-area-select"">" & NL &
@@ -1933,13 +1932,13 @@ is
               Array_Merge (
                 As_Array (Get (Allowed_HTML_2, Tag_Name)),
                 Array_Fill_Keys (
-                  To_List (List => (
-                    +"data-customize-partial-id",
-                    +"data-customize-partial-type",
-                    +"data-customize-partial-placement-context",
-                    +"data-customize-partial-widget-id",
-                    +"data-customize-partial-options"
-                  )),
+                  [
+                    "data-customize-partial-id",
+                    "data-customize-partial-type",
+                    "data-customize-partial-placement-context",
+                    "data-customize-partial-widget-id",
+                    "data-customize-partial-options"
+                  ],
                   From_Boolean (True)
                 )
               )));
@@ -1973,10 +1972,10 @@ is
 
       if not This.Manager.Selective_Refresh.Is_Render_Partials_Request then -- ()
          Printf ("\n<!--dynamic_sidebar_before:%s:%d-->\n",
-                 To_List (List => (
-                   1 => +ESC_HTML (Index),
-                   2 => +As_String (Get (This.Sidebar_Instance_Count, Index)))
-                 ));
+                 [
+                   1 => ESC_HTML (Index),
+                   2 => Get_As_String (This.Sidebar_Instance_Count, Index)
+                 ]);
       end if;
    end Start_Dynamic_Sidebar;
 
@@ -1998,10 +1997,10 @@ is
 
       if not This.Manager.Selective_Refresh.Is_Render_Partials_Request then
          Printf ("\n<!--dynamic_sidebar_after:%s:%d-->\n",
-                 To_List (List => (
-                   1 => +ESC_HTML (Index),
-                   2 => +As_String (Get (This.Sidebar_Instance_Count, Index))
-                 ))
+                 [
+                   1 => ESC_HTML (Index),
+                   2 => Get_As_String (This.Sidebar_Instance_Count, Index)
+                 ]
                 );
       end if;
    end End_Dynamic_Sidebar;

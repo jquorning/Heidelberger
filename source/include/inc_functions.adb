@@ -2515,7 +2515,6 @@ is
       use Php.Arrays;
       use Php.Strings;
       use Constants;
-      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Load;
@@ -2523,10 +2522,11 @@ is
       use Inc_Plugins;
 
       Key : constant String :=
-        Sprintf ("%d-%s", To_List (List => (
-          1 => +Helpers.Image (Get_Current_Blog_Id),
-          2 => +Time                      -- (string)
-        )));
+        Sprintf ("%d-%s",
+                 [
+                   1 => Helpers.Image (Get_Current_Blog_Id),
+                   2 => Time                      -- (string)
+                 ]);
    begin
       if Refresh_Cache or else Empty (Static_Cache, Key) then
          Set (Static_Cache, Key, From_Array (X_Wp_Upload_Dir (Time)));
@@ -3849,10 +3849,10 @@ is
                Append (HTML,
                        Sprintf (
                          "<a href=""%s"">%s</a>",
-                         To_List (List => (
-                           1 => +ESC_URL (Wp_HTTP_Referer),
-                           2 => +abs "Please try again."
-                         ))
+                         [
+                           1 => ESC_URL (Wp_HTTP_Referer),
+                           2 => abs "Please try again."
+                         ]
                       ));
             end;
          end if;
@@ -4808,7 +4808,6 @@ is
       use Php.Files;
       use Php.JSON;
       use Php.Strings;
-      use UStrings;
       use Inc_L10n;
 
       Result     : Array_Type;
@@ -4839,9 +4838,10 @@ is
               Sprintf (
                 -- translators: 1: Path to the JSON file, 2: Error message.
                 abs "Error when decoding a JSON file at path %1s: %2s",
-                To_List (List => (
-                  1 => +Filename_2,
-                  2 => +JSON_Last_Error_Msg))
+                [
+                  1 => Filename_2,
+                  2 => JSON_Last_Error_Msg
+                ]
               )
             );
             return Result;
@@ -5312,7 +5312,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
 
       -- phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
       -- ignore the camelCase names for variables so the names are the same as lodash
@@ -5346,20 +5345,24 @@ is
       -- Used to compose unicode regexes.--
       Rs_Misc_Lower : constant String := "(?:" & Rs_Lower & "|" & Rs_Misc & ")";
       Rs_Misc_Upper : constant String := "(?:" & Rs_Upper & "|" & Rs_Misc & ")";
-      Rs_Ord_Lower  : constant String := "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])";
-      Rs_Ord_Upper  : constant String := "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])";
+
+      Rs_Ord_Lower : constant String :=
+        "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])";
+
+      Rs_Ord_Upper : constant String :=
+        "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])";
 
       Regexp : constant String := "/" & Implode (
                 "|",
-                To_List (List => (
-                        +(Rs_Upper & "?" & Rs_Lower & "+" & "(?=" & Implode ("|", To_List (List => (+Rs_Break, +Rs_Upper, +""))) & ")"),
-                        +(Rs_Misc_Upper & "+" & "(?=" & Implode ("|", To_List (List => (+Rs_Break, +(Rs_Upper & Rs_Misc_Lower), +""))) & ")"),
-                        +(Rs_Upper & "?" & Rs_Misc_Lower & "+"),
-                        +(Rs_Upper & "+"),
-                        +Rs_Ord_Upper,
-                        +Rs_Ord_Lower,
-                        +Rs_Digits
-                ))
+                List_Type'[
+                  (Rs_Upper & "?" & Rs_Lower & "+" & "(?=" & Implode ("|", List_Type'[Rs_Break, Rs_Upper, ""]) & ")"),
+                  (Rs_Misc_Upper & "+" & "(?=" & Implode ("|", List_Type'[Rs_Break, (Rs_Upper & Rs_Misc_Lower), ""]) & ")"),
+                  (Rs_Upper & "?" & Rs_Misc_Lower & "+"),
+                  (Rs_Upper & "+"),
+                  Rs_Ord_Upper,
+                  Rs_Ord_Lower,
+                  Rs_Digits
+                ]
       ) & "/u";
 
       Matches : Array_Type;
@@ -6136,11 +6139,11 @@ is
               Sprintf (
                 -- translators: Developer debugging message. 1: PHP function name, 2: Explanatory message, 3: WordPress version number.
                 abs "Function %1s was called <strong>incorrectly</strong>. %2s %3s",
-                To_List (List => (
-                  1 => +Funct,
-                  2 => Message_2,
-                  3 => Version_2
-                ))
+                [
+                  1 => Funct,
+                  2 => -Message_2,
+                  3 => -Version_2
+                ]
               ),
               E_USER_NOTICE
             );
@@ -6158,11 +6161,11 @@ is
             Trigger_Error (
               Sprintf (
                 "Function %1s was called <strong>incorrectly</strong>. %2s %3s",
-                To_List (List => (
-                  1 => +Funct,
-                  2 => Message_2,
-                  3 => Version_2
-                ))
+                [
+                  1 => Funct,
+                  2 => -Message_2,
+                  3 => -Version_2
+                ]
               ),
               E_USER_NOTICE
             );
@@ -7208,17 +7211,16 @@ is
             return List_Type
    is
       use Php.Lists;
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
    begin
       if Static_Protocols.Is_Empty then
          Static_Protocols :=
-                      To_List (List => (+"http", +"https", +"ftp", +"ftps", +"mailto",
-                                        +"news", +"irc", +"irc6", +"ircs", +"gopher",
-                                        +"nntp", +"feed", +"telnet", +"mms", +"rtsp",
-                                        +"sms", +"svn", +"tel", +"fax", +"xmpp",
-                                        +"webcal", +"urn"));
+           ["http", "https", "ftp", "ftps", "mailto",
+            "news", "irc", "irc6", "ircs", "gopher",
+            "nntp", "feed", "telnet", "mms", "rtsp",
+            "sms", "svn", "tel", "fax", "xmpp",
+            "webcal", "urn"];
       end if;
 
       if not Did_Action ("wp_loaded") then
@@ -7869,21 +7871,20 @@ is
       use Php.Numerics;
       use Php.Strings;
       use Helpers;
-      use UStrings;
    begin
       return
         Sprintf (
           "%04x%04x-%04x-%04x-%04x-%04x%04x%04x",
-          To_List (List => (
-            1 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
-            2 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
-            3 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
-            4 => +Image_Hex_4 (MT_Rand (0, 16#0FFF#) + 16#4000#),
-            5 => +Image_Hex_4 (MT_Rand (0, 16#3FFF#) + 16#8000#),
-            6 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
-            7 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
-            8 => +Image_Hex_4 (MT_Rand (0, 16#FFFF#))
-        )));
+          [
+            1 => Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            2 => Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            3 => Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            4 => Image_Hex_4 (MT_Rand (0, 16#0FFF#) + 16#4000#),
+            5 => Image_Hex_4 (MT_Rand (0, 16#3FFF#) + 16#8000#),
+            6 => Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            7 => Image_Hex_4 (MT_Rand (0, 16#FFFF#)),
+            8 => Image_Hex_4 (MT_Rand (0, 16#FFFF#))
+          ]);
    end Wp_Generate_UUID4;
 
    ----------------

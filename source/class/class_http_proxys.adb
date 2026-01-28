@@ -7,7 +7,6 @@
 --
 
 with Constants;
-with Globals;
 with UStrings;
 
 package body Class_HTTP_Proxys

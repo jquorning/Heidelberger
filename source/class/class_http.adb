@@ -196,7 +196,7 @@ is
          --    if URL then
          --       URL :=
          --         Wp_KSES_Bad_Protocol (URL,
-         --                               To_List (List => (+"http", +"https", +"ssl")));
+         --                               list_type'["http", "https", "ssl"]);
          --    end if;
          -- end if;
 
@@ -458,12 +458,11 @@ is
       use Php.Lists;
 --    use Php.Misc;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
 --    use Inc_Plugins;
 
       Transports : constant List_Type :=
-        To_List (List => (+"curl", +"streams"));
+        ["curl", "streams"];
 
       --
       -- Filters which HTTP transports are available and in what order.

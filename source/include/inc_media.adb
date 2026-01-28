@@ -854,12 +854,11 @@ is
    is
       use Php.Arrays;
       use Php.Lists;
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
 
-      Default_Sizes_2 : constant List_Type := To_List (List => (
-        +"thumbnail", +"medium", +"medium_large", +"large"));
+      Default_Sizes_2 : constant List_Type :=
+        ["thumbnail", "medium", "medium_large", "large"];
 
       Additional_Sizes : constant Array_Type := Wp_Get_Additional_Image_Sizes;
 

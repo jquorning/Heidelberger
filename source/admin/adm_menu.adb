@@ -117,12 +117,13 @@ is
                  abs "Updates %s",
                  To_List (Sprintf (
                     "<span class=""update-plugins count-%s""><span class=""update-count"">%s</span></span>",
-                    To_List (List => (
-                      1 => +Counts_Total'Image,
+                    [
+                      1 => Counts_Total'Image,
                            -- Update_Data ("counts") ("total"),
-                      2 => +Number_Format_I18n (Float (Counts_Total))
+                      2 => Number_Format_I18n (Float (Counts_Total))
                            -- Update_Data ("counts") ("total"))
-                 ))))),
+                    ]
+                  ))),
               -Cap,
               "update-core.php");
 
@@ -363,9 +364,11 @@ is
                begin
                   Count := +Sprintf (
                      "<span class=""update-plugins count-%s""><span class=""theme-count"">%s</span></span>",
-                     To_List (List =>
-                       (1 => +Theme_Count,
-                        2 => +Number_Format_I18n (Float'Value (Theme_Count)))));
+                     [
+                       1 => Theme_Count,
+                       2 => Number_Format_I18n (Float'Value (Theme_Count))
+                     ]
+                   );
                end;
             end if;
 
@@ -494,10 +497,11 @@ is
 --             Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
                Count := +Sprintf (
                   "<span class=""update-plugins count-%s""><span class=""plugin-count"">%s</span></span>",
-                  To_List (List =>
-                    (1 => Plugin_Count,
-                     2 => +Number_Format_I18n (Float'Value (-Plugin_Count))))
-               );
+                  [
+                    1 => -Plugin_Count,
+                    2 => Number_Format_I18n (Float'Value (-Plugin_Count))
+                  ]
+                );
             end if;
 
             -- translators: %s: Number of available plugin updates.
@@ -598,9 +602,10 @@ is
                   begin
                      Site_Health_Count := +Sprintf (
                         "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
-                        To_List (List =>
-                          (1 => +Health,
-                           2 => +Number_Format_I18n (Float'Value (Health)))));
+                        [
+                          1 => Health,
+                          2 => Number_Format_I18n (Float'Value (Health))
+                        ]);
                   end;
                end;
             end if;

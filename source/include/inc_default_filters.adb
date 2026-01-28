@@ -21,8 +21,6 @@
 with Arrays;
 with Binder;
 with Constants;
-with UStrings;
-with Globals;
 with Lists;
 
 with Inc_Admin_Bar;
@@ -45,16 +43,15 @@ is
    procedure Run
    is
       use Arrays;
-      use UStrings;
       use Inc_Load;
       use Inc_Plugins;
    begin
       -- Strip, trim, kses, special chars for string saves.
-      for Filter of To_List (List => (+"pre_term_name", +"pre_comment_author_name",
-                              +"pre_link_name", +"pre_link_target",
-                              +"pre_link_rel", +"pre_user_display_name",
-                              +"pre_user_first_name", +"pre_user_last_name",
-                              +"pre_user_nickname"))
+      for Filter of List_Type'["pre_term_name", "pre_comment_author_name",
+                               "pre_link_name", "pre_link_target",
+                               "pre_link_rel", "pre_user_display_name",
+                               "pre_user_first_name", "pre_user_last_name",
+                               "pre_user_nickname"]
       loop
 --       Add_Filter (-Filter, "sanitize_text_field");
 --       Add_Filter (-Filter, "wp_filter_kses");
@@ -63,10 +60,10 @@ is
       end loop;
 
       -- Strip, kses, special chars for string display.
-      for Filter of To_List (List => (+"term_name", +"comment_author_name",
-                              +"link_name", +"link_target", +"link_rel",
-                              +"user_display_name", +"user_first_name",
-                              +"user_last_name", +"user_nickname"))
+      for Filter of List_Type'["term_name", "comment_author_name",
+                               "link_name", "link_target", "link_rel",
+                               "user_display_name", "user_first_name",
+                               "user_last_name", "user_nickname"]
       loop
          if Is_Admin then
             -- These are expensive. Run only on admin pages for defense in depth.
@@ -78,8 +75,8 @@ is
       end loop;
 
       -- Kses only for textarea saves.
-      for Filter of To_List (List => (+"pre_term_description", +"pre_link_description",
-                              +"pre_link_notes", +"pre_user_description"))
+      for Filter of List_Type'["pre_term_description", "pre_link_description",
+                               "pre_link_notes", "pre_user_description"]
       loop
 --       Add_Filter (-Filter, "wp_filter_kses");
          null;
@@ -87,8 +84,8 @@ is
 
       -- Kses only for textarea admin displays.
       if Is_Admin then
-         for Filter of To_List (List => (+"term_description", +"link_description",
-                                 +"link_notes", +"user_description"))
+         for Filter of List_Type'["term_description", "link_description",
+                                  "link_notes", "user_description"]
          loop
 --          Add_Filter (-Filter, "wp_kses_data");
             null;
@@ -97,8 +94,8 @@ is
       end if;
 
       -- Email saves.
-      for Filter of To_List (List => (+"pre_comment_author_email",
-                                      +"pre_user_email"))
+      for Filter of List_Type'["pre_comment_author_email",
+                               "pre_user_email"]
       loop
 --       Add_Filter (-Filter, "trim");
 --       Add_Filter (-Filter, "sanitize_email");
@@ -107,7 +104,7 @@ is
       end loop;
 
       -- Email admin display.
-      for Filter of To_List (List => (+"comment_author_email", +"user_email")) loop
+      for Filter of List_Type'["comment_author_email", "user_email"] loop
 --       Add_Filter (-Filter, "sanitize_email");
          if Is_Admin then
 --          Add_Filter (-Filter, "wp_kses_data");
@@ -116,14 +113,14 @@ is
       end loop;
 
       -- Save URL.
-      for Filter of To_List (List => (
-        +"pre_comment_author_url",
-        +"pre_user_url",
-        +"pre_link_url",
-        +"pre_link_image",
-        +"pre_link_rss",
-        +"pre_post_guid"
-        ))
+      for Filter of List_Type'[
+        "pre_comment_author_url",
+        "pre_user_url",
+        "pre_link_url",
+        "pre_link_image",
+        "pre_link_rss",
+        "pre_post_guid"
+        ]
       loop
 --       Add_Filter (-Filter, "wp_strip_all_tags");
 --       Add_Filter (-Filter, "sanitize_url");
@@ -132,8 +129,8 @@ is
       end loop;
 
       -- Display URL.
-      for Filter of To_List (List => (+"user_url", +"link_url", +"link_image",
-                                      +"link_rss", +"comment_url", +"post_guid"))
+      for Filter of List_Type'["user_url", "link_url", "link_image",
+                               "link_rss", "comment_url", "post_guid"]
       loop
          if Is_Admin then
 --          Add_Filter (-Filter, "wp_strip_all_tags");
@@ -152,8 +149,8 @@ is
 --                "_wp_customize_changeset_filter_insert_post_data", 10, 2);
 
       -- Keys.
-      for Filter of To_List (List => (+"pre_post_type", +"pre_post_status",
-                              +"pre_post_comment_status", +"pre_post_ping_status"))
+      for Filter of List_Type'["pre_post_type", "pre_post_status",
+                               "pre_post_comment_status", "pre_post_ping_status"]
       loop
 --       Add_Filter (-Filter, "sanitize_key");
          null;
@@ -169,7 +166,7 @@ is
       -- Counts.
 --    Add_Action ("admin_init", Wp_Schedule_Update_User_Counts'Access);
 --    Add_Action ("wp_update_user_counts", Wp_Schedule_Update_User_Counts'Access, 10, 0);
-      for Action of To_List (List => (+"user_register", +"deleted_user")) loop
+      for Action of List_Type'["user_register", "deleted_user"] loop
 --       Add_Action (-Action, Wp_Maybe_Update_User_Counts'Access, 10, 0);
          null;
       end loop;
@@ -201,8 +198,8 @@ is
 --    Add_Action ("deleted_comment_meta", Wp_Cache_Set_Comments_Last_Changed'Access);
 
       -- Places to balance tags on input.
-      for Filter of To_List (List => (+"content_save_pre", +"excerpt_save_pre",
-                              +"comment_save_pre", +"pre_comment_content"))
+      for Filter of List_Type'["content_save_pre", "excerpt_save_pre",
+                               "comment_save_pre", "pre_comment_content"]
       loop
 --       Add_Filter (-Filter, "convert_invalid_entities");
 --       Add_Filter (-Filter, "balanceTags", 50);
@@ -213,9 +210,9 @@ is
 --    Add_Action ("init", Wp_Init_Targeted_Link_Rel_Filters'Access);
 
       -- Format strings for display.
-      for Filter of To_List (List => (+"comment_author", +"term_name", +"link_name",
-                              +"link_description", +"link_notes", +"bloginfo",
-                              +"wp_title", +"document_title", +"widget_title"))
+      for Filter of List_Type'["comment_author", "term_name", "link_name",
+                               "link_description", "link_notes", "bloginfo",
+                               "wp_title", "document_title", "widget_title"]
       loop
 --       Add_Filter (-Filter, "wptexturize");
 --       Add_Filter (-Filter, "convert_chars");
@@ -224,8 +221,8 @@ is
       end loop;
 
       -- Format WordPress.
-      for Filter of To_List (List => (+"the_content", +"the_title", +"wp_title",
-                              +"document_title"))
+      for Filter of List_Type'["the_content", "the_title", "wp_title",
+                               "document_title"]
       loop
 --       Add_Filter (-Filter, "capital_P_dangit", 11);
          null;
@@ -233,9 +230,9 @@ is
 --    Add_Filter ("comment_text", "capital_P_dangit", 31);
 
       -- Format titles.
-      for Filter of To_List (List => (+"single_post_title", +"single_cat_title",
-                              +"single_tag_title", +"single_month_title",
-                              +"nav_menu_attr_title", +"nav_menu_description"))
+      for Filter of List_Type'["single_post_title", "single_cat_title",
+                               "single_tag_title", "single_month_title",
+                               "nav_menu_attr_title", "nav_menu_description"]
       loop
 --       Add_Filter (-Filter, "wptexturize");
 --       Add_Filter (-Filter, "strip_tags");
@@ -243,8 +240,8 @@ is
       end loop;
 
       -- Format text area for display.
-      for Filter of To_List (List => (+"term_description",
-                              +"get_the_post_type_description"))
+      for Filter of List_Type'["term_description",
+                               "get_the_post_type_description"]
       loop
 --       Add_Filter (-Filter, "wptexturize");
 --       Add_Filter (-Filter, "convert_chars");
@@ -347,16 +344,16 @@ is
 
       -- Mark site as no longer fresh.
       for Action of
-         To_List (List => (
-                +"publish_post",
-                +"publish_page",
-                +"wp_ajax_save-widget",
-                +"wp_ajax_widgets-order",
-                +"customize_save_after",
-                +"rest_after_save_widget",
-                +"rest_delete_widget",
-                +"rest_save_sidebar"
-         ))
+         List_Type'[
+                "publish_post",
+                "publish_page",
+                "wp_ajax_save-widget",
+                "wp_ajax_widgets-order",
+                "customize_save_after",
+                "rest_after_save_widget",
+                "rest_delete_widget",
+                "rest_save_sidebar"
+         ]
       loop
 --       Add_Action (-Action, X_Delete_Option_Fresh_Site'Access, 0);
          null;
@@ -463,9 +460,9 @@ is
 --    Add_Action ("login_init", Send_Frame_Options_Header'Access, 10, 0);
 
       -- Feed generator tags.
-      for Action of To_List (List => (+"rss2_head", +"commentsrss2_head", +"rss_head",
-                              +"rdf_header", +"atom_head", +"comments_atom_head",
-                              +"opml_head", +"app_head"))
+      for Action of List_Type'["rss2_head", "commentsrss2_head", "rss_head",
+                               "rdf_header", "atom_head", "comments_atom_head",
+                               "opml_head", "app_head"]
       loop
 --       Add_Action (-Action, The_Generator'Access);
          null;

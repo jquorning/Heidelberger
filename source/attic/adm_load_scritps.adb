@@ -34,8 +34,7 @@ is
       Protocol := Get (X_SERVER, "SERVER_PROTOCOL");
       if
         not In_Array (-Protocol,
-                      To_List (List => (+"HTTP/1.1", +"HTTP/2",
-                                        +"HTTP/2.0", +"HTTP/3")), True)
+                      ["HTTP/1.1", "HTTP/2", "HTTP/2.0", "HTTP/3"], True)
       then
          Protocol := +"HTTP/1.0";
       end if;

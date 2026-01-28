@@ -295,18 +295,19 @@ is
          -- @see wpdb::tables()
          -- @var string[]
          --
-         M_Tables : List_Type := To_List (List => (
-           UStrings.To_UString ("posts"),
-           UStrings.To_UString ("comments"),
-           UStrings.To_UString ("links"),
-           UStrings.To_UString ("options"),
-           UStrings.To_UString ("postmeta"),
-           UStrings.To_UString ("terms"),
-           UStrings.To_UString ("term_taxonomy"),
-           UStrings.To_UString ("term_relationships"),
-           UStrings.To_UString ("termmeta"),
-           UStrings.To_UString ("commentmeta")
-         ));
+         M_Tables : List_Type :=
+           [
+             "posts",
+             "comments",
+             "links",
+             "options",
+             "postmeta",
+             "terms",
+             "term_taxonomy",
+             "term_relationships",
+             "termmeta",
+             "commentmeta"
+           ];
 
          -- String_Maps.Map; --  :=
            -- [ -- String_Maps.To_Map ((
@@ -334,11 +335,11 @@ is
          -- @var string[]
          --
          Old_Tables : List_Type :=
-           To_List (List => (
-             UStrings.To_UString ("categories"),
-             UStrings.To_UString ("post2cat"),
-             UStrings.To_UString ("link2cat")
-           ));
+           [
+             "categories",
+             "post2cat",
+             "link2cat"
+           ];
 
          --
          -- List of WordPress global tables.
@@ -349,10 +350,10 @@ is
          -- @var string[]
          --
          Global_Tables : List_Type :=
-           To_List (List => (
-             UStrings.To_UString ("users"),
-             UStrings.To_UString ("usermeta")
-           ));
+           [
+             "users",
+             "usermeta"
+           ];
 
          --
          -- List of Multisite global tables.
@@ -363,14 +364,14 @@ is
          -- @var string[]
          --
          MS_Global_Tables : List_Type :=
-           To_List (List => (
-             UStrings.To_UString ("blogs"),
-             UStrings.To_UString ("blogmeta"),
-             UStrings.To_UString ("signups"),
-             UStrings.To_UString ("site"),
-             UStrings.To_UString ("sitemeta"),
-             UStrings.To_UString ("registration_log")
-           ));
+           [
+              "blogs",
+              "blogmeta",
+              "signups",
+              "site",
+              "sitemeta",
+              "registration_log"
+           ];
 
          --
          -- List of deprecated WordPress Multisite global tables.
@@ -684,14 +685,14 @@ is
          --
 --        protected
          Incompatible_Modes : List_Type :=
-           To_List (List => (
-             UStrings.To_UString ("NO_ZERO_DATE"),
-             UStrings.To_UString ("ONLY_FULL_GROUP_BY"),
-             UStrings.To_UString ("STRICT_TRANS_TABLES"),
-             UStrings.To_UString ("STRICT_ALL_TABLES"),
-             UStrings.To_UString ("TRADITIONAL"),
-             UStrings.To_UString ("ANSI")
-           ));
+           [
+             "NO_ZERO_DATE",
+             "ONLY_FULL_GROUP_BY",
+             "STRICT_TRANS_TABLES",
+             "STRICT_ALL_TABLES",
+             "TRADITIONAL",
+             "ANSI"
+           ];
 
          --
          -- Added by jq

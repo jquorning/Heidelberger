@@ -62,7 +62,7 @@ is
       Cap_2 : UString;
 
       Publish_Future : constant List_Type :=
-        To_List (List => (+"publish", +"future"));
+        ["publish", "future"];
    begin
       -- switch ( cap ) then
       if Cap in "remove_user" then
@@ -167,10 +167,10 @@ is
                X_Doing_It_Wrong (
                  "__FUNCTION__",
                  Sprintf (
-                   -Message, To_List (List => (
-                     1 => +"<code>" & Post.Post_Type & "</code>",
-                     2 => +"<code>" & Cap & "</code>"
-                   ))
+                   -Message, [
+                     1 => "<code>" & (-Post.Post_Type) & "</code>",
+                     2 => "<code>" & Cap & "</code>"
+                   ]
                  ),
                  "4.4.0"
                );
@@ -301,9 +301,10 @@ is
                X_Doing_It_Wrong (
                  "__FUNCTION__",
                  Sprintf (
-                   -Message, To_List (List => (
-                     1 => +"<code>" & Post.Post_Type & "</code>",
-                     2 => +"<code>" & Cap & "</code>"))
+                   -Message, [
+                     1 => "<code>" & (-Post.Post_Type) & "</code>",
+                     2 => "<code>" & Cap & "</code>"
+                   ]
                  ),
                  "4.4.0"
                );
@@ -430,9 +431,10 @@ is
                   X_Doing_It_Wrong (
                     "__FUNCTION__",
                     Sprintf (
-                      Message, To_List (List => (
-                        1 => +"<code>" & Post.Post_Type & "</code>",
-                        2 => +"<code>" & Cap & "</code>"))
+                      Message, [
+                        1 => "<code>" & (-Post.Post_Type) & "</code>",
+                        2 => "<code>" & Cap & "</code>"
+                      ]
                       ),
                       "4.4.0"
                     );
@@ -459,9 +461,10 @@ is
                   X_Doing_It_Wrong (
                     "__FUNCTION__",
                     Sprintf (
-                      Message, To_List (List => (
-                        1 => +"<code>" & Get_Post_Status (Post) & "</code>",
-                        2 => +"<code>" & Cap & "</code>"))
+                      Message, [
+                        1 => "<code>" & Get_Post_Status (Post) & "</code>",
+                        2 => "<code>" & Cap & "</code>"
+                      ]
                     ),
                     "5.4.0"
                   );
@@ -524,9 +527,10 @@ is
                   X_Doing_It_Wrong (
                     "__FUNCTION__",
                     Sprintf (
-                      Message, To_List (List => (
-                        1 => +"<code>" & Post.Post_Type & "</code>",
-                        2 => +"<code>" & Cap & "</code>"))
+                      Message, [
+                        1 => "<code>" & (-Post.Post_Type) & "</code>",
+                        2 => "<code>" & Cap & "</code>"
+                      ]
                     ),
                     "4.4.0"
                   );
@@ -680,7 +684,7 @@ is
                   --    --
                   --    Allowed := Apply_Filters_Deprecated (
                   --      "auth_{object_type}_{object_subtype}_meta_{meta_key}",
-                  --      To_List (List => (Allowed, Meta_Key, Object_Id, User_Id, Cap, Caps)),
+                  --      [Allowed, Meta_Key, Object_Id, User_Id, Cap, Caps],
                   --      "4.9.8",
                   --      "auth_{object_type}_meta_{meta_key}_for_{object_subtype}"
                   --    );
@@ -1014,18 +1018,19 @@ is
 
          declare
             -- Block capabilities map to their post equivalent.
-            Block_Caps : constant List_Type := To_List (List => (
-              +"edit_blocks",
-              +"edit_others_blocks",
-              +"publish_blocks",
-              +"read_private_blocks",
-              +"delete_blocks",
-              +"delete_private_blocks",
-              +"delete_published_blocks",
-              +"delete_others_blocks",
-              +"edit_private_blocks",
-              +"edit_published_blocks"
-            ));
+            Block_Caps : constant List_Type :=
+              [
+                "edit_blocks",
+                "edit_others_blocks",
+                "publish_blocks",
+                "read_private_blocks",
+                "delete_blocks",
+                "delete_private_blocks",
+                "delete_published_blocks",
+                "delete_others_blocks",
+                "edit_private_blocks",
+                "edit_published_blocks"
+              ];
          begin
             if In_List (Cap, Block_Caps, True) then
                Cap_2 := +Str_Replace ("_blocks", "_posts", Cap);

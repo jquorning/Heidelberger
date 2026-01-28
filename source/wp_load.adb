@@ -132,9 +132,10 @@ is
             Append (Die, "<p>" & Sprintf (
                -- translators: 1: Documentation URL, 2: wp-config.php
                abs "Need more help? <a href=""%1$s"">Read the support article on %2$s</a>.",
-               To_List (List => (
-                 1 => +abs "https://wordpress.org/support/article/editing-wp-config-php/",
-                 2 => +"<code>wp-config.php</code>"))) & "</p>");
+               [
+                 1 => abs "https://wordpress.org/support/article/editing-wp-config-php/",
+                 2 => "<code>wp-config.php</code>"
+               ]) & "</p>");
 
             Append (Die, "<p>" & Sprintf (
                -- translators: %s: wp-config.php

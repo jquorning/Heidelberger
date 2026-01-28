@@ -3,9 +3,6 @@
 --
 
 with Ada.Containers.Indefinite_Vectors;
--- with Ada.Containers.Vectors;
-
-with UStrings;
 
 package Lists is
 
@@ -34,10 +31,11 @@ package Lists is
 
    Empty_List : List_Type renames List_Vectors.Empty_Vector;
 
-   type Item_List is array (Positive range <>) of UStrings.UString; -- Lists.Item_Type;
+-- type Item_List is array (Positive range <>)
+--   of UStrings.UString; -- Lists.Item_Type;
 
-   function To_List (List : Item_List)
-                     return Lists.List_Type;
+-- function To_List (List : Item_List)
+--                   return Lists.List_Type;
 
    function To_List (Item : String)
                      return Lists.List_Type;

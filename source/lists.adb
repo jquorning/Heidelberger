@@ -4,7 +4,6 @@
 
 package body Lists
 is
-   use UStrings;
 
    ------------
    -- Append --
@@ -18,21 +17,21 @@ is
 --    List.Append (+Item);
    end Append;
 
-   -------------
-   -- To_List --
-   -------------
+--    -------------
+--    -- To_List --
+--    -------------
 
-   function To_List (List : Item_List)
-                     return List_Type
-   is
-      Result : List_Type;
-   begin
-      for A of List loop
-         Result.Append (-A);
---       Result.Append (A);
-      end loop;
-      return Result;
-   end To_List;
+--    function To_List (List : Item_List)
+--                      return List_Type
+--    is
+--       Result : List_Type;
+--    begin
+--       for A of List loop
+--          Result.Append (-A);
+-- --       Result.Append (A);
+--       end loop;
+--       return Result;
+--    end To_List;
 
    -------------
    -- To_List --
@@ -40,6 +39,12 @@ is
 
    function To_List (Item : String)
                      return List_Type
-   is (To_List (List => (1 => +Item)));
+   is
+      Result : List_Type;
+   begin
+      Result.Append (Item);
+      return Result;
+   end To_List;
+   -- (To_List (List => (1 => +Item)));
 
 end Lists;

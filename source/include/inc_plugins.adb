@@ -14,7 +14,6 @@ with Php.Preg;
 with Php.Strings;
 
 with Constants;
-with Globals;
 with Logging;
 with UStrings;
 

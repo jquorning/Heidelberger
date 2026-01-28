@@ -291,14 +291,14 @@ is
            +Sprintf (
               -- translators: 1: URL to WordPress release notes, 2: WordPress version number, 3: Minimum required PHP version number, 4: Minimum required MySQL version number, 5: Current PHP version number, 6: Current MySQL version number.
               abs "You cannot update because <a href=""%1s"">WordPress %2s</a> requires PHP version %3s or higher and MySQL version %4s or higher. You are running PHP version %5s and MySQL version %6s.",
-              To_List (List => (
-                1 => +Version_URL,
-                2 => +Wp_Version,
-                3 => +Inc_Versions.Required_PHP_Version,
-                4 => +Inc_Versions.Required_MySQL_Version,
-                5 => +PHP_Version,
-                6 => +MySQL_Version
-              ))
+              [
+                1 => Version_URL,
+                2 => Wp_Version,
+                3 => Inc_Versions.Required_PHP_Version,
+                4 => Inc_Versions.Required_MySQL_Version,
+                5 => PHP_Version,
+                6 => MySQL_Version
+              ]
            ) & PHP_Update_Message;
 
       elsif not PHP_Compat then
@@ -306,12 +306,12 @@ is
            +Sprintf (
               -- translators: 1: URL to WordPress release notes, 2: WordPress version number, 3: Minimum required PHP version number, 4: Current PHP version number.
               abs "You cannot update because <a href=""%1s"">WordPress %2s</a> requires PHP version %3s or higher. You are running version %4s.",
-              To_List (List => (
-                1 => +Version_URL,
-                2 => +Wp_Version,
-                3 => +Inc_Versions.Required_PHP_Version,
-                4 => +PHP_Version
-              ))
+              [
+                1 => Version_URL,
+                2 => Wp_Version,
+                3 => Inc_Versions.Required_PHP_Version,
+                4 => PHP_Version
+              ]
             ) & PHP_Update_Message;
 
       elsif not MySQL_Compat then
@@ -319,12 +319,12 @@ is
            +Sprintf (
               -- translators: 1: URL to WordPress release notes, 2: WordPress version number, 3: Minimum required MySQL version number, 4: Current MySQL version number.
               abs "You cannot update because <a href=""%1s"">WordPress %2s</a> requires MySQL version %3s or higher. You are running version %4s.",
-              To_List (List => (
-                1 => +Version_URL,
-                2 => +Wp_Version,
-                3 => +Inc_Versions.Required_MySQL_Version,
-                4 => +MySQL_Version
-              ))
+              [
+                1 => Version_URL,
+                2 => Wp_Version,
+                3 => Inc_Versions.Required_MySQL_Version,
+                4 => MySQL_Version
+              ]
             );
       end if;
 

@@ -64,7 +64,7 @@ is
          Defaults : constant Array_Type := To_Array (List => (
            Build ("coerce_to",        ""),
            Build ("root_size_value",  16),
-           Build ("acceptable_units", To_List (List => (+"rem", +"px", +"em")))
+           Build ("acceptable_units", List_Type'["rem", "px", "em"])
          ));
 
          Options_2 : constant Array_Type := Wp_Parse_Args (Options, Defaults);

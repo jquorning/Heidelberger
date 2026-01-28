@@ -91,7 +91,7 @@ is
 
          -- Standardize on \n line endings.
          Key_3 : constant String :=
-           Str_Replace (To_List (List => (+"\r\n", +"\r")), "\n", Key_2);
+           Str_Replace (List_Type'["\r\n", "\r"], "\n", Key_2);
       begin
          return Key_3;
       end;

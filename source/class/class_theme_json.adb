@@ -15,6 +15,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with UStrings;
 with Wp_Common;
 
 with Block_Typography;
@@ -152,7 +153,6 @@ is
                       return Array_Type
    is
       use Php.Arrays;
-      use UStrings;
 
       Output : Array_Type;
       Styles_Non_Top_Level   : constant Array_Type := VALID_STYLES;
@@ -241,7 +241,7 @@ is
       end;
 
       -- Remove anything that"s not present in the schema.
-      for Subtree of To_List (List => (+"styles", +"settings")) loop
+      for Subtree of List_Type'["styles", "settings"] loop
          if not Isset (Input, Subtree) then
             goto Continue;
          end if;
@@ -553,7 +553,7 @@ is
                 Build ("selector", ROOT_BLOCK_SELECTOR)
               )),
               To_Array (List => (
-                Build ("path",     To_List (List => (+"styles", +"blocks", +"core/columns"))),
+                Build ("path",     List_Type'["styles", "blocks", "core/columns"]),
                 Build ("selector", ".wp-block-columns"),
                 Build ("name",     "core/columns")
               ))
@@ -642,9 +642,9 @@ is
 
          Has_Block_Gap_Support : constant Boolean :=
            Kind_Of (X_Wp_Array_Get (This.Theme_JSON,
-                                    To_List (List => (+"settings",
-                                                      +"spacing",
-                                                      +"blockGap")))) /= Kind_Null;
+                                    List_Type'["settings",
+                                               "spacing",
+                                               "blockGap"])) /= Kind_Null;
 
          Has_Fallback_Gap_Support : constant Boolean := not Has_Block_Gap_Support;
          -- This setting isn"t useful yet: it exists as a placeholder for a future explicit
@@ -656,16 +656,17 @@ is
 
          Layout_Definitions : constant Multi_Type :=
            X_Wp_Array_Get (This.Theme_JSON,
-                           To_List (List => (+"settings", +"layout", +"definitions")));
+                           List_Type'["settings", "layout", "definitions"]);
 
-         Layout_Selector_Pattern : constant String := "/^[a-zA-Z0-9\-\.\--+>:\(\)]*$/";
-         -- Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and
-         -- pseudo class selectors.
+         Layout_Selector_Pattern : constant String :=
+           "/^[a-zA-Z0-9\-\.\--+>:\(\)]*$/";
+         -- Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator
+         -- and pseudo class selectors.
       begin
-         -- Gap styles will only be output if the theme has block gap support, or supports
-         -- a fallback gap.
-         -- Default layout gap styles will be skipped for themes that do not explicitly opt-in
-         -- to blockGap with a `true` or `false` value.
+         -- Gap styles will only be output if the theme has block gap support, or
+         -- supports a fallback gap.
+         -- Default layout gap styles will be skipped for themes that do not
+         -- explicitly opt-in to blockGap with a `true` or `false` value.
          if Has_Block_Gap_Support or Has_Fallback_Gap_Support then
             declare
                use Class_Block_Type;
@@ -683,14 +684,14 @@ is
 --                if not Empty (Block_Type) then
                      Block_Gap_Value :=
                        X_Wp_Array_Get (Block_Type.Supports,
-                                       To_List (List => (+"spacing",
-                                                         +"blockGap",
-                                                         +"__experimentalDefault"))); -- null
+                                       List_Type'["spacing",
+                                                  "blockGap",
+                                                  "__experimentalDefault"]); -- null
                   end if;
                else
                   Block_Gap_Value :=
                     Get_Property_Value (As_Array (Node),
-                                        To_List (List => (+"spacing", +"blockGap")));
+                                        List_Type'["spacing", "blockGap"]);
                end if;
 
                -- Support split row / column values and concatenate to a shorthand value.
@@ -703,15 +704,15 @@ is
                      declare
                         Gap_Row : String :=
                           As_String (Get_Property_Value (As_Array (Node),
-                                                         To_List (List => (+"spacing",
-                                                                           +"blockGap",
-                                                                           +"top"))));
+                                                         List_Type'["spacing",
+                                                                    "blockGap",
+                                                                    "top"]));
 
                         Gap_Column : constant String :=
                           As_String (Get_Property_Value (As_Array (Node),
-                                                         To_List (List => (+"spacing",
-                                                                           +"blockGap",
-                                                                           +"left"))));
+                                                         List_Type'["spacing",
+                                                                    "blockGap",
+                                                                    "left"]));
                      begin
                         Block_Gap_Value :=
                           From_String ((if Gap_Row = Gap_Column
@@ -812,10 +813,11 @@ is
 
                                              Layout_Selector := +Sprintf (
                                                 -Format,
-                                                To_List (List => (
-                                                  1 => +Selector,
-                                                  2 => +Class_Name,
-                                                  3 => +As_String (Get (Spacing_Rule, "selector"))))
+                                                [
+                                                  1 => Selector,
+                                                  2 => Class_Name,
+                                                  3 => Get_As_String (Spacing_Rule, "selector")
+                                                ]
                                              );
                                           else
                                              Format := +(if ROOT_BLOCK_SELECTOR = Selector
@@ -823,10 +825,11 @@ is
 
                                              Layout_Selector := +Sprintf (
                                                -Format,
-                                               To_List (List => (
-                                                 1 => +Selector,
-                                                 2 => +Class_Name,
-                                                 3 => +As_String (Get (Spacing_Rule, "selector"))))
+                                               [
+                                                 1 => Selector,
+                                                 2 => Class_Name,
+                                                 3 => Get_As_String (Spacing_Rule, "selector")
+                                               ]
                                              );
                                           end if;
                                           Append (Block_Rules,
@@ -851,7 +854,7 @@ is
          then
             declare
                Valid_Display_Modes : constant List_Type :=
-                 To_List (List => (+"block", +"flex", +"grid"));
+                 ["block", "flex", "grid"];
             begin
                for Layout_Definition_2 in As_Array (Layout_Definitions).Iterate loop
                   declare
@@ -884,10 +887,10 @@ is
                            declare
                               Layout_Selector : constant String := Sprintf (
                                 "%s .%s",
-                                To_List (List => (
-                                  1 => +Selector,
-                                  2 => +Class_Name
-                                ))
+                                [
+                                  1 => Selector,
+                                  2 => Class_Name
+                                ]
                               );
                            begin
                               Append (Block_Rules, To_Ruleset (
@@ -936,11 +939,11 @@ is
                                  declare
                                     Layout_Selector : constant String := Sprintf (
                                       "%s .%s%s",
-                                      To_List (List => (
-                                        1 => +Selector,
-                                        2 => +Class_Name,
-                                        3 => +As_String (Get (Base_Style_Rule, "selector"))
-                                      )));
+                                      [
+                                        1 => Selector,
+                                        2 => Class_Name,
+                                        3 => Get_As_String (Base_Style_Rule, "selector")
+                                      ]);
                                  begin
                                     Append (Block_Rules,
                                             To_Ruleset (Layout_Selector, Declarations));
@@ -1450,7 +1453,7 @@ is
                end if;
 
                Append (Nodes, From_Array (To_Array (List => (
-                 Build ("path",     To_List (List => (+"settings", +"blocks", +Name))),
+                 Build ("path",     List_Type'["settings", "blocks", Name]),
                  Build ("selector", -Selector)
               ))));
             end;
@@ -1469,7 +1472,6 @@ is
                              return Array_Type
    is
       use Php.Arrays;
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
 
@@ -1496,7 +1498,7 @@ is
                end if;
 
                Append (Nodes, From_Array (To_Array (List => (
-                 Build ("path",     To_List (List => (+"styles", +"elements", +Element))),
+                 Build ("path",     List_Type'["styles", "elements", Element]),
                  Build ("selector", As_String (Get (ELEMENTS, Element)))
                ))));
 
@@ -1518,7 +1520,7 @@ is
                                    Element, Pseudo_Selector)
                         then
                            Append (Nodes, From_Array (To_Array (List => (
-                             Build ("path",     To_List (List => (+"styles", +"elements", +Element))),
+                             Build ("path",     List_Type'["styles", "elements", Element]),
                              Build ("selector",
                                     Append_To_Selector (As_String (Get (ELEMENTS, Element)),
                                                         Pseudo_Selector))
@@ -1670,7 +1672,7 @@ is
 
             Append (Nodes, From_Array (To_Array (List => (
               Build ("name",     Name),
-              Build ("path",     To_List (List => (+"styles", +"blocks", +Name))),
+              Build ("path",     List_Type'["styles", "blocks", Name]),
               Build ("selector", -Selector),
               Build ("duotone",  -Duotone_Selector),
               Build ("features", -Feature_Selectors)
@@ -1686,8 +1688,8 @@ is
                      Node    : Multi_Type      := Arrays.Element (B);
                   begin
                      Append (Nodes, From_Array (To_Array (List => (
-                       Build ("path",     To_List (List =>
-                         (+"styles", +"blocks", +Name, +"elements", +Element))),
+                       Build ("path",     List_Type'[
+                         "styles", "blocks", Name, "elements", Element]),
                        Build ("selector", As_String (Get (Ref_3 (Selectors, Name, "elements", Element))))
                      ))));
 
@@ -1708,8 +1710,8 @@ is
                                          "elements", Element, Pseudo_Selector)
                               then
                                  Append (Nodes, From_Array (To_Array (List => (
-                                   Build ("path",     To_List (List =>
-                                     (+"styles", +"blocks", +Name, +"elements", +Element))),
+                                   Build ("path",     List_Type'[
+                                     "styles", "blocks", Name, "elements", Element]),
                                    Build ("selector",
                                      Append_To_Selector (
                                        As_String (Get (Ref_3 (Selectors, Name, "elements", Element))),
@@ -2102,7 +2104,6 @@ is
    is
       use Php.JSON;
       use Php.Strings;
-      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -2143,11 +2144,12 @@ is
                     Sprintf (
                       -- translators: 1: theme.json, 2: Value name, 3: Value path, 4: Another value name.
                       abs "Your %1s file uses a dynamic value (%2s) for the path at %3s. However, the value at %3s is also a dynamic value (pointing to %4s) and pointing to another dynamic value is not supported. Please update %3s to point directly to %4s.",
-                      To_List (List => (
-                        1 => +"theme.json",
-                        2 => +Ref_Value_String,
-                        3 => +Path_String,
-                        4 => +As_String (Get (As_Array (Ref_Value), "ref"))))
+                      [
+                        1 => "theme.json",
+                        2 => Ref_Value_String,
+                        3 => Path_String,
+                        4 => Get_As_String (As_Array (Ref_Value), "ref")
+                      ]
                     ),
                     "6.1.0"
                   );
@@ -2272,19 +2274,19 @@ is
       declare
          Block_Gap_Value : Multi_Type :=
            X_Wp_Array_Get (This.Theme_JSON,
-                           To_List (List => (+"styles", +"spacing", +"blockGap")),
+                           List_Type'["styles", "spacing", "blockGap"],
                            From_String ("0.5em"));
 
          Has_Block_Gap_Support : constant Boolean :=
            X_Wp_Array_Get (This.Theme_JSON,
-                           To_List (List => (+"settings", +"spacing", +"blockGap")))
+                           List_Type'["settings", "spacing", "blockGap"])
                            /= Null_Multi_Type; -- null;
       begin
          if Has_Block_Gap_Support then
             declare
                Block_Gap_Value_2 : constant String :=
                  As_String (Get_Property_Value (This.Theme_JSON,
-                            To_List (List => (+"styles", +"spacing", +"blockGap"))));
+                            List_Type'["styles", "spacing", "blockGap"]));
             begin
                Append (CSS, ".wp-site-blocks >-- { margin-block-start: 0; margin-block-end: 0; }");
                Append (CSS, ".wp-site-blocks >-- +-- { margin-block-start: " & Block_Gap_Value_2 & "; }");
@@ -2634,7 +2636,6 @@ is
                                       return Array_Type
    is
       use Php.Types;
-      use UStrings;
 
       Theme_Settings : Array_Type := To_Array (List => (
         Build ("version",  LATEST_SCHEMA),
@@ -2714,7 +2715,7 @@ is
                 Key_3 => "units",
                 Value => From_List
                   (if True = As_Boolean (Get (Settings, "enableCustomUnits"))
-                   then To_List (List => (+"px", +"em", +"rem", +"vh", +"vw", +"%"))
+                   then List_Type'["px", "em", "rem", "vh", "vw", "%"]
                    else To_List (As_String (Get (Settings, "enableCustomUnits")))));
       end if;
 
@@ -2808,7 +2809,6 @@ is
       use Php.Numerics;
       use Php.Strings;
       use Php.Types;
-      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -2816,7 +2816,7 @@ is
       Spacing_Scale : constant Array_Type :=
         As_Array (X_Wp_Array_Get
           (This.Theme_JSON,
-           To_List (List => (+"settings", +"spacing", +"spacingScale"))));
+           ["settings", "spacing", "spacingScale"]));
    begin
       if
         not Isset (Spacing_Scale, "steps")
@@ -2975,8 +2975,8 @@ is
                end if;
 
                X_Wp_Array_Set (This.Theme_JSON,
-                               To_List (List => (+"settings", +"spacing",
-                                                 +"spacingSizes", +"default")),
+                               ["settings", "spacing",
+                                "spacingSizes", "default"],
                                From_Array (Spacing_Sizes));
             end;
          end;

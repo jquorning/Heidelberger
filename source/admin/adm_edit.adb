@@ -177,8 +177,7 @@ is
                      use Inc_Functions;
 
                      List_2 : constant List_Type :=
-                       To_List (List => (+"trashed", +"untrashed", +"deleted",
-                                         +"locked",  +"ids"));
+                       ["trashed", "untrashed", "deleted", "locked",  "ids"];
 
                      Sendback : UString
                        := +Remove_Query_Arg (List_2, Wp_Get_Referer);
@@ -223,10 +222,10 @@ is
                                  Globals.WpDB.Prepare (
                                    "SELECT ID FROM " & Statement_Type (-Post_Type) &
                                    " WHERE post_type=%s AND post_status = %s",
-                                   To_List (List => (
-                                     1 => Post_Type,
-                                     2 => Post_Status
-                                   ))
+                                   [
+                                     1 => -Post_Type,
+                                     2 => -Post_Status
+                                   ]
                                  ));
                            end if;
                            Doaction := "delete";
@@ -406,10 +405,9 @@ is
 
                         declare
                            List : constant List_Type :=
-                             To_List (List => (+"action", +"action2", +"tags_input",
-                                               +"post_author", +"comment_status",
-                                               +"ping_status", +"_status", +"post",
-                                               +"bulk_edit",   +"post_view"));
+                             ["action", "action2", "tags_input", "post_author",
+                              "comment_status", "ping_status", "_status", "post",
+                              "bulk_edit", "post_view"];
                         begin
                            Sendback := +Remove_Query_Arg (List, -Sendback);
                         end;
@@ -426,7 +424,7 @@ is
 --                use String_Vectors;
 
                   List : constant List_Type :=
-                    To_List (List => (+"_wp_http_referer", +"_wpnonce"));
+                    ["_wp_http_referer", "_wpnonce"];
                begin
                   Inc_Pluggables.Wp_Redirect
                             (Remove_Query_Arg
@@ -922,10 +920,10 @@ is
                      begin
                         Append (Messages,
                                 Sprintf ("<a href=""%1$s"">%2$s</a>",
-                                  To_List (List => (
-                                    1 => +URL,
-                                    2 => +HTML
-                                  ))));
+                                  [
+                                    1 => URL,
+                                    2 => HTML
+                                  ]));
                      end;
                      -- Messages [] := Sprintf (
                      --               "<a href=""%1$s"">%2$s</a>",
@@ -953,8 +951,7 @@ is
 --       use String_Vectors;
 
          List : constant List_Type :=
-           To_List (List => (+"locked", +"skipped", +"updated", +"deleted",
-                             +"trashed", +"untrashed"));
+           ["locked", "skipped", "updated", "deleted", "trashed", "untrashed"];
       begin
          Set (X_SERVER, "REQUEST_URI",
               From_String (

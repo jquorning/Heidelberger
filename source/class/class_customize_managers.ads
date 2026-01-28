@@ -147,8 +147,7 @@ is
          --
          -- protected
          Components : List_Type :=
-           To_List (List => (UStrings.To_UString ("widgets"),
-                             UStrings.To_UString ("nav_menus")));
+           ["widgets", "nav_menus"];
 
          --
          -- Registered instances of WP_Customize_Section.

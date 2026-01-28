@@ -381,9 +381,10 @@ is
            Sprintf (
               -- translators: 1: 'type => link', 2: 'taxonomy => link_category'
               abs "%1$s is deprecated. Use %2$s instead.",
-              To_List (List => (
-                1 => +"<code>type => link</code>",
-                2 => +"<code>taxonomy => link_category</code>"))
+              [
+                1 => "<code>type => link</code>",
+                2 => "<code>taxonomy => link_category</code>"
+              ]
            )
          );
 --       Set (Args, "taxonomy", "link_category");
@@ -1534,7 +1535,7 @@ is
 
          Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
       begin
-         for Bool of To_List (List => (+"link", +"inclusive")) loop
+         for Bool of List_Type'["link", "inclusive"] loop
             Set (Args_2, Bool,
                  From_Boolean (Wp_Validate_Boolean (Get (Args_2, Bool))));
          end loop;

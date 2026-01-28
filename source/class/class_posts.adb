@@ -247,12 +247,12 @@ is
    --
    function To_Array (Post : Wp_Post) return Array_Type
    is
-      use UStrings;
       use Wp_Common;
 
       Post_2 : Array_Type := Get_Object_Vars (Post);
-      List   : constant List_Type := To_List (List =>
-        (+"ancestors", +"page_template", +"post_category", +"tags_input"));
+
+      List : constant List_Type :=
+        ["ancestors", "page_template", "post_category", "tags_input"];
    begin
       for Key of List loop
          if X_Isset (Post, Key) then

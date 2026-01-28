@@ -676,7 +676,6 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Class_Errors;
       use Class_Users;
@@ -688,7 +687,7 @@ is
       Password_2 : constant String := Trim (Password);
 
       Ignore_Codes : constant List_Type :=
-        To_List (List => (+"empty_username", +"empty_password"));
+        ["empty_username", "empty_password"];
 
       --
       -- Filters whether a set of user login credentials are valid.
@@ -1701,7 +1700,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
       use Inc_Formatting;
       use Inc_KSES;
 
@@ -1736,7 +1734,7 @@ is
 
       -- Remove %0D and %0A from location.
       Strip : constant List_Type :=
-        To_List (List => (+"%0d", +"%0a", +"%0D", +"%0A"));
+        ["%0d", "%0a", "%0D", "%0A"];
    begin
       return X_Deep_Replace (Strip, Location_5);
    end Wp_Sanitize_Redirect;
@@ -1895,7 +1893,7 @@ is
          end if;
 
          -- Reject malformed components parse_url() can return on odd inputs.
-         for Component of To_List (List => (+"user", +"pass", +"host")) loop
+         for Component of List_Type'["user", "pass", "host"] loop
             if
               Isset (Lp, Component) and then
               Strpbrk (Get_As_String (Lp, Component), ":/?#@") /= ""
@@ -2742,7 +2740,6 @@ is
                      return String
    is
       use Php.Lists;
-      use UStrings;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Options;
@@ -2774,10 +2771,10 @@ is
            Build (abs "put your unique phrase here", True)
          ));
          for
-           First of To_List (List => (+"AUTH", +"SECURE_AUTH", +"LOGGED_IN",
-                                      +"NONCE", +"SECRET"))
+           First of List_Type'["AUTH", "SECURE_AUTH", "LOGGED_IN",
+                               "NONCE", "SECRET"]
          loop
-            for Second of To_List (List => (+"KEY", +"SALT")) loop
+            for Second of List_Type'["KEY", "SALT"] loop
 --             if not Defined ("{first}_{second}") then
 --                goto Continue;
 --             end if;
@@ -2817,10 +2814,10 @@ is
          end if;
 
          if
-           In_List (Scheme, To_List (List => (+"auth", +"secure_auth",
-                                              +"logged_in", +"nonce")), True)
+           In_List (Scheme, List_Type'["auth", "secure_auth",
+                                       "logged_in", "nonce"], True)
          then
-            for Typ of To_List (List => (+"key", +"salt")) loop
+            for Typ of List_Type'["key", "salt"] loop
                declare
                   Const : constant String :=
                     Php.Strings.Strtoupper (Scheme & "_" & Typ);
@@ -3300,10 +3297,10 @@ is
             end if;
 
             declare
-               Class : List_Type := To_List (List => (
-                 +"avatar",
-                 +("avatar-" & Helpers.Image (As_Integer (Get (Args_3, "size")))),
-                 +"photo")); -- (int)
+               Class : List_Type :=
+                 ["avatar",
+                  ("avatar-" & Helpers.Image (As_Integer (Get (Args_3, "size")))),
+                  "photo"]; -- (int)
             begin
                if
                  not As_Boolean (Get (Args_2, "found_avatar")) or else
@@ -3329,10 +3326,10 @@ is
                     Get_As_String (Args_3, "loading");
 
                   Lazy_Eager : constant List_Type :=
-                    To_List (List => (+"lazy", +"eager"));
+                    ["lazy", "eager"];
 
                   Async_Sync_Auto : constant List_Type :=
-                    To_List (List => (+"async", +"sync", +"auto"));
+                    ["async", "sync", "auto"];
                begin
                   if
                     In_List (Loading, Lazy_Eager, True) and then
@@ -3364,15 +3361,15 @@ is
                      Avatar_2 : constant String :=
                        Sprintf (
                          "<img alt=""%s"" src=""%s"" srcset=""%s"" class=""%s"" height=""%d"" width=""%d"" %s/>",
-                         To_List (List => (
-                           1 => +ESC_Attr (Get_As_String (Args_3, "alt")),
-                           2 => +ESC_URL (URL),
-                           3 => +ESC_URL (URL_2x) & " 2x",
-                           4 => +ESC_Attr (Implode (" ", Class)),
-                           5 => +Helpers.Image (As_Integer (Get (Args_3, "height"))),
-                           6 => +Helpers.Image (As_Integer (Get (Args_3, "width"))),
-                           7 => Extra_Attr
-                         ))
+                         [
+                           1 => ESC_Attr (Get_As_String (Args_3, "alt")),
+                           2 => ESC_URL (URL),
+                           3 => ESC_URL (URL_2x) & " 2x",
+                           4 => ESC_Attr (Implode (" ", Class)),
+                           5 => Helpers.Image (As_Integer (Get (Args_3, "height"))),
+                           6 => Helpers.Image (As_Integer (Get (Args_3, "width"))),
+                           7 => -Extra_Attr
+                         ]
                        );
                   begin
                      --

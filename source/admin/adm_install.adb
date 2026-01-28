@@ -441,38 +441,38 @@ is
             Compat := +Sprintf (
                 -- translators: 1: URL to WordPress release notes, 2: WordPress version number, 3: Minimum required PHP version number, 4: Minimum required MySQL version number, 5: Current PHP version number, 6: Current MySQL version number.
                 abs "You cannot install because <a href=""%1$s"">WordPress %2$s</a> requires PHP version %3$s or higher and MySQL version %4$s or higher. You are running PHP version %5$s and MySQL version %6$s.",
-                To_List (List => (
-                1 => +Version_URL,
-                2 => +Wp_Version,
-                3 => +Required_PHP_Version,
-                4 => +Required_MySQL_Version,
-                5 => +Php_Version,
-                6 => +Mysql_Version
-                ))
+                [
+                  1 => Version_URL,
+                  2 => Wp_Version,
+                  3 => Required_PHP_Version,
+                  4 => Required_MySQL_Version,
+                  5 => Php_Version,
+                  6 => Mysql_Version
+                ]
              ) & Php_Update_Message;
 
          elsif not Php_Compat then
             Compat := +Sprintf (
                 -- translators: 1: URL to WordPress release notes, 2: WordPress version number, 3: Minimum required PHP version number, 4: Current PHP version number.
                 abs "You cannot install because <a href=""%1$s"">WordPress %2$s</a> requires PHP version %3$s or higher. You are running version %4$s.",
-                To_List (List => (
-                1 => +Version_URL,
-                2 => +Wp_Version,
-                3 => +Required_PHP_Version,
-                4 => +Php_Version
-                ))
+                [
+                  1 => Version_URL,
+                  2 => Wp_Version,
+                  3 => Required_PHP_Version,
+                  4 => Php_Version
+                ]
             ) & Php_Update_Message;
 
          elsif not Mysql_Compat then
             Compat := +Sprintf (
                 -- translators: 1: URL to WordPress release notes, 2: WordPress version number, 3: Minimum required MySQL version number, 4: Current MySQL version number.
                 abs "You cannot install because <a href=""%1$s"">WordPress %2$s</a> requires MySQL version %3$s or higher. You are running version %4$s.",
-                To_List (List => (
-                1 => +Version_URL,
-                2 => +Wp_Version,
-                3 => +Required_MySQL_Version,
-                4 => +Mysql_Version
-                ))
+                [
+                  1 => Version_URL,
+                  2 => Wp_Version,
+                  3 => Required_MySQL_Version,
+                  4 => Mysql_Version
+                ]
              );
          end if;
 

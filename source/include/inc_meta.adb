@@ -508,9 +508,10 @@ is
                   Object_Ids := WpDB.Get_Col (WpDB.Prepare (
                     "SELECT " & Type_Column &
                     " FROM table WHERE meta_key = %s AND meta_value = %s",
-                    To_List (List => (
-                      1 => +Meta_Key_2,
-                      2 => +Meta_Value_3))));
+                    [
+                      1 => Meta_Key_2,
+                      2 => Meta_Value_3
+                    ]));
                else
                   Object_Ids := WpDB.Get_Col (WpDB.Prepare (
                     "SELECT " & Type_Column & " FROM table WHERE meta_key = %s",

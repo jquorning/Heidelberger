@@ -9,7 +9,6 @@
 with Php.Strings;
 
 with Constants;
-with Globals;
 with Lists;
 with UStrings;
 
@@ -106,10 +105,10 @@ is
       use UStrings;
       use Inc_Formatting;
 
-      Locations : List_Type := To_List (List => (
-         +Constants.WP_LANG_DIR & "/plugins",
-         +Constants.WP_LANG_DIR & "/themes"
-      ));
+      Locations : List_Type := [
+         Constants.WP_LANG_DIR & "/plugins",
+         Constants.WP_LANG_DIR & "/themes"
+      ];
       Mofile : UString;
       Path   : UString;
    begin

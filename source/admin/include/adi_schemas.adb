@@ -649,13 +649,13 @@ is
                     Wp_Parse_Args (Options, Defaults);
 
                   -- Set autoload to no for these options.
-                  Fat_Options : constant List_Type := To_List (List => (
-                    +"moderation_keys",
-                    +"recently_edited",
-                    +"disallowed_keys",
-                    +"uninstall_plugins",
-                    +"auto_plugin_theme_update_emails"
-                  ));
+                  Fat_Options : constant List_Type := [
+                    "moderation_keys",
+                    "recently_edited",
+                    "disallowed_keys",
+                    "uninstall_plugins",
+                    "auto_plugin_theme_update_emails"
+                  ];
 
                   Keys : constant String :=
                     "'" & Implode ("', '", List_Type'(Array_Keys (Options_2))) & "'";
@@ -694,11 +694,11 @@ is
 
                         Append (Insert, String (
                                 WpDB.Prepare ("(%s, %s, %s)",
-                                              To_List (List => (
-                                                1 => +Option,
-                                                2 => +As_String (Value),
-                                                3 => Autoload))
-                                             )));
+                                              [
+                                                1 => Option,
+                                                2 => As_String (Value),
+                                                3 => -Autoload
+                                              ])));
                      end;
                      << Continue >>
                   end loop;
@@ -722,84 +722,84 @@ is
 
       declare
          -- Delete unused options.
-         Unusedoptions : constant List_Type := To_List (List => (
-                +"blodotgsping_url",
-                +"bodyterminator",
-                +"emailtestonly",
-                +"phoneemail_separator",
-                +"smilies_directory",
-                +"subjectprefix",
-                +"use_bbcode",
-                +"use_blodotgsping",
-                +"use_phoneemail",
-                +"use_quicktags",
-                +"use_weblogsping",
-                +"weblogs_cache_file",
-                +"use_preview",
-                +"use_htmltrans",
-                +"smilies_directory",
-                +"fileupload_allowedusers",
-                +"use_phoneemail",
-                +"default_post_status",
-                +"default_post_category",
-                +"archive_mode",
-                +"time_difference",
-                +"links_minadminlevel",
-                +"links_use_adminlevels",
-                +"links_rating_type",
-                +"links_rating_char",
-                +"links_rating_ignore_zero",
-                +"links_rating_single_image",
-                +"links_rating_image0",
-                +"links_rating_image1",
-                +"links_rating_image2",
-                +"links_rating_image3",
-                +"links_rating_image4",
-                +"links_rating_image5",
-                +"links_rating_image6",
-                +"links_rating_image7",
-                +"links_rating_image8",
-                +"links_rating_image9",
-                +"links_recently_updated_time",
-                +"links_recently_updated_prepend",
-                +"links_recently_updated_append",
-                +"weblogs_cacheminutes",
-                +"comment_allowed_tags",
-                +"search_engine_friendly_urls",
-                +"default_geourl_lat",
-                +"default_geourl_lon",
-                +"use_default_geourl",
-                +"weblogs_xml_url",
-                +"new_users_can_blog",
-                +"_wpnonce",
-                +"_wp_http_referer",
-                +"Update",
-                +"action",
-                +"rich_editing",
-                +"autosave_interval",
-                +"deactivated_plugins",
-                +"can_compress_scripts",
-                +"page_uris",
-                +"update_core",
-                +"update_plugins",
-                +"update_themes",
-                +"doing_cron",
-                +"random_seed",
-                +"rss_excerpt_length",
-                +"secret",
-                +"use_linksupdate",
-                +"default_comment_status_page",
-                +"wporg_popular_tags",
-                +"what_to_show",
-                +"rss_language",
-                +"language",
-                +"enable_xmlrpc",
-                +"enable_app",
-                +"embed_autourls",
-                +"default_post_edit_rows",
-                +"gzipcompression",
-                +"advanced_edit"
-              ));
+         Unusedoptions : constant List_Type := [
+                "blodotgsping_url",
+                "bodyterminator",
+                "emailtestonly",
+                "phoneemail_separator",
+                "smilies_directory",
+                "subjectprefix",
+                "use_bbcode",
+                "use_blodotgsping",
+                "use_phoneemail",
+                "use_quicktags",
+                "use_weblogsping",
+                "weblogs_cache_file",
+                "use_preview",
+                "use_htmltrans",
+                "smilies_directory",
+                "fileupload_allowedusers",
+                "use_phoneemail",
+                "default_post_status",
+                "default_post_category",
+                "archive_mode",
+                "time_difference",
+                "links_minadminlevel",
+                "links_use_adminlevels",
+                "links_rating_type",
+                "links_rating_char",
+                "links_rating_ignore_zero",
+                "links_rating_single_image",
+                "links_rating_image0",
+                "links_rating_image1",
+                "links_rating_image2",
+                "links_rating_image3",
+                "links_rating_image4",
+                "links_rating_image5",
+                "links_rating_image6",
+                "links_rating_image7",
+                "links_rating_image8",
+                "links_rating_image9",
+                "links_recently_updated_time",
+                "links_recently_updated_prepend",
+                "links_recently_updated_append",
+                "weblogs_cacheminutes",
+                "comment_allowed_tags",
+                "search_engine_friendly_urls",
+                "default_geourl_lat",
+                "default_geourl_lon",
+                "use_default_geourl",
+                "weblogs_xml_url",
+                "new_users_can_blog",
+                "_wpnonce",
+                "_wp_http_referer",
+                "Update",
+                "action",
+                "rich_editing",
+                "autosave_interval",
+                "deactivated_plugins",
+                "can_compress_scripts",
+                "page_uris",
+                "update_core",
+                "update_plugins",
+                "update_themes",
+                "doing_cron",
+                "random_seed",
+                "rss_excerpt_length",
+                "secret",
+                "use_linksupdate",
+                "default_comment_status_page",
+                "wporg_popular_tags",
+                "what_to_show",
+                "rss_language",
+                "language",
+                "enable_xmlrpc",
+                "enable_app",
+                "embed_autourls",
+                "default_post_edit_rows",
+                "gzipcompression",
+                "advanced_edit"
+              ];
       begin
          for Option of Unusedoptions loop
             Delete_Option (Option);
@@ -947,12 +947,11 @@ is
 
    procedure Populate_Roles_210
    is
-      use UStrings;
       use Inc_Capabilities;
       use type Wp_Role;
 
       Roles : constant List_Type :=
-        To_List (List => (+"administrator", +"editor"));
+        ["administrator", "editor"];
    begin
       for R of Roles loop
          declare

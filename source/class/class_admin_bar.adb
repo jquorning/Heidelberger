@@ -247,9 +247,12 @@ is
             X_Deprecated_Argument (
               "__METHOD__", -Version,
               Sprintf ("Use <code>%s</code> as the parent for the <code>%s</code> admin bar node instead of <code>%s</code>.",
-                To_List (List => (1 => New_Parent,
-                                  2 => Args_2.Id,
-                                  3 => Args_2.Parent))));
+                [
+                  1 => -New_Parent,
+                  2 => -Args_2.Id,
+                  3 => -Args_2.Parent
+                ]
+              ));
             Args_2.Parent := New_Parent;
          end if;
       end;
@@ -779,13 +782,11 @@ is
       Echo ("<li id=""" & ESC_Attr ("wp-admin-bar-" & (-Node.Id)) & """menuclass>");
 
       if Has_Link then
-         Attributes := To_List (List => (+"onclick", +"target", +"title",
-                                         +"rel", +"lang", +"dir"));
+         Attributes := ["onclick", "target", "title", "rel", "lang", "dir"];
          Echo ("<a class=""ab-item""aria_attributes href=""" & ESC_URL (-Node.Href) &
                """");
       else
-         Attributes := To_List (List => (+"onclick", +"target", +"title",
-                                         +"rel", +"lang", +"dir"));
+         Attributes := ["onclick", "target", "title", "rel", "lang", "dir"];
          Echo ("<div class=""ab-item ab-empty-item""" & (-Aria_Attributes));
       end if;
 

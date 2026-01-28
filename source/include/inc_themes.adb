@@ -2914,10 +2914,10 @@ is
               Sprintf (
                 -- translators: 1: title-tag, 2: wp_loaded
                 abs "Theme support for %1s should be registered before the %2s hook.",
-                To_List (List => (
-                  1 => +"<code>title-tag</code>",
-                  2 => +"<code>wp_loaded</code>"
-                ))),
+                [
+                  1 => "<code>title-tag</code>",
+                  2 => "<code>wp_loaded</code>"
+                ]),
                 "4.1.0"
             );
             raise Support_Error;
@@ -3252,7 +3252,6 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
       use Inc_Functions;
       use Inc_REST_API;
 
@@ -3289,8 +3288,8 @@ is
 
       if
         not In_List (As_String (Get (Args_2, "type")),
-                     To_List (List => (+"string", +"boolean", +"integer",
-                                       +"number", +"array", +"object")), True)
+                     List_Type'["string", "boolean", "integer",
+                                "number", "array", "object"], True)
       then
          raise Feature_Error with "invalid_type";
          -- return new WP_Error(
@@ -3313,7 +3312,7 @@ is
       if
         False /= As_Boolean (Get (Args_2, "show_in_rest")) and then
         In_List (As_String (Get (Args_2, "type")),
-                            To_List (List => (+"array", +"object")), True)
+                            List_Type'["array", "object"], True)
       then
          if
            Kind_Of (Get (Args_2, "show_in_rest")) not in Kind_Array or else
@@ -3544,7 +3543,6 @@ is
       use Php.Files;
       use Php.Strings;
       use Binder;
-      use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
@@ -3572,14 +3570,15 @@ is
       -- the values should contain any characters needing slashes anyway.
       --
       declare
-         Keys : constant List_Type := To_List (List => (
-           +"changeset_uuid",
-           +"customize_changeset_uuid",
-           +"customize_theme",
-           +"theme",
-           +"customize_messenger_channel",
-           +"customize_autosaved"
-         ));
+         Keys : constant List_Type :=
+           [
+             "changeset_uuid",
+             "customize_changeset_uuid",
+             "customize_theme",
+             "theme",
+             "customize_messenger_channel",
+             "customize_autosaved"
+           ];
 
          Input_Vars : constant Array_Type :=
            Array_Merge (
@@ -3969,7 +3968,6 @@ is
 
    procedure Create_Initial_Theme_Features
    is
-      use UStrings;
       use Inc_L10n;
    begin
       Register_Theme_Feature (
@@ -4001,75 +3999,52 @@ is
                 ))
         );
       Register_Theme_Feature (
-                "custom-background",
-                To_Array (List => (
-                        Build ("description",  abs "Custom background if defined by the theme."),
-                        Build ("type",         "object"),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("properties", To_Array (List => (
-                                                Build ("default-image",      To_Array (List => (
-                                                        Build ("type",   "string"),
-                                                        Build ("format", "uri")
-                                                ))),
-                                                Build ("default-preset",     To_Array (List => (
-                                                        Build ("type", "string"),
-                                                        Build ("enum", To_List (List => (
-                                                                +"default",
-                                                                +"fill",
-                                                                +"fit",
-                                                                +"repeat",
-                                                                +"custom"
-                                                        )))
-                                                ))),
-                                                Build ("default-position-x", To_Array (List => (
-                                                        Build ("type", "string"),
-                                                        Build ("enum", To_List (List => (
-                                                                +"left",
-                                                                +"center",
-                                                                +"right"
-                                                        )))
-                                                ))),
-                                                Build ("default-position-y", To_Array (List => (
-                                                        Build ("type", "string"),
-                                                        Build ("enum", To_List (List => (
-                                                                +"left",
-                                                                +"center",
-                                                                +"right"
-                                                        )))
-                                                ))),
-                                                Build ("default-size",       To_Array (List => (
-                                                        Build ("type", "string"),
-                                                        Build ("enum", To_List (List => (
-                                                                +"auto",
-                                                                +"contain",
-                                                                +"cover"
-                                                        )))
-                                                ))),
-                                                Build ("default-repeat",     To_Array (List => (
-                                                        Build ("type", "string"),
-                                                        Build ("enum", To_List (List => (
-                                                                +"repeat-x",
-                                                                +"repeat-y",
-                                                                +"repeat",
-                                                                +"no-repeat"
-                                                        )))
-                                                ))),
-                                                Build ("default-attachment", To_Array (List => (
-                                                        Build ("type", "string"),
-                                                        Build ("enum", To_List (List => (
-                                                                +"scroll",
-                                                                +"fixed"
-                                                        )))
-                                                ))),
-                                                Build ("default-color",      To_Array (List => (1 =>
-                                                        Build ("type", "string")
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
-        );
+        "custom-background",
+        To_Array (List => (
+          Build ("description",  abs "Custom background if defined by the theme."),
+          Build ("type",         "object"),
+          Build ("show_in_rest", To_Array (List => (1 =>
+            Build ("schema",      To_Array (List => (1 =>
+              Build ("properties", To_Array (List => (
+                Build ("default-image",      To_Array (List => (
+                  Build ("type",   "string"),
+                  Build ("format", "uri")
+                ))),
+                Build ("default-preset",     To_Array (List => (
+                  Build ("type", "string"),
+                  Build ("enum", List_Type'["default", "fill",
+                                            "fit", "repeat", "custom"])
+                ))),
+                Build ("default-position-x", To_Array (List => (
+                  Build ("type", "string"),
+                  Build ("enum", List_Type'["left", "center", "right"])
+                ))),
+                Build ("default-position-y", To_Array (List => (
+                  Build ("type", "string"),
+                  Build ("enum", List_Type'["left", "center", "right"])
+                ))),
+                Build ("default-size",       To_Array (List => (
+                  Build ("type", "string"),
+                  Build ("enum", List_Type'["auto", "contain", "cover"])
+                ))),
+                Build ("default-repeat",     To_Array (List => (
+                  Build ("type", "string"),
+                  Build ("enum", List_Type'["repeat-x", "repeat-y",
+                                            "repeat", "no-repeat"])
+                ))),
+                Build ("default-attachment", To_Array (List => (
+                  Build ("type", "string"),
+                  Build ("enum", List_Type'["scroll", "fixed"])
+                ))),
+                Build ("default-color",      To_Array (List => (1 =>
+                  Build ("type", "string")
+                )))
+              )))
+            )))
+          )))
+        ))
+      );
+
       Register_Theme_Feature (
                 "custom-header",
                 To_Array (List => (
@@ -4272,29 +4247,25 @@ is
                         Build ("show_in_rest", True)
                 ))
         );
+
       Register_Theme_Feature (
-                "html5",
-                To_Array (List => (
-                        Build ("type",         "array"),
-                        Build ("description",  abs "Allows use of HTML5 markup for search forms, comment forms, comment lists, gallery, and caption."),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("items", To_Array (List => (
-                                                Build ("type", "string"),
-                                                Build ("enum", To_List (List => (
-                                                        +"search-form",
-                                                        +"comment-form",
-                                                        +"comment-list",
-                                                        +"gallery",
-                                                        +"caption",
-                                                        +"script",
-                                                        +"style"
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
-        );
+        "html5",
+        To_Array (List => (
+          Build ("type",         "array"),
+          Build ("description",  abs "Allows use of HTML5 markup for search forms, comment forms, comment lists, gallery, and caption."),
+          Build ("show_in_rest", To_Array (List => (1 =>
+            Build ("schema", To_Array (List => (1 =>
+              Build ("items", To_Array (List => (
+                Build ("type", "string"),
+                Build ("enum", List_Type'["search-form", "comment-form",
+                                          "comment-list", "gallery",
+                                          "caption", "script", "style"])
+              )))
+            )))
+          )))
+        ))
+      );
+
       Register_Theme_Feature (
                 "post-formats",
                 To_Array (List => (
@@ -4318,21 +4289,23 @@ is
                         )))
                 ))
         );
+
       Register_Theme_Feature (
-                "post-thumbnails",
-                To_Array (List => (
-                        Build ("type",         "array"),
-                        Build ("description",  abs "The post types that support thumbnails or true if all post types are supported."),
-                        Build ("show_in_rest", To_Array (List => (
-                                Build ("type",   To_List (List => (+"boolean", +"array"))),
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("items", To_Array (List => (1 =>
-                                                Build ("type", "string")
-                                        )))
-                                )))
-                        )))
-                ))
-        );
+        "post-thumbnails",
+        To_Array (List => (
+          Build ("type",         "array"),
+          Build ("description",  abs "The post types that support thumbnails or true if all post types are supported."),
+          Build ("show_in_rest", To_Array (List => (
+            Build ("type",   List_Type'["boolean", "array"]),
+            Build ("schema", To_Array (List => (1 =>
+              Build ("items", To_Array (List => (1 =>
+                Build ("type", "string")
+              )))
+            )))
+          )))
+        ))
+      );
+
       Register_Theme_Feature (
                 "responsive-embeds",
                 To_Array (List => (
@@ -4388,7 +4361,6 @@ is
 
    procedure X_Add_Default_Theme_Supports
    is
-      use UStrings;
 --    use Inc_Functions;
 --    use Inc_Plugins;
    begin
@@ -4405,9 +4377,9 @@ is
       -- form (which use default template functions) and `[caption]` and `[gallery]`
       -- shortcodes. Other blocks contain their own HTML5 markup.
       --
-      Add_Theme_Support ("html5", To_List (List => (+"comment-form", +"comment-list",
-                                  +"search-form", +"gallery", +"caption",
-                                  +"style", +"script")));
+      Add_Theme_Support ("html5", List_Type'["comment-form", "comment-list",
+                                             "search-form", "gallery", "caption",
+                                             "style", "script"]);
       Add_Theme_Support ("automatic-feed-links");
 
 --    Add_Filter ("should_load_separate_core_block_assets", X_Return_True'Access);

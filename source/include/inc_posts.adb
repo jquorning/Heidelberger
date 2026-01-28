@@ -90,10 +90,9 @@ is
                         Query_Var             => Null_UString,
                         Delete_With_User      => True,
                         Supports              =>
-                          To_List (List => (+"title", +"editor", +"author",
-                                            +"thumbnail", +"excerpt", +"trackbacks",
-                                            +"custom-fields", +"comments",
-                                            +"revisions", +"post-formats")),
+                          ["title", "editor", "author", "thumbnail", "excerpt",
+                           "trackbacks", "custom-fields", "comments",
+                           "revisions", "post-formats"],
                         Show_In_REST          => True,
                         REST_Base             => +"posts",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
@@ -142,10 +141,9 @@ is
                         Query_Var             => Null_UString,
                         Delete_With_User      => True,
                         Supports              =>
-                          To_List (List => (+"title", +"editor", +"author",
-                                            +"thumbnail", +"page-attributes",
-                                            +"custom-fields", +"comments",
-                                            +"revisions")),
+                          ["title", "editor", "author", "thumbnail",
+                           "page-attributes", "custom-fields", "comments",
+                           "revisions"],
                         Show_In_REST          => True,
                         REST_Base             => +"pages",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
@@ -203,7 +201,7 @@ is
                         Show_In_Nav_Menus     => False,
                         Delete_With_User      => True,
                         Supports              =>
-                          To_List (List => (+"title", +"author", +"comments")),
+                          ["title", "author", "comments"],
                         Show_In_REST          => True,
                         REST_Base             => +"media",
                         REST_Controller_Class => +"WP_REST_Attachments_Controller",
@@ -375,7 +373,7 @@ is
                         Delete_With_User => False,
                         Can_Export       => True,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
-                        Supports         => To_List (List => (+"title", +"revisions")),
+                        Supports         => ["title", "revisions"],
                         Capabilities     => Arrays.To_Array ((
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_post",            "edit_theme_options"),
@@ -451,7 +449,7 @@ is
                         Query_Var        => Null_UString,
                         Can_Export       => False,
                         Delete_With_User => False,
-                        Supports         => To_List (List => (+"title", +"author")),
+                        Supports         => ["title", "author"],
                         Capability_Type_String => +"customize_changeset",
                         Capability_Type_Array  => Empty_Array,
                         Capabilities     => Arrays.To_Array ((
@@ -659,11 +657,7 @@ is
                                 Build ("delete_others_posts",    "delete_others_posts")
                         )),
                         Map_Meta_Cap          => True,
-                        Supports              => To_List (List => (
-                                +"title",
-                                +"editor",
-                                +"revisions"
-                        )),
+                        Supports              => ["title", "editor", "revisions"],
 
                         -- Added
                         Hierarchical           => False,
@@ -755,14 +749,8 @@ is
                                 Build ("read_private_posts",     "edit_theme_options")
                         )),
                         Map_Meta_Cap          => True,
-                        Supports              => To_List (List => (
-                                +"title",
-                                +"slug",
-                                +"excerpt",
-                                +"editor",
-                                +"revisions",
-                                +"author"
-                        )),
+                        Supports              => ["title", "slug", "excerpt",
+                                                  "editor", "revisions", "author"],
 
                         -- Added
                         Hierarchical           => False,
@@ -852,14 +840,8 @@ is
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("read_private_posts",     "edit_theme_options")
                         )),
-                        Supports              => To_List (List => (
-                                +"title",
-                                +"slug",
-                                +"excerpt",
-                                +"editor",
-                                +"revisions",
-                                +"author"
-                        )),
+                        Supports              => ["title", "slug", "excerpt",
+                                                  "editor", "revisions", "author"],
 
                         -- Added
                         Hierarchical           => False,
@@ -921,11 +903,7 @@ is
                                 Build ("delete_others_posts",    "edit_theme_options")
                         )),
                         Map_Meta_Cap => True,
-                        Supports     => To_List (List => (
-                                +"title",
-                                +"editor",
-                                +"revisions"
-                        )),
+                        Supports     => ["title", "editor", "revisions"],
 
                         -- Added
                         Labels                 => Empty_Array,
@@ -1016,11 +994,7 @@ is
                         )),
                         REST_Base             => +"navigation",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
-                        Supports              => To_List (List => (
-                                +"title",
-                                +"editor",
-                                +"revisions"
-                        )),
+                        Supports              => ["title", "editor", "revisions"],
 
                         -- Added
 --                        Internal               => False,
@@ -1879,7 +1853,7 @@ is
       elsif
         "attachment" = Post_2.Post_Type and then
         not In_List (-Post_Status,
-                     To_List (List => (+"private", +"trash", +"auto-draft")), True)
+                     List_Type'["private", "trash", "auto-draft"], True)
       then
          --
          -- Ensure uninherited attachments have a permitted status either "private",
@@ -3639,8 +3613,9 @@ is
       use Wp_Common;
 --    use Inc_Formatting;
 
-      Int_Fields : constant List_Type := To_List (List => (+"ID", +"post_parent",
-                                                           +"menu_order"));
+      Int_Fields : constant List_Type :=
+        ["ID", "post_parent", "menu_order"];
+
       Value_2    : Array_Type := Value;
       pragma Unreferenced (Value);
       Array_Int_Fields : constant List_Type := To_List ("ancestors");
@@ -3674,8 +3649,8 @@ is
          end if;
 
          if "edit" = Context then
-            Format_To_Edit := To_List (List => (+"post_content", +"post_excerpt",
-                                                +"post_title",   +"post_password"));
+            Format_To_Edit := ["post_content", "post_excerpt",
+                               "post_title",   "post_password"];
 
             if Prefixed then
                --
@@ -6647,7 +6622,8 @@ is
          --    Post_Types_2 := Post_Type;
          -- else
          Post_Types_2 : constant List_Type :=
-           To_List (List => (+Post_Type, +"attachment"));
+           [Post_Type, "attachment"];
+
 --       Post_Types_2 := To_Array (Post_Type, "attachment");
          -- end if;
 

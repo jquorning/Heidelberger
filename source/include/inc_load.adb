@@ -47,7 +47,6 @@ is
             return String
    is
       use Php.Lists;
-      use UStrings;
 
       Protocol : constant String :=
         (if Isset (Binder.X_SERVER, "SERVER_PROTOCOL")
@@ -55,7 +54,7 @@ is
          else "");
 
       Protocols : constant List_Type :=
-        To_List (List => (+"HTTP/1.1", +"HTTP/2", +"HTTP/2.0", +"HTTP/3"));
+        ["HTTP/1.1", "HTTP/2", "HTTP/2.0", "HTTP/3"];
    begin
       if not In_List (Protocol, Protocols, True) then
          return "HTTP/1.0"; -- protocol =
@@ -658,8 +657,10 @@ is
             Php.Strings.Sprintf (
               -- translators: 1: table_prefix, 2: wp-config.php
               abs "<strong>Error:</strong> %1s in %2s can only contain numbers, letters, and underscores.",
-              To_List (List => (1 => +"<code>table_prefix</code>",
-                                2 => +"<code>wp-config.php</code>"))
+              [
+                1 => "<code>table_prefix</code>",
+                2 => "<code>wp-config.php</code>"
+              ]
            ));
       end if;
    end Wp_Set_Wpdb_Vars;

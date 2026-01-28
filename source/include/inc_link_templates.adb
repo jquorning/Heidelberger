@@ -239,19 +239,20 @@ is
       use Inc_Taxonomys;
       use List_Vectors;
 
-      Rewrite_Code : constant List_Type := To_List (List => (
-        +"%year%",
-        +"%monthnum%",
-        +"%day%",
-        +"%hour%",
-        +"%minute%",
-        +"%second%",
-        +(if Leavename then "" else "%postname%"),
-        +"%post_id%",
-        +"%category%",
-        +"%author%",
-        +(if Leavename then "" else "%pagename%")
-      ));
+      Rewrite_Code : constant List_Type :=
+        [
+          "%year%",
+          "%monthnum%",
+          "%day%",
+          "%hour%",
+          "%minute%",
+          "%second%",
+          (if Leavename then "" else "%postname%"),
+          "%post_id%",
+          "%category%",
+          "%author%",
+          (if Leavename then "" else "%pagename%")
+        ];
 
       Sample : Boolean;
       Permalink : UString;
@@ -381,24 +382,24 @@ is
                   -- stored post_date value, which should be parsed as local time
                   -- regardless of the default PHP timezone.
                   declare
-                     L : constant List_Type := To_List (List => (+"-", +":"));
+                     L : constant List_Type := ["-", ":"];
 
                      Date : constant List_Type :=
                        Explode (" ", Str_Replace (L, " ", -Post.Post_Date));
 
-                     Rewrite_Replace : constant List_Type := To_List (List => (
-                        +Date (1),
-                        +Date (2),
-                        +Date (3),
-                        +Date (4),
-                        +Date (5),
-                        +Date (6),
-                        Post.Post_Name,
-                        +Helpers.Image (Integer (Post.Id)),
-                        +Category.First_Element, -- First_Element added
-                        Author,
-                        Post.Post_Name
-                     ));
+                     Rewrite_Replace : constant List_Type := [
+                        Date (1),
+                        Date (2),
+                        Date (3),
+                        Date (4),
+                        Date (5),
+                        Date (6),
+                        -Post.Post_Name,
+                        Helpers.Image (Integer (Post.Id)),
+                        Category.First_Element, -- First_Element added
+                        -Author,
+                        -Post.Post_Name
+                     ];
                   begin
                      Permalink :=
                        +Home_URL (Str_Replace (Rewrite_Code,
@@ -3642,7 +3643,7 @@ is
       end if;
 
       if
-        not In_List (Scheme, To_List (List => (+"http", +"https", +"relative")), True)
+        not In_List (Scheme, List_Type'["http", "https", "relative"], True)
       then
          if Is_SSL then
             Scheme_2 := +"https";
@@ -4776,10 +4777,10 @@ is
                  then "https://secure.gravatar.com/avatar/" & (-Email_Hash)
                else
                  Sprintf ("http://%d.gravatar.com/avatar/%s",
-                          To_List (List => (
-                            1 => +Helpers.Image (Gravatar_Server),
-                            2 => Email_Hash
-                          ))));
+                          [
+                            1 => Helpers.Image (Gravatar_Server),
+                            2 => -Email_Hash
+                          ]));
 
             URL : constant String :=
               Add_Query_Arg (
@@ -4997,7 +4998,6 @@ is
                                          return String
    is
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Options;
@@ -5019,10 +5019,10 @@ is
          then
            Sprintf (
              "<a class=""privacy-policy-link"" href=""%s"">%s</a>",
-             To_List (List => (
-               1 => +ESC_URL (Privacy_Policy_URL),
-               2 => +ESC_HTML (Page_Title)
-             )))
+             [
+               1 => ESC_URL (Privacy_Policy_URL),
+               2 => ESC_HTML (Page_Title)
+             ])
          else "");
 
       --

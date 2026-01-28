@@ -801,13 +801,13 @@ is
                  "<li>" & Sprintf (
                    -- translators: 1: Database user, 2: Database name.
                    abs "Does the user %1s have permission to use the %2s database?",
-                   To_List (List => (
-                     1 => +"<code>" &
+                   [
+                     1 => "<code>" &
                           HTML_Special_Chars (-This.Dbuser, ENT_QUOTES) &
                           "</code>",
-                     2 => +"<code>" &
+                     2 => "<code>" &
                           HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"
-                   ))
+                   ]
                  ) & "</li>\n" &
 
                  "<li>" & Sprintf (
@@ -983,7 +983,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
       use Inc_Functions;
       use Inc_L10n;
 
@@ -1114,10 +1113,10 @@ is
                       -- translators: 1: Number of placeholders, 2: Number of
                       -- arguments passed.
                       abs "The query does not contain the correct number of placeholders (%1d) for the number of arguments passed (%2d).",
-                      To_List (List => (
-                        1 => +Helpers.Image (Placeholders),
-                        2 => +Helpers.Image (Args_Count)
-                      ))
+                      [
+                        1 => Helpers.Image (Placeholders),
+                        2 => Helpers.Image (Args_Count)
+                      ]
                     ),
                     "4.8.3");
 
@@ -1510,10 +1509,11 @@ is
               "<p>" & Sprintf (
                 -- translators: 1: wp-config.php, 2: Database host.
                 abs "This either means that the username and password information in your %1s file is incorrect or that contact with the database server at %2s could not be established. This could mean your host&#8217;s database server is down.",
-                To_List (List => (
-                  1 => +"<code>wp-config.php</code>",
-                  2 => +"<code>" & HTML_Special_Chars (-This.Dbhost, ENT_QUOTES) & "</code>"
-                ))
+                [
+                  1 => "<code>wp-config.php</code>",
+                  2 => "<code>" &
+                       HTML_Special_Chars (-This.Dbhost, ENT_QUOTES) & "</code>"
+                ]
               ) & "</p>\n" &
 
               "<ul>\n" &
@@ -2175,7 +2175,6 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
 
       Data_2 : Array_Type;
    begin
@@ -2183,7 +2182,7 @@ is
 
       if
         not In_List (Strtoupper (Typ),
-                      To_List (List => (+"REPLACE", +"INSERT")), True)
+                      List_Type'["REPLACE", "INSERT"], True)
       then
          return (Status => Error,
                  Rows   => 0);
@@ -2986,8 +2985,8 @@ is
          --       Typ  : String := -List.First_Element;
 
          --       Blob : constant List_Type :=
-         --         To_List (List => (+"BINARY", +"VARBINARY", +"TINYBLOB",
-         --                           +"MEDIUMBLOB", +"BLOB", +"LONGBLOB"));
+         --         ["BINARY", "VARBINARY", "TINYBLOB",
+         --                           "MEDIUMBLOB", "BLOB", "LONGBLOB"];
          --    begin
          --       -- A binary/blob means the whole query gets treated like this.
          --       if In_List (Strtoupper (Typ), Blob, True) then
@@ -3311,14 +3310,14 @@ is
          -- If any of the columns don't have one of these collations, it needs
          -- more sanity checking.
          declare
-            Safe_Collations : List_Type := To_List (List =>
-                       (+"utf8_bin",
-                        +"utf8_general_ci",
-                        +"utf8mb3_bin",
-                        +"utf8mb3_general_ci",
-                        +"utf8mb4_bin",
-                        +"utf8mb4_general_ci")
-            );
+            Safe_Collations : List_Type :=
+              ["utf8_bin",
+               "utf8_general_ci",
+               "utf8mb3_bin",
+               "utf8mb3_general_ci",
+               "utf8mb4_bin",
+               "utf8mb4_general_ci"
+              ];
          begin
             null;
             -- for Col of Value_Of (This.Col_Meta, Key => Table) loop
@@ -3977,7 +3976,6 @@ is
    is
       use Php.Misc;
       use Php.Strings;
-      use UStrings;
       use Class_Errors;
       use Inc_L10n;
       use Inc_Versions;
@@ -3989,10 +3987,10 @@ is
          return X_Construct
            ("database_version",
             Sprintf (abs "<strong>Error:</strong> WordPress %1s requires MySQL %2s or higher",
-            To_List (List => (
-              1 => +Wp_Version,
-              2 => +Required_MySQL_Version
-            ))
+            [
+              1 => Wp_Version,
+              2 => Required_MySQL_Version
+            ]
           ));
       end if;
 

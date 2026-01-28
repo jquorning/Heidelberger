@@ -63,11 +63,11 @@ is
       Message := +Sprintf (
         -- translators: 1: wp_enqueue_scripts, 2: admin_enqueue_scripts, 3: login_enqueue_scripts
         abs "Scripts and styles should not be registered or enqueued until the %1s, %2s, or %3s hooks.",
-        To_List (List => (
-          1 => +"<code>wp_enqueue_scripts</code>",
-          2 => +"<code>admin_enqueue_scripts</code>",
-          3 => +"<code>login_enqueue_scripts</code>"
-        )));
+        [
+          1 => "<code>wp_enqueue_scripts</code>",
+          2 => "<code>admin_enqueue_scripts</code>",
+          3 => "<code>login_enqueue_scripts</code>"
+        ]);
 
       if Handle /= "" then
          Append (Message, " " & Sprintf (
@@ -140,7 +140,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
       use Class_Scripts;
       use Inc_Functions;
       use Inc_L10n;
@@ -153,10 +152,10 @@ is
            Sprintf (
              -- translators: 1: <script>, 2: wp_add_inline_script()
              abs "Do not pass %1s tags to %2s.",
-             To_List (List => (
-               1 => +"<code>&lt;script&gt;</code>",
-               2 => +"<code>wp_add_inline_script()</code>"
-             ))
+             [
+               1 => "<code>&lt;script&gt;</code>",
+               2 => "<code>wp_add_inline_script()</code>"
+             ]
            ),
            "4.5.0"
          );

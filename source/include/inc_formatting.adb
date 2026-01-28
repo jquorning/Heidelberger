@@ -45,7 +45,6 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
@@ -103,7 +102,7 @@ is
         X_X ("&#8212;", "em dash");
 
       Default_No_Texturize_Tags : constant List_Type :=
-        To_List (List => (+"pre", +"code", +"kbd", +"style", +"script", +"tt"));
+        ["pre", "code", "kbd", "style", "script", "tt"];
 
       Default_No_Texturize_Shortcodes : constant List_Type :=
         To_List ("code");
@@ -177,13 +176,12 @@ is
          end if;
 
          Static_Characters :=
-           List_Merge (To_List (List => (+"...", +"``", +"\\", +" (tm)")),
+           List_Merge (List_Type'["...", "``", "\\", " (tm)"],
                        Cockney);
 
          Static_Replacements :=
            List_Merge (
-             To_List (List => (+"&#8230;", +Opening_Quote, +Closing_Quote,
-                               +" &#8482;")),
+             List_Type'["&#8230;", Opening_Quote, Closing_Quote, " &#8482;"],
              Cockneyreplace);
 
          -- Pattern-based replacements of characters.
@@ -1175,8 +1173,8 @@ is
          Quote_Style_2 := ENT_QUOTES + ENT_XML1; -- or
       elsif True
 --      not In_Array (Quote_Style,
---                    To_List (List => (ENT_NOQUOTES, ENT_COMPAT, ENT_QUOTES,
---                                      +"single", +"double")), True)
+--                    list_type'[ENT_NOQUOTES, ENT_COMPAT, ENT_QUOTES,
+--                                      "single", "double"], True)
       then
          Quote_Style_2 := ENT_QUOTES;
       end if;
@@ -1200,7 +1198,7 @@ is
       end if;
 
       if
-        In_List (-Charset_2, To_List (List => (+"utf8", +"utf-8", +"UTF8")), True)
+        In_List (-Charset_2, List_Type'["utf8", "utf-8", "UTF8"], True)
       then
          Charset_2 := +"UTF-8";
       end if;
@@ -1339,7 +1337,6 @@ is
                                    return String
    is
       use Php.Lists;
-      use UStrings;
       use Inc_Options;
 
    begin
@@ -1352,7 +1349,7 @@ is
       if not Static_Is_UTF8_Bool then
          Static_Is_UTF8 :=
            In_List (Get_Option ("blog_charset"),
-                     To_List (List => (+"utf8", +"utf-8", +"UTF8", +"UTF-8")), True);
+                    List_Type'["utf8", "utf-8", "UTF8", "UTF-8"], True);
          Static_Is_UTF8_Bool := True;
       end if;
 
@@ -4277,7 +4274,7 @@ is
                          URL_2);
 
          Strip : constant List_Type :=
-           To_List (List => (+"%0d", +"%0a", +"%0D", +"%0A"));
+           ["%0d", "%0a", "%0D", "%0A"];
 
          URL_4 : constant String :=
            (if 0 /= Stripos (URL_3, "mailto:")
@@ -4300,7 +4297,7 @@ is
          if
            Strpos (URL_5, ":") = 0 and then
            not In_List (URL_5 (URL_5'First) & "",
-                        To_List (List => (+"/", +"#", +"?")), True) and then
+                        List_Type'["/", "#", "?"], True) and then
            not Preg_Match ("/^[a-z0-9-]+?\.php/i", URL_5)
          then
             URL_6 := +"http://" & URL_5;
@@ -4350,8 +4347,8 @@ is
                declare
                   End_Dirty : constant String := Str_Replace (-Front, "", -URL_6);
                   End_Clean : constant String :=
-                    Str_Replace (To_List (List => (+"[", +"]")),
-                                 To_List (List => (+"%5B", +"%5D")), End_Dirty);
+                    Str_Replace (List_Type'["[", "]"],
+                                 List_Type'["%5B", "%5D"], End_Dirty);
                begin
                   URL_6 := +Str_Replace (End_Dirty, End_Clean, -URL_6);
                end;
@@ -5486,12 +5483,11 @@ is
       use Php.Files;
       use Php.HTML;
       use Php.Strings;
-      use UStrings;
    begin
       return
         URL_Decode (
           Basename (
-            Str_Replace (To_List (List => (+"%2F", +"%5C")), "/",
+            Str_Replace (List_Type'["%2F", "%5C"], "/",
                          URL_Encode (Path)),
             Suffix));
    end Wp_Basename;

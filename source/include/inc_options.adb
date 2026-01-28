@@ -100,10 +100,10 @@ is
               Sprintf (
                 -- translators: 1: Deprecated option key, 2: New option key.
                 abs "The ""%1s"" option key has been renamed to ""%2s"".",
-                To_List (List => (
-                  1 => +Option,
-                  2 => +Get_As_String (Deprecated_Keys, Option)
-                ))
+                [
+                  1 => Option,
+                  2 => Get_As_String (Deprecated_Keys, Option)
+                ]
               )
             );
             return Get_Option (Get_As_String (Deprecated_Keys, Option), Default);
@@ -294,8 +294,8 @@ is
       end if;
 
       if
-        In_List (Option, To_List (List => (+"siteurl", +"home", +"category_base",
-                                           +"tag_base")), True)
+        In_List (Option, List_Type'["siteurl", "home", "category_base",
+                                    "tag_base"], True)
       then
          Value := From_String (Un_Trailing_Slash_It (As_String (Value)));
       end if;
@@ -591,10 +591,10 @@ is
               Sprintf (
                 -- translators: 1: Deprecated option key, 2: New option key.
                 abs "The ""%1s"" option key has been renamed to ""%2s"".",
-                To_List (List => (
-                  1 => +Option,
-                  2 => +Get_As_String (Deprecated_Keys, Option)
-                ))
+                [
+                  1 => Option,
+                  2 => Get_As_String (Deprecated_Keys, Option)
+                ]
               )
             );
             return Update_Option
@@ -785,7 +785,6 @@ is
    is
       use Php.Strings;
       use Php.Types;
-      use UStrings;
       use Wp_Common;
       use Class_WpDB;
       use Inc_Caches;
@@ -825,10 +824,10 @@ is
               Sprintf (
                 -- translators: 1: Deprecated option key, 2: New option key.
                 abs "The ""%1s"" option key has been renamed to ""%2s"".",
-                To_List (List => (
-                  1 => +Option,
-                  2 => +Get_As_String (Deprecated_Keys, Option)
-                ))
+                [
+                  1 => Option,
+                  2 => Get_As_String (Deprecated_Keys, Option)
+                ]
               )
             );
             return Add_Option (Get_As_String (Deprecated_Keys, Option),
@@ -886,10 +885,11 @@ is
                 "VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `option_name` = " &
                 "VALUES(`option_name`), `option_value` = " &
                 "VALUES(`option_value`), `autoload` = VALUES(`autoload`)",
-                To_List (List => (
-                  1 => +Option,
-                  2 => +As_String (Serialized_Value),
-                  3 => +Boolean'Image (Autoload))));
+                [
+                  1 => Option,
+                  2 => As_String (Serialized_Value),
+                  3 => Boolean'Image (Autoload)
+                ]);
 
             Result : constant Rows_Result_Type :=
               Globals.WpDB.Query (Statement);
@@ -1385,11 +1385,11 @@ is
           "AND b.option_name = " &
           "CONCAT( '_transient_timeout_', SUBSTRING( a.option_name, 12 ) ) " &
           "AND b.option_value < %d",
-          To_List (List => (
-            1 => +(WpDB.ESC_Like ("_transient_") & "%"),
-            2 => +(WpDB.ESC_Like ("_transient_timeout_") & "%"),
-            3 => +Helpers.Image (Php.Misc.Time)
-          ))
+          [
+            1 => WpDB.ESC_Like ("_transient_") & "%",
+            2 => WpDB.ESC_Like ("_transient_timeout_") & "%",
+            3 => Helpers.Image (Php.Misc.Time)
+          ]
         ));
 
       if not Is_Multisite then
@@ -1402,11 +1402,11 @@ is
              "AND b.option_name = " &
              "CONCAT('_site_transient_timeout_', SUBSTRING( a.option_name, 17 ) ) " &
              "AND b.option_value < %d",
-             To_List (List => (
-               1 => +(WpDB.ESC_Like ("_site_transient_") & "%"),
-               2 => +(WpDB.ESC_Like ("_site_transient_timeout_") & "%"),
-               3 => +Helpers.Image (Php.Misc.Time)
-             ))
+             [
+               1 => WpDB.ESC_Like ("_site_transient_") & "%",
+               2 => WpDB.ESC_Like ("_site_transient_timeout_") & "%",
+               3 => Helpers.Image (Php.Misc.Time)
+             ]
            ));
 
       elsif Is_Multisite and then Is_Main_Site and then Is_Main_Network then
@@ -1419,11 +1419,11 @@ is
              "AND b.meta_key = " &
              "CONCAT('_site_transient_timeout_', SUBSTRING( a.meta_key, 17 ) ) " &
              "AND b.meta_value < %d",
-             To_List (List => (
-               1 => +(WpDB.ESC_Like ("_site_transient_") & "%"),
-               2 => +(WpDB.ESC_Like ("_site_transient_timeout_") & "%"),
-               3 => +Helpers.Image (Php.Misc.Time)
-             ))
+             [
+               1 => WpDB.ESC_Like ("_site_transient_") & "%",
+               2 => WpDB.ESC_Like ("_site_transient_timeout_") & "%",
+               3 => Helpers.Image (Php.Misc.Time)
+             ]
            ));
       end if;
    end Delete_Expired_Transients;
@@ -1829,10 +1829,9 @@ is
                                 return Multi_Type
    is
       use Php.Types;
-      use UStrings;
       use Wp_Common;
-      use Inc_Caches;
       use Class_WpDB;
+      use Inc_Caches;
       use Inc_Functions;
       use Inc_Load;
 --    use Inc_Plugins;
@@ -1937,10 +1936,10 @@ is
                        Globals.WpDB.Prepare (
                          "SELECT meta_value FROM wpdb->sitemeta " &
                          "WHERE meta_key = %s AND site_id = %d",
-                         To_List (List => (
-                           1 => +Option,
-                           2 => +Helpers.Image (Network_Id_2)
-                         ))
+                         [
+                           1 => Option,
+                           2 => Helpers.Image (Network_Id_2)
+                         ]
                        );
 
                      Row : constant Array_Type :=
@@ -2205,10 +2204,10 @@ is
               Globals.WpDB.Prepare (
                 "SELECT meta_id FROM {wpdb->sitemeta} " &
                 "WHERE meta_key = %s AND site_id = %d",
-                To_List (List => (
-                  1 => +Option,
-                  2 => +Helpers.Image (Network_Id_2)
-                ))
+                [
+                  1 => Option,
+                  2 => Helpers.Image (Network_Id_2)
+                ]
               );
 
             Row : constant Array_Type :=
@@ -2554,9 +2553,8 @@ is
          -- timeouts can be avoided.
          declare
             No_Timeout : constant List_Type :=
-              To_List (List => (+"update_core",
-                                +"update_plugins",
-                                +"update_themes"));
+              ["update_core", "update_plugins", "update_themes"];
+
             Transient_Option : constant String := "_site_transient_" & Transient;
          begin
             if not In_List (Transient, No_Timeout, True) then

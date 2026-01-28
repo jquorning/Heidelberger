@@ -65,7 +65,7 @@ is
 --    require ABSPATH . WPINC . "/version.php";
 
       if
-        not In_List (Typ, To_List (List => (+"plugins", +"themes", +"core")), True)
+        not In_List (Typ, List_Type'["plugins", "themes", "core"], True)
       then
          return (Success => False,
                  Arry    => Empty_Array,
@@ -278,21 +278,21 @@ is
             begin
                Printf (
                  "<option value=""%s"" lang=""%s"" data-continue=""%s""%s>%s</option>" & NL,
-                 To_List (List =>  (
-                   1 => +ESC_Attr (Get_As_String (Language, "language")),
-                   2 => +ESC_Attr (Get_As_String (Language, "iso")), -- current
-                   3 => +ESC_Attr (if As_Boolean (Get (Ref_2 (Language,
+                 [
+                   1 => ESC_Attr (Get_As_String (Language, "language")),
+                   2 => ESC_Attr (Get_As_String (Language, "iso")), -- current
+                   3 => ESC_Attr (if As_Boolean (Get (Ref_2 (Language,
+                                                             Key_1 => "strings",
+                                                             Key_2 => "continue")))
+                                  then As_String (Get (Ref_2 (Language,
                                                               Key_1 => "strings",
                                                               Key_2 => "continue")))
-                                   then As_String (Get (Ref_2 (Language,
-                                                               Key_1 => "strings",
-                                                               Key_2 => "continue")))
-                                   else "Continue"),
+                                  else "Continue"),
                    4 => (if In_Array (Get_As_String (Language, "language"),
                                       Installed_Languages, True)
-                         then +" data-installed=""1""" else +""),
-                   5 => +ESC_HTML (Get_As_String (Language, "native_name"))
-                 ))
+                         then " data-installed=""1""" else ""),
+                   5 => ESC_HTML (Get_As_String (Language, "native_name"))
+                 ]
                );
             end;
             Delete (Ref (Languages, -Wp_Local_Package));
@@ -305,18 +305,18 @@ is
          begin
             Printf (
               "<option value=""%s"" lang=""%s"" data-continue=""%s""%s>%s</option>" & NL,
-              To_List (List => (
-                1 => +ESC_Attr (Get_As_String (Language, "language")),
-                2 => +ESC_Attr (Get_As_String (Language, "iso")), -- current
-                3 => +ESC_Attr
+              [
+                1 => ESC_Attr (Get_As_String (Language, "language")),
+                2 => ESC_Attr (Get_As_String (Language, "iso")), -- current
+                3 => ESC_Attr
                        (if As_Boolean (Get (Ref_2 (Language, "strings", "continue")))
                         then As_String (Get (Ref_2 (Language, "strings", "continue")))
                         else "Continue"),
                 4 => (if In_Array (Get_As_String (Language, "language"),
                                    Installed_Languages, True)
-                      then +" data-installed=""1""" else +""),
-                5 => +ESC_HTML (Get_As_String (Language, "native_name"))
-              ))
+                      then " data-installed=""1""" else ""),
+                5 => ESC_HTML (Get_As_String (Language, "native_name"))
+              ]
             );
          end;
       end loop;
@@ -433,8 +433,8 @@ is
          Upgrader.Init;
          declare
             Check : constant Boolean :=
-              Upgrader.FS_Connect (To_List (List => (Globals.WP_CONTENT_DIR,
-                                                     +Constants.WP_LANG_DIR)));
+              Upgrader.FS_Connect (List_Type'[-Globals.WP_CONTENT_DIR,
+                                              Constants.WP_LANG_DIR]);
          begin
             if not Check or else Is_Wp_Error (Check) then
                return False;

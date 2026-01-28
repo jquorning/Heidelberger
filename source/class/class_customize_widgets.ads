@@ -59,25 +59,26 @@ is
          -- @var array
          --
          -- protected
-         Core_Widget_Id_Bases : List_Type := To_List (List => (
-                +"archives",
-                +"calendar",
-                +"categories",
-                +"custom_html",
-                +"links",
-                +"media_audio",
-                +"media_image",
-                +"media_video",
-                +"meta",
-                +"nav_menu",
-                +"pages",
-                +"recent-comments",
-                +"recent-posts",
-                +"rss",
-                +"search",
-                +"tag_cloud",
-                +"text"
-         ));
+         Core_Widget_Id_Bases : List_Type :=
+           [
+                "archives",
+                "calendar",
+                "categories",
+                "custom_html",
+                "links",
+                "media_audio",
+                "media_image",
+                "media_video",
+                "meta",
+                "nav_menu",
+                "pages",
+                "recent-comments",
+                "recent-posts",
+                "rss",
+                "search",
+                "tag_cloud",
+                "text"
+           ];
 
          --
          -- @since 3.9.0

@@ -9,7 +9,6 @@ with Php.Lists;
 with Php.Strings;
 
 with Constants;
-with Globals;
 with UStrings;
 
 with Class_Theme_JSON;
@@ -33,13 +32,12 @@ is
                                     return Multi_Type -- Array_Type
    is
       use Php.Lists;
-      use UStrings;
       use Inc_Functions;
 
       Path_2 : constant List_Type :=
         (if not Empty (Context, "block_name")
-         then List_Merge (To_List (List => (
-                +"blocks", +As_String (Get (Context, "block_name")))),
+         then List_Merge (List_Type'[
+                "blocks", Get_As_String (Context, "block_name")],
                            Path)
          else Path);
 
@@ -133,9 +131,9 @@ is
 
          Types_2 : List_Type :=
            (if Types.Is_Empty and then not Supports_Theme_JSON
-              then To_List (List => (+"variables", +"presets", +"base-layout-styles"))
+              then List_Type'["variables", "presets", "base-layout-styles"]
             elsif Types.Is_Empty
-              then To_List (List => (+"variables", +"styles", +"presets"))
+              then List_Type'["variables", "styles", "presets"]
             else   Types
            );
          --
@@ -156,7 +154,7 @@ is
             --
             declare
                Origins : constant List_Type :=
-                 To_List (List => (+"default", +"theme", +"custom"));
+                 ["default", "theme", "custom"];
             begin
                Styles_Variables := +Tree.Get_Stylesheet (To_List ("variables"),
                                                          Origins);
@@ -182,7 +180,7 @@ is
             declare
                Origins : List_Type :=
                  (if Supports_Theme_JSON
-                    then To_List (List => (+"default", +"theme", +"custom"))
+                    then List_Type'["default", "theme", "custom"]
                     else To_List ("default"));
             begin
                Styles_REST := +Tree.Get_Stylesheet (Types_2, Origins);

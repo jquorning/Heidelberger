@@ -3767,9 +3767,9 @@ is
 --         Isset (Queried_Object.Term_Id) and then
 --         Count (
              List_Intersect (
-               To_List (List => (+Queried_Object.Term_Id'Image,
-                                 Queried_Object.Name,
-                                 Queried_Object.Slug)),
+               List_Type'[Queried_Object.Term_Id'Image,
+                          -Queried_Object.Name,
+                          -Queried_Object.Slug],
                Term_Array
              ).Length /= 0;
 --         );

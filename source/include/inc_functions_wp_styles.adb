@@ -104,10 +104,10 @@ is
            Sprintf (
              -- translators: 1: <style>, 2: wp_add_inline_style()
              abs "Do not pass %1s tags to %2s.",
-             To_List (List => (
-               1 => +"<code>&lt;style&gt;</code>",
-               2 => +"<code>wp_add_inline_style()</code>"
-             ))
+             [
+               1 => "<code>&lt;style&gt;</code>",
+               2 => "<code>wp_add_inline_style()</code>"
+             ]
            ),
            "3.7.0"
          );

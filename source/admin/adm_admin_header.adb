@@ -157,10 +157,10 @@ is
                      Screen_Title := +Sprintf (
                         -- translators: Editor admin screen title. 1: "Edit item" text for the post type, 2: Post title.
                         abs "%1s &#8220;%2s&#8221;",
-                        To_List (List => (
-                          1 => +Get_As_String (Post_Type_Obj.Labels, "edit_item"),
-                          2 => +Post_Title
-                        )));
+                        [
+                          1 => Get_As_String (Post_Type_Obj.Labels, "edit_item"),
+                          2 => Post_Title
+                        ]);
                   end;
                end if;
             end;
@@ -168,8 +168,7 @@ is
 
          -- translators: Admin screen title. 1: Admin screen name, 2: Network or site name.
          Admin_Title := +Sprintf (abs "%1s &lsaquo; %2s &#8212; WordPress",
-                                  To_List (List => (Screen_Title,
-                                                    Admin_Title)));
+                                  [-Screen_Title, -Admin_Title]);
       end if;
 
       if Wp_Is_Recovery_Mode then
@@ -300,8 +299,7 @@ is
       end if;
 
       Append (Admin_Body_Class, " branch-" &
-        Str_Replace (To_List (List => (+".", +",")), "-",
-                     Get_Bloginfo ("version")));
+        Str_Replace (List_Type'[".", ","], "-", Get_Bloginfo ("version")));
 
       Append (Admin_Body_Class, " version-" &
          Str_Replace (".", "-", Preg_Replace ("/^([.0-9]+).*/", "$1",

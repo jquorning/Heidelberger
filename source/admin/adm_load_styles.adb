@@ -79,8 +79,8 @@ is
       WP_CONTENT_DIR := +ABSPATH & "wp-content";
 
       Protocol := +As_String (Get (X_SERVER, "SERVER_PROTOCOL"));
-      if not In_List (-Protocol, To_List (List => (+"HTTP/1.1", +"HTTP/2",
-                                                   +"HTTP/2.0", +"HTTP/3")), True)
+      if not In_List (-Protocol, List_Type'["HTTP/1.1", "HTTP/2",
+                                            "HTTP/2.0", "HTTP/3"], True)
       then
          Protocol := +"HTTP/1.0";
       end if;
