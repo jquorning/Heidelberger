@@ -55,8 +55,283 @@ is
 --      wp_die( __( 'Invalid taxonomy.' ) );
 -- }
 
+   procedure Action_Add_Tag (Referer  : String;
+                             Location : in out UStrings.UString);
+
+   procedure Action_Delete (Referer  : String;
+                            Location : in out UStrings.UString);
+
+   procedure Action_Bulk_Delete (Referer  : String;
+                                 Location : in out UStrings.UString);
+
+   procedure Action_Edit;
+
+   procedure Action_Edittag (Referer  : String;
+                             Location : in out UStrings.UString);
+
+   procedure Action_Default (Location : in out UStrings.UString;
+                             Action   : String);
+
    function Translation
       return Templates_Parser.Translate_Table;
+
+   --------------------
+   -- Action_Add_Tag --
+   --------------------
+
+   procedure Action_Add_Tag (Referer  : String;
+                             Location : in out UStrings.UString)
+   is
+      use Binder;
+      use UStrings;
+      use Inc_Capabilities;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Pluggables;
+      use Inc_Taxonomys;
+   begin
+      Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
+
+      if not Current_User_Can (Get_As_String (Globals.Tax.Cap, "edit_terms")) then
+         Wp_Die (
+           "<h1>" & abs "You need a higher level of permission." & "</h1>" & "<p>" &
+           abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
+           Code => 403);
+      end if;
+
+      declare
+         Taxonomy : UString;  --  Added by jq. Not declared anywhere
+         Ret : constant Array_Type :=
+           Wp_Insert_Term (Get_As_String (X_POST, "tag-name"),
+                           -Taxonomy, X_POST);
+      begin
+         if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
+            Location := +Add_Query_Arg ("message", "1", Referer);
+         else
+            Location := +Add_Query_Arg (
+              To_Array (List => (
+                Build ("error", "true"),
+                Build ("message", "4")
+              )),
+              Referer
+            );
+         end if;
+      end;
+   end Action_Add_Tag;
+
+   -------------------
+   -- Action_Delete --
+   -------------------
+
+   procedure Action_Delete (Referer  : String;
+                            Location : in out UStrings.UString)
+   is
+      use Php.Strings;
+      use Binder;
+      use UStrings;
+      use Inc_Capabilities;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Pluggables;
+      use Inc_Taxonomys;
+   begin
+      if not Isset (Get_As_String (X_REQUEST, "tag_ID")) then
+         return;
+      end if;
+
+      declare
+         Taxonomy : UString;  -- Added by jq
+         Tag_ID   : constant Integer :=
+           Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
+      begin
+         Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
+
+         if not Current_User_Can ("delete_term", Tag_ID) then
+            Wp_Die (
+              "<h1>" & abs "You need a higher level of permission." & "</h1>" &
+              "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
+              Code => 403);
+         end if;
+
+         Wp_Delete_Term (Tag_ID, -Taxonomy);
+
+         Location := +Add_Query_Arg ("message", "2", Referer);
+
+         -- When deleting a term, prevent the action from redirecting back to
+         -- a term that no longer exists.
+         declare
+            List : constant List_Type :=
+              ["tag_ID", "action"];
+         begin
+            Location := +Remove_Query_Arg (List, -Location);
+         end;
+      end;
+   end Action_Delete;
+
+   ------------------------
+   -- Action_Bulk_Delete --
+   ------------------------
+
+   procedure Action_Bulk_Delete (Referer  : String;
+                                 Location : in out UStrings.UString)
+   is
+      use Binder;
+      use UStrings;
+      use Inc_Capabilities;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Pluggables;
+      use Inc_Taxonomys;
+   begin
+      Check_Admin_Referer ("bulk-tags");
+
+      if not Current_User_Can (Get_As_String (Globals.Tax.Cap, "delete_terms")) then
+         Wp_Die (
+           "<h1>" & abs "You need a higher level of permission." & "</h1>" &
+           "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
+           Code => 403);
+      end if;
+
+      declare
+         Taxonomy : UString;
+         Tags : constant List_Type :=
+           [Get_As_String (X_REQUEST, "delete_tags")];
+      begin
+         for Tag_ID of Tags loop
+            Wp_Delete_Term (Integer'Value (Tag_ID), -Taxonomy);
+         end loop;
+
+         Location := +Add_Query_Arg ("message", "6", Referer);
+      end;
+   end Action_Bulk_Delete;
+
+   -----------------
+   -- Action_Edit --
+   -----------------
+
+   procedure Action_Edit
+   is
+      use Php.Strings;
+      use Binder;
+      use UStrings;
+      use Class_Terms;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Pluggables;
+      use Inc_Taxonomys;
+   begin
+      if not Isset (Get_As_String (X_REQUEST, "tag_ID")) then
+         return;
+      end if;
+
+      declare
+         Taxonomy : UString;
+
+         Term_Id  : constant Integer :=
+           Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
+
+         Term : constant Wp_Term := Get_Term (Term_Id);
+      begin
+         if Term not in Wp_Term then  -- instanceof
+            Wp_Die (
+              abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+         end if;
+
+         Wp_Redirect (
+           Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, -Globals.Post_Type)));
+      end;
+      Php.Errors.Die;
+   end Action_Edit;
+
+   --------------------
+   -- Action_Edittag --
+   --------------------
+
+   procedure Action_Edittag (Referer : String; Location : in out UStrings.UString)
+   is
+      use Binder;
+      use UStrings;
+      use Class_Terms;
+      use Inc_Capabilities;
+      use Inc_Functions;
+      use Inc_L10n;
+      use Inc_Pluggables;
+      use Inc_Taxonomys;
+
+      Taxonomy : UString;
+      Tag_ID   : constant Integer :=
+        Integer'Value (Get_As_String (X_POST, "tag_ID"));
+   begin
+      Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
+
+      if not Current_User_Can ("edit_term", Tag_ID) then
+         Wp_Die (
+           "<h1>" & abs "You need a higher level of permission." & "</h1>" &
+           "<p>" & abs "Sorry, you are not allowed to edit this item." & "</p>",
+           Code => 403);
+      end if;
+
+      declare
+         Tag : constant Wp_Term := Get_Term (Tag_ID, -Taxonomy);
+      begin
+         if Tag = Null_Term then
+            Wp_Die (
+              abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
+         end if;
+
+         declare
+            Ret : constant Array_Type :=
+              Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
+         begin
+            if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
+               Location := +Add_Query_Arg ("message", "3", Referer);
+            else
+               Location := +Add_Query_Arg (
+                  To_Array (List => (
+                    Build ("error", "true"),
+                    Build ("message", "5")
+                  )),
+                  Referer
+                );
+            end if;
+         end;
+      end;
+   end Action_Edittag;
+
+   --------------------
+   -- Action_Default --
+   --------------------
+
+   procedure Action_Default (Location : in out UStrings.UString;
+                             Action   : String)
+   is
+      use Binder;
+      use UStrings;
+      use Wp_Common;
+      use Adi_Screens;
+      use Inc_Pluggables;
+   begin
+      if
+        "" = Action or else  -- not
+        not Isset (X_REQUEST, "delete_tags")
+      then
+         return;
+      end if;
+      Check_Admin_Referer ("bulk-tags");
+
+      declare
+         Screen : constant String := -Get_Current_Screen.Id;
+
+         Tags : constant List_Type :=
+           [Get_As_String (X_REQUEST, "delete_tags")];
+      begin
+         -- This action is documented in wp-admin/edit.php
+         Location := +Apply_Filters ("handle_bulk_actions-" & Screen,
+                                     -Location, Action, Tags);
+      end;
+   end Action_Default;
 
    ------------
    -- Render --
@@ -71,14 +346,19 @@ is
       use UStrings;
       use Wp_Common;
       use Adi_Screens;
+      use Adi_Class_Wp_Terms_List_Tables;
+      use Adi_List_Tables;
+      use Adi_Plugins;
+      use Adm_Menu;
       use Inc_Capabilities;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
+      use Inc_Link_Templates;
       use Inc_L10n;
+      use Inc_Pluggables;
+      use Inc_Plugins;
       use Inc_Taxonomys;
---    use Class_Taxonomy;
-      use Class_Terms;
    begin
       Adm_Admin.Run;
 
@@ -98,14 +378,15 @@ is
 
       if
          not In_Array (-Tax.Name, Get_Taxonomies
-                                   (To_Array (List => (1 => Build ("show_ui", "true")))), True)
+                                   (To_Array (List => (1 =>
+                                      Build ("show_ui", "true")))), True)
       then
-         Inc_Functions.Wp_Die
+         Wp_Die
            (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
       end if;
 
       if False then -- not Current_User_Can (Get (Tax.Cap, "manage_terms")) then
-         Inc_Functions.Wp_Die
+         Wp_Die
             ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
              "<p>" & abs "Sorry, you are not allowed to manage terms in this taxonomy." &
              "</p>",
@@ -120,30 +401,24 @@ is
 --  global $post_type;
       Label_1 :
       declare
-         use Adi_Class_Wp_Terms_List_Tables;
-         use Adi_List_Tables;
-         use Adm_Menu;
-
-         Post_Type : constant String := ""; -- jq
-
          X_Wp_List_Table : Wp_Terms_List_Table :=
             Wp_Terms_List_Table (X_Get_List_Table ("Wp_Terms_List_Table"));
 
          Pagenum : constant Natural := X_Wp_List_Table.Get_Pagenum;  -- ();
 
          Location : UString;  -- jq
-         Referer  : UString;  -- jq
       begin
          Parent_File :=
-            +Slug_Type ((if "post" /= Post_Type then (if "attachment" = Post_Type
-                                          then Slug_Type'("upload.php")
-                                          else "edit.php?post_type=post_type")
+            +Slug_Type ((if "post" /= Globals.Post_Type
+                         then (if "attachment" = Post_Type
+                               then Slug_Type'("upload.php")
+                               else Slug_Type ("edit.php?post_type=" & (-Globals.Post_Type)))
              elsif "link_category" = Tax.Name then Slug_Type'("link-manager.php")
              else                                  "edit.php"));
 
          Submenu_File :=
-            +Slug_Type ((if "post" /= Post_Type
-             then Slug_Type'("edit-tags.php?taxonomy=taxonomy&amp;post_type=post_type")
+            +Slug_Type ((if "post" /= Globals.Post_Type
+             then Slug_Type ("edit-tags.php?taxonomy=taxonomy&amp;post_type=" & (-Globals.Post_Type))
              elsif "link_category" = Tax.Name
              then
                Slug_Type'("edit-tags.php?taxonomy=link_category")
@@ -156,9 +431,10 @@ is
 --         null;
 --      end;
          Add_Screen_Option ("per_page",
-                            To_Array (List => (Build ("default", "20"),
-                                               Build ("option",  "edit_" & (-Tax.Name) &
-                                                               "_per_page"))));
+                            To_Array (List => (
+                              Build ("default", "20"),
+                              Build ("option",  "edit_" & (-Tax.Name) &
+                                                "_per_page"))));
 
          Get_Current_Screen.Set_Screen_Reader_Content (
             Arrays.To_Array ((
@@ -169,12 +445,9 @@ is
             )));
 
 --               Location := False;
-         Referer  := +Inc_Functions.Wp_Get_Referer; -- ();
-         if Referer = "" then -- For POST requests.  -- not
-            Referer := +Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI"));
-         end if;
-
          declare
+            Action : constant String := X_Wp_List_Table.Current_Action;
+
             List : constant List_Type :=
               [
                 "_wp_http_referer",
@@ -183,192 +456,35 @@ is
                 "message",
                 "paged"
               ];
+
+            Referer_3 : constant String := Wp_Get_Referer;
+
+            Referer_2 : constant String :=
+               (if Referer_3 = ""  -- For POST requests.  -- not
+                then Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI"))
+                else Referer_3);
+
+            Referer : constant String := Remove_Query_Arg (List, Referer_2);
          begin
-            Referer := +Remove_Query_Arg (List, -Referer);
+            if "add-tag" = Action then
+               Action_Add_Tag (Referer, Location);
+
+            elsif "delete" = Action then
+               Action_Delete (Referer, Location);
+
+            elsif "bulk-delete" = Action then
+               Action_Bulk_Delete (Referer, Location);
+
+            elsif "edit" =  Action then
+               Action_Edit;
+
+            elsif "editedtag" = Action then
+               Action_Edittag (Referer, Location);
+
+            else
+               Action_Default (Location, Action);
+            end if;
          end;
-
--- case Hb_List_Table.Current_Action then
-
-         if "add-tag" = X_Wp_List_Table.Current_Action then
-            Inc_Pluggables.Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
-
-            if not Current_User_Can (Get_As_String (Tax.Cap, "edit_terms")) then
-               Inc_Functions.Wp_Die
-                  ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                   "<p>" & abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
-                   Code => 403);
-            end if;
-
-            declare
-               Taxonomy : UString;  --  Added by jq. Not declared anywhere
-               Ret : constant Array_Type := Wp_Insert_Term (Get_As_String (X_POST, "tag-name"),
-                                                         -Taxonomy, X_POST);
-            begin
-               if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
-                  Location := +Add_Query_Arg ("message", "1", -Referer);
-               else
-                  Location := +Add_Query_Arg (
-                                To_Array (List => (
-                                        Build ("error", "true"),
-                                        Build ("message", "4")
-                                )),
-                                -Referer
-                        );
-               end if;
-            end;
-
-         elsif "delete" = X_Wp_List_Table.Current_Action then
-            if not Isset (Get_As_String (X_REQUEST, "tag_ID")) then
-               goto  Break;
-            end if;
-
-            declare
-               Taxonomy : UString;  -- Added by jq
-               Tag_ID   : constant Integer :=
-                 Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
-            begin
-               Inc_Pluggables.Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
-
-               if not Current_User_Can ("delete_term", Tag_ID) then
-                  Inc_Functions.Wp_Die
-                     ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                      "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
-                      Code => 403);
-               end if;
-
-               Wp_Delete_Term (Tag_ID, -Taxonomy);
-
-               Location := +Add_Query_Arg ("message", "2", -Referer);
-
-               -- When deleting a term, prevent the action from redirecting back to
-               -- a term that no longer exists.
-               declare
---                use String_Vectors;
-
-                  List : constant List_Type :=
-                    ["tag_ID", "action"];
-               begin
-                  Location := +Remove_Query_Arg (List, -Location);
-               end;
-            end;
-            <<Break>>
-
-         elsif "bulk-delete" = X_Wp_List_Table.Current_Action then
-            Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
-
-            if not Current_User_Can (Get_As_String (Tax.Cap, "delete_terms")) then
-               Inc_Functions.Wp_Die
-                  ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                   "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
-                   Code => 403);
-            end if;
-
-            declare
-               Taxonomy : UString;
-               Tags : constant List_Type :=
-                 [Get_As_String (X_REQUEST, "delete_tags")];
-            begin
-               for Tag_ID of Tags loop
-                  Wp_Delete_Term (Integer'Value (Tag_ID), -Taxonomy);
-               end loop;
-
-               Location := +Add_Query_Arg ("message", "6", -Referer);
-            end;
-
-         elsif "edit" =  X_Wp_List_Table.Current_Action then
-            if not Isset (Get_As_String (X_REQUEST, "tag_ID")) then
-               goto Break_2;
-            end if;
-
-            declare
-               use Inc_Link_Templates;
-
-               Taxonomy : UString;
-
-               Term_Id  : constant Integer :=
-                 Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
-
-               Term : constant Wp_Term := Get_Term (Term_Id);
-            begin
-               if Term not in Wp_Term then  -- instanceof
-                  Inc_Functions.Wp_Die
-                    (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
-               end if;
-
-               Inc_Pluggables.Wp_Redirect
-                  (Sanitize_URL (Get_Edit_Term_Link (Term_Id, -Taxonomy, Post_Type)));
-            end;
-            goto Bailout; -- return; -- exit;
-
-         <<Break_2>>
-
-         elsif "editedtag" = X_Wp_List_Table.Current_Action then
-            declare
-               Taxonomy : UString;
-               Tag_ID   : constant Integer :=
-                 Integer'Value (Get_As_String (X_POST, "tag_ID"));
-            begin
-               Inc_Pluggables.Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
-
-               if not Current_User_Can ("edit_term", Tag_ID) then
-                  Inc_Functions.Wp_Die
-                    ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
-                          "<p>" & abs "Sorry, you are not allowed to edit this item." & "</p>",
-                          Code => 403);
-               end if;
-
-               declare
-                  Tag : constant Wp_Term := Get_Term (Tag_ID, -Taxonomy);
-               begin
-                  if Tag = Null_Term then
-                     Inc_Functions.Wp_Die
-                        (abs "You attempted to edit an item that does not exist. Perhaps it was deleted?");
-                  end if;
-
-                  declare
---                   use Array_Maps;
-
-                     Ret : constant Array_Type :=
-                        Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
-                  begin
-                     if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
-                        Location := +Add_Query_Arg ("message", "3", -Referer);
-                     else
-                        Location := +Add_Query_Arg (
-                                To_Array (List => (
-                                        Build ("error", "true"),
-                                        Build ("message", "5")
-                                )),
-                                -Referer
-                        );
-                     end if;
-                  end;
-               end;
-            end;
-
-         else
-            if
-              "" = X_Wp_List_Table.Current_Action or else  -- not
-              not Isset (X_REQUEST, "delete_tags")
-            then
-               goto Break_3;
-            end if;
-            Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
-
-            declare
-               Screen : constant String := -Get_Current_Screen.Id;
-
-               Tags : constant List_Type :=
-                 [Get_As_String (X_REQUEST, "delete_tags")];
-            begin
-               -- This action is documented in wp-admin/edit.php
-               Location := +Apply_Filters ("handle_bulk_actions-" & Screen,
-                                           -Location, X_Wp_List_Table.Current_Action,
-                                           Tags);
-               -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-            end;
-            <<Break_3>>
-         end if; -- end case;
 
          if
            "" = Location and then
@@ -376,8 +492,6 @@ is
 --         not Empty (String'(Get (X_REQUEST, "_wp_http_referer")))
          then  -- not
             declare
---             use String_Vectors;
-
                List : constant List_Type :=
                  ["_wp_http_referer", "_wpnonce"];
             begin
@@ -399,21 +513,21 @@ is
             -- @param string      location The destination URL.
             -- @param WP_Taxonomy tax      The taxonomy object.
             --
-            Inc_Pluggables.Wp_Redirect (
+            Wp_Redirect (
               Apply_Filters ("redirect_term_location",
                              -Location, -Tax.Name));  -- .name added
-            goto Bailout; -- return;  --  exit;
+            Php.Errors.Die;
          end if;
 
-         X_Wp_List_Table.Prepare_Items; -- ();
+         X_Wp_List_Table.Prepare_Items;
 
          declare
             Total_Pages : constant Natural :=
               Get_Pagination_Arg (X_Wp_List_Table, "total_pages");
          begin
             if Pagenum > Total_Pages and Total_Pages > 0 then
-               Inc_Pluggables.Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
-               goto Bailout; -- return;  -- exit;
+               Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
+               Php.Errors.Die;
             end if;
          end;
 
@@ -501,19 +615,14 @@ is
                Help := Help & "<p>" & abs "<a href=""https://wordpress.org/support/"">Support</a>" & "</p>";
 
                Get_Current_Screen.Set_Help_Sidebar (-Help);
---        unset (help);
             end if;  -- ???
          end Label_2;
 
-         <<Bailout>>
          -- require_once ABSPATH . "wp-admin/admin-header.php";
 
          -- Also used by the Edit Tag form.
          -- require_once ABSPATH . "wp-admin/includes/edit-tag-messages.php";
          declare
-            use Adi_Plugins;
-            use Inc_Link_Templates;
-
             Class : String :=  (if Isset (X_REQUEST, "error")
                                 then "error" else "updated");
             Import_Link : UString;
@@ -539,8 +648,6 @@ is
                                 Var_Name     : in     String;
                                 Translations : in out Translate_Set)
                is
-                  use Inc_Plugins;
-
                   procedure Set (Var : String; Value : String);
                   procedure Set (Var : String; Value : Boolean);
 
@@ -622,8 +729,8 @@ is
                      Clear_Echo;
                      declare
                         Unused : constant String :=
-                           Inc_Functions.Wp_Nonce_Field ("add-tag",
-                                                         "_wpnonce_add-tag");
+                           Wp_Nonce_Field ("add-tag",
+                                           "_wpnonce_add-tag");
                      begin
                         Set ("VAR_edit_tags_add_tag", Get_Echo);
                      end;
@@ -920,7 +1027,7 @@ is
                           "post_tag" = Taxonomy and then Current_User_Can ("import"));
 
                   elsif Var_Name = "VAR_edit_tags_post_type" then
-                     Set ("VAR_edit_tags_post_type", ESC_Attr (Post_Type));
+                     Set ("VAR_edit_tags_post_type", ESC_Attr (-Globals.Post_Type));
 
                   elsif Var_Name = "VAR_edit_tags_remove_message_and_error" then
                      declare
@@ -960,7 +1067,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_tax_parent_item" then
                      Set ("VAR_edit_tags_tax_parent_item",
-                          Inc_Formatting.ESC_HTML (Get_As_String (Tax.Labels, "parent_item")));
+                          ESC_HTML (Get_As_String (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
                      Set ("VAR_edit_tags_taxonomy", ESC_Attr (-Taxonomy));
