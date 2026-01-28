@@ -1193,7 +1193,7 @@ is
         --                 uri = args[2];
         --         end if;
         -- end if;
-      URI   : constant String  := As_String (Get (Binder.X_SERVER, "REQUEST_URI"));
+      URI   : constant String  := Get_As_String (Binder.X_SERVER, "REQUEST_URI");
       URI_2 : UString := +URI;
    begin
       Put_Line ("add_query_arg: " & URI);
@@ -1393,7 +1393,7 @@ is
 --          use Arrays.Array_Maps;
 
             K : constant String := Key (A);
-            V : constant String := As_String (Get (Array_2, K));
+            V : constant String := Get_As_String (Array_2, K);
          begin
             Set (Array_2, Key => K,
                  Value => From_String (Add_Slashes (V)));

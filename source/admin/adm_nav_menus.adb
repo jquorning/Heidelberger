@@ -86,7 +86,7 @@ is
          -- The menu id of the current menu being edited.
          Nav_Menu_Selected_Id : constant Integer :=
             (if Isset (X_REQUEST, "menu")
-             then Integer'Value (As_String (Get (X_REQUEST, "menu")))
+             then Integer'Value (Get_As_String ((X_REQUEST, "menu")))
              else 0);
 
          -- Get existing menu locations assignments.
@@ -97,7 +97,7 @@ is
 
          -- Allowed actions: add, update, delete.
          Action : constant String := (if Isset (X_REQUEST, "action")
-                                      then As_String (Get (X_REQUEST, "action")) else "edit");
+                                      then Get_As_String ((X_REQUEST, "action")) else "edit");
 
          Unused   : Integer;
          Unused_2 : Boolean;
@@ -204,7 +204,7 @@ is
                                                           "menu_item_parent"))
 --                               if not Empty (Get_Integer (Menu_Item_Data,
 --                                                  "menu_item_parent"))
-                                    and then (Empty (As_String (Get (Next_Item_Data,
+                                    and then (Empty (Get_As_String ((Next_Item_Data,
                                                                   "menu_item_parent")))
                                       or else As_Integer (Get (Next_Item_Data,
                                                            "menu_item_parent"))  -- (int)
@@ -258,7 +258,7 @@ is
                                            As_Integer (Get (Menu_Item_Data, "menu_order")) + 1));
 
                                     Set (Menu_Item_Data, "menu_item_parent",
-                                       From_String (As_String (Get (Next_Item_Data, "ID"))));
+                                       From_String (Get_As_String ((Next_Item_Data, "ID"))));
 
                                     declare
                                        Unused : Integer;
@@ -277,9 +277,9 @@ is
 
                            -- The item is last but still has a parent, so bubble up.
                            elsif
-                             not Empty (As_String (Get (Menu_Item_Data,
+                             not Empty (Get_As_String ((Menu_Item_Data,
                                                         "menu_item_parent")))
-                             and then In_Array (As_String (Get (Menu_Item_Data,
+                             and then In_Array (Get_As_String ((Menu_Item_Data,
                                                      "menu_item_parent")), -- (int)
                                                 Orders_To_Dbids, True)
                            then

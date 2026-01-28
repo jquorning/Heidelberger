@@ -51,7 +51,7 @@ is
 
 --    Self   : Adm_Menu.Unbounded_Slug;  -- Where does this come from? jq
       Unused : UString;
-      Self_2 : constant String := As_String (Get (X_SERVER, "PHP_SELF"));
+      Self_2 : constant String := Get_As_String (X_SERVER, "PHP_SELF");
       Self_3 : constant String := Preg_Replace ("|^.*/wp-admin/network/|i",
                                                 "", Self_2);
       Self_4 : constant String := Preg_Replace ("|^.*/wp-admin/|i", "",   Self_3);

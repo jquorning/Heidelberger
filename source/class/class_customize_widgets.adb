@@ -192,7 +192,7 @@ is
       use Php.Preg;
    begin
       if Isset (Static_Cache, Setting_Id) then
-         return As_String (Get (Static_Cache, Setting_Id));
+         return Get_As_String (Static_Cache, Setting_Id);
       end if;
 
       for A in This.Setting_Id_Patterns.Iterate loop
@@ -236,7 +236,7 @@ is
       then
          Widget_Setting_Ids.Append
            (This.Get_Setting_Id (
-              Wp_Unslash (As_String (Get (X_REQUEST, "widget-id")))));
+              Wp_Unslash (Get_As_String (X_REQUEST, "widget-id"))));
       end if;
 
       declare
@@ -589,8 +589,8 @@ is
                                         To_Array (List => (
                                           Build ("section",     -Section_Id),
                                           Build ("sidebar_id",  Sidebar_Id),
-                                          Build ("label",       As_String (Get (Section_Args, "title"))),
-                                          Build ("description", As_String (Get (Section_Args, "description")))
+                                          Build ("label",       Get_As_String (Section_Args, "title")),
+                                          Build ("description", Get_As_String (Section_Args, "description"))
                                         ))
                                       );
                                  begin
@@ -674,7 +674,7 @@ is
                                This.Manager,
                                Setting_Id,
                                To_Array (List => (
-                                 Build ("label",          As_String (Get (Registered_Widget, "name"))),
+                                 Build ("label",          Get_As_String (Registered_Widget, "name")),
                                  Build ("section",        -Section_Id),
                                  Build ("sidebar_id",     Sidebar_Id),
                                  Build ("widget_id",      Widget_Id),
@@ -734,8 +734,8 @@ is
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
 
-      Id_Base : constant String := As_String (Get (Parsed_Widget_Id, "id_base"));
-      Number  : constant String := As_String (Get (Parsed_Widget_Id, "number"));
+      Id_Base : constant String := Get_As_String (Parsed_Widget_Id, "id_base");
+      Number  : constant String := Get_As_String (Parsed_Widget_Id, "number");
 
       Setting_Id : UString := +Sprintf ("widget_%s", [1 => Id_Base]);
    begin
@@ -763,7 +763,7 @@ is
         As_Integer (Get (Ref_2 (Global_Wp_Registered_Widget_Controls,
                                 Key_1 => Widget_Id, Key_2 => "width")));
       Is_Core : constant Boolean :=
-        In_List (As_String (Get (Parsed_Widget_Id, "id_base")),
+        In_List (Get_As_String (Parsed_Widget_Id, "id_base"),
                  This.Core_Widget_Id_Bases, True);
 
       Is_Wide : constant Boolean := Width > 250 and not Is_Core;
@@ -1135,10 +1135,10 @@ is
               As_Array (Arrays.Element (A));
 
             Id  : constant String :=
-              ESC_Attr (As_String (Get (Available_Widget, "id"))); -- []
+              ESC_Attr (Get_As_String (Available_Widget, "id")); -- []
 
             TPL : constant String :=
-              As_String (Get (Available_Widget, "control_tpl")); -- []
+              Get_As_String (Available_Widget, "control_tpl"); -- []
          begin
             Echo ("        <div id=""widget-tpl-" & Id &
                   " data-widget-id=""" & Id &
@@ -1198,10 +1198,10 @@ is
       ));
 
       Pattern_Widgets : constant String :=
-        As_String (Get (This.Setting_Id_Patterns, "sidebar_widgets"));
+        Get_As_String (This.Setting_Id_Patterns, "sidebar_widgets");
 
       Pattern_Instance : constant String :=
-        As_String (Get (This.Setting_Id_Patterns, "widget_instance"));
+        Get_As_String (This.Setting_Id_Patterns, "widget_instance");
 
       Matches : List_Type;
    begin
@@ -1219,7 +1219,7 @@ is
       elsif Preg_Match (Pattern_Instance, Id, Matches) /= 0 then
          declare
             Id_Base : constant String := "XXX-013";
-            -- As_String (Get (Matches, "id_base"));
+            -- Get_As_String (Matches, "id_base");
          begin
             -- args["sanitize_callback"]    = function( value ) use ( id_base ) {
             --    return this.sanitize_widget_instance( value, id_base );
@@ -1307,7 +1307,7 @@ is
                Widget : Array_Type := As_Array (Element (A));
             begin
                if
-                 In_Array (As_String (Get (Widget, "callback")),
+                 In_Array (Get_As_String (Widget, "callback"),
                            Done, True)
                then
                   -- We already showed this multi-widget.
@@ -1317,7 +1317,7 @@ is
                declare
                   Sidebar : constant String :=
                     Is_Active_Widget (As_Callable (Get (Widget, "callback")),
-                                      As_String (Get (Widget, "id")),
+                                      Get_As_String (Widget, "id"),
                                       "", False); -- "" was False
                begin
                   Done.Append (Get (Widget, "callback"));
@@ -1333,15 +1333,15 @@ is
                      -- Not serializable to JSON.
                      declare
                         Args : Array_Type := To_Array (List => (
-                          Build ("widget_id",   As_String (Get (Widget, "id"))),
-                          Build ("widget_name", As_String (Get (Widget, "name"))),
+                          Build ("widget_id",   Get_As_String (Widget, "id")),
+                          Build ("widget_name", Get_As_String (Widget, "name")),
                           Build ("_display",    "template")
                         ));
 
                         Is_Disabled : Boolean := False;
 
                         Key_Id : constant String :=
-                           As_String (Get (Widget, "id"));
+                           Get_As_String (Widget, "id");
 
                         Is_Multi_Widget : constant Boolean :=
                           Isset_2 (Global_Wp_Registered_Widget_Controls,
@@ -1370,7 +1370,7 @@ is
                            then
                               Is_Disabled := True;
                            end if;
-                           Id_Base := +As_String (Get (Widget, "id"));
+                           Id_Base := +Get_As_String (Widget, "id");
                         end if;
 
                         declare
@@ -1386,7 +1386,7 @@ is
                            Control_TPL : constant String :=
                              This.Get_Widget_Control (List_Widget_Controls_Args);
 
-                           Id : constant String := As_String (Get (Widget, "id"));
+                           Id : constant String := Get_As_String (Widget, "id");
 
                            Width : constant String :=
                              As_String (Get (Ref_2 (Global_Wp_Registered_Widget_Controls,
@@ -1405,15 +1405,15 @@ is
 
                                  Build ("temp_id",
                                         (if Isset (Args, "_temp_id")
-                                         then As_String (Get (Args, "_temp_id"))
+                                         then Get_As_String (Args, "_temp_id")
                                          else "")), -- null
 
                                  Build ("is_multi",     Is_Multi_Widget),
                                  Build ("control_tpl",  Control_TPL),
 
                                  Build ("multi_number",
-                                        (if "multi" = As_String (Get (Args, "_add"))
-                                         then As_String (Get (Args, "_multi_num"))
+                                        (if "multi" = Get_As_String (Args, "_add")
+                                         then Get_As_String (Args, "_multi_num")
                                          else "")), -- False
 
                                  Build ("is_disabled",  Is_Disabled),
@@ -1648,7 +1648,7 @@ is
    procedure Tally_Rendered_Widgets (This   : in out Wp_Customize_Widgets;
                                      Widget : Array_Type)
    is
-      Id : constant String := As_String (Get (Widget, "id"));
+      Id : constant String := Get_As_String (Widget, "id");
    begin
       Set (This.Rendered_Widgets, Id, From_Boolean (True));
    end Tally_Rendered_Widgets;
@@ -1839,12 +1839,12 @@ is
 
       Is_Valid : constant Boolean :=
         Isset (Sidebar_Args, "id") and then
-        Is_Registered_Sidebar (As_String (Get (Sidebar_Args, "id"))) and then
+        Is_Registered_Sidebar (Get_As_String (Sidebar_Args, "id")) and then
         (Isset (This.Current_Dynamic_Sidebar_Id_Stack, "[0]") and then
          Get (This.Current_Dynamic_Sidebar_Id_Stack, "[0]")
-         = As_String (Get (Sidebar_Args, "id"))) and then
+         = Get_As_String (Sidebar_Args, "id")) and then
          Preg_Match ("#^<(?P<tag_name>\w+)#",
-                     As_String (Get (Sidebar_Args, "before_widget")),
+                     Get_As_String (Sidebar_Args, "before_widget"),
                      Matches) /= 0;
    begin
       if not Is_Valid then
@@ -1852,13 +1852,13 @@ is
       end if;
 
       Set (This.Before_Widget_Tags_Seen,
-           Key   => As_String (Get (Matches, "tag_name")),
+           Key   => Get_As_String (Matches, "tag_name"),
            Value => From_Boolean (True));
 
       declare
          Context : Array_Type :=
            To_Array (List => (1 =>
-             Build ("sidebar_id", As_String (Get (Sidebar_Args, "id")))
+             Build ("sidebar_id", Get_As_String (Sidebar_Args, "id"))
            ));
 
 --         Attributes : Unbounded_String;
@@ -1869,19 +1869,19 @@ is
          elsif
            Isset (Sidebar_Args, "id") and then
            Isset (This.Sidebar_Instance_Count,
-                  As_String (Get (Sidebar_Args, "id")))
+                  Get_As_String (Sidebar_Args, "id"))
          then
             Set (Context, "sidebar_instance_number",
                  Get (This.Sidebar_Instance_Count,
-                      As_String (Get (Sidebar_Args, "id"))));
+                      Get_As_String (Sidebar_Args, "id")));
          end if;
 
          declare
             Widget_Id : constant String :=
-              As_String (Get (Sidebar_Args, "widget_id"));
+              Get_As_String (Sidebar_Args, "widget_id");
 
             Before_Widget : constant String :=
-              As_String (Get (Sidebar_Args, "before_widget"));
+              Get_As_String (Sidebar_Args, "before_widget");
 
             Attributes : constant String :=
               Sprintf (" data-customize-partial-id=""%s""",
@@ -2054,12 +2054,12 @@ is
       if
 --      not Is_Array (Context)        or else
         Empty (Context, "sidebar_id") or else
-        not Is_Registered_Sidebar (As_String (Get (Context, "sidebar_id")))
+        not Is_Registered_Sidebar (Get_As_String (Context, "sidebar_id"))
       then
          return ""; -- false;
       end if;
 
-      This.Rendering_Sidebar_Id := +As_String (Get (Context, "sidebar_id"));
+      This.Rendering_Sidebar_Id := +Get_As_String (Context, "sidebar_id");
 
       if Isset (Context, "sidebar_instance_number") then
          This.Context_Sidebar_Instance_Number :=
@@ -2077,7 +2077,7 @@ is
 
          -- Render the widget.
          OB_Start;
-         This.Rendering_Sidebar_Id := +As_String (Get (Context, "sidebar_id"));
+         This.Rendering_Sidebar_Id := +Get_As_String (Context, "sidebar_id");
          Dynamic_Sidebar (-This.Rendering_Sidebar_Id);
          declare
             Container : constant String := OB_Get_Clean;

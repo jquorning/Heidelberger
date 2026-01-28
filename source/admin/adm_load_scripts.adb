@@ -67,7 +67,7 @@ is
 
       WPINC := +"wp-includes";
 
-      Protocol := +As_String (Get (X_SERVER, "SERVER_PROTOCOL"));
+      Protocol := +Get_As_String (X_SERVER, "SERVER_PROTOCOL");
       if
         not In_List (-Protocol,
                      ["HTTP/1.1", "HTTP/2", "HTTP/2.0", "HTTP/3"], True)
@@ -75,7 +75,7 @@ is
          Protocol := +"HTTP/1.0";
       end if;
 
-      Load := +As_String (Get (XX_GET, "load"));
+      Load := +Get_As_String (XX_GET, "load");
 -- if ( is_array( load ) ) then
 --         ksort( load );
 --         load = implode( "", load );

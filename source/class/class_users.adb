@@ -900,7 +900,7 @@ is
 
             -- Must have ALL requested caps.
             for Cap of Caps loop -- (array)
-               if Empty (As_String (Get (Capabilities, Cap))) then
+               if Empty (Get_As_String (Capabilities, Cap)) then
                   return False;
                end if;
             end loop;

@@ -475,10 +475,10 @@ is
                   Arry : constant Array_Type := As_Array (Element (A));
 
                   Option_Name  : constant String :=
-                    As_String (Get (Arry, "option_name"));
+                    Get_As_String (Arry, "option_name");
 
                   Option_Value : constant String :=
-                    As_String (Get (Arry, "option_value"));
+                    Get_As_String (Arry, "option_value");
                begin
                   Set (Alloptions, Option_Name,
                        Value => From_String (Option_Value));

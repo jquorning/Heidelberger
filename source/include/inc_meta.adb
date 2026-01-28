@@ -878,7 +878,7 @@ is
             Meta_Cache := As_Array (Get (Meta_Cache, Object_Id'Image));
          end if;
 
-         if "" /= As_String (Get (Meta_Cache, Meta_Key)) then -- isset
+         if "" /= Get_As_String (Meta_Cache, Meta_Key) then -- isset
             return True;
          end if;
       end;

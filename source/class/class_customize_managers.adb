@@ -135,10 +135,10 @@ is
       if not Isset (Args_2, "theme") then
          if Isset (X_REQUEST, "customize_theme") then
             Set (Args_2, "theme", From_String (
-                 Wp_Unslash (As_String (Get (X_REQUEST, "customize_theme")))));
+                 Wp_Unslash (Get_As_String (X_REQUEST, "customize_theme"))));
          elsif Isset (X_REQUEST, "theme") then -- Deprecated.
             Set (Args_2, "theme", From_String (
-                 Wp_Unslash (As_String (Get (X_REQUEST, "theme")))));
+                 Wp_Unslash (Get_As_String (X_REQUEST, "theme"))));
          end if;
       end if;
 
@@ -148,18 +148,18 @@ is
       then
          Set (Args_2, "messenger_channel", From_String (
               Sanitize_Key (
-                Wp_Unslash (As_String (Get (X_REQUEST, "customize_messenger_channel")))
+                Wp_Unslash (Get_As_String (X_REQUEST, "customize_messenger_channel"))
               )));
       end if;
 
       This.Original_Stylesheet := +Get_Stylesheet;
 
       This.Theme :=
-        Wp_Get_Theme (if 0 = Validate_File (As_String (Get (Args_2, "theme")))
-                      then As_String (Get (Args, "theme")) else ""); -- null
+        Wp_Get_Theme (if 0 = Validate_File (Get_As_String (Args_2, "theme"))
+                      then Get_As_String (Args, "theme") else ""); -- null
 
-      This.Messenger_Channel   := +As_String (Get (Args_2, "messenger_channel"));
-      This.X_Changeset_UUID    := +As_String (Get (Args_2, "changeset_uuid"));
+      This.Messenger_Channel   := +Get_As_String (Args_2, "messenger_channel");
+      This.X_Changeset_UUID    := +Get_As_String (Args_2, "changeset_uuid");
 
       for
         Key of List_Type'["settings_previewed", "autosaved", "branching"]
@@ -296,7 +296,7 @@ is
          --
          return
            Isset (X_REQUEST, "action") and then
-           Wp_Unslash (As_String (Get (X_REQUEST, "action"))) = Action;
+           Wp_Unslash (Get_As_String (X_REQUEST, "action")) = Action;
       end if;
    end Doing_AJAX;
 
@@ -1685,7 +1685,7 @@ is
 
                if
                  Isset (Setting_Params, "type") and then
-                 "theme_mod" = As_String (Get (Setting_Params, "type"))
+                 "theme_mod" = Get_As_String (Setting_Params, "type")
                then
                   -- Ensure that theme mods values are only used if they were saved
                   -- under the active theme.

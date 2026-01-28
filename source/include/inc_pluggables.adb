@@ -1079,7 +1079,7 @@ is
          if Empty (X_COOKIE, -Cookie_Name) then
             return Empty_Array; -- false;
          end if;
-         Cookie_2 := +As_String (Get (X_COOKIE, -Cookie_Name));
+         Cookie_2 := +Get_As_String (X_COOKIE, -Cookie_Name);
       end if;
 
       declare
@@ -2755,7 +2755,7 @@ is
          -- @param string scheme      Authentication scheme. Values include 'auth',
          --                            'secure_auth', 'logged_in', and 'nonce'.
          --
-         return Apply_Filters ("salt", As_String (Get (Static_Cached_Salts, Scheme)), Scheme);
+         return Apply_Filters ("salt", Get_As_String (Static_Cached_Salts, Scheme), Scheme);
       end if;
 
       if Static_Duplicated_Keys = Empty_Array then
@@ -2858,16 +2858,16 @@ is
             end if;
             Set (Values, "salt",
                  From_String (Inc_Compat.Hash_Hmac ("md5", Scheme,
-                                                    As_String (Get (Values, "key")))));
+                                                    Get_As_String (Values, "key"))));
          end if;
 
          Set (Static_Cached_Salts, Scheme,
-              From_String (As_String (Get (Values, "key")) &
-                           As_String (Get (Values, "salt"))));
+              From_String (Get_As_String (Values, "key") &
+                           Get_As_String (Values, "salt")));
 --       Set (Static_Cached_Salts, Scheme, Values ("key") & Values ("salt"));
 
          -- This filter is documented in wp-includes/pluggable.php--
-         return Apply_Filters ("salt", As_String (Get (Static_Cached_Salts, Scheme)), Scheme);
+         return Apply_Filters ("salt", Get_As_String (Static_Cached_Salts, Scheme), Scheme);
       end;
    end Wp_Salt;
 

@@ -20,11 +20,11 @@ is
       This : Wp_Block_Editor_Context;
    begin
       if Isset (Settings, "name") then
-         This.Name := +As_String (Get (Settings, "name"));
+         This.Name := +Get_As_String (Settings, "name");
       end if;
 
       if Isset (Settings, "post") then
-         This.Post := null; -- +As_String (Get (Settings, "post"));
+         This.Post := null; -- +Get_As_String (Settings, "post");
       end if;
 
       return This;

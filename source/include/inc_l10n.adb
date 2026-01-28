@@ -203,7 +203,7 @@ package body Inc_L10n is
       begin
          if
            Isset (XX_GET, "_locale") and then
-           "user" = As_String (Get (XX_GET, "_locale")) and then
+           "user" = Get_As_String (XX_GET, "_locale") and then
            Wp_Is_JSON_Request
          then
             Determined_Locale_3 := +Get_User_Locale;
@@ -222,7 +222,7 @@ package body Inc_L10n is
             if
               not Empty (Wp_Lang) and then
               not Empty (Globals.GLOBALS, "pagenow") and then
-              "wp-login.php" = As_String (Get (Globals.GLOBALS, "pagenow"))
+              "wp-login.php" = Get_As_String (Globals.GLOBALS, "pagenow")
             then
                Determined_Locale_3 := +Wp_Lang;
             end if;

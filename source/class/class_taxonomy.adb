@@ -137,15 +137,15 @@ is
       end if;
 
       if
-        As_String (Get (Args_2, "query_var")) /= "" and then
+        Get_As_String (Args_2, "query_var") /= "" and then
         (Inc_Load.Is_Admin or else As_Boolean (Get (Args_2, "publicly_queryable")))
       then
-         if As_String (Get (Args_2, "query_var")) /= "" then
+         if Get_As_String (Args_2, "query_var") /= "" then
             Set (Args_2, "query_var", From_String (-This.Name));
          else
             Set (Args_2, "query_var",
                  From_String (
-                   Sanitize_Title_With_Dashes (As_String (Get (Args_2, "query_var")))));
+                   Sanitize_Title_With_Dashes (Get_As_String (Args_2, "query_var"))));
          end if;
       else
          -- Force "query_var" to false for non-public taxonomies.
@@ -261,7 +261,7 @@ is
       -- Default meta box sanitization callback depends on the value of "meta_box_cb".
       if Is_Null (Get (Args_2, "meta_box_sanitize_cb")) then
          declare
-            Arc : constant String := As_String (Get (Args_2, "meta_box_cb"));
+            Arc : constant String := Get_As_String (Args_2, "meta_box_cb");
          begin
             if Arc = "post_categories_meta_box" then
                Set (Args_2,
@@ -371,7 +371,7 @@ is
                               else "taxonomy=" & (-This.Name) & "&term="));
             Add_Permastruct
               (-This.Name,
-               As_String (Get (This.Rewrite, "slug")) & "/%" & (-This.Name) & "%",
+               Get_As_String (This.Rewrite, "slug") & "/%" & (-This.Name) & "%",
                This.Rewrite);
          end;
       end if;

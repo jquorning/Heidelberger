@@ -40,7 +40,7 @@ is
             Build ("plural",   "tags"),
             Build ("singular", "tag"),
             Build ("screen",   (if Isset (Args, "screen")
-                                then As_String (Get (Args, "screen")) else "null"))
+                                then Get_As_String (Args, "screen") else "null"))
           ))
         )
         with

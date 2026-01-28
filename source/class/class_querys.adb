@@ -1340,7 +1340,7 @@ is
 --    use UStrings;
    begin
       if Isset (This.Query_Vars, Query_Var) then
-         return As_String (Get (This.Query_Vars, Query_Var));
+         return Get_As_String (This.Query_Vars, Query_Var);
       end if;
 
       return Default_Value;

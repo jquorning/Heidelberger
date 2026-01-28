@@ -1636,7 +1636,7 @@ is
             --
             Title : constant String :=
               Apply_Filters ("post_type_archive_title",
-                             As_String (Get (Post_Type_Obj.Labels, "name")), Post_Type);
+                             Get_As_String (Post_Type_Obj.Labels, "name"), Post_Type);
          begin
             if Display then
                Echo (Prefix & Title);

@@ -244,7 +244,7 @@ is
       begin
          if Isset (XX_GET, "page") then
             Plugin_Page :=
-              +Slug_Type (Wp_Unslash (As_String (Get (XX_GET, "page"))));
+              +Slug_Type (Wp_Unslash (Get_As_String (XX_GET, "page")));
 
             Plugin_Page :=
               +Slug_Type (Plugin_Basename (String (-Plugin_Page)));
@@ -252,18 +252,18 @@ is
 
          if
            Isset (X_REQUEST, "post_type") and then
-           Inc_Posts.Post_Type_Exists (As_String (Get (X_REQUEST, "post_type")))
+           Inc_Posts.Post_Type_Exists (Get_As_String (X_REQUEST, "post_type"))
          then
-            Typenow := +As_String (Get (X_REQUEST, "post_type"));
+            Typenow := +Get_As_String (X_REQUEST, "post_type");
          else
             Typenow := +"";
          end if;
 
          if
            Isset (X_REQUEST, "taxonomy") and then
-           Inc_Taxonomys.Taxonomy_Exists (As_String (Get (X_REQUEST, "taxonomy")))
+           Inc_Taxonomys.Taxonomy_Exists (Get_As_String (X_REQUEST, "taxonomy"))
          then
-            Taxnow := +As_String (Get (X_REQUEST, "taxonomy"));
+            Taxnow := +Get_As_String (X_REQUEST, "taxonomy");
          else
             Taxnow := +"";
          end if;
@@ -323,8 +323,8 @@ is
                      declare
                         Query_String : UString;
                      begin
-                        if As_String (Get (X_SERVER, "QUERY_STRING")) /= "" then
-                           Query_String := +As_String (Get (X_SERVER, "QUERY_STRING"));
+                        if Get_As_String (X_SERVER, "QUERY_STRING") /= "" then
+                           Query_String := +Get_As_String (X_SERVER, "QUERY_STRING");
                         else
                            Query_String := "page=" & UString (Plugin_Page);
                         end if;
@@ -451,7 +451,7 @@ is
 
          elsif Isset (XX_GET, "import") then
             declare
-               Importer : constant String := As_String (Get (XX_GET, "import"));
+               Importer : constant String := Get_As_String (XX_GET, "import");
             begin
                if not Inc_Capabilities.Current_User_Can ("import") then
                   Wp_Die (abs "Sorry, you are not allowed to import content into this site.");
@@ -577,7 +577,7 @@ is
       if Isset (X_REQUEST, "action") then
 --    if not Empty (X_REQUEST, "action") then
          declare
-            Action : constant String := As_String (Get (X_REQUEST, "action"));
+            Action : constant String := Get_As_String (X_REQUEST, "action");
          begin
             --
             -- Fires when an "action" request variable is sent.

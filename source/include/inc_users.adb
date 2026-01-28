@@ -3440,12 +3440,13 @@ is
    function Wp_Get_Session_Token
             return String
    is
---    use UStrings;
       use Inc_Pluggables;
 
       Cookie : constant Array_Type := Wp_Parse_Auth_Cookie ("", "logged_in");
    begin
-      return (if not Isset (Cookie, "token") then As_String (Get (Cookie, "token")) else "");
+      return
+        (if not Isset (Cookie, "token")
+         then Get_As_String (Cookie, "token") else "");
 --    return (if not Empty (Cookie ("token")) then Get (Cookie, "token") else "");
    end Wp_Get_Session_Token;
 

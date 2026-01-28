@@ -71,8 +71,8 @@ is
       end if;
 
       declare
-         Id_Field : String := As_String (Get (This.DB_Fields, "id"));
-         Id       : constant String := As_String (Get (Element, "term_id"));
+         Id_Field : String := Get_As_String (This.DB_Fields, "id");
+         Id       : constant String := Get_As_String (Element, "term_id");
          Newlevel     : Boolean;
          Newlevel_Set : Boolean := False;
       begin
@@ -167,7 +167,7 @@ is
       -- Children_elements[10][] contains all sub-elements whose parent is 10.
       --
       declare
-         Parent_Field : constant String := As_String (Get (This.DB_Fields, "parent"));
+         Parent_Field : constant String := Get_As_String (This.DB_Fields, "parent");
          Top_Level_Elements : Array_Type;
          Children_Elements  : Array_Type;
       begin

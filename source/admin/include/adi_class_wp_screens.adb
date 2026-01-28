@@ -1171,7 +1171,7 @@ is
       end if;
 
       Echo ("<" & Tag & " class=""screen-reader-text"">" &
-            As_String (Get (This.X_Screen_Reader_Content, Key)) &
+            Get_As_String (This.X_Screen_Reader_Content, Key) &
             "</" & Tag & ">");
    end Render_Screen_Reader_Content;
 

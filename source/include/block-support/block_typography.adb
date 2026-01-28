@@ -90,10 +90,10 @@ is
             Unit  : UString := +Matches (3);      -- (2)
 
             Coerce_To : constant String :=
-              As_String (Get (Options_2, "coerce_to"));
+              Get_As_String (Options_2, "coerce_to");
 
             Root_Size_Value : constant Float  :=
-              Float'Value (As_String (Get (Options_2, "root_size_value")));
+              Float'Value (Get_As_String (Options_2, "root_size_value"));
          begin
             --
             -- Default browser font size. Later, possibly could inject some JS to
@@ -166,7 +166,7 @@ is
 
       Scale_Factor : constant Float :=
         (if Isset (Args, "scale_factor")
-         then Float'Value (As_String (Get (Args, "scale_factor"))) else 0.0); -- null);
+         then Float'Value (Get_As_String (Args, "scale_factor")) else 0.0); -- null);
 
       -- Normalizes the minimum font size in order to use the value for calculations.
       Minimum_Font_Size : constant Array_Type :=
@@ -178,7 +178,7 @@ is
       --
       Font_Size_Unit : constant String :=
         (if Isset (Minimum_Font_Size, "unit")
-         then As_String (Get (Minimum_Font_Size, "unit")) else "rem");
+         then Get_As_String (Minimum_Font_Size, "unit") else "rem");
 
       -- Normalizes the maximum font size in order to use the value for calculations.
       Maximum_Font_Size : constant Array_Type :=
@@ -231,16 +231,16 @@ is
          -- Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
          --
          Minimum_Viewport_Width_Value : constant Float :=
-           Float'Value (As_String (Get (Minimum_Viewport_Width, "value")));
+           Float'Value (Get_As_String (Minimum_Viewport_Width, "value"));
 
          Maximum_Viewport_Width_Value : constant Float :=
-           Float'Value (As_String (Get (Maximum_Viewport_Width, "value")));
+           Float'Value (Get_As_String (Maximum_Viewport_Width, "value"));
 
          Minimum_Font_Size_Value : constant Float :=
-           Float'Value (As_String (Get (Minimum_Font_Size, "value")));
+           Float'Value (Get_As_String (Minimum_Font_Size, "value"));
 
          Maximum_Font_Size_Value : constant Float :=
-           Float'Value (As_String (Get (Maximum_Font_Size, "value")));
+           Float'Value (Get_As_String (Maximum_Font_Size, "value"));
 
          View_Port_Width_Offset : constant String :=
            Round (Minimum_Viewport_Width_Value / 100.0, 3)'Image & Font_Size_Unit;
@@ -292,7 +292,7 @@ is
       -- Fluid calculations cannot be performed on 0.
       --
       if Empty (Preset, "size") then
-         return As_String (Get (Preset, "size"));
+         return Get_As_String (Preset, "size");
       end if;
 
       -- Checks if fluid font sizes are activated.
@@ -319,12 +319,12 @@ is
             else Empty_Array); -- null
       begin
          if not Should_Use_Fluid_Typography_2 then
-            return As_String (Get (Preset, "size"));
+            return Get_As_String (Preset, "size");
          end if;
 
          -- A font size has explicitly bypassed fluid calculations.
          if Fluid_Font_Size_Settings = Empty_Array then -- False
-            return As_String (Get (Preset, "size"));
+            return Get_As_String (Preset, "size");
          end if;
 
          -- Try to grab explicit min and max fluid font sizes.
@@ -351,7 +351,7 @@ is
               Wp_Get_Typography_Value_And_Unit (
                 From_String (Default_Minimum_Font_Size_Limit),
                 To_Array (List => (1 =>
-                  Build ("coerce_to", As_String (Get (Preferred_Size, "unit")))
+                  Build ("coerce_to", Get_As_String (Preferred_Size, "unit"))
                 ))
               );
 
@@ -360,7 +360,7 @@ is
          begin
             -- Protects against unsupported units.
             if Empty (Preferred_Size, "unit") then
-               return As_String (Get (Preset, "size"));
+               return Get_As_String (Preset, "size");
             end if;
 
             -- Don't enforce minimum font size if a font size has explicitly set a
@@ -379,15 +379,15 @@ is
                  As_Integer (Get (Preferred_Size, "value")) <=
                  As_Integer (Get (Minimum_Font_Size_Limit, "value"))
                then
-                  return As_String (Get (Preset, "size"));
+                  return Get_As_String (Preset, "size");
                end if;
             end if;
 
             -- If no fluid max font size is available use the incoming value.
             if not Maximum_Font_Size_Raw then
                Maximum_Font_Size_Raw_String := +(
-                 As_String (Get (Preferred_Size, "value")) &
-                 As_String (Get (Preferred_Size, "unit")));
+                 Get_As_String (Preferred_Size, "value") &
+                 Get_As_String (Preferred_Size, "unit"));
             end if;
 
             --
@@ -398,7 +398,7 @@ is
                declare
                   Calculated_Minimum_Font_Size : constant Float :=
                     Round (
-                      Float'Value (As_String (Get (Preferred_Size, "value"))) *
+                      Float'Value (Get_As_String (Preferred_Size, "value")) *
                       Default_Minimum_Font_Size_Factor,
                       3
                     );
@@ -408,15 +408,15 @@ is
                   if
                     not Empty (Minimum_Font_Size_Limit) and then
                     Calculated_Minimum_Font_Size <=
-                    Float'Value (As_String (Get (Minimum_Font_Size_Limit, "value")))
+                    Float'Value (Get_As_String (Minimum_Font_Size_Limit, "value"))
                   then
                      Minimum_Font_Size_Raw_String := +(
-                       As_String (Get (Minimum_Font_Size_Limit, "value")) &
-                       As_String (Get (Minimum_Font_Size_Limit, "unit")));
+                       Get_As_String (Minimum_Font_Size_Limit, "value") &
+                       Get_As_String (Minimum_Font_Size_Limit, "unit"));
                   else
                      Minimum_Font_Size_Raw_String := +(
                        Calculated_Minimum_Font_Size'Image &
-                       As_String (Get (Preferred_Size, "unit")));
+                       Get_As_String (Preferred_Size, "unit"));
                   end if;
                end;
             end if;
@@ -438,7 +438,7 @@ is
             end;
          end;
       end;
-      return As_String (Get (Preset, "size"));
+      return Get_As_String (Preset, "size");
    end Wp_Get_Typography_Font_Size_Value;
 
 end Block_Typography;

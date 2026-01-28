@@ -61,19 +61,19 @@ is
           ))
         );
    begin
-      This.Screen := Convert_To_Screen (As_String (Get (Args, "screen")));
+      This.Screen := Convert_To_Screen (Get_As_String (Args, "screen"));
 
 --    Add_Filter ("manage_" & (-This.Screen.Id) & "_columns",
 --                "Empty_Array", -- To_Array (This, "get_columns"),
 --                0);
 
-      if "" = As_String (Get (Args_2, "plural")) then
+      if "" = Get_As_String (Args_2, "plural") then
 --    if not Args_2 ("plural") then
          Set (Args_2, "plural", From_String (-This.Screen.Base));
       end if;
 
-      Set (Args_2, "plural",   From_String (Sanitize_Key (As_String (Get (Args_2, "plural")))));
-      Set (Args_2, "singular", From_String (Sanitize_Key (As_String (Get (Args_2, "singular")))));
+      Set (Args_2, "plural",   From_String (Sanitize_Key (Get_As_String (Args_2, "plural"))));
+      Set (Args_2, "singular", From_String (Sanitize_Key (Get_As_String (Args_2, "singular"))));
 
       This.X_Args := Args_2;
 
@@ -284,22 +284,22 @@ is
 
       if not Empty (X_REQUEST, "orderby") then
          Echo ("<input type=""hidden"" name=""orderby"" value=""""" &
-               ESC_Attr (As_String (Get (X_REQUEST, "orderby"))) & """ />");
+               ESC_Attr (Get_As_String (X_REQUEST, "orderby")) & """ />");
       end if;
 
       if not Empty (X_REQUEST, "order") then
          Echo ("<input type=""hidden"" name=""order"" value=""""" &
-               ESC_Attr (As_String (Get (X_REQUEST, "order"))) & """ />");
+               ESC_Attr (Get_As_String (X_REQUEST, "order")) & """ />");
       end if;
 
       if not Empty (X_REQUEST, "post_mime_type") then
          Echo ("<input type=""hidden"" name=""post_mime_type"" value=""""" &
-               ESC_Attr (As_String (Get (X_REQUEST, "post_mime_type"))) & """ />");
+               ESC_Attr (Get_As_String (X_REQUEST, "post_mime_type")) & """ />");
       end if;
 
       if not Empty (X_REQUEST, "detached") then
          Echo ("<input type=""hidden"" name=""detached"" value=""""" &
-               ESC_Attr (As_String (Get (X_REQUEST, "detached"))) & """ />");
+               ESC_Attr (Get_As_String (X_REQUEST, "detached")) & """ />");
       end if;
 
       Echo ("<p class=""search-box"">" & NL);
@@ -438,7 +438,7 @@ is
       for A in Views.Iterate loop
          declare
             Class : constant String := Key (A);
-            View  : constant String := As_String (Get (Views, Class));
+            View  : constant String := Get_As_String (Views, Class);
          begin
             Set (Views, Class,
                  From_String ("\t<li class=""" & Class  & """>" & View));
@@ -515,7 +515,7 @@ is
       for A in This.X_Actions.Iterate loop --  as key => value ) then
          declare
             Key   : constant String := Arrays.Key     (A);
-            Value : constant String := As_String (Get (This.X_Actions, Key));
+            Value : constant String := Get_As_String (This.X_Actions, Key);
          begin
             if False then -- Is_Array (Value) then
                Echo (TAB & "<optgroup label=""" & ESC_Attr (Key) & """>" & NL & NL);
@@ -523,7 +523,7 @@ is
                for B in Empty_Array.Iterate loop -- Value.Iterate loop
                   declare
                      Name  : constant String := Arrays.Key (B);
-                     Title : constant String := As_String (Get (Empty_Array, Name));
+                     Title : constant String := Get_As_String (Empty_Array, Name);
                      -- Array_Maps.Element (B);
 
                      Class : constant String :=
@@ -979,8 +979,8 @@ is
 
          Current_URL :=
            +Set_URL_Scheme ("http://" &
-           As_String (Get (X_SERVER, "HTTP_HOST")) &
-           As_String (Get (X_SERVER, "REQUEST_URI")));
+           Get_As_String (X_SERVER, "HTTP_HOST") &
+           Get_As_String (X_SERVER, "REQUEST_URI"));
 
          Current_URL := +Remove_Query_Arg (Removable_Query_Args, -Current_URL);
 
@@ -1155,7 +1155,7 @@ is
       for A in Columns.Iterate loop
          declare
             Col         : constant String := Key (A);
---          Column_Name :          String := As_String (Get (Columns, Col));
+--          Column_Name :          String := Get_As_String (Columns, Col);
             -- Array_Maps.Element (A);
          begin
             if "cb" = Col then
@@ -1378,8 +1378,8 @@ is
       Sortable : constant Array_Type := Column_Info.Sortable;
       Primary  : constant String     := -Column_Info.Primary;
 
-      HTTP_Host   : constant String := As_String (Get (X_SERVER, "HTTP_HOST"));
-      Request_URI : constant String := As_String (Get (X_SERVER, "REQUEST_URI"));
+      HTTP_Host   : constant String := Get_As_String (X_SERVER, "HTTP_HOST");
+      Request_URI : constant String := Get_As_String (X_SERVER, "REQUEST_URI");
 
       Current_URL_2 : constant String :=
         Inc_Link_Templates.Set_URL_Scheme
@@ -1418,7 +1418,7 @@ is
 --          Column_Key          : constant Integer := -To_Index (A); -- Key (A);
             Column_Key          : constant String := Key (A);
 --          Column_Display_Name : String := -Columns (Column_Key); -- Element (A);
-            Column_Display_Name : String := As_String (Get (Columns, Column_Key));
+            Column_Display_Name : String := Get_As_String (Columns, Column_Key);
             -- Array_Maps.Element (A);
             Class : List_Type := ["manage-column", "column-column_key"];
          begin
@@ -1441,11 +1441,12 @@ is
             if Isset (Sortable, Column_Key) then
                declare
                   Orderby : constant String :=
-                    As_String (Get (Sortable, "orderby"));
+                    Get_As_String (Sortable, "orderby");
 --                  Get (Get_List (Sortable, Column_Key), "orderby");
 
                   Desc_First : constant String :=
-                    As_String (Get (As_Array (Get (Sortable, Column_Key)), "desc_first"));
+                    Get_As_String (As_Array (Get (Sortable, Column_Key)),
+                                   "desc_first");
 
 --                List (orderby, desc_first) := Sortable (Column_Key);
                   Order : UString;
@@ -1508,7 +1509,7 @@ is
       use Php.Strings;
       use UStrings;
 
-      Singular : constant String := As_String (Get (This.X_Args, "singular"));
+      Singular : constant String := Get_As_String (This.X_Args, "singular");
    begin
       This.Display_Tablenav ("top");
       This.Screen.Render_Screen_Reader_Content ("heading_list");
@@ -1563,7 +1564,7 @@ is
       Mode_Class : constant String := ESC_Attr ("table-view-" & Mode);
    begin
       return ["widefat", "fixed", "striped",
-              Mode_Class, As_String (Get (This.X_Args, "plural"))];
+              Mode_Class, Get_As_String (This.X_Args, "plural")];
    end Get_Table_Classes;
 
    ----------------------
@@ -1581,13 +1582,13 @@ is
       Unused : UString;
    begin
       declare
-         Unused : constant String := As_String (Get (This.X_Args, "plural"));
+         Unused : constant String := Get_As_String (This.X_Args, "plural");
       begin
          null;
       end;
 
       if "top" = Which then
-         Unused := +Wp_Nonce_Field ("bulk-" & As_String (Get (This.X_Args, "plural")));
+         Unused := +Wp_Nonce_Field ("bulk-" & Get_As_String (This.X_Args, "plural"));
       end if;
 
       Echo ("  <div class=""tablenav " & ESC_Attr (Which) & ">" & NL);
@@ -1647,7 +1648,7 @@ is
    begin
       for Item in This.Items.Iterate loop
          This.Single_Row (To_Array ((1 =>
-                          Build (Key (Item), As_String (Get (This.Items, Key (Item)))) -- Element (Item))
+                          Build (Key (Item), Get_As_String (This.Items, Key (Item))) -- Element (Item))
                           )));
       end loop;
    end Display_Rows;
@@ -1712,7 +1713,7 @@ is
       for A in Columns.Iterate loop
          declare
             Column_Name         : constant String := Key (A);
-            Column_Display_Name : constant String := As_String (Get (Columns, Column_Name));
+            Column_Display_Name : constant String := Get_As_String (Columns, Column_Name);
             -- Array_Maps.Element (A);
 
             Classes    : UString := +"column_name column-column_name";

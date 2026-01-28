@@ -110,7 +110,7 @@ is
          end if;
 
          if Isset (Cache, "theme_root_template") then
-            Theme_Root_Template := +As_String (Get (Cache, "theme_root_template"));
+            Theme_Root_Template := +Get_As_String (Cache, "theme_root_template");
          end if;
 
       elsif not File_Exists (-(This.Theme_Root & "/" & Theme_File)) then
@@ -181,7 +181,7 @@ is
             -- Properly identify default themes that are inside a directory within
             -- wp-content/themes.
             Default_Theme_Slug : constant String :=
-              Array_Search (As_String (Get (This.Headers, "Name")),
+              Array_Search (Get_As_String (This.Headers, "Name"),
                             Static_Default_Themes,
                             True);
          begin
@@ -197,7 +197,7 @@ is
       if
         This.Template = "" and then
 --      not This.Template and then
-        This.Stylesheet = +As_String (Get (This.Headers, "Template"))
+        This.Stylesheet = +Get_As_String (This.Headers, "Template")
       then
          This.M_Errors :=
            Wp_Error'(X_Construct (
@@ -222,7 +222,7 @@ is
 
       -- (If template is set from cache [and there are no errors], we know it's good.)
       if This.Template = "" then
-         This.Template := +As_String (Get (This.Headers, "Template"));
+         This.Template := +Get_As_String (This.Headers, "Template");
       end if;
 
       if This.Template = "" then
@@ -287,7 +287,7 @@ is
                This.Template := Parent_Dir & "/" & This.Template;
             elsif
               not Directories.Is_Empty and then
-              Isset (As_String (Get (Directories, -This.Template)))
+              Isset (Get_As_String (Directories, -This.Template))
             then
                -- Look for the template in the search_theme_directories() results, in
                -- case it is in another theme root.
@@ -520,7 +520,7 @@ is
       end if;
 
       if Isset (This.Headers_Sanitized, Header) then
-         return As_String (Get (This.Headers_Sanitized, Header));
+         return Get_As_String (This.Headers_Sanitized, Header);
       end if;
 
       -- If themes are a persistent group, sanitize everything and cache it. One
@@ -529,17 +529,17 @@ is
          for X_Header of List_Type'(Array_Keys (This.Headers)) loop
             Set (This.Headers_Sanitized, X_Header, From_String (
                    This.Sanitize_Header (X_Header,
-                     As_String (Get (This.Headers, X_Header)))));
+                     Get_As_String (This.Headers, X_Header))));
          end loop;
          This.Cache_Add ("headers", This.Headers_Sanitized);
       else
          Set (This.Headers_Sanitized, Header,
               From_String (
                 This.Sanitize_Header (Header,
-                  As_String (Get (This.Headers, Header)))));
+                  Get_As_String (This.Headers, Header))));
       end if;
 
-      return As_String (Get (This.Headers_Sanitized, Header));
+      return Get_As_String (This.Headers_Sanitized, Header);
    end Get;
 
    ---------------------

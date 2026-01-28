@@ -1190,7 +1190,7 @@ is
             begin
                Static_X_Charset :=
                  +(if Isset (Alloptions, "blog_charset")
-                   then As_String (Get (Alloptions, "blog_charset")) else "");
+                   then Get_As_String (Alloptions, "blog_charset") else "");
             end;
             Static_X_Charset_Set := True;
          end if;

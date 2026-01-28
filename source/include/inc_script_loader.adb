@@ -106,7 +106,7 @@ is
         Static_Compress_Scripts   and then
         Static_Concatenate_Script and then
         Isset (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING") and then
-        0 /= Stripos (As_String (Get (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING")), "gzip") and then
+        0 /= Stripos (Get_As_String (Binder.X_SERVER, "HTTP_ACCEPT_ENCODING"), "gzip") and then
         not Force_Uncompressed;
 
       -- Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in
@@ -193,7 +193,7 @@ is
 --          use Array_Maps;
 
             Handle       : constant String := Key     (A);
-            Dependencies : constant String := As_String (Get (Vendor_Scripts, Handle));
+            Dependencies : constant String := Get_As_String (Vendor_Scripts, Handle);
             -- Element (A);
             Path    : UString;
             Version : UString;
@@ -204,7 +204,7 @@ is
             -- end if;
 
             Path    := +"/wp-includes/js/dist/vendor/handle" & Suffix & " .js";
-            Version := +As_String (Get (Vendor_Scripts_Versions, Handle));
+            Version := +Get_As_String (Vendor_Scripts_Versions, Handle);
 
             Scripts.Add (Handle, -Path, [Dependencies], -Version, 1);
          end;
@@ -340,7 +340,7 @@ is
               "wp-" & Script_Name,
               "/wp-includes/js/dist/development/" & Script_Name & ".js",
               As_List (Get (Assets, "dependencies")),
-              As_String (Get (Assets, "version"))
+              Get_As_String (Assets, "version")
             );
          end;
       end loop;
@@ -412,7 +412,7 @@ is
 
             end if;
 
-            Scripts.Add (Handle, Path, Dependencies, As_String (Get (Package_Data, "version")), 1);
+            Scripts.Add (Handle, Path, Dependencies, Get_As_String (Package_Data, "version"), 1);
 
             if In_List ("wp-i18n", Dependencies, True) then
                Scripts.Set_Translations (Handle);
@@ -829,10 +829,10 @@ is
       end if;
 
       if "dev" = Typ then
-         return As_String (Get (Static_Suffixes, "dev_suffix"));
+         return Get_As_String (Static_Suffixes, "dev_suffix");
       end if;
 
-      return As_String (Get (Static_Suffixes, "suffix"));
+      return Get_As_String (Static_Suffixes, "suffix");
    end Wp_Scripts_Get_Suffix;
 
    ------------------------
@@ -2816,7 +2816,7 @@ is
             for A in Concat_2.Iterate loop
                declare
                   Key   : constant String := Arrays.Key (A);
-                  Chunk : constant String := As_String (Get (Concat_2, Key));
+                  Chunk : constant String := Get_As_String (Concat_2, Key);
                begin
                   Append (Concatenated, "&load%5Bchunk_" & Key & "%5D=" & Chunk);
                end;
@@ -3526,7 +3526,7 @@ is
 
             -- Set `src` to `False` and add styles inline.
             declare
-               Handle     : constant String := As_String (Get (Style, "handle"));
+               Handle     : constant String := Get_As_String (Style, "handle");
                Registered : Dependency_Maps.Cursor := -- X_Wp_Dependency :=
                  Styles.Registered.Find (Handle);
 --             Registered :  := Styles.Registered (Handle);

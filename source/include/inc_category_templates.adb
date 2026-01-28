@@ -374,7 +374,7 @@ is
                          else 0));
 
       -- Back compat.
-      if Isset (Args, "type") and then "link" = As_String (Get (Args, "type")) then
+      if Isset (Args, "type") and then "link" = Get_As_String (Args, "type") then
          X_Deprecated_Argument (
            "__FUNCTION__",
            "3.0.0",
@@ -430,17 +430,17 @@ is
 
          Categories : constant Wp_Term_Array := Get_Terms (Get_Terms_Args);
 
-         Name     : constant String := ESC_Attr (As_String (Get (Parsed_Args, "name")));
-         Class    : constant String := ESC_Attr (As_String (Get (Parsed_Args, "class")));
-         Id       : String := (if As_String (Get (Parsed_Args, "id")) /= ""
-                               then ESC_Attr (As_String (Get (Parsed_Args, "id"))) else Name);
+         Name     : constant String := ESC_Attr (Get_As_String (Parsed_Args, "name"));
+         Class    : constant String := ESC_Attr (Get_As_String (Parsed_Args, "class"));
+         Id       : String := (if Get_As_String (Parsed_Args, "id") /= ""
+                               then ESC_Attr (Get_As_String (Parsed_Args, "id")) else Name);
          Required : String := (if As_Boolean (Get (Parsed_Args, "required"))
                                then "required" else "");
 
          Aria_Describedby_Attribute : String :=
-           (if As_String (Get (Parsed_Args, "aria_describedby")) /= ""
+           (if Get_As_String (Parsed_Args, "aria_describedby") /= ""
             then " aria-describedby=""" &
-                 ESC_Attr (As_String (Get (Parsed_Args, "aria_describedby"))) & """"
+                 ESC_Attr (Get_As_String (Parsed_Args, "aria_describedby")) & """"
             else "");
       begin
          if
@@ -457,7 +457,7 @@ is
          if
            Empty (Categories) and then
            not As_Boolean (Get (Parsed_Args, "hide_if_empty")) and then
-           not Empty (As_String (Get (Parsed_Args, "show_option_none")))
+           not Empty (Get_As_String (Parsed_Args, "show_option_none"))
          then
             --
             -- Filters a taxonomy drop-down display element.
@@ -477,7 +477,7 @@ is
             --
             declare
                Show_Option_None : constant String :=
-                 Apply_Filters ("list_cats", As_String (Get (Parsed_Args, "show_option_none")),
+                 Apply_Filters ("list_cats", Get_As_String (Parsed_Args, "show_option_none"),
                                 "null"); -- "" added
             begin
                Append (Output,
@@ -488,13 +488,13 @@ is
          end if;
 
          if not Empty (Categories) then
-            if As_String (Get (Parsed_Args, "show_option_all")) /= "" then
+            if Get_As_String (Parsed_Args, "show_option_all") /= "" then
                declare
                   -- This filter is documented in wp-includes/category-template.php
                   Show_Option_All : constant String :=
-                    Apply_Filters ("list_cats", As_String (Get (Parsed_Args, "show_option_all")),
+                    Apply_Filters ("list_cats", Get_As_String (Parsed_Args, "show_option_all"),
                                    "null");  -- "" added
-                  Selected : String := (if "0" = As_String (Get (Parsed_Args, "selected"))
+                  Selected : String := (if "0" = Get_As_String (Parsed_Args, "selected")
                                         then " selected=""selected""" else "");
                begin
                   Append (Output,
@@ -503,17 +503,17 @@ is
                end;
             end if;
 
-            if As_String (Get (Parsed_Args, "show_option_none")) /= "" then
+            if Get_As_String (Parsed_Args, "show_option_none") /= "" then
                declare
                   use Inc_General_Templates;
 
                   -- This filter is documented in wp-includes/category-template.php
                   Show_Option_None : constant String :=
-                    Apply_Filters ("list_cats", As_String (Get (Parsed_Args, "show_option_none")),
+                    Apply_Filters ("list_cats", Get_As_String (Parsed_Args, "show_option_none"),
                                    "null");  -- "" added
                   Selectd : constant String :=
                     Selected (-Option_None_Value,
-                              As_String (Get (Parsed_Args, "selected")),
+                              Get_As_String (Parsed_Args, "selected"),
                               Echo => False);
                begin
                   Append (Output,

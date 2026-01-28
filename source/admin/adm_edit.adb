@@ -204,8 +204,8 @@ is
                               +Preg_Replace (
                                  Pattern     => "/(^a-z0-9_-)+/i",
                                  Replacement => "",
-                                 Subject     => As_String (Get (X_REQUEST,
-                                                                "post_status")));
+                                 Subject     => Get_As_String (X_REQUEST,
+                                                              "post_status"));
 
                            -- Validate the post status exists.
                            if
@@ -236,7 +236,7 @@ is
                         elsif Isset (X_REQUEST, "ids") then
                            Post_Ids := Explode (",", Get_As_String (X_REQUEST, "ids"));
 
-                        elsif not Empty (As_String (Get (X_REQUEST, "post"))) then
+                        elsif not Empty (Get_As_String (X_REQUEST, "post")) then
                            Post_Ids := List_Type'(
                              Array_Map (Intval'Access,
                                         As_Array (Get (X_REQUEST, "post"))));
@@ -290,8 +290,8 @@ is
                               Untrashed : Natural := 0;
                            begin
                               if
-                                Isset (As_String (Get (XX_GET, "doaction"))) and then
-                                "undo" = As_String (Get (XX_GET, "doaction"))
+                                Isset (Get_As_String (XX_GET, "doaction")) and then
+                                "undo" = Get_As_String (XX_GET, "doaction")
                               then
                                  Add_Filter
                                    ("wp_untrash_post_status",
@@ -352,7 +352,7 @@ is
 
                         elsif "edit" = Doaction then
 --              when "edit" =>
-                           if Isset (As_String (Get (X_REQUEST, "bulk_edit"))) then
+                           if Isset (Get_As_String (X_REQUEST, "bulk_edit")) then
                               declare
                                  Done : Array_Type :=
                                     Adi_Posts.Bulk_Edit_Posts (
@@ -429,7 +429,7 @@ is
                   Inc_Pluggables.Wp_Redirect
                             (Remove_Query_Arg
                              (List,
-                              Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI")))));
+                              Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI"))));
                end;
                return; -- exit;  -- redirect
             end if;
@@ -707,7 +707,7 @@ is
                         if
                           Isset (X_REQUEST, "s") and then
 --                        Isset (String'(Get (X_REQUEST, "s"))) and then
-                          As_String (Get (X_REQUEST, "s"))'Length /= 0
+                          Get_As_String (X_REQUEST, "s")'Length /= 0
                         then
                            declare
                               use Inc_General_Templates;
@@ -745,7 +745,7 @@ is
                      elsif Var_Name = "VAR_page_edit_post_status" then
                         Set ("VAR_page_edit_post_status",
                             (if Isset (X_REQUEST, "post_status")
-                             then ESC_Attr (As_String (Get (X_REQUEST, "post_status")))
+                             then ESC_Attr (Get_As_String (X_REQUEST, "post_status"))
                              else "all"));
 
                      elsif Var_Name = "VAR_page_edit_post_type" then
@@ -755,7 +755,7 @@ is
                         if Isset (X_REQUEST, "author") then
                            declare
                               Author : constant String :=
-                                ESC_Attr (As_String (Get (X_REQUEST, "author")));
+                                ESC_Attr (Get_As_String (X_REQUEST, "author"));
                            begin
                               Set
                                 ("VAR_page_edit_author",
@@ -848,20 +848,20 @@ is
 --          use Array_Maps;
 
             Count   : constant Natural := Natural'Value (Key (X));
-            Message : constant String  := As_String (Get (Bulk_Counts, Key (X)));
+            Message : constant String  := Get_As_String (Bulk_Counts, Key (X));
             Message_Array : Array_Type renames As_Array (Get (Bulk_Messages, Post_Type));
             Post_Array    : Array_Type renames As_Array (Get (Bulk_Messages, Post_Type));
          begin
             if Isset (Message_Array, Message) then
 --          if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages,
-                       Sprintf (As_String (Get (Message_Array, Message)),
+                       Sprintf (Get_As_String (Message_Array, Message),
                                 [Number_Format_I18n (Float (Count))]));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
             elsif Isset (Post_Array, Message) then
                Append (Messages,
-                       Sprintf (As_String (Get (Post_Array, Message)),
+                       Sprintf (Get_As_String (Post_Array, Message),
                                 [Number_Format_I18n (Float (Count))]));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
@@ -955,7 +955,7 @@ is
       begin
          Set (X_SERVER, "REQUEST_URI",
               From_String (
-                Remove_Query_Arg (List, As_String (Get (X_SERVER, "REQUEST_URI")))));
+                Remove_Query_Arg (List, Get_As_String (X_SERVER, "REQUEST_URI"))));
       end;
       return "XXX-51";
    end Var_Bulk;

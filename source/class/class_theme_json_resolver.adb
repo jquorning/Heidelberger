@@ -292,7 +292,7 @@ is
          end;
       end if;
 
-      if "" = As_String (Get (Options_2, "with_supports")) then -- not
+      if "" = Get_As_String (Options_2, "with_supports") then -- not
          return Static_Theme; -- static::
       end if;
 
@@ -609,7 +609,7 @@ is
          if Array_Key_Exists ("post_content", User_CPT) then
             declare
                Decoded_Data : constant Array_Type :=
-                 JSON_Decode (As_String (Get (User_CPT, "post_content")), True);
+                 JSON_Decode (Get_As_String (User_CPT, "post_content"), True);
 
                JSON_Decoding_Error : constant Integer := JSON_Last_Error;
             begin
@@ -645,7 +645,7 @@ is
                if
                  Is_Array (Decoded_Data) and then
                  Isset (Decoded_Data, "isGlobalStylesUserThemeJSON") and then
-                 As_String (Get (Decoded_Data, "isGlobalStylesUserThemeJSON")) /= ""
+                 Get_As_String (Decoded_Data, "isGlobalStylesUserThemeJSON") /= ""
                then
                   Delete (Ref (Decoded_Data, "isGlobalStylesUserThemeJSON"));
 --                Unset (Decoded_Data ("isGlobalStylesUserThemeJSON"));

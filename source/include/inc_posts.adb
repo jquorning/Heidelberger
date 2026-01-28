@@ -2868,9 +2868,9 @@ is
 
             Add_Submenu_Page
               (Parent_Slug => -PType_Obj.Show_In_Menu,
-               Page_Title  => As_String (Get (PType_Obj.Labels, "name")),
-               Menu_Title  => As_String (Get (PType_Obj.Labels, "all_items")),
-               Capability  => As_String (Get (PType_Obj.Cap,    "edit_posts")),
+               Page_Title  => Get_As_String (PType_Obj.Labels, "name"),
+               Menu_Title  => Get_As_String (PType_Obj.Labels, "all_items"),
+               Capability  => Get_As_String (PType_Obj.Cap,    "edit_posts"),
                Menu_Slug   => "edit.php?post_type=ptype");
 
          end;

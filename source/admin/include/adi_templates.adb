@@ -171,10 +171,10 @@ is
       end if;
 
       declare
-         Taxonomy : constant String  := As_String (Get (Parsed_Args, "taxonomy"));
+         Taxonomy : constant String  := Get_As_String (Parsed_Args, "taxonomy");
 
          Descendants_And_Self : constant Integer
-            := Integer'Value (As_String (Get (Parsed_Args, "descendants_and_self")));
+            := Integer'Value (Get_As_String (Parsed_Args, "descendants_and_self"));
          Args_2 : Array_Type := To_Array (List => (1 =>
                                    Build ("taxonomy", Taxonomy)));
 
@@ -185,7 +185,7 @@ is
          Set (Args_2, "disabled",
               From_String (
                 Boolean'Image (
-                  not Current_User_Can (As_String (Get (Tax.Cap, "assign_terms"))))));
+                  not Current_User_Can (Get_As_String (Tax.Cap, "assign_terms")))));
 
          Set (Args_2, "list_only",
               From_String (
@@ -2317,7 +2317,7 @@ is
       use Inc_Formatting;
    begin
       Echo ((if Isset (X_REQUEST, "s")
-             then ESC_Attr (Wp_Unslash (As_String (Get (X_REQUEST, "s")))) else ""));
+             then ESC_Attr (Wp_Unslash (Get_As_String (X_REQUEST, "s"))) else ""));
    end X_Admin_Search_Query;
 
 -- --
@@ -2705,8 +2705,8 @@ is
                Mods : constant Array_Type := Get_Theme_Mods;  -- ();
             begin
                if
-                 Isset (As_String (Get (Mods, "header_video"))) and then
-                 Post.Id'Image = As_String (Get (Mods, "header_video"))
+                 Isset (Get_As_String (Mods, "header_video")) and then
+                 Post.Id'Image = Get_As_String (Mods, "header_video")
                then
                   Media_States := +abs "Current Header Video";
                end if;
@@ -2888,7 +2888,7 @@ is
          Id : UString := +Name;
       begin
          if Is_Array (Other_Attributes) and then Isset (Other_Attributes, "id") then
-            Id := +As_String (Get (Other_Attributes, "id"));
+            Id := +Get_As_String (Other_Attributes, "id");
 --          Other_Attributes.Delete (Other_Attributes.Find (Item => "id"));
 --          Unset (Other_Attributes ("id"));
          end if;
@@ -2902,7 +2902,7 @@ is
 --                   use Array_Maps;
 
                      Attribute : constant String := Key (A); -- A.Key;
-                     Value     : constant String := As_String (Get (Other_Attributes, Attribute));
+                     Value     : constant String := Get_As_String (Other_Attributes, Attribute);
                      -- Element (A); -- A.Value;
                   begin
                      Append (Attributes, "=""" & ESC_Attr (Value) & """ ");

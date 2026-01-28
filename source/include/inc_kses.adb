@@ -1175,10 +1175,10 @@ is
          for Arreach in Attrarr.Iterate loop
             declare
                Arry     : constant Array_Type := As_Array (Arrays.Element (Arreach));
-               Name     :          String     := As_String (Get (Arry, "name"));
-               Value    :          String     := As_String (Get (Arry, "value"));
-               Whole    :          String     := As_String (Get (Arry, "whole"));
-               Vless    : constant String     := As_String (Get (Arry, "vless"));
+               Name     :          String     := Get_As_String (Arry, "name");
+               Value    :          String     := Get_As_String (Arry, "value");
+               Whole    :          String     := Get_As_String (Arry, "whole");
+               Vless    : constant String     := Get_As_String (Arry, "vless");
                Name_Low : constant String     := Strtolower (Name);
 
                -- Check if this attribute is required.
@@ -1250,7 +1250,7 @@ is
 
       if
         not Isset (Allowed_Attr, Name_Low) or else
-        "" = As_String (Get (Allowed_Attr, Name_Low))
+        "" = Get_As_String (Allowed_Attr, Name_Low)
       then
          --
          -- Allow `data-*` attributes.
@@ -1726,7 +1726,7 @@ is
         Preg_Replace ("/[\x00-\x08\x0B\x0C\x0E-\x1F]/", "", Item);
 
       String_3 : constant String :=
-        (if "remove" = As_String (Get (Options_2, "slash_zero"))
+        (if "remove" = Get_As_String (Options_2, "slash_zero")
          then Preg_Replace ("/\\\\+0+/", "", String_2)
          else String_2);
    begin

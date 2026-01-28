@@ -580,7 +580,7 @@ is
 --             use Class_Terms;
 
                Term : Array_Type :=
-                 Term_Exists (As_String (Get (Taxonomy_Object.Default_Term, "name")),
+                 Term_Exists (Get_As_String (Taxonomy_Object.Default_Term, "name"),
                               Taxonomy);
             begin
                if Term /= Empty_Array then
@@ -590,13 +590,13 @@ is
                else
                   Term :=
                     Wp_Insert_Term (
-                      As_String (Get (Taxonomy_Object.Default_Term, "name")),
+                      Get_As_String (Taxonomy_Object.Default_Term, "name"),
                       Taxonomy,
                       To_Array (List => (
                         Build ("slug",
-                               Sanitize_Title (As_String (Get (Taxonomy_Object.Default_Term, "slug")))),
+                               Sanitize_Title (Get_As_String (Taxonomy_Object.Default_Term, "slug"))),
                         Build ("description",
-                               As_String (Get (Taxonomy_Object.Default_Term, "description")))
+                               Get_As_String (Taxonomy_Object.Default_Term, "description"))
                       ))
                     );
 
@@ -2305,7 +2305,7 @@ is
 
       for A in Taxonomies.Iterate loop
          declare
-            Taxonomy : constant String := As_String (Get (Taxonomies, Key (A)));
+            Taxonomy : constant String := Get_As_String (Taxonomies, Key (A));
          begin
             if not Taxonomy_Exists (Taxonomy) then
                return Empty_Term_Array;
@@ -2359,7 +2359,7 @@ is
                   Index : constant String := Key (X);
 
                   Taxonomy : constant String :=
-                    As_String (Get (Taxonomies_2, Index));
+                    Get_As_String (Taxonomies_2, Index);
                begin
                   T := Get_Taxonomy (Taxonomy);
                   if
@@ -2406,7 +2406,7 @@ is
                -- Array keys should be preserved for values of fields that use
                -- term_id for keys.
                if
-                 not Empty (As_String (Get (Args_3, "fields"))) and then
+                 not Empty (Get_As_String (Args_3, "fields")) and then
                  0 = Strpos (As_String  (Get (Args_3, "fields")), "id=>")
                then
                   Terms := Terms & Terms_From_Remaining_Taxonomies;

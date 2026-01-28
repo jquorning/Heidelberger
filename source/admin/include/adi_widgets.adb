@@ -33,8 +33,8 @@ is
    is
       use Php.Strings;
 
-      Left  : constant String := As_String (Get (As_Array (A), "name"));
-      Right : constant String := As_String (Get (As_Array (B), "name"));
+      Left  : constant String := Get_As_String (As_Array (A), "name");
+      Right : constant String := Get_As_String (As_Array (B), "name");
    begin
       return Strnatcasecmp (Left, Right);
    end X_Sort_Name_Callback;
@@ -52,10 +52,10 @@ is
 --    static i = 0;
       Params_2  : constant Array_Type := Params;
       Params_0  : Array_Type := As_Array (Get (Params_2, "[0]"));
-      Widget_Id : constant String := As_String (Get (Params_0, "widget_id"));
+      Widget_Id : constant String := Get_As_String (Params_0, "widget_id");
 
       Id : constant String := (if Isset (Params_0, "_temp_id")
-                               then As_String (Get (Params_0, "_temp_id"))
+                               then Get_As_String (Params_0, "_temp_id")
                                else Widget_Id);
 
       Hidden : constant String := (if Isset (Params_0, "_hide")

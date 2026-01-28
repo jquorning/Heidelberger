@@ -83,8 +83,8 @@ is
          if
            Isset (XX_GET, "post")    and then
            Isset (X_POST, "post_ID") and then
-           Integer'Value (As_String (Get (XX_GET, "post"))) /=
-           Integer'Value (As_String (Get (X_POST, "post_ID")))
+           Integer'Value (Get_As_String (XX_GET, "post")) /=
+           Integer'Value (Get_As_String (X_POST, "post_ID"))
          then
             Wp_Die
                (abs "A post ID mismatch has been detected.",
@@ -128,7 +128,7 @@ is
             if
               Isset (X_POST, "post_type") and then
    --         Post and then
-              Post_Type /= As_String (Get (X_POST, "post_type"))
+              Post_Type /= Get_As_String (X_POST, "post_type")
             then
                Wp_Die
                   (abs "A post type mismatch has been detected.",
@@ -139,7 +139,7 @@ is
                   Action := +"delete";
                elsif
                  Isset (X_POST, "wp-preview") and then
-                 "dopreview" = As_String (Get (X_POST, "wp-preview"))
+                 "dopreview" = Get_As_String (X_POST, "wp-preview")
                then
                   Action := +"preview";
                end if;
@@ -172,7 +172,7 @@ is
                if "post-quickdraft-save" = Action then
                   declare
                      -- Check nonce and capabilities.
-                     Nonce     : constant String  := As_String (Get (X_REQUEST, "_wpnonce"));
+                     Nonce     : constant String  := Get_As_String (X_REQUEST, "_wpnonce");
                      Error_Msg : UString; -- Boolean := false;
                   begin
                      -- For output of the Quick Draft dashboard widget.
@@ -183,7 +183,7 @@ is
                      end if;
 
                      if
-                       not Current_User_Can (As_String (Get (Inc_Posts.Get_Post_Type_Object ("post").Cap, "create_posts")))
+                       not Current_User_Can (Get_As_String (Inc_Posts.Get_Post_Type_Object ("post").Cap, "create_posts"))
                      then
                         goto Bailout;
                      end if;
@@ -204,7 +204,7 @@ is
                        From_String (Get_Default_Comment_Status (-Post.Post_Type, "pingback")));
 
                   -- Wrap Quick Draft content in the Paragraph block.
-                  if Ada.Strings.Fixed.Index (As_String (Get (X_POST, "content")),
+                  if Ada.Strings.Fixed.Index (Get_As_String (X_POST, "content"),
                                               "<!-- wp:paragraph -->") = 0
                   then
                      declare
@@ -279,7 +279,7 @@ is
                         (abs "You cannot edit this item because it is in the Trash. Please restore it and try again.");
                   end if;
 
-                  if not Empty (As_String (Get (XX_GET, "get-post-lock"))) then
+                  if not Empty (Get_As_String (XX_GET, "get-post-lock")) then
                      Check_Admin_Referer ("lock-post_" & Id'Image);
                      declare
                         Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
@@ -372,7 +372,7 @@ is
                         Wp_Get_Attachment_Metadata (Integer (Id), True);
                   begin
                      Set (Newmeta, "thumb",
-                          From_String (Wp_Basename (As_String (Get (X_POST, "thumb")))));
+                          From_String (Wp_Basename (Get_As_String (X_POST, "thumb"))));
 
                      Unused := Wp_Update_Attachment_Metadata (Integer (Id), Newmeta);
                   end;
@@ -385,7 +385,7 @@ is
 
                   -- Session cookie flag that the post was saved.
                   if
-                    Isset (As_String (Get (X_COOKIE, "wp-saving-post"))) -- and then
+                    Isset (Get_As_String (X_COOKIE, "wp-saving-post")) -- and then
                   then
                      Set (X_COOKIE, "wp-saving-post", From_String (Id'Image & "-check"));
 --                  Setcookie ("wp-saving-post", Post_Id'Image & "-saved", time + DAY_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN, Is_Ssl); -- ssl());

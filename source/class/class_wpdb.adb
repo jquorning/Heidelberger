@@ -3302,7 +3302,7 @@ is
          Put_Line ("  " & Table);
          Put_Line (This.Col_Meta'Image);
 
-         if "" = As_String (Get (This.Col_Meta, Table)) then
+         if "" = Get_As_String (This.Col_Meta, Table) then
             return False;
          end if;
 

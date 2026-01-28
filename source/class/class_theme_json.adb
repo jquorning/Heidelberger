@@ -589,7 +589,7 @@ is
          declare
             Metadata : constant Array_Type := As_Array (Element (Metadata_2));
          begin
-            if "" = As_String (Get (Metadata, "selector")) then -- null
+            if "" = Get_As_String (Metadata, "selector") then -- null
                goto Continue;
             end if;
             Append (Block_Rules, This.Get_Styles_For_Block (Metadata)); -- this. added
@@ -627,7 +627,7 @@ is
       if Isset (Block_Metadata, "name") then
          Block_Type :=
            Class_Block_Type_Registry.
-             Get_Instance.Get_Registered (As_String (Get (Block_Metadata, "name")));
+             Get_Instance.Get_Registered (Get_As_String (Block_Metadata, "name"));
 
          if
            not Inc_Blocks.Block_Has_Support (Block_Type,
@@ -640,7 +640,7 @@ is
       declare
          Selector : String :=
           (if Isset (Block_Metadata, "selector")
-           then As_String (Get (Block_Metadata, "selector")) else "");
+           then Get_As_String (Block_Metadata, "selector") else "");
 
          Has_Block_Gap_Support : constant Boolean :=
            Kind_Of (X_Wp_Array_Get (This.Theme_JSON,
@@ -771,8 +771,8 @@ is
                                     if
                                        Isset (Spacing_Rule, "selector") and then
                                        Preg_Match (Layout_Selector_Pattern,
-                                                   As_String (Get (Spacing_Rule, "selector"))) and then
-                                       not Empty (As_String (Get (Spacing_Rule, "rules")))
+                                                   Get_As_String (Spacing_Rule, "selector")) and then
+                                       not Empty (Get_As_String (Spacing_Rule, "rules"))
                                     then
                                        -- Iterate over each of the styling rules and substitute
                                        -- non-string values such as `null` with the real `blockGap`
@@ -881,9 +881,9 @@ is
                         -- Output display mode. This requires special handling as `display` is
                         -- not exposed in `safe_style_css_filter`.
                         if
-                          not Empty (As_String (Get (Layout_Definition, "displayMode"))) and then
+                          not Empty (Get_As_String (Layout_Definition, "displayMode")) and then
                           Kind_Of (Get (Layout_Definition, "displayMode")) = Kind_String and then
-                          In_List (As_String (Get (Layout_Definition, "displayMode")),
+                          In_List (Get_As_String (Layout_Definition, "displayMode"),
                                    Valid_Display_Modes, True)
                         then
                            declare
@@ -900,8 +900,8 @@ is
                                 To_Array (List => (1 =>
                                   To_Array (List => (
                                     Build ("name",  "display"),
-                                    Build ("value", As_String (Get (Layout_Definition,
-                                                                    "displayMode")))
+                                    Build ("value", Get_As_String (Layout_Definition,
+                                                                    "displayMode"))
                                   ))
                                 ))
                               ));
@@ -916,8 +916,8 @@ is
                               if
                                  Isset (Base_Style_Rule, "selector") and then
                                  Preg_Match (Layout_Selector_Pattern,
-                                             As_String (Get (Base_Style_Rule, "selector"))) and then
-                                 not Empty (As_String (Get (Base_Style_Rule, "rules")))
+                                             Get_As_String (Base_Style_Rule, "selector")) and then
+                                 not Empty (Get_As_String (Base_Style_Rule, "rules"))
                               then
                                  for E in As_Array (Get (Base_Style_Rule, "rules")).Iterate loop
                                     declare
@@ -1064,8 +1064,8 @@ is
    is
    begin
       return Carry &
-        As_String (Get (Element, "name")) & ": " &
-        As_String (Get (Element, "value")) & ";";
+        Get_As_String (Element, "name") & ": " &
+        Get_As_String (Element, "value") & ";";
    end Reduce_Callback;
 
    function To_Ruleset (Selector     : String;
@@ -1125,7 +1125,7 @@ is
 
                         CSS_Var : constant String :=
                           Replace_Slug_In_String (
-                            As_String (Get (Preset_Metadata, "css_vars")), Slug);
+                            Get_As_String (Preset_Metadata, "css_vars"), Slug);
 
                         Class_Name  : constant String :=
                           Replace_Slug_In_String (Class, Slug);
@@ -1217,7 +1217,7 @@ is
                   Append (Declarations, From_Array (To_Array (List => (
                     Build ("name",
                       Replace_Slug_In_String (
-                        As_String (Get (Preset_Metadata, "css_vars")), Slug)),
+                        Get_As_String (Preset_Metadata, "css_vars"), Slug)),
                     Build ("value", Value)
                   ))));
                end;
@@ -1253,17 +1253,17 @@ is
          for Preset_2 in As_Array (Get (As_Array (Preset_Per_Origin), Origin)).Iterate loop
             declare
                Preset : Array_Type renames As_Array (Element (Preset_2));
-               Slug   : constant String := X_Wp_To_Kebab_Case (As_String (Get (Preset, "slug")));
+               Slug   : constant String := X_Wp_To_Kebab_Case (Get_As_String (Preset, "slug"));
                Value  : UString;
             begin
                if
                  Isset (As_Array (Get (Preset_Metadata, "value_key")),
-                        As_String (Get (Preset, As_String (Get (Preset_Metadata, "value_key")))))
+                        Get_As_String (Preset, Get_As_String (Preset_Metadata, "value_key")))
                then
                   declare
-                     Value_Key : constant String := As_String (Get (Preset_Metadata, "value_key"));
+                     Value_Key : constant String := Get_As_String (Preset_Metadata, "value_key");
                   begin
-                     Value := +As_String (Get (Preset, Value_Key));
+                     Value := +Get_As_String (Preset, Value_Key);
                   end;
                -- elsif
                --   Isset (Preset_Metadata, "value_func") and then
@@ -1319,7 +1319,7 @@ is
          for Preset_2 in As_Array (Get (Preset_Per_Origin, Origin)).Iterate loop
             declare
                Preset : Array_Type renames As_Array (Element (Preset_2));
-               Slug   : constant String := X_Wp_To_Kebab_Case (As_String (Get (Preset, "slug")));
+               Slug   : constant String := X_Wp_To_Kebab_Case (Get_As_String (Preset, "slug"));
             begin
                -- Use the array as a set so we don"t get duplicates.
                Set (Result, Slug, From_String (Slug));
@@ -1501,7 +1501,7 @@ is
 
                Append (Nodes, From_Array (To_Array (List => (
                  Build ("path",     List_Type'["styles", "elements", Element]),
-                 Build ("selector", As_String (Get (ELEMENTS, Element)))
+                 Build ("selector", Get_As_String (ELEMENTS, Element))
                ))));
 
                -- Handle any pseudo selectors for the element.
@@ -1524,7 +1524,7 @@ is
                            Append (Nodes, From_Array (To_Array (List => (
                              Build ("path",     List_Type'["styles", "elements", Element]),
                              Build ("selector",
-                                    Append_To_Selector (As_String (Get (ELEMENTS, Element)),
+                                    Append_To_Selector (Get_As_String (ELEMENTS, Element),
                                                         Pseudo_Selector))
                            ))));
                         end if;
@@ -1581,16 +1581,16 @@ is
               As_Array (Element (Declaration_2));
          begin
             if
-              "background-color" = As_String (Get (Declaration, "name")) and then
+              "background-color" = Get_As_String (Declaration, "name") and then
               Background_Color = "" and then
               Isset (Declaration, "value")
             then
-               Background_Color := +As_String (Get (Declaration, "value"));
+               Background_Color := +Get_As_String (Declaration, "value");
 
-            elsif "border-color" = As_String (Get (Declaration, "name")) then
+            elsif "border-color" = Get_As_String (Declaration, "name") then
                Border_Color_Matches := True;
 
-            elsif "color" = As_String (Get (Declaration, "name")) then
+            elsif "color" = Get_As_String (Declaration, "name") then
                Text_Color_Matches := True;
             end if;
          end;
@@ -1661,15 +1661,18 @@ is
             Feature_Selectors : UString; -- null
          begin
             if Isset_2 (Selectors, Name, "selector") then
-               Selector := +As_String (Get (Ref_2 (Selectors, Name, "selector")));
+               Selector :=
+                 +As_String (Get (Ref_2 (Selectors, Name, "selector")));
             end if;
 
             if Isset_2 (Selectors, Name, "duotone") then
-               Duotone_Selector := +As_String (Get (Ref_2 (Selectors, Name, "duotone")));
+               Duotone_Selector :=
+                 +As_String (Get (Ref_2 (Selectors, Name, "duotone")));
             end if;
 
             if Isset_2 (Selectors, Name, "features") then
-               Feature_Selectors := +As_String (Get (Ref_2 (Selectors, Name, "features")));
+               Feature_Selectors :=
+                 +As_String (Get (Ref_2 (Selectors, Name, "features")));
             end if;
 
             Append (Nodes, From_Array (To_Array (List => (
@@ -1771,7 +1774,7 @@ is
         Isset_2 (This.Theme_JSON, "settings", "useRootPaddingAwareAlignments") and then
         True = As_Boolean (Get (Ref_2 (This.Theme_JSON, "settings", "useRootPaddingAwareAlignments")));
 
-      Selector : constant String := As_String (Get (Block_Metadata, "selector"));
+      Selector : constant String := Get_As_String (Block_Metadata, "selector");
 
       Settings : constant Array_Type  :=
         As_Array (X_Wp_Array_Get (This.Theme_JSON, ["settings"]));
@@ -1784,19 +1787,19 @@ is
       --
       Feature_Declarations : Array_Type;
    begin
-      if not Empty (As_String (Get (Block_Metadata, "features"))) then
+      if not Empty (Get_As_String (Block_Metadata, "features")) then
          for A in As_Array (Get (Block_Metadata, "features")).Iterate loop
             declare
                Feature_Name     : constant String     := Key (A);
                Feature_Selector : constant Multi_Type := Element (A);
             begin
-               if not Empty (As_String (Get (Node, Feature_Name))) then
+               if not Empty (Get_As_String (Node, Feature_Name)) then
                   declare
                      -- Create temporary node containing only the feature data
                      -- to leverage existing `compute_style_properties` function.
                      Feature : constant Array_Type :=
                        To_Array (List => (1 =>
-                         Build (Feature_Name, As_String (Get (Node, Feature_Name)))));
+                         Build (Feature_Name, Get_As_String (Node, Feature_Name))));
 
                      -- Generate the feature"s declarations only.
                      New_Feature_Declarations : constant Array_Type :=
@@ -1906,7 +1909,7 @@ is
                   Index       : constant String     := Key (A);
                   Declaration : constant Multi_Type := Element (A);
                begin
-                  if "filter" = As_String (Get (As_Array (Declaration), "name")) then
+                  if "filter" = Get_As_String (As_Array (Declaration), "name") then
                      Delete (Ref (Declarations, Index));
                      Append (Declarations_Duotone, Declaration);
                   end if;
@@ -1925,8 +1928,8 @@ is
             if Isset (Block_Metadata, "duotone") and then not Empty (Declarations_Duotone) then
                declare
                   Selector_Duotone : constant String :=
-                    Scope_Selector (As_String (Get (Block_Metadata, "selector")),
-                                    As_String (Get (Block_Metadata, "duotone")));
+                    Scope_Selector (Get_As_String (Block_Metadata, "selector"),
+                                    Get_As_String (Block_Metadata, "duotone"));
                begin
                   Append (Block_Rules, To_Ruleset (Selector_Duotone,
                                                    Declarations_Duotone));
@@ -1936,7 +1939,7 @@ is
             -- 4. Generate Layout block gap styles.
             if
               ROOT_BLOCK_SELECTOR /= Selector and then
-              not Empty (As_String (Get (Block_Metadata, "name")))
+              not Empty (Get_As_String (Block_Metadata, "name"))
             then
                Append (Block_Rules, This.Get_Layout_Styles (Block_Metadata));
             end if;
@@ -2124,7 +2127,7 @@ is
       if Kind_Of (Value) = Kind_Array and then Isset (As_Array (Value), "ref") then
          declare
             Value_Path : constant List_Type    :=
-              Explode (".", As_String (Get (As_Array (Value), "ref")));
+              Explode (".", Get_As_String (As_Array (Value), "ref"));
 
             Ref_Value  : constant Multi_Type := X_Wp_Array_Get (Theme_JSON, Value_Path);
          begin
@@ -2376,7 +2379,7 @@ is
             declare
                Node    : constant Multi_Type := Element (Node_2);
                -- Replace the spacing.units.
-               Path    : UString := +As_String (Get (As_Array (Node), "path"));
+               Path    : UString := +Get_As_String (As_Array (Node), "path");
                Content : Multi_Type;
             begin
                Append (Path, "spacing");
@@ -2400,7 +2403,7 @@ is
                      for Origin of VALID_ORIGINS loop
                         declare
                            Base_Path : UString :=
-                             +As_String (Get (As_Array (Node), "path"));
+                             +Get_As_String (As_Array (Node), "path");
                         begin
                            for Leaf in As_Array (Get (Preset, "path")).Iterate loop
                               Append (Base_Path, As_String (Element (Leaf)));
@@ -2517,7 +2520,7 @@ is
                      Arry : constant Array_Type := As_Array (Element (Item));
                   begin
                      if Isset (Arry, "slug") then
-                        Append (Slugs_For_Preset, As_String (Get (Arry, "slug")));
+                        Append (Slugs_For_Preset, Get_As_String (Arry, "slug"));
                      end if;
                   end;
                end loop;
@@ -2561,8 +2564,8 @@ is
          declare
             Item : constant Array_Type := As_Array (Element (Item_2));
          begin
-            if Slug = As_String (Get (Item, "slug")) then
-               return As_String (Get (Item, "name"));
+            if Slug = Get_As_String (Item, "slug") then
+               return Get_As_String (Item, "name");
             end if;
          end;
       end loop;
@@ -2718,7 +2721,7 @@ is
                 Value => From_List
                   (if True = As_Boolean (Get (Settings, "enableCustomUnits"))
                    then List_Type'["px", "em", "rem", "vh", "vw", "%"]
-                   else List_Type'[As_String (Get (Settings, "enableCustomUnits"))]));
+                   else List_Type'[Get_As_String (Settings, "enableCustomUnits")]));
       end if;
 
       if Isset (Settings, "colors") then
@@ -2822,16 +2825,16 @@ is
    begin
       if
         not Isset (Spacing_Scale, "steps")
-        or else not Is_Numeric (As_String (Get (Spacing_Scale, "steps")))
+        or else not Is_Numeric (Get_As_String (Spacing_Scale, "steps"))
         or else not Isset (Spacing_Scale, "mediumStep")
         or else not Isset (Spacing_Scale, "unit")
         or else not Isset (Spacing_Scale, "operator")
         or else not Isset (Spacing_Scale, "increment")
         or else not Isset (Spacing_Scale, "steps")
-        or else not Is_Numeric (As_String (Get (Spacing_Scale, "increment")))
-        or else not Is_Numeric (As_String (Get (Spacing_Scale, "mediumStep")))
-        or else ("+" /= As_String (Get (Spacing_Scale, "operator")) and then
-                 "*" /= As_String (Get (Spacing_Scale, "operator")))
+        or else not Is_Numeric (Get_As_String (Spacing_Scale, "increment"))
+        or else not Is_Numeric (Get_As_String (Spacing_Scale, "mediumStep"))
+        or else ("+" /= Get_As_String (Spacing_Scale, "operator") and then
+                 "*" /= Get_As_String (Spacing_Scale, "operator"))
       then
          if not Empty (Spacing_Scale) then
             Trigger_Error (
@@ -2849,8 +2852,8 @@ is
 
       declare
          Unit : String :=
-           (if "%" = As_String (Get (Spacing_Scale, "unit")) then "%"
-            else Sanitize_Title (As_String (Get (Spacing_Scale, "unit"))));
+           (if "%" = Get_As_String (Spacing_Scale, "unit") then "%"
+            else Sanitize_Title (Get_As_String (Spacing_Scale, "unit")));
 
          Current_Step    : Natural := As_Integer (Get (Spacing_Scale, "mediumStep"));
 
@@ -2871,7 +2874,7 @@ is
             Slug > 0 and
             Below_Midpoint_Count > 0
          loop
-            if "+" = As_String (Get (Spacing_Scale, "operator")) then
+            if "+" = Get_As_String (Spacing_Scale, "operator") then
                Current_Step := Current_Step - Increment;
             elsif Increment > 1 then
                Current_Step := Current_Step / Increment;
@@ -2911,7 +2914,7 @@ is
          Append (Below_Sizes, From_Array (To_Array (List => (
             Build ("name", abs "Medium"),
             Build ("slug", "50"),
-            Build ("size", As_String (Get (Spacing_Scale, "mediumStep")) & Unit)
+            Build ("size", Get_As_String (Spacing_Scale, "mediumStep") & Unit)
          ))));
 
          declare
@@ -2929,7 +2932,7 @@ is
             while
               Above_Midpoint_Count < Steps_Above
             loop
-               Current_Step := (if "+" = As_String (Get (Spacing_Scale, "operator"))
+               Current_Step := (if "+" = Get_As_String (Spacing_Scale, "operator")
                                 then Current_Step + Increment
                                 else (if Increment >= 1
                                       then Current_Step * Increment

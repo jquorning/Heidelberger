@@ -44,7 +44,7 @@ is
       Origin : constant String :=
         (if
            Isset (Context, "origin") and then
-           "base" = As_String (Get (Context, "origin"))
+           "base" = Get_As_String (Context, "origin")
          then "theme"
          else "custom");
 
@@ -293,10 +293,10 @@ is
                   -- This hooks inline CSS to them so that they are loaded conditionally
                   -- based on whether or not the block is used on the page.
                   --
-                  if Str_Starts_With (As_String (Get (Metadata, "name")), "core/") then
+                  if Str_Starts_With (Get_As_String (Metadata, "name"), "core/") then
                      declare
                         Block_Name : constant String :=
-                          Str_Replace ("core/", "", As_String (Get (Metadata, "name")));
+                          Str_Replace ("core/", "", Get_As_String (Metadata, "name"));
                      begin
                         Stylesheet_Handle := +"wp-block-" & Block_Name;
                      end;
@@ -308,7 +308,7 @@ is
                -- metadata["name"] set.
                if
                  not Isset (Metadata, "name") and then
-                 not Empty (As_String (Get (Metadata, "path")))
+                 not Empty (Get_As_String (Metadata, "path"))
                then
                   declare
                      Result : constant List_Type :=

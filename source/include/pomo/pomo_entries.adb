@@ -48,7 +48,7 @@ is
 
       if
         Isset (Args, "plural") and then
-        As_String (Get (Args, "plural")) /= ""
+        Get_As_String (Args, "plural") /= ""
       then
          This.Is_Plural := True;
       end if;

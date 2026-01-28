@@ -475,7 +475,7 @@ is
                else
                   Set (Node.Meta, "class",
                        From_String (
-                         As_String (Get (Node.Meta, "class")) & " " & Group_Class));
+                         Get_As_String (Node.Meta, "class") & " " & Group_Class));
                end if;
             end if;
 
@@ -702,7 +702,7 @@ is
       if not Empty (Node.Meta, "class") then
          Class :=
            +" class=""" &
-           ESC_Attr (Trim (As_String (Get (Node.Meta, "class")))) &
+           ESC_Attr (Trim (Get_As_String (Node.Meta, "class"))) &
            """";
       else
          Class := +"";
@@ -741,8 +741,8 @@ is
       -- value of `0` for a11y.
       Tabindex : constant Integer := (if
                                Isset (Node.Meta, "tabindex") and then
-                               Is_Numeric (As_String (Get (Node.Meta, "tabindex")))
-                             then Integer'Value (As_String (Get (Node.Meta, "tabindex"))) else 0);
+                               Is_Numeric (Get_As_String (Node.Meta, "tabindex"))
+                             then Integer'Value (Get_As_String (Node.Meta, "tabindex")) else 0);
 
       Aria_Attributes : UString :=
          +(if 0 /= Tabindex
@@ -763,7 +763,7 @@ is
       end if;
 
       if not Empty (Node.Meta, "class") then
-         Menuclass := Menuclass & As_String (Get (Node.Meta, "class"));
+         Menuclass := Menuclass & Get_As_String (Node.Meta, "class");
       end if;
 
       -- Print the arrow icon for the menu children with children.
@@ -796,9 +796,9 @@ is
          end if;
 
          if "onclick" = Attribute then
-            Echo (" attribute=""" & ESC_JS (As_String (Get (Node.Meta, Attribute))) & """");
+            Echo (" attribute=""" & ESC_JS (Get_As_String (Node.Meta, Attribute)) & """");
          else
-            Echo (" attribute=""" & ESC_Attr (As_String (Get (Node.Meta, Attribute))) & """");
+            Echo (" attribute=""" & ESC_Attr (Get_As_String (Node.Meta, Attribute)) & """");
          end if;
          << Continue_2 >>
       end loop;
@@ -820,7 +820,7 @@ is
       end if;
 
       if not Empty (Node.Meta, "html") then
-         Echo (As_String (Get (Node.Meta, "html")));
+         Echo (Get_As_String (Node.Meta, "html"));
       end if;
 
       Echo ("</li>");

@@ -149,8 +149,9 @@ is
             goto Continue_1;
          end if;
 
-         Set (Submenu, "upload.php", I, ESC_Attr (As_String (Get (Tax.Labels, "menu_name"))),
-              As_String (Get (Tax.Cap, "manage_terms")),
+         Set (Submenu, "upload.php", I,
+              ESC_Attr (Get_As_String (Tax.Labels, "menu_name")),
+              Get_As_String (Tax.Cap, "manage_terms"),
               "edit-tags.php?taxonomy=" & (-Tax.Name) & "&amp;post_type=attachment");
          I := I + 1;
          << Continue_1 >>
@@ -306,14 +307,14 @@ is
 
                Menu (Ptype_Menu_Position)  :=
                   To_Menu (ESC_Attr (Get (Ptype_Obj, "labels.menu_name")),
-                           As_String (Get (Ptype_Obj.Cap, "edit_posts")),
+                           Get_As_String (Ptype_Obj.Cap, "edit_posts"),
                            -Ptype_File, "", -Menu_Class, -Ptype_Menu_Id, -Menu_Icon);
 
                Set (Submenu, -Ptype_File, 5, Get (Ptype_Obj, "labels.all_items"),
-                    As_String (Get (Ptype_Obj.Cap, "edit_posts")), String (-Ptype_File));
+                    Get_As_String (Ptype_Obj.Cap, "edit_posts"), String (-Ptype_File));
 
                Set (Submenu, -Ptype_File, 10, Get (Ptype_Obj, "labels.add_new"),
-                    As_String (Get (Ptype_Obj.Cap, "create_posts")), -Post_New_File);
+                    Get_As_String (Ptype_Obj.Cap, "create_posts"), -Post_New_File);
 
                I := 15;
                for Tax of Inc_Taxonomys.Get_Taxonomies (Empty_Array, "objects") loop
@@ -326,8 +327,8 @@ is
                   end if;
 
                   Set (Submenu, -Ptype_File, I,
-                       ESC_Attr (As_String (Get (Tax.Labels, "menu_name"))),
-                       As_String (Get (Tax.Cap, "manage_terms")),
+                       ESC_Attr (Get_As_String (Tax.Labels, "menu_name")),
+                       Get_As_String (Tax.Cap, "manage_terms"),
                        Sprintf (-Edit_Tags_File, [-Tax.Name]));
                   I := I + 1;
                   << Continue_3 >>
@@ -408,7 +409,7 @@ is
                 Add_Query_Arg
                   ("return",
                    URL_Encode (Remove_Query_Arg (List_Type'(Wp_Removable_Query_Args),
-                                          Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI"))))),
+                                          Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")))),
                    "customize.php");
          begin
             -- Hide Customize link on block themes unless a plugin or theme
@@ -600,7 +601,7 @@ is
                   end if;
 
                   declare
-                     Health : constant String := As_String (Get (Issue_Counts, "critical"));
+                     Health : constant String := Get_As_String (Issue_Counts, "critical");
                   begin
                      Site_Health_Count := +Sprintf (
                         "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",

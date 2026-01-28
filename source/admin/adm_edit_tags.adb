@@ -171,7 +171,7 @@ is
 --               Location := False;
          Referer  := +Inc_Functions.Wp_Get_Referer; -- ();
          if Referer = "" then -- For POST requests.  -- not
-            Referer := +Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI")));
+            Referer := +Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI"));
          end if;
 
          declare
@@ -192,7 +192,7 @@ is
          if "add-tag" = X_Wp_List_Table.Current_Action then
             Inc_Pluggables.Check_Admin_Referer ("add-tag", "_wpnonce_add-tag");
 
-            if not Current_User_Can (As_String (Get (Tax.Cap, "edit_terms"))) then
+            if not Current_User_Can (Get_As_String (Tax.Cap, "edit_terms")) then
                Inc_Functions.Wp_Die
                   ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                    "<p>" & abs "Sorry, you are not allowed to create terms in this taxonomy." & "</p>",
@@ -201,7 +201,7 @@ is
 
             declare
                Taxonomy : UString;  --  Added by jq. Not declared anywhere
-               Ret : constant Array_Type := Wp_Insert_Term (As_String (Get (X_POST, "tag-name")),
+               Ret : constant Array_Type := Wp_Insert_Term (Get_As_String (X_POST, "tag-name"),
                                                          -Taxonomy, X_POST);
             begin
                if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
@@ -218,13 +218,14 @@ is
             end;
 
          elsif "delete" = X_Wp_List_Table.Current_Action then
-            if not Isset (As_String (Get (X_REQUEST, "tag_ID"))) then
+            if not Isset (Get_As_String (X_REQUEST, "tag_ID")) then
                goto  Break;
             end if;
 
             declare
                Taxonomy : UString;  -- Added by jq
-               Tag_ID   : constant Integer := Integer'Value (As_String (Get (X_REQUEST, "tag_ID")));
+               Tag_ID   : constant Integer :=
+                 Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
             begin
                Inc_Pluggables.Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
 
@@ -255,7 +256,7 @@ is
          elsif "bulk-delete" = X_Wp_List_Table.Current_Action then
             Inc_Pluggables.Check_Admin_Referer ("bulk-tags");
 
-            if not Current_User_Can (As_String (Get (Tax.Cap, "delete_terms"))) then
+            if not Current_User_Can (Get_As_String (Tax.Cap, "delete_terms")) then
                Inc_Functions.Wp_Die
                   ("<h1>" & abs "You need a higher level of permission." & "</h1>" &
                    "<p>" & abs "Sorry, you are not allowed to delete these items." & "</p>",
@@ -275,7 +276,7 @@ is
             end;
 
          elsif "edit" =  X_Wp_List_Table.Current_Action then
-            if not Isset (As_String (Get (X_REQUEST, "tag_ID"))) then
+            if not Isset (Get_As_String (X_REQUEST, "tag_ID")) then
                goto Break_2;
             end if;
 
@@ -285,7 +286,7 @@ is
                Taxonomy : UString;
 
                Term_Id  : constant Integer :=
-                 Integer'Value (As_String (Get (X_REQUEST, "tag_ID")));
+                 Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
 
                Term : constant Wp_Term := Get_Term (Term_Id);
             begin
@@ -304,7 +305,8 @@ is
          elsif "editedtag" = X_Wp_List_Table.Current_Action then
             declare
                Taxonomy : UString;
-               Tag_ID   : constant Integer := Integer'Value (As_String (Get (X_POST, "tag_ID")));
+               Tag_ID   : constant Integer :=
+                 Integer'Value (Get_As_String (X_POST, "tag_ID"));
             begin
                Inc_Pluggables.Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
 
@@ -380,7 +382,7 @@ is
                  ["_wp_http_referer", "_wpnonce"];
             begin
                Location := +Remove_Query_Arg
-                  (List, Wp_Unslash (As_String (Get (X_SERVER, "REQUEST_URI"))));
+                  (List, Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")));
             end;
          end if;
 
@@ -614,7 +616,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_add_new_item" then
                      Set ("VAR_edit_tags_add_new_item",
-                          As_String (Get (Tax.Labels, "add_new_item")));
+                          Get_As_String (Tax.Labels, "add_new_item"));
 
                   elsif Var_Name = "VAR_edit_tags_add_tag" then
                      Clear_Echo;
@@ -878,13 +880,13 @@ is
                      begin
                         if
                           Isset (X_REQUEST, "s") and then
-                          As_String (Get (X_REQUEST, "s"))'Length /= 0
+                          Get_As_String (X_REQUEST, "s")'Length /= 0
                         then
                            Append (R, "<span class=""subtitle"">");
                            Append (R, Printf (
                               -- translators: %s: Search query.
                               abs "Search results for: %s",
-                              ["<strong>" & ESC_HTML (Wp_Unslash (As_String (Get (X_REQUEST, "s")))) & "</strong>"
+                              ["<strong>" & ESC_HTML (Wp_Unslash (Get_As_String (X_REQUEST, "s"))) & "</strong>"
                            ]));
                            Append (R, "</span>");
                         end if;
@@ -908,7 +910,7 @@ is
 
                   elsif Var_Name = "VAR_edit_tags_name_field_description" then
                      Set ("VAR_edit_tags_name_field_description",
-                          As_String (Get (Tax.Labels, "name_field_description")));
+                          Get_As_String (Tax.Labels, "name_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_not_is_mobile" then
                      Set ("VAR_edit_tags_not_is_mobile", not Inc_Vars.Wp_Is_Mobile);
@@ -928,7 +930,7 @@ is
                           ["message", "error"];
 
                         Request : constant String :=
-                          Remove_Query_Arg (List, As_String (Get (X_SERVER, "REQUEST_URI")));
+                          Remove_Query_Arg (List, Get_As_String (X_SERVER, "REQUEST_URI"));
                      begin
                         Set (X_SERVER, "REQUEST_URI", From_String (Request));
                         Set ("VAR_edit_tags_remove_message_and_error", Request);
@@ -937,28 +939,28 @@ is
                   elsif Var_Name = "VAR_edit_tags_search_box" then
                      Clear_Echo;
                      Search_Box (X_Wp_List_Table,
-                                 As_String (Get (Tax.Labels, "search_items")),
+                                 Get_As_String (Tax.Labels, "search_items"),
                                  "tag");
                      Set ("VAR_edit_tags_search_box", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_slug_field_description" then
                      Set ("VAR_edit_tags_slug_field_description",
-                          As_String (Get (Tax.Labels, "slug_field_description")));
+                          Get_As_String (Tax.Labels, "slug_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_submit_button" then
                      Clear_Echo;
                      Adi_Templates.Submit_Button
-                       (As_String (Get (Tax.Labels, "add_new_item")),
+                       (Get_As_String (Tax.Labels, "add_new_item"),
                         "primary", "submit", False);
                      Set ("VAR_edit_tags_submit_button", Get_Echo);
 
                   elsif Var_Name = "VAR_edit_tags_tax_field_description" then
                      Set ("VAR_edit_tags_tax_field_description",
-                          As_String (Get (Tax.Labels, "parent_field_description")));
+                          Get_As_String (Tax.Labels, "parent_field_description"));
 
                   elsif Var_Name = "VAR_edit_tags_tax_parent_item" then
                      Set ("VAR_edit_tags_tax_parent_item",
-                          Inc_Formatting.ESC_HTML (As_String (Get (Tax.Labels, "parent_item"))));
+                          Inc_Formatting.ESC_HTML (Get_As_String (Tax.Labels, "parent_item")));
 
                   elsif Var_Name = "VAR_edit_tags_taxonomy" then
                      Set ("VAR_edit_tags_taxonomy", ESC_Attr (-Taxonomy));

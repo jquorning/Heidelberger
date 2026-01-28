@@ -180,10 +180,10 @@ is
             end if;
 
             if not Post_Type.Map_Meta_Cap then
-               Append (Caps, As_String (Get (Post_Type.Cap, "cap")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "cap"));
                -- Prior to 3.1 we would re-call map_meta_cap here.
                if "delete_post" = Cap then
-                  Cap_2 := +As_String (Get (Post_Type.Cap, "cap"));
+                  Cap_2 := +Get_As_String (Post_Type.Cap, "cap");
                end if;
                goto Break_2;
             end if;
@@ -193,8 +193,8 @@ is
                -- If the post is published or scheduled...
                if In_List (-Post.Post_Status, Publish_Future, True) then
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "delete_published_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "delete_published_posts"));
                elsif "trash" = Post.Post_Status then
                   declare
                      Status : constant String :=
@@ -202,36 +202,36 @@ is
                   begin
                      if In_List (Status, Publish_Future, True) then
                         Append (Caps,
-                                As_String (Get (
-                                  Post_Type.Cap, "delete_published_posts")));
+                                Get_As_String (
+                                  Post_Type.Cap, "delete_published_posts"));
                      else
                         Append (Caps,
-                                As_String (Get (
-                                  Post_Type.Cap, "delete_posts")));
+                                Get_As_String (
+                                  Post_Type.Cap, "delete_posts"));
                      end if;
                   end;
                else
                   -- If the post is draft...
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "delete_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "delete_posts"));
                end if;
             else
                -- The user is trying to edit someone else"s post.
                Append (Caps,
-                       As_String (Get (
-                         Post_Type.Cap, "delete_others_posts")));
+                       Get_As_String (
+                         Post_Type.Cap, "delete_others_posts"));
                -- The post is published or scheduled, extra cap required.
                if
                  In_List (-Post.Post_Status, Publish_Future, True)
                then
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "delete_published_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "delete_published_posts"));
                elsif "private" = Post.Post_Status then
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "delete_private_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "delete_private_posts"));
                end if;
             end if;
 
@@ -314,10 +314,10 @@ is
             end if;
 
             if not Post_Type.Map_Meta_Cap then
-               Append (Caps, As_String (Get (Post_Type.Cap, "cap")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "cap"));
                -- Prior to 3.1 we would re-call map_meta_cap here.
                if "edit_post" = Cap then
-                  Cap_2 := +As_String (Get (Post_Type.Cap, "cap"));
+                  Cap_2 := +Get_As_String (Post_Type.Cap, "cap");
                end if;
                goto Break_3;
             end if;
@@ -327,8 +327,8 @@ is
                -- If the post is published or scheduled...
                if In_List (-Post.Post_Status, Publish_Future, True) then
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "edit_published_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "edit_published_posts"));
 
                elsif "trash" = Post.Post_Status then
                   declare
@@ -337,32 +337,32 @@ is
                   begin
                      if In_List (Status, Publish_Future, True) then
                         Append (Caps,
-                                As_String (Get (
-                                  Post_Type.Cap, "edit_published_posts")));
+                                Get_As_String (
+                                  Post_Type.Cap, "edit_published_posts"));
                      else
                         Append (Caps,
-                                As_String (Get (
-                                  Post_Type.Cap, "edit_posts")));
+                                Get_As_String (
+                                  Post_Type.Cap, "edit_posts"));
                      end if;
                   end;
                else
                   -- If the post is draft...
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "edit_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "edit_posts"));
                end if;
             else
                -- The user is trying to edit someone else"s post.
-               Append (Caps, As_String (Get (Post_Type.Cap, "edit_others_posts")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "edit_others_posts"));
                -- The post is published or scheduled, extra cap required.
                if In_List (-Post.Post_Status, Publish_Future, True) then
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "edit_published_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "edit_published_posts"));
                elsif "private" = Post.Post_Status then
                   Append (Caps,
-                          As_String (Get (
-                            Post_Type.Cap, "edit_private_posts")));
+                          Get_As_String (
+                            Post_Type.Cap, "edit_private_posts"));
                end if;
             end if;
 
@@ -444,10 +444,10 @@ is
             end if;
 
             if not Post_Type.Map_Meta_Cap then
-               Append (Caps, As_String (Get (Post_Type.Cap, "cap")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "cap"));
                -- Prior to 3.1 we would re-call map_meta_cap here.
                if "read_post" = Cap then
-                  Cap_2 := +As_String (Get (Post_Type.Cap, "cap"));
+                  Cap_2 := +Get_As_String (Post_Type.Cap, "cap");
                end if;
                goto Break_4;
             end if;
@@ -475,14 +475,14 @@ is
             end if;
 
             if Status_Obj.Public then
-               Append (Caps, As_String (Get (Post_Type.Cap, "read")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "read"));
                goto Break_4;
             end if;
 
             if Post.Post_Author /= 0 and then User_Id = Post.Post_Author then
-               Append (Caps, As_String (Get (Post_Type.Cap, "read")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "read"));
             elsif Status_Obj.Privat then
-               Append (Caps, As_String (Get (Post_Type.Cap, "read_private_posts")));
+               Append (Caps, Get_As_String (Post_Type.Cap, "read_private_posts"));
             else
                Caps := Map_Meta_Cap ("edit_post", User_Id, (Post_Id  => Post.Id,
                                                             Meta_Key => False,
@@ -539,7 +539,7 @@ is
                goto Break_5;
             end if;
 
-            Append (Caps, As_String (Get (Post_Type.Cap, "publish_posts")));
+            Append (Caps, Get_As_String (Post_Type.Cap, "publish_posts"));
          end;
          << Break_5 >>
 
@@ -931,7 +931,7 @@ is
 
             Taxo_Cap := +Cap & "s";
 
-            Caps := Map_Meta_Cap (As_String (Get (Tax.Cap, "taxo_cap")),
+            Caps := Map_Meta_Cap (Get_As_String (Tax.Cap, "taxo_cap"),
                                   User_Id, (Term_Id  => Term_Id,
                                             Meta_Key => False,
                                             Post_Id  => 0,
@@ -1012,7 +1012,7 @@ is
          if Isset (Global_Post_Type_Meta_Caps, Cap) then
             return
               Map_Meta_Cap (
-                As_String (Get (Global_Post_Type_Meta_Caps, Cap)),
+                Get_As_String (Global_Post_Type_Meta_Caps, Cap),
                 User_Id, Args);
          end if;
 

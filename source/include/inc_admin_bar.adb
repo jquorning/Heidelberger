@@ -636,8 +636,8 @@ is
       end if;
 
       Current_URL := +(if Is_SSL then "https://" else "http://") &
-                       As_String (Get (X_SERVER, "HTTP_HOST")) &
-                       As_String (Get (X_SERVER, "REQUEST_URI"));
+                       Get_As_String (X_SERVER, "HTTP_HOST") &
+                       Get_As_String (X_SERVER, "REQUEST_URI");
 
       if
         Is_Customize_Preview and then
@@ -928,16 +928,16 @@ is
                   end if;
 
                   if
-                    Current_User_Can (As_String (Get (Get_Post_Type_Object ("post").Cap,
-                                                      "create_posts")))
+                    Current_User_Can (Get_As_String (Get_Post_Type_Object ("post").Cap,
+                                                      "create_posts"))
                   then
                      declare
                         Node : Node_Args;
                      begin
                         Node.Parent := +Menu_Id;
                         Node.Id     := +Menu_Id & "-n";
-                        Node.Title  := +As_String (Get (Get_Post_Type_Object ("post").Labels,
-                                                        "new_item"));
+                        Node.Title  := +Get_As_String (Get_Post_Type_Object ("post").Labels,
+                                                        "new_item");
                         Node.Href   := +Admin_URL ("post-new.php");
 
                         Admin_Bar.Add_Node (Node);
@@ -1077,7 +1077,7 @@ is
                      Node : Node_Args;
                   begin
                      Node.Id    := +"preview";
-                     Node.Title := +As_String (Get (Post_Type_Object.Labels, "view_item"));
+                     Node.Title := +Get_As_String (Post_Type_Object.Labels, "view_item");
                      Node.Href  := +ESC_URL (Preview_Link);
                      Node.Meta  :=
                         Arrays.To_Array ((1 =>
@@ -1091,7 +1091,7 @@ is
                      Node : Node_Args;
                   begin
                      Node.Id    := +"view";
-                     Node.Title := +As_String (Get (Post_Type_Object.Labels, "view_item"));
+                     Node.Title := +Get_As_String (Post_Type_Object.Labels, "view_item");
                      Node.Href  := +Get_Permalink (Post.Id);
 
                      Admin_Bar.Add_Node (Node);
@@ -1110,7 +1110,7 @@ is
                   Node : Node_Args;
                begin
                   Node.Id    := +"archive";
-                  Node.Title := +As_String (Get (Post_Type_Object.Labels, "view_items"));
+                  Node.Title := +Get_As_String (Post_Type_Object.Labels, "view_items");
                   Node.Href  :=
                     +Get_Post_Type_Archive_Link (-Current_Screen.Post_Type);
 
@@ -1133,7 +1133,7 @@ is
                         Node : Node_Args;
                      begin
                         Node.Id    := +"view";
-                        Node.Title := +As_String (Get (Tax.Labels, "view_item"));
+                        Node.Title := +Get_As_String (Tax.Labels, "view_item");
                         Node.Href  := +Get_Term_Link (Tag);
 
                         Admin_Bar.Add_Node (Node);
@@ -1191,7 +1191,7 @@ is
                         Node : Node_Args;
                      begin
                         Node.Id    := +"edit";
-                        Node.Title := +As_String (Get (Post_Type_Object.Labels, "edit_item"));
+                        Node.Title := +Get_As_String (Post_Type_Object.Labels, "edit_item");
                         Node.Href  := +Edit_Post_Link;
 
                         Admin_Bar.Add_Node (Node);
@@ -1219,7 +1219,7 @@ is
                         Node : Node_Args;
                      begin
                         Node.Id    := +"edit";
-                        Node.Title := +As_String (Get (Tax.Labels, "edit_item"));
+                        Node.Title := +Get_As_String (Tax.Labels, "edit_item");
                         Node.Href  := +Edit_Term_Link;
 
                         Admin_Bar.Add_Node (Node);
@@ -1296,11 +1296,11 @@ is
       if
         Cpts.Find ("post") /= No_Element or else
 --      Isset (cpts ("post")) or else
-        Current_User_Can (As_String (Get (Cpts ("post").Cap, "create_posts")))
+        Current_User_Can (Get_As_String (Cpts ("post").Cap, "create_posts"))
       then
          Actions ("post-new.php") :=
             Arrays.To_Array ((1 =>
-               Build (As_String (Get (Cpts ("post").Labels, "name_admin_bar")), "new-post")));
+               Build (Get_As_String (Cpts ("post").Labels, "name_admin_bar"), "new-post")));
       end if;
 
       if
@@ -1309,7 +1309,7 @@ is
       then
          Actions ("media-new.php") :=
             Arrays.To_Array ((1 =>
-               Build (As_String (Get (Cpts ("attachment").Labels, "name_admin_bar")),
+               Build (Get_As_String (Cpts ("attachment").Labels, "name_admin_bar"),
                       "new-media")));
       end if;
 
@@ -1321,11 +1321,11 @@ is
 
       if
         Cpts.Find ("page") /= No_Element or else
-        Current_User_Can (As_String (Get (Cpts ("page").Cap, "create_posts")))
+        Current_User_Can (Get_As_String (Cpts ("page").Cap, "create_posts"))
       then
          Actions ("post-new.php?post_type=page") :=
             Arrays.To_Array ((1 =>
-               Build (As_String (Get (Cpts ("page").Labels, "name_admin_bar")), "new-page")));
+               Build (Get_As_String (Cpts ("page").Labels, "name_admin_bar"), "new-page")));
       end if;
 
       Cpts.Delete ("post");
@@ -1337,7 +1337,7 @@ is
 
       -- Add any additional custom post types.
       for Cpt of Cpts loop
-         if not Current_User_Can (As_String (Get (Cpt.Cap, "create_posts"))) then
+         if not Current_User_Can (Get_As_String (Cpt.Cap, "create_posts")) then
             goto Continue;
          end if;
 
@@ -1346,7 +1346,7 @@ is
          begin
             Actions (Key) :=
                Arrays.To_Array ((1 =>
-                  Build (As_String (Get (Cpt.Labels, "name_admin_bar")), "new-" & (-Cpt.Name))));
+                  Build (Get_As_String (Cpt.Labels, "name_admin_bar"), "new-" & (-Cpt.Name))));
          end;
          << Continue >>
       end loop;

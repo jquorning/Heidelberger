@@ -2823,13 +2823,13 @@ is
             if True then
                Set (Arry_2, "default-text-color", From_String (-HEADER_TEXTCOLOR));
             elsif Isset (Arry, "default-text-color") then
-               HEADER_TEXTCOLOR := +As_String (Get (Arry, "default-text-color"));
+               HEADER_TEXTCOLOR := +Get_As_String (Arry, "default-text-color");
             end if;
 
             if True then
                Set (Arry_2, "default-image", From_String (-HEADER_IMAGE));
             elsif Isset (Arry, "default-image") then
-               HEADER_IMAGE := +As_String (Get (Arry, "default-image"));
+               HEADER_IMAGE := +Get_As_String (Arry, "default-image");
             end if;
 
             if JIT and then not Empty (Arry, "default-image") then
@@ -2894,13 +2894,13 @@ is
             if True then
                Set (Arry_2, "default-color", From_String (-BACKGROUND_COLOR));
             elsif Isset (Arry, "default-color") or JIT then
-               BACKGROUND_COLOR := +As_String (Get (Arry, "default-color"));
+               BACKGROUND_COLOR := +Get_As_String (Arry, "default-color");
             end if;
 
             if True then
                Set (Arry_2, "default-image", From_String (-BACKGROUND_IMAGE));
             elsif Isset (Arry, "default-image") or JIT then
-               BACKGROUND_IMAGE := +As_String (Get (Arry, "default-image"));
+               BACKGROUND_IMAGE := +Get_As_String (Arry, "default-image");
             end if;
          end;
 
@@ -3287,7 +3287,7 @@ is
       end if;
 
       if
-        not In_List (As_String (Get (Args_2, "type")),
+        not In_List (Get_As_String (Args_2, "type"),
                      List_Type'["string", "boolean", "integer",
                                 "number", "array", "object"], True)
       then
@@ -3300,7 +3300,7 @@ is
 
       if
         True = As_Boolean (Get (Args_2, "variadic")) and then
-        "array" /= As_String (Get (Args_2, "type"))
+        "array" /= Get_As_String (Args_2, "type")
       then
          raise Feature_Error with "variadic_must_be_array";
          -- return new WP_Error(
@@ -3311,7 +3311,7 @@ is
 
       if
         False /= As_Boolean (Get (Args_2, "show_in_rest")) and then
-        In_List (As_String (Get (Args_2, "type")),
+        In_List (Get_As_String (Args_2, "type"),
                             List_Type'["array", "object"], True)
       then
          if
@@ -3326,7 +3326,7 @@ is
          end if;
 
          if
-           "array" = As_String (Get (Args_2, "type")) and then
+           "array" = Get_As_String (Args_2, "type") and then
            not Isset_3 (Args_2, "show_in_rest", "schema", "items")
          then
             raise Feature_Error with "missing_schema_items";
@@ -3337,7 +3337,7 @@ is
          end if;
 
          if
-           "object" = As_String (Get (Args_2, "type")) and then
+           "object" = Get_As_String (Args_2, "type") and then
            not Isset_3 (Args_2, "show_in_rest", "schema", "properties")
          then
             raise Feature_Error with "missing_schema_properties";
@@ -3372,8 +3372,8 @@ is
                   From_Array (Wp_Parse_Args (
                     As_Array (Get (Ref_2 (Args_2, "show_in_rest", "schema"))),
                     To_Array (List => (
-                      Build ("description", As_String (Get (Args_2, "description"))),
-                      Build ("type",        As_String (Get (Args_2, "type"))),
+                      Build ("description", Get_As_String (Args_2, "description")),
+                      Build ("type",        Get_As_String (Args_2, "type")),
                       Build ("default",     False)
                     ))
                   )));
@@ -3549,16 +3549,16 @@ is
 
       Is_Customize_Admin_Page : constant Boolean :=
         Is_Admin and then
-        "customize.php" = Basename (As_String (Get (X_SERVER, "PHP_SELF")));
+        "customize.php" = Basename (Get_As_String (X_SERVER, "PHP_SELF"));
 
       Should_Include : constant Boolean :=
         Is_Customize_Admin_Page or else
         (Isset (X_REQUEST, "wp_customize") and then
-         "on" = As_String (Get (X_REQUEST, "wp_customize"))) or else
+         "on" = Get_As_String (X_REQUEST, "wp_customize")) or else
         (not Empty (XX_GET, "customize_changeset_uuid") or else
---      (not Empty (As_String (Get (X_GET, "customize_changeset_uuid"))) or else
+--      (not Empty (Get_As_String (X_GET, "customize_changeset_uuid")) or else
          not Empty (X_POST, "customize_changeset_uuid"));
---       not Empty (As_String (Get (X_POST, "customize_changeset_uuid"))));
+--       not Empty (Get_As_String (X_POST, "customize_changeset_uuid")));
    begin
       if not Should_Include then
          return;
@@ -3594,11 +3594,11 @@ is
              Is_Customize_Admin_Page and then
              Isset (Input_Vars, "changeset_uuid")
            then
-              Sanitize_Key (As_String (Get (Input_Vars, "changeset_uuid")))
+              Sanitize_Key (Get_As_String (Input_Vars, "changeset_uuid"))
            elsif
-             not Empty (As_String (Get (Input_Vars, "customize_changeset_uuid")))
+             not Empty (Get_As_String (Input_Vars, "customize_changeset_uuid"))
            then
-              Sanitize_Key (As_String (Get (Input_Vars, "customize_changeset_uuid")))
+              Sanitize_Key (Get_As_String (Input_Vars, "customize_changeset_uuid"))
            else "");
 
          -- Note that theme will be sanitized via WP_Theme.
@@ -3607,9 +3607,9 @@ is
               Is_Customize_Admin_Page and then
               Isset (Input_Vars, "theme")
             then
-               As_String (Get (Input_Vars, "theme"))
+               Get_As_String (Input_Vars, "theme")
             elsif Isset (Input_Vars, "customize_theme") then
-               As_String (Get (Input_Vars, "customize_theme"))
+               Get_As_String (Input_Vars, "customize_theme")
             else "");
 
          Autosaved : constant Boolean :=
@@ -3620,7 +3620,7 @@ is
          Messenger_Channel : constant String :=
            (if Isset (Input_Vars, "customize_messenger_channel")
             then Sanitize_Key
-                    (As_String (Get (Input_Vars, "customize_messenger_channel")))
+                    (Get_As_String (Input_Vars, "customize_messenger_channel"))
             else "");
 
          -- Set initially fo false since defaults to true for back-compat;
@@ -3639,7 +3639,7 @@ is
             and then
             Isset (X_REQUEST, "action")
             and then
-            "customize_save" = Wp_Unslash (As_String (Get (X_REQUEST, "action")))
+            "customize_save" = Wp_Unslash (Get_As_String (X_REQUEST, "action"))
          );
 
          Settings_Previewed : constant Boolean := not Is_Customize_Save_Action;
