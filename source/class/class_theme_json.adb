@@ -15,6 +15,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Helpers;
 with UStrings;
 with Wp_Common;
 
@@ -1845,7 +1846,7 @@ is
          Current_Element : String :=
            (if Is_Processing_Element
             then As_String (Get (Ref_2 (Block_Metadata, "path",
-                             Integer'Image (Count (As_Array (Get (Block_Metadata, "path"))) - 1))))
+                             Helpers.Image ((Count (As_Array (Get (Block_Metadata, "path"))) - 1)))))
             else ""); -- null
 
          -- TODO: Replace array_key_exists() with isset() check once WordPress drops
@@ -2892,8 +2893,8 @@ is
                Build ("name", (if Below_Midpoint_Count = Steps_Mid_Point - 1
                                then abs "Small"
                                else Sprintf (abs "%sX-Small",
-                                             [1 => Natural'Image (X_Small_Count)]))),
-               Build ("slug", Natural'Image (Slug)),
+                                             [1 => Helpers.Image (X_Small_Count)]))),
+               Build ("slug", Helpers.Image (Slug)),
                Build ("size", Float'Image (Round (Float (Current_Step), 2)) & Unit)
             ))));
 
@@ -2943,8 +2944,8 @@ is
                  Build ("name", (if 0 = Above_Midpoint_Count
                                  then abs "Large"
                                  else Sprintf (abs "%sX-Large",
-                                               [1 => Natural'Image (X_Large_Count)]))),
-                 Build ("slug", Natural'Image (Slug)),
+                                               [1 => Helpers.Image (X_Large_Count)]))),
+                 Build ("slug", Helpers.Image (Slug)),
                  Build ("size", Float'Image (Round (Float (Current_Step), 2)) & Unit)
                ))));
 
@@ -2972,10 +2973,10 @@ is
                if As_Integer (Get (Spacing_Scale, "steps")) <= 7 then
                   for Spacing_Sizes_Count in 0 .. Count (Spacing_Sizes) - 1 loop
                      Set_2 (Spacing_Sizes,
-                            Key_1 => Natural'Image (Spacing_Sizes_Count),
+                            Key_1 => Helpers.Image (Spacing_Sizes_Count),
                             Key_2 => "name",
                             Value =>
-                              From_String (Natural'Image (Spacing_Sizes_Count + 1)));
+                              From_String (Helpers.Image (Spacing_Sizes_Count + 1)));
                   end loop;
                end if;
 

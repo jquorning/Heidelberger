@@ -1321,7 +1321,7 @@ is
       if (Paged >= 2 or Page >= 2) and then not Is_404 then
          declare
             P : constant Natural := Natural'Max (Paged, Page);
-            Page_Image : constant String := P'Image;
+            Page_Image : constant String := Helpers.Image (P);
          begin
             -- translators: %s: Page number.
             Set (Title, "page",

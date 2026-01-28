@@ -16,6 +16,7 @@ with Php.Numerics;
 with Php.Strings;
 
 with Globals;
+with Helpers;
 with Wp_Common;
 
 with Adi_Plugins;
@@ -1729,20 +1730,20 @@ is
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
-         Append (Ancestors, From_String (Id'Image));
+         Append (Ancestors, From_String (Image (Id)));
          Ancestor := Inc_Posts.Get_Post (Id);
          loop -- while Ancestor loop
             -- Loop detection: If the ancestor has been seen before, break.
             if
               Ancestor.Post_Parent /= 0      or else -- empty
               Ancestor.Post_Parent = Post_2.Id or else
-              In_Array (Ancestor.Post_Parent'Image, Ancestors, True)
+              In_Array (Image (Ancestor.Post_Parent), Ancestors, True)
             then
                exit;
             end if;
 
             Id := Ancestor.Post_Parent;
-            Append (Ancestors, Value => From_String (Id'Image));
+            Append (Ancestors, Value => From_String (Image (Id)));
 
             Ancestor := Get_Post (Id);
          end loop;
@@ -3611,6 +3612,7 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
+      use Class_Posts;
 --    use Inc_Formatting;
 
       Int_Fields : constant List_Type :=
@@ -3757,11 +3759,11 @@ is
                --                        Accepts "raw", "edit", "db", "display",
                --                        "attribute", or "js". Default "display".
                --
-               Value_2 := Apply_Filters (Field, Value_2, Post_Id'Image,
+               Value_2 := Apply_Filters (Field, Value_2, Image (Post_Id),
                                          Context);
             else
                Value_2 := Apply_Filters ("post_" & Field, Value_2,
-                                         Post_Id'Image, Context);
+                                         Image (Post_Id), Context);
             end if;
 
             -- if "attribute" = Context then

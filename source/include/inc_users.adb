@@ -1932,7 +1932,7 @@ is
          User_2 := User.Data.all;
       end if;
 
---    Wp_Cache_Add (User_2.Id'Image, User_2, "users");
+--    Wp_Cache_Add (Image (User_2.Id), User_2, "users");
       Wp_Cache_Add (-User_2.Prop.User_Login,    Integer (User_2.Id), "userlogins");
       Wp_Cache_Add (-User_2.Prop.User_Nicename, Integer (User_2.Id), "userslugs");
 

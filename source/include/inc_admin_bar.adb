@@ -528,7 +528,7 @@ is
                Node.Title  := +abs "Edit Site";
                Node.Href   := +Network_Admin_URL
                                  ("site-info.php?id=" &
-                                  Integer'Image (Get_Current_Blog_Id));
+                                  Helpers.Image (Get_Current_Blog_Id));
                Admin_Bar.Add_Node (Node);
             end;
          end if;
@@ -890,7 +890,7 @@ is
 
                declare
                   Menu_Id : constant String :=
-                     "blog-" & Integer'Image (Blog.Userblog_Id);
+                     "blog-" & Helpers.Image (Blog.Userblog_Id);
                begin
                   if Current_User_Can ("read") then
                      declare
@@ -1082,7 +1082,7 @@ is
                      Node.Meta  :=
                         Arrays.To_Array ((1 =>
                            Build ("target",
-                                  "wp-preview-" & "XXX-451"))); --"Post_Id'Image (Post.Id))));
+                                  "wp-preview-" & "XXX-451"))); --"Image (Post_Id) (Post.Id))));
 
                      Admin_Bar.Add_Node (Node);
                   end;
@@ -1444,7 +1444,7 @@ is
 
       Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
       Title := +"<span class=""ab-label awaiting-mod pending-count count-" &
-                Natural'Image (Awaiting_Mod) & """ aria-hidden=""true"">" &
+                Helpers.Image (Awaiting_Mod) & """ aria-hidden=""true"">" &
                 Number_Format_I18n (Float (Awaiting_Mod)) & "</span>";
       Title := Title &
                "<span class=""screen-reader-text comments-in-moderation-text"">" &

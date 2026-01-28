@@ -7,6 +7,7 @@
 
 with Arrays;
 with Globals;
+with Helpers;
 with Wp_Common;
 
 with Inc_Caches;
@@ -1430,7 +1431,7 @@ is
       declare
          Found : Boolean;
          Count : constant Comment_Counts :=
-           Wp_Cache_Get ("comments-" & Natural'Image (Post_Id),
+           Wp_Cache_Get ("comments-" & Helpers.Image (Post_Id),
                          "counts", Found => Found);
       begin
          if Count /= Null_Comment_Counts then
@@ -1448,7 +1449,7 @@ is
          declare
             Stats_Object : constant Comment_Counts := Stats; -- (object) Stats;
          begin
-            Wp_Cache_Set ("comments-" & (Natural'Image (Post_Id)),
+            Wp_Cache_Set ("comments-" & (Helpers.Image (Post_Id)),
                           Stats_Object, "counts");
 
             return Stats_Object;

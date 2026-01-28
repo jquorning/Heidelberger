@@ -209,7 +209,8 @@ is
                                then Obj.Extra ("conditional") else "false"));
 
             Cond_Before : constant String :=
-               (if Conditional then "<!--[if " & Conditional'Image & "]>\n" else "");
+              (if Conditional
+               then "<!--[if " & Boolean'Image (Conditional) & "]>\n" else "");
 
             Cond_After  : constant String :=
                (if Conditional then "<![endif]-->\n" else "");

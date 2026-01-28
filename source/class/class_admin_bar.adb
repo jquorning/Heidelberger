@@ -10,6 +10,7 @@ with Php.Echoing;
 with Php.Strings;
 with Php.Types;
 
+with Helpers;
 with Lists;
 
 with Inc_Admin_Bar;
@@ -739,14 +740,15 @@ is
 
       -- Allow only numeric values, then casted to integers, and allow a tabindex
       -- value of `0` for a11y.
-      Tabindex : constant Integer := (if
-                               Isset (Node.Meta, "tabindex") and then
-                               Is_Numeric (Get_As_String (Node.Meta, "tabindex"))
-                             then Integer'Value (Get_As_String (Node.Meta, "tabindex")) else 0);
+      Tabindex : constant Integer :=
+        (if
+           Isset (Node.Meta, "tabindex") and then
+           Is_Numeric (Get_As_String (Node.Meta, "tabindex"))
+         then Integer'Value (Get_As_String (Node.Meta, "tabindex")) else 0);
 
       Aria_Attributes : UString :=
          +(if 0 /= Tabindex
-           then " tabindex=""" & Tabindex'Image & """" else "");
+           then " tabindex=""" & Helpers.Image (Tabindex) & """" else "");
 
       Menuclass : UString;
       Arrow     : UString;

@@ -15,6 +15,7 @@ with Php.Strings;
 with Php.Types;
 
 with Constants;
+with Helpers;
 
 with Inc_Block_Editors;
 -- with Class_Block_Type;
@@ -553,7 +554,7 @@ is
                  Wp_Insert_Post (To_Array (List => (
                    Build ("post_content",
                           "{""version"": " &
-                          Class_Theme_JSON.LATEST_SCHEMA'Image &
+                          Helpers.Image (Class_Theme_JSON.LATEST_SCHEMA) &
                           ", ""isGlobalStylesUserThemeJSON"": true }"),
                    Build ("post_status",  "publish"),
                    Build ("post_title",   "Custom Styles"),

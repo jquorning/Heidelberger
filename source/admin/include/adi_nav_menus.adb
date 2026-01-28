@@ -15,9 +15,9 @@
 with Ada.Containers;
 
 with Binder;
-with UStrings;
 with Globals;
-with Php;
+with Helpers;
+with UStrings;
 with Wp_Common;
 
 with Adi_Templates;
@@ -859,7 +859,7 @@ is
       X_E ("Search");
       Echo ("</label>" & NL);
       Echo ("                <input type=""search""" &
-            Wp_Nav_Menu_Disabled_Check (Nav_Menu_Selected_Id'Image) &
+            Wp_Nav_Menu_Disabled_Check (Helpers.Image (Nav_Menu_Selected_Id)) &
             """ class=""quick-search"" value=""" & (-Searched) &
             """ name=""quick-search-posttype-" & Post_Type_Name &
             """ id=""quick-search-posttype-" & Post_Type_Name &

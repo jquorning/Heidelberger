@@ -107,7 +107,7 @@ is
       -- need to.
       if Typ in "timestamp" | "U" then
          return
-           Integer'Image (if GMT
+           Helpers.Image (if GMT
             then Php.Misc.Time
             else Php.Misc.Time +
               Get_Option ("gmt_offset") * Constants.HOUR_IN_SECONDS);
@@ -1122,7 +1122,7 @@ is
 
 --          if K.Is_Integer and then "" /= Prefix then
             if Is_Numeric (-K) and then "" /= Prefix then
-               K := +Prefix & Integer'Value (-K)'Image;
+               K := +Prefix & Helpers.Image (Integer'Value (-K));
             end if;
 
             if not Empty (Key) then
@@ -3916,7 +3916,7 @@ is
    is
    begin
       raise Program_Die
-        with Title & " " & Message & " " & Integer'Image (Code);
+        with Title & " " & Message & " " & Helpers.Image (Code);
    end Wp_Die;
 --         global wp_query;
 

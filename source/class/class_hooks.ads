@@ -10,6 +10,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
 with Arrays;
+with Helpers_2;
 with Lists;
 
 package Class_Hooks
@@ -19,6 +20,8 @@ is
 
    type Nesting_Type  is new Natural;
    type Priority_Type is new Natural;
+
+   function Image is new Helpers_2.Generic_Image (Priority_Type);
 
    package Index_Maps is new
       Ada.Containers.Indefinite_Ordered_Maps

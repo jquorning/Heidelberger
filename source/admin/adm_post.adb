@@ -280,13 +280,13 @@ is
                   end if;
 
                   if not Empty (Get_As_String (XX_GET, "get-post-lock")) then
-                     Check_Admin_Referer ("lock-post_" & Id'Image);
+                     Check_Admin_Referer ("lock-post_" & Image (Id));
                      declare
                         Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
                      begin
                         Wp_Redirect
                            (Get_Edit_Post_Link (Integer (Id), "url"));
---                         (Get_Edit_Post_Link (Build (Post_Id'Image, "url")));
+--                         (Get_Edit_Post_Link (Build (image (Post_Id), "url")));
                      end;
                      goto Bailout;
                   end if;
@@ -335,7 +335,7 @@ is
                      goto Label_1; -- break;
                   end if;
 
-                  if 0 = Wp_Check_Post_Lock (Post.Id'Image) then
+                  if 0 = Wp_Check_Post_Lock (Image (Post.Id)) then
                      declare
                         Active_Post_Lock : Array_Type :=
                            Wp_Set_Post_Lock (Integer (Post.Id));
@@ -357,7 +357,7 @@ is
                   <<Label_1>>
 
                elsif Action = "editattachment" then
-                  Check_Admin_Referer ("update-post_" & Id'Image);
+                  Check_Admin_Referer ("update-post_" & Image (Id));
 
                   -- Don't let these be changed.
                   Delete (Ref (X_POST, "guid"));
@@ -379,7 +379,7 @@ is
                   -- Intentional fall-through to trigger the edit_post() call.
 
                elsif Action = "editpost" then
-                  Check_Admin_Referer ("update-post_" & Id'Image);
+                  Check_Admin_Referer ("update-post_" & Image (Id));
 
                   Id := Post_Id (Edit_Post); --();
 
@@ -387,8 +387,9 @@ is
                   if
                     Isset (Get_As_String (X_COOKIE, "wp-saving-post")) -- and then
                   then
-                     Set (X_COOKIE, "wp-saving-post", From_String (Id'Image & "-check"));
---                  Setcookie ("wp-saving-post", Post_Id'Image & "-saved", time + DAY_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN, Is_Ssl); -- ssl());
+                     Set (X_COOKIE, "wp-saving-post",
+                          From_String (Image (Id) & "-check"));
+--                  Setcookie ("wp-saving-post", Image (Post_Id) & "-saved", time + DAY_IN_SECONDS, ADMIN_COOKIE_PATH, COOKIE_DOMAIN, Is_Ssl); -- ssl());
                   end if;
 
                   Redirect_Post (Integer (Id));
@@ -397,7 +398,7 @@ is
                   goto Bailout;
 
                elsif Action = "trash" then
-                  Check_Admin_Referer ("trash-post_" & Id'Image);
+                  Check_Admin_Referer ("trash-post_" & Image (Id));
 
                   if Post = Null_Post then
                      Wp_Die
@@ -415,7 +416,7 @@ is
 
                   declare
                      User_Id : constant User_Id_Type :=
-                       Wp_Check_Post_Lock (Id'Image);
+                       Wp_Check_Post_Lock (Image (Id));
                   begin
                      if User_Id /= 0 then
                         declare
@@ -429,7 +430,7 @@ is
                         end;
                      end if;
 
-                     if not Wp_Trash_Post (Id'Image) then
+                     if not Wp_Trash_Post (Image (Id)) then
                         Wp_Die
                            (abs "Error in moving the item to Trash.");
                      end if;
@@ -438,14 +439,14 @@ is
                         Add_Query_Arg (
                           To_Array (List => (
                             Build ("trashed", "1"),
-                            Build ("ids",     Id'Image)
+                            Build ("ids",     Image (Id))
                           )),
                           -Sendback));
                   end;
                   goto Bailout;
 
                elsif Action = "untrash" then
-                  Check_Admin_Referer ("untrash-post_" & Id'Image);
+                  Check_Admin_Referer ("untrash-post_" & Image (Id));
 
                   if Post = Null_Post then
                      Wp_Die
@@ -468,14 +469,14 @@ is
                   Sendback := +Add_Query_Arg (
                            To_Array (List => (
                               Build ("untrashed", "1"),
-                              Build ("ids",       Id'Image)
+                              Build ("ids",       Image (Id))
                            )),
                            -Sendback);
                   Wp_Redirect (-Sendback);
                   goto Bailout;
 
                elsif Action = "delete" then
-                  Check_Admin_Referer ("delete-post_" & Id'Image);
+                  Check_Admin_Referer ("delete-post_" & Image (Id));
 
                   if Post = Null_Post then
                      Wp_Die (abs "This item has already been deleted.");
@@ -510,7 +511,7 @@ is
                   goto Bailout;
 
                elsif Action = "preview" then
-                  Check_Admin_Referer ("update-post_" & Id'Image);
+                  Check_Admin_Referer ("update-post_" & Image (Id));
                   declare
                      URL : constant String := Post_Preview;
                   begin
@@ -556,7 +557,7 @@ is
                   --
                   -- @param int post_id Post ID sent with the request.
                   --
-                  Do_Action ("post_action_" & (-Action), Id'Image);
+                  Do_Action ("post_action_" & (-Action), Image (Id));
 
                   Wp_Redirect (Admin_URL ("edit.php"));
                   goto Bailout;

@@ -36,6 +36,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Helpers;
 with UStrings;
 with Wp_Common;
 
@@ -2052,7 +2053,7 @@ is
                                            return String
    is
    begin
-      return Integer'Image (Integer'Value (Match (2))); -- (1)
+      return Helpers.Image (Integer'Value (Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr;
 
    ------------------------------------------
@@ -2064,7 +2065,7 @@ is
    is
       use Php.Numerics;
    begin
-      return Integer'Image (Hexdec (Match (2))); -- (1)
+      return Helpers.Image (Hexdec (Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr_Hexdec;
 
 -- --

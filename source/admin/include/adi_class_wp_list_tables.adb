@@ -16,6 +16,7 @@ with Php.Misc;
 with Php.Strings;
 
 with Binder;
+with Helpers;
 with Wp_Common;
 
 with Adi_Screens;
@@ -1020,7 +1021,7 @@ is
               [
                 1 => ESC_URL (
                        Add_Query_Arg ("paged",
-                               Natural'Max (1, Current - 1)'Image,
+                               Helpers.Image (Natural'Max (1, Current - 1)),
                                -Current_URL)),
                 2 => abs "Previous page",
                 3 => "&lsaquo;"
@@ -1029,7 +1030,7 @@ is
          end if;
 
          if "bottom" = Which then
-            HTML_Current_Page  := +Current'Image;
+            HTML_Current_Page  := +Helpers.Image (Current);
             Total_Pages_Before := +"<span class=""screen-reader-text"">" &
               abs "Current Page" &
               "</span><span id=""table-paging"" class=""paging-input""><span class=""tablenav-paging-text"">";
@@ -1038,8 +1039,8 @@ is
               "%s<input class=""current-page"" id=""current-page-selector"" type=""text"" name=""paged"" value=""%s"" size=""%d"" aria-describedby=""table-paging"" /><span class=""tablenav-paging-text"">",
               [
                 1 => "<label for=""current-page-selector"" class=""screen-reader-text"">" & abs "Current Page" & "</label>",
-                2 => Current'Image,
-                3 => String'(Total_Pages'Image)'Length'Image
+                2 => Helpers.Image (Current),
+                3 => Helpers.Image (Helpers.Image (Total_Pages)'Length)
               ]
             );
          end if;
@@ -1063,9 +1064,9 @@ is
               "<a class=""next-page button"" href=""%s""><span class=""screen-reader-text"">%s</span><span aria-hidden=""true"">%s</span></a>",
               [
                 1 => ESC_URL (
-                          Add_Query_Arg ("paged",
-                               Natural'Min (Total_Pages, Current + 1)'Image,
-                               -Current_URL)),
+                       Add_Query_Arg ("paged",
+                         Helpers.Image (Natural'Min (Total_Pages, Current + 1)),
+                         -Current_URL)),
                 2 => abs "Next page",
                 3 => "&rsaquo;"
               ]));
@@ -1078,7 +1079,8 @@ is
               "<a class=""last-page button"" href=""%s""><span class=""screen-reader-text"">%s</span><span aria-hidden=""true"">%s</span></a>",
               [
                 1 => ESC_URL (
-                       Add_Query_Arg ("paged", Total_Pages'Image, -Current_URL)),
+                       Add_Query_Arg ("paged",
+                                      Helpers.Image (Total_Pages), -Current_URL)),
                 2 => abs "Last page",
                 3 => "&raquo;"
               ]));
@@ -1404,8 +1406,9 @@ is
          Set (Columns, "cb",
            From_String (
              "<label class=""screen-reader-text"" for=""cb-select-all-" &
-             Static_CB_Counter'Image & """>" & abs "Select All" & "</label>" &
-             "<input id=""cb-select-all-" & Static_CB_Counter'Image &
+             Helpers.Image (Static_CB_Counter) & """>" &
+             abs "Select All" & "</label>" &
+             "<input id=""cb-select-all-" & Helpers.Image (Static_CB_Counter) &
              """ type=""checkbox"" />"));
 
          Static_CB_Counter := Static_CB_Counter + 1;
@@ -1633,7 +1636,7 @@ is
          This.Display_Rows;
       else
          Echo ("<tr class=""no-items""><td class=""colspanchange"" colspan=""" &
-               This.Get_Column_Count'Image & """>" & NL);
+               Helpers.Image (This.Get_Column_Count) & """>" & NL);
          This.No_Items;
          Echo ("</td></tr>" & NL);
       end if;

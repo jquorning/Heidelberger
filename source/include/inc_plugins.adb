@@ -14,6 +14,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Constants;
+with Helpers;
 with Logging;
 with UStrings;
 
@@ -925,7 +926,7 @@ is
             K : constant String  := Key (A);
             V : constant Natural := Element (A);
          begin
-            Put_Line ("    " & K & ": " & V'Image);
+            Put_Line ("    " & K & ": " & Helpers.Image (V));
          end;
       end loop;
 
@@ -935,7 +936,7 @@ is
             K : constant String  := Key (A);
             V : constant Natural := Element (A);
          begin
-            Put_Line ("    " & K & ": " & V'Image);
+            Put_Line ("    " & K & ": " & Helpers.Image (V));
          end;
       end loop;
 
@@ -950,7 +951,7 @@ is
             K : constant String  := Key (A);
             V : constant Wp_Hook := Element (A);
          begin
-            Put_Line ("    " & K); --  & ": " & V'Image);
+            Put_Line ("    " & K); --  & ": " & Helpers.Image (V));
          end;
       end loop;
    end Dump_Hooks;

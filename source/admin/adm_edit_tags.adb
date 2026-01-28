@@ -14,6 +14,7 @@ with Templates_Parser;
 with Arrays;
 with Binder;
 with Globals;
+with Helpers;
 with UStrings;
 with Lists;
 with Wp_Common;
@@ -141,19 +142,19 @@ is
 
       declare
          Taxonomy : UString;  -- Added by jq
-         Tag_ID   : constant Integer :=
+         Tag_Id   : constant Integer :=
            Integer'Value (Get_As_String (X_REQUEST, "tag_ID"));
       begin
-         Check_Admin_Referer ("delete-tag_" & Tag_ID'Image);
+         Check_Admin_Referer ("delete-tag_" & Helpers.Image (Tag_Id));
 
-         if not Current_User_Can ("delete_term", Tag_ID) then
+         if not Current_User_Can ("delete_term", Tag_Id) then
             Wp_Die (
               "<h1>" & abs "You need a higher level of permission." & "</h1>" &
               "<p>" & abs "Sorry, you are not allowed to delete this item." & "</p>",
               Code => 403);
          end if;
 
-         Wp_Delete_Term (Tag_ID, -Taxonomy);
+         Wp_Delete_Term (Tag_Id, -Taxonomy);
 
          Location := +Add_Query_Arg ("message", "2", Referer);
 
@@ -197,8 +198,8 @@ is
          Tags : constant List_Type :=
            [Get_As_String (X_REQUEST, "delete_tags")];
       begin
-         for Tag_ID of Tags loop
-            Wp_Delete_Term (Integer'Value (Tag_ID), -Taxonomy);
+         for Tag_Id of Tags loop
+            Wp_Delete_Term (Integer'Value (Tag_Id), -Taxonomy);
          end loop;
 
          Location := +Add_Query_Arg ("message", "6", Referer);
@@ -261,12 +262,12 @@ is
       use Inc_Taxonomys;
 
       Taxonomy : UString;
-      Tag_ID   : constant Integer :=
+      Tag_Id   : constant Integer :=
         Integer'Value (Get_As_String (X_POST, "tag_ID"));
    begin
-      Check_Admin_Referer ("update-tag_" & Tag_ID'Image);
+      Check_Admin_Referer ("update-tag_" & Helpers.Image (Tag_Id));
 
-      if not Current_User_Can ("edit_term", Tag_ID) then
+      if not Current_User_Can ("edit_term", Tag_Id) then
          Wp_Die (
            "<h1>" & abs "You need a higher level of permission." & "</h1>" &
            "<p>" & abs "Sorry, you are not allowed to edit this item." & "</p>",
@@ -274,7 +275,7 @@ is
       end if;
 
       declare
-         Tag : constant Wp_Term := Get_Term (Tag_ID, -Taxonomy);
+         Tag : constant Wp_Term := Get_Term (Tag_Id, -Taxonomy);
       begin
          if Tag = Null_Term then
             Wp_Die (
@@ -283,7 +284,7 @@ is
 
          declare
             Ret : constant Array_Type :=
-              Wp_Update_Term (Tag_ID, -Taxonomy, X_POST);
+              Wp_Update_Term (Tag_Id, -Taxonomy, X_POST);
          begin
             if Ret /= Empty_Array then -- and then not Is_Wp_Error (Ret) then
                Location := +Add_Query_Arg ("message", "3", Referer);
@@ -502,7 +503,8 @@ is
 
          if Location /= "" then
             if Pagenum > 1 then
-               Location := +Add_Query_Arg ("paged", Pagenum'Image, -Location);
+               Location :=
+                 +Add_Query_Arg ("paged", Helpers.Image (Pagenum), -Location);
                -- pagenum takes care of total_pages.
             end if;
             --
@@ -526,7 +528,7 @@ is
               Get_Pagination_Arg (X_Wp_List_Table, "total_pages");
          begin
             if Pagenum > Total_Pages and Total_Pages > 0 then
-               Wp_Redirect (Add_Query_Arg ("paged", Total_Pages'Image));
+               Wp_Redirect (Add_Query_Arg ("paged", Helpers.Image (Total_Pages)));
                Php.Errors.Die;
             end if;
          end;

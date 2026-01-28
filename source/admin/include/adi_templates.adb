@@ -17,6 +17,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
+with Helpers;
 with UStrings;
 with Wp_Common;
 
@@ -74,17 +75,18 @@ is
                                     Walker               : Walker_Type := null;
                                     Checked_Ontop        : Boolean     := True)
    is
-      Unused : String := Wp_Terms_Checklist (
-                Post_Id,
-                To_Array (List => (
-                        Build ("taxonomy",             "category"),
-                        Build ("descendants_and_self", Descendants_And_Self'Image),
-                        Build ("selected_cats",        Selected_Cats),
-                        Build ("popular_cats",         Popular_Cats),
---                        Build ("walker",               Walker),
-                        Build ("checked_ontop",        Checked_Ontop'Image)
-               ))
-       );
+      Unused : constant String :=
+        Wp_Terms_Checklist (
+          Post_Id,
+          To_Array (List => (
+            Build ("taxonomy",             "category"),
+            Build ("descendants_and_self", Helpers.Image (Descendants_And_Self)),
+            Build ("selected_cats",        Selected_Cats),
+            Build ("popular_cats",         Popular_Cats),
+--          Build ("walker",               Walker),
+            Build ("checked_ontop",        Boolean'Image (Checked_Ontop))
+          ))
+        );
    begin
       null;
    end Wp_Category_Checklist;
@@ -199,9 +201,10 @@ is
                              As_List (Get (Parsed_Args, "selected_cats")))));
          elsif Post_Id /= 0 then
             null;
---                Set (Args_2, "selected_cats",
---                     Wp_Get_Object_Terms (Empty_Term_Array & Post_Id'Image, Taxonomy,
---                                          Array_Merge (Args, To_array (List => (1 => Build ("fields", "ids"))))));
+--          Set (Args_2, "selected_cats",
+--               Wp_Get_Object_Terms (Empty_Term_Array & image (Post_Id), Taxonomy,
+--                 Array_Merge (Args, To_array (List => (1 =>
+--                   Build ("fields", "ids"))))));
          else
             Set (Args_2, "selected_cats", From_Array (Empty_Array));
          end if;
@@ -226,26 +229,28 @@ is
          end if;
 
          if Descendants_And_Self /= 0 then
-            Categories := Get_Terms (  -- (array)
-                        To_Array (List => (
-                                Build ("taxonomy",     Taxonomy),
-                                Build ("child_of",     Descendants_And_Self'Image),
-                                Build ("hierarchical", "0"),
-                                Build ("hide_empty",   "0")
-                       ))
-            );
+            Categories :=
+              Get_Terms (  -- (array)
+                To_Array (List => (
+                  Build ("taxonomy",     Taxonomy),
+                  Build ("child_of",     Helpers.Image (Descendants_And_Self)),
+                  Build ("hierarchical", "0"),
+                  Build ("hide_empty",   "0")
+                ))
+              );
             declare
                Self : constant Wp_Term := Get_Term (Descendants_And_Self, Taxonomy);
             begin
                Array_Unshift (Categories, Self);
             end;
          else
-            Categories := Get_Terms ( -- (array)
-                        To_Array (List => (
-                                Build ("taxonomy", Taxonomy),
-                                Build ("get",      "all")
-                       ))
-            );
+            Categories :=
+              Get_Terms ( -- (array)
+                To_Array (List => (
+                  Build ("taxonomy", Taxonomy),
+                  Build ("get",      "all")
+                ))
+              );
          end if;
 
 --        Output := "";
@@ -316,7 +321,7 @@ is
 --                         Build ("taxonomy",     Taxonomy),
 --                         Build ("orderby",      "count"),
 --                         Build ("order",        "DESC"),
---                         Build ("number",       Integer'Image (Number)),
+--                         Build ("number",       Helpers.Integer (Number)),
 --                         Build ("hierarchical", "false")
 --                ))
 --        );
@@ -2706,7 +2711,7 @@ is
             begin
                if
                  Isset (Get_As_String (Mods, "header_video")) and then
-                 Post.Id'Image = Get_As_String (Mods, "header_video")
+                 Image (Post.Id) = Get_As_String (Mods, "header_video")
                then
                   Media_States := +abs "Current Header Video";
                end if;

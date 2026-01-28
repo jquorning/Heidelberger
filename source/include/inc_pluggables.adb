@@ -2706,7 +2706,7 @@ is
       begin
          return Php.Strings.Substr
            (Wp_Hash (Float'Image (I) & '|' & Integer'Image (Action) & '|' &
-                     Integer'Image (Uid) & '|' & Token, "nonce"),
+                     Helpers.Image (Uid) & '|' & Token, "nonce"),
                     -12, 10);
       end;
    end Wp_Create_Nonce;

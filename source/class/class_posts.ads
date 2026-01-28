@@ -9,6 +9,7 @@
 with Ada.Containers.Vectors;
 
 with Arrays;
+with Helpers_2;
 with UStrings;
 
 with Class_Users;
@@ -26,6 +27,8 @@ is
    Null_Property_Type : constant Property_Type := (UStrings.Null_UString, 0);
 
    type Post_Id is new Natural;
+
+   function Image is new Helpers_2.Generic_Image (Post_Id);
 
    --
    -- Core class used to implement the WP_Post object.

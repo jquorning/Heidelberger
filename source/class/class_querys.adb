@@ -11,6 +11,7 @@ with Ada.Containers;
 with Php.Lists;
 with Php.Strings;
 
+with Helpers;
 with Lists;
 
 with Class_Post_Type;
@@ -3608,7 +3609,7 @@ is
             Author_2 : constant List_Type :=
               List_Map (Strval'Access, [Author]); -- (array)
          begin
-            if In_List (Author_Obj.Id'Image, Author_2, True) then -- (string)
+            if In_List (Image (Author_Obj.Id), Author_2, True) then -- (string)
                return True;
             elsif In_List (-Author_Obj.Prop.Nickname, Author_2, True) then
                return True;
@@ -3653,7 +3654,7 @@ is
          declare
             Category_2 : List_Type; --  := Category; -- Array_Map ("strval", (array) Category);
          begin
-            if In_List (Integer'Image (Cat_Obj.Term_Id), Category_2, True) then -- (string)
+            if In_List (Helpers.Image (Cat_Obj.Term_Id), Category_2, True) then -- (string)
                return True;
             elsif In_List (-Cat_Obj.Name, Category_2, True) then
                return True;
@@ -3699,7 +3700,7 @@ is
             Tag_2 : constant List_Type :=
               List_Map (Strval'Access, [Tag]); -- (array)
          begin
-            if In_List (Tag_Obj.Term_Id'Image, Tag_2, True) then -- (string)
+            if In_List (Helpers.Image (Tag_Obj.Term_Id), Tag_2, True) then -- (string)
                return True;
             elsif In_List (-Tag_Obj.Name, Tag_2, True) then
                return True;
@@ -3767,7 +3768,7 @@ is
 --         Isset (Queried_Object.Term_Id) and then
 --         Count (
              List_Intersect (
-               List_Type'[Queried_Object.Term_Id'Image,
+               List_Type'[Helpers.Image (Queried_Object.Term_Id),
                           -Queried_Object.Name,
                           -Queried_Object.Slug],
                Term_Array
@@ -3961,7 +3962,7 @@ is
             Page_2 : constant List_Type :=
               List_Map (Strval'Access, [Page]); -- (array)
          begin
-            if In_List (Page_Obj.Id'Image, Page_2, True) then -- (string)
+            if In_List (Image (Page_Obj.Id), Page_2, True) then -- (string)
                return True;
             elsif In_List (-Page_Obj.Post_Title, Page_2, True) then
                return True;
@@ -4080,7 +4081,7 @@ is
          declare
             Post_2 : constant List_Type := List_Map (Strval'Access, [Post]);
          begin
-            if In_List (Post_Obj.Id'Image, Post_2, True) then
+            if In_List (Image (Post_Obj.Id), Post_2, True) then
                return True;
             elsif In_List (-Post_Obj.Post_Title, Post_2, True) then
                return True;

@@ -2033,8 +2033,8 @@ is
                                 return String
    is
       use Php.Numerics;
-      use Inc_Plugins;
       use UStrings;
+      use Inc_Plugins;
 --                static_placeholder;
    begin
       if Static_Placeholder = "" then -- not
@@ -2048,7 +2048,7 @@ is
             -- Old WP installs may not have AUTH_SALT defined.
             Salt : constant String :=
               (if True -- Defined ("AUTH_SALT") and then AUTH_SALT
-               then Constants.AUTH_SALT else Rand'Image); -- (string)
+               then Constants.AUTH_SALT else Helpers.Image (Rand)); -- (string)
          begin
             Static_Placeholder :=
               +"{" & Hash_HMAC (Algo, Uniqid (Salt, True), Salt) & "}";
@@ -2623,8 +2623,11 @@ is
       use UStrings;
    begin
       This.Func_Call :=
-        +("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
-      Put_Line ("\db.get_var(\" & String (Query) & "\" & X'Image & Y'Image & "");
+        +("\db.get_var(\" & String (Query) & "\" &
+          Helpers.Image (X) & "," &
+          Helpers.Image (Y) & "");
+      Put_Line ("\db.get_var(\" & String (Query) & "\" &
+                Helpers.Image (X) & "," & Helpers.Image (Y) & "");
 
       if Query /= "" then
          if

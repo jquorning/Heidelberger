@@ -3,6 +3,7 @@
 --
 
 with Globals;
+with Helpers;
 with Lists;
 with Wp_Common;
 
@@ -39,7 +40,7 @@ is
  --                  raise Constraint_Error with "illegal post_id";
  --                end if;
 
-      Wp_Cache_Get (Key     => Id'Image,
+      Wp_Cache_Get (Key     => Image (Id),
                     Group   => "posts",
                     Post    => Post,
                     Success => Success);
@@ -53,7 +54,7 @@ is
             Statement : constant Statement_Type :=
               WpDB.Prepare (
                 "SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
-                [Id'Image]);
+                [Image (Id)]);
          begin
             Post := Class_WpDB.Get_Row (WpDB, -- Post,
                                         Query   => Statement,
@@ -66,7 +67,7 @@ is
          end if;
 
          Post := Inc_Posts.Sanitize_Post (Post, "raw");
-         Wp_Cache_Add (Post.Id'Image, Post, "posts");
+         Wp_Cache_Add (Image (Post.Id), Post, "posts");
 
       elsif Post.Filter = "" or else "raw" /= Post.Filter then
          Post := Inc_Posts.Sanitize_Post (Post, "raw");

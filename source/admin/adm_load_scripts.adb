@@ -14,8 +14,9 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Constants;
-with UStrings;
 with Globals;
+with Helpers;
+with UStrings;
 with Lists;
 
 with Adi_Noop;
@@ -124,7 +125,7 @@ is
       Header ("Etag: " & Inc_Versions.Wp_Version);
       Header ("Content-Type: application/javascript; charset=UTF-8");
 --    Header ("Expires: " & gmdate( "D, d M Y H:i:s", time() + Expires_offset ) & " GMT" );
-      Header ("Cache-Control: public, max-age=" & Expires_Offset'Image);
+      Header ("Cache-Control: public, max-age=" & Helpers.Image (Expires_Offset));
 
       Echo (-Outt);
       -- exit;

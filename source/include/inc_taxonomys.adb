@@ -13,6 +13,7 @@ with Php.Numerics;
 with Php.Strings;
 with Php.Types;
 
+with Helpers;
 with UStrings;
 with Wp_Common;
 
@@ -2320,7 +2321,7 @@ is
 --        end;
 
       for Id of Object_Ids loop
-         Append (Object_Ids_3, Id'Image);
+         Append (Object_Ids_3, Helpers.Image (Id));
       end loop;
 
       declare

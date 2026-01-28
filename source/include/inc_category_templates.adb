@@ -8,10 +8,12 @@
 
 with Ada.Containers;
 
-with UStrings;
 with Php.Echoing;
 with Php.Strings;
+
+with Helpers;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Adi_Caches;
@@ -393,7 +395,8 @@ is
       -- Parse incoming $args into an array and merge it with $defaults.
       Parsed_Args := Wp_Parse_Args (Args, Defaults);
 
-      Option_None_Value := +As_Integer (Get (Parsed_Args, "option_none_value"))'Image;
+      Option_None_Value :=
+        +Helpers.Image (As_Integer (Get (Parsed_Args, "option_none_value")));
 
       if
         not Isset (Parsed_Args, "pad_counts")          and then
@@ -407,7 +410,7 @@ is
 
       Tab_Index_Attribute := +"";
       if Tab_Index > 0 then -- (int)
-         Tab_Index_Attribute := +" tabindex=""" & Integer'Image (Tab_Index) & """";
+         Tab_Index_Attribute := +" tabindex=""" & Helpers.Image (Tab_Index) & """";
       end if;
 
       -- Avoid clashes with the 'name' param of get_terms().
@@ -1377,6 +1380,7 @@ is
       use Wp_Common;
       use Adi_Caches;
       use Class_Terms;
+      use Class_Posts;
       use Inc_Taxonomys;
       use Inc_Load;
       use Inc_Functions;
@@ -1395,7 +1399,8 @@ is
       begin
          if Length (Terms) = 0 then  -- false =
             Terms := Wp_Get_Object_Terms (Empty_Integer_Array & Integer (Post_2.Id),
-                                          To_Array ((1 => Build (Taxonomy, ""))));
+                                          Arrays.To_Array ((1 =>
+                                            Build (Taxonomy, ""))));
             if not Is_Wp_Error ("Terms") then
                declare
                   Term_Ids : constant Array_Type := Wp_List_Pluck (Terms, "term_id");
@@ -1411,7 +1416,8 @@ is
          --
          -- @since 3.1.0
          --
-         -- @param WP_Term[]|WP_Error $terms    Array of attached terms, or WP_Error on failure.
+         -- @param WP_Term[]|WP_Error $terms    Array of attached terms, or WP_Error
+         --                                     on failure.
          -- @param int                $post_id  Post ID.
          -- @param string             $taxonomy Name of the taxonomy.
          --
@@ -1419,7 +1425,7 @@ is
             Terms_2 : constant Wp_Term_Array
                := Apply_Filters (Hook_Name => "get_the_terms",
                                  Value     => Terms,
-                                 Id        => Post_2.Id'Image,
+                                 Id        => Image (Post_2.Id),
                                  Taxonomy  => Taxonomy);
          begin
             if Length (Terms_2) = 0 then

@@ -28,6 +28,7 @@ with Php.Types;
 with Array_Vectors;
 with Binder;
 with Constants;
+with Helpers;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -515,7 +516,7 @@ is
              "end; ) ();",
              [
                 1 => Wp_JSON_Encode (From_Boolean (Preload_Data)),
-                2 => User_Id'Image
+                2 => Image (User_Id)
              ]
            )
          );
@@ -527,7 +528,7 @@ is
              NL, -- "\n",
              List_Type'[
                "( function() then",
-               ("       var userId = " & Get_Current_User_Id'Image & ";"),
+               ("       var userId = " & Image (Get_Current_User_Id) & ";"),
                "       var storageKey = ""WP_DATA_USER_"" + userId;",
                "       wp.data",
                "  .use( wp.data.plugins.persistence, { storageKey: storageKey } );",
@@ -1538,8 +1539,9 @@ is
               "userProfileL10n",
               To_Array ((
                 Build ("user_id", User_Id),
-                Build ("nonce",   (if Wp_Installing then ""
-                                   else Inc_Pluggables.Wp_Create_Nonce ("reset-password-for-" & User_Id'Image)))
+                Build ("nonce",
+                  (if Wp_Installing then ""
+                   else Inc_Pluggables.Wp_Create_Nonce ("reset-password-for-" & Helpers.Image (User_Id))))
               ))
             );
          end if;

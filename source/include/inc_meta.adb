@@ -875,7 +875,7 @@ is
          if Meta_Cache.Is_Empty then  -- not
 --       if Array_Maps.Length (Meta_Cache) in 0 then  -- not
             Meta_Cache := Update_Meta_Cache (Meta_Type, (1 => Object_Id)); -- to_array
-            Meta_Cache := As_Array (Get (Meta_Cache, Object_Id'Image));
+            Meta_Cache := As_Array (Get (Meta_Cache, Helpers.Image (Object_Id)));
          end if;
 
          if "" /= Get_As_String (Meta_Cache, Meta_Key) then -- isset

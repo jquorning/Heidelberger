@@ -7,6 +7,7 @@
 --
 
 with Globals;
+with Helpers;
 
 with Class_WpDB;
 with Inc_Caches;
@@ -44,7 +45,7 @@ is
               WpDB.Get_Row (
                 WpDB.Prepare (
                   "SELECT * FROM wpdb.comments WHERE comment_ID = %d LIMIT 1",
-                  [1 => Integer'Image (Comment_Id)]),
+                  [1 => Helpers.Image (Comment_Id)]),
                   Success => Success);
 
             if X_Comment = Null_Comment then -- not

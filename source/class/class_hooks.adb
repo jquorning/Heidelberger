@@ -30,7 +30,7 @@ is
       Result : List_Type;
    begin
       for A in Map.Iterate loop
-         Result.Append (Priority_Type'Image (Key (A)));
+         Result.Append (Image (Priority_Type (Key (A))));
       end loop;
       return Result;
    end Array_Keys;
@@ -309,9 +309,9 @@ is
             Priority : constant Priority_Type :=
               This.Current_Priority (Nesting_Level);
          begin
--- Put_Line ("  Priority: " & Priority'Image);
+-- Put_Line ("  Priority: " & Helpers.Image (Priority));
 -- for A in This.Callbacks.Iterate loop
---    Put_Line ("  " & Priority_Maps.Key (A)'Image);
+--    Put_Line ("  " & Helpers.Image (Priority_Maps.Key (A)));
 --    for B in Priority_Maps.Element (A).Iterate loop
 --       Put ("    " & Index_Maps.Key (B));
 --       Put ("  ");

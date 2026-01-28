@@ -20,6 +20,7 @@ with Templates_Parser;
 with Arrays;
 with Binder;
 with Globals;
+with Helpers;
 with UStrings;
 with Lists;
 with Wp_Common;
@@ -186,7 +187,9 @@ is
                         Sendback := +Admin_URL (String (-Parent_File));
                      end if;
 
-                     Sendback := +Add_Query_Arg ("paged", Pagenum'Image, -Sendback);
+                     Sendback :=
+                       +Add_Query_Arg ("paged", Helpers.Image (Pagenum), -Sendback);
+
                      if Strpos (-Sendback, "post.php") /= 0 then
                         Sendback := +Admin_URL (-Globals.Post_New_File);
                      end if;
@@ -277,9 +280,9 @@ is
 
                               Sendback := +Add_Query_Arg (
                                 To_Array (List => (
-                                        Build ("trashed", Trashed'Image),
+                                        Build ("trashed", Helpers.Image (Trashed)),
 --                                        Build ("ids",     Implode (",", Post_Ids)),
-                                        Build ("locked",  Locked'Image)
+                                        Build ("locked",  Helpers.Image (Locked))
                                 )),
                                 -Sendback);
                            end;
@@ -312,10 +315,13 @@ is
 
                                  Untrashed := Untrashed + 1;
                               end loop;
-                              Sendback := +Add_Query_Arg ("untrashed", Untrashed'Image, -Sendback);
+                              Sendback :=
+                                +Add_Query_Arg ("untrashed",
+                                                Helpers.Image (Untrashed), -Sendback);
 
                               Remove_Filter ("wp_untrash_post_status",
-                                             "wp_untrash_post_set_previous_status", 10);
+                                             "wp_untrash_post_set_previous_status",
+                                             10);
                            end;
 
                         elsif "delete" = Doaction then
@@ -347,7 +353,9 @@ is
                                     Deleted := Deleted + 1;
                                  end;
                               end loop;
-                              Sendback := +Add_Query_Arg ("deleted", Deleted'Image, -Sendback);
+                              Sendback :=
+                                +Add_Query_Arg ("deleted", Helpers.Image (Deleted),
+                                                -Sendback);
                            end;
 
                         elsif "edit" = Doaction then
@@ -540,7 +548,7 @@ is
                Add_Screen_Option (
                   "per_page",
                   To_Array (List => (
-                     Build ("default", Natural'(20)'Image),
+                     Build ("default", "20"),
                      Build ("option",  "edit_" & (-Post_Type) & "_per_page")
                )));
             end;
@@ -877,7 +885,7 @@ is
 
                   URL_2 : constant String :=
                      """edit?post_type=$post_type&doaction=undo&action=untrash&ids=" &
-                     Ids'Image & """";
+                     Helpers.Image (Ids) & """";
 
                   URL : constant String :=
                     ESC_URL (Wp_Nonce_URL (URL_2, "bulk-posts"));

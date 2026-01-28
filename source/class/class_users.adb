@@ -13,6 +13,7 @@ with Php.Strings;
 with Php.Types;
 
 with Globals;
+with Helpers;
 with Wp_Common;
 
 with Inc_Caches;
@@ -128,7 +129,7 @@ is
       Field_2 : String :=
         (if "ID" = Field then "id" else Field);
 
-      Value_2  : UString := +Value'Image;
+      Value_2  : UString := +Helpers.Image (Value);
       User_Id  : Integer;
       DB_Field : UString;
       Unused_Found : Boolean;
@@ -139,7 +140,7 @@ is
          if not True then -- Is_Numeric (Value) then
             return Null_User; -- False;
          end if;
---       Value_2 := +Value'Image; -- (int)
+--       Value_2 := +Helpers.Image (Value); -- (int)
          if Value < 1 then
             return Null_User; -- False;
          end if;
@@ -240,7 +241,7 @@ is
          if not True then -- Is_Numeric (Value) then
             return Null_User; -- False;
          end if;
---       Value_2 := +Value'Image; -- (int)
+--       Value_2 := +Helpers.Image (Value); -- (int)
          if False then -- Value < 1 then
             return Null_User; -- False;
          end if;

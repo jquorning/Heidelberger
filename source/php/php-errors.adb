@@ -6,6 +6,8 @@ with Ada.Text_IO;
 
 with Php.Echoing;
 
+with Helpers;
+
 package body Php.Errors
 is
 
@@ -29,7 +31,7 @@ is
    is
       use Ada.Text_IO;
    begin
-      Put_Line ("error_reporting: " & Error_Level'Image);
+      Put_Line ("error_reporting: " & Helpers.Image (Error_Level));
    end Error_Reporting;
 
    -------------------
@@ -41,7 +43,7 @@ is
    is
       use Ada.Text_IO;
    begin
-      Put_Line ("trigger_error:" & Error_Level'Image);
+      Put_Line ("trigger_error:" & Helpers.Image (Error_Level));
       Put_Line (Message);
    end Trigger_Error;
 

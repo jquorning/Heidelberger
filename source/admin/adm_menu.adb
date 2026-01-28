@@ -11,6 +11,7 @@ with Php.Strings;
 with Php.Types;
 
 with Binder;
+with Helpers;
 with Wp_Common;
 with Lists;
 
@@ -118,7 +119,7 @@ is
                  [1 => Sprintf (
                     "<span class=""update-plugins count-%s""><span class=""update-count"">%s</span></span>",
                     [
-                      1 => Counts_Total'Image,
+                      1 => Helpers.Image (Counts_Total),
                            -- Update_Data ("counts") ("total"),
                       2 => Number_Format_I18n (Float (Counts_Total))
                            -- Update_Data ("counts") ("total"))
@@ -191,7 +192,7 @@ is
               Sprintf (
                 abs "Comments %s",
                 ["<span class=""awaiting-mod count-" &
-                 Awaiting_Mod'Image &
+                 Helpers.Image (Awaiting_Mod) &
                  """><span class=""pending-count"" aria-hidden=""true"">" &
                  Awaiting_Mod_I18n &
                  "</span><span class=""comments-in-moderation-text " &
@@ -361,7 +362,7 @@ is
                end if;
 
                declare
-                  Theme_Count : constant String := Natural'Image (Update_Data.Themes);
+                  Theme_Count : constant String := Helpers.Image (Update_Data.Themes);
 --                Theme_Count : constant String := Get_2 (Update_Data, "counts",
 --                                                                     "themes");
                begin
@@ -496,7 +497,7 @@ is
                if True then -- not Isset (Update_Data) then
                   Update_Data := Inc_Updates.Wp_Get_Update_Data; -- ();
                end if;
-               Plugin_Count := +Natural'Image (Update_Data.Plugins);
+               Plugin_Count := +Helpers.Image (Update_Data.Plugins);
 --             Plugin_Count := +Get_2 (Update_Data, "counts", "plugins");
                Count := +Sprintf (
                   "<span class=""update-plugins count-%s""><span class=""plugin-count"">%s</span></span>",
