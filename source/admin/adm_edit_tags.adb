@@ -268,7 +268,7 @@ is
                  To_List (Item => As_String (Get (X_REQUEST, "delete_tags")));
             begin
                for Tag_ID of Tags loop
-                  Wp_Delete_Term (Integer'Value (-Tag_ID), -Taxonomy);
+                  Wp_Delete_Term (Integer'Value (Tag_ID), -Taxonomy);
                end loop;
 
                Location := +Add_Query_Arg ("message", "6", -Referer);

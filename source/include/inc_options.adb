@@ -1567,7 +1567,6 @@ is
                                  return Boolean
    is
       use Php.HTML;
-      use UStrings;
    begin
       if Headers_Sent then
          return False;
@@ -1579,8 +1578,8 @@ is
          Deleted           : Boolean    := False;
       begin
          for Name of Names_2 loop
-            if Isset (All_User_Settings, -Name) then
-               Delete (Ref (All_User_Settings, -Name));
+            if Isset (All_User_Settings, Name) then
+               Delete (Ref (All_User_Settings, Name));
                Deleted := True;
             end if;
          end loop;

@@ -187,7 +187,6 @@ is
                                Media  : String    := "all")
    is
       use Php.Strings;
-      use UStrings;
       use Class_Styles;
       use Inc_Functions_Wp_Scripts;
    begin
@@ -199,7 +198,7 @@ is
             X_Handle : constant List_Type := Explode ("?", Handle);
          begin
             Unused :=
-              Wp_Styles_X.Add (-X_Handle.First_Element, Src, Deps, Ver, Media);
+              Wp_Styles_X.Add (X_Handle.First_Element, Src, Deps, Ver, Media);
          end;
       end if;
 

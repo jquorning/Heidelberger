@@ -164,7 +164,7 @@ is
       for
         Key of To_List (List => (+"settings_previewed", +"autosaved", +"branching"))
       loop
-         if In_Array (-Key, Args_2) then -- Isset (Args_2, Key) then
+         if In_Array (Key, Args_2) then -- Isset (Args_2, Key) then
             null;
 --          This.Key := As_Boolean (Get (Args_2, Key)); -- (bool)
          end if;
@@ -3247,11 +3247,11 @@ is
       begin
          if
            Lock not in Empty_List and then
-           not Empty (-Lock (1))        -- [1]
+           not Empty (Lock (1))        -- [1]
          then
             declare
                User_Id : constant User_Id_Type :=
-                 User_Id_Type'Value (-Lock (1));  -- (int) [1]
+                 User_Id_Type'Value (Lock (1));  -- (int) [1]
 
                Current_User_Id : constant User_Id_Type := Get_Current_User_Id;
             begin
@@ -3795,7 +3795,6 @@ is
                                   Setting_Ids : List_Type)
                                   return Setting_Lists.Vector -- Array_Type;
    is
-      use UStrings;
       use Wp_Common;
       use Class_Customize_Settings;
       use Inc_Plugins;
@@ -3804,7 +3803,7 @@ is
    begin
       for Setting_Id of Setting_Ids loop
          -- Skip settings already created.
-         if This.Get_Setting (-Setting_Id) /= Null_Setting then
+         if This.Get_Setting (Setting_Id) /= Null_Setting then
 --       if This.Get_Setting (-Setting_Id) then
             goto Continue;
          end if;
@@ -3830,7 +3829,7 @@ is
             --
             Setting_Args :=
               Apply_Filters ("customize_dynamic_setting_args",
-                             Setting_Args, -Setting_Id);
+                             Setting_Args, Setting_Id);
 
             if False = Setting_Args then
                goto Continue;
@@ -3849,7 +3848,7 @@ is
             --
             Setting_Class :=
               Apply_Filters ("customize_dynamic_setting_class",
-                             Setting_Class, -Setting_Id, Setting_Args);
+                             Setting_Class, Setting_Id, Setting_Args);
 
 --          Setting := new Setting_Class (This, Setting_Id, Setting_Args);
 

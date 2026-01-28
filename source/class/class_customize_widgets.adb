@@ -225,7 +225,7 @@ is
         Array_Keys (This.Manager.Unsanitized_Post_Values); -- ()
    begin
       for Setting_Id of Incoming_Setting_Ids loop
-         if "" /= This.Get_Setting_Type (-Setting_Id) then -- not is_null
+         if "" /= This.Get_Setting_Type (Setting_Id) then -- not is_null
             Widget_Setting_Ids.Append (Setting_Id);
          end if;
       end loop;
@@ -235,8 +235,8 @@ is
         Isset (X_REQUEST, "widget-id")
       then
          Widget_Setting_Ids.Append
-           (+This.Get_Setting_Id (
-               Wp_Unslash (As_String (Get (X_REQUEST, "widget-id")))));
+           (This.Get_Setting_Id (
+              Wp_Unslash (As_String (Get (X_REQUEST, "widget-id")))));
       end if;
 
       declare
@@ -401,7 +401,6 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
@@ -435,13 +434,13 @@ is
          declare
             use Class_Customize_Settings;
 
-            Setting_Id   : constant String     := This.Get_Setting_Id (-Widget_Id);
+            Setting_Id   : constant String     := This.Get_Setting_Id (Widget_Id);
             Setting_Args : constant Array_Type := This.Get_Setting_Args (Setting_Id);
          begin
             if Null_Setting = This.Manager.Get_Setting (Setting_Id) then -- not
                This.Manager.Add_Setting (Setting_Id, Setting_Args);
             end if;
-            New_Setting_Ids.Append (+Setting_Id);
+            New_Setting_Ids.Append (Setting_Id);
          end;
       end loop;
 
@@ -515,7 +514,7 @@ is
                         end if;
                         This.Manager.Add_Setting (Setting_Id, Setting_Args);
                      end if;
-                     New_Setting_Ids.Append (+Setting_Id);
+                     New_Setting_Ids.Append (Setting_Id);
 
                      -- Add section to contain controls.
 --                     declare
@@ -619,7 +618,7 @@ is
                                       (Wp_Customize_Control (Control));
                                  end;
                               end if;
-                              New_Setting_Ids.Append (+Setting_Id);
+                              New_Setting_Ids.Append (Setting_Id);
                            end;
                         end if;
                      end;
@@ -704,7 +703,7 @@ is
                use Class_Customize_Settings;
 
                Setting : Wp_Customize_Setting :=
-                 This.Manager.Get_Setting (-New_Setting_Id);
+                 This.Manager.Get_Setting (New_Setting_Id);
             begin
                Setting.Preview;
             end;
@@ -732,8 +731,6 @@ is
                             return String
    is
       use Php.Strings;
-      use UStrings;
-      use Wp_Common;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
 
@@ -799,8 +796,8 @@ is
       Matches : List_Type;
    begin
       if Preg_Match ("/^(.+)-(\d+)/", Widget_Id, Matches) /= 0 then
-         Set (Parsed, "id_base", From_String (-Matches (1)));                  -- [1]
-         Set (Parsed, "number",  From_Integer (Integer'Value (-Matches (2)))); -- [2]
+         Set (Parsed, "id_base", From_String (Matches (1)));                  -- [1]
+         Set (Parsed, "number",  From_Integer (Integer'Value (Matches (2)))); -- [2]
       else
          -- Likely an old single widget.
          Set (Parsed, "id_base", From_String (Widget_Id));
@@ -849,7 +846,6 @@ is
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
-      use UStrings;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Functions;
@@ -879,10 +875,10 @@ is
 
             Available_Widget : constant String := Key (A);
             Position : List_Vectors.Cursor :=
-              Available_Widgets.Find (+"control_tpl");
+              Available_Widgets.Find ("control_tpl");
          begin
             Available_Widgets.Delete (Position);
-            Available_Widgets.Append (+Available_Widget);
+            Available_Widgets.Append (Available_Widget);
          end;
       end loop;
 
@@ -1272,7 +1268,7 @@ is
    begin
       for Widget_Id of Widget_Ids_2 loop
          Sanitized_Widget_Ids.Append
-           (+Preg_Replace ("/[^a-z0-9_\-]/", "", -Widget_Id));
+           (Preg_Replace ("/[^a-z0-9_\-]/", "", Widget_Id));
       end loop;
       return Sanitized_Widget_Ids;
    end Sanitize_Sidebar_Widgets;
@@ -1929,13 +1925,13 @@ is
    begin
       for Tag_Name of List_Type'(Array_Keys (This.Before_Widget_Tags_Seen)) loop
 --       if List_Vectors.Has_Element (Allowed_HTML_2.Find (-Tag_Name)) then
-         if not Isset (Allowed_HTML_2, -Tag_Name) then
-            Set (Allowed_HTML_2, -Tag_Name, From_Array (Empty_Array));
+         if not Isset (Allowed_HTML_2, Tag_Name) then
+            Set (Allowed_HTML_2, Tag_Name, From_Array (Empty_Array));
          end if;
 
-         Set (Allowed_HTML_2, -Tag_Name, From_Array (
+         Set (Allowed_HTML_2, Tag_Name, From_Array (
               Array_Merge (
-                As_Array (Get (Allowed_HTML_2, -Tag_Name)),
+                As_Array (Get (Allowed_HTML_2, Tag_Name)),
                 Array_Fill_Keys (
                   To_List (List => (
                     +"data-customize-partial-id",

@@ -583,7 +583,6 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Arrays;
-      use UStrings;
       use Adi_Translation_Install;
    begin
       if Wp_Can_Install_Language_Pack and then Empty (Language) then
@@ -592,7 +591,7 @@ is
               Wp_Get_Available_Translations;
          begin
             if not Languages.Is_Empty then
-               Scripts.Append (+"language-chooser");
+               Scripts.Append ("language-chooser");
                Display_Header ("language-chooser");
                Echo ("<form id=""setup"" method=""post"" action=""?step=1"">");
                Wp_Install_Language_Form (Languages);

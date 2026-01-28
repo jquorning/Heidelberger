@@ -15,7 +15,6 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Constants;
-with Globals;
 with UStrings;
 
 with Inc_Formatting;

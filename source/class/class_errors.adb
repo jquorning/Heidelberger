@@ -8,7 +8,6 @@ with Php.Arrays;
 with Php.Strings;
 
 with Logging;
-with UStrings;
 with Wp_Common;
 
 package body Class_Errors
@@ -58,15 +57,13 @@ is
    function Get_Error_Code (This : Wp_Error)
                             return String
    is
-      use UStrings;
-
       Codes : constant List_Type := This.Get_Error_Codes;
    begin
       if Codes.Is_Empty then
          return "";
       end if;
 
-      return -Codes.First_Element;
+      return Codes.First_Element;
    end Get_Error_Code;
 
    -----------------------
@@ -78,7 +75,6 @@ is
                                 return List_Type
    is
       use Php.Strings;
-      use UStrings;
    begin
       -- Return all messages if no code specified.
       if Empty (Code) then
@@ -90,7 +86,7 @@ is
 --                Code    : constant String := Key (A);
                   Message : constant String := As_String (Element (A));
                begin
-                  All_Messages.Append (+Message);
+                  All_Messages.Append (Message);
 --                All_Messages := array_merge( all_messages, messages );
                end;
             end loop;

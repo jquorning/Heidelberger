@@ -45,7 +45,7 @@ is
          Explode ("-", Inc_General_Templates.Get_Bloginfo ("version"));
 
       Admin_Header    : UString;
-      Display_Version : constant String     := -List.First_Element;
+      Display_Version : constant String     := List.First_Element;
       Credits         : constant JSON_Value := Adi_Credits.Wp_Credits;
    begin
       Globals.Title := +abs "Credits";

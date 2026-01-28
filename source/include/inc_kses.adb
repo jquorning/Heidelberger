@@ -1007,10 +1007,9 @@ is
    function X_Wp_KSES_Split_Callback (Match : List_Type)
                                       return String
    is
-      use UStrings;
    begin
       return
-        Wp_KSES_Split2 (-Match.First_Element, -- (0),
+        Wp_KSES_Split2 (Match.First_Element, -- (0),
                         Pass_Allowed_HTML,
                         Pass_Allowed_Protocols);
 
@@ -1072,9 +1071,9 @@ is
          end if;
 
          declare
-            Slash    : constant String := Trim (-Matches (1));
-            Elem     : constant String := -Matches (2);
-            Attrlist : constant String := -Matches (3);
+            Slash    : constant String := Trim (Matches (1));
+            Elem     : constant String := Matches (2);
+            Attrlist : constant String := Matches (3);
 
             Allowed_HTML_2 : constant Array_Type :=
               (if not Is_Array (Allowed_HTML)
@@ -1235,7 +1234,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
 
       Name_Low    : constant String := Strtolower (Name);
       Element_Low : constant String := Strtolower (Element);
@@ -1278,7 +1276,7 @@ is
                -- element.
                --
                Set (Allowed_Attr,
-                    Key   => -Match (1),    -- (0)
+                    Key   => Match (1),    -- (0)
                     Value => Get (Allowed_Attr, "data-*"));
             else
                Name  := "";
@@ -1364,7 +1362,7 @@ is
                Match : List_Type;
             begin
                if 0 /= Preg_Match ("/^([_a-zA-Z][-_a-zA-Z0-9:.]*)/", -Attr_2, Match) then
-                  Attrname := Match (1);
+                  Attrname := +Match (1);
                   Working  := True;
                   Mode     := 1;
                   Attr_2   := +Preg_Replace ("/^[_a-zA-Z][-_a-zA-Z0-9:.]*/", "", -Attr_2);
@@ -1398,7 +1396,7 @@ is
             begin
                if 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
                   -- "value"
-                  Thisval := Match (1);
+                  Thisval := +Match (1);
                   if In_List (Strtolower (-Attrname), URIs, True) then
                      Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
                   end if;
@@ -1417,7 +1415,7 @@ is
 
                elsif 0 /= Preg_Match ("%^'([^']*)'(\s+|/?$)%", -Attr_2, Match) then
                   -- "value"
-                  Thisval := Match (1);
+                  Thisval := +Match (1);
                   if In_List (Strtolower (-Attrname), URIs, True) then
                      Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
                   end if;
@@ -1436,7 +1434,7 @@ is
 
                elsif 0 /= Preg_Match ("%^([^\s\""]+)(\s+|/?$)%", -Attr_2, Match) then
                   -- value
-                  Thisval := Match (1);
+                  Thisval := +Match (1);
                   if In_List (Strtolower (-Attrname), URIs, True) then
                      Thisval := +Wp_KSES_Bad_Protocol (-Thisval, Allowed_Protocols);
                   end if;
@@ -1810,12 +1808,12 @@ is
       if
         Item_2.Length in 2 and then
 --      Isset (-Item_2 (1)) and then
-        not Preg_Match ("%/\?%", -Item_2 (1)) -- (0)
+        not Preg_Match ("%/\?%", Item_2 (1)) -- (0)
       then
-         Item_4 := +Trim (-Item_2 (2)); -- (1)
+         Item_4 := +Trim (Item_2 (2)); -- (1)
          declare
             Protocol : constant String :=
-              Wp_KSES_Bad_Protocol_Once2 (-Item_2 (1), -- (0)
+              Wp_KSES_Bad_Protocol_Once2 (Item_2 (1), -- (0)
                                           Allowed_Protocols);
          begin
             if "feed:" = Protocol then
@@ -1846,7 +1844,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
 
       String_5 : constant String := Wp_KSES_Decode_Entities (Item);
       String_4 : constant String := Preg_Replace ("/\s/", "", String_5);
@@ -1856,7 +1853,7 @@ is
       Allowed : Boolean := False;
    begin
       for One_Protocol of Allowed_Protocols loop
-         if Strtolower (-One_Protocol) = String_2 then
+         if Strtolower (One_Protocol) = String_2 then
             Allowed := True;
             exit;
          end if;
@@ -2054,9 +2051,8 @@ is
    function X_Wp_KSES_Decode_Entities_Chr (Match : List_Type)
                                            return String
    is
-      use UStrings;
    begin
-      return Integer'Image (Integer'Value (-Match (2))); -- (1)
+      return Integer'Image (Integer'Value (Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr;
 
    ------------------------------------------
@@ -2067,9 +2063,8 @@ is
                                                   return String
    is
       use Php.Numerics;
-      use UStrings;
    begin
-      return Integer'Image (Hexdec (-Match (2))); -- (1)
+      return Integer'Image (Hexdec (Match (2))); -- (1)
    end X_Wp_KSES_Decode_Entities_Chr_Hexdec;
 
 -- --
@@ -2485,7 +2480,7 @@ is
          end if;
 
          declare
-            CSS_Item        : constant String  := Trim (-CSS_Item_2);
+            CSS_Item        : constant String  := Trim (CSS_Item_2);
             CSS_Test_String : UString := +CSS_Item;
             Found           : Boolean := False;
             URL_Attr        : Boolean := False;
@@ -2499,14 +2494,14 @@ is
                Parts := Explode (":", CSS_Item, 2);
 
                declare
-                  CSS_Selector : constant String    := Trim (-Parts (1)); -- (0)
+                  CSS_Selector : constant String    := Trim (Parts (1)); -- (0)
                begin
                   -- Allow assigning values to CSS variables.
                   if
                     In_List ("--*", Allowed_Attr, True) and then
                     Preg_Match ("/^--[a-zA-Z0-9-_]+$/", CSS_Selector)
                   then
-                     Allowed_Attr.Append (+CSS_Selector);
+                     Allowed_Attr.Append (CSS_Selector);
                      Is_Custom_Var  := True;
                   end if;
 
@@ -2520,7 +2515,7 @@ is
 
                   if Is_Custom_Var then
                      declare
-                        CSS_Value : constant String := Trim (-Parts (2)); -- (1)
+                        CSS_Value : constant String := Trim (Parts (2)); -- (1)
                      begin
                         URL_Attr      := Str_Starts_With (CSS_Value, "url(");
                         Gradient_Attr := Str_Contains (CSS_Value, "-gradient(");
@@ -2536,7 +2531,7 @@ is
                   Unused      : Integer;
                begin
                   Unused :=
-                    Preg_Match_All ("/url\([^)]+\)/", -Parts (2), URL_Matches); -- (1)
+                    Preg_Match_All ("/url\([^)]+\)/", Parts (2), URL_Matches); -- (1)
 
                   Match_Loop :
                   for A in URL_Matches.Iterate loop -- (1) loop -- (0)
@@ -2548,13 +2543,13 @@ is
                         Unused := Preg_Match ("/^url\(\s*([\""\""]?)(.*)(\g1)\s*\)$/",
                                               URL_Match, URL_Pieces);
 
-                        if Empty (-URL_Pieces (3)) then -- (2)
+                        if Empty (URL_Pieces (3)) then -- (2)
                            Found := False;
                            exit Match_Loop;
                         end if;
 
                         declare
-                           URL : constant String := Trim (-URL_Pieces (3)); -- (2)
+                           URL : constant String := Trim (URL_Pieces (3)); -- (2)
                         begin
                            if
                              Empty (URL) or else
@@ -2576,7 +2571,7 @@ is
 
             if Found and then Gradient_Attr then
                declare
-                  CSS_Value : constant String := Trim (-Parts (2));  -- (1)
+                  CSS_Value : constant String := Trim (Parts (2));  -- (1)
                begin
                   if
                     Preg_Match

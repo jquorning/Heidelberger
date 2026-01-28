@@ -138,12 +138,12 @@ is
          begin
 
             if First then
-               Append (Class, +"wp-first-item");  -- ()
+               Lists.Append (Class, "wp-first-item");
                First := False;
             end if;
 
             if Item.Menu_Slug /= "" then
-               Append (Class, +"wp-has-submenu"); -- ()
+               Lists.Append (Class, "wp-has-submenu");
 --             Submenu_Items := Submenu (-Item.Menu_Slug);
             end if;
 
@@ -153,13 +153,13 @@ is
             then
                if Submenu_Items = Inner_Maps.Empty_Map then
 --             if not Empty (Submenu_Items) then
-                  Append (Class, +"wp-has-current-submenu wp-menu-open");
+                  Lists.Append (Class, "wp-has-current-submenu wp-menu-open");
                else
-                  Append (Class, +"current");  -- ()
+                  Lists.Append (Class, "current");
                   Append (Aria_Attributes, +"aria-current=""page""");
                end if;
             else
-               Append (Class, +"wp-not-current-submenu");  -- ()
+               Lists.Append (Class, "wp-not-current-submenu");
                if Submenu_Items = Inner_Maps.Empty_Map then
 --               if not Empty (Submenu_Items) then
                   Append (Aria_Attributes, +"aria-haspopup=""true""");
@@ -167,7 +167,7 @@ is
             end if;
 
             if Item.Classes /= "" then
-               Append (Class, +ESC_Attr (-Item.Classes));
+               Lists.Append (Class, ESC_Attr (-Item.Classes));
             end if;
 
             declare
@@ -345,7 +345,7 @@ is
                            end if;
 
                            if First then
-                              Append (Class, +"wp-first-item");  -- ()
+                              Lists.Append (Class, "wp-first-item");
                               First := False;
                            end if;
 
@@ -368,7 +368,7 @@ is
 
                               if Submenu_File /= "" then
                                  if Submenu_File = Sub_Item.Menu_Slug then
-                                    Append (Class,           +"current");  -- ()
+                                    Lists.Append (Class, "current");
                                     Append (Aria_Attributes, +" aria-current=""page""");
                                  end if;
                                  -- If plugin_page is set the parent must either match
@@ -385,12 +385,12 @@ is
                                    Item.Menu_Slug = Unbounded_Slug (Self) or else
                                    not File_Exists (String (Menu_File))))
                               then
-                                 Append (Class,           +"current");  -- ()
+                                 Lists.Append (Class, "current");
                                  Append (Aria_Attributes, +" aria-current=""page""");
                               end if;
 
                               if Sub_Item.Classes /= "" then
-                                 Append (Class, +ESC_Attr (-Sub_Item.Classes));
+                                 Lists.Append (Class, ESC_Attr (-Sub_Item.Classes));
                               end if;
 
                               declare

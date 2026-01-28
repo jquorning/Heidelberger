@@ -2881,7 +2881,7 @@ is
    begin
       for PType of Post_Types loop
          declare
-            PType_Obj : constant Wp_Post_Type := Get_Post_Type_Object (-PType);
+            PType_Obj : constant Wp_Post_Type := Get_Post_Type_Object (PType);
          begin
             -- Sub-menus only.
             if
@@ -3582,8 +3582,8 @@ is
          end if;
          for Field of List_Type'(Array_Keys (Get_Object_Vars (Post_2))) loop
             -- field selecting jq
-            Set (Post_2, -Field,
-                 Sanitize_Post_Field (-Field, Get (Post_2, -Field),
+            Set (Post_2, Field,
+                 Sanitize_Post_Field (Field, Get (Post_2, Field),
                                       Post_2.Id, Context));
          end loop;
          Set (Post_2, "filter", Context);
@@ -6689,7 +6689,7 @@ is
                      begin
                         Count  := Count + 1;
 --                      exit Inner when Null_Post = Revparts (Count);
-                        exit Inner when not Isset (-Revparts (Count));
+                        exit Inner when not Isset (Revparts (Count));
                         exit Inner when Parent.Post_Name /= Revparts (Count);
                         P := Parent;
                      end;

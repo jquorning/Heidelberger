@@ -888,7 +888,6 @@ is
    function Wp_Get_Registered_Image_Subsizes
             return Array_Type
    is
-      use UStrings;
       use Inc_Options;
 
       Additional_Sizes : constant Array_Type :=
@@ -898,7 +897,7 @@ is
    begin
       for Size_Name_2 of Get_Intermediate_Image_Sizes loop
          declare
-            Size_Name : constant String := -Size_Name_2;
+            Size_Name : constant String := Size_Name_2;
 
             Size_Data : Array_Type := To_Array (List => (
               Build ("width",  0),
@@ -999,8 +998,8 @@ is
 
                      List : constant List_Type := Wp_Getimagesize (Src_File);
                   begin
-                     Width  := Integer'Value (-List (1));
-                     Height := Integer'Value (-List (2));
+                     Width  := Integer'Value (List (1));
+                     Height := Integer'Value (List (2));
                   end;
                end if;
             end if;

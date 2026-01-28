@@ -257,17 +257,17 @@ is
                               Locked  : Natural := 0;
                            begin
                               for Post_Id of Post_Ids loop -- foreach (To_Array)
-                                 if not Current_User_Can ("delete_post", -Post_Id) then
+                                 if not Current_User_Can ("delete_post", Post_Id) then
                                     Inc_Functions.Wp_Die
                                       (abs "Sorry, you are not allowed to move this item to the Trash.");
                                  end if;
 
-                                 if Wp_Check_Post_Lock (-Post_Id) not in 0 then
+                                 if Wp_Check_Post_Lock (Post_Id) not in 0 then
                                     Locked := Locked + 1;
                                     goto Continue;
                                  end if;
 
-                                 if not Wp_Trash_Post (-Post_Id) then
+                                 if not Wp_Trash_Post (Post_Id) then
                                     Inc_Functions.Wp_Die
                                       (abs "Error in moving the item to Trash.");
                                  end if;
@@ -301,12 +301,12 @@ is
                               end if;
 
                               for Post_Id of Post_Ids loop
-                                 if not Current_User_Can ("delete_post", -Post_Id) then
+                                 if not Current_User_Can ("delete_post", Post_Id) then
                                     Inc_Functions.Wp_Die
                                       (abs "Sorry, you are not allowed to restore this item from the Trash.");
                                  end if;
 
-                                 if not Inc_Posts.Wp_Untrash_Post (-Post_Id) then
+                                 if not Inc_Posts.Wp_Untrash_Post (Post_Id) then
                                     Inc_Functions.Wp_Die
                                       (abs "Error in restoring the item from Trash.");
                                  end if;
@@ -327,20 +327,20 @@ is
                               for Id of Post_Ids loop
                                  declare
                                     Post_Del : constant Wp_Post :=
-                                      Inc_Posts.Get_Post (Post_Id'Value (-Id));
+                                      Inc_Posts.Get_Post (Post_Id'Value (Id));
                                  begin
-                                    if not Current_User_Can ("delete_post", -Id) then
+                                    if not Current_User_Can ("delete_post", Id) then
                                        Inc_Functions.Wp_Die
                                           (abs "Sorry, you are not allowed to delete this item.");
                                     end if;
 
                                     if "attachment" = Post_Del.Post_Type then
-                                       if Wp_Delete_Attachment (Integer'Value (-Id)) = Null_Post then
+                                       if Wp_Delete_Attachment (Integer'Value (Id)) = Null_Post then
                                           Inc_Functions.Wp_Die
                                              (abs "Error in deleting the attachment.");
                                        end if;
                                     else
-                                       if Wp_Delete_Post (Integer'Value (-Id)) = Null_Post then
+                                       if Wp_Delete_Post (Integer'Value (Id)) = Null_Post then
                                           Inc_Functions.Wp_Die
                                             (abs "Error in deleting the item.");
                                        end if;
@@ -900,7 +900,7 @@ is
                begin
                   if
                     1 = Length (Ids) and then
-                    Current_User_Can ("edit_post", -Ids.First_Element) --  (Ids'First))
+                    Current_User_Can ("edit_post", Ids.First_Element) --  (Ids'First))
                   then
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
                      declare
@@ -908,7 +908,7 @@ is
                         use Inc_Link_Templates;
                         use Class_Posts;
 
-                        Id   : constant Post_Id := Post_Id'Value (-Ids.First_Element);
+                        Id   : constant Post_Id := Post_Id'Value (Ids.First_Element);
 
                         URL  : constant String  :=
                            ESC_URL (Get_Edit_Post_Link (Integer (Id)));

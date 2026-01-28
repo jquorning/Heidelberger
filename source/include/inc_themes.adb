@@ -486,7 +486,7 @@ is
         not Empty (-Untrailed) and then
         not In_List (-Untrailed, Wp_Theme_Directories, True)
       then
-         Wp_Theme_Directories.Append (Untrailed);
+         Wp_Theme_Directories.Append (-Untrailed);
       end if;
 
       return True;

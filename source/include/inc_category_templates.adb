@@ -1535,8 +1535,8 @@ is
          Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
       begin
          for Bool of To_List (List => (+"link", +"inclusive")) loop
-            Set (Args_2, -Bool,
-                 From_Boolean (Wp_Validate_Boolean (Get (Args_2, -Bool))));
+            Set (Args_2, Bool,
+                 From_Boolean (Wp_Validate_Boolean (Get (Args_2, Bool))));
          end loop;
 
          declare

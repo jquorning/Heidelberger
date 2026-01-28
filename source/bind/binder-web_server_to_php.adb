@@ -42,7 +42,6 @@ begin
    declare
       use Php.Strings;
       use AWS.URL;
-      use UStrings;
       use Lists;
 
       Obj              : constant Object := Parse (URL => URL (Status));
@@ -52,12 +51,12 @@ begin
    begin
       for A of List loop
          declare
-            KV : constant List_Type := Explode ("=", -A);
-            First : constant String := -KV (1);
+            KV : constant List_Type := Explode ("=", A);
+            First : constant String := KV (1);
          begin
             if KV.Length in 2 then
                XX_GET.Append (Key   => First,
-                              Value => From_String (-KV (2)));
+                              Value => From_String (KV (2)));
             else
                XX_GET.Append (Key   => First,
                               Value => From_String (""));

@@ -1227,8 +1227,8 @@ is
             declare
                List : constant List_Type := Explode ("?", URI_3, 2);
             begin
-               Base  := List (1);
-               Query := List (2);
+               Base  := +List (1);
+               Query := +List (2);
             end;
             Append (Base, "?");
 
@@ -1314,7 +1314,7 @@ is
       Query_2 : UString := +Query;
    begin
       for K of Key loop
-         Query_2 := +Add_Query_Arg (-K, "", -Query_2); -- "" was False
+         Query_2 := +Add_Query_Arg (K, "", -Query_2); -- "" was False
       end loop;
       return -Query_2;
    end Remove_Query_Arg;
@@ -2198,8 +2198,8 @@ is
          declare
             List : constant List_Type := Explode ("://", Target, Limit => 2);
          begin
-            Wrapper  := List (1);
-            Target_2 := List (2);
+            Wrapper  := +List (1);
+            Target_2 := +List (2);
          end;
       end if;
 
@@ -2365,8 +2365,8 @@ is
          declare
             E : constant List_Type := Explode ("://", -Path_2, 2);
          begin
-            Wrapper := E (E.First_Index + 0);
-            Path_2  := E (E.First_Index + 1);
+            Wrapper := +E (E.First_Index + 0);
+            Path_2  := +E (E.First_Index + 1);
          end;
          Append (Wrapper, "://");
       end if;
@@ -5197,13 +5197,11 @@ is
                                   Keys : List_Type)
                                   return Array_Type
    is
-      use UStrings;
-
       Slice : Array_Type;
    begin
       for Key of Keys loop
-         if Isset (Arry, -Key) then
-            Set (Slice, -Key, Get (Arry, -Key));
+         if Isset (Arry, Key) then
+            Set (Slice, Key, Get (Arry, Key));
          end if;
       end loop;
 
@@ -5222,7 +5220,6 @@ is
       use Ada.Containers;
       use Php.Arrays;
       use Php.Types;
-      use UStrings;
 
       Arry_2 : Array_Type := Arry;
    begin
@@ -5234,16 +5231,16 @@ is
       for Path_Element of Path loop
          if
            not Is_Array (Arry_2) or else
-           (not Is_String (-Path_Element)  and then
+           (not Is_String (Path_Element)  and then
 --          not Is_Integer (Path_Element) and then
 --          not Is_Null (Path_Element)
             True
            ) or else
-           not Array_Key_Exists (-Path_Element, Arry_2)
+           not Array_Key_Exists (Path_Element, Arry_2)
          then
             return Default;
          end if;
-         Arry_2 := As_Array (Get (Arry_2, -Path_Element));
+         Arry_2 := As_Array (Get (Arry_2, Path_Element));
       end loop;
 
       return From_Array (Arry_2);
@@ -5258,7 +5255,6 @@ is
                              Value : Multi_Type)
    is
       use Php.Arrays;
-      use UStrings;
 
       Arry_2 : Array_Type := Arry;
 
@@ -5290,7 +5286,7 @@ is
 
       for I in 0 .. Path_Length - 1 loop
          declare
-            Path_Element : constant String := -Path (I);
+            Path_Element : constant String := Path (I);
          begin
             if
               not Array_Key_Exists (Path_Element, Arry_2) or else
@@ -5304,7 +5300,7 @@ is
          I_2 := I;
       end loop;
 
-      Set (Arry_2, -Path (I_2), Value);
+      Set (Arry_2, Path (I_2), Value);
    end X_Wp_Array_Set;
 
    ------------------------
@@ -6947,7 +6943,6 @@ is
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
 
@@ -7002,7 +6997,7 @@ is
               Match (1) /= ""
             then
                Set (All_Headers, Field,
-                    From_String (X_Cleanup_Header_Comment (-Match (1))));
+                    From_String (X_Cleanup_Header_Comment (Match (1))));
             else
                Set (All_Headers, Field,
                     From_String (""));
@@ -7572,7 +7567,6 @@ is
       use Php.Ini;
       use Php.Lists;
       use Php.Multibyte;
-      use UStrings;
    begin
       if not Static_Overloaded_Bool then -- is_null
          Static_Overloaded_Bool := True;
@@ -7595,7 +7589,7 @@ is
          declare
             Encoding : constant String := MB_Internal_Encoding;
          begin
-            Static_Encodings.Append (+Encoding);
+            Static_Encodings.Append (Encoding);
 --          Array_Push (Static_Encodings, Encoding);
             MB_Internal_Encoding ("ISO-8859-1");
          end;

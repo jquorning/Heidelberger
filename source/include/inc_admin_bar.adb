@@ -1143,7 +1143,6 @@ is
             elsif "user-edit" = Current_Screen.Base or else User_Id not in 0 then
                declare
                   use Inc_Author_Templates;
-                  use Class_Users;
                   use Inc_Pluggables;
 
                   User_Object : constant Wp_User := Get_Userdata (User_Id);
@@ -1283,7 +1282,7 @@ is
          Result : List_Type;
       begin
          for A in Map.Iterate loop
-            Result.Append (+Action_Maps.Key (A));
+            Result.Append (Action_Maps.Key (A));
          end loop;
          return Result;
       end Array_Keys;

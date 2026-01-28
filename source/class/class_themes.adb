@@ -99,7 +99,7 @@ is
 
       if Is_Array (Cache) then
          for Key of To_List (List => (+"errors", +"headers", +"template")) loop
-            if Isset (Cache, -Key) then
+            if Isset (Cache, Key) then
 --             Append (Ref (This, -Key), Ref (Cache, -Key)); -- []
                null;
             end if;
@@ -507,7 +507,6 @@ is
    is
       use Php.Arrays;
       use Php.Types;
-      use UStrings;
    begin
       if not Isset (This.Headers, Header) then
          return ""; -- False;
@@ -528,15 +527,16 @@ is
       -- cache add is better than many cache sets.
       if Static_Persistently_Cache then -- self::
          for X_Header of List_Type'(Array_Keys (This.Headers)) loop
-            Set (This.Headers_Sanitized, -X_Header,
-                 From_String (
-                   This.Sanitize_Header (-X_Header, As_String (Get (This.Headers, -X_Header)))));
+            Set (This.Headers_Sanitized, X_Header, From_String (
+                   This.Sanitize_Header (X_Header,
+                     As_String (Get (This.Headers, X_Header)))));
          end loop;
          This.Cache_Add ("headers", This.Headers_Sanitized);
       else
          Set (This.Headers_Sanitized, Header,
               From_String (
-                This.Sanitize_Header (Header, As_String (Get (This.Headers, Header)))));
+                This.Sanitize_Header (Header,
+                  As_String (Get (This.Headers, Header)))));
       end if;
 
       return As_String (Get (This.Headers_Sanitized, Header));

@@ -176,7 +176,7 @@ is
 --      end if;
 
       if False = Group then -- and then This.Groups (Handle) > 0 then
-         This.In_Footer.Append (+Handle); -- []
+         This.In_Footer.Append (Handle); -- []
          return False;
       end if;
 
@@ -641,7 +641,6 @@ is
                               return Boolean
    is
       use Php.Lists;
-      use UStrings;
       use Class_Dependency.Dependency_Maps;
    begin
 --      if not Isset (This.Registered (Handle)) then
@@ -656,7 +655,7 @@ is
          Obj : X_Wp_Dependency := This.Registered (Handle);
       begin
          if not In_List ("wp-i18n", Obj.Deps, True) then
-            Obj.Deps.Append (+"wp-i18n");  -- ()
+            Obj.Deps.Append ("wp-i18n");  -- ()
          end if;
 
          return Obj.Set_Translations (Domain, Path);
@@ -798,7 +797,7 @@ is
       end if;
 
       for Test of This.Default_Dirs loop -- (array)
-         if 0 = Strpos (Src, -Test) then
+         if 0 = Strpos (Src, Test) then
             return True;
          end if;
       end loop;

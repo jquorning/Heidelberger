@@ -1381,7 +1381,7 @@ is
             if "" = Constants.WPLANG then
                exit;
             end if;
-            Locales.Append (+Constants.WPLANG);
+            Locales.Append (Constants.WPLANG);
 --         end if;
 
          -- if Isset (Wp_Local_Package) then
@@ -1394,22 +1394,22 @@ is
 --         Defined ("WP_LANG_DIR") and then
            Is_Dir (Constants.WP_LANG_DIR)          -- @
          then
-            Locations.Append (+Constants.WP_LANG_DIR);
+            Locations.Append (Constants.WP_LANG_DIR);
          end if;
 
          if
 --         Defined ("WP_CONTENT_DIR") and then
            Is_Dir (-Globals.WP_CONTENT_DIR & "/languages") -- @
          then
-            Locations.Append ((Globals.WP_CONTENT_DIR) & "/languages");
+            Locations.Append (-(Globals.WP_CONTENT_DIR) & "/languages");
          end if;
 
          if Is_Dir (Constants.ABSPATH & "wp-content/languages") then -- @
-            Locations.Append ((+Constants.ABSPATH) & "wp-content/languages");
+            Locations.Append (Constants.ABSPATH & "wp-content/languages");
          end if;
 
          if Is_Dir (Constants.ABSPATH & (-Globals.WPINC) & "/languages") then -- @
-            Locations.Append ((+Constants.ABSPATH) & Globals.WPINC & "/languages");
+            Locations.Append (Constants.ABSPATH & (-Globals.WPINC) & "/languages");
          end if;
 
          exit when Locations.Is_Empty;
@@ -1422,14 +1422,14 @@ is
             Find_Location :
             for Location of Locations loop
                declare
-                  Filename : constant String := (-Location) & "/" & (-Locale) & ".mo";
+                  Filename : constant String := Location & "/" & Locale & ".mo";
                   Unused   : Boolean;
                begin
                   if File_Exists (Filename) then
-                     Unused := Load_Textdomain ("default", Filename, -Locale);
+                     Unused := Load_Textdomain ("default", Filename, Locale);
                      declare
                         Filename_2 : constant String :=
-                          (-Location) & "/admin-" & (-Locale) & ".mo";
+                          Location & "/admin-" & Locale & ".mo";
                         Unused_2 : Boolean;
                      begin
                         if
@@ -1437,7 +1437,7 @@ is
                           File_Exists (Filename_2)
                         then
                            Unused_2 :=
-                             Load_Textdomain ("default", Filename_2, -Locale);
+                             Load_Textdomain ("default", Filename_2, Locale);
                         end if;
                      end;
                      exit Find_Locale;

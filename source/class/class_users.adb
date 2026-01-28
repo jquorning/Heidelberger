@@ -546,7 +546,6 @@ is
                            return Array_Type -- Boolean_Maps.Map
    is
       use Php.Arrays;
-      use UStrings;
       use Inc_Capabilities;
       use Class_Role;
       use Class_Roles;
@@ -574,7 +573,7 @@ is
          This.Allcaps := Empty_Array;
          for Role of This.Roles loop -- (array)
             declare
-               The_Role : constant Wp_Role := Roles.Get_Role (-Role);
+               The_Role : constant Wp_Role := Roles.Get_Role (Role);
             begin
                This.Allcaps :=
                  Array_Merge (This.Allcaps, The_Role.Capabilities); -- 2x(array)
@@ -682,7 +681,7 @@ is
       end if;
 
       for Old_Role of This.Roles loop -- (array)
-         Delete (Ref (This.Caps, -Old_Role));
+         Delete (Ref (This.Caps, Old_Role));
       end loop;
 
       declare
@@ -710,7 +709,7 @@ is
             end if;
 
             -- This action is documented in wp-includes/class-wp-user.php
-            Do_Action ("remove_user_role", Integer (This.Id), -Old_Role);
+            Do_Action ("remove_user_role", Integer (This.Id), Old_Role);
             << Continue >>
          end loop;
 
@@ -743,13 +742,12 @@ is
                              return Integer
    is
       use Php.Preg;
-      use UStrings;
 
       Matches : List_Type;
    begin
       if Preg_Match ("/^level_(10|[0-9])/i", Item, Matches) /= 0 then
          declare
-            Level : constant Integer := Integer'Value (-Matches (1));
+            Level : constant Integer := Integer'Value (Matches (1));
          begin
             return Integer'Max (Max, Level);
          end;
@@ -839,7 +837,6 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
       use Inc_Load;
@@ -903,7 +900,7 @@ is
 
             -- Must have ALL requested caps.
             for Cap of Caps loop -- (array)
-               if Empty (As_String (Get (Capabilities, -Cap))) then
+               if Empty (As_String (Get (Capabilities, Cap))) then
                   return False;
                end if;
             end loop;

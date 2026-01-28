@@ -6,8 +6,6 @@ with Ada.Strings.Unbounded;
 
 with Php.Strings;
 
-with UStrings;
-
 package body Php.Misc
 is
 
@@ -24,7 +22,6 @@ is
    is
       use Ada.Strings.Unbounded;
       use Php.Strings;
-      use UStrings;
 
       List_1 : constant List_Type := Explode (".", Version_1);
       List_2 : constant List_Type := Explode (".", Version_2);
@@ -35,8 +32,8 @@ is
       if Operator = ">=" then
          for A in List_1.First_Index .. Last loop
             declare
-               Left  : constant Natural := Natural'Value (-List_1 (A));
-               Right : constant Natural := Natural'Value (-List_2 (A));
+               Left  : constant Natural := Natural'Value (List_1 (A));
+               Right : constant Natural := Natural'Value (List_2 (A));
             begin
                if Left >= Right then
                   return True;
@@ -50,8 +47,8 @@ is
       elsif Operator = "<" then
          for A in List_1.First_Index .. Last loop
             declare
-               Left  : constant Natural := Natural'Value (-List_1 (A));
-               Right : constant Natural := Natural'Value (-List_2 (A));
+               Left  : constant Natural := Natural'Value (List_1 (A));
+               Right : constant Natural := Natural'Value (List_2 (A));
             begin
                if Left < Right then
                   return True;

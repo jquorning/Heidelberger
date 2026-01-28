@@ -335,10 +335,10 @@ is
                                          Cats.First_Element, Cats, Post); -- [0]
                      begin
                         Category_Object := Get_Term (Category_Object, "category");
-                        Category.Append (Category_Object.Slug);
+                        Category.Append (-Category_Object.Slug);
                         if Category_Object.Parent /= 0 then
                            Category.Prepend (
-                             +Get_Category_Parents (Category_Object.Parent,
+                             Get_Category_Parents (Category_Object.Parent,
                                                    False, "/", True));
                            -- Category :=
                            --   Get_Category_Parents (Category_Object.Parent,
@@ -359,7 +359,7 @@ is
                           Default_Category /= Null_Term and then
                           not Is_Wp_Error (Default_Category)
                         then
-                           Category := Empty_List & Default_Category.Slug;
+                           Category := Empty_List & (-Default_Category.Slug);
                         end if;
                      end;
                   end if;
@@ -387,15 +387,15 @@ is
                        Explode (" ", Str_Replace (L, " ", -Post.Post_Date));
 
                      Rewrite_Replace : constant List_Type := To_List (List => (
-                        Date (1),
-                        Date (2),
-                        Date (3),
-                        Date (4),
-                        Date (5),
-                        Date (6),
+                        +Date (1),
+                        +Date (2),
+                        +Date (3),
+                        +Date (4),
+                        +Date (5),
+                        +Date (6),
                         Post.Post_Name,
                         +Helpers.Image (Integer (Post.Id)),
-                        Category.First_Element, -- First_Element added
+                        +Category.First_Element, -- First_Element added
                         Author,
                         Post.Post_Name
                      ));
@@ -1291,7 +1291,7 @@ is
             elsif not Tax.Object_Type.Is_Empty then
 --          elsif not Empty (Tax.Object_Type) then
                Set (Args, "post_type",
-                    From_String (-Tax.Object_Type.First_Element));
+                    From_String (Tax.Object_Type.First_Element));
 --             Set (Args, "post_type", Reset (Tax.Object_Type));
             end if;
 
@@ -2659,7 +2659,7 @@ is
 
             if Qs_Match.Length >= 1 then
 --          if ( ! empty( qs_match[0] ) ) then
-               Query_String := Qs_Match (1); -- [0];
+               Query_String := +Qs_Match (1); -- [0];
                Request      := Preg_Replace (Qs_Regex, "", Request);
             else
                Query_String := +"";
@@ -4718,7 +4718,7 @@ is
                declare
                   L : constant List_Type := Explode ("@", -Id_Or_Email_2);
                begin
-                  Email_Hash := L.First_Element;
+                  Email_Hash := +L.First_Element;
                end;
             else
                -- Email address.

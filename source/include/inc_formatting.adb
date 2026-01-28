@@ -340,7 +340,7 @@ is
          declare
             Tagnames : constant List_Type :=
               List_Intersect (Array_Keys (Global_Shortcode_Tags),
-                              To_List (-Matches (1)));
+                              To_List (Matches (1)));
 
             Found_Shortcodes : constant Boolean := not Tagnames.Is_Empty;
             Shortcode_Regex  : constant String :=
@@ -357,7 +357,7 @@ is
             for Curl_0 of Textarr loop -- &
                -- Only call _wptexturize_pushpop_element if curl is a delimiter.
                declare
-                  Curl  : String := -Curl_0;
+                  Curl  : String := Curl_0;
                   First : constant Character := Curl (1);
                begin
 
@@ -492,7 +492,7 @@ is
       for A in Sentences.First_Index .. Sentences.Last_Index loop
          declare
             Index    : constant Integer := A;
-            Sentence : constant String  := -Sentences (A);     -- &
+            Sentence : constant String  := Sentences (A);     -- &
          begin
             if 0 = Strpos (Sentence, Needle) then
                goto Continue;
@@ -591,7 +591,6 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
 
       Opening_Tag : Boolean;
       Name_Offset : Integer;
@@ -5044,12 +5043,11 @@ is
                                             return String
    is
       use Php.Strings;
-      use UStrings;
    begin
-      if 0 = Strpos (-Matches (1), ">") then -- false, [0]
-         return ESC_HTML (-Matches (1)); -- [0]
+      if 0 = Strpos (Matches (1), ">") then -- false, [0]
+         return ESC_HTML (Matches (1)); -- [0]
       end if;
-      return -Matches (1); -- [0]
+      return Matches (1); -- [0]
    end Wp_Pre_KSES_Less_Than_Callback;
 
 -- --
@@ -5465,7 +5463,7 @@ is
       Filtered := +Trim (-Filtered);
 
       while Preg_Match ("/%[a-f0-9]{2}/i", -Filtered, Match) /= 0 loop
-         Filtered := +Str_Replace (-Match (1), "", -Filtered); -- [0]
+         Filtered := +Str_Replace (Match (1), "", -Filtered); -- [0]
          Found    := True;
       end loop;
 

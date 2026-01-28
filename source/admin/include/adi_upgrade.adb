@@ -33,7 +33,6 @@ with Class_Options;
 with Class_Posts;
 with Class_Post2cat;
 with Class_Roles;
-with Class_Users;
 with Class_WpDB;
 
 with Inc_Caches;
@@ -520,7 +519,7 @@ is
                   Done_Posts : List_Type; --  = array();
                begin
                   for Done_Id of Done_Ids loop
-                     Done_Posts.Append (+Helpers.Image (Done_Id.Post_Id));
+                     Done_Posts.Append (Helpers.Image (Done_Id.Post_Id));
                   end loop;
                   Cat_Where := +" AND ID NOT IN (" & Implode (",", Done_Posts) & ")";
                end;
@@ -1081,7 +1080,7 @@ is
       begin
          WpDB.Hide_Errors;
          for Old of Old_User_Fields loop
-            WpDB.Query ("ALTER TABLE " & Users_2 & " DROP " & Statement_Type (-Old));
+            WpDB.Query ("ALTER TABLE " & Users_2 & " DROP " & Statement_Type (Old));
          end loop;
          WpDB.Show_Errors;
       end;
@@ -1434,7 +1433,7 @@ is
       WpDB.Hide_Errors;
       for Old of Old_Options_Fields loop
          WpDB.Query (Statement_Type (
-           "ALTER TABLE " & (-WpDB.Options) & " DROP " & (-Old)));
+           "ALTER TABLE " & (-WpDB.Options) & " DROP " & Old));
       end loop;
       WpDB.Show_Errors;
    end Upgrade_230_Options_Table;
@@ -2426,22 +2425,22 @@ is
    begin
       -- Create a tablename index for an array (cqueries) of queries.
       for Qry of Queries_5 loop
-         if Preg_Match ("|CREATE TABLE ([^ ]*)|", -Qry, Matches) /= 0 then
+         if Preg_Match ("|CREATE TABLE ([^ ]*)|", Qry, Matches) /= 0 then
             declare
-               M : constant String := -Matches (1); -- [1]
+               M : constant String := Matches (1); -- [1]
             begin
-               Set (C_Queries,  Trim (M, "`"), From_String (-Qry));
+               Set (C_Queries,  Trim (M, "`"), From_String (Qry));
                Set (For_Update, M,             From_String ("Created table " & M));
             end;
 
-         elsif Preg_Match ("|CREATE DATABASE ([^ ]*)|", -Qry, Matches) /= 0 then
-            Array_Unshift (C_Queries, -Qry);
+         elsif Preg_Match ("|CREATE DATABASE ([^ ]*)|", Qry, Matches) /= 0 then
+            Array_Unshift (C_Queries, Qry);
 
-         elsif Preg_Match ("|INSERT INTO ([^ ]*)|", -Qry, Matches) /= 0 then
-            I_Queries.Append (From_String (-Qry));
+         elsif Preg_Match ("|INSERT INTO ([^ ]*)|", Qry, Matches) /= 0 then
+            I_Queries.Append (From_String (Qry));
 
-         elsif Preg_Match ("|UPDATE ([^ ]*)|", -Qry, Matches) /= 0 then
-            I_Queries.Append (From_String (-Qry));
+         elsif Preg_Match ("|UPDATE ([^ ]*)|", Qry, Matches) /= 0 then
+            I_Queries.Append (From_String (Qry));
 
          else
             null;  -- Unrecognized query type.
@@ -2526,7 +2525,7 @@ is
                      -- parentheses.
                      Preg_Match ("|\((.*)\)|ms", Qry, Match_2);
                      declare
-                        Qryline : constant String := Trim (-Match_2 (1));
+                        Qryline : constant String := Trim (Match_2 (1));
 
                         -- Separate field lines into an array.
                         Flds : constant List_Type := Explode ("\n", Qryline);
@@ -2534,7 +2533,7 @@ is
                         -- For every field line specified in the query.
                         for Fld_0 of Flds loop
                            declare
-                              Fld : constant String := Trim (-Fld_0, " \t\n\r\0\x0B,");
+                              Fld : constant String := Trim (Fld_0, " \t\n\r\0\x0B,");
                               -- Default trim characters, plus ",".
                               Fvals : List_Type;
                            begin
@@ -2542,7 +2541,7 @@ is
                               Preg_Match ("|^([^ ]*)|", Fld, Fvals);
                               declare
                                  Fieldname : constant String :=
-                                   Trim (-Fvals (1), "`");
+                                   Trim (Fvals (1), "`");
 
                                  Fieldname_Lowercased : constant String :=
                                    Strtolower (Fieldname);
@@ -2742,7 +2741,7 @@ is
                                    ("|`?" & Get_As_String (Tablefield, "Field") & "`? ([^ ]*( unsigned)?)|i",
                                     Get_As_String (C_Fields, Tablefield_Field_Lowercased), Matches);
                                  declare
-                                    Fieldtype : constant String := -Matches (1);
+                                    Fieldtype : constant String := Matches (1);
 
                                     Fieldtype_Lowercased : constant String :=
                                       Strtolower (Fieldtype);
@@ -2833,7 +2832,7 @@ is
                                     then
                                        declare
                                           Default_Value : constant String :=
-                                            -Matches (1);
+                                            Matches (1);
                                        begin
                                           if Get_As_String (Tablefield, "Default") /= Default_Value then
                                              -- Add a query to change the column's
@@ -3004,10 +3003,10 @@ is
                         for Index of Indices loop -- (array)
                            -- Push a query line into cqueries that adds the index to that table.
                            C_Queries.Append (From_String (
-                             -("ALTER TABLE " & Table & " ADD " & Index)));
+                             "ALTER TABLE " & Table & " ADD " & Index));
 
                            For_Update.Append (From_String (
-                             -("Added " & Index & " " & Table & " " & Index)));
+                             "Added " & Index & " " & Table & " " & Index));
                         end loop;
 
                         -- Remove the original table creation query from processing.
@@ -3137,7 +3136,7 @@ is
                      begin
                         for L of Lines loop
                            declare
-                              Line : constant String := -L;
+                              Line : constant String := L;
 
                               Line_2 : String :=
                                 (if Preg_Match ("/require.*wp-blog-header/", Line)
@@ -3258,7 +3257,7 @@ is
             begin
                for L of Stylelines loop
                   declare
-                     Line : constant String := -L;
+                     Line : constant String := L;
 
                      Line_2 : constant String :=
                        (if Strpos (Line, "Theme Name:") /= 0
@@ -3432,14 +3431,13 @@ is
    procedure Maybe_Disable_Automattic_Widgets
    is
       use Php.Files;
-      use UStrings;
       use Inc_Options;
 
       Plugins : constant List_Type := Empty_List;  -- ???
 --      As_List (X_Get_Option ("active_plugins"));
    begin
       for Plugin of Plugins loop -- (array)
-         if "widgets.php" = Basename (-Plugin) then
+         if "widgets.php" = Basename (Plugin) then
 --          Array_Splice (Plugins, Array_Search (-Plugin, Plugins, True), 1); -- ???
             Update_Option ("active_plugins", From_List (Plugins));
             exit;

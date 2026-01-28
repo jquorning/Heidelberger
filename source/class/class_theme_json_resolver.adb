@@ -492,7 +492,6 @@ is
       Post_Status_Filter : List_Type := To_List ("publish"))
       return Array_Type
    is
-      use UStrings;
       use Php.HTML;
       use Php.Strings;
       use Class_Posts;
@@ -530,7 +529,7 @@ is
             Build ("order",               "desc"),
             Build ("post_type",           Post_Type_Filter),
             Build ("post_status",
-                   -Post_Status_Filter (Post_Status_Filter.First_Index)),
+                   Post_Status_Filter (Post_Status_Filter.First_Index)),
             Build ("ignore_sticky_posts", True),
             Build ("no_found_rows",       True),
             Build ("tax_query",           -- To_Array (List => (

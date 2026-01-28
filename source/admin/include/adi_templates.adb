@@ -259,11 +259,11 @@ is
                Keys               : constant List_Type  := Array_Keys (Categories);
             begin
                for K of Keys loop
-                  if In_Array (Get_Term_Array (Categories, -K).Term_Id,
+                  if In_Array (Get_Term_Array (Categories, K).Term_Id,
                                As_Array (Get (Args_2, "selected_cats")), True)
                   then
-                     Checked_Categories := Get_Array (Categories, -K); -- ()
-                     Delete (Ref (Checked_Categories, -K)); -- checked_ added
+                     Checked_Categories := Get_Array (Categories, K); -- ()
+                     Delete (Ref (Checked_Categories, K)); -- checked_ added
                   end if;
                end loop;
             end;
@@ -2872,7 +2872,7 @@ is
             goto Continue_3;
          end if;
 
-         Classes.Append ((if In_List (-T, Button_Shorthand, True)
+         Classes.Append ((if In_List (T, Button_Shorthand, True)
                           then "button-" & T else T)); -- ()
          <<Continue_3>>
       end loop;

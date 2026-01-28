@@ -171,7 +171,7 @@ is
       -- Do 'all' actions first.
       if Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
 --    if Isset (Wp_Filter ("all")) then
-         Global_Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (Hook_Name);
 
          declare
             All_Args : constant Array_Type := Func_Get_Args; -- ()
@@ -193,7 +193,7 @@ is
 
       if not Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
 --    if not Isset (Wp_Filter ("all")) then
-         Global_Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (Hook_Name);
       end if;
 
       -- Pass the value to WP_Hook.
@@ -353,9 +353,8 @@ is
    function Current_Filter
             return String
    is
-      use UStrings;
    begin
-      return -Global_Wp_Current_Filter.Last_Element; -- end()
+      return Global_Wp_Current_Filter.Last_Element; -- end()
    end Current_Filter;
 
    -----------------
@@ -429,7 +428,6 @@ is
                         Arg_3     : String := "")
    is
       use Php.Lists;
-      use UStrings;
       use Count_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
    begin
@@ -446,7 +444,7 @@ is
       -- Do 'all' actions first.
       if Has_Element (Global_Wp_Filter.Find ("all")) then
 --    if Isset (Wp_Filter, "all") then
-         Global_Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (Hook_Name);
          declare
             All_Args : Array_Type; --            := Func_Get_Args;
          begin
@@ -465,7 +463,7 @@ is
       end if;
 
       if not Has_Element (Global_Wp_Filter.Find ("all")) then
-         Global_Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (Hook_Name);
       end if;
 
       declare
@@ -493,7 +491,6 @@ is
                                   Args      : Array_Type)
    is
       use Php.Lists;
-      use UStrings;
       use Count_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
    begin
@@ -508,7 +505,7 @@ is
 
       -- Do 'all' actions first.
       if Has_Element (Global_Wp_Filter.Find ("all")) then
-         Global_Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (Hook_Name);
          declare
             All_Args : Array_Type; --            := Func_Get_Args;
          begin
@@ -525,7 +522,7 @@ is
       end if;
 
       if not Has_Element (Global_Wp_Filter.Find ("all")) then
-         Global_Wp_Current_Filter.Append (+Hook_Name);
+         Global_Wp_Current_Filter.Append (Hook_Name);
       end if;
 
       Global_Wp_Filter (Hook_Name).Do_Action (Args);
@@ -654,11 +651,10 @@ is
                                       Message     : String := "")
                                       return String
    is
-      use UStrings;
       use Inc_Functions;
    begin
       if not Has_Filter (Hook_Name) then
-         return -Args (1); -- [0]
+         return Args (1); -- [0]
       end if;
 
       X_Deprecated_Hook (Hook_Name, Version, Replacement, Message);
@@ -918,7 +914,6 @@ is
 
    procedure Dump_Hooks
    is
-      use UStrings;
       use Count_Maps;
       use Natural_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
@@ -947,7 +942,7 @@ is
 
       Put_Line ("  global_wp_current_filter:");
       for A of Global_Wp_Current_Filter loop
-         Put_Line ("    " & (-A));
+         Put_Line ("    " & A);
       end loop;
 
       Put_Line ("  global_wp_filter:");

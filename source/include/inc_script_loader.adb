@@ -219,9 +219,9 @@ is
             "moment",
             Php.Strings.Sprintf (
               "moment.updateLocale( ""%s"", %s );",
-              To_List (List => (
-                1 => +Get_User_Locale,
-                2 => +Wp_JSON_Encode (From_Array (
+              [
+                1 => Get_User_Locale,
+                2 => Wp_JSON_Encode (From_Array (
                   To_Array ((
                   Build ("months",
                          List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Month))),
@@ -244,7 +244,7 @@ is
                   )))
                 ))
               ))
-            ))),
+            ]),
             "after"
          );
       end if;
@@ -310,13 +310,11 @@ is
    procedure Wp_Register_Development_Scripts
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
-      use UStrings;
-
       Development_Scripts : constant List_Type :=
-        To_List (List => (
-          +"react-refresh-entry",
-          +"react-refresh-runtime"
-        ));
+        [
+          "react-refresh-entry",
+          "react-refresh-runtime"
+        ];
    begin
       if
 --      not Defined ("SCRIPT_DEBUG") or else
@@ -339,8 +337,8 @@ is
             -- end if;
 
             Scripts.Add (
-              "wp-" & (-Script_Name),
-              "/wp-includes/js/dist/development/" & (-Script_Name) & ".js",
+              "wp-" & Script_Name,
+              "/wp-includes/js/dist/development/" & Script_Name & ".js",
               As_List (Get (Assets, "dependencies")),
               As_String (Get (Assets, "version"))
             );
@@ -348,7 +346,7 @@ is
       end loop;
 
       -- See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
-      Scripts.Registered ("react").Deps.Append (+"wp-react-refresh-entry");
+      Scripts.Registered ("react").Deps.Append ("wp-react-refresh-entry");
    end Wp_Register_Development_Scripts;
 
    ---------------------------------
@@ -462,7 +460,7 @@ is
    begin
       if Has_Element (Scripts.Registered.Find ("wp-api-fetch")) then
 --    if Isset (Scripts.Registered, "wp-api-fetch") then
-         Scripts.Registered ("wp-api-fetch").Deps.Append (+"wp-hooks");
+         Scripts.Registered ("wp-api-fetch").Deps.Append ("wp-hooks");
       end if;
 
       Scripts.Add_Inline_Script (
@@ -478,19 +476,19 @@ is
         "wp-api-fetch",
         Implode (
           NL, -- "\n",
-          To_List (List => (
-            +Sprintf (
-              "wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( ""%s"" );",
-              To_List ((if Inc_Load.Wp_Installing then ""
-                        else Inc_Pluggables.Wp_Create_Nonce ("wp_rest")))
+          List_Type'[
+            Sprintf (
+             "wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( ""%s"" );",
+             To_List ((if Inc_Load.Wp_Installing then ""
+                       else Inc_Pluggables.Wp_Create_Nonce ("wp_rest")))
             ),
-            +"wp.apiFetch.use( wp.apiFetch.nonceMiddleware );",
-            +"wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );",
-            +Sprintf (
+            "wp.apiFetch.use( wp.apiFetch.nonceMiddleware );",
+            "wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );",
+            Sprintf (
               "wp.apiFetch.nonceEndpoint = ""%s"";",
               To_List (Admin_URL ("admin-ajax.php?action=rest-nonce"))
             )
-          ))
+          ]
         ),
         "after"
       );
@@ -515,9 +513,10 @@ is
              "  var preferencesStore = wp.preferences.store; " &
              "  wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer ); " &
              "end; ) ();",
-             To_List (List =>
-               (1 => +Wp_JSON_Encode (From_Boolean (Preload_Data)),
-                2 => +User_Id'Image))
+             [
+                1 => Wp_JSON_Encode (From_Boolean (Preload_Data)),
+                2 => User_Id'Image
+             ]
            )
          );
 
@@ -526,14 +525,14 @@ is
            "wp-data",
            Implode (
              NL, -- "\n",
-             To_List (List => (
-               +"( function() then",
-               +("       var userId = " & Get_Current_User_Id'Image & ";"),
-               +"       var storageKey = ""WP_DATA_USER_"" + userId;",
-               +"       wp.data",
-               +"  .use( wp.data.plugins.persistence, { storageKey: storageKey } );",
-               +"end; )();"
-             ))
+             List_Type'[
+               "( function() then",
+               ("       var userId = " & Get_Current_User_Id'Image & ";"),
+               "       var storageKey = ""WP_DATA_USER_"" + userId;",
+               "       wp.data",
+               "  .use( wp.data.plugins.persistence, { storageKey: storageKey } );",
+               "end; )();"
+             ]
            )
          );
       end;
@@ -867,7 +866,7 @@ is
       Scripts.Content_URL     := Constants.WP_CONTENT_URL; -- defined( "WP_CONTENT_URL" ) ? WP_CONTENT_URL : "";
       Scripts.Default_Version := +Get_Bloginfo ("version");
       Scripts.Default_Dirs    :=
-        To_List (List => (+"/wp-admin/js/", +"/wp-includes/js/"));
+        ["/wp-admin/js/", "/wp-includes/js/"];
 
       Scripts.Add ("utils", "/wp-includes/js/utils" & Suffix & ".js");
       if Did_Action ("init") then
@@ -884,7 +883,7 @@ is
       end if;
 
       Scripts.Add ("common", "/wp-admin/js/commonsuffix.js",
-                   To_List (List => (+"jquery", +"hoverIntent", +"utils")), False, 1);
+                   ["jquery", "hoverIntent", "utils"], False, 1);
       Scripts.Set_Translations ("common");
 
       Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js",
@@ -938,13 +937,13 @@ is
                    To_List ("prototype"), "3517m");
 
       Scripts.Add ("editor", "/wp-admin/js/editorsuffix.js",
-                   To_List (List => (+"utils", +"jquery")), False, 1);
+                   ["utils", "jquery"], False, 1);
 
       Scripts.Add ("clipboard", "/wp-includes/js/clipboardsuffix.js",
                    Empty_List, "2.0.11", 1);
 
       Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js",
-                   To_List (List => (+"jquery", +"wp-a11y")), False, 1);
+                   ["jquery", "wp-a11y"], False, 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -983,7 +982,7 @@ is
                    To_List ("heartbeat"), False, 1);
 
       Scripts.Add ("heartbeat", "/wp-includes/js/heartbeatsuffix.js",
-                   To_List (List => (+"jquery", +"wp-hooks")), False, 1);
+                   ["jquery", "wp-hooks"], False, 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1006,45 +1005,79 @@ is
       Scripts.Set_Translations ("wp-auth-check");
 
       Scripts.Add ("wp-lists", "/wp-includes/js/wp-listssuffix.js",
-                   To_List (List => (+"wp-ajax-response", +"jquery-color")), False, 1);
+                   ["wp-ajax-response", "jquery-color"], False, 1);
 
       -- WordPress no longer uses or bundles Prototype or script.aculo.us. These
       -- are now pulled from an external source.
-      Scripts.Add ("prototype", "https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js", Empty_List, "1.7.1");
-      Scripts.Add ("scriptaculous-root", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js",
-                   To_List ("prototype"), "1.9.0");
-      Scripts.Add ("scriptaculous-builder", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js",
-                   To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous-dragdrop", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js",
-                   To_List (List => (+"scriptaculous-builder", +"scriptaculous-effects")), "1.9.0");
-      Scripts.Add ("scriptaculous-effects", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js",
-                   To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous-slider", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js",
-                   To_List ("scriptaculous-effects"), "1.9.0");
-      Scripts.Add ("scriptaculous-sound", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js",
-                   To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous-controls", "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js",
-                   To_List ("scriptaculous-root"), "1.9.0");
-      Scripts.Add ("scriptaculous", False,
-                   To_List (List => (+"scriptaculous-dragdrop", +"scriptaculous-slider", +"scriptaculous-controls")));
+      Scripts.Add (
+        "prototype",
+        "https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js",
+        Empty_List, "1.7.1");
+      Scripts.Add (
+        "scriptaculous-root",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js",
+        To_List ("prototype"), "1.9.0");
+      Scripts.Add (
+        "scriptaculous-builder",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/builder.js",
+        To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add (
+        "scriptaculous-dragdrop",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/dragdrop.js",
+        ["scriptaculous-builder", "scriptaculous-effects"], "1.9.0");
+      Scripts.Add (
+        "scriptaculous-effects",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/effects.js",
+        To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add (
+        "scriptaculous-slider",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/slider.js",
+        To_List ("scriptaculous-effects"), "1.9.0");
+      Scripts.Add (
+        "scriptaculous-sound",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/sound.js",
+        To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add (
+        "scriptaculous-controls",
+        "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/controls.js",
+        To_List ("scriptaculous-root"), "1.9.0");
+      Scripts.Add (
+        "scriptaculous", False,
+        ["scriptaculous-dragdrop", "scriptaculous-slider",
+         "scriptaculous-controls"]);
 
       -- Not used in core, replaced by Jcrop.js.
       Scripts.Add ("cropper", "/wp-includes/js/crop/cropper.js",
                    To_List ("scriptaculous-dragdrop"));
 
       -- jQuery.
-      -- The unminified jquery.js and jquery-migrate.js are included to facilitate debugging.
-      Scripts.Add ("jquery", False, To_List (List => (+"jquery-core", +"jquery-migrate")), "3.6.1");
-      Scripts.Add ("jquery-core", "/wp-includes/js/jquery/jquerysuffix.js", Empty_List, "3.6.1");
-      Scripts.Add ("jquery-migrate", "/wp-includes/js/jquery/jquery-migratesuffix.js", Empty_List, "3.3.2");
+      -- The unminified jquery.js and jquery-migrate.js are included to facilitate
+      -- debugging.
+      Scripts.Add (
+        "jquery", False,
+        ["jquery-core", "jquery-migrate"], "3.6.1");
+      Scripts.Add (
+        "jquery-core",
+        "/wp-includes/js/jquery/jquerysuffix.js", Empty_List, "3.6.1");
+      Scripts.Add (
+        "jquery-migrate",
+        "/wp-includes/js/jquery/jquery-migratesuffix.js", Empty_List, "3.3.2");
 
       -- Full jQuery UI.
       -- The build process in 1.12.1 has changed significantly.
       -- In order to keep backwards compatibility, and to keep the optimized loading,
-      -- the source files were flattened and included with some modifications for AMD loading.
-      -- A notable change is that "jquery-ui-core" now contains "jquery-ui-position" and "jquery-ui-widget".
-      Scripts.Add ("jquery-ui-core", "/wp-includes/js/jquery/ui/coresuffix.js", To_List ("jquery"), "1.13.2", 1);
-      Scripts.Add ("jquery-effects-core", "/wp-includes/js/jquery/ui/effectsuffix.js", To_List ("jquery"), "1.13.2", 1);
+      -- the source files were flattened and included with some modifications for AMD
+      -- loading.
+      -- A notable change is that "jquery-ui-core" now contains "jquery-ui-position"
+      -- and "jquery-ui-widget".
+      Scripts.Add (
+        "jquery-ui-core",
+        "/wp-includes/js/jquery/ui/coresuffix.js",
+        To_List ("jquery"), "1.13.2", 1);
+      Scripts.Add (
+        "jquery-effects-core",
+        "/wp-includes/js/jquery/ui/effectsuffix.js",
+        To_List ("jquery"), "1.13.2", 1);
 
       Scripts.Add ("jquery-effects-blind", "/wp-includes/js/jquery/ui/effect-blindsuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
       Scripts.Add ("jquery-effects-bounce", "/wp-includes/js/jquery/ui/effect-bouncesuffix.js", To_List ("jquery-effects-core"), "1.13.2", 1);
@@ -1193,34 +1226,52 @@ is
          Scripts.Add ("plupload", "/wp-includes/js/plupload/pluploadsuffix.js", To_List ("moxiejs"), "2.1.9");
 
          -- Back compat handles:
-         for Handle of To_List (List => (+"all", +"html5", +"flash", +"silverlight", +"html4")) loop
-            Scripts.Add ("plupload-" & (-Handle), False, To_List ("plupload"), "2.1.1");
+         for Handle of List_Type'["all", "html5", "flash", "silverlight", "html4"] loop
+            Scripts.Add ("plupload-" & Handle, False, To_List ("plupload"), "2.1.1");
          end loop;
 
-         Scripts.Add ("plupload-handlers", "/wp-includes/js/plupload/handlerssuffix.js",
-                      To_List (List => (+"clipboard", +"jquery", +"plupload", +"underscore", +"wp-a11y", +"wp-i18n")));
+         Scripts.Add (
+           "plupload-handlers",
+           "/wp-includes/js/plupload/handlerssuffix.js",
+           ["clipboard", "jquery", "plupload", "underscore",
+            "wp-a11y", "wp-i18n"]);
 
          if Did_Action ("init") then
             Scripts.Localize ("plupload-handlers", "pluploadL10n", Uploader_L10n);
          end if;
 
-         Scripts.Add ("wp-plupload", "/wp-includes/js/plupload/wp-pluploadsuffix.js", To_List (List => (+"plupload", +"jquery", +"json2", +"media-models")), False, 1);
+         Scripts.Add (
+           "wp-plupload",
+           "/wp-includes/js/plupload/wp-pluploadsuffix.js",
+           ["plupload", "jquery", "json2", "media-models"], False, 1);
 
          if Did_Action ("init") then
             Scripts.Localize ("wp-plupload", "pluploadL10n", Uploader_L10n);
          end if;
 
          -- Keep "swfupload" for back-compat.
-         Scripts.Add ("swfupload", "/wp-includes/js/swfupload/swfupload.js", Empty_List, "2201-20110113");
+         Scripts.Add (
+           "swfupload",
+           "/wp-includes/js/swfupload/swfupload.js",
+           Empty_List, "2201-20110113");
          Scripts.Add ("swfupload-all", False, To_List ("swfupload"), "2201");
-         Scripts.Add ("swfupload-handlers", "/wp-includes/js/swfupload/handlerssuffix.js", To_List (List => (+"swfupload-all", +"jquery")), "2201-20110524");
+         Scripts.Add (
+           "swfupload-handlers",
+           "/wp-includes/js/swfupload/handlerssuffix.js",
+           ["swfupload-all", "jquery"], "2201-20110524");
+
          if Did_Action ("init") then
             Scripts.Localize ("swfupload-handlers", "swfuploadL10n", Uploader_L10n);
          end if;
       end;
-      Scripts.Add ("comment-reply", "/wp-includes/js/comment-replysuffix.js", Empty_List, False, 1);
+      Scripts.Add (
+        "comment-reply",
+        "/wp-includes/js/comment-replysuffix.js", Empty_List, False, 1);
 
-      Scripts.Add ("json2", "/wp-includes/js/json2suffix.js", Empty_List, "2015-05-03");
+      Scripts.Add (
+        "json2",
+        "/wp-includes/js/json2suffix.js", Empty_List, "2015-05-03");
+
       if Did_Action ("init") then
          Scripts.Add_Data ("json2", "conditional", "lt IE 8");
       end if;
@@ -1404,14 +1455,24 @@ is
       Scripts.Add ("jsonlint", "/wp-includes/js/codemirror/jsonlint.js", Empty_List, "1.6.2");
       Scripts.Add ("htmlhint", "/wp-includes/js/codemirror/htmlhint.js", Empty_List, "0.9.14-xwp");
       Scripts.Add ("htmlhint-kses", "/wp-includes/js/codemirror/htmlhint-kses.js", To_List ("htmlhint"));
-      Scripts.Add ("code-editor", "/wp-admin/js/code-editorsuffix.js", To_List (List => (+"jquery", +"wp-codemirror", +"underscore")));
-      Scripts.Add ("wp-theme-plugin-editor", "/wp-admin/js/theme-plugin-editorsuffix.js",
-                   To_List (List => (+"common", +"wp-util", +"wp-sanitize", +"jquery", +"jquery-ui-core", +"wp-a11y", +"underscore")));
+      Scripts.Add ("code-editor", "/wp-admin/js/code-editorsuffix.js",
+                   ["jquery", "wp-codemirror", "underscore"]);
+      Scripts.Add (
+        "wp-theme-plugin-editor",
+        "/wp-admin/js/theme-plugin-editorsuffix.js",
+        ["common", "wp-util", "wp-sanitize", "jquery", "jquery-ui-core",
+         "wp-a11y", "underscore"]);
       Scripts.Set_Translations ("wp-theme-plugin-editor");
 
-      Scripts.Add ("wp-playlist", "/wp-includes/js/mediaelement/wp-playlistsuffix.js", To_List (List => (+"wp-util", +"backbone", +"mediaelement")), False, 1);
+      Scripts.Add (
+        "wp-playlist",
+        "/wp-includes/js/mediaelement/wp-playlistsuffix.js",
+        ["wp-util", "backbone", "mediaelement"], False, 1);
 
-      Scripts.Add ("zxcvbn-async", "/wp-includes/js/zxcvbn-asyncsuffix.js", Empty_List, "1.0");
+      Scripts.Add (
+        "zxcvbn-async",
+        "/wp-includes/js/zxcvbn-asyncsuffix.js", Empty_List, "1.0");
+
       if Did_Action ("init") then
          Scripts.Localize (
            "zxcvbn-async",
@@ -1424,7 +1485,11 @@ is
          );
       end if;
 
-      Scripts.Add ("password-strength-meter", "/wp-admin/js/password-strength-metersuffix.js", To_List (List => (+"jquery", +"zxcvbn-async")), False, 1);
+      Scripts.Add (
+        "password-strength-meter",
+        "/wp-admin/js/password-strength-metersuffix.js",
+        ["jquery", "zxcvbn-async"], False, 1);
+
       if Did_Action ("init") then
          Scripts.Localize (
            "password-strength-meter",
@@ -1442,13 +1507,23 @@ is
 
       Scripts.Set_Translations ("password-strength-meter");
 
-      Scripts.Add ("application-passwords", "/wp-admin/js/application-passwordssuffix.js", To_List (List => (+"jquery", +"wp-util", +"wp-api-request", +"wp-date", +"wp-i18n", +"wp-hooks")), False, 1);
+      Scripts.Add (
+        "application-passwords",
+        "/wp-admin/js/application-passwordssuffix.js",
+        ["jquery", "wp-util", "wp-api-request", "wp-date",
+         "wp-i18n", "wp-hooks"], False, 1);
       Scripts.Set_Translations ("application-passwords");
 
-      Scripts.Add ("auth-app", "/wp-admin/js/auth-appsuffix.js", To_List (List => (+"jquery", +"wp-api-request", +"wp-i18n", +"wp-hooks")), False, 1);
+      Scripts.Add (
+        "auth-app",
+        "/wp-admin/js/auth-appsuffix.js",
+        ["jquery", "wp-api-request", "wp-i18n", "wp-hooks"], False, 1);
       Scripts.Set_Translations ("auth-app");
 
-      Scripts.Add ("user-profile", "/wp-admin/js/user-profilesuffix.js", To_List (List => (+"jquery", +"password-strength-meter", +"wp-util")), False, 1);
+      Scripts.Add (
+        "user-profile",
+        "/wp-admin/js/user-profilesuffix.js",
+        ["jquery", "password-strength-meter", "wp-util"], False, 1);
       Scripts.Set_Translations ("user-profile");
 
       declare
@@ -1505,12 +1580,20 @@ is
       -- JS-only version of hoverintent (no dependencies).
       Scripts.Add ("hoverintent-js", "/wp-includes/js/hoverintent-js.min.js", Empty_List, "2.2.1", 1);
 
-      Scripts.Add ("customize-base", "/wp-includes/js/customize-basesuffix.js", To_List (List => (+"jquery", +"json2", +"underscore")), False, 1);
+      Scripts.Add ("customize-base", "/wp-includes/js/customize-basesuffix.js",
+                   ["jquery", "json2", "underscore"], False, 1);
       Scripts.Add ("customize-loader", "/wp-includes/js/customize-loadersuffix.js", To_List ("customize-base"), False, 1);
-      Scripts.Add ("customize-preview", "/wp-includes/js/customize-previewsuffix.js", To_List (List => (+"wp-a11y", +"customize-base")), False, 1);
-      Scripts.Add ("customize-models", "/wp-includes/js/customize-models.js", To_List (List => (+"underscore", +"backbone")), False, 1);
-      Scripts.Add ("customize-views", "/wp-includes/js/customize-views.js", To_List (List => (+"jquery", +"underscore", +"imgareaselect", +"customize-models", +"media-editor", +"media-views")), False, 1);
-      Scripts.Add ("customize-controls", "/wp-admin/js/customize-controlssuffix.js", To_List (List => (+"customize-base", +"wp-a11y", +"wp-util", +"jquery-ui-core")), False, 1);
+      Scripts.Add ("customize-preview", "/wp-includes/js/customize-previewsuffix.js",
+                   ["wp-a11y", "customize-base"], False, 1);
+      Scripts.Add ("customize-models", "/wp-includes/js/customize-models.js",
+                   ["underscore", "backbone"], False, 1);
+      Scripts.Add ("customize-views", "/wp-includes/js/customize-views.js",
+                   ["jquery", "underscore", "imgareaselect", "customize-models",
+                    "media-editor", "media-views"], False, 1);
+      Scripts.Add ("customize-controls", "/wp-admin/js/customize-controlssuffix.js",
+                   ["customize-base", "wp-a11y", "wp-util", "jquery-ui-core"],
+                   False, 1);
+
       if Did_Action ("init") then
          Scripts.Localize (
            "customize-controls",
@@ -1590,10 +1673,10 @@ is
                     1 => +abs "https://wordpress.org/support/article/site-editor/",
                     2 => +Php.Strings.Sprintf (
                       "<button type=""button"" data-action=""%1s"" class=""button switch-to-editor"">%2s</button>",
-                      To_List (List => (
-                        1 => +ESC_URL (Admin_URL ("site-editor.php")),
-                        2 => +abs "Use Site Editor"
-                      ))
+                      [
+                        1 => ESC_URL (Admin_URL ("site-editor.php")),
+                        2 => abs "Use Site Editor"
+                      ]
                     )
                   ))
                 ))
@@ -1601,18 +1684,30 @@ is
          );
       end if;
 
-      Scripts.Add ("customize-selective-refresh", "/wp-includes/js/customize-selective-refreshsuffix.js",
-                   To_List (List => (+"jquery", +"wp-util", +"customize-preview")), False, 1);
+      Scripts.Add (
+        "customize-selective-refresh",
+        "/wp-includes/js/customize-selective-refreshsuffix.js",
+        ["jquery", "wp-util", "customize-preview"], False, 1);
 
-      Scripts.Add ("customize-widgets", "/wp-admin/js/customize-widgetssuffix.js",
-                   To_List (List => (+"jquery", +"jquery-ui-sortable", +"jquery-ui-droppable", +"wp-backbone", +"customize-controls")), False, 1);
-      Scripts.Add ("customize-preview-widgets", "/wp-includes/js/customize-preview-widgetssuffix.js",
-                   To_List (List => (+"jquery", +"wp-util", +"customize-preview", +"customize-selective-refresh")), False, 1);
+      Scripts.Add (
+        "customize-widgets",
+        "/wp-admin/js/customize-widgetssuffix.js",
+        ["jquery", "jquery-ui-sortable", "jquery-ui-droppable",
+         "wp-backbone", "customize-controls"], False, 1);
+      Scripts.Add (
+        "customize-preview-widgets",
+        "/wp-includes/js/customize-preview-widgetssuffix.js",
+        ["jquery", "wp-util", "customize-preview",
+         "customize-selective-refresh"], False, 1);
 
       Scripts.Add ("customize-nav-menus", "/wp-admin/js/customize-nav-menussuffix.js",
-                   To_List (List => (+"jquery", +"wp-backbone", +"customize-controls", +"accordion", +"nav-menu", +"wp-sanitize")), False, 1);
-      Scripts.Add ("customize-preview-nav-menus", "/wp-includes/js/customize-preview-nav-menussuffix.js",
-                   To_List (List => (+"jquery", +"wp-util", +"customize-preview", +"customize-selective-refresh")), False, 1);
+                   ["jquery", "wp-backbone", "customize-controls",
+                    "accordion", "nav-menu", "wp-sanitize"], False, 1);
+      Scripts.Add (
+        "customize-preview-nav-menus",
+        "/wp-includes/js/customize-preview-nav-menussuffix.js",
+        ["jquery", "wp-util", "customize-preview",
+         "customize-selective-refresh"], False, 1);
 
       Scripts.Add ("wp-custom-header", "/wp-includes/js/wp-custom-headersuffix.js", To_List ("wp-a11y"), False, 1);
 
@@ -1620,6 +1715,7 @@ is
 
       Scripts.Add ("shortcode", "/wp-includes/js/shortcodesuffix.js", To_List ("underscore"), False, 1);
       Scripts.Add ("media-models", "/wp-includes/js/media-modelssuffix.js", To_List ("wp-backbone"), False, 1);
+
       if Did_Action ("init") then
          Scripts.Localize (
                 "media-models",
@@ -1637,30 +1733,39 @@ is
       -- To enqueue media-views or media-editor, call wp_enqueue_media().
       -- Both rely on numerous settings, styles, and templates to operate correctly.
       Scripts.Add ("media-views", "/wp-includes/js/media-viewssuffix.js",
-                   To_List (List => (+"utils", +"media-models", +"wp-plupload", +"jquery-ui-sortable", +"wp-mediaelement", +"wp-api-request", +"wp-a11y", +"clipboard")), False, 1);
+                   ["utils", "media-models", "wp-plupload", "jquery-ui-sortable",
+                    "wp-mediaelement", "wp-api-request", "wp-a11y", "clipboard"],
+                    False, 1);
       Scripts.Set_Translations ("media-views");
 
-      Scripts.Add ("media-editor", "/wp-includes/js/media-editorsuffix.js", To_List (List => (+"shortcode", +"media-views")), False, 1);
+      Scripts.Add ("media-editor", "/wp-includes/js/media-editorsuffix.js",
+                   ["shortcode", "media-views"], False, 1);
       Scripts.Set_Translations ("media-editor");
       Scripts.Add ("media-audiovideo", "/wp-includes/js/media-audiovideosuffix.js", To_List ("media-editor"), False, 1);
-      Scripts.Add ("mce-view", "/wp-includes/js/mce-viewsuffix.js", To_List (List => (+"shortcode", +"jquery", +"media-views", +"media-audiovideo")), False, 1);
+      Scripts.Add (
+        "mce-view", "/wp-includes/js/mce-viewsuffix.js",
+        ["shortcode", "jquery", "media-views", "media-audiovideo"], False, 1);
 
-      Scripts.Add ("wp-api", "/wp-includes/js/wp-apisuffix.js", To_List (List => (+"jquery", +"backbone", +"underscore", +"wp-api-request")), False, 1);
+      Scripts.Add (
+        "wp-api", "/wp-includes/js/wp-apisuffix.js",
+        ["jquery", "backbone", "underscore", "wp-api-request"], False, 1);
 
       if Is_Admin then
-         Scripts.Add ("admin-tags", "/wp-admin/js/tagssuffix.js", To_List (List => (+"jquery", +"wp-ajax-response")), False, 1);
+         Scripts.Add ("admin-tags", "/wp-admin/js/tagssuffix.js",
+                      ["jquery", "wp-ajax-response"], False, 1);
          Scripts.Set_Translations ("admin-tags");
 
-         Scripts.Add ("admin-comments", "/wp-admin/js/edit-commentssuffix.js", To_List (List => (+"wp-lists", +"quicktags", +"jquery-query")), False, 1);
+         Scripts.Add ("admin-comments", "/wp-admin/js/edit-commentssuffix.js",
+                      ["wp-lists", "quicktags", "jquery-query"], False, 1);
          Scripts.Set_Translations ("admin-comments");
          if Did_Action ("init") then
             Scripts.Localize (
-                        "admin-comments",
-                        "adminCommentsSettings",
-                        To_Array ((
-                                Build ("hotkeys_highlight_first", Isset (XX_GET, "hotkeys_highlight_first")),
-                                Build ("hotkeys_highlight_last",  Isset (XX_GET, "hotkeys_highlight_last"))
-                        ))
+              "admin-comments",
+              "adminCommentsSettings",
+              To_Array ((
+                Build ("hotkeys_highlight_first", Isset (XX_GET, "hotkeys_highlight_first")),
+                Build ("hotkeys_highlight_last",  Isset (XX_GET, "hotkeys_highlight_last"))
+              ))
             );
          end if;
 
@@ -1675,7 +1780,10 @@ is
          Scripts.Add ("tags-suggest", "/wp-admin/js/tags-suggestsuffix.js", To_List (List => (+"jquery-ui-autocomplete", +"wp-a11y")), False, 1);
          Scripts.Set_Translations ("tags-suggest");
 
-         Scripts.Add ("post", "/wp-admin/js/postsuffix.js", To_List (List => (+"suggest", +"wp-lists", +"postbox", +"tags-box", +"underscore", +"word-count", +"wp-a11y", +"wp-sanitize", +"clipboard")), False, 1);
+         Scripts.Add (
+           "post", "/wp-admin/js/postsuffix.js",
+           ["suggest", "wp-lists", "postbox", "tags-box", "underscore",
+            "word-count", "wp-a11y", "wp-sanitize", "clipboard"], False, 1);
          Scripts.Set_Translations ("post");
 
          Scripts.Add ("editor-expand", "/wp-admin/js/editor-expandsuffix.js", To_List (List => (+"jquery", +"underscore")), False, 1);
@@ -1842,7 +1950,7 @@ is
 
       -- Register a stylesheet for the selected admin color scheme.
       Styles.Add ("colors", "true",    -- True
-                  To_List (List => (+"wp-admin", +"buttons")));
+                  ["wp-admin", "buttons"]);
 
       declare
          Suffix : constant String :=
@@ -1862,38 +1970,39 @@ is
          Styles.Add ("nav-menus",   "/wp-admin/css/nav-menus" & Suffix & ".css");
          Styles.Add ("widgets",
                      "/wp-admin/css/widgets" & Suffix & ".css",
-                     To_List ("wp-pointer"));
+                     ["wp-pointer"]);
          Styles.Add ("site-icon",   "/wp-admin/css/site-icon" & Suffix & ".css");
          Styles.Add ("l10n",        "/wp-admin/css/l10n" & Suffix & ".css");
          Styles.Add ("code-editor", "/wp-admin/css/code-editor" & Suffix & ".css",
-                     To_List ("wp-codemirror"));
+                     ["wp-codemirror"]);
+--                   To_List ("wp-codemirror"));
          Styles.Add ("site-health", "/wp-admin/css/site-health" & Suffix & ".css");
 
          Styles.Add ("wp-admin", "False", -- False
-                  To_List (List => (+"dashicons", +"common",
-                                    +"forms", +"admin-menu",
-                                    +"dashboard", +"list-tables",
-                                    +"edit", +"revisions",
-                                    +"media", +"themes",
-                                    +"about", +"nav-menus",
-                                    +"widgets", +"site-icon",
-                                    +"l10n")));
+                     ["dashicons", "common",
+                      "forms", "admin-menu",
+                      "dashboard", "list-tables",
+                      "edit", "revisions",
+                      "media", "themes",
+                      "about", "nav-menus",
+                      "widgets", "site-icon",
+                      "l10n"]);
 
          Styles.Add ("login",   "/wp-admin/css/login" & Suffix & ".css",
-                     To_List (List => (+"dashicons", +"buttons", +"forms", +"l10n")));
+                     ["dashicons", "buttons", "forms", "l10n"]);
          Styles.Add ("install", "/wp-admin/css/install" & Suffix & ".css",
-                     To_List (List => (+"dashicons", +"buttons", +"forms", +"l10n")));
+                     ["dashicons", "buttons", "forms", "l10n"]);
          Styles.Add ("wp-color-picker",
                      "/wp-admin/css/color-picker" & Suffix & ".css");
          Styles.Add ("customize-controls",
                      "/wp-admin/css/customize-controls" & Suffix & ".css",
-                     To_List (List => (+"wp-admin", +"colors", +"imgareaselect")));
+                     ["wp-admin", "colors", "imgareaselect"]);
          Styles.Add ("customize-widgets",
                      "/wp-admin/css/customize-widgets" & Suffix & ".css",
-                     To_List (List => (+"wp-admin", +"colors")));
+                     ["wp-admin", "colors"]);
          Styles.Add ("customize-nav-menus",
                      "/wp-admin/css/customize-nav-menus" & Suffix & ".css",
-                     To_List (List => (+"wp-admin", +"colors")));
+                     ["wp-admin", "colors"]);
 
          -- Common dependencies.
          Styles.Add ("buttons",   "/wp-includes/css/buttons" & Suffix & ".css");
@@ -1901,20 +2010,20 @@ is
 
          -- Includes CSS.
          Styles.Add ("admin-bar", "/wp-includes/css/admin-bar" & Suffix & ".css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("wp-auth-check",
                      "/wp-includes/css/wp-auth-check" & Suffix & ".css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("editor-buttons", "/wp-includes/css/editor" & Suffix & ".css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("media-views",
                      "/wp-includes/css/media-views" & Suffix & ".css",
-                     To_List (List => (+"buttons", +"dashicons", +"wp-mediaelement")));
+                     ["buttons", "dashicons", "wp-mediaelement"]);
          Styles.Add ("wp-pointer", "/wp-includes/css/wp-pointer" & Suffix & ".css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("customize-preview",
                      "/wp-includes/css/customize-preview" & Suffix & ".css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("wp-embed-template-ie",
                      "/wp-includes/css/wp-embed-template-ie" & Suffix & ".css");
          Styles.Add_Data ("wp-embed-template-ie", "conditional", "lte IE 8");
@@ -1925,15 +2034,15 @@ is
                      Empty_List, "0.9.8");
          Styles.Add ("wp-jquery-ui-dialog",
                      "/wp-includes/css/jquery-ui-dialog" & Suffix & ".css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("mediaelement",
                      "/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css",
                      Empty_List, "4.2.17");
          Styles.Add ("wp-mediaelement",
                      "/wp-includes/js/mediaelement/wp-mediaelement" & Suffix & ".css",
-                     To_List ("mediaelement"));
+                     ["mediaelement"]);
          Styles.Add ("thickbox", "/wp-includes/js/thickbox/thickbox.css",
-                     To_List ("dashicons"));
+                     ["dashicons"]);
          Styles.Add ("wp-codemirror",
                      "/wp-includes/js/codemirror/codemirror.min.css",
                      Empty_List, "5.29.1-alpha-ee20357");
@@ -1946,7 +2055,7 @@ is
          Styles.Add ("jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.css",
                      Empty_List, "0.9.15");
          Styles.Add ("colors-fresh", "False", -- False
-                     To_List (List => (+"wp-admin", +"buttons"))); -- Old handle.
+                     ["wp-admin", "buttons"]); -- Old handle.
          Styles.Add ("open-sans", -Open_Sans_Font_URL);
          -- No longer used in core as of 4.6.
 
@@ -1984,7 +2093,7 @@ is
          Styles.Add (
            "wp-reset-editor-styles",
            "/wp-includes/css/dist/block-library/reset" & Suffix & ".css",
-           To_List (List => (+"common", +"forms"))
+           ["common", "forms"]
            -- Make sure the reset is loaded after the default WP Admin styles.
          );
 
@@ -1995,22 +2104,22 @@ is
          );
 
          declare
-            Wp_Edit_Blocks_Dependencies : List_Type := To_List (List => (
-                +"wp-components",
-                +"wp-editor",
-                -- This need to be added before the block library styles,
-                -- The block library styles override the "reset" styles.
-                +"wp-reset-editor-styles",
-                +"wp-block-library",
-                +"wp-reusable-blocks"
-            ));
+            Wp_Edit_Blocks_Dependencies : List_Type :=
+              ["wp-components",
+               "wp-editor",
+               -- This need to be added before the block library styles,
+               -- The block library styles override the "reset" styles.
+               "wp-reset-editor-styles",
+               "wp-block-library",
+               "wp-reusable-blocks"
+              ];
          begin
             -- Only load the default layout and margin styles for themes without
             -- theme.json file.
             if
               True -- not Inc_Class_Wp_Theme_Json_Resolver.Theme_Has_Support -- ::
             then
-               Wp_Edit_Blocks_Dependencies.Append (+"wp-editor-classic-layout-styles");
+               Wp_Edit_Blocks_Dependencies.Append ("wp-editor-classic-layout-styles");
             end if;
 
             if
@@ -2019,7 +2128,7 @@ is
             then
                -- Include opinionated block styles if no editor_styles are declared,
                -- so the editor never appears broken.
-               Wp_Edit_Blocks_Dependencies.Append (+"wp-block-library-theme");
+               Wp_Edit_Blocks_Dependencies.Append ("wp-block-library-theme");
             end if;
 
             Styles.Add (
@@ -2035,44 +2144,44 @@ is
                 Build ("block-library",        Empty_List),
                 Build ("block-directory",      Empty_List),
                 Build ("components",           Empty_List),
-                Build ("edit-post",            To_List (List => (
-                        +"wp-components",
-                        +"wp-block-editor",
-                        +"wp-editor",
-                        +"wp-edit-blocks",
-                        +"wp-block-library",
-                        +"wp-nux"
-                ))),
-                Build ("editor",               To_List (List => (
-                        +"wp-components",
-                        +"wp-block-editor",
-                        +"wp-nux",
-                        +"wp-reusable-blocks"
-                ))),
+                Build ("edit-post",            List_Type'[
+                        "wp-components",
+                        "wp-block-editor",
+                        "wp-editor",
+                        "wp-edit-blocks",
+                        "wp-block-library",
+                        "wp-nux"
+                ]),
+                Build ("editor",               List_Type'[
+                        "wp-components",
+                        "wp-block-editor",
+                        "wp-nux",
+                        "wp-reusable-blocks"
+                ]),
                 Build ("format-library",       Empty_List),
                 Build ("list-reusable-blocks", To_List ("wp-components")),
                 Build ("reusable-blocks",      To_List ("wp-components")),
                 Build ("nux",                  To_List ("wp-components")),
                 Build ("widgets",              To_List ("wp-components")),
-                Build ("edit-widgets",         To_List (List => (
-                        +"wp-widgets",
-                        +"wp-block-editor",
-                        +"wp-edit-blocks",
-                        +"wp-block-library",
-                        +"wp-reusable-blocks"
-                ))),
-                Build ("customize-widgets",    To_List (List => (
-                        +"wp-widgets",
-                        +"wp-block-editor",
-                        +"wp-edit-blocks",
-                        +"wp-block-library",
-                        +"wp-reusable-blocks"
-                ))),
-                Build ("edit-site",            To_List (List => (
-                        +"wp-components",
-                        +"wp-block-editor",
-                        +"wp-edit-blocks"
-                )))
+                Build ("edit-widgets",         List_Type'[
+                        "wp-widgets",
+                        "wp-block-editor",
+                        "wp-edit-blocks",
+                        "wp-block-library",
+                        "wp-reusable-blocks"
+                ]),
+                Build ("customize-widgets",    List_Type'[
+                        "wp-widgets",
+                        "wp-block-editor",
+                        "wp-edit-blocks",
+                        "wp-block-library",
+                        "wp-reusable-blocks"
+                ]),
+                Build ("edit-site",            List_Type'[
+                        "wp-components",
+                        "wp-block-editor",
+                        "wp-edit-blocks"
+                ])
          ));
 
          begin
@@ -2101,66 +2210,67 @@ is
 
          declare
             -- RTL CSS.
-            RTL_Styles : constant List_Type := To_List (List => (
+            RTL_Styles : constant List_Type :=
+              [
                 -- Admin CSS.
-                +"common",
-                +"forms",
-                +"admin-menu",
-                +"dashboard",
-                +"list-tables",
-                +"edit",
-                +"revisions",
-                +"media",
-                +"themes",
-                +"about",
-                +"nav-menus",
-                +"widgets",
-                +"site-icon",
-                +"l10n",
-                +"install",
-                +"wp-color-picker",
-                +"customize-controls",
-                +"customize-widgets",
-                +"customize-nav-menus",
-                +"customize-preview",
-                +"login",
-                +"site-health",
+                "common",
+                "forms",
+                "admin-menu",
+                "dashboard",
+                "list-tables",
+                "edit",
+                "revisions",
+                "media",
+                "themes",
+                "about",
+                "nav-menus",
+                "widgets",
+                "site-icon",
+                "l10n",
+                "install",
+                "wp-color-picker",
+                "customize-controls",
+                "customize-widgets",
+                "customize-nav-menus",
+                "customize-preview",
+                "login",
+                "site-health",
                 -- Includes CSS.
-                +"buttons",
-                +"admin-bar",
-                +"wp-auth-check",
-                +"editor-buttons",
-                +"media-views",
-                +"wp-pointer",
-                +"wp-jquery-ui-dialog",
+                "buttons",
+                "admin-bar",
+                "wp-auth-check",
+                "editor-buttons",
+                "media-views",
+                "wp-pointer",
+                "wp-jquery-ui-dialog",
                 -- Package styles.
-                +"wp-reset-editor-styles",
-                +"wp-editor-classic-layout-styles",
-                +"wp-block-library-theme",
-                +"wp-edit-blocks",
-                +"wp-block-editor",
-                +"wp-block-library",
-                +"wp-block-directory",
-                +"wp-components",
-                +"wp-customize-widgets",
-                +"wp-edit-post",
-                +"wp-edit-site",
-                +"wp-edit-widgets",
-                +"wp-editor",
-                +"wp-format-library",
-                +"wp-list-reusable-blocks",
-                +"wp-reusable-blocks",
-                +"wp-nux",
-                +"wp-widgets",
+                "wp-reset-editor-styles",
+                "wp-editor-classic-layout-styles",
+                "wp-block-library-theme",
+                "wp-edit-blocks",
+                "wp-block-editor",
+                "wp-block-library",
+                "wp-block-directory",
+                "wp-components",
+                "wp-customize-widgets",
+                "wp-edit-post",
+                "wp-edit-site",
+                "wp-edit-widgets",
+                "wp-editor",
+                "wp-format-library",
+                "wp-list-reusable-blocks",
+                "wp-reusable-blocks",
+                "wp-nux",
+                "wp-widgets",
                 -- Deprecated CSS.
-                +"deprecated-media",
-                +"farbtastic")
-           );
+                "deprecated-media",
+                "farbtastic"
+           ];
          begin
             for RTL_Style of RTL_Styles loop
-               Styles.Add_Data (-RTL_Style, "rtl", "replace");
+               Styles.Add_Data (RTL_Style, "rtl", "replace");
                if Suffix /= "" then
-                  Styles.Add_Data (-RTL_Style, "suffix", Suffix);
+                  Styles.Add_Data (RTL_Style, "suffix", Suffix);
                end if;
             end loop;
          end;
@@ -2612,7 +2722,6 @@ is
             return List_Type
    is
       use Wp_Common;
-      use Inc_Plugins;
 --         global concatenate_scripts;
       Wp_Styles : Class_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
 --    Wp_Styles : Class_Styles.Wp_Styles;
@@ -2644,7 +2753,6 @@ is
             return List_Type
    is
       use Wp_Common;
-      use Inc_Plugins;
 --    global wp_styles, concatenate_scripts;
       Wp_Styles : Class_Styles.Wp_Styles renames Adm_Load_Styles.Styles;
    begin
@@ -2793,7 +2901,6 @@ is
    procedure Wp_Common_Block_Scripts_And_Styles
    is
       use Php.Files;
-      use Php.Strings;
       use UStrings;
       use Inc_Functions_Wp_Styles;
       use Inc_L10n;
@@ -2822,8 +2929,8 @@ is
             begin
                for Path of Files loop
                   declare
-                     Block_Name : constant String := Basename (Dirname (-Path));
-                     Path_2     : UString := Path;
+                     Block_Name : constant String := Basename (Dirname (Path));
+                     Path_2     : UString := +Path;
                      Unused     : Boolean;
                   begin
                      if
@@ -2988,7 +3095,6 @@ is
             return Boolean
    is
       use Wp_Common;
-      use Inc_Plugins;
 --    global current_screen;
       Is_Block_Editor_Screen : constant Boolean :=
         Globals.Current_Screen in Adi_Class_Wp_Screens.Wp_Screen and then -- instanceof
@@ -3329,7 +3435,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
       use Class_Dependency;
       use Inc_Functions_Wp_Styles;
       use Adm_Load_Styles;
@@ -3362,14 +3467,14 @@ is
       for Handle of Styles.Queue loop -- wp_ removed
          declare
             Registered : constant X_Wp_Dependency :=
-              Dependency_Maps.Element (Styles.Registered.Find (-Handle));
+              Dependency_Maps.Element (Styles.Registered.Find (Handle));
          begin
             if
-              "" /= Wp_Styles_X.Get_Data (-Handle, "path") and then -- ()
+              "" /= Wp_Styles_X.Get_Data (Handle, "path") and then -- ()
               File_Exists (Registered.Extra ("path"))
             then
                Styles_2.Append (To_Array (List => (
-                 Build ("handle", -Handle),
+                 Build ("handle", Handle),
                  Build ("src",    -Registered.Src),
                  Build ("path",   Registered.Extra ("path")),
                  Build ("size",   Filesize (Registered.Extra ("path")))
@@ -3611,7 +3716,7 @@ is
             Append (Style_Tag_Id, "-" & Style_Key);
             Append (Compiled_Core_Stylesheet,
                     Wp_Style_Engine_Get_Stylesheet_From_Context
-                      (-Style_Key, Options));
+                      (Style_Key, Options));
          end loop;
 
          -- Combines Core styles.

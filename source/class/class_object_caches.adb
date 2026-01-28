@@ -292,15 +292,13 @@ is
                              Group : String := "")
                              return Array_Type
    is
-      use UStrings;
-
       Values      : Array_Type;
       Unused_Done : Boolean;
    begin
       for Key of Keys loop
-         Set (Values, -Key,
+         Set (Values, Key,
               From_Boolean (
-                This.Delete (-Key, Group)));
+                This.Delete (Key, Group)));
       end loop;
 
       return Values;

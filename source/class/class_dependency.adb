@@ -46,14 +46,12 @@ is
                       Data : List_Type) -- String)
                       return Boolean
    is
-      use UStrings;
---    use Array_Vectors;
    begin
 --      if not Is_Scalar (Name) then
 --         return False;
 --      end if;
       for A of Data loop
-         This.Extra.Insert (Name, -A); -- (Name)
+         This.Extra.Insert (Name, A); -- (Name)
       end loop;
       return True;
    end Add_Data;

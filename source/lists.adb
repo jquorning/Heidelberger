@@ -14,7 +14,8 @@ is
                      Item : String)
    is
    begin
-      List.Append (+Item);
+      List.Append (Item);
+--    List.Append (+Item);
    end Append;
 
    -------------
@@ -27,7 +28,8 @@ is
       Result : List_Type;
    begin
       for A of List loop
-         Result.Append (A);
+         Result.Append (-A);
+--       Result.Append (A);
       end loop;
       return Result;
    end To_List;

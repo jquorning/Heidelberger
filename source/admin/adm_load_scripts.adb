@@ -112,11 +112,11 @@ is
 
             Path : UString;
          begin
-            if not Has_Element (Wp_Scripts.Registered.Find (-Handle)) then
+            if not Has_Element (Wp_Scripts.Registered.Find (Handle)) then
                goto Continue;
             end if;
 
-            Path := ABSPATH & Wp_Scripts.Registered (-Handle).Src;
+            Path := ABSPATH & Wp_Scripts.Registered (Handle).Src;
             Append (Outt, Adi_Noop.Get_File (-Path) & NL);
          end;
          << Continue >>

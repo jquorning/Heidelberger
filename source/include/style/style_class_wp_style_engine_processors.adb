@@ -15,7 +15,6 @@ with Php.Sorting;
 with Php.Strings;
 
 with Constants;
-with Globals;
 with Lists;
 with UStrings;
 
@@ -128,7 +127,6 @@ is
       use Php.Arrays;
       use Php.Sorting;
       use Php.Strings;
-      use UStrings;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Declarations;
 
@@ -169,10 +167,10 @@ is
             for Key of Duplicates loop
                -- Unset the duplicates from the selectors_json array to avoid looping
                -- through them as well.
-               Delete (Ref (Selectors_JSON, -Key));
+               Delete (Ref (Selectors_JSON, Key));
 
                -- Remove the rules from the rules collection.
-               This.CSS_Rules.Delete (-Key);
+               This.CSS_Rules.Delete (Key);
             end loop;
 
             -- Create a new rule with the combined selectors.

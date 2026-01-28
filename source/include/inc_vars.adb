@@ -61,7 +61,7 @@ is
          end if;
 
          Pagenow := +(if Self_Matches.Length in 1
-                     then -Self_Matches (1) else "");
+                     then Self_Matches (1) else "");
          Pagenow := +Trim (-Pagenow, "/");
          Pagenow := +Preg_Replace ("#\?.*?#", "", -Pagenow);
 
@@ -69,7 +69,7 @@ is
             Pagenow := +"index.php";
          else
             Unused  := Preg_Match ("#(.*?)(/|)#", -Pagenow, Self_Matches);
-            Pagenow := +Strtolower (-Self_Matches (1));
+            Pagenow := +Strtolower (Self_Matches (1));
 
             if ".php" /= Substr (-Pagenow, -4, 4) then
                Pagenow := Pagenow & ".php";
@@ -81,7 +81,7 @@ is
          if
            0 /= Preg_Match ("#((^/)+\.php)((?/).*?)?#i", Php_Self, Self_Matches)
          then
-            Pagenow := +Strtolower (-Self_Matches (1));
+            Pagenow := +Strtolower (Self_Matches (1));
          else
             Pagenow := +"index.php";
          end if;

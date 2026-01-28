@@ -7,8 +7,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Strings;
 
-with UStrings;
-
 package body Php.Arrays
 is
 
@@ -21,14 +19,13 @@ is
                            return Array_Type
    is
       use Ada.Containers;
-      use UStrings;
 
       Result : Array_Type;
    begin
       pragma Assert (Keys.Length = Values.Length);
       for A in Keys.First_Index .. Keys.Last_Index loop
-         Result.Append (Key   => -Keys (A),
-                        Value => From_String (-Values (A)));
+         Result.Append (Key   => Keys (A),
+                        Value => From_String (Values (A)));
       end loop;
       return Result;
    end Array_Combine;
@@ -129,12 +126,10 @@ is
    function Array_Values (Arry : Array_Type)
                           return List_Type
    is
-      use UStrings;
-
       Result : List_Type;
    begin
       for A in Arry.Iterate loop
-         Result.Append (+As_String (Element (A)));
+         Result.Append (As_String (Element (A)));
       end loop;
       return Result;
    end Array_Values;
@@ -146,12 +141,10 @@ is
    function Array_Keys (Arry : Array_Type)
                         return List_Type
    is
-      use UStrings;
-
       Result : List_Type;
    begin
       for A in Arry.Iterate loop
-         Result.Append (+Key (A));
+         Result.Append (Key (A));
       end loop;
       return Result;
    end Array_Keys;

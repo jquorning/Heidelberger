@@ -27,7 +27,6 @@ is
                               return Boolean
    is
       use Php.Lists;
-      use UStrings;
       use Inc_L10n;
       use Inc_Plugins;
 
@@ -41,7 +40,7 @@ is
          return False;
       end if;
 
-      This.Locales.Append (+Locale);
+      This.Locales.Append (Locale);
 
       This.Change_Locale (Locale);
 
@@ -109,7 +108,6 @@ is
    procedure Load_Translations (This   : Wp_Locale_Switcher;
                                 Locale : String)
    is
-      use UStrings;
       use Inc_L10n;
 
       Domains : constant List_Type := (if L10n.Is_Empty
@@ -126,8 +124,8 @@ is
 
          -- Unload current text domain but allow them to be reloaded
          -- after switching back or to another locale.
-         Unload_Textdomain (-Domain, True);
-         Get_Translations_For_Domain (-Domain);
+         Unload_Textdomain (Domain, True);
+         Get_Translations_For_Domain (Domain);
          << Continue >>
       end loop;
    end Load_Translations;

@@ -41,12 +41,10 @@ package body Inc_L10n is
    function Array_Keys (Map : String_Maps.Map)
                         return List_Type
    is
-      use UStrings;
-
       List : List_Type;
    begin
       for A in Map.Iterate loop
-         List.Append (+String_Maps.Key (A));
+         List.Append (String_Maps.Key (A));
       end loop;
       return List;
    end Array_Keys;
@@ -1500,7 +1498,6 @@ package body Inc_L10n is
    is
       use Php.Files;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Plugins;
 
@@ -1514,7 +1511,7 @@ package body Inc_L10n is
       if not Lang_Files.Is_Empty then
          for Lang_File of Lang_Files loop
             declare
-               Lang_File_2 : constant String := Basename (-Lang_File, ".mo");
+               Lang_File_2 : constant String := Basename (Lang_File, ".mo");
             begin
                if
                  0 /= Strpos (Lang_File_2, "continents-cities") and then
@@ -1685,10 +1682,10 @@ package body Inc_L10n is
          -- locale in translations to get the native name. Fall back to locale.
          --
          for Locale of As_List (Get (Parsed_Args, "languages")) loop
-            if Isset (Translations, -Locale) then
+            if Isset (Translations, Locale) then
                declare
                   Translation : constant Array_Type :=
-                    As_Array (Get (Translations, -Locale));
+                    As_Array (Get (Translations, Locale));
                begin
                   Languages.Append (To_Array (List => (
                     Build ("language",    Get_As_String (Translation, "language")),
@@ -1698,12 +1695,12 @@ package body Inc_L10n is
                   )));
 
                   -- Remove installed language from available translations.
-                  Delete (Ref (Translations, -Locale));
+                  Delete (Ref (Translations, Locale));
                end;
             else
                Languages.Append (To_Array (List => (
-                 Build ("language",    -Locale),
-                 Build ("native_name", -Locale),
+                 Build ("language",    Locale),
+                 Build ("native_name", Locale),
                  Build ("lang",        "")
                )));
             end if;
@@ -1719,14 +1716,14 @@ package body Inc_L10n is
          begin
             -- List installed languages.
             if Translations_Available then
-               Structure.Append (+("<optgroup label=""" &
-                                   ESC_Attr_X ("Installed", "translations") & """>"));
+               Structure.Append ("<optgroup label=""" &
+                                 ESC_Attr_X ("Installed", "translations") & """>");
             end if;
 
             -- Site default.
             if As_Boolean (Get (Parsed_Args, "show_option_site_default")) then
                Structure.Append (
-                 +Sprintf (
+                 Sprintf (
                    "<option value=""site-default"" data-installed=""1""%s>%s</option>",
                    To_List (List => (
                      1 => +Selected ("site-default",
@@ -1744,7 +1741,7 @@ package body Inc_L10n is
                      then "en_US" else "");
                begin
                   Structure.Append (
-                    +Sprintf (
+                    Sprintf (
                       "<option value=""%s"" lang=""en"" data-installed=""1""%s>" &
                       "English (United States)</option>",
                       To_List (List => (
@@ -1760,7 +1757,7 @@ package body Inc_L10n is
             -- List installed languages.
             for Language of Languages loop
                Structure.Append (
-                 +Sprintf (
+                 Sprintf (
                    "<option value=""%s"" lang=""%s""%s data-installed=""1"">" &
                    "%s</option>",
                    To_List (List => (
@@ -1775,20 +1772,20 @@ package body Inc_L10n is
             end loop;
 
             if Translations_Available then
-               Structure.Append (+"</optgroup>");
+               Structure.Append ("</optgroup>");
             end if;
 
             -- List available translations.
             if Translations_Available then
-               Structure.Append (+("<optgroup label=""" &
-                                   ESC_Attr_X ("Available", "translations") & """>"));
+               Structure.Append ("<optgroup label=""" &
+                                 ESC_Attr_X ("Available", "translations") & """>");
 
                for T in Translations.Iterate loop
                   declare
                      Translation : constant Array_Type := As_Array (Element (T));
                   begin
                      Structure.Append (
-                       +Sprintf (
+                       Sprintf (
                          "<option value=""%s"" lang=""%s""%s>%s</option>",
                          To_List (List => (
                            1 => +ESC_Attr (Get_As_String (Translation, "language")),
@@ -1802,7 +1799,7 @@ package body Inc_L10n is
                        ));
                   end;
                end loop;
-               Structure.Append (+"</optgroup>");
+               Structure.Append ("</optgroup>");
             end if;
 
             -- Combine the output string.

@@ -186,7 +186,6 @@ is
                         return Integer
    is
       use GNAT.Regpat;
-      use UStrings;
 
       Marks : constant Marks_Type :=
         Find_Marks (Pattern);
@@ -209,7 +208,7 @@ is
             declare
                M : String renames Subject (Result (A).First .. Result (A).Last);
             begin
-               Matches.Append (+M);
+               Matches.Append (M);
             end;
          end loop;
          return Paren_Count (Re);
@@ -341,7 +340,6 @@ is
                         return List_Type
    is
       use GNAT.Regpat;
-      use UStrings;
 
       Marks : constant Marks_Type := Find_Marks (Pattern);
 
@@ -361,7 +359,7 @@ is
       Match (Engine, Subject, Result);
 
       for A of Result loop
-         List.Append (+Subject (A.First .. A.Last));
+         List.Append (Subject (A.First .. A.Last));
       end loop;
 
       return List;

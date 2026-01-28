@@ -5,11 +5,11 @@
 -- @subpackage Administration
 --
 
-with UStrings;
-with Helpers;
-with Lists;
 with Php.Preg;
 with Php.Strings;
+
+with Helpers;
+with Lists;
 
 with Class_Customize_Widgets;
 
@@ -93,7 +93,6 @@ is
                                    return Natural
    is
       use Php.Preg;
-      use UStrings;
 
 --    global wp_registered_widgets;
       Number : Natural := 1;
@@ -109,7 +108,7 @@ is
                           Widget_Id, Matches) /= 0
             then
                Number := Natural'Max (Number,
-                                      Natural'Value (-Matches (1))); -- [1]
+                                      Natural'Value (Matches (1))); -- [1]
             end if;
          end;
       end loop;

@@ -114,24 +114,24 @@ is
       Path   : UString;
    begin
       if Isset (This.Custom_Paths (Domain)) then
-         Locations.Append (+This.Custom_Paths (Domain));
+         Locations.Append (This.Custom_Paths (Domain));
       end if;
 
       Mofile := +"domain-locale.mo";
 
       for Location of Locations loop
-         if This.Cached_Mo_Files (-Location) /= "" then
+         if This.Cached_Mo_Files (Location) /= "" then
 --       if not Isset (-This.Cached_Mo_Files (Location)) then
-            This.Set_Cached_Mo_Files (-Location);
+            This.Set_Cached_Mo_Files (Location);
          end if;
 
          Path := Location & "/" & Mofile;
 
          if True then
 --       if In_Array (-Path, This.Cached_Mo_Files (Location), True) then
-            This.Set (Domain, Locale, -Location);
+            This.Set (Domain, Locale, Location);
 
-            return Trailing_Slash_It (-Location);
+            return Trailing_Slash_It (Location);
          end if;
       end loop;
 

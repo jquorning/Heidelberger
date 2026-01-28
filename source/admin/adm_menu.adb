@@ -229,7 +229,7 @@ is
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
                Ptype_Obj : constant Class_Post_Type.Wp_Post_Type :=
-                  Inc_Posts.Get_Post_Type_Object (-Ptype);
+                  Inc_Posts.Get_Post_Type_Object (Ptype);
                Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : UString;
                Menu_Icon           : UString;
@@ -252,7 +252,7 @@ is
                end if;
 
                -- If we"re to use _wp_last_object_menu, increment it first.
-               Ptype_For_Id := +Inc_Formatting.Sanitize_HTML_Class (-Ptype);
+               Ptype_For_Id := +Inc_Formatting.Sanitize_HTML_Class (Ptype);
                Menu_Icon    := +"dashicons-admin-post";
 
                if Is_String (-Ptype_Obj.Menu_Icon) then
@@ -317,7 +317,7 @@ is
                   if
                     not Tax.Show_UI      or else
                     not Tax.Show_In_Menu or else
-                    not In_List (-Ptype, Tax.Object_Type, True) -- (array)
+                    not In_List (Ptype, Tax.Object_Type, True) -- (array)
                   then
                      goto Continue_3;
                   end if;

@@ -3969,13 +3969,13 @@ is
                return True;
             else
                for Pagepath of Page_2 loop
-                  if 0 /= Strpos (-Pagepath, "/") then
+                  if 0 /= Strpos (Pagepath, "/") then
                      goto Continue;
                   end if;
 
                   declare
                      Pagepath_Obj : constant Wp_Post :=
-                       Get_Page_By_Path (-Pagepath);
+                       Get_Page_By_Path (Pagepath);
                   begin
                      if
                        Pagepath_Obj /= Null_Post and then
@@ -4088,13 +4088,13 @@ is
                return True;
             else
                for Postpath of Post_2 loop
-                  if 0 /= Strpos (-Postpath, "/") then
+                  if 0 /= Strpos (Postpath, "/") then
                      goto Continue;
                   end if;
 
                   declare
                      Postpath_Obj : constant Wp_Post :=
-                       Get_Page_By_Path (-Postpath, "OBJECT", -Post_Obj.Post_Type);
+                       Get_Page_By_Path (Postpath, "OBJECT", -Post_Obj.Post_Type);
                   begin
                      if
                         Postpath_Obj /= Null_Post and then

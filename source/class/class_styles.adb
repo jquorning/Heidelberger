@@ -218,7 +218,6 @@ is
                               return Boolean
    is
       use Lists.List_Vectors;
-      use UStrings;
 
       After : List_Type;
    begin
@@ -232,7 +231,7 @@ is
          After := Empty_List; -- Empty_Array;
       end if;
 
-      After.Append (+Code);
+      After.Append (Code);
 
       return This.Add_Data (Handle, "after", After);
    end Add_Inline_Style;

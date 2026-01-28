@@ -300,21 +300,21 @@ is
            To_List (List => (+"login-action-" & Action, +"wp-core-ui"));
       begin
          if Is_RTL then
-            Classes.Append (+"rtl");
+            Classes.Append ("rtl");
          end if;
 
          if Interim_Login then
-            Classes.Append (+"interim-login");
+            Classes.Append ("interim-login");
 
             Echo ("    <style type=""text/css"">html{background-color: transparent;}</style>" & NL);
 
             if Interim_Login then
 --          if "success" = Interim_Login then
-               Classes.Append (+"interim-login-success");
+               Classes.Append ("interim-login-success");
             end if;
          end if;
 
-         Classes.Append (+" locale-" &
+         Classes.Append (" locale-" &
                          Sanitize_HTML_Class (
                            Strtolower (
                              Str_Replace ("_", "-", Get_Locale))));
@@ -380,9 +380,9 @@ is
          begin
             for Code of Wp_Error_2.Get_Error_Codes loop
                declare
-                  Severity : constant String := Wp_Error_2.Get_Error_Data (-Code);
+                  Severity : constant String := Wp_Error_2.Get_Error_Data (Code);
                begin
-                  for Error_Message of Wp_Error_2.Get_Error_Messages (-Code) loop
+                  for Error_Message of Wp_Error_2.Get_Error_Messages (Code) loop
                      if "message" = Severity then
                         Append (Messages, "  " & Error_Message & "<br />" & NL);
                      else
@@ -1140,7 +1140,7 @@ is
       List : constant List_Type :=
         Explode ("?", Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI")));
 
-      RP_Path   : constant String := -List (1);
+      RP_Path   : constant String := List (1);
       RP_Cookie : constant String := "wp-resetpass-" & (-Constants.COOKIEHASH);
       RP_Login  : UString;
       RP_Key    : UString;
@@ -1174,8 +1174,8 @@ is
               Explode (":", Wp_Unslash (Get_As_String (X_COOKIE, RP_Cookie)),
                        Limit => 2);
          begin
-            RP_Login := List (1);
-            RP_Key   := List (2);
+            RP_Login := +List (1);
+            RP_Key   := +List (2);
 
             User := Check_Password_Reset_Key (-RP_Key, -RP_Login);
 

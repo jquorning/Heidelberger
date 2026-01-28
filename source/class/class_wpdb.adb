@@ -425,10 +425,10 @@ is
                Modes_Array : constant List_Type :=
                  Mysqli_Fetch_Array (Res);
             begin
-               if Empty (-Modes_Array (1)) then -- [0]
+               if Empty (Modes_Array (1)) then -- [0]
                   return;
                end if;
-               Modes_Str := Modes_Array (1); -- [0]
+               Modes_Str := +Modes_Array (1); -- [0]
             end;
 
          when Engine_MySQL =>
@@ -2204,12 +2204,12 @@ is
                Value : constant Array_Type := As_Array (Element (A));
             begin
                if Kind_Of (Get (Value, "value")) = Kind_Null then
-                  Formats.Append (+"NULL");
+                  Formats.Append ("NULL");
                   goto Continue;
                end if;
 
-               Formats.Append (+Get_As_String (Value, "format"));
-               Values.Append  (+Get_As_String (Value, "value"));
+               Formats.Append (Get_As_String (Value, "format"));
+               Values.Append  (Get_As_String (Value, "value"));
             end;
             << Continue >>
          end loop;
@@ -2245,7 +2245,6 @@ is
    is
       use Php.Strings;
       use Php.Types;
-      use UStrings;
 
       Data_2  : Array_Type;
       Where_2 : Array_Type;
@@ -2278,14 +2277,14 @@ is
                Value : constant Array_Type := As_Array (Element (A));
             begin
                if Kind_Of (Get (Value, "value")) = Kind_Null then
-                  Fields.Append (+"`" & Field & "` = NULL");
+                  Fields.Append ("`" & Field & "` = NULL");
                   goto Continue_1;
                end if;
 
                Fields.Append
-                 (+"`" & Field & "` = " & Get_As_String (Value, "format"));
+                 ("`" & Field & "` = " & Get_As_String (Value, "format"));
 
-               Values.Append (+Get_As_String (Value, "value"));
+               Values.Append (Get_As_String (Value, "value"));
             end;
             << Continue_1 >>
          end loop;
@@ -2296,14 +2295,14 @@ is
                Value : constant Array_Type := As_Array (Element (B));
             begin
                if Kind_Of (Get (Value, "value")) = Kind_Null then
-                  Conditions.Append (+"`" & Field & "` IS NULL");
+                  Conditions.Append ("`" & Field & "` IS NULL");
                   goto Continue_2;
                end if;
 
                Conditions.Append
-                 (+"`" & Field & "` = " & Get_As_String (Value, "format"));
+                 ("`" & Field & "` = " & Get_As_String (Value, "format"));
 
-               Values.Append (+Get_As_String (Value, "value"));
+               Values.Append (Get_As_String (Value, "value"));
             end;
             << Continue_2 >>
          end loop;
@@ -2359,7 +2358,6 @@ is
    is
       use Php.Strings;
       use Php.Types;
-      use UStrings;
    begin
       if not Is_Array (Where) then
          return (Status => Error,
@@ -2385,12 +2383,12 @@ is
                   Value  : constant Array_Type := As_Array (Element (A));
                begin
                   if Kind_Of (Get (Value, "value")) = Kind_Null then
-                     Conditions.Append (+"`" & Field & "` IS NULL");
+                     Conditions.Append ("`" & Field & "` IS NULL");
                      goto Continue;
                   end if;
-                  Conditions.Append (+"`" & Field & "` = " &
+                  Conditions.Append ("`" & Field & "` = " &
                                      Get_As_String (Value, "format"));
-                  Values.Append (+Get_As_String (Value, "value"));
+                  Values.Append (Get_As_String (Value, "value"));
                end;
                << Continue >>
             end loop;
@@ -2459,7 +2457,7 @@ is
                      Value : constant Multi_Type := Element (A);
                   begin
                      if Value /= Get (Converted_Data, Field) then
-                        Problem_Fields.Append (+Field);
+                        Problem_Fields.Append (Field);
                      end if;
                   end;
                end loop;
@@ -2470,7 +2468,7 @@ is
                   This.Last_Error := +Sprintf (
                     -- translators: %s: Database field where the error occurred.
                     abs "WordPress database error: Processing the value for the following field failed: %s. The supplied value may be too long or contains invalid data.",
-                    To_List (-Problem_Fields.First_Element) -- Reset (Problem_Fields)
+                    To_List (Problem_Fields.First_Element) -- Reset (Problem_Fields)
                   );
                else
                   This.Last_Error := +Sprintf (
@@ -2497,7 +2495,6 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
 
       Data_2           : Array_Type := Data;
       Formats          : List_Type  := To_List (Format); -- (array)
@@ -2517,7 +2514,7 @@ is
                Set (Value_2, "format", From_String (List_Shift (Formats)));
                if Kind_Of (Get (Value_2, "format")) in Kind_Null then -- not
                   Set (Value_2, "format",
-                       From_String (-Original_Formats.First_Element)); -- Reset
+                       From_String (Original_Formats.First_Element)); -- Reset
                end if;
             elsif Isset (This.Field_Types, Field) then
                Set (Value_2, "format", Get (This.Field_Types, Field));
@@ -3124,7 +3121,7 @@ is
       declare
          L : List_Type; --  :=
 --           Explode ("_", As_String (Ref_2 (This.Col_Meta, Tablekey, Columnkey).Collation));
-         Charset : constant String := -L.First_Element;
+         Charset : constant String := L.First_Element;
       begin
          return Charset;
       end;
@@ -3140,7 +3137,6 @@ is
                             return Array_Type
    is
       use Php.Strings;
-      use UStrings;
 
       Tablekey  : constant String := Strtolower (Table);
       Columnkey : constant String := Strtolower (Column);
@@ -3175,11 +3171,11 @@ is
 --           Explode ("(", As_String (Get (Ref_2 (This.Col_Meta,
 --                                                Key_1 => Tablekey,
 --                                                Key_2 => Columnkey))).Typ);
-         Typ : constant String := Strtolower (-Typeinfo.First_Element); -- [0]
+         Typ : constant String := Strtolower (Typeinfo.First_Element); -- [0]
          Length : Natural;
       begin
-         if not Empty (-Typeinfo (2)) then -- [1]
-            Length := Natural'Value (Trim (-Typeinfo (2), ")")); -- [1]
+         if not Empty (Typeinfo (2)) then -- [1]
+            Length := Natural'Value (Trim (Typeinfo (2), ")")); -- [1]
          else
             Length := 0; -- False;
          end if;
@@ -3588,7 +3584,7 @@ is
                         goto Continue_2;
                      end if;
 
-                     SQL.Append (+Query & " AS x_column");
+                     SQL.Append (Query & " AS x_column");
                   end;
                   << Continue_2 >>
                end loop;
@@ -3727,7 +3723,6 @@ is
    is
       use Php.Preg;
       use Php.Strings;
-      use UStrings;
 
       -- Remove characters that can legally trail the table name.
       Query_2 : constant String := Rtrim (String (Query), ";/-#");
@@ -3757,7 +3752,7 @@ is
           Query_4,
           Maybe) /= 0
       then
-         return Str_Replace ("`", "", -Maybe (1)); -- [1]
+         return Str_Replace ("`", "", Maybe (1)); -- [1]
       end if;
 
       -- SHOW TABLE STATUS and SHOW TABLES WHERE Name = "wp_posts"
@@ -3766,7 +3761,7 @@ is
           "/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES).+WHERE\s+Name\s*=\s*('|\')((?:[0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)\\1/is",
           Query_4, Maybe) /= 0
       then
-         return -Maybe (2); -- [2];
+         return Maybe (2); -- [2];
       end if;
 
       --
@@ -3781,7 +3776,7 @@ is
           "/^\s*SHOW\s+(?:TABLE\s+STATUS|(?:FULL\s+)?TABLES)\s+(?:WHERE\s+Name\s+)?LIKE\s*('|\')((?:[\\\\0-9a-zA-Z_.-]|[\xC2-\xDF][\x80-\xBF])+)%?\\1/is",
           Query_4, Maybe) /= 0
       then
-         return Str_Replace ("\\_", "_", -Maybe (2)); -- [2]);
+         return Str_Replace ("\\_", "_", Maybe (2)); -- [2]);
       end if;
 
       -- Big pattern for the rest of the table-related queries.
@@ -3805,7 +3800,7 @@ is
           Query_4,
           Maybe) /= 0
       then
-         return Str_Replace ("`", "", -Maybe (1)); -- [1]);
+         return Str_Replace ("`", "", Maybe (1)); -- [1]);
       end if;
 
       return ""; -- False;

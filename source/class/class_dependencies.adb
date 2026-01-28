@@ -12,7 +12,6 @@ with Ada.Text_IO;
 with Php.Lists;
 with Php.Strings;
 
-with UStrings;
 with Wp_Common;
 
 package body Class_Dependencies
@@ -28,7 +27,6 @@ is
                       return List_Type
    is
       use Php.Lists;
-      use UStrings;
       use List_Vectors;
 
       --
@@ -47,7 +45,7 @@ is
             use Class_Dependency.Dependency_Maps;
 
 --          Key    : String := -A.Key;
-            Handle : constant String := -A; -- .Value;
+            Handle : constant String := A; -- .Value;
          begin
             if
               not In_List (Handle, This.Done, True) and then
@@ -60,7 +58,7 @@ is
                -- Unset the item from the to_do array.
                --
                if This.Do_Item (Handle, Group) then
-                  This.Done.Append (+Handle); -- ()
+                  This.Done.Append (Handle); -- ()
                end if;
 
 --               Unset (This.To_Do (Key));
@@ -124,10 +122,8 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use List_Vectors;
---    use Array_Maps;
 
       Handles_2 : constant List_Type := Handles; -- (array)
    begin
@@ -137,8 +133,8 @@ is
 
       for Handle of Handles_2 loop
          declare
-            Handle_Parts : constant List_Type := Explode ("?", -Handle);
-            Handle_2     : constant String    := -Handle_Parts.First_Element; --  (0);
+            Handle_Parts : constant List_Type := Explode ("?", Handle);
+            Handle_2     : constant String    := Handle_Parts.First_Element; --  (0);
             Queued       : constant Boolean   := In_List (Handle_2, This.To_Do, True);
          begin
             if In_List (Handle_2, This.Done, True) then -- Already done.
@@ -192,10 +188,10 @@ is
                if "" /= Handle_Parts (Handle_Parts.First_Index + 1) then
                   This.Args.Insert
                     (Key      => Handle_2,
-                     New_Item => -Handle_Parts (Handle_Parts.First_Index + 1));
+                     New_Item => Handle_Parts (Handle_Parts.First_Index + 1));
                end if;
 
-               This.To_Do.Append (+Handle_2);
+               This.To_Do.Append (Handle_2);
             end;
             << Continue >>
          end;
@@ -232,10 +228,8 @@ is
                  return Boolean
    is
       use Php.Lists;
-      use UStrings;
       use Class_Dependency;
       use Class_Dependency.Dependency_Maps;
---    use String_Vectors;
       use List_Vectors;
    begin
       if This.Registered.Find (Handle) /= Dependency_Maps.No_Element then
@@ -249,12 +243,12 @@ is
       -- If the item was enqueued before the details were registered, enqueue it now.
       if List_Key_Exists (Handle, This.Queued_Before_Register) then
          if
-           This.Queued_Before_Register.Find (+Handle) = List_Vectors.No_Element
+           This.Queued_Before_Register.Find (Handle) = List_Vectors.No_Element
          then
 --       if not Is_Null (This.Queued_Before_Register (Handle)) then
             This.Enqueue
               (To_List (Handle & "?" &
-                        (-Element (This.Queued_Before_Register.Find (+Handle)))));
+                        (Element (This.Queued_Before_Register.Find (Handle)))));
          else
             This.Enqueue (To_List (Handle));
          end if;
@@ -352,10 +346,9 @@ is
    procedure Remove (This    : in out Wp_Dependencies;
                      Handles : List_Type)
    is
-      use UStrings;
    begin
       for Handle of Handles loop
-         This.Registered.Delete (-Handle);
+         This.Registered.Delete (Handle);
 --       Unset (This.Registered (Handle));
       end loop;
    end Remove;
@@ -369,33 +362,32 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
       use List_Vectors;
       use Class_Dependency.Dependency_Maps;
    begin
       for Handle of Handles loop
          declare
-            List  : constant List_Type := Explode ("?", -Handle);
-            First : constant String    := -List (1);
+            List  : constant List_Type := Explode ("?", Handle);
+            First : constant String    := List (1);
          begin
             if
               not In_List (First, This.Queue, True) and then
               Has_Element (This.Registered.Find (First))
             then
-               This.Queue.Append (+First);
+               This.Queue.Append (First);
 
                -- Reset all dependencies so they must be recalculated in
                -- recurse_deps().
                This.All_Queued_Deps.Clear;
 
                if List.Length in 2 then
-                  This.Args (First) := -List (2);
+                  This.Args (First) := List (2);
                end if;
 
             elsif not Has_Element (This.Registered.Find (First)) then
                declare
                   Position : List_Vectors.Cursor :=
-                    This.Queued_Before_Register.Find (+First);
+                    This.Queued_Before_Register.Find (First);
                begin
                   if Has_Element (Position) then
                      This.Queued_Before_Register.Delete (Position);
@@ -405,9 +397,9 @@ is
                if List.Length in 2 then
                   declare
                      Position : constant List_Vectors.Cursor :=
-                       This.Queued_Before_Register.Find (+First);
+                       This.Queued_Before_Register.Find (First);
 
-                     Second : constant UString := List (2);
+                     Second : constant String := List (2);
                   begin
                      if Has_Element (Position) then
                         This.Queued_Before_Register.Replace_Element
@@ -433,13 +425,11 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
---    use Class_Dependency;
    begin
       for Handle of Handles loop
          declare
-            Handle_2 : constant List_Type := Explode ("?", -Handle);
-            First    : constant String := -Handle_2 (Handle_2.First_Index);
+            Handle_2 : constant List_Type := Explode ("?", Handle);
+            First    : constant String := Handle_2 (Handle_2.First_Index);
             Key      : constant String :=
                List_Search (First, This.Queue, True);
 
@@ -451,7 +441,7 @@ is
                -- recurse_deps().
                This.All_Queued_Deps.Clear; --  := null;
 
-               Position_1 := This.Queue.Find (+Key);
+               Position_1 := This.Queue.Find (Key);
                This.Queue.Delete (Position_1);
 
                Position_2 := This.Args.Find (First);
@@ -460,7 +450,7 @@ is
 --             Unset (This.Args (Handle_2 (Handle_2.First_Index)));
 
             elsif List_Key_Exists (First, This.Queued_Before_Register) then
-               Position_1 := This.Queued_Before_Register.Find (+First);
+               Position_1 := This.Queued_Before_Register.Find (First);
                This.Queued_Before_Register.Delete (Position_1);
 --             Unset (This.Queued_Before_Register (Handle_2 (Handle_2.First_Index)));
             end if;
@@ -479,17 +469,15 @@ is
                           return Boolean
    is
       use Php.Lists;
-      use UStrings;
       use Class_Dependency;
       use Class_Dependency.Dependency_Maps;
---    use String_Vectors;
       use List_Vectors;
 
-      Queue_2 : List_Type := Queue; -- String_Array := Queue;
+      Queue_2 : List_Type := Queue;
    begin
       if not This.All_Queued_Deps.Is_Empty then
 --         return Isset (This.All_Queued_Deps.Find (Handle));
-         return This.All_Queued_Deps.Find (+Handle) /= List_Vectors.No_Element;
+         return This.All_Queued_Deps.Find (Handle) /= List_Vectors.No_Element;
       end if;
 
       declare
@@ -503,11 +491,11 @@ is
                if
                  Done.Find (Queued) = List_Vectors.No_Element and then
 --               not Isset (Done (Queued)) and then
-                 This.Registered.Find (-Queued) /= Dependency_Maps.No_Element
+                 This.Registered.Find (Queued) /= Dependency_Maps.No_Element
 --               Isset (This.Registered (Queued))
                then
                   declare
-                     Deps   : constant List_Type := This.Registered (-Queued).Deps;
+                     Deps   : constant List_Type := This.Registered (Queued).Deps;
 --                   Deps   : constant String_Array := This.Registered (-Queued).Deps;
                      Unused : Integer;
                   begin
@@ -523,13 +511,13 @@ is
 --                Done (Queued) := True;
                end if;
             end loop;
-            Queue_2.Append (+List_Pop (Queues));
+            Queue_2.Append (List_Pop (Queues));
 --            Queue_2 := Array_Pop (Queues);
          end loop;
 
          This.All_Queued_Deps := All_Deps;
 
-         return This.All_Queued_Deps.Find (+Handle) /= List_Vectors.No_Element;
+         return This.All_Queued_Deps.Find (Handle) /= List_Vectors.No_Element;
 --       return Isset (This.All_Queued_Deps (Handle));
       end;
    end Recurse_Deps;

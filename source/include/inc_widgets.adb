@@ -143,7 +143,7 @@ is
 
             for Id of As_List (Get (Sidebars_Widgets, Index)) loop -- (array)
 
-               if not Isset (Global_Wp_Registered_Widgets, -Id) then
+               if not Isset (Global_Wp_Registered_Widgets, Id) then
                   goto Continue;
                end if;
 
@@ -154,17 +154,17 @@ is
                         Array_Merge (
                           Sidebar,
                           To_Array (List => (
-                            Build ("widget_id",   -Id),
+                            Build ("widget_id",   Id),
                             Build ("widget_name",
                                    As_String (Get (Ref_2 (
                                      Global_Wp_Registered_Widgets,
-                                     Key_1 => -Id, Key_2 => "name"))))
+                                     Key_1 => Id, Key_2 => "name"))))
                           ))
 --                       )
                         ),
                         As_Array (Get (Ref_2 (
                           Global_Wp_Registered_Widgets,
-                          Key_1 => -Id,
+                          Key_1 => Id,
                           Key_2 => "params")))
                     );
 
@@ -174,7 +174,7 @@ is
                begin
                   for
                     E in As_Array (Get (Ref_2 (
-                      Global_Wp_Registered_Widgets, -Id, "classname"))).Iterate
+                      Global_Wp_Registered_Widgets, Id, "classname"))).Iterate
                   loop
                      declare
                         CN : constant Multi_Type := Element (E);
@@ -197,7 +197,7 @@ is
                                            Key_1 => "[0]",
                                            Key_2 => "before_widget"))),
                            To_List (List => (
-                             1 => +Str_Replace ("\\", "_", -Id),
+                             1 => +Str_Replace ("\\", "_", Id),
                              2 => Classname_X
                            )))
                       ));
@@ -246,7 +246,7 @@ is
 
                   Callback := As_Callable (Get (Ref_2 (
                     Global_Wp_Registered_Widgets,
-                    Key_1 => -Id,
+                    Key_1 => Id,
                     Key_2 => "callback")));
 
                   --
@@ -283,7 +283,7 @@ is
                   -- }
                   --
                   Do_Action ("dynamic_sidebar",
-                             Get_As_String (Global_Wp_Registered_Widgets, -Id));
+                             Get_As_String (Global_Wp_Registered_Widgets, Id));
 
                   if Callback /= null then
 --                if Is_Callable (Callback) then
@@ -699,8 +699,8 @@ is
 
                         -- ...actually match!
                         if
-                          0 = Stripos (New_Sidebar, -Slug) and then
-                          0 = Stripos (-Slug, New_Sidebar)
+                          0 = Stripos (New_Sidebar, Slug) and then
+                          0 = Stripos (Slug, New_Sidebar)
                         then
                            goto Continue_1;
                         end if;
@@ -717,8 +717,8 @@ is
 
                                  -- ... have a match as well.
                                  if
-                                   0 = Stripos (Sidebar, -Slug) and then
-                                   0 = Stripos (-Slug, Sidebar)
+                                   0 = Stripos (Sidebar, Slug) and then
+                                   0 = Stripos (Slug, Sidebar)
                                  then
                                     goto Continue_2;
                                  end if;

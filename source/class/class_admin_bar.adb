@@ -790,14 +790,14 @@ is
       end if;
 
       for Attribute of Attributes loop
-         if Empty (Node.Meta, -Attribute) then
+         if Empty (Node.Meta, Attribute) then
             goto Continue_2;
          end if;
 
          if "onclick" = Attribute then
-            Echo (" attribute=""" & ESC_JS (As_String (Get (Node.Meta, -Attribute))) & """");
+            Echo (" attribute=""" & ESC_JS (As_String (Get (Node.Meta, Attribute))) & """");
          else
-            Echo (" attribute=""" & ESC_Attr (As_String (Get (Node.Meta, -Attribute))) & """");
+            Echo (" attribute=""" & ESC_Attr (As_String (Get (Node.Meta, Attribute))) & """");
          end if;
          << Continue_2 >>
       end loop;

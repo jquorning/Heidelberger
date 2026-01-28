@@ -4501,7 +4501,6 @@ is
                                      return String
    is
       use Php.Strings;
-      use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_L10n;
@@ -4515,16 +4514,16 @@ is
 --      function_exists( "is_rtl" ) and then
         Is_RTL
       then
-         Attributes.Append (+"dir=""rtl""");
+         Attributes.Append ("dir=""rtl""");
       end if;
 
       if Lang /= "" then
          if "text/html" = Get_Option ("html_type") or else "html" = Doctype then
-            Attributes.Append (+("lang=""" & ESC_Attr (Lang) & """"));
+            Attributes.Append ("lang=""" & ESC_Attr (Lang) & """");
          end if;
 
          if "text/html" /= Get_Option ("html_type") or else "xhtml" = Doctype then
-            Attributes.Append (+("xml:lang=""" & ESC_Attr (Lang) & """"));
+            Attributes.Append ("xml:lang=""" & ESC_Attr (Lang) & """");
          end if;
       end if;
 
@@ -4598,7 +4597,7 @@ is
 
       -- Append the format placeholder to the base URL.
       Pagenum_Link : constant String :=
-        Trailing_Slash_It ((-URL_Parts (1))) & "%_%"; -- [0]
+        Trailing_Slash_It (URL_Parts (1)) & "%_%"; -- [0]
 
       -- URL base depends on permalink settings.
       Format_2 : constant String :=
@@ -4651,13 +4650,13 @@ is
                                          Get_As_String (Args_2, "base")));
 
             Format_Query : String := (if Format.Last_Index = 2  -- [1]
-                                      then -Format (2) else ""); -- [1]
+                                      then Format (2) else ""); -- [1]
 --          Format_Query : String := (if isset( format[1] ) then format[1] else "");
          begin
             Wp_Parse_Str (Format_Query, Format_Args);
 
             -- Find the query args of the requested URL.
-            Wp_Parse_Str (-URL_Parts (2), URL_Query_Args); -- [1]
+            Wp_Parse_Str (URL_Parts (2), URL_Query_Args); -- [1]
 
             -- Remove the format argument from the array of query arguments, to
             -- avoid overwriting custom format.

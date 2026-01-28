@@ -9,8 +9,6 @@
 with Php.Lists;
 with Php.Strings;
 
-with UStrings;
-
 with Class_Theme_JSON;
 with Inc_Functions;
 
@@ -132,7 +130,6 @@ is
                                     Path     : List_Type)
    is
       use Php.Lists;
-      use UStrings;
 
       Path_2       : List_Type  := Path;
       Tmp_Settings : Array_Type := Settings;
@@ -141,7 +138,7 @@ is
       Last_Key : constant String := List_Pop (Path_2);
    begin
       for Key of Path_2 loop
-         Tmp_Settings := As_Array (Get (Tmp_Settings, -Key));
+         Tmp_Settings := As_Array (Get (Tmp_Settings, Key));
       end loop;
 
       Delete (Ref (Tmp_Settings, Last_Key));

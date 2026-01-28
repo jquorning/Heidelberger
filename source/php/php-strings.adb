@@ -190,7 +190,7 @@ is
             for A in Search.First_Index .. Search.Last_Index loop
                E := Ada.Strings.Unbounded.Index
                       (Source  => +Subject (First .. Subject'Last),
-                       Pattern => -Search (A));
+                       Pattern => Search (A));
                if E /= 0 and then E < B then
                   B := E;
                   I := A;
@@ -203,7 +203,7 @@ is
             else
                UStrings.Append (Result, Subject (First .. B - 1));
                UStrings.Append (Result, Replace (I));
-               First := First + Ada.Strings.Unbounded.Length (Search (I));
+               First := First + Ada.Strings.Unbounded.Length (+Search (I));
             end if;
          end;
       end loop;
@@ -240,7 +240,7 @@ is
 
                Position :=
                  Ada.Strings.Fixed.Index (Source  => Subject,
-                                          Pattern => -Search (Search_Index),
+                                          Pattern => Search (Search_Index),
                                           From    => First);
 
                if Position = 0 then
@@ -264,7 +264,7 @@ is
                Append (Result, Subject (First .. Found_Position - 1));
                Append (Result, Replace);
                Count := Count + 1;
-               First := Position + Ada.Strings.Unbounded.Length (Search (Found_Index));
+               First := Position + Ada.Strings.Unbounded.Length (+Search (Found_Index));
             end if;
          end;
       end loop;
@@ -743,7 +743,6 @@ is
                      return List_Type
    is
       use Ada.Strings.Fixed;
-      use UStrings;
 
       Count : Natural := 0;
       First : Natural := Item'First;
@@ -755,12 +754,12 @@ is
                        Pattern => Separator,
                        From    => First);
          exit when Pos = 0;
-         List.Append (+Item (First .. Pos - 1));
+         List.Append (Item (First .. Pos - 1));
          Count := Count + 1;
          First := Pos + Separator'Length;
       end loop;
 
-      List.Append (+Item (First .. Item'Last));
+      List.Append (Item (First .. Item'Last));
       return List;
    end Explode;
 
@@ -773,13 +772,11 @@ is
                      Limit     : Integer := Integer'Last)
                      return Array_Type
    is
-      use UStrings;
-
       List : constant List_Type := Explode (Separator, Item, Limit);
       Result : Array_Type;
    begin
       for A of List loop
-         Result.Append (Key   => -A,
+         Result.Append (Key   => A,
                         Value => From_String (""));
       end loop;
       return Result;

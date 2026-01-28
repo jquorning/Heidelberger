@@ -1420,21 +1420,21 @@ is
                                                    +"column-column_key"));
          begin
             if In_Array (Column_Key, Hidden, True) then
-               Class.Append (+"hidden");
+               Class.Append ("hidden");
             end if;
 
             if "cb" = Column_Key then
-               Class.Append (+"check-column");
+               Class.Append ("check-column");
             elsif
                In_List (Column_Key, To_List (List => (+"posts",
                                                       +"comments",
                                                       +"links")), True)
             then
-               Class.Append (+"num");
+               Class.Append ("num");
             end if;
 
             if Column_Key = Primary then
-               Class.Append (+"column-primary");
+               Class.Append ("column-primary");
             end if;
 
             if Isset (Sortable, Column_Key) then
@@ -1452,8 +1452,8 @@ is
                   if Current_Orderby = Orderby then
                      Order := +(if "asc" = Current_Order then "desc" else "asc");
 
-                     Class.Append (+"sorted");
-                     Class.Append (+Current_Order);
+                     Class.Append ("sorted");
+                     Class.Append (Current_Order);
                   else
                      Order := +Php.Strings.Strtolower (Desc_First);
 
@@ -1464,8 +1464,8 @@ is
                         Order := +(if Desc_First /= "" then "desc" else "asc");
                      end if;
 
-                     Class.Append (+"sortable");
-                     Class.Append (+(if "desc" = Order then "asc" else "desc"));
+                     Class.Append ("sortable");
+                     Class.Append (if "desc" = Order then "asc" else "desc");
                   end if;
 
                   Column_Display_Name := Php.Strings.Sprintf (

@@ -149,7 +149,6 @@ is
    procedure Init_Roles (This : in out Wp_Roles)
    is
       use Php.Arrays;
-      use UStrings;
       use Wp_Common;
       use Lists;
       use Class_Role;
@@ -164,7 +163,7 @@ is
 
       for Role_2 of List_Type'(Array_Keys (This.Roles)) loop
          declare
-            Role : constant String := -Role_2;
+            Role : constant String := Role_2;
          begin
             This.Role_Objects (Role) :=
               Wp_Role'(X_Construct (Role, As_Array (Get (

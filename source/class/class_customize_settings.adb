@@ -591,7 +591,6 @@ is
                               Create : Boolean := False)
                               return Array_Type
    is
-      use UStrings;
       use Php.Arrays;
       use Php.Lists;
       use Php.Types;
@@ -611,15 +610,15 @@ is
          Node : Array_Type := Root; -- &
       begin
          for Key of Keys_2 loop
-            if Create and then not Isset (Node, -Key) then
-               Set (Node, -Key, From_Array (Empty_Array));
+            if Create and then not Isset (Node, Key) then
+               Set (Node, Key, From_Array (Empty_Array));
             end if;
 
-            if not Is_Array (Node) or else not Isset (Node, -Key) then
+            if not Is_Array (Node) or else not Isset (Node, Key) then
                return Empty_Array;
             end if;
 
-            Node := As_Array (Get (Node, -Key)); -- &
+            Node := As_Array (Get (Node, Key)); -- &
          end loop;
 
          if Create then

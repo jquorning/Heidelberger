@@ -44,7 +44,6 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
-      use UStrings;
 --    use Class_Theme_JSON;
       use Inc_Functions;
 
@@ -92,7 +91,7 @@ is
                            if not Preset.Is_Empty then
 --                         if null /= Preset then
                               -- If the preset is not already keyed by origin.
-                              if Isset (-Preset.First_Element) or else Preset.Is_Empty then -- (0)
+                              if Isset (Preset.First_Element) or else Preset.Is_Empty then -- (0)
 --                            if Isset (-Preset.First_Element) or else Empty (Preset) then -- (0)
 
                                  X_Wp_Array_Set (This.Theme_JSON, Path,
@@ -177,15 +176,15 @@ is
       for Section of List_Type'(Array_Keys (Styles_Non_Top_Level)) loop
          -- array_key_exists() needs to be used instead of isset() because the value can be null.
          if
-           Array_Key_Exists (-Section, Styles_Non_Top_Level) and then
-           Kind_Of (Get (Styles_Non_Top_Level, -Section)) = Kind_Array
+           Array_Key_Exists (Section, Styles_Non_Top_Level) and then
+           Kind_Of (Get (Styles_Non_Top_Level, Section)) = Kind_Array
 --         Is_Array (Styles_Non_Top_Level (Section))
          then
-            for Prop of List_Type'(Array_Keys (As_Array (Get (Styles_Non_Top_Level, -Section)))) loop
+            for Prop of List_Type'(Array_Keys (As_Array (Get (Styles_Non_Top_Level, Section)))) loop
 --          for Prof of Array_Keys (Styles_Non_Top_Level (Section)) loop
-               if "top" = As_String (Get (Ref_2 (Styles_Non_Top_Level, -Section, -Prop))) then
+               if "top" = As_String (Get (Ref_2 (Styles_Non_Top_Level, Section, Prop))) then
 --             if "top" = Styles_Non_Top_Level (Section) (Prop) then
-                  Delete (Ref_2 (Styles_Non_Top_Level, -Section, -Prop));
+                  Delete (Ref_2 (Styles_Non_Top_Level, Section, Prop));
 --                Unset (Styles_Non_Top_Level (Section) (Prop));
                end if;
             end loop;
@@ -204,17 +203,17 @@ is
       -- - block level elements: `$schema["styles"]["blocks"]["core/button"]["elements"]["link"][":hover"]`.
       --
       for Element of Valid_Element_Names loop
-         Set (Schema_Styles_Elements, -Element, From_Array (Styles_Non_Top_Level));
+         Set (Schema_Styles_Elements, Element, From_Array (Styles_Non_Top_Level));
 
          -- TODO: Replace array_key_exists() with isset() check once WordPress drops
          -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-         if Array_Key_Exists (-Element, VALID_ELEMENT_PSEUDO_SELECTORS) then
+         if Array_Key_Exists (Element, VALID_ELEMENT_PSEUDO_SELECTORS) then
             for
               Pseudo_Selector in
-              As_Array (Get (VALID_ELEMENT_PSEUDO_SELECTORS, -Element)).Iterate
+              As_Array (Get (VALID_ELEMENT_PSEUDO_SELECTORS, Element)).Iterate
             loop
                Set_2 (Schema_Styles_Elements,
-                      Key_1 => -Element,
+                      Key_1 => Element,
                       Key_2 => As_String (Arrays.Element (Pseudo_Selector)),
                       Value => From_Array (Styles_Non_Top_Level));
             end loop;
@@ -226,10 +225,10 @@ is
          Schema_Settings_Blocks : Array_Type;
       begin
          for Block of Valid_Block_Names loop
-            Set (Schema_Settings_Blocks, -Block, From_Array (VALID_SETTINGS));
-            Set (Schema_Styles_Blocks,   -Block, From_Array (Styles_Non_Top_Level));
+            Set (Schema_Settings_Blocks, Block, From_Array (VALID_SETTINGS));
+            Set (Schema_Styles_Blocks,   Block, From_Array (Styles_Non_Top_Level));
             Set_2 (Schema_Styles_Blocks,
-                   Key_1 => -Block,
+                   Key_1 => Block,
                    Key_2 => "elements",
                    Value => From_Array (Schema_Styles_Elements));
          end loop;
@@ -243,25 +242,25 @@ is
 
       -- Remove anything that"s not present in the schema.
       for Subtree of To_List (List => (+"styles", +"settings")) loop
-         if not Isset (Input, -Subtree) then
+         if not Isset (Input, Subtree) then
             goto Continue;
          end if;
 
-         if Kind_Of (Get (Input, -Subtree)) /= Kind_Array then
+         if Kind_Of (Get (Input, Subtree)) /= Kind_Array then
 --       if not Is_Array (Input, -Subtree) then
-            Delete (Ref (Output, -Subtree));
+            Delete (Ref (Output, Subtree));
             goto Continue;
          end if;
 
          declare
             Result : constant Array_Type :=
-              Remove_Keys_Not_In_Schema (As_Array (Get (Input,  -Subtree)),
-                                         As_Array (Get (Schema, -Subtree)));
+              Remove_Keys_Not_In_Schema (As_Array (Get (Input,  Subtree)),
+                                         As_Array (Get (Schema, Subtree)));
          begin
             if Empty (Result) then
-               Delete (Ref (Output, -Subtree));
+               Delete (Ref (Output, Subtree));
             else
-               Set (Output, -Subtree, From_Array (Result));
+               Set (Output, Subtree, From_Array (Result));
             end if;
          end;
 
@@ -281,15 +280,14 @@ is
                                 return String
    is
       use Php.Strings;
-      use UStrings;
 
       New_Selectors : List_Type;
       Selectors     : constant List_Type := Explode (",", Selector);
    begin
       for Sel of Selectors loop
-         New_Selectors.Append (+(if "right" = Position
-                                then (-Sel) & To_Append
-                                else To_Append & (-Sel)));
+         New_Selectors.Append (if "right" = Position
+                               then Sel & To_Append
+                               else To_Append & Sel);
       end loop;
       return Implode (",", New_Selectors);
    end Append_To_Selector;
@@ -304,7 +302,6 @@ is
       use Php.Arrays;
       use Php.Strings;
       use Php.Types;
-      use UStrings;
       use Class_Block_Type_Registry;
 
       Registry : constant Wp_Block_Type_Registry :=
@@ -406,7 +403,7 @@ is
                            exit;
                         end if;
                         Element_Selector.Append
-                          (+Append_To_Selector (El_Selector, -Selector & " ", "left"));
+                          (Append_To_Selector (El_Selector, Selector & " ", "left"));
                      end loop;
                      Set_3 (Blocks_Metadata,
                             Key_1 => Block_Name,
@@ -1157,7 +1154,6 @@ is
                             return String
    is
       use Php.Strings;
-      use UStrings;
 
       Scopes    : constant List_Type := Explode (",", Scope);
       Selectors : constant List_Type := Explode (",", Selector);
@@ -1167,11 +1163,11 @@ is
       for Outer of Scopes loop
          for Inner of Selectors loop
             declare
-               Trim_Inner : constant String := Trim (-Inner);
-               Trim_Outer : constant String := Trim (-Outer);
+               Trim_Inner : constant String := Trim (Inner);
+               Trim_Outer : constant String := Trim (Outer);
                Concat     : constant String := Trim_Outer & " " & Trim_Inner;
             begin
-               Selectors_Scoped.Append (+Concat);
+               Selectors_Scoped.Append (Concat);
             end;
          end loop;
       end loop;
@@ -1245,11 +1241,11 @@ is
       Result : Array_Type;
    begin
       for Origin of Origins loop
-         if not Isset (As_Array (Preset_Per_Origin), -Origin) then
+         if not Isset (As_Array (Preset_Per_Origin), Origin) then
             goto Continue_2;
          end if;
 
-         for Preset_2 in As_Array (Get (As_Array (Preset_Per_Origin), -Origin)).Iterate loop
+         for Preset_2 in As_Array (Get (As_Array (Preset_Per_Origin), Origin)).Iterate loop
             declare
                Preset : Array_Type renames As_Array (Element (Preset_2));
                Slug   : constant String := X_Wp_To_Kebab_Case (As_String (Get (Preset, "slug")));
@@ -1296,7 +1292,6 @@ is
                                 Origins         : List_Type := Empty_List) -- null
                                 return Array_Type
    is
-      use UStrings;
       use Inc_Functions;
       use List_Vectors;
 
@@ -1312,11 +1307,11 @@ is
       Result : Array_Type;
    begin
       for Origin of Origins_2 loop
-         if not Isset (Preset_Per_Origin, -Origin) then
+         if not Isset (Preset_Per_Origin, Origin) then
             goto Continue;
          end if;
 
-         for Preset_2 in As_Array (Get (Preset_Per_Origin, -Origin)).Iterate loop
+         for Preset_2 in As_Array (Get (Preset_Per_Origin, Origin)).Iterate loop
             declare
                Preset : Array_Type renames As_Array (Element (Preset_2));
                Slug   : constant String := X_Wp_To_Kebab_Case (As_String (Get (Preset, "slug")));
@@ -2083,7 +2078,7 @@ is
       for Duplicate of Root_Variable_Duplicates loop
          declare
             Discard : Integer :=
-              Array_Search (-Duplicate, Array_Column (Declarations, "name"), True);
+              Array_Search (Duplicate, Array_Column (Declarations, "name"), True);
 
             Unused : Array_Type;
          begin
@@ -2492,7 +2487,6 @@ is
                                return Array_Type
    is
       use Php.Arrays;
-      use UStrings;
       use Inc_Functions;
 
       Slugs : Array_Type;
@@ -2502,9 +2496,9 @@ is
             Path : List_Type := Node_Path;
          begin
             for Leaf in As_Array (Get (Metadata, "path")).Iterate loop
-               Path.Append (+As_String (Element (Leaf)));
+               Path.Append (As_String (Element (Leaf)));
             end loop;
-            Path.Append (+"default");
+            Path.Append ("default");
 
             declare
                Preset : constant Multi_Type := X_Wp_Array_Get (Data, Path);
@@ -2545,14 +2539,13 @@ is
                                     Base_Path : List_Type)
                                     return String
    is
-      use UStrings;
       use Inc_Functions;
 
       Path : List_Type := Base_Path;
 
       Default_Content : Multi_Type;
    begin
-      Path.Append (+"default");
+      Path.Append ("default");
       Default_Content := X_Wp_Array_Get (This.Theme_JSON, Path);
 
       if Kind_Of (Default_Content) = Kind_Null then

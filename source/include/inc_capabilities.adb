@@ -554,7 +554,7 @@ is
       then
          declare
             Expl_Cap    : constant List_Type := Explode ("_", Cap);
-            Object_Type : constant String    := -Expl_Cap (2); -- [1]
+            Object_Type : constant String    := Expl_Cap (2); -- [1]
             Message     : UString;
          begin
             if Args.Object_Id = 0 then

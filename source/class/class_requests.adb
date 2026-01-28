@@ -283,8 +283,8 @@ is
                    "noversion"; -- , headers_4);
          end if;
 
-         Return2.Protocol_Version := Matches (1); -- (float)
-         Return2.Status_Code      := Integer'Value (-Matches (2));   -- (int)
+         Return2.Protocol_Version := +Matches (1); -- (float)
+         Return2.Status_Code      := Integer'Value (Matches (2));   -- (int)
 
          if Return2.Status_Code in 200 .. 300 - 1 then
             Return2.Success := True;
@@ -292,10 +292,10 @@ is
 
          for Header of Headers_4 loop
             declare
-               List : List_Type := Explode (":", -Header, 2);
-               -- list(key, value)
-               Key   : constant String := -List (1);
-               Value : constant String := Trim (-List (2));
+               List : List_Type := Explode (":", Header, 2);
+
+               Key   : constant String := List (1);
+               Value : constant String := Trim (List (2));
                Unused : UString;
             begin
                Unused := +Preg_Replace ("#(\s+)#i", " ", Value);

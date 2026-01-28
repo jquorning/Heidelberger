@@ -319,7 +319,7 @@ is
                            As_Array (Get (Metadata, "path")),
                            Filter_Core'Access
                        ));
-                     Result_0 : constant String := -Result (Result.First_Index); -- (0)
+                     Result_0 : constant String := Result (Result.First_Index); -- (0)
                   begin
                      if Isset (Result_0) then
                         if Str_Starts_With (Result_0, "core/") then

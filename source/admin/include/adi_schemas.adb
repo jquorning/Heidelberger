@@ -802,7 +802,7 @@ is
               ));
       begin
          for Option of Unusedoptions loop
-            Delete_Option (-Option);
+            Delete_Option (Option);
          end loop;
       end;
 
@@ -956,7 +956,7 @@ is
    begin
       for R of Roles loop
          declare
-            Role : Wp_Role := Get_Role (-R);
+            Role : Wp_Role := Get_Role (R);
          begin
             if Role = Null_Role then
                goto Continue;

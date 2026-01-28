@@ -14,7 +14,6 @@ with Php.Preg;
 with Php.Strings;
 
 with Constants;
-with Globals;
 with UStrings;
 with Lists;
 with Wp_Common;
@@ -27,7 +26,6 @@ with Inc_General_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
-with Inc_Plugins;
 
 with Req_Responses;
 
@@ -52,7 +50,6 @@ is
       use Inc_General_Templates;
       use Inc_Load;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Defaults : Array_Type := To_Array (List => (
         Build ("method",              "GET"),
@@ -486,9 +483,9 @@ is
       for Transport of Request_Order loop
          declare
             Transport_2 : String :=
-              (if In_List (-Transport, Transports, True)
-               then UC_First (-Transport)
-               else -Transport);
+              (if In_List (Transport, Transports, True)
+               then UC_First (Transport)
+               else Transport);
 
             Class : constant String := "WP_Http_" & Transport_2;
          begin
@@ -541,7 +538,6 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
-      use UStrings;
 
       -- -- Split headers, one per array element.
       -- if ( is_string( headers ) ) then
@@ -595,9 +591,9 @@ is
                   declare
                      Stack : List_Type := Explode (" ", Temp_Header, 3);
                   begin
-                     Stack.Append (+"");
-                     Set (Response, "code",    From_String (-Stack (2)));
-                     Set (Response, "message", From_String (-Stack (3)));
+                     Stack.Append ("");
+                     Set (Response, "code",    From_String (Stack (2)));
+                     Set (Response, "message", From_String (Stack (3)));
 --                   list( , response["code"], response["message"]) := Stack;
                      goto Continue;
                   end;
@@ -606,8 +602,8 @@ is
                declare
                   List : constant List_Type := Explode (":", Temp_Header, 2);
 
-                  Key   : constant String := Strtolower (-List (1));
-                  Value : constant String := Trim (-List (2));
+                  Key   : constant String := Strtolower (List (1));
+                  Value : constant String := Trim (List (2));
                begin
                   if Isset (New_Headers, Key) then
                      if Kind_Of (Get (New_Headers, Key)) not in Kind_Array then
@@ -659,7 +655,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_Options;
-      use Inc_Plugins;
    begin
       -- We don't need to block requests, because nothing is blocked.
       if
@@ -713,7 +708,7 @@ is
                   begin
                      for Host of Static_Accessible_Hosts loop
                         Wildcard_Regex.Append
-                          (+Str_Replace ("\*", ".+", Preg_Quote (-Host, "/")));
+                          (Str_Replace ("\*", ".+", Preg_Quote (Host, "/")));
                      end loop;
                      Static_Wildcard_Regex :=
                        +"/^(" & Implode ("|", Wildcard_Regex) & ")/i";

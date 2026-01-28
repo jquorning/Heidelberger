@@ -119,12 +119,12 @@ is
          declare
             use Dependency_Maps;
 
-            Style   : X_Wp_Dependency renames Wp_Styles.Registered (-Handle);
+            Style   : X_Wp_Dependency renames Wp_Styles.Registered (Handle);
             Content : UString;
             Path    : UString;
          begin
 
-            if not Has_Element (Wp_Styles.Registered.Find (-Handle)) then
+            if not Has_Element (Wp_Styles.Registered.Find (Handle)) then
 --          if not Array_Key_Exists (-Handle, Wp_Styles.Registered) then
                goto Continue;
             end if;

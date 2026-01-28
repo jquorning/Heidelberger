@@ -391,7 +391,6 @@ is
                                 In_Footer : Boolean   := False)
    is
       use Php.Strings;
-      use UStrings;
       use Class_Scripts;
       use Class_Dependencies;
    begin
@@ -407,13 +406,13 @@ is
                if Src /= "" then
                   Unused := Class_Dependencies.Add
                     (Wp_Dependencies (Scripts),
-                     -(X_Handle.First_Element), Src, Deps, Ver); -- (0)
+                     X_Handle.First_Element, Src, Deps, Ver); -- (0)
                end if;
 
                if In_Footer then
                   Unused := Class_Dependencies.Add_Data
                     (Wp_Dependencies (Scripts),
-                     -(X_Handle.First_Element), "group", "1"); -- (0), 1 -> "1"
+                     X_Handle.First_Element, "group", "1"); -- (0), 1 -> "1"
                end if;
             end;
          end if;

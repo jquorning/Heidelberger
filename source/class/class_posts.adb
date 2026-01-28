@@ -255,8 +255,8 @@ is
         (+"ancestors", +"page_template", +"post_category", +"tags_input"));
    begin
       for Key of List loop
-         if X_Isset (Post, -Key) then
-            Set (Post_2, -Key, From_String (Get_As_String (Post_2, -Key))); -- x_get
+         if X_Isset (Post, Key) then
+            Set (Post_2, Key, From_String (Get_As_String (Post_2, Key))); -- x_get
          end if;
       end loop;
 

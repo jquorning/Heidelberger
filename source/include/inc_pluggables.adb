@@ -1093,10 +1093,10 @@ is
          end if;
 
          declare
-            Username   : constant String := -Cookie_Elements (1);
-            Expiration : constant String := -Cookie_Elements (2);
-            Token      : constant String := -Cookie_Elements (3);
-            Hmac       : constant String := -Cookie_Elements (4);
+            Username   : constant String := Cookie_Elements (1);
+            Expiration : constant String := Cookie_Elements (2);
+            Token      : constant String := Cookie_Elements (3);
+            Hmac       : constant String := Cookie_Elements (4);
          begin
             return To_Array (List => (
               Build ("username",   Username),
@@ -1749,9 +1749,8 @@ is
                                             return String
    is
       use Php.HTML;
-      use UStrings;
    begin
-      return URL_Encode (-Matches.First_Element); -- [0]
+      return URL_Encode (Matches.First_Element); -- [0]
    end X_Wp_Sanitize_UTF8_In_Redirect;
 
 -- endif;
@@ -1898,8 +1897,8 @@ is
          -- Reject malformed components parse_url() can return on odd inputs.
          for Component of To_List (List => (+"user", +"pass", +"host")) loop
             if
-              Isset (Lp, -Component) and then
-              Strpbrk (Get_As_String (Lp, -Component), ":/?#@") /= ""
+              Isset (Lp, Component) and then
+              Strpbrk (Get_As_String (Lp, Component), ":/?#@") /= ""
             then
                return Default;
             end if;
@@ -2784,7 +2783,7 @@ is
 --             end if;
 
                declare
-                  Value : constant String := (-First) & "_" & (-Second);
+                  Value : constant String := First & "_" & Second;
                begin
                   Set (Static_Duplicated_Keys, Key => Value,
                        Value => From_Boolean (Isset (Static_Duplicated_Keys, Value)));
@@ -2824,22 +2823,22 @@ is
             for Typ of To_List (List => (+"key", +"salt")) loop
                declare
                   Const : constant String :=
-                    Php.Strings.Strtoupper (Scheme & "_" & (-Typ));
+                    Php.Strings.Strtoupper (Scheme & "_" & Typ);
                begin
                   if
 --                  Defined (const) and then
 --                  constant( const ) and then
                     Empty (Static_Duplicated_Keys, Const) -- [ constant( const ) ])
                   then
-                     Set (Values, -Typ, From_String (Const)); -- constant( const ));
-                  elsif not Isset (Values, -Typ) then
+                     Set (Values, Typ, From_String (Const)); -- constant( const ));
+                  elsif not Isset (Values, Typ) then
 --                elsif not Values (Typ) then
-                     Set (Values, -Typ, Get_Site_Option (Scheme & "_" & (-Typ)));
-                     if not Isset (Values, -Typ) then
+                     Set (Values, Typ, Get_Site_Option (Scheme & "_" & Typ));
+                     if not Isset (Values, Typ) then
 --                   if not Values (Typ) then
-                        Set (Values, -Typ,
+                        Set (Values, Typ,
                              From_String (Wp_Generate_Password (64, True, True)));
-                        Update_Site_Option (Scheme & "_" & (-Typ), Get (Values, -Typ));
+                        Update_Site_Option (Scheme & "_" & Typ, Get (Values, Typ));
                      end if;
                   end if;
                end;
@@ -3310,14 +3309,14 @@ is
                  not As_Boolean (Get (Args_2, "found_avatar")) or else
                  As_Boolean (Get (Args_3, "force_default"))
                then
-                  Class.Append (+"avatar-default");
+                  Class.Append ("avatar-default");
                end if;
 
                if As_Boolean (Get (Args_3, "class")) then
                   if Kind_Of (Get (Args_3, "class")) = Kind_List then -- array
                      Class := List_Merge (Class, As_List (Get (Args, "class")));
                   else
-                     Class.Append (+Get_As_String (Args_3, "class"));
+                     Class.Append (Get_As_String (Args_3, "class"));
                   end if;
                end if;
 

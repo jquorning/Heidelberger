@@ -81,13 +81,13 @@ is
          Unused := Preg_Match (Pattern, As_String (Raw_Value_2), Matches);
 
          -- Bails out if not a number value and a px or rem unit.
-         if not Isset (-Matches (2)) or else not Isset (-Matches (3)) then
+         if not Isset (Matches (2)) or else not Isset (Matches (3)) then
             return Empty_Array; -- null;
          end if;
 
          declare
-            Value : Float  := Float'Value (-Matches (2)); -- (1)
-            Unit  : UString := Matches (3);      -- (2)
+            Value : Float  := Float'Value (Matches (2)); -- (1)
+            Unit  : UString := +Matches (3);      -- (2)
 
             Coerce_To : constant String :=
               As_String (Get (Options_2, "coerce_to"));

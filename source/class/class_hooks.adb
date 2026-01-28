@@ -25,13 +25,12 @@ is
    function Array_Keys (Map : Priority_Maps.Map)
                         return List_Type
    is
-      use UStrings;
       use Priority_Maps;
 
       Result : List_Type;
    begin
       for A in Map.Iterate loop
-         Result.Append (+Priority_Type'Image (Key (A)));
+         Result.Append (Priority_Type'Image (Key (A)));
       end loop;
       return Result;
    end Array_Keys;
