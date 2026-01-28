@@ -2861,7 +2861,7 @@ is
       Button_Shorthand : constant List_Type :=
          ["primary", "small", "large"];
 
-      Classes          : List_Type := To_List ("button");
+      Classes          : List_Type := ["button"];
    begin
 --      if not Is_Array (Typ) then
          Typ_2 := Explode (" ", Typ);

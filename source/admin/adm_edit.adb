@@ -717,7 +717,7 @@ is
                                     Printf (
                                       -- translators: %s: Search query.
                                       abs "Search results for: %s",
-                                      To_List ("<strong>" & Get_Search_Query & "</strong>")) &
+                                      ["<strong>" & Get_Search_Query & "</strong>"]) &
                                       "</span>";
                            begin
                               Set ("VAR_page_edit_h1_sub", Buffer);
@@ -856,13 +856,13 @@ is
 --          if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
                Append (Messages,
                        Sprintf (As_String (Get (Message_Array, Message)),
-                                To_List (Number_Format_I18n (Float (Count)))));
+                                [Number_Format_I18n (Float (Count))]));
                -- Messages [] := Sprintf (Bulk_Messages [Post_Type] [Message],
                --                         Number_Format_I18n (Count));
             elsif Isset (Post_Array, Message) then
                Append (Messages,
                        Sprintf (As_String (Get (Post_Array, Message)),
-                                To_List (Number_Format_I18n (Float (Count)))));
+                                [Number_Format_I18n (Float (Count))]));
                -- Messages [] := Sprintf (Bulk_Messages ["post"] [Message ],
                --                         Number_Format_I18n (Count));
             end if;

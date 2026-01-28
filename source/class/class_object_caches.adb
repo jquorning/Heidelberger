@@ -50,7 +50,7 @@ is
             -- translators: %s: The type of the given cache key.
             else Sprintf (
               abs "Cache key must be integer or non-empty string, %s given.",
-              To_List ("Typ")));
+              [1 => "Typ"]));
       begin
          X_Doing_It_Wrong (
            Sprintf (

@@ -125,7 +125,7 @@ is
                        Sprintf (
                          -- translators: %s: Support forums URL.
                          abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
-                         To_List (abs "https://wordpress.org/support/forums/")
+                         [1 => abs "https://wordpress.org/support/forums/"]
                        ) & " " & abs "(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)",
                        (if Headers_Sent or else Constants.WP_DEBUG
                         then E_USER_WARNING
@@ -141,7 +141,7 @@ is
                        Sprintf (
                          -- translators: %s: Support forums URL.
                          abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
-                         To_List (abs "https://wordpress.org/support/forums/")
+                         [1 => abs "https://wordpress.org/support/forums/"]
                        ),
                        "XXX-976" -- Request.Get_Error_Message
                      );
@@ -159,7 +159,7 @@ is
                           Sprintf (
                             -- translators: %s: Support forums URL.
                             abs "An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href=""%s"">support forums</a>.",
-                            To_List (abs "https://wordpress.org/support/forums/")
+                            [1 => abs "https://wordpress.org/support/forums/"]
                           ),
                           Wp_Remote_Retrieve_Body (Request)
                         );

@@ -133,7 +133,6 @@ is
       use Arrays;
       use Binder;
       use UStrings;
-      use Lists;
       use Adi_Templates;
       use Class_WpDB;
       use Inc_Formatting;
@@ -144,7 +143,7 @@ is
 
       Statement : constant Statement_Type :=
         Globals.WpDB.Prepare ("SHOW TABLES LIKE %s",
-                              To_List (Globals.WpDB.ESC_Like (-Globals.WpDB.Users)));
+                              [Globals.WpDB.ESC_Like (-Globals.WpDB.Users)]);
 
       User_Table : constant Boolean :=
         (Globals.WpDB.Get_Var (Statement) /= ""); -- null);
@@ -421,13 +420,13 @@ is
          Version_URL : constant String := Sprintf (
            -- translators: %s: WordPress version.
            ESC_URL (abs "https://wordpress.org/support/wordpress-version/version-%s/"),
-           To_List (Sanitize_Title (Wp_Version))
+           [Sanitize_Title (Wp_Version)]
          );
 
          Php_Update_Message : UString := +"</p><p>" & Sprintf (
            -- translators: %s: URL to Update PHP page.
            abs "<a href=""%s"">Learn more about updating PHP</a>.",
-           To_List (ESC_URL (Wp_Get_Update_PHP_URL))
+           [ESC_URL (Wp_Get_Update_PHP_URL)]
          );
 
          Annotation : constant String := Wp_Get_Update_PHP_Annotation;
@@ -493,7 +492,7 @@ is
               Sprintf (
                 -- translators: %s: wp-config.php
                 abs "Your %s file has an empty database table prefix, which is not supported.",
-                To_List ("<code>wp-config.php</code>")
+                [1 => "<code>wp-config.php</code>"]
               ) & "</p></body></html>"
             );
          end if;
@@ -508,7 +507,7 @@ is
               Sprintf (
                 -- translators: %s: DO_NOT_UPGRADE_GLOBAL_TABLES
                 abs "The constant %s cannot be defined when installing WordPress.",
-                To_List ("<code>DO_NOT_UPGRADE_GLOBAL_TABLES</code>")
+                [1 => "<code>DO_NOT_UPGRADE_GLOBAL_TABLES</code>"]
               ) & "</p></body></html>"
             );
          end if;
@@ -519,7 +518,7 @@ is
          --
          declare
 
-            Scripts_To_Print : List_Type := To_List ("jquery");
+            Scripts_To_Print : List_Type := ["jquery"];
 
             Language : UString;
             Step : constant Integer :=

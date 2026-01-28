@@ -95,7 +95,7 @@ is
                Printf (
                   -- translators: %s: Version number.
                   abs "WordPress %s was created by a worldwide team of passionate individuals",
-                  To_List (Display_Version));
+                  [Display_Version]);
                Set ("VAR_credits_header", Get_Echo);
 
             elsif Var_Name = "VAR_credits_secondary_menu" then
@@ -131,7 +131,7 @@ is
                Printf (
                   -- translators: 1: https://wordpress.org/about/
                   abs "WordPress is created by a <a href=""%1$s"">worldwide team</a> of passionate individuals.",
-                  To_List (abs "https://wordpress.org/about/"));
+                  [abs "https://wordpress.org/about/"]);
                Set ("VAR_credits_created", Get_Echo);
 
             elsif Var_Name = "VAR_credits_get_involved_1" then

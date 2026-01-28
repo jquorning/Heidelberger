@@ -11,7 +11,6 @@ with Php.Strings;
 with Binder;
 with Globals;
 with Helpers;
-with Lists;
 with UStrings;
 with Wp_Common;
 
@@ -30,7 +29,6 @@ with Inc_Pluggables;
 
 package body Inc_Users
 is
-   use Lists;
 
    ---------------
    -- Wp_Signon --
@@ -1457,7 +1455,7 @@ is
            Sprintf (
              -- translators: %s: network_id
              abs "Unable to pass %s if not using multisite.",
-             To_List ("<code>network_id</code>")
+             [1 => "<code>network_id</code>"]
            ),
            "6.0.0"
          );

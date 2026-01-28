@@ -64,7 +64,7 @@ is
       --    end if;
       -- end if;
 
-      return Wp_Styles_X.Do_Items (To_List (Handles)); -- to_list added
+      return Wp_Styles_X.Do_Items ([Handles]); -- [] added
    end Wp_Print_Styles;
 
    ---------------------
@@ -202,7 +202,7 @@ is
          end;
       end if;
 
-      Wp_Styles_X.Enqueue (To_List (Handle));
+      Wp_Styles_X.Enqueue ([Handle]);
    end Wp_Enqueue_Style;
 
 -- --

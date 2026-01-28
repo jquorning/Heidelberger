@@ -475,12 +475,12 @@ is
 
             Query := +String (
               WpDB.Prepare ("SELECT " & Id_Column & " FROM table WHERE meta_key = %s",
-                            To_List (Meta_Key_2)));
+                            [1 => Meta_Key_2]));
 
             if not Delete_All then
                Append (Query, String (
                        WpDB.Prepare (" AND " & Type_Column & " = %d",
-                                     To_List (Helpers.Image (Object_Id_2)))));
+                                     [1 => Helpers.Image (Object_Id_2)])));
             end if;
 
             if
@@ -490,7 +490,7 @@ is
             then
                Append (Query, String (
                        WpDB.Prepare (" AND meta_value = %s",
-                                     To_List (Meta_Value_3))));
+                                     [1 => Meta_Value_3])));
             end if;
 
             Meta_Ids := WpDB.Get_Col (Statement_Type (-Query));
@@ -515,7 +515,7 @@ is
                else
                   Object_Ids := WpDB.Get_Col (WpDB.Prepare (
                     "SELECT " & Type_Column & " FROM table WHERE meta_key = %s",
-                    To_List (Meta_Key_2)));
+                    [1 => Meta_Key_2]));
                end if;
             end if;
 
@@ -576,7 +576,7 @@ is
                Data : List_Type :=
                  (if Delete_All
                   then Object_Ids -- (array)
-                  else To_List (Helpers.Image (Object_Id_2)));
+                  else List_Type'[Helpers.Image (Object_Id_2)]);
             begin
                Wp_Cache_Delete_Multiple (Data, Meta_Type & "_meta");
             end;

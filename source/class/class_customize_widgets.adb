@@ -504,7 +504,7 @@ is
                      use Class_Customize_Settings;
 
                      Setting_Id : constant String :=
-                       Sprintf ("sidebars_widgets[%s]", To_List (Sidebar_Id));
+                       Sprintf ("sidebars_widgets[%s]", [1 => Sidebar_Id]);
 
                      Setting_Args : Array_Type := This.Get_Setting_Args (Setting_Id);
                   begin
@@ -519,10 +519,10 @@ is
                      -- Add section to contain controls.
 --                     declare
 --                        Section_Id : String :=
---                          Sprintf ("sidebar-widgets-%s", To_List (Sidebar_Id));
+--                          Sprintf ("sidebar-widgets-%s", [Sidebar_Id]);
                      begin
                         Section_Id :=
-                          +Sprintf ("sidebar-widgets-%s", To_List (Sidebar_Id));
+                          +Sprintf ("sidebar-widgets-%s", [1 => Sidebar_Id]);
 
                         if Is_Active_Sidebar then
                            declare
@@ -737,10 +737,10 @@ is
       Id_Base : constant String := As_String (Get (Parsed_Widget_Id, "id_base"));
       Number  : constant String := As_String (Get (Parsed_Widget_Id, "number"));
 
-      Setting_Id : UString := +Sprintf ("widget_%s", To_List (Id_Base));
+      Setting_Id : UString := +Sprintf ("widget_%s", [1 => Id_Base]);
    begin
       if "" /= Number then -- not is_null
-         Append (Setting_Id, Sprintf ("[%d]", To_List (Number)));
+         Append (Setting_Id, Sprintf ("[%d]", [1 => Number]));
       end if;
       return -Setting_Id;
    end Get_Setting_Id;
@@ -938,7 +938,7 @@ is
                        "Your theme has %s other widget areas, but this particular page does not display them.",
                        Non_Rendered_Count
                      ),
-                     To_List (Number_Format_I18n (Float (Non_Rendered_Count)))
+                     [1 => Number_Format_I18n (Float (Non_Rendered_Count))]
                    ),
                    ENT_QUOTES,
                    Get_Bloginfo ("charset")
@@ -965,7 +965,7 @@ is
                     "Your theme has %s widget areas, but this particular page does not display them.",
                     Registered_Sidebar_Count
                   ),
-                  To_List (Number_Format_I18n (Float (Registered_Sidebar_Count)))
+                  [1 => Number_Format_I18n (Float (Registered_Sidebar_Count))]
                 ),
                 ENT_QUOTES,
                 Get_Bloginfo ("charset")
@@ -1021,7 +1021,7 @@ is
               "customize-widgets",
               "data",
               Sprintf ("var _wpCustomizeWidgetsSettings = %s;",
-                       To_List (Wp_JSON_Encode (From_Array (Settings))))
+                       [1 => Wp_JSON_Encode (From_Array (Settings))])
               );
          end;
 
@@ -1054,7 +1054,7 @@ is
                    "wp.domReady( function() {" & NL &
                    "   wp.customizeWidgets.initialize( ""widgets-customizer"", %s );" & NL &
                    "} );" & NL,
-                   To_List (Wp_JSON_Encode (From_Array (Editor_Settings)))
+                   [1 => Wp_JSON_Encode (From_Array (Editor_Settings))]
                  )
                );
 
@@ -1070,8 +1070,8 @@ is
                Wp_Add_Inline_Script (
                  "wp-blocks",
                  Sprintf ("wp.blocks.setCategories( %s );",
-                          To_List (Wp_JSON_Encode (From_Array (
-                                     Get_Block_Categories (Block_Editor_Context))))),
+                          [1 => Wp_JSON_Encode (From_Array (
+                                  Get_Block_Categories (Block_Editor_Context)))]),
                  "after"
                );
 
@@ -1107,7 +1107,7 @@ is
       Echo ("            <span class=""customize-action"">" & NL);
       -- translators: &#9656; is the unicode right-pointing triangle. %s: Section title in the Customizer.
       Printf (abs "Customizing &#9656; %s",
-              To_List (ESC_HTML (-This.Manager.Get_Panel ("widgets").Title)));
+              [1 => ESC_HTML (-This.Manager.Get_Panel ("widgets").Title)]);
       Echo ("            </span>" & NL);
       Echo ("            ");
       X_E ("Add a Widget");
@@ -1885,15 +1885,14 @@ is
 
             Attributes : constant String :=
               Sprintf (" data-customize-partial-id=""%s""",
-                       To_List (ESC_Attr ("widget[" & Widget_Id & "]"))) &
-
+                       [1 => ESC_Attr ("widget[" & Widget_Id & "]")]) &
               " data-customize-partial-type=""widget""" &
 
               Sprintf (" data-customize-partial-placement-context=""%s""",
-                       To_List (ESC_Attr (Wp_JSON_Encode (From_Array (Context))))) &
+                       [1 => ESC_Attr (Wp_JSON_Encode (From_Array (Context)))]) &
 
               Sprintf (" data-customize-widget-id=""%s""",
-                       To_List (ESC_Attr (Widget_Id)));
+                       [1 => ESC_Attr (Widget_Id)]);
          begin
             Set (Sidebar_Args, "before_widget",
                  From_String (Preg_Replace ("#^(<\w+)#", "1 " & Attributes,

@@ -399,7 +399,7 @@ is
                   begin
                      for Selector  of Block_Selectors loop
                         if Selector = El_Selector then
-                           Element_Selector := To_List (El_Selector);
+                           Element_Selector := [El_Selector];
                            exit;
                         end if;
                         Element_Selector.Append
@@ -543,13 +543,14 @@ is
          Append (Stylesheet, This.Get_Block_Classes (Style_Nodes));
 
       elsif In_List ("base-layout-styles", Types, True) then
-         -- Base layout styles are provided as part of `styles`, so only output separately if
-         -- explicitly requested. For backwards compatibility, the Columns block is explicitly
-         -- included, to support a different default gap value.
+         -- Base layout styles are provided as part of `styles`, so only output
+         -- separately if explicitly requested. For backwards compatibility, the
+         -- Columns block is explicitly included, to support a different default
+         -- gap value.
          declare
             Base_Styles_Nodes : constant array (Positive range <>) of Array_Type :=
              (To_Array (List => (
-                Build ("path",     To_List ("styles")),
+                Build ("path",     List_Type'["styles"]),
                 Build ("selector", ROOT_BLOCK_SELECTOR)
               )),
               To_Array (List => (
@@ -629,7 +630,8 @@ is
              Get_Instance.Get_Registered (As_String (Get (Block_Metadata, "name")));
 
          if
-           not Inc_Blocks.Block_Has_Support (Block_Type, To_List ("__experimentalLayout"), False)
+           not Inc_Blocks.Block_Has_Support (Block_Type,
+                                            ["__experimentalLayout"], False)
          then
             return -Block_Rules;
          end if;
@@ -748,11 +750,11 @@ is
                            Class_Name : constant String :=
                              Sanitize_Title (
                                As_String (X_Wp_Array_Get (As_Array (Layout_Definition),
-                                                          To_List ("className"))));
+                                                          ["className"])));
 
                            Spacing_Rules : constant Array_Type :=
                              As_Array (X_Wp_Array_Get (As_Array (Layout_Definition),
-                                                       To_List ("spacingStyles")));
+                                                       ["spacingStyles"]));
                         begin
 
                            if
@@ -866,11 +868,11 @@ is
                      Class_Name : constant String :=
                        Sanitize_Title (
                          As_String (X_Wp_Array_Get (Layout_Definition,
-                                                    To_List ("className")))); -- False
+                                                    ["className"]))); -- False
 
                      Base_Style_Rules : constant Multi_Type :=
                        X_Wp_Array_Get (Layout_Definition,
-                                       To_List ("baseStyles")); -- Empty_Array
+                                       ["baseStyles"]); -- Empty_Array
                   begin
                      if
                         not Empty (Class_Name) and then
@@ -1341,7 +1343,7 @@ is
 
       Custom_Values : constant Array_Type :=
         As_Array (
-          X_Wp_Array_Get (Settings, To_List ("custom")));
+          X_Wp_Array_Get (Settings, ["custom"]));
 
       CSS_Vars : constant Array_Type := Flatten_Tree (Custom_Values);
    begin
@@ -1428,7 +1430,7 @@ is
 
       -- Top-level.
       Append (Nodes, From_Array (To_Array (List => (
-        Build ("path",     To_List ("settings")),
+        Build ("path",     List_Type'["settings"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
       ))));
 
@@ -1483,7 +1485,7 @@ is
 
       -- Top-level.
       Append (Nodes, From_Array (To_Array (List => (
-        Build ("path",     To_List ("styles")),
+        Build ("path",     List_Type'["styles"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
       ))));
 
@@ -1772,7 +1774,7 @@ is
       Selector : constant String := As_String (Get (Block_Metadata, "selector"));
 
       Settings : constant Array_Type  :=
-        As_Array (X_Wp_Array_Get (This.Theme_JSON, To_List ("settings")));
+        As_Array (X_Wp_Array_Get (This.Theme_JSON, ["settings"]));
 
       --
       -- Process style declarations for block support features the current
@@ -2200,7 +2202,7 @@ is
       CSS              : UString;
 
       Settings : constant Array_Type :=
-        As_Array (X_Wp_Array_Get (This.Theme_JSON, To_List ("settings")));
+        As_Array (X_Wp_Array_Get (This.Theme_JSON, ["settings"]));
 
       Use_Root_Padding : constant Boolean :=
         Isset_2 (This.Theme_JSON, "settings", "useRootPaddingAwareAlignments") and then
@@ -2368,7 +2370,7 @@ is
       declare
          Nodes        : constant Array_Type := Get_Setting_Nodes (Incoming_Data);
          Slugs_Global : constant Array_Type := Get_Default_Slugs (This.Theme_JSON,
-                                                                  To_List ("settings"));
+                                                                  ["settings"]);
       begin
          for Node_2 in Nodes.Iterate loop
             declare
@@ -2380,10 +2382,10 @@ is
                Append (Path, "spacing");
                Append (Path, "units");
 
-               Content := X_Wp_Array_Get (Incoming_Data, To_List (-Path));
+               Content := X_Wp_Array_Get (Incoming_Data, [-Path]);
 
                if Isset (As_Array (Content)) then
-                  X_Wp_Array_Set (This.Theme_JSON, To_List (-Path), Content);
+                  X_Wp_Array_Set (This.Theme_JSON, [-Path], Content);
                end if;
 
                -- Replace the presets.
@@ -2407,7 +2409,7 @@ is
                            Path    := Base_Path;
                            Append (Path, Origin);
 
-                           Content := X_Wp_Array_Get (Incoming_Data, To_List (-Path));
+                           Content := X_Wp_Array_Get (Incoming_Data, [-Path]);
                            if not Isset (As_Array (Content)) then
                               goto Continue;
                            end if;
@@ -2426,7 +2428,7 @@ is
                                           Name : constant String :=
                                             Get_Name_From_Defaults (This, -- added
                                               As_String (Get (As_Array (Item), "slug")),
-                                                   To_List (-Base_Path));
+                                                   [-Base_Path]);
 
                                           Content_Array : Array_Type :=
                                             As_Array (Content);
@@ -2447,7 +2449,7 @@ is
                              ("theme" /= Origin) or else
                              ("theme" = Origin and then Override_Preset)
                            then
-                              X_Wp_Array_Set (This.Theme_JSON, To_List (-Path),
+                              X_Wp_Array_Set (This.Theme_JSON, [-Path],
                                               Content);
                            else
                               declare
@@ -2465,7 +2467,7 @@ is
                                    From_List (Filter_Slugs (As_Array (Content),
                                               As_Array (Slugs_For_Preset)));
                                  X_Wp_Array_Set (This.Theme_JSON,
-                                                 To_List (-Path),
+                                                 [-Path],
                                                  Content);
                               end;
                            end if;
@@ -2716,7 +2718,7 @@ is
                 Value => From_List
                   (if True = As_Boolean (Get (Settings, "enableCustomUnits"))
                    then List_Type'["px", "em", "rem", "vh", "vw", "%"]
-                   else To_List (As_String (Get (Settings, "enableCustomUnits")))));
+                   else List_Type'[As_String (Get (Settings, "enableCustomUnits"))]));
       end if;
 
       if Isset (Settings, "colors") then
@@ -2887,7 +2889,7 @@ is
                Build ("name", (if Below_Midpoint_Count = Steps_Mid_Point - 1
                                then abs "Small"
                                else Sprintf (abs "%sX-Small",
-                                             To_List (Natural'Image (X_Small_Count))))),
+                                             [1 => Natural'Image (X_Small_Count)]))),
                Build ("slug", Natural'Image (Slug)),
                Build ("size", Float'Image (Round (Float (Current_Step), 2)) & Unit)
             ))));
@@ -2938,7 +2940,7 @@ is
                  Build ("name", (if 0 = Above_Midpoint_Count
                                  then abs "Large"
                                  else Sprintf (abs "%sX-Large",
-                                               To_List (Natural'Image (X_Large_Count))))),
+                                               [1 => Natural'Image (X_Large_Count)]))),
                  Build ("slug", Natural'Image (Slug)),
                  Build ("size", Float'Image (Round (Float (Current_Step), 2)) & Unit)
                ))));

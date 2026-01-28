@@ -116,7 +116,7 @@ is
                      " WHERE post_type = %s" &
                      " AND post_status NOT IN (""trash"", ""auto-draft"")" &
                      " AND ID IN (" & Sticky_Posts_2 & ")",
-                     To_List (-Globals.Post_Type)
+                     [1 => -Globals.Post_Type]
                  )));
             end;
          end if;

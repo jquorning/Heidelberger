@@ -330,9 +330,9 @@ is
          -- translators: %s: Current user"s display name.
          Howdy : constant String :=
             Sprintf (abs "Howdy, %s",
-                     To_List ("<span class=""display-name"">"  &
-                              (-Current_User.Prop.Display_Name) &
-                              "</span>"));
+                     [1 => "<span class=""display-name"">"  &
+                           (-Current_User.Prop.Display_Name) &
+                           "</span>"]);
 
          Class : String := (if Empty (Avatar) then "" else "with-avatar");
          Node  : Node_Args;
@@ -482,11 +482,11 @@ is
       if Is_Network_Admin then
          -- translators: %s: Site title.
          Blogname := +Sprintf (abs "Network Admin: %s",
-                               To_List (ESC_HTML (-Get_Network.Site_Name)));
+                               [1 => ESC_HTML (-Get_Network.Site_Name)]);
       elsif Is_User_Admin then
          -- translators: %s: Site title.
          Blogname := +Sprintf (abs "User Dashboard: %s",
-                               To_List (ESC_HTML (-Get_Network.Site_Name)));
+                               [1 => ESC_HTML (-Get_Network.Site_Name)]);
       end if;
 
       declare
@@ -1433,7 +1433,7 @@ is
                   -- translators: %s: Number of comments.
                   X_N ("%s Comment in moderation",
                        "%s Comments in moderation", Awaiting_Mod),
-                  To_List (Number_Format_I18n (Float (Awaiting_Mod))));
+                  [1 => Number_Format_I18n (Float (Awaiting_Mod))]);
       Icon  : UString;
       Title : UString;
       Node  : Node_Args;
@@ -1587,7 +1587,7 @@ is
                 -- translators: %s: Total number of updates available.
                 X_N ("%s update available", "%s updates available",
                      Counts_Total),
-                To_List (Number_Format_I18n (Float (Counts_Total))));
+                [1 => Number_Format_I18n (Float (Counts_Total))]);
 
       Icon  := +"<span class=""ab-icon"" aria-hidden=""true""></span>";
       Title := +"<span class=""ab-label"" aria-hidden=""true"">" &

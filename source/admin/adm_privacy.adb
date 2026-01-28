@@ -9,7 +9,6 @@ with Php.Echoing;
 
 with Globals;
 with UStrings;
-with Lists;
 
 with Templates_Parser;
 
@@ -25,7 +24,6 @@ with Inc_Link_Templates;
 -- require_once __DIR__ . '/admin.php';
 package body Adm_Privacy
 is
-   use Lists;
 
    ---------
    -- Run --
@@ -127,7 +125,7 @@ is
                Printf (
                  -- translators: %s: https://wordpress.org/about/stats/
                  abs "This data is used to provide general enhancements to WordPress, which includes helping to protect your site by finding and automatically installing new updates. It is also used to calculate statistics, such as those shown on the <a href=""%s"">WordPress.org stats page</a>.",
-                 To_List (abs "https://wordpress.org/about/stats/"));
+                 [1 => abs "https://wordpress.org/about/stats/"]);
                Set ("VAR_privacy_text_2", Get_Echo);
 
             elsif Var_Name = "VAR_privacy_text_3" then
@@ -135,7 +133,7 @@ is
                Printf (
                  -- translators: %s: https://wordpress.org/about/privacy/
                  abs "We take privacy and transparency very seriously. To learn more about what data we collect, and how we use it, please visit <a href=""%s"">our Privacy Policy</a>.",
-                 To_List (abs "https://wordpress.org/about/privacy/"));
+                 [1 => abs "https://wordpress.org/about/privacy/"]);
                Set ("VAR_privacy_text_3", Get_Echo);
 
             else

@@ -19,7 +19,6 @@ with Binder;
 with Databases;
 with Globals;
 with UStrings;
-with Lists;
 
 with Adi_Upgrade;
 with Inc_Formatting;
@@ -34,7 +33,6 @@ with Wp_Load;
 package body Adm_Upgrade
 is
    use Arrays;
-   use Lists;
 
    type Step_Value is range 0 .. 1;
 
@@ -265,7 +263,7 @@ is
         Sprintf (
           -- translators: %s: WordPress version.
           ESC_URL (abs "https://wordpress.org/support/wordpress-version/version-%s/"),
-          To_List (Sanitize_Title (Wp_Version))
+          [1 => Sanitize_Title (Wp_Version)]
         );
 
       PHP_Update_Message_2 : constant String :=
@@ -273,7 +271,7 @@ is
         Sprintf (
           -- translators: %s: URL to Update PHP page.
           abs "<a href=""%s"">Learn more about updating PHP</a>.",
-          To_List (ESC_URL (Wp_Get_Update_PHP_URL))
+          [1 => ESC_URL (Wp_Get_Update_PHP_URL)]
         );
 
       Annotation : constant String :=

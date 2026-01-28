@@ -11,7 +11,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Arrays;
 with Globals;
 with UStrings;
-with Lists;
 with Php.Echoing;
 with Php.Strings;
 
@@ -25,7 +24,6 @@ with Inc_HTTP;
 package body Adi_Credits
 is
    use Arrays;
-   use Lists;
 
    function Get_File (Filename : String)
                       return UStrings.UString;
@@ -131,7 +129,7 @@ is
       use Php.Strings;
       use Inc_Formatting;
    begin
-      Display_Name := "<a href=""" & ESC_URL (Sprintf (Profiles, To_List (Username))) &
+      Display_Name := "<a href=""" & ESC_URL (Sprintf (Profiles, [1 => Username])) &
                       """>" & ESC_HTML (Display_Name) & "</a>";
    end X_Wp_Credits_Add_Profile_Link;
 
@@ -188,7 +186,7 @@ is
                                       "Translate this to be the equivalent of English Translators in your language for the credits page Translators section");
             elsif Placeholders.Kind = JSON_Array_Type then  -- Isset
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
-               Globals.Title := +Vsprintf (Translate (Name.Get), To_List ("XXX-913")); -- Placeholders.Get);
+               Globals.Title := +Vsprintf (Translate (Name.Get), ["XXX-913"]); -- Placeholders.Get);
 --             Globals.Title := +Vsprintf (Translate (Name.Get), Arrays.Empty_List); -- Placeholders.Get);
             else
                -- phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText
@@ -279,7 +277,7 @@ is
                      ESC_Attr (Get (Person_Data, 3).Get) & """>" & NL_TAB); -- (2)
                Echo ("<a href=""" &
                      ESC_URL (Sprintf ("%s", -- Get (Credits_Data, "profiles").Get,
-                                       To_List (Get (Person_Data, 2).Get))) &
+                                       [Get (Person_Data, 2).Get])) &
                      """ class=""web"">");
                declare
                   use Inc_Link_Templates;

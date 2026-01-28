@@ -76,7 +76,7 @@ is
       Parent_File   := +Slug_Type'("edit.php");
       Submenu_File  := +"edit.php";
 
-      Adi_Misc.Wp_Reset_Vars (To_List ("action"));
+      Adi_Misc.Wp_Reset_Vars (["action"]);
       declare
          Id : Post_Id;
       begin
@@ -217,7 +217,7 @@ is
                         Value : constant String :=
                           Sprintf (
                              "<!-- wp:paragraph -->%s<!-- /wp:paragraph -->",
-                              To_List (Str_Replace (Needle, "<br />", Value_2))
+                              [1 => Str_Replace (Needle, "<br />", Value_2)]
                           );
                      begin
                         Set (X_POST, "content", From_String (Value));
@@ -425,7 +425,7 @@ is
                            Wp_Die (
                              Sprintf (
                                abs "You cannot move this item to the Trash. %s is currently editing.",
-                               To_List (-User.Prop.Display_Name)));
+                               [1 => -User.Prop.Display_Name]));
                         end;
                      end if;
 

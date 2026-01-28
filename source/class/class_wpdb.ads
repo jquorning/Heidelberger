@@ -382,7 +382,7 @@ is
          -- @var string[]
          --
          Old_MS_Global_Tables : List_Type :=
-           To_List ("sitecategories");
+           ["sitecategories"];
 
          --
          -- WordPress Comments table.

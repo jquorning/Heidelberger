@@ -15,12 +15,12 @@
 -- @package WordPress
 --
 
+with Php.HTML;
+with Php.Strings;
+
 with Arrays;
 with Binder;
 with UStrings;
-with Lists;
-with Php.HTML;
-with Php.Strings;
 with Wp_Config;
 
 with Inc_Functions;
@@ -30,7 +30,6 @@ with Inc_Load;
 package body Wp_Load
 is
    use Arrays;
-   use Lists;
 
    ---------
    -- Run --
@@ -127,7 +126,7 @@ is
             Append (Die, "<p>" & Sprintf (
                -- translators: %s: wp-config.php
                abs "There doesn't seem to be a %s file. It is needed before the installation can continue.",
-               To_List ("<code>wp-config.php</code>")) & "</p>");
+               [1 => "<code>wp-config.php</code>"]) & "</p>");
 
             Append (Die, "<p>" & Sprintf (
                -- translators: 1: Documentation URL, 2: wp-config.php
@@ -140,7 +139,7 @@ is
             Append (Die, "<p>" & Sprintf (
                -- translators: %s: wp-config.php
                abs "You can create a %s file through a web interface, but this doesn't work for all server setups. The safest way is to manually create the file.",
-               To_List ("<code>wp-config.php</code>")) & "</p>");
+               [1 => "<code>wp-config.php</code>"]) & "</p>");
 
             Append (Die, "<p><a href=""" & (-Path) &
                     """ class=""button button-large"">" &

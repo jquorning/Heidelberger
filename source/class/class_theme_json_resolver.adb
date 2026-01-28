@@ -487,7 +487,7 @@ is
    function Get_User_Data_From_Wp_Global_Styles
      (Theme              : Class_Themes.Wp_Theme;
       Create_Post        : Boolean   := False;
-      Post_Status_Filter : List_Type := To_List ("publish"))
+      Post_Status_Filter : List_Type := ["publish"])
       return Array_Type
    is
       use Php.HTML;
@@ -562,7 +562,7 @@ is
                    Build ("post_type",    Post_Type_Filter),
                    Build ("post_name",
                           Sprintf ("wp-global-styles-%s",
-                                   To_List (URL_Encode (Stylesheet)))),
+                                   [1 => URL_Encode (Stylesheet)])),
                    Build ("tax_input",    To_Array (List => (1 =>
                       Build ("wp_theme", Stylesheet) -- To_Array (Stylesheet))
                    )))

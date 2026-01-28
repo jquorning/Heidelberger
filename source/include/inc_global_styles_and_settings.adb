@@ -156,9 +156,9 @@ is
                Origins : constant List_Type :=
                  ["default", "theme", "custom"];
             begin
-               Styles_Variables := +Tree.Get_Stylesheet (To_List ("variables"),
+               Styles_Variables := +Tree.Get_Stylesheet (["variables"],
                                                          Origins);
-               Types_2          := List_Diff (Types_2, To_List ("variables"));
+               Types_2          := List_Diff (Types_2, List_Type'["variables"]);
             end;
          end if;
 
@@ -181,7 +181,7 @@ is
                Origins : List_Type :=
                  (if Supports_Theme_JSON
                     then List_Type'["default", "theme", "custom"]
-                    else To_List ("default"));
+                    else List_Type'["default"]);
             begin
                Styles_REST := +Tree.Get_Stylesheet (Types_2, Origins);
             end;

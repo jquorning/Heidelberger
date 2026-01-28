@@ -265,7 +265,7 @@ is
             declare
                Taxonomy : UString;
                Tags : constant List_Type :=
-                 To_List (Item => As_String (Get (X_REQUEST, "delete_tags")));
+                 [Get_As_String (X_REQUEST, "delete_tags")];
             begin
                for Tag_ID of Tags loop
                   Wp_Delete_Term (Integer'Value (Tag_ID), -Taxonomy);
@@ -355,8 +355,9 @@ is
 
             declare
                Screen : constant String := -Get_Current_Screen.Id;
-               Tags   : constant List_Type :=
-                 To_List (Item => As_String (Get (X_REQUEST, "delete_tags")));
+
+               Tags : constant List_Type :=
+                 [Get_As_String (X_REQUEST, "delete_tags")];
             begin
                -- This action is documented in wp-admin/edit.php
                Location := +Apply_Filters ("handle_bulk_actions-" & Screen,
@@ -434,7 +435,7 @@ is
                   Set_UString (Help, "<p>" & Sprintf (
                         -- translators: %s: URL to Writing Settings screen.
                         abs "You can use categories to define sections of your site and group related posts. The default category is &#8220;Uncategorized&#8221; until you change it in your <a href=""%s"">writing settings</a>.",
-                        To_List ("options-writing.php")
+                        ["options-writing.php"]
                ) & "</p>");
                elsif "link_category" = Taxonomy then
                   Set_UString (Help, "<p>" & abs "You can create groups of links by using Link Categories. Link Category names must be unique and Link Categories are separate from the categories you use for posts." & "</p>");
@@ -565,7 +566,7 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("edit_category_form",
-                                              To_List ("parent"),
+                                              ["parent"],
                                               "3.0.0", (-Taxonomy) & "_add_form");
                      elsif "link_category" = Taxonomy then
                         --
@@ -577,7 +578,7 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("edit_link_category_form",
-                                              To_List ("parent"),
+                                              ["parent"],
                                               "3.0.0", (-Taxonomy) & "_add_form");
                      else
                         --
@@ -588,7 +589,7 @@ is
                         --
                         -- @param string taxonomy The taxonomy slug.
                         --
-                        Do_Action_Deprecated ("add_tag_form", To_List (-Taxonomy),
+                        Do_Action_Deprecated ("add_tag_form", [-Taxonomy],
                                       "3.0.0", (-Taxonomy) & "_add_form");
                      end if;
 
@@ -649,7 +650,7 @@ is
                         R : constant String := Printf (
                         -- translators: %s: URL to Categories to Tags Converter tool.
                         abs "Tags can be selectively converted to categories using the <a href=""%s"">tag to category converter</a>.",
-                        To_List (ESC_URL (-Import_Link)));
+                        [ESC_URL (-Import_Link)]);
                      begin
                         Set ("VAR_edit_tags_convert_help", R);
                      end;
@@ -659,7 +660,7 @@ is
                         R : constant String := Printf (
                         -- translators: %s: URL to Categories to Tags Converter tool.
                         abs "Categories can be selectively converted to tags using the <a href=""%s"">category to tag converter</a>.",
-                        To_List (ESC_URL (-Import_Link)));
+                        [-Import_Link]);
                      begin
                         Set ("VAR_edit_tags_converter_help", R);
                      end;
@@ -677,8 +678,8 @@ is
                         -- translators: %s: Default category.
                         abs "Deleting a category does not delete the posts in that category. Instead, posts that were only assigned to the deleted category are set to the default category %s. The default category cannot be deleted.",
                         -- This filter is documented in wp-includes/category-template.php
-                        To_List ("<strong>" & Apply_Filters ("the_category",
-                                                    Get_Cat_Name (Get_Option ("default_category")), "", "") & "</strong>"));
+                        ["<strong>" & Apply_Filters ("the_category",
+                                                    Get_Cat_Name (Get_Option ("default_category")), "", "") & "</strong>"]);
                      begin
                         Set ("VAR_edit_tags_delete_help", R);
                      end;
@@ -705,7 +706,7 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("add_category_form_pre",
-                                              To_List ("parent"),
+                                              ["parent"],
                                               "3.0.0", (-Taxonomy) & "_pre_add_form");
                      elsif "link_category" = Taxonomy then
                         --
@@ -718,7 +719,7 @@ is
                         -- @param object arg Optional arguments cast to an object.
                         --
                         Do_Action_Deprecated ("add_link_category_form_pre",
-                                              To_List ("parent"),
+                                              ["parent"],
                                               "3.0.0", (-Taxonomy) & "_pre_add_form");
                      else
                         --
@@ -731,7 +732,7 @@ is
                         -- @param string taxonomy The taxonomy slug.
                         --
                         Do_Action_Deprecated ("add_tag_form_pre",
-                                              To_List (-Taxonomy),
+                                              [-Taxonomy],
                                               "3.0.0", "{taxonomy}_pre_add_form");
                      end if;
 
@@ -883,8 +884,8 @@ is
                            Append (R, Printf (
                               -- translators: %s: Search query.
                               abs "Search results for: %s",
-                              To_List ("<strong>" & ESC_HTML (Wp_Unslash (As_String (Get (X_REQUEST, "s")))) & "</strong>"
-                           )));
+                              ["<strong>" & ESC_HTML (Wp_Unslash (As_String (Get (X_REQUEST, "s")))) & "</strong>"
+                           ]));
                            Append (R, "</span>");
                         end if;
                         Set ("VAR_edit_tags_h1_sub", -R);

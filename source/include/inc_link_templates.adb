@@ -1703,7 +1703,7 @@ is
          if Post_Type_Object.X_Edit_Link /= "" then
             Link :=
               +Admin_URL (Sprintf (-(Post_Type_Object.X_Edit_Link & Action),
-                                   To_List (Helpers.Image (Integer (Post_2.Id)))));
+                                   [1 => Helpers.Image (Integer (Post_2.Id))]));
          else
             Link := +"";
          end if;

@@ -127,7 +127,7 @@ is
                X_Doing_It_Wrong (
                  "__FUNCTION__",
                  Sprintf (-Message,
-                          To_List ("<code>" & Cap & "</code>")),
+                          [1 => "<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
             end;
@@ -266,7 +266,7 @@ is
                X_Doing_It_Wrong (
                  "__FUNCTION__",
                  Sprintf (-Message,
-                          To_List ("<code>" & Cap & "</code>")),
+                          [1 => "<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
             end;
@@ -394,7 +394,7 @@ is
 
                X_Doing_It_Wrong (
                  "__FUNCTION__",
-                 Sprintf (-Message, To_List ("<code>" & Cap & "</code>")),
+                 Sprintf (-Message, [1 => "<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
             end;
@@ -500,7 +500,7 @@ is
             begin
                X_Doing_It_Wrong (
                  "__FUNCTION__",
-                 Sprintf (Message, To_List ("<code>" & Cap & "</code>")),
+                 Sprintf (Message, [1 => "<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
             end;
@@ -578,7 +578,7 @@ is
 
                X_Doing_It_Wrong (
                  "__FUNCTION__",
-                 Sprintf (-Message, To_List ("<code>" & Cap & "</code>")),
+                 Sprintf (-Message, ["<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
 
@@ -706,7 +706,7 @@ is
             begin
                X_Doing_It_Wrong (
                  "__FUNCTION__",
-                 Sprintf (Message, To_List ("<code>" & Cap & "</code>")),
+                 Sprintf (Message, [1 => "<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
             end;
@@ -891,7 +891,7 @@ is
             begin
                X_Doing_It_Wrong (
                  "__FUNCTION__",
-                 Sprintf (Message, To_List ("<code>" & Cap & "</code>")),
+                 Sprintf (Message, [1 => "<code>" & Cap & "</code>"]),
                  "6.1.0"
                );
             end;
@@ -1278,7 +1278,7 @@ is
          return Global_Super_Admins;
       else
          return As_List (
-           Get_Site_Option ("site_admins", From_List (To_List ("admin"))));
+           Get_Site_Option ("site_admins", From_List (["admin"])));
       end if;
    end Get_Super_Admins;
 

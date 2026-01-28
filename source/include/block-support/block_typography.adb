@@ -298,7 +298,7 @@ is
       -- Checks if fluid font sizes are activated.
       declare
          Typography_Settings : constant Array_Type :=
-           As_Array (Wp_Get_Global_Settings (To_List ("typography")));
+           As_Array (Wp_Get_Global_Settings (["typography"]));
 
          Should_Use_Fluid_Typography_2 : constant Boolean :=
            (if Isset (Typography_Settings, "fluid") and then

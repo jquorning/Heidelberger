@@ -105,7 +105,7 @@ is
         ["pre", "code", "kbd", "style", "script", "tt"];
 
       Default_No_Texturize_Shortcodes : constant List_Type :=
-        To_List ("code");
+        ["code"];
 
       Open_Q_Flag  : constant String := "<!--oq-->";
       Open_Sq_Flag : constant String := "<!--osq-->";
@@ -338,7 +338,7 @@ is
          declare
             Tagnames : constant List_Type :=
               List_Intersect (Array_Keys (Global_Shortcode_Tags),
-                              To_List (Matches (1)));
+                              [Matches (1)]);
 
             Found_Shortcodes : constant Boolean := not Tagnames.Is_Empty;
             Shortcode_Regex  : constant String :=

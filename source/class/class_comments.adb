@@ -7,10 +7,9 @@
 --
 
 with Globals;
-with Lists;
 
-with Inc_Caches;
 with Class_WpDB;
+with Inc_Caches;
 
 package body Class_Comments
 is
@@ -24,7 +23,6 @@ is
    is
       use Globals;
       use UStrings;
-      use Lists;
       use Inc_Caches;
       use Class_WpDB;
 
@@ -46,7 +44,7 @@ is
               WpDB.Get_Row (
                 WpDB.Prepare (
                   "SELECT * FROM wpdb.comments WHERE comment_ID = %d LIMIT 1",
-                  To_List (Integer'Image (Comment_Id))),
+                  [1 => Integer'Image (Comment_Id)]),
                   Success => Success);
 
             if X_Comment = Null_Comment then -- not

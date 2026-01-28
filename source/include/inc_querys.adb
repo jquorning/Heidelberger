@@ -13,15 +13,12 @@
 
 with Php.Strings;
 
-with Lists;
-
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
 
 package body Inc_Querys
 is
-   use Lists;
 
    function Isset (Query : Class_Querys.Wp_Query)
                    return Boolean;

@@ -337,12 +337,12 @@ is
                if Set_Charset_Succeeded then
                   declare
                      Query : UString :=
-                       +String (This.Prepare ("SET NAMES %s", To_List (Charset_2)));
+                       +String (This.Prepare ("SET NAMES %s", [1 => Charset_2]));
                   begin
                      if not Empty (Collate_2) then
                         Append (Query,
                                 String (This.Prepare (" COLLATE %s",
-                                                      To_List (Collate_2))));
+                                                      [1 => Collate_2])));
                      end if;
                      Mysqli_Query (Dbh, -Query);
                   end;
@@ -359,12 +359,12 @@ is
                if Set_Charset_Succeeded then
                   declare
                      Query : UString :=
-                       +String (This.Prepare ("SET NAMES %s", To_List (Charset_2)));
+                       +String (This.Prepare ("SET NAMES %s", [1 => Charset_2]));
                   begin
                      if not Empty (Collate_2) then
                         Append (Query,
                                 String (This.Prepare (" COLLATE %s",
-                                        To_List (Collate_2))));
+                                        [1 => Collate_2])));
                      end if;
                      Mysql_Query (-Query, Dbh);
                   end;
@@ -792,7 +792,7 @@ is
                  "<p>" & Sprintf (
                    -- translators: %s: Database name.
                    abs "The database server could be connected to (which means your username and password is okay) but the %s database could not be selected.",
-                   To_List ("<code>" & HTML_Special_Chars (DB, ENT_QUOTES) & "</code>")
+                   [1 => "<code>" & HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"]
                  ) & "</p>\n" &
 
                  "<ul>\n" &
@@ -813,7 +813,7 @@ is
                  "<li>" & Sprintf (
                    -- translators: %s: Database name.
                    abs "On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1s</code>. Could that be the problem?",
-                   To_List (HTML_Special_Chars (DB, ENT_QUOTES))
+                   [1 => HTML_Special_Chars (DB, ENT_QUOTES)]
                  ) & "</li>\n" &
 
                  "</ul>\n" &
@@ -821,7 +821,7 @@ is
                  "<p>" & Sprintf (
                    -- translators: %s: Support forums URL.
                    abs "If you do not know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href=""%s"">WordPress Support Forums</a>.",
-                   To_List (abs "https://wordpress.org/support/forums/")
+                   [1 => abs "https://wordpress.org/support/forums/"]
                  ) & "</p>\n";
             begin
                This.Bail (Message, "db_select_fail");
@@ -891,7 +891,7 @@ is
             X_Doing_It_Wrong (
               Class,
               Sprintf (abs "%s must set a database connection for use with escaping.",
-                       To_List (Class)),
+                       [1 => Class]),
               "3.6.0");
          end;
          Escaped := +Add_Slashes (Item);
@@ -1010,7 +1010,7 @@ is
             Sprintf (
                -- translators: %s: wpdb::prepare()
                abs "The query argument of %s must have a placeholder.",
-               To_List ("wpdb::prepare()")
+               [1 => "wpdb::prepare()"]
             ),
             "3.9.0");
       end if;
@@ -1525,7 +1525,7 @@ is
               "<p>" & Sprintf (
                  -- translators: %s: Support forums URL.
                  abs "If you are unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href=""%s"">WordPress Support Forums</a>.",
-                 To_List (abs "https://wordpress.org/support/forums/")
+                 [1 => abs "https://wordpress.org/support/forums/"]
                ) & "</p>\n";
          begin
             This.Bail (Message, "db_connect_fail");
@@ -2467,13 +2467,13 @@ is
                   This.Last_Error := +Sprintf (
                     -- translators: %s: Database field where the error occurred.
                     abs "WordPress database error: Processing the value for the following field failed: %s. The supplied value may be too long or contains invalid data.",
-                    To_List (Problem_Fields.First_Element) -- Reset (Problem_Fields)
+                    [1 => Problem_Fields.First_Element] -- Reset (Problem_Fields)
                   );
                else
                   This.Last_Error := +Sprintf (
                     -- translators: %s: Database fields where the error occurred.
                     abs "WordPress database error: Processing the values for the following fields failed: %s. The supplied values may be too long or contain invalid data.",
-                    To_List (Implode (", ", Problem_Fields))
+                    [1 => Implode (", ", Problem_Fields)]
                   );
                end if;
             end;
@@ -2496,7 +2496,7 @@ is
       use Php.Strings;
 
       Data_2           : Array_Type := Data;
-      Formats          : List_Type  := To_List (Format); -- (array)
+      Formats          : List_Type  := [Format]; -- (array)
       Original_Formats : constant List_Type  := Formats;
    begin
       for A in Data_2.Iterate loop
@@ -2890,7 +2890,6 @@ is
                                return String_Error_Type
    is
       use Ada.Containers;
-      use Php.Lists;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
@@ -3520,10 +3519,10 @@ is
                               Length : constant Statement_Type :=
                                 Statement_Type (Sprintf (
                                   "%.0f",
-                                  To_List (As_String (Get (Ref_2 (Value,
+                                  [1 => As_String (Get (Ref_2 (Value,
                                     Key_1 => "length",
                                     Key_2 => "length"
-                                  ))))
+                                  )))]
                                 ));
 
                               Charset_2 : constant Statement_Type :=
@@ -3539,7 +3538,7 @@ is
                            begin
                               Set (Queries, Col, From_String (String (
                                    This.Prepare (SQL,
-                                     To_List (Get_As_String (Value, "value"))
+                                     [1 => Get_As_String (Value, "value")]
                                    )
                                   )));
                            end;
@@ -3561,7 +3560,7 @@ is
                            begin
                               Set (Queries, Col, From_String (String (
                                    This.Prepare (SQL,
-                                     To_List (Get_As_String (Value, "value"))
+                                     [1 => Get_As_String (Value, "value")]
                                    ))));
                            end;
                         end if;

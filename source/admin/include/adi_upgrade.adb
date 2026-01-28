@@ -1827,7 +1827,7 @@ is
       use Adi_Plugins;
    begin
       if Wp_Current_DB_Version < 26691 then
-         Deactivate_Plugins (To_List ("mp6/mp6.php"), True); -- array(
+         Deactivate_Plugins (["mp6/mp6.php"], True); -- array(
       end if;
    end Upgrade_380;
 
@@ -2327,7 +2327,7 @@ is
            Globals.WpDB.Get_Var (
              Globals.WpDB.Prepare (
                "SELECT option_value FROM " & Options &
-               " WHERE option_name = %s", To_List (Setting)));
+               " WHERE option_name = %s", [Setting]));
       begin
          if "home" = Setting and then Option = "" then -- not
             return X_Get_Option ("siteurl");

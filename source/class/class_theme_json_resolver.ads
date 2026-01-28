@@ -279,7 +279,7 @@ is
    function Get_User_Data_From_Wp_Global_Styles
      (Theme              : Class_Themes.Wp_Theme;
       Create_Post        : Boolean   := False;
-      Post_Status_Filter : List_Type := To_List ("publish"))
+      Post_Status_Filter : List_Type := ["publish"])
       return Array_Type;
 
    --

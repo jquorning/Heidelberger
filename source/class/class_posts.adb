@@ -53,7 +53,7 @@ is
             Statement : constant Statement_Type :=
               WpDB.Prepare (
                 "SELECT * FROM wpdb->posts WHERE ID = %d LIMIT 1",
-                To_List (Id'Image));
+                [Id'Image]);
          begin
             Post := Class_WpDB.Get_Row (WpDB, -- Post,
                                         Query   => Statement,

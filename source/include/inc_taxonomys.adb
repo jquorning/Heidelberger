@@ -96,7 +96,7 @@ is
 
       Register_Taxonomy (
          "category",
-         To_List ("post"),
+         ["post"],
          Arrays.To_Array ((
             Build ("hierarchical",          True),
             Build ("query_var",             "category_name"),
@@ -119,7 +119,7 @@ is
 
       Register_Taxonomy (
          "post_tag",
-         To_List ("post"),
+         ["post"],
          Arrays.To_Array ((
             Build ("hierarchical",          False),
             Build ("query_var",             "tag"),
@@ -142,7 +142,7 @@ is
 
       Register_Taxonomy (
          "nav_menu",
-         To_List ("nav_menu_item"),
+         ["nav_menu_item"],
          Arrays.To_Array ((
             Build ("public",                False),
             Build ("hierarchical",          False),
@@ -169,7 +169,7 @@ is
 
       Register_Taxonomy (
          "link_category",
-         To_List ("link"),
+         ["link"],
          Arrays.To_Array ((
             Build ("hierarchical", False),
             Build ("labels",       Arrays.To_Array ((
@@ -203,7 +203,7 @@ is
 
       Register_Taxonomy (
          "post_format",
-         To_List ("post"),
+         ["post"],
          Arrays.To_Array ((
             Build ("public",            True),
             Build ("hierarchical",      False),
@@ -241,7 +241,7 @@ is
 
       Register_Taxonomy (
          "wp_template_part_area",
-         To_List ("wp_template_part"),
+         ["wp_template_part"],
          Arrays.To_Array ((
             Build ("public",            False),
             Build ("hierarchical",      False),
@@ -505,7 +505,7 @@ is
    -- is
    -- begin
    --    Register_Taxonomy (Taxonomy,
-   --                       To_List (Object_Type),
+   --                       [Object_Type],
    --                       Args);
    -- end Register_Taxonomy;
 

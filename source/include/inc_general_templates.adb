@@ -1262,7 +1262,7 @@ is
          -- translators: %s: Search query.
          Set (Title, "title", From_String (
                 Sprintf (abs "Search Results for &#8220;%s&#8221;",
-                         To_List (Get_Search_Query))));
+                         [1 => Get_Search_Query])));
 
       -- If on the front page, use the site title.
       elsif Is_Front_Page then
@@ -1325,7 +1325,7 @@ is
          begin
             -- translators: %s: Page number.
             Set (Title, "page",
-                 From_String (Sprintf (abs "Page %s", To_List (Page_Image))));
+                 From_String (Sprintf (abs "Page %s", [1 => Page_Image])));
          end;
       end if;
 
@@ -5108,7 +5108,7 @@ is
          Stylesheet_Link : constant String :=
            Sprintf (
              "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />" & NL,
-             To_List (ESC_URL (Wp_Admin_CSS_URI (File)))
+             [1 => ESC_URL (Wp_Admin_CSS_URI (File))]
           );
       begin
          --
@@ -5133,7 +5133,7 @@ is
                RTL_Stylesheet_Link : constant String :=
                  Sprintf (
                    "<link rel=""stylesheet"" href=""%s"" type=""text/css"" />" & NL,
-                   To_List (ESC_URL (Wp_Admin_CSS_URI ("file-rtl")))
+                   [1 => ESC_URL (Wp_Admin_CSS_URI ("file-rtl"))]
                 );
             begin
                -- This filter is documented in wp-includes/general-template.php

@@ -124,7 +124,7 @@ is
                 Sprintf (
                   -- translators: %s: Theme directory name.
                   abs "The theme directory ""%s"" does not exist.",
-                  To_List (ESC_HTML (-This.Stylesheet))
+                  [1 => ESC_HTML (-This.Stylesheet)]
                 )
               ));
          else
@@ -205,7 +205,7 @@ is
              Sprintf (
                -- translators: %s: Template.
                abs "The theme defines itself as its parent theme. Please check the %s header.",
-               To_List ("<code>Template</code>")
+               [1 => "<code>Template</code>"]
              )
            ));
          This.Cache_Add (
@@ -302,7 +302,7 @@ is
                  Sprintf (
                    -- translators: %s: Theme directory name.
                    abs "The parent theme is missing. Please install the ""%s"" parent theme.",
-                   To_List (ESC_HTML (-This.Template))
+                   [1 => ESC_HTML (-This.Template)]
                  )
                ));
                This.Cache_Add (
@@ -335,7 +335,7 @@ is
               Sprintf (
                 -- translators: %s: Theme directory name.
                 abs "The ""%s"" theme is not a valid parent theme.",
-                To_List (ESC_HTML (-X_Child.Template))
+                [1 => ESC_HTML (-X_Child.Template)]
               )
             ));
             X_Child.Cache_Add (
@@ -354,7 +354,7 @@ is
                  Sprintf (
                    -- translators: %s: Theme directory name.--
                    abs "The ""%s"" theme is not a valid parent theme.",
-                   To_List (ESC_HTML (-This.Template))
+                   [1 => ESC_HTML (-This.Template)]
                  )
                ));
                This.Cache_Add (

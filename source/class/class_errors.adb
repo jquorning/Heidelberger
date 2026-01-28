@@ -99,7 +99,7 @@ is
          declare
             Message : constant String := Get_As_String (This.Errors, Code);
          begin
-            return To_List (Message);
+            return [Message];
          end;
       else
          return Empty_List;

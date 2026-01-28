@@ -1916,7 +1916,7 @@ is
             --
             Allowed_Hosts : constant List_Type :=
               Apply_Filters ("allowed_redirect_hosts",
-                             To_List (Get_As_String (Wpp, "host")),
+                             [Get_As_String (Wpp, "host")],
                              (if Isset (Lp, "host")
                               then Get_As_String (Lp, "host") else "")); -- (array)
          begin

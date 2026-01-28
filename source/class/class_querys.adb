@@ -3534,7 +3534,7 @@ is
             return False;
          end if;
 
-         return In_List (-Post_Type_Object.Name, To_List (Post_Types), True);
+         return In_List (-Post_Type_Object.Name, [Post_Types], True);
 --       return In_Array (-Post_Type_Object.Name, Post_Types, True); -- (array)
       end;
    end Is_Post_Type_Archive;
@@ -3606,7 +3606,7 @@ is
 
          declare
             Author_2 : constant List_Type :=
-              List_Map (Strval'Access, To_List (Author)); -- (array)
+              List_Map (Strval'Access, [Author]); -- (array)
          begin
             if In_List (Author_Obj.Id'Image, Author_2, True) then -- (string)
                return True;
@@ -3697,7 +3697,7 @@ is
 
          declare
             Tag_2 : constant List_Type :=
-              List_Map (Strval'Access, To_List (Tag)); -- (array)
+              List_Map (Strval'Access, [Tag]); -- (array)
          begin
             if In_List (Tag_Obj.Term_Id'Image, Tag_2, True) then -- (string)
                return True;
@@ -3741,9 +3741,9 @@ is
            This.Get_Queried_Object;
 
          Tax_Array : constant List_Type :=
-           List_Intersect (List_Keys (Wp_Taxonomies), To_List (Taxonomy));
+           List_Intersect (List_Keys (Wp_Taxonomies), [Taxonomy]);
 
-         Term_Array : constant List_Type := To_List (Term); -- (array)
+         Term_Array : constant List_Type := [Term]; -- (array)
       begin
          -- Check that the taxonomy matches.
          if
@@ -3959,7 +3959,7 @@ is
 
          declare
             Page_2 : constant List_Type :=
-              List_Map (Strval'Access, To_List (Page)); -- (array)
+              List_Map (Strval'Access, [Page]); -- (array)
          begin
             if In_List (Page_Obj.Id'Image, Page_2, True) then -- (string)
                return True;
@@ -4078,7 +4078,7 @@ is
          end if;
 
          declare
-            Post_2 : constant List_Type := List_Map (Strval'Access, To_List (Post));
+            Post_2 : constant List_Type := List_Map (Strval'Access, [Post]);
          begin
             if In_List (Post_Obj.Id'Image, Post_2, True) then
                return True;
@@ -4139,7 +4139,7 @@ is
             return False;
          end if;
 
-         return In_List (-Post_Obj.Post_Type, To_List (Post_Types), True);
+         return In_List (-Post_Obj.Post_Type, [Post_Types], True);
       end;
    end Is_Singular;
 

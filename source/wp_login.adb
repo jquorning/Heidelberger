@@ -198,7 +198,7 @@ is
          Login_Title_2 : constant String :=
            (if Wp_Is_Recovery_Mode
               -- translators: %s: Login screen title.
-              then Sprintf (abs "Recovery Mode &#8212; %s", To_List (Login_Title_3))
+              then Sprintf (abs "Recovery Mode &#8212; %s", [1 => Login_Title_3])
             else Login_Title_3);
 
          --
@@ -275,7 +275,7 @@ is
          Login_Header_Title : constant String :=
            Apply_Filters_Deprecated (
              "login_headertitle",
-             To_List (Login_Header_Title_2), -- array(
+             [Login_Header_Title_2], -- array(
              "5.2.0",
              "login_headertext",
              abs "Usage of the title attribute on the login logo is not recommended for accessibility reasons. Use the link text instead."
@@ -451,7 +451,7 @@ is
                   2 => Sprintf (
                           -- translators: %s: Site title.
                           X_X ("&larr; Go to %s", "site"),
-                          To_List (Get_Bloginfo ("title", "display"))
+                          [1 => Get_Bloginfo ("title", "display")]
                         )
                 ]);
          begin
@@ -764,7 +764,7 @@ is
             -- translators: Accessibility text.
             Accessibility_Text : constant String :=
                Sprintf ("<span class=""screen-reader-text""> %s</span>",
-                        To_List (abs "(opens in a new tab)"));
+                        [1 => abs "(opens in a new tab)"]);
          begin
             Printf (
               "<a href=""%s"" rel=""noopener"" target=""_blank"">%s%s</a>",
@@ -782,7 +782,7 @@ is
          Printf (
            -- translators: %s: Admin email address.
            abs "Current administration email: %s",
-           To_List ("<strong>" & ESC_HTML (-Admin_Email) & "</strong>")
+           [1 => "<strong>" & ESC_HTML (-Admin_Email) & "</strong>"]
          );
 
          Echo ("</p>" & NL);
@@ -1570,7 +1570,7 @@ is
            Sprintf (
              -- translators: %s: Link to the login page.
              abs "Check your email for the confirmation link, then visit the <a href=""%s"">login page</a>.",
-             To_List (Wp_Login_URL)
+             [1 => Wp_Login_URL]
            ),
            "message"
          );
@@ -1580,7 +1580,7 @@ is
            Sprintf (
              -- translators: %s: Link to the login page.
              abs "Registration complete. Please check your email, then visit the <a href=""%s"">login page</a>.",
-             To_List (Wp_Login_URL)
+             [1 => Wp_Login_URL]
            ),
            "message"
          );
@@ -1773,7 +1773,7 @@ is
                  Sprintf (
                    -- translators: %s: Browser cookie documentation URL.
                    abs "<strong>Error:</strong> Cookies are blocked or not supported by your browser. You must <a href=""%s"">enable cookies</a> to use WordPress.",
-                   To_List (abs "https://wordpress.org/support/article/cookies/#enable-cookies-in-your-browser")
+                   [1 => abs "https://wordpress.org/support/article/cookies/#enable-cookies-in-your-browser"]
                  )
                );
             end if;
@@ -1975,8 +1975,9 @@ is
                           ]);
                      else
                         -- translators: %s: Website name.
-                        Message := +Sprintf ("Please log in to %s to proceed with authorization.",
-                          To_List (Get_Bloginfo ("name", "display")));
+                        Message := +Sprintf (
+                          "Please log in to %s to proceed with authorization.",
+                          [1 => Get_Bloginfo ("name", "display")]);
                      end if;
 
                      Errors.Add ("authorize_application", -Message, "message");

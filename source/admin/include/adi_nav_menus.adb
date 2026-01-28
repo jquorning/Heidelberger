@@ -1103,7 +1103,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
       if
         Isset (X_REQUEST, Tab_Name) -- and then
 --      In_Array (X_REQUEST, Tab_Name,
---                To_list ((+"all", +"most-used", +"search")), True)
+--                ["all", "most-used", "search"], True)
       then
          Current_Tab := +As_String (Get (X_REQUEST, Tab_Name));
       end if;
@@ -1736,7 +1736,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
            Sprintf (
              -- translators: %s: Nav menu title.
              abs "%s has been updated.",
-             To_List ("<strong>" & Nav_Menu_Selected_Title & "</strong>")
+             [1 => "<strong>" & Nav_Menu_Selected_Title & "</strong>"]
            ) & "</p></div>";
 
 --    Unset (Menu_Items);
@@ -1777,8 +1777,8 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                                         Matches);
                   declare
                      Array_Bits    : List_Type  :=
-                        To_List (-Matches (1));
---                   Array_Bits    : List_Type  := To_List ((1 => Matches (1)));
+                        [-Matches (1)];
+--                   Array_Bits    : List_Type  := [1 => Matches (1)]);
                      New_Post_Data : Array_Type := Empty_Array;
                   begin
 

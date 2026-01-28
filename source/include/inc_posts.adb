@@ -253,7 +253,7 @@ is
                         Query_Var        => Null_UString,
                         Can_Export       => False,
                         Delete_With_User => True,
-                        Supports         => To_List ("author"),
+                        Supports         => ["author"],
 
                         -- Added
                         Label                => Null_UString,
@@ -3618,7 +3618,7 @@ is
 
       Value_2    : Array_Type := Value;
       pragma Unreferenced (Value);
-      Array_Int_Fields : constant List_Type := To_List ("ancestors");
+      Array_Int_Fields : constant List_Type := ["ancestors"];
    begin
       if In_List (Field, Int_Fields, True) then
          null;

@@ -194,7 +194,7 @@ is
            WpDB.Prepare (
              "SELECT * FROM wpdb->users " &
              "WHERE " & DB_Field_2 & " = %s LIMIT 1",
-             To_List (-Value_2));
+             [1 => -Value_2]);
 
          User : constant Wp_User :=
            WpDB.Get_Row (Statement,
@@ -295,7 +295,7 @@ is
            WpDB.Prepare (
              "SELECT * FROM wpdb->users " &
              "WHERE " & DB_Field_2 & " = %s LIMIT 1",
-             To_List (-Value_2));
+             [1 => -Value_2]);
 
          User : constant Wp_User :=
            WpDB.Get_Row (Statement,
@@ -689,7 +689,7 @@ is
       begin
          if not Empty (Role) then
             Set (This.Caps, Role, From_Boolean (True));
-            This.Roles := To_List (Role);
+            This.Roles := [Role];
 --          This.Roles := To_Array (List => (1 => Build (Role, True)));
          else
             This.Roles := Empty_List; -- Array;

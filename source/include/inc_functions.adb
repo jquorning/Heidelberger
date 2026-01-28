@@ -1280,7 +1280,7 @@ is
                            Value : String;
                            URL   : String := "")
                            return String
-   is (Add_Query_Arg (To_List (Key), Value, URL));
+   is (Add_Query_Arg (List_Type'[Key], Value, URL));
 
    -------------------
    -- Add_Query_Arg --
@@ -1326,7 +1326,7 @@ is
    function Remove_Query_Arg (Key   : String;
                               Query : String := "")
                               return String
-   is (Remove_Query_Arg (To_List (Key), Query));
+   is (Remove_Query_Arg (List_Type'[Key], Query));
 
 --
 -- Returns an array of single-use query variable names that can be removed from a URL.
@@ -1980,7 +1980,7 @@ is
                  +Sprintf (
                     -- translators: %s: Database repair URL.
                     abs "One or more database tables are unavailable. The database may need to be <a href=""%s"">repaired</a>.",
-                    To_List ("maint/repair.php?referrer=is_blog_installed")
+                    [1 => "maint/repair.php?referrer=is_blog_installed"]
                   );
 
                Dead_DB;
@@ -2577,7 +2577,7 @@ is
                              Sprintf (
                                -- translators: %s: Directory path.
                                abs "Unable to create directory %s. Is its parent directory writable by the server?",
-                               To_List (ESC_HTML (Error_Path))
+                               [1 => ESC_HTML (Error_Path)]
                              )));
                      end;
                   end if;
@@ -3818,7 +3818,7 @@ is
          Title := +Sprintf (
            -- translators: %s: Site title.
            abs "You are attempting to log out of %s",
-           To_List (Get_Bloginfo ("name"))
+           [1 => Get_Bloginfo ("name")]
          );
          HTML        := Title;
          Append (HTML, "</p><p>");
@@ -3832,7 +3832,7 @@ is
                     Sprintf (
                       -- translators: %s: Logout URL.
                       abs "Do you really want to <a href=""%s"">log out</a>?",
-                      To_List (Wp_Logout_URL (Redirect_To))
+                      [1 => Wp_Logout_URL (Redirect_To)]
                    ));
          end;
       else
@@ -4818,7 +4818,7 @@ is
            Sprintf (
               -- translators: %s: Path to the JSON file.
               abs "File %s doesn't exist!",
-              To_List (Filename_2)
+              [1 => Filename_2]
            )
          );
          return Result;
@@ -6126,13 +6126,13 @@ is
             if Version_2 /= "" then
                -- translators: %s: Version number.
                Version_2 := +Sprintf (abs "(This message was added in version %s.)",
-                                      To_List (-Version_2));
+                                      [1 => -Version_2]);
             end if;
 
             Append (Message_2, " " & Sprintf (
                -- translators: %s: Documentation URL.
                abs "Please see <a href=""%s"">Debugging in WordPress</a> for more information.",
-               To_List (abs "https://wordpress.org/support/article/debugging-in-wordpress/")
+               [1 => abs "https://wordpress.org/support/article/debugging-in-wordpress/"]
             ));
 
             Trigger_Error (
@@ -6150,12 +6150,12 @@ is
          else
             if Version_2 /= "" then
                Version_2 := +Sprintf ("(This message was added in version %s.)",
-                                      To_List (-Version_2));
+                                      [1 => -Version_2]);
             end if;
 
             Append (Message_2, Sprintf (
               " Please see <a href=""%s"">Debugging in WordPress</a> for more information.",
-              To_List ("https://wordpress.org/support/article/debugging-in-wordpress/")
+              [1 => "https://wordpress.org/support/article/debugging-in-wordpress/"]
             ));
 
             Trigger_Error (
@@ -8390,7 +8390,7 @@ is
            Sprintf (
              -- translators: %s: Default Update PHP page URL.
              abs "This resource is provided by your web host, and is specific to your site. For more information, <a href=""%s"" target=""_blank"">see the official WordPress documentation</a>.",
-             To_List (ESC_URL (Default_URL))
+             [1 => ESC_URL (Default_URL)]
            );
       begin
          return Annotation;

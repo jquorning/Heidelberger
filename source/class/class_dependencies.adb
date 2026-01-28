@@ -247,10 +247,10 @@ is
          then
 --       if not Is_Null (This.Queued_Before_Register (Handle)) then
             This.Enqueue
-              (To_List (Handle & "?" &
-                        (Element (This.Queued_Before_Register.Find (Handle)))));
+              ([Handle & "?" &
+                        (Element (This.Queued_Before_Register.Find (Handle)))]);
          else
-            This.Enqueue (To_List (Handle));
+            This.Enqueue ([Handle]);
          end if;
 
 --       Unset (This.Queued_Before_Register (Handle));
@@ -270,7 +270,7 @@ is
                       return Boolean
    is
    begin
-      return Add_Data (This, Handle, Key, To_List (Value));
+      return Add_Data (This, Handle, Key, List_Type'[Value]);
    end Add_Data;
 
    --------------
@@ -502,7 +502,7 @@ is
                      if not Deps.Is_Empty then
 --                   if Deps /= Empty_String_Array then
                         All_Deps.Append (Deps);
---                      All_Deps.Append (To_List (Deps));
+--                      All_Deps.Append ([Deps]);
 --                      All_Deps.Append (Array_Fill_Keys (Deps, True));
                         Unused := List_Push (Queues, Deps);
                      end if;

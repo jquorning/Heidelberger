@@ -223,7 +223,8 @@ is
                             "SELECT option_value" &
                             " FROM " & Options    &
                             " WHERE option_name = %s LIMIT 1",
-                            To_List (Option));
+                            [1 => Option]
+                          );
 
                         Row : constant Array_Type :=
                           Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -267,7 +268,7 @@ is
               Globals.WpDB.Prepare (
                 "SELECT option_value FROM " & Options &
                 " WHERE option_name = %s LIMIT 1",
-                To_List (Option));
+                [1 => Option]);
 
             Row : constant Array_Type :=
               Globals.WpDB.Get_Row (Statement, Success => Success);
@@ -410,7 +411,7 @@ is
            Sprintf (
              -- translators: %s: Option name.
              abs "%s is a protected WP option and may not be modified",
-             To_List (ESC_HTML (Option))
+             [1 => ESC_HTML (Option)]
            )
          );
       end if;
@@ -994,7 +995,9 @@ is
          Statement : constant Statement_Type :=
            Globals.WpDB.Prepare (
              "SELECT autoload FROM wpdb->options " &
-             "WHERE option_name = %s", To_List (Option));
+             "WHERE option_name = %s",
+             [1 => Option]
+           );
 
          Row : constant Boolean :=
            Globals.WpDB.Get_Row (Statement, Success => Success_2) /= 0;
@@ -1574,7 +1577,7 @@ is
 
       declare
          All_User_Settings : constant Array_Type := Get_All_User_Settings;
-         Names_2           : constant List_Type  := To_List (Names); -- (array) names;
+         Names_2           : constant List_Type  := [Names]; -- (array) names;
          Deleted           : Boolean    := False;
       begin
          for Name of Names_2 loop

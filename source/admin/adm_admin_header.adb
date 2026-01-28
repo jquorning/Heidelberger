@@ -120,12 +120,12 @@ is
       if Is_Network_Admin then
          -- translators: Network admin screen title. %s: Network title.
          Admin_Title := +Sprintf (abs "Network Admin: %s",
-                                  To_List (-Inc_Ms_Networks.Get_Network.Site_Name));
+                                  [1 => -Inc_Ms_Networks.Get_Network.Site_Name]);
 
       elsif Is_User_Admin then
          -- translators: User dashboard screen title. %s: Network title.
          Admin_Title := +Sprintf (abs "User Dashboard: %s",
-                                  To_List (-Inc_Ms_Networks.Get_Network.Site_Name));
+                                  [1 => -Inc_Ms_Networks.Get_Network.Site_Name]);
 
       else
          Admin_Title := +Get_Bloginfo ("name");
@@ -134,7 +134,7 @@ is
       if Admin_Title = Globals.Title then
          -- translators: Admin screen title. %s: Admin screen name.
          Admin_Title := +Sprintf (abs "%s &#8212; WordPress",
-                                  To_List (-Globals.Title));
+                                  [1 => -Globals.Title]);
       else
          Screen_Title := Globals.Title;
 
@@ -174,7 +174,7 @@ is
       if Wp_Is_Recovery_Mode then
          -- translators: %s: Admin screen title.
          Admin_Title := +Sprintf (abs "Recovery Mode &#8212; %s",
-                                  To_List (-Admin_Title));
+                                  [1 => -Admin_Title]);
       end if;
 
       --

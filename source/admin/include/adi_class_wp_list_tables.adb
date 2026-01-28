@@ -971,7 +971,7 @@ is
          Output := +"<span class=""displaying-num"">" & Sprintf (
                     -- translators: %s: Number of items.
                     X_N ("%s item", "%s items", Total_Items),
-                    To_List (Number_Format_I18n (Float (Total_Items)))
+                    [1 => Number_Format_I18n (Float (Total_Items))]
                 ) & "</span>";
 
          Current              := This.Get_Pagenum;
@@ -1046,7 +1046,7 @@ is
 
          HTML_Total_Pages :=
            +Sprintf ("<span class=""total-pages"">%s</span>",
-                     To_List (Number_Format_I18n (Float (Total_Pages))));
+                     [1 => Number_Format_I18n (Float (Total_Pages))]);
 
          Append (Page_Links, Total_Pages_Before & Sprintf (
            -- translators: 1: Current page, 2: Total pages.

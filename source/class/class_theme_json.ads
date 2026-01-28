@@ -254,7 +254,7 @@ is
      Build ("text-decoration",                   List_Type'["typography", "textDecoration"]),
      Build ("text-transform",                    List_Type'["typography", "textTransform"]),
      Build ("filter",                            List_Type'["filter", "duotone"]),
-     Build ("box-shadow",                        To_List ("shadow"))
+     Build ("box-shadow",                        List_Type'["shadow"])
   ));
 
    --

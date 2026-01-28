@@ -4267,28 +4267,27 @@ is
       );
 
       Register_Theme_Feature (
-                "post-formats",
-                To_Array (List => (
-                        Build ("type",         "array"),
-                        Build ("description",  abs "Post formats supported."),
-                        Build ("show_in_rest", To_Array (List => (
-                                Build ("name",             "formats"),
-                                Build ("schema",           To_Array (List => (
-                                        Build ("items",   To_Array (List => (1 =>
-                                                Build ("type", "string")
---                                              Build ("enum", Get_Post_Format_Slugs) -- ()
-                                        ))),
-                                        Build ("default", To_List ("standard"))
-                                )))
-                                -- Build ("prepare_callback", static function ( formats ) then
-                                --         formats = is_Array (List => ( formats ) ? array_values( formats[0] ) : To_Array (List => ();
-                                --         formats = array_merge( To_Array (List => ( "standard" ), formats );
-
-                                --         return formats;
-                                -- end;,
-                        )))
-                ))
-        );
+        "post-formats",
+        To_Array (List => (
+          Build ("type",         "array"),
+          Build ("description",  abs "Post formats supported."),
+          Build ("show_in_rest", To_Array (List => (
+            Build ("name",             "formats"),
+            Build ("schema",           To_Array (List => (
+              Build ("items",   To_Array (List => (1 =>
+                Build ("type", "string")
+--              Build ("enum", Get_Post_Format_Slugs) -- ()
+              ))),
+              Build ("default", List_Type'["standard"])
+            )))
+            -- Build ("prepare_callback", static function ( formats ) then
+            --         formats = is_Array (List => ( formats ) ? array_values( formats[0] ) : To_Array (List => ();
+            --         formats = array_merge( To_Array (List => ( "standard" ), formats );
+            --         return formats;
+            -- end;,
+          )))
+        ))
+      );
 
       Register_Theme_Feature (
         "post-thumbnails",

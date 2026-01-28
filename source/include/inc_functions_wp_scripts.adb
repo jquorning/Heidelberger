@@ -73,7 +73,7 @@ is
          Append (Message, " " & Sprintf (
            -- translators: %s: Name of the script or stylesheet.
            abs "This notice was triggered by the %s handle.",
-           To_List ("<code>" & Handle & "</code>")
+           [1 => "<code>" & Handle & "</code>"]
          ));
       end if;
 
@@ -415,7 +415,7 @@ is
                end if;
             end;
          end if;
-         Scripts.Enqueue (To_List (Handle));
+         Scripts.Enqueue ([Handle]);
       end;
    end Wp_Enqueue_Script;
 

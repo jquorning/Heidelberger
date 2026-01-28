@@ -9,7 +9,6 @@ with Php.Echoing;
 with Php.Strings;
 
 with Globals;
-with Lists;
 with UStrings;
 with Wp_Common;
 
@@ -23,7 +22,6 @@ with Inc_Plugins;
 
 package body Adm_Admin_Footer
 is
-   use Lists;
 
    ---------
    -- Run --
@@ -61,7 +59,7 @@ is
       Text := +Sprintf (
         -- translators: %s: https://wordpress.org/
         abs "Thank you for creating with <a href=""%s"">WordPress</a>.",
-        To_List (abs "https://wordpress.org/"));
+        [1 => abs "https://wordpress.org/"]);
 
       --
       -- Filters the "Thank you" text displayed in the admin footer.
