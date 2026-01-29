@@ -388,7 +388,7 @@ is
                       Plural   : String;
                       Domain   : String := "default") -- null
                       return List_Type -- String_Array
-                      is ([]);
+                      is (Empty_List);
 --                    is (Empty_String_Array);
 
    --

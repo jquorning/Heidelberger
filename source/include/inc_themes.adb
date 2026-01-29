@@ -2644,7 +2644,7 @@ is
 
       if Feature = "post-thumbnails" then
          -- All post types are already supported.
-         if [] /= Get_Theme_Support ("post-thumbnails") then
+         if not Get_Theme_Support ("post-thumbnails").Is_Empty then
             return;
          end if;
 
@@ -2982,8 +2982,8 @@ is
       use Inc_Formatting;
    begin
       if
-        not Current_Theme_Supports ("custom-header", "header-text")    and then
-        [] /= Get_Theme_Support ("custom-logo", "header-text") and then
+        not Current_Theme_Supports ("custom-header", "header-text")   and then
+        not Get_Theme_Support ("custom-logo", "header-text").Is_Empty and then
         0 = Get_Theme_Mod ("header_text", True)
       then
          declare

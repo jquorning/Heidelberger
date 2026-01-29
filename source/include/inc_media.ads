@@ -267,7 +267,7 @@ is
    function Wp_Getimagesize (Filename   : String;
                              Image_Info : out Array_Type) -- null
                              return List_Type
-                             is ([]);
+                             is (Empty_List);
 
    function Wp_Getimagesize (Filename : String)
                              return List_Type;

@@ -360,7 +360,7 @@ is
                           Default_Category /= Null_Term and then
                           not Is_Wp_Error (Default_Category)
                         then
-                           Category := List_Type'[] & (-Default_Category.Slug);
+                           Category := Empty_List & (-Default_Category.Slug);
                         end if;
                      end;
                   end if;

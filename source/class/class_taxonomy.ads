@@ -349,7 +349,7 @@ is
        Publicly_Queryable => False,
        Public             => False,
        Cap                => Empty_Array,
-       Object_Type        => [],
+       Object_Type        => Empty_List,
        Show_In_REST       => False,
        Default_Term       => Empty_Array,
        Args               => Empty_Array,

@@ -5518,7 +5518,7 @@ is
    is
    begin
       raise Program_Error with "not implemented";
-      return [];
+      return Empty_List;
       -- if not Is_Array (List) then
       --    return [];
       -- end if;

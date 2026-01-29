@@ -1016,7 +1016,7 @@ is
 
    function Wp_Removable_Query_Args
             return List_Type
-            is ([]);
+            is (Empty_List);
 
    --
    -- Determines whether a site is the main site of the current network.

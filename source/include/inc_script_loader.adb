@@ -116,13 +116,13 @@ is
          Scripts.Add
            ("wp-tinymce",
             Includes_URL ("js/tinymce/") & "wp-tinymce.js",
-            [],
+            Empty_List,
             Tinymce_Version);
       else
          Scripts.Add
            ("wp-tinymce-root",
             Includes_URL ("js/tinymce/") & "tinymce" & Dev_Suffix & ".js",
-            [],
+            Empty_List,
             Tinymce_Version);
 
          Scripts.Add
@@ -888,13 +888,13 @@ is
       Scripts.Set_Translations ("common");
 
       Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js",
-                   [], False, 1);
+                   Empty_List, False, 1);
 
       Scripts.Add ("sack", "/wp-includes/js/tw-sacksuffix.js",
-                   [], "1.6.1", 1);
+                   Empty_List, "1.6.1", 1);
 
       Scripts.Add ("quicktags", "/wp-includes/js/quicktagssuffix.js",
-                   [], False, 1);
+                   Empty_List, False, 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -941,7 +941,7 @@ is
                    ["utils", "jquery"], False, 1);
 
       Scripts.Add ("clipboard", "/wp-includes/js/clipboardsuffix.js",
-                   [], "2.0.11", 1);
+                   Empty_List, "2.0.11", 1);
 
       Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js",
                    ["jquery", "wp-a11y"], False, 1);
@@ -1013,7 +1013,7 @@ is
       Scripts.Add (
         "prototype",
         "https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js",
-        [], "1.7.1");
+        Empty_List, "1.7.1");
       Scripts.Add (
         "scriptaculous-root",
         "https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js",
@@ -1059,10 +1059,10 @@ is
         ["jquery-core", "jquery-migrate"], "3.6.1");
       Scripts.Add (
         "jquery-core",
-        "/wp-includes/js/jquery/jquerysuffix.js", [], "3.6.1");
+        "/wp-includes/js/jquery/jquerysuffix.js", Empty_List, "3.6.1");
       Scripts.Add (
         "jquery-migrate",
-        "/wp-includes/js/jquery/jquery-migratesuffix.js", [], "3.3.2");
+        "/wp-includes/js/jquery/jquery-migratesuffix.js", Empty_List, "3.3.2");
 
       -- Full jQuery UI.
       -- The build process in 1.12.1 has changed significantly.
@@ -1162,7 +1162,7 @@ is
 
       -- Masonry v2 depended on jQuery. v3 does not. The older jquery-masonry handle is a shiv.
       -- It sets jQuery as a dependency, as the theme may have been implicitly loading it this way.
-      Scripts.Add ("imagesloaded", "/wp-includes/js/imagesloaded.min.js", [], "4.1.4", 1);
+      Scripts.Add ("imagesloaded", "/wp-includes/js/imagesloaded.min.js", Empty_List, "4.1.4", 1);
       Scripts.Add ("masonry", "/wp-includes/js/masonry.min.js", ["imagesloaded"], "4.2.2", 1);
       Scripts.Add ("jquery-masonry", "/wp-includes/js/jquery/jquery.masonry.min.js", ["jquery", "masonry"], "3.1.2b", 1);
 
@@ -1187,7 +1187,7 @@ is
       -- Not used in core, replaced by imgAreaSelect.
       Scripts.Add ("jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.js", ["jquery"], "0.9.15");
 
-      Scripts.Add ("swfobject", "/wp-includes/js/swfobject.js", [], "2.2-20120417");
+      Scripts.Add ("swfobject", "/wp-includes/js/swfobject.js", Empty_List, "2.2-20120417");
 
       -- Error messages for Plupload.
       declare
@@ -1224,7 +1224,7 @@ is
            Build ("file_url_copied",           abs "The file URL has been copied to your clipboard")
          ));
       begin
-         Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", [], "1.3.5");
+         Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", Empty_List, "1.3.5");
          Scripts.Add ("plupload", "/wp-includes/js/plupload/pluploadsuffix.js", ["moxiejs"], "2.1.9");
 
          -- Back compat handles:
@@ -1255,7 +1255,7 @@ is
          Scripts.Add (
            "swfupload",
            "/wp-includes/js/swfupload/swfupload.js",
-           [], "2201-20110113");
+           Empty_List, "2201-20110113");
          Scripts.Add ("swfupload-all", False, ["swfupload"], "2201");
          Scripts.Add (
            "swfupload-handlers",
@@ -1268,11 +1268,11 @@ is
       end;
       Scripts.Add (
         "comment-reply",
-        "/wp-includes/js/comment-replysuffix.js", [], False, 1);
+        "/wp-includes/js/comment-replysuffix.js", Empty_List, False, 1);
 
       Scripts.Add (
         "json2",
-        "/wp-includes/js/json2suffix.js", [], "2015-05-03");
+        "/wp-includes/js/json2suffix.js", Empty_List, "2015-05-03");
 
       if Did_Action ("init") then
          Scripts.Add_Data ("json2", "conditional", "lt IE 8");
@@ -1280,7 +1280,7 @@ is
 
       Scripts.Add ("underscore",
                    "/wp-includes/js/underscore" & Dev_Suffix & ".js",
-                   [], "1.13.4", 1);
+                   Empty_List, "1.13.4", 1);
 
       Scripts.Add ("backbone",
                    "/wp-includes/js/backbone" & Dev_Suffix & ".js",
@@ -1324,11 +1324,11 @@ is
       Scripts.Add ("mediaelement-core",
                    "/wp-includes/js/mediaelement/mediaelement-and-player" &
                    Suffix & ".js",
-                   [], "4.2.17", 1);
+                   Empty_List, "4.2.17", 1);
 
       Scripts.Add ("mediaelement-migrate",
                    "/wp-includes/js/mediaelement/mediaelement-migrate" &
-                   Suffix & ".js", [], False, 1);
+                   Suffix & ".js", Empty_List, False, 1);
 
       if Did_Action ("init") then
          Scripts.Add_Inline_Script (
@@ -1450,12 +1450,12 @@ is
          end if;
       end;
 
-      Scripts.Add ("wp-codemirror", "/wp-includes/js/codemirror/codemirror.min.js", [], "5.29.1-alpha-ee20357");
-      Scripts.Add ("csslint", "/wp-includes/js/codemirror/csslint.js", [], "1.0.5");
-      Scripts.Add ("esprima", "/wp-includes/js/codemirror/esprima.js", [], "4.0.0");
+      Scripts.Add ("wp-codemirror", "/wp-includes/js/codemirror/codemirror.min.js", Empty_List, "5.29.1-alpha-ee20357");
+      Scripts.Add ("csslint", "/wp-includes/js/codemirror/csslint.js", Empty_List, "1.0.5");
+      Scripts.Add ("esprima", "/wp-includes/js/codemirror/esprima.js", Empty_List, "4.0.0");
       Scripts.Add ("jshint", "/wp-includes/js/codemirror/fakejshint.js", ["esprima"], "2.9.5");
-      Scripts.Add ("jsonlint", "/wp-includes/js/codemirror/jsonlint.js", [], "1.6.2");
-      Scripts.Add ("htmlhint", "/wp-includes/js/codemirror/htmlhint.js", [], "0.9.14-xwp");
+      Scripts.Add ("jsonlint", "/wp-includes/js/codemirror/jsonlint.js", Empty_List, "1.6.2");
+      Scripts.Add ("htmlhint", "/wp-includes/js/codemirror/htmlhint.js", Empty_List, "0.9.14-xwp");
       Scripts.Add ("htmlhint-kses", "/wp-includes/js/codemirror/htmlhint-kses.js", ["htmlhint"]);
       Scripts.Add ("code-editor", "/wp-admin/js/code-editorsuffix.js",
                    ["jquery", "wp-codemirror", "underscore"]);
@@ -1473,7 +1473,7 @@ is
 
       Scripts.Add (
         "zxcvbn-async",
-        "/wp-includes/js/zxcvbn-asyncsuffix.js", [], "1.0");
+        "/wp-includes/js/zxcvbn-asyncsuffix.js", Empty_List, "1.0");
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1575,14 +1575,14 @@ is
 
       Scripts.Add ("wpdialogs", "/wp-includes/js/wpdialogsuffix.js", ["jquery-ui-dialog"], False, 1);
 
-      Scripts.Add ("word-count", "/wp-admin/js/word-countsuffix.js", [], False, 1);
+      Scripts.Add ("word-count", "/wp-admin/js/word-countsuffix.js", Empty_List, False, 1);
 
       Scripts.Add ("media-upload", "/wp-admin/js/media-uploadsuffix.js", ["thickbox", "shortcode"], False, 1);
 
       Scripts.Add ("hoverIntent", "/wp-includes/js/hoverIntentsuffix.js", ["jquery"], "1.10.2", 1);
 
       -- JS-only version of hoverintent (no dependencies).
-      Scripts.Add ("hoverintent-js", "/wp-includes/js/hoverintent-js.min.js", [], "2.2.1", 1);
+      Scripts.Add ("hoverintent-js", "/wp-includes/js/hoverintent-js.min.js", Empty_List, "2.2.1", 1);
 
       Scripts.Add ("customize-base", "/wp-includes/js/customize-basesuffix.js",
                    ["jquery", "json2", "underscore"], False, 1);
@@ -1732,7 +1732,7 @@ is
            ))
          );
       end if;
-      Scripts.Add ("wp-embed", "/wp-includes/js/wp-embedsuffix.js", [], False, 1);
+      Scripts.Add ("wp-embed", "/wp-includes/js/wp-embedsuffix.js", Empty_List, False, 1);
 
       -- To enqueue media-views or media-editor, call wp_enqueue_media().
       -- Both rely on numerous settings, styles, and templates to operate correctly.
@@ -2035,13 +2035,13 @@ is
          -- External libraries and friends.
          Styles.Add ("imgareaselect",
                      "/wp-includes/js/imgareaselect/imgareaselect.css",
-                     [], "0.9.8");
+                     Empty_List, "0.9.8");
          Styles.Add ("wp-jquery-ui-dialog",
                      "/wp-includes/css/jquery-ui-dialog" & Suffix & ".css",
                      ["dashicons"]);
          Styles.Add ("mediaelement",
                      "/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css",
-                     [], "4.2.17");
+                     Empty_List, "4.2.17");
          Styles.Add ("wp-mediaelement",
                      "/wp-includes/js/mediaelement/wp-mediaelement" & Suffix & ".css",
                      ["mediaelement"]);
@@ -2049,15 +2049,15 @@ is
                      ["dashicons"]);
          Styles.Add ("wp-codemirror",
                      "/wp-includes/js/codemirror/codemirror.min.css",
-                     [], "5.29.1-alpha-ee20357");
+                     Empty_List, "5.29.1-alpha-ee20357");
 
          -- Deprecated CSS.
          Styles.Add ("deprecated-media",
                      "/wp-admin/css/deprecated-media" & Suffix & ".css");
          Styles.Add ("farbtastic", "/wp-admin/css/farbtastic" & Suffix & ".css",
-                     [], "1.3u1");
+                     Empty_List, "1.3u1");
          Styles.Add ("jcrop", "/wp-includes/js/jcrop/jquery.Jcrop.min.css",
-                     [], "0.9.15");
+                     Empty_List, "0.9.15");
          Styles.Add ("colors-fresh", "False", -- False
                      ["wp-admin", "buttons"]); -- Old handle.
          Styles.Add ("open-sans", -Open_Sans_Font_URL);
@@ -2145,9 +2145,9 @@ is
          declare
             Package_Styles : constant Array_Type := To_Array ((
                 Build ("block-editor",         ["wp-components")),
-                Build ("block-library",        List_Type'[]),
-                Build ("block-directory",      List_Type'[]),
-                Build ("components",           List_Type'[]),
+                Build ("block-library",        Empty_List),
+                Build ("block-directory",      Empty_List),
+                Build ("components",           Empty_List),
                 Build ("edit-post",            List_Type'[
                         "wp-components",
                         "wp-block-editor",
@@ -2162,7 +2162,7 @@ is
                         "wp-nux",
                         "wp-reusable-blocks"
                 ]),
-                Build ("format-library",       List_Type'[]),
+                Build ("format-library",       Empty_List),
                 Build ("list-reusable-blocks", ["wp-components")),
                 Build ("reusable-blocks",      ["wp-components")),
                 Build ("nux",                  ["wp-components")),
@@ -3054,7 +3054,7 @@ is
             return;
          end if;
 
-         Wp_Register_Style ("global-styles", False, [], True, True);
+         Wp_Register_Style ("global-styles", False, Empty_List, True, True);
          Wp_Add_Inline_Style ("global-styles", Stylesheet);
          Wp_Enqueue_Style ("global-styles");
       end;
@@ -3725,7 +3725,7 @@ is
 
          -- Combines Core styles.
          if not Empty (-Compiled_Core_Stylesheet) then
-            Wp_Register_Style   (-Style_Tag_Id, False, [], True, True);
+            Wp_Register_Style   (-Style_Tag_Id, False, Empty_List, True, True);
             Wp_Add_Inline_Style (-Style_Tag_Id, -Compiled_Core_Stylesheet);
             Wp_Enqueue_Style    (-Style_Tag_Id);
          end if;
@@ -3753,7 +3753,7 @@ is
                         declare
                            Key : constant String := "wp-style-engine-" & Store_Name;
                         begin
-                           Wp_Register_Style   (Key, False, [], True, True);
+                           Wp_Register_Style   (Key, False, Empty_List, True, True);
                            Wp_Add_Inline_Style (Key, Styles);
                            Wp_Enqueue_Style    (Key);
                         end;

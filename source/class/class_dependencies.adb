@@ -79,7 +79,7 @@ is
                       return List_Type
    is
    begin
-      return Do_Items (This, [], Group);
+      return Do_Items (This, Empty_List, Group);
    end Do_Items;
 
    --------------

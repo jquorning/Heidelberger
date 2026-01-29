@@ -827,7 +827,7 @@ is
                -- update_, install_, and delete_ are handled above with
                -- is_super_admin().
                Menu_Perms : constant Array_Type :=
-                 As_Array (Get_Site_Option ("menu_items", From_List ([])));
+                 As_Array (Get_Site_Option ("menu_items", From_List (Empty_List)));
             begin
                if Empty (Menu_Perms, "plugins") then
                   Append (Caps, "manage_network_plugins");

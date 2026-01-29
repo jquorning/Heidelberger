@@ -112,7 +112,7 @@ is
 
       Domains : constant List_Type := (if L10n.Is_Empty
                                        then Array_Keys (L10n)
-                                       else List_Type'[]);
+                                       else Empty_List);
    begin
       Load_Default_Textdomain (Locale);
 

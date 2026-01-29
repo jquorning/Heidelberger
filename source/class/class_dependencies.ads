@@ -327,7 +327,7 @@ is
                       Handle : String;
                       Key    : String)
                       return List_Type
-                      is ([]);
+                      is (Empty_List);
 
    --
    -- Un-register an item or items.

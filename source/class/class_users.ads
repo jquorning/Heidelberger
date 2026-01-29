@@ -347,7 +347,7 @@ is
       Id      => 0,
       Caps    => Empty_Array, -- Boolean_Maps.Empty_Map,
       Cap_Key => UStrings.Null_UString,
-      Roles   => [],
+      Roles   => Empty_List,
       Allcaps => Empty_Array,
       Site_Id => 0,
       Prop    => (User_Level => 0,

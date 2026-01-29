@@ -131,7 +131,7 @@ is
    function List_Unique (Arry  : List_Type;
                          Flags : Unique_Flags := Sort_String)
                          return List_Type
-                         is ([]);
+                         is (Empty_List);
 
    function Get (List : List_Type;
                  Key  : String)

@@ -346,7 +346,7 @@ is
    function Get_Theme_Support (Feature : String;
                                T       : String := "")
                                return List_Type -- String_Array
-                               is ([]);
+                               is (Empty_List);
 
    function Get_Theme_Support (Feature : String;
                                T       : String := "")
