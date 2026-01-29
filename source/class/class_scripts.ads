@@ -385,7 +385,7 @@ is
    function All_Deps (This      : in out Wp_Scripts;
                       Handles   : String;
                       Recursion : Boolean := False;
-                      Group     : Boolean := False)
+                      Group     : Integer := 0) -- False
                       return Boolean
                       with Side_Effects;
 

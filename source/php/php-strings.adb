@@ -10,8 +10,6 @@ with Ada.Strings.Maps;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with UStrings;
-
 package body Php.Strings
 is
 

@@ -10,11 +10,13 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
+with Arrays;
 with Lists;
 with UStrings;
 
 package Class_Dependency
 is
+   use Arrays;
    use Lists;
 
    package String_Maps is new
@@ -73,7 +75,7 @@ is
         -- @since 2.6.0
         -- @var array
         --
-        Args : String_Map; -- Array_Type; -- = null;  -- Custom property, such as in_footer or media.
+        Args : UStrings.UString; -- String_Map; -- Array_Type; -- = null;  -- Custom property, such as in_footer or media.
 
         --
         -- Extra data to supply to the handle.
@@ -81,7 +83,7 @@ is
         -- @since 2.6.0
         -- @var array
         --
-        Extra : String_Map; -- Array_Type; --  = array();
+        Extra : Array_Type; -- String_Map;
 
         --
         -- Translation textdomain set for this dependency.

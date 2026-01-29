@@ -7,9 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with Ada.Containers;
-
-with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
 with Php.Lists;
@@ -25,7 +22,6 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
-with Inc_Plugins;
 with Inc_Script_Loader;
 with Inc_Themes;
 
@@ -115,38 +111,37 @@ is
                                 return String
    is
       use Php.Echoing;
-      use Php.Strings;
       use UStrings;
       use Inc_Formatting;
 
-      Output : constant UString := +This.Get_Data (Handle, "data");
-      Unused : UString;
+      Output : constant String := This.Get_Data (Handle, "data");
    begin
       if Output = "" then
          return "";  -- "" added jq
       end if;
 
       if not Display then
-         return -Output;
+         return Output;
       end if;
 
-      Unused := +Printf ("<script%s id=""%s-js-extra"">\n",
-                         [
-                           1 => -This.Type_Attr,
-                           2 => ESC_Attr (Handle)]);
+      Printf ("<script%s id=""%s-js-extra"">" & NL,
+              [
+                1 => -This.Type_Attr,
+                2 => ESC_Attr (Handle)
+              ]);
 
       -- CDATA is not needed for HTML 5.
       if This.Type_Attr /= "" then
-         Echo ("/* <![CDATA[--\n");
+         Echo ("/* <![CDATA[ */" & NL);
       end if;
 
-      Echo ("output\n");
+      Echo (Output & NL);
 
       if This.Type_Attr /= "" then
-         Echo ("/* ]]>--\n");
+         Echo ("/* ]]> */" & NL);
       end if;
 
-      Echo ("</script>\n");
+      Echo ("</script>" & NL);
 
       return ""; -- True;
    end Print_Extra_Script;
@@ -168,249 +163,267 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_Formatting;
+      use Class_Dependencies;
       use Class_Dependency;
       use Class_Dependency.String_Maps;
    begin
---      if not parent::Do_Item (handle) then
---         return False;
---      end if;
+      if not Do_Item (Wp_Dependencies (This), Handle) then
+         return False;
+      end if;
 
       if False = Group then -- and then This.Groups (Handle) > 0 then
-         This.In_Footer.Append (Handle); -- []
+         This.In_Footer.Append (Handle);
          return False;
       end if;
 
       if False = Group and then In_List (Handle, This.In_Footer, True) then
-         This.In_Footer := List_Diff (This.In_Footer, Handle); -- (array)
+         This.In_Footer := List_Diff (This.In_Footer, Handle);
       end if;
 
+      Label_2 :
       declare
-         Obj : X_Wp_Dependency := This.Registered (Handle);
-         Ver : UString;
+         Obj : constant X_Wp_Dependency := This.Registered (Handle);
+
+         Ver_2 : constant String :=
+           (if "" = Obj.Ver then ""
+            else (if Obj.Ver /= ""
+                  then -Obj.Ver else -This.Default_Version));
+
+         Ver : constant String :=
+           (if This.Args.Find (Handle) /= No_Element
+            then (if Ver_2 /= ""
+                  then Ver_2 & "&amp;" & This.Args (Handle)
+                  else This.Args (Handle))
+            else Ver_2);
+
+         Src : constant String := -Obj.Src;
+
+         Conditional : constant String :=
+            (if Isset (Obj.Extra, "conditional")
+             then Get_As_String (Obj.Extra, "conditional")
+             else "");
+
+         Cond_Before : constant String :=
+           (if Conditional /= ""
+            then "<!--[if " & Conditional & "]>" & NL else "");
+
+         Cond_After : constant String :=
+            (if Conditional /= "" then "<![endif]-->" & NL else "");
+
+         Before_Handle_2 : constant String :=
+            This.Print_Inline_Script (Handle, "before", False);
+
+         After_Handle_2 : constant String :=
+            This.Print_Inline_Script (Handle, "after", False);
+
+         Before_Handle : constant String :=
+           (if Before_Handle_2 /= "" then
+              Sprintf (
+                "<script%s id=""%s-js-before"">\n%s\n</script>\n",
+                [
+                  1 => -This.Type_Attr,
+                  2 => ESC_Attr (Handle),
+                  3 => Before_Handle_2
+                ])
+            else Before_Handle_2);
+
+         After_Handle : constant String :=
+           (if After_Handle_2 /= "" then
+              Sprintf (
+                "<script%s id=""%s-js-after"">\n%s\n</script>\n",
+                [
+                  1 => -This.Type_Attr,
+                  2 => ESC_Attr (Handle),
+                  3 => After_Handle_2
+                ])
+            else After_Handle_2);
+
+         Inline_Script_Tag : constant String :=
+           (if Before_Handle /= "" or else After_Handle /= ""
+            then Cond_Before & Before_Handle & After_Handle & Cond_After
+            else "");
+
+         -- Prevent concatenation of scripts if the text domain is defined
+         -- to ensure the dependency order is respected.
+         Translations_Stop_Concat : constant Boolean :=
+            Obj.Textdomain /= "";
+
+         Translations_2 : constant String :=
+            This.Print_Translations (Handle, False);
+
+         Translations : constant String :=
+           (if Translations_2 /= "" then
+              Sprintf (
+                "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
+                [
+                  1 => -This.Type_Attr,
+                  2 => ESC_Attr (Handle),
+                  3 => Translations_2
+                ])
+            else Translations_2);
       begin
-         if "" = Obj.Ver then
-            Ver := Null_UString;
-         else
-            Ver := (if Obj.Ver /= "" then Obj.Ver else This.Default_Version);
+         if This.Do_Concat then
+            --
+            -- Filters the script loader source.
+            --
+            -- @since 2.2.0
+            --
+            -- @param string src    Script loader source path.
+            -- @param string handle Script handle.
+            --
+            declare
+               Srce : constant String :=
+                  Apply_Filters ("script_loader_src", Src, Handle);
+            begin
+               if
+                 This.In_Default_Dir (Srce) and then
+                 (Before_Handle /= "" or else After_Handle /= "" or else
+                 Translations_Stop_Concat)
+               then
+                  This.Do_Concat := False;
+
+                  -- Have to print the so-far concatenated scripts right
+                  -- away to maintain the right order.
+                  Inc_Script_Loader.X_Print_Scripts; -- ();
+                  This.Reset; -- ();
+               elsif
+                 This.In_Default_Dir (Srce) and then
+                 Conditional /= ""
+               then
+                  Append (This.Print_Code,
+                          This.Print_Extra_Script (Handle, False));
+                  Append (This.Concat,         "handle,");
+                  Append (This.Concat_Version, "handlever");
+                  return True;
+               else
+                  Append (This.Ext_Handles, "handle,");
+                  Append (This.Ext_Version, "handlever");
+               end if;
+            end;
          end if;
 
-         if This.Args.Find (Handle) /= No_Element then
-            Ver := (if Ver /= "" then Ver & "&amp;" & (+This.Args (Handle))
-                                 else +This.Args (Handle));
-         end if;
-
-         Label_2 :
          declare
-            Src : UString := Obj.Src;
-
-            Conditional : constant Boolean :=
-               Boolean'Value ((if Obj.Extra.Find ("conditional") /=
-                                  Class_Dependency.String_Maps.No_Element
-                               then Obj.Extra ("conditional") else "false"));
-
-            Cond_Before : constant String :=
-              (if Conditional
-               then "<!--[if " & Boolean'Image (Conditional) & "]>\n" else "");
-
-            Cond_After  : constant String :=
-               (if Conditional then "<![endif]-->\n" else "");
-
-            Before_Handle : UString :=
-               +This.Print_Inline_Script (Handle, "before", False);
-
-            After_Handle  : UString :=
-               +This.Print_Inline_Script (Handle, "after",  False);
-
-            Unused_Matches : List_Type;
+            Unused : UString;
+            Has_Conditional_Data : constant Boolean :=
+               Conditional /= "" and then
+               "" = This.Get_Data (Handle, "data");
          begin
 
-            if Before_Handle /= "" then
-               Before_Handle :=
-                  +Sprintf ("<script%s id=""%s-js-before"">\n%s\n</script>\n",
-                            [
-                              1 => -This.Type_Attr,
-                              2 => ESC_Attr (Handle),
-                              3 => -Before_Handle]);
+            if Has_Conditional_Data then
+               Echo (Cond_Before);
             end if;
 
-            if After_Handle /= "" then
-               After_Handle :=
-                  +Sprintf (
-                     "<script%s id=""%s-js-after"">\n%s\n</script>\n",
-                     [
-                       1 => -This.Type_Attr,
-                       2 => ESC_Attr (Handle),
-                       3 => -After_Handle
-                     ]);
+            Unused := +This.Print_Extra_Script (Handle);
+
+            if Has_Conditional_Data then
+               Echo (Cond_After);
+            end if;
+         end;
+         -- A single item may alias a set of items, by having dependencies,
+         -- but no source.
+         if Src = "" then
+            if Inline_Script_Tag /= "" then
+               if This.Do_Concat then
+                  Append (This.Print_HTML, Inline_Script_Tag);
+               else
+                  Echo (Inline_Script_Tag);
+               end if;
+            end if;
+            return True;
+         end if;
+
+         declare
+            Unused_Matches : List_Type;
+
+            Src_2 : constant String :=
+              (if
+                 0 /= Preg_Match ("|^(https?:)?//|", Src, Unused_Matches) and then
+                 not (This.Content_URL /= "" and then
+                 0 = Strpos (Src, -This.Content_URL))
+               then -This.Base_URL & Src
+               else Src);
+
+            Src_3 : constant String :=
+              (if not Empty (Ver)
+               then Add_Query_Arg ("ver", Ver, Src)
+               else Src_2);
+
+            -- This filter is documented in wp-includes/class-wp-scripts.php
+            Src_4 : constant String :=
+              ESC_URL (Apply_Filters ("script_loader_src", Src_3, Handle));
+         begin
+            if Src_4 = "" then
+               return True;
             end if;
 
             declare
-               Inline_Script_Tag : UString;
+               Tag_4 : constant String :=
+                 Translations & Cond_Before & Before_Handle;
+
+               Tag_3 : constant String := Tag_4 &
+                 Sprintf (
+                   "<script%s src=""%s"" id=""%s-js""></script>\n",
+                   [
+                     1 => -This.Type_Attr,
+                     2 => Src_4,
+                     3 => ESC_Attr (Handle)
+                   ]);
+
+               Tag_2 : constant String :=
+                  Tag_3 & After_Handle & Cond_After;
+
+               --
+               -- Filters the HTML script tag of an enqueued script.
+               --
+               -- @since 4.1.0
+               --
+               -- @param string tag    The `<script>` tag for the enqueued
+               --                      script.
+               -- @param string handle The script"s registered handle.
+               -- @param string src    The script"s source URL.
+               --
+               Tag : constant String :=
+                 Apply_Filters ("script_loader_tag", Tag_2, Handle, Src_4);
             begin
-               if Before_Handle /= "" or else After_Handle /= "" then
-                  Inline_Script_Tag :=
-                     Cond_Before & Before_Handle & After_Handle & Cond_After;
+               if This.Do_Concat then
+                  Append (This.Print_HTML, Tag);
                else
-                  Inline_Script_Tag := Null_UString;
+                  Echo (Tag);
                end if;
-
-               --
-               -- Prevent concatenation of scripts if the text domain is defined
-               -- to ensure the dependency order is respected.
-               --
-               Label_1 :
-               declare
-                  Translations_Stop_Concat : constant Boolean :=
-                     Obj.Textdomain /= "";
-
-                  Translations : UString :=
-                     +This.Print_Translations (Handle, False);
-               begin
-                  if Translations /= "" then
-                     Translations := +Sprintf (
-                        "<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                        [
-                          1 => -This.Type_Attr,
-                          2 => ESC_Attr (Handle),
-                          3 => -Translations
-                        ]);
-                  end if;
-
-                  if This.Do_Concat then
-                     --
-                     -- Filters the script loader source.
-                     --
-                     -- @since 2.2.0
-                     --
-                     -- @param string src    Script loader source path.
-                     -- @param string handle Script handle.
-                     --
-                     declare
-                        use Inc_Plugins;
-
-                        Srce : constant String :=
-                           Apply_Filters ("script_loader_src", -Src, Handle);
-                     begin
-                        if
-                          This.In_Default_Dir (Srce) and then
-                          (Before_Handle /= "" or else After_Handle /= "" or else
-                          Translations_Stop_Concat)
-                        then
-                           This.Do_Concat := False;
-
-                           -- Have to print the so-far concatenated scripts right
-                           -- away to maintain the right order.
-                           Inc_Script_Loader.X_Print_Scripts; -- ();
-                           This.Reset; -- ();
-                        elsif
-                          This.In_Default_Dir (Srce) and then
-                          Conditional
-                        then
-                           Append (This.Print_Code,
-                                   This.Print_Extra_Script (Handle, False));
-                           Append (This.Concat,         "handle,");
-                           Append (This.Concat_Version, "handlever");
-                           return True;
-                        else
-                           Append (This.Ext_Handles, "handle,");
-                           Append (This.Ext_Version, "handlever");
-                        end if;
-                     end;
-                  end if;
-
-                  declare
-                     Unused : UString;
-                     Has_Conditional_Data : constant Boolean :=
-                        Conditional and then
-                        "" = This.Get_Data (Handle, "data");
-                  begin
-
-                     if Has_Conditional_Data then
-                        Echo (Cond_Before);
-                     end if;
-
-                     Unused := +This.Print_Extra_Script (Handle);
-
-                     if Has_Conditional_Data then
-                        Echo (Cond_After);
-                     end if;
-                  end;
-                  -- A single item may alias a set of items, by having dependencies,
-                  -- but no source.
-                  if Src = "" then
-                     if Inline_Script_Tag /= "" then
-                        if This.Do_Concat then
-                           Append (This.Print_HTML, Inline_Script_Tag);
-                        else
-                           Echo (-Inline_Script_Tag);
-                        end if;
-                     end if;
-                     return True;
-                  end if;
-
-                  if
-                    0 /= Preg_Match ("|^(https?:)?//|", -Src, Unused_Matches)
-                    and then not (This.Content_URL /= "" and then
-                    0 = Strpos (-Src, -This.Content_URL))
-                  then
-                     Src := This.Base_URL & Src;
-                  end if;
-
-                  if not Empty (-Ver) then
-                     Src := +Add_Query_Arg ("ver", -Ver, -Src);
-                  end if;
-
-                  -- This filter is documented in wp-includes/class-wp-scripts.php
-                  Src := +ESC_URL (
-                    Apply_Filters ("script_loader_src", -Src,
-                                   Handle));
-
-                  if Src = "" then
-                     return True;
-                  end if;
-
-                  declare
-                     use Inc_Plugins;
-
-                     Tag : UString :=
-                        Translations & Cond_Before & Before_Handle;
-                  begin
-                     Append (Tag,
-                        Sprintf (
-                          "<script%s src=""%s"" id=""%s-js""></script>\n",
-                          [
-                            1 => -This.Type_Attr,
-                            2 => -Src,
-                            3 => ESC_Attr (Handle)
-                          ]));
-                     Append (Tag, After_Handle & Cond_After);
-
-                     --
-                     -- Filters the HTML script tag of an enqueued script.
-                     --
-                     -- @since 4.1.0
-                     --
-                     -- @param string tag    The `<script>` tag for the enqueued
-                     --                      script.
-                     -- @param string handle The script"s registered handle.
-                     -- @param string src    The script"s source URL.
-                     --
-                     Tag := +Apply_Filters
-                        ("script_loader_tag", -Tag, Handle, -Src);
-
-                     if This.Do_Concat then
-                        Append (This.Print_HTML, Tag);
-                     else
-                        Echo (-Tag);
-                     end if;
-                  end;
-               end Label_1;
             end;
-         end Label_2;
-
-         return True;
-      end;
+         end;
+      end Label_2;
+      return True;
    end Do_Item;
+
+   -----------------------
+   -- Add_Inline_Script --
+   -----------------------
+
+   function Add_Inline_Script (This     : in out Wp_Scripts;
+                               Handle   : String;
+                               Data     : String;
+                               Position : String := "after")
+                               return Boolean
+   is
+   begin
+      if Data /= "" then
+         return False;
+      end if;
+
+      declare
+         Position_2 : constant String :=
+           (if "after" /= Position
+            then "before" else Position);
+
+         Script_2 : constant String :=
+           This.Get_Data (Handle, Position_2);
+
+         Script : constant String := Script_2 & Data;
+      begin
+         return This.Add_Data (Handle, Position_2, Script);
+      end;
+   end Add_Inline_Script;
 
    -----------------------
    -- Add_Inline_Script --
@@ -427,34 +440,6 @@ is
       null;
    end Add_Inline_Script;
 
-   function Add_Inline_Script (This     : in out Wp_Scripts;
-                               Handle   : String;
-                               Data     : String;
-                               Position : String := "after")
-                               return Boolean
-   is
-      use UStrings;
-
-      Position_2 : UString := +Position;
-   begin
-      if Data /= "" then
-         return False;
-      end if;
-
-      if "after" /= Position_2 then
-         Position_2 := +"before";
-      end if;
-
-      declare
---       use Array_Maps;
-
-         Script : UString := +This.Get_Data (Handle, -Position_2); -- (array)
-      begin
-         Append (Script, Data);  -- ()
-         return This.Add_Data (Handle, -Position_2, -Script);
-      end;
-   end Add_Inline_Script;
-
    -------------------------
    -- Print_Inline_Script --
    -------------------------
@@ -465,47 +450,37 @@ is
                                  Display  : Boolean := True)
                                  return String
    is
+      use Php.Echoing;
       use Php.Strings;
       use UStrings;
---    use Inc_Functions;
       use Inc_Formatting;
 
-      Output : UString := +This.Get_Data (Handle, Position);
-      Unused : UString;
+      Output_2 : constant String := This.Get_Data (Handle, Position);
    begin
-      if Output = "" then
+      if Output_2 = "" then
          return ""; -- False;
       end if;
 
-      Output := +Trim (Implode ("\n", -Output), "\n");
+      declare
+         Output : constant String := Trim (Implode (NL, Output_2), NL);
+      begin
+         if Display then
+            Printf ("<script%s id=""%s-js-%s"">" & NL & "%s" & NL & "</script>" & NL,
+                    [
+                      1 => -This.Type_Attr,
+                      2 => ESC_Attr (Handle),
+                      3 => ESC_Attr (Position),
+                      4 => Output
+                    ]);
+         end if;
 
-      if Display then
-         Unused := +Printf ("<script%s id=""%s-js-%s"">\n%s\n</script>\n",
-                 [
-                   1 => -This.Type_Attr,
-                   2 => ESC_Attr (Handle),
-                   3 => ESC_Attr (Position),
-                   4 => -Output
-                 ]);
-      end if;
-
-      return -Output;
+         return Output;
+      end;
    end Print_Inline_Script;
 
    --------------
    -- Localize --
    --------------
-
-   procedure Localize (This        : in out Wp_Scripts;
-                       Handle      : String;
-                       Object_Name : String;
-                       L10n        : Array_Type)
-   is
-      Unused : constant Boolean :=
-        Localize (This, Handle, Object_Name, L10n);
-   begin
-      null;
-   end Localize;
 
    function Localize (This        : in out Wp_Scripts;
                       Handle      : String;
@@ -513,7 +488,6 @@ is
                       L10n        : Array_Type)
                       return Boolean
    is
-      use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
       use Php.Types;
@@ -521,20 +495,18 @@ is
       use Inc_Functions;
       use Inc_L10n;
 
-      L10n_2   : Array_Type := L10n;
-      After    : Array_Type;
-      Handle_2 : UString := +Handle;
-   begin
-      if "jquery" = Handle_2 then
-         Handle_2 := +"jquery-core";
-      end if;
+      L10n_2 : Array_Type := L10n;
+
+      Handle_2 : constant String :=
+        (if "jquery" = Handle then "jquery-core" else Handle);
 
       -- back compat, preserve the code in "l10n_print_after" if present.
-      if Is_Array (L10n_2) and then Isset (L10n_2, "l10n_print_after") then
-         After := As_Array (Get (L10n_2, "l10n_print_after"));
+      After : constant String :=
+        (if Is_Array (L10n_2) and then Isset (L10n_2, "l10n_print_after")
+         then Get_As_String (L10n_2, "l10n_print_after")
+         else "");
 --         Unset (L10n_2 ("l10n_print_after"));
-      end if;
-
+   begin
       if not Is_Array (L10n_2) then
          X_Doing_It_Wrong
            ("__METHOD__",
@@ -576,23 +548,38 @@ is
 --      end if;
 
       declare
-         Script : UString :=
-            +"var object_name = " & Wp_JSON_Encode (From_Array (L10n_2)) & ";";
+         Script_3 : constant String :=
+            "var object_name = " & Wp_JSON_Encode (From_Array (L10n_2)) & ";";
+
+         Script_2 : constant String :=
+           (if not Empty (After)
+            then Script_3 & NL & After & ";"
+            else Script_3);
+
+         Data : constant String := This.Get_Data (Handle_2, "data");
+
+         Script : constant String :=
+           (if Data /= ""
+            then Data & NL & Script_2
+            else Script_2);
       begin
-         if not Empty (After) then
-            Append (Script, "\nafter;");
-         end if;
-
-         declare
-            Data : constant String := This.Get_Data (-Handle_2, "data");
-         begin
-            if Data /= "" then
-               Script := +"data\nscript";
-            end if;
-         end;
-
-         return This.Add_Data (-Handle_2, "data", -Script);
+         return This.Add_Data (Handle_2, "data", Script);
       end;
+   end Localize;
+
+   --------------
+   -- Localize --
+   --------------
+
+   procedure Localize (This        : in out Wp_Scripts;
+                       Handle      : String;
+                       Object_Name : String;
+                       L10n        : Array_Type)
+   is
+      Unused : constant Boolean :=
+        Localize (This, Handle, Object_Name, L10n);
+   begin
+      null;
    end Localize;
 
    ---------------
@@ -605,14 +592,15 @@ is
                        Group     : Integer := 0) -- Boolean := False)
                        return Boolean
    is
-      use Ada.Containers;
---    use Array_Maps;
+      use Php.Strings;
+      use UStrings;
+      use Class_Dependencies;
 
       Grp : Integer;
    begin
       if
-        not This.Registered (Handle).Args.Is_Empty and then
-        1 = This.Registered (Handle).Args.Length
+        not Empty (This.Registered (Handle).Args) and then
+        Length (This.Registered (Handle).Args) = 1
       then
          Grp := 1;
       else
@@ -623,8 +611,39 @@ is
          Grp := Group;
       end if;
 
-      return True; -- parent::Set_Group (Handle, Recursion, Grp);
+      return Set_Group (Wp_Dependencies (This), Handle, Recursion, Grp);
    end Set_Group;
+
+   ----------------------
+   -- Set_Translations --
+   ----------------------
+
+   function Set_Translations (This   : Wp_Scripts;
+                              Handle : String;
+                              Domain : String := "default";
+                              Path   : String := "")
+                              return Boolean
+   is
+      use Php.Lists;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
+   begin
+--      if not Isset (This.Registered (Handle)) then
+      if not Has_Element (This.Registered.Find (Handle)) then
+         return False;
+      end if;
+
+      -- @var \_WP_Dependency obj
+      declare
+         Obj : X_Wp_Dependency := This.Registered (Handle);
+      begin
+         if not In_List ("wp-i18n", Obj.Deps, True) then
+            Obj.Deps.Append ("wp-i18n");
+         end if;
+
+         return Obj.Set_Translations (Domain, Path);
+      end;
+   end Set_Translations;
 
    ----------------------
    -- Set_Translations --
@@ -641,34 +660,6 @@ is
       null;
    end Set_Translations;
 
-   function Set_Translations (This   : Wp_Scripts;
-                              Handle : String;
-                              Domain : String := "default";
-                              Path   : String := "")
-                              return Boolean
-   is
-      use Php.Lists;
-      use Class_Dependency.Dependency_Maps;
-   begin
---      if not Isset (This.Registered (Handle)) then
-      if This.Registered.Find (Handle) = No_Element then
-         return False;
-      end if;
-
-      -- @var \_WP_Dependency obj
-      declare
-         use Class_Dependency;
---         use String_
-         Obj : X_Wp_Dependency := This.Registered (Handle);
-      begin
-         if not In_List ("wp-i18n", Obj.Deps, True) then
-            Obj.Deps.Append ("wp-i18n");  -- ()
-         end if;
-
-         return Obj.Set_Translations (Domain, Path);
-      end;
-   end Set_Translations;
-
    ------------------------
    -- Print_Translations --
    ------------------------
@@ -678,55 +669,57 @@ is
                                 Display : Boolean := True)
                                 return String
    is
-      use Php.Strings;
+      use Php.Echoing;
       use UStrings;
---    use Inc_Functions;
+      use Class_Dependency;
       use Class_Dependency.Dependency_Maps;
+      use Inc_Formatting;
+
       use Inc_L10n;
    begin
       if
-        This.Registered.Find (Handle) /= No_Element or else
+        Has_Element (This.Registered.Find (Handle)) or else
         This.Registered (Handle).Textdomain = ""
       then
          return ""; -- False;
       end if;
 
       declare
-         use Inc_Formatting;
-         use Class_Dependency;
-
          Regist : constant Dependency_Maps.Cursor := This.Registered.Find (Handle);
          Domain : constant String := -Element (Regist).Textdomain;
---       Domain : String   := -This.Registered (Handle).Textdomain;
---         Path   : UString;
-         Path   : String   := (if Element (Regist).Translations_Path /= ""
-                               then -Element (Regist).Translations_Path else "");
-         Json_Translations : constant String :=
+
+         Path   : constant String :=
+           (if Element (Regist).Translations_Path /= ""
+            then -Element (Regist).Translations_Path else "");
+
+         JSON_Translations : constant String :=
             Load_Script_Textdomain (Handle, Domain, Path);
-         Output : UString;
-         Unused : UString;
       begin
-         if Json_Translations = "" then
+         if JSON_Translations = "" then
             return "";
          end if;
 
-         Output :=
-           +"( function( domain, translations ) {"  &
-            "        var localeData = translations.locale_data( domain ) || translations.locale_data.messages;" &
-            "        localeData("").domain = domain;" &
-            "        wp.i18n.setLocaleData( localeData, domain );" &
-            "} )( ""{domain}"", {json_translations} );";
+         declare
+            Output : constant String :=
+              "( function( domain, translations ) {"  &
+              "        var localeData = translations.locale_data[ domain ] || " &
+              "translations.locale_data.messages;" &
+              "        localeData[""].domain = domain;" &
+              "        wp.i18n.setLocaleData( localeData, domain );" &
+              "} )( """ & Domain & """, " & JSON_Translations & " );";
+         begin
+            if Display then
+               Printf ("<script%s id=""%s-js-translations"">" & NL & "%s" & NL &
+                       "</script>" & NL,
+                       [
+                         1 => -This.Type_Attr,
+                         2 => ESC_Attr (Handle),
+                         3 => Output
+                       ]);
+            end if;
 
-         if Display then
-            Unused := +Printf ("<script%s id=""%s-js-translations"">\n%s\n</script>\n",
-                               [
-                                 1 => -This.Type_Attr,
-                                 2 => ESC_Attr (Handle),
-                                 3 => -Output
-                               ]);
-         end if;
-
-         return -Output;
+            return Output;
+         end;
       end;
    end Print_Translations;
 
@@ -737,13 +730,14 @@ is
    function All_Deps (This      : in out Wp_Scripts;
                       Handles   : String;
                       Recursion : Boolean := False;
-                      Group     : Boolean := False)
+                      Group     : Integer := 0)
                       return Boolean
    is
       use Wp_Common;
-      use Inc_Plugins;
+      use Class_Dependencies;
 
-      R : constant Boolean := False; -- Parent::All_Deps (Handles, Recursion, Group);
+      R : constant Boolean :=
+        All_Deps (Wp_Dependencies (This), [Handles], Recursion, Group);
    begin
       if not Recursion then
          --
@@ -804,7 +798,7 @@ is
          return False;
       end if;
 
-      for Test of This.Default_Dirs loop -- (array)
+      for Test of This.Default_Dirs loop
          if 0 = Strpos (Src, Test) then
             return True;
          end if;

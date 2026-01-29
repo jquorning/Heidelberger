@@ -132,6 +132,24 @@ is
             return Wp_Styles;
 
    --
+   -- Processes a style dependency.
+   --
+   -- @since 2.6.0
+   -- @since 5.5.0 Added the `group` parameter.
+   --
+   -- @see WP_Dependencies::do_item()
+   --
+   -- @param string    handle The style's registered handle.
+   -- @param int|false group  Optional. Group level: level (int), no groups (false).
+   --                          Default false.
+   -- @return bool True on success, false on failure.
+   --
+   function Do_Item (This   : in out Wp_Styles;
+                     Handle : String;
+                     Group  : Boolean := False)
+                     return Boolean;
+
+   --
    -- Adds extra CSS styles to a registered stylesheet.
    --
    -- @since 3.3.0
@@ -144,6 +162,54 @@ is
                               Handle : String;
                               Code   : String)
                               return Boolean;
+
+   --
+   -- Prints extra CSS styles of a registered stylesheet.
+   --
+   -- @since 3.3.0
+   --
+   -- @param string handle  The style"s registered handle.
+   -- @param bool   display Optional. Whether to print the inline style
+   --                        instead of just returning it. Default true.
+   -- @return string|bool False if no data exists, inline styles if `display` is true,
+   --                     true otherwise.
+   --
+   function Print_Inline_Style (This    : Wp_Styles;
+                                Handle  : String;
+                                Display : Boolean := True)
+                                return String;
+
+   procedure Print_Inline_Style (This    : Wp_Styles;
+                                 Handle  : String;
+                                 Display : Boolean := True);
+
+   --
+   -- Generates an enqueued style's fully-qualified URL.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string src    The source of the enqueued style.
+   -- @param string ver    The version of the enqueued style.
+   -- @param string handle The style"s registered handle.
+   -- @return string Style's fully-qualified URL.
+   --
+   function X_CSS_Href (This   : Wp_Styles;
+                        Src    : String;
+                        Ver    : String;
+                        Handle : String)
+                        return String;
+
+   --
+   -- Whether a handle"s source is in a default directory.
+   --
+   -- @since 2.8.0
+   --
+   -- @param string src The source of the enqueued style.
+   -- @return bool True if found, false if not.
+   --
+   function In_Default_Dir (This : Wp_Styles;
+                            Src  : String)
+                            return Boolean;
 
    --
    -- Processes items and dependencies for the footer group.

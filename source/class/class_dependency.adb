@@ -51,7 +51,7 @@ is
 --         return False;
 --      end if;
       for A of Data loop
-         This.Extra.Insert (Name, A); -- (Name)
+         This.Extra.Append (Name, From_String (A)); -- (Name)
       end loop;
       return True;
    end Add_Data;

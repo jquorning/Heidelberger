@@ -2974,15 +2974,15 @@ is
 
    -- For use in Wp_Filter_Out_Block_Nodes
 
-   function Filter_Blocks (Node : String) return Boolean;
+   function Filter_Blocks (Node : Array_Type) return Boolean;
 
-   function Filter_Blocks (Node : String) return Boolean
+   function Filter_Blocks (Node : Array_Type) return Boolean
    is
       use Php.Arrays;
    begin
       return
         not In_Array ("blocks",
-                      Empty_Array, -- Node ("path"),
+                      As_Array (Get (Node, "path")),
                       Strict => True);
    end Filter_Blocks;
 
@@ -3434,18 +3434,20 @@ is
 
    procedure Wp_Maybe_Inline_Styles
    is
-      use Array_Vectors;
+--    use Php.Arrays;
       use Php.Files;
       use Php.Strings;
+      use Array_Vectors;
       use UStrings;
       use Wp_Common;
       use Class_Dependency;
-      use Inc_Functions_Wp_Styles;
       use Adm_Load_Styles;
+      use Inc_Functions_Wp_Styles;
 
 --    global wp_styles;
 
       Total_Inline_Limit_2 : constant Natural := 20_000;
+
       --
       -- The maximum size of inlined styles in bytes.
       --
@@ -3472,16 +3474,18 @@ is
          declare
             Registered : constant X_Wp_Dependency :=
               Dependency_Maps.Element (Styles.Registered.Find (Handle));
+
+            Path : constant String := Get_As_String (Registered.Extra, "path");
          begin
             if
-              "" /= Wp_Styles_X.Get_Data (Handle, "path") and then -- ()
-              File_Exists (Registered.Extra ("path"))
+              "" /= Wp_Styles_X.Get_Data (Handle, "path") and then
+              File_Exists (Path)
             then
                Styles_2.Append (To_Array (List => (
                  Build ("handle", Handle),
                  Build ("src",    -Registered.Src),
-                 Build ("path",   Registered.Extra ("path")),
-                 Build ("size",   Filesize (Registered.Extra ("path")))
+                 Build ("path",   Path),
+                 Build ("size",   Filesize (Path))
                )));
             end if;
          end;
@@ -3503,8 +3507,8 @@ is
       for Style of Styles_2 loop
          declare
             Size : constant Natural := As_Integer (Get (Style, "size"));
-            Path : constant String  := As_String  (Get (Style, "path"));
-            Src  : constant String  := As_String  (Get (Style, "src"));
+            Path : constant String  := Get_As_String (Style, "path");
+            Src  : constant String  := Get_As_String (Style, "src");
 
             Contents_2 : constant String := File_Get_Contents (Path);
 
@@ -3518,30 +3522,29 @@ is
 
             -- Get the styles if we don't already have them.
             Set (Style, "css", From_String (Contents));
---          Style ("css") := File_Get_Contents (Style ("path"));
 
-         -- Check if the style contains relative URLs that need to be modified.
-         -- URLs relative to the stylesheet's path should be converted to relative
-         -- to the site's root.
---         Style ("css") :=
---           X_Wp_Normalize_Relative_CSS_Links (Style ("css"), Style ("src"));
+            -- Check if the style contains relative URLs that need to be modified.
+            -- URLs relative to the stylesheet's path should be converted to relative
+            -- to the site's root.
+            Set (Style, "css", From_String (
+                 X_Wp_Normalize_Relative_CSS_Links (
+                   Get_As_String (Style, "css"), Src)));
 
             -- Set `src` to `False` and add styles inline.
             declare
-               Handle     : constant String := Get_As_String (Style, "handle");
-               Registered : Dependency_Maps.Cursor := -- X_Wp_Dependency :=
-                 Styles.Registered.Find (Handle);
---             Registered :  := Styles.Registered (Handle);
+               Handle : constant String := Get_As_String (Style, "handle");
             begin
                Styles.Registered (Handle).Src := Null_UString; -- False;
-               if Empty (Styles.Registered (Handle).Extra ("after")) then
-                  null;
---             Dependency_Maps.Element (Registered).Extra ("after") := Empty_Array;
---             Styles.Registered (Handle).Extra ("after") := Empty_Array;
+               if
+                 Empty (Get_As_String (Styles.Registered (Handle).Extra, "after"))
+               then
+                  Set (Styles.Registered (Handle).Extra, "after",
+                       From_Array (Empty_Array));
                end if;
 
---             Array_Unshift (
---               Styles.Registered (Handle).Extra ("after"), Style ("css"));
+               -- Array_Unshift (
+               --   As_Array (Get (Styles.Registered (Handle).Extra, "after")),
+               --   Get_As_String (Style, "css"));
 
                -- Add the styles size to the total_inline_size var.
                Total_Inline_Size := Total_Inline_Size + Size;
@@ -3571,7 +3574,7 @@ is
       Has_Src_Results : Natural;
    begin
       Has_Src_Results :=
-        Preg_Match_All ("#url\s*\(\s*[\""]?\s*([^\""\)]+)#", CSS, Src_Results);
+        Preg_Match_All ("#url\s*\(\s*[\'""]?\s*([^\'""\)]+)#", CSS, Src_Results);
 
       if Has_Src_Results = 0 then
          return CSS;

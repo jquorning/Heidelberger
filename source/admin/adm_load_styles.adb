@@ -135,7 +135,7 @@ is
 
             Path := ABSPATH & Style.Src;
 
-            if RTL and then not Empty (Style.Extra ("rtl")) then
+            if RTL and then not Empty (Style.Extra, "rtl") then
                -- All default styles have fully independent RTL files.
                Path := +Str_Replace (".min.css", "-rtl.min.css", -Path);
             end if;

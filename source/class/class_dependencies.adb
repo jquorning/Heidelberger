@@ -12,10 +12,12 @@ with Ada.Text_IO;
 with Php.Lists;
 with Php.Strings;
 
+with Arrays;
 with Wp_Common;
 
 package body Class_Dependencies
 is
+   use Arrays;
 
    --------------
    -- Do_Items --
@@ -320,24 +322,22 @@ is
    -- Get_Data --
    --------------
 
---        public function get_data( handle, key ) then
    function Get_Data (This   : Wp_Dependencies;
                       Handle : String;
                       Key    : String)
-                      return String -- Array_Type
+                      return String
    is
-      use Php.Strings;
       use Class_Dependency.Dependency_Maps;
    begin
       if This.Registered.Find (Handle) = No_Element then
          return ""; -- False;
       end if;
 
-      if not Isset (This.Registered (Handle).Extra (Key)) then
+      if not Isset (This.Registered (Handle).Extra, Key) then
          return ""; -- False;
       end if;
 
-      return This.Registered (Handle).Extra (Key);
+      return Get_As_String (This.Registered (Handle).Extra, Key);
    end Get_Data;
 
    ------------

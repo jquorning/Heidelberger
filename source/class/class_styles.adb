@@ -7,12 +7,23 @@
 -- @subpackage Dependencies
 --
 
+with Php.Echoing;
+with Php.Preg;
+with Php.Strings;
+
+with Arrays;
+with Wp_Common;
+
+with Class_Dependency;
+with Inc_Formatting;
+with Inc_Functions;
 with Inc_Themes;
 with Inc_Load;
 with Inc_Plugins;
 
 package body Class_Styles
 is
+   use Arrays;
 
    -----------------
    -- X_Construct --
@@ -48,165 +59,225 @@ is
       return This;
    end X_Construct;
 
---         --
---         -- Processes a style dependency.
---         --
---         -- @since 2.6.0
---         -- @since 5.5.0 Added the `group` parameter.
---         --
---         -- @see WP_Dependencies::do_item()
---         --
---         -- @param string    handle The style"s registered handle.
---         -- @param int|false group  Optional. Group level: level (int), no groups (false).
---         --                          Default false.
---         -- @return bool True on success, false on failure.
---         --
---         public function do_item( handle, group = false ) then
---                 if ( not parent::do_item( handle ) ) then
---                         return false;
---                 end;
+   -------------
+   -- Do_Item --
+   -------------
 
---                 obj = this.registered[ handle ];
+   function Do_Item (This   : in out Wp_Styles;
+                     Handle : String;
+                     Group  : Boolean := False)
+                     return Boolean
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Dependencies;
+      use Class_Dependency;
+      use Inc_Formatting;
+   begin
+      if not Do_Item (Wp_Dependencies (This), Handle) then
+         return False;
+      end if;
 
---                 if ( null === obj.ver ) then
---                         ver = "";
---                 end; else then
---                         ver = obj.ver ? obj.ver : this.default_version;
---                 end;
+      declare
+         Obj : constant X_Wp_Dependency := This.Registered (Handle);
 
---                 if ( isset( this.args[ handle ] ) ) then
---                         ver = ver ? ver . "&amp;" . this.args[ handle ] : this.args[ handle ];
---                 end;
+         Ver_2 : constant String :=
+           (if "" = Obj.Ver -- null
+            then ""
+            else (if Obj.Ver /= "" then -Obj.Ver else -This.Default_Version));
 
---                 src         = obj.src;
---                 cond_before = "";
---                 cond_after  = "";
---                 conditional = isset( obj.extra["conditional"] ) ? obj.extra["conditional"] : "";
+         Ver : constant String :=
+           (if Isset (This.Args (Handle))
+            then (if Ver_2 /= ""
+                  then Ver_2 & "&amp;" & This.Args (Handle)
+                  else This.Args (Handle))
+            else Ver_2);
 
---                 if ( conditional ) then
---                         cond_before = "<!--[if thenconditionalend;]>\n";
---                         cond_after  = "<![endif]-.\n";
---                 end;
+         Src : constant String := -Obj.Src;
 
---                 inline_style = this.print_inline_style( handle, false );
+         Conditional : constant String :=
+           (if Isset (Obj.Extra, "conditional")
+            then Get_As_String (Obj.Extra, "conditional")
+            else "");
 
---                 if ( inline_style ) then
---                         inline_style_tag = sprintf(
---                                 "<style id="%s-inline-css"%s>\n%s\n</style>\n",
---                                 esc_attr( handle ),
---                                 this.type_attr,
---                                 inline_style
---                         );
---                 end; else then
---                         inline_style_tag = "";
---                 end;
+         Cond_Before : constant String :=
+           (if Conditional /= ""
+            then "<!--[if " & Conditional & "]>" & NL
+            else "");
 
---                 if ( this.do_concat ) then
---                         if ( this.in_default_dir( src ) and then not conditional and then not isset( obj.extra["alt"] ) ) then
---                                 this.concat         .= "handle,";
---                                 this.concat_version .= "handlever";
+         Cond_After  : constant String :=
+           (if Conditional /= ""
+            then "<![endif]-->" & NL
+            else "");
 
---                                 this.print_code .= inline_style;
+         Inline_Style : constant String :=
+           This.Print_Inline_Style (Handle, False);
 
---                                 return true;
---                         end;
---                 end;
+         Inline_Style_Tag : constant String :=
+           (if Inline_Style /= ""
+            then Sprintf (
+                   "<style id=""%s-inline-css""%s>" & NL &
+                   "%s" & NL & "</style>" & NL,
+                   [
+                     1 => ESC_Attr (Handle),
+                     2 => -This.Type_Attr,
+                     3 => Inline_Style
+                   ])
+            else "");
 
---                 if ( isset( obj.args ) ) then
---                         media = esc_attr( obj.args );
---                 end; else then
---                         media = "all";
---                 end;
+      begin
+         if This.Do_Concat then
+            if
+              This.In_Default_Dir (Src) and then
+              Conditional = "" and then
+              not Isset (Obj.Extra, "alt")
+            then
+               Append (This.Concat,         "handle,");
+               Append (This.Concat_Version, "handlever");
 
---                 // A single item may alias a set of items, by having dependencies, but no source.
---                 if ( not src ) then
---                         if ( inline_style_tag ) then
---                                 if ( this.do_concat ) then
---                                         this.print_html .= inline_style_tag;
---                                 end; else then
---                                         echo inline_style_tag;
---                                 end;
---                         end;
+               Append (This.Print_Code, Inline_Style);
 
---                         return true;
---                 end;
+               return True;
+            end if;
+         end if;
 
---                 href = this._css_href( src, ver, handle );
---                 if ( not href ) then
---                         return true;
---                 end;
+         -- A single item may alias a set of items, by having dependencies, but
+         -- no source.
+         if Src = "" then
+            if Inline_Style_Tag /= "" then
+               if This.Do_Concat then
+                  Append (This.Print_HTML, Inline_Style_Tag);
+               else
+                  Echo (Inline_Style_Tag);
+               end if;
+            end if;
 
---                 rel   = isset( obj.extra["alt"] ) and then obj.extra["alt"] ? "alternate stylesheet" : "stylesheet";
---                 title = isset( obj.extra["title"] ) ? sprintf( " title="%s"", esc_attr( obj.extra["title"] ) ) : "";
+            return True;
+         end if;
 
---                 tag = sprintf(
---                         "<link rel="%s" id="%s-css"%s href="%s"%s media="%s" />\n",
---                         rel,
---                         handle,
---                         title,
---                         href,
---                         this.type_attr,
---                         media
---                 );
+         declare
+            Media : constant String :=
+              (if Isset (-Obj.Args)
+               then ESC_Attr (-Obj.Args)
+               else "all");
 
---                 --
---                 -- Filters the HTML link tag of an enqueued style.
---                 --
---                 -- @since 2.6.0
---                 -- @since 4.3.0 Introduced the `href` parameter.
---                 -- @since 4.5.0 Introduced the `media` parameter.
---                 --
---                 -- @param string tag    The link tag for the enqueued style.
---                 -- @param string handle The style"s registered handle.
---                 -- @param string href   The stylesheet"s source URL.
---                 -- @param string media  The stylesheet"s media attribute.
---                 --
---                 tag = apply_filters( "style_loader_tag", tag, handle, href, media );
+            Href : constant String := This.X_CSS_Href (Src, Ver, Handle);
 
---                 if ( "rtl" === this.text_direction and then isset( obj.extra["rtl"] ) and then obj.extra["rtl"] ) then
---                         if ( is_bool( obj.extra["rtl"] ) || "replace" === obj.extra["rtl"] ) then
---                                 suffix   = isset( obj.extra["suffix"] ) ? obj.extra["suffix"] : "";
---                                 rtl_href = str_replace( "thensuffixend;.css", "-rtlthensuffixend;.css", this._css_href( src, ver, "handle-rtl" ) );
---                         end; else then
---                                 rtl_href = this._css_href( obj.extra["rtl"], ver, "handle-rtl" );
---                         end;
+            Rel : constant String :=
+              (if
+                 Isset (Obj.Extra, "alt") and then
+                 Get_As_String (Obj.Extra, "alt") /= ""
+               then "alternate stylesheet" else "stylesheet");
 
---                         rtl_tag = sprintf(
---                                 "<link rel="%s" id="%s-rtl-css"%s href="%s"%s media="%s" />\n",
---                                 rel,
---                                 handle,
---                                 title,
---                                 rtl_href,
---                                 this.type_attr,
---                                 media
---                         );
+            Title : constant String :=
+              (if Isset (Obj.Extra, "title")
+               then Sprintf (" title=""%s""",
+                             [1 => ESC_Attr (Get_As_String (Obj.Extra, "title"))])
+               else "");
 
---                         -- This filter is documented in wp-includes/class-wp-styles.php--
---                         rtl_tag = apply_filters( "style_loader_tag", rtl_tag, handle, rtl_href, media );
+            Tag_2 : constant String :=
+              Sprintf (
+                "<link rel=""%s"" id=""%s-css""%s href=""%s""%s media=""%s"" />" & NL,
+                [
+                  1 => Rel,
+                  2 => Handle,
+                  3 => Title,
+                  4 => Href,
+                  5 => -This.Type_Attr,
+                  6 => Media
+                ]
+              );
 
---                         if ( "replace" === obj.extra["rtl"] ) then
---                                 tag = rtl_tag;
---                         end; else then
---                                 tag .= rtl_tag;
---                         end;
---                 end;
+            Tag      : UString;
+            RTL_Href : UString;
+         begin
+            if Href = "" then
+               return True;
+            end if;
 
---                 if ( this.do_concat ) then
---                         this.print_html .= cond_before;
---                         this.print_html .= tag;
---                         if ( inline_style_tag ) then
---                                 this.print_html .= inline_style_tag;
---                         end;
---                         this.print_html .= cond_after;
---                 end; else then
---                         echo cond_before;
---                         echo tag;
---                         this.print_inline_style( handle );
---                         echo cond_after;
---                 end;
+            --
+            -- Filters the HTML link tag of an enqueued style.
+            --
+            -- @since 2.6.0
+            -- @since 4.3.0 Introduced the `href` parameter.
+            -- @since 4.5.0 Introduced the `media` parameter.
+            --
+            -- @param string tag    The link tag for the enqueued style.
+            -- @param string handle The style"s registered handle.
+            -- @param string href   The stylesheet"s source URL.
+            -- @param string media  The stylesheet"s media attribute.
+            --
+            Tag := +Apply_Filters ("style_loader_tag", Tag_2, Handle, Href, Media);
 
---                 return true;
---         end;
+            if
+              "rtl" = This.Text_Direction and then
+              Isset (Obj.Extra, "rtl")    and then
+              Get_As_String (Obj.Extra, "rtl") /= ""
+            then
+               if
+                 Kind_Of (Get (Obj.Extra, "rtl")) in Kind_Boolean or else
+                 "replace" = Get_As_String (Obj.Extra, "rtl")
+               then
+                  declare
+                     Suffix : constant String :=
+                       (if Isset (Obj.Extra, "suffix")
+                        then Get_As_String (Obj.Extra, "suffix") else "");
+                  begin
+                     RTL_Href :=
+                       +Str_Replace (Suffix & ".css", "-rtl" & Suffix & ".css",
+                                     This.X_CSS_Href (Src, Ver, "handle-rtl"));
+                  end;
+               else
+                  RTL_Href := +This.X_CSS_Href (Get_As_String (Obj.Extra, "rtl"),
+                                                Ver, "handle-rtl");
+               end if;
+
+               declare
+                  RTL_Tag_2 : constant String :=
+                    Sprintf (
+                      "<link rel=""%s"" id=""%s-rtl-css""%s href=""%s""%s " &
+                      "media=""%s"" />" & NL,
+                      [
+                        1 => Rel,
+                        2 => Handle,
+                        3 => Title,
+                        4 => -RTL_Href,
+                        5 => -This.Type_Attr,
+                        6 => Media
+                      ]);
+
+                  -- This filter is documented in wp-includes/class-wp-styles.php--
+                  RTL_Tag : constant String :=
+                    Apply_Filters ("style_loader_tag", RTL_Tag_2,
+                                   Handle, -RTL_Href, Media);
+               begin
+                  if "replace" = Get_As_String (Obj.Extra, "rtl") then
+                     Tag := +RTL_Tag;
+                  else
+                     Append (Tag, RTL_Tag);
+                  end if;
+               end;
+            end if;
+
+            if This.Do_Concat then
+               Append (This.Print_HTML, Cond_Before);
+               Append (This.Print_HTML, Tag);
+               if Inline_Style_Tag /= "" then
+                  Append (This.Print_HTML, Inline_Style_Tag);
+               end if;
+               Append (This.Print_HTML, Cond_After);
+            else
+               Echo (Cond_Before);
+               Echo (-Tag);
+               This.Print_Inline_Style (Handle);
+               Echo (Cond_After);
+            end if;
+         end;
+      end;
+      return True;
+   end Do_Item;
 
    ----------------------
    -- Add_Inline_Style --
@@ -236,39 +307,56 @@ is
       return This.Add_Data (Handle, "after", After);
    end Add_Inline_Style;
 
---         --
---         -- Prints extra CSS styles of a registered stylesheet.
---         --
---         -- @since 3.3.0
---         --
---         -- @param string handle  The style"s registered handle.
---         -- @param bool   display Optional. Whether to print the inline style
---         --                        instead of just returning it. Default true.
---         -- @return string|bool False if no data exists, inline styles if `display` is true,
---         --                     true otherwise.
---         --
---         public function print_inline_style( handle, display = true ) then
---                 output = this.get_data( handle, "after" );
+   ------------------------
+   -- Print_Inline_Style --
+   ------------------------
 
---                 if ( empty( output ) ) then
---                         return false;
---                 end;
+   function Print_Inline_Style (This    : Wp_Styles;
+                                Handle  : String;
+                                Display : Boolean := True)
+                                return String
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use UStrings;
+      use Inc_Formatting;
 
---                 output = implode( "\n", output );
+      Output_2 : constant List_Type := This.Get_Data (Handle, "after");
+   begin
+      if Output_2.Is_Empty then
+         return ""; -- False;
+      end if;
 
---                 if ( not display ) then
---                         return output;
---                 end;
+      declare
+         Output : constant String := Implode ("\n", Output_2);
+      begin
+         if not Display then
+            return Output;
+         end if;
 
---                 printf(
---                         "<style id="%s-inline-css"%s>\n%s\n</style>\n",
---                         esc_attr( handle ),
---                         this.type_attr,
---                         output
---                 );
+         Printf (
+           "<style id=""%s-inline-css""%s>" & NL & "%s" & NL & "</style>" & NL,
+           [
+             1 => ESC_Attr (Handle),
+             2 => -This.Type_Attr,
+             3 => Output
+           ]);
+      end;
+      return "True";
+   end Print_Inline_Style;
 
---                 return true;
---         end;
+   ------------------------
+   -- Print_Inline_Style --
+   ------------------------
+
+   procedure Print_Inline_Style (This    : Wp_Styles;
+                                 Handle  : String;
+                                 Display : Boolean := True)
+   is
+      Unused : constant String := Print_Inline_Style (This, Handle, Display);
+   begin
+      null;
+   end Print_Inline_Style;
 
 --         --
 --         -- Determines style dependencies.
@@ -299,57 +387,72 @@ is
 --                 return r;
 --         end;
 
---         --
---         -- Generates an enqueued style"s fully-qualified URL.
---         --
---         -- @since 2.6.0
---         --
---         -- @param string src    The source of the enqueued style.
---         -- @param string ver    The version of the enqueued style.
---         -- @param string handle The style"s registered handle.
---         -- @return string Style"s fully-qualified URL.
---         --
---         public function _css_href( src, ver, handle ) then
---                 if ( not is_bool( src ) and then not preg_match( "|^(https?:)?//|", src ) and then not ( this.content_url and then 0 === strpos( src, this.content_url ) ) ) then
---                         src = this.base_url . src;
---                 end;
+   ----------------
+   -- X_CSS_Href --
+   ----------------
 
---                 if ( not empty( ver ) ) then
---                         src = add_query_arg( "ver", ver, src );
---                 end;
+   function X_CSS_Href (This   : Wp_Styles;
+                        Src    : String;
+                        Ver    : String;
+                        Handle : String)
+                        return String
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Functions;
 
---                 --
---                 -- Filters an enqueued style"s fully-qualified URL.
---                 --
---                 -- @since 2.6.0
---                 --
---                 -- @param string src    The source URL of the enqueued style.
---                 -- @param string handle The style"s registered handle.
---                 --
---                 src = apply_filters( "style_loader_src", src, handle );
---                 return esc_url( src );
---         end;
+      Src_2 : constant String :=
+         (if
+--          not Is_Bool (Src) and then
+            not Preg_Match ("|^(https?:)?//|", Src) and then
+            not (This.Content_URL /= "" and then
+                 0 = Strpos (Src, -This.Content_URL))
+          then -This.Base_URL & Src
+          else Src);
 
---         --
---         -- Whether a handle"s source is in a default directory.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string src The source of the enqueued style.
---         -- @return bool True if found, false if not.
---         --
---         public function in_default_dir( src ) then
---                 if ( not this.default_dirs ) then
---                         return true;
---                 end;
+      Src_3 : constant String :=
+        (if not Empty (Ver)
+         then Add_Query_Arg ("ver", Ver, Src_2)
+         else Src_2);
 
---                 foreach ( (array) this.default_dirs as test ) then
---                         if ( 0 === strpos( src, test ) ) then
---                                 return true;
---                         end;
---                 end;
---                 return false;
---         end;
+      --
+      -- Filters an enqueued style's fully-qualified URL.
+      --
+      -- @since 2.6.0
+      --
+      -- @param string src    The source URL of the enqueued style.
+      -- @param string handle The style"s registered handle.
+      --
+      Src_4 : constant String :=
+        Apply_Filters ("style_loader_src", Src_3, Handle);
+   begin
+      return ESC_URL (Src_4);
+   end X_CSS_Href;
+
+   --------------------
+   -- Id_Default_Dir --
+   --------------------
+
+   function In_Default_Dir (This : Wp_Styles;
+                            Src  : String)
+                            return Boolean
+   is
+      use Php.Strings;
+   begin
+      if This.Default_Dirs.Is_Empty then
+         return True;
+      end if;
+
+      for Test of This.Default_Dirs loop -- (array)
+         if 0 = Strpos (Src, Test) then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end In_Default_Dir;
 
    ---------------------
    -- Do_Footer_Items --
