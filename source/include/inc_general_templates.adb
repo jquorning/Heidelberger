@@ -1734,7 +1734,7 @@ is
          return ""; -- "" added
       end if;
 
-      if Empty (-Term_Name) then
+      if Empty (Term_Name) then
          return ""; -- "" added
       end if;
 
@@ -2965,7 +2965,7 @@ is
             Timezone := Wp_Timezone_2;
          end if;
 
-         if Empty (-Time) or else "0000-00-00 00:00:00" = Time then
+         if Empty (Time) or else "0000-00-00 00:00:00" = Time then
             raise Some_Time_Error;
 --          return False;
          end if;

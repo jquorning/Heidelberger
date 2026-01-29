@@ -112,7 +112,7 @@ package body Inc_L10n is
          end;
       end if;
 
-      if Empty (-Global_Locale) then
+      if Empty (Global_Locale) then
          Global_Locale := +"en_US";
       end if;
 

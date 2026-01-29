@@ -483,7 +483,7 @@ is
 
       Untrailed := +Un_Trailing_Slash_It (-Directory_2);
       if
-        not Empty (-Untrailed) and then
+        not Empty (Untrailed) and then
         not In_List (-Untrailed, Wp_Theme_Directories, True)
       then
          Wp_Theme_Directories.Append (-Untrailed);
@@ -776,7 +776,7 @@ is
          end if;
       end if;
 
-      if Empty (-Theme_Root) then
+      if Empty (Theme_Root) then
          declare
             Theme_Roots : constant String_Maps.Map := Get_Theme_Roots; -- ()
          begin

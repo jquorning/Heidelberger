@@ -1921,7 +1921,7 @@ is
          end if;
          Globals.WpDB.Suppress_Errors (Suppress);
 
-         Installed := not Empty (-Installed_Site);
+         Installed := not Empty (Installed_Site);
          Wp_Cache_Set ("is_blog_installed", Installed);
 
          if Installed then
@@ -1963,7 +1963,7 @@ is
                begin
                   if
                     (Described_Table = Empty_Array and then
-                     Empty (-Globals.WpDB.Last_Error))
+                     Empty (Globals.WpDB.Last_Error))
                     or else
                     (Is_Array (Described_Table) and then
                      0 = Count (Described_Table))
@@ -2216,7 +2216,7 @@ is
       -- Use rtrim() instead of untrailingslashit to avoid formatting.php dependency.
       --
       Target_2 := +Rtrim (-Target_2, "/");
-      if Empty (-Target_2) then
+      if Empty (Target_2) then
          Target_2 := +"/";
       end if;
 
@@ -8327,7 +8327,7 @@ is
       --
       Update_URL := +Apply_Filters ("wp_update_php_url", -Update_URL);
 
-      if Empty (-Update_URL) then
+      if Empty (Update_URL) then
          Update_URL := +Default_URL;
       end if;
 

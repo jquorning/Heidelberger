@@ -1824,7 +1824,7 @@ is
                Count_2 := Count_2 + 1;
                Item_4 := +Wp_KSES_Bad_Protocol_Once (-Item_4, Allowed_Protocols,
                                                      Count_2);
-               if Empty (-Item_4) then
+               if Empty (Item_4) then
                   return -Item_4;
                end if;
             end if;

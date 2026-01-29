@@ -2833,7 +2833,7 @@ is
                      Type_Attr & " media=""all"" />" & NL);
             end;
 
-            if not Empty (-Wp_Styles.Print_Code) then
+            if not Empty (Wp_Styles.Print_Code) then
                Echo ("<style" & Type_Attr & ">" & NL);
                Echo (-Wp_Styles.Print_Code);
                Echo (NL & "</style>\n");
@@ -2841,7 +2841,7 @@ is
          end;
       end if;
 
-      if not Empty (-Wp_Styles.Print_HTML) then
+      if not Empty (Wp_Styles.Print_HTML) then
          Echo (-Wp_Styles.Print_HTML);
       end if;
    end X_Print_Styles;
@@ -3724,7 +3724,7 @@ is
          end loop;
 
          -- Combines Core styles.
-         if not Empty (-Compiled_Core_Stylesheet) then
+         if not Empty (Compiled_Core_Stylesheet) then
             Wp_Register_Style   (-Style_Tag_Id, False, Empty_List, True, True);
             Wp_Add_Inline_Style (-Style_Tag_Id, -Compiled_Core_Stylesheet);
             Wp_Enqueue_Style    (-Style_Tag_Id);

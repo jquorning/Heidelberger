@@ -4,6 +4,7 @@
 
 with Arrays;
 with Lists;
+with UStrings;
 
 package Php.Strings
 is
@@ -13,6 +14,10 @@ is
    function Empty (A : String)
                    return Boolean
                    is (A'Length = 0);
+
+   function Empty (A : UStrings.UString)
+                   return Boolean
+                   is (UStrings.Length (A) in 0);
 
    function Isset (Item : String)
                    return Boolean;

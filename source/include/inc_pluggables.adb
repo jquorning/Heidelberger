@@ -3335,7 +3335,7 @@ is
                     In_List (Loading, Lazy_Eager, True) and then
                     not Preg_Match ("/\bloading\s*=/", -Extra_Attr)
                   then
-                     if not Empty (-Extra_Attr) then
+                     if not Empty (Extra_Attr) then
                         Append (Extra_Attr, " ");
                      end if;
 
@@ -3348,7 +3348,7 @@ is
                     and then
                     not Preg_Match ("/\bdecoding\s*=/", -Extra_Attr)
                   then
-                     if not Empty (-Extra_Attr) then
+                     if not Empty (Extra_Attr) then
                         Append (Extra_Attr, " ");
                      end if;
                      Append (Extra_Attr,

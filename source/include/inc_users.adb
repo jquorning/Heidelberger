@@ -1936,7 +1936,7 @@ is
       Wp_Cache_Add (-User_2.Prop.User_Login,    Integer (User_2.Id), "userlogins");
       Wp_Cache_Add (-User_2.Prop.User_Nicename, Integer (User_2.Id), "userslugs");
 
-      if not Empty (-User_2.Prop.User_Email) then
+      if not Empty (User_2.Prop.User_Email) then
          Wp_Cache_Add (-User_2.Prop.User_Email, Integer (User_2.Id), "useremail");
       end if;
    end Update_User_Caches;

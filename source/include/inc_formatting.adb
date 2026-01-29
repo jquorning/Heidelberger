@@ -5639,7 +5639,7 @@ is
       use Wp_Common;
       use Inc_Plugins;
    begin
-      if Empty (-Static_Spaces) then
+      if Empty (Static_Spaces) then
          --
          -- Filters the regexp for common whitespace characters.
          --

@@ -484,7 +484,7 @@ is
          end if;
 
          if
-           not Empty (-Post_Link) and then
+           not Empty (Post_Link) and then
            (not Force_Plain_Link or Sample)
          then
             if not Leavename then
@@ -588,7 +588,7 @@ is
       Link : UString := +Global_Wp_Rewrite.Get_Page_Permastruct;
    begin
       if
-        not Empty (-Link) and then
+        not Empty (Link) and then
         ((Isset (-Post_2.Post_Status) and then
           not Force_Plain_Link) or else Sample)
       then
@@ -2691,7 +2691,7 @@ is
 
                if Pagenum > 1 then
                   Request_7 :=
-                    +(if not Empty (-Request_7)
+                    +(if not Empty (Request_7)
                       then Trailing_Slash_It (-Request_7)
                       else -Request_7)
                     & User_Trailing_Slash_It

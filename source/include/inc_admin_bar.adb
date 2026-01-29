@@ -1174,7 +1174,7 @@ is
                return;
             end if;
 
-            if not Empty (-Current_Object.Post_Type) then
+            if not Empty (Current_Object.Post_Type) then
                declare
                   Post_Type_Object : constant Wp_Post_Type :=
                      Get_Post_Type_Object (-Current_Object.Post_Type);
