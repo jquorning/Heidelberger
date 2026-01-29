@@ -253,83 +253,23 @@ is
    function Get_Legacy_Widget_Block_Editor_Settings
             return Array_Type;
 
--- --
--- -- Collect the block editor assets that need to be loaded into the editor"s iframe.
--- --
--- -- @since 6.0.0
--- -- @access private
--- --
--- -- @global string pagenow The filename of the current screen.
--- --
--- -- @return array then
--- --     The block editor assets.
--- --
--- --     @type string|false styles  String containing the HTML for styles.
--- --     @type string|false scripts String containing the HTML for scripts.
--- -- end;
--- --
--- function _wp_get_iframed_editor_assets() then
---         global pagenow;
-
---         script_handles = array();
---         style_handles  = array(
---                 "wp-block-editor",
---                 "wp-block-library",
---                 "wp-edit-blocks",
---         );
-
---         if ( current_theme_supports( "wp-block-styles" ) ) then
---                 style_handles[] = "wp-block-library-theme";
---         end;
-
---         if ( "widgets.php" === pagenow || "customize.php" === pagenow ) then
---                 style_handles[] = "wp-widgets";
---                 style_handles[] = "wp-edit-widgets";
---         end;
-
---         block_registry = WP_Block_Type_Registry::get_instance();
-
---         foreach ( block_registry->get_all_registered() as block_type ) then
---                 style_handles = array_merge(
---                         style_handles,
---                         block_type->style_handles,
---                         block_type->editor_style_handles
---                 );
-
---                 script_handles = array_merge(
---                         script_handles,
---                         block_type->script_handles
---                 );
---         end;
-
---         style_handles = array_unique( style_handles );
---         done          = wp_styles()->done;
-
---         ob_start();
-
---         // We do not need reset styles for the iframed editor.
---         wp_styles()->done = array( "wp-reset-editor-styles" );
---         wp_styles()->do_items( style_handles );
---         wp_styles()->done = done;
-
---         styles = ob_get_clean();
-
---         script_handles = array_unique( script_handles );
---         done           = wp_scripts()->done;
-
---         ob_start();
-
---         wp_scripts()->done = array();
---         wp_scripts()->do_items( script_handles );
---         wp_scripts()->done = done;
-
---         scripts = ob_get_clean();
-
---         return array(
---                 "styles"  => styles,
---                 "scripts" => scripts,
---         );
--- end;
+   --
+   -- Collect the block editor assets that need to be loaded into the editor's iframe.
+   --
+   -- @since 6.0.0
+   -- @access private
+   --
+   -- @global string pagenow The filename of the current screen.
+   --
+   -- @return array {
+   --     The block editor assets.
+   --
+   --     @type string|false styles  String containing the HTML for styles.
+   --     @type string|false scripts String containing the HTML for scripts.
+   -- }
+   --
+   function X_Wp_Get_Iframed_Editor_Assets
+            return Array_Type;
 
    --
    -- Returns the contextualized block editor settings for a selected editor context.

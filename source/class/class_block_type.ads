@@ -7,10 +7,12 @@
 --
 
 with Arrays;
+with Lists;
 
 package Class_Block_Type
 is
    use Arrays;
+   use Lists;
 
    --
    -- Core class representing a block type.
@@ -184,7 +186,7 @@ is
          -- @since 6.1.0
          -- @var string[]
          --
-         -- public script_handles = array();
+         Script_Handles : List_Type;
 
          --
          -- Block type front end only script handles.
@@ -200,7 +202,7 @@ is
          -- @since 6.1.0
          -- @var string[]
          --
-         -- public editor_style_handles = array();
+         Editor_Style_Handles : List_Type;
 
          --
          -- Block type front end and editor style handles.
@@ -208,7 +210,7 @@ is
          -- @since 6.1.0
          -- @var string[]
          --
-         -- public style_handles = array();
+         Style_Handles : List_Type;
 
          --
          -- Deprecated block type properties for script and style handles.
@@ -523,7 +525,10 @@ is
         -- end;
 
    Null_Wp_Block_Type : constant Wp_Block_Type :=
-     (Supports => Empty_Array);
+     (Supports             => Empty_Array,
+      Style_Handles        => Empty_List,
+      Script_Handles       => Empty_List,
+      Editor_Style_Handles => Empty_List);
 
 -- type Wp_Block_Type_Array is array (Positive range <>) of Wp_Block_Type;
 

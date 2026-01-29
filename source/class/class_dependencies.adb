@@ -89,6 +89,19 @@ is
    --------------
 
    procedure Do_Items (This    : in out Wp_Dependencies;
+                       Handles : List_Type;
+                       Group   : Integer := 0)
+   is
+      Unused : constant List_Type := Do_Items (This, Handles, Group);
+   begin
+      null;
+   end Do_Items;
+
+   --------------
+   -- Do_Items --
+   --------------
+
+   procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : Boolean;
                        Group   : Integer := 0)
    is

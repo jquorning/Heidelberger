@@ -7,6 +7,7 @@
 --
 
 with Php.Arrays;
+with Php.Echoing;
 with Php.Files;
 with Php.Lists;
 with Php.Misc;
@@ -16,15 +17,17 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
+with Class_Block_Type_Registry;
 with Class_Posts;
+with Class_Theme_JSON_Resolver;
+with Adm_Load_Styles;
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
 with Inc_L10n;
 with Inc_Media;
 with Inc_Options;
-with Inc_Plugins;
+with Inc_Script_Loader;
 with Inc_Themes;
-with Class_Theme_JSON_Resolver;
 
 package body Inc_Block_Editors
 is
@@ -222,7 +225,6 @@ is
       use Inc_L10n;
       use Inc_Media;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Themes;
 
       function Get_Image_Sizes (Names : Array_Type)
@@ -379,7 +381,6 @@ is
             return Array_Type
    is
       use Wp_Common;
-      use Inc_Plugins;
 
       Editor_Settings : Array_Type;
    begin
@@ -419,6 +420,102 @@ is
 
       return Editor_Settings;
    end Get_Legacy_Widget_Block_Editor_Settings;
+
+   ------------------------------------
+   -- X_Wp_Get_Iframed_Editor_Assets --
+   ------------------------------------
+
+   function X_Wp_Get_Iframed_Editor_Assets
+            return Array_Type
+   is
+      use Php.Echoing;
+      use Php.Lists;
+      use UStrings;
+      use Class_Block_Type_Registry;
+      use Adm_Load_Styles;
+      use Inc_Script_Loader;
+      use Inc_Themes;
+--    global pagenow;
+
+      Scripts_2 : UString;
+      Styles_2  : UString;
+
+      Script_Handles : List_Type;
+
+      Style_Handles : List_Type :=
+        [
+          "wp-block-editor",
+          "wp-block-library",
+          "wp-edit-blocks"
+        ];
+   begin
+      if Current_Theme_Supports ("wp-block-styles") then
+         Style_Handles.Append ("wp-block-library-theme");
+      end if;
+
+      if
+        Globals.Pagenow = "widgets.php" or else
+        Globals.Pagenow = "customize.php"
+      then
+         Style_Handles.Append ("wp-widgets");
+         Style_Handles.Append ("wp-edit-widgets");
+      end if;
+
+      declare
+         Block_Registry : constant Wp_Block_Type_Registry :=
+           Class_Block_Type_Registry.Get_Instance;
+      begin
+         for Block_Type of Block_Registry.Get_All_Registered loop
+            Style_Handles :=
+              List_Merge (
+                Style_Handles,
+                Block_Type.Style_Handles,
+                Block_Type.Editor_Style_Handles
+              );
+
+            Script_Handles :=
+              List_Merge (
+                Script_Handles,
+                Block_Type.Script_Handles
+              );
+         end loop;
+      end;
+
+      Style_Handles := List_Unique (Style_Handles);
+
+      declare
+         Done : constant List_Type := Styles.Done;
+      begin
+         OB_Start;
+
+         -- We do not need reset styles for the iframed editor.
+         Styles.Done := ["wp-reset-editor-styles"];
+         Styles.Do_Items (Style_Handles);
+         Styles.Done := Done;
+      end;
+
+      Styles_2 := +OB_Get_Clean;
+
+      Script_Handles := List_Unique (Script_Handles);
+
+      declare
+         Done : constant List_Type := Global_Wp_Scripts.Done;
+      begin
+         OB_Start;
+
+         Global_Wp_Scripts.Done := Empty_List;
+         Global_Wp_Scripts.Do_Items (Script_Handles);
+         Global_Wp_Scripts.Done := Done;
+      end;
+
+      Scripts_2 := +OB_Get_Clean;
+
+      return
+        To_Array (List => (
+          Build ("styles",  From_String (-Styles_2)),
+          Build ("scripts", From_String (-Scripts_2))
+        ));
+   end X_Wp_Get_Iframed_Editor_Assets;
 
    -------------------------------
    -- Get_Block_Editor_Settings --

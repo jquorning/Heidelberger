@@ -155,6 +155,10 @@ is
 --                    is ([]);
 
    procedure Do_Items (This    : in out Wp_Dependencies;
+                       Handles : List_Type;
+                       Group   : Integer := 0); --  = false
+
+   procedure Do_Items (This    : in out Wp_Dependencies;
                        Handles : Boolean;
                        Group   : Integer := 0); --  = false
 

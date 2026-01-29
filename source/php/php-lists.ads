@@ -18,6 +18,9 @@ is
    function List_Merge (Left, Right : List_Type)
                         return List_Type;
 
+   function List_Merge (List_1, List_2, List_3 : List_Type)
+                        return List_Type;
+
    function List_Diff (Left, Right : List_Type)
                        return List_Type;
 

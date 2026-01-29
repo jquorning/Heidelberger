@@ -3,7 +3,6 @@
 --
 
 with Ada.Containers;
-with Ada.Strings.Unbounded;
 
 package body Php.Lists
 is
@@ -17,7 +16,6 @@ is
                      Strict   : Boolean := False)
                      return Boolean
    is
-      use Ada.Strings.Unbounded;
    begin
       for A of Haystack loop
          if Needle = A then
@@ -44,6 +42,17 @@ is
          end if;
       end loop;
       return Result;
+   end List_Merge;
+
+   ----------------
+   -- List_Merge --
+   ----------------
+
+   function List_Merge (List_1, List_2, List_3 : List_Type)
+                        return List_Type
+   is
+   begin
+      return List_Merge (List_1, List_Merge (List_2, List_3));
    end List_Merge;
 
    ----------------
