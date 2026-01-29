@@ -3431,7 +3431,7 @@ is
       use Php.Files;
       use Inc_Options;
 
-      Plugins : constant List_Type := [];  -- ???
+      Plugins : constant List_Type := Empty_List;  -- ???
 --      As_List (X_Get_Option ("active_plugins"));
    begin
       for Plugin of Plugins loop -- (array)

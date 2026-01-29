@@ -129,7 +129,7 @@ is
             use type Adm_Menu.Inner_Maps.Map;
 
             Admin_Is_Parent : Boolean    := False;
-            Class           : List_Type  := [];
+            Class           : List_Type;
             Aria_Attributes : UString;
             Aria_Hidden     : UString;
             Is_Separator    : Boolean    := False;
@@ -337,7 +337,7 @@ is
                      for Sub of Submenu_Items loop
                         declare
                            Sub_Item        : constant Adm_Menu.Submenu_Item := Sub;
-                           Class           : List_Type := [];
+                           Class           : List_Type;
                            Aria_Attributes : UString;
                         begin
                            if Current_User_Can (-Sub_Item.Capability) then

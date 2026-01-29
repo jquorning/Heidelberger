@@ -693,7 +693,7 @@ is
             This.Roles := [Role];
 --          This.Roles := To_Array (List => (1 => Build (Role, True)));
          else
-            This.Roles := []; -- Array;
+            This.Roles := Empty_List;
          end if;
 
          Update_User_Meta (This.Id, -This.Cap_Key, This.Caps);

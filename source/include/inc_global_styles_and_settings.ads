@@ -32,7 +32,7 @@ is
    -- }
    -- @return array The settings to retrieve.
    --
-   function Wp_Get_Global_Settings (Path    : List_Type  := [];
+   function Wp_Get_Global_Settings (Path    : List_Type  := Empty_List;
                                     Context : Array_Type := Empty_Array)
                                     return Multi_Type; -- Array_Type;
 
@@ -48,7 +48,7 @@ is
    --                     theme.json support.
    -- @return string Stylesheet.
    --
-   function Wp_Get_Global_Stylesheet (Types : List_Type := [])
+   function Wp_Get_Global_Stylesheet (Types : List_Type := Empty_List)
                                       return String;
 
    --

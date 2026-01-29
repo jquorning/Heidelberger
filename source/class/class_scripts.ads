@@ -181,7 +181,7 @@ is
    -- @return string[] Handles of scripts that have been printed.
    --
    function Print_Scripts (This    : in out Wp_Scripts;
-                           Handles : List_Type := [];
+                           Handles : List_Type := Empty_List;
                            Group   : Integer   := 0) -- False
                            return List_Type
                            with Side_Effects;

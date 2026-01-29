@@ -142,7 +142,7 @@ is
    -- @return string[] Array of handles of items that have been processed.
    --
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := []; -- = false,
+                      Handles : List_Type := Empty_List; -- = false,
                       Group   : Integer   := 0) --  = false
                       return List_Type
                       with Side_Effects;
@@ -239,8 +239,7 @@ is
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
-                 Deps   : List_Type := [];
-                 -- String_Array := Empty_String_Array;
+                 Deps   : List_Type := Empty_List;
                  Ver    : String    := ""; -- Boolean      := False;
                  Args   : String    := "") -- = null
                  return Boolean
@@ -249,14 +248,14 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := [];
+                  Deps   : List_Type := Empty_List;
                   Ver    : String    := "";
                   Args   : String    := "");
 
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := [];
+                  Deps   : List_Type := Empty_List;
                   Ver    : String    := "";
                   Args   : Integer)
                   is null;
@@ -264,7 +263,7 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := [];
+                  Deps   : List_Type := Empty_List;
                   Ver    : Boolean;
                   Args   : Integer)
                   is null;
@@ -272,7 +271,7 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : Boolean;
-                  Deps   : List_Type := [];
+                  Deps   : List_Type := Empty_List;
                   Ver    : String    := "";
                   Args   : Integer   := 0)
                   is null;

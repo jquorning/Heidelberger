@@ -16,6 +16,8 @@ package Lists is
 
    subtype List_Type is List_Vectors.Vector;
 
+   Empty_List : constant List_Type := List_Vectors.Empty_Vector;
+
    procedure Append (List : in out List_Type;
                      Item : String);
    -- Append Item to List.

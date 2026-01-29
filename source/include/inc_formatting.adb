@@ -4246,7 +4246,7 @@ is
    -------------
 
    function ESC_URL (URL       : String;
-                     Protocols : List_Type := [];
+                     Protocols : List_Type := Empty_List;
                      X_Context : String    := "display")
                     return String
    is
@@ -4395,7 +4395,7 @@ is
    -----------------
 
    function ESC_URL_Raw (URL       : String;
-                         Protocols : List_Type := []) -- null
+                         Protocols : List_Type := Empty_List) -- null
                          return String
    is
    begin
@@ -4407,7 +4407,7 @@ is
    ------------------
 
    function Sanitize_URL (URL       : String;
-                          Protocols : List_Type := [])
+                          Protocols : List_Type := Empty_List)
                           return String
    is
    begin

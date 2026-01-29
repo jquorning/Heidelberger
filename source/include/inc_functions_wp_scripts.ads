@@ -49,10 +49,10 @@ is
    -- @return string[] On success, an array of handles of processed WP_Dependencies
    --                   items; otherwise, an empty array.
    --
-   function Wp_Print_Scripts (Handles : List_Type := [])
+   function Wp_Print_Scripts (Handles : List_Type := Empty_List)
                               return List_Type;
 
-   procedure Wp_Print_Scripts (Handles : List_Type := []); -- false
+   procedure Wp_Print_Scripts (Handles : List_Type := Empty_List); -- false
 
    --
    -- Helper function to output a _doing_it_wrong message when applicable.
@@ -126,7 +126,7 @@ is
    --
    procedure Wp_Enqueue_Script (Handle    : String;
                                 Src       : String    := "";
-                                Deps      : List_Type := [];
+                                Deps      : List_Type := Empty_List;
                                 Ver       : String    := ""; -- Boolean   := False;
                                 In_Footer : Boolean   := False);
 

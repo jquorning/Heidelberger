@@ -687,7 +687,7 @@ is
    --
    function Wp_Get_Object_Terms (Object_Ids : Integer;
                                  Taxonomies : String;
-                                 Args       : List_Type := [])
+                                 Args       : List_Type := Empty_List)
                                  return Array_Type
                                  -- Class_Terms.Wp_Term_Array;
                                  is (Empty_Array);

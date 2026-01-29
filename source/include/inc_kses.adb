@@ -711,7 +711,7 @@ is
 
    function Wp_KSES (Item              : String;
                      Allowed_HTML      : Array_Type;
-                     Allowed_Protocols : List_Type := [])
+                     Allowed_Protocols : List_Type := Empty_List)
                      return String
    is
       use Inc_Functions;

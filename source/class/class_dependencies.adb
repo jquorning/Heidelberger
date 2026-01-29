@@ -22,7 +22,7 @@ is
    --------------
 
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := []; -- = false,
+                      Handles : List_Type := Empty_List; -- = false,
                       Group   : Integer   := 0) --  = false
                       return List_Type
    is
@@ -207,7 +207,7 @@ is
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
-                 Deps   : List_Type := [];
+                 Deps   : List_Type := Empty_List;
                  Ver    : String    := "";
                  Args   : String    := "")
                  return Boolean
@@ -251,7 +251,7 @@ is
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : String;
-                  Deps   : List_Type := [];
+                  Deps   : List_Type := Empty_List;
                   Ver    : String    := "";
                   Args   : String    := "")
    is

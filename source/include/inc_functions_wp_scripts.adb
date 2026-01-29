@@ -88,7 +88,7 @@ is
    -- Wp_Print_Scripts --
    ----------------------
 
-   function Wp_Print_Scripts (Handles : List_Type := [])
+   function Wp_Print_Scripts (Handles : List_Type := Empty_List)
                               return List_Type
    is
 --    global wp_scripts;
@@ -121,7 +121,7 @@ is
    -- Wp_Print_Scripts --
    ----------------------
 
-   procedure Wp_Print_Scripts (Handles : List_Type := [])
+   procedure Wp_Print_Scripts (Handles : List_Type := Empty_List)
    is
       Unused : constant List_Type :=
         Wp_Print_Scripts (Handles);
@@ -385,7 +385,7 @@ is
 
    procedure Wp_Enqueue_Script (Handle    : String;
                                 Src       : String    := "";
-                                Deps      : List_Type := [];
+                                Deps      : List_Type := Empty_List;
                                 Ver       : String    := "";
                                 In_Footer : Boolean   := False)
    is

@@ -207,7 +207,7 @@ is
    --                           is ([]);
 
    -- function Get_Site_Option (Option  : String;
-   --                           Default : List_Type := [])
+   --                           Default : List_Type := Empty_List)
    --                           return Natural
    --                           is (999);
 

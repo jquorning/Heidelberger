@@ -490,7 +490,7 @@ is
    function Get_Stylesheet
               (This    : Wp_Theme_JSON;
                Types   : List_Type := Variables_Styles_Present;
-               Origins : List_Type := []) -- null
+               Origins : List_Type := Empty_List) -- null
                return String
    is
       use Php.Arrays;
@@ -1295,7 +1295,7 @@ is
 
    function Get_Settings_Slugs (Settings        : Array_Type;
                                 Preset_Metadata : Array_Type;
-                                Origins         : List_Type := []) -- null
+                                Origins         : List_Type := Empty_List) -- null
                                 return Array_Type
    is
       use Inc_Functions;

@@ -2621,7 +2621,7 @@ is
    BACKGROUND_IMAGE    : UStrings.UString;
 
    procedure Add_Theme_Support (Feature : String;
-                                List    : List_Type  := [];
+                                List    : List_Type  := Empty_List;
                                 Arry    : Array_Type := Empty_Array) -- ...args
    is
       use Php.Arrays;

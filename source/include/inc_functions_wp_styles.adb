@@ -131,7 +131,7 @@ is
 
    function Wp_Register_Style (Handle : String;
                                Src    : String;
-                               Deps   : List_Type := [];
+                               Deps   : List_Type := Empty_List;
                                Ver    : String    := ""; -- Boolean   := False;
                                Media  : String    := "all")
                                return Boolean
@@ -147,7 +147,7 @@ is
 
    procedure Wp_Register_Style (Handle : String;
                                 Src    : Boolean;
-                                Deps   : List_Type := [];
+                                Deps   : List_Type := Empty_List;
                                 Ver    : Boolean   := False;
                                 Media  : Boolean   := False)
    is
@@ -181,7 +181,7 @@ is
 
    procedure Wp_Enqueue_Style (Handle : String;
                                Src    : String    := "";
-                               Deps   : List_Type := [];
+                               Deps   : List_Type := Empty_List;
                                Ver    : String    := "";
                                Media  : String    := "all")
    is

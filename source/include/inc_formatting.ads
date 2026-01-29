@@ -228,7 +228,7 @@ is
    -- @return string The cleaned URL after esc_url() is run with the "db" context.
    --
    function Sanitize_URL (URL       : String;
-                          Protocols : List_Type := [])
+                          Protocols : List_Type := Empty_List)
                           return String;
 
    --
@@ -348,7 +348,7 @@ is
    --                than those in `protocols`, or if `url` contains an empty string.
    --
    function ESC_URL (URL       : String;
-                     Protocols : List_Type := [];
+                     Protocols : List_Type := Empty_List;
                      X_Context : String    := "display")
                     return String;
 
@@ -368,7 +368,7 @@ is
    -- @return string The cleaned URL after sanitize_url() is run.
    --
    function ESC_URL_Raw (URL       : String;
-                         Protocols : List_Type := []) -- null
+                         Protocols : List_Type := Empty_List) -- null
                          return String;
 
    --
