@@ -499,7 +499,7 @@ is
       use List_Vectors;
 
       Origins_2 : List_Type :=
-        (if Origins = []
+        (if Origins.Is_Empty
          then VALID_ORIGINS
          else Origins);
 
@@ -1302,7 +1302,7 @@ is
       use List_Vectors;
 
       Origins_2 : List_Type :=
-        (if Origins = []
+        (if Origins.Is_Empty
          then VALID_ORIGINS
          else Origins);
 

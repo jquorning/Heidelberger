@@ -2146,7 +2146,7 @@ is
             -- Account for sites that have this key present when the original key
             -- does not exist.
             --
-            if Disallowed_List = [] then
+            if Disallowed_List.Is_Empty then
 --          if False = Disallowed_List then
                Disallowed_List := Get_Option ("blocklist_keys");
             end if;

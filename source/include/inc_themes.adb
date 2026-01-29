@@ -2638,7 +2638,7 @@ is
       List_2 : List_Type;
       Args_2 : Boolean := False;
    begin
-      if List = [] and Arry = Empty_Array then
+      if List.Is_Empty and Arry = Empty_Array then
          Args_2 := True;
       end if;
 
@@ -2688,7 +2688,7 @@ is
 
       elsif Feature = "html5" then
          -- You can't just pass "html5", you need to pass an array of types.
-         if List = [] then
+         if List.Is_Empty then
 --       if ( empty( args[0] ) || ! is_array( args[0] ) ) then
             X_Doing_It_Wrong (
               "add_theme_support('html5')",

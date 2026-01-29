@@ -33,7 +33,7 @@ is
       -- If nothing is passed, print the queue. If a string is passed,
       -- print that item. If an array is passed, print those items.
       --
-      Handles_2 : List_Type := (if Handles = []
+      Handles_2 : List_Type := (if Handles.Is_Empty
                                 then This.Queue else Handles); -- (array)
       Unused : Boolean;
    begin
@@ -127,7 +127,7 @@ is
 
       Handles_2 : constant List_Type := Handles; -- (array)
    begin
-      if Handles_2 = [] then
+      if Handles_2.Is_Empty then
          return False;
       end if;
 
@@ -160,7 +160,7 @@ is
                  not This.Registered (Handle_2).Deps.Is_Empty and then
 --               This.Registered (Handle_2).Deps /= Empty_String_Array and then
                  List_Diff (This.Registered (Handle_2).Deps,
-                            Array_Keys (This.Registered)) = []
+                            Array_Keys (This.Registered)).Is_Empty
                then
                   Keep_Going := False; -- Item requires dependencies that don't exist.
                elsif
@@ -204,26 +204,12 @@ is
    -- Add --
    ---------
 
-   procedure Add (This   : in out Wp_Dependencies;
-                  Handle : String;
-                  Src    : String;
-                  Deps   : List_Type := [];
-                  Ver    : String       := "";
-                  Args   : String       := "")
-   is
-      Unused : constant Boolean :=
-        Add (This, Handle, Src, Deps, Ver, Args);
-   begin
-      null;
-   end Add;
-
    function Add (This   : in out Wp_Dependencies;
                  Handle : String;
                  Src    : String;
                  Deps   : List_Type := [];
-                 Ver    : String    := ""; -- Boolean      := False;
-                 Args   : String    := "") -- = null
---               Args   : Array_Type   := Empty_Array) -- = null
+                 Ver    : String    := "";
+                 Args   : String    := "")
                  return Boolean
    is
       use Php.Lists;
@@ -231,31 +217,48 @@ is
       use Class_Dependency.Dependency_Maps;
       use List_Vectors;
    begin
-      if This.Registered.Find (Handle) /= Dependency_Maps.No_Element then
+      if Has_Element (This.Registered.Find (Handle)) then
          return False;
       end if;
 
       This.Registered.Insert
-        (Handle, New_Item => X_Construct (Handle, Src, Deps, Ver, Args));
-        -- X_Wp_Dependency'
+        (Handle,
+         New_Item => X_Wp_Dependency'(X_Construct (Handle, Src, Deps, Ver, Args)));
 
       -- If the item was enqueued before the details were registered, enqueue it now.
       if List_Key_Exists (Handle, This.Queued_Before_Register) then
-         if
-           This.Queued_Before_Register.Find (Handle) = List_Vectors.No_Element
-         then
---       if not Is_Null (This.Queued_Before_Register (Handle)) then
-            This.Enqueue
-              ([Handle & "?" &
-                        (Element (This.Queued_Before_Register.Find (Handle)))]);
-         else
-            This.Enqueue ([Handle]);
-         end if;
+         declare
+            Position : List_Vectors.Cursor :=
+              This.Queued_Before_Register.Find (Handle);
+         begin
+            if not Has_Element (Position) then
+               This.Enqueue ([Handle & "?" & Element (Position)]);
+            else
+               This.Enqueue ([Handle]);
+            end if;
 
---       Unset (This.Queued_Before_Register (Handle));
+            This.Queued_Before_Register.Delete (Position);
+         end;
       end if;
 
       return True;
+   end Add;
+
+   ---------
+   -- Add --
+   ---------
+
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : String;
+                  Deps   : List_Type := [];
+                  Ver    : String    := "";
+                  Args   : String    := "")
+   is
+      Unused : constant Boolean :=
+        Add (This, Handle, Src, Deps, Ver, Args);
+   begin
+      null;
    end Add;
 
    --------------
