@@ -201,6 +201,10 @@ is
                  Key  : String)
                  return Multi_Type;
 
+   function Get (Position : Cursor;
+                 Key      : String)
+                 return Multi_Type;
+
    function Get_As_String (Arry : Array_Type;
                            Key  : String)
                            return String;
@@ -248,6 +252,10 @@ is
    -----------
    -- Isset --
    -----------
+
+   function Isset (Position : Cursor;
+                   Key      : String)
+                   return Boolean;
 
    function Isset (Arry : Array_Type;
                    Key  : String)

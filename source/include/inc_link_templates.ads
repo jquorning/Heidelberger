@@ -551,6 +551,37 @@ is
                           return String;
 
    --
+   -- Retrieves the URL to the content directory.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string path Optional. Path relative to the content URL. Default empty.
+   -- @return string Content URL link with optional path appended.
+   --
+   function Content_URL (Path : String := "")
+                         return String;
+
+   --
+   -- Retrieves a URL within the plugins or mu-plugins directory.
+   --
+   -- Defaults to the plugins directory URL if no arguments are supplied.
+   --
+   -- @since 2.6.0
+   --
+   -- @param string path   Optional. Extra path appended to the end of the URL,
+   --                      including the relative directory if plugin is supplied.
+   --                      Default empty.
+   -- @param string plugin Optional. A full path to a file inside a plugin or
+   --                      mu-plugin. The URL will be relative to its directory.
+   --                      Default empty. Typically this is done by passing
+   --                      `__FILE__` as the argument.
+   -- @return string Plugins URL link with optional paths appended.
+   --
+   function Plugins_URL (Path   : String := "";
+                         Plugin : String := "")
+                         return String;
+
+   --
    -- Retrieves the site URL for the current network.
    --
    -- Returns the site URL with the appropriate protocol, "https" if
@@ -625,6 +656,34 @@ is
    function Get_Avatar_Data (Id_Or_Email : String;
                              Args        : Array_Type) -- = null
                              return Array_Type;
+
+   --
+   -- Retrieves the URL of a file in the theme.
+   --
+   -- Searches in the stylesheet directory before the template directory so themes
+   -- which inherit from a parent theme can just override one file.
+   --
+   -- @since 4.7.0
+   --
+   -- @param string file Optional. File to search for in the stylesheet directory.
+   -- @return string The URL of the file.
+   --
+   function Get_Theme_File_URI (File : String := "")
+                                return String;
+
+   --
+   -- Retrieves the path of a file in the theme.
+   --
+   -- Searches in the stylesheet directory before the template directory so themes
+   -- which inherit from a parent theme can just override one file.
+   --
+   -- @since 4.7.0
+   --
+   -- @param string file Optional. File to search for in the stylesheet directory.
+   -- @return string The path of the file.
+   --
+   function Get_Theme_File_Path (File : String := "")
+                                 return String;
 
    --
    -- Retrieves the URL to the privacy policy page.

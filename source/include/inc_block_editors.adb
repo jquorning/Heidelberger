@@ -11,6 +11,7 @@ with Php.Echoing;
 with Php.Files;
 with Php.Lists;
 with Php.Misc;
+with Php.Preg;
 
 with Constants;
 with Globals;
@@ -23,6 +24,9 @@ with Class_Theme_JSON_Resolver;
 with Adm_Load_Styles;
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
+with Inc_HTTP;
+with Inc_Link_Templates;
+with Inc_Load;
 with Inc_L10n;
 with Inc_Media;
 with Inc_Options;
@@ -528,10 +532,15 @@ is
                return Array_Type
    is
       use Php.Arrays;
+      use Wp_Common;
+      use Class_Posts;
       use Inc_Global_Styles_And_Settings;
+      use Inc_Link_Templates;
+      use Inc_Options;
+      use Inc_Themes;
 
-      Editor_Settings : constant Array_Type := Array_Merge (
-        Get_Default_Block_Editor_Settings, -- (),
+      Editor_Settings : Array_Type := Array_Merge (
+        Get_Default_Block_Editor_Settings,
         To_Array (List => (
           Build ("allowedBlockTypes", Get_Allowed_Block_Types (Block_Editor_Context)),
           Build ("blockCategories",   Get_Block_Categories (Block_Editor_Context))
@@ -600,125 +609,290 @@ is
          end;
       end if;
 
-      raise Program_Error with "not implemented";
+      Set (Editor_Settings, "styles", From_Array (
+           Array_Merge (Global_Styles, Get_Block_Editor_Theme_Styles)));
 
-        -- editor_settings["styles"] = array_merge( global_styles, get_block_editor_theme_styles() );
+      Set (Editor_Settings, "__experimentalFeatures",
+           Wp_Get_Global_Settings);
 
-        -- editor_settings["__experimentalFeatures"] = wp_get_global_settings();
-        -- -- These settings may need to be updated based on data coming from theme.json sources.
-        -- if ( isset( editor_settings["__experimentalFeatures"]["color"]["palette"] ) ) then
-        --         colors_by_origin          = editor_settings["__experimentalFeatures"]["color"]["palette"];
-        --         editor_settings["colors"] = isset( colors_by_origin["custom"] ) ?
-        --                 colors_by_origin["custom"] : (
-        --                         isset( colors_by_origin["theme"] ) ?
-        --                                 colors_by_origin["theme"] :
-        --                                 colors_by_origin["default"]
-        --                 );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["color"]["gradients"] ) ) then
-        --         gradients_by_origin          = editor_settings["__experimentalFeatures"]["color"]["gradients"];
-        --         editor_settings["gradients"] = isset( gradients_by_origin["custom"] ) ?
-        --                 gradients_by_origin["custom"] : (
-        --                         isset( gradients_by_origin["theme"] ) ?
-        --                                 gradients_by_origin["theme"] :
-        --                                 gradients_by_origin["default"]
-        --                 );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["typography"]["fontSizes"] ) ) then
-        --         font_sizes_by_origin         = editor_settings["__experimentalFeatures"]["typography"]["fontSizes"];
-        --         editor_settings["fontSizes"] = isset( font_sizes_by_origin["custom"] ) ?
-        --                 font_sizes_by_origin["custom"] : (
-        --                         isset( font_sizes_by_origin["theme"] ) ?
-        --                                 font_sizes_by_origin["theme"] :
-        --                                 font_sizes_by_origin["default"]
-        --                 );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["color"]["custom"] ) ) then
-        --         editor_settings["disableCustomColors"] = ! editor_settings["__experimentalFeatures"]["color"]["custom"];
-        --         unset( editor_settings["__experimentalFeatures"]["color"]["custom"] );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["color"]["customGradient"] ) ) then
-        --         editor_settings["disableCustomGradients"] = ! editor_settings["__experimentalFeatures"]["color"]["customGradient"];
-        --         unset( editor_settings["__experimentalFeatures"]["color"]["customGradient"] );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["typography"]["customFontSize"] ) ) then
-        --         editor_settings["disableCustomFontSizes"] = ! editor_settings["__experimentalFeatures"]["typography"]["customFontSize"];
-        --         unset( editor_settings["__experimentalFeatures"]["typography"]["customFontSize"] );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["typography"]["lineHeight"] ) ) then
-        --         editor_settings["enableCustomLineHeight"] = editor_settings["__experimentalFeatures"]["typography"]["lineHeight"];
-        --         unset( editor_settings["__experimentalFeatures"]["typography"]["lineHeight"] );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["units"] ) ) then
-        --         editor_settings["enableCustomUnits"] = editor_settings["__experimentalFeatures"]["spacing"]["units"];
-        --         unset( editor_settings["__experimentalFeatures"]["spacing"]["units"] );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["padding"] ) ) then
-        --         editor_settings["enableCustomSpacing"] = editor_settings["__experimentalFeatures"]["spacing"]["padding"];
-        --         unset( editor_settings["__experimentalFeatures"]["spacing"]["padding"] );
-        -- end;
-        -- if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["customSpacingSize"] ) ) then
-        --         editor_settings["disableCustomSpacingSizes"] = ! editor_settings["__experimentalFeatures"]["spacing"]["customSpacingSize"];
-        --         unset( editor_settings["__experimentalFeatures"]["spacing"]["customSpacingSize"] );
-        -- end;
+      -- These settings may need to be updated based on data coming from theme.json
+      -- sources.
+      if Isset_3 (Editor_Settings, "__experimentalFeatures", "color", "palette") then
+         declare
+            Colors_By_Origin : constant Cursor :=
+              Ref_3 (Editor_Settings, "__experimentalFeatures", "color", "palette");
+         begin
+            Set (Editor_Settings, "colors",
+                 (if Isset (Colors_By_Origin, "custom")
+                  then Get (Colors_By_Origin, "custom")
+                   else
+                     (if Isset (Colors_By_Origin, "theme")
+                      then Get (Colors_By_Origin, "theme")
+                      else Get (Colors_By_Origin, "default"))
+                 ));
+         end;
+      end if;
 
-        -- if ( isset( editor_settings["__experimentalFeatures"]["spacing"]["spacingSizes"] ) ) then
-        --         spacing_sizes_by_origin         = editor_settings["__experimentalFeatures"]["spacing"]["spacingSizes"];
-        --         editor_settings["spacingSizes"] = isset( spacing_sizes_by_origin["custom"] ) ?
-        --                 spacing_sizes_by_origin["custom"] : (
-        --                         isset( spacing_sizes_by_origin["theme"] ) ?
-        --                                 spacing_sizes_by_origin["theme"] :
-        --                                 spacing_sizes_by_origin["default"]
-        --                 );
-        -- end;
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "color", "gradients")
+      then
+         declare
+            Gradients_By_Origin : constant Cursor :=
+              Ref_3 (Editor_Settings, "__experimentalFeatures", "color", "gradients");
+         begin
+            Set (Editor_Settings, "gradients",
+                 (if Isset (Gradients_By_Origin, "custom")
+                  then Get (Gradients_By_Origin, "custom")
+                  else
+                    (if Isset (Gradients_By_Origin, "theme")
+                     then Get (Gradients_By_Origin, "theme")
+                     else Get (Gradients_By_Origin, "default"))
+                ));
+         end;
+      end if;
 
-        -- editor_settings["__unstableResolvedAssets"]         = _wp_get_iframed_editor_assets();
-        -- editor_settings["localAutosaveInterval"]            = 15;
-        -- editor_settings["disableLayoutStyles"]              = current_theme_supports( "disable-layout-styles" );
-        -- editor_settings["__experimentalDiscussionSettings"] = array(
-        --         "commentOrder"         => get_option( "comment_order" ),
-        --         "commentsPerPage"      => get_option( "comments_per_page" ),
-        --         "defaultCommentsPage"  => get_option( "default_comments_page" ),
-        --         "pageComments"         => get_option( "page_comments" ),
-        --         "threadComments"       => get_option( "thread_comments" ),
-        --         "threadCommentsDepth"  => get_option( "thread_comments_depth" ),
-        --         "defaultCommentStatus" => get_option( "default_comment_status" ),
-        --         "avatarURL"            => get_avatar_url(
-        --                 "",
-        --                 array(
-        --                         "size"          => 96,
-        --                         "force_default" => true,
-        --                         "default"       => get_option( "avatar_default" ),
-        --                 )
-        --         ),
-        -- );
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "typography", "fontSizes")
+      then
+         declare
+            Font_Sizes_By_Origin : constant Cursor :=
+              Ref_3 (Editor_Settings, "__experimentalFeatures",
+                     "typography", "fontSizes");
+         begin
+            Set (Editor_Settings, "fontSizes",
+                 (if Isset (Font_Sizes_By_Origin, "custom")
+                  then Get (Font_Sizes_By_Origin, "custom")
+                  else
+                    (if Isset (Font_Sizes_By_Origin, "theme")
+                     then Get (Font_Sizes_By_Origin, "theme")
+                     else Get (Font_Sizes_By_Origin, "default"))
+                 ));
+         end;
+      end if;
 
-        -- --
-        -- -- Filters the settings to pass to the block editor for all editor type.
-        -- --
-        -- -- @since 5.8.0
-        -- --
-        -- -- @param array                   editor_settings      Default editor settings.
-        -- -- @param WP_Block_Editor_Context block_editor_context The current block editor context.
-        -- --
-        -- editor_settings = apply_filters( "block_editor_settings_all", editor_settings, block_editor_context );
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures", "color", "custom")
+      then
+         Set (Editor_Settings, "disableCustomColors", From_Boolean (
+              not As_Boolean (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                          "color", "custom")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "color", "custom"));
+      end if;
 
-        -- if ( ! empty( block_editor_context->post ) ) then
-        --         post = block_editor_context->post;
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures", "color", "customGradient")
+      then
+         Set (Editor_Settings, "disableCustomGradients", From_Boolean (
+              not As_Boolean (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                   "color", "customGradient")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "color", "customGradient"));
+      end if;
 
-        --         --
-        --         -- Filters the settings to pass to the block editor.
-        --         --
-        --         -- @since 5.0.0
-        --         -- @deprecated 5.8.0 Use the then@see "block_editor_settings_all"end; filter instead.
-        --         --
-        --         -- @param array   editor_settings Default editor settings.
-        --         -- @param WP_Post post            Post being edited.
-        --         --
-        --         editor_settings = apply_filters_deprecated( "block_editor_settings", array( editor_settings, post ), "5.8.0", "block_editor_settings_all" );
-        -- end;
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "typography", "customFontSize")
+      then
+         Set (Editor_Settings, "disableCustomFontSizes", From_Boolean (
+              not As_Boolean (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                   "typography", "customFontSize")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "typography", "customFontSize"));
+      end if;
+
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "typography", "lineHeight")
+      then
+         Set (Editor_Settings, "enableCustomLineHeight", From_Integer (
+              As_Integer (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                     "typography", "lineHeight")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "typography", "lineHeight"));
+      end if;
+
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "spacing", "units")
+      then
+         Set (Editor_Settings, "enableCustomUnits", From_String (
+              As_String (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                     "spacing", "units")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "spacing", "units"));
+      end if;
+
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "spacing", "padding")
+      then
+         Set (Editor_Settings, "enableCustomSpacing", From_Integer (
+              As_Integer (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                      "spacing", "padding")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "spacing", "padding"));
+      end if;
+
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "spacing", "customSpacingSize")
+      then
+         Set (Editor_Settings, "disableCustomSpacingSizes", From_Boolean (
+              not As_Boolean (Get (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                                          "spacing", "customSpacingSize")))));
+         Delete (Ref_3 (Editor_Settings, "__experimentalFeatures",
+                        "spacing", "customSpacingSize"));
+      end if;
+
+      if
+        Isset_3 (Editor_Settings, "__experimentalFeatures",
+                 "spacing", "spacingSizes")
+      then
+         declare
+            Spacing_Sizes_By_Origin : constant Cursor :=
+              Ref_3 (Editor_Settings, "__experimentalFeatures",
+                     "spacing", "spacingSizes");
+         begin
+            Set (Editor_Settings, "spacingSizes",
+                 (if Isset (Spacing_Sizes_By_Origin, "custom")
+                  then Get (Spacing_Sizes_By_Origin, "custom")
+                  else
+                    (if Isset (Spacing_Sizes_By_Origin, "theme")
+                     then Get (Spacing_Sizes_By_Origin, "theme")
+                     else Get (Spacing_Sizes_By_Origin, "default"))
+                 ));
+         end;
+      end if;
+
+      Set (Editor_Settings, "__unstableResolvedAssets", From_Array (
+           X_Wp_Get_Iframed_Editor_Assets));
+
+      Set (Editor_Settings, "localAutosaveInterval", From_Integer (15));
+
+      Set (Editor_Settings, "disableLayoutStyles", From_Boolean (
+           Current_Theme_Supports ("disable-layout-styles")));
+
+      Set (Editor_Settings, "__experimentalDiscussionSettings", From_Array (
+           To_Array (List => (
+             Build ("commentOrder",        String'(Get_Option ("comment_order"))),
+             Build ("commentsPerPage",     String'(Get_Option ("comments_per_page"))),
+             Build ("defaultCommentsPage",
+                    String'(Get_Option ("default_comments_page"))),
+             Build ("pageComments",         String'(Get_Option ("page_comments"))),
+             Build ("threadComments",       String'(Get_Option ("thread_comments"))),
+             Build ("threadCommentsDepth",
+                    String'(Get_Option ("thread_comments_depth"))),
+             Build ("defaultCommentStatus",
+                    String'(Get_Option ("default_comment_status"))),
+             Build ("avatarURL",
+               Get_Avatar_URL (
+                 "",
+                 To_Array (List => (
+                   Build ("size",          96),
+                   Build ("force_default", True),
+                   Build ("default",       String'(Get_Option ("avatar_default")))
+                 ))
+               ))
+           ))
+          ));
+
+      --
+      -- Filters the settings to pass to the block editor for all editor type.
+      --
+      -- @since 5.8.0
+      --
+      -- @param array                   editor_settings      Default editor settings.
+      -- @param WP_Block_Editor_Context block_editor_context The current block editor
+      --                                                     context.
+      --
+      Editor_Settings :=
+        Apply_Filters ("block_editor_settings_all", Editor_Settings,
+                       Block_Editor_Context);
+
+      if Block_Editor_Context.Post.all = Null_Post then
+--    if not Empty (Block_Editor_Context.Post) then
+         declare
+            Post : constant Wp_Post := Block_Editor_Context.Post.all;
+         begin
+            --
+            -- Filters the settings to pass to the block editor.
+            --
+            -- @since 5.0.0
+            -- @deprecated 5.8.0 Use the {@see "block_editor_settings_all"}
+            --                   filter instead.
+            --
+            -- @param array   editor_settings Default editor settings.
+            -- @param WP_Post post            Post being edited.
+            --
+            Editor_Settings :=
+              Apply_Filters_Deprecated ("block_editor_settings",
+                                        Editor_Settings,
+                                        Post,
+--                                      To_Array (Editor_Settings, Post),
+                                        "5.8.0", "block_editor_settings_all");
+         end;
+      end if;
 
       return Editor_Settings;
    end Get_Block_Editor_Settings;
+
+   -----------------------------------
+   -- Get_Block_Editor_Theme_Styles --
+   -----------------------------------
+
+   Global_Editor_Styles : List_Type; -- Array_Vectors.Array_Vector;
+
+   function Get_Block_Editor_Theme_Styles
+            return Array_Type
+   is
+      use Php.Files;
+      use Php.Preg;
+      use Inc_HTTP;
+      use Inc_Themes;
+      use Inc_Load;
+      use Inc_Link_Templates;
+--    global editor_styles;
+
+      Styles : Array_Type;
+   begin
+      if
+        not Global_Editor_Styles.Is_Empty and then
+        Current_Theme_Supports ("editor-styles")
+      then
+         for Style of Global_Editor_Styles loop
+            if Preg_Match ("~^(https?:)?//~", Style) then
+               declare
+                  Response : constant Array_Type := Wp_Remote_Get (Style);
+               begin
+                  if not Is_Wp_Error (Response) then
+                     Styles.Append (From_Array (To_Array (List => (
+                       Build ("css",            Wp_Remote_Retrieve_Body (Response)),
+                       Build ("__unstableType", "theme"),
+                       Build ("isGlobalStyles", False)
+                     ))));
+                  end if;
+               end;
+            else
+               declare
+                  File : constant String := Get_Theme_File_Path (Style);
+               begin
+                  if Is_File (File) then
+                     Styles.Append (From_Array (To_Array (List => (
+                       Build ("css",            File_Get_Contents (File)),
+                       Build ("baseURL",        Get_Theme_File_URI (Style)),
+                       Build ("__unstableType", "theme"),
+                       Build ("isGlobalStyles", False)
+                     ))));
+                  end if;
+               end;
+            end if;
+         end loop;
+      end if;
+
+      return Styles;
+   end Get_Block_Editor_Theme_Styles;
 
 end Inc_Block_Editors;

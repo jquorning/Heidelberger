@@ -381,46 +381,16 @@ is
 --         );
 -- end;
 
--- --
--- -- Creates an array of theme styles to load into the block editor.
--- --
--- -- @since 5.8.0
--- --
--- -- @global array editor_styles
--- --
--- -- @return array An array of theme styles for the block editor.
--- --
--- function get_block_editor_theme_styles() then
---         global editor_styles;
-
---         styles = array();
-
---         if ( editor_styles && current_theme_supports( "editor-styles" ) ) then
---                 foreach ( editor_styles as style ) then
---                         if ( preg_match( "~^(https?:)?//~", style ) ) then
---                                 response = wp_remote_get( style );
---                                 if ( ! is_wp_error( response ) ) then
---                                         styles[] = array(
---                                                 "css"            => wp_remote_retrieve_body( response ),
---                                                 "__unstableType" => "theme",
---                                                 "isGlobalStyles" => false,
---                                         );
---                                 end;
---                         end; else then
---                                 file = get_theme_file_path( style );
---                                 if ( is_file( file ) ) then
---                                         styles[] = array(
---                                                 "css"            => file_get_contents( file ),
---                                                 "baseURL"        => get_theme_file_uri( style ),
---                                                 "__unstableType" => "theme",
---                                                 "isGlobalStyles" => false,
---                                         );
---                                 end;
---                         end;
---                 end;
---         end;
-
---         return styles;
--- end;
+   --
+   -- Creates an array of theme styles to load into the block editor.
+   --
+   -- @since 5.8.0
+   --
+   -- @global array editor_styles
+   --
+   -- @return array An array of theme styles for the block editor.
+   --
+   function Get_Block_Editor_Theme_Styles
+            return Array_Type;
 
 end Inc_Block_Editors;

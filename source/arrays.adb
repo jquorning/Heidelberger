@@ -503,6 +503,18 @@ is
       return Get (Source);
    end Get;
 
+   ---------
+   -- Get --
+   ---------
+
+   function Get (Position : Cursor;
+                 Key      : String)
+                 return Multi_Type
+   is
+   begin
+      return Get (As_Array (Element (Position)), Key);
+   end Get;
+
    -------------------
    -- Get_As_String --
    -------------------
@@ -715,6 +727,18 @@ is
          end;
       end;
    end Set_5;
+
+   -----------
+   -- Isset --
+   -----------
+
+   function Isset (Position : Cursor;
+                   Key      : String)
+                   return Boolean
+   is
+   begin
+      return Isset (As_Array (Element (Position)), Key);
+   end Isset;
 
    -----------
    -- Isset --

@@ -768,6 +768,15 @@ is
                return List_Type
                is (Value);
 
+   function Apply_Filters_Deprecated
+              (Hook_Name : String;
+               Value     : Array_Type;
+               Post      : Class_Posts.Wp_Post;
+               Version   : String;
+               Hook      : String)
+               return Array_Type
+               is (Value);
+
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;
                         Arg_3     : Boolean);

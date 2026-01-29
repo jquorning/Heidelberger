@@ -137,6 +137,16 @@ is
             return String;
 
    --
+   -- Retrieves stylesheet directory URI for the active theme.
+   --
+   -- @since 1.5.0
+   --
+   -- @return string URI to active theme"s stylesheet directory.
+   --
+   function Get_Stylesheet_Directory_URI
+            return String;
+
+   --
    -- Retrieves name of the active theme.
    --
    -- @since 1.5.0
@@ -157,6 +167,16 @@ is
             return String;
 
    --
+   -- Retrieves template directory URI for the active theme.
+   --
+   -- @since 1.5.0
+   --
+   -- @return string URI to active theme"s template directory.
+   --
+   function Get_Template_Directory_URI
+            return String;
+
+   --
    -- Retrieves path to themes directory.
    --
    -- Does not have trailing slash.
@@ -172,6 +192,28 @@ is
    --
    function Get_Theme_Root (Stylesheet_Or_Template : String := "")
                             return String;
+
+   --
+   -- Retrieves URI for themes directory.
+   --
+   -- Does not have trailing slash.
+   --
+   -- @since 1.5.0
+   --
+   -- @global array wp_theme_directories
+   --
+   -- @param string stylesheet_or_template Optional. The stylesheet or template name
+   --                                      of the theme. Default is to leverage the
+   --                                      main theme root.
+   -- @param string theme_root             Optional. The theme root for which
+   --                                      calculations will be based, preventing the
+   --                                      need for a get_raw_theme_root() call.
+   --                                      Default empty.
+   -- @return string Themes directory URI.
+   --
+   function Get_Theme_Root_URI (Stylesheet_Or_Template : String := "";
+                                Theme_Root             : String := "")
+                                return String;
 
    --
    -- Gets the raw theme root relative to the content directory with no filters

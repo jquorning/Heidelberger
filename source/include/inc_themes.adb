@@ -10,11 +10,13 @@ with Ada.Containers;
 with Php.Arrays;
 with Php.Echoing;
 with Php.Files;
+with Php.HTML;
 with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
 with Binder;
+with Constants;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -22,6 +24,7 @@ with Wp_Common;
 -- with Class_Customize_Managers;
 with Inc_Formatting;
 with Inc_Functions;
+with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Plugins;
@@ -196,10 +199,8 @@ is
    function Get_Stylesheet
             return String
    is
---    use UStrings;
       use Wp_Common;
       use Inc_Options;
-      use Inc_Plugins;
    begin
       --
       -- Filters the name of current stylesheet.
@@ -218,9 +219,7 @@ is
    function Get_Stylesheet_Directory
             return String
    is
---    use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Stylesheet     : constant String := Get_Stylesheet; -- ();
       Theme_Root     : constant String := Get_Theme_Root (Stylesheet);
@@ -239,29 +238,39 @@ is
                             Theme_Root);
    end Get_Stylesheet_Directory;
 
--- --
--- -- Retrieves stylesheet directory URI for the active theme.
--- --
--- -- @since 1.5.0
--- --
--- -- @return string URI to active theme"s stylesheet directory.
--- --
--- function get_stylesheet_directory_uri() then
---         stylesheet         = str_replace( "%2F", "/", rawurlencode( get_stylesheet() ) );
---         theme_root_uri     = get_theme_root_uri( stylesheet );
---         stylesheet_dir_uri = "theme_root_uri/stylesheet";
+   ----------------------------------
+   -- Get_Stylesheet_Directory_URI --
+   ----------------------------------
 
---         --
---         -- Filters the stylesheet directory URI.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string stylesheet_dir_uri Stylesheet directory URI.
---         -- @param string stylesheet         Name of the activated theme"s directory.
---         -- @param string theme_root_uri     Themes root URI.
---         --
---         return apply_filters( "stylesheet_directory_uri", stylesheet_dir_uri, stylesheet, theme_root_uri );
--- end;
+   function Get_Stylesheet_Directory_URI
+            return String
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Wp_Common;
+
+      Stylesheet : constant String :=
+        Str_Replace ("%2F", "/", Raw_URL_Encode (Get_Stylesheet));
+
+      Theme_Root_URI : constant String :=
+        Get_Theme_Root_URI (Stylesheet);
+
+      Stylesheet_Dir_URI : constant String :=
+        Theme_Root_URI & "/" & Stylesheet;
+   begin
+      --
+      -- Filters the stylesheet directory URI.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string stylesheet_dir_uri Stylesheet directory URI.
+      -- @param string stylesheet         Name of the activated theme"s directory.
+      -- @param string theme_root_uri     Themes root URI.
+      --
+      return
+        Apply_Filters ("stylesheet_directory_uri", Stylesheet_Dir_URI,
+                       Stylesheet, Theme_Root_URI);
+   end Get_Stylesheet_Directory_URI;
 
 -- --
 -- -- Retrieves stylesheet URI for the active theme.
@@ -338,10 +347,8 @@ is
    function Get_Template
             return String
    is
---    use UStrings;
       use Wp_Common;
       use Inc_Options;
-      use Inc_Plugins;
    begin
       --
       -- Filters the name of the active theme.
@@ -360,9 +367,7 @@ is
    function Get_Template_Directory
             return String
    is
---    use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Template     : constant String := Get_Template; -- ();
       Theme_Root   : constant String := Get_Theme_Root (Template);
@@ -381,41 +386,44 @@ is
                             Theme_Root);
    end Get_Template_Directory;
 
--- --
--- -- Retrieves template directory URI for the active theme.
--- --
--- -- @since 1.5.0
--- --
--- -- @return string URI to active theme"s template directory.
--- --
--- function get_template_directory_uri() then
---         template         = str_replace( "%2F", "/", rawurlencode( get_template() ) );
---         theme_root_uri   = get_theme_root_uri( template );
---         template_dir_uri = "theme_root_uri/template";
+   --------------------------------
+   -- Get_Template_Directory_URI --
+   --------------------------------
 
---         --
---         -- Filters the active theme directory URI.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string template_dir_uri The URI of the active theme directory.
---         -- @param string template         Directory name of the active theme.
---         -- @param string theme_root_uri   The themes root URI.
---         --
---         return apply_filters( "template_directory_uri", template_dir_uri, template, theme_root_uri );
--- end;
+   function Get_Template_Directory_URI
+            return String
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Wp_Common;
 
--- --
--- -- Retrieves theme roots.
--- --
--- -- @since 2.9.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @return array|string An array of theme roots keyed by template/stylesheet
--- --                      or a single theme root if all themes have the same root.
--- --
--- function get_theme_roots() then
+      Template : constant String :=
+        Str_Replace ("%2F", "/", Raw_URL_Encode (Get_Template));
+
+      Theme_Root_URI : constant String :=
+        Get_Theme_Root_URI (Template);
+
+      Template_Dir_URI : constant String :=
+        Theme_Root_URI & "/" & Template;
+   begin
+      --
+      -- Filters the active theme directory URI.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string template_dir_uri The URI of the active theme directory.
+      -- @param string template         Directory name of the active theme.
+      -- @param string theme_root_uri   The themes root URI.
+      --
+      return
+        Apply_Filters ("template_directory_uri", Template_Dir_URI,
+                       Template, Theme_Root_URI);
+   end Get_Template_Directory_URI;
+
+   ---------------------
+   -- Get_Theme_Roots --
+   ---------------------
+
    function Get_Theme_Roots
             return Inc_Options.String_Maps.Map
    is
@@ -645,8 +653,6 @@ is
       use Globals;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
-
 --      global wp_theme_directories;
 
       Theme_Root : UString; --  = "";
@@ -677,58 +683,71 @@ is
       return Apply_Filters ("theme_root", -Theme_Root);
    end Get_Theme_Root;
 
--- --
--- -- Retrieves URI for themes directory.
--- --
--- -- Does not have trailing slash.
--- --
--- -- @since 1.5.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @param string stylesheet_or_template Optional. The stylesheet or template name of the theme.
--- --                                       Default is to leverage the main theme root.
--- -- @param string theme_root             Optional. The theme root for which calculations will be based,
--- --                                       preventing the need for a get_raw_theme_root() call. Default empty.
--- -- @return string Themes directory URI.
--- --
--- function get_theme_root_uri( stylesheet_or_template = "", theme_root = "" ) then
---         global wp_theme_directories;
+   ------------------------
+   -- Get_Theme_Root_URI --
+   ------------------------
 
---         if ( stylesheet_or_template && ! theme_root ) then
---                 theme_root = get_raw_theme_root( stylesheet_or_template );
---         end;
+   function Get_Theme_Root_URI (Stylesheet_Or_Template : String := "";
+                                Theme_Root             : String := "")
+                                return String
+   is
+      use Php.Files;
+      use Php.Lists;
+      use Php.Strings;
+      use Constants;
+      use Globals;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Link_Templates;
+      use Inc_Options;
+--    global wp_theme_directories;
 
---         if ( stylesheet_or_template && theme_root ) then
---                 if ( in_array( theme_root, (array) wp_theme_directories, true ) ) then
---                         // Absolute path. Make an educated guess. YMMV -- but note the filter below.
---                         if ( 0 === strpos( theme_root, WP_CONTENT_DIR ) ) then
---                                 theme_root_uri = content_url( str_replace( WP_CONTENT_DIR, "", theme_root ) );
---                         end; elseif ( 0 === strpos( theme_root, ABSPATH ) ) then
---                                 theme_root_uri = site_url( str_replace( ABSPATH, "", theme_root ) );
---                         end; elseif ( 0 === strpos( theme_root, WP_PLUGIN_DIR ) || 0 === strpos( theme_root, WPMU_PLUGIN_DIR ) ) then
---                                 theme_root_uri = plugins_url( basename( theme_root ), theme_root );
---                         end; else then
---                                 theme_root_uri = theme_root;
---                         end;
---                 end; else then
---                         theme_root_uri = content_url( theme_root );
---                 end;
---         end; else then
---                 theme_root_uri = content_url( "themes" );
---         end;
+      Theme_Root_2 : constant String :=
+        (if Stylesheet_Or_Template /= "" and then Theme_Root = ""
+         then Get_Raw_Theme_Root (Stylesheet_Or_Template)
+         else Theme_Root);
 
---         --
---         -- Filters the URI for themes directory.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string theme_root_uri         The URI for themes directory.
---         -- @param string siteurl                WordPress web address which is set in General Options.
---         -- @param string stylesheet_or_template The stylesheet or template name of the theme.
---         --
---         return apply_filters( "theme_root_uri", theme_root_uri, get_option( "siteurl" ), stylesheet_or_template );
--- end;
+      Theme_Root_URI : UString;
+   begin
+      if Stylesheet_Or_Template /= "" and then Theme_Root_2 /= "" then
+         if In_List (Theme_Root_2, Wp_Theme_Directories, True) then -- (array)
+            -- Absolute path. Make an educated guess. YMMV -- but note the
+            -- filter below.
+            if 0 = Strpos (Theme_Root_2, -WP_CONTENT_DIR) then
+               Theme_Root_URI :=
+                 +Content_URL (Str_Replace (-WP_CONTENT_DIR, "", Theme_Root_2));
+            elsif 0 = Strpos (Theme_Root_2, ABSPATH) then
+               Theme_Root_URI := +Site_URL (Str_Replace (ABSPATH, "", Theme_Root_2));
+            elsif
+              0 = Strpos (Theme_Root_2, -WP_PLUGIN_DIR) or else
+              0 = Strpos (Theme_Root_2, -WPMU_PLUGIN_DIR)
+            then
+               Theme_Root_URI := +Plugins_URL (Basename (Theme_Root_2), Theme_Root_2);
+            else
+               Theme_Root_URI := +Theme_Root_2;
+            end if;
+         else
+            Theme_Root_URI := +Content_URL (Theme_Root_2);
+         end if;
+      else
+         Theme_Root_URI := +Content_URL ("themes");
+      end if;
+
+      --
+      -- Filters the URI for themes directory.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string theme_root_uri         The URI for themes directory.
+      -- @param string siteurl                WordPress web address which is set in
+      --                                      General Options.
+      -- @param string stylesheet_or_template The stylesheet or template name of
+      --                                      the theme.
+      --
+      return Apply_Filters ("theme_root_uri", -Theme_Root_URI,
+                            String'(Get_Option ("siteurl")),
+                            Stylesheet_Or_Template);
+   end Get_Theme_Root_URI;
 
 -- --
 -- -- Gets the raw theme root relative to the content directory with no filters applied.

@@ -9,6 +9,7 @@ with Ada.Containers;
 
 with Php.Arrays;
 with Php.Echoing;
+with Php.Files;
 with Php.HTML;
 with Php.Lists;
 with Php.Misc;
@@ -17,19 +18,20 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Constants;
 with Globals;
-with UStrings;
 with Helpers;
 with Lists;
+with UStrings;
 with Wp_Common;
 
-with Inc_Capabilities;
 with Class_Admin_Bar; -- ???
 with Class_Networks;
 with Class_Post_Type;
 with Class_Sites;
 with Class_Taxonomy;
 with Class_Terms;
+with Inc_Capabilities;
 with Inc_Category_Templates;
 with Inc_Formatting;
 with Inc_Functions;
@@ -39,11 +41,12 @@ with Inc_Ms_Blogs;
 with Inc_Ms_Functions;
 with Inc_Ms_Networks;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Pluggables;
+with Inc_Plugins;
 with Inc_Post_Templates;
 with Inc_Posts;
 with Inc_Taxonomys;
+with Inc_Themes;
 with Inc_Users;
 with Inc_Querys;
 
@@ -3818,85 +3821,93 @@ is
       return Apply_Filters ("includes_url", URL, Path, Scheme);
    end Includes_URL;
 
--- --
--- -- Retrieves the URL to the content directory.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string path Optional. Path relative to the content URL. Default empty.
--- -- @return string Content URL link with optional path appended.
--- --
--- function content_url( path = "" ) then
---         url = set_url_scheme( WP_CONTENT_URL );
+   -----------------
+   -- Content_URL --
+   -----------------
 
---         if ( path && is_string( path ) ) then
---                 url .= "/" . ltrim( path, "/" );
---         end;
+   function Content_URL (Path : String := "")
+                         return String
+   is
+      use Php.Strings;
+      use Constants;
+      use UStrings;
+      use Wp_Common;
 
---         --
---         -- Filters the URL to the content directory.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string url  The complete URL to the content directory including scheme and path.
---         -- @param string path Path relative to the URL to the content directory. Blank string
---         --                     if no path is specified.
---         --
---         return apply_filters( "content_url", url, path );
--- end;
+      URL : constant String :=
+        (if Path /= "" -- and then Is_String (Path)
+         then Set_URL_Scheme (-WP_CONTENT_URL) & "/" & Ltrim (Path, "/")
+         else Set_URL_Scheme (-WP_CONTENT_URL));
+   begin
+      --
+      -- Filters the URL to the content directory.
+      --
+      -- @since 2.8.0
+      --
+      -- @param string url  The complete URL to the content directory including
+      --                    scheme and path.
+      -- @param string path Path relative to the URL to the content directory.
+      --                    Blank string if no path is specified.
+      --
+      return Apply_Filters ("content_url", URL, Path);
+   end Content_URL;
 
--- --
--- -- Retrieves a URL within the plugins or mu-plugins directory.
--- --
--- -- Defaults to the plugins directory URL if no arguments are supplied.
--- --
--- -- @since 2.6.0
--- --
--- -- @param string path   Optional. Extra path appended to the end of the URL, including
--- --                       the relative directory if plugin is supplied. Default empty.
--- -- @param string plugin Optional. A full path to a file inside a plugin or mu-plugin.
--- --                       The URL will be relative to its directory. Default empty.
--- --                       Typically this is done by passing `__FILE__` as the argument.
--- -- @return string Plugins URL link with optional paths appended.
--- --
--- function plugins_url( path = "", plugin = "" ) then
+   -----------------
+   -- Plugins_URL --
+   -----------------
 
---         path          = wp_normalize_path( path );
---         plugin        = wp_normalize_path( plugin );
---         mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
+   function Plugins_URL (Path   : String := "";
+                         Plugin : String := "")
+                         return String
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Constants;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Functions;
+      use Inc_Plugins;
 
---         if ( ! empty( plugin ) && 0 === strpos( plugin, mu_plugin_dir ) ) then
---                 url = WPMU_PLUGIN_URL;
---         end; else then
---                 url = WP_PLUGIN_URL;
---         end;
+      Path_2        : constant String := Wp_Normalize_Path (Path);
+      Plugin_2      : constant String := Wp_Normalize_Path (Plugin);
+      MU_Plugin_Dir : constant String := Wp_Normalize_Path (-WPMU_PLUGIN_DIR);
 
---         url = set_url_scheme( url );
+      URL_2 : constant String :=
+        (if
+           not Empty (Plugin_2) and then
+           0 = Strpos (Plugin_2, MU_Plugin_Dir)
+         then -WPMU_PLUGIN_URL
+         else -WP_PLUGIN_URL);
 
---         if ( ! empty( plugin ) && is_string( plugin ) ) then
---                 folder = dirname( plugin_basename( plugin ) );
---                 if ( "." !== folder ) then
---                         url .= "/" . ltrim( folder, "/" );
---                 end;
---         end;
+      URL : UString := +Set_URL_Scheme (URL_2);
+   begin
+      if not Empty (Plugin_2) then -- and then Is_String (Plugin_2) then
+         declare
+            Folder : constant String := Dirname (Plugin_Basename (Plugin_2));
+         begin
+            if "." /= Folder then
+               Append (URL, "/" & Ltrim (Folder, "/"));
+            end if;
+         end;
+      end if;
 
---         if ( path && is_string( path ) ) then
---                 url .= "/" . ltrim( path, "/" );
---         end;
+      if Path_2 /= "" then -- and then Is_String (Path_2) then
+         Append (URL, "/" & Ltrim (Path_2, "/"));
+      end if;
 
---         --
---         -- Filters the URL to the plugins directory.
---         --
---         -- @since 2.8.0
---         --
---         -- @param string url    The complete URL to the plugins directory including scheme and path.
---         -- @param string path   Path relative to the URL to the plugins directory. Blank string
---         --                       if no path is specified.
---         -- @param string plugin The plugin file path to be relative to. Blank string if no plugin
---         --                       is specified.
---         --
---         return apply_filters( "plugins_url", url, path, plugin );
--- end;
+      --
+      -- Filters the URL to the plugins directory.
+      --
+      -- @since 2.8.0
+      --
+      -- @param string url    The complete URL to the plugins directory including
+      --                      scheme and path.
+      -- @param string path   Path relative to the URL to the plugins directory.
+      --                      Blank string if no path is specified.
+      -- @param string plugin The plugin file path to be relative to. Blank string
+      --                      if no plugin is specified.
+      --
+      return Apply_Filters ("plugins_url", -URL, Path_2, Plugin_2);
+   end Plugins_URL;
 
    ----------------------
    -- Network_Site_URL --
@@ -4391,7 +4402,6 @@ is
       use Class_Posts;
       use Class_Post_Type;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Posts;
       use Inc_Querys;
 
@@ -4604,7 +4614,6 @@ is
       use Inc_Functions;
       use Inc_Load;
       use Inc_Options;
-      use Inc_Plugins;
 
       Args_2 : Array_Type :=
         Wp_Parse_Args (
@@ -4819,38 +4828,37 @@ is
       end;
    end Get_Avatar_Data;
 
--- --
--- -- Retrieves the URL of a file in the theme.
--- --
--- -- Searches in the stylesheet directory before the template directory so themes
--- -- which inherit from a parent theme can just override one file.
--- --
--- -- @since 4.7.0
--- --
--- -- @param string file Optional. File to search for in the stylesheet directory.
--- -- @return string The URL of the file.
--- --
--- function get_theme_file_uri( file = "" ) then
---         file = ltrim( file, "/" );
+   ------------------------
+   -- Get_Theme_File_URI --
+   ------------------------
 
---         if ( empty( file ) ) then
---                 url = get_stylesheet_directory_uri();
---         end; elseif ( file_exists( get_stylesheet_directory() . "/" . file ) ) then
---                 url = get_stylesheet_directory_uri() . "/" . file;
---         end; else then
---                 url = get_template_directory_uri() . "/" . file;
---         end;
+   function Get_Theme_File_URI (File : String := "")
+                                return String
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Wp_Common;
+      use Inc_Themes;
 
---         --
---         -- Filters the URL to a file in the theme.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string url  The file URL.
---         -- @param string file The requested file to search for.
---         --
---         return apply_filters( "theme_file_uri", url, file );
--- end;
+      File_2 : constant String := Ltrim (File, "/");
+
+      URL : constant String :=
+        (if Empty (File_2)
+           then Get_Stylesheet_Directory_URI
+        elsif File_Exists (Get_Stylesheet_Directory & "/" & File_2)
+           then Get_Stylesheet_Directory_URI & "/" & File_2
+        else  Get_Template_Directory_URI & "/" & File_2);
+   begin
+      --
+      -- Filters the URL to a file in the theme.
+      --
+      -- @since 4.7.0
+      --
+      -- @param string url  The file URL.
+      -- @param string file The requested file to search for.
+      --
+      return Apply_Filters ("theme_file_uri", URL, File_2);
+   end Get_Theme_File_URI;
 
 -- --
 -- -- Retrieves the URL of a file in the parent theme.
@@ -4880,38 +4888,38 @@ is
 --         return apply_filters( "parent_theme_file_uri", url, file );
 -- end;
 
--- --
--- -- Retrieves the path of a file in the theme.
--- --
--- -- Searches in the stylesheet directory before the template directory so themes
--- -- which inherit from a parent theme can just override one file.
--- --
--- -- @since 4.7.0
--- --
--- -- @param string file Optional. File to search for in the stylesheet directory.
--- -- @return string The path of the file.
--- --
--- function get_theme_file_path( file = "" ) then
---         file = ltrim( file, "/" );
+   -------------------------
+   -- Get_Theme_File_Path --
+   -------------------------
 
---         if ( empty( file ) ) then
---                 path = get_stylesheet_directory();
---         end; elseif ( file_exists( get_stylesheet_directory() . "/" . file ) ) then
---                 path = get_stylesheet_directory() . "/" . file;
---         end; else then
---                 path = get_template_directory() . "/" . file;
---         end;
+   function Get_Theme_File_Path (File : String := "")
+                                 return String
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Wp_Common;
+      use Inc_Themes;
 
---         --
---         -- Filters the path to a file in the theme.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string path The file path.
---         -- @param string file The requested file to search for.
---         --
---         return apply_filters( "theme_file_path", path, file );
--- end;
+      File_2 : constant String := Ltrim (File, "/");
+
+      Path : constant String :=
+        (if Empty (File_2)
+           then Get_Stylesheet_Directory
+        elsif File_Exists (Get_Stylesheet_Directory & "/" & File_2)
+           then Get_Stylesheet_Directory & "/" & File_2
+        else
+            Get_Template_Directory & "/" & File_2);
+   begin
+      --
+      -- Filters the path to a file in the theme.
+      --
+      -- @since 4.7.0
+      --
+      -- @param string path The file path.
+      -- @param string file The requested file to search for.
+      --
+      return Apply_Filters ("theme_file_path", Path, File_2);
+   end Get_Theme_File_Path;
 
 -- --
 -- -- Retrieves the path of a file in the parent theme.
@@ -4951,7 +4959,6 @@ is
       use Wp_Common;
       use Class_Posts;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Posts;
 
       Policy_Page_Id : constant Integer :=
@@ -5001,7 +5008,6 @@ is
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Post_Templates;
 
       Privacy_Policy_URL : constant String :=
