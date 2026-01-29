@@ -102,7 +102,7 @@ is
       RTL            := Isset (XX_GET, "dir") and then
                         "rtl" = Get_As_String (XX_GET, "dir");
       Expires_Offset := 31536000; -- 1 year.
-      Outt           := +"";
+      Outt           := Null_UString;
 
       Inc_Script_Loader.Wp_Default_Styles (Wp_Styles);
 

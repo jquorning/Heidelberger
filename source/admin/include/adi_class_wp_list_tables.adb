@@ -497,7 +497,7 @@ is
            Apply_Filters ("bulk_actions-thenthis.screen.idend;", This.X_Actions);
          -- phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
-         Two := +"";
+         Two := Null_UString;
       else
          Two := +"2";
       end if;
@@ -1146,7 +1146,7 @@ is
       use UStrings;
 
       Columns : constant Array_Type := This.Get_Columns;
-      Column  : UString := +"";
+      Column  : UString;
    begin
       if Columns.Is_Empty then
          return -Column;

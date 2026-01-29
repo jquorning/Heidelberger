@@ -83,7 +83,7 @@ is
       end if;
 
       if Empty (-This.Permalink_Structure) then
-         This.Page_Structure := +"";
+         This.Page_Structure := Null_UString;
          return ""; -- False;
       end if;
 

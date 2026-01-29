@@ -656,7 +656,7 @@ is
       end if;
 
       if Force_Plain_Link or else not Parent_Valid then
-         Link := +""; -- False;
+         Link := Null_UString; -- False;
       elsif
         Global_Wp_Rewrite.Using_Permalinks and then
         Parent /= Null_Post
@@ -1299,7 +1299,7 @@ is
             if Tax.Show_UI then
                Location := +Add_Query_Arg (Args, Admin_URL ("term.php"));
             else
-               Location := +"";
+               Location := Null_UString;
             end if;
 
             --
@@ -1680,7 +1680,7 @@ is
       end if;
 
       if "revision" = Post_2.Post_Type then
-         Action := +"";
+         Action := Null_UString;
       elsif "display" = Context then
          Action := +"&amp;action=edit";
       else
@@ -1705,7 +1705,7 @@ is
               +Admin_URL (Sprintf (-(Post_Type_Object.X_Edit_Link & Action),
                                    [1 => Helpers.Image (Integer (Post_2.Id))]));
          else
-            Link := +"";
+            Link := Null_UString;
          end if;
       end;
 
@@ -2663,7 +2663,7 @@ is
                Query_String := +Qs_Match (1); -- [0];
                Request      := Preg_Replace (Qs_Regex, "", Request);
             else
-               Query_String := +"";
+               Query_String := Null_UString;
             end if;
 
             declare
@@ -4432,7 +4432,7 @@ is
          end if;
       end if;
 
-      Shortlink := +"";
+      Shortlink := Null_UString;
 
       -- Return `?p=` link for all public post types.
       if Post_Id /= 0 then

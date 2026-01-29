@@ -380,9 +380,9 @@ is
       use UStrings;
    begin
       This.Do_Concat      := False;
-      This.Concat         := +"";
-      This.Concat_Version := +"";
-      This.Print_HTML     := +"";
+      This.Concat         := Null_UString;
+      This.Concat_Version := Null_UString;
+      This.Print_HTML     := Null_UString;
    end Reset;
 
 end Class_Styles;

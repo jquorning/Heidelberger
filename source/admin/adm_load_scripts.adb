@@ -91,7 +91,7 @@ is
       end if;
 
       Expires_Offset := 31536000; -- 1 year.
-      Outt           := +"";
+      Outt           := Null_UString;
 
       Wp_Default_Scripts          (Wp_Scripts);
       Wp_Default_Packages_Vendor  (Wp_Scripts);

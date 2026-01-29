@@ -174,12 +174,12 @@ is
       Args_2 : Node_Args := Args;
 
       Defaults : Node_Args := -- Array_Type := To_Array ((
-        (Id       => +"",   --              Build ("id",     "false"),
-         Title    => +"",   --              Build ("title",  "false"),
-         Parent   => +"",   --              Build ("parent", "false"),
-         Href     => +"",   --              Build ("href",   "false"),
-         Group    => False, --              Build ("group",  "false"),
-         Meta     => Empty_Array, --        Build ("meta",   Empty_Array)
+        (Id       => Null_UString,   --              Build ("id",     "false"),
+         Title    => Null_UString,   --              Build ("title",  "false"),
+         Parent   => Null_UString,   --              Build ("parent", "false"),
+         Href     => Null_UString,   --              Build ("href",   "false"),
+         Group    => False,          --              Build ("group",  "false"),
+         Meta     => Empty_Array,    --        Build ("meta",   Empty_Array)
          Typ      => Typ_Item,
          Children => null);
 
@@ -500,8 +500,8 @@ is
                            Meta     =>  Arrays.To_Array ((
                                  1 => Build ("class", Group_Class)
                               )),
-                           Title    => +"",
-                           Href     => +"",
+                           Title    => Null_UString,
+                           Href     => Null_UString,
                            Group    => False
                         ));
                         -- To_Array ((
@@ -545,9 +545,9 @@ is
                               Typ      =>  Typ_Container,
                               Children =>  new Node_Array'(V),
 --                            Children =>  To_Array (Parent),
-                              Parent   =>  +"",
-                              Title    =>  +"",
-                              Href     =>  +"",
+                              Parent   =>  Null_UString,
+                              Title    =>  Null_UString,
+                              Href     =>  Null_UString,
                               Meta     =>  Empty_Array,
                               Group    =>  False
                            ));
@@ -706,7 +706,7 @@ is
            ESC_Attr (Trim (Get_As_String (Node.Meta, "class"))) &
            """";
       else
-         Class := +"";
+         Class := Null_UString;
       end if;
 
       Echo ("<ul id=""" &

@@ -934,7 +934,7 @@ is
               Wp_Login_URL
             );
 
-            Requested_Redirect_To := +"";
+            Requested_Redirect_To := Null_UString;
          end if;
 
          --
@@ -1044,7 +1044,7 @@ is
                        abs "Please enter your username or email address. You will receive an email message with instructions on how to reset your password." & "</p>",
                        Errors.Error);
 
-         User_Login := +"";
+         User_Login := Null_UString;
 
          if
            Isset (X_POST, "user_login") and then

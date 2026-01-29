@@ -256,7 +256,7 @@ is
          then
             Typenow := +Get_As_String (X_REQUEST, "post_type");
          else
-            Typenow := +"";
+            Typenow := Null_UString;
          end if;
 
          if
@@ -265,7 +265,7 @@ is
          then
             Taxnow := +Get_As_String (X_REQUEST, "taxonomy");
          else
-            Taxnow := +"";
+            Taxnow := Null_UString;
          end if;
 
          if WP_NETWORK_ADMIN then
@@ -338,7 +338,7 @@ is
             end;
          end if;
 
-         Hook_Suffix := +"";
+         Hook_Suffix := Null_UString;
          if Page_Hook /= "" then
             Hook_Suffix := Page_Hook;
          elsif Plugin_Page /= "" then

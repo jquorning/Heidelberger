@@ -2571,7 +2571,7 @@ is
                   if 0 /= Timeout and then Timeout < Time then -- false =
                      Delete_Site_Option (Transient_Option);
                      Delete_Site_Option (Transient_Timeout);
-                     Value := +""; -- False;
+                     Value := Null_UString; -- False;
                   end if;
                end;
             end if;

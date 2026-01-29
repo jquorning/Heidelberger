@@ -408,7 +408,7 @@ is
 
       Tab_Index := As_Integer (Get (Parsed_Args, "tab_index"));
 
-      Tab_Index_Attribute := +"";
+      Tab_Index_Attribute := Null_UString;
       if Tab_Index > 0 then -- (int)
          Tab_Index_Attribute := +" tabindex=""" & Helpers.Image (Tab_Index) & """";
       end if;
@@ -454,7 +454,7 @@ is
                       """ class=""" & Class & """" & Tab_Index_Attribute &
                       Aria_Describedby_Attribute & ">" & NL;
          else
-            Output := +"";
+            Output := Null_UString;
          end if;
 
          if

@@ -189,7 +189,7 @@ is
          Ver : UString;
       begin
          if "" = Obj.Ver then
-            Ver := +"";
+            Ver := Null_UString;
          else
             Ver := (if Obj.Ver /= "" then Obj.Ver else This.Default_Version);
          end if;
@@ -251,7 +251,7 @@ is
                   Inline_Script_Tag :=
                      Cond_Before & Before_Handle & After_Handle & Cond_After;
                else
-                  Inline_Script_Tag := +"";
+                  Inline_Script_Tag := Null_UString;
                end if;
 
                --
@@ -821,12 +821,12 @@ is
       use UStrings;
    begin
       This.Do_Concat      := False;
-      This.Print_Code     := +"";
-      This.Concat         := +"";
-      This.Concat_Version := +"";
-      This.Print_HTML     := +"";
-      This.Ext_Version    := +"";
-      This.Ext_Handles    := +"";
+      This.Print_Code     := Null_UString;
+      This.Concat         := Null_UString;
+      This.Concat_Version := Null_UString;
+      This.Print_HTML     := Null_UString;
+      This.Ext_Version    := Null_UString;
+      This.Ext_Handles    := Null_UString;
    end Reset;
 
 end Class_Scripts;

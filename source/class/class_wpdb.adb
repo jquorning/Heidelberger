@@ -436,7 +436,7 @@ is
 
          when Engine_SQLite =>
             Put_Line ("set_sql_mode: modes_str");
-            Modes_Str := +"";
+            Modes_Str := Null_UString;
 --          pragma Assert (False);
          end case;
 
@@ -1322,10 +1322,10 @@ is
    begin
       This.Last_Result   := String_Vectors.Empty_Vector;
 --      This.Col_Info      := null;
-      This.Last_Query    := +""; -- null;
+      This.Last_Query    := Null_UString; -- null;
       This.Rows_Affected := 0;
       This.Num_Rows      := 0;
-      This.Last_Error    := +"";
+      This.Last_Error    := Null_UString;
 
 --      if
 --        This.Use_Mysqli and then
@@ -2947,7 +2947,7 @@ is
          if Results = Empty_Array then -- not
             return
               (Success => False,
-               Item    => +"",
+               Item    => Null_UString,
                Error   =>
                  X_Construct (
                    "wpdb_get_table_charset_failure",
@@ -3012,7 +3012,7 @@ is
                Charset := +As_String (Charsets.First_Element); -- Key (Charsets);
             elsif Count in 0 then
                -- No charsets, assume this table can store whatever.
-               Charset := +""; -- false;
+               Charset := Null_UString; -- false;
             else
                -- More than one charset. Remove latin1 if present and recalculate.
                Delete (Ref (Charsets, "latin1"));
@@ -3921,7 +3921,7 @@ is
 
             when Engine_SQLite =>
                pragma Assert (False);
-               Error := +"";
+               Error := Null_UString;
             end case;
 
             if Error /= "" then

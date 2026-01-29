@@ -178,7 +178,7 @@ is
       elsif Is_Multisite then
          About_URL := +Get_Dashboard_URL (Get_Current_User_Id, "about.php");
       else
-         About_URL := +""; -- false;
+         About_URL := Null_UString; -- false;
       end if;
 
       declare
@@ -320,7 +320,7 @@ is
       elsif Is_Multisite then
          Profile_Url := +Get_Dashboard_URL (User_Id, "profile.php");
       else
-         Profile_Url := +""; -- false;
+         Profile_Url := Null_UString; -- false;
       end if;
 
       declare
@@ -379,7 +379,7 @@ is
       elsif Is_Multisite then
          Profile_Url := +Get_Dashboard_URL (User_Id, "profile.php");
       else
-         Profile_Url := +""; -- false;
+         Profile_Url := Null_UString; -- false;
       end if;
 
       declare

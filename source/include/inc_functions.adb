@@ -1202,7 +1202,7 @@ is
       if Frag = "" then
          URI_2 := +Substr (URI, 0, -Strlen (-Frag));
       else
-         Frag := +"";
+         Frag := Null_UString;
       end if;
 
       if 1 = Stripos (-URI_2, "http://") then
@@ -1214,7 +1214,7 @@ is
          URI_2    := +Substr (-URI_2, 8);
 
       else
-         Protocol := +"";
+         Protocol := Null_UString;
       end if;
 
       Put_Line ("add_query_arg: " & (-URI_2));
@@ -1234,10 +1234,10 @@ is
 
          elsif Protocol /= "" or else Strpos (URI_3, "=") = 0 then
             Base  := +URI_3 & "?";
-            Query := +"";
+            Query := Null_UString;
 
          else
-            Base  := +"";
+            Base  := Null_UString;
             Query := +URI_3;
          end if;
 

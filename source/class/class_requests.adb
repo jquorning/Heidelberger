@@ -234,7 +234,7 @@ is
 
       Return2.Raw  := +Headers;
       Return2.URL  := +URL; -- (string)
-      Return2.Bodi := +"";
+      Return2.Bodi := Null_UString;
 
       if not As_Boolean (Get (Options_2, "filename")) then
          declare

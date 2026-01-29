@@ -1917,7 +1917,7 @@ is
 
       -- Open Sans is no longer used by core, but may be relied upon by themes
       -- and plugins.
-      Open_Sans_Font_URL := +"";
+      Open_Sans_Font_URL := Null_UString;
 
       --
       -- translators: If there are characters in your language that are not supported
@@ -2813,7 +2813,7 @@ is
             Ver : constant String := -Wp_Styles.Default_Version;
 
             Concat_2     : constant Array_Type := Str_Split (Concat, 128);
-            Concatenated : UString := +"";
+            Concatenated : UString;
          begin
             for A in Concat_2.Iterate loop
                declare
@@ -3533,7 +3533,7 @@ is
                  Styles.Registered.Find (Handle);
 --             Registered :  := Styles.Registered (Handle);
             begin
-               Styles.Registered (Handle).Src := +""; -- False;
+               Styles.Registered (Handle).Src := Null_UString; -- False;
                if Empty (Styles.Registered (Handle).Extra ("after")) then
                   null;
 --             Dependency_Maps.Element (Registered).Extra ("after") := Empty_Array;

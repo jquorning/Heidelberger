@@ -1024,7 +1024,7 @@ is
             if Size >= 512 then
                Size_Data := +"full";
             else
-               Size_Data := +""; -- array (Size, Size);
+               Size_Data := Null_UString; -- array (Size, Size);
             end if;
             URL_2 := +Wp_Get_Attachment_Image_URL (Site_Icon_Id, -Size_Data);
          end if;
@@ -5402,7 +5402,7 @@ is
       if Helper = Current then -- 2x (string)
          Result := +" type=""" & Typ & """";
       else
-         Result := +"";
+         Result := Null_UString;
       end if;
 
       if Echo then
@@ -5429,7 +5429,7 @@ is
       if Helper = Current then -- 2x (string)
          Result := +" type=""" & Typ & """";
       else
-         Result := +"";
+         Result := Null_UString;
       end if;
 
       if Echo then

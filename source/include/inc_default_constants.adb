@@ -266,7 +266,7 @@ is
             if Site_URL /= "" then
                COOKIEHASH := +MD5 (Site_URL);
             else
-               COOKIEHASH := +"";
+               COOKIEHASH := Null_UString;
             end if;
          end;
       end if;

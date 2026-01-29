@@ -2090,8 +2090,8 @@ is
 
             This.Context_Sidebar_Instance_Number_Set := False;
             This.Context_Sidebar_Instance_Number     := 0;
-            This.Rendering_Sidebar_Id                := +""; -- null
-            This.Rendering_Widget_Id                 := +""; -- null
+            This.Rendering_Sidebar_Id                := Null_UString; -- null
+            This.Rendering_Widget_Id                 := Null_UString; -- null
 
             return Container;
          end;

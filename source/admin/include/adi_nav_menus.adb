@@ -849,7 +849,7 @@ is
 --                  Build ("order",     "DESC")
 --               )));
                else
-                  Searched       := +"";
+                  Searched       := Null_UString;
                   Search_Results := Empty_Array;
                end if;
                pragma Style_Checks (Off);

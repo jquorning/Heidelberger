@@ -524,7 +524,7 @@ is
                   Cat_Where := +" AND ID NOT IN (" & Implode (",", Done_Posts) & ")";
                end;
             else
-               Cat_Where := +"";
+               Cat_Where := Null_UString;
             end if;
          end;
 
