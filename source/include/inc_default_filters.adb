@@ -29,6 +29,7 @@ with Inc_General_Templates;
 with Inc_Load;
 with Inc_Plugins;
 with Inc_Posts;
+with Inc_Robots_Templates;
 with Inc_Script_Loader;
 with Inc_Taxonomys;
 with Inc_Themes;
@@ -341,7 +342,8 @@ is
 --    Add_Filter ("wp_robots", "wp_robots_noindex");
 --    Add_Filter ("wp_robots", "wp_robots_noindex_embeds");
 --    Add_Filter ("wp_robots", "wp_robots_noindex_search");
---    Add_Filter ("wp_robots", "wp_robots_max_image_preview_large");
+      Add_Filter ("wp_robots",
+                  Inc_Robots_Templates.Wp_Robots_Max_Image_Preview_Large'Access);
 
       -- Mark site as no longer fresh.
       for Action of
@@ -423,7 +425,7 @@ is
       Add_Action ("wp_head",
                   Inc_Themes.Locale_Stylesheet'Access);
 --    Add_Action ("publish_future_post", Check_And_Publish_Future_Post'Access, 10, 1);
---    Add_Action ("wp_head", Wp_Robots'Access, 1);
+      Add_Action ("wp_head", Inc_Robots_Templates.Wp_Robots'Access, 1);
 --    Add_Action ("wp_head", Print_Emoji_Detection_Script'Access, 7);
       Add_Action ("wp_head",
                   Inc_Functions_Wp_Styles.Wp_Print_Styles'Access, 8);
@@ -455,7 +457,7 @@ is
       end if;
 
       -- Login actions.
---    Add_Action ("login_head", Wp_Robots'Access, 1);
+      Add_Action ("login_head", Inc_Robots_Templates.Wp_Robots'Access, 1);
 --    Add_Filter ("login_head", "wp_resource_hints", 8);
 --    Add_Action ("login_head", Wp_Print_Head_Scripts'Access, 9);
 --    Add_Action ("login_head", Inc_Script_Loader.Print_Admin_Styles'Access, 9);
@@ -805,7 +807,7 @@ is
 --    Add_Action ("embed_head", Print_Embed_Styles'Access);
 --    Add_Action ("embed_head", Wp_Print_Head_Scripts'Access, 20);
 --    Add_Action ("embed_head", Wp_Print_Styles'Access, 20);
---    Add_Action ("embed_head", Wp_Robots'Access);
+      Add_Action ("embed_head", Inc_Robots_Templates.Wp_Robots'Access);
 --    Add_Action ("embed_head", Rel_Canonical'Access);
 --    Add_Action ("embed_head", Locale_Stylesheet'Access, 30);
 
