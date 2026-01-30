@@ -8,6 +8,7 @@
 with Arrays;
 with Lists;
 
+with Class_Posts;
 with Class_Themes;
 with Inc_Options;
 
@@ -317,6 +318,37 @@ is
             return Array_Type is (Empty_Array);
 
    --
+   -- Renders the Custom CSS style element.
+   --
+   -- @since 4.7.0
+   --
+   procedure Wp_Custom_CSS_CB;
+
+   --
+   -- Fetches the `custom_css` post for a given theme.
+   --
+   -- @since 4.7.0
+   --
+   -- @param string stylesheet Optional. A theme object stylesheet name. Defaults
+   --                          to the active theme.
+   -- @return WP_Post|null The custom_css post or null if none exists.
+   --
+   function Wp_Get_Custom_CSS_Post (Stylesheet : String := "")
+                                    return Class_Posts.Wp_Post;
+
+   --
+   -- Fetches the saved Custom CSS content for rendering.
+   --
+   -- @since 4.7.0
+   --
+   -- @param string stylesheet Optional. A theme object stylesheet name. Defaults
+   --                          to the active theme.
+   -- @return string The Custom CSS Post content.
+   --
+   function Wp_Get_Custom_CSS (Stylesheet : String := "")
+                               return String;
+
+   --
    -- Retrieves theme modification value for the active theme.
    --
    -- If the modification name does not exist and `default` is a string, then the
@@ -358,6 +390,10 @@ is
                            Value : Array_Type)
                            return Boolean
                            is (False);
+
+   procedure Set_Theme_Mod (Name  : String;
+                            Value : Integer)
+                            is null;
 
    --
    -- Checks whether a header image is set or not.

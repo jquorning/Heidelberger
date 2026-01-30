@@ -22,12 +22,14 @@ with UStrings;
 with Wp_Common;
 
 -- with Class_Customize_Managers;
+with Class_Querys;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Plugins;
+with Inc_Posts;
 with Inc_Post_Formats;
 with Inc_REST_API;
 
@@ -1984,109 +1986,133 @@ is
 --         <?php
 -- end;
 
--- --
--- -- Renders the Custom CSS style element.
--- --
--- -- @since 4.7.0
--- --
--- function wp_custom_css_cb() then
---         styles = wp_get_custom_css();
---         if ( styles || is_customize_preview() ) :
---                 type_attr = current_theme_supports( "html5", "style" ) ? "" : " type="text/css"";
---                 ?>
---                 <style<?php echo type_attr; ?> id="wp-custom-css">
---                         <?php
---                         // Note that esc_html() cannot be used because `div &gt; span` is not interpreted properly.
---                         echo strip_tags( styles );
---                         ?>
---                 </style>
---                 <?php
---         endif;
--- end;
+   ----------------------
+   -- Wp_Custom_CSS_CB --
+   ----------------------
 
--- --
--- -- Fetches the `custom_css` post for a given theme.
--- --
--- -- @since 4.7.0
--- --
--- -- @param string stylesheet Optional. A theme object stylesheet name. Defaults to the active theme.
--- -- @return WP_Post|null The custom_css post or null if none exists.
--- --
--- function wp_get_custom_css_post( stylesheet = "" ) then
---         if ( empty( stylesheet ) ) then
---                 stylesheet = get_stylesheet();
---         end;
+   procedure Wp_Custom_CSS_CB
+   is
+      use Php.Echoing;
+      use Php.Strings;
 
---         custom_css_query_vars = array(
---                 "post_type"              => "custom_css",
---                 "post_status"            => get_post_stati(),
---                 "name"                   => sanitize_title( stylesheet ),
---                 "posts_per_page"         => 1,
---                 "no_found_rows"          => true,
---                 "cache_results"          => true,
---                 "update_post_meta_cache" => false,
---                 "update_post_term_cache" => false,
---                 "lazy_load_term_meta"    => false,
---         );
+      Styles : constant String := Wp_Get_Custom_CSS;
+   begin
+      if Styles /= "" or else Is_Customize_Preview then
+         declare
+            Type_Attr : constant String :=
+              (if Current_Theme_Supports ("html5", "style")
+               then "" else " type=""text/css""");
+         begin
+            Echo ("<style" & Type_Attr & " id=""wp-custom-css"">");
+            -- Note that esc_html() cannot be used because `div &gt; span` is
+            -- not interpreted properly.
+            Echo (Strip_Tags (Styles));
+            Echo ("</style>");
+         end;
+      end if;
+   end Wp_Custom_CSS_CB;
 
---         post = null;
---         if ( get_stylesheet() === stylesheet ) then
---                 post_id = get_theme_mod( "custom_css_post_id" );
+   ----------------------------
+   -- Wp_Get_Custom_CSS_Post --
+   ----------------------------
 
---                 if ( post_id > 0 && get_post( post_id ) ) then
---                         post = get_post( post_id );
---                 end;
+   function Wp_Get_Custom_CSS_Post (Stylesheet : String := "")
+                                    return Class_Posts.Wp_Post
+   is
+      use Php.Strings;
+      use Class_Posts;
+      use Class_Querys;
+      use Inc_Formatting;
+      use Inc_Posts;
 
---                 // `-1` indicates no post exists; no query necessary.
---                 if ( ! post && -1 !== post_id ) then
---                         query = new WP_Query( custom_css_query_vars );
---                         post  = query.post;
---                         /*
---                         -- Cache the lookup. See wp_update_custom_css_post().
---                         -- @todo This should get cleared if a custom_css post is added/removed.
---                         --
---                         set_theme_mod( "custom_css_post_id", post ? post.ID : -1 );
---                 end;
---         end; else then
---                 query = new WP_Query( custom_css_query_vars );
---                 post  = query.post;
---         end;
+      Stylesheet_2 : constant String :=
+        (if Empty (Stylesheet) then Get_Stylesheet else Stylesheet);
 
---         return post;
--- end;
+      Custom_CSS_Query_Vars : constant Array_Type := To_Array (List => (
+        Build ("post_type",              "custom_css"),
+        Build ("post_status",            Get_Post_Stati),
+        Build ("name",                   Sanitize_Title (Stylesheet_2)),
+        Build ("posts_per_page",         1),
+        Build ("no_found_rows",          True),
+        Build ("cache_results",          True),
+        Build ("update_post_meta_cache", False),
+        Build ("update_post_term_cache", False),
+        Build ("lazy_load_term_meta",    False)
+      ));
 
--- --
--- -- Fetches the saved Custom CSS content for rendering.
--- --
--- -- @since 4.7.0
--- --
--- -- @param string stylesheet Optional. A theme object stylesheet name. Defaults to the active theme.
--- -- @return string The Custom CSS Post content.
--- --
--- function wp_get_custom_css( stylesheet = "" ) then
---         css = "";
+      Post : Wp_Post := Null_Post;
+   begin
+      if Get_Stylesheet = Stylesheet_2 then
+         declare
+            Post_Id : constant Class_Posts.Post_Id :=
+              Class_Posts.Post_Id (Integer'(Get_Theme_Mod ("custom_css_post_id")));
+         begin
+            if Post_Id > 0 and then Get_Post (Post_Id) /= Null_Post then
+               Post := Get_Post (Post_Id);
+            end if;
 
---         if ( empty( stylesheet ) ) then
---                 stylesheet = get_stylesheet();
---         end;
+            -- `-1` indicates no post exists; no query necessary.
+            if Post = Null_Post and then -1 /= Post_Id then
+               declare
+                  Query : constant Wp_Query :=
+                    X_Construct (Custom_CSS_Query_Vars);
+               begin
+                  Post := Query.Post;
+                  --
+                  -- Cache the lookup. See wp_update_custom_css_post().
+                  -- @todo This should get cleared if a custom_css post is
+                  -- added/removed.
+                  --
+                  Set_Theme_Mod ("custom_css_post_id", Integer
+                                 (if Post /= Null_Post then Post.Id else -1));
+               end;
+            end if;
+         end;
+      else
+         declare
+            Query : constant Wp_Query :=
+              X_Construct (Custom_CSS_Query_Vars);
+         begin
+            Post  := Query.Post;
+         end;
+      end if;
 
---         post = wp_get_custom_css_post( stylesheet );
---         if ( post ) then
---                 css = post.post_content;
---         end;
+      return Post;
+   end Wp_Get_Custom_CSS_Post;
 
---         --
---         -- Filters the custom CSS output into the head element.
---         --
---         -- @since 4.7.0
---         --
---         -- @param string css        CSS pulled in from the Custom CSS post type.
---         -- @param string stylesheet The theme stylesheet name.
---         --
---         css = apply_filters( "wp_get_custom_css", css, stylesheet );
+   -----------------------
+   -- Wp_Get_Custom_CSS --
+   -----------------------
 
---         return css;
--- end;
+   function Wp_Get_Custom_CSS (Stylesheet : String := "")
+                               return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Posts;
+
+      Stylesheet_2 : constant String :=
+        (if Empty (Stylesheet) then Get_Stylesheet else Stylesheet);
+
+      Post : constant Wp_Post := Wp_Get_Custom_CSS_Post (Stylesheet_2);
+
+      CSS_2 : constant String :=
+        (if Post /= Null_Post then -Post.Post_Content else "");
+
+      --
+      -- Filters the custom CSS output into the head element.
+      --
+      -- @since 4.7.0
+      --
+      -- @param string css        CSS pulled in from the Custom CSS post type.
+      -- @param string stylesheet The theme stylesheet name.
+      --
+      CSS : constant String :=
+        Apply_Filters ("wp_get_custom_css", CSS_2, Stylesheet_2);
+   begin
+      return CSS;
+   end Wp_Get_Custom_CSS;
 
 -- --
 -- -- Updates the `custom_css` post for a given theme.

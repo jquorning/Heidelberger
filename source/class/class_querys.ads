@@ -135,7 +135,7 @@ is
         -- @since 1.5.0
         -- @var WP_Post|null
         --
---        public $post;
+        Post : Class_Posts.Wp_Post;  -- Should this be an acces? -- jq
 
         --
         -- The list of comments for current post.
@@ -792,6 +792,7 @@ is
       Max_Num_Pages         => 0,
       Max_Num_Comment_Pages => 0,
       Posts                 => Class_Posts.Post_Arrays.Empty_Vector,
+      Post                  => Class_Posts.Null_Post,
       others                => False);
 
 end Class_Querys;

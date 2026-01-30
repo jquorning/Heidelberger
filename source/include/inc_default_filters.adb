@@ -432,7 +432,7 @@ is
 --    Add_Action ("wp_head", Wp_Generator'Access);
 --    Add_Action ("wp_head", Rel_Canonical'Access);
 --    Add_Action ("wp_head", Wp_Shortlink_Wp_Head'Access, 10, 0);
---    Add_Action ("wp_head", Wp_Custom_Css_Cb'Access, 101);
+      Add_Action ("wp_head", Inc_Themes.Wp_Custom_CSS_CB'Access, 101);
 --    Add_Action ("wp_head", Wp_Site_Icon'Access, 99);
 --    Add_Action ("wp_footer", Wp_Print_Footer_Scripts'Access, 20);
 --    Add_Action ("template_redirect", Wp_Shortlink_Header'Access, 11, 0);
