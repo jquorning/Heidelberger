@@ -420,7 +420,8 @@ is
 --    Add_Action ("wp_head", Feed_Links_Extra'Access, 3);
 --    Add_Action ("wp_head", Rsd_Link'Access);
 --    Add_Action ("wp_head", Wlwmanifest_Link'Access);
---    Add_Action ("wp_head", Locale_Stylesheet'Access);
+      Add_Action ("wp_head",
+                  Inc_Themes.Locale_Stylesheet'Access);
 --    Add_Action ("publish_future_post", Check_And_Publish_Future_Post'Access, 10, 1);
 --    Add_Action ("wp_head", Wp_Robots'Access, 1);
 --    Add_Action ("wp_head", Print_Emoji_Detection_Script'Access, 7);

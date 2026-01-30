@@ -296,49 +296,45 @@ is
 --         return apply_filters( "stylesheet_uri", stylesheet_uri, stylesheet_dir_uri );
 -- end;
 
--- --
--- -- Retrieves the localized stylesheet URI.
--- --
--- -- The stylesheet directory for the localized stylesheet files are located, by
--- -- default, in the base theme directory. The name of the locale file will be the
--- -- locale followed by ".css". If that does not exist, then the text direction
--- -- stylesheet will be checked for existence, for example "ltr.css".
--- --
--- -- The theme may change the location of the stylesheet directory by either using
--- -- the {@see "stylesheet_directory_uri"} or {@see "locale_stylesheet_uri"} filters.
--- --
--- -- If you want to change the location of the stylesheet files for the entire
--- -- WordPress workflow, then change the former. If you just have the locale in a
--- -- separate folder, then change the latter.
--- --
--- -- @since 2.1.0
--- --
--- -- @global WP_Locale wp_locale WordPress date and time locale object.
--- --
--- -- @return string URI to active theme"s localized stylesheet.
--- --
--- function get_locale_stylesheet_uri() then
---         global wp_locale;
---         stylesheet_dir_uri = get_stylesheet_directory_uri();
---         dir                = get_stylesheet_directory();
---         locale             = get_locale();
---         if ( file_exists( "dir/locale.css" ) ) then
---                 stylesheet_uri = "stylesheet_dir_uri/locale.css";
---         end; elseif ( ! empty( wp_locale.text_direction ) && file_exists( "dir/thenwp_locale.text_directionend;.css" ) ) then
---                 stylesheet_uri = "stylesheet_dir_uri/thenwp_locale.text_directionend;.css";
---         end; else then
---                 stylesheet_uri = "";
---         end;
---         --
---         -- Filters the localized stylesheet URI.
---         --
---         -- @since 2.1.0
---         --
---         -- @param string stylesheet_uri     Localized stylesheet URI.
---         -- @param string stylesheet_dir_uri Stylesheet directory URI.
---         --
---         return apply_filters( "locale_stylesheet_uri", stylesheet_uri, stylesheet_dir_uri );
--- end;
+   -------------------------------
+   -- Get_Locale_Stylesheet_URI --
+   -------------------------------
+
+   function Get_Locale_Stylesheet_URI
+            return String
+   is
+      use Php.Files;
+      use Php.Strings;
+      use Globals;
+      use Wp_Common;
+      use UStrings;
+      use Inc_L10n;
+--    global wp_locale;
+      Stylesheet_Dir_URI : constant String := Get_Stylesheet_Directory_URI;
+      Dir                : constant String := Get_Stylesheet_Directory;
+      Locale             : constant String := Get_Locale;
+
+      Stylesheet_URI : constant String :=
+        (if File_Exists ("dir/locale.css")
+           then Stylesheet_Dir_URI & "/" & Locale & ".css"
+         elsif
+           not Empty (Wp_Locale.Text_Direction) and then
+           File_Exists (Dir & "/" & (-Wp_Locale.Text_Direction) & ".css")
+         then Stylesheet_Dir_URI & "/" & (-Wp_Locale.Text_Direction) & ".css"
+         else "");
+   begin
+
+      --
+      -- Filters the localized stylesheet URI.
+      --
+      -- @since 2.1.0
+      --
+      -- @param string stylesheet_uri     Localized stylesheet URI.
+      -- @param string stylesheet_dir_uri Stylesheet directory URI.
+      --
+      return
+        Apply_Filters ("locale_stylesheet_uri", Stylesheet_URI, Stylesheet_Dir_URI);
+   end Get_Locale_Stylesheet_URI;
 
    ------------------
    -- Get_Template --
@@ -808,25 +804,35 @@ is
       return -Theme_Root;
    end Get_Raw_Theme_Root;
 
--- --
--- -- Displays localized stylesheet link element.
--- --
--- -- @since 2.1.0
--- --
--- function locale_stylesheet() then
---         stylesheet = get_locale_stylesheet_uri();
---         if ( empty( stylesheet ) ) then
---                 return;
---         end;
+   -----------------------
+   -- Locale_Stylesheet --
+   -----------------------
 
---         type_attr = current_theme_supports( "html5", "style" ) ? "" : " type="text/css"";
+   procedure Locale_Stylesheet
+   is
+      use Php.Echoing;
+      use Php.Strings;
 
---         printf(
---                 "<link rel="stylesheet" href="%s"%s media="screen" />",
---                 stylesheet,
---                 type_attr
---         );
--- end;
+      Stylesheet : constant String := Get_Locale_Stylesheet_URI;
+   begin
+      if Empty (Stylesheet) then
+         return;
+      end if;
+
+      declare
+         Type_Attr : constant String :=
+           (if Current_Theme_Supports ("html5", "style")
+            then "" else " type=""text/css""");
+      begin
+         Printf (
+           "<link rel=""stylesheet"" href=""%s""%s media=""screen"" />",
+           [
+             1 => Stylesheet,
+             2 => Type_Attr
+           ]
+         );
+      end;
+   end Locale_Stylesheet;
 
 -- --
 -- -- Switches the theme.
