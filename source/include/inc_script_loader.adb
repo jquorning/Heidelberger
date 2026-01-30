@@ -2538,7 +2538,7 @@ is
       use Inc_Plugins;
 --    global concatenate_scripts;
       Wp_Scripts : Class_Scripts.Wp_Scripts
-        renames Global_Wp_Scripts;
+        renames Globals.Global_Wp_Scripts;
    begin
       if not Did_Action ("wp_print_scripts") then
          -- This action is documented in wp-includes/functions.wp-scripts.php

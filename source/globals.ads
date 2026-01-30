@@ -11,6 +11,7 @@ with Class_WpDB;
 with Class_Locales;
 with Class_Posts;
 with Class_Post_Type;
+with Class_Scripts;
 with Class_Styles;
 with Class_Taxonomy;
 
@@ -33,8 +34,8 @@ is
 
    Wp_Importers : Array_Type;
 
-   Global_Wp_Styles : Class_Styles.Wp_Styles; -- :=
---   Class_Styles.X_Construct;
+   Global_Wp_Scripts : Class_Scripts.Wp_Scripts;
+   Global_Wp_Styles  : Class_Styles.Wp_Styles;
 
    Typenow     : UStrings.UString;
    Taxnow      : UStrings.UString;

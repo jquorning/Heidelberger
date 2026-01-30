@@ -1,3 +1,7 @@
+--
+--
+--
+
 package body Globals
 is
 
@@ -5,6 +9,7 @@ is
 
 begin
 
-   Global_Wp_Styles := Class_Styles.X_Construct;
+   Global_Wp_Scripts := Class_Scripts.X_Construct;
+   Global_Wp_Styles  := Class_Styles.X_Construct;
 
 end Globals;

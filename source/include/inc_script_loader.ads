@@ -30,8 +30,6 @@ is
    use Arrays;
    use Lists;
 
-   Global_Wp_Scripts : Class_Scripts.Wp_Scripts; -- arbitrary position (jq)
-
    --
    -- Registers TinyMCE scripts.
    --

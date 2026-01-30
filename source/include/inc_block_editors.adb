@@ -21,7 +21,6 @@ with Wp_Common;
 with Class_Block_Type_Registry;
 with Class_Posts;
 with Class_Theme_JSON_Resolver;
-with Adm_Load_Styles;
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
 with Inc_HTTP;
@@ -30,7 +29,6 @@ with Inc_Load;
 with Inc_L10n;
 with Inc_Media;
 with Inc_Options;
-with Inc_Script_Loader;
 with Inc_Themes;
 
 package body Inc_Block_Editors
@@ -436,8 +434,6 @@ is
       use Php.Lists;
       use UStrings;
       use Class_Block_Type_Registry;
-      use Adm_Load_Styles;
-      use Inc_Script_Loader;
       use Inc_Themes;
 --    global pagenow;
 
@@ -503,13 +499,13 @@ is
       Script_Handles := List_Unique (Script_Handles);
 
       declare
-         Done : constant List_Type := Global_Wp_Scripts.Done;
+         Done : constant List_Type := Globals.Global_Wp_Scripts.Done;
       begin
          OB_Start;
 
-         Global_Wp_Scripts.Done := Empty_List;
-         Global_Wp_Scripts.Do_Items (Script_Handles);
-         Global_Wp_Scripts.Done := Done;
+         Globals.Global_Wp_Scripts.Done := Empty_List;
+         Globals.Global_Wp_Scripts.Do_Items (Script_Handles);
+         Globals.Global_Wp_Scripts.Done := Done;
       end;
 
       Scripts_2 := +OB_Get_Clean;
