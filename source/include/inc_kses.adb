@@ -29,7 +29,10 @@
 -- @subpackage KSES
 --
 
+with Ada.Containers;
+
 with Php.Arrays;
+with Php.HTML;
 with Php.Lists;
 with Php.Numerics;
 with Php.Preg;
@@ -41,7 +44,6 @@ with UStrings;
 with Wp_Common;
 
 with Inc_Functions;
-with Inc_Plugins;
 
 package body Inc_KSES
 is
@@ -427,277 +429,279 @@ is
 --                 "strong"     => array(),
 --         );
 
---         --
---         -- @var string[] $allowedentitynames Array of KSES allowed HTML entity names.
---         -- @since 1.0.0
---         --
---         $allowedentitynames = array(
---                 "nbsp",
---                 "iexcl",
---                 "cent",
---                 "pound",
---                 "curren",
---                 "yen",
---                 "brvbar",
---                 "sect",
---                 "uml",
---                 "copy",
---                 "ordf",
---                 "laquo",
---                 "not",
---                 "shy",
---                 "reg",
---                 "macr",
---                 "deg",
---                 "plusmn",
---                 "acute",
---                 "micro",
---                 "para",
---                 "middot",
---                 "cedil",
---                 "ordm",
---                 "raquo",
---                 "iquest",
---                 "Agrave",
---                 "Aacute",
---                 "Acirc",
---                 "Atilde",
---                 "Auml",
---                 "Aring",
---                 "AElig",
---                 "Ccedil",
---                 "Egrave",
---                 "Eacute",
---                 "Ecirc",
---                 "Euml",
---                 "Igrave",
---                 "Iacute",
---                 "Icirc",
---                 "Iuml",
---                 "ETH",
---                 "Ntilde",
---                 "Ograve",
---                 "Oacute",
---                 "Ocirc",
---                 "Otilde",
---                 "Ouml",
---                 "times",
---                 "Oslash",
---                 "Ugrave",
---                 "Uacute",
---                 "Ucirc",
---                 "Uuml",
---                 "Yacute",
---                 "THORN",
---                 "szlig",
---                 "agrave",
---                 "aacute",
---                 "acirc",
---                 "atilde",
---                 "auml",
---                 "aring",
---                 "aelig",
---                 "ccedil",
---                 "egrave",
---                 "eacute",
---                 "ecirc",
---                 "euml",
---                 "igrave",
---                 "iacute",
---                 "icirc",
---                 "iuml",
---                 "eth",
---                 "ntilde",
---                 "ograve",
---                 "oacute",
---                 "ocirc",
---                 "otilde",
---                 "ouml",
---                 "divide",
---                 "oslash",
---                 "ugrave",
---                 "uacute",
---                 "ucirc",
---                 "uuml",
---                 "yacute",
---                 "thorn",
---                 "yuml",
---                 "quot",
---                 "amp",
---                 "lt",
---                 "gt",
---                 "apos",
---                 "OElig",
---                 "oelig",
---                 "Scaron",
---                 "scaron",
---                 "Yuml",
---                 "circ",
---                 "tilde",
---                 "ensp",
---                 "emsp",
---                 "thinsp",
---                 "zwnj",
---                 "zwj",
---                 "lrm",
---                 "rlm",
---                 "ndash",
---                 "mdash",
---                 "lsquo",
---                 "rsquo",
---                 "sbquo",
---                 "ldquo",
---                 "rdquo",
---                 "bdquo",
---                 "dagger",
---                 "Dagger",
---                 "permil",
---                 "lsaquo",
---                 "rsaquo",
---                 "euro",
---                 "fnof",
---                 "Alpha",
---                 "Beta",
---                 "Gamma",
---                 "Delta",
---                 "Epsilon",
---                 "Zeta",
---                 "Eta",
---                 "Theta",
---                 "Iota",
---                 "Kappa",
---                 "Lambda",
---                 "Mu",
---                 "Nu",
---                 "Xi",
---                 "Omicron",
---                 "Pi",
---                 "Rho",
---                 "Sigma",
---                 "Tau",
---                 "Upsilon",
---                 "Phi",
---                 "Chi",
---                 "Psi",
---                 "Omega",
---                 "alpha",
---                 "beta",
---                 "gamma",
---                 "delta",
---                 "epsilon",
---                 "zeta",
---                 "eta",
---                 "theta",
---                 "iota",
---                 "kappa",
---                 "lambda",
---                 "mu",
---                 "nu",
---                 "xi",
---                 "omicron",
---                 "pi",
---                 "rho",
---                 "sigmaf",
---                 "sigma",
---                 "tau",
---                 "upsilon",
---                 "phi",
---                 "chi",
---                 "psi",
---                 "omega",
---                 "thetasym",
---                 "upsih",
---                 "piv",
---                 "bull",
---                 "hellip",
---                 "prime",
---                 "Prime",
---                 "oline",
---                 "frasl",
---                 "weierp",
---                 "image",
---                 "real",
---                 "trade",
---                 "alefsym",
---                 "larr",
---                 "uarr",
---                 "rarr",
---                 "darr",
---                 "harr",
---                 "crarr",
---                 "lArr",
---                 "uArr",
---                 "rArr",
---                 "dArr",
---                 "hArr",
---                 "forall",
---                 "part",
---                 "exist",
---                 "empty",
---                 "nabla",
---                 "isin",
---                 "notin",
---                 "ni",
---                 "prod",
---                 "sum",
---                 "minus",
---                 "lowast",
---                 "radic",
---                 "prop",
---                 "infin",
---                 "ang",
---                 "and",
---                 "or",
---                 "cap",
---                 "cup",
---                 "int",
---                 "sim",
---                 "cong",
---                 "asymp",
---                 "ne",
---                 "equiv",
---                 "le",
---                 "ge",
---                 "sub",
---                 "sup",
---                 "nsub",
---                 "sube",
---                 "supe",
---                 "oplus",
---                 "otimes",
---                 "perp",
---                 "sdot",
---                 "lceil",
---                 "rceil",
---                 "lfloor",
---                 "rfloor",
---                 "lang",
---                 "rang",
---                 "loz",
---                 "spades",
---                 "clubs",
---                 "hearts",
---                 "diams",
---                 "sup1",
---                 "sup2",
---                 "sup3",
---                 "frac14",
---                 "frac12",
---                 "frac34",
---                 "there4",
---         );
+   --
+   -- @var string[] $allowedentitynames Array of KSES allowed HTML entity names.
+   -- @since 1.0.0
+   --
+   Allowedentitynames : constant List_Type :=
+          [
+                "nbsp",
+                "iexcl",
+                "cent",
+                "pound",
+                "curren",
+                "yen",
+                "brvbar",
+                "sect",
+                "uml",
+                "copy",
+                "ordf",
+                "laquo",
+                "not",
+                "shy",
+                "reg",
+                "macr",
+                "deg",
+                "plusmn",
+                "acute",
+                "micro",
+                "para",
+                "middot",
+                "cedil",
+                "ordm",
+                "raquo",
+                "iquest",
+                "Agrave",
+                "Aacute",
+                "Acirc",
+                "Atilde",
+                "Auml",
+                "Aring",
+                "AElig",
+                "Ccedil",
+                "Egrave",
+                "Eacute",
+                "Ecirc",
+                "Euml",
+                "Igrave",
+                "Iacute",
+                "Icirc",
+                "Iuml",
+                "ETH",
+                "Ntilde",
+                "Ograve",
+                "Oacute",
+                "Ocirc",
+                "Otilde",
+                "Ouml",
+                "times",
+                "Oslash",
+                "Ugrave",
+                "Uacute",
+                "Ucirc",
+                "Uuml",
+                "Yacute",
+                "THORN",
+                "szlig",
+                "agrave",
+                "aacute",
+                "acirc",
+                "atilde",
+                "auml",
+                "aring",
+                "aelig",
+                "ccedil",
+                "egrave",
+                "eacute",
+                "ecirc",
+                "euml",
+                "igrave",
+                "iacute",
+                "icirc",
+                "iuml",
+                "eth",
+                "ntilde",
+                "ograve",
+                "oacute",
+                "ocirc",
+                "otilde",
+                "ouml",
+                "divide",
+                "oslash",
+                "ugrave",
+                "uacute",
+                "ucirc",
+                "uuml",
+                "yacute",
+                "thorn",
+                "yuml",
+                "quot",
+                "amp",
+                "lt",
+                "gt",
+                "apos",
+                "OElig",
+                "oelig",
+                "Scaron",
+                "scaron",
+                "Yuml",
+                "circ",
+                "tilde",
+                "ensp",
+                "emsp",
+                "thinsp",
+                "zwnj",
+                "zwj",
+                "lrm",
+                "rlm",
+                "ndash",
+                "mdash",
+                "lsquo",
+                "rsquo",
+                "sbquo",
+                "ldquo",
+                "rdquo",
+                "bdquo",
+                "dagger",
+                "Dagger",
+                "permil",
+                "lsaquo",
+                "rsaquo",
+                "euro",
+                "fnof",
+                "Alpha",
+                "Beta",
+                "Gamma",
+                "Delta",
+                "Epsilon",
+                "Zeta",
+                "Eta",
+                "Theta",
+                "Iota",
+                "Kappa",
+                "Lambda",
+                "Mu",
+                "Nu",
+                "Xi",
+                "Omicron",
+                "Pi",
+                "Rho",
+                "Sigma",
+                "Tau",
+                "Upsilon",
+                "Phi",
+                "Chi",
+                "Psi",
+                "Omega",
+                "alpha",
+                "beta",
+                "gamma",
+                "delta",
+                "epsilon",
+                "zeta",
+                "eta",
+                "theta",
+                "iota",
+                "kappa",
+                "lambda",
+                "mu",
+                "nu",
+                "xi",
+                "omicron",
+                "pi",
+                "rho",
+                "sigmaf",
+                "sigma",
+                "tau",
+                "upsilon",
+                "phi",
+                "chi",
+                "psi",
+                "omega",
+                "thetasym",
+                "upsih",
+                "piv",
+                "bull",
+                "hellip",
+                "prime",
+                "Prime",
+                "oline",
+                "frasl",
+                "weierp",
+                "image",
+                "real",
+                "trade",
+                "alefsym",
+                "larr",
+                "uarr",
+                "rarr",
+                "darr",
+                "harr",
+                "crarr",
+                "lArr",
+                "uArr",
+                "rArr",
+                "dArr",
+                "hArr",
+                "forall",
+                "part",
+                "exist",
+                "empty",
+                "nabla",
+                "isin",
+                "notin",
+                "ni",
+                "prod",
+                "sum",
+                "minus",
+                "lowast",
+                "radic",
+                "prop",
+                "infin",
+                "ang",
+                "and",
+                "or",
+                "cap",
+                "cup",
+                "int",
+                "sim",
+                "cong",
+                "asymp",
+                "ne",
+                "equiv",
+                "le",
+                "ge",
+                "sub",
+                "sup",
+                "nsub",
+                "sube",
+                "supe",
+                "oplus",
+                "otimes",
+                "perp",
+                "sdot",
+                "lceil",
+                "rceil",
+                "lfloor",
+                "rfloor",
+                "lang",
+                "rang",
+                "loz",
+                "spades",
+                "clubs",
+                "hearts",
+                "diams",
+                "sup1",
+                "sup2",
+                "sup3",
+                "frac14",
+                "frac12",
+                "frac34",
+                "there4"
+     ];
 
---         --
---         -- @var string[] $allowedxmlentitynames Array of KSES allowed XML entity names.
---         -- @since 5.5.0
---         --
---         $allowedxmlentitynames = array(
---                 "amp",
---                 "lt",
---                 "gt",
---                 "apos",
---                 "quot",
---         );
+   --
+   -- @var string[] $allowedxmlentitynames Array of KSES allowed XML entity names.
+   -- @since 5.5.0
+   --
+   Allowedxmlentitynames : constant List_Type :=
+     [
+                "amp",
+                "lt",
+                "gt",
+                "apos",
+                "quot"
+     ];
 
 --         $allowedposttags = array_map( "_wp_add_global_attributes", $allowedposttags );
 -- end; else then
@@ -729,9 +733,9 @@ is
         Wp_KSES_Normalize_Entities (String_3);
 
       String_1 : constant String :=
-        Wp_KSES_Hook (String_2, Allowed_HTML, Allowed_Protocols);
+        Wp_KSES_Hook (String_2, Allowed_HTML, Allowed_Protocols_2);
    begin
-      return Wp_KSES_Split (String_1, Allowed_HTML, Allowed_Protocols);
+      return Wp_KSES_Split (String_1, Allowed_HTML, Allowed_Protocols_2);
    end Wp_KSES;
 
 -- --
@@ -816,7 +820,6 @@ is
    is
       use Php.Types;
       use Wp_Common;
-      use Inc_Plugins;
 --        global $allowedposttags, $allowedtags, $allowedentitynames;
    begin
       if Is_Array (Context) then
@@ -944,7 +947,6 @@ is
                            return String
    is
       use Php.Preg;
-      use Wp_Common;
    begin
       Pass_Allowed_HTML      := Allowed_HTML;
       Pass_Allowed_Protocols := Allowed_Protocols;
@@ -961,7 +963,6 @@ is
             return List_Type
    is
       use Wp_Common;
-      use Inc_Plugins;
 
       URI_Attributes_2 : constant List_Type :=
         [
@@ -1867,161 +1868,154 @@ is
       end if;
    end Wp_KSES_Bad_Protocol_Once2;
 
--- --
--- -- Converts and fixes HTML entities.
--- --
--- -- This function normalizes HTML entities. It will convert `AT&T` to the correct
--- -- `AT&amp;T`, `&#00058;` to `&#058;`, `&#XYZZY;` to `&amp;#XYZZY;` and so on.
--- --
--- -- When `$context` is set to "xml", HTML entities are converted to their code points.  For
--- -- example, `AT&T&hellip;&#XYZZY;` is converted to `AT&amp;T…&amp;#XYZZY;`.
--- --
--- -- @since 1.0.0
--- -- @since 5.5.0 Added `$context` parameter.
--- --
--- -- @param string $string  Content to normalize entities.
--- -- @param string $context Context for normalization. Can be either "html" or "xml".
--- --                        Default "html".
--- -- @return string Content with normalized entities.
--- --
--- function wp_kses_normalize_entities( $string, $context = "html" ) then
---         // Disarm all entities by converting & to &amp;
---         $string = str_replace( "&", "&amp;", $string );
+   --------------------------------
+   -- Wp_KSES_Normalize_Entities --
+   --------------------------------
 
---         // Change back the allowed entities in our list of allowed entities.
---         if ( "xml" === $context ) then
---                 $string = preg_replace_callback( "/&amp;([A-Za-z]then2,8end;[0-9]then0,2end;);/", "wp_kses_xml_named_entities", $string );
---         end; else then
---                 $string = preg_replace_callback( "/&amp;([A-Za-z]then2,8end;[0-9]then0,2end;);/", "wp_kses_named_entities", $string );
---         end;
---         $string = preg_replace_callback( "/&amp;#(0*[0-9]then1,7end;);/", "wp_kses_normalize_entities2", $string );
---         $string = preg_replace_callback( "/&amp;#[Xx](0*[0-9A-Fa-f]then1,6end;);/", "wp_kses_normalize_entities3", $string );
+   function Wp_KSES_Normalize_Entities (Item    : String;
+                                        Context : String := "html")
+                                        return String
+   is
+      use Php.Preg;
+      use Php.Strings;
 
---         return $string;
--- end;
+      -- Disarm all entities by converting & to &amp;
+      Item_2 : constant String := Str_Replace ("&", "&amp;", Item);
 
--- --
--- -- Callback for `wp_kses_normalize_entities()` regular expression.
--- --
--- -- This function only accepts valid named entity references, which are finite,
--- -- case-sensitive, and highly scrutinized by HTML and XML validators.
--- --
--- -- @since 3.0.0
--- --
--- -- @global array $allowedentitynames
--- --
--- -- @param array $matches preg_replace_callback() matches array.
--- -- @return string Correctly encoded entity.
--- --
--- function wp_kses_named_entities( $matches ) then
---         global $allowedentitynames;
+      -- Change back the allowed entities in our list of allowed entities.
+      Item_3 : constant String :=
+        (if "xml" = Context
+         then Preg_Replace_Callback ("/&amp;([A-Za-z]{2,8}[0-9]{0,2});/",
+                                     Wp_KSES_XML_Named_Entities'Access, Item_2)
+         else Preg_Replace_Callback ("/&amp;([A-Za-z]{2,8}[0-9]{0,2});/",
+                                     Wp_KSES_Named_Entities'Access, Item_2));
 
---         if ( empty( $matches[1] ) ) then
---                 return "";
---         end;
+      Item_4 : constant String :=
+        Preg_Replace_Callback ("/&amp;#(0*[0-9]{1,7});/",
+                               Wp_KSES_Normalize_Entities2'Access, Item_3);
 
---         $i = $matches[1];
---         return ( ! in_array( $i, $allowedentitynames, true ) ) ? "&amp;$i;" : "&$i;";
--- end;
+      Item_5 : constant String :=
+        Preg_Replace_Callback ("/&amp;#[Xx](0*[0-9A-Fa-f]{1,6});/",
+                               Wp_KSES_Normalize_Entities3'Access, Item_4);
+   begin
+      return Item_5;
+   end Wp_KSES_Normalize_Entities;
 
--- --
--- -- Callback for `wp_kses_normalize_entities()` regular expression.
--- --
--- -- This function only accepts valid named entity references, which are finite,
--- -- case-sensitive, and highly scrutinized by XML validators.  HTML named entity
--- -- references are converted to their code points.
--- --
--- -- @since 5.5.0
--- --
--- -- @global array $allowedentitynames
--- -- @global array $allowedxmlentitynames
--- --
--- -- @param array $matches preg_replace_callback() matches array.
--- -- @return string Correctly encoded entity.
--- --
--- function wp_kses_xml_named_entities( $matches ) then
---         global $allowedentitynames, $allowedxmlentitynames;
+   ----------------------------
+   -- Wp_KSES_Named_Entities --
+   ----------------------------
 
---         if ( empty( $matches[1] ) ) then
---                 return "";
---         end;
+   function Wp_KSES_Named_Entities (Matches : List_Type)
+                                    return String
+   is
+      use Ada.Containers;
+      use Php.Lists;
+--    global $allowedentitynames;
+   begin
+      if Matches.Length < 2 then
+         return "";
+      end if;
 
---         $i = $matches[1];
+      declare
+         I : constant String := Matches (2);
+      begin
+         return (if not In_List (I, Allowedentitynames, True)
+                 then "&amp;" & I else "&" & I);
+      end;
+   end Wp_KSES_Named_Entities;
 
---         if ( in_array( $i, $allowedxmlentitynames, true ) ) then
---                 return "&$i;";
---         end; elseif ( in_array( $i, $allowedentitynames, true ) ) then
---                 return html_entity_decode( "&$i;", ENT_HTML5 );
---         end;
+   --------------------------------
+   -- Wp_KSES_XML_Named_Entities --
+   --------------------------------
 
---         return "&amp;$i;";
--- end;
+   function Wp_KSES_XML_Named_Entities (Matches : List_Type)
+                                        return String
+   is
+      use Ada.Containers;
+      use Php.HTML;
+      use Php.Lists;
+--    global $allowedentitynames, $allowedxmlentitynames;
+   begin
+      if Matches.Length < 2 then
+         return "";
+      end if;
 
--- --
--- -- Callback for `wp_kses_normalize_entities()` regular expression.
--- --
--- -- This function helps `wp_kses_normalize_entities()` to only accept 16-bit
--- -- values and nothing more for `&#number;` entities.
--- --
--- -- @access private
--- -- @ignore
--- -- @since 1.0.0
--- --
--- -- @param array $matches `preg_replace_callback()` matches array.
--- -- @return string Correctly encoded entity.
--- --
--- function wp_kses_normalize_entities2( $matches ) then
---         if ( empty( $matches[1] ) ) then
---                 return "";
---         end;
+      declare
+         I : constant String := Matches (2);
+      begin
+         if In_List (I, Allowedxmlentitynames, True) then
+            return "&" & I & ";";
+         elsif In_List (I, Allowedentitynames, True) then
+            return HTML_Entity_Decode ("&" & I & ";", ENT_HTML5);
+         end if;
 
---         $i = $matches[1];
---         if ( valid_unicode( $i ) ) then
---                 $i = str_pad( ltrim( $i, "0" ), 3, "0", STR_PAD_LEFT );
---                 $i = "&#$i;";
---         end; else then
---                 $i = "&amp;#$i;";
---         end;
+         return "&amp;" & I & ";";
+      end;
+   end Wp_KSES_XML_Named_Entities;
 
---         return $i;
--- end;
+   -----------------------------
+   -- Wp_KSES_Named_Entities2 --
+   -----------------------------
 
--- --
--- -- Callback for `wp_kses_normalize_entities()` for regular expression.
--- --
--- -- This function helps `wp_kses_normalize_entities()` to only accept valid Unicode
--- -- numeric entities in hex form.
--- --
--- -- @since 2.7.0
--- -- @access private
--- -- @ignore
--- --
--- -- @param array $matches `preg_replace_callback()` matches array.
--- -- @return string Correctly encoded entity.
--- --
--- function wp_kses_normalize_entities3( $matches ) then
---         if ( empty( $matches[1] ) ) then
---                 return "";
---         end;
+   function Wp_KSES_Normalize_Entities2 (Matches : List_Type)
+                                         return String
+   is
+      use Ada.Containers;
+      use Php.Strings;
+   begin
+      if Matches.Length < 2 then
+         return "";
+      end if;
 
---         $hexchars = $matches[1];
---         return ( ! valid_unicode( hexdec( $hexchars ) ) ) ? "&amp;#x$hexchars;" : "&#x" . ltrim( $hexchars, "0" ) . ";";
--- end;
+      declare
+         I : constant String := Matches (2);
+      begin
+         if Valid_Unicode (Integer'Value (I)) then
+            return "&#" & Str_Pad (Ltrim (I, "0"), 3, '0', STR_PAD_LEFT) & ";";
+         else
+            return "&amp;#" & I & ";";
+         end if;
+      end;
+   end Wp_KSES_Normalize_Entities2;
 
--- --
--- -- Determines if a Unicode codepoint is valid.
--- --
--- -- @since 2.7.0
--- --
--- -- @param int $i Unicode codepoint.
--- -- @return bool Whether or not the codepoint is a valid Unicode codepoint.
--- --
--- function valid_unicode( $i ) then
---         return ( 0x9 == $i || 0xa == $i || 0xd == $i ||
---                         ( 0x20 <= $i && $i <= 0xd7ff ) ||
---                         ( 0xe000 <= $i && $i <= 0xfffd ) ||
---                         ( 0x10000 <= $i && $i <= 0x10ffff ) );
--- end;
+   -----------------------------
+   -- Wp_KSES_Named_Entities3 --
+   -----------------------------
+
+   function Wp_KSES_Normalize_Entities3 (Matches : List_Type)
+                                         return String
+   is
+      use Ada.Containers;
+      use Php.Numerics;
+      use Php.Strings;
+   begin
+      if Matches.Length < 2 then
+         return "";
+      end if;
+
+      declare
+         Hexchars : constant String := Matches (2);
+      begin
+         return (if not Valid_Unicode (Hexdec (Hexchars))
+                 then "&amp;#x" & Hexchars & ";"
+                 else "&#x" & Ltrim (Hexchars, "0") & ";");
+      end;
+   end Wp_KSES_Normalize_Entities3;
+
+   -------------------
+   -- Valid_Unicode --
+   -------------------
+
+   function Valid_Unicode (I : Integer)
+                           return Boolean
+   is
+   begin
+      return
+        I in 16#9# | 16#a# | 16#d# or
+        I in 16#20# .. 16#d7ff#    or
+        I in 16#e000# .. 16#fffd#  or
+        I in 16#10000# .. 16#10ffff#;
+   end Valid_Unicode;
 
    -----------------------------
    -- Wp_KSES_Decode_Entities --
@@ -2279,7 +2273,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_Functions;
-      use Inc_Plugins;
 
       -- if ( ! empty( $deprecated ) ) then
       --         _deprecated_argument( __FUNCTION__, "2.8.1" ); // Never implemented.

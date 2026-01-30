@@ -16,6 +16,7 @@ is
    ENT_XML1       : constant Flag_Type := 16#0010#;
    ENT_HTML401    : constant Flag_Type := 16#0020#;
    ENT_COMPAT     : constant Flag_Type := 16#0040#;
+   ENT_HTML5      : constant Flag_Type := 16#0080#;
    -- Shold be or'ed together instead
 
    function HTML_Entity_Decode

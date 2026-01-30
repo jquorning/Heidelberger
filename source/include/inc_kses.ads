@@ -492,7 +492,83 @@ is
    --
    function Wp_KSES_Normalize_Entities (Item    : String;
                                         Context : String := "html")
-                                        return String
-                                        is (Item);
+                                        return String;
+
+   --
+   -- Callback for `wp_kses_normalize_entities()` regular expression.
+   --
+   -- This function only accepts valid named entity references, which are finite,
+   -- case-sensitive, and highly scrutinized by HTML and XML validators.
+   --
+   -- @since 3.0.0
+   --
+   -- @global array $allowedentitynames
+   --
+   -- @param array $matches preg_replace_callback() matches array.
+   -- @return string Correctly encoded entity.
+   --
+   function Wp_KSES_Named_Entities (Matches : List_Type)
+                                    return String;
+
+   --
+   -- Callback for `wp_kses_normalize_entities()` regular expression.
+   --
+   -- This function only accepts valid named entity references, which are finite,
+   -- case-sensitive, and highly scrutinized by XML validators.  HTML named entity
+   -- references are converted to their code points.
+   --
+   -- @since 5.5.0
+   --
+   -- @global array $allowedentitynames
+   -- @global array $allowedxmlentitynames
+   --
+   -- @param array $matches preg_replace_callback() matches array.
+   -- @return string Correctly encoded entity.
+   --
+   function Wp_KSES_XML_Named_Entities (Matches : List_Type)
+                                        return String;
+
+   --
+   -- Callback for `wp_kses_normalize_entities()` regular expression.
+   --
+   -- This function helps `wp_kses_normalize_entities()` to only accept 16-bit
+   -- values and nothing more for `&#number;` entities.
+   --
+   -- @access private
+   -- @ignore
+   -- @since 1.0.0
+   --
+   -- @param array $matches `preg_replace_callback()` matches array.
+   -- @return string Correctly encoded entity.
+   --
+   function Wp_KSES_Normalize_Entities2 (Matches : List_Type)
+                                         return String;
+
+   --
+   -- Callback for `wp_kses_normalize_entities()` for regular expression.
+   --
+   -- This function helps `wp_kses_normalize_entities()` to only accept valid Unicode
+   -- numeric entities in hex form.
+   --
+   -- @since 2.7.0
+   -- @access private
+   -- @ignore
+   --
+   -- @param array $matches `preg_replace_callback()` matches array.
+   -- @return string Correctly encoded entity.
+   --
+   function Wp_KSES_Normalize_Entities3 (Matches : List_Type)
+                                         return String;
+
+   --
+   -- Determines if a Unicode codepoint is valid.
+   --
+   -- @since 2.7.0
+   --
+   -- @param int $i Unicode codepoint.
+   -- @return bool Whether or not the codepoint is a valid Unicode codepoint.
+   --
+   function Valid_Unicode (I : Integer)
+                           return Boolean;
 
 end Inc_KSES;

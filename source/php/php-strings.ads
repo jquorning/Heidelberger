@@ -54,6 +54,15 @@ is
                             Length  : Natural)
                             return String;
 
+   STR_PAD_RIGHT : constant Integer := 1;
+   STR_PAD_LEFT  : constant Integer := 2;
+
+   function Str_Pad (Item       : String;
+                     Length     : Integer;
+                     Pad_String : Character := ' ';
+                     Pad_Type   : Integer   := STR_PAD_RIGHT)
+                     return String;
+
    function Str_Replace (Search  : String;
                          Replace : String;
                          Subject : String)

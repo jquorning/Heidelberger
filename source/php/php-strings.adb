@@ -124,6 +124,37 @@ is
       return Pre & Replace & Post;
    end Substr_Replace;
 
+   -------------
+   -- Str_Pad --
+   -------------
+
+   function Str_Pad (Item       : String;
+                     Length     : Integer;
+                     Pad_String : Character := ' ';
+                     Pad_Type   : Integer   := STR_PAD_RIGHT)
+                     return String
+   is
+      use Ada.Strings.Fixed;
+
+      Target : String (1 .. Length);
+   begin
+      if Pad_Type = STR_PAD_LEFT then
+         Move (Source  => Item,
+               Target  => Target,
+               Justify => Ada.Strings.Right,
+               Pad     => Pad_String);
+
+      elsif Pad_Type = STR_PAD_RIGHT then
+         Move (Source  => Item,
+               Target  => Target,
+               Justify => Ada.Strings.Left,
+               Pad     => Pad_String);
+      else
+         pragma Assert (False);
+      end if;
+      return Target;
+   end Str_Pad;
+
    -----------------
    -- Str_Replace --
    -----------------
