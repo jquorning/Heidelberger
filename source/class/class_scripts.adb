@@ -190,7 +190,7 @@ is
                   then -Obj.Ver else -This.Default_Version));
 
          Ver : constant String :=
-           (if This.Args.Find (Handle) /= No_Element
+           (if Has_Element (This.Args.Find (Handle))
             then (if Ver_2 /= ""
                   then Ver_2 & "&amp;" & This.Args (Handle)
                   else This.Args (Handle))

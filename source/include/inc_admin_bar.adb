@@ -1294,7 +1294,7 @@ is
                          "objects"); -- (array)
    begin
       if
-        Cpts.Find ("post") /= No_Element or else
+        Has_Element (Cpts.Find ("post")) or else
 --      Isset (cpts ("post")) or else
         Current_User_Can (Get_As_String (Cpts ("post").Cap, "create_posts"))
       then
@@ -1304,7 +1304,7 @@ is
       end if;
 
       if
-        Cpts.Find ("attachment") /= No_Element or else
+        Has_Element (Cpts.Find ("attachment")) or else
         Current_User_Can ("upload_files")
       then
          Actions ("media-new.php") :=
@@ -1320,12 +1320,13 @@ is
       end if;
 
       if
-        Cpts.Find ("page") /= No_Element or else
+        Has_Element (Cpts.Find ("page")) or else
         Current_User_Can (Get_As_String (Cpts ("page").Cap, "create_posts"))
       then
          Actions ("post-new.php?post_type=page") :=
             Arrays.To_Array ((1 =>
-               Build (Get_As_String (Cpts ("page").Labels, "name_admin_bar"), "new-page")));
+               Build (Get_As_String (Cpts ("page").Labels, "name_admin_bar"),
+                      "new-page")));
       end if;
 
       Cpts.Delete ("post");

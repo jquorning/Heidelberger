@@ -775,7 +775,7 @@ is
 --          M : Submenu_Maps.Map;
             E : constant Inner_Maps.Cursor := A.Find (Key => Position);
          begin
-            if E = Inner_Maps.No_Element then
+            if not Has_Element (E) then
                A.Include (Key => Position, New_Item => Sub_Item);
             else
                A.Include (Key => Position, New_Item => Sub_Item);
