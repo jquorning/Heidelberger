@@ -74,6 +74,23 @@ is
    procedure Wp_Default_Styles;
 
    --
+   -- Prints the script queue in the HTML head on admin pages.
+   --
+   -- Postpones the scripts that were queued for the footer.
+   -- print_footer_scripts() is called in the footer to print these scripts.
+   --
+   -- @since 2.8.0
+   --
+   -- @see wp_print_scripts()
+   --
+   -- @global bool concatenate_scripts
+   --
+   -- @return array
+   --
+   function Print_Head_Scripts
+            return List_Type;
+
+   --
    -- Prints scripts (internal use only)
    --
    -- @ignore
@@ -205,6 +222,23 @@ is
    function Wp_Should_Load_Separate_Core_Block_Assets
             return Boolean
             is (True);
+
+   --
+   -- Prints the script queue in the HTML head on the front end.
+   --
+   -- Postpones the scripts that were queued for the footer.
+   -- wp_print_footer_scripts() is called in the footer to print these scripts.
+   --
+   -- @since 2.8.0
+   --
+   -- @global WP_Scripts wp_scripts
+   --
+   -- @return array
+   --
+   function Wp_Print_Head_Scripts
+            return List_Type;
+
+   procedure Wp_Print_Head_Scripts;  -- For Add_Action -- jq
 
    --
    -- Wrapper for do_action( "wp_enqueue_scripts" ).

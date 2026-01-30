@@ -62,6 +62,10 @@ with Style_Class_Wp_Style_Engine_CSS_Rules_Stores;
 package body Inc_Script_Loader
 is
 
+   Concatenate_Scripts : Boolean;
+   Compress_CSS        : Boolean;
+   Compress_Scripts    : Boolean;
+
 -- -- WordPress Dependency Class
 -- require ABSPATH . WPINC . "/class-wp-dependency.php";
 
@@ -2525,48 +2529,42 @@ is
 --         return src;
 -- end;
 
--- --
--- -- Prints the script queue in the HTML head on admin pages.
--- --
--- -- Postpones the scripts that were queued for the footer.
--- -- print_footer_scripts() is called in the footer to print these scripts.
--- --
--- -- @since 2.8.0
--- --
--- -- @see wp_print_scripts()
--- --
--- -- @global bool concatenate_scripts
--- --
--- -- @return array
--- --
--- function print_head_scripts() then
---         global concatenate_scripts;
+   ------------------------
+   -- Print_Head_Scripts --
+   ------------------------
 
---         if ( ! did_action( "wp_print_scripts" ) ) then
---                 -- This action is documented in wp-includes/functions.wp-scripts.php--
---                 do_action( "wp_print_scripts");
---         end;
+   function Print_Head_Scripts
+            return List_Type
+   is
+      use Wp_Common;
+      use Inc_Plugins;
+--    global concatenate_scripts;
+      Wp_Scripts : Class_Scripts.Wp_Scripts
+        renames Global_Wp_Scripts;
+   begin
+      if not Did_Action ("wp_print_scripts") then
+         -- This action is documented in wp-includes/functions.wp-scripts.php
+         Do_Action ("wp_print_scripts");
+      end if;
 
---         wp_scripts = wp_scripts();
+      Script_Concat_Settings;
+      Wp_Scripts.Do_Concat := Concatenate_Scripts;
+      Wp_Scripts.Do_Head_Items;
 
---         script_concat_settings();
---         wp_scripts.do_concat = concatenate_scripts;
---         wp_scripts.do_head_items();
+      --
+      -- Filters whether to print the head scripts.
+      --
+      -- @since 2.8.0
+      --
+      -- @param bool print Whether to print the head scripts. Default true.
+      --
+      if Apply_Filters ("print_head_scripts", True) then
+         X_Print_Scripts;
+      end if;
 
---         --
---         -- Filters whether to print the head scripts.
---         --
---         -- @since 2.8.0
---         --
---         -- @param bool print Whether to print the head scripts. Default true.
---         --
---         if ( apply_filters( "print_head_scripts", true ) ) then
---                 _print_scripts();
---         end;
-
---         wp_scripts.reset();
---         return wp_scripts.done;
--- end;
+      Wp_Scripts.Reset;
+      return Wp_Scripts.Done;
+   end Print_Head_Scripts;
 
 -- --
 -- -- Prints the scripts that were queued for the footer or too late for the HTML head.
@@ -2647,32 +2645,38 @@ is
 --         end;
 -- end;
 
--- --
--- -- Prints the script queue in the HTML head on the front end.
--- --
--- -- Postpones the scripts that were queued for the footer.
--- -- wp_print_footer_scripts() is called in the footer to print these scripts.
--- --
--- -- @since 2.8.0
--- --
--- -- @global WP_Scripts wp_scripts
--- --
--- -- @return array
--- --
--- function wp_print_head_scripts() then
---         global wp_scripts;
+   ---------------------------
+   -- Wp_Print_Head_Scripts --
+   ---------------------------
 
---         if ( ! did_action( "wp_print_scripts" ) ) then
---                 -- This action is documented in wp-includes/functions.wp-scripts.php--
---                 do_action( "wp_print_scripts");
---         end;
+   function Wp_Print_Head_Scripts
+            return List_Type
+   is
+      use Inc_Plugins;
+--    global wp_scripts;
+   begin
+      if not Did_Action ("wp_print_scripts") then
+         -- This action is documented in wp-includes/functions.wp-scripts.php--
+         Do_Action ("wp_print_scripts");
+      end if;
 
---         if ( ! ( wp_scripts instanceof WP_Scripts ) ) then
---                 return array(); -- No need to run if nothing is queued.
---         end;
+      -- if not ( wp_scripts instanceof WP_Scripts ) then
+      --    return Empty_Array; -- No need to run if nothing is queued.
+      -- end if;
 
---         return print_head_scripts();
--- end;
+      return Print_Head_Scripts;
+   end Wp_Print_Head_Scripts;
+
+   ---------------------------
+   -- Wp_Print_Head_Scripts --
+   ---------------------------
+
+   procedure Wp_Print_Head_Scripts
+   is
+      Unused : constant List_Type := Wp_Print_Head_Scripts;
+   begin
+      null;
+   end Wp_Print_Head_Scripts;
 
 -- --
 -- -- Private, for use in--_footer_scripts hooks
@@ -2713,10 +2717,6 @@ is
       --
       Do_Action ("wp_enqueue_scripts");
    end Wp_Enqueue_Scripts;
-
-   Concatenate_Scripts : Boolean;
-   Compress_CSS        : Boolean;
-   Compress_Scripts    : Boolean;
 
    ------------------------
    -- Print_Admin_Styles --

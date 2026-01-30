@@ -765,6 +765,17 @@ is
       return This.Done;
    end Do_Head_Items;
 
+   -------------------
+   -- Do_Head_Items --
+   -------------------
+
+   procedure Do_Head_Items (This : in out Wp_Scripts)
+   is
+      Unused : constant List_Type := Do_Head_Items (This);
+   begin
+      null;
+   end Do_Head_Items;
+
    ---------------------
    -- Do_Footer_Items --
    ---------------------

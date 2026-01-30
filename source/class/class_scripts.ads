@@ -402,6 +402,8 @@ is
                            return List_Type
                            with Side_Effects;
 
+   procedure Do_Head_Items (This : in out Wp_Scripts);
+
    --
    -- Processes items and dependencies for the footer group.
    --

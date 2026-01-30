@@ -51,6 +51,8 @@ is
 
    procedure Wp_Print_Styles (Handles : String); -- = false
 
+   procedure Wp_Print_Styles; -- For Add_Action -- jq
+
    --
    -- Add extra CSS styles to a registered stylesheet.
    --

@@ -24,6 +24,7 @@ with Constants;
 with Lists;
 
 with Inc_Admin_Bar;
+with Inc_Functions_Wp_Styles;
 with Inc_General_Templates;
 with Inc_Load;
 with Inc_Plugins;
@@ -423,8 +424,10 @@ is
 --    Add_Action ("publish_future_post", Check_And_Publish_Future_Post'Access, 10, 1);
 --    Add_Action ("wp_head", Wp_Robots'Access, 1);
 --    Add_Action ("wp_head", Print_Emoji_Detection_Script'Access, 7);
---    Add_Action ("wp_head", Wp_Print_Styles'Access, 8);
---    Add_Action ("wp_head", Wp_Print_Head_Scripts'Access, 9);
+      Add_Action ("wp_head",
+                  Inc_Functions_Wp_Styles.Wp_Print_Styles'Access, 8);
+      Add_Action ("wp_head",
+                  Inc_Script_Loader.Wp_Print_Head_Scripts'Access, 9);
 --    Add_Action ("wp_head", Wp_Generator'Access);
 --    Add_Action ("wp_head", Rel_Canonical'Access);
 --    Add_Action ("wp_head", Wp_Shortlink_Wp_Head'Access, 10, 0);

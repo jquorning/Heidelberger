@@ -78,6 +78,12 @@ is
       null;
    end Wp_Print_Styles;
 
+   procedure Wp_Print_Styles
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Wp_Print_Styles;
+
    -------------------------
    -- Wp_Add_Inline_Style --
    -------------------------
