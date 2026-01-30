@@ -193,7 +193,7 @@ is
          end if;
       end if;
 
--- require_once ABSPATH . "wp-admin/includes/admin.php";
+      Adm_Admin.Run;
 
       Auth_Redirect;
 

@@ -57,9 +57,10 @@ is
             if Kind_Of (Value) = Kind_String then
                -- If a string value, include it as value for the directive.
                Robots_Strings.Append (Directive & ":" & As_String (Value));
+            else
             -- elsif ( value ) then
-            --    -- Otherwise, include the directive if it is truthy.
-            --    robots_strings[] = directive;
+               -- Otherwise, include the directive if it is truthy.
+               Robots_Strings.Append (Directive);
             end if;
          end;
       end loop;

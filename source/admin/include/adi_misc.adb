@@ -4,9 +4,16 @@
 -- @package WordPress
 -- @subpackage Administration
 --
+
+with Php.Echoing;
+with Php.Strings;
+
+with Wp_Common;
+
+with Inc_Formatting;
+
 package body Adi_Misc
 is
-   procedure Dummy is null;
 
 -- --
 -- -- Returns whether the server is running Apache with the mod_rewrite module loaded.
@@ -1074,27 +1081,34 @@ is
 --         echo "<script type="text/javascript">var _wpColorScheme = " . wp_json_encode( array( "icons" => icon_colors ) ) . ";</script>\n";
 -- end;
 
--- --
--- -- Displays the viewport meta in the admin.
--- --
--- -- @since 5.5.0
--- --
--- function wp_admin_viewport_meta() then
---         --
---         -- Filters the viewport meta in the admin.
---         --
---         -- @since 5.5.0
---         --
---         -- @param string viewport_meta The viewport meta.
---         --
---         viewport_meta = apply_filters( "admin_viewport_meta", "width=device-width,initial-scale=1.0" );
+   ----------------------------
+   -- Wp_Admin_Viewport_Meta --
+   ----------------------------
 
---         if ( empty( viewport_meta ) ) then
---                 return;
---         end;
+   procedure Wp_Admin_Viewport_Meta
+   is
+      use Php.Strings;
+      use Php.Echoing;
+      use Wp_Common;
+      use Inc_Formatting;
+      --
+      -- Filters the viewport meta in the admin.
+      --
+      -- @since 5.5.0
+      --
+      -- @param string viewport_meta The viewport meta.
+      --
+      Viewport_Meta : constant String :=
+        Apply_Filters ("admin_viewport_meta",
+                       "width=device-width,initial-scale=1.0");
+   begin
+      if Empty (Viewport_Meta) then
+         return;
+      end if;
 
---         echo "<meta name="viewport" content="" . esc_attr( viewport_meta ) . "">";
--- end;
+      Echo ("<meta name=""viewport"" content=""" &
+            ESC_Attr (Viewport_Meta) & """>");
+   end Wp_Admin_Viewport_Meta;
 
 -- --
 -- -- Adds viewport meta for mobile in Customizer.

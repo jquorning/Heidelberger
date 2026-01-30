@@ -11,7 +11,12 @@ package Adi_Misc
 is
    use Lists;
 
-   procedure Dummy;
+   --
+   -- Displays the viewport meta in the admin.
+   --
+   -- @since 5.5.0
+   --
+   procedure Wp_Admin_Viewport_Meta;
 
    --
    -- Resets global variables based on _GET and _POST.
