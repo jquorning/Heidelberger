@@ -5093,7 +5093,7 @@ is
                                    then Substr (File, 4)
                                    else File);
    begin
-      if Wp_Styles_X.Query (Handle).Success then -- ()
+      if Globals.Global_Wp_Styles.Query (Handle).Success then
          if Force_Echo or else Did_Action ("wp_print_styles") then
             -- We already printed the style queue. Print this one immediately.
             Wp_Print_Styles (Handle);

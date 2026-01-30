@@ -10,8 +10,10 @@
 with Php.Preg;
 with Php.Strings;
 
+with Globals;
 with UStrings;
 
+with Class_Styles;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
@@ -64,7 +66,7 @@ is
       --    end if;
       -- end if;
 
-      return Wp_Styles_X.Do_Items ([Handles]); -- [] added
+      return Globals.Global_Wp_Styles.Do_Items ([Handles]); -- [] added
    end Wp_Print_Styles;
 
    ---------------------
@@ -201,11 +203,12 @@ is
             X_Handle : constant List_Type := Explode ("?", Handle);
          begin
             Unused :=
-              Wp_Styles_X.Add (X_Handle.First_Element, Src, Deps, Ver, Media);
+              Globals.Global_Wp_Styles.Add (X_Handle.First_Element,
+                                            Src, Deps, Ver, Media);
          end;
       end if;
 
-      Wp_Styles_X.Enqueue ([Handle]);
+      Globals.Global_Wp_Styles.Enqueue ([Handle]);
    end Wp_Enqueue_Style;
 
 -- --

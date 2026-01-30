@@ -1018,7 +1018,7 @@ is
                -- May not be JSON-serializeable.
             end loop;
 
-            Global_Wp_Scripts.Add_Data (
+            Globals.Global_Wp_Scripts.Add_Data (
               "customize-widgets",
               "data",
               Sprintf ("var _wpCustomizeWidgetsSettings = %s;",

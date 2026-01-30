@@ -3433,14 +3433,12 @@ is
 
    procedure Wp_Maybe_Inline_Styles
    is
---    use Php.Arrays;
       use Php.Files;
       use Php.Strings;
       use Array_Vectors;
       use UStrings;
       use Wp_Common;
       use Class_Dependency;
-      use Inc_Functions_Wp_Styles;
 
 --    global wp_styles;
 
@@ -3477,7 +3475,7 @@ is
             Path : constant String := Get_As_String (Registered.Extra, "path");
          begin
             if
-              "" /= Wp_Styles_X.Get_Data (Handle, "path") and then
+              "" /= Globals.Global_Wp_Styles.Get_Data (Handle, "path") and then
               File_Exists (Path)
             then
                Styles_2.Append (To_Array (List => (
