@@ -4371,7 +4371,7 @@ is
             URL_9 : constant String := -URL_8;
             Good_Protocol_URL : UString;
          begin
-            if '/' = URL_9 (URL_9'First) then
+            if URL_9'Length >= 1 and then '/' = URL_9 (URL_9'First) then
                Good_Protocol_URL := +URL_9;
             else
                declare

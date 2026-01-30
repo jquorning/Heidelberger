@@ -9,6 +9,7 @@
 with Ada.Numerics.Discrete_Random;
 
 with Php.Arrays;
+with Php.Errors;
 with Php.Files;
 with Php.HTML;
 with Php.Strings;
@@ -20,6 +21,7 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
+with Adi_Admin;
 with Adi_Plugins;
 with Adi_Screens;
 with Adm_Menu;
@@ -127,8 +129,8 @@ is
             Wp_Redirect (Admin_URL ("upgrade.php?_wp_http_referer=" &
                          URL_Encode (Wp_Unslash
                            (Get_As_String (X_SERVER, "REQUEST_URI")))));
-            raise Redirect_Signal;
-            return; -- exit;
+--          raise Redirect_Signal;
+            Php.Errors.Die; -- return; -- exit;
          end if;
 
          --
@@ -193,7 +195,7 @@ is
          end if;
       end if;
 
-      Adm_Admin.Run;
+      Adi_Admin.Run;
 
       Auth_Redirect;
 

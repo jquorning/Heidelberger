@@ -358,7 +358,7 @@ is
 
       Match (Engine, Subject, Result);
 
-      for A of Result loop
+      for A of Result (1 .. Result'Last) loop
          List.Append (Subject (A.First .. A.Last));
       end loop;
 
