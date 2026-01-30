@@ -4260,6 +4260,23 @@ is
       use Inc_KSES;
       use Inc_Plugins;
 
+      function Display (URL : String)
+                        return String;
+
+      -------------
+      -- Display --
+      -------------
+
+      function Display (URL : String)
+                        return String
+      is
+         URL_2 : constant String := Wp_KSES_Normalize_Entities     (URL);
+         URL_3 : constant String := Str_Replace ("&amp;", "&#038;", URL_2);
+         URL_4 : constant String := Str_Replace ("'",     "&#039;", URL_3);
+      begin
+         return URL_4;
+      end Display;
+
       Original_URL : constant String := URL;
    begin
       if "" = URL then
@@ -4283,44 +4300,39 @@ is
 
          URL_5 : constant String := Str_Replace (";//", "://", URL_4);
 
-         URL_6 : UString := +URL_5;
-      begin
-         if "" = URL_3 then
-            return URL_3;
-         end if;
-
-         --
          -- If the URL doesn't appear to contain a scheme, we presume
          -- it needs http:// prepended (unless it's a relative link
          -- starting with /, # or ?, or a PHP file).
-         --
-         if
+         Cond : constant Boolean :=
            Strpos (URL_5, ":") = 0 and then
            not In_List (URL_5 (URL_5'First) & "",
                         List_Type'["/", "#", "?"], True) and then
-           not Preg_Match ("/^[a-z0-9-]+?\.php/i", URL_5)
-         then
-            URL_6 := +"http://" & URL_5;
-         end if;
+           not Preg_Match ("/^[a-z0-9-]+?\.php/i", URL_5);
+
+         URL_6 : constant String :=
+           (if Cond then "http://" & URL_5 else URL_5);
 
          -- Replace ampersands and single quotes only when displaying.
-         if "display" = X_Context then
-            URL_6 := +Wp_KSES_Normalize_Entities     (-URL_6);
-            URL_6 := +Str_Replace ("&amp;", "&#038;", -URL_6);
-            URL_6 := +Str_Replace ("""", "&#039;",    -URL_6);
+         URL_7 : constant String :=
+           (if "display" = X_Context then Display (URL_6) else URL_6);
+
+         URL_8 : UString;
+      begin
+         if "" = URL_3 then  -- Yes, URL_3
+            return URL_3;
          end if;
 
          if
-           0 /= Strpos (-URL_6, "[") or else
-           0 /= Strpos (-URL_6, "]")
+           0 /= Strpos (URL_7, "[") or else
+           0 /= Strpos (URL_7, "]")
          then
             declare
-               Parsed : constant Array_Type := Wp_Parse_URL (-URL_6);
+               Parsed : constant Array_Type := Wp_Parse_URL (URL_7);
                Front  : UString;
             begin
                if Isset (Parsed, "scheme") then
                   Append (Front, Get_As_String (Parsed, "scheme") & "://");
-               elsif '/' = Element (URL_6, 1) then -- [0]
+               elsif '/' = URL_7 (URL_7'First) then -- [0]
                   Append (Front, "//");
                end if;
 
@@ -4345,21 +4357,22 @@ is
                end if;
 
                declare
-                  End_Dirty : constant String := Str_Replace (-Front, "", -URL_6);
+                  End_Dirty : constant String := Str_Replace (-Front, "", URL_7);
                   End_Clean : constant String :=
                     Str_Replace (List_Type'["[", "]"],
                                  List_Type'["%5B", "%5D"], End_Dirty);
                begin
-                  URL_6 := +Str_Replace (End_Dirty, End_Clean, -URL_6);
+                  URL_8 := +Str_Replace (End_Dirty, End_Clean, URL_7);
                end;
             end;
          end if;
 
          declare
+            URL_9 : constant String := -URL_8;
             Good_Protocol_URL : UString;
          begin
-            if '/' = Element (URL_6, 1) then -- [0]
-               Good_Protocol_URL := URL_6;
+            if '/' = URL_9 (URL_9'First) then
+               Good_Protocol_URL := +URL_9;
             else
                declare
                   Protocols_2 : constant List_Type :=
@@ -4367,8 +4380,8 @@ is
                      then Wp_Allowed_Protocols
                      else Protocols);
                begin
-                  Good_Protocol_URL := +Wp_KSES_Bad_Protocol (-URL_6, Protocols_2);
-                  if Strtolower (-Good_Protocol_URL) /= Strtolower (-URL_6) then
+                  Good_Protocol_URL := +Wp_KSES_Bad_Protocol (URL_9, Protocols_2);
+                  if Strtolower (-Good_Protocol_URL) /= Strtolower (URL_9) then
                      return "";
                   end if;
                end;

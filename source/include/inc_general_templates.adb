@@ -5089,8 +5089,8 @@ is
       use Inc_Formatting;
 
       -- For backward compatibility.
-      Handle : constant String := (if 0 = Strpos (File, "css/")
-                                   then Substr (File, 4)
+      Handle : constant String := (if File'First = Strpos (File, "css/")
+                                   then Substr (File, 5) -- 4
                                    else File);
    begin
       if Globals.Global_Wp_Styles.Query (Handle).Success then
