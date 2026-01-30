@@ -9,9 +9,6 @@
 
 with Lists;
 
-with Class_Scripts;
-with Inc_Script_Loader;
-
 package Inc_Functions_Wp_Scripts
 is
    use Lists;
@@ -25,8 +22,6 @@ is
    --
    -- @return WP_Scripts WP_Scripts instance.
    --
-   Wp_Scripts_X : Class_Scripts.Wp_Scripts
-      renames Inc_Script_Loader.Global_Wp_Scripts;
 -- function Wp_Scripts_X
 --          return Class_Scripts.Wp_Scripts;
 

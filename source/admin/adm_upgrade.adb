@@ -20,6 +20,7 @@ with Databases;
 with Globals;
 with UStrings;
 
+with Adi_Admin;
 with Adi_Upgrade;
 with Inc_Formatting;
 with Inc_Functions;
@@ -82,6 +83,17 @@ is
          else Version_Compare (MySQL_Version,
                                Inc_Versions.Required_MySQL_Version, ">="));
    begin
+-- -- Include user installation customization script.--
+-- if ( file_exists( WP_CONTENT_DIR . "/install.php" ) ) then
+--         require WP_CONTENT_DIR . "/install.php";
+-- end;
+
+      -- WordPress Administration API
+      Adi_Admin.Run;
+
+-- -- WordPress Schema API--
+-- require_once ABSPATH . "wp-admin/includes/schema.php";
+
       --
       -- We are upgrading WordPress.
       --

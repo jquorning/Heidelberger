@@ -65,7 +65,7 @@ is
 
    function Do_Item (This   : in out Wp_Styles;
                      Handle : String;
-                     Group  : Boolean := False)
+                     Group  : Integer := 0) -- False
                      return Boolean
    is
       use Php.Echoing;

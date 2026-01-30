@@ -14,7 +14,7 @@ with Lists;
 with Class_Dependency;
 
 package Class_Dependencies
-   with SPARK_Mode => On
+-- with SPARK_Mode => On
 is
    use Lists;
 
@@ -173,9 +173,9 @@ is
    --                          Default false.
    -- @return bool True on success, false if not set.
    --
-   function Do_Item (This   : Wp_Dependencies;
+   function Do_Item (This   : in out Wp_Dependencies;
                      Handle : String;
-                     Group  : Integer := 0) -- false
+                     Group  : Integer := 0) -- False
                      return Boolean;
 
    --

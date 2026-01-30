@@ -17,17 +17,6 @@ is
 
    Wp_Current_DB_Version : Integer := 0;  -- Added by jq
 
--- -- Include user installation customization script.--
--- if ( file_exists( WP_CONTENT_DIR . "/install.php" ) ) then
---         require WP_CONTENT_DIR . "/install.php";
--- end;
-
--- -- WordPress Administration API--
--- require_once ABSPATH . "wp-admin/includes/admin.php";
-
--- -- WordPress Schema API--
--- require_once ABSPATH . "wp-admin/includes/schema.php";
-
 -- if ( ! function_exists( "wp_install" ) ) :
 
    --

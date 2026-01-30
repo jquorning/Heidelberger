@@ -51,7 +51,7 @@ is
          begin
             if
               not In_List (Handle, This.Done, True) and then
-              This.Registered.Find (Handle) /= Dependency_Maps.No_Element
+              Has_Element (This.Registered.Find (Handle))
             then
                --
                -- Attempt to process the item. If successful,
@@ -106,7 +106,7 @@ is
                        Group   : Integer := 0)
    is
       Unused : constant List_Type :=
-        Do_Items (This, Handles, Group);
+        Do_Items (Wp_Dependencies'Class (This), Handles, Group);
    begin
       null;
    end Do_Items;
@@ -115,14 +115,14 @@ is
    -- Do_Item --
    -------------
 
-   function Do_Item (This   : Wp_Dependencies;
+   function Do_Item (This   : in out Wp_Dependencies;
                      Handle : String;
                      Group  : Integer := 0) -- false
                      return Boolean
    is
       use Class_Dependency.Dependency_Maps;
    begin
-      return This.Registered.Find (Handle) /= No_Element;
+      return Has_Element (This.Registered.Find (Handle));
    end Do_Item;
 
    --------------
@@ -169,7 +169,7 @@ is
                   goto Continue;
                end if;
 
-               if This.Registered.Find (Handle_2) = Dependency_Maps.No_Element then
+               if not Has_Element (This.Registered.Find (Handle_2)) then
                   Keep_Going := False; -- Item doesn't exist.
                elsif
                  not This.Registered (Handle_2).Deps.Is_Empty and then
@@ -302,7 +302,7 @@ is
    is
       use Class_Dependency.Dependency_Maps;
    begin
-      if This.Registered.Find (Handle) = No_Element then
+      if not Has_Element (This.Registered.Find (Handle)) then
          return False;
       end if;
 
@@ -342,7 +342,7 @@ is
    is
       use Class_Dependency.Dependency_Maps;
    begin
-      if This.Registered.Find (Handle) = No_Element then
+      if not Has_Element (This.Registered.Find (Handle)) then
          return ""; -- False;
       end if;
 
@@ -492,7 +492,7 @@ is
    begin
       if not This.All_Queued_Deps.Is_Empty then
 --         return Isset (This.All_Queued_Deps.Find (Handle));
-         return This.All_Queued_Deps.Find (Handle) /= List_Vectors.No_Element;
+         return Has_Element (This.All_Queued_Deps.Find (Handle));
       end if;
 
       declare
@@ -504,9 +504,9 @@ is
          while not Queue_2.Is_Empty loop
             for Queued of Queue_2 loop
                if
-                 Done.Find (Queued) = List_Vectors.No_Element and then
+                 not Has_Element (Done.Find (Queued)) and then
 --               not Isset (Done (Queued)) and then
-                 This.Registered.Find (Queued) /= Dependency_Maps.No_Element
+                 Has_Element (This.Registered.Find (Queued))
 --               Isset (This.Registered (Queued))
                then
                   declare
@@ -532,7 +532,7 @@ is
 
          This.All_Queued_Deps := All_Deps;
 
-         return This.All_Queued_Deps.Find (Handle) /= List_Vectors.No_Element;
+         return Has_Element (This.All_Queued_Deps.Find (Handle));
 --       return Isset (This.All_Queued_Deps (Handle));
       end;
    end Recurse_Deps;
@@ -557,7 +557,7 @@ is
 --                        case "registered":
 --                        case "scripts": -- Back compat.
       if Status in "registered" | "scripts" then
-         if No_Element /= This.Registered.Find (Handle) then
+         if Has_Element (This.Registered.Find (Handle)) then
             return (True, This.Registered (Handle));
          end if;
          return (False, Null_Deps);
@@ -598,7 +598,7 @@ is
       use Class_Dependencies.Integer_Maps;
    begin
       if
-        This.Groups.Find (Handle) /= No_Element and then
+        Has_Element (This.Groups.Find (Handle)) and then
 --      Isset (This.Groups (Handle)) and then
         This.Groups (Handle) <= Group
       then

@@ -13,9 +13,11 @@ with Php.Strings;
 with UStrings;
 
 with Class_Dependencies;
+with Class_Scripts;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Plugins;
+with Inc_Script_Loader;
 
 package body Inc_Functions_Wp_Scripts
 is
@@ -93,6 +95,7 @@ is
    is
 --    global wp_scripts;
       use Class_Scripts;
+      use Inc_Script_Loader;
       use Inc_Plugins;
    begin
       --
@@ -114,7 +117,7 @@ is
 --       end if;
 --    end if;
 
-      return Wp_Scripts_X.Do_Items (Handles); -- ()
+      return Global_Wp_Scripts.Do_Items (Handles);
    end Wp_Print_Scripts;
 
    ----------------------
@@ -143,6 +146,7 @@ is
       use Class_Scripts;
       use Inc_Functions;
       use Inc_L10n;
+      use Inc_Script_Loader;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 
@@ -165,11 +169,11 @@ is
                                   "1", Data));
          begin
             return
-              Wp_Scripts_X.Add_Inline_Script (Handle, Data_2, Position);
+              Global_Wp_Scripts.Add_Inline_Script (Handle, Data_2, Position);
          end;
       end if;
 
-      return Wp_Scripts_X.Add_Inline_Script (Handle, Data, Position);
+      return Global_Wp_Scripts.Add_Inline_Script (Handle, Data, Position);
    end Wp_Add_Inline_Script;
 
    procedure Wp_Add_Inline_Script (Handle   : String;
