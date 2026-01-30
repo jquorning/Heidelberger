@@ -47,8 +47,16 @@ is
 
    function To_Array (This : Wpdb_Class;
                       Cb   : Cb_Func)
+                      return Arrays.Callable;
+
+   function To_Array (This : Wpdb_Class;
+                      Cb   : Cb_Func)
                       return Arrays.Callable
-                      is (null);
+   is
+   begin
+--    raise Program_Error with "not implemented";
+      return null;
+   end To_Array;
 
 --
 -- @since 0.71

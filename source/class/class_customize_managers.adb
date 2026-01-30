@@ -90,6 +90,7 @@ is
                       return Callable
    is
    begin
+      raise Program_Error with "not implemented";
       return null;
    end To_Array;
 
