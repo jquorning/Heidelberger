@@ -59,7 +59,7 @@ is
       RTL      : Boolean;
       Outt     : UString;
 
-      Wp_Styles : Class_Styles.Wp_Styles;
+      Wp_Styles : Class_Styles.Wp_Styles := Class_Styles.X_Construct;
 
       Expires_Offset : Natural;
    begin
