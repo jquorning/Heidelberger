@@ -95,7 +95,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use UStrings;
-      use Adm_Load_Styles;
       use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_L10n;
@@ -120,7 +119,7 @@ is
          Data_2 := +Trim (Preg_Replace ("#<style[^>]*>(.*)</style>#is", "1", Data));
       end if;
 
-      return Global_Wp_Styles.Add_Inline_Style (Handle, -Data_2);
+      return Globals.Global_Wp_Styles.Add_Inline_Style (Handle, -Data_2);
    end Wp_Add_Inline_Style;
 
    procedure Wp_Add_Inline_Style (Handle : String;
@@ -142,12 +141,11 @@ is
                                Media  : String    := "all")
                                return Boolean
    is
-      use Adm_Load_Styles;
       use Inc_Functions_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 
-      return Global_Wp_Styles.Add (Handle, Src, Deps, Ver, Media);
+      return Globals.Global_Wp_Styles.Add (Handle, Src, Deps, Ver, Media);
 --    return Wp_Styles_X.Add (Handle, Src, Deps, Ver, Media);
    end Wp_Register_Style;
 

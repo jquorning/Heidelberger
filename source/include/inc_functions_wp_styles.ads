@@ -7,9 +7,8 @@
 -- @subpackage Dependencies
 --
 
+with Globals;
 with Lists;
-
-with Adm_Load_Styles;
 
 with Class_Styles;
 
@@ -29,7 +28,7 @@ is
 --   function Wp_Styles_X
 --            return Wp_Styles;
    Wp_Styles_X : Class_Styles.Wp_Styles
-     renames Adm_Load_Styles.Global_Wp_Styles; -- Wp_styles
+     renames Globals.Global_Wp_Styles; -- Wp_styles
 
    --
    -- Display styles that are in the handles queue.

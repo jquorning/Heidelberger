@@ -488,14 +488,14 @@ is
       Style_Handles := List_Unique (Style_Handles);
 
       declare
-         Done : constant List_Type := Global_Wp_Styles.Done;
+         Done : constant List_Type := Globals.Global_Wp_Styles.Done;
       begin
          OB_Start;
 
          -- We do not need reset styles for the iframed editor.
-         Global_Wp_Styles.Done := ["wp-reset-editor-styles"];
-         Global_Wp_Styles.Do_Items (Style_Handles);
-         Global_Wp_Styles.Done := Done;
+         Globals.Global_Wp_Styles.Done := ["wp-reset-editor-styles"];
+         Globals.Global_Wp_Styles.Do_Items (Style_Handles);
+         Globals.Global_Wp_Styles.Done := Done;
       end;
 
       Styles_2 := +OB_Get_Clean;

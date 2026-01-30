@@ -14,12 +14,12 @@ with Binder;
 with Constants;
 with Globals;
 with Helpers;
-with UStrings;
 with Lists;
+with UStrings;
 
 with Adi_Noop;
--- with Class_Styles;
 with Class_Dependency;
+with Class_Styles;
 with Inc_Script_Loader;
 with Inc_Versions;
 -- require ABSPATH . 'wp-admin/includes/noop.php';

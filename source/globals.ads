@@ -11,11 +11,14 @@ with Class_WpDB;
 with Class_Locales;
 with Class_Posts;
 with Class_Post_Type;
+with Class_Styles;
 with Class_Taxonomy;
 
 package Globals
 is
    use Arrays;
+
+   procedure Dummy;
 
    GLOBALS : Array_Type := Empty_Array;
 
@@ -29,6 +32,9 @@ is
    WP_CONTENT_DIR  : UStrings.UString;
 
    Wp_Importers : Array_Type;
+
+   Global_Wp_Styles : Class_Styles.Wp_Styles; -- :=
+--   Class_Styles.X_Construct;
 
    Typenow     : UStrings.UString;
    Taxnow      : UStrings.UString;

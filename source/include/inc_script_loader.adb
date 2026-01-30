@@ -33,8 +33,6 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
-with Adm_Load_Styles;
-
 with Adi_Class_Wp_Screens;
 
 with Class_Dependency;
@@ -2292,7 +2290,7 @@ is
    procedure Wp_Default_Styles
    is
    begin
-      Wp_Default_Styles (Adm_Load_Styles.Global_Wp_Styles);
+      Wp_Default_Styles (Globals.Global_Wp_Styles);
    end Wp_Default_Styles;
 
 -- --
@@ -2728,7 +2726,7 @@ is
       use Wp_Common;
 --         global concatenate_scripts;
       Wp_Styles : Class_Styles.Wp_Styles
-        renames Adm_Load_Styles.Global_Wp_Styles;
+        renames Globals.Global_Wp_Styles;
    begin
       Script_Concat_Settings;
       Wp_Styles.Do_Concat := Concatenate_Scripts;
@@ -2759,7 +2757,7 @@ is
       use Wp_Common;
 --    global wp_styles, concatenate_scripts;
       Wp_Styles : Class_Styles.Wp_Styles
-        renames Adm_Load_Styles.Global_Wp_Styles;
+        renames Globals.Global_Wp_Styles;
    begin
       -- if not ( wp_styles instanceof WP_Styles ) ) then
       --         return;
@@ -3442,7 +3440,6 @@ is
       use UStrings;
       use Wp_Common;
       use Class_Dependency;
-      use Adm_Load_Styles;
       use Inc_Functions_Wp_Styles;
 
 --    global wp_styles;
@@ -3471,10 +3468,11 @@ is
       Styles_2 : Array_Vector;
    begin
       -- Build an array of styles that have a path defined.
-      for Handle of Global_Wp_Styles.Queue loop -- wp_ removed
+      for Handle of Globals.Global_Wp_Styles.Queue loop -- wp_ removed
          declare
             Registered : constant X_Wp_Dependency :=
-              Dependency_Maps.Element (Global_Wp_Styles.Registered.Find (Handle));
+              Dependency_Maps.Element (
+                Globals.Global_Wp_Styles.Registered.Find (Handle));
 
             Path : constant String := Get_As_String (Registered.Extra, "path");
          begin
@@ -3535,12 +3533,12 @@ is
             declare
                Handle : constant String := Get_As_String (Style, "handle");
             begin
-               Global_Wp_Styles.Registered (Handle).Src := Null_UString; -- False;
+               Globals.Global_Wp_Styles.Registered (Handle).Src := Null_UString;
                if
                  Empty (Get_As_String (
-                   Global_Wp_Styles.Registered (Handle).Extra, "after"))
+                   Globals.Global_Wp_Styles.Registered (Handle).Extra, "after"))
                then
-                  Set (Global_Wp_Styles.Registered (Handle).Extra, "after",
+                  Set (Globals.Global_Wp_Styles.Registered (Handle).Extra, "after",
                        From_Array (Empty_Array));
                end if;
 
