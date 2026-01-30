@@ -56,7 +56,7 @@ is
       Load     : UString;
       Outt     : UString;
       Load_2   : List_Type;
-      Wp_Scripts : Class_Scripts.Wp_Scripts;
+      Wp_Scripts : Class_Scripts.Wp_Scripts := Class_Scripts.X_Construct;
       Expires_Offset : Natural;
    begin
       Error_Reporting (0);
