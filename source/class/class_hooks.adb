@@ -190,33 +190,32 @@ is
                         Callback  : Callable := null) -- Boolean := False)
                         return Boolean
    is
---    use Inc_Elab_Plugins;
+      use Inc_Elab_Plugins;
    begin
       if null = Callback then
          return This.Has_Filters;
       end if;
 
---       declare
---          Function_Key : String :=
---            X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, False);
---       begin
+      declare
+         Function_Key : constant String :=
+           X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, 0); -- False);
+      begin
 
---          if Function_Key = "" then
---             return False;
---          end if;
+         if Function_Key = "" then
+            return False;
+         end if;
 
---          for A in This.Callbacks.Iterate loop
---             declare
---                Priority  : Priority_Type  := Priority_Maps.Key (A);
---                Callbacks : Index_Maps.Map := Priority_Maps.Element (A);
---             begin
---                if Index_Maps.Has_Element (Callbacks.Find (Function_Key)) then
--- --             if Isset (Callbacks (Function_Key)) then
---                   return Priority;
---                end if;
---             end;
---          end loop;
---       end;
+         for A in This.Callbacks.Iterate loop
+            declare
+               Priority  : constant Priority_Type  := Priority_Maps.Key (A);
+               Callbacks : constant Index_Maps.Map := Priority_Maps.Element (A);
+            begin
+               if Index_Maps.Has_Element (Callbacks.Find (Function_Key)) then
+                  return Priority /= 0;
+               end if;
+            end;
+         end loop;
+      end;
 
       return False;
    end Has_Filter;
