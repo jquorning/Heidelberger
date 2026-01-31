@@ -150,9 +150,10 @@ is
    -- Do_Item --
    -------------
 
+   overriding
    function Do_Item (This   : in out Wp_Scripts;
                      Handle : String;
-                     Group  : Boolean := False)
+                     Group  : Integer := 0) -- Boolean := False)
                      return Boolean
    is
       use Php.Preg;
@@ -161,22 +162,22 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Functions;
-      use Inc_Formatting;
       use Class_Dependencies;
       use Class_Dependency;
       use Class_Dependency.String_Maps;
+      use Inc_Functions;
+      use Inc_Formatting;
    begin
       if not Do_Item (Wp_Dependencies (This), Handle) then
          return False;
       end if;
 
-      if False = Group then -- and then This.Groups (Handle) > 0 then
+      if 0 = Group then -- and then This.Groups (Handle) > 0 then
          This.In_Footer.Append (Handle);
          return False;
       end if;
 
-      if False = Group and then In_List (Handle, This.In_Footer, True) then
+      if 0 = Group and then In_List (Handle, This.In_Footer, True) then
          This.In_Footer := List_Diff (This.In_Footer, Handle);
       end if;
 

@@ -235,11 +235,11 @@ is
    --                          Default false.
    -- @return bool True on success, false on failure.
    --
+   overriding
    function Do_Item (This   : in out Wp_Scripts;
                      Handle : String;
-                     Group  : Boolean := False)
-                     return Boolean
-                     with Side_Effects;
+                     Group  : Integer := 0) -- Boolean := False)
+                     return Boolean;
 
    --
    -- Adds extra code to a registered script.
