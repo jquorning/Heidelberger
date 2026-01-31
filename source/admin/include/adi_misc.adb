@@ -6,6 +6,7 @@
 --
 
 with Php.Echoing;
+with Php.HTML;
 with Php.Strings;
 
 with Wp_Common;
@@ -1408,28 +1409,36 @@ is
 --         <?php
 -- end;
 
--- --
--- -- Sends a referrer policy header so referrers are not sent externally from administration screens.
--- --
--- -- @since 4.9.0
--- --
--- function wp_admin_headers() then
---         policy = "strict-origin-when-cross-origin";
+   ----------------------
+   -- Wp_Admin_Headers --
+   ----------------------
 
---         --
---         -- Filters the admin referrer policy header value.
---         --
---         -- @since 4.9.0
---         -- @since 4.9.5 The default value was changed to "strict-origin-when-cross-origin".
---         --
---         -- @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
---         --
---         -- @param string policy The admin referrer policy header value. Default "strict-origin-when-cross-origin".
---         --
---         policy = apply_filters( "admin_referrer_policy", policy );
+   procedure Wp_Admin_Headers
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use Wp_Common;
 
---         header( sprintf( "Referrer-Policy: %s", policy ) );
--- end;
+      Policy_2 : constant String := "strict-origin-when-cross-origin";
+
+      --
+      -- Filters the admin referrer policy header value.
+      --
+      -- @since 4.9.0
+      -- @since 4.9.5 The default value was changed to
+      --              "strict-origin-when-cross-origin".
+      --
+      -- @link
+      -- https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+      --
+      -- @param string policy The admin referrer policy header value. Default
+      --                      "strict-origin-when-cross-origin".
+      --
+      Policy : constant String :=
+        Apply_Filters ("admin_referrer_policy", Policy_2);
+   begin
+      Header (Sprintf ("Referrer-Policy: %s", [1 => Policy]));
+   end Wp_Admin_Headers;
 
 -- --
 -- -- Outputs JS that reloads the page if the user navigated to it with the Back or Forward button.

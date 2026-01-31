@@ -55,8 +55,8 @@ is
 -- add_action( "admin_color_scheme_picker", "admin_color_scheme_picker" );
 
       -- Misc hooks.
--- add_action( "admin_init", "wp_admin_headers" );
--- add_action( "login_init", "wp_admin_headers" );
+      Add_Action ("admin_init", Adi_Misc.Wp_Admin_Headers'Access);
+      Add_Action ("login_init", Adi_Misc.Wp_Admin_Headers'Access);
 -- add_action( "admin_init", "send_frame_options_header", 10, 0 );
 -- add_action( "admin_head", "wp_admin_canonical_url" );
 -- add_action( "admin_head", "wp_site_icon" );

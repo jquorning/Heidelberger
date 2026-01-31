@@ -32,4 +32,12 @@ is
    procedure Wp_Reset_Vars (Vars : List_Type)
                            is null;
 
+   --
+   -- Sends a referrer policy header so referrers are not sent externally from
+   -- administration screens.
+   --
+   -- @since 4.9.0
+   --
+   procedure Wp_Admin_Headers;
+
 end Adi_Misc;
