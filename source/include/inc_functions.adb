@@ -1966,7 +1966,7 @@ is
                      Empty (Globals.WpDB.Last_Error))
                     or else
                     (Is_Array (Described_Table) and then
-                     0 = Count (Described_Table))
+                     Described_Table.Length in 0)
                   then
                      goto Continue;
                   end if;

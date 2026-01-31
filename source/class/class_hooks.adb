@@ -294,7 +294,7 @@ is
          This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
       end if;
 --    This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
-      Num_Args                        := Arrays.Count (Args);
+      Num_Args                        := Natural (Args.Length);
 
       loop
          if This.Current_Priority.Last_Index < Nesting_Level then

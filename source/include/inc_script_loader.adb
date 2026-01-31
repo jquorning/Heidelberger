@@ -2130,7 +2130,7 @@ is
 
             if
               not Php.Types.Is_Array (Global_Editor_Styles) or else
-              Arrays.Count (Global_Editor_Styles) = 0
+              Global_Editor_Styles.Length in 0
             then
                -- Include opinionated block styles if no editor_styles are declared,
                -- so the editor never appears broken.

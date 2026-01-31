@@ -564,7 +564,7 @@ is
       -- have been passed. In this case, determine the final HTTP header and parse
       -- from there.
       --
-      for I in reverse 0 .. Count (Headers_2) loop
+      for I in reverse 0 .. Natural (Headers_2.Length) loop
          if
            not Empty (Headers_2, "[I]") and then
            0 = Strpos (Get_As_String (Headers_2, "[I]"), ":")

@@ -636,8 +636,8 @@ is
 
       -- If old and new theme have just one sidebar, map it and we're done.
       if
-        1 = Count (Existing_Sidebars_Widgets) and then
-        1 = Count (Global_Wp_Registered_Sidebars)
+        Existing_Sidebars_Widgets.Length in 1 and then
+        Global_Wp_Registered_Sidebars.Length in 1
       then
          Set (New_Sidebars_Widgets, Php.Misc.Key (Global_Wp_Registered_Sidebars),
               From_Integer (Array_Pop (Existing_Sidebars_Widgets)));

@@ -328,10 +328,6 @@ is
                     return Boolean
                     is (True);
 
-   function Count (Arry : Array_Type)
-                   return Natural
-                   is (1);
-
    -----------
    -- Build --
    -----------
