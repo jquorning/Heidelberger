@@ -15,6 +15,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Array_Vectors;
 with Binder;
 with Globals;
 with Helpers;
@@ -3770,119 +3771,170 @@ is
       end loop;
    end Wp_Resource_Hints;
 
--- --
--- -- Prints resource preloads directives to browsers.
--- --
--- -- Gives directive to browsers to preload specific resources that website will
--- -- need very soon, this ensures that they are available earlier and are less
--- -- likely to block the page"s render. Preload directives should not be used for
--- -- non-render-blocking elements, as then they would compete with the
--- -- render-blocking ones, slowing down the render.
--- --
--- -- These performance improving indicators work by using `<link rel="preload">`.
--- --
--- -- @link https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types/preload
--- -- @link https://web.dev/preload-responsive-images/
--- --
--- -- @since 6.1.0
--- --
--- function wp_preload_resources() then
---         --
---         -- Filters domains and URLs for resource preloads.
---         --
---         -- @since 6.1.0
---         --
---         -- @param array  preload_resources then
---         --     Array of resources and their attributes, or URLs to print for resource preloads.
---         --
---         --     @type array ...0 then
---         --         Array of resource attributes.
---         --
---         --         @type string href        URL to include in resource preloads. Required.
---         --         @type string as          How the browser should treat the resource
---         --                                   (`script`, `style`, `image`, `document`, etc).
---         --         @type string crossorigin Indicates the CORS policy of the specified resource.
---         --         @type string type        Type of the resource (`text/html`, `text/css`, etc).
---         --         @type string media       Accepts media types or media queries. Allows responsive preloading.
---         --         @type string imagesizes  Responsive source size to the source Set.
---         --         @type string imagesrcset Responsive image sources to the source set.
---         --     end;
---         -- end;
---         --
---         preload_resources = apply_filters( "wp_preload_resources", array() );
+   --------------------------
+   -- Wp_Preload_Resources --
+   --------------------------
 
---         if ( ! is_array( preload_resources ) ) then
---                 return;
---         end;
+   procedure Wp_Preload_Resources
+   is
+      use Php.Echoing;
+      use Php.Lists;
+      use Php.Strings;
+      use Php.Types;
+      use Array_Vectors;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Formatting;
+      --
+      -- Filters domains and URLs for resource preloads.
+      --
+      -- @since 6.1.0
+      --
+      -- @param array  preload_resources {
+      --     Array of resources and their attributes, or URLs to print for resource
+      --     preloads.
+      --
+      --     @type array ...0 {
+      --         Array of resource attributes.
+      --
+      --         @type string href        URL to include in resource preloads.
+      --                                  Required.
+      --         @type string as          How the browser should treat the resource
+      --                                  (`script`, `style`, `image`, `document`,
+      --                                  etc).
+      --         @type string crossorigin Indicates the CORS policy of the specified
+      --                                  resource.
+      --         @type string type        Type of the resource (`text/html`,
+      --                                  `text/css`, etc).
+      --         @type string media       Accepts media types or media queries. Allows
+      --                                   responsive preloading.
+      --         @type string imagesizes  Responsive source size to the source Set.
+      --         @type string imagesrcset Responsive image sources to the source set.
+      --     }
+      -- }
+      --
+      Preload_Resources : constant Array_Vector :=
+        Apply_Filters ("wp_preload_resources", Empty_Vector);
 
---         unique_resources = array();
+      Unique_Resources : Array_Type;
+   begin
+      -- if not Is_Array (Preload_Resources) then
+      --    return;
+      -- end if;
 
---         // Parse the complete resource list and extract unique resources.
---         foreach ( preload_resources as resource ) then
---                 if ( ! is_array( resource ) ) then
---                         continue;
---                 end;
+      -- Parse the complete resource list and extract unique resources.
+      for Resource of Preload_Resources loop
+         if not Is_Array (Resource) then
+            goto Continue_1;
+         end if;
 
---                 attributes = resource;
---                 if ( isset( resource["href"] ) ) then
---                         href = resource["href"];
---                         if ( isset( unique_resources[ href ] ) ) then
---                                 continue;
---                         end;
---                         unique_resources[ href ] = attributes;
---                         // Media can use imagesrcset and not href.
---                 end; elseif ( ( "image" === resource["as"] ) &&
---                         ( isset( resource["imagesrcset"] ) || isset( resource["imagesizes"] ) )
---                 ) then
---                         if ( isset( unique_resources[ resource["imagesrcset"] ] ) ) then
---                                 continue;
---                         end;
---                         unique_resources[ resource["imagesrcset"] ] = attributes;
---                 end; else then
---                         continue;
---                 end;
---         end;
+         declare
+            Attributes : constant Array_Type := Resource;
+         begin
+            if Isset (Resource, "href") then
+               declare
+                  Href : constant String := Get_As_String (Resource, "href");
+               begin
+                  if Isset (Unique_Resources, Href) then
+                     goto Continue_1;
+                  end if;
+                  Set (Unique_Resources, Href, From_Array (Attributes));
+               end;
 
---         // Build and output the HTML for each unique resource.
---         foreach ( unique_resources as unique_resource ) then
---                 html = "";
+            -- Media can use imagesrcset and not href.
+            elsif
+              "image" = Get_As_String (Resource, "as") and then
+              (Isset (Resource, "imagesrcset") or else
+               Isset (Resource, "imagesizes"))
+            then
+               if
+                 Isset (Unique_Resources,
+                        Get_As_String (Resource, "imagesrcset"))
+               then
+                  goto Continue_1;
+               end if;
+               Set (Unique_Resources, Get_As_String (Resource, "imagesrcset"),
+                    From_Array (Attributes));
+            else
+               goto Continue_1;
+            end if;
+         end;
+         << Continue_1 >>
+      end loop;
 
---                 foreach ( unique_resource as resource_key => resource_value ) then
---                         if ( ! is_scalar( resource_value ) ) then
---                                 continue;
---                         end;
+      -- Build and output the HTML for each unique resource.
+      for B in Unique_Resources.Iterate loop
+         declare
+            Unique_Resource : constant Array_Type := As_Array (Element (B));
+            HTML : UString;
+         begin
+            for A in Unique_Resource.Iterate loop
+               declare
+                  Resource_Key   : constant String := Key (A);
+                  Resource_Value : constant String := As_String (Element (A));
+               begin
+                  -- if not Is_Scalar (Resource_Value) then
+                  --    goto Continue;
+                  -- end if;
 
---                         // Ignore non-supported attributes.
---                         non_supported_attributes = array( "as", "crossorigin", "href", "imagesrcset", "imagesizes", "type", "media" );
---                         if ( ! in_array( resource_key, non_supported_attributes, true ) && ! is_numeric( resource_key ) ) then
---                                 continue;
---                         end;
+                  -- Ignore non-supported attributes.
+                  declare
+                     Non_Supported_Attributes : constant List_Type :=
+                       ["as", "crossorigin", "href", "imagesrcset",
+                        "imagesizes", "type", "media"];
+                  begin
+                     if
+                       not In_List (Resource_Key,
+                                    Non_Supported_Attributes, True)
+                     and then
+                       not Is_Numeric (Resource_Key)
+                     then
+                        goto Continue;
+                     end if;
 
---                         // imagesrcset only usable when preloading image, ignore otherwise.
---                         if ( ( "imagesrcset" === resource_key ) && ( ! isset( unique_resource["as"] ) || ( "image" !== unique_resource["as"] ) ) ) then
---                                 continue;
---                         end;
+                     -- imagesrcset only usable when preloading image, ignore
+                     -- otherwise.
+                     if
+                       ("imagesrcset" = Resource_Key) and then
+                       (not Isset (Unique_Resource, "as") or else
+                       ("image" /= Get_As_String (Unique_Resource, "as")))
+                     then
+                        goto Continue;
+                     end if;
 
---                         // imagesizes only usable when preloading image and imagesrcset present, ignore otherwise.
---                         if ( ( "imagesizes" === resource_key ) &&
---                                 ( ! isset( unique_resource["as"] ) || ( "image" !== unique_resource["as"] ) || ! isset( unique_resource["imagesrcset"] ) )
---                         ) then
---                                 continue;
---                         end;
+                     -- imagesizes only usable when preloading image and imagesrcset
+                     -- present, ignore otherwise.
+                     if
+                       ("imagesizes" = Resource_Key) and then
+                       (not Isset (Unique_Resource, "as") or else
+                        ("image" /= Get_As_String (Unique_Resource, "as") or else
+                        not Isset (Unique_Resource, "imagesrcset")))
+                     then
+                        goto Continue;
+                     end if;
 
---                         resource_value = ( "href" === resource_key ) ? esc_url( resource_value, array( "http", "https" ) ) : esc_attr( resource_value );
+                     declare
+                        Resource_Value_2 : String :=
+                          (if "href" = Resource_Key
+                           then ESC_URL (Resource_Value, ["http", "https"])
+                           else ESC_Attr (Resource_Value));
+                     begin
+                        if not Is_String (Resource_Key) then
+                           Append (HTML, " " & Resource_Value_2);
+                        else
+                           Append (HTML, " resource_key=""" & Resource_Value_2 & """");
+                        end if;
+                     end;
+                  end;
+               end;
+               << Continue >>
+            end loop;
+            HTML := +Trim (-HTML);
 
---                         if ( ! is_string( resource_key ) ) then
---                                 html .= " resource_value";
---                         end; else then
---                                 html .= " resource_key="resource_value"";
---                         end;
---                 end;
---                 html = trim( html );
-
---                 printf( "<link rel="preload" %s />\n", html );
---         end;
--- end;
+            Printf ("<link rel=""preload"" %s />\n", [1 => -HTML]);
+         end;
+      end loop;
+   end Wp_Preload_Resources;
 
    ----------------------------------
    -- Wp_Dependencies_Unique_Hosts --

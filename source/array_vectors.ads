@@ -16,4 +16,6 @@ is
 
    subtype Array_Vector is Vectors.Vector;
 
+   Empty_Vector : constant Array_Vector := Vectors.Empty_Vector;
+
 end Array_Vectors;

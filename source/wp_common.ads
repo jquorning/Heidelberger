@@ -4,6 +4,7 @@
 
 with Php.Calendar;
 
+with Array_Vectors;
 with Arrays;
 with Lists;
 
@@ -750,6 +751,12 @@ is
                Value     : Class_Users.User_Id_Type;
                Name      : String)
                return Class_Users.User_Id_Type
+               is (Value);
+
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Array_Vectors.Array_Vector)
+               return Array_Vectors.Array_Vector
                is (Value);
 
    function Apply_Filters_Deprecated

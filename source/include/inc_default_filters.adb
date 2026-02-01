@@ -417,7 +417,7 @@ is
       Add_Action ("wp_head", Inc_General_Templates.X_Wp_Render_Title_Tag'Access, 1);
       Add_Action ("wp_head", Inc_Script_Loader.Wp_Enqueue_Scripts'Access, 1);
       Add_Action ("wp_head", Inc_General_Templates.Wp_Resource_Hints'Access, 2);
---    Add_Action ("wp_head", Wp_Preload_Resources'Access, 1);
+      Add_Action ("wp_head", Inc_General_Templates.Wp_Preload_Resources'Access, 1);
 --    Add_Action ("wp_head", Feed_Links'Access, 2);
 --    Add_Action ("wp_head", Feed_Links_Extra'Access, 3);
 --    Add_Action ("wp_head", Rsd_Link'Access);
