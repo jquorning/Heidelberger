@@ -71,9 +71,4 @@ is
                         return List_Type
                         is (Empty_List);
 
-   function Array_Fill_Keys (Keys  : List_Type;
-                             Value : Boolean)
-                             return Array_Type
-                             is (Empty_Array);
-
 end Helpers_3;

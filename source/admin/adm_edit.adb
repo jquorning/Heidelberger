@@ -75,7 +75,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
-      use Helpers_3;
       use Binder;
       use UStrings;
       use Wp_Common;

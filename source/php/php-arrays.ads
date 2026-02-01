@@ -162,6 +162,11 @@ is
                              return Array_Type
    is (raise Program_Error with "not implemented");
 
+   function Array_Fill_Keys (Keys  : List_Type;
+                             Value : Boolean)
+                             return Array_Type
+   is (raise Program_Error with "not implemented");
+
    ARRAY_FILTER_USE_KEY  : constant Integer := 47; -- arbitrary value
    ARRAY_FILTER_USE_BOTH : constant Integer := 48; -- arbitrary value
 
