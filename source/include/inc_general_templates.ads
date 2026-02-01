@@ -486,6 +486,17 @@ is
    procedure Feed_Links; -- Used by Add_Action -- jq
 
    --
+   -- Displays the links to the extra feeds such as category feeds.
+   --
+   -- @since 2.8.0
+   --
+   -- @param array args Optional arguments.
+   --
+   procedure Feed_Links_Extra (Args : Array_Type := Empty_Array);
+
+   procedure Feed_Links_Extra; -- Used by Add_Action -- jq
+
+   --
    -- Displays a referrer `strict-origin-when-cross-origin` meta tag.
    --
    -- Outputs a referrer `strict-origin-when-cross-origin` meta tag that tells the

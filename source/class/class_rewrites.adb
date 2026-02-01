@@ -68,6 +68,30 @@ is
       return ""; -- False;
    end Get_Extra_Permastruct;
 
+   ----------------------------
+   -- Get_Search_Permastruct --
+   ----------------------------
+
+   function Get_Search_Permastruct (This : in out Wp_Rewrite)
+                                    return String
+   is
+      use Php.Strings;
+      use UStrings;
+   begin
+      if Isset (-This.Search_Structure) then
+         return -This.Search_Structure;
+      end if;
+
+      if Empty (This.Permalink_Structure) then
+         This.Search_Structure := Null_UString;
+         return ""; -- False;
+      end if;
+
+      This.Search_Structure := This.Root & This.Search_Base & "/%search%";
+
+      return -This.Search_Structure;
+   end Get_Search_Permastruct;
+
    --------------------------
    -- Get_Page_Permastruct --
    --------------------------

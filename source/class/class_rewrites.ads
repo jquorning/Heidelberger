@@ -86,7 +86,8 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public search_base = "search";
+         Search_Base : UStrings.UString :=
+           UStrings.To_UString ("search");
 
          --
          -- Permalink structure for searches.
@@ -94,7 +95,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public search_structure;
+         Search_Structure : UStrings.UString;
 
          --
          -- Comments permalink base.
@@ -676,31 +677,19 @@ is
 --                 return this.author_structure;
 --         end;
 
---         --
---         -- Retrieves the search permalink structure.
---         --
---         -- The permalink structure is root property, search base, and finally
---         -- "/%search%". Will set the search_structure property and then return it
---         -- without attempting to set the value again.
---         --
---         -- @since 1.5.0
---         --
---         -- @return string|false Search permalink structure on success, false on failure.
---         --
---         public function get_search_permastruct() then
---                 if ( isset( this.search_structure ) ) then
---                         return this.search_structure;
---                 end;
-
---                 if ( empty( this.permalink_structure ) ) then
---                         this.search_structure = "";
---                         return false;
---                 end;
-
---                 this.search_structure = this.root . this.search_base . "/%search%";
-
---                 return this.search_structure;
---         end;
+   --
+   -- Retrieves the search permalink structure.
+   --
+   -- The permalink structure is root property, search base, and finally
+   -- "/%search%". Will set the search_structure property and then return it
+   -- without attempting to set the value again.
+   --
+   -- @since 1.5.0
+   --
+   -- @return string|false Search permalink structure on success, false on failure.
+   --
+   function Get_Search_Permastruct (This : in out Wp_Rewrite)
+                                    return String;
 
    --
    -- Retrieves the page permalink structure.

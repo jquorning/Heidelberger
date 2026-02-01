@@ -74,6 +74,21 @@ is
                                         return String;
 
    --
+   -- Retrieves the permalink for a post type archive feed.
+   --
+   -- @since 3.1.0
+   --
+   -- @param string post_type Post type.
+   -- @param string feed      Optional. Feed type. Possible values include "rss2",
+   --                         "atom". Default is the value of get_default_feed().
+   -- @return string|false The post type feed permalink. False if the post type
+   --                      does not exist or does not have an archive.
+   --
+   function Get_Post_Type_Archive_Feed_Link (Post_Type : String;
+                                             Feed      : String := "")
+                                             return String;
+
+   --
    -- Retrieves the full permalink for the current post or post ID.
    --
    -- @since 1.0.0
@@ -197,6 +212,96 @@ is
    --
    function Get_Feed_Link (Feed : String := "")
                            return String;
+
+   --
+   -- Retrieves the feed link for a given author.
+   --
+   -- Returns a link to the feed for all posts by a given author. A specific feed
+   -- can be requested or left blank to get the default feed.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int    author_id Author ID.
+   -- @param string feed      Optional. Feed type. Possible values include "rss2",
+   --                         "atom". Default is the value of get_default_feed().
+   -- @return string Link to the feed for the author specified by author_id.
+   --
+   function Get_Author_Feed_Link (Author_Id : Integer;
+                                  Feed      : String := "")
+                                  return String;
+
+   --
+   -- Retrieves the permalink for the post comments feed.
+   --
+   -- @since 2.2.0
+   --
+   -- @param int    post_id Optional. Post ID. Default is the ID of the global `post`.
+   -- @param string feed    Optional. Feed type. Possible values include "rss2",
+   --                       "atom". Default is the value of get_default_feed().
+   -- @return string The permalink for the comments feed for the given post on
+   --                success, empty string on failure.
+   --
+   function Get_Post_Comments_Feed_Link (Post_Id : Class_Posts.Post_Id := 0;
+                                         Feed    : String              := "")
+                                         return String;
+
+   --
+   -- Retrieves the feed link for a category.
+   --
+   -- Returns a link to the feed for all posts in a given category. A specific feed
+   -- can be requested or left blank to get the default feed.
+   --
+   -- @since 2.5.0
+   --
+   -- @param int|WP_Term|object cat  The ID or category object whose feed link will
+   --                                be retrieved.
+   -- @param string             feed Optional. Feed type. Possible values include
+   --                                "rss2", "atom". Default is the value of
+   --                                get_default_feed().
+   --
+   -- @return string Link to the feed for the category specified by `cat`.
+   --
+   function Get_Category_Feed_Link (Cat  : Integer;
+                                    Feed : String := "")
+                                    return String;
+
+   --
+   -- Retrieves the feed link for a term.
+   --
+   -- Returns a link to the feed for all posts in a given term. A specific feed
+   -- can be requested or left blank to get the default feed.
+   --
+   -- @since 3.0.0
+   --
+   -- @param int|WP_Term|object term     The ID or term object whose feed link will
+   --                                    be retrieved.
+   -- @param string             taxonomy Optional. Taxonomy of `term_id`.
+   -- @param string             feed     Optional. Feed type. Possible values include
+   --                                    "rss2", "atom". Default is the value of
+   --                                    get_default_feed().
+   -- @return string|false Link to the feed for the term specified by `term` and
+   --                      `taxonomy`.
+   --
+   function Get_Term_Feed_Link (Term     : Integer;
+                                Taxonomy : String := "";
+                                Feed     : String := "")
+                                return String;
+
+   --
+   -- Retrieves the permalink for a tag feed.
+   --
+   -- @since 2.3.0
+   --
+   -- @param int|WP_Term|object tag  The ID or term object whose feed link will be
+   --                                retrieved.
+   -- @param string             feed Optional. Feed type. Possible values include
+   --                                "rss2", "atom". Default is the value of
+   --                                get_default_feed().
+   -- @return string                 The feed permalink for the given tag.
+   --
+   function Get_Tag_Feed_Link (Tag  : Integer;
+                               Feed : String := "")
+                               return String;
 
    --
    -- Retrieves the URL for a given site where the front end is accessible.
@@ -405,6 +510,36 @@ is
                                 Taxonomy    : String := "";
                                 Object_Type : String := "")
                                 return String;
+
+   --
+   -- Retrieves the permalink for a search.
+   --
+   -- @since 3.0.0
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param string query Optional. The query string to use. If empty the current
+   --                     query is used. Default empty.
+   -- @return string The search permalink.
+   --
+   function Get_Search_Link (Query : String := "")
+                             return String;
+
+   --
+   -- Retrieves the permalink for the search results feed.
+   --
+   -- @since 2.5.0
+   --
+   -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
+   --
+   -- @param string search_query Optional. Search query. Default empty.
+   -- @param string feed         Optional. Feed type. Possible values include "rss2",
+   --                            "atom". Default is the value of get_default_feed().
+   -- @return string The search results feed permalink.
+   --
+   function Get_Search_Feed_Link (Search_Query : String := "";
+                                  Feed         : String := "")
+                                  return String;
 
    --
    -- Retrieves the link for a page number.

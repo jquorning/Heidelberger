@@ -45,6 +45,12 @@ is
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
+                           Value     : Boolean;
+                           Post      : Class_Posts.Post_Id)
+                           return Boolean
+                           is (Value);
+
+   function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            Arg_3     : Array_Type;
                            Arg_4     : Array_Type := Empty_Array)

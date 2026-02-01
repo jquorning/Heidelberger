@@ -7,9 +7,16 @@
 -- @subpackage Template
 --
 
+with Php.Echoing;
+with Php.Strings;
+
+with Inc_Formatting;
+with Inc_Functions;
+with Inc_Posts;
+
 package body Inc_Post_Templates
 is
-   procedure Dummy is null;
+
 -- --
 -- -- Displays the ID of the current item in the WordPress Loop.
 -- --
@@ -19,17 +26,20 @@ is
 --         echo get_the_ID();
 -- end;
 
--- --
--- -- Retrieves the ID of the current item in the WordPress Loop.
--- --
--- -- @since 2.1.0
--- --
--- -- @return int|false The ID of the current item in the WordPress Loop. False if post is not set.
--- --
--- function get_the_ID() then -- phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
---         post = get_post();
---         return ! empty( post ) ? post.ID : false;
--- end;
+   ----------------
+   -- Get_The_Id --
+   ----------------
+
+   function Get_The_Id
+            return Class_Posts.Post_Id
+   is
+      use Class_Posts;
+      use Inc_Posts;
+
+      Post : constant Wp_Post := Get_Post;
+   begin
+      return (if Post = Null_Post then Post.Id else 0); -- False);
+   end Get_The_Id;
 
 -- --
 -- -- Displays or retrieves the current post title with optional markup.
@@ -57,52 +67,51 @@ is
 --         end;
 -- end;
 
--- --
--- -- Sanitizes the current title when retrieving or displaying.
--- --
--- -- Works like the_title(), except the parameters can be in a string or
--- -- an array. See the function for what can be override in the args parameter.
--- --
--- -- The title before it is displayed will have the tags stripped and esc_attr()
--- -- before it is passed to the user or displayed. The default as with the_title(),
--- -- is to display the title.
--- --
--- -- @since 2.3.0
--- --
--- -- @param string|array args then
--- --     Title attribute arguments. Optional.
--- --
--- --     @type string  before Markup to prepend to the title. Default empty.
--- --     @type string  after  Markup to append to the title. Default empty.
--- --     @type bool    echo   Whether to echo or return the title. Default true for echo.
--- --     @type WP_Post post   Current post object to retrieve the title for.
--- -- end;
--- -- @return void|string Void if "echo" argument is true, the title attribute if "echo" is false.
--- --
--- function the_title_attribute( args = "" ) then
---         defaults    = array(
---                 "before" => "",
---                 "after"  => "",
---                 "echo"   => true,
---                 "post"   => get_post(),
---         );
---         parsed_args = wp_parse_args( args, defaults );
+   -------------------------
+   -- The_Title_Attribute --
+   -------------------------
 
---         title = get_the_title( parsed_args["post"] );
+   function The_Title_Attribute (Args : Array_Type) -- ""
+                                 return String
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Posts;
 
---         if ( strlen( title ) == 0 ) then
---                 return;
---         end;
+      Defaults : constant Array_Type :=
+        To_Array (List => (
+          Build ("before", ""),
+          Build ("after",  ""),
+          Build ("echo",   True),
+          Build ("post",   Get_Post)
+        ));
 
---         title = parsed_args["before"] . title . parsed_args["after"];
---         title = esc_attr( strip_tags( title ) );
+      Parsed_Args : constant Array_Type := Wp_Parse_Args (Args, Defaults);
 
---         if ( parsed_args["echo"] ) then
---                 echo title;
---         end; else then
---                 return title;
---         end;
--- end;
+      Title_3 : constant String :=
+        Get_The_Title (As_Integer (Get (Parsed_Args, "post")));
+   begin
+      if Strlen (Title_3) = 0 then
+         return "";
+      end if;
+
+      declare
+         Title_2 : constant String :=
+           Get_As_String (Parsed_Args, "before") & Title_3 &
+           Get_As_String (Parsed_Args, "after");
+
+         Title : constant String := ESC_Attr (Strip_Tags (Title_2));
+      begin
+         if As_Boolean (Get (Parsed_Args, "echo")) then
+            Echo (Title);
+         else
+            return Title;
+         end if;
+      end;
+      return "";
+   end The_Title_Attribute;
 
 -- --
 -- -- Retrieves the post title.

@@ -28,8 +28,11 @@ with Class_Post_Type;
 with Class_Sites;
 with Class_Scripts;
 with Class_Styles;
+with Class_Taxonomy;
 with Class_Terms;
 with Class_Users;
+with Inc_Author_Templates;
+with Inc_Comments_Templates;
 with Inc_Feeds;
 with Inc_Formatting;
 with Inc_Functions;
@@ -43,7 +46,9 @@ with Inc_Ms_Blogs;
 with Inc_Options;
 with Inc_Plugins;
 with Inc_Posts;
+with Inc_Post_Templates;
 with Inc_Querys;
+with Inc_Taxonomys;
 with Inc_Themes;
 with Inc_Versions;
 
@@ -3336,227 +3341,341 @@ is
       Feed_Links (Empty_Array);
    end Feed_Links;
 
--- --
--- -- Displays the links to the extra feeds such as category feeds.
--- --
--- -- @since 2.8.0
--- --
--- -- @param array args Optional arguments.
--- --
--- function feed_links_extra( args = array() ) then
---         defaults = array(
---                 /* translators: Separator between blog name and feed type in feed links.--
---                 "separator"     => _x( "&raquo;", "feed link" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Post title.--
---                 "singletitle"   => __( "%1s %2s %3s Comments Feed" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Category name.--
---                 "cattitle"      => __( "%1s %2s %3s Category Feed" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Tag name.--
---                 "tagtitle"      => __( "%1s %2s %3s Tag Feed" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Term name, 4: Taxonomy singular name.--
---                 "taxtitle"      => __( "%1s %2s %3s %4s Feed" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Author name.--
---                 "authortitle"   => __( "%1s %2s Posts by %3s Feed" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Search query.--
---                 "searchtitle"   => __( "%1s %2s Search Results for &#8220;%3s&#8221; Feed" ),
---                 /* translators: 1: Blog name, 2: Separator (raquo), 3: Post type name.--
---                 "posttypetitle" => __( "%1s %2s %3s Feed" ),
---         );
+   ----------------------
+   -- Feed_Links_Extra --
+   ----------------------
 
---         args = wp_parse_args( args, defaults );
+   procedure Feed_Links_Extra (Args : Array_Type := Empty_Array)
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Posts;
+      use Class_Post_Type;
+      use Class_Taxonomy;
+      use Class_Terms;
+      use Inc_Author_Templates;
+      use Inc_Comments_Templates;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Posts;
+      use Inc_Post_Templates;
+      use Inc_Querys;
+      use Inc_Taxonomys;
 
---         if ( is_singular() ) then
---                 id   = 0;
---                 post = get_post( id );
+      Defaults : constant Array_Type :=
+        To_Array (List => (
+          -- translators: Separator between blog name and feed type in feed links.
+          Build ("separator",     X_X ("&raquo;", "feed link")),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Post title.
+          Build ("singletitle",   abs "%1s %2s %3s Comments Feed"),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Category name.
+          Build ("cattitle",      abs "%1s %2s %3s Category Feed"),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Tag name.
+          Build ("tagtitle",      abs "%1s %2s %3s Tag Feed"),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Term name, 4: Taxonomy singular name.
+          Build ("taxtitle",      abs "%1s %2s %3s %4s Feed"),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Author name.
+          Build ("authortitle",   abs "%1s %2s Posts by %3s Feed"),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Search query.
+          Build ("searchtitle",   abs "%1s %2s Search Results for &#8220;%3s&#8221; Feed"),
+          -- translators: 1: Blog name, 2: Separator (raquo), 3: Post type name.
+          Build ("posttypetitle", abs "%1s %2s %3s Feed")
+        ));
 
---                 -- This filter is documented in wp-includes/general-template.php--
---                 show_comments_feed = apply_filters( "feed_links_show_comments_feed", true );
+      Args_2 : constant Array_Type := Wp_Parse_Args (Args, Defaults);
 
---                 --
---                 -- Filters whether to display the post comments feed link.
---                 --
---                 -- This filter allows to enable or disable the feed link for a singular post
---                 -- in a way that is independent of {@see "feed_links_show_comments_feed"}
---                 -- (which controls the global comments feed). The result of that filter
---                 -- is accepted as a parameter.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show_comments_feed Whether to display the post comments feed link. Defaults to
---                 --                                 the {@see "feed_links_show_comments_feed"} filter result.
---                 --
---                 show_post_comments_feed = apply_filters( "feed_links_extra_show_post_comments_feed", show_comments_feed );
+      Title : UString;
+      Href  : UString;
+   begin
+      if Is_Singular then
+         declare
+            Id   : constant Post_Id := 0;
+            Post : constant Wp_Post := Get_Post (Id);
 
---                 if ( show_post_comments_feed && ( comments_open() || pings_open() || post->comment_count > 0 ) ) then
---                         title = sprintf(
---                                 args["singletitle"],
---                                 get_bloginfo( "name" ),
---                                 args["separator"],
---                                 the_title_attribute( array( "echo" => false ) )
---                         );
+            -- This filter is documented in wp-includes/general-template.php--
+            Show_Comments_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_show_comments_feed", True);
 
---                         feed_link = get_post_comments_feed_link( post->ID );
+            --
+            -- Filters whether to display the post comments feed link.
+            --
+            -- This filter allows to enable or disable the feed link for a singular
+            -- post in a way that is independent of {@see
+            -- "feed_links_show_comments_feed"} (which controls the global comments
+            -- feed). The result of that filter is accepted as a parameter.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show_comments_feed Whether to display the post comments
+            --                                feed link. Defaults to the {@see
+            --                                "feed_links_show_comments_feed"} filter
+            --                                 result.
+            --
+            Show_Post_Comments_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_post_comments_feed",
+                             Show_Comments_Feed);
+         begin
+            if
+              Show_Post_Comments_Feed and then
+              (Comments_Open or else
+               Pings_Open    or else
+               Natural'Value (-Post.Comment_Count) > 0)
+            then
+               Title :=
+                 +Sprintf (
+                    Get_As_String (Args_2, "singletitle"),
+                    [
+                      1 => Get_Bloginfo ("name"),
+                      2 => Get_As_String (Args_2, "separator"),
+                      3 => The_Title_Attribute (To_Array (List => (1 =>
+                             Build ("echo", False))))
+                    ]
+                  );
+               declare
+                  Feed_Link : constant String :=
+                    Get_Post_Comments_Feed_Link (Post.Id);
+               begin
+                  if Feed_Link /= "" then
+                     Href := +Feed_Link;
+                  end if;
+               end;
+            end if;
+         end;
 
---                         if ( feed_link ) then
---                                 href = feed_link;
---                         end;
---                 end;
---         end; elseif ( is_post_type_archive() ) then
---                 --
---                 -- Filters whether to display the post type archive feed link.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show Whether to display the post type archive feed link. Default true.
---                 --
---                 show_post_type_archive_feed = apply_filters( "feed_links_extra_show_post_type_archive_feed", true );
+      elsif Is_Post_Type_Archive then
+         declare
+            --
+            -- Filters whether to display the post type archive feed link.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show Whether to display the post type archive feed link.
+            --                  Default true.
+            --
+            Show_Post_Type_Archive_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_post_type_archive_feed", True);
+         begin
+            if Show_Post_Type_Archive_Feed then
+               declare
+                  Post_Type : constant String := Get_Query_Var ("post_type");
+               begin
+                  -- if Is_Array (Post_Type) then
+                  --    Post_Type := Reset (Post_Type);
+                  -- end if;
 
---                 if ( show_post_type_archive_feed ) then
---                         post_type = get_query_var( "post_type" );
+                  declare
+                     Post_Type_Obj : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
+                  begin
+                     Title :=
+                       +Sprintf (
+                          Get_As_String (Args_2, "posttypetitle"),
+                          [
+                            1 => Get_Bloginfo ("name"),
+                            2 => Get_As_String (Args_2, "separator"),
+                            3 => Get_As_String (Post_Type_Obj.Labels, "name")
+                          ]
+                        );
 
---                         if ( is_array( post_type ) ) then
---                                 post_type = reset( post_type );
---                         end;
+                     Href := +Get_Post_Type_Archive_Feed_Link (-Post_Type_Obj.Name);
+                  end;
+               end;
+            end if;
+         end;
 
---                         post_type_obj = get_post_type_object( post_type );
+      elsif Is_Category then
+         declare
+            --
+            -- Filters whether to display the category feed link.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show Whether to display the category feed link. Default
+            --                  true.
+            --
+            Show_Category_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_category_feed", True);
+         begin
+            if Show_Category_Feed then
+               declare
+                  Term : constant Wp_Term := Get_Queried_Object;
+               begin
+                  if Term /= Null_Term then
+                     Title :=
+                       +Sprintf (
+                          Get_As_String (Args_2, "cattitle"),
+                          [
+                            1 => Get_Bloginfo ("name"),
+                            2 => Get_As_String (Args_2, "separator"),
+                            3 => -Term.Name
+                          ]
+                        );
 
---                         title = sprintf(
---                                 args["posttypetitle"],
---                                 get_bloginfo( "name" ),
---                                 args["separator"],
---                                 post_type_obj->labels->name
---                         );
+                     Href := +Get_Category_Feed_Link (Term.Term_Id);
+                  end if;
+               end;
+            end if;
+         end;
 
---                         href = get_post_type_archive_feed_link( post_type_obj->name );
---                 end;
---         end; elseif ( is_category() ) then
---                 --
---                 -- Filters whether to display the category feed link.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show Whether to display the category feed link. Default true.
---                 --
---                 show_category_feed = apply_filters( "feed_links_extra_show_category_feed", true );
+      elsif Is_Tag then
+         declare
+            --
+            -- Filters whether to display the tag feed link.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show Whether to display the tag feed link. Default true.
+            --
+            Show_Tag_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_tag_feed", True);
+         begin
+            if Show_Tag_Feed then
+               declare
+                  Term : constant Wp_Term := Get_Queried_Object;
+               begin
+                  if Term /= Null_Term then
+                     Title :=
+                       +Sprintf (
+                          Get_As_String (Args_2, "tagtitle"),
+                          [
+                            1 => Get_Bloginfo ("name"),
+                            2 => Get_As_String (Args_2, "separator"),
+                            3 => -Term.Name
+                          ]
+                        );
 
---                 if ( show_category_feed ) then
---                         term = get_queried_object();
+                     Href := +Get_Tag_Feed_Link (Term.Term_Id);
+                  end if;
+               end;
+            end if;
+         end;
 
---                         if ( term ) then
---                                 title = sprintf(
---                                         args["cattitle"],
---                                         get_bloginfo( "name" ),
---                                         args["separator"],
---                                         term->name
---                                 );
+      elsif Is_Tax then
+         declare
+            --
+            -- Filters whether to display the custom taxonomy feed link.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show Whether to display the custom taxonomy feed link.
+            --                  Default true.
+            --
+            Show_Tax_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_tax_feed", True);
+         begin
+            if Show_Tax_Feed then
+               declare
+                  Term : constant Wp_Term := Get_Queried_Object;
+               begin
+                  if Term /= Null_Term then
+                     declare
+                        Tax : constant Wp_Taxonomy := Get_Taxonomy (-Term.Taxonomy);
+                     begin
+                        Title :=
+                          +Sprintf (
+                             Get_As_String (Args_2, "taxtitle"),
+                             [
+                               1 => Get_Bloginfo ("name"),
+                               2 => Get_As_String (Args_2, "separator"),
+                               3 => -Term.Name,
+                               4 => Get_As_String (Tax.Labels, "singular_name")
+                             ]
+                           );
 
---                                 href = get_category_feed_link( term->term_id );
---                         end;
---                 end;
---         end; elseif ( is_tag() ) then
---                 --
---                 -- Filters whether to display the tag feed link.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show Whether to display the tag feed link. Default true.
---                 --
---                 show_tag_feed = apply_filters( "feed_links_extra_show_tag_feed", true );
+                        Href := +Get_Term_Feed_Link (Term.Term_Id, -Term.Taxonomy);
+                     end;
+                  end if;
+               end;
+            end if;
+         end;
 
---                 if ( show_tag_feed ) then
---                         term = get_queried_object();
+      elsif Is_Author then
+         declare
+            --
+            -- Filters whether to display the author feed link.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show Whether to display the author feed link. Default true.
+            --
+            Show_Author_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_author_feed", True);
+         begin
+            if Show_Author_Feed then
+               declare
+                  Author_Id : constant Integer := Get_Query_Var ("author"); -- (int)
+               begin
+                  Title :=
+                    +Sprintf (
+                       Get_As_String (Args_2, "authortitle"),
+                       [
+                         1 => Get_Bloginfo ("name"),
+                         2 => Get_As_String (Args_2, "separator"),
+                         3 => Get_The_Author_Meta ("display_name", Author_Id)
+                       ]
+                     );
 
---                         if ( term ) then
---                                 title = sprintf(
---                                         args["tagtitle"],
---                                         get_bloginfo( "name" ),
---                                         args["separator"],
---                                         term->name
---                                 );
+                  Href := +Get_Author_Feed_Link (Author_Id);
+               end;
+            end if;
+         end;
 
---                                 href = get_tag_feed_link( term->term_id );
---                         end;
---                 end;
---         end; elseif ( is_tax() ) then
---                 --
---                 -- Filters whether to display the custom taxonomy feed link.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show Whether to display the custom taxonomy feed link. Default true.
---                 --
---                 show_tax_feed = apply_filters( "feed_links_extra_show_tax_feed", true );
+      elsif Is_Search then
+         declare
+            --
+            -- Filters whether to display the search results feed link.
+            --
+            -- @since 6.1.0
+            --
+            -- @param bool show Whether to display the search results feed link.
+            --                  Default true.
+            --
+            Show_Search_Feed : constant Boolean :=
+              Apply_Filters ("feed_links_extra_show_search_feed", True);
+         begin
+            if Show_Search_Feed then
+               Title :=
+                 +Sprintf (
+                    Get_As_String (Args_2, "searchtitle"),
+                    [
+                      1 => Get_Bloginfo ("name"),
+                      2 => Get_As_String (Args_2, "separator"),
+                      3 => Get_Search_Query (False)
+                    ]
+                  );
 
---                 if ( show_tax_feed ) then
---                         term = get_queried_object();
+               Href := +Get_Search_Feed_Link;
+            end if;
+         end;
 
---                         if ( term ) then
---                                 tax = get_taxonomy( term->taxonomy );
+      end if;
 
---                                 title = sprintf(
---                                         args["taxtitle"],
---                                         get_bloginfo( "name" ),
---                                         args["separator"],
---                                         term->name,
---                                         tax->labels->singular_name
---                                 );
+      if Title /= "" and then Href /= "" then
+--    if Isset (Title) and then Isset (Href) then
+         Printf (
+           "<link rel=""alternate"" type=""%s"" title=""%s"" href=""%s"" />" & NL,
+           [
+             1 => Feed_Content_Type,
+             2 => ESC_Attr (-Title),
+             3 => ESC_URL (-Href)
+           ]
+         );
+      end if;
+   end Feed_Links_Extra;
 
---                                 href = get_term_feed_link( term->term_id, term->taxonomy );
---                         end;
---                 end;
---         end; elseif ( is_author() ) then
---                 --
---                 -- Filters whether to display the author feed link.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show Whether to display the author feed link. Default true.
---                 --
---                 show_author_feed = apply_filters( "feed_links_extra_show_author_feed", true );
+   ----------------------
+   -- Feed_Link_Ekstra --
+   ----------------------
 
---                 if ( show_author_feed ) then
---                         author_id = (int) get_query_var( "author" );
-
---                         title = sprintf(
---                                 args["authortitle"],
---                                 get_bloginfo( "name" ),
---                                 args["separator"],
---                                 get_the_author_meta( "display_name", author_id )
---                         );
-
---                         href = get_author_feed_link( author_id );
---                 end;
---         end; elseif ( is_search() ) then
---                 --
---                 -- Filters whether to display the search results feed link.
---                 --
---                 -- @since 6.1.0
---                 --
---                 -- @param bool show Whether to display the search results feed link. Default true.
---                 --
---                 show_search_feed = apply_filters( "feed_links_extra_show_search_feed", true );
-
---                 if ( show_search_feed ) then
---                         title = sprintf(
---                                 args["searchtitle"],
---                                 get_bloginfo( "name" ),
---                                 args["separator"],
---                                 get_search_query( false )
---                         );
-
---                         href = get_search_feed_link();
---                 end;
---         end;
-
---         if ( isset( title ) && isset( href ) ) then
---                 printf(
---                         "<link rel="alternate" type="%s" title="%s" href="%s" />" . "\n",
---                         feed_content_type(),
---                         esc_attr( title ),
---                         esc_url( href )
---                 );
---         end;
--- end;
+   procedure Feed_Links_Extra
+   is
+   begin
+      Feed_Links_Extra (Empty_Array);
+   end Feed_Links_Extra;
 
 -- --
 -- -- Displays the link to the Really Simple Discovery service endpoint.
@@ -5626,7 +5745,7 @@ is
 -- -- @return string Indicator glyph wrapped in a `span` tag.
 -- --
 -- function wp_required_field_indicator() then
---         /* translators: Character to identify required form fields.--
+--         -- translators: Character to identify required form fields.--
 --         glyph     = __( "*" );
 --         indicator = "<span class="required">" . esc_html( glyph ) . "</span>";
 
@@ -5650,7 +5769,7 @@ is
 -- function wp_required_field_message() then
 --         message = sprintf(
 --                 "<span class="required-field-message">%s</span>",
---                 /* translators: %s: Asterisk symbol (*).--
+--                 -- translators: %s: Asterisk symbol (*).--
 --                 sprintf( __( "Required fields are marked %s" ), wp_required_field_indicator() )
 --         );
 

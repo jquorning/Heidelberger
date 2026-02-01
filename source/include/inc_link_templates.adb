@@ -31,6 +31,7 @@ with Class_Post_Type;
 with Class_Sites;
 with Class_Taxonomy;
 with Class_Terms;
+with Inc_Author_Templates;
 with Inc_Capabilities;
 with Inc_Category_Templates;
 with Inc_Feeds;
@@ -914,93 +915,111 @@ is
       return Apply_Filters ("feed_link", -Output, -Feed_2);
    end Get_Feed_Link;
 
--- --
--- -- Retrieves the permalink for the post comments feed.
--- --
--- -- @since 2.2.0
--- --
--- -- @param int    post_id Optional. Post ID. Default is the ID of the global `post`.
--- -- @param string feed    Optional. Feed type. Possible values include "rss2", "atom".
--- --                        Default is the value of get_default_feed().
--- -- @return string The permalink for the comments feed for the given post on success, empty string on failure.
--- --
--- function get_post_comments_feed_link( post_id = 0, feed = "" ) then
---         post_id = absint( post_id );
+   ---------------------------------
+   -- Get_Post_Comments_Feed_Link --
+   ---------------------------------
 
---         if ( ! post_id ) then
---                 post_id = get_the_ID();
---         end;
+   function Get_Post_Comments_Feed_Link (Post_Id : Class_Posts.Post_Id := 0;
+                                         Feed    : String              := "")
+                                         return String
+   is
+      use Php.Strings;
+      use Wp_Common;
+      use UStrings;
+      use Class_Posts;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Options;
+      use Inc_Posts;
+      use Inc_Post_Templates;
+--    post_id = absint( post_id );
 
---         if ( empty( feed ) ) then
---                 feed = get_default_feed();
---         end;
+      Post_Id_2 : constant Class_Posts.Post_Id :=
+        (if Post_Id = 0 then Get_The_Id else Post_Id);
 
---         post = get_post( post_id );
+      Feed_2 : constant String :=
+        (if Empty (Feed) then Get_Default_Feed else Feed);
 
---         // Bail out if the post does not exist.
---         if ( ! post instanceof WP_Post ) then
---                 return "";
---         end;
+      Post : constant Wp_Post := Get_Post (Post_Id_2);
 
---         unattached = "attachment" === post->post_type && 0 === (int) post->post_parent;
+      URL : UString;
+   begin
+      -- -- Bail out if the post does not exist.
+      -- if not post in Wp_Post then -- instanceof
+      --    return "";
+      -- end if;
 
---         if ( get_option( "permalink_structure" ) ) then
---                 if ( "page" === get_option( "show_on_front" ) && get_option( "page_on_front" ) == post_id ) then
---                         url = _get_page_link( post_id );
---                 end; else then
---                         url = get_permalink( post_id );
---                 end;
+      declare
+         Unattached : constant Boolean :=
+           "attachment" = Post.Post_Type and then
+           0 = Post.Post_Parent; -- (int)
+      begin
+         if Get_Option ("permalink_structure") then
+            if
+              "page" = Get_Option ("show_on_front") and then
+              Get_Option ("page_on_front") = Integer (Post_Id_2)
+            then
+               URL := +X_Get_Page_Link (Post_Id_2);
+            else
+               URL := +Get_Permalink (Post_Id_2);
+            end if;
 
---                 if ( unattached ) then
---                         url = home_url( "/feed/" );
---                         if ( get_default_feed() !== feed ) then
---                                 url .= "feed/";
---                         end;
---                         url = add_query_arg( "attachment_id", post_id, url );
---                 end; else then
---                         url = trailingslashit( url ) . "feed";
---                         if ( get_default_feed() != feed ) then
---                                 url .= "/feed";
---                         end;
---                         url = user_trailingslashit( url, "single_feed" );
---                 end;
---         end; else then
---                 if ( unattached ) then
---                         url = add_query_arg(
---                                 array(
---                                         "feed"          => feed,
---                                         "attachment_id" => post_id,
---                                 ),
---                                 home_url( "/" )
---                         );
---                 end; elseif ( "page" === post->post_type ) then
---                         url = add_query_arg(
---                                 array(
---                                         "feed"    => feed,
---                                         "page_id" => post_id,
---                                 ),
---                                 home_url( "/" )
---                         );
---                 end; else then
---                         url = add_query_arg(
---                                 array(
---                                         "feed" => feed,
---                                         "p"    => post_id,
---                                 ),
---                                 home_url( "/" )
---                         );
---                 end;
---         end;
+            if Unattached then
+               URL := +Home_URL ("/feed/");
+               if Get_Default_Feed /= Feed_2 then
+                  Append (URL, "feed/");
+               end if;
+               URL := +Add_Query_Arg ("attachment_id", Image (Post_Id_2), -URL);
+            else
+               URL := +Trailing_Slash_It (-URL) & "feed";
+               if Get_Default_Feed /= Feed_2 then
+                  Append (URL, "/feed");
+               end if;
+               URL := +User_Trailing_Slash_It (-URL, "single_feed");
+            end if;
 
---         --
---         -- Filters the post comments feed permalink.
---         --
---         -- @since 1.5.1
---         --
---         -- @param string url Post comments feed permalink.
---         --
---         return apply_filters( "post_comments_feed_link", url );
--- end;
+         else
+            if Unattached then
+               URL :=
+                 +Add_Query_Arg (
+                    To_Array (List => (
+                      Build ("feed",          Feed),
+                      Build ("attachment_id", Integer (Post_Id))
+                    )),
+                    Home_URL ("/")
+                  );
+            elsif "page" = Post.Post_Type then
+               URL :=
+                 +Add_Query_Arg (
+                    To_Array (List => (
+                      Build ("feed",    Feed),
+                      Build ("page_id", Integer (Post_Id))
+                    )),
+                    Home_URL ("/")
+                  );
+            else
+               URL :=
+                 +Add_Query_Arg (
+                    To_Array (List => (
+                      Build ("feed", Feed),
+                      Build ("p",    Integer (Post_Id))
+                    )),
+                    Home_URL ("/")
+                  );
+            end if;
+         end if;
+
+         --
+         -- Filters the post comments feed permalink.
+         --
+         -- @since 1.5.1
+         --
+         -- @param string url Post comments feed permalink.
+         --
+         return Apply_Filters ("post_comments_feed_link", -URL);
+      end;
+   end Get_Post_Comments_Feed_Link;
 
 -- --
 -- -- Displays the comment feed link for a post.
@@ -1036,172 +1055,191 @@ is
 --         echo apply_filters( "post_comments_feed_link_html", link, post_id, feed );
 -- end;
 
--- --
--- -- Retrieves the feed link for a given author.
--- --
--- -- Returns a link to the feed for all posts by a given author. A specific feed
--- -- can be requested or left blank to get the default feed.
--- --
--- -- @since 2.5.0
--- --
--- -- @param int    author_id Author ID.
--- -- @param string feed      Optional. Feed type. Possible values include "rss2", "atom".
--- --                          Default is the value of get_default_feed().
--- -- @return string Link to the feed for the author specified by author_id.
--- --
--- function get_author_feed_link( author_id, feed = "" ) then
---         author_id           = (int) author_id;
---         permalink_structure = get_option( "permalink_structure" );
+   --------------------------
+   -- Get_Author_Feed_Link --
+   --------------------------
 
---         if ( empty( feed ) ) then
---                 feed = get_default_feed();
---         end;
+   function Get_Author_Feed_Link (Author_Id : Integer;
+                                  Feed      : String := "")
+                                  return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Author_Templates;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Options;
 
---         if ( ! permalink_structure ) then
---                 link = home_url( "?feed=feed&amp;author=" . author_id );
---         end; else then
---                 link = get_author_posts_url( author_id );
---                 if ( get_default_feed() == feed ) then
---                         feed_link = "feed";
---                 end; else then
---                         feed_link = "feed/feed";
---                 end;
+--    author_id           = (int) author_id;
+      Permalink_Structure : constant Boolean := Get_Option ("permalink_structure");
 
---                 link = trailingslashit( link ) . user_trailingslashit( feed_link, "feed" );
---         end;
+      Feed_2 : String :=
+        (if Empty (Feed) then Get_Default_Feed else Feed);
 
---         --
---         -- Filters the feed link for a given author.
---         --
---         -- @since 1.5.1
---         --
---         -- @param string link The author feed link.
---         -- @param string feed Feed type. Possible values include "rss2", "atom".
---         --
---         link = apply_filters( "author_feed_link", link, feed );
+      Link      : UString;
+      Feed_Link : UString;
+   begin
+      if not Permalink_Structure then
+         Link := +Home_URL ("?feed=" & Feed_2 & "&amp;author=" &
+                            Helpers.Image (Author_Id));
+      else
+         Link := +Get_Author_Posts_Url (Author_Id);
+         if Get_Default_Feed = Feed_2 then
+            Feed_Link := +"feed";
+         else
+            Feed_Link := +"feed/feed";
+         end if;
 
---         return link;
--- end;
+         Link :=
+           +Trailing_Slash_It (-Link) & User_Trailing_Slash_It (-Feed_Link, "feed");
+      end if;
 
--- --
--- -- Retrieves the feed link for a category.
--- --
--- -- Returns a link to the feed for all posts in a given category. A specific feed
--- -- can be requested or left blank to get the default feed.
--- --
--- -- @since 2.5.0
--- --
--- -- @param int|WP_Term|object cat  The ID or category object whose feed link will be retrieved.
--- -- @param string             feed Optional. Feed type. Possible values include "rss2", "atom".
--- --                                 Default is the value of get_default_feed().
--- -- @return string Link to the feed for the category specified by `cat`.
--- --
--- function get_category_feed_link( cat, feed = "" ) then
---         return get_term_feed_link( cat, "category", feed );
--- end;
+      --
+      -- Filters the feed link for a given author.
+      --
+      -- @since 1.5.1
+      --
+      -- @param string link The author feed link.
+      -- @param string feed Feed type. Possible values include "rss2", "atom".
+      --
+      Link := +Apply_Filters ("author_feed_link", -Link, Feed_2);
 
--- --
--- -- Retrieves the feed link for a term.
--- --
--- -- Returns a link to the feed for all posts in a given term. A specific feed
--- -- can be requested or left blank to get the default feed.
--- --
--- -- @since 3.0.0
--- --
--- -- @param int|WP_Term|object term     The ID or term object whose feed link will be retrieved.
--- -- @param string             taxonomy Optional. Taxonomy of `term_id`.
--- -- @param string             feed     Optional. Feed type. Possible values include "rss2", "atom".
--- --                                     Default is the value of get_default_feed().
--- -- @return string|false Link to the feed for the term specified by `term` and `taxonomy`.
--- --
--- function get_term_feed_link( term, taxonomy = "", feed = "" ) then
---         if ( ! is_object( term ) ) then
---                 term = (int) term;
---         end;
+      return -Link;
+   end Get_Author_Feed_Link;
 
---         term = get_term( term, taxonomy );
+   ----------------------------
+   -- Get_Category_Feed_Link --
+   ----------------------------
 
---         if ( empty( term ) || is_wp_error( term ) ) then
---                 return false;
---         end;
+   function Get_Category_Feed_Link (Cat  : Integer;
+                                    Feed : String := "")
+                                    return String
+   is
+   begin
+      return Get_Term_Feed_Link (Cat, "category", Feed);
+   end Get_Category_Feed_Link;
 
---         taxonomy = term->taxonomy;
+   ------------------------
+   -- Get_Term_Feed_Link --
+   ------------------------
 
---         if ( empty( feed ) ) then
---                 feed = get_default_feed();
---         end;
+   function Get_Term_Feed_Link (Term     : Integer;
+                                Taxonomy : String := "";
+                                Feed     : String := "")
+                                return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Taxonomy;
+      use Class_Terms;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Load;
+      use Inc_Options;
+      use Inc_Taxonomys;
 
---         permalink_structure = get_option( "permalink_structure" );
+      Term_2 : constant Integer := Term;
+--      (if not Is_Object (Term) then Term else Term);  -- (int)
 
---         if ( ! permalink_structure ) then
---                 if ( "category" === taxonomy ) then
---                         link = home_url( "?feed=feed&amp;cat=term->term_id" );
---                 end; elseif ( "post_tag" === taxonomy ) then
---                         link = home_url( "?feed=feed&amp;tag=term->slug" );
---                 end; else then
---                         t    = get_taxonomy( taxonomy );
---                         link = home_url( "?feed=feed&amp;t->query_var=term->slug" );
---                 end;
---         end; else then
---                 link = get_term_link( term, term->taxonomy );
---                 if ( get_default_feed() == feed ) then
---                         feed_link = "feed";
---                 end; else then
---                         feed_link = "feed/feed";
---                 end;
+      Term_3 : constant Wp_Term := Get_Term (Term_2, Taxonomy);
+   begin
+      if Term_3 = Null_Term or else Is_Wp_Error (Term_3) then
+         return ""; -- false;
+      end if;
 
---                 link = trailingslashit( link ) . user_trailingslashit( feed_link, "feed" );
---         end;
+      declare
+         Taxonomy : constant String := -Term_3.Taxonomy;
 
---         if ( "category" === taxonomy ) then
---                 --
---                 -- Filters the category feed link.
---                 --
---                 -- @since 1.5.1
---                 --
---                 -- @param string link The category feed link.
---                 -- @param string feed Feed type. Possible values include "rss2", "atom".
---                 --
---                 link = apply_filters( "category_feed_link", link, feed );
---         end; elseif ( "post_tag" === taxonomy ) then
---                 --
---                 -- Filters the post tag feed link.
---                 --
---                 -- @since 2.3.0
---                 --
---                 -- @param string link The tag feed link.
---                 -- @param string feed Feed type. Possible values include "rss2", "atom".
---                 --
---                 link = apply_filters( "tag_feed_link", link, feed );
---         end; else then
---                 --
---                 -- Filters the feed link for a taxonomy other than "category" or "post_tag".
---                 --
---                 -- @since 3.0.0
---                 --
---                 -- @param string link     The taxonomy feed link.
---                 -- @param string feed     Feed type. Possible values include "rss2", "atom".
---                 -- @param string taxonomy The taxonomy name.
---                 --
---                 link = apply_filters( "taxonomy_feed_link", link, feed, taxonomy );
---         end;
+         Feed_2 : constant String :=
+           (if Empty (Feed) then Get_Default_Feed else Feed);
 
---         return link;
--- end;
+         Permalink_Structure : constant Boolean :=
+           Get_Option ("permalink_structure");
 
--- --
--- -- Retrieves the permalink for a tag feed.
--- --
--- -- @since 2.3.0
--- --
--- -- @param int|WP_Term|object tag  The ID or term object whose feed link will be retrieved.
--- -- @param string             feed Optional. Feed type. Possible values include "rss2", "atom".
--- --                                 Default is the value of get_default_feed().
--- -- @return string                  The feed permalink for the given tag.
--- --
--- function get_tag_feed_link( tag, feed = "" ) then
---         return get_term_feed_link( tag, "post_tag", feed );
--- end;
+         Link      : UString;
+         Feed_Link : UString;
+      begin
+         if not Permalink_Structure then
+            if "category" = Taxonomy then
+               Link := +Home_URL ("?feed=" & Feed_2 & "&amp;cat=" &
+                                  Helpers.Image (Term_3.Term_Id));
+            elsif "post_tag" = Taxonomy then
+               Link := +Home_URL ("?feed=" & Feed_2 & "&amp;tag=" & (-Term_3.Slug));
+            else
+               declare
+                  T : constant Wp_Taxonomy := Get_Taxonomy (Taxonomy);
+               begin
+                  Link := +Home_URL ("?feed=" & Feed_2 & "&amp;" &
+                                     (-T.Query_Var) & "=" & (-Term_3.Slug));
+               end;
+            end if;
+         else
+            Link := +Get_Term_Link (Term_3, -Term_3.Taxonomy);
+            if Get_Default_Feed = Feed_2 then
+               Feed_Link := +"feed";
+            else
+               Feed_Link := +"feed/feed";
+            end if;
+
+            Link :=
+              +Trailing_Slash_It (-Link) &
+              User_Trailing_Slash_It (-Feed_Link, "feed");
+         end if;
+
+         if "category" = Taxonomy then
+            --
+            -- Filters the category feed link.
+            --
+            -- @since 1.5.1
+            --
+            -- @param string link The category feed link.
+            -- @param string feed Feed type. Possible values include "rss2", "atom".
+            --
+            Link := +Apply_Filters ("category_feed_link", -Link, Feed_2);
+
+         elsif "post_tag" = Taxonomy then
+            --
+            -- Filters the post tag feed link.
+            --
+            -- @since 2.3.0
+            --
+            -- @param string link The tag feed link.
+            -- @param string feed Feed type. Possible values include "rss2", "atom".
+            --
+            Link := +Apply_Filters ("tag_feed_link", -Link, Feed_2);
+
+         else
+            --
+            -- Filters the feed link for a taxonomy other than "category" or
+            -- "post_tag".
+            --
+            -- @since 3.0.0
+            --
+            -- @param string link     The taxonomy feed link.
+            -- @param string feed     Feed type. Possible values include "rss2",
+            --                        "atom".
+            -- @param string taxonomy The taxonomy name.
+            --
+            Link := +Apply_Filters ("taxonomy_feed_link", -Link, Feed_2, Taxonomy);
+         end if;
+
+         return -Link;
+      end;
+   end Get_Term_Feed_Link;
+
+   -----------------------
+   -- Get_Tag_Feed_Link --
+   -----------------------
+
+   function Get_Tag_Feed_Link (Tag  : Integer;
+                               Feed : String := "")
+                               return String
+   is
+   begin
+      return Get_Term_Feed_Link (Tag, "post_tag", Feed);
+   end Get_Tag_Feed_Link;
 
 -- --
 -- -- Retrieves the edit link for a tag.
@@ -1377,87 +1415,93 @@ is
 --         end;
 -- end;
 
--- --
--- -- Retrieves the permalink for a search.
--- --
--- -- @since 3.0.0
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param string query Optional. The query string to use. If empty the current query is used. Default empty.
--- -- @return string The search permalink.
--- --
--- function get_search_link( query = "" ) then
---         global wp_rewrite;
+   ---------------------
+   -- Get_Search_Link --
+   ---------------------
 
---         if ( empty( query ) ) then
---                 search = get_search_query( false );
---         end; else then
---                 search = stripslashes( query );
---         end;
+   function Get_Search_Link (Query : String := "")
+                             return String
+   is
+      use Php.HTML;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Inc_General_Templates;
+--    global wp_rewrite;
 
---         permastruct = wp_rewrite->get_search_permastruct();
+      Search : UString :=
+        (if Empty (Query)
+         then +Get_Search_Query (False)
+         else +Strip_Slashes (Query));
 
---         if ( empty( permastruct ) ) then
---                 link = home_url( "?s=" . urlencode( search ) );
---         end; else then
---                 search = urlencode( search );
---                 search = str_replace( "%2F", "/", search ); // %2F(/) is not valid within a URL, send it un-encoded.
---                 link   = str_replace( "%search%", search, permastruct );
---                 link   = home_url( user_trailingslashit( link, "search" ) );
---         end;
+      Permastruct : constant String :=
+        Global_Wp_Rewrite.Get_Search_Permastruct;
 
---         --
---         -- Filters the search permalink.
---         --
---         -- @since 3.0.0
---         --
---         -- @param string link   Search permalink.
---         -- @param string search The URL-encoded search term.
---         --
---         return apply_filters( "search_link", link, search );
--- end;
+      Link : UString;
+   begin
+      if Empty (Permastruct) then
+         Link := +Home_URL ("?s=" & URL_Encode (-Search));
+      else
+         Search := +URL_Encode (-Search);
+         Search := +Str_Replace ("%2F", "/", -Search);
+         -- %2F(/) is not valid within a URL, send it un-encoded.
+         Link   := +Str_Replace ("%search%", -Search, Permastruct);
+         Link   := +Home_URL (User_Trailing_Slash_It (-Link, "search"));
+      end if;
 
--- --
--- -- Retrieves the permalink for the search results feed.
--- --
--- -- @since 2.5.0
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param string search_query Optional. Search query. Default empty.
--- -- @param string feed         Optional. Feed type. Possible values include "rss2", "atom".
--- --                             Default is the value of get_default_feed().
--- -- @return string The search results feed permalink.
--- --
--- function get_search_feed_link( search_query = "", feed = "" ) then
---         global wp_rewrite;
---         link = get_search_link( search_query );
+      --
+      -- Filters the search permalink.
+      --
+      -- @since 3.0.0
+      --
+      -- @param string link   Search permalink.
+      -- @param string search The URL-encoded search term.
+      --
+      return Apply_Filters ("search_link", -Link, -Search);
+   end Get_Search_Link;
 
---         if ( empty( feed ) ) then
---                 feed = get_default_feed();
---         end;
+   --------------------------
+   -- Get_Search_Feed_Link --
+   --------------------------
 
---         permastruct = wp_rewrite->get_search_permastruct();
+   function Get_Search_Feed_Link (Search_Query : String := "";
+                                  Feed         : String := "")
+                                  return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Functions;
 
---         if ( empty( permastruct ) ) then
---                 link = add_query_arg( "feed", feed, link );
---         end; else then
---                 link  = trailingslashit( link );
---                 link .= "feed/feed/";
---         end;
+--    global wp_rewrite;
+      Link : UString := +Get_Search_Link (Search_Query);
 
---         --
---         -- Filters the search feed link.
---         --
---         -- @since 2.5.0
---         --
---         -- @param string link Search feed link.
---         -- @param string feed Feed type. Possible values include "rss2", "atom".
---         -- @param string type The search type. One of "posts" or "comments".
---         --
---         return apply_filters( "search_feed_link", link, feed, "posts" );
--- end;
+      Feed_2 : constant String :=
+        (if Empty (Feed) then Get_Default_Feed else Feed);
+
+      Permastruct : constant String :=
+        Global_Wp_Rewrite.Get_Search_Permastruct;
+   begin
+      if Empty (Permastruct) then
+         Link := +Add_Query_Arg ("feed", Feed_2, -Link);
+      else
+         Link := +Trailing_Slash_It (-Link);
+         Append (Link, "feed/feed/");
+      end if;
+
+      --
+      -- Filters the search feed link.
+      --
+      -- @since 2.5.0
+      --
+      -- @param string link Search feed link.
+      -- @param string feed Feed type. Possible values include "rss2", "atom".
+      -- @param string type The search type. One of "posts" or "comments".
+      --
+      return Apply_Filters ("search_feed_link", -Link, Feed_2, "posts");
+   end Get_Search_Feed_Link;
 
 -- --
 -- -- Retrieves the permalink for the search results comments feed.
@@ -1567,49 +1611,63 @@ is
       return Apply_Filters ("post_type_archive_link", -Link, Post_Type);
    end Get_Post_Type_Archive_Link;
 
--- --
--- -- Retrieves the permalink for a post type archive feed.
--- --
--- -- @since 3.1.0
--- --
--- -- @param string post_type Post type.
--- -- @param string feed      Optional. Feed type. Possible values include "rss2", "atom".
--- --                          Default is the value of get_default_feed().
--- -- @return string|false The post type feed permalink. False if the post type
--- --                      does not exist or does not have an archive.
--- --
--- function get_post_type_archive_feed_link( post_type, feed = "" ) then
---         default_feed = get_default_feed();
---         if ( empty( feed ) ) then
---                 feed = default_feed;
---         end;
+   -------------------------------------
+   -- Get_Post_Type_Archive_Feed_Link --
+   -------------------------------------
 
---         link = get_post_type_archive_link( post_type );
---         if ( ! link ) then
---                 return false;
---         end;
+   function Get_Post_Type_Archive_Feed_Link (Post_Type : String;
+                                             Feed      : String := "")
+                                             return String
+   is
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Post_Type;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Options;
+      use Inc_Posts;
 
---         post_type_obj = get_post_type_object( post_type );
---         if ( get_option( "permalink_structure" ) && is_array( post_type_obj->rewrite ) && post_type_obj->rewrite["feeds"] ) then
---                 link  = trailingslashit( link );
---                 link .= "feed/";
---                 if ( feed != default_feed ) then
---                         link .= "feed/";
---                 end;
---         end; else then
---                 link = add_query_arg( "feed", feed, link );
---         end;
+      Default_Feed : constant String := Get_Default_Feed;
 
---         --
---         -- Filters the post type archive feed link.
---         --
---         -- @since 3.1.0
---         --
---         -- @param string link The post type archive feed link.
---         -- @param string feed Feed type. Possible values include "rss2", "atom".
---         --
---         return apply_filters( "post_type_archive_feed_link", link, feed );
--- end;
+      Feed_2 : String :=
+        (if Empty (Feed) then Default_Feed else Feed);
+
+      Link : UString := +Get_Post_Type_Archive_Link (Post_Type);
+   begin
+      if Link = "" then
+         return ""; -- false;
+      end if;
+
+      declare
+         Post_Type_Obj : constant Wp_Post_Type := Get_Post_Type_Object (Post_Type);
+      begin
+         if
+           Get_Option ("permalink_structure") and then
+--         Is_Array (Post_Type_Obj.Rewrite)   and then
+           "" /= Get_As_String (Post_Type_Obj.Rewrite, "feeds")
+         then
+            Link := +Trailing_Slash_It (-Link);
+            Append (Link, "feed/");
+            if Feed_2 /= Default_Feed then
+               Append (Link, "feed/");
+            end if;
+         else
+            Link := +Add_Query_Arg ("feed", Feed_2, -Link);
+         end if;
+      end;
+
+      --
+      -- Filters the post type archive feed link.
+      --
+      -- @since 3.1.0
+      --
+      -- @param string link The post type archive feed link.
+      -- @param string feed Feed type. Possible values include "rss2", "atom".
+      --
+      return Apply_Filters ("post_type_archive_feed_link", -Link, Feed_2);
+   end Get_Post_Type_Archive_Feed_Link;
 
    ---------------------------
    -- Get_Preview_Post_Link --

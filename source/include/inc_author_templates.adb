@@ -9,9 +9,20 @@
 -- @subpackage Template
 --
 
+with Php.Lists;
+
+with Lists;
+with UStrings;
+with Wp_Common;
+
+with Class_Users;
+with Inc_Pluggables;
+
 package body Inc_Author_Templates
 is
-   procedure Dummy is null;
+   use Lists;
+
+   Authordata : Class_Users.Wp_User;
 
 -- --
 -- -- Retrieves the author of the current post.
@@ -120,77 +131,62 @@ is
 --         echo get_the_modified_author();
 -- end;
 
--- --
--- -- Retrieves the requested data of the author of the current post.
--- --
--- -- Valid values for the `field` parameter include:
--- --
--- -- - admin_color
--- -- - aim
--- -- - comment_shortcuts
--- -- - description
--- -- - display_name
--- -- - first_name
--- -- - ID
--- -- - jabber
--- -- - last_name
--- -- - nickname
--- -- - plugins_last_view
--- -- - plugins_per_page
--- -- - rich_editing
--- -- - syntax_highlighting
--- -- - user_activation_key
--- -- - user_description
--- -- - user_email
--- -- - user_firstname
--- -- - user_lastname
--- -- - user_level
--- -- - user_login
--- -- - user_nicename
--- -- - user_pass
--- -- - user_registered
--- -- - user_status
--- -- - user_url
--- -- - yim
--- --
--- -- @since 2.8.0
--- --
--- -- @global WP_User authordata The current author"s data.
--- --
--- -- @param string    field   Optional. The user field to retrieve. Default empty.
--- -- @param int|false user_id Optional. User ID.
--- -- @return string The author"s field from the current author"s DB object, otherwise an empty string.
--- --
--- function get_the_author_meta( field = "", user_id = false ) then
---         original_user_id = user_id;
+   -------------------------
+   -- Get_The_Author_Meta --
+   -------------------------
 
---         if ( ! user_id ) then
---                 global authordata;
---                 user_id = isset( authordata.ID ) ? authordata.ID : 0;
---         end; else then
---                 authordata = get_userdata( user_id );
---         end;
+   function Get_The_Author_Meta (Field   : String  := "";
+                                 User_Id : Integer := 0) -- false
+                                 return String
+   is
+      use Php.Lists;
+      use UStrings;
+      use Wp_Common;
+      use Class_Users;
+      use Inc_Pluggables;
 
---         if ( in_array( field, array( "login", "pass", "nicename", "email", "url", "registered", "activation_key", "status" ), true ) ) then
---                 field = "user_" . field;
---         end;
+      Original_User_Id : constant Integer := User_Id;
+      User_Id_2 : User_Id_Type := User_Id_Type (User_Id);
+      Field_2   : UString      := +Field;
 
---         value = isset( authordata.field ) ? authordata.field : "";
+      List : constant List_Type :=
+        ["login", "pass", "nicename", "email", "url", "registered",
+         "activation_key", "status"];
+   begin
+      if User_Id = 0 then
+--       global authordata;
+         User_Id_2 := (if Authordata.Id /= 0 -- Isset (Authordata.Id)
+                       then Authordata.Id else 0);
+      else
+         Authordata := Get_Userdata (User_Id_2);
+      end if;
 
---         --
---         -- Filters the value of the requested user metadata.
---         --
---         -- The filter name is dynamic and depends on the field parameter of the function.
---         --
---         -- @since 2.8.0
---         -- @since 4.3.0 The `original_user_id` parameter was added.
---         --
---         -- @param string    value            The value of the metadata.
---         -- @param int       user_id          The user ID for the value.
---         -- @param int|false original_user_id The original user ID, as passed to the function.
---         --
---         return apply_filters( "get_the_author_thenfieldend;", value, user_id, original_user_id );
--- end;
+      if In_List (Field, List, True) then
+         Field_2 := "user_" & Field_2;
+      end if;
+
+      declare
+         Value : constant String := "XXX-933";
+--         (if Isset (Authordata.Field) then Authordata.Field else "");
+      begin
+         --
+         -- Filters the value of the requested user metadata.
+         --
+         -- The filter name is dynamic and depends on the field parameter of the
+         -- function.
+         --
+         -- @since 2.8.0
+         -- @since 4.3.0 The `original_user_id` parameter was added.
+         --
+         -- @param string    value            The value of the metadata.
+         -- @param int       user_id          The user ID for the value.
+         -- @param int|false original_user_id The original user ID, as passed to
+         --                                   the function.
+         --
+         return Apply_Filters ("get_the_author_" & (-Field_2), Value,
+                               Integer (User_Id_2), Original_User_Id);
+      end;
+   end Get_The_Author_Meta;
 
 -- --
 -- -- Outputs the field from the user"s DB object. Defaults to current post"s author.

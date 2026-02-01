@@ -419,7 +419,7 @@ is
       Add_Action ("wp_head", Inc_General_Templates.Wp_Resource_Hints'Access, 2);
       Add_Action ("wp_head", Inc_General_Templates.Wp_Preload_Resources'Access, 1);
       Add_Action ("wp_head", Inc_General_Templates.Feed_Links'Access, 2);
---    Add_Action ("wp_head", Feed_Links_Extra'Access, 3);
+      Add_Action ("wp_head", Inc_General_Templates.Feed_Links_Extra'Access, 3);
 --    Add_Action ("wp_head", Rsd_Link'Access);
 --    Add_Action ("wp_head", Wlwmanifest_Link'Access);
       Add_Action ("wp_head",
