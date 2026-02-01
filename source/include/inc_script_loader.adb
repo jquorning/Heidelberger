@@ -2747,6 +2747,17 @@ is
       return Wp_Styles.Done;
    end Print_Admin_Styles;
 
+   ------------------------
+   -- Print_Admin_Styles --
+   ------------------------
+
+   procedure Print_Admin_Styles
+   is
+      Unused : constant List_Type := Print_Admin_Styles;
+   begin
+      null;
+   end Print_Admin_Styles;
+
    -----------------------
    -- Print_Late_Styles --
    -----------------------
@@ -2852,6 +2863,9 @@ is
    procedure Script_Concat_Settings
    is
       use Php.Ini;
+      use Inc_Load;
+      use Inc_Options;
+      use Inc_Plugins;
 --    global concatenate_scripts, compress_scripts, compress_css;
 
       Compressed_Output : constant Boolean :=
@@ -2859,8 +2873,8 @@ is
         "ob_gzhandler" = Ini_Get ("output_handler");
 
       Can_Compress_Scripts : constant Boolean :=
-        not Inc_Load.Wp_Installing and then
-        As_Boolean (Inc_Options.Get_Site_Option ("can_compress_scripts"));
+        not Wp_Installing and then
+        "" /= As_String (Get_Site_Option ("can_compress_scripts"));
 
    begin
       if not Concatenate_Scripts then
@@ -2868,8 +2882,8 @@ is
 --       Concatenate_Scripts :=
 --         defined( "CONCATENATE_SCRIPTS" ) ? CONCATENATE_SCRIPTS : true;
          if
-           (not Inc_Load.Is_Admin and then
-            not Inc_Plugins.Did_Action ("login_init")) or else
+           (not Is_Admin and then
+            not Did_Action ("login_init")) or else
            Constants.SCRIPT_DEBUG
          then
             Concatenate_Scripts := False;

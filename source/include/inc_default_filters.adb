@@ -416,7 +416,7 @@ is
       -- Actions.
       Add_Action ("wp_head", Inc_General_Templates.X_Wp_Render_Title_Tag'Access, 1);
       Add_Action ("wp_head", Inc_Script_Loader.Wp_Enqueue_Scripts'Access, 1);
---    Add_Action ("wp_head", Wp_Resource_Hints'Access, 2);
+      Add_Action ("wp_head", Inc_General_Templates.Wp_Resource_Hints'Access, 2);
 --    Add_Action ("wp_head", Wp_Preload_Resources'Access, 1);
 --    Add_Action ("wp_head", Feed_Links'Access, 2);
 --    Add_Action ("wp_head", Feed_Links_Extra'Access, 3);
@@ -458,9 +458,11 @@ is
 
       -- Login actions.
       Add_Action ("login_head", Inc_Robots_Templates.Wp_Robots'Access, 1);
---    Add_Filter ("login_head", "wp_resource_hints", 8);
---    Add_Action ("login_head", Wp_Print_Head_Scripts'Access, 9);
---    Add_Action ("login_head", Inc_Script_Loader.Print_Admin_Styles'Access, 9);
+      Add_Filter ("login_head", Inc_General_Templates.Wp_Resource_Hints'Access, 8);
+      Add_Action ("login_head",
+                  Inc_Script_Loader.Wp_Print_Head_Scripts'Access, 9);
+      Add_Action ("login_head",
+                  Inc_Script_Loader.Print_Admin_Styles'Access, 9);
 --    Add_Action ("login_head", Wp_Site_Icon'Access, 99);
 --    Add_Action ("login_footer", Wp_Print_Footer_Scripts'Access, 20);
 --    Add_Action ("login_init", Send_Frame_Options_Header'Access, 10, 0);
@@ -706,7 +708,8 @@ is
 --                Wp_Enqueue_Global_Styles_Css_Custom_Properties'Access);
 --    Add_Filter ("wp_print_scripts", "wp_just_in_time_script_localization");
 --    Add_Filter ("print_scripts_array", "wp_prototype_before_jquery");
---    Add_Filter ("customize_controls_print_styles", "wp_resource_hints", 1);
+      Add_Filter ("customize_controls_print_styles",
+                  Inc_General_Templates.Wp_Resource_Hints'Access, 1);
 --    Add_Action ("admin_head", Wp_Check_Widget_Editor_Deps'Access);
 --    Add_Filter ("block_editor_settings_all", "wp_add_editor_classic_theme_styles");
 

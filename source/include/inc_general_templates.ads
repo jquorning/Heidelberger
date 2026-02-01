@@ -8,12 +8,14 @@
 with Php.Calendar;
 
 with Arrays;
+with Lists;
 
 with Class_Posts;
 
 package Inc_General_Templates
 is
    use Arrays;
+   use Lists;
 
    Post_Not_Found  : exception;
    Some_Time_Error : exception;
@@ -486,6 +488,30 @@ is
    -- @since 5.7.0
    --
    procedure Wp_Strict_Cross_Origin_Referrer;
+
+   --
+   -- Prints resource hints to browsers for pre-fetching, pre-rendering
+   -- and pre-connecting to web sites.
+   --
+   -- Gives hints to browsers to prefetch specific pages or render them
+   -- in the background, to perform DNS lookups or to begin the connection
+   -- handshake (DNS, TCP, TLS) in the background.
+   --
+   -- These performance improving indicators work by using `<link rel"…">`.
+   --
+   -- @since 4.6.0
+   --
+   procedure Wp_Resource_Hints;
+
+   --
+   -- Retrieves a list of unique hosts of all enqueued scripts and styles.
+   --
+   -- @since 4.6.0
+   --
+   -- @return string[] A list of unique hosts of enqueued scripts and styles.
+   --
+   function Wp_Dependencies_Unique_Hosts
+            return List_Type;
 
    --
    -- Retrieves post published or modified time as a `DateTimeImmutable` object

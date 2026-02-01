@@ -7,7 +7,9 @@
 --
 
 with Adi_Misc;
+with Inc_General_Templates;
 with Inc_Plugins;
+with Inc_Themes;
 
 package body Adi_Admin_Filters
 is
@@ -66,10 +68,11 @@ is
                   Adi_Misc.Wp_Admin_Viewport_Meta'Access);
 -- add_filter( "nav_menu_meta_box_object", "_wp_nav_menu_meta_box_object" );
 
--- -- Prerendering.
--- if ( ! is_customize_preview() ) {
---         add_filter( "admin_print_styles", "wp_resource_hints", 1 );
--- }
+      -- Prerendering.
+      if not Inc_Themes.Is_Customize_Preview then
+         Add_Filter ("admin_print_styles",
+                     Inc_General_Templates.Wp_Resource_Hints'Access, 1);
+      end if;
 
 -- add_action( "admin_print_scripts", "print_emoji_detection_script" );
 -- add_action( "admin_print_scripts", "print_head_scripts", 20 );

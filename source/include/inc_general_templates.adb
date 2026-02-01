@@ -10,23 +10,29 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Php.Arrays;
 with Php.Echoing;
 with Php.HTML;
+with Php.Lists;
 with Php.Preg;
 with Php.Strings;
+with Php.Types;
 
+with Binder;
 with Globals;
 with Helpers;
 with UStrings;
-with Lists;
 with Wp_Common;
 
-with Class_Terms;
-with Class_Users;
+with Class_Dependencies;
+with Class_Dependency;
 with Class_Post_Type;
 with Class_Sites;
+with Class_Scripts;
 with Class_Styles;
+with Class_Terms;
+with Class_Users;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
+with Inc_HTTP;
 with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
@@ -41,7 +47,6 @@ with Inc_Versions;
 
 package body Inc_General_Templates
 is
-   use Lists;
 
 -- --
 -- -- Loads header template.
@@ -444,7 +449,6 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
-      use Inc_Plugins;
 
       Args : Array_Type;
    begin
@@ -484,7 +488,6 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
-      use Inc_Plugins;
 
       Login_URL : UString := +Site_URL ("wp-login.php", "login");
    begin
@@ -520,7 +523,6 @@ is
    is
       use Wp_Common;
       use Inc_Link_Templates;
-      use Inc_Plugins;
    begin
       --
       -- Filters the user registration URL.
@@ -701,7 +703,6 @@ is
       use Inc_Link_Templates;
       use Inc_Load;
       use Inc_Ms_Blogs;
-      use Inc_Plugins;
 
       Args : Array_Type := To_Array (List => (1 =>
         Build ("action", "lostpassword")
@@ -1225,7 +1226,6 @@ is
       use Class_Terms;
 --    use Class_Querys;
       use Inc_L10n;
-      use Inc_Plugins;
       use Inc_Querys;
 
       Page  : Natural renames Globals.Global_Page;
@@ -1606,7 +1606,6 @@ is
    is
       use Php.Echoing;
       use Wp_Common;
-      use Inc_Plugins;
       use Inc_Posts;
       use Inc_Querys;
    begin
@@ -1689,7 +1688,6 @@ is
       use UStrings;
       use Wp_Common;
       use Class_Terms;
-      use Inc_Plugins;
       use Inc_Querys;
 
       Term      : constant Class_Terms.Wp_Term := Get_Queried_Object;
@@ -2854,7 +2852,6 @@ is
       use Wp_Common;
       use Class_Posts;
       use Inc_Functions;
-      use Inc_Plugins;
       use Inc_Posts;
 
       Post_2 : constant Wp_Post := Get_Post (Post);
@@ -3608,124 +3605,170 @@ is
 --         end;
 -- end;
 
--- --
--- -- Prints resource hints to browsers for pre-fetching, pre-rendering
--- -- and pre-connecting to web sites.
--- --
--- -- Gives hints to browsers to prefetch specific pages or render them
--- -- in the background, to perform DNS lookups or to begin the connection
--- -- handshake (DNS, TCP, TLS) in the background.
--- --
--- -- These performance improving indicators work by using `<link rel"…">`.
--- --
--- -- @since 4.6.0
--- --
--- function wp_resource_hints() then
---         hints = array(
---                 "dns-prefetch" => wp_dependencies_unique_hosts(),
---                 "preconnect"   => array(),
---                 "prefetch"     => array(),
---                 "prerender"    => array(),
---         );
+   -----------------------
+   -- Wp_Resource_Hints --
+   -----------------------
 
---         foreach ( hints as relation_type => urls ) then
---                 unique_urls = array();
+   procedure Wp_Resource_Hints
+   is
+      use Php.Echoing;
+      use Php.Lists;
+      use Php.Strings;
+      use Php.Types;
+      use UStrings;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_HTTP;
 
---                 --
---                 -- Filters domains and URLs for resource hints of relation type.
---                 --
---                 -- @since 4.6.0
---                 -- @since 4.7.0 The `urls` parameter accepts arrays of specific HTML attributes
---                 --              as its child elements.
---                 --
---                 -- @param array  urls then
---                 --     Array of resources and their attributes, or URLs to print for resource hints.
---                 --
---                 --     @type array|string ...0 then
---                 --         Array of resource attributes, or a URL string.
---                 --
---                 --         @type string href        URL to include in resource hints. Required.
---                 --         @type string as          How the browser should treat the resource
---                 --                                   (`script`, `style`, `image`, `document`, etc).
---                 --         @type string crossorigin Indicates the CORS policy of the specified resource.
---                 --         @type float  pr          Expected probability that the resource hint will be used.
---                 --         @type string type        Type of the resource (`text/html`, `text/css`, etc).
---                 --     end;
---                 -- end;
---                 -- @param string relation_type The relation type the URLs are printed for,
---                 --                              e.g. "preconnect" or "prerender".
---                 --
---                 urls = apply_filters( "wp_resource_hints", urls, relation_type );
+      Hints : constant Array_Type :=
+        To_Array (List => (
+          Build ("dns-prefetch", Wp_Dependencies_Unique_Hosts),
+          Build ("preconnect",   Empty_List),
+          Build ("prefetch",     Empty_List),
+          Build ("prerender",    Empty_List)
+        ));
+   begin
+      for A in Hints.Iterate loop
+         declare
+            Relation_Type : constant String    := Key (A);
+            URLs_2        : constant List_Type := As_List (Element (A));
 
---                 foreach ( urls as key => url ) then
---                         atts = array();
+            Unique_URLs : Array_Type;
 
---                         if ( is_array( url ) ) then
---                                 if ( isset( url["href"] ) ) then
---                                         atts = url;
---                                         url  = url["href"];
---                                 end; else then
---                                         continue;
---                                 end;
---                         end;
+            --
+            -- Filters domains and URLs for resource hints of relation type.
+            --
+            -- @since 4.6.0
+            -- @since 4.7.0 The `urls` parameter accepts arrays of specific HTML
+            --              attributes as its child elements.
+            --
+            -- @param array  urls {
+            --     Array of resources and their attributes, or URLs to print for
+            --     resource hints.
+            --
+            --     @type array|string ...0 {
+            --         Array of resource attributes, or a URL string.
+            --
+            --         @type string href        URL to include in resource hints.
+            --                                  Required.
+            --         @type string as          How the browser should treat the
+            --                                  resource (`script`, `style`, `image`,
+            --                                  `document`, etc).
+            --         @type string crossorigin Indicates the CORS policy of the
+            --                                  specified resource.
+            --         @type float  pr          Expected probability that the resource
+            --                                  hint will be used.
+            --         @type string type        Type of the resource (`text/html`,
+            --                                  `text/css`, etc).
+            --     }
+            -- }
+            -- @param string relation_type The relation type the URLs are printed for,
+            --                              e.g. "preconnect" or "prerender".
+            --
+            URLs : List_Type :=
+              Apply_Filters ("wp_resource_hints", URLs_2, Relation_Type);
+         begin
+            for URL of URLs loop
+               declare
+--                  Key : String     := Arrays.Key (B);
+--                  URL : Multi_Type := Arrays.Element (B);
 
---                         url = esc_url( url, array( "http", "https" ) );
+                  Atts : Array_Type;
+               begin
+                  -- if Kind_Of (URL) = Kind_Array then
+                  --    if Isset (URL, "href") then
+                  --       Atts := URL;
+                  --       URL  := Get_As_String (URL, "href");
+                  --    else
+                  --       goto Continue;
+                  --    end if;
+                  -- end if;
 
---                         if ( ! url ) then
---                                 continue;
---                         end;
+                  URL := ESC_URL (URL, ["http", "https"]);
 
---                         if ( isset( unique_urls[ url ] ) ) then
---                                 continue;
---                         end;
+                  if URL = "" then
+                     goto Continue_1;
+                  end if;
 
---                         if ( in_array( relation_type, array( "preconnect", "dns-prefetch" ), true ) ) then
---                                 parsed = wp_parse_url( url );
+                  if Isset (Unique_URLs, URL) then
+                     goto Continue_1;
+                  end if;
 
---                                 if ( empty( parsed["host"] ) ) then
---                                         continue;
---                                 end;
+                  if In_List (Relation_Type, ["preconnect", "dns-prefetch"], True) then
+                     declare
+                        Parsed : constant Array_Type := Wp_Parse_URL (URL);
+                     begin
+                        if Empty (Parsed, "host") then
+                           goto Continue_1;
+                        end if;
 
---                                 if ( "preconnect" === relation_type && ! empty( parsed["scheme"] ) ) then
---                                         url = parsed["scheme"] . "://" . parsed["host"];
---                                 end; else then
---                                         // Use protocol-relative URLs for dns-prefetch or if scheme is missing.
---                                         url = "//" . parsed["host"];
---                                 end;
---                         end;
+                        if
+                          "preconnect" = Relation_Type and then
+                          not Empty (Parsed, "scheme")
+                        then
+                           URL :=
+                             Get_As_String (Parsed, "scheme") & "://" &
+                             Get_As_String (Parsed, "host");
+                        else
+                           -- Use protocol-relative URLs for dns-prefetch or if
+                           -- scheme is missing.
+                           URL := "//" & Get_As_String (Parsed, "host");
+                        end if;
+                     end;
+                  end if;
 
---                         atts["rel"]  = relation_type;
---                         atts["href"] = url;
+                  Set (Atts, "rel",  From_String (Relation_Type));
+                  Set (Atts, "href", From_String (URL));
 
---                         unique_urls[ url ] = atts;
---                 end;
+                  Set (Unique_URLs, URL, From_Array (Atts));
+               end;
+               << Continue_1 >>
+            end loop;
 
---                 foreach ( unique_urls as atts ) then
---                         html = "";
+            for F in Unique_URLs.Iterate loop -- Atts of
+               declare
+                  Atts : constant Array_Type := As_Array (Element (F));
+                  HTML : UString;
+               begin
+                  for E in Atts.Iterate loop
+                     declare
+                        Attr  : constant String := Key (E);
+                        Value : constant String := As_String (Element (E));
 
---                         foreach ( atts as attr => value ) then
---                                 if ( ! is_scalar( value )
---                                         || ( ! in_array( attr, array( "as", "crossorigin", "href", "pr", "rel", "type" ), true ) && ! is_numeric( attr ) )
---                                 ) then
+                        List : constant List_Type :=
+                          ["as", "crossorigin", "href", "pr", "rel", "type"];
+                     begin
+                        if
+--                        not Is_Scalar (Value) or else
+                          not In_List (Attr, List, True) and then
+                          not Is_Numeric (Attr)
+                        then
+                           goto Continue_2;
+                        end if;
 
---                                         continue;
---                                 end;
+                        declare
+                           Value_2 : constant String :=
+                             (if "href" = Attr
+                              then ESC_URL (Value) else ESC_Attr (Value));
+                        begin
+                           if not Is_String (Attr) then
+                              Append (HTML, " " & Value_2);
+                           else
+                              Append (HTML, " attr=""" & Value_2 & """");
+                           end if;
+                        end;
+                     end;
+                     << Continue_2 >>
+                  end loop;
 
---                                 value = ( "href" === attr ) ? esc_url( value ) : esc_attr( value );
+                  HTML := +Trim (-HTML);
 
---                                 if ( ! is_string( attr ) ) then
---                                         html .= " value";
---                                 end; else then
---                                         html .= " attr="value"";
---                                 end;
---                         end;
-
---                         html = trim( html );
-
---                         echo "<link html />\n";
---                 end;
---         end;
--- end;
+                  Echo ("<link " & (-HTML) & " />" & NL);
+               end;
+            end loop;
+         end;
+      end loop;
+   end Wp_Resource_Hints;
 
 -- --
 -- -- Prints resource preloads directives to browsers.
@@ -3841,40 +3884,90 @@ is
 --         end;
 -- end;
 
--- --
--- -- Retrieves a list of unique hosts of all enqueued scripts and styles.
--- --
--- -- @since 4.6.0
--- --
--- -- @return string[] A list of unique hosts of enqueued scripts and styles.
--- --
--- function wp_dependencies_unique_hosts() then
---         global wp_scripts, wp_styles;
+   ----------------------------------
+   -- Wp_Dependencies_Unique_Hosts --
+   ----------------------------------
 
---         unique_hosts = array();
+   function Wp_Dependencies_Unique_Hosts
+            return List_Type
+   is
+      use Php.Lists;
+      use Binder;
+      use Globals;
+      use UStrings;
+      use Class_Dependencies;
+      use Class_Dependency;
+      use Class_Scripts;
+      use Class_Styles;
+      use Inc_HTTP;
+--    global wp_scripts, wp_styles;
 
---         foreach ( array( wp_scripts, wp_styles ) as dependencies ) then
---                 if ( dependencies instanceof WP_Dependencies && ! empty( dependencies->queue ) ) then
---                         foreach ( dependencies->queue as handle ) then
---                                 if ( ! isset( dependencies->registered[ handle ] ) ) then
---                                         continue;
---                                 end;
+      Unique_Hosts : List_Type;
 
---                                 /* @var _WP_Dependency dependency--
---                                 dependency = dependencies->registered[ handle ];
---                                 parsed     = wp_parse_url( dependency->src );
+      --
+      --
+      --
+      generic
+        type Dep_Type is new Wp_Dependencies with private;
+      procedure Generic_Do_Dep (Dependencies : Dep_Type);
 
---                                 if ( ! empty( parsed["host"] )
---                                         && ! in_array( parsed["host"], unique_hosts, true ) && parsed["host"] !== _SERVER["SERVER_NAME"]
---                                 ) then
---                                         unique_hosts[] = parsed["host"];
---                                 end;
---                         end;
---                 end;
---         end;
+      --------------------
+      -- Generic_Do_Dep --
+      --------------------
 
---         return unique_hosts;
--- end;
+      procedure Generic_Do_Dep (Dependencies : Dep_Type)
+      is
+      begin
+--         for Dependencies of Dep loop
+--       for ( array( wp_scripts, wp_styles ) as dependencies ) then
+            if
+--            Dependencies in Wp_Dependencies and then  -- instanceof
+              not Dependencies.Queue.Is_Empty
+            then
+               for Handle of Dependencies.Queue loop
+                  if
+                    not Dependency_Maps.Has_Element
+                      (Dependencies.Registered.Find (Handle))
+                  then
+--                if not Isset (Dependencies.Registered, Handle) then
+                     goto Continue;
+                  end if;
+
+                  declare
+                     -- @var _WP_Dependency dependency
+                     Dependency : constant X_Wp_Dependency :=
+                       Dependencies.Registered (Handle);
+
+                     Parsed : constant Array_Type :=
+                       Wp_Parse_URL (-Dependency.Src);
+                  begin
+                     if
+                       not Empty (Parsed, "host") and then
+                       not In_List (Get_As_String (Parsed, "host"),
+                                    Unique_Hosts, True) and then
+                       Get_As_String (Parsed, "host") /=
+                       Get_As_String (X_SERVER, "SERVER_NAME")
+                     then
+                        Append (Unique_Hosts, Get_As_String (Parsed, "host"));
+                     end if;
+                  end;
+                  << Continue >>
+               end loop;
+            end if;
+--         end loop;
+      end Generic_Do_Dep;
+
+      procedure Do_Scripts is new
+        Generic_Do_Dep (Dep_Type => Wp_Scripts);
+
+      procedure Do_Styles  is new
+        Generic_Do_Dep (Dep_Type => Wp_Styles);
+
+   begin
+      Do_Scripts (Global_Wp_Scripts);
+      Do_Styles  (Global_Wp_Styles);
+      return Unique_Hosts;
+   end Wp_Dependencies_Unique_Hosts;
 
 -- --
 -- -- Determines whether the user can access the visual editor.
@@ -4454,7 +4547,6 @@ is
    is
       use Wp_Common;
       use Inc_Formatting;
-      use Inc_Plugins;
       use Inc_Querys;
 
       --
@@ -4505,7 +4597,6 @@ is
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Options;
-      use Inc_Plugins;
 
       Attributes : List_Type;
       Lang : constant String := Get_Bloginfo ("language");
@@ -5051,7 +5142,6 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_Link_Templates;
-      use Inc_Plugins;
 
       X_File_1 : constant String := (if Globals.WP_INSTALLING
                                      then "./" & File & ".css"

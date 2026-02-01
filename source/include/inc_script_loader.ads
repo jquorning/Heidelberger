@@ -261,6 +261,8 @@ is
    function Print_Admin_Styles
             return List_Type;
 
+   procedure Print_Admin_Styles;
+
    --
    -- Prints the styles that were queued too late for the HTML head.
    --
