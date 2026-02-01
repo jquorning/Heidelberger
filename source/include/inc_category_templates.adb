@@ -12,6 +12,7 @@ with Php.Echoing;
 with Php.Strings;
 
 with Helpers;
+with Integer_Vectors;
 with Lists;
 with UStrings;
 with Wp_Common;
@@ -1393,6 +1394,7 @@ is
       declare
          use Term_Vectors;
          use Integer_Vectors;
+         use Integer_Vectors.Vectors;
 
          Terms : Wp_Term_Array
             := Get_Object_Term_Cache (Integer (Post_2.Id), Taxonomy);

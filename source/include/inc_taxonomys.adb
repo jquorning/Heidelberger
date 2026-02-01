@@ -2276,7 +2276,7 @@ is
 --
 -- function wp_get_object_terms (object_ids, taxonomies, args = array()) then
 
-   function Wp_Get_Object_Terms (Object_Ids : Integer_Array;
+   function Wp_Get_Object_Terms (Object_Ids : Integer_Vectors.Integer_Array;
                                  Taxonomies : Array_Type; -- String_Array;
                                  Args       : Array_Type := Empty_Array)
                                  return Class_Terms.Wp_Term_Array
@@ -2290,7 +2290,7 @@ is
 --    use Adi_Templates;
       use Class_Terms;
       use Inc_Formatting;
-      use Integer_Vectors;
+      use Integer_Vectors.Vectors;
 
       Object_Ids_3 : List_Type;
    begin

@@ -12,12 +12,6 @@ with UStrings;
 package Arrays
 is
 
-   package Integer_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Positive,
-                              Element_Type => Integer);
-   subtype Integer_Array is Integer_Vectors.Vector;
-   Empty_Integer_Array : constant Integer_Array := Integer_Vectors.Empty_Vector;
-
    subtype Key_Type   is UStrings.UString;
    subtype Value_Type is UStrings.UString;
 

@@ -9,6 +9,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
 with Arrays;
+with Integer_Vectors;
 with Lists;
 
 with Class_Terms;
@@ -692,7 +693,7 @@ is
                                  -- Class_Terms.Wp_Term_Array;
                                  is (Empty_Array);
 
-   function Wp_Get_Object_Terms (Object_Ids : Integer_Array;
+   function Wp_Get_Object_Terms (Object_Ids : Integer_Vectors.Integer_Array;
                                  Taxonomies : Array_Type; -- String_Array;
                                  Args       : Array_Type := Empty_Array)
                                  return Class_Terms.Wp_Term_Array;

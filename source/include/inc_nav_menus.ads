@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+with Integer_Vectors;
 with Lists;
 with UStrings;
 
@@ -129,8 +130,8 @@ is
 --               location name. If none are registered, an empty array.
 --
    function Get_Nav_Menu_Locations
-            return Integer_Array
-            is (Empty_Integer_Array);
+            return Integer_Vectors.Integer_Array
+            is (Integer_Vectors.Empty_Integer_Array);
 
 --
 -- Retrieves all menu items of a navigation menu.

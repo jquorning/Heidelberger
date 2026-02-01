@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+with Integer_Vectors;
 
 limited with Class_Customize_Managers;
 
@@ -41,7 +42,7 @@ is
          -- @var array
          --
          -- protected
-         Original_Nav_Menu_Locations : Integer_Array;
+         Original_Nav_Menu_Locations : Integer_Vectors.Integer_Array;
 
       end record;
 
