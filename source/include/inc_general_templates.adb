@@ -30,6 +30,7 @@ with Class_Scripts;
 with Class_Styles;
 with Class_Terms;
 with Class_Users;
+with Inc_Feeds;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Functions_Wp_Styles;
@@ -3243,61 +3244,97 @@ is
 --         do_action( "wp_body_open" );
 -- end;
 
--- --
--- -- Displays the links to the general feeds.
--- --
--- -- @since 2.8.0
--- --
--- -- @param array args Optional arguments.
--- --
--- function feed_links( args = array() ) then
---         if ( ! current_theme_supports( "automatic-feed-links" ) ) then
---                 return;
---         end;
+   ----------------
+   -- Feed_Links --
+   ----------------
 
---         defaults = array(
---                 /* translators: Separator between blog name and feed type in feed links.--
---                 "separator" => _x( "&raquo;", "feed link" ),
---                 /* translators: 1: Blog title, 2: Separator (raquo).--
---                 "feedtitle" => __( "%1s %2s Feed" ),
---                 /* translators: 1: Blog title, 2: Separator (raquo).--
---                 "comstitle" => __( "%1s %2s Comments Feed" ),
---         );
+   procedure Feed_Links (Args : Array_Type := Empty_Array)
+   is
+      use Php.Echoing;
+      use Php.Strings;
+      use Wp_Common;
+      use UStrings;
+      use Inc_Feeds;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
+      use Inc_L10n;
+      use Inc_Themes;
+   begin
+      if not Current_Theme_Supports ("automatic-feed-links") then
+         return;
+      end if;
 
---         args = wp_parse_args( args, defaults );
+      declare
+         Defaults : constant Array_Type := To_Array (List => (
+           -- translators: Separator between blog name and feed type in feed links.
+           Build ("separator", X_X ("&raquo;", "feed link")),
+           -- translators: 1: Blog title, 2: Separator (raquo).
+           Build ("feedtitle", abs "%1s %2s Feed"),
+           -- translators: 1: Blog title, 2: Separator (raquo).
+           Build ("comstitle", abs "%1s %2s Comments Feed")
+         ));
 
---         --
---         -- Filters whether to display the posts feed link.
---         --
---         -- @since 4.4.0
---         --
---         -- @param bool show Whether to display the posts feed link. Default true.
---         --
---         if ( apply_filters( "feed_links_show_posts_feed", true ) ) then
---                 printf(
---                         "<link rel="alternate" type="%s" title="%s" href="%s" />" . "\n",
---                         feed_content_type(),
---                         esc_attr( sprintf( args["feedtitle"], get_bloginfo( "name" ), args["separator"] ) ),
---                         esc_url( get_feed_link() )
---                 );
---         end;
+         Args_2 : constant Array_Type := Wp_Parse_Args (Args, Defaults);
+      begin
+         --
+         -- Filters whether to display the posts feed link.
+         --
+         -- @since 4.4.0
+         --
+         -- @param bool show Whether to display the posts feed link. Default true.
+         --
+         if Apply_Filters ("feed_links_show_posts_feed", True) then
+            Printf (
+              "<link rel=""alternate"" type=""%s"" title=""%s"" href=""%s"" />" & NL,
+              [
+                1 => Feed_Content_Type,
+                2 => ESC_Attr (
+                       Sprintf (Get_As_String (Args_2, "feedtitle"),
+                                [
+                                  1 => Get_Bloginfo ("name"),
+                                  2 => Get_As_String (Args_2, "separator")
+                                ]
+                     )),
+                3 => ESC_URL (Get_Feed_Link)
+              ]
+            );
+         end if;
 
---         --
---         -- Filters whether to display the comments feed link.
---         --
---         -- @since 4.4.0
---         --
---         -- @param bool show Whether to display the comments feed link. Default true.
---         --
---         if ( apply_filters( "feed_links_show_comments_feed", true ) ) then
---                 printf(
---                         "<link rel="alternate" type="%s" title="%s" href="%s" />" . "\n",
---                         feed_content_type(),
---                         esc_attr( sprintf( args["comstitle"], get_bloginfo( "name" ), args["separator"] ) ),
---                         esc_url( get_feed_link( "comments_" . get_default_feed() ) )
---                 );
---         end;
--- end;
+         --
+         -- Filters whether to display the comments feed link.
+         --
+         -- @since 4.4.0
+         --
+         -- @param bool show Whether to display the comments feed link. Default true.
+         --
+         if Apply_Filters ("feed_links_show_comments_feed", True) then
+            Printf (
+              "<link rel=""alternate"" type=""%s"" title=""%s"" href=""%s"" />" & NL,
+              [
+                1 => Feed_Content_Type,
+                2 => ESC_Attr (
+                       Sprintf (Get_As_String (Args_2, "comstitle"),
+                                [
+                                  1 => Get_Bloginfo ("name"),
+                                  2 => Get_As_String (Args_2, "separator")
+                                ])),
+                3 => ESC_URL (Get_Feed_Link ("comments_" & Get_Default_Feed))
+              ]
+            );
+         end if;
+      end;
+   end Feed_Links;
+
+   ----------------
+   -- Feed_Links --
+   ----------------
+
+   procedure Feed_Links
+   is
+   begin
+      Feed_Links (Empty_Array);
+   end Feed_Links;
 
 -- --
 -- -- Displays the links to the extra feeds such as category feeds.

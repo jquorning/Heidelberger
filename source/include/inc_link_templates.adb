@@ -33,6 +33,7 @@ with Class_Taxonomy;
 with Class_Terms;
 with Inc_Capabilities;
 with Inc_Category_Templates;
+with Inc_Feeds;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
@@ -856,58 +857,62 @@ is
 --         echo apply_filters( "the_feed_link", link, feed );
 -- end;
 
--- --
--- -- Retrieves the permalink for the feed type.
--- --
--- -- @since 1.5.0
--- --
--- -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
--- --
--- -- @param string feed Optional. Feed type. Possible values include "rss2", "atom".
--- --                     Default is the value of get_default_feed().
--- -- @return string The feed permalink.
--- --
--- function get_feed_link( feed = "" ) then
---         global wp_rewrite;
+   -------------------
+   -- Get_Feed_Link --
+   -------------------
 
---         permalink = wp_rewrite->get_feed_permastruct();
+   function Get_Feed_Link (Feed : String := "")
+                           return String
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+      use Class_Rewrites;
+      use Inc_Feeds;
 
---         if ( permalink ) then
---                 if ( false !== strpos( feed, "comments_" ) ) then
---                         feed      = str_replace( "comments_", "", feed );
---                         permalink = wp_rewrite->get_comment_feed_permastruct();
---                 end;
+--    global wp_rewrite;
+      Permalink : UString := +Global_Wp_Rewrite.Get_Feed_Permastruct;
+      Feed_2 : UString := +Feed;
+      Output : UString;
+   begin
+      if Permalink /= "" then
+         if 0 /= Strpos (Feed, "comments_") then
+            Feed_2    := +Str_Replace ("comments_", "", Feed);
+            Permalink := +Global_Wp_Rewrite.Get_Comment_Feed_Permastruct;
+         end if;
 
---                 if ( get_default_feed() == feed ) then
---                         feed = "";
---                 end;
+         if Get_Default_Feed = Feed_2 then
+            Feed_2 := Null_UString;
+         end if;
 
---                 permalink = str_replace( "%feed%", feed, permalink );
---                 permalink = preg_replace( "#/+#", "/", "/permalink" );
---                 output    = home_url( user_trailingslashit( permalink, "feed" ) );
---         end; else then
---                 if ( empty( feed ) ) then
---                         feed = get_default_feed();
---                 end;
+         Permalink := +Str_Replace ("%feed%", -Feed_2, -Permalink);
+         Permalink := +Preg_Replace ("#/+#", "/", "/" & (-Permalink));
+         Output    := +Home_URL (User_Trailing_Slash_It (-Permalink, "feed"));
 
---                 if ( false !== strpos( feed, "comments_" ) ) then
---                         feed = str_replace( "comments_", "comments-", feed );
---                 end;
+      else
+         if Empty (Feed) then
+            Feed_2 := +Get_Default_Feed;
+         end if;
 
---                 output = home_url( "?feed=thenfeedend;" );
---         end;
+         if 0 /= Strpos (-Feed_2, "comments_") then
+            Feed_2 := +Str_Replace ("comments_", "comments-", Feed);
+         end if;
 
---         --
---         -- Filters the feed type permalink.
---         --
---         -- @since 1.5.0
---         --
---         -- @param string output The feed permalink.
---         -- @param string feed   The feed type. Possible values include "rss2", "atom",
---         --                       or an empty string for the default feed type.
---         --
---         return apply_filters( "feed_link", output, feed );
--- end;
+         Output := +Home_URL ("?feed=" & (-Feed_2));
+      end if;
+
+      --
+      -- Filters the feed type permalink.
+      --
+      -- @since 1.5.0
+      --
+      -- @param string output The feed permalink.
+      -- @param string feed   The feed type. Possible values include "rss2", "atom",
+      --                       or an empty string for the default feed type.
+      --
+      return Apply_Filters ("feed_link", -Output, -Feed_2);
+   end Get_Feed_Link;
 
 -- --
 -- -- Retrieves the permalink for the post comments feed.

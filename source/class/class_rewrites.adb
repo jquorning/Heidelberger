@@ -92,4 +92,55 @@ is
       return -This.Page_Structure;
    end Get_Page_Permastruct;
 
+   --------------------------
+   -- Get_Feed_Permastruct --
+   --------------------------
+
+   function Get_Feed_Permastruct (This : in out Wp_Rewrite)
+                                  return String
+   is
+      use Php.Strings;
+      use UStrings;
+   begin
+      if This.Feed_Structure /= "" then
+--    if Isset (This.Feed_Structure) then
+         return -This.Feed_Structure;
+      end if;
+
+      if Empty (This.Permalink_Structure) then
+         This.Feed_Structure := Null_UString;
+         return ""; -- false;
+      end if;
+
+      This.Feed_Structure := This.Root & This.Feed_Base & "/%feed%";
+
+      return -This.Feed_Structure;
+   end Get_Feed_Permastruct;
+
+   ----------------------------------
+   -- Get_Comment_Feed_Permastruct --
+   ----------------------------------
+
+   function Get_Comment_Feed_Permastruct (This : in out Wp_Rewrite)
+                                          return String
+   is
+      use Php.Strings;
+      use UStrings;
+   begin
+      if This.Comment_Feed_Structure /= "" then
+--    if Isset (This.Comment_Feed_Structure) then
+         return -This.Comment_Feed_Structure;
+      end if;
+
+      if Empty (-This.Permalink_Structure) then
+         This.Comment_Feed_Structure := Null_UString;
+         return ""; -- False;
+      end if;
+
+      This.Comment_Feed_Structure :=
+        This.Root & This.Comments_Base & "/" & This.Feed_Base & "/%feed%";
+
+      return -This.Comment_Feed_Structure;
+   end Get_Comment_Feed_Permastruct;
+
 end Class_Rewrites;

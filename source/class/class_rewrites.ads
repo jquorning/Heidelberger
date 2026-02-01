@@ -102,7 +102,8 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public comments_base = "comments";
+         Comments_Base : UStrings.UString :=
+           UStrings.To_UString ("comments");
 
          --
          -- Pagination permalink base.
@@ -127,7 +128,8 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public feed_base = "feed";
+         Feed_Base : UStrings.UString :=
+           UStrings.To_UString ("feed");
 
          --
          -- Comments feed permalink structure.
@@ -135,7 +137,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public comment_feed_structure;
+         Comment_Feed_Structure : UStrings.UString;
 
          --
          -- Feed request permalink structure.
@@ -143,7 +145,7 @@ is
          -- @since 1.5.0
          -- @var string
          --
-         -- public feed_structure;
+         Feed_Structure : UStrings.UString;
 
          --
          -- The static portion of the post permalink structure.
@@ -727,44 +729,34 @@ is
 --                 return this.page_structure;
 --         end;
 
---         --
---         -- Retrieves the feed permalink structure.
---         --
---         -- The permalink structure is root property, feed base, and finally
---         -- "/%feed%". Will set the feed_structure property and then return it
---         -- without attempting to set the value again.
---         --
---         -- @since 1.5.0
---         --
---         -- @return string|false Feed permalink structure on success, false on failure.
---         --
---         public function get_feed_permastruct() then
---                 if ( isset( this.feed_structure ) ) then
---                         return this.feed_structure;
---                 end;
+   --
+   -- Retrieves the feed permalink structure.
+   --
+   -- The permalink structure is root property, feed base, and finally
+   -- "/%feed%". Will set the feed_structure property and then return it
+   -- without attempting to set the value again.
+   --
+   -- @since 1.5.0
+   --
+   -- @return string|false Feed permalink structure on success, false on failure.
+   --
+   function Get_Feed_Permastruct (This : in out Wp_Rewrite)
+                                  return String;
 
---                 if ( empty( this.permalink_structure ) ) then
---                         this.feed_structure = "";
---                         return false;
---                 end;
-
---                 this.feed_structure = this.root . this.feed_base . "/%feed%";
-
---                 return this.feed_structure;
---         end;
-
---         --
---         -- Retrieves the comment feed permalink structure.
---         --
---         -- The permalink structure is root property, comment base property, feed
---         -- base and finally "/%feed%". Will set the comment_feed_structure property
---         -- and then return it without attempting to set the value again.
---         --
---         -- @since 1.5.0
---         --
---         -- @return string|false Comment feed permalink structure on success, false on failure.
---         --
---         public function get_comment_feed_permastruct() then
+   --
+   -- Retrieves the comment feed permalink structure.
+   --
+   -- The permalink structure is root property, comment base property, feed
+   -- base and finally "/%feed%". Will set the comment_feed_structure property
+   -- and then return it without attempting to set the value again.
+   --
+   -- @since 1.5.0
+   --
+   -- @return string|false Comment feed permalink structure on success, false on
+   --                      failure.
+   --
+   function Get_Comment_Feed_Permastruct (This : in out Wp_Rewrite)
+                                          return String;
 --                 if ( isset( this.comment_feed_structure ) ) then
 --                         return this.comment_feed_structure;
 --                 end;
