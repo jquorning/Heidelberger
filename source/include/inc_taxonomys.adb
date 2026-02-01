@@ -14,6 +14,7 @@ with Php.Strings;
 with Php.Types;
 
 with Helpers;
+with Helpers_3;
 with UStrings;
 with Wp_Common;
 
@@ -541,7 +542,6 @@ is
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Options;
-      use Inc_Plugins;
 
 --         global wp_taxonomies;
       Args_2 : Array_Type;
@@ -699,7 +699,6 @@ is
       use Php.Arrays;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
    begin
 --    tax.labels = (array) tax.labels;
 
@@ -1564,7 +1563,6 @@ is
       use Php.Strings;
       use Wp_Common;
       use Inc_Functions;
-      use Inc_Plugins;
 
 --         global _wp_suspend_cache_invalidation;
       Defaults : Array_Type := To_Array (List => (
@@ -5072,7 +5070,7 @@ is
                                    Taxonomy    : String)
                                    return Boolean
    is
-      use Wp_Common;
+      use Helpers_3;
       use Taxonomy_Vectors;
 
       Taxonomies : constant Taxonomy_Array := Get_Object_Taxonomies (Object_Type);
@@ -5094,6 +5092,7 @@ is
 --                            return Int_Arrays.Vector -- ;Int_Array
    is
 --    use Php.Arrays;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Class_Taxonomy;

@@ -17,6 +17,7 @@ with Php.Strings;
 
 with Globals;
 with Helpers;
+with Helpers_3;
 with Wp_Common;
 
 with Adi_Plugins;
@@ -1639,6 +1640,7 @@ is
                       Filter : String := "raw")
                       return Class_Posts.Wp_Post
    is
+      use Helpers_3;
       use Wp_Common;
       use UStrings;
       use Class_Posts;
@@ -3541,6 +3543,7 @@ is
                            return Class_Posts.Wp_Post
    is
       use Php.Arrays;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Class_Posts;

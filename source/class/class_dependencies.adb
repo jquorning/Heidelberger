@@ -13,7 +13,7 @@ with Php.Lists;
 with Php.Strings;
 
 with Arrays;
-with Wp_Common;
+with Helpers_3;
 
 package body Class_Dependencies
 is
@@ -137,7 +137,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
-      use Wp_Common;
+      use Helpers_3;
       use List_Vectors;
 
       Handles_2 : constant List_Type := Handles; -- (array)

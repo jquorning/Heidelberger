@@ -15,6 +15,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Helpers;
+with Helpers_3;
 with UStrings;
 with Lists;
 with Wp_Common;
@@ -344,6 +345,7 @@ is
       use Php.Strings;
       use Binder;
       use Globals;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Adi_Screens;

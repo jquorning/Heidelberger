@@ -12,6 +12,7 @@ with Php.Types;
 
 with Binder;
 with Helpers;
+with Helpers_3;
 with Wp_Common;
 with Lists;
 
@@ -66,6 +67,7 @@ is
       use Php.Strings;
       use Php.Types;
       use Binder;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Inc_Capabilities;

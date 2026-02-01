@@ -21,6 +21,7 @@ with Arrays;
 with Binder;
 with Globals;
 with Helpers;
+with Helpers_3;
 with UStrings;
 with Lists;
 with Wp_Common;
@@ -74,6 +75,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use Helpers_3;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -456,7 +458,7 @@ is
                use Adi_Screens;
             begin
                --  Used in the HTML title tag.
-               Globals.Title := +Wp_Common.Get (Post_Type_Object, "labels.name");
+               Globals.Title := +Helpers_3.Get (Post_Type_Object, "labels.name");
 
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
@@ -538,11 +540,11 @@ is
                Get_Current_Screen.Set_Screen_Reader_Content (
                   To_Array (List => (
                    Build ("heading_views",
-                          Wp_Common.Get (Post_Type_Object, "labels.filter_items_list")),
+                          Helpers_3.Get (Post_Type_Object, "labels.filter_items_list")),
                    Build ("heading_pagination",
-                          Wp_Common.Get (Post_Type_Object, "labels.items_list_navigation")),
+                          Helpers_3.Get (Post_Type_Object, "labels.items_list_navigation")),
                    Build ("heading_list",
-                          Wp_Common.Get (Post_Type_Object, "labels.items_list"))
+                          Helpers_3.Get (Post_Type_Object, "labels.items_list"))
                )));
 
                Add_Screen_Option (
@@ -690,7 +692,7 @@ is
                      if Var_Name = "VAR_page_edit_h1" then
                         Insert (Translations,
                                 Assoc ("VAR_page_edit_h1",
-                                       ESC_HTML (Wp_Common.Get (Post_Type_Object,
+                                       ESC_HTML (Helpers_3.Get (Post_Type_Object,
                                                       "labels.name"))));
 
                      elsif Var_Name = "VAR_page_edit_h1_sub" then
@@ -698,7 +700,7 @@ is
                            URL  : constant String :=
                               ESC_URL  (Admin_URL (-Globals.Post_New_File));
                            HTML : constant String :=
-                              ESC_HTML (String'(Wp_Common.Get (Post_Type_Object,
+                              ESC_HTML (String'(Helpers_3.Get (Post_Type_Object,
                                                      "labels.add_new")));
                         begin
                            if

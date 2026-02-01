@@ -18,6 +18,7 @@ with Php.Types;
 
 with Binder;
 with Helpers;
+with Helpers_3;
 with UStrings;
 with Wp_Common;
 
@@ -125,13 +126,13 @@ is
       use Php.Numerics;
       use Php.Lists;
       use Php.Types;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Class_Taxonomy;
       use Class_Terms;
       use Class_Terms.Term_Vectors;
       use Inc_Capabilities;
-      use Inc_Plugins;
       use Inc_Taxonomys;
 
       Output : UString;
@@ -2649,6 +2650,7 @@ is
 --    static (Header_Images);
       use Php.Arrays;
       use Php.Strings;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Class_Posts;

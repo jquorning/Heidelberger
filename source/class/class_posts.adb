@@ -3,9 +3,8 @@
 --
 
 with Globals;
-with Helpers;
+with Helpers_3;
 with Lists;
-with Wp_Common;
 
 with Adi_Caches;
 
@@ -248,7 +247,7 @@ is
    --
    function To_Array (Post : Wp_Post) return Array_Type
    is
-      use Wp_Common;
+      use Helpers_3;
 
       Post_2 : Array_Type := Get_Object_Vars (Post);
 

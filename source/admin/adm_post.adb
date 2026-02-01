@@ -16,6 +16,7 @@ with Arrays;
 with Binder;
 with Constants;
 with Globals;
+with Helpers_3;
 with Lists;
 with UStrings;
 with Wp_Common;
@@ -57,6 +58,7 @@ is
       use Binder;
       use Globals;
       use Constants;
+      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Adm_Menu;
