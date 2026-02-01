@@ -122,6 +122,7 @@ is
    function Wp_Terms_Checklist (Post_Id : Integer := 0;
                                 Args    : Array_Type) return String
    is
+      use Php.Arrays;
       use Php.Echoing;
       use Php.Numerics;
       use Php.Lists;
@@ -2650,7 +2651,6 @@ is
 --    static (Header_Images);
       use Php.Arrays;
       use Php.Strings;
-      use Helpers_3;
       use UStrings;
       use Wp_Common;
       use Class_Posts;

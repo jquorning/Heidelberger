@@ -100,6 +100,12 @@ is
                       Strict   : Boolean := False)
                       return Boolean;
 
+   function In_Array (A      : Integer;
+                      B      : Array_Type;
+                      Strict : Boolean)
+                      return Boolean
+   is (raise Program_Error with "not implemented");
+
    procedure Array_Unshift (Arry : in out Array_Type;
                             S    : String) is null;
 

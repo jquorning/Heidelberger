@@ -47,12 +47,6 @@ is
                       S          : Boolean)
                       return Boolean is (True);
 
-   function In_Array (A      : Integer;
-                      B      : Array_Type;
-                      Strict : Boolean)
-                      return Boolean
-                      is (True);
-
    function Get_Array (Arry : Class_Terms.Wp_Term_Array;
                        Key  : String)
                        return Array_Type
