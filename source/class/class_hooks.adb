@@ -11,6 +11,7 @@ with Ada.Containers;
 with Php.Arrays;
 with Php.Misc;
 
+with Logging;
 with UStrings;
 
 with Inc_Elab_Plugins;
@@ -18,22 +19,11 @@ with Inc_Elab_Plugins;
 package body Class_Hooks
 is
 
-   ----------------
-   -- Array_Keys --
-   ----------------
-
-   function Array_Keys (Map : Priority_Maps.Map)
-                        return List_Type
-   is
-      use Priority_Maps;
-
-      Result : List_Type;
-   begin
-      for A in Map.Iterate loop
-         Result.Append (Image (Priority_Type (Key (A))));
-      end loop;
-      return Result;
-   end Array_Keys;
+   --
+   --
+   --
+   function Get_Priorities (Map : Priority_Maps.Map)
+                            return Priority_List;
 
    ----------------
    -- Add_Filter --
@@ -47,7 +37,6 @@ is
    is
       use Ada.Containers;
       use Inc_Elab_Plugins;
---    use Inc_Plugins;
 
       Index : constant String :=
         X_Wp_Filter_Build_Unique_Id (Hook_Name, Callback, Integer (Priority));
@@ -64,7 +53,6 @@ is
    begin
       Map.Include (Key => Index, New_Item => Item);
       This.Callbacks.Include (Key => Priority, New_Item => Map);
---    This.Callbacks (Priority) (Idx) := Item;
 
       -- If we're adding a new priority to the list, put them back in sorted order.
       if not Priority_Existed and then This.Callbacks.Length > 1 then
@@ -187,7 +175,7 @@ is
 
    function Has_Filter (This      : Wp_Hook;
                         Hook_Name : String   := "";
-                        Callback  : Callable := null) -- Boolean := False)
+                        Callback  : Callable := null)
                         return Boolean
    is
       use Inc_Elab_Plugins;
@@ -230,7 +218,6 @@ is
    begin
       for Callbacks of This.Callbacks loop
          if not Callbacks.Is_Empty then
---       if Callbacks then
             return True;
          end if;
       end loop;
@@ -267,58 +254,69 @@ is
 
    function Apply_Filters (This  : in out Wp_Hook;
                            Value : String;
-                           Args  : Array_Type) -- Args_Type) -- Array_Type)
+                           Args  : Array_Type)
                            return String
    is
       use UStrings;
       use Php.Arrays;
       use Php.Misc;
 
-      Args_2        : constant Array_Type := Args;
-      Nesting_Level : Nesting_Type;
-      Num_Args      : Natural;
-      Value_2       : UString := +Value;
+      Args_2          : constant Array_Type := Args;
+      Nesting_Level   : Nesting_Type;
+      Num_Args        : Natural;
+      Value_2         : UString := +Value;
+      Current_Nesting : Nesting_Maps.Cursor; -- Nesting_Type;
    begin
       if This.Callbacks.Is_Empty then
          return Value;
       end if;
 
-      Nesting_Level := This.Nesting_Level;
+      This.Nesting_Level := This.Nesting_Level + 1;
+      Nesting_Level      := This.Nesting_Level;
 
-      This.Nesting_Level :=
-        This.Nesting_Level + 1;
+--    Logging.Log ("apply_filters", "this.iteration: " & This.Iterations'Image);
+--    Logging.Log ("apply_filters", "this.callbacks: " & This.Callbacks'Image);
 
-      if This.Iterations.Last_Index < Nesting_Level then
-         This.Iterations.Append (Array_Keys (This.Callbacks));
-      else
-         This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
-      end if;
---    This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
-      Num_Args                        := Natural (Args.Length);
+      -- if This.Iterations.Last_Index < Nesting_Level then
+      --    This.Iterations.Append (Get_Priorities (This.Callbacks));
+      --    Current_Nesting := This.Iterations.Last_Index;
+      -- else
+      --    This.Iterations (Nesting_Level) := Get_Priorities (This.Callbacks);
+      --    Current_Nesting := Nesting_Level;
+      -- end if;
+      This.Iterations.Include (Nesting_Level, Get_Priorities (This.Callbacks));
+      Current_Nesting := This.Iterations.Find (Nesting_Level);
 
-      loop
-         if This.Current_Priority.Last_Index < Nesting_Level then
-            This.Current_Priority.Append (
-              This.Callbacks.First_Key);
-         end if;
---       This.Current_Priority (Nesting_Level) :=
---         Current (This.Iterations (Nesting_Level));
+      Num_Args := Natural (Args.Length);
+
+--    Logging.Log ("apply_filters", "nesting_level: " & Nesting_Level'Image);
+--    Logging.Log ("apply_filters",
+--                 "current_pri: " & This.Current_Priority.Length'Image);
+--    Logging.Log ("apply_filters",
+--                 "this.iterations: " & This.Iterations'Image);
+      Logging.Log ("apply_filters",
+                   "this.callbacks: " & This.Callbacks'Image);
+
+      for Pri of This.Callbacks loop
+         declare
+            Pri_List : constant Priority_List :=
+              This.Iterations (Nesting_Level); -- Current_Nesting);
+         begin
+            Logging.Log ("apply_filters",
+                         "this.iterations: " & This.Iterations'Image);
+
+            This.Current_Priority.Include (Nesting_Level,
+                                           Pri_List.First_Element);
+         end;
 
          declare
             Priority : constant Priority_Type :=
               This.Current_Priority (Nesting_Level);
          begin
--- Put_Line ("  Priority: " & Helpers.Image (Priority));
--- for A in This.Callbacks.Iterate loop
---    Put_Line ("  " & Helpers.Image (Priority_Maps.Key (A)));
---    for B in Priority_Maps.Element (A).Iterate loop
---       Put ("    " & Index_Maps.Key (B));
---       Put ("  ");
--- --    Put ("  " & Array_Maps.Key (Index_Maps.Element (B)));
---       New_Line;
---    end loop;
--- end loop;
-            for The_X of This.Callbacks (Priority) loop
+            for The_X of Pri loop -- This.Callbacks (Priority) loop
+               Logging.Log ("apply_filters",
+                            "Call function, nest: " & Nesting_Level'Image &
+                            ", pri: " & Priority'Image);
                -- if not This.Doing_Action then
                --    Args_2 (Args_2.First_Index) := Value_2;
                -- end if;
@@ -330,6 +328,8 @@ is
                   User_Function : constant Callable :=
                     As_Callable (Get (The_X, "function"));
                begin
+                  Logging.Log ("apply_filters",
+                               "function: " & User_Function'Image);
                   -- Avoid the array_slice() if possible.
                   if 0 = Accepted_Args then
                      Value_2 := +Call_User_Func (User_Function);
@@ -339,25 +339,26 @@ is
                      Value_2 :=
                        +Call_User_Func_Array (
                           User_Function,
-                          Array_Slice (Args_2, 0, Accepted_Args)); -- (int)
+                          Array_Slice (Args_2, 0, Accepted_Args));
                   end if;
                end;
             end loop;
          end;
-         exit when True;
---       exit when not Next (This.Iterations (Nesting_Level).Element);
+--       Nesting_Maps.Next (Current_Nesting);
+--       exit when not Nesting_Maps.Has_Element (Current_Nesting);
       end loop;
 
       This.Iterations      .Delete (Nesting_Level);
       This.Current_Priority.Delete (Nesting_Level);
---    Unset (This.Iterations (Nesting_Level));
---    Unset (This.Current_Priority (Nesting_Level));
 
-      This.Nesting_Level :=
-        This.Nesting_Level - 1;
+      This.Nesting_Level := This.Nesting_Level - 1;
 
       return -Value_2;
    end Apply_Filters;
+
+   -------------------
+   -- Apply_Filters --
+   -------------------
 
    procedure Apply_Filters (This  : in out Wp_Hook;
                             Value : String;
@@ -399,7 +400,7 @@ is
       Nesting_Level : constant Nesting_Type := This.Nesting_Level;
    begin
       This.Nesting_Level := This.Nesting_Level + 1;
-      This.Iterations (Nesting_Level) := Array_Keys (This.Callbacks);
+      This.Iterations (Nesting_Level) := Get_Priorities (This.Callbacks);
 
       loop
          declare
@@ -502,31 +503,31 @@ is
 --                 unset( this.callbacks[ offset ] );
 --         end;
 
-   -------------
-   -- Current --
-   -------------
+   -- -------------
+   -- -- Current --
+   -- -------------
 
-   -- #[ReturnTypeWillChange]
-   -- public function current() then
-   function Current (This : Wp_Hook)
-                     return String
-   is
-   begin
-      return ""; -- Php.Current (This.Callbacks);
-   end Current;
+   -- -- #[ReturnTypeWillChange]
+   -- -- public function current() then
+   -- function Current (This : Wp_Hook)
+   --                   return String
+   -- is
+   -- begin
+   --    return ""; -- Php.Current (This.Callbacks);
+   -- end Current;
 
-   ----------
-   -- Next --
-   ----------
+   -- ----------
+   -- -- Next --
+   -- ----------
 
-   -- #[ReturnTypeWillChange]
-   -- public function next() then
-   function Next (This : in out Wp_Hook)
-                  return String
-   is
-   begin
-      return ""; -- Php.Next (This.Callbacks);
-   end Next;
+   -- -- #[ReturnTypeWillChange]
+   -- -- public function next() then
+   -- function Next (This : in out Wp_Hook)
+   --                return String
+   -- is
+   -- begin
+   --    return ""; -- Php.Next (This.Callbacks);
+   -- end Next;
 
 --         --
 --         -- Returns the key of the current element.
@@ -569,5 +570,22 @@ is
 --         end;
 
 -- end;
+
+   ------------------
+   -- Get_Nestings --
+   ------------------
+
+   function Get_Priorities (Map : Priority_Maps.Map)
+                          return Priority_List
+   is
+      use Priority_Maps;
+
+      Result : Priority_List;
+   begin
+      for A in Map.Iterate loop
+         Result.Append (Key (A));
+      end loop;
+      return Result;
+   end Get_Priorities;
 
 end Class_Hooks;

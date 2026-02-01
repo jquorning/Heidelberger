@@ -6,46 +6,17 @@
 -- @since 4.7.0
 --
 
-with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Containers.Vectors;
+private with Ada.Containers.Indefinite_Ordered_Maps;
+private with Ada.Containers.Ordered_Maps;
+private with Ada.Containers.Vectors;
 
 with Arrays;
-with Helpers_2;
-with Lists;
 
 package Class_Hooks
 is
    use Arrays;
-   use Lists;
 
-   type Nesting_Type  is new Natural;
    type Priority_Type is new Natural;
-
-   function Image is new Helpers_2.Generic_Image (Priority_Type);
-
-   package Index_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Arrays.Array_Type,
-         "="          => Arrays."=");
-
-   package Priority_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => Priority_Type,
-         Element_Type => Index_Maps.Map,
-         "="          => Index_Maps."=");
-
-   function Array_Keys (Map : Priority_Maps.Map)
-                        return List_Type;
-
-   package List_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Nesting_Type,
-                              Element_Type => List_Type,
-                              "="          => List_Vectors."=");
-
-   package Priority_Vectors is new
-      Ada.Containers.Vectors (Index_Type   => Nesting_Type,
-                              Element_Type => Priority_Type);
 
    --
    -- Core class used to implement action and filter hook functionality.
@@ -56,53 +27,7 @@ is
    -- @see ArrayAccess
    --
    --#[AllowDynamicProperties]
-   type Wp_Hook is tagged -- implements Iterator, ArrayAccess
-      record
-         --
-         -- Hook callbacks.
-         --
-         -- @since 4.7.0
-         -- @var array
-         --
-         Callbacks : Priority_Maps.Map;
-
-         --
-         -- The priority keys of actively running iterations of a hook.
-         --
-         -- @since 4.7.0
-         -- @var array
-         --
-         -- private
-         Iterations : List_Vectors.Vector;
-
-         --
-         -- The current priority of actively running iterations of a hook.
-         --
-         -- @since 4.7.0
-         -- @var array
-         --
-         -- private
-         Current_Priority : Priority_Vectors.Vector;
-
-         --
-         -- Number of levels this hook can be recursively called.
-         --
-         -- @since 4.7.0
-         -- @var int
-         --
-         -- private
-         Nesting_Level : Nesting_Type := 0;
-
-         --
-         -- Flag for if we"re currently doing an action, rather than a filter.
-         --
-         -- @since 4.7.0
-         -- @var bool
-         --
-         -- private
-         Doing_Action : Boolean := False;
-
-      end record;
+   type Wp_Hook is tagged private;
 
    --
    -- Adds a callback function to a filter hook.
@@ -241,8 +166,8 @@ is
    -- @return array Of callbacks at current priority.
    --
    -- #[ReturnTypeWillChange]
-   function Current (This : Wp_Hook)
-                     return String;
+--   function Current (This : Wp_Hook)
+--                     return String;
 
    --
    -- Moves forward to the next element.
@@ -254,7 +179,95 @@ is
    -- @return array Of callbacks at next priority.
    --
    -- #[ReturnTypeWillChange]
-   function Next (This : in out Wp_Hook)
-                  return String;
+--   function Next (This : in out Wp_Hook)
+--                  return String;
+
+private
+
+   type Nesting_Type  is new Natural;
+
+   package Index_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Arrays.Array_Type,
+         "="          => Arrays."=");
+
+   package Priority_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => Priority_Type,
+         Element_Type => Index_Maps.Map,
+         "="          => Index_Maps."=");
+
+   package Priority_Vectors is new
+      Ada.Containers.Vectors (Index_Type   => Positive,
+                              Element_Type => Priority_Type);
+
+   subtype Priority_List is Priority_Vectors.Vector;
+
+   package Nesting_Maps is new -- Vectors is new
+      Ada.Containers.Ordered_Maps -- Vectors
+        (Key_Type     => Nesting_Type, -- Index_Type   => Nesting_Type,
+         Element_Type => Priority_List, -- List_Type,
+         "="          => Priority_Vectors."="); -- List_Vectors."=");
+
+   subtype Nesting_Map is Nesting_Maps.Map; -- Vectors.Vector;
+
+   package Priority_Nesting_Maps is new
+      Ada.Containers.Ordered_Maps (Key_Type     => Nesting_Type,
+                                   Element_Type => Priority_Type);
+
+   subtype Priority_Nesting_Map is Priority_Nesting_Maps.Map;
+
+   -------------
+   -- Wp_Hook --
+   -------------
+
+   type Wp_Hook is tagged -- implements Iterator, ArrayAccess
+      record
+         --
+         -- Hook callbacks.
+         --
+         -- @since 4.7.0
+         -- @var array
+         --
+         Callbacks : Priority_Maps.Map;
+
+         --
+         -- The priority keys of actively running iterations of a hook.
+         --
+         -- @since 4.7.0
+         -- @var array
+         --
+         -- private
+         Iterations : Nesting_Map; -- List;
+
+         --
+         -- The current priority of actively running iterations of a hook.
+         --
+         -- @since 4.7.0
+         -- @var array
+         --
+         -- private
+         Current_Priority : Priority_Nesting_Map;
+
+         --
+         -- Number of levels this hook can be recursively called.
+         --
+         -- @since 4.7.0
+         -- @var int
+         --
+         -- private
+         Nesting_Level : Nesting_Type := 0;
+
+         --
+         -- Flag for if we"re currently doing an action, rather than a filter.
+         --
+         -- @since 4.7.0
+         -- @var bool
+         --
+         -- private
+         Doing_Action : Boolean := False;
+
+      end record;
 
 end Class_Hooks;
