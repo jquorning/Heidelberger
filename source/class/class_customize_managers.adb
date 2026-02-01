@@ -864,7 +864,7 @@ is
 
    function Find_Changeset_Post_Id (This : Wp_Customize_Manager;
                                     UUID : String)
-                                    return Post_Id -- Natural
+                                    return Post_Id_Type -- Natural
    is
       use Inc_Caches;
       use Class_Posts;
@@ -873,7 +873,7 @@ is
 
       Cache_Group       : constant String  := "customize_changeset_post";
       Found             : Boolean;
-      Changeset_Post_Id : Post_Id := Post_Id (Integer'(
+      Changeset_Post_Id : Post_Id_Type := Post_Id_Type (Integer'(
         Wp_Cache_Get (UUID, Cache_Group, Found => Found)));
    begin
       if
@@ -988,9 +988,9 @@ is
    -----------------------
 
    function Changeset_Post_Id (This : in out Wp_Customize_Manager)
-                               return Post_Id -- Natural
+                               return Post_Id_Type -- Natural
    is
-      Post : Post_Id;
+      Post : Post_Id_Type;
    begin
       if not This.X_Changeset_Post_Id_Set then
 --    if not Isset (This.X_Changeset_Post_Id) then
@@ -3184,7 +3184,7 @@ is
    ------------------------
 
    procedure Set_Changeset_Lock (This              : Wp_Customize_Manager;
-                                 Changeset_Post_Id : Post_Id; -- Integer;
+                                 Changeset_Post_Id : Post_Id_Type; -- Integer;
                                  Take_Over         : Boolean := False)
    is
       use Php.Misc;
@@ -3226,7 +3226,7 @@ is
    ----------------------------
 
    procedure Refresh_Changeset_Lock (This              : Wp_Customize_Manager;
-                                     Changeset_Post_Id : Post_Id) -- Integer)
+                                     Changeset_Post_Id : Post_Id_Type) -- Integer)
    is
       use Php.Misc;
       use Php.Strings;

@@ -2689,7 +2689,7 @@ is
       use Inc_Options;
 --    use Inc_Plugins;
 
-      Post_2 : constant Wp_Post := Inc_Posts.Get_Post (Post_Id (Post));
+      Post_2 : constant Wp_Post := Inc_Posts.Get_Post (Post_Id_Type (Post));
    begin
 --    if not Post_2 then
       if Post_2 = Null_Post then
@@ -3394,7 +3394,7 @@ is
    begin
       if Is_Singular then
          declare
-            Id   : constant Post_Id := 0;
+            Id   : constant Post_Id_Type := 0;
             Post : constant Wp_Post := Get_Post (Id);
 
             -- This filter is documented in wp-includes/general-template.php--

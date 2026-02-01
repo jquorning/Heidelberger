@@ -23,7 +23,7 @@ is
    Tag            : Class_Terms.Wp_Term;
    Wp_The_Query   : Class_Querys.Wp_Query;
    User_Id        : Class_Users.User_Id_Type;
-   Id_Of_Post     : Class_Posts.Post_Id; -- was Post_Id : Integer
+   Id_Of_Post     : Class_Posts.Post_Id_Type; -- was Post_Id : Integer
 
    X_Show_Admin_Bar : Boolean; -- X_ added
    Pagenow          : UStrings.UString;

@@ -42,7 +42,7 @@ is
         -- @since 4.4.0
         -- @var string
         --
-        Comment_Post_Id : Class_Posts.Post_Id := 0;
+        Comment_Post_Id : Class_Posts.Post_Id_Type := 0;
 
         --
         -- Comment author name.

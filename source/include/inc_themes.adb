@@ -2044,8 +2044,8 @@ is
    begin
       if Get_Stylesheet = Stylesheet_2 then
          declare
-            Post_Id : constant Class_Posts.Post_Id :=
-              Class_Posts.Post_Id (Integer'(Get_Theme_Mod ("custom_css_post_id")));
+            Post_Id : constant Class_Posts.Post_Id_Type :=
+              Class_Posts.Post_Id_Type (Integer'(Get_Theme_Mod ("custom_css_post_id")));
          begin
             if Post_Id > 0 and then Get_Post (Post_Id) /= Null_Post then
                Post := Get_Post (Post_Id);

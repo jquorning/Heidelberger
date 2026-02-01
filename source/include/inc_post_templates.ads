@@ -24,7 +24,7 @@ is
    --                   post is not set.
    --
    function Get_The_Id
-            return Class_Posts.Post_Id;
+            return Class_Posts.Post_Id_Type;
 
    --
    -- Retrieves the post title.

@@ -333,7 +333,7 @@ is
                               for Id of Post_Ids loop
                                  declare
                                     Post_Del : constant Wp_Post :=
-                                      Inc_Posts.Get_Post (Post_Id'Value (Id));
+                                      Inc_Posts.Get_Post (Post_Id_Type'Value (Id));
                                  begin
                                     if not Current_User_Can ("delete_post", Id) then
                                        Inc_Functions.Wp_Die
@@ -915,7 +915,8 @@ is
                         use Inc_Link_Templates;
                         use Class_Posts;
 
-                        Id   : constant Post_Id := Post_Id'Value (Ids.First_Element);
+                        Id : constant Post_Id_Type :=
+                          Post_Id_Type'Value (Ids.First_Element);
 
                         URL  : constant String  :=
                            ESC_URL (Get_Edit_Post_Link (Integer (Id)));

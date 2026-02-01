@@ -57,7 +57,7 @@ is
    -- @return WP_Term[] Array of WP_Term objects, one for each category assigned to
    --                    the post.
    --
-   function Get_The_Category (Post_Id : Class_Posts.Post_Id := 0) -- false
+   function Get_The_Category (Post_Id : Class_Posts.Post_Id_Type := 0) -- false
                               return Class_Terms.Wp_Term_Array;
 
    --
@@ -156,7 +156,7 @@ is
                            return Class_Terms.Wp_Term_Array;
                            -- Inc_Class_Posts.Wp_Post;
 
-   function Get_The_Terms (Post     : Class_Posts.Post_Id;
+   function Get_The_Terms (Post     : Class_Posts.Post_Id_Type;
                            Taxonomy : String)
                            return Class_Terms.Wp_Term_Array;
 

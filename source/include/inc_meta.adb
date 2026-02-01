@@ -1873,7 +1873,7 @@ is
    begin
       if Object_Type = "post" then
          declare
-            Post_Type : constant String := Get_Post_Type (Post_Id (Object_Id));
+            Post_Type : constant String := Get_Post_Type (Post_Id_Type (Object_Id));
          begin
             if not Empty (Post_Type) then
                Object_Subtype := +Post_Type;

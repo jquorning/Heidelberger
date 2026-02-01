@@ -1238,7 +1238,7 @@ is
    -- @param int|WP_Post post Post ID or WP_Post object. Default current post.
    -- @return bool True if the comments are open.
    --
-   function Comments_Open (Post : Class_Posts.Post_Id := 0) -- null
+   function Comments_Open (Post : Class_Posts.Post_Id_Type := 0) -- null
                            return Boolean;
 
    --
@@ -1253,7 +1253,7 @@ is
    -- @param int|WP_Post post Post ID or WP_Post object. Default current post.
    -- @return bool True if pings are accepted
    --
-   function Pings_Open (Post : Class_Posts.Post_Id := 0) -- null
+   function Pings_Open (Post : Class_Posts.Post_Id_Type := 0) -- null
                         return Boolean;
 
 -- --

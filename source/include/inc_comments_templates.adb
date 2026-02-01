@@ -19,7 +19,7 @@ is
    -- Comments_Open --
    -------------------
 
-   function Comments_Open (Post : Class_Posts.Post_Id := 0) -- null
+   function Comments_Open (Post : Class_Posts.Post_Id_Type := 0) -- null
                            return Boolean
    is
       use UStrings;
@@ -29,7 +29,7 @@ is
 
       X_Post : constant Wp_Post := Get_Post (Post);
 
-      Post_Id : constant Class_Posts.Post_Id :=
+      Post_Id : constant Class_Posts.Post_Id_Type :=
         (if X_Post /= Null_Post then X_Post.Id else 0);
 
       Open : constant Boolean :=
@@ -50,7 +50,7 @@ is
    -- Pings_Open --
    ----------------
 
-   function Pings_Open (Post : Class_Posts.Post_Id := 0) -- null
+   function Pings_Open (Post : Class_Posts.Post_Id_Type := 0) -- null
                         return Boolean
    is
       use UStrings;
@@ -60,7 +60,7 @@ is
 
       X_Post : constant Wp_Post := Get_Post (Post);
 
-      Post_Id : constant Class_Posts.Post_Id :=
+      Post_Id : constant Class_Posts.Post_Id_Type :=
         (if X_Post /= Null_Post then X_Post.Id else 0);
 
       Open : constant Boolean :=

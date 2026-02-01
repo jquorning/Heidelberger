@@ -60,7 +60,7 @@ is
       record
          Comment_Id : Integer := 0;
          Object_Id  : Integer := 0;
-         Post_Id    : Class_Posts.Post_Id := 0;
+         Post_Id    : Class_Posts.Post_Id_Type := 0;
          Term_Id    : Integer := 0;
          User_Id    : Class_Users.User_Id_Type := 0;
          Meta_Key   : Boolean := False;

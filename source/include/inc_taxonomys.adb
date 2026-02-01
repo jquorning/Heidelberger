@@ -5134,7 +5134,7 @@ is
             end loop;
          end;
       elsif "post_type" = Resource_Type_2 then
-         Ancestors := Get_Post_Ancestors (Class_Posts.Post_Id (Object_Id));
+         Ancestors := Get_Post_Ancestors (Class_Posts.Post_Id_Type (Object_Id));
       end if;
 
       --

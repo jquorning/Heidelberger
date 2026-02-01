@@ -74,7 +74,7 @@ is
    -- @return int ID of the queried object.
    --
    function Get_Queried_Object_Id
-            return Class_Posts.Post_Id; -- Integer;
+            return Class_Posts.Post_Id_Type; -- Integer;
 
    --
    -- Determines whether the query is for an existing post type archive page.

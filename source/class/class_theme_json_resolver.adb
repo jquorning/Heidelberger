@@ -548,7 +548,7 @@ is
               Get_Post (Recent_Posts (Recent_Posts.First_Index), "ARRAY_A");
          elsif Create_Post then
             declare
-               CPT_Post_Id : Post_Id;
+               CPT_Post_Id : Post_Id_Type;
             begin
                CPT_Post_Id :=
                  Wp_Insert_Post (To_Array (List => (

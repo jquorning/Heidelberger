@@ -438,7 +438,7 @@ is
    -- Get_Permalink --
    -------------------
 
-   function Get_Permalink (Id        : Class_Posts.Post_Id := 0;
+   function Get_Permalink (Id        : Class_Posts.Post_Id_Type := 0;
                            Leavename : Boolean := False)
                            return String
    is
@@ -640,7 +640,7 @@ is
 
       Post_2           : constant Wp_Post := Get_Post (Post);
       Force_Plain_Link : constant Boolean := Wp_Force_Plain_Post_Permalink (Post_2);
-      Parent_Id        : constant Post_Id := Post_2.Post_Parent;
+      Parent_Id        : constant Post_Id_Type := Post_2.Post_Parent;
       Parent           : Wp_Post := (if Parent_Id /= 0
                                      then Get_Post (Parent_Id)
                                      else Null_Post); -- False);
@@ -919,8 +919,8 @@ is
    -- Get_Post_Comments_Feed_Link --
    ---------------------------------
 
-   function Get_Post_Comments_Feed_Link (Post_Id : Class_Posts.Post_Id := 0;
-                                         Feed    : String              := "")
+   function Get_Post_Comments_Feed_Link (Post_Id : Class_Posts.Post_Id_Type := 0;
+                                         Feed    : String                   := "")
                                          return String
    is
       use Php.Strings;
@@ -935,7 +935,7 @@ is
       use Inc_Post_Templates;
 --    post_id = absint( post_id );
 
-      Post_Id_2 : constant Class_Posts.Post_Id :=
+      Post_Id_2 : constant Class_Posts.Post_Id_Type :=
         (if Post_Id = 0 then Get_The_Id else Post_Id);
 
       Feed_2 : constant String :=
@@ -1562,8 +1562,8 @@ is
          declare
             Show_On_Front  : constant String  := Get_Option ("show_on_front");
 
-            Page_For_Posts : constant Class_Posts.Post_Id :=
-              Class_Posts.Post_Id (Integer'(Get_Option ("page_for_posts")));
+            Page_For_Posts : constant Class_Posts.Post_Id_Type :=
+              Class_Posts.Post_Id_Type (Integer'(Get_Option ("page_for_posts")));
          begin
             if "page" = Show_On_Front and then Page_For_Posts /= 0 then
                Link := +Get_Permalink (Page_For_Posts);
@@ -1737,7 +1737,7 @@ is
       use Class_Post_Type;
       use Inc_Posts;
 
-      Post_2 : constant Wp_Post := Get_Post (Post_Id (Post));
+      Post_2 : constant Wp_Post := Get_Post (Post_Id_Type (Post));
       Action : UString;
       Link   : UString;
    begin
@@ -4486,7 +4486,7 @@ is
       Shortlink : UString :=
         +Apply_Filters ("pre_get_shortlink", "False", Id, Context, Allow_Slugs);
 
-      Post_Id : Class_Posts.Post_Id := 0;
+      Post_Id : Class_Posts.Post_Id_Type := 0;
       Post    : Wp_Post;
    begin
 
@@ -4498,7 +4498,7 @@ is
          Post_Id := Get_Queried_Object_Id;
          Post    := Get_Post (Post_Id);
       elsif "post" = Context then
-         Post := Get_Post (Class_Posts.Post_Id (Id));
+         Post := Get_Post (Class_Posts.Post_Id_Type (Id));
          if Post.Id /= 0 then
 --       if not Empty (Post.Id) then
             Post_Id := Post.Id;
@@ -5031,8 +5031,8 @@ is
         (if
            Policy_Page_Id /= 0 and then
 --         not Empty (Policy_Page_Id) and then
-           Get_Post_Status (Post_Id (Policy_Page_Id)) = "publish"
-         then String'(Get_Permalink (Post_Id (Policy_Page_Id)))
+           Get_Post_Status (Post_Id_Type (Policy_Page_Id)) = "publish"
+         then String'(Get_Permalink (Post_Id_Type (Policy_Page_Id)))
          else "");
    begin
       --

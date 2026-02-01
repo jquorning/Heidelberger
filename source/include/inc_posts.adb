@@ -1396,7 +1396,7 @@ is
    -- Update_Attached_File --
    --------------------------
 
-   function Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
+   function Update_Attached_File (Attachment_Id : Class_Posts.Post_Id_Type;
                                   File          : String)
                                   return Boolean
    is
@@ -1436,7 +1436,7 @@ is
    -- Update_Attached_File --
    --------------------------
 
-   procedure Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
+   procedure Update_Attached_File (Attachment_Id : Class_Posts.Post_Id_Type;
                                    File          : String)
    is
       Unused : constant Boolean := Update_Attached_File (Attachment_Id, File);
@@ -1687,7 +1687,7 @@ is
       return X_Post;
    end Get_Post;
 
-   function Get_Post (Post   : Class_Posts.Post_Id := 0;
+   function Get_Post (Post   : Class_Posts.Post_Id_Type := 0;
                       Output : String  := "OBJECT"; --  = OBJECT,
                       Filter : String  := "raw")
                       return Class_Posts.Wp_Post
@@ -1728,7 +1728,7 @@ is
       declare
          Ancestors : Array_Type;
 
-         Id        : Post_Id    := Post_2.Post_Parent;
+         Id        : Post_Id_Type := Post_2.Post_Parent;
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
@@ -1880,7 +1880,7 @@ is
       return Apply_Filters ("get_post_status", -Post_Status, Post_2);
    end Get_Post_Status;
 
-   function Get_Post_Status (Post : Class_Posts.Post_Id := 0)
+   function Get_Post_Status (Post : Class_Posts.Post_Id_Type := 0)
                              return String
    is
    begin
@@ -2134,7 +2134,7 @@ is
    -- Get_Post_Type --
    -------------------
 
-   function Get_Post_Type (Post : Class_Posts.Post_Id := 0)
+   function Get_Post_Type (Post : Class_Posts.Post_Id_Type := 0)
                            return String
    is
       use UStrings;
@@ -3314,7 +3314,7 @@ is
    --               value). An empty string if a valid but non-existing post ID is
    --               passed.
    --
-   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return Array_Type -- Post_Id_List;
@@ -3323,7 +3323,7 @@ is
       return Inc_Meta.Get_Metadata ("post", Integer (Post_Id), Key, Single);
    end Get_Post_Meta;
 
-   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return String
@@ -3605,7 +3605,7 @@ is
 
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
-                                 Post_Id : Class_Posts.Post_Id;
+                                 Post_Id : Class_Posts.Post_Id_Type;
                                  Context : String := "display")
                                  return Array_Type
    is
@@ -6693,7 +6693,7 @@ is
          Wp_Cache_Set (Cache_Key, Foundid, "posts");
 
          if Foundid /= 0 then
-            return Get_Post (Post_Id (Foundid), Output);
+            return Get_Post (Post_Id_Type (Foundid), Output);
          end if;
       end;
       return Null_Post; -- null;

@@ -31,7 +31,7 @@ is
    ----------------
 
    function Get_The_Id
-            return Class_Posts.Post_Id
+            return Class_Posts.Post_Id_Type
    is
       use Class_Posts;
       use Inc_Posts;

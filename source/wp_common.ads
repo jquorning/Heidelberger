@@ -46,7 +46,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Boolean;
-                           Post      : Class_Posts.Post_Id)
+                           Post      : Class_Posts.Post_Id_Type)
                            return Boolean
                            is (Value);
 
@@ -230,7 +230,7 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
-                           Id        : Class_Posts.Post_Id)
+                           Id        : Class_Posts.Post_Id_Type)
                            return Array_Type
                            is (Empty_Array);
 
@@ -284,14 +284,14 @@ is
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
-                           Post      : Class_Posts.Post_Id;
+                           Post      : Class_Posts.Post_Id_Type;
                            B         : Boolean)
                            return String
                            is (Value);
 
    function Apply_Filters (Hook_Name : String;
                            Value     : Class_Terms.Wp_Term_Array;
-                           Post      : Class_Posts.Post_Id)
+                           Post      : Class_Posts.Post_Id_Type)
                            return Class_Terms.Wp_Term_Array
                            is (Value);
 

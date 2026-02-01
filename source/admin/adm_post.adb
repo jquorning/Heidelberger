@@ -80,7 +80,7 @@ is
 
       Adi_Misc.Wp_Reset_Vars (["action"]);
       declare
-         Id : Post_Id;
+         Id : Post_Id_Type;
       begin
          if
            Isset (XX_GET, "post")    and then
@@ -93,10 +93,10 @@ is
                 abs "Sorry, you are not allowed to edit this item.", 400);
 
          elsif Isset (XX_GET, "post") then
-            Id := Post_Id (As_Integer (Get (XX_GET, "post")));
+            Id := Post_Id_Type (As_Integer (Get (XX_GET, "post")));
 
          elsif Isset (X_POST, "post_ID") then
-            Id := Post_Id (As_Integer (Get (X_POST, "post_ID")));
+            Id := Post_Id_Type (As_Integer (Get (X_POST, "post_ID")));
 
          else
             Id := 0;
@@ -196,7 +196,7 @@ is
                   end;
 
                   Post :=
-                    Inc_Posts.Get_Post (Post_Id (As_Integer (Get (X_REQUEST, "post_ID"))));
+                    Inc_Posts.Get_Post (Post_Id_Type (As_Integer (Get (X_REQUEST, "post_ID"))));
 
                   Check_Admin_Referer ("add-" & (-Post.Post_Type));
 
@@ -383,7 +383,7 @@ is
                elsif Action = "editpost" then
                   Check_Admin_Referer ("update-post_" & Image (Id));
 
-                  Id := Post_Id (Edit_Post); --();
+                  Id := Post_Id_Type (Edit_Post); --();
 
                   -- Session cookie flag that the post was saved.
                   if

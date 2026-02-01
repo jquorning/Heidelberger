@@ -71,7 +71,7 @@ is
    ---------------------------
 
    function Get_Queried_Object_Id
-            return Class_Posts.Post_Id
+            return Class_Posts.Post_Id_Type
    is
 --    global wp_query;
    begin

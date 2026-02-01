@@ -99,7 +99,7 @@ is
    --                               Default false.
    -- @return string|false The permalink URL. False if the post does not exist.
    --
-   function Get_Permalink (Id        : Class_Posts.Post_Id := 0;
+   function Get_Permalink (Id        : Class_Posts.Post_Id_Type := 0;
                            Leavename : Boolean := False)
                            return String;
 
@@ -174,7 +174,7 @@ is
                              Sample    : Boolean := False)
                              return String;
 
-   function X_Get_Page_Link (Post      : Class_Posts.Post_Id; -- = false,
+   function X_Get_Page_Link (Post      : Class_Posts.Post_Id_Type; -- = false,
                              Leavename : Boolean := False;
                              Sample    : Boolean := False)
                              return String
@@ -241,8 +241,8 @@ is
    -- @return string The permalink for the comments feed for the given post on
    --                success, empty string on failure.
    --
-   function Get_Post_Comments_Feed_Link (Post_Id : Class_Posts.Post_Id := 0;
-                                         Feed    : String              := "")
+   function Get_Post_Comments_Feed_Link (Post_Id : Class_Posts.Post_Id_Type := 0;
+                                         Feed    : String                   := "")
                                          return String;
 
    --

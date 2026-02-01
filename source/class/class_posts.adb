@@ -24,7 +24,7 @@ is
    -- Get_Instance --
    ------------------
 
-   procedure Get_Instance (Id      : Post_Id;
+   procedure Get_Instance (Id      : Post_Id_Type;
                            Post    : out Wp_Post;
                            Success : out Boolean)
    is

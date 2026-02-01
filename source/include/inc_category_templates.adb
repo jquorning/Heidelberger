@@ -90,7 +90,7 @@ is
    -- Get_The_Category --
    ----------------------
 
-   function Get_The_Category (Post_Id : Class_Posts.Post_Id := 0) -- false
+   function Get_The_Category (Post_Id : Class_Posts.Post_Id_Type := 0) -- false
                               return Class_Terms.Wp_Term_Array
    is
       use Wp_Common;
@@ -1439,7 +1439,7 @@ is
       end;
    end Get_The_Terms;
 
-   function Get_The_Terms (Post     : Class_Posts.Post_Id;
+   function Get_The_Terms (Post     : Class_Posts.Post_Id_Type;
                            Taxonomy : String)
                            return Class_Terms.Wp_Term_Array
                            is (raise Program_Error with "not implemented");

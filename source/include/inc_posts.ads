@@ -45,11 +45,11 @@ is
    -- @param string file          File path for the attachment.
    -- @return bool True on success, False on failure.
    --
-   function Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
+   function Update_Attached_File (Attachment_Id : Class_Posts.Post_Id_Type;
                                   File          : String)
                                   return Boolean;
 
-   procedure Update_Attached_File (Attachment_Id : Class_Posts.Post_Id;
+   procedure Update_Attached_File (Attachment_Id : Class_Posts.Post_Id_Type;
                                    File          : String);
 
    --
@@ -75,7 +75,7 @@ is
    --                               global $post.
    -- @return string|false          Post type on success, false on failure.
    --
-   function Get_Post_Type (Post : Class_Posts.Post_Id := 0)  -- := null )
+   function Get_Post_Type (Post : Class_Posts.Post_Id_Type := 0)  -- := null )
                            return String;
 
    function Get_Post_Type (Post : Class_Posts.Wp_Post) -- := null )
@@ -1006,12 +1006,12 @@ is
                       Filter : String := "raw")
                       return Class_Posts.Wp_Post;
 
-   function Get_Post (Post   : Class_Posts.Post_Id := 0;
+   function Get_Post (Post   : Class_Posts.Post_Id_Type := 0;
                       Output : String  := "OBJECT"; --  = OBJECT,
                       Filter : String  := "raw")
                       return Class_Posts.Wp_Post;
 
-   function Get_Post (Post   : Class_Posts.Post_Id := 0;
+   function Get_Post (Post   : Class_Posts.Post_Id_Type := 0;
                       Output : String  := "OBJECT";
                       Filter : String  := "raw")
                       return Array_Type
@@ -1147,7 +1147,7 @@ is
 
 --   function Sanitize_Post (Key    : String;
 --                           Post   : Array_Type;
---                           Id     : Integer; -- Inc_Class_Posts.Post_Id;
+--                           Id     : Integer; -- Inc_Class_Posts.Post_Id_Type;
 --                           Filter : String := "display")
 --                           return Array_Type;
 
@@ -1171,7 +1171,7 @@ is
    --
    function Sanitize_Post_Field (Field   : String;
                                  Value   : Array_Type; -- Inc_Class_Posts.Wp_Post;
-                                 Post_Id : Class_Posts.Post_Id;
+                                 Post_Id : Class_Posts.Post_Id_Type;
                                  Context : String := "display")
                                  return Array_Type;
    --
@@ -1316,7 +1316,7 @@ is
    function Wp_Insert_Post (Postarr          : Array_Type;
                             Wp_Error         : Boolean := False;
                             Fire_After_Hooks : Boolean := True)
-                            return Class_Posts.Post_Id
+                            return Class_Posts.Post_Id_Type
    is (raise Program_Error with "not implemented");
 
    --
@@ -1362,7 +1362,7 @@ is
    function Get_Post_Ancestors (Post : Class_Posts.Wp_Post)
                                 return Array_Type;
 
-   function Get_Post_Ancestors (Post : Class_Posts.Post_Id)
+   function Get_Post_Ancestors (Post : Class_Posts.Post_Id_Type)
                                 return Class_Taxonomy.Int_Arrays.Vector
    is (raise Program_Error with "not implemented");
 
@@ -1381,7 +1381,7 @@ is
    function Get_Post_Status (Post : Class_Posts.Wp_Post := Class_Posts.Null_Post)
                              return String;
 
-   function Get_Post_Status (Post : Class_Posts.Post_Id := 0)
+   function Get_Post_Status (Post : Class_Posts.Post_Id_Type := 0)
                              return String;
 
    --
@@ -1401,12 +1401,12 @@ is
    --               value). An empty string if a valid but non-existing post ID is
    --               passed.
    --
-   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
-                           return Array_Type; -- Post_Id_List;
+                           return Array_Type; -- Post_Id_Type_List;
 
-   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id;
+   function Get_Post_Meta (Post_Id : Class_Posts.Post_Id_Type;
                            Key     : String  := "";
                            Single  : Boolean := False)
                            return String;
@@ -1433,14 +1433,14 @@ is
    --                  false on failure or if the value passed to the function
    --                  is the same as the one that is already in the database.
    --
-   function Update_Post_Meta (Post_Id    : Class_Posts.Post_Id; -- Integer;
+   function Update_Post_Meta (Post_Id    : Class_Posts.Post_Id_Type; -- Integer;
                               Meta_Key   : String;
                               Meta_Value : Multi_Type;
                               Prev_Value : Multi_Type := From_String (""))
                               return Boolean
    is (raise Program_Error with "not implemented");
 
-   procedure Update_Post_Meta (Post_Id    : Class_Posts.Post_Id;
+   procedure Update_Post_Meta (Post_Id    : Class_Posts.Post_Id_Type;
                                Meta_Key   : String;
                                Meta_Value : Multi_Type;
                                Prev_Value : Multi_Type := From_String (""))

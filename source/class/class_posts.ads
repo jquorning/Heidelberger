@@ -26,9 +26,9 @@ is
 
    Null_Property_Type : constant Property_Type := (UStrings.Null_UString, 0);
 
-   type Post_Id is new Natural;
+   type Post_Id_Type is new Natural;
 
-   function Image is new Helpers_2.Generic_Image (Post_Id);
+   function Image is new Helpers_2.Generic_Image (Post_Id_Type);
 
    --
    -- Core class used to implement the WP_Post object.
@@ -50,7 +50,7 @@ is
          -- @since 3.5.0
          -- @var int
          --
-         Id : Post_Id;
+         Id : Post_Id_Type;
 
          --
          -- ID of post author.
@@ -195,7 +195,7 @@ is
          -- @since 3.5.0
          -- @var int
          --
-         Post_Parent : Post_Id := 0; -- Integer := 0;
+         Post_Parent : Post_Id_Type := 0; -- Integer := 0;
 
          --
          -- The unique identifier for a post, not necessarily a URL, used as the
@@ -266,7 +266,7 @@ is
    -- @param int $post_id Post ID.
    -- @return WP_Post|false Post object, false otherwise.
    --
-   procedure Get_Instance (Id      : Post_Id;
+   procedure Get_Instance (Id      : Post_Id_Type;
                            Post    : out Wp_Post;
                            Success : out Boolean);
 --        function Get_Instance (Id : Post_Id) return Wp_Post;
@@ -344,7 +344,7 @@ is
    ----------------
 
    package Post_Arrays is new
-      Ada.Containers.Vectors (Index_Type   => Post_Id, -- Positive,
+      Ada.Containers.Vectors (Index_Type   => Post_Id_Type, -- Positive,
                               Element_Type => Wp_Post);
 
    subtype Post_Array is Post_Arrays.Vector;

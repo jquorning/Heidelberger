@@ -539,7 +539,7 @@ is
    -- @return int
    --
    function Get_Queried_Object_Id (This : Wp_Query)
-                                   return Class_Posts.Post_Id; -- Integer;
+                                   return Class_Posts.Post_Id_Type; -- Integer;
 
    --
    -- Constructor.

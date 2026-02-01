@@ -3410,14 +3410,14 @@ is
    ---------------------------
 
    function Get_Queried_Object_Id (This : Wp_Query)
-                                   return Class_Posts.Post_Id -- Integer
+                                   return Class_Posts.Post_Id_Type -- Integer
    is
       use Class_Posts;
 
       Unused : constant Wp_Post := This.Get_Queried_Object;
    begin
       if This.Queried_Object_Id /= 0 then -- isset
-         return Class_Posts.Post_Id (This.Queried_Object_Id);
+         return Class_Posts.Post_Id_Type (This.Queried_Object_Id);
       end if;
 
       return 0;

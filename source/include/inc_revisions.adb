@@ -47,7 +47,7 @@ is
       use Inc_Posts;
 
       Revision : constant Wp_Post :=
-        Get_Post (Post_Id (Post), "OBJECT", Filter);
+        Get_Post (Post_Id_Type (Post), "OBJECT", Filter);
    begin
       if Revision = Null_Post then
          return Revision;
