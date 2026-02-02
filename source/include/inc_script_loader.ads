@@ -324,6 +324,8 @@ is
    function Wp_Filter_Out_Block_Nodes (Nodes : Array_Type)
                                        return Array_Type;
 
+   procedure Wp_Filter_Out_Block_Nodes; -- For Add_Filter -- jq
+
    --
    -- Enqueues the global styles defined via theme.json.
    --

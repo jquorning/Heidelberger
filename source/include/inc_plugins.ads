@@ -205,10 +205,10 @@ is
                          Priority      : Priority_Type := 10;
                          Accepted_Args : Integer       := 1);
 
-   procedure Add_Filter (Hook_Name     : String;
-                         Callback      : Callable_5;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1);
+   -- procedure Add_Filter (Hook_Name     : String;
+   --                       Callback      : Callable_5;
+   --                       Priority      : Priority_Type := 10;
+   --                       Accepted_Args : Integer       := 1);
 
    --
    -- Calls the callback functions that have been added to a filter hook.

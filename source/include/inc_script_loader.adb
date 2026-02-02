@@ -3019,6 +3019,18 @@ is
         );
    end Wp_Filter_Out_Block_Nodes;
 
+   -------------------------------
+   -- Wp_Filter_Out_Block_Nodes --
+   -------------------------------
+
+   procedure Wp_Filter_Out_Block_Nodes
+   is
+      Unused : constant Array_Type :=
+        Wp_Filter_Out_Block_Nodes (Empty_Array);
+   begin
+      null;
+   end Wp_Filter_Out_Block_Nodes;
+
    ------------------------------
    -- Wp_Enqueue_Global_Styles --
    ------------------------------

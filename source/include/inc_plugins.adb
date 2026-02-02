@@ -122,7 +122,7 @@ is
                          Accepted_Args : Integer       := 1)
    is
    begin
-      null;
+      raise Program_Error with "not implemented";
    end Add_Filter;
 
    procedure Add_Filter (Hook_Name     : String;
@@ -131,17 +131,17 @@ is
                          Accepted_Args : Integer       := 1)
    is
    begin
-      null;
+      raise Program_Error with "not implemented";
    end Add_Filter;
 
-   procedure Add_Filter (Hook_Name     : String;
-                         Callback      : Callable_5;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1)
-   is
-   begin
-      null;
-   end Add_Filter;
+   -- procedure Add_Filter (Hook_Name     : String;
+   --                       Callback      : Callable_5;
+   --                       Priority      : Priority_Type := 10;
+   --                       Accepted_Args : Integer       := 1)
+   -- is
+   -- begin
+   --    raise Program_Error with "not implemented";
+   -- end Add_Filter;
 
    -------------------
    -- Apply_Filters --
@@ -160,9 +160,11 @@ is
 
       Args_2 : Array_Type := Args;
    begin
-      if Natural_Maps.Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
+      Logging.Log ("inc_pluging.apply_filters", Hook_Name);
+
+      if not Natural_Maps.Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
 --    if not Isset (Wp_Filters (Hook_Name)) then
-         Global_Wp_Filters (Hook_Name) := 1;
+         Global_Wp_Filters.Include (Hook_Name, 1);
       else
          Global_Wp_Filters (Hook_Name) :=
            Global_Wp_Filters (Hook_Name) + 1;

@@ -142,13 +142,15 @@ is
    function Wp_Robots_Sensitive_Page (Robots : Array_Type)
                                       return Array_Type;
 
+   procedure Wp_Robots_Sensitive_Page; -- For Add_Filer -- jq
+
    --
    -- Adds `max-image-preview:large` to the robots meta tag.
    --
    -- This directive tells web robots that large image previews are allowed to be
    -- displayed, e.g. in search engines, unless the blog is marked as not being public.
    --
-   -- Typical usage is as a then@see "wp_robots"end; callback:
+   -- Typical usage is as a {@see "wp_robots"} callback:
    --
    --     add_filter( "wp_robots", "wp_robots_max_image_preview_large" );
    --
@@ -159,5 +161,7 @@ is
    --
    function Wp_Robots_Max_Image_Preview_Large (Robots : Array_Type)
                                                return Array_Type;
+
+   procedure Wp_Robots_Max_Image_Preview_Large; -- For Add_Filter -- jq
 
 end Inc_Robots_Templates;
