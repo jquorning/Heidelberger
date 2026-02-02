@@ -13,8 +13,6 @@ package POMO_Streams
 is
    use UStrings;
 
-   procedure Dummy;
-
 -- if ( ! class_exists( "POMO_Reader", false ) ) :
 --        #[AllowDynamicProperties]
    type POMO_Reader is tagged

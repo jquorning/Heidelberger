@@ -11,7 +11,6 @@ with Adi_Class_Wp_Posts_List_Tables;
 
 package body Adi_List_Tables
 is
-   procedure Dummy is null;
 
 -- --
 -- -- Fetches an instance of a WP_List_Table class.

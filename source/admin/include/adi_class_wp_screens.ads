@@ -13,7 +13,6 @@ package Adi_Class_Wp_Screens
 is
    use Arrays;
 
-   procedure Dummy;
 --
 -- Core class used to implement an admin screen API.
 --

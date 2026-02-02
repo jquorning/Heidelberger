@@ -10,7 +10,6 @@ with Php.Arrays;
 
 package body POMO_Translations
 is
-   procedure Dummy is null;
 
 -- -- require_once __DIR__ . "/plural-forms.php";
 -- -- require_once __DIR__ . "/entry.php";

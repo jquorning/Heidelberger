@@ -14,8 +14,6 @@ package Adi_List_Tables
 is
    use Arrays;
 
-   procedure Dummy;
-
    --
    -- Fetches an instance of a WP_List_Table class.
    --

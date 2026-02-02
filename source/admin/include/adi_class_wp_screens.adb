@@ -11,7 +11,6 @@ with Php.Strings;
 
 package body Adi_Class_Wp_Screens
 is
-   procedure Dummy is null;
 
    ---------
    -- Get --

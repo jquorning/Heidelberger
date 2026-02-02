@@ -17,8 +17,6 @@ package POMO_Translations
 is
    use Arrays;
 
-   procedure Dummy;
-
 -- if ( ! class_exists( 'Translations', false ) ) :
 --        #[AllowDynamicProperties]
    type Translations is tagged

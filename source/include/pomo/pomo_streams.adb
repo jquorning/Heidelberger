@@ -9,7 +9,6 @@
 
 package body POMO_Streams
 is
-   procedure Dummy is null;
 
 -- if ( ! class_exists( "POMO_Reader", false ) ) :
 --         #[AllowDynamicProperties]
