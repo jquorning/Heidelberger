@@ -864,7 +864,7 @@ is
 
    function Find_Changeset_Post_Id (This : Wp_Customize_Manager;
                                     UUID : String)
-                                    return Post_Id_Type -- Natural
+                                    return Class_Posts.Post_Id_Type
    is
       use Inc_Caches;
       use Class_Posts;
@@ -988,8 +988,10 @@ is
    -----------------------
 
    function Changeset_Post_Id (This : in out Wp_Customize_Manager)
-                               return Post_Id_Type -- Natural
+                               return Class_Posts.Post_Id_Type
    is
+      use Class_Posts;
+
       Post : Post_Id_Type;
    begin
       if not This.X_Changeset_Post_Id_Set then
@@ -3184,7 +3186,7 @@ is
    ------------------------
 
    procedure Set_Changeset_Lock (This              : Wp_Customize_Manager;
-                                 Changeset_Post_Id : Post_Id_Type; -- Integer;
+                                 Changeset_Post_Id : Class_Posts.Post_Id_Type;
                                  Take_Over         : Boolean := False)
    is
       use Php.Misc;
@@ -3226,7 +3228,7 @@ is
    ----------------------------
 
    procedure Refresh_Changeset_Lock (This              : Wp_Customize_Manager;
-                                     Changeset_Post_Id : Post_Id_Type) -- Integer)
+                                     Changeset_Post_Id : Class_Posts.Post_Id_Type)
    is
       use Php.Misc;
       use Php.Strings;
@@ -3744,7 +3746,6 @@ is
    is
       use Wp_Common;
       use Class_Customize_Settings;
-      use Inc_Plugins;
 
       Args_2 : Array_Type := Args;
       Setting : Wp_Customize_Setting;
@@ -3796,7 +3797,6 @@ is
    is
       use Wp_Common;
       use Class_Customize_Settings;
-      use Inc_Plugins;
 
       New_Settings : Setting_Lists.Vector; -- Array_Type;
    begin

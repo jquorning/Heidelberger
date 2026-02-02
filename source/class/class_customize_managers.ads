@@ -31,8 +31,6 @@ is
    subtype Wp_Customize_Setting
      is Class_Customize_Settings.Wp_Customize_Setting;
 
-   subtype Post_Id_Type is Class_Posts.Post_Id_Type;
-
    subtype Setting_Index is Positive;
 
    package Setting_Lists is new
@@ -283,7 +281,7 @@ is
          -- @var int|false
          --
          -- private
-         X_Changeset_Post_Id     : Post_Id_Type; -- Integer;
+         X_Changeset_Post_Id     : Class_Posts.Post_Id_Type; -- Integer;
          X_Changeset_Post_Id_Set : Boolean := False;
 
          --
@@ -438,7 +436,7 @@ is
    --
    function Find_Changeset_Post_Id (This : Wp_Customize_Manager;
                                     UUID : String)
-                                    return Post_Id_Type; -- Natural;
+                                    return Class_Posts.Post_Id_Type;
 
    --
    -- Gets changeset posts.
@@ -473,7 +471,7 @@ is
    -- @return int|null Post ID on success or null if there is no post yet saved.
    --
    function Changeset_Post_Id (This : in out Wp_Customize_Manager)
-                               return Post_Id_Type; -- Natural;
+                               return Class_Posts.Post_Id_Type;
 
    --
    -- Returns the sanitized value for a given setting from the current customized
@@ -578,7 +576,7 @@ is
    -- @param bool take_over Whether to take over the changeset. Default false.
    --
    procedure Set_Changeset_Lock (This              : Wp_Customize_Manager;
-                                 Changeset_Post_Id : Post_Id_Type; -- Integer;
+                                 Changeset_Post_Id : Class_Posts.Post_Id_Type;
                                  Take_Over         : Boolean := False);
    --
    -- Refreshes changeset lock with the current time if current user edited the
@@ -589,7 +587,7 @@ is
    -- @param int changeset_post_id Changeset post ID.
    --
    procedure Refresh_Changeset_Lock (This              : Wp_Customize_Manager;
-                                     Changeset_Post_Id : Post_Id_Type); -- Integer);
+                                     Changeset_Post_Id : Class_Posts.Post_Id_Type);
 
    --
    -- Adds a customize setting.
