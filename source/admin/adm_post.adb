@@ -371,12 +371,12 @@ is
 
                      Unused  : Integer;
                      Newmeta : Array_Type :=
-                        Wp_Get_Attachment_Metadata (Integer (Id), True);
+                        Wp_Get_Attachment_Metadata (Id, True);
                   begin
                      Set (Newmeta, "thumb",
                           From_String (Wp_Basename (Get_As_String (X_POST, "thumb"))));
 
-                     Unused := Wp_Update_Attachment_Metadata (Integer (Id), Newmeta);
+                     Unused := Wp_Update_Attachment_Metadata (Id, Newmeta);
                   end;
                   -- Intentional fall-through to trigger the edit_post() call.
 
@@ -497,13 +497,13 @@ is
                      declare
                         Force : constant Boolean := not MEDIA_TRASH;
                      begin
-                        if Wp_Delete_Attachment (Integer (Id), Force) = Null_Post then
+                        if Wp_Delete_Attachment (Id, Force) = Null_Post then
                            Wp_Die
                               (abs "Error in deleting the attachment.");
                         end if;
                      end;
                   else
-                     if Wp_Delete_Post (Integer (Id), True) = Null_Post then
+                     if Wp_Delete_Post (Id, True) = Null_Post then
                         Wp_Die (abs "Error in deleting the item.");
                      end if;
                   end if;

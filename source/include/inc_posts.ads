@@ -910,12 +910,12 @@ is
    --                           Must be serializable if non-scalar. Default empty.
    -- @return bool True on success, False on failure.
    --
-   function Delete_Post_Meta (Post_Id    : Integer;
+   function Delete_Post_Meta (Post_Id    : Class_Posts.Post_Id_Type;
                               Meta_Key   : String;
                               Meta_Value : Multi_Type := From_String (""))
                               return Boolean;
 
-   procedure Delete_Post_Meta (Post_Id    : Integer;
+   procedure Delete_Post_Meta (Post_Id    : Class_Posts.Post_Id_Type;
                                Meta_Key   : String;
                                Meta_Value : Multi_Type := From_String (""));
 
@@ -955,7 +955,7 @@ is
    --                           Default False.
    -- @return WP_Post|False|null Post data on success, False or null on failure.
    --
-   function Wp_Delete_Post (Postid       : Integer := 0;
+   function Wp_Delete_Post (Postid       : Class_Posts.Post_Id_Type := 0;
                             Force_Delete : Boolean := False)
                             return Class_Posts.Wp_Post
    is (raise Program_Error with "not implemented");
@@ -1078,7 +1078,7 @@ is
    --                           Default False.
    -- @return WP_Post|False|null Post data on success, False or null on failure.
    --
-   function Wp_Delete_Attachment (Post_Id      : Integer;
+   function Wp_Delete_Attachment (Post_Id      : Class_Posts.Post_Id_Type;
                                   Force_Delete : Boolean := False)
                                   return Class_Posts.Wp_Post
    is (raise Program_Error with "not implemented");
@@ -1119,7 +1119,7 @@ is
    -- @param array data          Attachment meta data.
    -- @return int|False False if post is invalid.
    --
-   function Wp_Update_Attachment_Metadata (Attachment_Id : Integer;
+   function Wp_Update_Attachment_Metadata (Attachment_Id : Class_Posts.Post_Id_Type;
                                            Data          : Array_Type)
                                            return Integer
    is (raise Program_Error with "not implemented");
@@ -1202,7 +1202,7 @@ is
    -- @param int $post_id Optional. Post ID. Default is the ID of the global `$post`.
    -- @return WP_Post|false|null Post data on success, false or null on failure.
    --
-   function Wp_Untrash_Post (Post_Id : Integer := 0)
+   function Wp_Untrash_Post (Post_Id : Class_Posts.Post_Id_Type := 0)
                              return Class_Posts.Wp_Post;
 
    function Wp_Untrash_Post (Item : String)
@@ -1456,7 +1456,7 @@ is
    -- @param int $attachment_id Optional. Attachment post ID. Defaults to global $post.
    -- @return string|false Attachment URL, otherwise false.
    --
-   function Wp_Get_Attachment_URL (Attachment_Id : Integer := 0)
+   function Wp_Get_Attachment_URL (Attachment_Id : Class_Posts.Post_Id_Type := 0)
                                    return String
    is (raise Program_Error with "not implemented");
 
@@ -1482,7 +1482,7 @@ is
    -- }
    --
 
-   function Wp_Get_Attachment_Metadata (Attachment_Id : Integer := 0;
+   function Wp_Get_Attachment_Metadata (Attachment_Id : Class_Posts.Post_Id_Type := 0;
                                         Unfiltered    : Boolean := False)
                                         return Array_Type
    is (raise Program_Error with "not implemented");
@@ -1510,13 +1510,15 @@ is
    --
    -- @param string new_status      The new status of the post being restored.
    -- @param int    post_id         The ID of the post being restored.
-   -- @param string previous_status The status of the post at the point where it was trashed.
+   -- @param string previous_status The status of the post at the point where it
+   --                               was trashed.
    -- @return string The new status of the post.
    --
-   function Wp_Untrash_Post_Set_Previous_Status (New_Status      : String;
-                                                 Post_Id         : Integer;
-                                                 Previous_Status : String)
-                                                 return String
+   function Wp_Untrash_Post_Set_Previous_Status
+              (New_Status      : String;
+               Post_Id         : Class_Posts.Post_Id_Type;
+               Previous_Status : String)
+               return String
    is (raise Program_Error with "not implemented");
 
    -- By jq

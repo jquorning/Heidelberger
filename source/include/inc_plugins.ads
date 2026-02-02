@@ -25,6 +25,7 @@ with Lists;
 with Class_Admin_Bar;
 with Class_Errors;
 with Class_Hooks;
+with Class_Posts;
 with Class_Roles;
 with Class_Styles;
 with Class_Taxonomy;
@@ -37,7 +38,7 @@ is
 
    type Callable_2 is access function return Array_Type;
    type Callable_3 is access function (New_Status      : String;
-                                       Post_Id         : Integer;
+                                       Post_Id         : Class_Posts.Post_Id_Type;
                                        Previous_Status : String)
                                        return String;
    type Callable_5 is access function (Arry : Array_Type)

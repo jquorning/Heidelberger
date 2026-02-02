@@ -16,7 +16,6 @@ with Php.Numerics;
 with Php.Strings;
 
 with Globals;
-with Helpers;
 with Helpers_3;
 with Wp_Common;
 
@@ -1401,7 +1400,6 @@ is
                                   return Boolean
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       if Get_Post (Attachment_Id).Is_Empty then
 --    if not Get_Post (Attachment_Id) then
@@ -1427,7 +1425,7 @@ is
                                      From_String (File_3));
          else
             return
-              Delete_Post_Meta (Integer (Attachment_Id), "_wp_attached_file");
+              Delete_Post_Meta (Attachment_Id, "_wp_attached_file");
          end if;
       end;
    end Update_Attached_File;
@@ -1455,7 +1453,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_Functions;
-      use Inc_Plugins;
 
       New_Path : UString := +Path;
 
@@ -1641,7 +1638,6 @@ is
                       return Class_Posts.Wp_Post
    is
       use Helpers_3;
-      use Wp_Common;
       use UStrings;
       use Class_Posts;
 
@@ -3265,29 +3261,30 @@ is
    -- Delete_Post_Meta --
    ----------------------
 
-   function Delete_Post_Meta (Post_Id    : Integer;
+   function Delete_Post_Meta (Post_Id    : Class_Posts.Post_Id_Type;
                               Meta_Key   : String;
                               Meta_Value : Multi_Type := From_String (""))
                               return Boolean
    is
+      use Class_Posts;
       use Inc_Meta;
       use Inc_Revisions;
 
       -- Make sure meta is deleted from the post, not from a revision.
-      The_Post : constant Integer :=
-        Wp_Is_Post_Revision (Post_Id);
+      The_Post : constant Post_Id_Type :=
+        Post_Id_Type (Wp_Is_Post_Revision (Post_Id));
 
-      Post_Id_2 : constant Integer :=
+      Post_Id_2 : constant Post_Id_Type :=
         (if The_Post /= 0 then The_Post else Post_Id);
    begin
-      return Delete_Metadata ("post", Post_Id_2, Meta_Key, Meta_Value);
+      return Delete_Metadata ("post", Integer (Post_Id_2), Meta_Key, Meta_Value);
    end Delete_Post_Meta;
 
    ----------------------
    -- Delete_Post_Meta --
    ----------------------
 
-   procedure Delete_Post_Meta (Post_Id    : Integer;
+   procedure Delete_Post_Meta (Post_Id    : Class_Posts.Post_Id_Type;
                                Meta_Key   : String;
                                Meta_Value : Multi_Type := From_String (""))
    is
@@ -4518,7 +4515,7 @@ is
 -- @param int post_id Optional. Post ID. Default is the ID of the global `post`.
 -- @return WP_Post|False|null Post data on success, False or null on failure.
 --
-   function Wp_Untrash_Post (Post_Id : Integer := 0)
+   function Wp_Untrash_Post (Post_Id : Class_Posts.Post_Id_Type := 0)
                              return Class_Posts.Wp_Post
    is
       use Class_Posts;

@@ -16,12 +16,12 @@ is
    -- Wp_Is_Post_Revision --
    -------------------------
 
-   function Wp_Is_Post_Revision (Post : Integer)
+   function Wp_Is_Post_Revision (Post : Class_Posts.Post_Id_Type)
                                  return Integer
    is
       use Class_Posts;
 
-      Post_2 : Integer := Post;
+      Post_2 : Post_Id_Type := Post;
 
       Post_3 : constant Wp_Post := Wp_Get_Post_Revision (Post_2);
    begin
@@ -37,7 +37,7 @@ is
    -- Wp_Get_Post_Revision --
    --------------------------
 
-   function Wp_Get_Post_Revision (Post   : in out Integer; -- &
+   function Wp_Get_Post_Revision (Post   : in out Class_Posts.Post_Id_Type; -- &
                                   Output : String := "OBJECT";
                                   Filter : String := "raw")
                                   return Class_Posts.Wp_Post
@@ -47,7 +47,7 @@ is
       use Inc_Posts;
 
       Revision : constant Wp_Post :=
-        Get_Post (Post_Id_Type (Post), "OBJECT", Filter);
+        Get_Post (Post, "OBJECT", Filter);
    begin
       if Revision = Null_Post then
          return Revision;

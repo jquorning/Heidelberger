@@ -82,11 +82,13 @@ is
       use Class_Post_Type;
       use Class_WpDB;
       use Inc_Capabilities;
+      use Inc_Functions;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Link_Templates;
       use Inc_L10n;
       use Inc_Plugins;
+      use Inc_Pluggables;
       use Inc_Posts;
 --
 --  @global string       $post_type
@@ -129,7 +131,7 @@ is
 
       if False then
 --    if not Current_User_Can (Get (Post_Type_Object.Cap, "edit_posts")) then
-         Inc_Functions.Wp_Die
+         Wp_Die
            ("<h1>" & abs "You need a higher level of permission."  & "</h1>" &
             "<p>"  & abs "Sorry, you are not allowed to edit posts in this post type." &
             "</p>",
@@ -173,11 +175,8 @@ is
                                        else "post-new?post_type=" & (-Post_Type));
 
             if Doaction = "" then   -- if doaction then
-               Inc_Pluggables.Check_Admin_Referer ("bulk-posts");
+               Check_Admin_Referer ("bulk-posts");
                   declare
---                   use String_Vectors;
-                     use Inc_Functions;
-
                      List_2 : constant List_Type :=
                        ["trashed", "untrashed", "deleted", "locked",  "ids"];
 
@@ -247,7 +246,7 @@ is
                         end if;
 
                         if Post_Ids.Is_Empty then
-                           Inc_Pluggables.Wp_Redirect (-Sendback);
+                           Wp_Redirect (-Sendback);
                            return; -- exit;  -- redirect
                         end if;
 
@@ -261,7 +260,7 @@ is
                            begin
                               for Post_Id of Post_Ids loop -- foreach (To_Array)
                                  if not Current_User_Can ("delete_post", Post_Id) then
-                                    Inc_Functions.Wp_Die
+                                    Wp_Die
                                       (abs "Sorry, you are not allowed to move this item to the Trash.");
                                  end if;
 
@@ -271,7 +270,7 @@ is
                                  end if;
 
                                  if not Wp_Trash_Post (Post_Id) then
-                                    Inc_Functions.Wp_Die
+                                    Wp_Die
                                       (abs "Error in moving the item to Trash.");
                                  end if;
 
@@ -299,18 +298,18 @@ is
                               then
                                  Add_Filter
                                    ("wp_untrash_post_status",
-                                    Inc_Posts.Wp_Untrash_Post_Set_Previous_Status'Access,
+                                    Wp_Untrash_Post_Set_Previous_Status'Access,
                                     10, 3);
                               end if;
 
                               for Post_Id of Post_Ids loop
                                  if not Current_User_Can ("delete_post", Post_Id) then
-                                    Inc_Functions.Wp_Die
+                                    Wp_Die
                                       (abs "Sorry, you are not allowed to restore this item from the Trash.");
                                  end if;
 
                                  if not Inc_Posts.Wp_Untrash_Post (Post_Id) then
-                                    Inc_Functions.Wp_Die
+                                    Wp_Die
                                       (abs "Error in restoring the item from Trash.");
                                  end if;
 
@@ -336,18 +335,18 @@ is
                                       Inc_Posts.Get_Post (Post_Id_Type'Value (Id));
                                  begin
                                     if not Current_User_Can ("delete_post", Id) then
-                                       Inc_Functions.Wp_Die
+                                       Wp_Die
                                           (abs "Sorry, you are not allowed to delete this item.");
                                     end if;
 
                                     if "attachment" = Post_Del.Post_Type then
-                                       if Wp_Delete_Attachment (Integer'Value (Id)) = Null_Post then
-                                          Inc_Functions.Wp_Die
+                                       if Wp_Delete_Attachment (Post_Id_Type'Value (Id)) = Null_Post then
+                                          Wp_Die
                                              (abs "Error in deleting the attachment.");
                                        end if;
                                     else
-                                       if Wp_Delete_Post (Integer'Value (Id)) = Null_Post then
-                                          Inc_Functions.Wp_Die
+                                       if Wp_Delete_Post (Post_Id_Type'Value (Id)) = Null_Post then
+                                          Wp_Die
                                             (abs "Error in deleting the item.");
                                        end if;
                                     end if;
@@ -420,7 +419,7 @@ is
                         begin
                            Sendback := +Remove_Query_Arg (List, -Sendback);
                         end;
-                        Inc_Pluggables.Wp_Redirect (-Sendback);
+                        Wp_Redirect (-Sendback);
                         return; -- exit;  -- redirect
                      end;
                   end;
@@ -429,16 +428,14 @@ is
 --          elsif not Empty (String'(Get (X_REQUEST, "_wp_http_referer"))) then
                declare
                   use Inc_Formatting;
-                  use Inc_Functions;
---                use String_Vectors;
 
                   List : constant List_Type :=
                     ["_wp_http_referer", "_wpnonce"];
                begin
-                  Inc_Pluggables.Wp_Redirect
-                            (Remove_Query_Arg
-                             (List,
-                              Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI"))));
+                  Wp_Redirect
+                    (Remove_Query_Arg
+                      (List,
+                       Wp_Unslash (Get_As_String (X_SERVER, "REQUEST_URI"))));
                end;
                return; -- exit;  -- redirect
             end if;

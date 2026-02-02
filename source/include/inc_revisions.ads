@@ -278,7 +278,7 @@ is
    -- @param int|WP_Post post Post ID or post object.
    -- @return int|false ID of revision's parent on success, false if not a revision.
    --
-   function Wp_Is_Post_Revision (Post : Integer)
+   function Wp_Is_Post_Revision (Post : Class_Posts.Post_Id_Type)
                                  return Integer;
 
 -- --
@@ -363,7 +363,7 @@ is
    -- @param string      filter Optional sanitization filter. See sanitize_post().
    -- @return WP_Post|array|null WP_Post (or array) on success, or null on failure.
    --
-   function Wp_Get_Post_Revision (Post   : in out Integer; -- &
+   function Wp_Get_Post_Revision (Post   : in out Class_Posts.Post_Id_Type; -- &
                                   Output : String := "OBJECT";
                                   Filter : String := "raw")
                                   return Class_Posts.Wp_Post;
