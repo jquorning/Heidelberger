@@ -916,7 +916,7 @@ is
                           Post_Id_Type'Value (Ids.First_Element);
 
                         URL  : constant String  :=
-                           ESC_URL (Get_Edit_Post_Link (Integer (Id)));
+                           ESC_URL (Get_Edit_Post_Link (Id));
 
                         Post : constant String  := -- Inc_Class_Posts.Wp_Post :=
                            Inc_Posts.Get_Post_Type (Id);

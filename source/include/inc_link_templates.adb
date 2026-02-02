@@ -1562,8 +1562,8 @@ is
          declare
             Show_On_Front  : constant String  := Get_Option ("show_on_front");
 
-            Page_For_Posts : constant Class_Posts.Post_Id_Type :=
-              Class_Posts.Post_Id_Type (Integer'(Get_Option ("page_for_posts")));
+            Page_For_Posts : constant Post_Id_Type :=
+              Post_Id_Type (Integer'(Get_Option ("page_for_posts")));
          begin
             if "page" = Show_On_Front and then Page_For_Posts /= 0 then
                Link := +Get_Permalink (Page_For_Posts);
@@ -1725,7 +1725,7 @@ is
    -- Get_Edit_Post_Link --
    ------------------------
 
-   function Get_Edit_Post_Link (Post    : Integer := 0;
+   function Get_Edit_Post_Link (Post    : Class_Posts.Post_Id_Type := 0;
                                 Context : String  := "display")
                                 return String
    is
@@ -1737,7 +1737,7 @@ is
       use Class_Post_Type;
       use Inc_Posts;
 
-      Post_2 : constant Wp_Post := Get_Post (Post_Id_Type (Post));
+      Post_2 : constant Wp_Post := Get_Post (Post);
       Action : UString;
       Link   : UString;
    begin

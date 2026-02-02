@@ -6643,7 +6643,7 @@ is
          Pages    : Post_Array := Globals.WpDB.Get_Results (SQL, "OBJECT_K");
          Revparts : constant List_Type  := List_Reverse (Parts);
 
-         Foundid : Natural := 0;
+         Foundid : Post_Id_Type := 0;
       begin
          Outer :
          for Page of Pages loop -- (array)
@@ -6679,7 +6679,7 @@ is
 --                  Count (Revparts) = Count + 1 and then
                     P.Post_Name = Revparts (Count)
                   then
-                     Foundid := Integer (Page.Id);
+                     Foundid := Page.Id;
                      exit Outer when Page.Post_Type = Post_Type;
                   end if;
                end;
@@ -6687,10 +6687,10 @@ is
          end loop Outer;
 
          -- We cache misses as well as hits.
-         Wp_Cache_Set (Cache_Key, Foundid, "posts");
+         Wp_Cache_Set (Cache_Key, Integer (Foundid), "posts");
 
          if Foundid /= 0 then
-            return Get_Post (Post_Id_Type (Foundid), Output);
+            return Get_Post (Foundid, Output);
          end if;
       end;
       return Null_Post; -- null;

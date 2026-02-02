@@ -287,7 +287,7 @@ is
                         Unused : Array_Type := Wp_Set_Post_Lock (Integer (Id));
                      begin
                         Wp_Redirect
-                           (Get_Edit_Post_Link (Integer (Id), "url"));
+                           (Get_Edit_Post_Link (Id, "url"));
 --                         (Get_Edit_Post_Link (Build (image (Post_Id), "url")));
                      end;
                      goto Bailout;

@@ -397,7 +397,7 @@ is
    -- @return string|null The edit post link for the given post. Null if the post type
    --                     does not exist or does not allow an editing UI.
    --
-   function Get_Edit_Post_Link (Post    : Integer := 0;
+   function Get_Edit_Post_Link (Post    : Class_Posts.Post_Id_Type := 0;
                                 Context : String  := "display")
                                 return String;
 

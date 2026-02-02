@@ -1180,7 +1180,7 @@ is
                      Get_Post_Type_Object (-Current_Object.Post_Type);
 
                   Edit_Post_Link : constant String :=
-                     Get_Edit_Post_Link (Integer (Current_Object.Id));
+                     Get_Edit_Post_Link (Current_Object.Id);
                begin
                   if Post_Type_Object /= Null_Post_Type
                     or else Edit_Post_Link /= ""
