@@ -42,6 +42,11 @@ is
                            return String;
 
    function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Args      : Array_Type)
+                           return String;
+
+   function Apply_Filters (Hook_Name : String;
                            Value     : Boolean;
                            Post      : Class_Posts.Post_Id_Type)
                            return Boolean;

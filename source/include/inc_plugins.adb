@@ -148,13 +148,14 @@ is
    -------------------
 
    function Apply_Filters (Hook_Name : String;
-                           Value     : String;
+                           Value     : Array_Type;
                            Args      : Array_Type)
-                           return String
+                           return Array_Type
    is
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
+      use Natural_Maps;
       use UStrings;
       use Inc_Elab_Hooks;
 
@@ -162,7 +163,7 @@ is
    begin
       Logging.Log ("inc_pluging.apply_filters", Hook_Name);
 
-      if not Natural_Maps.Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
+      if not Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
 --    if not Isset (Wp_Filters (Hook_Name)) then
          Global_Wp_Filters.Include (Hook_Name, 1);
       else
@@ -176,8 +177,7 @@ is
          Global_Wp_Current_Filter.Append (Hook_Name);
 
          declare
-            All_Args : constant Array_Type := Func_Get_Args; -- ()
-            -- phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
+            All_Args : constant Array_Type := Func_Get_Args;
          begin
             X_Wp_Call_All_Hook (All_Args);
          end;
@@ -203,16 +203,15 @@ is
 
       declare
          Unused   : UString;
-         Filter   : Wp_Hook renames Global_Wp_Filter (Hook_Name);
+
          Filtered : constant Array_Type :=
-           Filter.Apply_Filters (Empty_Array, -- Value,
-                                 Args_2);
+           Global_Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
 --         Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
       begin
 
          Unused := +List_Pop (Global_Wp_Current_Filter);
 
-         return "XXX-941"; -- Filtered;
+         return Filtered;
       end;
    end Apply_Filters;
 

@@ -3,7 +3,6 @@
 --
 
 with Logging;
-with UStrings;
 
 with Inc_Plugins;
 
@@ -16,12 +15,22 @@ is
                            X         : String := "")
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters (Hook_Name : String;
+                           Value     : String;
+                           Args      : Array_Type)
+                           return String
+   is
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -30,12 +39,10 @@ is
                            Post      : Class_Posts.Post_Id_Type)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -45,12 +52,10 @@ is
                            Arg_4     : Array_Type := Empty_Array)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -60,12 +65,10 @@ is
                            N         : String := "")
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Empty_Array;
    end Apply_Filters;
 
@@ -75,12 +78,10 @@ is
                            List      : List_Type)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -91,12 +92,10 @@ is
                            I         : Integer)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -106,12 +105,10 @@ is
                            N         : Array_Type)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -120,12 +117,10 @@ is
                            Right     : Integer := 0)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -134,12 +129,10 @@ is
                            Right     : Integer := 0)
                            return List_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -151,12 +144,10 @@ is
                            Arg_5     : String)
                            return Integer
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -166,12 +157,10 @@ is
                            P         : Array_Type)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -181,12 +170,10 @@ is
                            P         : List_Type)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -194,12 +181,10 @@ is
                            Value     : Boolean)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -209,12 +194,10 @@ is
                            D         : String)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -224,12 +207,10 @@ is
                            B         : Boolean)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -238,12 +219,10 @@ is
                            B         : Integer := 0)
                            return Integer
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -254,12 +233,10 @@ is
                            E         : Boolean)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -268,12 +245,10 @@ is
                            C         : String)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -282,12 +257,10 @@ is
                            Id        : Integer)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -297,12 +270,10 @@ is
                            Strict    : Boolean)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -313,12 +284,10 @@ is
                            Blog      : Integer)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -329,12 +298,10 @@ is
                            Allow     : Boolean)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -344,12 +311,10 @@ is
                            Trans     : String)
                            return Integer
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -358,12 +323,10 @@ is
                            User      : Class_Users.Wp_User)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -374,12 +337,10 @@ is
                            A4        : Array_Type := Empty_Array)
                            return Class_Terms.Wp_Term_Array
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -390,12 +351,10 @@ is
                            A4         : Array_Type)
                            return Class_Terms.Wp_Term_Array
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -404,12 +363,10 @@ is
                            Id        : Class_Posts.Wp_Post)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return False; -- Value;
    end Apply_Filters;
 
@@ -418,12 +375,10 @@ is
                            Id        : Class_Posts.Post_Id_Type)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -432,12 +387,10 @@ is
                            C         : Class_Posts.Wp_Post)
                            return List_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Empty_List;
    end Apply_Filters;
 
@@ -447,12 +400,10 @@ is
                            B         : Boolean)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -461,12 +412,10 @@ is
                            C         : Class_Posts.Wp_Post)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -476,12 +425,10 @@ is
                            C         : Class_Posts.Wp_Post)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -491,12 +438,10 @@ is
                            Arg_4     : Boolean := False)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -506,12 +451,10 @@ is
                            Post      : Class_Posts.Wp_Post)
                            return Class_Terms.Wp_Term
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -522,12 +465,10 @@ is
                            B         : Boolean)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -537,12 +478,10 @@ is
                            B         : Boolean)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -551,12 +490,10 @@ is
                            Post      : Class_Posts.Post_Id_Type)
                            return Class_Terms.Wp_Term_Array
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -567,12 +504,10 @@ is
                            Res       : String)
                            return Class_Taxonomy.Int_Arrays.Vector
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -581,12 +516,10 @@ is
                            Status    : Inc_Posts.Status_Type)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -595,12 +528,10 @@ is
                            Status    : Class_Post_Type.Wp_Post_Type)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -609,12 +540,10 @@ is
                            Option    : String)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -624,12 +553,10 @@ is
                            Passed    : Boolean)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -640,12 +567,10 @@ is
                            Default   : Multi_Type)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -655,12 +580,10 @@ is
                            Id        : Integer)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -670,12 +593,10 @@ is
                            Option    : String)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -686,12 +607,10 @@ is
                            Net       : Natural)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -701,12 +620,10 @@ is
                            Old       : Multi_Type)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -716,12 +633,10 @@ is
                            Trans      : String)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -731,12 +646,10 @@ is
                            Trans      : String)
                            return Natural
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -747,12 +660,10 @@ is
                            Scheme     : String)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -762,12 +673,10 @@ is
                            Args       : Array_Type)
                            return Adi_Translation_Install.Trans_Result
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Adi_Translation_Install.Trans_Result'(Success => False,
                                                    Arry    => Empty_Array,
                                                    Error   => Class_Errors.Null_Wp_Error);
@@ -779,12 +688,10 @@ is
                            Args       : Array_Type)
                            return Adi_Translation_Install.Trans_Result
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -794,12 +701,10 @@ is
                            URL        : String)
                            return List_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -809,12 +714,10 @@ is
                            URL        : String)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Empty_Array;
    end Apply_Filters;
 
@@ -823,12 +726,10 @@ is
                            URL        : String)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return "XXX-942";
    end Apply_Filters;
 
@@ -837,12 +738,10 @@ is
                            Name       : String)
                            return Integer
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -852,12 +751,10 @@ is
                            Location   : String)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -867,12 +764,10 @@ is
                            Decimals   : Integer)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -883,12 +778,10 @@ is
                            Protocol   : String)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -899,12 +792,10 @@ is
                            Version    : String)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -913,12 +804,10 @@ is
                            Host       : String)
                            return List_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -931,12 +820,10 @@ is
                            Args       : Array_Type)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -946,12 +833,10 @@ is
                            Blog_Id    : Integer)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -961,12 +846,10 @@ is
                            GMT        : Boolean)
                            return String -- Php.Calendar.Time_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return "XXX-943";
    end Apply_Filters;
 
@@ -977,12 +860,10 @@ is
                            Icon       : Boolean)
                            return Inc_Media.Image_Src_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -992,12 +873,10 @@ is
                            User       : Class_Users.Wp_User)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1006,12 +885,10 @@ is
                            Redirect_To : String)
                            return Class_Errors.Wp_Error
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1021,12 +898,10 @@ is
                            User        : Inc_Users.User_Error_Type)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1035,12 +910,10 @@ is
                            User        : Inc_Users.User_Id_Error_Type)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1050,12 +923,10 @@ is
                            Password    : String)
                            return Inc_Users.User_Error_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1064,12 +935,10 @@ is
                            Errors      : Class_Errors.Wp_Error)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1078,12 +947,10 @@ is
                            Credentials : Array_Type)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1093,12 +960,10 @@ is
                            Typ        : String)
                            return Class_HTTP.Response_Result
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Class_HTTP.Response_Result'(Success => False,
                                          Arry    => Empty_Array,
                                          Error   => Class_Errors.Null_Wp_Error);
@@ -1110,12 +975,10 @@ is
                            URL        : String)
                            return Class_HTTP.Response_Result
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1127,12 +990,10 @@ is
                            Delete_All : Boolean)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1141,12 +1002,10 @@ is
                            T         : Class_Customize_Managers.Wp_Customize_Manager)
                            return List_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1156,12 +1015,10 @@ is
                            A         : Array_Type)
                            return Class_Customize_Managers.Wp_Customize_Setting
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1171,12 +1028,10 @@ is
                            Setting   : Boolean)
                            return Class_Customize_Managers.Wp_Customize_Setting
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1185,12 +1040,10 @@ is
                            T         : Class_Customize_Managers.Wp_Customize_Manager)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1199,12 +1052,10 @@ is
                            This      : Class_Customize_Settings.Wp_Customize_Setting)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1213,12 +1064,10 @@ is
                            This      : Class_Customize_Settings.Wp_Customize_Setting)
                            return Multi_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1228,12 +1077,10 @@ is
                            This      : Class_Customize_Settings.Wp_Customize_Setting)
                            return Class_Errors.Wp_Error
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1243,12 +1090,10 @@ is
                Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1257,12 +1102,10 @@ is
                Value     : List_Type; -- Boolean;
                Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1272,12 +1115,10 @@ is
                            Protocols : List_Type)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1288,12 +1129,10 @@ is
                            Args      : Inc_Capabilities.Args_Type)
                            return List_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1306,12 +1145,10 @@ is
                            L         : List_Type)
                            return Boolean
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1321,12 +1158,10 @@ is
                            This      : Class_Users.Wp_User)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1337,12 +1172,10 @@ is
                            Domain    : String)
                            return String
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1352,12 +1185,10 @@ is
                            P         : Natural)
                            return Natural
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1366,12 +1197,10 @@ is
                            Post_Id   : Integer)
                            return Inc_Comments.Comment_Counts
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1381,12 +1210,10 @@ is
                            Tax       : Array_Type)
                            return Array_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1395,12 +1222,10 @@ is
                Value     : Class_Sites.Wp_Site)
                return Class_Sites.Wp_Site
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1410,12 +1235,10 @@ is
                Name      : String)
                return Class_Users.User_Id_Type
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 
@@ -1424,12 +1247,10 @@ is
                Value     : Array_Vectors.Array_Vector)
                return Array_Vectors.Array_Vector
    is
-      use UStrings;
-
-      Unused : UString;
+      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := +Inc_Plugins.Apply_Filters (Hook_Name, "", Empty_Array);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
       return Value;
    end Apply_Filters;
 

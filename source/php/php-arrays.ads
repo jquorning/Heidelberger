@@ -107,7 +107,12 @@ is
    is (raise Program_Error with "not implemented");
 
    procedure Array_Unshift (Arry : in out Array_Type;
-                            S    : String) is null;
+                            S    : String)
+                            is null;
+
+   procedure Array_Unshift (Arry : in out Array_Type;
+                            S    : Array_Type)
+                            is null;
 
    function Array_Values (Arry : Array_Type)
                           return List_Type;

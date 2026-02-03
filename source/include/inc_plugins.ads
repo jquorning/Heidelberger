@@ -23,12 +23,9 @@ with Arrays;
 with Lists;
 
 with Class_Admin_Bar;
-with Class_Errors;
 with Class_Hooks;
 with Class_Posts;
-with Class_Roles;
 with Class_Styles;
-with Class_Taxonomy;
 
 package Inc_Plugins
 is
@@ -253,9 +250,9 @@ is
    -- @return mixed The filtered value after all hooked functions are applied to it.
    --
    function Apply_Filters (Hook_Name : String;
-                           Value     : String;
+                           Value     : Array_Type;
                            Args      : Array_Type)
-                           return String;
+                           return Array_Type;
 
    --
    -- Calls the callback functions that have been added to a filter hook, specifying
