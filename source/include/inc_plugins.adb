@@ -927,4 +927,9 @@ is
       end loop;
    end Dump_Hooks;
 
+begin
+
+   Globals.Global_Wp_Filter :=
+     Inc_Elab_Hooks.Build_Preinitialized_Hooks (Globals.Global_Wp_Filter);
+
 end Inc_Plugins;

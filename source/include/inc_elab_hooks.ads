@@ -1,7 +1,10 @@
+--
+--
+--
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
-with Arrays;
+-- with Arrays;
 
 with Class_Hooks;
 
@@ -48,7 +51,7 @@ is
    -- @return WP_Hook[] Array of normalized filters.
    --
    -- static
-   function Build_Preinitialized_Hooks (Filters : Arrays.Array_Type)
+   function Build_Preinitialized_Hooks (Filters : Hook_Maps.Map) -- Arrays.Array_Type)
                                         return Hook_Maps.Map;
 
 end Inc_Elab_Hooks;

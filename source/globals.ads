@@ -49,9 +49,7 @@ is
         (Key_Type     => String,
          Element_Type => Natural);
 
-   Global_Wp_Filter  : Inc_Elab_Hooks.Hook_Maps.Map; --  :=
---   Inc_Elab_Hooks.Build_Preinitialized_Hooks (Empty_Array); --  (Wp_Filter);
-
+   Global_Wp_Filter         : Inc_Elab_Hooks.Hook_Maps.Map;
    Global_Wp_Actions        : Count_Maps.Map;
    Global_Wp_Filters        : Natural_Maps.Map;
    Global_Wp_Current_Filter : List_Type;
