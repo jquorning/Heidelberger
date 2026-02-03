@@ -4,7 +4,6 @@
 -- @since 1.5.0
 --
 
-with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
@@ -14,6 +13,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Constants;
+with Globals;
 with Helpers;
 with Logging;
 with UStrings;
@@ -58,27 +58,6 @@ is
 --         wp_current_filter = array();
 -- end;
 
-   package Count_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Natural);
-
-   package Natural_Maps is new
-      Ada.Containers.Indefinite_Ordered_Maps
-        (Key_Type     => String,
-         Element_Type => Natural);
-
-   -------------
-   -- Globals --
-   -------------
-
-   Global_Wp_Filter  : Inc_Elab_Hooks.Hook_Maps.Map :=
-     Inc_Elab_Hooks.Build_Preinitialized_Hooks (Empty_Array); --  (Wp_Filter);
-
-   Global_Wp_Actions        : Count_Maps.Map;
-   Global_Wp_Filters        : Natural_Maps.Map;
-   Global_Wp_Current_Filter : List_Type;
-
    ----------------
    -- Add_Filter --
    ----------------
@@ -89,6 +68,7 @@ is
                         Accepted_Args : Integer := 1)
                         return Boolean
    is
+      use Globals;
       use Class_Hooks;
       use Inc_Elab_Hooks;
 
@@ -146,7 +126,8 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
-      use Natural_Maps;
+      use Globals;
+      use Globals.Natural_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
 
       Args_2 : Array_Type := Args;
@@ -254,6 +235,7 @@ is
                         Callback  : Callable := null) -- Boolean := False)
                         return Boolean
    is
+      use Globals;
       use Inc_Elab_Hooks.Hook_Maps;
    begin
       if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
@@ -335,6 +317,7 @@ is
    function Current_Filter
             return String
    is
+      use Globals;
    begin
       return Global_Wp_Current_Filter.Last_Element; -- end()
    end Current_Filter;
@@ -347,6 +330,7 @@ is
                           return Boolean
    is
       use Php.Lists;
+      use Globals;
    begin
       if "" = Hook_Name then
          return not Global_Wp_Current_Filter.Is_Empty;
@@ -410,7 +394,8 @@ is
                         Arg_3     : String := "")
    is
       use Php.Lists;
-      use Count_Maps;
+      use Globals;
+      use Globals.Count_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
    begin
       Put_Line ("do_action: " & Hook_Name & ": '" & Arg_2 & "' '" & Arg_3 & "'");
@@ -473,7 +458,8 @@ is
                                   Args      : Array_Type)
    is
       use Php.Lists;
-      use Count_Maps;
+      use Globals;
+      use Globals.Count_Maps;
       use Inc_Elab_Hooks.Hook_Maps;
    begin
       Logging.Log ("do_action_ref_array", Hook_Name);
@@ -612,7 +598,8 @@ is
    function Did_Action (Hook_Name : String)
                         return Boolean
    is
-      use Count_Maps;
+      use Globals;
+      use Globals.Count_Maps;
    begin
       if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
@@ -884,8 +871,8 @@ is
 
    procedure X_Wp_Call_All_Hook (Args : Array_Type)
    is
+      use Globals;
 --    global wp_filter;
---    Filter : Wp_Hook renames Wp_Filter ("all");
    begin
       Global_Wp_Filter ("all").Do_All_Hook (Args);
    end X_Wp_Call_All_Hook;
@@ -896,8 +883,9 @@ is
 
    procedure Dump_Hooks
    is
-      use Count_Maps;
-      use Natural_Maps;
+      use Globals;
+      use Globals.Count_Maps;
+      use Globals.Natural_Maps;
       use Class_Hooks;
       use Inc_Elab_Hooks.Hook_Maps;
    begin

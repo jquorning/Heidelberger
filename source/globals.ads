@@ -2,7 +2,10 @@
 --
 --
 
+with Ada.Containers.Indefinite_Ordered_Maps;
+
 with Arrays;
+with Lists;
 with UStrings;
 
 with Adi_Class_Wp_Screens;
@@ -14,10 +17,12 @@ with Class_Post_Type;
 with Class_Scripts;
 with Class_Styles;
 with Class_Taxonomy;
+with Inc_Elab_Hooks;
 
 package Globals
 is
    use Arrays;
+   use Lists;
 
    procedure Dummy;
 
@@ -33,6 +38,23 @@ is
    WP_CONTENT_DIR  : UStrings.UString;
 
    Wp_Importers : Array_Type;
+
+   package Count_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Natural);
+
+   package Natural_Maps is new
+      Ada.Containers.Indefinite_Ordered_Maps
+        (Key_Type     => String,
+         Element_Type => Natural);
+
+   Global_Wp_Filter  : Inc_Elab_Hooks.Hook_Maps.Map; --  :=
+--   Inc_Elab_Hooks.Build_Preinitialized_Hooks (Empty_Array); --  (Wp_Filter);
+
+   Global_Wp_Actions        : Count_Maps.Map;
+   Global_Wp_Filters        : Natural_Maps.Map;
+   Global_Wp_Current_Filter : List_Type;
 
    Global_Wp_Scripts : Class_Scripts.Wp_Scripts;
    Global_Wp_Styles  : Class_Styles.Wp_Styles;
