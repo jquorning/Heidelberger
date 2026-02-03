@@ -17,6 +17,7 @@ with Php.Strings;
 with Binder;
 with Constants;
 with Helpers;
+with Helpers_3;
 with Lists;
 with Wp_Common;
 
@@ -114,7 +115,7 @@ is
 
    procedure Wp_Admin_Bar_Render
    is
-      use Wp_Common;
+      use Helpers_3;
       use Inc_Plugins;
 --    global wp_admin_bar;
    begin

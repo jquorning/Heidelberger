@@ -176,10 +176,6 @@ is
                            Trans     : String)
                            return Integer;
 
-   function Is_Object (Admin_Bar : Class_Admin_Bar.Wp_Admin_Bar)
-                      return Boolean
-                      is (True);
-
    function Apply_Filters (Hook_Name : String;
                            Value     : Array_Type;
                            User      : Class_Users.Wp_User)

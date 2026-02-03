@@ -5,6 +5,7 @@
 with Arrays;
 with Lists;
 
+with Class_Admin_Bar;
 with Class_Dependency;
 with Class_Posts;
 with Class_Post_Type;
@@ -26,6 +27,10 @@ is
    function Is_Object (Post : Class_Posts.Wp_Post)
                        return Boolean
                        is (True);
+
+   function Is_Object (Admin_Bar : Class_Admin_Bar.Wp_Admin_Bar)
+                      return Boolean
+                      is (True);
 
    function Get_Object_Vars (Object : Class_Posts.Wp_Post)
                              return Array_Type is (Empty_Array);
