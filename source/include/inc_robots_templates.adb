@@ -116,16 +116,4 @@ is
       return Robots_2;
    end Wp_Robots_Max_Image_Preview_Large;
 
-   ---------------------------------------
-   -- Wp_Robots_Max_Image_Preview_Large --
-   ---------------------------------------
-
-   procedure Wp_Robots_Max_Image_Preview_Large
-   is
-      Unused : constant Array_Type :=
-        Wp_Robots_Max_Image_Preview_Large (Empty_Array);
-   begin
-      null;
-   end Wp_Robots_Max_Image_Preview_Large;
-
 end Inc_Robots_Templates;

@@ -4873,7 +4873,6 @@ is
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_L10n;
-      use Inc_Plugins;
       use Inc_Querys;
 --    global wp_query, wp_rewrite;
 

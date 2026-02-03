@@ -2106,7 +2106,7 @@ is
          Styles.Add (
            "wp-editor-classic-layout-styles",
            "/wp-includes/css/dist/edit-post/classic" & Suffix & ".css",
-            [] -- Array
+            Empty_List
          );
 
          declare

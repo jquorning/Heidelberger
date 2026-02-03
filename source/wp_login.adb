@@ -2224,6 +2224,7 @@ is
 
    procedure Render
    is
+      use Php.Errors;
       use Php.Files;
       use Php.HTML;
       use Php.Lists;
@@ -2249,12 +2250,12 @@ is
          if 0 = Strpos (Get_As_String (X_SERVER, "REQUEST_URI"), "http") then
             Wp_Safe_Redirect (
               Set_URL_Scheme (Get_As_String (X_SERVER, "REQUEST_URI"), "https"));
-            return; --    exit;
+            Die; --    exit;
          else
             Wp_Safe_Redirect ("https://" &
                               Get_As_String (X_SERVER, "HTTP_HOST") &
                               Get_As_String (X_SERVER, "REQUEST_URI"));
-            return; --     exit;
+            Die; --     exit;
          end if;
       end if;
 

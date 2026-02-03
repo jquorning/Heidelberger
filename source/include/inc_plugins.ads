@@ -31,15 +31,12 @@ package Inc_Plugins
 is
    use Arrays;
    use Lists;
-   use Class_Hooks;
 
    type Callable_2 is access function return Array_Type;
    type Callable_3 is access function (New_Status      : String;
                                        Post_Id         : Class_Posts.Post_Id_Type;
                                        Previous_Status : String)
                                        return String;
-   type Callable_5 is access function (Arry : Array_Type)
-                                       return Array_Type;
 
    --
    -- Checks if any action has been registered for a hook.
@@ -183,29 +180,19 @@ is
    --
    function Add_Filter (Hook_Name     : String;
                         Callback      : Callable;
-                        Priority      : Priority_Type := 10;
-                        Accepted_Args : Integer       := 1)
+                        Priority      : Class_Hooks.Priority_Type := 10;
+                        Accepted_Args : Integer                   := 1)
                         return Boolean;
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1);
-
-   procedure Add_Filter (Hook_Name     : String;
-                         Callback      : Callable_2;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1);
+                         Priority      : Class_Hooks.Priority_Type := 10;
+                         Accepted_Args : Integer                   := 1);
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable_3;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1);
-
-   -- procedure Add_Filter (Hook_Name     : String;
-   --                       Callback      : Callable_5;
-   --                       Priority      : Priority_Type := 10;
-   --                       Accepted_Args : Integer       := 1);
+                         Priority      : Class_Hooks.Priority_Type := 10;
+                         Accepted_Args : Integer                   := 1);
 
    --
    -- Calls the callback functions that have been added to a filter hook.
@@ -586,12 +573,10 @@ is
    --                                 accepts. Default 1.
    -- @return true Always returns true.
    --
-   type Callable_4 is access procedure;
-
    procedure Add_Action (Hook_Name     : String;
-                         Callback      : Callable; -- _4;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1);
+                         Callback      : Callable;
+                         Priority      : Class_Hooks.Priority_Type := 10;
+                         Accepted_Args : Integer                   := 1);
 
    -- procedure Add_Action (Hook_Name     : String;
    --                       Callback      : String;

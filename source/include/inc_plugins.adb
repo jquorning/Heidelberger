@@ -85,10 +85,11 @@ is
 
    function Add_Filter (Hook_Name     : String;
                         Callback      : Callable;
-                        Priority      : Priority_Type := 10;
+                        Priority      : Class_Hooks.Priority_Type := 10;
                         Accepted_Args : Integer := 1)
                         return Boolean
    is
+      use Class_Hooks;
       use Inc_Elab_Hooks;
 
       Hook : Wp_Hook;
@@ -105,10 +106,14 @@ is
       return True;
    end Add_Filter;
 
+   ----------------
+   -- Add_Filter --
+   ----------------
+
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer := 1)
+                         Priority      : Class_Hooks.Priority_Type := 10;
+                         Accepted_Args : Integer                   := 1)
    is
       Unused : constant Boolean :=
         Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
@@ -116,32 +121,18 @@ is
       null;
    end Add_Filter;
 
-   procedure Add_Filter (Hook_Name     : String;
-                         Callback      : Callable_2;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1)
-   is
-   begin
-      raise Program_Error with "not implemented";
-   end Add_Filter;
+   ----------------
+   -- Add_Filter --
+   ----------------
 
    procedure Add_Filter (Hook_Name     : String;
                          Callback      : Callable_3;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1)
+                         Priority      : Class_Hooks.Priority_Type := 10;
+                         Accepted_Args : Integer                   := 1)
    is
    begin
       raise Program_Error with "not implemented";
    end Add_Filter;
-
-   -- procedure Add_Filter (Hook_Name     : String;
-   --                       Callback      : Callable_5;
-   --                       Priority      : Priority_Type := 10;
-   --                       Accepted_Args : Integer       := 1)
-   -- is
-   -- begin
-   --    raise Program_Error with "not implemented";
-   -- end Add_Filter;
 
    -------------------
    -- Apply_Filters --
@@ -392,8 +383,8 @@ is
 
    procedure Add_Action (Hook_Name     : String;
                          Callback      : Callable;
-                         Priority      : Priority_Type := 10;
-                         Accepted_Args : Integer       := 1)
+                         Priority      : Class_Hooks.Priority_Type := 10;
+                         Accepted_Args : Integer                   := 1)
 --                        return Boolean
    is
       Unused : Boolean;
@@ -907,6 +898,7 @@ is
    is
       use Count_Maps;
       use Natural_Maps;
+      use Class_Hooks;
       use Inc_Elab_Hooks.Hook_Maps;
    begin
       Put_Line ("dump_hooks:");

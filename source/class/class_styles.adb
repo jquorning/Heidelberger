@@ -131,11 +131,11 @@ is
          if This.Do_Concat then
             if
               This.In_Default_Dir (Src) and then
-              Conditional = "" and then
+              Conditional = ""          and then
               not Isset (Obj.Extra, "alt")
             then
-               Append (This.Concat,         "handle,");
-               Append (This.Concat_Version, "handlever");
+               Append (This.Concat,         Handle & ",");
+               Append (This.Concat_Version, Handle & Ver);
 
                Append (This.Print_Code, Inline_Style);
 

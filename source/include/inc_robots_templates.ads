@@ -166,6 +166,4 @@ is
    function Wp_Robots_Max_Image_Preview_Large (Robots : Array_Type)
                                                return Array_Type;
 
-   procedure Wp_Robots_Max_Image_Preview_Large; -- For Add_Filter -- jq
-
 end Inc_Robots_Templates;
