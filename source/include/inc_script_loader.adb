@@ -2287,10 +2287,13 @@ is
    -- Wp_Default_Styles --
    -----------------------
 
-   procedure Wp_Default_Styles
+   function Wp_Default_Styles (Arry : Array_Type)
+                               return Array_Type
    is
+      pragma Unreferenced (Arry);
    begin
       Wp_Default_Styles (Globals.Global_Wp_Styles);
+      return Empty_Array;
    end Wp_Default_Styles;
 
 -- --
@@ -2669,11 +2672,14 @@ is
    -- Wp_Print_Head_Scripts --
    ---------------------------
 
-   procedure Wp_Print_Head_Scripts
+   function Wp_Print_Head_Scripts (Arry : Array_Type)
+                                   return Array_Type
    is
+      pragma Unreferenced (Arry);
       Unused : constant List_Type := Wp_Print_Head_Scripts;
    begin
-      null;
+      raise Program_Error with "not implemented";
+      return Empty_Array;
    end Wp_Print_Head_Scripts;
 
 -- --
@@ -3793,10 +3799,16 @@ is
       end;
    end Wp_Enqueue_Stored_Styles;
 
-   procedure Wp_Enqueue_Stored_Styles
+   ------------------------------
+   -- Wp_Enqueue_Stored_Styles --
+   ------------------------------
+
+   function Wp_Enqueue_Stored_Styles (Arry : Array_Type)
+                                      return Array_Type
    is
    begin
-      Wp_Enqueue_Stored_Styles (Empty_Array);
+      Wp_Enqueue_Stored_Styles (Arry);
+      return Empty_Array;
    end Wp_Enqueue_Stored_Styles;
 
 -- --

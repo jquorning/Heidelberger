@@ -204,14 +204,15 @@ is
       declare
          Unused   : UString;
          Filter   : Wp_Hook renames Global_Wp_Filter (Hook_Name);
-         Filtered : constant String :=
-           Filter.Apply_Filters (Value, Args_2);
+         Filtered : constant Array_Type :=
+           Filter.Apply_Filters (Empty_Array, -- Value,
+                                 Args_2);
 --         Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
       begin
 
          Unused := +List_Pop (Global_Wp_Current_Filter);
 
-         return Filtered;
+         return "XXX-941"; -- Filtered;
       end;
    end Apply_Filters;
 

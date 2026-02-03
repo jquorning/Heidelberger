@@ -5,10 +5,13 @@
 -- @subpackage Administration
 --
 
+with Arrays;
+with Helpers_2;
 with Lists;
 
 package Adi_Misc
 is
+   use Arrays;
    use Lists;
 
    --
@@ -17,6 +20,9 @@ is
    -- @since 5.5.0
    --
    procedure Wp_Admin_Viewport_Meta;
+
+   function Wp_Admin_Viewport_Meta
+     is new Helpers_2.Generic_Call_Procedure (Wp_Admin_Viewport_Meta);
 
    --
    -- Resets global variables based on _GET and _POST.
@@ -39,5 +45,8 @@ is
    -- @since 4.9.0
    --
    procedure Wp_Admin_Headers;
+
+   function Wp_Admin_Headers
+     is new Helpers_2.Generic_Call_Procedure (Wp_Admin_Headers);
 
 end Adi_Misc;

@@ -80,10 +80,16 @@ is
       null;
    end Wp_Print_Styles;
 
-   procedure Wp_Print_Styles
+   ---------------------
+   -- Wp_Print_Styles --
+   ---------------------
+
+   function Wp_Print_Styles (Arry : Array_Type)
+                             return Array_Type
    is
    begin
       raise Program_Error with "not implemented";
+      return Empty_Array;
    end Wp_Print_Styles;
 
    -------------------------

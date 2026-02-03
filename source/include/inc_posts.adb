@@ -1347,6 +1347,19 @@ is
         );
    end Create_Initial_Post_Types;
 
+   -------------------------------
+   -- Create_Initial_Post_Types --
+   -------------------------------
+
+   function Create_Initial_Post_Types (Arry : Array_Type)
+                                       return Array_Type
+   is
+      pragma Unureferenced (Arry);
+   begin
+      Create_Initial_Post_Types;
+      return Empty_Array;
+   end Create_Initial_Post_Types;
+
 --
 -- Retrieves attached file path based on attachment ID.
 --

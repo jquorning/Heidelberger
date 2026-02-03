@@ -8,6 +8,7 @@
 with Php.Calendar;
 
 with Arrays;
+with Helpers_2;
 with Lists;
 
 with Class_Posts;
@@ -360,6 +361,9 @@ is
    --
    procedure X_Wp_Render_Title_Tag;
 
+   function X_Wp_Render_Title_Tag
+     is new Helpers_2.Generic_Call_Procedure (X_Wp_Render_Title_Tag);
+
    --
    -- Displays or retrieves title for a post type archive.
    --
@@ -483,7 +487,8 @@ is
    --
    procedure Feed_Links (Args : Array_Type := Empty_Array);
 
-   procedure Feed_Links; -- Used by Add_Action -- jq
+   function Feed_Links (Arry : Array_Type)
+                        return Array_Type;
 
    --
    -- Displays the links to the extra feeds such as category feeds.
@@ -494,7 +499,8 @@ is
    --
    procedure Feed_Links_Extra (Args : Array_Type := Empty_Array);
 
-   procedure Feed_Links_Extra; -- Used by Add_Action -- jq
+   function Feed_Links_Extra (Arry : Array_Type)
+                              return Array_Type;
 
    --
    -- Displays a referrer `strict-origin-when-cross-origin` meta tag.
@@ -511,6 +517,9 @@ is
    --
    procedure Wp_Strict_Cross_Origin_Referrer;
 
+   function Wp_Strict_Cross_Origin_Referrer
+     is new Helpers_2.Generic_Call_Procedure (Wp_Strict_Cross_Origin_Referrer);
+
    --
    -- Prints resource hints to browsers for pre-fetching, pre-rendering
    -- and pre-connecting to web sites.
@@ -524,6 +533,9 @@ is
    -- @since 4.6.0
    --
    procedure Wp_Resource_Hints;
+
+   function Wp_Resource_Hints
+     is new Helpers_2.Generic_Call_Procedure (Wp_Resource_Hints);
 
    --
    -- Prints resource preloads directives to browsers.
@@ -542,6 +554,9 @@ is
    -- @since 6.1.0
    --
    procedure Wp_Preload_Resources;
+
+   function Wp_Preload_Resources
+     is new Helpers_2.Generic_Call_Procedure (Wp_Preload_Resources);
 
    --
    -- Retrieves a list of unique hosts of all enqueued scripts and styles.

@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+with Helpers_2;
 
 package Inc_Robots_Templates
 is
@@ -23,6 +24,9 @@ is
    -- @since 5.7.1 No longer prevents specific directives to occur together.
    --
    procedure Wp_Robots;
+
+   function Wp_Robots
+     is new Helpers_2.Generic_Call_Procedure (Wp_Robots);
 
 -- --
 -- -- Adds `noindex` to the robots meta tag if required by the site configuration.

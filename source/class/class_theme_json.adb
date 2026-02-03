@@ -1846,7 +1846,7 @@ is
          Current_Element : String :=
            (if Is_Processing_Element
             then As_String (Get (Ref_2 (Block_Metadata, "path",
-                             Helpers.Image (Natural (As_Array (Get (Block_Metadata, "path")).Length) - 1))))
+                             Helpers.Image (As_Array (Get (Block_Metadata, "path")).Length - 1))))
             else ""); -- null
 
          -- TODO: Replace array_key_exists() with isset() check once WordPress drops
@@ -2972,7 +2972,7 @@ is
                -- labels instead of t-shirt sizes.
                if As_Integer (Get (Spacing_Scale, "steps")) <= 7 then
                   for
-                    Spacing_Sizes_Count in 0 .. Natural (Spacing_Sizes.Length) - 1
+                    Spacing_Sizes_Count in 0 .. Spacing_Sizes.Length - 1
                   loop
                      Set_2 (Spacing_Sizes,
                             Key_1 => Helpers.Image (Spacing_Sizes_Count),

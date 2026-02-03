@@ -610,7 +610,7 @@ is
                                         To_Array (List => (
                                           Build ("section",    -Section_Id),
                                           Build ("sidebar_id", Sidebar_Id),
-                                          Build ("priority",   Natural (Sidebar_Widget_Ids.Length))
+                                          Build ("priority",   Sidebar_Widget_Ids.Length)
                                           -- place "Add Widget" and "Reorder" buttons at end.
                                         ))
                                       );
@@ -927,7 +927,7 @@ is
                 ENT_QUOTES,
                 Get_Bloginfo ("charset")
               )));
-         Registered_Sidebar_Count := Natural (Global_Wp_Registered_Sidebars.Length);
+         Registered_Sidebar_Count := Global_Wp_Registered_Sidebars.Length;
 
          for Non_Rendered_Count in 2 .. Registered_Sidebar_Count - 1 loop
             Set (Some_Non_Rendered_Areas_Messages, "(Non_Rendered_Count)",  -- []
@@ -1979,8 +1979,15 @@ is
       end if;
    end Start_Dynamic_Sidebar;
 
+   ---------------------------
+   -- Start_Dynamic_Sidebar --
+   ---------------------------
+
    procedure Start_Dynamic_Sidebar (This : in out Wp_Customize_Widgets)
-   is null;
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Start_Dynamic_Sidebar;
 
    -------------------------
    -- End_Dynamic_Sidebar --
@@ -2005,8 +2012,15 @@ is
       end if;
    end End_Dynamic_Sidebar;
 
+   -------------------------
+   -- End_Dynamic_Sidebar --
+   -------------------------
+
    procedure End_Dynamic_Sidebar (This : in out Wp_Customize_Widgets)
-   is null;
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end End_Dynamic_Sidebar;
 
    --------------------------------------------------
    -- Filter_Sidebars_Widgets_For_Rendering_Widget --
@@ -2024,12 +2038,28 @@ is
       return Widgets;
    end Filter_Sidebars_Widgets_For_Rendering_Widget;
 
-   procedure Filter_Sidebars_Widgets_For_Rendering_Widget
-              (This : in out Wp_Customize_Widgets)
-   is null;
+   --------------------------------------------------
+   -- Filter_Sidebars_Widgets_For_Rendering_Widget --
+   --------------------------------------------------
 
    procedure Filter_Sidebars_Widgets_For_Rendering_Widget
-   is null;
+              (This : in out Wp_Customize_Widgets)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Filter_Sidebars_Widgets_For_Rendering_Widget;
+
+   --------------------------------------------------
+   -- Filter_Sidebars_Widgets_For_Rendering_Widget --
+   --------------------------------------------------
+
+   function Filter_Sidebars_Widgets_For_Rendering_Widget (Arry : Array_Type)
+                                                          return Array_Type
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return Empty_Array;
+   end Filter_Sidebars_Widgets_For_Rendering_Widget;
 
    ---------------------------
    -- Render_Widget_Partial --

@@ -72,7 +72,7 @@ is
    --
    function Has_Filter (This      : Wp_Hook;
                         Hook_Name : String := "";
-                        Callback  : Callable := null) -- Boolean := False)
+                        Callback  : Callable := null)
                         return Boolean;
 
    --
@@ -97,25 +97,13 @@ is
    -- @return mixed The filtered value after all hooked functions are applied to it.
    --
 
-   -- type Args_Type is
-   --    record
-   --       Text_1    : UString;
-   --       Text_2    : UString;
-   --       Array_1   : Array_Type;
-   --       Array_2   : Array_Type;
-   --       Integer_1 : Integer;
-   --       Integer_2 : Integer;
-   --       Bool      : Boolean;
-   --       List      : List_Type;
-   --    end record;
-
    function Apply_Filters (This  : in out Wp_Hook;
-                           Value : String;
+                           Value : Array_Type;
                            Args  : Array_Type)
-                           return String;
+                           return Array_Type;
 
    procedure Apply_Filters (This  : in out Wp_Hook;
-                            Value : String;
+                            Value : Array_Type;
                             Args  : Array_Type);
 
    --
@@ -204,13 +192,13 @@ private
 
    subtype Priority_List is Priority_Vectors.Vector;
 
-   package Nesting_Maps is new -- Vectors is new
-      Ada.Containers.Ordered_Maps -- Vectors
-        (Key_Type     => Nesting_Type, -- Index_Type   => Nesting_Type,
-         Element_Type => Priority_List, -- List_Type,
-         "="          => Priority_Vectors."="); -- List_Vectors."=");
+   package Nesting_Maps is new
+      Ada.Containers.Ordered_Maps
+        (Key_Type     => Nesting_Type,
+         Element_Type => Priority_List,
+         "="          => Priority_Vectors."=");
 
-   subtype Nesting_Map is Nesting_Maps.Map; -- Vectors.Vector;
+   subtype Nesting_Map is Nesting_Maps.Map;
 
    package Priority_Nesting_Maps is new
       Ada.Containers.Ordered_Maps (Key_Type     => Nesting_Type,

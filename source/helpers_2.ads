@@ -2,6 +2,8 @@
 --
 --
 
+with Arrays;
+
 package Helpers_2 is
 
    generic
@@ -9,5 +11,10 @@ package Helpers_2 is
    function Generic_Image (Item : Item_Type)
                            return String;
    -- Image of Value without leading space.
+
+   generic
+      with procedure Procedur;
+   function Generic_Call_Procedure (Arry : Arrays.Array_Type)
+                                    return Arrays.Array_Type;
 
 end Helpers_2;

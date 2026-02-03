@@ -6,6 +6,8 @@
 -- @since 3.1.0
 --
 
+with Arrays;
+with Helpers_2;
 with UStrings;
 
 with Class_Admin_Bar;
@@ -17,6 +19,7 @@ with Class_Users;
 
 package Inc_Admin_Bar
 is
+   use Arrays;
 
    X_Wp_Admin_Bar : Class_Admin_Bar.Wp_Admin_Bar; -- X_ added jq
 
@@ -46,7 +49,8 @@ is
    function X_Wp_Admin_Bar_Init
             return Boolean;
 
-   procedure X_Wp_Admin_Bar_Init;
+   function X_Wp_Admin_Bar_Init (Arry : Array_Type)
+                                 return Array_Type;
 
    --
    -- Renders the admin bar to the page based on the wp_admin_bar.menu member var.
@@ -69,6 +73,9 @@ is
    -- @global WP_Admin_Bar wp_admin_bar
    --
    procedure Wp_Admin_Bar_Render;
+
+   function Wp_Admin_Bar_Render
+     is new Helpers_2.Generic_Call_Procedure (Wp_Admin_Bar_Render);
 
    --
    -- Adds the WordPress logo menu.
@@ -256,6 +263,9 @@ is
    -- @since 3.1.0
    --
    procedure Wp_Admin_Bar_Header;
+
+   function Wp_Admin_Bar_Header
+     is new Helpers_2.Generic_Call_Procedure (Wp_Admin_Bar_Header);
 
    --
    -- Prints default admin bar callback.

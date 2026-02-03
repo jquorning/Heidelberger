@@ -10,12 +10,14 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 
 with Arrays;
+with Helpers_2;
 with UStrings;
 
 package Adm_Menu
 is
+   use Arrays;
 
-   X_Wp_Real_Parent_File : Arrays.Array_Type;
+   X_Wp_Real_Parent_File : Array_Type;
 
    type Unbounded_Slug is new UStrings.UString;
 
@@ -120,6 +122,9 @@ is
    --
    procedure X_Add_Themes_Utility_Last;
 
+   function X_Add_Themes_Utility_Last
+     is new Helpers_2.Generic_Call_Procedure (X_Add_Themes_Utility_Last);
+
    --
    -- Adds the "Plugin File Editor" menu item after the "Themes File Editor" in Tools
    -- for block themes.
@@ -128,5 +133,8 @@ is
    -- @since 5.9.0
    --
    procedure X_Add_Plugin_File_Editor_To_Tools;
+
+   function X_Add_Plugin_File_Editor_To_Tools
+     is new Helpers_2.Generic_Call_Procedure (X_Add_Plugin_File_Editor_To_Tools);
 
 end Adm_Menu;

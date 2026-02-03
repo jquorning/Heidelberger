@@ -20,6 +20,7 @@
 --
 
 with Arrays;
+with Helpers_2;
 with Lists;
 
 with Class_Scripts;
@@ -66,10 +67,8 @@ is
    --
    procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles);
 
-   --
-   -- Added by jq
-   --
-   procedure Wp_Default_Styles;
+   function Wp_Default_Styles (Arry : Array_Type)
+                               return Array_Type;
 
    --
    -- Prints the script queue in the HTML head on admin pages.
@@ -196,6 +195,9 @@ is
    --
    procedure Wp_Enqueue_Classic_Theme_Styles;
 
+   function Wp_Enqueue_Classic_Theme_Styles
+     is new Helpers_2.Generic_Call_Procedure (Wp_Enqueue_Classic_Theme_Styles);
+
    --
    -- Checks whether separate styles should be loaded for core blocks on-render.
    --
@@ -236,7 +238,8 @@ is
    function Wp_Print_Head_Scripts
             return List_Type;
 
-   procedure Wp_Print_Head_Scripts;  -- For Add_Action -- jq
+   function Wp_Print_Head_Scripts (Arry : Array_Type)
+                                   return Array_Type;
 
    --
    -- Wrapper for do_action( "wp_enqueue_scripts" ).
@@ -248,6 +251,9 @@ is
    -- @since 2.8.0
    --
    procedure Wp_Enqueue_Scripts;
+
+   function Wp_Enqueue_Scripts
+     is new Helpers_2.Generic_Call_Procedure (Wp_Enqueue_Scripts);
 
    --
    -- Prints the styles queue in the HTML head on admin pages.
@@ -262,6 +268,9 @@ is
             return List_Type;
 
    procedure Print_Admin_Styles;
+
+   function Print_Admin_Styles
+     is new Helpers_2.Generic_Call_Procedure (Print_Admin_Styles);
 
    --
    -- Prints the styles that were queued too late for the HTML head.
@@ -305,6 +314,9 @@ is
    --
    procedure Wp_Common_Block_Scripts_And_Styles;
 
+   function Wp_Common_Block_Scripts_And_Styles
+     is new Helpers_2.Generic_Call_Procedure (Wp_Common_Block_Scripts_And_Styles);
+
    --
    -- Applies a filter to the list of style nodes that comes from
    -- WP_Theme_JSON::get_style_nodes().
@@ -333,6 +345,9 @@ is
    --
    procedure Wp_Enqueue_Global_Styles;
 
+   function Wp_Enqueue_Global_Styles
+     is new Helpers_2.Generic_Call_Procedure (Wp_Enqueue_Global_Styles);
+
    --
    -- Checks if the editor scripts and styles for all registered block types
    -- should be enqueued on the current screen.
@@ -360,6 +375,9 @@ is
    -- @global WP_Styles wp_styles
    --
    procedure Wp_Maybe_Inline_Styles;
+
+   function Wp_Maybe_Inline_Styles
+     is new Helpers_2.Generic_Call_Procedure (Wp_Maybe_Inline_Styles);
 
    --
    -- Makes URLs relative to the WordPress installation.
@@ -399,6 +417,8 @@ is
    -- @return void
    --
    procedure Wp_Enqueue_Stored_Styles (Options : Array_Type := Empty_Array);
-   procedure Wp_Enqueue_Stored_Styles;
+
+   function Wp_Enqueue_Stored_Styles (Arry : Array_Type)
+                                      return Array_Type;
 
 end Inc_Script_Loader;

@@ -8,6 +8,7 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Arrays;
+with Helpers_2;
 with Lists;
 with UStrings;
 
@@ -32,6 +33,9 @@ is
    -- @since 2.9.0
    --
    procedure Create_Initial_Post_Types;
+
+   function Create_Initial_Post_Types (Arry : Array_Type)
+                                       return Array_Type;
 
    --
    -- Updates attachment file path based on attachment ID.
@@ -755,6 +759,9 @@ is
    -- @since 3.1.0
    --
    procedure X_Add_Post_Type_Submenus;
+
+   function X_Add_Post_Type_Submenus
+     is new Helpers_2.Generic_Call_Procedure (X_Add_Post_Type_Submenus);
 
    --
    -- Gets a list of post statuses.

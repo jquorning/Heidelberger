@@ -3,7 +3,6 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
-with Ada.Containers.Vectors;
 with Ada.Iterator_Interfaces;
 
 with Lists;
@@ -14,8 +13,6 @@ is
 
    subtype Key_Type   is UStrings.UString;
    subtype Value_Type is UStrings.UString;
-
-   type Callable is access procedure;
 
    type Array_Kind is (Kind_String,  Kind_Integer,  Kind_Array, Kind_List,
                        Kind_Boolean, Kind_Callable, Kind_Null);
@@ -41,6 +38,9 @@ is
 --         Constant_Indexing => Constant_Reference,
 --         Variable_Indexing => Reference,
          Iterator_Element  => Multi_Type;
+
+   type Callable is access function (Arry : Array_Type)
+                                     return Array_Type;
 
    type Cursor is private;
 
@@ -306,7 +306,7 @@ is
                           return Multi_Type;
 
    function Length (Arry : Array_Type)
-                    return Ada.Containers.Count_Type;
+                    return Natural;
 
    function Empty (Arry : Array_Type;
                    Key  : String)

@@ -20,6 +20,7 @@ with Php.Strings;
 with Arrays;
 with Binder;
 with Constants;
+with Helpers_2;
 with Lists;
 with UStrings;
 with Wp_Common;
@@ -101,12 +102,17 @@ is
    --
    procedure Wp_Shake_JS;
 
+   function Wp_Shake_JS
+     is new Helpers_2.Generic_Call_Procedure (Wp_Shake_JS);
+
    --
    -- Outputs the viewport meta tag for the login page.
    --
    -- @since 3.7.0
    --
    procedure Wp_Login_Viewport_Meta;
+   function Wp_Login_Viewport_Meta
+     is new Helpers_2.Generic_Call_Procedure (Wp_Login_Viewport_Meta);
 
    procedure Action_Confirm_Admin_Email (Errors : Class_Errors.Wp_Error);
    procedure Action_Postpass;

@@ -1349,7 +1349,7 @@ is
       Hidden   : constant List_Type :=
         List_Intersect (Array_Keys (Columns), Array_Filter (Hidden_2));
    begin
-      return Natural (Columns.Length - List_Vectors.Length (Hidden));
+      return Columns.Length - Natural (Hidden.Length);
 --    return Natural (Array_Maps.Length (Columns) - List_Vectors.Length (Hidden));
    end Get_Column_Count;
 

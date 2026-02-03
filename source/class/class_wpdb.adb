@@ -3014,7 +3014,7 @@ is
 
          -- Check if we have more than one charset in play.
          declare
-            Count : Count_Type := Charsets.Length;
+            Count : Natural := Charsets.Length;
          begin
             if Count in 1 then
                Charset := +As_String (Charsets.First_Element); -- Key (Charsets);

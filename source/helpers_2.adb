@@ -2,13 +2,11 @@
 --
 --
 
-with Ada.Text_IO;
-
 package body Helpers_2 is
 
-   -----------
-   -- Image --
-   -----------
+   -------------------
+   -- Generic_Image --
+   -------------------
 
    function Generic_Image (Item : Item_Type)
                            return String
@@ -21,5 +19,18 @@ package body Helpers_2 is
          return Img;
       end if;
    end Generic_Image;
+
+   ----------------------------
+   -- Generic_Call_Procedure --
+   ----------------------------
+
+   function Generic_Call_Procedure (Arry : Arrays.Array_Type)
+                                    return Arrays.Array_Type
+   is
+      pragma Unreferenced (Arry);
+   begin
+      Procedur;
+      return Arrays.Empty_Array;
+   end Generic_Call_Procedure;
 
 end Helpers_2;

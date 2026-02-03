@@ -6,6 +6,7 @@
 --
 
 with Arrays;
+with Helpers_2;
 with Lists;
 
 with Class_Posts;
@@ -266,6 +267,9 @@ is
    --
    procedure Locale_Stylesheet;
 
+   function Locale_Stylesheet
+     is new Helpers_2.Generic_Call_Procedure (Locale_Stylesheet);
+
    --
    -- Checks whether a header video is set or not.
    --
@@ -323,6 +327,9 @@ is
    -- @since 4.7.0
    --
    procedure Wp_Custom_CSS_CB;
+
+   function Wp_Custom_CSS_CB
+     is new Helpers_2.Generic_Call_Procedure (Wp_Custom_CSS_CB);
 
    --
    -- Fetches the `custom_css` post for a given theme.
@@ -510,6 +517,9 @@ is
    procedure Wp_Customize_Support_Script
              is null;
 
+   function Wp_Customize_Support_Script
+     is new Helpers_2.Generic_Call_Procedure (Wp_Customize_Support_Script);
+
    --
    -- Returns whether the active theme is a block-based theme or not.
    --
@@ -588,6 +598,9 @@ is
    -- @global WP_Customize_Manager wp_customize
    --
    procedure X_Wp_Customize_Include;
+
+   function X_Wp_Customize_Include
+     is new Helpers_2.Generic_Call_Procedure (X_Wp_Customize_Include);
 
    --
    -- Registers theme support for a given feature.
@@ -680,6 +693,9 @@ is
    --
    procedure X_Custom_Logo_Header_Styles;
 
+   function X_Custom_Logo_Header_Styles
+     is new Helpers_2.Generic_Call_Procedure (X_Custom_Logo_Header_Styles);
+
    --
    -- Creates the initial theme features when the "setup_theme" action is fired.
    --
@@ -690,6 +706,9 @@ is
    --
    procedure Create_Initial_Theme_Features;
 
+   function Create_Initial_Theme_Features
+     is new Helpers_2.Generic_Call_Procedure (Create_Initial_Theme_Features);
+
    --
    -- Adds default theme supports for block themes when the "setup_theme" action fires.
    --
@@ -699,5 +718,8 @@ is
    -- @access private
    --
    procedure X_Add_Default_Theme_Supports;
+
+   function X_Add_Default_Theme_Supports
+     is new Helpers_2.Generic_Call_Procedure (X_Add_Default_Theme_Supports);
 
 end Inc_Themes;

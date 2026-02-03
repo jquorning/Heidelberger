@@ -288,7 +288,7 @@ is
                   if Callback /= null then
 --                if Is_Callable (Callback) then
                      declare
-                        Unused : constant String :=
+                        Unused : constant Array_Type :=
                            Call_User_Func_Array (Callback, Params);
                      begin
                         Did_One := True;

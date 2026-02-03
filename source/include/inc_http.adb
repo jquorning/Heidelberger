@@ -9,8 +9,6 @@
 -- @subpackage HTTP
 --
 
-with Ada.Containers;
-
 with Php.Arrays;
 with Php.HTML;
 with Php.Lists;
@@ -381,7 +379,6 @@ is
                               URL          : String    := "")
                               return Boolean
    is
-      use Ada.Containers;
       use Php.Arrays;
       use Php.HTML;
       use Php.Lists;
@@ -392,14 +389,14 @@ is
 
       Capabilities_2 : Array_Type := Wp_Parse_Args (Capabilities);
 
-      Count : constant Count_Type := Capabilities_2.Length;
+      Count : constant Natural := Capabilities_2.Length;
    begin
       -- If we have a numeric capabilities array, spoof a wp_remote_request()
       -- associative args array.
       if
         Count not in 0 and then
-        List_Filter (Array_Keys (Capabilities_2),
-                     Is_Numeric'Access).Length = Count
+        Natural (List_Filter (Array_Keys (Capabilities_2),
+                              Is_Numeric'Access).Length) = Count
       then
          Capabilities_2 :=
            List_Combine (Array_Values (Capabilities_2),

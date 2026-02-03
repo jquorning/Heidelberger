@@ -7,10 +7,12 @@
 -- @subpackage Dependencies
 --
 
+with Arrays;
 with Lists;
 
 package Inc_Functions_Wp_Styles
 is
+   use Arrays;
    use Lists;
 
    --
@@ -47,7 +49,8 @@ is
 
    procedure Wp_Print_Styles (Handles : String); -- = false
 
-   procedure Wp_Print_Styles; -- For Add_Action -- jq
+   function Wp_Print_Styles (Arry : Array_Type)
+                             return Array_Type;
 
    --
    -- Add extra CSS styles to a registered stylesheet.

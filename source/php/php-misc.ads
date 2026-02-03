@@ -50,12 +50,12 @@ is
             is (Empty_List);
 
    function Call_User_Func (Callback : Callable;
-                            Args     : String := "")
-                            return String;
+                            Args     : Array_Type := Empty_Array)
+                            return Array_Type;
 
    function Call_User_Func_Array (Callback : Callable;
                                   Args     : Array_Type)
-                                  return String;
+                                  return Array_Type;
 
    function Func_Get_Args
             return Array_Type;

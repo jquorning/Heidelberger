@@ -2,14 +2,14 @@
 --
 --
 
-with Ada.Strings.Unbounded;
-
 with Php.Strings;
 
 package body Php.Misc
 is
 
-   function Get_Object_Vars (Arry : Array_Type) return Array_Type is (Empty_Array);
+   function Get_Object_Vars (Arry : Array_Type)
+                             return Array_Type
+                             is (Empty_Array);
 
    ---------------------
    -- Version_Compare --
@@ -20,7 +20,6 @@ is
                              Operator  : String)
                              return Boolean
    is
-      use Ada.Strings.Unbounded;
       use Php.Strings;
 
       List_1 : constant List_Type := Explode (".", Version_1);
@@ -69,12 +68,11 @@ is
    --------------------
 
    function Call_User_Func (Callback : Callable;
-                            Args     : String := "")
-                            return String
+                            Args     : Array_Type := Empty_Array)
+                            return Array_Type
    is
    begin
-      Callback.all;
-      return ""; -- Callback.all (Args);
+      return Callback (Args);
    end Call_User_Func;
 
    --------------------------
@@ -83,12 +81,10 @@ is
 
    function Call_User_Func_Array (Callback : Callable;
                                   Args     : Array_Type)
-                                  return String
+                                  return Array_Type
    is
---    Unused : constant String := Callback.all; --  ("XXX-990"); --  (Args);
    begin
-      Callback.all;
-      return "XXX-991";
+      return Callback (Args);
    end Call_User_Func_Array;
 
    -------------------

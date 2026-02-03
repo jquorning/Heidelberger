@@ -14,7 +14,6 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
-with Arrays;
 with Binder;
 with Constants;
 with Helpers;
@@ -51,11 +50,7 @@ with Inc_Users;
 
 package body Inc_Admin_Bar
 is
-   use Arrays;
---   use Inc_L10n;
---   use Wp_Common;
    use Lists;
---   use Inc_Capabilities;
 
    -- static
    Rendered : Boolean := False;
@@ -100,11 +95,17 @@ is
       return True;
    end X_Wp_Admin_Bar_Init;
 
-   procedure X_Wp_Admin_Bar_Init
+   -------------------------
+   -- X_Wp_Admin_Bar_Init --
+   -------------------------
+
+   function X_Wp_Admin_Bar_Init (Arry : Array_Type)
+                                 return Array_Type
    is
-      Unused : Boolean;
+      pragma Unreferenced (Arry);
+      Unused : constant Boolean := X_Wp_Admin_Bar_Init;
    begin
-      Unused := X_Wp_Admin_Bar_Init;
+      return Empty_Array;
    end X_Wp_Admin_Bar_Init;
 
    -------------------------
@@ -667,7 +668,8 @@ is
          Admin_Bar.Add_Node (Node);
       end;
 
-      Add_Action ("wp_before_admin_bar_render", Wp_Customize_Support_Script'Access);
+      Add_Action ("wp_before_admin_bar_render",
+                  Wp_Customize_Support_Script'Access);
    end Wp_Admin_Bar_Customize_Menu;
 
    --------------------------------

@@ -1616,7 +1616,8 @@ is
    procedure Filter_Sidebars_Widgets_For_Rendering_Widget
               (This : in out Wp_Customize_Widgets);
 
-   procedure Filter_Sidebars_Widgets_For_Rendering_Widget;
+   function Filter_Sidebars_Widgets_For_Rendering_Widget (Arry : Array_Type)
+                                                          return Array_Type;
 
    --
    -- Renders a specific widget using the supplied sidebar arguments.

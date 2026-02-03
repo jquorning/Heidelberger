@@ -9,6 +9,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
 with Arrays;
+with Helpers_2;
 with Integer_Vectors;
 with Lists;
 
@@ -47,6 +48,9 @@ is
    -- @global WP_Rewrite wp_rewrite WordPress rewrite component.
    --
    procedure Create_Initial_Taxonomies;
+
+   function Create_Initial_Taxonomies
+     is new Helpers_2.Generic_Call_Procedure (Create_Initial_Taxonomies);
 
    --
    -- Creates or modifies a taxonomy object.

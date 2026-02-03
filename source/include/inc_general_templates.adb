@@ -3335,10 +3335,12 @@ is
    -- Feed_Links --
    ----------------
 
-   procedure Feed_Links
+   function Feed_Links (Arry : Array_Type)
+                        return Array_Type
    is
    begin
-      Feed_Links (Empty_Array);
+      Feed_Links (Arry);
+      return Empty_Array;
    end Feed_Links;
 
    ----------------------
@@ -3671,10 +3673,12 @@ is
    -- Feed_Link_Ekstra --
    ----------------------
 
-   procedure Feed_Links_Extra
+   function Feed_Links_Extra (Arry : Array_Type)
+                              return Array_Type
    is
    begin
-      Feed_Links_Extra (Empty_Array);
+      Feed_Links_Extra (Arry);
+      return Empty_Array;
    end Feed_Links_Extra;
 
 -- --

@@ -931,10 +931,10 @@ is
    ------------
 
    function Length (Arry : Array_Type)
-                    return Ada.Containers.Count_Type
+                    return Natural
    is
    begin
-      return Array_Maps.Length (Array_Maps.Map (Arry));
+      return Natural (Array_Maps.Length (Array_Maps.Map (Arry)));
    end Length;
 
    -- --------------
