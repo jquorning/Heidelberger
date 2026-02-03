@@ -8,7 +8,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 
 with Class_Hooks;
 
-package Inc_Elab_Hooks
+package Class_Hook_Maps
 is
 
    ---------------
@@ -54,4 +54,4 @@ is
    function Build_Preinitialized_Hooks (Filters : Hook_Maps.Map) -- Arrays.Array_Type)
                                         return Hook_Maps.Map;
 
-end Inc_Elab_Hooks;
+end Class_Hook_Maps;

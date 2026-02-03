@@ -6,7 +6,7 @@
 -- @since 4.7.0
 --
 
-private with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Containers.Indefinite_Ordered_Maps;
 private with Ada.Containers.Ordered_Maps;
 private with Ada.Containers.Vectors;
 

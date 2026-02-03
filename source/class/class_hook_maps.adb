@@ -2,7 +2,7 @@
 --
 --
 
-package body Inc_Elab_Hooks
+package body Class_Hook_Maps
 is
 -- use Arrays;
 
@@ -70,4 +70,4 @@ is
       return Normalized;
    end Build_Preinitialized_Hooks;
 
-end Inc_Elab_Hooks;
+end Class_Hook_Maps;

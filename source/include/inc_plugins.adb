@@ -18,45 +18,11 @@ with Helpers;
 with Logging;
 with UStrings;
 
-with Inc_Elab_Hooks;
+with Class_Hook_Maps;
 with Inc_Functions;
 
 package body Inc_Plugins
 is
---   use Inc_Elab_Hooks;
-
--- -- Initialize the filter globals.
--- require __DIR__ . '/class-wp-hook.php';
-
--- -- @var WP_Hook[] wp_filter--
--- global wp_filter;
-
--- -- @var int[] wp_actions--
--- global wp_actions;
-
--- -- @var int[] wp_filters--
--- global wp_filters;
-
--- -- @var string[] wp_current_filter--
--- global wp_current_filter;
-
--- if ( wp_filter ) then
---         wp_filter = WP_Hook::build_preinitialized_hooks( wp_filter );
--- end; else then
---         wp_filter = array();
--- end;
-
--- if ( ! isset( wp_actions ) ) then
---         wp_actions = array();
--- end;
-
--- if ( ! isset( wp_filters ) ) then
---         wp_filters = array();
--- end;
-
--- if ( ! isset( wp_current_filter ) ) then
---         wp_current_filter = array();
--- end;
 
    ----------------
    -- Add_Filter --
@@ -70,7 +36,7 @@ is
    is
       use Globals;
       use Class_Hooks;
-      use Inc_Elab_Hooks;
+      use Class_Hook_Maps;
 
       Hook : Wp_Hook;
    begin
@@ -128,7 +94,7 @@ is
       use Php.Misc;
       use Globals;
       use Globals.Natural_Maps;
-      use Inc_Elab_Hooks.Hook_Maps;
+      use Class_Hook_Maps.Hook_Maps;
 
       Args_2 : Array_Type := Args;
    begin
@@ -236,7 +202,7 @@ is
                         return Boolean
    is
       use Globals;
-      use Inc_Elab_Hooks.Hook_Maps;
+      use Class_Hook_Maps.Hook_Maps;
    begin
       if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
@@ -369,21 +335,12 @@ is
                          Callback      : Callable;
                          Priority      : Class_Hooks.Priority_Type := 10;
                          Accepted_Args : Integer                   := 1)
---                        return Boolean
    is
-      Unused : Boolean;
+      Unused : constant Boolean :=
+        Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
    begin
-      Unused := Add_Filter (Hook_Name, Callback, Priority, Accepted_Args);
+      null;
    end Add_Action;
-
-   -- procedure Add_Action (Hook_Name     : String;
-   --                       Callback      : String;
-   --                       Priority      : Priority_Type := 10;
-   --                       Accepted_Args : Integer       := 1)
-   -- is
-   -- begin
-   --    Put ("#Add_Action  " & Hook_Name & ", ");
-   -- end Add_Action;
 
    ---------------
    -- Do_Action --
@@ -396,7 +353,7 @@ is
       use Php.Lists;
       use Globals;
       use Globals.Count_Maps;
-      use Inc_Elab_Hooks.Hook_Maps;
+      use Class_Hook_Maps.Hook_Maps;
    begin
       Put_Line ("do_action: " & Hook_Name & ": '" & Arg_2 & "' '" & Arg_3 & "'");
 
@@ -460,7 +417,7 @@ is
       use Php.Lists;
       use Globals;
       use Globals.Count_Maps;
-      use Inc_Elab_Hooks.Hook_Maps;
+      use Class_Hook_Maps.Hook_Maps;
    begin
       Logging.Log ("do_action_ref_array", Hook_Name);
 
@@ -887,7 +844,7 @@ is
       use Globals.Count_Maps;
       use Globals.Natural_Maps;
       use Class_Hooks;
-      use Inc_Elab_Hooks.Hook_Maps;
+      use Class_Hook_Maps.Hook_Maps;
    begin
       Put_Line ("dump_hooks:");
 
@@ -930,6 +887,6 @@ is
 begin
 
    Globals.Global_Wp_Filter :=
-     Inc_Elab_Hooks.Build_Preinitialized_Hooks (Globals.Global_Wp_Filter);
+     Class_Hook_Maps.Build_Preinitialized_Hooks (Globals.Global_Wp_Filter);
 
 end Inc_Plugins;

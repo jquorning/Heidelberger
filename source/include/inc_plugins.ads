@@ -264,7 +264,7 @@ is
    function Apply_Filters_Ref_Array (Hook_Name : String;
                                      Args      : List_Type)
                                      return String
-                                     is ("XXX-953");
+   is (raise Program_Error with "not implemented");
 
    --
    -- Checks if any filter has been registered for a hook.

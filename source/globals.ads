@@ -10,14 +10,14 @@ with UStrings;
 
 with Adi_Class_Wp_Screens;
 
-with Class_WpDB;
+with Class_Hook_Maps;
 with Class_Locales;
 with Class_Posts;
 with Class_Post_Type;
 with Class_Scripts;
 with Class_Styles;
 with Class_Taxonomy;
-with Inc_Elab_Hooks;
+with Class_WpDB;
 
 package Globals
 is
@@ -49,7 +49,7 @@ is
         (Key_Type     => String,
          Element_Type => Natural);
 
-   Global_Wp_Filter         : Inc_Elab_Hooks.Hook_Maps.Map;
+   Global_Wp_Filter         : Class_Hook_Maps.Hook_Maps.Map;
    Global_Wp_Actions        : Count_Maps.Map;
    Global_Wp_Filters        : Natural_Maps.Map;
    Global_Wp_Current_Filter : List_Type;
