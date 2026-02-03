@@ -117,11 +117,10 @@ is
                            Right     : Integer := 0)
                            return Array_Type
    is
-      Unused : Array_Type;
    begin
       Logging.Log ("apply_filters", Hook_Name);
-      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Array);
-      return Value;
+      return
+        Inc_Plugins.Apply_Filters (Hook_Name, Value, Empty_Array);
    end Apply_Filters;
 
    function Apply_Filters (Hook_Name : String;

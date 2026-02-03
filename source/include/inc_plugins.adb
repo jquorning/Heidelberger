@@ -156,15 +156,13 @@ is
       use Php.Lists;
       use Php.Misc;
       use Natural_Maps;
-      use UStrings;
-      use Inc_Elab_Hooks;
+      use Inc_Elab_Hooks.Hook_Maps;
 
       Args_2 : Array_Type := Args;
    begin
       Logging.Log ("inc_pluging.apply_filters", Hook_Name);
 
       if not Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
---    if not Isset (Wp_Filters (Hook_Name)) then
          Global_Wp_Filters.Include (Hook_Name, 1);
       else
          Global_Wp_Filters (Hook_Name) :=
@@ -172,8 +170,7 @@ is
       end if;
 
       -- Do 'all' actions first.
-      if Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
---    if Isset (Wp_Filter ("all")) then
+      if Has_Element (Global_Wp_Filter.Find ("all")) then
          Global_Wp_Current_Filter.Append (Hook_Name);
 
          declare
@@ -183,18 +180,15 @@ is
          end;
       end if;
 
-      if not Hook_Maps.Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
---    if not Isset (Wp_Filter (Hook_Name)) then
-         if Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
---       if Isset (Wp_Filter ("all")) then
+      if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
+         if Has_Element (Global_Wp_Filter.Find ("all")) then
             List_Pop (Global_Wp_Current_Filter);
          end if;
 
          return Value;
       end if;
 
-      if not Hook_Maps.Has_Element (Global_Wp_Filter.Find ("all")) then
---    if not Isset (Wp_Filter ("all")) then
+      if not Has_Element (Global_Wp_Filter.Find ("all")) then
          Global_Wp_Current_Filter.Append (Hook_Name);
       end if;
 
@@ -202,15 +196,10 @@ is
       Array_Unshift (Args_2, Value);
 
       declare
-         Unused   : UString;
-
          Filtered : constant Array_Type :=
            Global_Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
---         Wp_Filter (Hook_Name).Apply_Filters (Value, Args_2);
       begin
-
-         Unused := +List_Pop (Global_Wp_Current_Filter);
-
+         List_Pop (Global_Wp_Current_Filter);
          return Filtered;
       end;
    end Apply_Filters;
