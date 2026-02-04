@@ -287,10 +287,19 @@ is
                      return Lists.List_Type
    is
    begin
-      pragma Assert (Arry.Kind = Kind_List);
-      pragma Assert (Arry.List /= null);
+      case Arry.Kind is
 
-      return Arry.List.all;
+      when Kind_List =>
+         pragma Assert (Arry.List /= null);
+         return Arry.List.all;
+
+      when Kind_String =>
+         return [-Arry.Str];
+
+      when others =>
+         pragma Assert (False);
+      end case;
+
    end As_List;
 
    ---------------
@@ -1103,8 +1112,8 @@ is
    begin
       for A of List loop
          for B in A.Iterate loop
-            Result.Insert (Key      => Key     (B),
-                           New_Item => Element (B));
+            Result.Include (Key   => Key     (B),
+                            Value => Element (B));
          end loop;
       end loop;
       return Result;

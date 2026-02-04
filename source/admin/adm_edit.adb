@@ -840,9 +840,15 @@ is
       use Php.Preg;
       use Php.Strings;
       use Binder;
+      use List_Vectors;
       use UStrings;
+      use Class_Posts;
       use Inc_Capabilities;
+      use Inc_Formatting;
+      use Inc_Functions;
+      use Inc_Link_Templates;
       use Inc_L10n;
+      use Inc_Posts;
 
       Messages : UString;
       -- Messages := array();
@@ -850,13 +856,14 @@ is
       -- If we have a bulk message to issue:
       for X in Bulk_Counts.Iterate loop   -- foreach
          declare
-            use Inc_Functions;
---          use Array_Maps;
-
             Count   : constant Natural := Natural'Value (Key (X));
             Message : constant String  := Get_As_String (Bulk_Counts, Key (X));
-            Message_Array : Array_Type renames As_Array (Get (Bulk_Messages, Post_Type));
-            Post_Array    : Array_Type renames As_Array (Get (Bulk_Messages, Post_Type));
+
+            Message_Array : Array_Type
+              renames As_Array (Get (Bulk_Messages, Post_Type));
+
+            Post_Array : Array_Type
+              renames As_Array (Get (Bulk_Messages, Post_Type));
          begin
             if Isset (Message_Array, Message) then
 --          if Isset (String'(Get (Bulk_Messages, Post_Type, Message))) then
@@ -875,9 +882,7 @@ is
 
             if "trashed" = Message and then Isset (X_REQUEST, "ids") then
                declare
-                  use Inc_Formatting;
-
-                  Ids   : constant Integer :=
+                  Ids : constant Integer :=
                     Preg_Replace ("/[^0-9,]/", "",
                       As_Array (Get (X_REQUEST, "ids")));
 
@@ -897,8 +902,6 @@ is
 
             if "untrashed" = Message and then Isset (X_REQUEST, "ids") then
                declare
-                  use List_Vectors;
-
                   Ids : constant List_Type :=
                      Explode (",", Get_As_String (X_REQUEST, "ids"));
                begin
@@ -908,22 +911,18 @@ is
                   then
 --                  if 1 = Count (Ids) and then Current_User_Can ("edit_post", Ids (0)) then
                      declare
-                        use Inc_Formatting;
-                        use Inc_Link_Templates;
-                        use Class_Posts;
-
                         Id : constant Post_Id_Type :=
                           Post_Id_Type'Value (Ids.First_Element);
 
-                        URL  : constant String  :=
+                        URL  : constant String :=
                            ESC_URL (Get_Edit_Post_Link (Id));
 
-                        Post : constant String  := -- Inc_Class_Posts.Wp_Post :=
-                           Inc_Posts.Get_Post_Type (Id);
+                        Post : constant String := -- Inc_Class_Posts.Wp_Post :=
+                           Get_Post_Type (Id);
 
-                        HTML : constant String := "XXX-251";
---                        ESC_HTML (Inc_Posts.Get_Post_Type_Object
---                                   (Get (A => Post, Key => "labels.edit_item")));
+                        HTML : constant String :=
+                          ESC_HTML (-Get_Post_Type_Object (Post).Label);
+                          -- , Key => "labels.edit_item")));
                      begin
                         Append (Messages,
                                 Sprintf ("<a href=""%1$s"">%2$s</a>",
@@ -954,9 +953,6 @@ is
       -- unset( $messages );
 
       declare
-         use Inc_Functions;
---       use String_Vectors;
-
          List : constant List_Type :=
            ["locked", "skipped", "updated", "deleted", "trashed", "untrashed"];
       begin

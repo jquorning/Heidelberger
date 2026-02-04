@@ -1696,7 +1696,7 @@ is
       use Inc_Themes;
       use Inc_Users;
 
-      Secure_Cookie   : Boolean;
+      Secure_Cookie   : Boolean := False;
       Customize_Login : constant Boolean := Isset (X_REQUEST, "customize-login");
       Redirect_To     : UString;
       Errors          : Wp_Error;

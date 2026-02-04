@@ -154,7 +154,7 @@ is
    --
    -- function wp_enqueue_style( handle, src = '', deps = array(), ver = false, media = 'all' ) then
    procedure Wp_Enqueue_Style (Handle : String;
-                               Src    : String    := "";
+                               Src    : String    := "(empty)";
                                Deps   : List_Type := Empty_List;
                                Ver    : String    := ""; -- Boolean      := False;
                                Media  : String    := "all");

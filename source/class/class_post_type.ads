@@ -75,10 +75,12 @@ is
         Description : UStrings.UString;
 
         --
-        -- Whether a post type is intended for use -- publicly either via the admin interface or by front-end users.
+        -- Whether a post type is intended for use -- publicly either via the admin
+        -- interface or by front-end users.
         --
-        -- While the default settings of exclude_from_search, -- publicly_queryable, show_ui, and show_in_nav_menus
-        -- are inherited from -- public, each does not rely on this relationship and controls a very specific intention.
+        -- While the default settings of exclude_from_search, -- publicly_queryable,
+        -- show_ui, and show_in_nav_menus are inherited from -- public, each does not
+        -- rely on this relationship and controls a very specific intention.
         --
         -- Default false.
         --
@@ -237,7 +239,8 @@ is
         --
         -- An array of taxonomy identifiers that will be registered for the post type.
         --
-        -- Taxonomies can be registered later with `register_taxonomy()` or `register_taxonomy_for_object_type()`.
+        -- Taxonomies can be registered later with `register_taxonomy()` or
+        -- `register_taxonomy_for_object_type()`.
         --
         -- Default empty array.
         --
@@ -247,7 +250,8 @@ is
         -- public taxonomies = array();
 
         --
-        -- Whether there should be post type archives, or if a string, the archive slug to use.
+        -- Whether there should be post type archives, or if a string, the archive
+        -- slug to use.
         --
         -- Will generate the proper rewrite rules if rewrite is enabled. Default false.
         --
@@ -282,10 +286,12 @@ is
         --
         -- Whether to delete posts of this type when deleting a user.
         --
-        -- - If true, posts of this type belonging to the user will be moved to Trash when the user is deleted.
-        -- - If false, posts of this type belonging to the user will--not* be trashed or deleted.
-        -- - If not set (the default), posts are trashed if post type supports the "author" feature.
-        --   Otherwise posts are not trashed or deleted.
+        -- - If true, posts of this type belonging to the user will be moved to Trash
+        --   when the user is deleted.
+        -- - If false, posts of this type belonging to the user will *not* be trashed
+        --   or deleted.
+        -- - If not set (the default), posts are trashed if post type supports the
+        --   "author" feature. Otherwise posts are not trashed or deleted.
         --
         -- Default null.
         --
@@ -311,10 +317,10 @@ is
         --
         -- Whether the block template should be locked if template is set.
         --
-        -- - If set to "all", the user is unable to insert new blocks, move existing blocks
-        --   and delete blocks.
-        -- - If set to "insert", the user is able to move existing blocks but is unable to insert
-        --   new blocks and delete blocks.
+        -- - If set to "all", the user is unable to insert new blocks, move existing
+        --   blocks and delete blocks.
+        -- - If set to "insert", the user is able to move existing blocks but is
+        --   unable to insert new blocks and delete blocks.
         --
         -- Default false.
         --
@@ -412,7 +418,8 @@ is
         --
         -- The controller instance for this post type"s REST API endpoints.
         --
-        -- Lazily computed. Should be accessed using {@see WP_Post_Type::get_rest_controller()}.
+        -- Lazily computed. Should be accessed using
+        -- {@see WP_Post_Type::get_rest_controller()}.
         --
         -- @since 5.3.0
         -- @var WP_REST_Controller rest_controller
@@ -434,8 +441,8 @@ is
         -- @see register_post_type()
         --
         -- @param string       post_type Post type key.
-        -- @param array|string args      Optional. Array or string of arguments for registering a post type.
-        --                                Default empty array.
+        -- @param array|string args      Optional. Array or string of arguments for
+        --                               registering a post type. Default empty array.
         --
 --        function X_Construct (Post_Type : String;
 --                              Args      : Inc_Posts.Args_Type) -- = array() )

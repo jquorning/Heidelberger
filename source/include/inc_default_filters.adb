@@ -680,8 +680,8 @@ is
 --    Add_Action ("set_current_user", Kses_Init'Access);
 
       -- Script Loader.
---    Add_Action ("wp_default_scripts",
---                Inc_Script_Loader.Wp_Default_Scripts'Access);
+      Add_Action ("wp_default_scripts",
+                  Inc_Script_Loader.Wp_Default_Scripts'Access);
 --    Add_Action ("wp_default_scripts",
 --                Inc_Script_Loader.Wp_Default_Packages'Access);
 

@@ -24,8 +24,6 @@ is
    use Arrays;
    use Lists;
 
-   procedure Dummy;
-
    GLOBALS : Array_Type := Empty_Array;
 
    WpDB : Class_WpDB.Wpdb_Class;
@@ -82,5 +80,10 @@ is
 
    Global_Page  : Natural;
    Global_Paged : Natural;
+
+   --
+   --
+   --
+   procedure Initialize;
 
 end Globals;

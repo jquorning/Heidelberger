@@ -13,7 +13,6 @@ with Php.Strings;
 with Globals;
 with UStrings;
 
-with Class_Dependencies;
 with Class_Scripts;
 with Inc_Functions;
 with Inc_L10n;
@@ -386,39 +385,37 @@ is
    -----------------------
 
    procedure Wp_Enqueue_Script (Handle    : String;
-                                Src       : String    := "";
+                                Src       : String    := "(empty)";
                                 Deps      : List_Type := Empty_List;
                                 Ver       : String    := "";
                                 In_Footer : Boolean   := False)
    is
       use Php.Strings;
       use Class_Scripts;
-      use Class_Dependencies;
+
+      Scripts : Wp_Scripts renames Globals.Global_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
-      declare
-         Scripts : Wp_Scripts := X_Construct; -- wp_scripts();
-      begin
-         if Src /= "" or else In_Footer then
-            declare
-               X_Handle : constant List_Type := Explode ("?", Handle);
-               Unused   : Boolean;
-            begin
-               if Src /= "" then
-                  Unused := Class_Dependencies.Add
-                    (Wp_Dependencies (Scripts),
-                     X_Handle.First_Element, Src, Deps, Ver); -- (0)
-               end if;
 
-               if In_Footer then
-                  Unused := Class_Dependencies.Add_Data
-                    (Wp_Dependencies (Scripts),
-                     X_Handle.First_Element, "group", "1"); -- (0), 1 -> "1"
-               end if;
-            end;
-         end if;
-         Scripts.Enqueue ([Handle]);
-      end;
+      if Src = "(empty)" or else In_Footer then
+         declare
+            X_Handle : constant List_Type := Explode ("?", Handle);
+            Unused   : Boolean;
+         begin
+            if Src /= "(empty)" then
+               Unused := Class_Scripts.Add
+                 (Scripts,
+                  X_Handle.First_Element, Src, Deps, Ver); -- (0)
+            end if;
+
+            if In_Footer then
+               Unused := Class_Scripts.Add_Data
+                 (Scripts,
+                  X_Handle.First_Element, "group", "1"); -- (0), 1 -> "1"
+            end if;
+         end;
+      end if;
+      Scripts.Enqueue ([Handle]);
    end Wp_Enqueue_Script;
 
 -- function wp_enqueue_script( handle, src = "", deps = array(), ver = false, in_footer = false ) then

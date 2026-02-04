@@ -1880,6 +1880,19 @@ is
       end if;
    end Wp_Default_Scripts;
 
+   ------------------------
+   -- Wp_Default_Scripts --
+   ------------------------
+
+   function Wp_Default_Scripts (Arry : Array_Type)
+                               return Array_Type
+   is
+      pragma Unreferenced (Arry);
+   begin
+      Wp_Default_Scripts (Globals.Global_Wp_Scripts);
+      return Empty_Array;
+   end Wp_Default_Scripts;
+
    Global_Editor_Styles : Array_Type;
 
    -----------------------
@@ -2730,13 +2743,15 @@ is
             return List_Type
    is
       use Wp_Common;
+      use Class_Styles;
+
 --         global concatenate_scripts;
-      Wp_Styles : Class_Styles.Wp_Styles
+      Styles : Wp_Styles
         renames Globals.Global_Wp_Styles;
    begin
       Script_Concat_Settings;
-      Wp_Styles.Do_Concat := Concatenate_Scripts;
-      Wp_Styles.Do_Items (False);
+      Styles.Do_Concat := Concatenate_Scripts;
+      Styles.Do_Items (False);
 
       --
       -- Filters whether to print the admin styles.
@@ -2749,8 +2764,8 @@ is
          X_Print_Styles;
       end if;
 
-      Wp_Styles.Reset;
-      return Wp_Styles.Done;
+      Styles.Reset;
+      return Styles.Done;
    end Print_Admin_Styles;
 
    ------------------------
@@ -2772,8 +2787,10 @@ is
             return List_Type
    is
       use Wp_Common;
+      use Class_Styles;
 --    global wp_styles, concatenate_scripts;
-      Wp_Styles : Class_Styles.Wp_Styles
+
+      Styles : Wp_Styles
         renames Globals.Global_Wp_Styles;
    begin
       -- if not ( wp_styles instanceof WP_Styles ) ) then
@@ -2781,8 +2798,8 @@ is
       -- end if;
 
       Script_Concat_Settings;
-      Wp_Styles.Do_Concat := Concatenate_Scripts;
-      Wp_Styles.Do_Footer_Items;
+      Styles.Do_Concat := Concatenate_Scripts;
+      Styles.Do_Footer_Items;
 
       --
       -- Filters whether to print the styles queued too late for the HTML head.
@@ -2795,8 +2812,8 @@ is
          X_Print_Styles;
       end if;
 
-      Wp_Styles.Reset;
-      return Wp_Styles.Done;
+      Styles.Reset;
+      return Styles.Done;
    end Print_Late_Styles;
 
    --------------------
@@ -2808,16 +2825,18 @@ is
       use Php.Echoing;
       use Php.Strings;
       use UStrings;
+      use Class_Styles;
       use Inc_Formatting;
       use Inc_Themes;
 --      global compress_css;
 
-      Wp_Styles : Class_Styles.Wp_Styles; -- := wp_styles();
+      Styles : Wp_Styles renames
+        Globals.Global_Wp_Styles;
 
       Zip : constant String :=
         (if Compress_CSS and then Constants.ENFORCE_GZIP then "gzip" else "");
 
-      Concat : constant String := Php.Strings.Trim (-Wp_Styles.Concat, ", ");
+      Concat : constant String := Php.Strings.Trim (-Styles.Concat, ", ");
 
       Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
                               then "" else " type=""text/css""");
@@ -2825,8 +2844,8 @@ is
 
       if Concat /= "" then
          declare
-            Dir : constant String := -Wp_Styles.Text_Direction;
-            Ver : constant String := -Wp_Styles.Default_Version;
+            Dir : constant String := -Styles.Text_Direction;
+            Ver : constant String := -Styles.Default_Version;
 
             Concat_2     : constant Array_Type := Str_Split (Concat, 128);
             Concatenated : UString;
@@ -2842,23 +2861,23 @@ is
 
             declare
                Href : constant String :=
-                 -Wp_Styles.Base_URL & "/wp-admin/load-styles.php?c=" & Zip &
+                 -Styles.Base_URL & "/wp-admin/load-styles.php?c=" & Zip &
                  "&dir=" & Dir & (-Concatenated) & "&ver=" & Ver;
             begin
                Echo ("<link rel=""stylesheet"" href=""" & ESC_Attr (Href) & """" &
                      Type_Attr & " media=""all"" />" & NL);
             end;
 
-            if not Empty (Wp_Styles.Print_Code) then
+            if not Empty (Styles.Print_Code) then
                Echo ("<style" & Type_Attr & ">" & NL);
-               Echo (-Wp_Styles.Print_Code);
+               Echo (-Styles.Print_Code);
                Echo (NL & "</style>\n");
             end if;
          end;
       end if;
 
-      if not Empty (Wp_Styles.Print_HTML) then
-         Echo (-Wp_Styles.Print_HTML);
+      if not Empty (Styles.Print_HTML) then
+         Echo (-Styles.Print_HTML);
       end if;
    end X_Print_Styles;
 
@@ -4417,14 +4436,10 @@ is
 --         add_action( "admin_init", fn_generate_and_enqueue_editor_styles);
 -- end;
 
--- --
--- -- Loads classic theme styles on classic themes in the frontend.
--- --
--- -- This is needed for backwards compatibility for button blocks specifically.
--- --
--- -- @since 6.1.0
--- --
--- function wp_enqueue_classic_theme_styles() then
+   -------------------------------------
+   -- Wp_Enqueue_Classic_Theme_Styles --
+   -------------------------------------
+
    procedure Wp_Enqueue_Classic_Theme_Styles
    is
       use Globals;

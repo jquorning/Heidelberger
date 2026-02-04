@@ -31,6 +31,7 @@ with Inc_Versions;
 
 package body Adm_Load_Styles
 is
+   use Arrays;
    use Lists;
 
    ---------
@@ -39,18 +40,17 @@ is
 
    procedure Run
    is
-      use Arrays;
-      use Binder;
-      use Globals;
-      use Constants;
-      use Helpers;
-      use UStrings;
       use Php.Echoing;
       use Php.HTML;
       use Php.Lists;
       use Php.Misc;
       use Php.Preg;
       use Php.Strings;
+      use Binder;
+      use Globals;
+      use Constants;
+      use Helpers;
+      use UStrings;
       use Class_Dependency;
 
       Protocol : UString;

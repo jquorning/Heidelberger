@@ -120,7 +120,7 @@ is
    --                                    Default 'false'.
    --
    procedure Wp_Enqueue_Script (Handle    : String;
-                                Src       : String    := "";
+                                Src       : String    := "(empty)";
                                 Deps      : List_Type := Empty_List;
                                 Ver       : String    := ""; -- Boolean   := False;
                                 In_Footer : Boolean   := False);

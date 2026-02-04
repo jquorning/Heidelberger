@@ -382,8 +382,9 @@ is
    --                                   Default false.
    -- @return bool True on success, false on failure.
    --
+   overriding
    function All_Deps (This      : in out Wp_Scripts;
-                      Handles   : String;
+                      Handles   : List_Type; -- String;
                       Recursion : Boolean := False;
                       Group     : Integer := 0) -- False
                       return Boolean

@@ -24,28 +24,26 @@ is
    --------------
 
    function Do_Items (This    : in out Wp_Dependencies;
-                      Handles : List_Type := Empty_List; -- = false,
-                      Group   : Integer   := 0) --  = false
+                      Handles : List_Type := Empty_List;
+                      Group   : Integer   := 0)
                       return List_Type
    is
       use Php.Lists;
       use List_Vectors;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
 
-      --
       -- If nothing is passed, print the queue. If a string is passed,
       -- print that item. If an array is passed, print those items.
-      --
-      Handles_2 : List_Type := (if Handles.Is_Empty
-                                then This.Queue else Handles); -- (array)
-      Unused : Boolean;
-   begin
-      Unused := All_Deps (This, Handles_2);
+      Handles_2 : constant List_Type :=
+        (if Handles.Is_Empty
+         then This.Queue else Handles);
 
+      Unused : constant Boolean :=
+        All_Deps (Wp_Dependencies'Class (This), Handles_2);
+   begin
       for A of This.To_Do loop
          declare
-            use Class_Dependency;
-            use Class_Dependency.Dependency_Maps;
-
 --          Key    : String := -A.Key;
             Handle : constant String := A; -- .Value;
          begin
@@ -130,15 +128,17 @@ is
    --------------
 
    function All_Deps (This      : in out Wp_Dependencies;
-                      Handles   : List_Type; -- String_Array;
+                      Handles   : List_Type;
                       Recursion : Boolean := False;
-                      Group     : Integer := 0) -- = false
+                      Group     : Integer := 0)
                       return Boolean
    is
       use Php.Lists;
       use Php.Strings;
       use Helpers_3;
       use List_Vectors;
+      use Class_Dependency;
+      use Class_Dependency.Dependency_Maps;
 
       Handles_2 : constant List_Type := Handles; -- (array)
    begin
@@ -149,7 +149,7 @@ is
       for Handle of Handles_2 loop
          declare
             Handle_Parts : constant List_Type := Explode ("?", Handle);
-            Handle_2     : constant String    := Handle_Parts.First_Element; --  (0);
+            Handle_2     : constant String    := Handle_Parts.First_Element;
             Queued       : constant Boolean   := In_List (Handle_2, This.To_Do, True);
          begin
             if In_List (Handle_2, This.Done, True) then -- Already done.
@@ -157,10 +157,6 @@ is
             end if;
 
             declare
-               use Class_Dependency;
-               use Class_Dependency.Dependency_Maps;
---             use String_Vectors;
-
                Moved : constant Boolean := This.Set_Group (Handle_2, Recursion, Group);
                New_Group  : constant Integer := This.Groups (Handle_2);
                Keep_Going : Boolean := True;
@@ -173,17 +169,16 @@ is
                   Keep_Going := False; -- Item doesn't exist.
                elsif
                  not This.Registered (Handle_2).Deps.Is_Empty and then
---               This.Registered (Handle_2).Deps /= Empty_String_Array and then
                  List_Diff (This.Registered (Handle_2).Deps,
                             Array_Keys (This.Registered)).Is_Empty
                then
                   Keep_Going := False; -- Item requires dependencies that don't exist.
                elsif
                  not This.Registered (Handle_2).Deps.Is_Empty and then
---               This.Registered (Handle_2).Deps /= Empty_String_Array and then
-                 not This.All_Deps (This.Registered (Handle_2).Deps,
-                                    Recursion => True,
-                                    Group     => New_Group)
+                 not All_Deps (Wp_Dependencies'Class (This),
+                               This.Registered (Handle_2).Deps,
+                               Recursion => True,
+                               Group     => New_Group)
                then
                   Keep_Going := False; -- Item requires dependencies that don't exist.
                end if;
@@ -200,7 +195,7 @@ is
                   goto Continue;
                end if;
 
-               if "" /= Handle_Parts (Handle_Parts.First_Index + 1) then
+               if Handle_Parts.Length in 2 then
                   This.Args.Insert
                     (Key      => Handle_2,
                      New_Item => Handle_Parts (Handle_Parts.First_Index + 1));
@@ -357,14 +352,12 @@ is
    -- Remove --
    ------------
 
---        public function remove( handles ) then
    procedure Remove (This    : in out Wp_Dependencies;
                      Handles : List_Type)
    is
    begin
       for Handle of Handles loop
          This.Registered.Delete (Handle);
---       Unset (This.Registered (Handle));
       end loop;
    end Remove;
 
@@ -434,7 +427,6 @@ is
    -- Dequeue --
    -------------
 
---        public function dequeue( handles ) then
    procedure Dequeue (This    : in out Wp_Dependencies;
                       Handles : List_Type)
    is
@@ -467,7 +459,6 @@ is
             elsif List_Key_Exists (First, This.Queued_Before_Register) then
                Position_1 := This.Queued_Before_Register.Find (First);
                This.Queued_Before_Register.Delete (Position_1);
---             Unset (This.Queued_Before_Register (Handle_2 (Handle_2.First_Index)));
             end if;
          end;
       end loop;
@@ -477,9 +468,8 @@ is
    -- Recurse_Deps --
    ------------------
 
---        protected function recurse_deps( queue, handle ) then
    function Recurse_Deps (This   : in out Wp_Dependencies;
-                          Queue  : List_Type; -- String_Array;
+                          Queue  : List_Type;
                           Handle : String)
                           return Boolean
    is
@@ -491,7 +481,6 @@ is
       Queue_2 : List_Type := Queue;
    begin
       if not This.All_Queued_Deps.Is_Empty then
---         return Isset (This.All_Queued_Deps.Find (Handle));
          return Has_Element (This.All_Queued_Deps.Find (Handle));
       end if;
 
@@ -505,19 +494,14 @@ is
             for Queued of Queue_2 loop
                if
                  not Has_Element (Done.Find (Queued)) and then
---               not Isset (Done (Queued)) and then
                  Has_Element (This.Registered.Find (Queued))
---               Isset (This.Registered (Queued))
                then
                   declare
                      Deps   : constant List_Type := This.Registered (Queued).Deps;
---                   Deps   : constant String_Array := This.Registered (-Queued).Deps;
                      Unused : Integer;
                   begin
                      if not Deps.Is_Empty then
---                   if Deps /= Empty_String_Array then
                         All_Deps.Append (Deps);
---                      All_Deps.Append ([Deps]);
 --                      All_Deps.Append (Array_Fill_Keys (Deps, True));
                         Unused := List_Push (Queues, Deps);
                      end if;
@@ -533,7 +517,6 @@ is
          This.All_Queued_Deps := All_Deps;
 
          return Has_Element (This.All_Queued_Deps.Find (Handle));
---       return Isset (This.All_Queued_Deps (Handle));
       end;
    end Recurse_Deps;
 
@@ -541,11 +524,10 @@ is
    -- Query --
    -----------
 
---        public function query( handle, status = "registered" ) then
    function Query (This   : in out Wp_Dependencies;
                    Handle : String;
                    Status : String := "registered")
-                   return Query_Result -- Boolean
+                   return Query_Result
    is
       use Php.Lists;
       use Class_Dependency;
@@ -553,30 +535,21 @@ is
 
       Null_Deps : Class_Dependency.X_Wp_Dependency;
    begin
---                switch ( status ) then
---                        case "registered":
---                        case "scripts": -- Back compat.
       if Status in "registered" | "scripts" then
          if Has_Element (This.Registered.Find (Handle)) then
             return (True, This.Registered (Handle));
          end if;
          return (False, Null_Deps);
 
---                        case "enqueued":
---                        case "queue": -- Back compat.
       elsif Status in "enqueued" | "queue" then
          if In_List (Handle, This.Queue, True) then
             return (True, Null_Deps);
          end if;
          return (This.Recurse_Deps (This.Queue, Handle), Null_Deps);
 
---                        case "to_do":
---                        case "to_print": -- Back compat.
       elsif Status in "to_do" | "to_print" then
          return (In_List (Handle, This.To_Do, True), Null_Deps);
 
---                        case "done":
---                        case "printed": -- Back compat.
       elsif Status in "done" | "printed" then
          return (In_List (Handle, This.Done, True), Null_Deps);
       end if;
@@ -588,7 +561,6 @@ is
    -- Set_Group --
    ---------------
 
---        public function set_group( handle, recursion, group ) then
    function Set_Group (This      : in out Wp_Dependencies;
                        Handle    : String;
                        Recursion : Boolean;
@@ -599,7 +571,6 @@ is
    begin
       if
         Has_Element (This.Groups.Find (Handle)) and then
---      Isset (This.Groups (Handle)) and then
         This.Groups (Handle) <= Group
       then
          return False;
@@ -608,8 +579,6 @@ is
       Ada.Text_IO.Put_Line (This'Image);
       This.Groups.Include (Key      => Handle,
                            New_Item => Group);
---    This.Groups.Replace (Handle, Group);
---    This.Groups (Handle) := Group;
 
       return True;
    end Set_Group;

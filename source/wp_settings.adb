@@ -7,8 +7,7 @@
 -- @package WordPress
 --
 
--- with Globals;
--- with Php;
+with Globals;
 
 with Inc_Default_Filters;
 with Inc_Default_Constants;
@@ -413,6 +412,9 @@ is
       Inc_Default_Constants.Wp_Plugin_Directory_Constants;
 
 --    $GLOBALS['wp_plugin_paths'] = array();
+
+      -- Added by jq
+      Globals.Initialize;
 
       -- Load must-use plugins.
 --    for Mu_Plugin of Wp_Get_Mu_Plugins loop

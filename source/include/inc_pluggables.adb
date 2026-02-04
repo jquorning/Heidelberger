@@ -1356,7 +1356,6 @@ is
       use Inc_General_Templates;
       use Inc_Link_Templates;
       use Inc_Load;
-      use Inc_Plugins;
       use Inc_Users;
 
       Secure_2 : constant Boolean := Is_SSL or else Force_SSL_Admin;
@@ -1476,7 +1475,6 @@ is
       use Inc_Functions;
       use Inc_Link_Templates;
       use Inc_L10n;
-      use Inc_Plugins;
    begin
       if "-1" = Action then -- -1
          X_Doing_It_Wrong (
@@ -1606,7 +1604,6 @@ is
       use Wp_Common;
       use Inc_Functions;
       use Inc_L10n;
-      use Inc_Plugins;
       use Inc_Vars;
 
       --
@@ -1766,7 +1763,6 @@ is
    is
       use Wp_Common;
       use Inc_Link_Templates;
-      use Inc_Plugins;
 
       -- Need to look at the URL the way it will end up in wp_redirect().
       Location_2 : constant String :=
@@ -2566,12 +2562,11 @@ is
    -- Wp_Nonce_Tick --
    -------------------
 
-   function Wp_Nonce_Tick (Action : Integer := -1)
+   function Wp_Nonce_Tick (Action : String)
                            return Float
    is
       use Constants;
       use Wp_Common;
-      use Inc_Plugins;
 
       Nonce_Life : Integer;
    begin
@@ -2632,7 +2627,7 @@ is
 
       declare
          Token : constant String := Wp_Get_Session_Token;
-         I     : constant Float  := Wp_Nonce_Tick (Integer'Value (Action));
+         I     : constant Float  := Wp_Nonce_Tick (Action);
          II    : constant Integer := Integer (I); -- added
 
          -- Nonce generated 0-12 hours ago.
@@ -2684,12 +2679,12 @@ is
    -- Wp_Create_Nonce --
    ---------------------
 
-   function Wp_Create_Nonce (Action : Integer := -1)
+   function Wp_Create_Nonce (Action : String)
             return String
    is
+      use Php.Strings;
       use Wp_Common;
       use Class_Users;
-      use Inc_Plugins;
       use Inc_Users;
 
       User : constant Wp_User := Wp_Get_Current_User;
@@ -2704,10 +2699,10 @@ is
          Token : constant String := Wp_Get_Session_Token;
          I     : constant Float  := Wp_Nonce_Tick (Action);
       begin
-         return Php.Strings.Substr
-           (Wp_Hash (Float'Image (I) & '|' & Integer'Image (Action) & '|' &
+         return Substr
+           (Wp_Hash (Float'Image (I) & '|' & Action & '|' &
                      Helpers.Image (Uid) & '|' & Token, "nonce"),
-                    -12, 10);
+            Offset => -12, Length => 10);
       end;
    end Wp_Create_Nonce;
 
@@ -2715,11 +2710,11 @@ is
    -- Wp_Create_Nonce --
    ---------------------
 
-   function Wp_Create_Nonce (Action : String)
+   function Wp_Create_Nonce (Action : Integer := -1)
             return String
    is
    begin
-      return Wp_Create_Nonce (Integer'Value (Action));
+      return Wp_Create_Nonce (Integer'Image (Action));
    end Wp_Create_Nonce;
 
 -- endif;
@@ -2743,7 +2738,6 @@ is
       use Wp_Common;
       use Inc_L10n;
       use Inc_Options;
-      use Inc_Plugins;
    begin
       if Isset (Static_Cached_Salts, Scheme) then
          --
@@ -2993,7 +2987,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Chars : UString :=
         +"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -3191,7 +3184,6 @@ is
       use Inc_Load;
       use Inc_Media;
       use Inc_Options;
-      use Inc_Plugins;
 
       Defaults : Array_Type := To_Array (List => (
         -- get_avatar_data() args.

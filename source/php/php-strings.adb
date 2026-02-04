@@ -323,6 +323,10 @@ is
                     return String
    is
    begin
+      if Offset < 0 then
+         return "XXX-931";
+      end if;
+
       if Length = 0 then
          return "";
       elsif Length > 0 then
@@ -532,7 +536,20 @@ is
    function Strtok (Item  : String;
                     Token : String)
                     return String
-   is (raise Program_Error with "XXX-783");
+   is
+      use Ada.Strings;
+
+      Tokens : constant Maps.Character_Set := Maps.To_Set (Token);
+      First  : Positive;
+      Last   : Natural;
+   begin
+      Fixed.Find_Token (Source => Item,
+                        Set    => Tokens,
+                        Test   => Inside,
+                        First  => First,
+                        Last   => Last);
+      return Item (First .. Last);
+   end Strtok;
 
    -------------
    -- Strpbrk --

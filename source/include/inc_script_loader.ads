@@ -133,6 +133,9 @@ is
    --
    procedure Wp_Default_Scripts (Scripts : in out Class_Scripts.Wp_Scripts);
 
+   function Wp_Default_Scripts (Arry : Array_Type)
+                               return Array_Type;
+
    --
    -- Registers all the WordPress vendor scripts that are in the standardized
    -- `js/dist/vendor/` location.

@@ -412,7 +412,7 @@ is
    -------------------------
 
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Array_Type)
+                                  Args      : in out Array_Type)
    is
       use Php.Lists;
       use Globals;
@@ -459,11 +459,49 @@ is
    -- Do_Action_Ref_Array --
    -------------------------
 
-   procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Class_Styles.Wp_Styles)
+   procedure Do_Action_Ref_Array
+               (Hook_Name : String;
+                Args      : in out Class_Dependencies.Wp_Dependencies'Class)
    is
+      use Php.Lists;
+      use Globals;
+      use Globals.Count_Maps;
+      use Class_Hook_Maps.Hook_Maps;
    begin
-      Do_Action_Ref_Array (Hook_Name, Empty_Array);
+      Logging.Log ("do_action_ref_array", Hook_Name);
+
+      if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
+         Global_Wp_Actions.Include (Hook_Name, 1);
+      else
+         Global_Wp_Actions.Include (Hook_Name,
+                                    Global_Wp_Actions (Hook_Name) + 1);
+      end if;
+
+      -- Do 'all' actions first.
+      if Has_Element (Global_Wp_Filter.Find ("all")) then
+         Global_Wp_Current_Filter.Append (Hook_Name);
+         declare
+            All_Args : Array_Type; --            := Func_Get_Args;
+         begin
+            X_Wp_Call_All_Hook (All_Args);
+         end;
+      end if;
+
+      if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
+         if Has_Element (Global_Wp_Filter.Find ("all")) then
+            List_Pop (Global_Wp_Current_Filter);
+         end if;
+
+         return;
+      end if;
+
+      if not Has_Element (Global_Wp_Filter.Find ("all")) then
+         Global_Wp_Current_Filter.Append (Hook_Name);
+      end if;
+
+      Global_Wp_Filter (Hook_Name).Do_Action (Empty_Array); -- (Args);
+
+      List_Pop (Global_Wp_Current_Filter);
    end Do_Action_Ref_Array;
 
    -------------------------
@@ -473,8 +511,9 @@ is
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Class_Admin_Bar.Wp_Admin_Bar)
    is
+      Args_2 : Array_Type;
    begin
-      Do_Action_Ref_Array (Hook_Name, Empty_Array);
+      Do_Action_Ref_Array (Hook_Name, Args_2);
    end Do_Action_Ref_Array;
 
    ----------------

@@ -63,9 +63,10 @@ is
    -- Do_Item --
    -------------
 
+   overriding
    function Do_Item (This   : in out Wp_Styles;
                      Handle : String;
-                     Group  : Integer := 0) -- False
+                     Group  : Integer := 0)
                      return Boolean
    is
       use Php.Echoing;
@@ -76,7 +77,7 @@ is
       use Class_Dependency;
       use Inc_Formatting;
    begin
-      if not Do_Item (Wp_Dependencies (This), Handle) then
+      if not Do_Item (Wp_Dependencies'Class (This), Handle) then
          return False;
       end if;
 
@@ -289,22 +290,23 @@ is
                               return Boolean
    is
       use Lists.List_Vectors;
-
-      After : List_Type;
    begin
       if Code = "" then
          return False;
       end if;
 
-      After := This.Get_Data (Handle, "after");
-      if After.Is_Empty then
---    if not After then
-         After := Empty_List;
-      end if;
+      declare
+         After_2 : constant List_Type := This.Get_Data (Handle, "after");
+         After   : constant List_Type := After_2 & Code;
+      begin
+         -- if After.Is_Empty then
+         --    After := Empty_List;
+         -- end if;
 
-      After.Append (Code);
+         -- After.Append (Code);
 
-      return This.Add_Data (Handle, "after", After);
+         return This.Add_Data (Handle, "after", After);
+      end;
    end Add_Inline_Style;
 
    ------------------------
@@ -358,34 +360,36 @@ is
       null;
    end Print_Inline_Style;
 
---         --
---         -- Determines style dependencies.
---         --
---         -- @since 2.6.0
---         --
---         -- @see WP_Dependencies::all_deps()
---         --
---         -- @param string|string[] handles   Item handle (string) or item handles (array of strings).
---         -- @param bool            recursion Optional. Internal flag that function is calling itself.
---         --                                   Default false.
---         -- @param int|false       group     Optional. Group level: level (int), no groups (false).
---         --                                   Default false.
---         -- @return bool True on success, false on failure.
---         --
---         public function all_deps( handles, recursion = false, group = false ) then
---                 r = parent::all_deps( handles, recursion, group );
---                 if ( not recursion ) then
---                         --
---                         -- Filters the array of enqueued styles before processing for output.
---                         --
---                         -- @since 2.6.0
---                         --
---                         -- @param string[] to_do The list of enqueued style handles about to be processed.
---                         --
---                         this.to_do = apply_filters( "print_styles_array", this.to_do );
---                 end;
---                 return r;
---         end;
+   --------------
+   -- All_Deps --
+   --------------
+
+   overriding
+   function All_Deps (This      : in out Wp_Styles;
+                      Handles   : List_Type;
+                      Recursion : Boolean := False;
+                      Group     : Integer := 0) -- false
+                      return Boolean
+   is
+      use Wp_Common;
+      use Class_Dependencies;
+
+      Result : constant Boolean :=
+        All_Deps (Wp_Dependencies (This), Handles, Recursion, Group);
+   begin
+      if not Recursion then
+         --
+         -- Filters the array of enqueued styles before processing for output.
+         --
+         -- @since 2.6.0
+         --
+         -- @param string[] to_do The list of enqueued style handles about to be
+         --                       processed.
+         --
+         This.To_Do := Apply_Filters ("print_styles_array", This.To_Do);
+      end if;
+      return Result;
+   end All_Deps;
 
    ----------------
    -- X_CSS_Href --
@@ -465,6 +469,10 @@ is
    begin
       null;
    end Do_Footer_Items;
+
+   ---------------------
+   -- Do_Footer_Items --
+   ---------------------
 
    function Do_Footer_Items (This : in out Wp_Styles)
             return List_Type

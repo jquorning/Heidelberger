@@ -185,6 +185,28 @@ is
                                  Display : Boolean := True);
 
    --
+   -- Determines style dependencies.
+   --
+   -- @since 2.6.0
+   --
+   -- @see WP_Dependencies::all_deps()
+   --
+   -- @param string|string[] handles   Item handle (string) or item handles (array of
+   --                                  strings).
+   -- @param bool            recursion Optional. Internal flag that function is
+   --                                  calling itself. Default false.
+   -- @param int|false       group     Optional. Group level: level (int), no
+   --                                  groups (false). Default false.
+   -- @return bool True on success, false on failure.
+   --
+   overriding
+   function All_Deps (This      : in out Wp_Styles;
+                      Handles   : List_Type;
+                      Recursion : Boolean := False;
+                      Group     : Integer := 0) -- false
+                      return Boolean;
+
+   --
    -- Generates an enqueued style's fully-qualified URL.
    --
    -- @since 2.6.0

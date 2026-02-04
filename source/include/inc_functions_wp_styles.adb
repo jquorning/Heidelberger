@@ -13,6 +13,7 @@ with Php.Strings;
 with Globals;
 with UStrings;
 
+with Class_Dependencies;
 with Class_Styles;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
@@ -192,25 +193,28 @@ is
    ----------------------
 
    procedure Wp_Enqueue_Style (Handle : String;
-                               Src    : String    := "";
+                               Src    : String    := "(empty)";
                                Deps   : List_Type := Empty_List;
                                Ver    : String    := "";
                                Media  : String    := "all")
    is
       use Php.Strings;
       use Class_Styles;
+      use Class_Dependencies;
       use Inc_Functions_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);
 
-      if Src /= "" then
+      if Src = "(empty)" then
          declare
             Unused : Boolean;
             X_Handle : constant List_Type := Explode ("?", Handle);
          begin
             Unused :=
-              Globals.Global_Wp_Styles.Add (X_Handle.First_Element,
-                                            Src, Deps, Ver, Media);
+              Add (Globals.Global_Wp_Styles,
+                   X_Handle.First_Element,
+                   "", -- Src,
+                   Deps, Ver, Media);
          end;
       end if;
 

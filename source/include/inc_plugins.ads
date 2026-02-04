@@ -23,9 +23,9 @@ with Arrays;
 with Lists;
 
 with Class_Admin_Bar;
+with Class_Dependencies;
 with Class_Hooks;
 with Class_Posts;
-with Class_Styles;
 
 package Inc_Plugins
 is
@@ -84,10 +84,11 @@ is
    --                         `hook_name`.
    --
    procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Array_Type);
+                                  Args      : in out Array_Type);
 
-   procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Class_Styles.Wp_Styles);
+   procedure Do_Action_Ref_Array
+               (Hook_Name : String;
+                Args      : in out Class_Dependencies.Wp_Dependencies'Class);
 
    procedure Do_Action_Ref_Array (Hook_Name : String;
                                   Args      : Class_Admin_Bar.Wp_Admin_Bar);

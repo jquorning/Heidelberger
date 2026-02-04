@@ -185,10 +185,10 @@ is
    -- @param string|int action Scalar value to add context to the nonce.
    -- @return string The token.
    --
-   function Wp_Create_Nonce (Action : Integer := -1)
+   function Wp_Create_Nonce (Action : String)
             return String;
 
-   function Wp_Create_Nonce (Action : String)
+   function Wp_Create_Nonce (Action : Integer := -1)
             return String;
 
    --
@@ -203,7 +203,7 @@ is
    -- @param string|int action Optional. The nonce action. Default -1.
    -- @return float Float value rounded up to the next highest integer.
    --
-   function Wp_Nonce_Tick (Action : Integer := -1)
+   function Wp_Nonce_Tick (Action : String)
                            return Float;
 
    --

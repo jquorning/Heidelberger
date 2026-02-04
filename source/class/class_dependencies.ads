@@ -40,8 +40,7 @@ is
         --
         -- @var _WP_Dependency[]
         --
-        Registered : Class_Dependency.Dependency_Map; -- = array();
---      Registered : Class_Dependency.Dependency_Array; -- = array();
+        Registered : Class_Dependency.Dependency_Map;
 
         --
         -- An array of handles of queued dependencies.
@@ -203,13 +202,6 @@ is
                       Group     : Integer := 0) -- = false
                       return Boolean
                       with Side_Effects;
-
-   -- function All_Deps (This      : in out Wp_Dependencies;
-   --                    Handles   : String_Array;
-   --                    Recursion : Boolean := False;
-   --                    Group     : Integer := 0) -- = false
-   --                    return Boolean
-   --                    is (False);
 
    --
    -- Register an item.

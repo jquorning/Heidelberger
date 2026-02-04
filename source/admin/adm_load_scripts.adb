@@ -31,6 +31,7 @@ with Inc_Versions;
 
 package body Adm_Load_Scripts
 is
+   use Arrays;
    use Lists;
 
    ---------
@@ -45,7 +46,6 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
-      use Arrays;
       use Binder;
       use Constants;
       use Globals;

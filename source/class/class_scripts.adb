@@ -22,11 +22,30 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
+with Inc_Plugins;
 with Inc_Script_Loader;
 with Inc_Themes;
 
 package body Class_Scripts
 is
+
+   --
+   --
+   --
+   function Dummy_Init (Arry : Array_Type)
+                        return Array_Type;
+
+   ----------------
+   -- Dummy_Init --
+   ----------------
+
+   function Dummy_Init (Arry : Array_Type)
+                        return Array_Type
+   is
+   begin
+      Init (Globals.Global_Wp_Scripts);
+      return Empty_Array;
+   end Dummy_Init;
 
    -----------------
    -- X_Construct --
@@ -35,12 +54,12 @@ is
    function X_Construct
             return Wp_Scripts
    is
---    use Inc_Plugins;
+      use Inc_Plugins;
 
       This : Wp_Scripts;
    begin
       This.Init;
---    Add_Action ("init", To_Array (This, "init"), 0);
+      Add_Action ("init", Dummy_Init'Access, 0); -- To_Array (This, "init"), 0);
       return This;
    end X_Construct;
 
@@ -51,7 +70,7 @@ is
    procedure Init (This : in out Wp_Scripts)
    is
       use UStrings;
---    use Inc_Plugins;
+      use Inc_Plugins;
    begin
       if
 --      Function_Exists ("is_admin") and then
@@ -69,7 +88,7 @@ is
       --
       -- @param WP_Scripts wp_scripts WP_Scripts instance (passed by reference).
       --
---    Do_Action_Ref_Array ("wp_default_scripts", This); -- to_array (&this)
+      Do_Action_Ref_Array ("wp_default_scripts", This);
    end Init;
 
    -------------------
@@ -729,7 +748,7 @@ is
    --------------
 
    function All_Deps (This      : in out Wp_Scripts;
-                      Handles   : String;
+                      Handles   : List_Type; -- String;
                       Recursion : Boolean := False;
                       Group     : Integer := 0)
                       return Boolean
@@ -737,8 +756,8 @@ is
       use Wp_Common;
       use Class_Dependencies;
 
-      R : constant Boolean :=
-        All_Deps (Wp_Dependencies (This), [Handles], Recursion, Group);
+      Result : constant Boolean :=
+        All_Deps (Wp_Dependencies (This), Handles, Recursion, Group);
    begin
       if not Recursion then
          --
@@ -750,7 +769,7 @@ is
          --
          This.To_Do := Apply_Filters ("print_scripts_array", This.To_Do);
       end if;
-      return R;
+      return Result;
    end All_Deps;
 
    -------------------
