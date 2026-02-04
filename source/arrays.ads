@@ -23,7 +23,6 @@ is
 
    type Array_Type;
    type Array_Access is access all Array_Type;
-   type List_Access  is access all Lists.List_Type;
 
    type Multi_Type is private;
 
@@ -375,7 +374,7 @@ private
          Str  : UStrings.UString;
          Int  : Integer          := 0;
          Arry : Array_Access     := null;
-         List : List_Access      := null;
+         List : Lists.List_Type;
          Func : Callable         := null;
          Bool : Boolean          := False;
       end record;
@@ -396,7 +395,7 @@ private
        Str  => UStrings.Null_UString,
        Int  => 0,
        Arry => null,
-       List => null,
+       List => Lists.Empty_List,
        Func => null,
        Bool => False);
 

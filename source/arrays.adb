@@ -13,6 +13,7 @@ is
    function "=" (Left, Right : Multi_Type)
                  return Boolean
    is
+      use Lists.List_Vectors;
    begin
       if Left.Kind /= Right.Kind then
          return False;
@@ -290,8 +291,7 @@ is
       case Arry.Kind is
 
       when Kind_List =>
-         pragma Assert (Arry.List /= null);
-         return Arry.List.all;
+         return Arry.List;
 
       when Kind_String =>
          return [-Arry.Str];
@@ -409,7 +409,7 @@ is
       M : Multi_Type;
    begin
       M.Kind := Kind_List;
-      M.List := new Lists.List_Type'(Value);
+      M.List.Append (Value);
       return M;
    end From_List;
 
@@ -1010,7 +1010,7 @@ is
       Map  : Array_Type;
    begin
       Item.Kind := Kind_List;
-      Item.List := new Lists.List_Type'(Value);
+      Item.List.Append (Value);
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
