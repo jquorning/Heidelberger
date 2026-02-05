@@ -6,6 +6,8 @@
 -- @since 4.7.0
 --
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Php.Arrays;
 with Php.Lists;
 
@@ -18,7 +20,6 @@ with Inc_Functions;
 with Inc_L10n;
 with Inc_Load;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Rewrites;
 with Inc_Taxonomys;
 
@@ -58,7 +59,6 @@ is
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
-      use Inc_Plugins;
 
       Args_2 : Array_Type := Wp_Parse_Args (Args);
    begin
@@ -128,6 +128,10 @@ is
          ));
       begin
          Args_2 := Array_Merge (Defaults, Args_2);
+--       Put_Line (Defaults.Length'Image);
+--       Put_Line (List_Type'(Array_Keys (Defaults))'Image);
+--       Put_Line (Defaults'Image);
+--       Put_Line (Args_2'Image);
       end;
 
       -- If not set, default to the setting for "public".
@@ -229,6 +233,7 @@ is
            Build ("assign_terms", "edit_posts")
          ));
       begin
+--       Put_Line (Args_2'Image);
          Set (Args_2,
               Key   => "cap",
               Value => From_Array (
@@ -305,18 +310,20 @@ is
             Property_Value : Multi_Type := Element (A);
          begin
             null;
-            -- case Property_Value.Kind is
-            -- when Is_String =>
-            --    Set (This, Property_Name, -Property_Value.Str);
-            -- when Is_Integer =>
+            -- case Kind_Of (Property_Value) is
+            -- when Kind_String =>
+            --    Set (This, Property_Name, From_String (As_String (Property_Value)));
+            -- when Kind_Integer =>
             --    Set_Integer (This, Property_Name, Property_Value.Int);
-            -- when Is_Array =>
+            -- when Kind_Array =>
             --    Set (This, Property_Name, Property_Value.Arry.all);
-            -- when Is_Boolean =>
+            -- when Kind_Boolean =>
             --    Set (This, Property_Name, Property_Value.Bool);
-            -- when Is_Callable =>
+            -- when Kind_List =>
             --    null;
-            -- when Is_Null =>
+            -- when Kind_Callable =>
+            --    null;
+            -- when Kind_Null =>
             --    null;
             -- end case;
          end;
@@ -471,12 +478,19 @@ is
       --    return self::default_labels;
       -- end if;
 
-      Name_Field_Description   : constant String := abs "The name is how it appears on your site.";
-      Slug_Field_Description   : constant String := abs "The &#8220;slug&#8221; is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.";
-      Parent_Field_Description : constant String := abs "Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.";
-      Desc_Field_Description   : constant String := abs "The description is not prominent by default; however, some themes may show it.";
-   begin
-      Self_Default_Labels := To_Array (List => (
+      Name_Field_Description : constant String :=
+        abs "The name is how it appears on your site.";
+
+      Slug_Field_Description : constant String :=
+        abs "The &#8220;slug&#8221; is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.";
+
+      Parent_Field_Description : constant String :=
+        abs "Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.";
+
+      Desc_Field_Description : constant String :=
+        abs "The description is not prominent by default; however, some themes may show it.";
+
+      Self_Default_Labels : constant Array_Type := To_Array (List => (
          Build ("name",                       To_Array ((1 => Build (X_X ("Tags", "taxonomy general name"), X_X ("Categories", "taxonomy general name"))))),
          Build ("singular_name",              To_Array ((1 => Build (X_X ("Tag", "taxonomy singular name"), X_X ("Category", "taxonomy singular name"))))),
          Build ("search_items",               To_Array ((1 => Build (abs "Search Tags", abs "Search Categories")))),
@@ -513,7 +527,7 @@ is
                         X_X ("A link to a category.", "navigation link block description"))))
          )
       ));
-
+   begin
       return Self_Default_Labels;
    end Get_Default_Labels;
 

@@ -43,7 +43,7 @@ is
             when Kind_Boolean =>
                Append (Buffer, Rec.Bool'Image);
             when Kind_Array =>
-               Append (Buffer, Dump_Array (Rec.Arry.all));
+               Append (Buffer, Dump_Array (Rec.Arry.Holder.all));
             when Kind_List =>
                Append (Buffer, "<list>");
             when Kind_Callable =>

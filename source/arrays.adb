@@ -1,4 +1,9 @@
+--
+--
+--
+
 with Ada.Text_IO;
+with Ada.Unchecked_Deallocation;
 
 with Helpers;
 
@@ -62,7 +67,7 @@ is
                        Key_2 : String;
                        Value : Multi_Type)
    is
-      Array_2 : Array_Type := Element (Arry.Find (Key_1)).Arry.all;
+      Array_2 : Array_Type := Element (Arry.Find (Key_1)).Arry.Holder.all;
    begin
       Array_Maps.Include (Array_Maps.Map (Array_2), Key_2, Value);
    end Append_2;
@@ -193,7 +198,7 @@ is
    is
       Rec_1 : constant Cursor := Ref (Arry, Key_1);
    begin
-      return Arrays.Element (Rec_1).Arry.Find (Key_2);
+      return Arrays.Element (Rec_1).Arry.Holder.Find (Key_2);
    end Ref_2;
 
    -----------
@@ -208,7 +213,7 @@ is
    is
       Rec_2 : constant Cursor := Ref_2 (Arry, Key_1, Key_2);
    begin
-      return Arrays.Element (Rec_2).Arry.Find (Key_3);
+      return Arrays.Element (Rec_2).Arry.Holder.Find (Key_3);
    end Ref_3;
 
    -----------
@@ -224,7 +229,7 @@ is
    is
       Rec_3 : constant Cursor := Ref_3 (Arry, Key_1, Key_2, Key_3);
    begin
-      return Arrays.Element (Rec_3).Arry.Find (Key_4);
+      return Arrays.Element (Rec_3).Arry.Holder.Find (Key_4);
    end Ref_4;
 
    -----------
@@ -241,7 +246,7 @@ is
    is
       Rec_4 : constant Cursor := Ref_4 (Arry, Key_1, Key_2, Key_3, Key_4);
    begin
-      return Arrays.Element (Rec_4).Arry.Find (Key_5);
+      return Arrays.Element (Rec_4).Arry.Holder.Find (Key_5);
    end Ref_5;
 
    -------------
@@ -275,9 +280,19 @@ is
    is
    begin
       pragma Assert (Arry.Kind = Kind_Array);
-      pragma Assert (Arry.Arry /= null);
+--    pragma Assert (Arry.Arry.Holder.Element /= null);
 
-      return Arry.Arry.all;
+      -- if Arry.Arry.Holder.Is_Empty then
+      --    declare
+      --       Item : Multi_Type := Null_Multi_Type;
+      --       Array_1 : Array_Type := Null_Array_Type;
+      --    begin
+      --       Array_1.Kind := Kind_Array;
+      --       Array_1.Holder := To_Holder (new Map);
+      --       return Array_1;
+      --    end;
+      -- end if;
+      return Arry.Arry.Holder.all;
    end As_Array;
 
    -------------
@@ -321,6 +336,7 @@ is
          Put_Line ("as_string: ");
          Put_Line ("  kind: " & Kind_Of (Arry)'Image);
          pragma Assert (False);
+         return "";
       end case;
    end As_String;
 
@@ -356,7 +372,7 @@ is
          Put_Line ("as_boolean:");
          Put_Line ("  kind: " & Kind_Of (Arry)'Image);
          pragma Assert (False);
-
+         return False;
       end case;
    end As_Boolean;
 
@@ -393,9 +409,10 @@ is
    is
       M : Multi_Type;
    begin
-      M.Kind     := Kind_Array;
-      M.Arry     := new Array_Type;
-      M.Arry.all := Value;
+      M.Kind := Kind_Array;
+      if not Value.Is_Empty then
+         M.Arry.Holder := Value.First_Element.Arry.Holder;
+      end if;
       return M;
    end From_Array;
 
@@ -492,6 +509,10 @@ is
       return As_String (Arry);
    end Get;
 
+   ---------
+   -- Get --
+   ---------
+
    function Get (Position : Cursor)
                  return Multi_Type
    is
@@ -502,6 +523,10 @@ is
          return From_Null;
       end if;
    end Get;
+
+   ---------
+   -- Get --
+   ---------
 
    function Get (Arry : Array_Type;
                  Key  : String)
@@ -676,26 +701,28 @@ is
                     Key_4 : String;
                     Value : Multi_Type)
    is
-      Array_2 : constant Array_Access := Element (Arry.Find (Key_1)).Arry;
+      -- Array_2 : constant Array_Access :=
+      --   Element (Arry.Find (Key_1)).Arry;
    begin
-      pragma Assert (Array_2 /= null);
-      declare
-         Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
-      begin
-         pragma Assert (Array_3 /= null);
-         declare
-            Array_4 : constant Array_Access := Element (Array_3.Find (Key_3)).Arry;
-         begin
-            pragma Assert (Array_4 /= null);
-            declare
-               Array_5 : constant Array_Access :=
-                 Element (Array_4.Find (Key_4)).Arry;
-            begin
-               pragma Assert (Array_5 /= null);
-               Set (Array_5.all, Value);
-            end;
-         end;
-      end;
+      raise Program_Error with "not implemented";
+      -- pragma Assert (Array_2 /= null);
+      -- declare
+      --    Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
+      -- begin
+      --    pragma Assert (Array_3 /= null);
+      --    declare
+      --       Array_4 : constant Array_Access := Element (Array_3.Find (Key_3)).Arry;
+      --    begin
+      --       pragma Assert (Array_4 /= null);
+      --       declare
+      --          Array_5 : constant Array_Access :=
+      --            Element (Array_4.Find (Key_4)).Arry;
+      --       begin
+      --          pragma Assert (Array_5 /= null);
+      --          Set (Array_5.all, Value);
+      --       end;
+      --    end;
+      -- end;
    end Set_4;
 
    -----------
@@ -710,31 +737,32 @@ is
                     Key_5 : String;
                     Value : Multi_Type)
    is
-      Array_2 : constant Array_Access := Element (Arry.Find (Key_1)).Arry;
+--    Array_2 : constant Array_Access := Element (Arry.Find (Key_1)).Arry;
    begin
-      pragma Assert (Array_2 /= null);
-      declare
-         Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
-      begin
-         pragma Assert (Array_3 /= null);
-         declare
-            Array_4 : constant Array_Access := Element (Array_3.Find (Key_3)).Arry;
-         begin
-            pragma Assert (Array_4 /= null);
-            declare
-               Array_5 : constant Array_Access := Element (Array_3.Find (Key_4)).Arry;
-            begin
-               pragma Assert (Array_5 /= null);
-               declare
-                  Array_6 : constant Array_Access :=
-                    Element (Array_5.Find (Key_5)).Arry;
-               begin
-                  pragma Assert (Array_6 /= null);
-                  Set (Array_6.all, Value);
-               end;
-            end;
-         end;
-      end;
+      raise Program_Error with "not implemented";
+      -- pragma Assert (Array_2 /= null);
+      -- declare
+      --    Array_3 : constant Array_Access := Element (Array_2.Find (Key_2)).Arry;
+      -- begin
+      --    pragma Assert (Array_3 /= null);
+      --    declare
+      --       Array_4 : constant Array_Access := Element (Array_3.Find (Key_3)).Arry;
+      --    begin
+      --       pragma Assert (Array_4 /= null);
+      --       declare
+      --          Array_5 : constant Array_Access := Element (Array_3.Find (Key_4)).Arry;
+      --       begin
+      --          pragma Assert (Array_5 /= null);
+      --          declare
+      --             Array_6 : constant Array_Access :=
+      --               Element (Array_5.Find (Key_5)).Arry;
+      --          begin
+      --             pragma Assert (Array_6 /= null);
+      --             Set (Array_6.all, Value);
+      --          end;
+      --       end;
+      --    end;
+      -- end;
    end Set_5;
 
    -----------
@@ -946,15 +974,6 @@ is
       return Natural (Array_Maps.Length (Array_Maps.Map (Arry)));
    end Length;
 
-   -- --------------
-   -- -- Get_List --
-   -- --------------
-
-   -- function Get_List (Arry : Array_Type;
-   --                    Key  : String)
-   --                    return List_Type
-   --                    is ([]);
-
    -----------
    -- Empty --
    -----------
@@ -975,11 +994,11 @@ is
                    Value : Array_Type)
                    return Array_Type
    is
+      Map : Array_Type;
       Item : Multi_Type;
-      Map  : Array_Type;
    begin
       Item.Kind := Kind_Array;
-      Item.Arry := new Array_Type'(Value);
+      Item.Arry.Holder := new Array_Type'(Value);
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
@@ -1010,7 +1029,7 @@ is
       Map  : Array_Type;
    begin
       Item.Kind := Kind_List;
-      Item.List.Append (Value);
+      Item.List := Value;
       Map.Insert (Key => Key, New_Item => Item);
       return Map;
    end Build;
@@ -1140,54 +1159,6 @@ is
       return Arrays.Cursor (Array_Maps.Next (Array_Maps.Cursor (Position)));
    end Next;
 
-   -- ------------------------
-   -- -- Constant_Reference --
-   -- ------------------------
-
-   -- function Constant_Reference (Container : aliased in Array_Type;
-   --                              Position  : Cursor)
-   --                              return Constant_Reference_Type
-   -- is
-   -- begin
-   --    return Arrays.Constant_Reference_Type (
-   --      Array_Maps.Constant_Reference (Container => Array_Maps.Map (Container),
-   --                                     Position  => Array_Maps.Cursor (Position)));
-   -- end Constant_Reference;
-
-   -- ---------------
-   -- -- Reference --
-   -- ---------------
-
-   -- function Reference (Container : aliased in out Array_Type;
-   --                     Position  : Cursor)
-   --                     return Reference_Type
-   -- is
-   -- begin
-   --    return Arrays.Reference_Type (
-   --      Array_Maps.Reference (Container => Array_Maps.Map (Container),
-   --                            Position  => Array_Maps.Cursor (Position)));
-   -- end Reference;
-
-   -- function Constant_Reference (Container : aliased in Array_Type;
-   --                              Key       : Key_Type)
-   --                              return Constant_Reference_Type
-   -- is
-   -- begin
-   --    return Arrays.Constant_Reference_Type (
-   --      Array_Maps.Constant_Reference (Container => Array_Maps.Map (Container),
-   --                                     Key       => -Key));
-   -- end Constant_Reference;
-
-   -- function Reference (Container : aliased in out Array_Type;
-   --                     Key       : Key_Type)
-   --                     return Reference_Type
-   -- is
-   -- begin
-   --    return Arrays.Reference_Type (
-   --      Array_Maps.Reference (Container => Array_Maps.Map (Container),
-   --                            Key       => -Key));
-   -- end Reference;
-
    -----------
    -- First --
    -----------
@@ -1196,11 +1167,6 @@ is
    function First (Object : Iterator) return Cursor is
    begin
       return First (Object.Container.all);
-      -- if Object.Node = null then
-      --    return Arrays.Cursor (Object.Container.First);
-      -- else
-      --    return Cursor'(Object.Container, Object.Node);
-      -- end if;
    end First;
 
    ----------
@@ -1221,21 +1187,94 @@ is
    function Iterate (Container : Array_Type)
                      return Map_Iterator_Interfaces.Forward_Iterator'Class
    is
-      Fi : Iterator; -- Map_Iterator_Interfaces.Forward_Iterator'Class :=
---        Iterate (Array_Maps.Map (Container));
+      Fi : Iterator;
    begin
       Fi.Container := Container'Unrestricted_Access;
-      return Fi; -- Array_Maps.
+      return Fi;
    end Iterate;
 
-   -- function Iterate (Container : Array_Type)
-   --                   return Map_Iterator_Interfaces.Forward_Iterator'Class
-   -- is
-   -- begin
-   --    return It : Map_Iterator_Interfaces.Forward_Iterator do
-   --       It.Container := Container'Unrestricted_Access;
-   --       It.Position  := No_Element;
-   --    end return;
-   -- end Iterate;
+   ----------------
+   -- Initialize --
+   ----------------
+
+   overriding
+   procedure Initialize (Holder : in out Array_Holder)
+   is
+   begin
+      Holder.Holder := null;
+   end Initialize;
+
+   ------------
+   -- Adjust --
+   ------------
+
+   overriding
+   procedure Adjust (Holder : in out Array_Holder)
+   is
+   begin
+      if Holder.Holder = null then
+         return;
+      end if;
+
+      Holder.Holder := new Array_Type'(Copy (Holder.Holder.all));
+   end Adjust;
+
+   --------------
+   -- Finalize --
+   --------------
+
+   overriding
+   procedure Finalize (Holder : in out Array_Holder)
+   is
+      procedure Free is new
+        Ada.Unchecked_Deallocation (Object => Array_Type,
+                                    Name   => Array_Access);
+   begin
+      if Holder.Holder = null then
+         return;
+      end if;
+
+      declare
+         Arry : Array_Access := Holder.Holder;
+      begin
+         if Arry /= null then
+            Free (Arry);
+            Holder.Holder := null;
+         end if;
+      end;
+   end Finalize;
+
+   -----------------
+   -- Empty_Array --
+   -----------------
+
+   function Empty_Array
+            return Array_Type
+   is
+      Item : Multi_Type;
+      Arry : Array_Type;
+   begin
+      Item.Kind := Kind_Array;
+      Item.Arry.Holder := new Array_Type'(Null_Array_Type);
+      Arry.Append (Item);
+      return Arry;
+   end Empty_Array;
+
+   ---------------------
+   -- Null_Multi_Type --
+   ---------------------
+
+   function Null_Multi_Type return Multi_Type
+   is
+   begin
+      return
+        (Kind => Kind_Null,
+         Str  => UStrings.Null_UString,
+         Int  => 0,
+         Arry => Empty_Holder,
+         List => Lists.Empty_List,
+         Func => null,
+         Bool => False);
+   end Null_Multi_Type;
 
 end Arrays;

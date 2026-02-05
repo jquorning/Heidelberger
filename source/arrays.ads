@@ -3,6 +3,7 @@
 --
 
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Finalization;
 with Ada.Iterator_Interfaces;
 
 with Lists;
@@ -26,7 +27,7 @@ is
 
    type Multi_Type is private;
 
-   Null_Multi_Type : constant Multi_Type;
+   function Null_Multi_Type return Multi_Type;
 
    function "=" (Left, Right : Multi_Type)
                  return Boolean;
@@ -357,7 +358,7 @@ is
                    Value : Null_Type)
                    return Array_Type;
 
-   Empty_Array : constant Array_Type;
+   function Empty_Array return Array_Type;
 
    function First (Container : Array_Type) return Cursor;
    function Next (Container : Array_Type;
@@ -368,12 +369,29 @@ is
 
 private
 
+   type Array_Holder is new Ada.Finalization.Controlled with
+     record
+        Holder : Array_Access;
+     end record;
+
+   overriding
+   procedure Initialize (Holder : in out Array_Holder);
+
+   overriding
+   procedure Adjust (Holder : in out Array_Holder);
+
+   overriding
+   procedure Finalize (Holder : in out Array_Holder);
+
+   Empty_Holder : constant Array_Holder :=
+     (Ada.Finalization.Controlled with Holder => null);
+
    type Multi_Type is
       record
          Kind : Array_Kind       := Kind_Null;
          Str  : UStrings.UString;
          Int  : Integer          := 0;
-         Arry : Array_Access     := null;
+         Arry : Array_Holder     := Empty_Holder;
          List : Lists.List_Type;
          Func : Callable         := null;
          Bool : Boolean          := False;
@@ -387,22 +405,13 @@ private
 
    type Cursor is new Array_Maps.Cursor;
 
-   Empty_Array : constant Array_Type :=
+   Null_Array_Type : constant Array_Type :=
      (Array_Maps.Empty_Map with null record);
 
-   Null_Multi_Type : constant Multi_Type :=
-      (Kind => Kind_Null,
-       Str  => UStrings.Null_UString,
-       Int  => 0,
-       Arry => null,
-       List => Lists.Empty_List,
-       Func => null,
-       Bool => False);
-
-   type Map_Access is access all Array_Type; -- Array_Maps.Map;
+   type Map_Access is access all Array_Type;
    for Map_Access'Storage_Size use 0;
 
-   type Iterator is new -- Ada.Finalization.Limited_Controlled and
+   type Iterator is new
       Map_Iterator_Interfaces.Forward_Iterator with
       record
          Container : Map_Access;

@@ -93,8 +93,10 @@ is
    -- - prevent_override => Disables override of default presets by theme presets.
    --                       The relationship between whether to override the defaults
    --                       and whether the defaults are enabled is inverse:
-   --                         - If defaults are enabled  => theme presets should not be overriden
-   --                         - If defaults are disabled => theme presets should be overriden
+   --                         - If defaults are enabled  => theme presets should not
+   --                           be overriden
+   --                         - If defaults are disabled => theme presets should be
+   --                           overriden
    --                       For example, a theme sets defaultPalette to false,
    --                       making the default palette hidden from the user.
    --                       In that case, we want all the theme presets to be present,
@@ -104,13 +106,17 @@ is
    -- - value_func       => optionally, instead of value_key, a function to generate
    --                       the value that takes a preset as an argument
    --                       (either value_key or value_func should be present)
-   -- - css_vars         => template string to use in generating the CSS Custom Property.
-   --                       Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
-   --                       substituting the $slug for the slug"s value for each preset value.
+   -- - css_vars         => template string to use in generating the CSS Custom
+   --                       Property.
+   --                       Example output: "--wp--preset--duotone--blue: <value>"
+   --                       will generate as many CSS Custom Properties as presets
+   --                       defined substituting the $slug for the slug's value for
+   --                       each preset value.
    -- - classes          => array containing a structure with the classes to
    --                       generate for the presets, where for each array item
    --                       the key is the class name and the value the property name.
-   --                       The "$slug" substring will be replaced by the slug of each preset.
+   --                       The "$slug" substring will be replaced by the slug of
+   --                       each preset.
    --                       For example:
    --                       "classes" => array(
    --                         ".has-$slug-color"            => "color",
@@ -123,71 +129,77 @@ is
    --
    -- @since 5.8.0
    -- @since 5.9.0 Added the `color.duotone` and `typography.fontFamilies` presets,
-   --              `use_default_names` preset key, and simplified the metadata structure.
+   --              `use_default_names` preset key, and simplified the metadata
+   --              structure.
    -- @since 6.0.0 Replaced `override` with `prevent_override` and updated the
-   --              `prevent_overried` value for `color.duotone` to use `color.defaultDuotone`.
+   --              `prevent_overried` value for `color.duotone` to use
+   --              `color.defaultDuotone`.
    -- @var array
    --
-   PRESETS_METADATA : constant array (Positive range <>) of Array_Type := -- To_Array (List => (
+   PRESETS_METADATA : constant array (Positive range <>) of Array_Type :=
      (
-                To_Array (List => (
---                      Build ("path",              array( "color", "palette" )),
---                      Build ("prevent_override",  array( "color", "defaultPalette" )),
-                        Build ("use_default_names", False),
-                        Build ("value_key",         "color"),
-                        Build ("css_vars",          "--wp--preset--color--$slug"),
-                        Build ("classes",           To_Array (List => (
-                                Build (".has-$slug-color",            "color"),
-                                Build (".has-$slug-background-color", "background-color"),
-                                Build (".has-$slug-border-color",     "border-color")
-                        )))
---                      Build ("properties",        array( "color", "background-color", "border-color" ))
-                )),
-                To_Array (List => (
---                      Build ("path",              array( "color", "gradients" )),
---                      Build ("prevent_override",  array( "color", "defaultGradients" )),
-                        Build ("use_default_names", False),
-                        Build ("value_key",         "gradient"),
-                        Build ("css_vars",          "--wp--preset--gradient--$slug")
---                      Build ("classes",           array( ".has-$slug-gradient-background" => "background" )),
---                      Build ("properties",        array( "background" ))
-                )),
-                To_Array (List => (
---                      Build ("path",              array( "color", "duotone" )),
---                      Build ("prevent_override",  array( "color", "defaultDuotone" )),
-                        Build ("use_default_names", False),
-                        Build ("value_func",        "wp_get_duotone_filter_property"),
-                        Build ("css_vars",          "--wp--preset--duotone--$slug"),
-                        Build ("classes",           Empty_Array)
---                      Build ("properties",        array( "filter" ))
-                )),
-                To_Array (List => (
---                      Build ("path",              array( "typography", "fontSizes" )),
-                        Build ("prevent_override",  False),
-                        Build ("use_default_names", True),
-                        Build ("value_func",        "wp_get_typography_font_size_value"),
-                        Build ("css_vars",          "--wp--preset--font-size--$slug")
---                      Build ("classes",           array( ".has-$slug-font-size" => "font-size" )),
---                      Build ("properties",        array( "font-size" )
-                )),
-                To_Array (List => (
---                      Build ("path",              array( "typography", "fontFamilies" )),
-                        Build ("prevent_override",  False),
-                        Build ("use_default_names", False),
-                        Build ("value_key",         "fontFamily"),
-                        Build ("css_vars",          "--wp--preset--font-family--$slug")
---                      Build ("classes",           array( ".has-$slug-font-family" => "font-family" )),
---                      Build ("properties",        array( "font-family" ))
-                )),
-                To_Array (List => (
---                      Build ("path",              array( "spacing", "spacingSizes" )),
-                        Build ("prevent_override",  False),
-                        Build ("use_default_names", True),
-                        Build ("value_key",         "size"),
-                        Build ("css_vars",          "--wp--preset--spacing--$slug"),
-                        Build ("classes",           Empty_Array)
---                      Build ("properties",        array( "padding", "margin" ))
-                ))
+       To_Array (List => (
+         Build ("path",              List_Type'["color", "palette"]),
+         Build ("prevent_override",  List_Type'["color", "defaultPalette"]),
+         Build ("use_default_names", False),
+         Build ("value_key",         "color"),
+         Build ("css_vars",          "--wp--preset--color--$slug"),
+         Build ("classes",           To_Array (List => (
+           Build (".has-$slug-color",            "color"),
+           Build (".has-$slug-background-color", "background-color"),
+           Build (".has-$slug-border-color",     "border-color")
+         ))),
+         Build ("properties",
+                List_Type'["color", "background-color", "border-color"])
+       )),
+       To_Array (List => (
+         Build ("path",              List_Type'["color", "gradients"]),
+         Build ("prevent_override",  List_Type'["color", "defaultGradients"]),
+         Build ("use_default_names", False),
+         Build ("value_key",         "gradient"),
+         Build ("css_vars",          "--wp--preset--gradient--$slug"),
+         Build ("classes",           To_Array (List => (1 =>
+           Build (".has-$slug-gradient-background", "background")))),
+         Build ("properties",        List_Type'["background"])
+       )),
+       To_Array (List => (
+         Build ("path",              List_Type'["color", "duotone"]),
+         Build ("prevent_override",  List_Type'["color", "defaultDuotone"]),
+         Build ("use_default_names", False),
+         Build ("value_func",        "wp_get_duotone_filter_property"),
+         Build ("css_vars",          "--wp--preset--duotone--$slug"),
+         Build ("classes",           Empty_Array),
+         Build ("properties",        List_Type'["filter"])
+       )),
+       To_Array (List => (
+         Build ("path",              List_Type'["typography", "fontSizes"]),
+         Build ("prevent_override",  False),
+         Build ("use_default_names", True),
+         Build ("value_func",        "wp_get_typography_font_size_value"),
+         Build ("css_vars",          "--wp--preset--font-size--$slug"),
+         Build ("classes",           To_Array (List => (1 =>
+           Build (".has-$slug-font-size", "font-size")))),
+         Build ("properties",        List_Type'["font-size"])
+       )),
+       To_Array (List => (
+         Build ("path",              List_Type'["typography", "fontFamilies"]),
+         Build ("prevent_override",  False),
+         Build ("use_default_names", False),
+         Build ("value_key",         "fontFamily"),
+         Build ("css_vars",          "--wp--preset--font-family--$slug"),
+         Build ("classes",           To_Array (List => (1 =>
+           Build (".has-$slug-font-family", "font-family")))),
+         Build ("properties",        List_Type'["font-family"])
+       )),
+       To_Array (List => (
+         Build ("path",              List_Type'["spacing", "spacingSizes"]),
+         Build ("prevent_override",  False),
+         Build ("use_default_names", True),
+         Build ("value_key",         "size"),
+         Build ("css_vars",          "--wp--preset--spacing--$slug"),
+         Build ("classes",           Empty_Array),
+         Build ("properties",        List_Type'["padding", "margin"])
+       ))
    );
 
    --
