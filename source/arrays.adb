@@ -6,6 +6,7 @@ with Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 
 with Helpers;
+with Logging;
 
 package body Arrays
 is
@@ -1216,6 +1217,14 @@ is
          return;
       end if;
 
+      for E of Holder.Holder.all loop
+         null;
+--       Adjust (E.Arry);
+         -- if E.Arry.Holder /= null then
+         --    Logging.Log ("arrays.adjust", "Not null sub-array");
+         -- end if;
+      end loop;
+
       Holder.Holder := new Array_Type'(Copy (Holder.Holder.all));
    end Adjust;
 
@@ -1234,11 +1243,19 @@ is
          return;
       end if;
 
+      for E of Holder.Holder.all loop
+         null;
+--       Finalize (E.Arry);
+         -- if E.Arry.Holder /= null then
+         --    Logging.Log ("arrays.finalize", "Not null sub-array");
+         -- end if;
+      end loop;
+
       declare
          Arry : Array_Access := Holder.Holder;
       begin
          if Arry /= null then
-            Free (Arry);
+--          Free (Arry);
             Holder.Holder := null;
          end if;
       end;
