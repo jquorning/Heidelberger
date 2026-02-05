@@ -2,8 +2,6 @@
 --
 --
 
-with Ada.Containers;
-
 with Php.Arrays;
 
 package body Class_Walker
@@ -132,7 +130,6 @@ is
                   Args      : Array_Type)
                   return String
    is
-      use Ada.Containers;
       use Php.Arrays;
       use UStrings;
 
@@ -177,7 +174,7 @@ is
             begin
                if Empty (As_Array (E), Parent_Field) then
 --             if Empty (E.Parent_Field) then
-                  Append (Top_Level_Elements, E);
+                  Append (Top_Level_Elements, Key => "XXX-918", Value => E);
 --                Top_Level_Elements.Append (E.Arry.all);
                else
                   Append (Children_Elements, Parent_Field,
@@ -208,7 +205,7 @@ is
                        Get_As_String (As_Array (E), Parent_Field)
                      then
 --                   if Root.Parent_Field = E.Parent_Field then
-                        Append (Top_Level_Elements,
+                        Append (Top_Level_Elements, Key => "XXX-917",
                                 Value => From_Array (As_Array (E)));
 --                      Top_Level_Elements.Append (E);
                      else

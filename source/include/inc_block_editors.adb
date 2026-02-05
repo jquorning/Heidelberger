@@ -250,7 +250,7 @@ is
                  Build ("slug", Image_Size_Slug),
                  Build ("name", Image_Size_Name)));
             begin
-               Append (Result, From_Array (Value));
+               Append (Result, Key => "XXX-891", Value => From_Array (Value));
             end;
          end loop;
          return Result;
@@ -566,7 +566,8 @@ is
          begin
             if "" /= Actual_CSS then
                Set (Preset_Style, "css", From_String (Actual_CSS));
-               Global_Styles.Append (From_Array (Preset_Style));
+               Global_Styles.Append (Key   => "XXX-891",
+                                     Value => From_Array (Preset_Style));
             end if;
          end;
       end loop;
@@ -583,7 +584,8 @@ is
          begin
             if "" /= Actual_CSS then
                Set (Block_Classes, "css", From_String (Actual_CSS));
-               Global_Styles.Append (From_Array (Block_Classes));
+               Global_Styles.Append (Key   => "XXX-890",
+                                     Value => From_Array (Block_Classes));
             end if;
          end;
       else
@@ -600,7 +602,8 @@ is
          begin
             if "" /= Actual_CSS then
                Set (Block_Classes, "css", From_String (Actual_CSS));
-               Global_Styles.Append (From_Array (Block_Classes));
+               Global_Styles.Append (Key   => "XXX-889",
+                                     Value => From_Array (Block_Classes));
             end if;
          end;
       end if;
@@ -864,7 +867,8 @@ is
                   Response : constant Array_Type := Wp_Remote_Get (Style);
                begin
                   if not Is_Wp_Error (Response) then
-                     Styles.Append (From_Array (To_Array (List => (
+                     Styles.Append (Key   => "XXX-890",
+                                    Value => From_Array (To_Array (List => (
                        Build ("css",            Wp_Remote_Retrieve_Body (Response)),
                        Build ("__unstableType", "theme"),
                        Build ("isGlobalStyles", False)
@@ -876,7 +880,8 @@ is
                   File : constant String := Get_Theme_File_Path (Style);
                begin
                   if Is_File (File) then
-                     Styles.Append (From_Array (To_Array (List => (
+                     Styles.Append (Key   => "XXX-889",
+                                    Value => From_Array (To_Array (List => (
                        Build ("css",            File_Get_Contents (File)),
                        Build ("baseURL",        Get_Theme_File_URI (Style)),
                        Build ("__unstableType", "theme"),

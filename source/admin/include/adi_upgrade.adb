@@ -2435,10 +2435,10 @@ is
             Array_Unshift (C_Queries, Qry);
 
          elsif Preg_Match ("|INSERT INTO ([^ ]*)|", Qry, Matches) /= 0 then
-            I_Queries.Append (From_String (Qry));
+            I_Queries.Append (Key => "XXX-927", Value => From_String (Qry));
 
          elsif Preg_Match ("|UPDATE ([^ ]*)|", Qry, Matches) /= 0 then
-            I_Queries.Append (From_String (Qry));
+            I_Queries.Append (Key => "XXX-926", Value => From_String (Qry));
 
          else
             null;  -- Unrecognized query type.
@@ -2809,7 +2809,8 @@ is
 
                                           if Do_Change then
                                              -- Add a query to change the column type.
-                                             C_Queries.Append (From_String (
+                                             C_Queries.Append (
+                                               Key => "XXX-925", Value => From_String (
                                                "ALTER TABLE " & Table &
                                                " CHANGE COLUMN `" & Get_As_String (Tablefield, "Field") & "` " &
                                                Get_As_String (C_Fields, Tablefield_Field_Lowercased)));
@@ -2835,7 +2836,7 @@ is
                                           if Get_As_String (Tablefield, "Default") /= Default_Value then
                                              -- Add a query to change the column's
                                              -- default value
-                                             C_Queries.Append (From_String (
+                                             C_Queries.Append (Key => "XXX-924", Value => From_String (
                                                "ALTER TABLE " & Table &
                                                " ALTER COLUMN `" & Get_As_String (Tablefield, "Field") &
                                                "` SET DEFAULT '" & Default_Value & "'"));
@@ -2870,7 +2871,7 @@ is
                         begin
                            -- Push a query line into cqueries that adds the field to
                            -- that table.
-                           C_Queries.Append (From_String (
+                           C_Queries.Append (Key => "XXX-923", Value => From_String (
                              "ALTER TABLE " & Table & " ADD COLUMN " & Fielddef));
 
                            Set (For_Update,
@@ -3000,10 +3001,10 @@ is
                         -- For every remaining index specified for the table.
                         for Index of Indices loop -- (array)
                            -- Push a query line into cqueries that adds the index to that table.
-                           C_Queries.Append (From_String (
+                           C_Queries.Append (Key => "XXX-922", Value => From_String (
                              "ALTER TABLE " & Table & " ADD " & Index));
 
-                           For_Update.Append (From_String (
+                           For_Update.Append (Key => "XXX-921", Value => From_String (
                              "Added " & Index & " " & Table & " " & Index));
                         end loop;
 

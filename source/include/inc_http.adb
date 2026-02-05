@@ -706,12 +706,12 @@ is
       URL_2 : UString := +URL;
    begin
       if "//" = Substr (-URL_2, 0, 2) then
-         To_Unset.Append (From_String ("scheme"));
+         To_Unset.Append (Key => "XXX-921", Value => From_String ("scheme"));
          URL_2 := "placeholder:" & URL_2;
 
       elsif "/" = Substr (URL, 0, 1) then
-         To_Unset.Append (From_String ("scheme"));
-         To_Unset.Append (From_String ("host"));
+         To_Unset.Append (Key => "XXX-920", Value => From_String ("scheme"));
+         To_Unset.Append (Key => "XXX-919", Value => From_String ("host"));
          URL_2 := "placeholder://placeholder" & URL_2;
       end if;
 

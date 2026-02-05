@@ -515,15 +515,18 @@ is
                   ));
                begin
                   --
-                  -- Filters default arguments for the Languages select input on the login screen.
+                  -- Filters default arguments for the Languages select input on the
+                  -- login screen.
                   --
                   -- The arguments get passed to the wp_dropdown_languages() function.
                   --
                   -- @since 5.9.0
                   --
-                  -- @param array args Arguments for the Languages select input on the login screen.
+                  -- @param array args Arguments for the Languages select input on
+                  --                   the login screen.
                   --
-                  Wp_Dropdown_Languages (Apply_Filters ("login_language_dropdown_args", Args));
+                  Wp_Dropdown_Languages (
+                    Apply_Filters ("login_language_dropdown_args", Args));
                end;
 
                if Interim_Login then
@@ -534,7 +537,9 @@ is
                  Isset (XX_GET, "redirect_to") and then
                  "" /= Get_As_String (XX_GET, "redirect_to")
                then
-                  Echo ("<input type=""hidden"" name=""redirect_to"" value=""" & Sanitize_URL (Get_As_String (XX_GET, "redirect_to")) & """ />");
+                  Echo ("<input type=""hidden"" name=""redirect_to"" value=""" &
+                        Sanitize_URL (Get_As_String (XX_GET, "redirect_to")) &
+                        """ />");
                end if;
 
                if

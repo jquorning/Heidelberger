@@ -423,7 +423,6 @@ is
       use Inc_Functions;
       use Inc_Load;
       use Inc_Options;
-      use Inc_Plugins;
    begin
       if True /= Deprecated then
          X_Deprecated_Argument ("__FUNCTION__", "2.8.1");
@@ -919,7 +918,6 @@ is
             return Boolean
    is
       use Wp_Common;
-      use Inc_Plugins;
       use Inc_Themes;
    begin
       --

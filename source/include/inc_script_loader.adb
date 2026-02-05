@@ -1570,7 +1570,7 @@ is
              Build ("linkSelected",   abs "Link selected."),
              Build ("linkInserted",   abs "Link inserted."),
              -- translators: Minimum input length in characters to start searching posts in the "Insert/edit link" modal.
-             Build ("minInputLength", Integer'Value (X_X ("3", "minimum input length for searching post links")))
+             Build ("minInputLength", "XXX-930") -- XXX -- Integer'Value (X_X ("3", "minimum input length for searching post links")))
            ))
          );
       end if;
@@ -3667,7 +3667,7 @@ is
                Relative_URL : constant String :=
                  Wp_Make_Link_Relative (Absolute_URL);
 
-               Aaa : constant String := "XXX-011"; -- Src_Results (0) (Src_Index);
+               Aaa : constant String := "XXX-012"; -- Src_Results (0) (Src_Index);
             begin
                -- Replace the URL in the CSS.
                CSS_2 := +

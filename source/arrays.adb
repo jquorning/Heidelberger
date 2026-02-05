@@ -36,16 +36,16 @@ is
       end case;
    end "=";
 
-   ------------
-   -- Append --
-   ------------
+   -- ------------
+   -- -- Append --
+   -- ------------
 
-   procedure Append (Arry  : in out Array_Type;
-                     Value : Multi_Type)
-   is
-   begin
-      Array_Maps.Insert (Array_Maps.Map (Arry), "XXX-011", Value);
-   end Append;
+   -- procedure Append (Arry  : in out Array_Type;
+   --                   Value : Multi_Type)
+   -- is
+   -- begin
+   --    Array_Maps.Insert (Array_Maps.Map (Arry), "XXX-011", Value);
+   -- end Append;
 
    ------------
    -- Append --
@@ -593,7 +593,7 @@ is
                   Value : Multi_Type)
    is
    begin
-      Append (Arry, Value);
+      Append (Arry, "XXX-011", Value);
    end Set;
 
    ---------
@@ -1273,7 +1273,7 @@ is
    begin
       Item.Kind := Kind_Array;
       Item.Arry.Holder := new Array_Type'(Null_Array_Type);
-      Arry.Append (Item);
+      Arry.Append (Key => "XXX-929", Value => Item);
       return Arry;
    end Empty_Array;
 

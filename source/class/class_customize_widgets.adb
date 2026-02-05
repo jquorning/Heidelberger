@@ -756,7 +756,6 @@ is
    is
       use Php.Lists;
       use Wp_Common;
-      use Inc_Plugins;
 
       Parsed_Widget_Id : constant Array_Type := This.Parse_Widget_Id (Widget_Id);
 
@@ -1189,7 +1188,6 @@ is
       use Php.Arrays;
       use Php.Preg;
       use Wp_Common;
-      use Inc_Plugins;
       use Inc_Themes;
 
       Args : Array_Type := To_Array (List => (
@@ -1321,7 +1319,8 @@ is
                                       Get_As_String (Widget, "id"),
                                       "", False); -- "" was False
                begin
-                  Done.Append (Get (Widget, "callback"));
+                  Done.Append (Key   => "XXX-884",
+                               Value => Get (Widget, "callback"));
 
                   if not Isset_2 (Widget, "params", "[0]") then
                      Set_2 (Widget, "params", "[0]", From_Array (Empty_Array));
@@ -1428,8 +1427,9 @@ is
                                ))
                              );
 
-                           Static_Available_Widgets.Append
-                             (From_Array (Available_Widget));
+                           Static_Available_Widgets.Append (
+                             Key   => "XXX-883",
+                             Value => From_Array (Available_Widget));
                         end;
                      end;
                   end;

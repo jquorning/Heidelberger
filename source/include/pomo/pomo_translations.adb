@@ -6,8 +6,6 @@
 -- @subpackage translations
 --
 
-with Php.Arrays;
-
 package body POMO_Translations
 is
 
@@ -94,11 +92,9 @@ is
 
    function Translate_Entry (This  : Translations;
                              Entri : POMO_Entries.Translation_Entry)
-                             return POMO_Entries.Translation_Entry -- String
+                             return POMO_Entries.Translation_Entry
    is
---    use UStrings;
-
-      Key : constant String := Entri.Key; -- ();
+      Key : constant String := Entri.Key;
    begin
       return
         (if Isset (This.Entries, Key)
@@ -112,10 +108,9 @@ is
 
    function Translate (This     : Translations;
                        Singular : String;
-                       Context  : String := "") -- null
+                       Context  : String := "")
                        return String
    is
-      use Php.Arrays;
       use POMO_Entries;
 
       Entri : constant Translation_Entry :=
@@ -126,14 +121,12 @@ is
           ))
         );
       Translated : constant Translation_Entry := This.Translate_Entry (Entri);
---    Translated : constant String := This.Translate_Entry (Entri);
    begin
       return
         (if
-          Translated /= Null_Translation_Entry and then
-          not Empty (Translated.Translations)
+           Translated /= Null_Translation_Entry and then
+           not Translated.Translations.Is_Empty
          then As_String (Translated.Translations.First_Element) else Singular);
---       then Translated.Translations (0) else Singular);
    end Translate;
 
 --                 --

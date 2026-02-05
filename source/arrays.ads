@@ -56,9 +56,9 @@ is
    function Element (Position : Cursor)
                      return Multi_Type;
 
-   procedure Append (Arry  : in out Array_Type;
-                     Value : Multi_Type);
-   -- Append Value to Array_Type referenced by Cursor.
+   -- procedure Append (Arry  : in out Array_Type;
+   --                   Value : Multi_Type);
+   -- -- Append Value to Array_Type referenced by Cursor.
 
    procedure Append (Arry  : in out Array_Type;
                      Key   : String;

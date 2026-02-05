@@ -61,7 +61,6 @@ package body Inc_L10n is
       use Wp_Common;
       use Inc_Load;
       use Inc_Options;
-      use Inc_Plugins;
 --    global locale, wp_local_package;
    begin
       if Global_Locale /= "" then
@@ -170,7 +169,6 @@ package body Inc_L10n is
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Load;
-      use Inc_Plugins;
 
       --
       -- Filters the locale for the current request prior to the default determination
@@ -868,9 +866,7 @@ package body Inc_L10n is
                                Reloadable : Boolean := False)
                                return Boolean
    is
---    use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
 --         global l10n, l10n_unloaded;
       Plugin_Override : Boolean;
@@ -1499,7 +1495,6 @@ package body Inc_L10n is
       use Php.Files;
       use Php.Strings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Languages  : Array_Type;
 
@@ -1518,7 +1513,8 @@ package body Inc_L10n is
                  0 /= Strpos (Lang_File_2, "ms-") and then
                  0 /= Strpos (Lang_File_2, "admin-")
                then
-                  Languages.Append (From_String (Lang_File_2));
+                  Languages.Append (Key   => "XXX-886",
+                                    Value => From_String (Lang_File_2));
                end if;
             end;
          end loop;
@@ -1816,7 +1812,7 @@ package body Inc_L10n is
                Append (Output, Implode ("\n", Structure));
                Append (Output, "</select>");
 
-               if As_Boolean (Get (Parsed_Args, "echo")) then
+               if As_Integer (Get (Parsed_Args, "echo")) /= 0 then
                   Echo (-Output);
                end if;
 

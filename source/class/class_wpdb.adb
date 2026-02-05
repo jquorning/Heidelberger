@@ -2854,7 +2854,7 @@ is
          Result : Array_Type;
       begin
          for A of This.Last_Result loop
-            Result.Append (From_String (A));
+            Result.Append (Key => "XXX-928", Value => From_String (A));
          end loop;
          return Result;
       end;

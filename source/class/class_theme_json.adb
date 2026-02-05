@@ -794,7 +794,9 @@ is
                                                   As_String (Current_CSS_Value))
                                              then
                                                 Append (Declarations,
-                                                        From_Array (To_Array (List => (
+                                                        Key   => "XXX-914",
+                                                        Value =>
+                                                          From_Array (To_Array (List => (
                                                   Build ("name",  CSS_Property),
                                                   Build ("value", As_String (Current_CSS_Value))
                                                 ))));
@@ -931,7 +933,8 @@ is
                                                                   CSS_Value)
                                        then
                                           Append (Declarations,
-                                            From_Array (To_Array (List => (
+                                            Key   => "XXX-913",
+                                            Value => From_Array (To_Array (List => (
                                               Build ("name",  CSS_Property),
                                               Build ("value", CSS_Value)
                                             ))));
@@ -1039,7 +1042,8 @@ is
                  Compute_Theme_Vars (As_Array (Node));
             begin
                for Theme_Vars_Declaration in Theme_Vars_Declarations.Iterate loop
-                  Append (Declarations, Element (Theme_Vars_Declaration));
+                  Append (Declarations, Key => "XXX-912",
+                          Value => Element (Theme_Vars_Declaration));
                end loop;
 
                Append (Stylesheet, To_Ruleset (Selector, Declarations));
@@ -1215,12 +1219,14 @@ is
                   Slug  : constant String := Key (A);
                   Value : constant String := As_String (Element (A));
                begin
-                  Append (Declarations, From_Array (To_Array (List => (
-                    Build ("name",
-                      Replace_Slug_In_String (
-                        Get_As_String (Preset_Metadata, "css_vars"), Slug)),
-                    Build ("value", Value)
-                  ))));
+                  Append (Declarations,
+                    Key   => "XXX-911",
+                    Value => From_Array (To_Array (List => (
+                      Build ("name",
+                        Replace_Slug_In_String (
+                          Get_As_String (Preset_Metadata, "css_vars"), Slug)),
+                      Build ("value", Value)
+                    ))));
                end;
             end loop;
          end;
@@ -1353,7 +1359,8 @@ is
             Key   : constant String := Arrays.Key (A);
             Value : constant String := As_String (Element (A));
          begin
-            Append (Declarations, From_Array (To_Array (List => (
+            Append (Declarations, Key => "XXX-908",
+                    Value => From_Array (To_Array (List => (
               Build ("name",  "--wp--custom--" & Key),
               Build ("value", Value)
             ))));
@@ -1430,7 +1437,7 @@ is
       end if;
 
       -- Top-level.
-      Append (Nodes, From_Array (To_Array (List => (
+      Append (Nodes, Key => "XXX-910", Value => From_Array (To_Array (List => (
         Build ("path",     List_Type'["settings"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
       ))));
@@ -1455,7 +1462,9 @@ is
                   Selector := +As_String (Get (Ref_2 (Selectors, Name, "selector")));
                end if;
 
-               Append (Nodes, From_Array (To_Array (List => (
+               Append (Nodes,
+                       Key   => "XXX-909",
+                       Value => From_Array (To_Array (List => (
                  Build ("path",     List_Type'["settings", "blocks", Name]),
                  Build ("selector", -Selector)
               ))));
@@ -1485,7 +1494,7 @@ is
       end if;
 
       -- Top-level.
-      Append (Nodes, From_Array (To_Array (List => (
+      Append (Nodes, Key => "XXX-902", Value => From_Array (To_Array (List => (
         Build ("path",     List_Type'["styles"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
       ))));
@@ -1500,14 +1509,16 @@ is
                   goto Continue;
                end if;
 
-               Append (Nodes, From_Array (To_Array (List => (
+               Append (Nodes, Key => "XXX-906",
+                       Value => From_Array (To_Array (List => (
                  Build ("path",     List_Type'["styles", "elements", Element]),
                  Build ("selector", Get_As_String (ELEMENTS, Element))
                ))));
 
                -- Handle any pseudo selectors for the element.
-               -- TODO: Replace array_key_exists() with isset() check once WordPress drops
-               -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+               -- TODO: Replace array_key_exists() with isset() check once WordPress
+               -- drops support for PHP 5.6.
+               -- See https://core.trac.wordpress.org/ticket/57067.
                if Array_Key_Exists (Element, VALID_ELEMENT_PSEUDO_SELECTORS) then
                   for
                     Pseudo_Selector_2 in
@@ -1522,7 +1533,8 @@ is
                                    "styles", "elements",
                                    Element, Pseudo_Selector)
                         then
-                           Append (Nodes, From_Array (To_Array (List => (
+                           Append (Nodes, Key => "XXX-906",
+                             Value => From_Array (To_Array (List => (
                              Build ("path",     List_Type'["styles", "elements", Element]),
                              Build ("selector",
                                     Append_To_Selector (Get_As_String (ELEMENTS, Element),
@@ -1546,7 +1558,7 @@ is
          Block_Nodes : constant Array_Type := Get_Block_Nodes (Theme_JSON);
       begin
          for Block_Node in Block_Nodes.Iterate loop
-            Append (Nodes, Element (Block_Node));
+            Append (Nodes, Key => "XXX-905", Value => Element (Block_Node));
          end loop;
       end;
 
@@ -1610,7 +1622,8 @@ is
         not Border_Color_Matches and
         not Text_Color_Matches
       then
-         Append (Declarations_2, From_Array (To_Array (List => (
+         Append (Declarations_2, Key => "XXX-903",
+                 Value => From_Array (To_Array (List => (
            Build ("name",  "color"),
            Build ("value", -Background_Color)
          ))));
@@ -1676,7 +1689,7 @@ is
                  +As_String (Get (Ref_2 (Selectors, Name, "features")));
             end if;
 
-            Append (Nodes, From_Array (To_Array (List => (
+            Append (Nodes, Key => "XXX-903", Value => From_Array (To_Array (List => (
               Build ("name",     Name),
               Build ("path",     List_Type'["styles", "blocks", Name]),
               Build ("selector", -Selector),
@@ -1693,15 +1706,17 @@ is
                      Element : constant String := Key (B);
                      Node    : Multi_Type      := Arrays.Element (B);
                   begin
-                     Append (Nodes, From_Array (To_Array (List => (
+                     Append (Nodes, Key => "XXX-902",
+                       Value => From_Array (To_Array (List => (
                        Build ("path",     List_Type'[
                          "styles", "blocks", Name, "elements", Element]),
                        Build ("selector", As_String (Get (Ref_3 (Selectors, Name, "elements", Element))))
                      ))));
 
                      -- Handle any pseudo selectors for the element.
-                     -- TODO: Replace array_key_exists() with isset() check once WordPress drops
-                     -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+                     -- TODO: Replace array_key_exists() with isset() check once
+                     -- WordPress drops support for PHP 5.6.
+                     -- See https://core.trac.wordpress.org/ticket/57067.
                      if Array_Key_Exists (Element, VALID_ELEMENT_PSEUDO_SELECTORS) then
                         for
                           Pseudo_Selector_2 in
@@ -1715,7 +1730,8 @@ is
                                 Isset_6 (Theme_JSON, "styles", "blocks", Name,
                                          "elements", Element, Pseudo_Selector)
                               then
-                                 Append (Nodes, From_Array (To_Array (List => (
+                                 Append (Nodes, Key => "XXX-901",
+                                         Value => From_Array (To_Array (List => (
                                    Build ("path",     List_Type'[
                                      "styles", "blocks", Name, "elements", Element]),
                                    Build ("selector",
@@ -1912,7 +1928,9 @@ is
                begin
                   if "filter" = Get_As_String (As_Array (Declaration), "name") then
                      Delete (Ref (Declarations, Index));
-                     Append (Declarations_Duotone, Declaration);
+                     Append (Declarations_Duotone,
+                             Key   => "XXX-900",
+                             Value => Declaration);
                   end if;
                end;
             end loop;
@@ -2073,7 +2091,9 @@ is
                       Build ("size", As_String (Value)))));
                end if;
 
-               Append (Declarations, From_Array (To_Array (List => (
+               Append (Declarations,
+                       Key   => "XXX-899",
+                       Value => From_Array (To_Array (List => (
                  Build ("name",  CSS_Property),
                  Build ("value", -Value_2)
                ))));
@@ -2888,7 +2908,9 @@ is
                exit;
             end if;
 
-            Append (Below_Sizes, From_Array (To_Array (List => (
+            Append (Below_Sizes,
+                    Key   => "XXX-898",
+                    Value => From_Array (To_Array (List => (
                -- translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small.
                Build ("name", (if Below_Midpoint_Count = Steps_Mid_Point - 1
                                then abs "Small"
@@ -2912,7 +2934,9 @@ is
 
          Below_Sizes := Array_Reverse (Below_Sizes);
 
-         Append (Below_Sizes, From_Array (To_Array (List => (
+         Append (Below_Sizes,
+                 Key   => "XXX-898",
+                 Value => From_Array (To_Array (List => (
             Build ("name", abs "Medium"),
             Build ("slug", "50"),
             Build ("size", Get_As_String (Spacing_Scale, "mediumStep") & Unit)
@@ -2939,7 +2963,9 @@ is
                                       then Current_Step * Increment
                                       else Current_Step / Increment));
 
-               Append (Above_Sizes, From_Array (To_Array (List => (
+               Append (Above_Sizes,
+                       Key   => "XXX-897",
+                       Value => From_Array (To_Array (List => (
                  -- translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large.
                  Build ("name", (if 0 = Above_Midpoint_Count
                                  then abs "Large"
@@ -2965,7 +2991,9 @@ is
                Spacing_Sizes : Array_Type := Below_Sizes;
             begin
                for Above_Sizes_Item in Above_Sizes.Iterate loop
-                  Append (Spacing_Sizes, Element (Above_Sizes_Item));
+                  Append (Spacing_Sizes,
+                          Key   => "XXX-896",
+                          Value => Element (Above_Sizes_Item));
                end loop;
 
                -- If there are 7 or less steps in the scale revert to numbers for

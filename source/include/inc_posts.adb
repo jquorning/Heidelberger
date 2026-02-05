@@ -1354,7 +1354,7 @@ is
    function Create_Initial_Post_Types (Arry : Array_Type)
                                        return Array_Type
    is
-      pragma Unureferenced (Arry);
+      pragma Unreferenced (Arry);
    begin
       Create_Initial_Post_Types;
       return Empty_Array;
@@ -1741,7 +1741,7 @@ is
 --        Ancestors : Array_Type := Id;      -- []
          Ancestor  : Wp_Post;
       begin
-         Append (Ancestors, From_String (Image (Id)));
+         Append (Ancestors, Key => "XXX-916", Value => From_String (Image (Id)));
          Ancestor := Inc_Posts.Get_Post (Id);
          loop -- while Ancestor loop
             -- Loop detection: If the ancestor has been seen before, break.
@@ -1754,7 +1754,9 @@ is
             end if;
 
             Id := Ancestor.Post_Parent;
-            Append (Ancestors, Value => From_String (Image (Id)));
+            Append (Ancestors,
+                    Key   => "XXX-915",
+                    Value => From_String (Image (Id)));
 
             Ancestor := Get_Post (Id);
          end loop;
