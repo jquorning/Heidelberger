@@ -495,7 +495,7 @@ is
          begin
             if not Languages.Is_Empty then
                Echo ("      <div class=""language-switcher"">" & NL);
-               Echo ("        <form id=""language-switcher"" action="""""" method=""get"">" & NL);
+               Echo ("        <form id=""language-switcher"" action="""" method=""get"">" & NL);
 
                Echo ("          <label for=""language-switcher-locales"">" & NL);
                Echo ("            <span class=""dashicons dashicons-translation"" aria-hidden=""true""></span>" & NL);

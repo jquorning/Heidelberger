@@ -1809,7 +1809,7 @@ package body Inc_L10n is
                    ]
                  );
             begin
-               Append (Output, Implode ("\n", Structure));
+               Append (Output, Implode (NL, Structure));
                Append (Output, "</select>");
 
                if As_Integer (Get (Parsed_Args, "echo")) /= 0 then
