@@ -98,7 +98,7 @@ is
 
       Args_2 : Array_Type := Args;
    begin
-      Logging.Log ("inc_pluging.apply_filters", Hook_Name);
+      Logging.Log ("inc_plugins.apply_filters", Hook_Name);
 
       if not Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
          Global_Wp_Filters.Include (Hook_Name, 1);
