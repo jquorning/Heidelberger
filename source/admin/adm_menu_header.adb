@@ -16,8 +16,9 @@ with Arrays;
 with Binder;
 with Constants;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
+with Wp_Common;
 
 with Adi_Plugins;
 with Inc_Capabilities;
@@ -487,6 +488,7 @@ is
    procedure Bottom
    is
       use Php.Echoing;
+      use Wp_Common;
       use Adm_Menu;
       use Inc_Plugins;
       use Inc_L10n;

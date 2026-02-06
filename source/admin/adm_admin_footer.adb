@@ -13,7 +13,6 @@ with UStrings;
 with Wp_Common;
 
 with Inc_L10n;
-with Inc_Plugins;
 
 -- -- Don't load directly.
 -- if ( ! defined( 'ABSPATH' ) ) {
@@ -34,7 +33,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_L10n;
-      use Inc_Plugins;
       --
       -- @global string $hook_suffix
       --

@@ -9,6 +9,7 @@
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Vectors;
 
+with Arrayable_Interfaces;
 with Arrays;
 with UStrings;
 
@@ -113,8 +114,9 @@ is
    --
    --#[AllowDynamicProperties]
 
-   type Wp_Admin_Bar is tagged
-      record
+   type Wp_Admin_Bar is
+      new Arrayable_Interfaces.Arrayable_Interface
+      with record
          -- private
          Nodes : Node_Array_Access :=
            new Node_Array'(Node_Maps.Empty_Map with null record);
@@ -347,5 +349,19 @@ is
    -- @since 3.1.0
    --
    procedure Add_Menus (This : Wp_Admin_Bar);
+
+   --
+   --
+   --
+   overriding
+   function To_Array (X : Wp_Admin_Bar)
+                      return Arrays.Array_Type;
+
+   --
+   --
+   --
+   overriding
+   procedure Array_Unshift (X : in out Wp_Admin_Bar;
+                            S : Arrays.Array_Type);
 
 end Class_Admin_Bar;

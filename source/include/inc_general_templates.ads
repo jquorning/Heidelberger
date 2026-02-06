@@ -7,6 +7,7 @@
 
 with Php.Calendar;
 
+with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;
 with Lists;
@@ -487,7 +488,7 @@ is
    --
    procedure Feed_Links (Args : Array_Type := Empty_Array);
 
-   function Feed_Links (Arry : Array_Type)
+   function Feed_Links (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                         return Array_Type;
 
    --
@@ -499,8 +500,9 @@ is
    --
    procedure Feed_Links_Extra (Args : Array_Type := Empty_Array);
 
-   function Feed_Links_Extra (Arry : Array_Type)
-                              return Array_Type;
+   function Feed_Links_Extra
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Displays a referrer `strict-origin-when-cross-origin` meta tag.

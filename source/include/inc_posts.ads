@@ -7,6 +7,8 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
+with Arrayable_Arrays;
+with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;
 with Lists;
@@ -34,8 +36,9 @@ is
    --
    procedure Create_Initial_Post_Types;
 
-   function Create_Initial_Post_Types (Arry : Array_Type)
-                                       return Array_Type;
+   function Create_Initial_Post_Types
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Updates attachment file path based on attachment ID.

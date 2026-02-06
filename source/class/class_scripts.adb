@@ -14,6 +14,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Arrayable_Interfaces;
 with Globals;
 with Wp_Common;
 
@@ -32,14 +33,14 @@ is
    --
    --
    --
-   function Dummy_Init (Arry : Array_Type)
+   function Dummy_Init (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                         return Array_Type;
 
    ----------------
    -- Dummy_Init --
    ----------------
 
-   function Dummy_Init (Arry : Array_Type)
+   function Dummy_Init (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                         return Array_Type
    is
    begin

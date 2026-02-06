@@ -10,6 +10,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 private with Ada.Containers.Ordered_Maps;
 private with Ada.Containers.Vectors;
 
+with Arrayable_Interfaces;
 with Arrays;
 
 package Class_Hooks
@@ -99,12 +100,12 @@ is
 
    function Apply_Filters (This  : in out Wp_Hook;
                            Value : Array_Type;
-                           Args  : Array_Type)
+                           Args  : Arrayable_Interfaces.Arrayable_Interface'Class)
                            return Array_Type;
 
    procedure Apply_Filters (This  : in out Wp_Hook;
                             Value : Array_Type;
-                            Args  : Array_Type);
+                            Args  : Arrayable_Interfaces.Arrayable_Interface'Class);
 
    --
    -- Calls the callback functions that have been added to an action hook.
@@ -114,7 +115,7 @@ is
    -- @param array args Parameters to pass to the callback functions.
    --
    procedure Do_Action (This : in out Wp_Hook;
-                        Args : Array_Type);
+                        Args : Arrayable_Interfaces.Arrayable_Interface'Class);
 
    --
    -- Processes the functions hooked into the "all" hook.
@@ -124,7 +125,7 @@ is
    -- @param array args Arguments to pass to the hook callbacks. Passed by reference.
    --
    procedure Do_All_Hook (This : in out Wp_Hook;
-                          Args : Array_Type);
+                          Args : Arrayable_Interfaces.Arrayable_Interface'Class);
 
    --
    -- Handles resetting callback priority keys mid-iteration.

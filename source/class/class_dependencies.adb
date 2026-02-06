@@ -12,7 +12,6 @@ with Ada.Text_IO;
 with Php.Lists;
 with Php.Strings;
 
-with Arrays;
 with Helpers_3;
 
 package body Class_Dependencies
@@ -582,5 +581,26 @@ is
 
       return True;
    end Set_Group;
+
+   --------------
+   -- To_Array --
+   --------------
+
+   overriding
+   function To_Array (This : Wp_Dependencies)
+                      return Arrays.Array_Type
+   is (raise Program_Error with "not implemented");
+
+   -------------------
+   -- Array_Unshift --
+   -------------------
+
+   overriding
+   procedure Array_Unshift (X : in out Wp_Dependencies;
+                            S : Arrays.Array_Type)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Array_Unshift;
 
 end Class_Dependencies;

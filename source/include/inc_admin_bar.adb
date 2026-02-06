@@ -100,8 +100,9 @@ is
    -- X_Wp_Admin_Bar_Init --
    -------------------------
 
-   function X_Wp_Admin_Bar_Init (Arry : Array_Type)
-                                 return Array_Type
+   function X_Wp_Admin_Bar_Init
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
       pragma Unreferenced (Arry);
       Unused : constant Boolean := X_Wp_Admin_Bar_Init;
@@ -116,6 +117,7 @@ is
    procedure Wp_Admin_Bar_Render
    is
       use Helpers_3;
+      use Wp_Common;
       use Inc_Plugins;
 --    global wp_admin_bar;
    begin

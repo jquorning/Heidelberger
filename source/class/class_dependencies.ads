@@ -9,6 +9,8 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
+with Arrayable_Interfaces;
+with Arrays;
 with Lists;
 
 with Class_Dependency;
@@ -31,8 +33,9 @@ is
    -- @see _WP_Dependency
    --
    -- #[AllowDynamicProperties]
-   type Wp_Dependencies is tagged
-      record
+   type Wp_Dependencies is
+      new Arrayable_Interfaces.Arrayable_Interface
+      with record
         --
         -- An array of all registered dependencies keyed by handle.
         --
@@ -426,5 +429,19 @@ is
                        Group     : Integer)
                        return Boolean
                        with Side_Effects;
+
+   --
+   --
+   --
+   overriding
+   function To_Array (This : Wp_Dependencies)
+                      return Arrays.Array_Type;
+
+   --
+   --
+   --
+   overriding
+   procedure Array_Unshift (X : in out Wp_Dependencies;
+                            S : Arrays.Array_Type);
 
 end Class_Dependencies;

@@ -6,6 +6,7 @@
 -- @since 5.7.0
 --
 
+with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;
 
@@ -146,7 +147,11 @@ is
    function Wp_Robots_Sensitive_Page (Robots : Array_Type)
                                       return Array_Type;
 
-   procedure Wp_Robots_Sensitive_Page; -- For Add_Filer -- jq
+   function Wp_Robots_Sensitive_Page
+              (Robots : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
+
+-- procedure Wp_Robots_Sensitive_Page; -- For Add_Filer -- jq
 
    --
    -- Adds `max-image-preview:large` to the robots meta tag.
@@ -165,5 +170,9 @@ is
    --
    function Wp_Robots_Max_Image_Preview_Large (Robots : Array_Type)
                                                return Array_Type;
+
+   function Wp_Robots_Max_Image_Preview_Large
+              (Robots : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
 end Inc_Robots_Templates;

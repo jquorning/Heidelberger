@@ -442,7 +442,6 @@ is
       use Inc_General_Templates;
       use Inc_Link_Templates;
       use Inc_L10n;
-      use Inc_Plugins;
 --    global interim_login;
    begin
       -- Don't allow interim logins to navigate away from the page.
@@ -624,7 +623,6 @@ is
       use Inc_L10n;
       use Inc_Options;
       use Inc_Pluggables;
-      use Inc_Plugins;
 
       Admin_Email : UString;
    begin
@@ -989,7 +987,6 @@ is
       use Inc_L10n;
       use Inc_Options;
       use Inc_Pluggables;
-      use Inc_Plugins;
       use Inc_Users;
 
       Errors : Success_Error_Type;
@@ -1400,7 +1397,6 @@ is
       use Inc_L10n;
       use Inc_Options;
       use Inc_Pluggables;
-      use Inc_Plugins;
       use Inc_Users;
    begin
       if Is_Multisite then
@@ -1612,10 +1608,10 @@ is
    is
       use Php.Errors;
       use Binder;
+      use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
-      use Inc_Plugins;
       use Inc_Users;
    begin
       if not Isset (XX_GET, "request_id") then
@@ -1696,7 +1692,6 @@ is
       use Inc_Ms_Functions;
       use Inc_L10n;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Pluggables;
       use Inc_Themes;
       use Inc_Users;

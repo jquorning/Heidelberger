@@ -4,6 +4,8 @@
 
 with Php.Strings;
 
+with Arrayable_Arrays;
+
 package body Php.Misc
 is
 
@@ -67,9 +69,11 @@ is
    -- Call_User_Func --
    --------------------
 
-   function Call_User_Func (Callback : Callable;
-                            Args     : Array_Type := Empty_Array)
-                            return Array_Type
+   function Call_User_Func
+              (Callback : Callable;
+               Args     : Arrayable_Interfaces.Arrayable_Interface'Class) -- :=
+--                            Empty_Array)
+               return Array_Type
    is
    begin
       return Callback (Args);
@@ -79,9 +83,10 @@ is
    -- Call_User_Func_Array --
    --------------------------
 
-   function Call_User_Func_Array (Callback : Callable;
-                                  Args     : Array_Type)
-                                  return Array_Type
+   function Call_User_Func_Array
+              (Callback : Callable;
+               Args     : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
    begin
       return Callback (Args);
@@ -92,10 +97,11 @@ is
    -------------------
 
    function Func_Get_Args
-            return Array_Type
+            return Arrayable_Interfaces.Arrayable_Interface'Class
    is
+      use Arrayable_Arrays;
    begin
-      return Empty_Array;
+      return Empty_Arrayable;
    end Func_Get_Args;
 
 end Php.Misc;

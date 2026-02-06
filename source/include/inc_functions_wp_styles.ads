@@ -7,6 +7,8 @@
 -- @subpackage Dependencies
 --
 
+with Arrayable_Arrays;
+with Arrayable_Interfaces;
 with Arrays;
 with Lists;
 
@@ -49,8 +51,9 @@ is
 
    procedure Wp_Print_Styles (Handles : String); -- = false
 
-   function Wp_Print_Styles (Arry : Array_Type)
-                             return Array_Type;
+   function Wp_Print_Styles
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Add extra CSS styles to a registered stylesheet.

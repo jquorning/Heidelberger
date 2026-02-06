@@ -26,7 +26,6 @@ with Inc_Functions;
 with Inc_General_Templates;
 with Inc_Load;
 with Inc_L10n;
-with Inc_Plugins;
 with Inc_Posts;
 with Inc_Querys;
 with Inc_Taxonomys;
@@ -337,7 +336,6 @@ is
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Defaults : Array_Type := To_Array ((
          Build ("show_option_all",   ""),

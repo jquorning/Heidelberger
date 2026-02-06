@@ -24,7 +24,6 @@ with Lists;
 with Wp_Common;
 
 with Inc_Load;
-with Inc_Plugins;
 
 package body Inc_Vars
 is
@@ -102,9 +101,9 @@ is
 
       if Isset (X_SERVER, "HTTP_USER_AGENT") then
          declare
-            use Inc_Plugins;
+            Http_User_Agent : constant String :=
+              Get_As_String (X_SERVER, "HTTP_USER_AGENT");
 
-            Http_User_Agent : constant String := Get_As_String (X_SERVER, "HTTP_USER_AGENT");
             Is_Admin : Boolean;
          begin
             if Strpos (Http_User_Agent, "Lynx") /= 0 then

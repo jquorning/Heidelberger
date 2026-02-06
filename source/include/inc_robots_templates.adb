@@ -91,13 +91,25 @@ is
    -- Wp_Robots_Sensitive_Page --
    ------------------------------
 
-   procedure Wp_Robots_Sensitive_Page
+   function Wp_Robots_Sensitive_Page
+              (Robots : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
-      Unused : constant Array_Type :=
-        Wp_Robots_Sensitive_Page (Empty_Array);
    begin
-      null;
+      return Wp_Robots_Sensitive_Page (Robots.To_Array);
    end Wp_Robots_Sensitive_Page;
+
+   -- ------------------------------
+   -- -- Wp_Robots_Sensitive_Page --
+   -- ------------------------------
+
+   -- procedure Wp_Robots_Sensitive_Page
+   -- is
+   --    Unused : constant Array_Type :=
+   --      Wp_Robots_Sensitive_Page (Empty_Array);
+   -- begin
+   --    null;
+   -- end Wp_Robots_Sensitive_Page;
 
    ---------------------------------------
    -- Wp_Robots_Max_Image_Preview_Large --
@@ -114,6 +126,18 @@ is
          Set (Robots_2, "max-image-preview", From_String ("large"));
       end if;
       return Robots_2;
+   end Wp_Robots_Max_Image_Preview_Large;
+
+   ---------------------------------------
+   -- Wp_Robots_Max_Image_Preview_Large --
+   ---------------------------------------
+
+   function Wp_Robots_Max_Image_Preview_Large
+              (Robots : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
+   is
+   begin
+      return Wp_Robots_Max_Image_Preview_Large (Robots.To_Array);
    end Wp_Robots_Max_Image_Preview_Large;
 
 end Inc_Robots_Templates;

@@ -363,6 +363,7 @@ is
 
    procedure Customize_Controls_Init (This : in out Wp_Customize_Widgets)
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/includes/ajax-actions.php
@@ -811,6 +812,7 @@ is
 
    procedure Print_Styles (This : in out Wp_Customize_Widgets)
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/admin-header.php
@@ -827,6 +829,7 @@ is
 
    procedure Print_Scripts (This : in out Wp_Customize_Widgets)
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/admin-header.php
@@ -846,6 +849,7 @@ is
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
+      use Wp_Common;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Functions;
@@ -1162,6 +1166,7 @@ is
 
    procedure Print_Footer_Scripts (This : in out Wp_Customize_Widgets)
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/admin-footer.php
@@ -2053,8 +2058,9 @@ is
    -- Filter_Sidebars_Widgets_For_Rendering_Widget --
    --------------------------------------------------
 
-   function Filter_Sidebars_Widgets_For_Rendering_Widget (Arry : Array_Type)
-                                                          return Array_Type
+   function Filter_Sidebars_Widgets_For_Rendering_Widget
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
    begin
       raise Program_Error with "not implemented";

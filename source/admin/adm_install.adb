@@ -36,8 +36,9 @@ with Arrays;
 with Binder;
 with Constants;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
+with Wp_Common;
 
 with Adi_Templates;
 with Adi_Translation_Install;
@@ -133,8 +134,9 @@ is
       use Arrays;
       use Binder;
       use UStrings;
-      use Adi_Templates;
+      use Wp_Common;
       use Class_WpDB;
+      use Adi_Templates;
       use Inc_Formatting;
       use Inc_General_Templates;
       use Inc_L10n;

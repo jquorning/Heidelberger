@@ -25,7 +25,6 @@ with Inc_HTTP;
 with Inc_KSES;
 with Inc_L10n;
 with Inc_Options;
-with Inc_Plugins;
 
 package body Inc_Formatting
 is
@@ -47,7 +46,6 @@ is
       use Php.Strings;
       use Wp_Common;
       use Inc_L10n;
-      use Inc_Plugins;
 
       -- static
       Static_Characters    : List_Type;
@@ -1984,7 +1982,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Raw_Username : constant String := Username;
       Username_2   : constant String := Wp_Strip_All_Tags (Username);
@@ -2032,7 +2029,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Sanitized_Key : UString;
    begin
@@ -2062,7 +2058,6 @@ is
                             return String
    is
       use Wp_Common;
-      use Inc_Plugins;
 
       Raw_Title : constant String := Title;
 
@@ -2273,7 +2268,6 @@ is
    is
       use Php.Preg;
       use Wp_Common;
-      use Inc_Plugins;
 
       -- Strip out any %-encoded octets.
       Sanitized_1 : constant String :=
@@ -2308,7 +2302,6 @@ is
    is
       use Php.Preg;
       use Wp_Common;
-      use Inc_Plugins;
 
       -- Limit to A-Z, a-z, 0-9, "_", "-".
       Sanitized : constant String :=
@@ -4258,7 +4251,6 @@ is
       use Inc_Functions;
       use Inc_HTTP;
       use Inc_KSES;
-      use Inc_Plugins;
 
       function Display (URL : String)
                         return String;
@@ -4454,7 +4446,6 @@ is
       use Php.HTML;
       use Php.Preg;
       use Wp_Common;
-      use Inc_Plugins;
 
       Safe_Text_5 : constant String := Wp_Check_Invalid_UTF8 (Text);
       Safe_Text_4 : constant String := X_Wp_Specialchars (Safe_Text_5, ENT_COMPAT);
@@ -4522,7 +4513,6 @@ is
                       return String
    is
       use Wp_Common;
-      use Inc_Plugins;
 
       Safe_Text_2 : constant String := Wp_Check_Invalid_UTF8 (Text);
 
@@ -5392,7 +5382,6 @@ is
                                  return String
    is
       use Wp_Common;
-      use Inc_Plugins;
 
       Filtered : constant String :=
         X_Sanitize_Text_Fields (Str, False);
@@ -5650,7 +5639,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
    begin
       if Empty (Static_Spaces) then
          --

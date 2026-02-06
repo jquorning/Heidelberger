@@ -12,6 +12,7 @@ with Php.Types;
 
 with Helpers;
 with Lists;
+with Wp_Common;
 
 with Inc_Admin_Bar;
 with Inc_Ms_Functions;
@@ -64,8 +65,9 @@ is
    procedure Initialize (This : in out Wp_Admin_Bar)
    is
       use UStrings;
-      use Inc_Admin_Bar;
+      use Wp_Common;
       use Class_Sites;
+      use Inc_Admin_Bar;
       use Inc_Ms_Functions;
       use Inc_Formatting;
       use Inc_Functions_Wp_Styles;
@@ -850,9 +852,9 @@ is
 
    procedure Add_Menus (This : Wp_Admin_Bar)
    is
+      use Wp_Common;
 --    use Inc_Admin_Bar;
       use Inc_Load;
-      use Inc_Plugins;
    begin
       -- User-related, aligned right.
 --    Add_Action ("admin_bar_menu", Wp_Admin_Bar_My_Account_Menu'Access, 0);
@@ -886,5 +888,30 @@ is
       --
       Do_Action ("add_admin_bar_menus");
    end Add_Menus;
+
+   ------------------
+   -- To_Arrayable --
+   ------------------
+
+   overriding
+   function To_Array (X : Wp_Admin_Bar)
+                      return Arrays.Array_Type
+   is
+   begin
+      raise Program_Error with "not implemwnter";
+      return Empty_Array;
+   end To_Array;
+
+   -------------------
+   -- Array_Unshift --
+   -------------------
+
+   overriding
+   procedure Array_Unshift (X : in out Wp_Admin_Bar;
+                            S : Arrays.Array_Type)
+   is
+   begin
+      raise Program_Error with "not implemwnter";
+   end Array_Unshift;
 
 end Class_Admin_Bar;

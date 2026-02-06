@@ -9,6 +9,8 @@
 with Php.Lists;
 with Php.Misc;
 
+with Wp_Common;
+
 with Class_Locales;
 with Inc_L10n;
 with Inc_Plugins;
@@ -27,6 +29,7 @@ is
                               return Boolean
    is
       use Php.Lists;
+      use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
 
@@ -66,6 +69,7 @@ is
       use Php.Lists;
       use Php.Misc;
       use UStrings;
+      use Wp_Common;
       use Inc_Plugins;
 
       Previous_Locale : constant String := List_Pop (This.Locales);
@@ -137,6 +141,7 @@ is
    procedure Change_Locale (This   : Wp_Locale_Switcher;
                             Locale : String)
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       This.Load_Translations (Locale);

@@ -6,6 +6,8 @@
 -- @since 3.1.0
 --
 
+with Arrayable_Arrays;
+with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;
 with UStrings;
@@ -49,8 +51,9 @@ is
    function X_Wp_Admin_Bar_Init
             return Boolean;
 
-   function X_Wp_Admin_Bar_Init (Arry : Array_Type)
-                                 return Array_Type;
+   function X_Wp_Admin_Bar_Init
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Renders the admin bar to the page based on the wp_admin_bar.menu member var.

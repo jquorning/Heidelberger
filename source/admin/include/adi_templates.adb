@@ -31,7 +31,6 @@ with Inc_Functions;
 with Inc_General_Templates;
 with Inc_L10n;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
@@ -2955,9 +2954,9 @@ is
       use Php.Echoing;
       use Php.HTML;
       use UStrings;
+      use Wp_Common;
       use Inc_General_Templates;
       use Inc_Options;
-      use Inc_Plugins;
 
       Admin_HTML_Class : constant String :=
         (if Inc_Admin_Bar.Is_Admin_Bar_Showing then "wp-toolbar" else "");

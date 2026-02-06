@@ -1351,8 +1351,9 @@ is
    -- Create_Initial_Post_Types --
    -------------------------------
 
-   function Create_Initial_Post_Types (Arry : Array_Type)
-                                       return Array_Type
+   function Create_Initial_Post_Types
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
       pragma Unreferenced (Arry);
    begin

@@ -84,19 +84,21 @@ is
    -- Apply_Filters --
    -------------------
 
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Array_Type;
-                           Args      : Array_Type)
-                           return Array_Type
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Array_Type;
+               Args      : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
       use Php.Arrays;
       use Php.Lists;
       use Php.Misc;
+      use Arrayable_Interfaces;
       use Globals;
       use Globals.Natural_Maps;
       use Class_Hook_Maps.Hook_Maps;
 
-      Args_2 : Array_Type := Args;
+      Args_2 : Arrayable_Interface'Class := Args;
    begin
       Logging.Log ("inc_plugins.apply_filters", Hook_Name);
 
@@ -112,7 +114,7 @@ is
          Global_Wp_Current_Filter.Append (Hook_Name);
 
          declare
-            All_Args : constant Array_Type := Func_Get_Args;
+            All_Args : constant Arrayable_Interface'Class := Args; -- Func_Get_Args;
          begin
             X_Wp_Call_All_Hook (All_Args);
          end;
@@ -346,16 +348,21 @@ is
    -- Do_Action --
    ---------------
 
-   procedure Do_Action (Hook_Name : String;
-                        Arg_2     : String := "";
-                        Arg_3     : String := "")
+   procedure Do_Action
+               (Hook_Name : String;
+                Args      : Arrayable_Interfaces.Arrayable_Interface'Class)
+                -- Arg_2     : String := "";
+                -- Arg_3     : String := "")
    is
       use Php.Lists;
+      use Php.Misc;
+      use Arrayable_Interfaces;
       use Globals;
       use Globals.Count_Maps;
       use Class_Hook_Maps.Hook_Maps;
    begin
-      Put_Line ("do_action: " & Hook_Name & ": '" & Arg_2 & "' '" & Arg_3 & "'");
+      Logging.Log ("do_action", Hook_Name);
+      --  & ": '" & Arg_2 & "' '" & Arg_3 & "'");
 
       if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
@@ -370,7 +377,7 @@ is
 --    if Isset (Wp_Filter, "all") then
          Global_Wp_Current_Filter.Append (Hook_Name);
          declare
-            All_Args : Array_Type; --            := Func_Get_Args;
+            All_Args : Arrayable_Interface'Class := Args; -- Func_Get_Args;
          begin
             X_Wp_Call_All_Hook (All_Args);
          end;
@@ -391,7 +398,7 @@ is
       end if;
 
       declare
-         Arg : Array_Type; --  := Arg_2;
+         Arg_2 : Arrayable_Interface'Class := Args; -- Func_Get_Args;
       begin
 --       Arg.Include (Arg_2, "");
 --       Arg.Include (Arg_3, "");
@@ -402,7 +409,7 @@ is
         --         arg[0] = arg[0][0];
         -- end;
 
-         Global_Wp_Filter (Hook_Name).Do_Action (Arg);
+         Global_Wp_Filter (Hook_Name).Do_Action (Arg_2);
       end;
       List_Pop (Global_Wp_Current_Filter);
    end Do_Action;
@@ -411,10 +418,12 @@ is
    -- Do_Action_Ref_Array --
    -------------------------
 
-   procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : in out Array_Type)
+   procedure Do_Action_Ref_Array
+               (Hook_Name : String;
+                Args      : in out Arrayable_Interfaces.Arrayable_Interface'Class)
    is
       use Php.Lists;
+      use Arrayable_Interfaces;
       use Globals;
       use Globals.Count_Maps;
       use Class_Hook_Maps.Hook_Maps;
@@ -432,7 +441,7 @@ is
       if Has_Element (Global_Wp_Filter.Find ("all")) then
          Global_Wp_Current_Filter.Append (Hook_Name);
          declare
-            All_Args : Array_Type; --            := Func_Get_Args;
+            All_Args : Arrayable_Interface'Class := Args; -- Func_Get_Args;
          begin
             X_Wp_Call_All_Hook (All_Args);
          end;
@@ -455,66 +464,66 @@ is
       List_Pop (Global_Wp_Current_Filter);
    end Do_Action_Ref_Array;
 
-   -------------------------
-   -- Do_Action_Ref_Array --
-   -------------------------
+   -- -------------------------
+   -- -- Do_Action_Ref_Array --
+   -- -------------------------
 
-   procedure Do_Action_Ref_Array
-               (Hook_Name : String;
-                Args      : in out Class_Dependencies.Wp_Dependencies'Class)
-   is
-      use Php.Lists;
-      use Globals;
-      use Globals.Count_Maps;
-      use Class_Hook_Maps.Hook_Maps;
-   begin
-      Logging.Log ("do_action_ref_array", Hook_Name);
+   -- procedure Do_Action_Ref_Array
+   --             (Hook_Name : String;
+   --              Args      : in out Class_Dependencies.Wp_Dependencies'Class)
+   -- is
+   --    use Php.Lists;
+   --    use Globals;
+   --    use Globals.Count_Maps;
+   --    use Class_Hook_Maps.Hook_Maps;
+   -- begin
+   --    Logging.Log ("do_action_ref_array", Hook_Name);
 
-      if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
-         Global_Wp_Actions.Include (Hook_Name, 1);
-      else
-         Global_Wp_Actions.Include (Hook_Name,
-                                    Global_Wp_Actions (Hook_Name) + 1);
-      end if;
+   --    if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
+   --       Global_Wp_Actions.Include (Hook_Name, 1);
+   --    else
+   --       Global_Wp_Actions.Include (Hook_Name,
+   --                                  Global_Wp_Actions (Hook_Name) + 1);
+   --    end if;
 
-      -- Do 'all' actions first.
-      if Has_Element (Global_Wp_Filter.Find ("all")) then
-         Global_Wp_Current_Filter.Append (Hook_Name);
-         declare
-            All_Args : Array_Type; --            := Func_Get_Args;
-         begin
-            X_Wp_Call_All_Hook (All_Args);
-         end;
-      end if;
+   --    -- Do 'all' actions first.
+   --    if Has_Element (Global_Wp_Filter.Find ("all")) then
+   --       Global_Wp_Current_Filter.Append (Hook_Name);
+   --       declare
+   --          All_Args : Array_Type; --            := Func_Get_Args;
+   --       begin
+   --          X_Wp_Call_All_Hook (All_Args);
+   --       end;
+   --    end if;
 
-      if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
-         if Has_Element (Global_Wp_Filter.Find ("all")) then
-            List_Pop (Global_Wp_Current_Filter);
-         end if;
+   --    if not Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
+   --       if Has_Element (Global_Wp_Filter.Find ("all")) then
+   --          List_Pop (Global_Wp_Current_Filter);
+   --       end if;
 
-         return;
-      end if;
+   --       return;
+   --    end if;
 
-      if not Has_Element (Global_Wp_Filter.Find ("all")) then
-         Global_Wp_Current_Filter.Append (Hook_Name);
-      end if;
+   --    if not Has_Element (Global_Wp_Filter.Find ("all")) then
+   --       Global_Wp_Current_Filter.Append (Hook_Name);
+   --    end if;
 
-      Global_Wp_Filter (Hook_Name).Do_Action (Empty_Array); -- (Args);
+   --    Global_Wp_Filter (Hook_Name).Do_Action (Args);
 
-      List_Pop (Global_Wp_Current_Filter);
-   end Do_Action_Ref_Array;
+   --    List_Pop (Global_Wp_Current_Filter);
+   -- end Do_Action_Ref_Array;
 
-   -------------------------
-   -- Do_Action_Ref_Array --
-   -------------------------
+   -- -------------------------
+   -- -- Do_Action_Ref_Array --
+   -- -------------------------
 
-   procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Class_Admin_Bar.Wp_Admin_Bar)
-   is
-      Args_2 : Array_Type;
-   begin
-      Do_Action_Ref_Array (Hook_Name, Args_2);
-   end Do_Action_Ref_Array;
+   -- procedure Do_Action_Ref_Array (Hook_Name : String;
+   --                                Args      : Class_Admin_Bar.Wp_Admin_Bar)
+   -- is
+   --    Args_2 : Array_Type;
+   -- begin
+   --    Do_Action_Ref_Array (Hook_Name, Args_2);
+   -- end Do_Action_Ref_Array;
 
    ----------------
    -- Has_Action --
@@ -865,7 +874,8 @@ is
    -- X_Wp_Call_All_Hook --
    ------------------------
 
-   procedure X_Wp_Call_All_Hook (Args : Array_Type)
+   procedure X_Wp_Call_All_Hook
+               (Args : Arrayable_Interfaces.Arrayable_Interface'Class)
    is
       use Globals;
 --    global wp_filter;

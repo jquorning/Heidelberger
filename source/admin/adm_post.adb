@@ -39,7 +39,6 @@ with Class_Users;
 with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Pluggables;
-with Inc_Plugins;
 with Inc_Posts;
 with Inc_Users;
 
@@ -56,8 +55,8 @@ is
    is
       use Php.Strings;
       use Binder;
-      use Globals;
       use Constants;
+      use Globals;
       use Helpers_3;
       use UStrings;
       use Wp_Common;
@@ -113,7 +112,6 @@ is
             use Class_Post_Type;
             use Inc_Comments;
             use Inc_Link_Templates;
-            use Inc_Plugins;
 
             Action   : UString;
             Sendback : UString;

@@ -721,7 +721,7 @@ is
                      --
                      -- @param string taxonomy The taxonomy slug.
                      --
-                     Do_Action ((-Taxonomy) & "_add_form", (-Taxonomy));
+                     Do_Action ((-Taxonomy) & "_add_form", -Taxonomy);
 
                      Set ("VAR_edit_tags_add_form", "XXX-81");
 

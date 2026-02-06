@@ -38,7 +38,6 @@ with Inc_Load;
 with Inc_L10n;
 with Inc_Media;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Vars;
 
 package body Inc_Pluggables
@@ -59,8 +58,8 @@ is
                                  Name : String := "")
                                  return Class_Users.Wp_User
    is
+      use Wp_Common;
       use Class_Users;
-      use Inc_Plugins;
       use Inc_Users;
 --    global current_user;
    begin
@@ -796,7 +795,6 @@ is
       use Class_Users;
       use Inc_Compat;
       use Inc_Load;
-      use Inc_Plugins;
 
       Cookie_Elements : constant Array_Type :=
         Wp_Parse_Auth_Cookie (Cookie, Scheme);
@@ -1259,7 +1257,6 @@ is
       use Constants;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
       use Inc_Users;
    begin
       --

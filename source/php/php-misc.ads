@@ -2,6 +2,7 @@
 --
 --
 
+with Arrayable_Interfaces;
 with Arrays;
 with Lists;
 
@@ -49,16 +50,19 @@ is
             return List_Type
             is (Empty_List);
 
-   function Call_User_Func (Callback : Callable;
-                            Args     : Array_Type := Empty_Array)
-                            return Array_Type;
+   function Call_User_Func
+              (Callback : Callable;
+               Args     : Arrayable_Interfaces.Arrayable_Interface'Class) -- :=
+--                            Empty_Array)
+               return Array_Type;
 
-   function Call_User_Func_Array (Callback : Callable;
-                                  Args     : Array_Type)
-                                  return Array_Type;
+   function Call_User_Func_Array
+              (Callback : Callable;
+               Args     : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    function Func_Get_Args
-            return Array_Type;
+            return Arrayable_Interfaces.Arrayable_Interface'Class;
 
    function MD5 (Item   : String;
                  Binary : Boolean := False)

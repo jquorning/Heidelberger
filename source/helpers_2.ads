@@ -2,6 +2,7 @@
 --
 --
 
+with Arrayable_Interfaces;
 with Arrays;
 
 package Helpers_2 is
@@ -14,7 +15,8 @@ package Helpers_2 is
 
    generic
       with procedure Procedur;
-   function Generic_Call_Procedure (Arry : Arrays.Array_Type)
-                                    return Arrays.Array_Type;
+   function Generic_Call_Procedure
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Arrays.Array_Type;
 
 end Helpers_2;

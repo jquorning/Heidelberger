@@ -29,7 +29,6 @@ with Inc_Functions;
 with Inc_Load;
 with Inc_Link_Templates;
 with Inc_L10n;
-with Inc_Plugins;
 with Inc_Users;
 
 package body Inc_Options
@@ -973,10 +972,10 @@ is
    is
       use Php.Types;
       use UStrings;
-      use Inc_Caches;
+      use Wp_Common;
       use Class_WpDB;
+      use Inc_Caches;
       use Inc_Load;
-      use Inc_Plugins;
    begin
       -- if Is_Scalar (Option) then
       --    Option := Trim (Option);
@@ -2011,7 +2010,6 @@ is
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
-      use Inc_Plugins;
 
       Network_Id_2 : Natural    := Network_Id;
       Value_2      : Multi_Type := Value;
@@ -2163,7 +2161,6 @@ is
       use Class_WpDB;
       use Inc_Caches;
       use Inc_Load;
-      use Inc_Plugins;
 
       Network_Id_2 : Integer := Network_Id;
       Unused : Boolean;
@@ -2286,7 +2283,6 @@ is
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;
-      use Inc_Plugins;
 
       Network_Id_2 : Natural := Network_Id;
    begin
@@ -2442,9 +2438,9 @@ is
 
    procedure Delete_Site_Transient (Transient : String)
    is
+      use Wp_Common;
       use Inc_Caches;
       use Inc_Load;
-      use Inc_Plugins;
 
       Result : Boolean;
    begin
@@ -2595,8 +2591,6 @@ is
       -- @param string transient Transient name.
       --
       declare
-         use Inc_Plugins;
-
          M : String_Maps.Map;
          R : constant String :=
            Apply_Filters ("site_transient_" & Transient, -Value, Transient);
@@ -2619,7 +2613,6 @@ is
       use Wp_Common;
       use Inc_Caches;
       use Inc_Load;
-      use Inc_Plugins;
 
       --
       -- Filters the value of a specific site transient before it is set.

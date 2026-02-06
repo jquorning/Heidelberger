@@ -37,7 +37,6 @@ with Inc_Link_Templates;
 with Inc_Load;
 with Inc_Ms_Networks;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Post_Templates;
 with Inc_Posts;
 with Inc_Themes;
@@ -70,7 +69,6 @@ is
       use Inc_L10n;
       use Inc_Load;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Users;
 
       function RTL_To_String (RTL : Boolean)

@@ -253,13 +253,14 @@ is
 
    function Apply_Filters (This  : in out Wp_Hook;
                            Value : Array_Type;
-                           Args  : Array_Type)
+                           Args  : Arrayable_Interfaces.Arrayable_Interface'Class)
                            return Array_Type
    is
       use Php.Arrays;
       use Php.Misc;
+      use Arrayable_Interfaces;
 
-      Args_2          : Array_Type := Args;
+      Args_2          : Arrayable_Interface'Class := Args;
       Nesting_Level   : Nesting_Type;
       Num_Args        : Natural;
       Value_2         : Array_Type := Value;
@@ -285,7 +286,7 @@ is
       This.Iterations.Include (Nesting_Level, Get_Priorities (This.Callbacks));
       Current_Nesting := This.Iterations.Find (Nesting_Level);
 
-      Num_Args := Args.Length;
+      Num_Args := 1; -- Args.Length;
 
 --    Logging.Log ("apply_filters", "nesting_level: " & Nesting_Level'Image);
 --    Logging.Log ("apply_filters",
@@ -316,7 +317,8 @@ is
                             "Call function, nest: " & Nesting_Level'Image &
                             ", pri: " & Priority'Image);
                if not This.Doing_Action then
-                  Args_2 := Value_2;
+                  null;
+--                Args_2 := Value_2;
                end if;
 
                declare
@@ -329,16 +331,16 @@ is
                   Logging.Log ("apply_filters",
                                "function: " & User_Function'Image);
                   -- Avoid the array_slice() if possible.
-                  if 0 = Accepted_Args then
-                     Value_2 := Call_User_Func (User_Function);
-                  elsif Accepted_Args >= Num_Args then
+                  -- if 0 = Accepted_Args then
+                  --    Value_2 := Call_User_Func (User_Function);
+                  -- elsif Accepted_Args >= Num_Args then
                      Value_2 := Call_User_Func_Array (User_Function, Args_2);
-                  else
-                     Value_2 :=
-                       Call_User_Func_Array (
-                         User_Function,
-                         Array_Slice (Args_2, 0, Accepted_Args));
-                  end if;
+                  -- else
+                  --    Value_2 :=
+                  --      Call_User_Func_Array (
+                  --        User_Function,
+                  --        Array_Slice (Args_2, 0, Accepted_Args));
+                  -- end if;
                end;
             end loop;
          end;
@@ -359,8 +361,8 @@ is
    -------------------
 
    procedure Apply_Filters (This  : in out Wp_Hook;
-                            Value : Array_Type; -- String;
-                            Args  : Array_Type)
+                            Value : Array_Type;
+                            Args  : Arrayable_Interfaces.Arrayable_Interface'Class)
    is
       Unused : constant Array_Type := Apply_Filters (This, Value, Args);
    begin
@@ -372,7 +374,7 @@ is
    ---------------
 
    procedure Do_Action (This : in out Wp_Hook;
-                        Args : Array_Type)
+                        Args : Arrayable_Interfaces.Arrayable_Interface'Class)
    is
    begin
       This.Doing_Action := True;
@@ -385,12 +387,30 @@ is
       end if;
    end Do_Action;
 
+   -- ---------------
+   -- -- Do_Action --
+   -- ---------------
+
+   -- procedure Do_Action (This : in out Wp_Hook;
+   --                      Args : Class_Dependencies.Wp_Dependencies'Class)
+   -- is
+   -- begin
+   --    This.Doing_Action := True;
+   --    This.Apply_Filters (Empty_Array, Args);
+
+   --    -- If there are recursive calls to the current action, we haven't finished it
+   --    -- until we get to the last one.
+   --    if This.Nesting_Level = 0 then
+   --       This.Doing_Action := False;
+   --    end if;
+   -- end Do_Action;
+
    -----------------
    -- Do_All_Hook --
    -----------------
 
    procedure Do_All_Hook (This : in out Wp_Hook;
-                          Args : Array_Type)
+                          Args : Arrayable_Interfaces.Arrayable_Interface'Class)
    is
       use Php.Misc;
 

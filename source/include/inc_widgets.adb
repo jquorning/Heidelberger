@@ -26,6 +26,7 @@ with Php.Sorting;
 with Php.Strings;
 with Php.Types;
 
+with Arrayable_Arrays;
 with UStrings;
 with Wp_Common;
 
@@ -34,7 +35,6 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_Load;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Themes;
 
 package body Inc_Widgets
@@ -68,7 +68,7 @@ is
       use Class_Customize_Widgets;
       use Inc_Formatting;
       use Inc_Load;
-      use Inc_Plugins;
+
 --    Global_wp_registered_sidebars
 --    Global_wp_registered_widgets;
       Index_2 : UString;
@@ -288,8 +288,13 @@ is
                   if Callback /= null then
 --                if Is_Callable (Callback) then
                      declare
+                        use Arrayable_Arrays;
+
+                        Params_2 : constant Arrayable_Array :=
+                          (Container => Params);
+
                         Unused : constant Array_Type :=
-                           Call_User_Func_Array (Callback, Params);
+                          Call_User_Func_Array (Callback, Params_2);
                      begin
                         Did_One := True;
                      end;

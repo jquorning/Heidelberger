@@ -12,6 +12,7 @@ with Php.Strings;
 
 with Globals;
 with UStrings;
+with Wp_Common;
 
 with Class_Scripts;
 with Inc_Functions;
@@ -93,6 +94,7 @@ is
                               return List_Type
    is
 --    global wp_scripts;
+      use Wp_Common;
       use Class_Scripts;
       use Inc_Plugins;
    begin

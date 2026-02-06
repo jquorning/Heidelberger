@@ -19,6 +19,7 @@
 -- @since 1.5.0
 --
 
+with Arrayable_Interfaces;
 with Arrays;
 with Lists;
 
@@ -83,15 +84,16 @@ is
    -- @param array  args      The arguments supplied to the functions hooked to
    --                         `hook_name`.
    --
-   procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : in out Array_Type);
-
    procedure Do_Action_Ref_Array
                (Hook_Name : String;
-                Args      : in out Class_Dependencies.Wp_Dependencies'Class);
+                Args      : in out Arrayable_Interfaces.Arrayable_Interface'Class);
 
-   procedure Do_Action_Ref_Array (Hook_Name : String;
-                                  Args      : Class_Admin_Bar.Wp_Admin_Bar);
+   -- procedure Do_Action_Ref_Array
+   --             (Hook_Name : String;
+   --              Args      : in out Class_Dependencies.Wp_Dependencies'Class);
+
+   -- procedure Do_Action_Ref_Array (Hook_Name : String;
+   --                                Args      : Class_Admin_Bar.Wp_Admin_Bar);
 
    --
    -- Gets the basename of a plugin.
@@ -237,10 +239,11 @@ is
    -- @param mixed  ...args   Additional parameters to pass to the callback functions.
    -- @return mixed The filtered value after all hooked functions are applied to it.
    --
-   function Apply_Filters (Hook_Name : String;
-                           Value     : Array_Type;
-                           Args      : Array_Type)
-                           return Array_Type;
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Array_Type;
+               Args      : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Calls the callback functions that have been added to a filter hook, specifying
@@ -414,9 +417,11 @@ is
    -- @param mixed  ...arg    Optional. Additional arguments which are passed on to the
    --                         functions hooked to the action. Default empty.
    --
-   procedure Do_Action (Hook_Name : String;
-                        Arg_2     : String := "";
-                        Arg_3     : String := "");
+   procedure Do_Action
+               (Hook_Name : String;
+                Args      : Arrayable_Interfaces.Arrayable_Interface'Class);
+                -- Arg_2     : String := "";
+                -- Arg_3     : String := "");
 
    --
    -- Removes a callback function from an action hook.
@@ -602,7 +607,8 @@ is
    --
    -- @param array args The collected parameters from the hook that was called.
    --
-   procedure X_Wp_Call_All_Hook (Args : Array_Type);
+   procedure X_Wp_Call_All_Hook
+               (Args : Arrayable_Interfaces.Arrayable_Interface'Class);
 
    --
    -- Dump contents of hook filers. jq

@@ -1884,8 +1884,9 @@ is
    -- Wp_Default_Scripts --
    ------------------------
 
-   function Wp_Default_Scripts (Arry : Array_Type)
-                               return Array_Type
+   function Wp_Default_Scripts
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
       pragma Unreferenced (Arry);
    begin
@@ -2300,7 +2301,8 @@ is
    -- Wp_Default_Styles --
    -----------------------
 
-   function Wp_Default_Styles (Arry : Array_Type)
+   function Wp_Default_Styles
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                                return Array_Type
    is
       pragma Unreferenced (Arry);
@@ -2666,6 +2668,7 @@ is
    function Wp_Print_Head_Scripts
             return List_Type
    is
+      use Wp_Common;
       use Inc_Plugins;
 --    global wp_scripts;
    begin
@@ -2685,8 +2688,9 @@ is
    -- Wp_Print_Head_Scripts --
    ---------------------------
 
-   function Wp_Print_Head_Scripts (Arry : Array_Type)
-                                   return Array_Type
+   function Wp_Print_Head_Scripts
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
       pragma Unreferenced (Arry);
       Unused : constant List_Type := Wp_Print_Head_Scripts;
@@ -2725,7 +2729,7 @@ is
 
    procedure Wp_Enqueue_Scripts
    is
-      use Inc_Plugins;
+      use Wp_Common;
    begin
       --
       -- Fires when scripts and styles are enqueued.
@@ -2944,9 +2948,9 @@ is
    is
       use Php.Files;
       use UStrings;
+      use Wp_Common;
       use Inc_Functions_Wp_Styles;
       use Inc_L10n;
-      use Inc_Plugins;
 
       X_DIR_X : String renames Constants.X_DIR_X;
    begin
@@ -3048,12 +3052,12 @@ is
    -- Wp_Filter_Out_Block_Nodes --
    -------------------------------
 
-   procedure Wp_Filter_Out_Block_Nodes
+   function Wp_Filter_Out_Block_Nodes
+              (Nodes : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
-      Unused : constant Array_Type :=
-        Wp_Filter_Out_Block_Nodes (Empty_Array);
    begin
-      null;
+      return Wp_Filter_Out_Block_Nodes (Nodes.To_Array);
    end Wp_Filter_Out_Block_Nodes;
 
    ------------------------------
@@ -3822,11 +3826,12 @@ is
    -- Wp_Enqueue_Stored_Styles --
    ------------------------------
 
-   function Wp_Enqueue_Stored_Styles (Arry : Array_Type)
-                                      return Array_Type
+   function Wp_Enqueue_Stored_Styles
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type
    is
    begin
-      Wp_Enqueue_Stored_Styles (Arry);
+      Wp_Enqueue_Stored_Styles (Arry.To_Array);
       return Empty_Array;
    end Wp_Enqueue_Stored_Styles;
 

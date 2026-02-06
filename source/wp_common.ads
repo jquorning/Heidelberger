@@ -11,7 +11,7 @@ with Lists;
 with Adi_Class_Wp_Screens;
 with Adi_Translation_Install;
 
-with Class_Admin_Bar;
+-- with Class_Admin_Bar;
 with Class_Block_Editor_Contexts;
 with Class_Customize_Managers;
 with Class_Customize_Settings;
@@ -604,6 +604,13 @@ is
                Value     : Array_Vectors.Array_Vector)
                return Array_Vectors.Array_Vector;
 
+   -- function Apply_Filters
+   --            (Hook_Name : String;
+   --             Arg_2     : String := "";
+   --             Arg_3     : String := "")
+   --             return String
+   --             is (Arg_2);
+
    function Apply_Filters_Deprecated
               (Hook_Name : String;
                Value     : Array_Type;
@@ -628,6 +635,10 @@ is
                Hook      : String)
                return Array_Type
                is (Value);
+
+   procedure Do_Action (Hook_Name : String;
+                        Arg_2     : String := "";
+                        Arg_3     : String := "");
 
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String;

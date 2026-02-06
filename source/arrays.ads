@@ -6,6 +6,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Finalization;
 with Ada.Iterator_Interfaces;
 
+limited with Arrayable_Interfaces;
 with Lists;
 with UStrings;
 
@@ -39,8 +40,9 @@ is
 --         Variable_Indexing => Reference,
          Iterator_Element  => Multi_Type;
 
-   type Callable is access function (Arry : Array_Type)
-                                     return Array_Type;
+   type Callable is access
+     function (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    type Cursor is private;
 

@@ -8,6 +8,7 @@
 --
 
 with Globals;
+with Wp_Common;
 
 with Inc_Default_Filters;
 with Inc_Default_Constants;
@@ -30,6 +31,7 @@ is
 
    procedure Run
    is
+      use Wp_Common;
       use Inc_Plugins;
    begin
       --

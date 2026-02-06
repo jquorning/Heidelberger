@@ -17,6 +17,7 @@ with Constants;
 with Globals;
 with Lists;
 with UStrings;
+with Wp_Common;
 
 with Adi_Upgrade;
 with Class_WpDB;
@@ -400,9 +401,10 @@ is
       use Constants;
       use Globals;
       use UStrings;
-      use Adi_Upgrade;
+      use Wp_Common;
       use Class_Themes;
       use Class_WpDB;
+      use Adi_Upgrade;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Load;

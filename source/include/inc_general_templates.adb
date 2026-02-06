@@ -3335,11 +3335,11 @@ is
    -- Feed_Links --
    ----------------
 
-   function Feed_Links (Arry : Array_Type)
+   function Feed_Links (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                         return Array_Type
    is
    begin
-      Feed_Links (Arry);
+      Feed_Links (Arry.To_Array);
       return Empty_Array;
    end Feed_Links;
 
@@ -3673,11 +3673,11 @@ is
    -- Feed_Link_Ekstra --
    ----------------------
 
-   function Feed_Links_Extra (Arry : Array_Type)
+   function Feed_Links_Extra (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                               return Array_Type
    is
    begin
-      Feed_Links_Extra (Arry);
+      Feed_Links_Extra (Arry.To_Array);
       return Empty_Array;
    end Feed_Links_Extra;
 

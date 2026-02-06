@@ -12,6 +12,7 @@ with Php.Strings;
 
 with Globals;
 with UStrings;
+with Wp_Common;
 
 with Class_Dependencies;
 with Class_Styles;
@@ -44,6 +45,7 @@ is
    is
       use Inc_Functions_Wp_Scripts;
       use Inc_Plugins;
+      use Wp_Common;
 --    global wp_styles;
    begin
       -- if "" = handles then -- For 'wp_head'.
@@ -85,7 +87,7 @@ is
    -- Wp_Print_Styles --
    ---------------------
 
-   function Wp_Print_Styles (Arry : Array_Type)
+   function Wp_Print_Styles (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
                              return Array_Type
    is
    begin

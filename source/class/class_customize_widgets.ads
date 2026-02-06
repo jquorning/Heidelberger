@@ -6,6 +6,8 @@
 -- @since 3.9.0
 --
 
+with Arrayable_Arrays;
+with Arrayable_Interfaces;
 with Arrays;
 with UStrings;
 with Lists;
@@ -1614,10 +1616,11 @@ is
                return Array_Type;
 
    procedure Filter_Sidebars_Widgets_For_Rendering_Widget
-              (This : in out Wp_Customize_Widgets);
+               (This : in out Wp_Customize_Widgets);
 
-   function Filter_Sidebars_Widgets_For_Rendering_Widget (Arry : Array_Type)
-                                                          return Array_Type;
+   function Filter_Sidebars_Widgets_For_Rendering_Widget
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Renders a specific widget using the supplied sidebar arguments.

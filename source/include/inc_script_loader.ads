@@ -19,6 +19,7 @@
 -- @package WordPress
 --
 
+with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;
 with Lists;
@@ -67,8 +68,9 @@ is
    --
    procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles);
 
-   function Wp_Default_Styles (Arry : Array_Type)
-                               return Array_Type;
+   function Wp_Default_Styles
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Prints the script queue in the HTML head on admin pages.
@@ -133,8 +135,9 @@ is
    --
    procedure Wp_Default_Scripts (Scripts : in out Class_Scripts.Wp_Scripts);
 
-   function Wp_Default_Scripts (Arry : Array_Type)
-                               return Array_Type;
+   function Wp_Default_Scripts
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Registers all the WordPress vendor scripts that are in the standardized
@@ -241,8 +244,9 @@ is
    function Wp_Print_Head_Scripts
             return List_Type;
 
-   function Wp_Print_Head_Scripts (Arry : Array_Type)
-                                   return Array_Type;
+   function Wp_Print_Head_Scripts
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Wrapper for do_action( "wp_enqueue_scripts" ).
@@ -339,7 +343,9 @@ is
    function Wp_Filter_Out_Block_Nodes (Nodes : Array_Type)
                                        return Array_Type;
 
-   procedure Wp_Filter_Out_Block_Nodes; -- For Add_Filter -- jq
+   function Wp_Filter_Out_Block_Nodes
+              (Nodes : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
    --
    -- Enqueues the global styles defined via theme.json.
@@ -421,7 +427,8 @@ is
    --
    procedure Wp_Enqueue_Stored_Styles (Options : Array_Type := Empty_Array);
 
-   function Wp_Enqueue_Stored_Styles (Arry : Array_Type)
-                                      return Array_Type;
+   function Wp_Enqueue_Stored_Styles
+              (Arry : Arrayable_Interfaces.Arrayable_Interface'Class)
+               return Array_Type;
 
 end Inc_Script_Loader;
