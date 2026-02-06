@@ -12,7 +12,7 @@ with Php.Files;
 with Php.Strings;
 with Php.Types;
 
-with Array_Vectors;
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -1621,7 +1621,7 @@ package body Inc_L10n is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Array_Vectors;
+--    use Array_Lists;
       use UStrings;
       use Adi_Translation_Install;
       use Inc_Formatting;
@@ -1671,7 +1671,7 @@ package body Inc_L10n is
             then Wp_Get_Available_Translations
             else Translations_2);
 
-         Languages : Array_Vector;
+         Languages : Array_Lists.Array_List;
       begin
          --
          -- parsed_args["languages"] should only contain the locales. Find the

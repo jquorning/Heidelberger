@@ -314,9 +314,9 @@ is
                    Key  : String)
                    return Boolean;
 
-   type Array_List is array (Positive range <>) of Array_Type;
+   type Array_List_2 is array (Positive range <>) of Array_Type;
 
-   function To_Array (List : Array_List)
+   function To_Array (List : Array_List_2)
             return Array_Type;
 
    function Exists (Arry : Array_Type;

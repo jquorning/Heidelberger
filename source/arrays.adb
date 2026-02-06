@@ -1123,7 +1123,7 @@ is
    -- To_Array --
    --------------
 
-   function To_Array (List : Array_List)
+   function To_Array (List : Array_List_2)
             return Array_Type
    is
       use Array_Maps;

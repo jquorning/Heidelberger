@@ -4,7 +4,7 @@
 
 with Php.Calendar;
 
-with Array_Vectors;
+with Array_Lists;
 with Arrays;
 with Lists;
 
@@ -601,15 +601,8 @@ is
 
    function Apply_Filters
               (Hook_Name : String;
-               Value     : Array_Vectors.Array_Vector)
-               return Array_Vectors.Array_Vector;
-
-   -- function Apply_Filters
-   --            (Hook_Name : String;
-   --             Arg_2     : String := "";
-   --             Arg_3     : String := "")
-   --             return String
-   --             is (Arg_2);
+               Value     : Array_Lists.Array_List)
+               return Array_Lists.Array_List;
 
    function Apply_Filters_Deprecated
               (Hook_Name : String;

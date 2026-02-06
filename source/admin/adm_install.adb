@@ -330,6 +330,7 @@ is
          Echo ("        </table>" & NL);
          Echo ("        <p class=""step"">");
          Submit_Button (abs "Install WordPress", "large", "Submit", False,
+--                      Array_Type'[Build ("id", "submit")]);
                         To_Array (List => (1 => Build ("id", "submit"))));
          Echo ("</p>" & NL);
          Echo ("        <input type=""hidden"" name=""language"" value=""" & (if Isset (X_REQUEST, "language") then ESC_Attr (Get_As_String (X_REQUEST, "language")) else "") & " />" & NL);

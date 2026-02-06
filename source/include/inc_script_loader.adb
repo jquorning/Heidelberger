@@ -25,7 +25,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
-with Array_Vectors;
+with Array_Lists;
 with Binder;
 with Constants;
 with Helpers;
@@ -3490,7 +3490,7 @@ is
    is
       use Php.Files;
       use Php.Strings;
-      use Array_Vectors;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Dependency;
@@ -3518,7 +3518,7 @@ is
       --
       Total_Inline_Size : Natural := 0;
 
-      Styles_2 : Array_Vector;
+      Styles_2 : Array_List;
    begin
       -- Build an array of styles that have a path defined.
       for Handle of Globals.Global_Wp_Styles.Queue loop -- wp_ removed

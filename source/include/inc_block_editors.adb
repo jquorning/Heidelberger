@@ -546,7 +546,7 @@ is
 
       Global_Styles : Array_Type;
 
-      Presets : Array_List := ( -- To_Array (List =>
+      Presets : Array_List_2 := ( -- To_Array (List =>
         1 => To_Array (List => (
                Build ("css",            "variables"),
                Build ("__unstableType", "presets"),

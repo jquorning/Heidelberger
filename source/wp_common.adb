@@ -1433,8 +1433,8 @@ is
 
    function Apply_Filters
               (Hook_Name : String;
-               Value     : Array_Vectors.Array_Vector)
-               return Array_Vectors.Array_Vector
+               Value     : Array_Lists.Array_List)
+               return Array_Lists.Array_List
    is
       use Arrayable_Arrays;
 

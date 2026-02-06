@@ -6,7 +6,7 @@ with Ada.Containers.Vectors;
 
 with Arrays;
 
-package Array_Vectors
+package Array_Lists
 is
    use Arrays;
 
@@ -14,8 +14,8 @@ is
       Ada.Containers.Vectors (Index_Type   => Positive,
                               Element_Type => Array_Type);
 
-   subtype Array_Vector is Vectors.Vector;
+   subtype Array_List is Vectors.Vector;
 
-   Empty_Vector : constant Array_Vector := Vectors.Empty_Vector;
+   Empty_List : constant Array_List := Vectors.Empty_Vector;
 
-end Array_Vectors;
+end Array_Lists;
