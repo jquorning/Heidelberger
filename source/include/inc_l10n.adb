@@ -23,7 +23,6 @@ with Class_Locale_Switchers;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_General_Templates;
-with Inc_Plugins;
 with Inc_Load;
 with Inc_Options;
 with Inc_Themes;
@@ -761,7 +760,6 @@ package body Inc_L10n is
       use Php.Files;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
 -- @var WP_Textdomain_Registry wp_textdomain_registry
 --    global (l10n, l10n_unloaded, Wp_Textdomain_Registry);
@@ -1616,12 +1614,13 @@ package body Inc_L10n is
    -- Wp_Dropdown_Languages --
    ---------------------------
 
-   function Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
-                                   return String
+   function Wp_Dropdown_Languages
+              (Args : Array_Type := Empty_Array)
+               return String
    is
       use Php.Echoing;
       use Php.Strings;
---    use Array_Lists;
+      use Array_Lists;
       use UStrings;
       use Adi_Translation_Install;
       use Inc_Formatting;
@@ -1631,7 +1630,7 @@ package body Inc_L10n is
       Parsed_Args : Array_Type :=
         Wp_Parse_Args (
           Args,
-          To_Array (List => (
+          To_Array_Type (Array_List'[
             Build ("id",                          "locale"),
             Build ("name",                        "locale"),
             Build ("languages",                   Empty_List),
@@ -1642,7 +1641,7 @@ package body Inc_L10n is
             Build ("show_option_site_default",    False),
             Build ("show_option_en_us",           True),
             Build ("explicit_option_en_us",       False)
-          ))
+          ])
         );
    begin
       -- Bail if no ID or no name.
@@ -1778,7 +1777,8 @@ package body Inc_L10n is
 
                for T in Translations.Iterate loop
                   declare
-                     Translation : constant Array_Type := As_Array (Element (T));
+                     Translation : constant Array_Type :=
+                       As_Array (Element (T));
                   begin
                      Structure.Append (
                        Sprintf (
@@ -1826,7 +1826,7 @@ package body Inc_L10n is
    -- Wp_Dropdown_Languages --
    ---------------------------
 
-   procedure Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
+   procedure Wp_Dropdown_Languages (Args : Array_Type)
    is
       Unused : constant String := Wp_Dropdown_Languages (Args);
    begin

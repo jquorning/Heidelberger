@@ -3941,7 +3941,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
---    use Array_Lists;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -3973,8 +3973,8 @@ is
       --     }
       -- }
       --
-      Preload_Resources : constant Array_Lists.Array_List :=
-        Apply_Filters ("wp_preload_resources", Array_Lists.Empty_List);
+      Preload_Resources : constant Array_List :=
+        Apply_Filters ("wp_preload_resources", Empty_Array_List);
 
       Unique_Resources : Array_Type;
    begin

@@ -2709,6 +2709,10 @@ is
       return Result;
    end Set_Site_Transient;
 
+   ------------------------
+   -- Set_Site_Transient --
+   ------------------------
+
    procedure Set_Site_Transient (Transient  : String;
                                  Value      : Array_Type;
                                  Expiration : Integer := 0)
@@ -2717,6 +2721,18 @@ is
         Set_Site_Transient (Transient, Value, Expiration);
    begin
       null;
+   end Set_Site_Transient;
+
+   ------------------------
+   -- Set_Site_Transient --
+   ------------------------
+
+   procedure Set_Site_Transient (Transient  : String;
+                                 Value      : Array_Lists.Array_List;
+                                 Expiration : Integer := 0)
+   is
+   begin
+      raise Program_Error with "not implemented";
    end Set_Site_Transient;
 
 -- --

@@ -18,6 +18,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Constants;
 with Helpers_2;
@@ -435,6 +436,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -504,14 +506,14 @@ is
                Echo ("          </label>" & NL);
 
                declare
-                  Args : constant Array_Type := To_Array (List => (
+                  Args : constant Array_Type := To_Array_Type ([
                     Build ("id",                          "language-switcher-locales"),
                     Build ("name",                        "wp_lang"),
                     Build ("selected",                    Determine_Locale),
                     Build ("show_available_translations", False),
                     Build ("explicit_option_en_us",       True),
                     Build ("languages",                   Languages)
-                  ));
+                  ]);
                begin
                   --
                   -- Filters default arguments for the Languages select input on the
@@ -612,6 +614,7 @@ is
       use Php.Echoing;
       use Php.Errors;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -829,11 +832,11 @@ is
 
                Remind_Me_Link : constant String :=
                  Add_Query_Arg (
-                   To_Array (List => (
+                   To_Array_Type (Array_List'[
                      Build ("action", "confirm_admin_email"),
                      Build ("remind_me_later",
                             Wp_Create_Nonce ("remind_me_later_nonce"))
-                   )),
+                   ]),
                    Remind_Me_Link_2
                  );
             begin
@@ -913,6 +916,7 @@ is
    procedure Action_Logout
    is
       use Php.Errors;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -936,10 +940,10 @@ is
             Requested_Redirect_To := Redirect_To;
          else
             Redirect_To := +Add_Query_Arg (
-              To_Array (List => (
+              To_Array_Type (Array_List'[
                 Build ("loggedout", "true"),
                 Build ("wp_lang",   Get_User_Locale (User))
-              )),
+              ]),
               Wp_Login_URL
             );
 
@@ -1674,6 +1678,7 @@ is
       use Php.HTML;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Lists.List_Vectors;
@@ -1869,10 +1874,10 @@ is
                      then
                         Redirect_To :=
                           +Add_Query_Arg (
-                             To_Array (List => (
+                             To_Array_Type (Array_List'[
                                Build ("action",  "confirm_admin_email"),
                                Build ("wp_lang", Get_User_Locale (User.User))
-                             )),
+                             ]),
                              Wp_Login_URL (-Redirect_To)
                            );
                      end if;

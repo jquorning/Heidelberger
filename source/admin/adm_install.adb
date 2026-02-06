@@ -60,6 +60,7 @@ with Wp_Load;
 
 package body Adm_Install
 is
+   use Arrays;
 
    --
    --
@@ -131,7 +132,6 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Arrays;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -350,7 +350,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
-      use Arrays;
       use Binder;
       use UStrings;
       use Lists;
@@ -584,7 +583,6 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Arrays;
       use Adi_Translation_Install;
    begin
       if Wp_Can_Install_Language_Pack and then Empty (Language) then
@@ -657,7 +655,6 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
-      use Arrays;
       use Binder;
       use UStrings;
       use Lists;

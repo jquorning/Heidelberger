@@ -1618,7 +1618,6 @@ is
             return Array_Type
    is
       use Wp_Common;
-      use Inc_Plugins;
 
       Headers : constant Array_Type := To_Array (List => (
         Build ("Expires",       "Wed, 11 Jan 1984 05:00:00 GMT"),
@@ -2025,7 +2024,6 @@ is
                             return String
    is
       use Inc_Formatting;
-      use Inc_Pluggables;
       use UStrings;
 
       Name_2 : constant String := ESC_Attr (Name);
@@ -2519,7 +2517,6 @@ is
       use Inc_Formatting;
       use Inc_Load;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Key : constant String :=
         Sprintf ("%d-%s",
@@ -3551,7 +3548,6 @@ is
             return Array_Type
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       --
       -- Filters the list of mime types and file extensions.
@@ -5099,6 +5095,10 @@ is
       return Array_Merge (Defaults, Parsed_Args);
    end Wp_Parse_Args;
 
+   -------------------
+   -- Wp_Parse_Args --
+   -------------------
+
    function Wp_Parse_Args (Args     : Array_Type;
                            Defaults : Array_Type := Empty_Array)
                            return Array_Type
@@ -5123,6 +5123,15 @@ is
       end if;
       return Parsed_Args;
    end Wp_Parse_Args;
+
+   -------------------
+   -- Wp_Parse_Args --
+   -------------------
+
+   function Wp_Parse_Args (Args     : Array_Lists.Array_List;
+                           Defaults : Array_Lists.Array_List)
+                           return Array_Lists.Array_List
+   is (raise Program_Error with "not implemented");
 
    -------------------
    -- Wp_Parse_Args --
@@ -6089,7 +6098,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Message_2 : UString := +Message;
       Version_2 : UString := +Version;
@@ -6517,7 +6525,6 @@ is
       use Class_Networks;
       use Inc_Ms_Networks;
       use Inc_Load;
-      use Inc_Plugins;
 
       Main_Network_Id : Integer;
    begin
@@ -6947,7 +6954,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use Wp_Common;
-      use Inc_Plugins;
 
       -- Pull only the first 8 KB of the file in.
       File_Data_2 : constant String :=
@@ -8304,7 +8310,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Default_URL : constant String := Wp_Get_Default_Update_PHP_URL;
       Update_URL  : UString := +Default_URL;

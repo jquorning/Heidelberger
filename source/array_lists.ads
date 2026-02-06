@@ -16,6 +16,12 @@ is
 
    subtype Array_List is Vectors.Vector;
 
-   Empty_List : constant Array_List := Vectors.Empty_Vector;
+   Empty_Array_List : constant Array_List := Vectors.Empty_Vector;
+
+   --
+   --
+   --
+   function To_Array_Type (List : Array_List)
+                           return Array_Type;
 
 end Array_Lists;

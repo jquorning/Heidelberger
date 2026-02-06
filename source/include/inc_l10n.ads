@@ -531,10 +531,11 @@ is
    -- }
    -- @return string HTML dropdown list of languages.
    --
-   function Wp_Dropdown_Languages (Args : Array_Type := Empty_Array)
-                                   return String;
+   function Wp_Dropdown_Languages
+              (Args : Array_Type := Empty_Array)
+               return String;
 
-   procedure Wp_Dropdown_Languages (Args : Array_Type := Empty_Array);
+   procedure Wp_Dropdown_Languages (Args : Array_Type);
 
    --
    -- Unloads translations for a text domain.

@@ -5,6 +5,7 @@
 -- @subpackage Administration
 --
 
+with Array_Lists;
 with Arrays;
 
 with Class_Errors;
@@ -46,7 +47,7 @@ is
    --                 array will be returned.
    --
    function Wp_Get_Available_Translations
-            return Arrays.Array_Type;
+            return Array_Type;
 --         if ( ! wp_installing() ) then
 --                 translations = get_site_transient( "available_translations" );
 --                 if ( false !== translations ) then
@@ -86,7 +87,7 @@ is
    -- @param array[] languages Array of available languages (populated via the
    --                           Translation API).
    --
-   procedure Wp_Install_Language_Form (Languages : Arrays.Array_Type);
+   procedure Wp_Install_Language_Form (Languages : Array_Type);
 --         global wp_local_package;
 
 --         installed_languages = get_available_languages();

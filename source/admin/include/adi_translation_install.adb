@@ -30,7 +30,6 @@ with Inc_Link_Templates;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
--- with Inc_Plugins;
 with Inc_Versions;
 
 package body Adi_Translation_Install
@@ -42,8 +41,8 @@ is
    ----------------------
 
    function Translations_API (Typ  : String;
-                              Args : Array_Type := Empty_Array) -- null
-                              return Trans_Result -- Array_Type
+                              Args : Array_Type := Empty_Array)
+                              return Trans_Result
    is
       use Php.Errors;
       use Php.HTML;
@@ -58,7 +57,6 @@ is
       use Inc_Load;
       use Inc_L10n;
       use Inc_Link_Templates;
---    use Inc_Plugins;
       use Inc_Versions;
    begin
 --    -- Include an unmodified wp_version.
@@ -187,8 +185,9 @@ is
    -----------------------------------
 
    function Wp_Get_Available_Translations
-            return Arrays.Array_Type
+            return Array_Type
    is
+      use Array_Lists;
       use Inc_Load;
       use Inc_Options;
       use Inc_Versions;
@@ -198,7 +197,7 @@ is
             Translations : Array_Type; --  :=
 --            Get_Site_Transient ("available_translations");
          begin
-            if Empty_Array /= Translations then -- false
+            if not Translations.Is_Empty then -- false
                return Translations;
             end if;
          end;
@@ -248,11 +247,12 @@ is
    -- Wp_Install_Language_Form --
    ------------------------------
 
-   procedure Wp_Install_Language_Form (Languages : Arrays.Array_Type)
+   procedure Wp_Install_Language_Form (Languages : Array_Type)
    is
       use Php.Arrays;
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_L10n;
@@ -332,6 +332,7 @@ is
                                        return String
    is
       use Php.Arrays;
+      use Array_Lists;
       use Adi_Class_Language_Pack_Upgraders;
       use Adi_Class_Wp_Automatic_Upgrader_Skins;
       use Adi_Class_Wp_Upgrader_Skins;
@@ -353,7 +354,7 @@ is
          Translation_To_Load : Boolean := False;
          Trans : Multi_Type; -- added
       begin
-         if Translations = Empty_Array then -- not
+         if Translations.Is_Empty then
             return ""; -- false
          end if;
 

@@ -7,6 +7,7 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
+with Array_Lists;
 with Arrays;
 with Lists;
 
@@ -615,6 +616,10 @@ is
 
    procedure Set_Site_Transient (Transient  : String;
                                  Value      : Array_Type;
+                                 Expiration : Integer := 0);
+
+   procedure Set_Site_Transient (Transient  : String;
+                                 Value      : Array_Lists.Array_List;
                                  Expiration : Integer := 0);
 
 end Inc_Options;
