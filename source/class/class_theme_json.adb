@@ -550,17 +550,18 @@ is
          -- Columns block is explicitly included, to support a different default
          -- gap value.
          declare
-            Base_Styles_Nodes : constant array (Positive range <>) of Array_Type :=
-             (To_Array_Type ([
-                Build ("path",     List_Type'["styles"]),
-                Build ("selector", ROOT_BLOCK_SELECTOR)
-              ]),
-              To_Array_Type ([
-                Build ("path",     List_Type'["styles", "blocks", "core/columns"]),
-                Build ("selector", ".wp-block-columns"),
-                Build ("name",     "core/columns")
-              ])
-             );
+            Base_Styles_Nodes : constant Array_List :=
+              [
+                To_Array_Type ([
+                  Build ("path",     List_Type'["styles"]),
+                  Build ("selector", ROOT_BLOCK_SELECTOR)
+                ]),
+                To_Array_Type ([
+                  Build ("path",     List_Type'["styles", "blocks", "core/columns"]),
+                  Build ("selector", ".wp-block-columns"),
+                  Build ("name",     "core/columns")
+                ])
+              ];
          begin
             for Base_Style_Node of Base_Styles_Nodes loop
                Append (Stylesheet, This.Get_Layout_Styles (Base_Style_Node));

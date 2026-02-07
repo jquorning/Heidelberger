@@ -137,8 +137,8 @@ is
    --              `color.defaultDuotone`.
    -- @var array
    --
-   PRESETS_METADATA : constant array (Positive range <>) of Array_Type :=
-     (
+   PRESETS_METADATA : constant Array_Lists.Array_List :=
+     [
        Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["color", "palette"]),
          Build ("prevent_override",  List_Type'["color", "defaultPalette"]),
@@ -201,7 +201,7 @@ is
          Build ("classes",           Empty_Array),
          Build ("properties",        List_Type'["padding", "margin"])
        ])
-   );
+     ];
 
    --
    -- Metadata for style properties.
@@ -428,7 +428,6 @@ is
    --
    -- @since 6.1.0
    --
--- VALID_ELEMENT_PSEUDO_SELECTORS : constant array (Positive range <>) of Array_Type := (
    VALID_ELEMENT_PSEUDO_SELECTORS : constant Array_Type :=
      Array_Lists.To_Array_Type ([
        Build ("link",   List_Type'[":visited", ":hover", ":focus", ":active"]),
