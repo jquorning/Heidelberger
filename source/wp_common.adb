@@ -1266,6 +1266,21 @@ is
 
    function Apply_Filters
               (Hook_Name : String;
+               Value     : Array_Lists.Array_List;
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return Array_Lists.Array_List
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
+   function Apply_Filters
+              (Hook_Name : String;
                Value     : List_Type; -- Boolean;
                Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type -- Boolean
    is

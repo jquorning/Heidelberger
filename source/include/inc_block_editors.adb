@@ -13,7 +13,6 @@ with Php.Lists;
 with Php.Misc;
 with Php.Preg;
 
-with Array_Lists;
 with Constants;
 with Globals;
 with UStrings;
@@ -43,13 +42,13 @@ is
    ----------------------------------
 
    function Get_Default_Block_Categories
-            return Array_Type
+            return Array_Lists.Array_List
    is
       use Array_Lists;
       use Inc_L10n;
    begin
       return
-        To_Array_Type ([
+        [
           To_Array_Type ([
             Build ("slug",  "text"),
             Build ("title", X_X ("Text", "block category")),
@@ -85,7 +84,7 @@ is
             Build ("title", X_X ("Reusable Blocks", "block category")),
             Build ("icon",  null)
           ])
-        ]);
+        ];
    end Get_Default_Block_Categories;
 
    --------------------------
@@ -95,14 +94,14 @@ is
    function Get_Block_Categories
               (Post_Or_Block_Editor_Context :
                  Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
-               return Array_Type
+               return Array_Lists.Array_List
    is
       use Array_Lists;
       use Wp_Common;
       use Class_Block_Editor_Contexts;
       use Class_Posts;
 
-      Block_Categories     : Array_Type := Get_Default_Block_Categories;
+      Block_Categories     : Array_List := Get_Default_Block_Categories;
       Block_Editor_Context : constant Wp_Block_Editor_Context :=
         (if False -- Post_Or_Block_Editor_Context in Wp_Post -- instanceof
          then X_Construct ( -- new WP_Block_Editor_Context(
@@ -142,7 +141,7 @@ is
             Block_Categories :=
               Apply_Filters_Deprecated
                 ("block_categories",
-                 Empty_Array, -- To_Array (Block_Categories, Post),
+                 Empty_Array_List, -- To_Array (Block_Categories, Post),
                  "5.8.0", "block_categories_all");
          end;
       end if;
@@ -327,7 +326,8 @@ is
            Build ("allowedBlockTypes",     True),
            Build ("allowedMimeTypes",      Get_Allowed_MIME_Types),
            Build ("defaultEditorStyles",   Default_Editor_Styles),
-           Build ("blockCategories",       Get_Default_Block_Categories),
+           Build ("blockCategories",
+             To_Array_Type (Get_Default_Block_Categories)),
            Build ("disableCustomColors",
              Boolean'(Get_Theme_Support ("disable-custom-colors"))),
            Build ("disableCustomFontSizes",
@@ -547,7 +547,8 @@ is
         Get_Default_Block_Editor_Settings,
         To_Array_Type ([
           Build ("allowedBlockTypes", Get_Allowed_Block_Types (Block_Editor_Context)),
-          Build ("blockCategories",   Get_Block_Categories (Block_Editor_Context))
+          Build ("blockCategories",
+            To_Array_Type (Get_Block_Categories (Block_Editor_Context)))
         ]),
         Custom_Settings
       );
@@ -853,7 +854,7 @@ is
    Global_Editor_Styles : List_Type; -- Array_Vectors.Array_Vector;
 
    function Get_Block_Editor_Theme_Styles
-            return Array_Type
+            return Array_Lists.Array_List
    is
       use Php.Files;
       use Php.Preg;
@@ -864,7 +865,7 @@ is
       use Inc_Link_Templates;
 --    global editor_styles;
 
-      Styles : Array_Type;
+      Styles : Array_List;
    begin
       if
         not Global_Editor_Styles.Is_Empty and then
@@ -876,12 +877,11 @@ is
                   Response : constant Array_Type := Wp_Remote_Get (Style);
                begin
                   if not Is_Wp_Error (Response) then
-                     Styles.Append (Key   => "XXX-890",
-                                    Value => From_Array (To_Array_Type ([
+                     Styles.Append (To_Array_Type ([
                        Build ("css",            Wp_Remote_Retrieve_Body (Response)),
                        Build ("__unstableType", "theme"),
                        Build ("isGlobalStyles", False)
-                     ])));
+                     ]));
                   end if;
                end;
             else
@@ -889,13 +889,12 @@ is
                   File : constant String := Get_Theme_File_Path (Style);
                begin
                   if Is_File (File) then
-                     Styles.Append (Key   => "XXX-889",
-                                    Value => From_Array (To_Array_Type ([
+                     Styles.Append (To_Array_Type ([
                        Build ("css",            File_Get_Contents (File)),
                        Build ("baseURL",        Get_Theme_File_URI (Style)),
                        Build ("__unstableType", "theme"),
                        Build ("isGlobalStyles", False)
-                     ])));
+                     ]));
                   end if;
                end;
             end if;

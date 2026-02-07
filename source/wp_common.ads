@@ -533,8 +533,15 @@ is
 
    function Apply_Filters
               (Hook_Name : String;
+               Value     : Array_Lists.Array_List;
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return Array_Lists.Array_List;
+
+   function Apply_Filters
+              (Hook_Name : String;
                Value     : List_Type; -- Boolean;
-               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)                return List_Type; -- Boolean
+               Item      : Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
+               return List_Type; -- Boolean
 
    function Apply_Filters (Hook_Name : String;
                            Value     : String;
@@ -610,6 +617,14 @@ is
                Version   : String;
                X         : String)
                return Array_Type
+               is (Value);
+
+   function Apply_Filters_Deprecated
+              (Hook_Name : String;
+               Value     : Array_Lists.Array_List;
+               Version   : String;
+               X         : String)
+               return Array_Lists.Array_List
                is (Value);
 
    function Apply_Filters_Deprecated

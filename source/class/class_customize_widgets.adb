@@ -1074,7 +1074,7 @@ is
                  "wp-blocks",
                  Sprintf ("wp.blocks.setCategories( %s );",
                           [1 => Wp_JSON_Encode (From_Array (
-                                  Get_Block_Categories (Block_Editor_Context)))]),
+                                  To_Array_Type (Get_Block_Categories (Block_Editor_Context))))]),
                  "after"
                );
 
