@@ -72,11 +72,11 @@ is
 
          -- Internally, presets are keyed by origin.
          declare
-            Nodes : constant Array_Type := Get_Setting_Nodes (This.Theme_JSON);
+            Nodes : constant Array_List := Get_Setting_Nodes (This.Theme_JSON);
          begin
-            for Node_2 in Nodes.Iterate loop
+            for Node of Nodes loop
                declare
-                  Node : constant Array_Type := As_Array (Element (Node_2));
+--                Node : constant Array_Type := As_Array (Element (Node_2));
                begin
                   for Preset_Metadata of PRESETS_METADATA loop
                      declare
@@ -499,7 +499,25 @@ is
       use List_Vectors;
       use UStrings;
 
-      Origins_2 : List_Type :=
+      ------------------
+      -- Array_Column --
+      ------------------
+
+      function Array_Column (A : Array_List;
+                             S : String)
+                             return Array_Type
+      is (raise Program_Error with "not implemented");
+
+      ---------
+      -- Get --
+      ---------
+
+      function Get (A : Array_List;
+                    K : String)
+                    return Multi_Type
+      is (raise Program_Error with "not implemented");
+
+      Origins_2 : constant List_Type :=
         (if Origins.Is_Empty
          then VALID_ORIGINS
          else Origins);
@@ -518,10 +536,10 @@ is
 
       Blocks_Metadata : constant Array_Type := Get_Blocks_Metadata;
 
-      Style_Nodes : constant Array_Type :=
+      Style_Nodes : constant Array_List :=
         Get_Style_Nodes   (This.Theme_JSON, Blocks_Metadata);
 
-      Setting_Nodes : constant Array_Type :=
+      Setting_Nodes : constant Array_List :=
         Get_Setting_Nodes (This.Theme_JSON, Blocks_Metadata);
 
       Stylesheet : UString;
@@ -533,7 +551,8 @@ is
       if In_List ("styles", Types, True) then
          declare
             Root_Block_Key : constant String :=
-              Array_Search (ROOT_BLOCK_SELECTOR, Array_Column (Style_Nodes, "selector"), True);
+              Array_Search (ROOT_BLOCK_SELECTOR,
+                            Array_Column (Style_Nodes, "selector"), True);
          begin
             if "" /= Root_Block_Key then
 --          if False /= Root_Block_Key then
@@ -581,22 +600,18 @@ is
    -----------------------
 
    function Get_Block_Classes (This        : Wp_Theme_JSON;
-                               Style_Nodes : Array_Type)
+                               Style_Nodes : Array_Lists.Array_List)
                                return String
    is
       use UStrings;
 
       Block_Rules : UString;
    begin
-      for Metadata_2 in Style_Nodes.Iterate loop
-         declare
-            Metadata : constant Array_Type := As_Array (Element (Metadata_2));
-         begin
-            if "" = Get_As_String (Metadata, "selector") then -- null
-               goto Continue;
-            end if;
-            Append (Block_Rules, This.Get_Styles_For_Block (Metadata)); -- this. added
-         end;
+      for Metadata of Style_Nodes loop
+         if "" = Get_As_String (Metadata, "selector") then -- null
+            goto Continue;
+         end if;
+         Append (Block_Rules, This.Get_Styles_For_Block (Metadata)); -- this. added
          << Continue >>
       end loop;
 
@@ -653,8 +668,8 @@ is
                                                "blockGap"])) /= Kind_Null;
 
          Has_Fallback_Gap_Support : constant Boolean := not Has_Block_Gap_Support;
-         -- This setting isn"t useful yet: it exists as a placeholder for a future explicit
-         -- fallback gap styles support.
+         -- This setting isn"t useful yet: it exists as a placeholder for a future
+         -- explicit fallback gap styles support.
 
          Node : constant Multi_Type :=
            X_Wp_Array_Get (This.Theme_JSON,
@@ -700,7 +715,8 @@ is
                                         List_Type'["spacing", "blockGap"]);
                end if;
 
-               -- Support split row / column values and concatenate to a shorthand value.
+               -- Support split row / column values and concatenate to a shorthand
+               -- value.
                if Kind_Of (Block_Gap_Value) = Kind_Array then
 --             if Is_Array (Block_Gap_Value) then
                   if
@@ -742,9 +758,12 @@ is
                         Layout_Definition_Key : constant String     := Key (A);
                         Layout_Definition     : constant Multi_Type := Element (A);
                      begin
-                        -- Allow outputting fallback gap styles for flex layout type when block
-                        -- gap support isn't available.
-                        if not Has_Block_Gap_Support and "flex" /= Layout_Definition_Key then
+                        -- Allow outputting fallback gap styles for flex layout type
+                        -- when block gap support isn't available.
+                        if
+                          not Has_Block_Gap_Support and
+                          "flex" /= Layout_Definition_Key
+                        then
                            goto Continue;
                         end if;
 
@@ -778,9 +797,9 @@ is
                                                    Get_As_String (Spacing_Rule, "selector")) and then
                                        not Empty (Get_As_String (Spacing_Rule, "rules"))
                                     then
-                                       -- Iterate over each of the styling rules and substitute
-                                       -- non-string values such as `null` with the real `blockGap`
-                                       -- value.
+                                       -- Iterate over each of the styling rules and
+                                       -- substitute non-string values such as `null`
+                                       -- with the real `blockGap` value.
                                        for B in As_Array (Get (Spacing_Rule, "rules")).Iterate loop
                                           declare
                                              CSS_Property : constant String := Key (B);
@@ -812,9 +831,9 @@ is
                                           Layout_Selector : UString;
                                        begin
                                           if not Has_Block_Gap_Support then
-                                             -- For fallback gap styles, use lower specificity, to
-                                             -- ensure styles do not unintentionally override theme
-                                             -- styles.
+                                             -- For fallback gap styles, use lower
+                                             -- specificity, to ensure styles do not
+                                             -- unintentionally override theme styles.
                                              Format := +(if ROOT_BLOCK_SELECTOR = Selector
                                                          then ":where(.%2$s%3$s)"
                                                          else ":where(%1$s.%2$s%3$s)");
@@ -884,8 +903,8 @@ is
                         not Empty (Class_Name) and then
                         not Empty (As_String (Base_Style_Rules))
                      then
-                        -- Output display mode. This requires special handling as `display` is
-                        -- not exposed in `safe_style_css_filter`.
+                        -- Output display mode. This requires special handling as
+                        -- `display` is not exposed in `safe_style_css_filter`.
                         if
                           not Empty (Get_As_String (Layout_Definition, "displayMode")) and then
                           Kind_Of (Get (Layout_Definition, "displayMode")) = Kind_String and then
@@ -974,7 +993,7 @@ is
    ------------------------
 
    function Get_Preset_Classes (This          : Wp_Theme_JSON;
-                                Setting_Nodes : Array_Type;
+                                Setting_Nodes : Array_Lists.Array_List;
                                 Origins       : List_Type)
                                 return String
    is
@@ -983,25 +1002,21 @@ is
 
       Preset_Rules : UString;
    begin
-      for Metadata_2 in Setting_Nodes.Iterate loop
+      for Metadata of Setting_Nodes loop
+         if "" = Get_As_String (Metadata, "selector") then -- null
+            goto Continue;
+         end if;
+
          declare
-            Metadata : constant Array_Type := As_Array (Element (Metadata_2));
+            Selector : constant String := Get_As_String (Metadata, "selector");
+
+            Node : constant Multi_Type :=
+              X_Wp_Array_Get (This.Theme_JSON,
+                              As_List (Get (Metadata, "path")));
          begin
-            if "" = Get_As_String (Metadata, "selector") then -- null
-               goto Continue;
-            end if;
-
-            declare
-               Selector : constant String := Get_As_String (Metadata, "selector");
-
-               Node : constant Multi_Type :=
-                 X_Wp_Array_Get (This.Theme_JSON,
-                                 As_List (Get (Metadata, "path")));
-            begin
-               Append (Preset_Rules,
-                       Compute_Preset_Classes (As_Array (Node),
-                       Selector, Origins));
-            end;
+            Append (Preset_Rules,
+                    Compute_Preset_Classes (As_Array (Node),
+                    Selector, Origins));
          end;
          << Continue >>
       end loop;
@@ -1014,7 +1029,7 @@ is
    -----------------------
 
    function Get_CSS_Variables (This    : Wp_Theme_JSON;
-                               Nodes   : Array_Type;
+                               Nodes   : Array_Lists.Array_List;
                                Origins : List_Type)
                                return String
    is
@@ -1023,34 +1038,30 @@ is
 
       Stylesheet : UString;
    begin
-      for Metadata_2 in Nodes.Iterate loop
+      for Metadata of Nodes loop
+         if "" = Get_As_String (Metadata, "selector") then -- null
+            goto Continue;
+         end if;
+
          declare
-            Metadata : constant Array_Type := As_Array (Element (Metadata_2));
+            Selector : constant String := Get_As_String (Metadata, "selector");
+
+            Node : constant Multi_Type :=
+              X_Wp_Array_Get (This.Theme_JSON,
+                              As_List (Get (Metadata, "path")));
+
+            Declarations : Array_Type :=
+              Compute_Preset_Vars (As_Array (Node), Origins);
+
+            Theme_Vars_Declarations : constant Array_Type :=
+              Compute_Theme_Vars (As_Array (Node));
          begin
-            if "" = Get_As_String (Metadata, "selector") then -- null
-               goto Continue;
-            end if;
+            for Theme_Vars_Declaration in Theme_Vars_Declarations.Iterate loop
+               Append (Declarations, Key => "XXX-912",
+                       Value => Element (Theme_Vars_Declaration));
+            end loop;
 
-            declare
-               Selector : constant String := Get_As_String (Metadata, "selector");
-
-               Node : constant Multi_Type :=
-                 X_Wp_Array_Get (This.Theme_JSON,
-                                 As_List (Get (Metadata, "path")));
-
-               Declarations : Array_Type :=
-                 Compute_Preset_Vars (As_Array (Node), Origins);
-
-               Theme_Vars_Declarations : constant Array_Type :=
-                 Compute_Theme_Vars (As_Array (Node));
-            begin
-               for Theme_Vars_Declaration in Theme_Vars_Declarations.Iterate loop
-                  Append (Declarations, Key => "XXX-912",
-                          Value => Element (Theme_Vars_Declaration));
-               end loop;
-
-               Append (Stylesheet, To_Ruleset (Selector, Declarations));
-            end;
+            Append (Stylesheet, To_Ruleset (Selector, Declarations));
          end;
          << Continue >>
       end loop;
@@ -1075,6 +1086,10 @@ is
         Get_As_String (Element, "name") & ": " &
         Get_As_String (Element, "value") & ";";
    end Reduce_Callback;
+
+   ----------------
+   -- To_Ruleset --
+   ----------------
 
    function To_Ruleset (Selector     : String;
                         Declarations : Array_Type)
@@ -1121,7 +1136,8 @@ is
    begin
       for Preset_Metadata of PRESETS_METADATA loop
          declare
-            Slugs : constant Array_Type := Get_Settings_Slugs (Settings, Preset_Metadata, Origins);
+            Slugs : constant Array_Type :=
+              Get_Settings_Slugs (Settings, Preset_Metadata, Origins);
          begin
             for A in As_Array (Get (Preset_Metadata, "classes")).Iterate loop
                declare
@@ -1433,22 +1449,22 @@ is
 
    function Get_Setting_Nodes (Theme_JSON : Array_Type;
                                Selectors  : Array_Type := Empty_Array)
-                               return Array_Type
+                               return Array_Lists.Array_List
    is
       use Array_Lists;
       use UStrings;
 
-      Nodes : Array_Type;
+      Nodes : Array_List;
    begin
       if not Isset (Theme_JSON, "settings") then
          return Nodes;
       end if;
 
       -- Top-level.
-      Append (Nodes, Key => "XXX-910", Value => From_Array (To_Array_Type ([
+      Nodes.Append (To_Array_Type ([
         Build ("path",     List_Type'["settings"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
-      ])));
+      ]));
 
       -- Calculate paths for blocks.
       if not Isset_2 (Theme_JSON, "settings", "blocks") then
@@ -1470,12 +1486,10 @@ is
                   Selector := +As_String (Get (Ref_2 (Selectors, Name, "selector")));
                end if;
 
-               Append (Nodes,
-                       Key   => "XXX-909",
-                       Value => From_Array (To_Array_Type ([
+               Nodes.Append (To_Array_Type ([
                  Build ("path",     List_Type'["settings", "blocks", Name]),
                  Build ("selector", -Selector)
-              ])));
+               ]));
             end;
          end loop;
       end;
@@ -1489,23 +1503,23 @@ is
 
    function Get_Style_Nodes (Theme_JSON : Array_Type;
                              Selectors  : Array_Type := Empty_Array)
-                             return Array_Type
+                             return Array_Lists.Array_List
    is
       use Php.Arrays;
       use Array_Lists;
       use Wp_Common;
 
-      Nodes : Array_Type;
+      Nodes : Array_List;
    begin
       if not Isset (Theme_JSON, "styles") then
          return Nodes;
       end if;
 
       -- Top-level.
-      Append (Nodes, Key => "XXX-902", Value => From_Array (To_Array_Type ([
+      Nodes.Append (To_Array_Type ([
         Build ("path",     List_Type'["styles"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
-      ])));
+      ]));
 
       if Isset_2 (Theme_JSON, "styles", "elements") then
          for A in ELEMENTS.Iterate loop
@@ -1517,11 +1531,10 @@ is
                   goto Continue;
                end if;
 
-               Append (Nodes, Key => "XXX-906",
-                       Value => From_Array (To_Array_Type ([
+               Nodes.Append (To_Array_Type ([
                  Build ("path",     List_Type'["styles", "elements", Element]),
                  Build ("selector", Get_As_String (ELEMENTS, Element))
-               ])));
+               ]));
 
                -- Handle any pseudo selectors for the element.
                -- TODO: Replace array_key_exists() with isset() check once WordPress
@@ -1541,13 +1554,14 @@ is
                                    "styles", "elements",
                                    Element, Pseudo_Selector)
                         then
-                           Append (Nodes, Key => "XXX-906",
-                             Value => From_Array (To_Array_Type ([
-                             Build ("path",     List_Type'["styles", "elements", Element]),
+                           Nodes.Append (To_Array_Type ([
+                             Build ("path",
+                                    List_Type'["styles", "elements", Element]),
                              Build ("selector",
-                                    Append_To_Selector (Get_As_String (ELEMENTS, Element),
-                                                        Pseudo_Selector))
-                           ])));
+                                    Append_To_Selector (
+                                      Get_As_String (ELEMENTS, Element),
+                                      Pseudo_Selector))
+                           ]));
                         end if;
                      end;
                   end loop;
@@ -1563,10 +1577,10 @@ is
       end if;
 
       declare
-         Block_Nodes : constant Array_Type := Get_Block_Nodes (Theme_JSON);
+         Block_Nodes : constant Array_List := Get_Block_Nodes (Theme_JSON);
       begin
-         for Block_Node in Block_Nodes.Iterate loop
-            Append (Nodes, Key => "XXX-905", Value => Element (Block_Node));
+         for Block_Node of Block_Nodes loop
+            Nodes.Append (Block_Node);
          end loop;
       end;
 
@@ -1646,7 +1660,7 @@ is
    ----------------------------
 
    function Get_Styles_Block_Nodes (This : Wp_Theme_JSON)
-                                    return Array_Type
+                                    return Array_Lists.Array_List
    is
    begin
       return Get_Block_Nodes (This.Theme_JSON);
@@ -1657,14 +1671,14 @@ is
    ---------------------
 
    function Get_Block_Nodes (Theme_JSON : Array_Type)
-                             return Array_Type
+                             return Array_Lists.Array_List
    is
       use Php.Arrays;
       use Array_Lists;
       use UStrings;
 
       Selectors : constant Array_Type := Get_Blocks_Metadata;
-      Nodes     : Array_Type;
+      Nodes     : Array_List;
    begin
       if not Isset (Theme_JSON, "styles") then
          return Nodes;
@@ -1699,13 +1713,13 @@ is
                  +As_String (Get (Ref_2 (Selectors, Name, "features")));
             end if;
 
-            Append (Nodes, Key => "XXX-903", Value => From_Array (To_Array_Type ([
+            Nodes.Append (To_Array_Type ([
               Build ("name",     Name),
               Build ("path",     List_Type'["styles", "blocks", Name]),
               Build ("selector", -Selector),
               Build ("duotone",  -Duotone_Selector),
               Build ("features", -Feature_Selectors)
-            ])));
+            ]));
 
             if Isset_4 (Theme_JSON, "styles", "blocks", Name, "elements") then
                for
@@ -1716,12 +1730,12 @@ is
                      Element : constant String := Key (B);
                      Node    : Multi_Type      := Arrays.Element (B);
                   begin
-                     Append (Nodes, Key => "XXX-902",
-                       Value => From_Array (To_Array_Type ([
+                     Nodes.Append (To_Array_Type ([
                        Build ("path",     List_Type'[
                          "styles", "blocks", Name, "elements", Element]),
-                       Build ("selector", As_String (Get (Ref_3 (Selectors, Name, "elements", Element))))
-                     ])));
+                       Build ("selector",
+                              As_String (Get (Ref_3 (Selectors, Name, "elements", Element))))
+                     ]));
 
                      -- Handle any pseudo selectors for the element.
                      -- TODO: Replace array_key_exists() with isset() check once
@@ -1740,15 +1754,14 @@ is
                                 Isset_6 (Theme_JSON, "styles", "blocks", Name,
                                          "elements", Element, Pseudo_Selector)
                               then
-                                 Append (Nodes, Key => "XXX-901",
-                                         Value => From_Array (To_Array_Type ([
+                                 Nodes.Append (To_Array_Type ([
                                    Build ("path",     List_Type'[
                                      "styles", "blocks", Name, "elements", Element]),
                                    Build ("selector",
                                      Append_To_Selector (
                                        As_String (Get (Ref_3 (Selectors, Name, "elements", Element))),
                                        Pseudo_Selector))
-                                 ])));
+                                 ]));
                               end if;
                            end;
                         end loop;
@@ -1903,8 +1916,8 @@ is
          Declarations : Array_Type;
       begin
          --
-         -- If the current selector is a pseudo selector that"s defined in the allow list for
-         -- the current element then compute the style properties for it.
+         -- If the current selector is a pseudo selector that"s defined in the allow
+         -- list for the current element then compute the style properties for it.
          -- Otherwise just compute the styles for the default selector as normal.
          --
          if Pseudo_Selector /= "" and then Isset (Node, Pseudo_Selector) and then
@@ -1946,7 +1959,8 @@ is
                end;
             end loop;
 
-            -- Update declarations if there are separators with only background color defined.
+            -- Update declarations if there are separators with only background color
+            -- defined.
             if ".wp-block-separator" = Selector then
                Declarations := Update_Separator_Declarations (Declarations);
             end  if;
@@ -1955,7 +1969,10 @@ is
             Append (Block_Rules, To_Ruleset (Selector, Declarations));
 
             -- 3. Generate and append the rules that use the duotone selector.
-            if Isset (Block_Metadata, "duotone") and then not Empty (Declarations_Duotone) then
+            if
+              Isset (Block_Metadata, "duotone") and then
+              not Empty (Declarations_Duotone)
+            then
                declare
                   Selector_Duotone : constant String :=
                     Scope_Selector (Get_As_String (Block_Metadata, "selector"),
@@ -2062,8 +2079,9 @@ is
                   Path_String : constant String := Implode (".", As_List (Value_Path));
                begin
                   if
-                    -- TODO: Replace array_key_exists() with isset() check once WordPress drops
-                    -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+                    -- TODO: Replace array_key_exists() with isset() check once
+                    -- WordPress drops support for PHP 5.6. See
+                    -- https://core.trac.wordpress.org/ticket/57067.
                     Array_Key_Exists (Path_String, PROTECTED_PROPERTIES) and then
                     As_String (X_Wp_Array_Get (Settings,
                                                As_List (Get (PROTECTED_PROPERTIES,
@@ -2095,8 +2113,8 @@ is
                   -- wp_get_typography_font_size_value() will check
                   -- if fluid typography has been activated and also
                   -- whether the incoming value can be converted to a fluid value.
-                  -- Values that already have a clamp() function will not pass the test,
-                  -- and therefore the original value will be returned.
+                  -- Values that already have a clamp() function will not pass the
+                  -- test, and therefore the original value will be returned.
                   --
                   Value_2 :=
                     +Wp_Get_Typography_Font_Size_Value (To_Array_Type ([
@@ -2114,7 +2132,8 @@ is
          << Continue >>
       end loop;
 
-      -- If a variable value is added to the root, the corresponding property should be removed.
+      -- If a variable value is added to the root, the corresponding property
+      -- should be removed.
       for Duplicate of Root_Variable_Duplicates loop
          declare
             Discard : Integer :=
@@ -2162,10 +2181,14 @@ is
             Value_Path : constant List_Type    :=
               Explode (".", Get_As_String (As_Array (Value), "ref"));
 
-            Ref_Value  : constant Multi_Type := X_Wp_Array_Get (Theme_JSON, Value_Path);
+            Ref_Value  : constant Multi_Type :=
+              X_Wp_Array_Get (Theme_JSON, Value_Path);
          begin
             -- Only use the ref value if we find anything.
-            if Kind_Of (Ref_Value) /= Kind_Null and then Kind_Of (Ref_Value) = Kind_String then
+            if
+              Kind_Of (Ref_Value) /= Kind_Null and then
+              Kind_Of (Ref_Value) = Kind_String
+            then
                Value := Ref_Value;
             end if;
 
@@ -2235,7 +2258,7 @@ is
       use UStrings;
       use Inc_Functions;
 
-      CSS              : UString;
+      CSS : UString;
 
       Settings : constant Array_Type :=
         As_Array (X_Wp_Array_Get (This.Theme_JSON, ["settings"]));
@@ -2374,6 +2397,7 @@ is
                     Incoming : Wp_Theme_JSON)
    is
       use Php.Arrays;
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
 
@@ -2404,15 +2428,15 @@ is
       -- we remove it from the theme presets.
       --
       declare
-         Nodes        : constant Array_Type := Get_Setting_Nodes (Incoming_Data);
+         Nodes        : constant Array_List := Get_Setting_Nodes (Incoming_Data);
          Slugs_Global : constant Array_Type := Get_Default_Slugs (This.Theme_JSON,
                                                                   ["settings"]);
       begin
-         for Node_2 in Nodes.Iterate loop
+         for Node of Nodes loop
             declare
-               Node    : constant Multi_Type := Element (Node_2);
+--             Node    : constant Multi_Type := Element (Node_2);
                -- Replace the spacing.units.
-               Path    : UString := +Get_As_String (As_Array (Node), "path");
+               Path    : UString := +Get_As_String (Node, "path");
                Content : Multi_Type;
             begin
                Append (Path, "spacing");
@@ -2436,7 +2460,7 @@ is
                      for Origin of VALID_ORIGINS loop
                         declare
                            Base_Path : UString :=
-                             +Get_As_String (As_Array (Node), "path");
+                             +Get_As_String (Node, "path");
                         begin
                            for Leaf in As_Array (Get (Preset, "path")).Iterate loop
                               Append (Base_Path, As_String (Element (Leaf)));
@@ -2491,7 +2515,7 @@ is
                               declare
                                  Slugs_Node : constant Array_Type :=
                                    Get_Default_Slugs (This.Theme_JSON,
-                                                      As_List (Get (As_Array (Node), "path")));
+                                                      As_List (Get (Node, "path")));
 
                                  Slugs : constant Array_Type :=
                                    Array_Merge_Recursive (Slugs_Global, Slugs_Node);

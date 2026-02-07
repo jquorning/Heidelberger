@@ -589,92 +589,6 @@ is
                       Valid_Element_Names : List_Type)
                       return Array_Type;
 
---                 $output = array();
-
---                 if ( ! is_array( $input ) ) then
---                         return $output;
---                 end;
-
---                 -- Preserve only the top most level keys.
---                 $output = array_intersect_key( $input, array_flip( static::VALID_TOP_LEVEL_KEYS ) );
-
---                 /*
---                 -- Remove any rules that are annotated as "top" in VALID_STYLES constant.
---                 -- Some styles are only meant to be available at the top-level (e.g.: blockGap),
---                 -- hence, the schema for blocks & elements should not have them.
---                 --
---                 $styles_non_top_level = static::VALID_STYLES;
---                 foreach ( array_keys( $styles_non_top_level ) as $section ) then
---                         -- array_key_exists() needs to be used instead of isset() because the value can be null.
---                         if ( array_key_exists( $section, $styles_non_top_level ) && is_array( $styles_non_top_level[ $section ] ) ) then
---                                 foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) then
---                                         if ( "top" === $styles_non_top_level[ $section ][ $prop ] ) then
---                                                 unset( $styles_non_top_level[ $section ][ $prop ] );
---                                         end;
---                                 end;
---                         end;
---                 end;
-
---                 -- Build the schema based on valid block & element names.
---                 $schema                 = array();
---                 $schema_styles_elements = array();
-
---                 /*
---                 -- Set allowed element pseudo selectors based on per element allow list.
---                 -- Target data structure in schema:
---                 -- e.g.
---                 -- - top level elements: `$schema["styles"]["elements"]["link"][":hover"]`.
---                 -- - block level elements: `$schema["styles"]["blocks"]["core/button"]["elements"]["link"][":hover"]`.
---                 --
---                 foreach ( $valid_element_names as $element ) then
---                         $schema_styles_elements[ $element ] = $styles_non_top_level;
-
---                         -- TODO: Replace array_key_exists() with isset() check once WordPress drops
---                         -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
---                         if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) then
---                                 foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) then
---                                         $schema_styles_elements[ $element ][ $pseudo_selector ] = $styles_non_top_level;
---                                 end;
---                         end;
---                 end;
-
---                 $schema_styles_blocks   = array();
---                 $schema_settings_blocks = array();
---                 foreach ( $valid_block_names as $block ) then
---                         $schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
---                         $schema_styles_blocks[ $block ]             = $styles_non_top_level;
---                         $schema_styles_blocks[ $block ]["elements"] = $schema_styles_elements;
---                 end;
-
---                 $schema["styles"]             = static::VALID_STYLES;
---                 $schema["styles"]["blocks"]   = $schema_styles_blocks;
---                 $schema["styles"]["elements"] = $schema_styles_elements;
---                 $schema["settings"]           = static::VALID_SETTINGS;
---                 $schema["settings"]["blocks"] = $schema_settings_blocks;
-
---                 -- Remove anything that"s not present in the schema.
---                 foreach ( array( "styles", "settings" ) as $subtree ) then
---                         if ( ! isset( $input[ $subtree ] ) ) then
---                                 continue;
---                         end;
-
---                         if ( ! is_array( $input[ $subtree ] ) ) then
---                                 unset( $output[ $subtree ] );
---                                 continue;
---                         end;
-
---                         $result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
-
---                         if ( empty( $result ) ) then
---                                 unset( $output[ $subtree ] );
---                         end; else then
---                                 $output[ $subtree ] = $result;
---                         end;
---                 end;
-
---                 return $output;
---         end;
-
    --
    -- Appends a sub-selector to an existing one.
    --
@@ -687,7 +601,8 @@ is
    --
    -- @param string $selector  Original selector.
    -- @param string $to_append Selector to append.
-   -- @param string $position  A position sub-selector should be appended. Default "right".
+   -- @param string $position  A position sub-selector should be appended.
+   --                          Default "right".
    -- @return string The new selector.
    --
    -- protected static
@@ -695,13 +610,6 @@ is
                                 To_Append : String;
                                 Position  : String := "right")
                                 return String;
---                 $new_selectors = array();
---                 $selectors     = explode( ",", $selector );
---                 foreach ( $selectors as $sel ) then
---                         $new_selectors[] = "right" === $position ? $sel . $to_append : $to_append . $sel;
---                 end;
---                 return implode( ",", $new_selectors );
---         end;
 
    --
    -- Returns the metadata for each block.
@@ -737,71 +645,6 @@ is
    function Get_Blocks_Metadata
             return Array_Type;
 
---                 $registry = WP_Block_Type_Registry::get_instance();
---                 $blocks   = $registry->get_all_registered();
-
---                 -- Is there metadata for all currently registered blocks?
---                 $blocks = array_diff_key( $blocks, static::$blocks_metadata );
---                 if ( empty( $blocks ) ) then
---                         return static::$blocks_metadata;
---                 end;
-
---                 foreach ( $blocks as $block_name => $block_type ) then
---                         if (
---                                 isset( $block_type->supports["__experimentalSelector"] ) &&
---                                 is_string( $block_type->supports["__experimentalSelector"] )
---                         ) then
---                                 static::$blocks_metadata[ $block_name ]["selector"] = $block_type->supports["__experimentalSelector"];
---                         end; else then
---                                 static::$blocks_metadata[ $block_name ]["selector"] = ".wp-block-" . str_replace( "/", "-", str_replace( "core/", "", $block_name ) );
---                         end;
-
---                         if (
---                                 isset( $block_type->supports["color"]["__experimentalDuotone"] ) &&
---                                 is_string( $block_type->supports["color"]["__experimentalDuotone"] )
---                         ) then
---                                 static::$blocks_metadata[ $block_name ]["duotone"] = $block_type->supports["color"]["__experimentalDuotone"];
---                         end;
-
---                         -- Generate block support feature level selectors if opted into
---                         -- for the current block.
---                         $features = array();
---                         foreach ( static::BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS as $key => $feature ) then
---                                 if (
---                                         isset( $block_type->supports[ $key ]["__experimentalSelector"] ) &&
---                                         $block_type->supports[ $key ]["__experimentalSelector"]
---                                 ) then
---                                         $features[ $feature ] = static::scope_selector(
---                                                 static::$blocks_metadata[ $block_name ]["selector"],
---                                                 $block_type->supports[ $key ]["__experimentalSelector"]
---                                         );
---                                 end;
---                         end;
-
---                         if ( ! empty( $features ) ) then
---                                 static::$blocks_metadata[ $block_name ]["features"] = $features;
---                         end;
-
---                         -- Assign defaults, then overwrite those that the block sets by itself.
---                         -- If the block selector is compounded, will append the element to each
---                         -- individual block selector.
---                         $block_selectors = explode( ",", static::$blocks_metadata[ $block_name ]["selector"] );
---                         foreach ( static::ELEMENTS as $el_name => $el_selector ) then
---                                 $element_selector = array();
---                                 foreach ( $block_selectors as $selector ) then
---                                         if ( $selector === $el_selector ) then
---                                                 $element_selector = array( $el_selector );
---                                                 break;
---                                         end;
---                                         $element_selector[] = static::append_to_selector( $el_selector, $selector . " ", "left" );
---                                 end;
---                                 static::$blocks_metadata[ $block_name ]["elements"][ $el_name ] = implode( ",", $element_selector );
---                         end;
---                 end;
-
---                 return static::$blocks_metadata;
---         end;
-
    --
    -- Given a tree, removes the keys that are not present in the schema.
    --
@@ -817,26 +660,6 @@ is
    function Remove_Keys_Not_In_Schema (Tree   : Array_Type;
                                        Schema : Array_Type)
                                        return Array_Type;
---                 $tree = array_intersect_key( $tree, $schema );
-
---                 foreach ( $schema as $key => $data ) then
---                         if ( ! isset( $tree[ $key ] ) ) then
---                                 continue;
---                         end;
-
---                         if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) then
---                                 $tree[ $key ] = static::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
-
---                                 if ( empty( $tree[ $key ] ) ) then
---                                         unset( $tree[ $key ] );
---                                 end;
---                         end; elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) then
---                                 unset( $tree[ $key ] );
---                         end;
---                 end;
-
---                 return $tree;
---         end;
 
    --
    -- Returns the existing settings for each block.
@@ -862,12 +685,6 @@ is
    --
    function Get_Settings (This : Wp_Theme_JSON)
                           return Multi_Type;
---                 if ( ! isset( $this->theme_json["settings"] ) ) then
---                         return array();
---                 end; else then
---                         return $this->theme_json["settings"];
---                 end;
---         end;
 
    --
    -- Returns the stylesheet that results of processing
@@ -896,65 +713,6 @@ is
                Types   : List_Type := Variables_Styles_Present;
                Origins : List_Type := Empty_List) -- null
                return String;
---                 if ( null === $origins ) then
---                         $origins = static::VALID_ORIGINS;
---                 end;
-
---                 if ( is_string( $types ) ) then
---                         -- Dispatch error and map old arguments to new ones.
---                         _deprecated_argument( __FUNCTION__, "5.9.0" );
---                         if ( "block_styles" === $types ) then
---                                 $types = array( "styles", "presets" );
---                         end; elseif ( "css_variables" === $types ) then
---                                 $types = array( "variables" );
---                         end; else then
---                                 $types = array( "variables", "styles", "presets" );
---                         end;
---                 end;
-
---                 $blocks_metadata = static::get_blocks_metadata();
---                 $style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
---                 $setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
-
---                 $stylesheet = "";
-
---                 if ( in_array( "variables", $types, true ) ) then
---                         $stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
---                 end;
-
---                 if ( in_array( "styles", $types, true ) ) then
---                         $root_block_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, "selector" ), true );
-
---                         if ( false !== $root_block_key ) then
---                                 $stylesheet .= $this->get_root_layout_rules( static::ROOT_BLOCK_SELECTOR, $style_nodes[ $root_block_key ] );
---                         end;
---                         $stylesheet .= $this->get_block_classes( $style_nodes );
---                 end; elseif ( in_array( "base-layout-styles", $types, true ) ) then
---                         -- Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
---                         -- For backwards compatibility, the Columns block is explicitly included, to support a different default gap value.
---                         $base_styles_nodes = array(
---                                 array(
---                                         "path"     => array( "styles" ),
---                                         "selector" => static::ROOT_BLOCK_SELECTOR,
---                                 ),
---                                 array(
---                                         "path"     => array( "styles", "blocks", "core/columns" ),
---                                         "selector" => ".wp-block-columns",
---                                         "name"     => "core/columns",
---                                 ),
---                         );
-
---                         foreach ( $base_styles_nodes as $base_style_node ) then
---                                 $stylesheet .= $this->get_layout_styles( $base_style_node );
---                         end;
---                 end;
-
---                 if ( in_array( "presets", $types, true ) ) then
---                         $stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
---                 end;
-
---                 return $stylesheet;
---         end;
 
 --         --
 --         -- Returns the page templates of the active theme.
@@ -1027,11 +785,12 @@ is
    --
    -- protected
    function Get_Block_Classes (This        : Wp_Theme_JSON;
-                               Style_Nodes : Array_Type)
+                               Style_Nodes : Array_Lists.Array_List)
                                return String;
 
    --
-   -- Gets the CSS layout rules for a particular block from theme.json layout definitions.
+   -- Gets the CSS layout rules for a particular block from theme.json layout
+   -- definitions.
    --
    -- @since 6.1.0
    --
@@ -1042,179 +801,6 @@ is
    function Get_Layout_Styles (This           : Wp_Theme_JSON;
                                Block_Metadata : Array_Type)
                                return String;
---                 $block_rules = "";
---                 $block_type  = null;
-
---                 -- Skip outputting layout styles if explicitly disabled.
---                 if ( current_theme_supports( "disable-layout-styles" ) ) then
---                         return $block_rules;
---                 end;
-
---                 if ( isset( $block_metadata["name"] ) ) then
---                         $block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata["name"] );
---                         if ( ! block_has_support( $block_type, array( "__experimentalLayout" ), false ) ) then
---                                 return $block_rules;
---                         end;
---                 end;
-
---                 $selector                 = isset( $block_metadata["selector"] ) ? $block_metadata["selector"] : "";
---                 $has_block_gap_support    = _wp_array_get( $this->theme_json, array( "settings", "spacing", "blockGap" ) ) !== null;
---                 $has_fallback_gap_support = ! $has_block_gap_support; -- This setting isn"t useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
---                 $node                     = _wp_array_get( $this->theme_json, $block_metadata["path"], array() );
---                 $layout_definitions       = _wp_array_get( $this->theme_json, array( "settings", "layout", "definitions" ), array() );
---                 $layout_selector_pattern  = "/^[a-zA-Z0-9\-\.\-->:\(\)]*$/"; -- Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
-
---                 -- Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
---                 -- Default layout gap styles will be skipped for themes that do not explicitly opt-in to blockGap with a `true` or `false` value.
---                 if ( $has_block_gap_support || $has_fallback_gap_support ) then
---                         $block_gap_value = null;
---                         -- Use a fallback gap value if block gap support is not available.
---                         if ( ! $has_block_gap_support ) then
---                                 $block_gap_value = static::ROOT_BLOCK_SELECTOR === $selector ? "0.5em" : null;
---                                 if ( ! empty( $block_type ) ) then
---                                         $block_gap_value = _wp_array_get( $block_type->supports, array( "spacing", "blockGap", "__experimentalDefault" ), null );
---                                 end;
---                         end; else then
---                                 $block_gap_value = static::get_property_value( $node, array( "spacing", "blockGap" ) );
---                         end;
-
---                         -- Support split row / column values and concatenate to a shorthand value.
---                         if ( is_array( $block_gap_value ) ) then
---                                 if ( isset( $block_gap_value["top"] ) && isset( $block_gap_value["left"] ) ) then
---                                         $gap_row         = static::get_property_value( $node, array( "spacing", "blockGap", "top" ) );
---                                         $gap_column      = static::get_property_value( $node, array( "spacing", "blockGap", "left" ) );
---                                         $block_gap_value = $gap_row === $gap_column ? $gap_row : $gap_row . " " . $gap_column;
---                                 end; else then
---                                         -- Skip outputting gap value if not all sides are provided.
---                                         $block_gap_value = null;
---                                 end;
---                         end;
-
---                         -- If the block should have custom gap, add the gap styles.
---                         if ( null !== $block_gap_value && false !== $block_gap_value && "" !== $block_gap_value ) then
---                                 foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) then
---                                         -- Allow outputting fallback gap styles for flex layout type when block gap support isn"t available.
---                                         if ( ! $has_block_gap_support && "flex" !== $layout_definition_key ) then
---                                                 continue;
---                                         end;
-
---                                         $class_name    = sanitize_title( _wp_array_get( $layout_definition, array( "className" ), false ) );
---                                         $spacing_rules = _wp_array_get( $layout_definition, array( "spacingStyles" ), array() );
-
---                                         if (
---                                                 ! empty( $class_name ) &&
---                                                 ! empty( $spacing_rules )
---                                         ) then
---                                                 foreach ( $spacing_rules as $spacing_rule ) then
---                                                         $declarations = array();
---                                                         if (
---                                                                 isset( $spacing_rule["selector"] ) &&
---                                                                 preg_match( $layout_selector_pattern, $spacing_rule["selector"] ) &&
---                                                                 ! empty( $spacing_rule["rules"] )
---                                                         ) then
---                                                                 -- Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
---                                                                 foreach ( $spacing_rule["rules"] as $css_property => $css_value ) then
---                                                                         $current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
---                                                                         if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) then
---                                                                                 $declarations[] = array(
---                                                                                         "name"  => $css_property,
---                                                                                         "value" => $current_css_value,
---                                                                                 );
---                                                                         end;
---                                                                 end;
-
---                                                                 if ( ! $has_block_gap_support ) then
---                                                                         -- For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
---                                                                         $format          = static::ROOT_BLOCK_SELECTOR === $selector ? ":where(.%2$s%3$s)" : ":where(%1$s.%2$s%3$s)";
---                                                                         $layout_selector = sprintf(
---                                                                                 $format,
---                                                                                 $selector,
---                                                                                 $class_name,
---                                                                                 $spacing_rule["selector"]
---                                                                         );
---                                                                 end; else then
---                                                                         $format          = static::ROOT_BLOCK_SELECTOR === $selector ? "%s .%s%s" : "%s.%s%s";
---                                                                         $layout_selector = sprintf(
---                                                                                 $format,
---                                                                                 $selector,
---                                                                                 $class_name,
---                                                                                 $spacing_rule["selector"]
---                                                                         );
---                                                                 end;
---                                                                 $block_rules .= static::to_ruleset( $layout_selector, $declarations );
---                                                         end;
---                                                 end;
---                                         end;
---                                 end;
---                         end;
---                 end;
-
---                 -- Output base styles.
---                 if (
---                         static::ROOT_BLOCK_SELECTOR === $selector
---                 ) then
---                         $valid_display_modes = array( "block", "flex", "grid" );
---                         foreach ( $layout_definitions as $layout_definition ) then
---                                 $class_name       = sanitize_title( _wp_array_get( $layout_definition, array( "className" ), false ) );
---                                 $base_style_rules = _wp_array_get( $layout_definition, array( "baseStyles" ), array() );
-
---                                 if (
---                                         ! empty( $class_name ) &&
---                                         ! empty( $base_style_rules )
---                                 ) then
---                                         -- Output display mode. This requires special handling as `display` is not exposed in `safe_style_css_filter`.
---                                         if (
---                                                 ! empty( $layout_definition["displayMode"] ) &&
---                                                 is_string( $layout_definition["displayMode"] ) &&
---                                                 in_array( $layout_definition["displayMode"], $valid_display_modes, true )
---                                         ) then
---                                                 $layout_selector = sprintf(
---                                                         "%s .%s",
---                                                         $selector,
---                                                         $class_name
---                                                 );
---                                                 $block_rules    .= static::to_ruleset(
---                                                         $layout_selector,
---                                                         array(
---                                                                 array(
---                                                                         "name"  => "display",
---                                                                         "value" => $layout_definition["displayMode"],
---                                                                 ),
---                                                         )
---                                                 );
---                                         end;
-
---                                         foreach ( $base_style_rules as $base_style_rule ) then
---                                                 $declarations = array();
-
---                                                 if (
---                                                         isset( $base_style_rule["selector"] ) &&
---                                                         preg_match( $layout_selector_pattern, $base_style_rule["selector"] ) &&
---                                                         ! empty( $base_style_rule["rules"] )
---                                                 ) then
---                                                         foreach ( $base_style_rule["rules"] as $css_property => $css_value ) then
---                                                                 if ( static::is_safe_css_declaration( $css_property, $css_value ) ) then
---                                                                         $declarations[] = array(
---                                                                                 "name"  => $css_property,
---                                                                                 "value" => $css_value,
---                                                                         );
---                                                                 end;
---                                                         end;
-
---                                                         $layout_selector = sprintf(
---                                                                 "%s .%s%s",
---                                                                 $selector,
---                                                                 $class_name,
---                                                                 $base_style_rule["selector"]
---                                                         );
---                                                         $block_rules    .= static::to_ruleset( $layout_selector, $declarations );
---                                                 end;
---                                         end;
---                                 end;
---                         end;
---                 end;
---                 return $block_rules;
---         end;
 
    --
    -- Creates new rulesets as classes for each preset value such as:
@@ -1247,28 +833,15 @@ is
    --
    -- protected
    function Get_Preset_Classes (This          : Wp_Theme_JSON;
-                                Setting_Nodes : Array_Type;
+                                Setting_Nodes : Array_Lists.Array_List;
                                 Origins       : List_Type)
                                 return String;
---                 $preset_rules = "";
-
---                 foreach ( $setting_nodes as $metadata ) then
---                         if ( null === $metadata["selector"] ) then
---                                 continue;
---                         end;
-
---                         $selector      = $metadata["selector"];
---                         $node          = _wp_array_get( $this->theme_json, $metadata["path"], array() );
---                         $preset_rules .= static::compute_preset_classes( $node, $selector, $origins );
---                 end;
-
---                 return $preset_rules;
---         end;
 
    --
    -- Converts each styles section into a list of rulesets
    -- to be appended to the stylesheet.
-   -- These rulesets contain all the css variables (custom variables and preset variables).
+   -- These rulesets contain all the css variables (custom variables and preset
+   -- variables).
    --
    -- See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
    --
@@ -1288,7 +861,7 @@ is
    --
    -- protected
    function Get_CSS_Variables (This    : Wp_Theme_JSON;
-                               Nodes   : Array_Type;
+                               Nodes   : Array_Lists.Array_List;
                                Origins : List_Type)
                                return String;
 
@@ -1381,7 +954,8 @@ is
    -- @param array $settings        Settings to process.
    -- @param array $preset_metadata One of the PRESETS_METADATA values.
    -- @param array $origins         List of origins to process.
-   -- @return array Array of presets where each key is a slug and each value is the preset value.
+   -- @return array Array of presets where each key is a slug and each value is the
+   --               preset value.
    --
    -- protected static
    function Get_Settings_Values_By_Slug (Settings        : Array_Type;
@@ -1494,7 +1068,8 @@ is
    -- @since 5.8.0
    --
    -- @param array  $tree   Input tree to process.
-   -- @param string $prefix Optional. Prefix to prepend to each variable. Default empty string.
+   -- @param string $prefix Optional. Prefix to prepend to each variable. Default
+   --                       empty string.
    -- @param string $token  Optional. Token to use between levels. Default "--".
    -- @return array The flattened tree.
    --
@@ -1526,88 +1101,14 @@ is
    -- @return array  Returns the modified $declarations.
    --
    -- protected static
-   function Compute_Style_Properties (Styles           : Array_Type;
-                                      Settings         : Array_Type := Empty_Array;
-                                      Properties       : Array_Type := Empty_Array; -- null
-                                      Theme_JSON       : Array_Type := Empty_Array; -- null
-                                      Selector         : String     := "";          -- null
-                                      Use_Root_Padding : Boolean    := False)       -- null
-                                      return Array_Type;
---                 if ( null === $properties ) then
---                         $properties = static::PROPERTIES_METADATA;
---                 end;
-
---                 $declarations = array();
---                 if ( empty( $styles ) ) then
---                         return $declarations;
---                 end;
-
---                 $root_variable_duplicates = array();
-
---                 foreach ( $properties as $css_property => $value_path ) then
---                         $value = static::get_property_value( $styles, $value_path, $theme_json );
-
---                         if ( str_starts_with( $css_property, "--wp--style--root--" ) && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) then
---                                 continue;
---                         end;
---                         -- Root-level padding styles don"t currently support strings with CSS shorthand values.
---                         -- This may change: https://github.com/WordPress/gutenberg/issues/40132.
---                         if ( "--wp--style--root--padding" === $css_property && is_string( $value ) ) then
---                                 continue;
---                         end;
-
---                         if ( str_starts_with( $css_property, "--wp--style--root--" ) && $use_root_padding ) then
---                                 $root_variable_duplicates[] = substr( $css_property, strlen( "--wp--style--root--" ) );
---                         end;
-
---                         -- Look up protected properties, keyed by value path.
---                         -- Skip protected properties that are explicitly set to `null`.
---                         if ( is_array( $value_path ) ) then
---                                 $path_string = implode( ".", $value_path );
---                                 if (
---                                         -- TODO: Replace array_key_exists() with isset() check once WordPress drops
---                                         -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
---                                         array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
---                                         _wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
---                                 ) then
---                                         continue;
---                                 end;
---                         end;
-
---                         -- Skip if empty and not "0" or value represents array of longhand values.
---                         $has_missing_value = empty( $value ) && ! is_numeric( $value );
---                         if ( $has_missing_value || is_array( $value ) ) then
---                                 continue;
---                         end;
-
---                         -- Calculates fluid typography rules where available.
---                         if ( "font-size" === $css_property ) then
---                                 /*
---                                 -- wp_get_typography_font_size_value() will check
---                                 -- if fluid typography has been activated and also
---                                 -- whether the incoming value can be converted to a fluid value.
---                                 -- Values that already have a clamp() function will not pass the test,
---                                 -- and therefore the original $value will be returned.
---                                 --
---                                 $value = wp_get_typography_font_size_value( array( "size" => $value ) );
---                         end;
-
---                         $declarations[] = array(
---                                 "name"  => $css_property,
---                                 "value" => $value,
---                         );
---                 end;
-
---                 -- If a variable value is added to the root, the corresponding property should be removed.
---                 foreach ( $root_variable_duplicates as $duplicate ) then
---                         $discard = array_search( $duplicate, array_column( $declarations, "name" ), true );
---                         if ( is_numeric( $discard ) ) then
---                                 array_splice( $declarations, $discard, 1 );
---                         end;
---                 end;
-
---                 return $declarations;
---         end;
+   function Compute_Style_Properties
+              (Styles           : Array_Type;
+               Settings         : Array_Type := Empty_Array;
+               Properties       : Array_Type := Empty_Array; -- null
+               Theme_JSON       : Array_Type := Empty_Array; -- null
+               Selector         : String     := "";          -- null
+               Use_Root_Padding : Boolean    := False)       -- null
+               return Array_Type;
 
    --
    -- Returns the style property for the given path.
@@ -1658,7 +1159,7 @@ is
    -- protected static
    function Get_Setting_Nodes (Theme_JSON : Array_Type;
                                Selectors  : Array_Type := Empty_Array)
-                               return Array_Type;
+                               return Array_Lists.Array_List;
 
    --
    -- Builds metadata for the style nodes, which returns in the form of:
@@ -1685,7 +1186,7 @@ is
    -- protected static
    function Get_Style_Nodes (Theme_JSON : Array_Type;
                              Selectors  : Array_Type := Empty_Array)
-                             return Array_Type;
+                             return Array_Lists.Array_List;
 
    --
    -- A public helper to get the block nodes from a theme.json file.
@@ -1695,11 +1196,12 @@ is
    -- @return array The block nodes in theme.json.
    --
    function Get_Styles_Block_Nodes (This : Wp_Theme_JSON)
-                                    return Array_Type;
+                                    return Array_Lists.Array_List;
 
    --
-   -- Returns a filtered declarations array if there is a separator block with only a background
-   -- style defined in theme.json by adding a color attribute to reflect the changes in the front.
+   -- Returns a filtered declarations array if there is a separator block with only
+   -- a background style defined in theme.json by adding a color attribute to reflect
+   -- the changes in the front.
    --
    -- @since 6.1.1
    --
@@ -1720,7 +1222,7 @@ is
    --
    -- private static
    function Get_Block_Nodes (Theme_JSON : Array_Type)
-                             return Array_Type;
+                             return Array_Lists.Array_List;
 
    --
    -- Gets the CSS rules for a particular block from theme.json.
@@ -1734,138 +1236,6 @@ is
    function Get_Styles_For_Block (This           : Wp_Theme_JSON;
                                   Block_Metadata : Array_Type)
                                   return String;
---                 $node             = _wp_array_get( $this->theme_json, $block_metadata["path"], array() );
---                 $use_root_padding = isset( $this->theme_json["settings"]["useRootPaddingAwareAlignments"] ) && true === $this->theme_json["settings"]["useRootPaddingAwareAlignments"];
---                 $selector         = $block_metadata["selector"];
---                 $settings         = _wp_array_get( $this->theme_json, array( "settings" ) );
-
---                 /*
---                 -- Process style declarations for block support features the current
---                 -- block contains selectors for. Values for a feature with a custom
---                 -- selector are filtered from the theme.json node before it is
---                 -- processed as normal.
---                --
---                 $feature_declarations = array();
-
---                 if ( ! empty( $block_metadata["features"] ) ) then
---                         foreach ( $block_metadata["features"] as $feature_name => $feature_selector ) then
---                                 if ( ! empty( $node[ $feature_name ] ) ) then
---                                         -- Create temporary node containing only the feature data
---                                         -- to leverage existing `compute_style_properties` function.
---                                         $feature = array( $feature_name => $node[ $feature_name ] );
---                                         -- Generate the feature"s declarations only.
---                                         $new_feature_declarations = static::compute_style_properties( $feature, $settings, null, $this->theme_json );
-
---                                         -- Merge new declarations with any that already exist for
---                                         -- the feature selector. This may occur when multiple block
---                                         -- support features use the same custom selector.
---                                         if ( isset( $feature_declarations[ $feature_selector ] ) ) then
---                                                 foreach ( $new_feature_declarations as $new_feature_declaration ) then
---                                                         $feature_declarations[ $feature_selector ][] = $feature_declaration;
---                                                 end;
---                                         end; else then
---                                                 $feature_declarations[ $feature_selector ] = $new_feature_declarations;
---                                         end;
-
---                                         -- Remove the feature from the block"s node now the
---                                         -- styles will be included under the feature level selector.
---                                         unset( $node[ $feature_name ] );
---                                 end;
---                         end;
---                 end;
-
---                 /*
---                 -- Get a reference to element name from path.
---                 -- $block_metadata["path"] = array( "styles","elements","link" );
---                 -- Make sure that $block_metadata["path"] describes an element node, like [ "styles", "element", "link" ].
---                 -- Skip non-element paths like just ["styles"].
---                 --
---                 $is_processing_element = in_array( "elements", $block_metadata["path"], true );
-
---                 $current_element = $is_processing_element ? $block_metadata["path"][ count( $block_metadata["path"] ) - 1 ] : null;
-
---                 $element_pseudo_allowed = array();
-
---                 -- TODO: Replace array_key_exists() with isset() check once WordPress drops
---                 -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
---                 if ( array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) then
---                         $element_pseudo_allowed = static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ];
---                 end;
-
---                 /*
---                 -- Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
---                 -- This also resets the array keys.
---                 --
---                 $pseudo_matches = array_values(
---                         array_filter(
---                                 $element_pseudo_allowed,
---                                 function( $pseudo_selector ) use ( $selector ) then
---                                         return str_contains( $selector, $pseudo_selector );
---                                 end;
---                         )
---                 );
-
---                 $pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
-
---                 /*
---                 -- If the current selector is a pseudo selector that"s defined in the allow list for the current
---                 -- element then compute the style properties for it.
---                 -- Otherwise just compute the styles for the default selector as normal.
---                 --
---                 if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
---                         -- TODO: Replace array_key_exists() with isset() check once WordPress drops
---                         -- support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
---                         array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS )
---                         && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
---                 ) then
---                         $declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
---                 end; else then
---                         $declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
---                 end;
-
---                 $block_rules = "";
-
---                 /*
---                 -- 1. Separate the declarations that use the general selector
---                 -- from the ones using the duotone selector.
---                 --
---                 $declarations_duotone = array();
---                 foreach ( $declarations as $index => $declaration ) then
---                         if ( "filter" === $declaration["name"] ) then
---                                 unset( $declarations[ $index ] );
---                                 $declarations_duotone[] = $declaration;
---                         end;
---                 end;
-
---                 -- Update declarations if there are separators with only background color defined.
---                 if ( ".wp-block-separator" === $selector ) then
---                         $declarations = static::update_separator_declarations( $declarations );
---                 end;
-
---                 -- 2. Generate and append the rules that use the general selector.
---                 $block_rules .= static::to_ruleset( $selector, $declarations );
-
---                 -- 3. Generate and append the rules that use the duotone selector.
---                 if ( isset( $block_metadata["duotone"] ) && ! empty( $declarations_duotone ) ) then
---                         $selector_duotone = static::scope_selector( $block_metadata["selector"], $block_metadata["duotone"] );
---                         $block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
---                 end;
-
---                 -- 4. Generate Layout block gap styles.
---                 if (
---                         static::ROOT_BLOCK_SELECTOR !== $selector &&
---                         ! empty( $block_metadata["name"] )
---                 ) then
---                         $block_rules .= $this->get_layout_styles( $block_metadata );
---                 end;
-
---                 -- 5. Generate and append the feature level rulesets.
---                 foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) then
---                         $block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
---                 end;
-
---                 return $block_rules;
---         end;
 
    --
    -- Outputs the CSS for layout rules on the root.
@@ -1880,73 +1250,10 @@ is
                                    Selector       : String;
                                    Block_Metadata : Array_Type)
                                    return String;
---                 $css              = "";
---                 $settings         = _wp_array_get( $this->theme_json, array( "settings" ) );
---                 $use_root_padding = isset( $this->theme_json["settings"]["useRootPaddingAwareAlignments"] ) && true === $this->theme_json["settings"]["useRootPaddingAwareAlignments"];
-
---                 /*
---                -- Reset default browser margin on the root body element.
---                -- This is set on the root selector--*before** generating the ruleset
---                -- from the `theme.json`. This is to ensure that if the `theme.json` declares
---                -- `margin` in its `spacing` declaration for the `body` element then these
---                -- user-generated values take precedence in the CSS cascade.
---                -- @link https://github.com/WordPress/gutenberg/issues/36147.
---                --
---                 $css .= "body then margin: 0;";
-
---                 /*
---                -- If there are content and wide widths in theme.json, output them
---                -- as custom properties on the body element so all blocks can use them.
---                --
---                 if ( isset( $settings["layout"]["contentSize"] ) || isset( $settings["layout"]["wideSize"] ) ) then
---                         $content_size = isset( $settings["layout"]["contentSize"] ) ? $settings["layout"]["contentSize"] : $settings["layout"]["wideSize"];
---                         $content_size = static::is_safe_css_declaration( "max-width", $content_size ) ? $content_size : "initial";
---                         $wide_size    = isset( $settings["layout"]["wideSize"] ) ? $settings["layout"]["wideSize"] : $settings["layout"]["contentSize"];
---                         $wide_size    = static::is_safe_css_declaration( "max-width", $wide_size ) ? $wide_size : "initial";
---                         $css         .= "--wp--style--global--content-size: " . $content_size . ";";
---                         $css         .= "--wp--style--global--wide-size: " . $wide_size . ";";
---                 end;
-
---                 $css .= " end;";
-
---                 if ( $use_root_padding ) then
---                         -- Top and bottom padding are applied to the outer block container.
---                         $css .= ".wp-site-blocks then padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); end;";
---                         -- Right and left padding are applied to the first container with `.has-global-padding` class.
---                         $css .= ".has-global-padding then padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); end;";
---                         -- Nested containers with `.has-global-padding` class do not get padding.
---                         $css .= ".has-global-padding :where(.has-global-padding) then padding-right: 0; padding-left: 0; end;";
---                         -- Alignfull children of the container with left and right padding have negative margins so they can still be full width.
---                         $css .= ".has-global-padding > .alignfull then margin-right: calc(var(--wp--style--root--padding-right)-- -1); margin-left: calc(var(--wp--style--root--padding-left)-- -1); end;";
---                         -- The above rule is negated for alignfull children of nested containers.
---                         $css .= ".has-global-padding :where(.has-global-padding) > .alignfull then margin-right: 0; margin-left: 0; end;";
---                         -- Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
---                         $css .= ".has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) then padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); end;";
---                         -- The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
---                         $css .= ".has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) then padding-right: 0; padding-left: 0; end;";
---                 end;
-
---                 $css .= ".wp-site-blocks > .alignleft then float: left; margin-right: 2em; end;";
---                 $css .= ".wp-site-blocks > .alignright then float: right; margin-left: 2em; end;";
---                 $css .= ".wp-site-blocks > .aligncenter then justify-content: center; margin-left: auto; margin-right: auto; end;";
-
---                 $block_gap_value       = _wp_array_get( $this->theme_json, array( "styles", "spacing", "blockGap" ), "0.5em" );
---                 $has_block_gap_support = _wp_array_get( $this->theme_json, array( "settings", "spacing", "blockGap" ) ) !== null;
---                 if ( $has_block_gap_support ) then
---                         $block_gap_value = static::get_property_value( $this->theme_json, array( "styles", "spacing", "blockGap" ) );
---                         $css            .= ".wp-site-blocks >-- then margin-block-start: 0; margin-block-end: 0; end;";
---                         $css            .= ".wp-site-blocks >-- -- then margin-block-start: $block_gap_value; end;";
-
---                         -- For backwards compatibility, ensure the legacy block gap CSS variable is still available.
---                         $css .= "$selector then --wp--style--block-gap: $block_gap_value; end;";
---                 end;
---                 $css .= $this->get_layout_styles( $block_metadata );
-
---                 return $css;
---         end;
 
    --
-   -- For metadata values that can either be booleans or paths to booleans, gets the value.
+   -- For metadata values that can either be booleans or paths to booleans, gets
+   -- the value.
    --
    -- ```php
    -- $data = array(

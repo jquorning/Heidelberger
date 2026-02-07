@@ -8,6 +8,7 @@ with Php.Arrays;
 with Php.Lists;
 with Php.Strings;
 
+with Array_Lists;
 with Constants;
 with UStrings;
 
@@ -264,6 +265,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Theme_JSON;
       use Inc_Functions_Wp_Styles;
@@ -272,11 +274,11 @@ is
       Tree        : constant Wp_Theme_JSON :=
         Class_Theme_JSON_Resolver.Get_Merged_Data;
 
-      Block_Nodes : constant Array_Type := Tree.Get_Styles_Block_Nodes;
+      Block_Nodes : constant Array_List := Tree.Get_Styles_Block_Nodes;
    begin
-      for Metadata_2 in Block_Nodes.Iterate loop
+      for Metadata of Block_Nodes loop
          declare
-            Metadata  : constant Array_Type := As_Array (Element (Metadata_2));
+--          Metadata  : constant Array_Type := As_Array (Element (Metadata_2));
             Block_CSS : constant String := Tree.Get_Styles_For_Block (Metadata);
          begin
             if not Wp_Should_Load_Separate_Core_Block_Assets then
