@@ -535,6 +535,7 @@ is
    is
       use Php.Arrays;
       use Array_Lists;
+      use Array_Lists.Vectors;
       use Wp_Common;
       use Class_Posts;
       use Inc_Global_Styles_And_Settings;
@@ -551,9 +552,7 @@ is
         Custom_Settings
       );
 
-      Global_Styles : Array_Type;
-
-      Presets : Array_List := [
+      Presets : constant Array_List := [
         To_Array_Type ([
           Build ("css",            "variables"),
           Build ("__unstableType", "presets"),
@@ -565,16 +564,19 @@ is
           Build ("isGlobalStyles", True)
         ])
       ];
+
+      Global_Styles : Array_List;
    begin
       for Preset_Style of Presets loop
          declare
             Actual_CSS : constant String :=
               Wp_Get_Global_Stylesheet (As_List (Get (Preset_Style, "css")));
+
+            Preset_Style_2 : Array_Type := Preset_Style;
          begin
             if "" /= Actual_CSS then
-               Set (Preset_Style, "css", From_String (Actual_CSS));
-               Global_Styles.Append (Key   => "XXX-891",
-                                     Value => From_Array (Preset_Style));
+               Set (Preset_Style_2, "css", From_String (Actual_CSS));
+               Global_Styles.Append (Preset_Style_2);
             end if;
          end;
       end loop;
@@ -591,8 +593,7 @@ is
          begin
             if "" /= Actual_CSS then
                Set (Block_Classes, "css", From_String (Actual_CSS));
-               Global_Styles.Append (Key   => "XXX-890",
-                                     Value => From_Array (Block_Classes));
+               Global_Styles.Append (Block_Classes);
             end if;
          end;
       else
@@ -609,14 +610,14 @@ is
          begin
             if "" /= Actual_CSS then
                Set (Block_Classes, "css", From_String (Actual_CSS));
-               Global_Styles.Append (Key   => "XXX-889",
-                                     Value => From_Array (Block_Classes));
+               Global_Styles.Append (Block_Classes);
             end if;
          end;
       end if;
 
       Set (Editor_Settings, "styles", From_Array (
-           Array_Merge (Global_Styles, Get_Block_Editor_Theme_Styles)));
+           To_Array_Type (Global_Styles & Get_Block_Editor_Theme_Styles)));
+--         Array_Merge (Global_Styles, Get_Block_Editor_Theme_Styles)));
 
       Set (Editor_Settings, "__experimentalFeatures",
            Wp_Get_Global_Settings);
@@ -625,7 +626,7 @@ is
       -- sources.
       if Isset_3 (Editor_Settings, "__experimentalFeatures", "color", "palette") then
          declare
-            Colors_By_Origin : constant Cursor :=
+            Colors_By_Origin : constant Arrays.Cursor :=
               Ref_3 (Editor_Settings, "__experimentalFeatures", "color", "palette");
          begin
             Set (Editor_Settings, "colors",
@@ -644,7 +645,7 @@ is
                  "color", "gradients")
       then
          declare
-            Gradients_By_Origin : constant Cursor :=
+            Gradients_By_Origin : constant Arrays.Cursor :=
               Ref_3 (Editor_Settings, "__experimentalFeatures", "color", "gradients");
          begin
             Set (Editor_Settings, "gradients",
@@ -663,7 +664,7 @@ is
                  "typography", "fontSizes")
       then
          declare
-            Font_Sizes_By_Origin : constant Cursor :=
+            Font_Sizes_By_Origin : constant Arrays.Cursor :=
               Ref_3 (Editor_Settings, "__experimentalFeatures",
                      "typography", "fontSizes");
          begin
@@ -758,7 +759,7 @@ is
                  "spacing", "spacingSizes")
       then
          declare
-            Spacing_Sizes_By_Origin : constant Cursor :=
+            Spacing_Sizes_By_Origin : constant Arrays.Cursor :=
               Ref_3 (Editor_Settings, "__experimentalFeatures",
                      "spacing", "spacingSizes");
          begin
