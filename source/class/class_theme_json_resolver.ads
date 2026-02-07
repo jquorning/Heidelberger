@@ -9,6 +9,8 @@
 with Arrays;
 with Lists;
 
+with Array_Lists;
+
 with Class_Themes;
 with Class_Theme_JSON;
 
@@ -92,12 +94,12 @@ is
    -- @var array
    --
    -- protected static
-   Static_Blocks_Cache : Array_Type := To_Array (List => (
+   Static_Blocks_Cache : Array_Type := Array_Lists.To_Array_Type ([
      Build ("core",   Empty_Array),
      Build ("blocks", Empty_Array),
      Build ("theme",  Empty_Array),
      Build ("user",   Empty_Array)
-   ));
+   ]);
 
    --
    -- Container for data coming from core.

@@ -14,10 +14,11 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Constants;
 with Globals;
-with UStrings;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Adi_Class_Language_Pack_Upgraders;
@@ -50,6 +51,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Errors;
@@ -91,17 +93,17 @@ is
 
                HTTP_URL : constant String := -URL;
                SSL      : constant Boolean :=
-                 Wp_HTTP_Supports (To_Array (List => (1 => Build ("ssl", ""))));
+                 Wp_HTTP_Supports (To_Array_Type ([Build ("ssl", "")]));
 
-               Options : Array_Type := To_Array (List => (
+               Options : Array_Type := To_Array_Type ([
                  Build ("timeout", 3),
-                 Build ("body",    To_Array (List => (
+                 Build ("body",    To_Array_Type ([
                    Build ("wp_version", Wp_Version),
                    Build ("locale",     Get_Locale),
                    Build ("version",    Get_As_String (Args, "version"))
                    -- Version of plugin, theme or core.
-                 )))
-               ));
+                 ]))
+               ]);
             begin
                if SSL then
                   URL := +Set_URL_Scheme (-URL, "https");
@@ -208,8 +210,8 @@ is
 
       declare
          API : constant Trans_Result := -- Array_Type :=
-           Translations_API ("core", To_Array (List => (1 =>
-                                       Build ("version", Wp_Version))));
+           Translations_API ("core", To_Array_Type ([
+                                       Build ("version", Wp_Version)]));
       begin
          if
            Is_Wp_Error (API.Arry) or else
@@ -389,8 +391,9 @@ is
             declare
                Result : constant Array_Type :=
                  Upgrader.Upgrade (As_String (Translation),
-                                   To_Array (List => (1 =>
-                                     Build ("clear_update_cache", False))));
+                                   To_Array_Type ([
+                                     Build ("clear_update_cache", False)
+                                   ]));
             begin
                if
                  Result = Empty_Array or else   -- not

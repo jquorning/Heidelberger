@@ -9,6 +9,7 @@
 with Php.Lists;
 with Php.Strings;
 
+with Array_Lists;
 with Globals;
 with UStrings;
 
@@ -27,8 +28,10 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_Terms_List_Table
    is
-      use UStrings;
+      use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
+      use UStrings;
       use Inc_L10n;
 --    use Inc_Posts;
 
@@ -36,12 +39,12 @@ is
       This : constant Wp_Terms_List_Table := (
         Adi_Class_Wp_List_Tables.X_Construct (
 --      parent::x_Construct (
-          To_Array ((
+          To_Array_Type ([
             Build ("plural",   "tags"),
             Build ("singular", "tag"),
             Build ("screen",   (if Isset (Args, "screen")
                                 then Get_As_String (Args, "screen") else "null"))
-          ))
+          ])
         )
         with
           Level => 0
@@ -65,10 +68,10 @@ is
       -- @todo Still needed? Maybe just the show_ui part.
       if
         Empty (-Globals.Post_Type) or else
-        not Php.Lists.In_List (-Globals.Post_Type,
-                               Inc_Posts.Get_Post_Types (To_Array ((1 =>
-                                 Build ("show_ui", "true")))),
-                               True)
+        not In_List (-Globals.Post_Type,
+                     Inc_Posts.Get_Post_Types (To_Array_Type ([
+                       Build ("show_ui", "true")])),
+                     True)
       then
          Globals.Post_Type := +"post";
       end if;

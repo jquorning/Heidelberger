@@ -15,6 +15,7 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -2020,6 +2021,7 @@ is
                                     return Class_Posts.Wp_Post
    is
       use Php.Strings;
+      use Array_Lists;
       use Class_Posts;
       use Class_Querys;
       use Inc_Formatting;
@@ -2028,7 +2030,7 @@ is
       Stylesheet_2 : constant String :=
         (if Empty (Stylesheet) then Get_Stylesheet else Stylesheet);
 
-      Custom_CSS_Query_Vars : constant Array_Type := To_Array (List => (
+      Custom_CSS_Query_Vars : constant Array_Type := To_Array_Type ([
         Build ("post_type",              "custom_css"),
         Build ("post_status",            Get_Post_Stati),
         Build ("name",                   Sanitize_Title (Stylesheet_2)),
@@ -2038,7 +2040,7 @@ is
         Build ("update_post_meta_cache", False),
         Build ("update_post_term_cache", False),
         Build ("lazy_load_term_meta",    False)
-      ));
+      ]);
 
       Post : Wp_Post := Null_Post;
    begin
@@ -2678,6 +2680,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use List_Vectors;
       use UStrings;
       use Inc_Functions;
@@ -2766,14 +2769,14 @@ is
 
       elsif Feature = "custom-logo" then
          declare
-            Defaults : constant Array_Type := To_Array (List => (
+            Defaults : constant Array_Type := To_Array_Type ([
               Build ("width",                Null_Value),
               Build ("height",               Null_Value),
               Build ("flex-width",           False),
               Build ("flex-height",          False),
               Build ("header-text",          ""),
               Build ("unlink-homepage-logo", False)
-            ));
+            ]);
             Args : constant Array_Type :=
               (if Args_2
                then Empty_Array
@@ -2794,8 +2797,8 @@ is
 
       elsif Feature = "custom-header-uploads" then
          Add_Theme_Support ("custom-header",
-                            Arry => To_Array (List => (1 =>
-                              Build ("uploads", True))));
+                            Arry => To_Array_Type ([
+                              Build ("uploads", True)]));
          return;
 
       elsif Feature = "custom-header" then
@@ -2805,7 +2808,7 @@ is
                then Empty_Array
                else Arry);
 
-            Defaults : constant Array_Type := To_Array (List => (
+            Defaults : constant Array_Type := To_Array_Type ([
               Build ("default-image",          ""),
               Build ("random-default",         False),
               Build ("width",                  0),
@@ -2820,7 +2823,7 @@ is
               Build ("admin-preview-callback", ""),
               Build ("video",                  False),
               Build ("video-active-callback",  "is_front_page")
-            ));
+            ]);
 
             JIT : constant Boolean := Isset (Arry, "__jit");
          begin
@@ -2911,7 +2914,7 @@ is
             Args : constant Array_Type :=
               (if Args_2 then Empty_Array else Arry);
 
-            Defaults : constant Array_Type := To_Array (List => (
+            Defaults : constant Array_Type := To_Array_Type ([
               Build ("default-image",          ""),
               Build ("default-preset",         "default"),
               Build ("default-position-x",     "left"),
@@ -2923,7 +2926,7 @@ is
               Build ("wp-head-callback",       "_custom_background_cb"),
               Build ("admin-head-callback",    ""),
               Build ("admin-preview-callback", "")
-            ));
+            ]);
 
             JIT : constant Boolean := Isset (Arry, "__jit");
          begin
@@ -3303,15 +3306,16 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use Inc_Functions;
       use Inc_REST_API;
 
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
                 Build ("type",         "boolean"),
                 Build ("variadic",     False),
                 Build ("description",  ""),
                 Build ("show_in_rest", False)
-      ));
+      ]);
 
       Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
    begin
@@ -3329,11 +3333,11 @@ is
               From_Array (
                 Wp_Parse_Args (
                   As_Array (Get (Args_2, "show_in_rest")),
-                  To_Array (List => (
+                  To_Array_Type ([
                     Build ("schema",           Empty_Array),
                     Build ("name",             Feature),
                     Build ("prepare_callback", Null_Value)
-                  ))
+                  ])
               )));
       end if;
 
@@ -3422,11 +3426,11 @@ is
                 Value =>
                   From_Array (Wp_Parse_Args (
                     As_Array (Get (Ref_2 (Args_2, "show_in_rest", "schema"))),
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("description", Get_As_String (Args_2, "description")),
                       Build ("type",        Get_As_String (Args_2, "type")),
                       Build ("default",     False)
-                    ))
+                    ])
                   )));
 
          if
@@ -3593,6 +3597,7 @@ is
       use Php.Arrays;
       use Php.Files;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use Inc_Formatting;
       use Inc_Functions;
@@ -3695,7 +3700,7 @@ is
 
          Settings_Previewed : constant Boolean := not Is_Customize_Save_Action;
 
-         Comp : constant Array_Type := To_Array (List => (
+         Comp : constant Array_Type := To_Array_Type ([
 --         Compact (
            Build ("changeset_uuid",     Changeset_UUID),
            Build ("theme",              Theme),
@@ -3703,7 +3708,7 @@ is
            Build ("settings_previewed", Settings_Previewed),
            Build ("autosaved",          Autosaved),
            Build ("branching",          Branching)
-         ));
+         ]);
       begin
 --       require_once ABSPATH . WPINC . "/class-wp-customize-manager.php";
          null;
@@ -4019,363 +4024,364 @@ is
 
    procedure Create_Initial_Theme_Features
    is
+      use Array_Lists;
       use Inc_L10n;
    begin
       Register_Theme_Feature (
                 "align-wide",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether theme opts in to wide alignment CSS class."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "automatic-feed-links",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether posts and comments RSS feed links are added to head."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "block-templates",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether a theme uses block-based templates."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "block-template-parts",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether a theme uses block-based template parts."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
         "custom-background",
-        To_Array (List => (
+        To_Array_Type ([
           Build ("description",  abs "Custom background if defined by the theme."),
           Build ("type",         "object"),
-          Build ("show_in_rest", To_Array (List => (1 =>
-            Build ("schema",      To_Array (List => (1 =>
-              Build ("properties", To_Array (List => (
-                Build ("default-image",      To_Array (List => (
+          Build ("show_in_rest", To_Array_Type ([
+            Build ("schema",      To_Array_Type ([
+              Build ("properties", To_Array_Type ([
+                Build ("default-image",      To_Array_Type ([
                   Build ("type",   "string"),
                   Build ("format", "uri")
-                ))),
-                Build ("default-preset",     To_Array (List => (
+                ])),
+                Build ("default-preset",     To_Array_Type ([
                   Build ("type", "string"),
                   Build ("enum", List_Type'["default", "fill",
                                             "fit", "repeat", "custom"])
-                ))),
-                Build ("default-position-x", To_Array (List => (
+                ])),
+                Build ("default-position-x", To_Array_Type ([
                   Build ("type", "string"),
                   Build ("enum", List_Type'["left", "center", "right"])
-                ))),
-                Build ("default-position-y", To_Array (List => (
+                ])),
+                Build ("default-position-y", To_Array_Type ([
                   Build ("type", "string"),
                   Build ("enum", List_Type'["left", "center", "right"])
-                ))),
-                Build ("default-size",       To_Array (List => (
+                ])),
+                Build ("default-size",       To_Array_Type ([
                   Build ("type", "string"),
                   Build ("enum", List_Type'["auto", "contain", "cover"])
-                ))),
-                Build ("default-repeat",     To_Array (List => (
+                ])),
+                Build ("default-repeat",     To_Array_Type ([
                   Build ("type", "string"),
                   Build ("enum", List_Type'["repeat-x", "repeat-y",
                                             "repeat", "no-repeat"])
-                ))),
-                Build ("default-attachment", To_Array (List => (
+                ])),
+                Build ("default-attachment", To_Array_Type ([
                   Build ("type", "string"),
                   Build ("enum", List_Type'["scroll", "fixed"])
-                ))),
-                Build ("default-color",      To_Array (List => (1 =>
+                ])),
+                Build ("default-color",      To_Array_Type ([
                   Build ("type", "string")
-                )))
-              )))
-            )))
-          )))
-        ))
+                ]))
+              ]))
+            ]))
+          ]))
+        ])
       );
 
       Register_Theme_Feature (
                 "custom-header",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Custom header if defined by the theme."),
                         Build ("type",         "object"),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("properties", To_Array (List => (
-                                                Build ("default-image",      To_Array (List => (
+                        Build ("show_in_rest", To_Array_Type ([
+                                Build ("schema", To_Array_Type ([
+                                        Build ("properties", To_Array_Type ([
+                                                Build ("default-image",      To_Array_Type ([
                                                         Build ("type",   "string"),
                                                         Build ("format", "uri")
-                                                ))),
-                                                Build ("random-default",     To_Array (List => (1 =>
+                                                ])),
+                                                Build ("random-default",     To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("width",              To_Array (List => (1 =>
+                                                ])),
+                                                Build ("width",              To_Array_Type ([
                                                         Build ("type", "integer")
-                                                ))),
-                                                Build ("height",             To_Array (List => (1 =>
+                                                ])),
+                                                Build ("height",             To_Array_Type ([
                                                         Build ("type", "integer")
-                                                ))),
-                                                Build ("flex-height",        To_Array (List => (1 =>
+                                                ])),
+                                                Build ("flex-height",        To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("flex-width",         To_Array (List => (1 =>
+                                                ])),
+                                                Build ("flex-width",         To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("default-text-color", To_Array (List => (1 =>
+                                                ])),
+                                                Build ("default-text-color", To_Array_Type ([
                                                         Build ("type", "string")
-                                                ))),
-                                                Build ("header-text",        To_Array (List => (1 =>
+                                                ])),
+                                                Build ("header-text",        To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("uploads",            To_Array (List => (1 =>
+                                                ])),
+                                                Build ("uploads",            To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("video",              To_Array (List => (1 =>
+                                                ])),
+                                                Build ("video",              To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
+                                                ]))
+                                        ]))
+                                ]))
+                        ]))
+                ])
         );
       Register_Theme_Feature (
                 "custom-logo",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("type",         "object"),
                         Build ("description",  abs "Custom logo if defined by the theme."),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("properties", To_Array (List => (
-                                                Build ("width",                To_Array (List => (1 =>
+                        Build ("show_in_rest", To_Array_Type ([
+                                Build ("schema", To_Array_Type ([
+                                        Build ("properties", To_Array_Type ([
+                                                Build ("width",                To_Array_Type ([
                                                         Build ("type", "integer")
-                                                ))),
-                                                Build ("height",               To_Array (List => (1 =>
+                                                ])),
+                                                Build ("height",               To_Array_Type ([
                                                         Build ("type", "integer")
-                                                ))),
-                                                Build ("flex-width",           To_Array (List => (1 =>
+                                                ])),
+                                                Build ("flex-width",           To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("flex-height",          To_Array (List => (1 =>
+                                                ])),
+                                                Build ("flex-height",          To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                ))),
-                                                Build ("header-text",          To_Array (List => (
+                                                ])),
+                                                Build ("header-text",          To_Array_Type ([
                                                         Build ("type",  "array"),
-                                                        Build ("items", To_Array (List => (1 =>
+                                                        Build ("items", To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        )))
-                                                ))),
-                                                Build ("unlink-homepage-logo", To_Array (List => (1 =>
+                                                        ]))
+                                                ])),
+                                                Build ("unlink-homepage-logo", To_Array_Type ([
                                                         Build ("type", "boolean")
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
+                                                ]))
+                                        ]))
+                                ]))
+                        ]))
+                ])
         );
       Register_Theme_Feature (
                 "customize-selective-refresh-widgets",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme enables Selective Refresh for Widgets being managed with the Customizer."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "dark-editor-style",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether theme opts in to the dark editor style UI."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "disable-custom-colors",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme disables custom colors."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "disable-custom-font-sizes",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme disables custom font sizes."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "disable-custom-gradients",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme disables custom gradients."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "disable-layout-styles",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme disables generated layout styles."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "editor-color-palette",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("type",         "array"),
                         Build ("description",  abs "Custom color palette if defined by the theme."),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("items", To_Array (List => (
+                        Build ("show_in_rest", To_Array_Type ([
+                                Build ("schema", To_Array_Type ([
+                                        Build ("items", To_Array_Type ([
                                                 Build ("type",       "object"),
-                                                Build ("properties", To_Array (List => (
-                                                        Build ("name",  To_Array (List => (1 =>
+                                                Build ("properties", To_Array_Type ([
+                                                        Build ("name",  To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        ))),
-                                                        Build ("slug",  To_Array (List => (1 =>
+                                                        ])),
+                                                        Build ("slug",  To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        ))),
-                                                        Build ("color", To_Array (List => (1 =>
+                                                        ])),
+                                                        Build ("color", To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        )))
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
+                                                        ]))
+                                                ]))
+                                        ]))
+                                ]))
+                        ]))
+                ])
         );
       Register_Theme_Feature (
                 "editor-font-sizes",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("type",         "array"),
                         Build ("description",  abs "Custom font sizes if defined by the theme."),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("items", To_Array (List => (
+                        Build ("show_in_rest", To_Array_Type ([
+                                Build ("schema", To_Array_Type ([
+                                        Build ("items", To_Array_Type ([
                                                 Build ("type",       "object"),
-                                                Build ("properties", To_Array (List => (
-                                                        Build ("name", To_Array (List => (1 =>
+                                                Build ("properties", To_Array_Type ([
+                                                        Build ("name", To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        ))),
-                                                        Build ("size", To_Array (List => (1 =>
+                                                        ])),
+                                                        Build ("size", To_Array_Type ([
                                                                 Build ("type", "number")
-                                                        ))),
-                                                        Build ("slug", To_Array (List => (1 =>
+                                                        ])),
+                                                        Build ("slug", To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        )))
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
+                                                        ]))
+                                                ]))
+                                        ]))
+                                ]))
+                        ]))
+                ])
         );
       Register_Theme_Feature (
                 "editor-gradient-presets",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("type",         "array"),
                         Build ("description",  abs "Custom gradient presets if defined by the theme."),
-                        Build ("show_in_rest", To_Array (List => (1 =>
-                                Build ("schema", To_Array (List => (1 =>
-                                        Build ("items", To_Array (List => (
+                        Build ("show_in_rest", To_Array_Type ([
+                                Build ("schema", To_Array_Type ([
+                                        Build ("items", To_Array_Type ([
                                                 Build ("type",       "object"),
-                                                Build ("properties", To_Array (List => (
-                                                        Build ("name",     To_Array (List => (1 =>
+                                                Build ("properties", To_Array_Type ([
+                                                        Build ("name",     To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        ))),
-                                                        Build ("gradient", To_Array (List => (1 =>
+                                                        ])),
+                                                        Build ("gradient", To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        ))),
-                                                        Build ("slug",     To_Array (List => (1 =>
+                                                        ])),
+                                                        Build ("slug",     To_Array_Type ([
                                                                 Build ("type", "string")
-                                                        )))
-                                                )))
-                                        )))
-                                )))
-                        )))
-                ))
+                                                        ]))
+                                                ]))
+                                        ]))
+                                ]))
+                        ]))
+                ])
         );
       Register_Theme_Feature (
                 "editor-styles",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether theme opts in to the editor styles CSS wrapper."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
 
       Register_Theme_Feature (
         "html5",
-        To_Array (List => (
+        To_Array_Type ([
           Build ("type",         "array"),
           Build ("description",  abs "Allows use of HTML5 markup for search forms, comment forms, comment lists, gallery, and caption."),
-          Build ("show_in_rest", To_Array (List => (1 =>
-            Build ("schema", To_Array (List => (1 =>
-              Build ("items", To_Array (List => (
+          Build ("show_in_rest", To_Array_Type ([
+            Build ("schema", To_Array_Type ([
+              Build ("items", To_Array_Type ([
                 Build ("type", "string"),
                 Build ("enum", List_Type'["search-form", "comment-form",
                                           "comment-list", "gallery",
                                           "caption", "script", "style"])
-              )))
-            )))
-          )))
-        ))
+              ]))
+            ]))
+          ]))
+        ])
       );
 
       Register_Theme_Feature (
         "post-formats",
-        To_Array (List => (
+        To_Array_Type ([
           Build ("type",         "array"),
           Build ("description",  abs "Post formats supported."),
-          Build ("show_in_rest", To_Array (List => (
+          Build ("show_in_rest", To_Array_Type ([
             Build ("name",             "formats"),
-            Build ("schema",           To_Array (List => (
-              Build ("items",   To_Array (List => (1 =>
+            Build ("schema",           To_Array_Type ([
+              Build ("items",   To_Array_Type ([
                 Build ("type", "string")
 --              Build ("enum", Get_Post_Format_Slugs) -- ()
-              ))),
+              ])),
               Build ("default", List_Type'["standard"])
-            )))
+            ]))
             -- Build ("prepare_callback", static function ( formats ) then
-            --         formats = is_Array (List => ( formats ) ? array_values( formats[0] ) : To_Array (List => ();
-            --         formats = array_merge( To_Array (List => ( "standard" ), formats );
+            --         formats = is_Array (List => ( formats ) ? array_values( formats[0] ) : To_Array_Type ([]);
+            --         formats = array_merge( To_Array_Type ([ "standard" ), formats );
             --         return formats;
             -- end;,
-          )))
-        ))
+          ]))
+        ])
       );
 
       Register_Theme_Feature (
         "post-thumbnails",
-        To_Array (List => (
+        To_Array_Type ([
           Build ("type",         "array"),
           Build ("description",  abs "The post types that support thumbnails or true if all post types are supported."),
-          Build ("show_in_rest", To_Array (List => (
+          Build ("show_in_rest", To_Array_Type ([
             Build ("type",   List_Type'["boolean", "array"]),
-            Build ("schema", To_Array (List => (1 =>
-              Build ("items", To_Array (List => (1 =>
+            Build ("schema", To_Array_Type ([
+              Build ("items", To_Array_Type ([
                 Build ("type", "string")
-              )))
-            )))
-          )))
-        ))
+              ]))
+            ]))
+          ]))
+        ])
       );
 
       Register_Theme_Feature (
                 "responsive-embeds",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme supports responsive embedded content."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "title-tag",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether the theme can manage the document title tag."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
       Register_Theme_Feature (
                 "wp-block-styles",
-                To_Array (List => (
+                To_Array_Type ([
                         Build ("description",  abs "Whether theme opts in to default WordPress block styles for viewing."),
                         Build ("show_in_rest", True)
-                ))
+                ])
         );
    end Create_Initial_Theme_Features;
 

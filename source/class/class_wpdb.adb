@@ -26,6 +26,7 @@ with Php.Types;
 with MySQL_Bind;
 with MySQLi_Bind;
 
+with Array_Lists;
 with Arrays.IO;
 with Constants;
 with Globals;
@@ -254,6 +255,7 @@ is
                                return Array_Type
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
 
       Charset_2 : UString := +Charset;
@@ -297,10 +299,10 @@ is
       end if;
 
       return
-        To_Array (List => (
+        To_Array_Type ([
           Build ("charset", -Charset_2),
           Build ("collate", -Collate_2)
-        ));
+        ]);
    end Determine_Charset;
 
    -----------------
@@ -1141,7 +1143,7 @@ is
                            then 99 -- Max (Array_Map
                                    -- ("intval",
                                    --  Empty_Array & Matches (3)))
---              Table => To_Array (List => (1 => Build (Element (Matches, 3)))))
+--              Table => To_Array_Type ([Build (Element (Matches, 3))]))
                            else 0);
                      begin
                         if
@@ -2502,6 +2504,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
 
       Data_2           : Array_Type := Data;
       Formats          : List_Type  := [Format]; -- (array)
@@ -2512,10 +2515,10 @@ is
             Field : constant String := Key (A);
             Value : constant String := As_String (Element (A));
 
-            Value_2 : Array_Type := To_Array (List => (
+            Value_2 : Array_Type := To_Array_Type ([
               Build ("value",  Value),
               Build ("format", "%s")
-            ));
+            ]);
          begin
             if not Empty (Format) then
                Set (Value_2, "format", From_String (List_Shift (Formats)));
@@ -3146,6 +3149,7 @@ is
                             return Array_Type
    is
       use Php.Strings;
+      use Array_Lists;
 
       Tablekey  : constant String := Strtolower (Table);
       Columnkey : constant String := Strtolower (Column);
@@ -3190,40 +3194,40 @@ is
          end if;
 
          if Typ in "char" | "varchar" then
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("type",   "char"),
               Build ("length", Length) -- (int)
-            ));
+            ]);
 
          elsif Typ in "binary" | "varbinary" then
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("type",   "byte"),
               Build ("length", Length) -- (int)
-            ));
+            ]);
 
          elsif Typ in "tinyblob" | "tinytext" then
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("type",   "byte"),
               Build ("length", 255)        -- 2^8 - 1
-            ));
+            ]);
 
          elsif Typ in "blob" | "text" then
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("type",   "byte"),
               Build ("length", 65535)      -- 2^16 - 1
-            ));
+            ]);
 
          elsif Typ in "mediumblob" | "mediumtext" then
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("type",   "byte"),
               Build ("length", 16777215)   -- 2^24 - 1
-            ));
+            ]);
 
          elsif Typ in "longblob" | "longtext" then
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("type",   "byte"),
               Build ("length", Integer'Last) -- 4294967295) -- 2^32 - 1
-            ));
+            ]);
 
          else
             return Empty_Array; -- false;

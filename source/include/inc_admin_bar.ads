@@ -6,7 +6,6 @@
 -- @since 3.1.0
 --
 
-with Arrayable_Arrays;
 with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;

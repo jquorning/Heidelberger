@@ -13,6 +13,7 @@ with Php.Numerics;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Helpers;
 with Helpers_3;
 with UStrings;
@@ -43,6 +44,7 @@ is
 
    procedure Create_Initial_Taxonomies
    is
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Taxonomy;
@@ -56,11 +58,11 @@ is
       Reset_Default_Labels; -- WP_Taxonomy::reset_default_labels();
 
       if not Did_Action ("init") then
-         Rewrite := Arrays.To_Array ((
+         Rewrite := To_Array_Type ([
             Build ("category",    False),
             Build ("post_tag",    False),
             Build ("post_format", False)
-         ));
+         ]);
       else
          --
          -- Filters the post formats rewrite base.
@@ -71,8 +73,8 @@ is
          --
          Post_Format_Base := +Apply_Filters ("post_format_rewrite_base", "type");
 
-         Rewrite          := Arrays.To_Array ((
-            Build ("category",    Arrays.To_Array ((
+         Rewrite          := To_Array_Type ([
+            Build ("category",    To_Array_Type ([
                Build ("hierarchical", True),
                Build ("slug",         (if "" /= Get_Option ("category_base")
                                        then Get_Option ("category_base")
@@ -80,26 +82,26 @@ is
 --             Build ("with_front",   "" = Get_Option ("category_base") or else
 --                                    Wp_Rewrite.Using_Index_Permalinks), -- ()
 --             Build ("ep_mask",      Ep_Categories)
-            ))),
-            Build ("post_tag",    Arrays.To_Array ((
+            ])),
+            Build ("post_tag",    To_Array_Type ([
                Build ("hierarchical", False),
                Build ("slug",         (if "" /= Get_Option ("tag_base")
                                        then Get_Option ("tag_base") else "tag")) -- ,
 --             Build ("with_front",   "" = Get_Option ("tag_base") or else
 --                                    Wp_Rewrite.Using_Index_Permalinks),
 --               Build ("ep_mask",      Ep_Tags)
-            ))),
+            ])),
             Build ("post_format",
               (if Post_Format_Base /= ""
-               then Arrays.To_Array ((1 => Build ("slug", -Post_Format_Base)))
+               then To_Array_Type ([Build ("slug", -Post_Format_Base)])
                else Empty_Array)) -- False))
-         ));
+         ]);
       end if;
 
       Register_Taxonomy (
          "category",
          ["post"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("hierarchical",          True),
             Build ("query_var",             "category_name"),
             Build ("rewrite",               Get (Rewrite, "category")),
@@ -107,22 +109,22 @@ is
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
             Build ("_builtin",              True),
-            Build ("capabilities",          Arrays.To_Array ((
+            Build ("capabilities",          To_Array_Type ([
                Build ("manage_terms", "manage_categories"),
                Build ("edit_terms",   "edit_categories"),
                Build ("delete_terms", "delete_categories"),
                Build ("assign_terms", "assign_categories")
-            ))),
+            ])),
             Build ("show_in_rest",          True),
             Build ("rest_base",             "categories"),
             Build ("rest_controller_class", "WP_REST_Terms_Controller")
-         ))
+         ])
       );
 
       Register_Taxonomy (
          "post_tag",
          ["post"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("hierarchical",          False),
             Build ("query_var",             "tag"),
             Build ("rewrite",               Get (Rewrite, "post_tag")),
@@ -130,51 +132,51 @@ is
             Build ("show_ui",               True),
             Build ("show_admin_column",     True),
             Build ("_builtin",              True),
-            Build ("capabilities",          Arrays.To_Array ((
+            Build ("capabilities",          To_Array_Type ([
                Build ("manage_terms", "manage_post_tags"),
                Build ("edit_terms",   "edit_post_tags"),
                Build ("delete_terms", "delete_post_tags"),
                Build ("assign_terms", "assign_post_tags")
-            ))),
+            ])),
             Build ("show_in_rest",          True),
             Build ("rest_base",             "tags"),
             Build ("rest_controller_class", "WP_REST_Terms_Controller")
-         ))
+         ])
       );
 
       Register_Taxonomy (
          "nav_menu",
          ["nav_menu_item"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("public",                False),
             Build ("hierarchical",          False),
-            Build ("labels",                Arrays.To_Array ((
+            Build ("labels",                To_Array_Type ([
                Build ("name",          abs "Navigation Menus"),
                Build ("singular_name", abs "Navigation Menu")
-            ))),
+            ])),
             Build ("query_var",             False),
             Build ("rewrite",               False),
             Build ("show_ui",               False),
             Build ("_builtin",              True),
             Build ("show_in_nav_menus",     False),
-            Build ("capabilities",          Arrays.To_Array ((
+            Build ("capabilities",          To_Array_Type ([
                Build ("manage_terms", "edit_theme_options"),
                Build ("edit_terms",   "edit_theme_options"),
                Build ("delete_terms", "edit_theme_options"),
                Build ("assign_terms", "edit_theme_options")
-            ))),
+            ])),
             Build ("show_in_rest",          True),
             Build ("rest_base",             "menus"),
             Build ("rest_controller_class", "WP_REST_Menus_Controller")
-         ))
+         ])
       );
 
       Register_Taxonomy (
          "link_category",
          ["link"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("hierarchical", False),
-            Build ("labels",       Arrays.To_Array ((
+            Build ("labels",       To_Array_Type ([
                Build ("name",                       abs "Link Categories"),
                Build ("singular_name",              abs "Link Category"),
                Build ("search_items",               abs "Search Link Categories"),
@@ -188,76 +190,76 @@ is
                Build ("add_or_remove_items",        ""), -- null),
                Build ("choose_from_most_used",      ""), -- null),
                Build ("back_to_items",              abs "&larr; Go to Link Categories")
-            ))),
-            Build ("capabilities", Arrays.To_Array ((
+            ])),
+            Build ("capabilities", To_Array_Type ([
                Build ("manage_terms", "manage_links"),
                Build ("edit_terms",   "manage_links"),
                Build ("delete_terms", "manage_links"),
                Build ("assign_terms", "manage_links")
-            ))),
+            ])),
             Build ("query_var",    False),
             Build ("rewrite",      False),
             Build ("public",       False),
             Build ("show_ui",      True),
             Build ("_builtin",     True)
-         ))
+         ])
       );
 
       Register_Taxonomy (
          "post_format",
          ["post"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("public",            True),
             Build ("hierarchical",      False),
-            Build ("labels",            Arrays.To_Array ((
+            Build ("labels",            To_Array_Type ([
                Build ("name",          X_X ("Formats", "post format")),
                Build ("singular_name", X_X ("Format", "post format"))
-            ))),
+            ])),
             Build ("query_var",         True),
             Build ("rewrite",           Get (Rewrite, "post_format")),
             Build ("show_ui",           False),
             Build ("_builtin",          True),
             Build ("show_in_nav_menus",
                    Inc_Themes.Current_Theme_Supports ("post-formats"))
-         ))
+         ])
        );
 
       Register_Taxonomy (
          "wp_theme",
          ["wp_template", "wp_template_part", "wp_global_styles"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("public",            False),
             Build ("hierarchical",      False),
-            Build ("labels",            Arrays.To_Array ((
+            Build ("labels",            To_Array_Type ([
                Build ("name",          abs "Themes"),
                Build ("singular_name", abs "Theme")
-            ))),
+            ])),
             Build ("query_var",         False),
             Build ("rewrite",           False),
             Build ("show_ui",           False),
             Build ("_builtin",          True),
             Build ("show_in_nav_menus", False),
             Build ("show_in_rest",      False)
-         ))
+         ])
       );
 
       Register_Taxonomy (
          "wp_template_part_area",
          ["wp_template_part"],
-         Arrays.To_Array ((
+         To_Array_Type ([
             Build ("public",            False),
             Build ("hierarchical",      False),
-            Build ("labels",            Arrays.To_Array ((
+            Build ("labels",            To_Array_Type ([
                Build ("name",          abs "Template Part Areas"),
                Build ("singular_name", abs "Template Part Area")
-            ))),
+            ])),
             Build ("query_var",         False),
             Build ("rewrite",           False),
             Build ("show_ui",           False),
             Build ("_builtin",          True),
             Build ("show_in_nav_menus", False),
             Build ("show_in_rest",      False)
-         ))
+         ])
       );
    end Create_Initial_Taxonomies;
 
@@ -535,6 +537,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Taxonomy;
@@ -593,12 +596,12 @@ is
                     Wp_Insert_Term (
                       Get_As_String (Taxonomy_Object.Default_Term, "name"),
                       Taxonomy,
-                      To_Array (List => (
+                      To_Array_Type ([
                         Build ("slug",
                                Sanitize_Title (Get_As_String (Taxonomy_Object.Default_Term, "slug"))),
                         Build ("description",
                                Get_As_String (Taxonomy_Object.Default_Term, "description"))
-                      ))
+                      ])
                     );
 
                   -- Update `term_id` in options.
@@ -1561,11 +1564,12 @@ is
                          return Array_Type -- Integer
    is
       use Php.Strings;
+      use Array_Lists;
       use Wp_Common;
       use Inc_Functions;
 
 --         global _wp_suspend_cache_invalidation;
-      Defaults : Array_Type := To_Array (List => (
+      Defaults : Array_Type := To_Array_Type ([
         Build ("get",                    "all"),
         Build ("fields",                 "ids"),
         Build ("number",                 1),
@@ -1573,7 +1577,7 @@ is
         Build ("order",                  "ASC"),
         Build ("orderby",                "term_id"),
         Build ("suppress_filter",        True)
-      ));
+      ]);
 
    begin
       -- if null === term then
@@ -1621,8 +1625,8 @@ is
             --    return 0;
             -- end if;
             Args  := Wp_Parse_Args (
-                       To_Array (List => (1 =>
-                         Build ("include", Term))), -- To_Array (Term)))),
+                       To_Array_Type ([
+                         Build ("include", Term)]), -- To_Array (Term)))),
                        Defaults);
             Terms := Get_Terms (Args);
          else
@@ -1639,16 +1643,16 @@ is
 
                Args  :=
                  Wp_Parse_Args
-                   (To_Array (List => (1 =>
-                      Build ("slug", Inc_Formatting.Sanitize_Title (Term_2)))),
+                   (To_Array_Type ([
+                      Build ("slug", Inc_Formatting.Sanitize_Title (Term_2))]),
                     Defaults);
             end;
 
             Terms := Get_Terms (Args);
             if Terms = Empty_Term_Array then -- or else Is_Wp_Error (Terms) then
 --          if Empty (Terms) then -- or else Is_Wp_Error (Terms) then
-               Args  := Wp_Parse_Args (To_Array (List => (1 =>
-                                         Build ("name", Term))),
+               Args  := Wp_Parse_Args (To_Array_Type ([
+                                         Build ("name", Term)]),
                                        Defaults);
                Terms := Get_Terms (Args);
             end if;
@@ -1666,10 +1670,10 @@ is
 -- --          X_Term : Array_Type := Array_Shift (Terms);
 --          begin
 --             if not Empty (Taxonomy) then
---                return To_Array (List => (
+--                return To_Array_Type ([
 --                        Build ("term_id",          X_Term.Term_Id),         -- (string)
 --                        Build ("term_taxonomy_id", X_Term.Term_Taxonomy_Id)
---                       ));
+--                       ]);
 --             end if;
 
 --             return X_Term;  -- (string)

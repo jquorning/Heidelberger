@@ -12,6 +12,7 @@
 with Php.Strings;
 
 with Arrays;
+with Array_Lists;
 with Wp_Common;
 
 package body Inc_Feeds
@@ -49,19 +50,20 @@ is
                                return String
    is
       use Php.Strings;
+      use Array_Lists;
       use Wp_Common;
 
       Type_2 : constant String :=
         (if Empty (Typ) then Get_Default_Feed else Typ);
 
       Types : constant Array_Type :=
-        To_Array (List => (
+        To_Array_Type ([
           Build ("rss",      "application/rss+xml"),
           Build ("rss2",     "application/rss+xml"),
           Build ("rss-http", "text/xml"),
           Build ("atom",     "application/atom+xml"),
           Build ("rdf",      "application/rdf+xml")
-        ));
+        ]);
 
       Content_Type : constant String :=
         (if not Empty (Get_As_String (Types, Type_2))

@@ -29,7 +29,6 @@ with Inc_Formatting;
 with Inc_Functions;
 with Inc_KSES;
 with Inc_L10n;
-with Inc_Plugins;
 with Inc_Themes;
 
 package body Class_Theme_JSON
@@ -46,6 +45,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
 --    use Class_Theme_JSON;
       use Inc_Functions;
 
@@ -97,8 +97,8 @@ is
 --                            if Isset (-Preset.First_Element) or else Empty (Preset) then -- (0)
 
                                  X_Wp_Array_Set (This.Theme_JSON, Path,
-                                                 From_Array (To_Array (List => (1 =>
-                                                   Build (Origin, Preset)))));
+                                                 From_Array (To_Array_Type ([
+                                                   Build (Origin, Preset)])));
                               end if;
                            end if;
                         end;
@@ -495,8 +495,9 @@ is
    is
       use Php.Arrays;
       use Php.Lists;
-      use UStrings;
+      use Array_Lists;
       use List_Vectors;
+      use UStrings;
 
       Origins_2 : List_Type :=
         (if Origins.Is_Empty
@@ -550,15 +551,15 @@ is
          -- gap value.
          declare
             Base_Styles_Nodes : constant array (Positive range <>) of Array_Type :=
-             (To_Array (List => (
+             (To_Array_Type ([
                 Build ("path",     List_Type'["styles"]),
                 Build ("selector", ROOT_BLOCK_SELECTOR)
-              )),
-              To_Array (List => (
+              ]),
+              To_Array_Type ([
                 Build ("path",     List_Type'["styles", "blocks", "core/columns"]),
                 Build ("selector", ".wp-block-columns"),
                 Build ("name",     "core/columns")
-              ))
+              ])
              );
          begin
             for Base_Style_Node of Base_Styles_Nodes loop
@@ -609,11 +610,12 @@ is
                                Block_Metadata : Array_Type)
                                return String
    is
-      use UStrings;
       use Php.Arrays;
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
+      use UStrings;
       use Inc_Functions;
       use Inc_Themes;
 
@@ -796,10 +798,10 @@ is
                                                 Append (Declarations,
                                                         Key   => "XXX-914",
                                                         Value =>
-                                                          From_Array (To_Array (List => (
+                                                          From_Array (To_Array_Type ([
                                                   Build ("name",  CSS_Property),
                                                   Build ("value", As_String (Current_CSS_Value))
-                                                ))));
+                                                ])));
                                              end if;
                                           end;
                                        end loop;
@@ -900,13 +902,13 @@ is
                            begin
                               Append (Block_Rules, To_Ruleset (
                                 Layout_Selector,
-                                To_Array (List => (1 =>
-                                  To_Array (List => (
+                                To_Array_Type ([
+                                  To_Array_Type ([
                                     Build ("name",  "display"),
                                     Build ("value", Get_As_String (Layout_Definition,
                                                                     "displayMode"))
-                                  ))
-                                ))
+                                  ])
+                                ])
                               ));
                            end;
                         end if;
@@ -934,10 +936,10 @@ is
                                        then
                                           Append (Declarations,
                                             Key   => "XXX-913",
-                                            Value => From_Array (To_Array (List => (
+                                            Value => From_Array (To_Array_Type ([
                                               Build ("name",  CSS_Property),
                                               Build ("value", CSS_Value)
-                                            ))));
+                                            ])));
                                        end if;
                                     end;
                                  end loop;
@@ -1104,6 +1106,7 @@ is
                                     Origins  : List_Type)
                                     return String
    is
+      use Array_Lists;
       use UStrings;
 
       Selector_2 : constant String :=
@@ -1138,12 +1141,12 @@ is
                         Append (Stylesheet,
                                 To_Ruleset (
                                   Append_To_Selector (Selector, Class_Name),
-                                  To_Array (List => (1 =>
-                                    To_Array (List => (
+                                  To_Array_Type ([
+                                    To_Array_Type ([
                                       Build ("name",  Property),
                                       Build ("value", "var(" & CSS_Var & ") !important")
-                                    ))
-                                  ))
+                                    ])
+                                  ])
                                 ));
                      end;
                   end loop;
@@ -1207,6 +1210,8 @@ is
                                  Origins  : List_Type)
                                  return Array_Type
    is
+      use Array_Lists;
+
       Declarations : Array_Type;
    begin
       for Preset_Metadata of PRESETS_METADATA loop
@@ -1221,12 +1226,12 @@ is
                begin
                   Append (Declarations,
                     Key   => "XXX-911",
-                    Value => From_Array (To_Array (List => (
+                    Value => From_Array (To_Array_Type ([
                       Build ("name",
                         Replace_Slug_In_String (
                           Get_As_String (Preset_Metadata, "css_vars"), Slug)),
                       Build ("value", Value)
-                    ))));
+                    ])));
                end;
             end loop;
          end;
@@ -1344,6 +1349,7 @@ is
    function Compute_Theme_Vars (Settings : Array_Type)
                                 return Array_Type
    is
+      use Array_Lists;
       use Inc_Functions;
 
       Declarations  : Array_Type;
@@ -1360,10 +1366,10 @@ is
             Value : constant String := As_String (Element (A));
          begin
             Append (Declarations, Key => "XXX-908",
-                    Value => From_Array (To_Array (List => (
+                    Value => From_Array (To_Array_Type ([
               Build ("name",  "--wp--custom--" & Key),
               Build ("value", Value)
-            ))));
+            ])));
          end;
       end loop;
 
@@ -1428,6 +1434,7 @@ is
                                Selectors  : Array_Type := Empty_Array)
                                return Array_Type
    is
+      use Array_Lists;
       use UStrings;
 
       Nodes : Array_Type;
@@ -1437,10 +1444,10 @@ is
       end if;
 
       -- Top-level.
-      Append (Nodes, Key => "XXX-910", Value => From_Array (To_Array (List => (
+      Append (Nodes, Key => "XXX-910", Value => From_Array (To_Array_Type ([
         Build ("path",     List_Type'["settings"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
-      ))));
+      ])));
 
       -- Calculate paths for blocks.
       if not Isset_2 (Theme_JSON, "settings", "blocks") then
@@ -1464,10 +1471,10 @@ is
 
                Append (Nodes,
                        Key   => "XXX-909",
-                       Value => From_Array (To_Array (List => (
+                       Value => From_Array (To_Array_Type ([
                  Build ("path",     List_Type'["settings", "blocks", Name]),
                  Build ("selector", -Selector)
-              ))));
+              ])));
             end;
          end loop;
       end;
@@ -1484,8 +1491,8 @@ is
                              return Array_Type
    is
       use Php.Arrays;
+      use Array_Lists;
       use Wp_Common;
-      use Inc_Plugins;
 
       Nodes : Array_Type;
    begin
@@ -1494,10 +1501,10 @@ is
       end if;
 
       -- Top-level.
-      Append (Nodes, Key => "XXX-902", Value => From_Array (To_Array (List => (
+      Append (Nodes, Key => "XXX-902", Value => From_Array (To_Array_Type ([
         Build ("path",     List_Type'["styles"]),
         Build ("selector", ROOT_BLOCK_SELECTOR)
-      ))));
+      ])));
 
       if Isset_2 (Theme_JSON, "styles", "elements") then
          for A in ELEMENTS.Iterate loop
@@ -1510,10 +1517,10 @@ is
                end if;
 
                Append (Nodes, Key => "XXX-906",
-                       Value => From_Array (To_Array (List => (
+                       Value => From_Array (To_Array_Type ([
                  Build ("path",     List_Type'["styles", "elements", Element]),
                  Build ("selector", Get_As_String (ELEMENTS, Element))
-               ))));
+               ])));
 
                -- Handle any pseudo selectors for the element.
                -- TODO: Replace array_key_exists() with isset() check once WordPress
@@ -1534,12 +1541,12 @@ is
                                    Element, Pseudo_Selector)
                         then
                            Append (Nodes, Key => "XXX-906",
-                             Value => From_Array (To_Array (List => (
+                             Value => From_Array (To_Array_Type ([
                              Build ("path",     List_Type'["styles", "elements", Element]),
                              Build ("selector",
                                     Append_To_Selector (Get_As_String (ELEMENTS, Element),
                                                         Pseudo_Selector))
-                           ))));
+                           ])));
                         end if;
                      end;
                   end loop;
@@ -1581,6 +1588,7 @@ is
    function Update_Separator_Declarations (Declarations : Array_Type)
                                            return Array_Type
    is
+      use Array_Lists;
       use UStrings;
 
       Declarations_2       : Array_Type := Declarations;
@@ -1623,10 +1631,10 @@ is
         not Text_Color_Matches
       then
          Append (Declarations_2, Key => "XXX-903",
-                 Value => From_Array (To_Array (List => (
+                 Value => From_Array (To_Array_Type ([
            Build ("name",  "color"),
            Build ("value", -Background_Color)
-         ))));
+         ])));
       end if;
 
       return Declarations_2;
@@ -1651,6 +1659,7 @@ is
                              return Array_Type
    is
       use Php.Arrays;
+      use Array_Lists;
       use UStrings;
 
       Selectors : constant Array_Type := Get_Blocks_Metadata;
@@ -1689,13 +1698,13 @@ is
                  +As_String (Get (Ref_2 (Selectors, Name, "features")));
             end if;
 
-            Append (Nodes, Key => "XXX-903", Value => From_Array (To_Array (List => (
+            Append (Nodes, Key => "XXX-903", Value => From_Array (To_Array_Type ([
               Build ("name",     Name),
               Build ("path",     List_Type'["styles", "blocks", Name]),
               Build ("selector", -Selector),
               Build ("duotone",  -Duotone_Selector),
               Build ("features", -Feature_Selectors)
-            ))));
+            ])));
 
             if Isset_4 (Theme_JSON, "styles", "blocks", Name, "elements") then
                for
@@ -1707,11 +1716,11 @@ is
                      Node    : Multi_Type      := Arrays.Element (B);
                   begin
                      Append (Nodes, Key => "XXX-902",
-                       Value => From_Array (To_Array (List => (
+                       Value => From_Array (To_Array_Type ([
                        Build ("path",     List_Type'[
                          "styles", "blocks", Name, "elements", Element]),
                        Build ("selector", As_String (Get (Ref_3 (Selectors, Name, "elements", Element))))
-                     ))));
+                     ])));
 
                      -- Handle any pseudo selectors for the element.
                      -- TODO: Replace array_key_exists() with isset() check once
@@ -1731,14 +1740,14 @@ is
                                          "elements", Element, Pseudo_Selector)
                               then
                                  Append (Nodes, Key => "XXX-901",
-                                         Value => From_Array (To_Array (List => (
+                                         Value => From_Array (To_Array_Type ([
                                    Build ("path",     List_Type'[
                                      "styles", "blocks", Name, "elements", Element]),
                                    Build ("selector",
                                      Append_To_Selector (
                                        As_String (Get (Ref_3 (Selectors, Name, "elements", Element))),
                                        Pseudo_Selector))
-                                 ))));
+                                 ])));
                               end if;
                            end;
                         end loop;
@@ -1780,6 +1789,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
 
@@ -1815,8 +1825,8 @@ is
                      -- Create temporary node containing only the feature data
                      -- to leverage existing `compute_style_properties` function.
                      Feature : constant Array_Type :=
-                       To_Array (List => (1 =>
-                         Build (Feature_Name, Get_As_String (Node, Feature_Name))));
+                       To_Array_Type ([
+                         Build (Feature_Name, Get_As_String (Node, Feature_Name))]);
 
                      -- Generate the feature"s declarations only.
                      New_Feature_Declarations : constant Array_Type :=
@@ -1996,6 +2006,7 @@ is
       use Php.Arrays;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
 
@@ -2087,16 +2098,16 @@ is
                   -- and therefore the original value will be returned.
                   --
                   Value_2 :=
-                    +Wp_Get_Typography_Font_Size_Value (To_Array (List => (1 =>
-                      Build ("size", As_String (Value)))));
+                    +Wp_Get_Typography_Font_Size_Value (To_Array_Type ([
+                      Build ("size", As_String (Value))]));
                end if;
 
                Append (Declarations,
                        Key   => "XXX-899",
-                       Value => From_Array (To_Array (List => (
+                       Value => From_Array (To_Array_Type ([
                  Build ("name",  CSS_Property),
                  Build ("value", -Value_2)
-               ))));
+               ])));
             end;
          end;
          << Continue >>
@@ -2662,11 +2673,12 @@ is
                                       return Array_Type
    is
       use Php.Types;
+      use Array_Lists;
 
-      Theme_Settings : Array_Type := To_Array (List => (
+      Theme_Settings : Array_Type := To_Array_Type ([
         Build ("version",  LATEST_SCHEMA),
         Build ("settings", Empty_Array)
-      ));
+      ]);
    begin
       -- Deprecated theme supports.
       if Isset (Settings, "disableCustomColors") then
@@ -2835,6 +2847,7 @@ is
       use Php.Numerics;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
@@ -2910,7 +2923,7 @@ is
 
             Append (Below_Sizes,
                     Key   => "XXX-898",
-                    Value => From_Array (To_Array (List => (
+                    Value => From_Array (To_Array_Type ([
                -- translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small.
                Build ("name", (if Below_Midpoint_Count = Steps_Mid_Point - 1
                                then abs "Small"
@@ -2918,7 +2931,7 @@ is
                                              [1 => Helpers.Image (X_Small_Count)]))),
                Build ("slug", Helpers.Image (Slug)),
                Build ("size", Float'Image (Round (Float (Current_Step), 2)) & Unit)
-            ))));
+            ])));
 
             if Below_Midpoint_Count = Steps_Mid_Point - 2 then
                X_Small_Count := 2;
@@ -2936,11 +2949,11 @@ is
 
          Append (Below_Sizes,
                  Key   => "XXX-898",
-                 Value => From_Array (To_Array (List => (
+                 Value => From_Array (To_Array_Type ([
             Build ("name", abs "Medium"),
             Build ("slug", "50"),
             Build ("size", Get_As_String (Spacing_Scale, "mediumStep") & Unit)
-         ))));
+         ])));
 
          declare
             Current_Step  : Natural := As_Integer (Get (Spacing_Scale, "mediumStep"));
@@ -2965,7 +2978,7 @@ is
 
                Append (Above_Sizes,
                        Key   => "XXX-897",
-                       Value => From_Array (To_Array (List => (
+                       Value => From_Array (To_Array_Type ([
                  -- translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large.
                  Build ("name", (if 0 = Above_Midpoint_Count
                                  then abs "Large"
@@ -2973,7 +2986,7 @@ is
                                                [1 => Helpers.Image (X_Large_Count)]))),
                  Build ("slug", Helpers.Image (Slug)),
                  Build ("size", Float'Image (Round (Float (Current_Step), 2)) & Unit)
-               ))));
+               ])));
 
                if 1 = Above_Midpoint_Count then
                   X_Large_Count := 2;

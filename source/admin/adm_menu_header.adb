@@ -13,6 +13,7 @@ with Php.Preg;
 with Php.Strings;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -25,7 +26,6 @@ with Inc_Capabilities;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_L10n;
-with Inc_Plugins;
 
 package body Adm_Menu_Header
 is
@@ -108,6 +108,7 @@ is
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use Constants;
       use Globals;
       use UStrings;
@@ -439,13 +440,13 @@ is
                                           File_Exists (String (Menu_File))
                                        then
                                           Sub_Item_Url := +Add_Query_Arg (
-                                             Arrays.To_Array ((1 =>
-                                                Build ("page", String (-Sub_Item.Menu_Slug)))),
+                                             To_Array_Type ([
+                                                Build ("page", String (-Sub_Item.Menu_Slug))]),
                                                         String (-Item.Menu_Slug));
                                        else
                                           Sub_Item_Url := +Add_Query_Arg (
-                                             Arrays.To_Array ((1 =>
-                                                Build ("page", String (-Sub_Item.Menu_Slug)))),
+                                             To_Array_Type ([
+                                                Build ("page", String (-Sub_Item.Menu_Slug))]),
                                                         "admin.php");
                                        end if;
                                        Sub_Item_Url := +ESC_URL (-Sub_Item_Url);
@@ -490,7 +491,6 @@ is
       use Php.Echoing;
       use Wp_Common;
       use Adm_Menu;
-      use Inc_Plugins;
       use Inc_L10n;
    begin
       Echo ("<div id=""adminmenumain"" role=""navigation"" aria-label=""");

@@ -48,7 +48,7 @@ is
    is
       use Php.Arrays;
       use Php.Types;
---    use UStrings;
+      use Array_Lists;
       use Inc_Functions;
    begin
       if File_Path /= "" then
@@ -58,8 +58,8 @@ is
 
          declare
             Decoded_File : constant Array_Type :=
-              Wp_JSON_File_Decode (File_Path, To_Array (List => (1 =>
-                                   Build ("associative", True))));
+              Wp_JSON_File_Decode (File_Path, To_Array_Type ([
+                                   Build ("associative", True)]));
          begin
             if Is_Array (Decoded_File) then
                Set (Static_Theme_JSON_File_Cache, File_Path, From_Array (Decoded_File));
@@ -210,16 +210,16 @@ is
                             Options    : Array_Type := Empty_Array)
                             return Class_Theme_JSON.Wp_Theme_JSON
    is
---    use UStrings;
-      use Inc_Functions;
+      use Array_Lists;
       use Class_Themes;
       use Class_Theme_JSON;
       use Class_Theme_JSON_Data;
+      use Inc_Functions;
       use Inc_Themes;
 
       Options_2 : constant Array_Type :=
-        Wp_Parse_Args (Options, To_Array (List => (1 =>
-                       Build ("with_supports", True))));
+        Wp_Parse_Args (Options, To_Array_Type ([
+                       Build ("with_supports", True)]));
    begin
       if not Deprecated.Is_Empty then
          X_Deprecated_Argument ("__METHOD__", "5.9.0");
@@ -377,6 +377,7 @@ is
    function Get_Block_Data
             return Class_Theme_JSON.Wp_Theme_JSON
    is
+      use Array_Lists;
       use Class_Block_Type_Registry;
       use Class_Theme_JSON;
       use Class_Theme_JSON_Data;
@@ -386,7 +387,7 @@ is
         Class_Block_Type_Registry.Get_Instance;
 
       Blocks   : constant Array_Type := From_Map (Registry.Get_All_Registered);
-      Config   : Array_Type := To_Array (List => (1 => Build ("version", 2)));
+      Config   : Array_Type := To_Array_Type ([Build ("version", 2)]);
    begin
       if
         Null_Theme_JSON /= Static_Blocks and then
@@ -493,6 +494,7 @@ is
    is
       use Php.HTML;
       use Php.Strings;
+      use Array_Lists;
       use Class_Posts;
       use Class_Themes;
       use Class_Querys;
@@ -522,7 +524,7 @@ is
          Post_Type_Filter : constant String := "wp_global_styles";
          Stylesheet       : constant String := Theme_2.Get_Stylesheet;
 
-         Args : constant Array_Type := To_Array (List => (
+         Args : constant Array_Type := To_Array_Type ([
             Build ("posts_per_page",      1),
             Build ("orderby",             "date"),
             Build ("order",               "desc"),
@@ -531,14 +533,14 @@ is
                    Post_Status_Filter (Post_Status_Filter.First_Index)),
             Build ("ignore_sticky_posts", True),
             Build ("no_found_rows",       True),
-            Build ("tax_query",           -- To_Array (List => (
-                                To_Array (List => (
+            Build ("tax_query",
+                                To_Array_Type ([
                                         Build ("taxonomy", "wp_theme"),
                                         Build ("field",    "name"),
                                         Build ("terms",    Stylesheet)
-                                ))
+                                ])
                         )
-         ));
+         ]);
 
          Global_Style_Query : Wp_Query; -- new ()
          Recent_Posts       : constant Post_Array := Global_Style_Query.Query (Args);
@@ -551,7 +553,7 @@ is
                CPT_Post_Id : Post_Id_Type;
             begin
                CPT_Post_Id :=
-                 Wp_Insert_Post (To_Array (List => (
+                 Wp_Insert_Post (To_Array_Type ([
                    Build ("post_content",
                           "{""version"": " &
                           Helpers.Image (Class_Theme_JSON.LATEST_SCHEMA) &
@@ -564,10 +566,10 @@ is
                    Build ("post_name",
                           Sprintf ("wp-global-styles-%s",
                                    [1 => URL_Encode (Stylesheet)])),
-                   Build ("tax_input",    To_Array (List => (1 =>
+                   Build ("tax_input",    To_Array_Type ([
                       Build ("wp_theme", Stylesheet) -- To_Array (Stylesheet))
-                   )))
-                 )),
+                   ]))
+                 ]),
                 True);
 
                -- if not Is_Wp_Error (CPT_Post_Id) then

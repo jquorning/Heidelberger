@@ -14,6 +14,7 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
+with Array_Lists;
 with Constants;
 with Globals;
 with Helpers;
@@ -46,7 +47,6 @@ with Inc_L10n;
 with Inc_Ms_Sites;
 with Inc_Options;
 with Inc_Pluggables;
-with Inc_Plugins;
 with Inc_Posts;
 with Inc_Rewrites;
 with Inc_Roles;
@@ -71,16 +71,16 @@ is
                         return Arrays.Array_Type
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
+      use Class_Users;
       use Adi_Schemas;
       use Inc_Caches;
-      use Class_Users;
       use Inc_Functions;
       use Inc_L10n;
       use Inc_Options;
       use Inc_Pluggables;
---    use Inc_Plugins;
       use Inc_Rewrites;
       use Inc_Users;
    begin
@@ -184,12 +184,12 @@ is
                Do_Action ("wp_install", User);
 
                return
-                 To_Array (List => (
+                 To_Array_Type ([
                    Build ("url",              Guess_URL),
                    Build ("user_id",          Integer (User_Id)),
                    Build ("password",         User_Password),
                    Build ("password_message", -Message)
-                 ));
+                 ]);
             end;
          end;
       end;
@@ -434,6 +434,7 @@ is
    procedure Upgrade_100
    is
       use Php.Strings;
+      use Array_Lists;
       use Globals;
       use UStrings;
       use Class_Categories;
@@ -484,10 +485,10 @@ is
                begin
                   WpDB.Update
                     (-WpDB.Categories,
-                     Data  => To_Array (List => (1 =>
-                       Build ("category_nicename", Newtitle))),
-                     Where => To_Array (List => (1 =>
-                       Build ("cat_ID", Category.Cat_Id))));
+                     Data  => To_Array_Type ([
+                       Build ("category_nicename", Newtitle)]),
+                     Where => To_Array_Type ([
+                       Build ("cat_ID", Category.Cat_Id)]));
                end;
             end if;
          end loop;
@@ -561,10 +562,10 @@ is
                      then
                         WpDB.Insert (
                           -WpDB.Post2cat,
-                          To_Array (List => (
+                          To_Array_Type ([
                             Build ("post_id",     Integer (Post.Id)),
                             Build ("category_id", -Post.Post_Category)
-                          ))
+                          ])
                         );
                      end if;
                   end;
@@ -600,6 +601,7 @@ is
    procedure Upgrade_110
    is
       use Php.Preg;
+      use Array_Lists;
       use Constants;
       use Globals;
       use UStrings;
@@ -626,8 +628,8 @@ is
                begin
                   WpDB.Update
                     (-WpDB.Users,
-                     To_Array (List => (1 => Build ("user_nicename", Newname))),
-                     To_Array (List => (1 => Build ("ID", Integer (User.Id))))
+                     To_Array_Type ([Build ("user_nicename", Newname)]),
+                     To_Array_Type ([Build ("ID", Integer (User.Id))])
                   );
                end;
             end if;
@@ -642,10 +644,10 @@ is
             if not Preg_Match ("/^[A-Fa-f0-9]{32}/", -Row.Prop.User_Pass) then
                WpDB.Update
                  (-WpDB.Users,
-                  To_Array (List => (1 =>
-                    Build ("user_pass", Php.Misc.MD5 (-Row.Prop.User_Pass)))),
-                  To_Array (List => (1 =>
-                    Build ("ID", Integer (Row.Id))))
+                  To_Array_Type ([
+                    Build ("user_pass", Php.Misc.MD5 (-Row.Prop.User_Pass))]),
+                  To_Array_Type ([
+                    Build ("ID", Integer (Row.Id))])
                  );
             end if;
          end loop;
@@ -743,6 +745,7 @@ is
    procedure Upgrade_130
    is
       use Php.Strings;
+      use Array_Lists;
       use Globals;
       use UStrings;
       use Class_Comments;
@@ -779,17 +782,17 @@ is
                      else -Post.GUID);
 
                   Update : constant Array_Type :=
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("post_title",   Post_Title),
                       Build ("post_content", Post_Content),
                       Build ("post_exerpt",  Post_Excerpt),
                       Build ("guid",         GUID)
-                    ));
+                    ]);
                begin
                   WpDB.Update
                     (-WpDB.Posts, Update,
-                     To_Array (List => (1 =>
-                       Build ("ID", Integer (Post.Id))))
+                     To_Array_Type ([
+                       Build ("ID", Integer (Post.Id))])
                     );
                end;
             end loop;
@@ -814,14 +817,14 @@ is
                     Deslash (-Comment.Comment_Author);
 
                   Update : constant Array_Type :=
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("comment_content", Comment_Content),
                       Build ("comment_author",  Comment_Author)
-                    ));
+                    ]);
                begin
                   WpDB.Update (-WpDB.Comments, Update,
-                               To_Array (List => (1 =>
-                                 Build ("comment_ID", -Comment.Comment_Id))));
+                               To_Array_Type ([
+                                 Build ("comment_ID", -Comment.Comment_Id)]));
                end;
             end loop;
          end if;
@@ -845,13 +848,13 @@ is
                     Deslash (-Link.Link_Description);
 
                   Update : constant Array_Type :=
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("link_name",        Link_Name),
                       Build ("link_description", Link_Description)
-                    ));
+                    ]);
                begin
-                  WpDB.Update (-WpDB.Links, Update, To_Array (List => (1 =>
-                    Build ("link_id", Link.Link_Id))));
+                  WpDB.Update (-WpDB.Links, Update, To_Array_Type ([
+                    Build ("link_id", Link.Link_Id)]));
                end;
             end loop;
          end if;
@@ -946,6 +949,7 @@ is
    procedure Upgrade_160
    is
       use Php.Strings;
+      use Array_Lists;
       use Constants;
       use Globals;
       use UStrings;
@@ -1039,10 +1043,10 @@ is
             --       end if;
 
             --       WpDB.Update (WpDB.Users,
-            --                    To_Array (List => (1 =>
-            --                      Build ("display_name", Id))),
-            --                    To_Array (List => (1 =>
-            --                      Build ("ID", User.Id)))
+            --                    To_Array_Type ([
+            --                      Build ("display_name", Id)]),
+            --                    To_Array_Type ([
+            --                      Build ("ID", User.Id)])
             --                   );
             --    end;
             -- end if;
@@ -1063,8 +1067,8 @@ is
                   begin
                      Update_User_Meta (User.Id,
                                        (-WpDB.Prefix) & "capabilities",
-                                       To_Array (List => (1 =>
-                                         Build (Role, True))));
+                                       To_Array_Type ([
+                                         Build (Role, True)]));
                   end;
                end if;
             end;
@@ -1097,10 +1101,10 @@ is
             for Comment of Comments loop
                WpDB.Update (
                  -WpDB.Posts,
-                 To_Array (List => (1 =>
-                   Build ("comment_count", -Comment.C))),
-                 To_Array (List => (1 =>
-                   Build ("ID", Integer (Comment.Comment_Post_Id)))));
+                 To_Array_Type ([
+                   Build ("comment_count", -Comment.C)]),
+                 To_Array_Type ([
+                   Build ("ID", Integer (Comment.Comment_Post_Id))]));
             end loop;
          end if;
       end;
@@ -1121,13 +1125,14 @@ is
             for Object of Objects loop
                WpDB.Update (
                  -WpDB.Posts,
-                 To_Array (List => (
+                 To_Array_Type ([
                    Build ("post_status",    "attachment"),
                    Build ("post_mime_type", -Object.Post_Type),
                    Build ("post_type",      "")
-                 )),
-                 To_Array (List => (1 =>
-                   Build ("ID", Integer (Object.Id))))
+                 ]),
+                 To_Array_Type ([
+                   Build ("ID", Integer (Object.Id))
+                 ])
                );
 
                declare
@@ -2385,12 +2390,12 @@ is
       use Php.Misc;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use Globals;
       use UStrings;
       use Wp_Common;
-      use Adi_Schemas;
       use Class_WpDB;
-      use Inc_Plugins;
+      use Adi_Schemas;
 
       List : constant List_Type :=
         ["", "all", "blog", "global", "ms_global"];
@@ -2907,10 +2912,10 @@ is
                                       (Index_Ary,
                                        Key_1 => Keyname,
                                        Key_2 => "columns",
-                                       Value => From_Array (To_Array (List => (
+                                       Value => From_Array (To_Array_Type ([
                                          Build ("fieldname", Get_As_String (Tableindex, "Column_Name")),
                                          Build ("subpart",   Get_As_String (Tableindex, "Sub_Part"))
-                                       )))
+                                       ]))
                                       );
 
                                     Set_2 (Index_Ary, Keyname, "unique",
@@ -3059,6 +3064,7 @@ is
       use Php.Files;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use Constants;
       use Globals;
       use UStrings;
@@ -3077,12 +3083,12 @@ is
       -- WP files are copied.
       --
       declare
-         Files : constant Array_Type := To_Array (List => (
+         Files : constant Array_Type := To_Array_Type ([
            Build ("index.php",             "index.php"),
            Build ("wp-layout.css",         "style.css"),
            Build ("wp-comments.php",       "comments.php"),
            Build ("wp-comments-popup.php", "comments-popup.php")
-         ));
+         ]);
       begin
          for A in Files.Iterate loop
             declare
@@ -3579,7 +3585,6 @@ is
    is
       use Wp_Common;
       use Inc_Functions;
-      use Inc_Plugins;
 
       -- Assume global tables should be upgraded.
       Should_Upgrade : Boolean := True;

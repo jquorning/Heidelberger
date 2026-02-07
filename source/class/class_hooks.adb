@@ -8,9 +8,9 @@
 
 with Ada.Containers;
 
-with Php.Arrays;
 with Php.Misc;
 
+with Array_Lists;
 with Logging;
 
 with Inc_Elab_Plugins;
@@ -35,6 +35,7 @@ is
                          Accepted_Args : Integer)
    is
       use Ada.Containers;
+      use Array_Lists;
       use Inc_Elab_Plugins;
 
       Index : constant String :=
@@ -43,10 +44,10 @@ is
       Priority_Existed : constant Boolean :=
         Priority_Maps.Has_Element (This.Callbacks.Find (Priority));
 
-      Item : constant Array_Type := Arrays.To_Array ((
+      Item : constant Array_Type := To_Array_Type ([
         Build ("function",      Callback),
         Build ("accepted_args", Accepted_Args)
-      ));
+      ]);
 
       Map : Index_Maps.Map;
    begin
@@ -256,7 +257,6 @@ is
                            Args  : Arrayable_Interfaces.Arrayable_Interface'Class)
                            return Array_Type
    is
-      use Php.Arrays;
       use Php.Misc;
       use Arrayable_Interfaces;
 

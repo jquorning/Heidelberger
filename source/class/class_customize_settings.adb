@@ -10,6 +10,7 @@ with Php.Arrays;
 with Php.Lists;
 with Php.Types;
 
+with Array_Lists;
 with Wp_Common;
 
 with Inc_Load;
@@ -595,6 +596,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Types;
+      use Array_Lists;
 
       Keys_2 : List_Type := Keys;
    begin
@@ -637,11 +639,11 @@ is
             return Empty_Array;
          end if;
 
-         return To_Array (List => (
+         return To_Array_Type ([
            Build ("root", Root), -- &
            Build ("node", Node), -- &
            Build ("key",  Last)
-         ));
+         ]);
       end;
    end Multidimensional;
 

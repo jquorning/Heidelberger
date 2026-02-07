@@ -16,6 +16,7 @@ with Php.Numerics;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Binder;
 with Helpers;
 with Helpers_3;
@@ -75,17 +76,19 @@ is
                                     Walker               : Walker_Type := null;
                                     Checked_Ontop        : Boolean     := True)
    is
+      use Array_Lists;
+
       Unused : constant String :=
         Wp_Terms_Checklist (
           Post_Id,
-          To_Array (List => (
+          To_Array_Type ([
             Build ("taxonomy",             "category"),
             Build ("descendants_and_self", Helpers.Image (Descendants_And_Self)),
             Build ("selected_cats",        Selected_Cats),
             Build ("popular_cats",         Popular_Cats),
 --          Build ("walker",               Walker),
             Build ("checked_ontop",        Boolean'Image (Checked_Ontop))
-          ))
+          ])
         );
    begin
       null;
@@ -126,6 +129,7 @@ is
       use Php.Numerics;
       use Php.Lists;
       use Php.Types;
+      use Array_Lists;
       use Helpers_3;
       use UStrings;
       use Wp_Common;
@@ -137,7 +141,7 @@ is
 
       Output : UString;
 
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
                 Build ("descendants_and_self", "0"),
                 Build ("selected_cats",        "false"),
                 Build ("popular_cats",         "false"),
@@ -145,7 +149,7 @@ is
                 Build ("taxonomy",             "category"),
                 Build ("checked_ontop",        "true"),
                 Build ("echo",                 "true")
-      ));
+      ]);
       --
       -- Filters the taxonomy terms checklist arguments.
       --
@@ -178,8 +182,9 @@ is
 
          Descendants_And_Self : constant Integer
             := Integer'Value (Get_As_String (Parsed_Args, "descendants_and_self"));
-         Args_2 : Array_Type := To_Array (List => (1 =>
-                                   Build ("taxonomy", Taxonomy)));
+
+         Args_2 : Array_Type := To_Array_Type ([
+                                   Build ("taxonomy", Taxonomy)]);
 
          Tax : constant Wp_Taxonomy := Inc_Taxonomys.Get_Taxonomy (Taxonomy);
 
@@ -218,26 +223,26 @@ is
          else
             Set (Args_2, "popular_cats",
                      Get_Terms (
-                        To_Array (List => (
+                        To_Array_Type ([
                                 Build ("taxonomy",     Taxonomy),
                                 Build ("fields",       "ids"),
                                 Build ("orderby",      "count"),
                                 Build ("order",        "DESC"),
                                 Build ("number",       "10"),
                                 Build ("hierarchical", "False")
-                       ))
+                       ])
             ));
          end if;
 
          if Descendants_And_Self /= 0 then
             Categories :=
               Get_Terms (  -- (array)
-                To_Array (List => (
+                To_Array_Type ([
                   Build ("taxonomy",     Taxonomy),
                   Build ("child_of",     Helpers.Image (Descendants_And_Self)),
                   Build ("hierarchical", "0"),
                   Build ("hide_empty",   "0")
-                ))
+                ])
               );
             declare
                Self : constant Wp_Term := Get_Term (Descendants_And_Self, Taxonomy);
@@ -247,10 +252,10 @@ is
          else
             Categories :=
               Get_Terms ( -- (array)
-                To_Array (List => (
+                To_Array_Type ([
                   Build ("taxonomy", Taxonomy),
                   Build ("get",      "all")
-                ))
+                ])
               );
          end if;
 
@@ -318,7 +323,7 @@ is
 -- --        end if;
 -- declare
 --         Terms : Array_Type := Get_Terms (
---                 To_Array ((
+--                 To_Array_Type ([
 --                         Build ("taxonomy",     Taxonomy),
 --                         Build ("orderby",      "count"),
 --                         Build ("order",        "DESC"),
@@ -387,7 +392,7 @@ is
 --         end if;
 
 --         Categories := Get_Terms (
---                 To_Array ((
+--                 To_Array_Type ([
 --                         Build ("taxonomy",   "link_category"),
 --                         Build ("orderby",    "name"),
 --                         Build ("hide_empty", "0")
@@ -554,7 +559,7 @@ is
 --         Content : String := Apply_Filters (
 --                 "wp_comment_reply",
 --                 "",
---                 To_Array ((
+--                 To_Array_Type ([
 --                         Build ("position", Position),
 --                         Build ("checkbox", Checkbox),
 --                         Build ("mode",     Mode)
@@ -596,7 +601,7 @@ is
 --         hb_Editor (
 --                 "",
 --                 "replycontent",
---                 To_Array ((
+--                 To_Array_Type ([
 --                         Build ("media_buttons", False),
 --                         Build ("tinymce",       False),
 --                         Build ("quicktags",     Quicktags_Settings)
@@ -898,7 +903,7 @@ is
 --                 "",
 --                 "addmeta",
 --                 False,
---                 To_Array ((
+--                 To_Array_Type ([
 --                         Build ("id",            "newmeta-submit"),
 --                         Build ("data-wp-lists", "add:the-list:newmeta")
 --                ))
@@ -1002,7 +1007,7 @@ is
 
 --         echo ("\n\n");
 
---         Map := To_Array ((
+--         Map := To_Array_Type ([
 --                 Build ("mm", To_Array (mm, cur_mm)),
 --                 Build ("jj", To_Array (jj, cur_jj)),
 --                 Build ("aa", To_Array (aa, cur_aa)),
@@ -1311,7 +1316,7 @@ is
 --                 Hb_Meta_Boxes (Page) (Context) (Priority) := Empty_Array;
 --         end if;
 
---         Hb_Meta_Boxes (Page) (Context) (Priority) (Id) := To_Array ((
+--         Hb_Meta_Boxes (Page) (Context) (Priority) (Id) := To_Array_Type ([
 --                 Build ("id",       Id),
 --                 Build ("title",    Title),
 --                 Build ("callback", Callback),
@@ -1376,7 +1381,7 @@ is
 --                 end if;
 --         elsif Data_Object in WP_Post then  -- instanceof
 --                 Edit_Url := Add_Query_Arg (
---                         To_Array ((
+--                         To_Array_Type ([
 --                                 Build ("classic-editor",         ""),
 --                                 Build ("classic-editor__forget", "")
 --                        )),
@@ -1814,7 +1819,7 @@ is
 -- begin
 --         global (Hb_Settings_Sections);
 
---         Defaults := To_Array ((
+--         Defaults := To_Array_Type ([
 --                 Build ("id",             Id),
 --                 Build ("title",          Title),
 --                 Build ("callback",       Callback),
@@ -1925,7 +1930,7 @@ is
 --                 Page := "reading";
 --         end if;
 
---         Wp_settings_fields (Page) (Section) (Id) := To_Array ((
+--         Wp_settings_fields (Page) (Section) (Id) := To_Array_Type ([
 --                 Build ("id",       Id),
 --                 Build ("title",    Title),
 --                 Build ("callback", Callback),
@@ -2070,7 +2075,7 @@ is
 -- begin
 --         global (Hb_Settings_Errors);
 
---         hb_Settings_Errors := To_Array ((  -- ()
+--         hb_Settings_Errors := To_Array_Type ([  -- ()
 --                 Build ("setting", Setting),
 --                 Build ("code",    Code),
 --                 Build ("message", Message),
@@ -3011,7 +3016,7 @@ is
          );
 
          -- return
-         --   To_Array ((
+         --   To_Array_Type ([
          --     Build ("id",   "_invalid"),
          --     Build ("base", "_are_belong_to_us")
          --   ));
@@ -3077,7 +3082,7 @@ is
 --          Half_Stars  : Natural;
 --          Empty_Stars : Natural;
 
---         Defaults : Array_Type   := To_Array ((
+--         Defaults : Array_Type   := To_Array_Type ([
 --                 Build ("rating", "0"),
 --                 Build ("type",   "rating"),
 --                 Build ("number", "0"),

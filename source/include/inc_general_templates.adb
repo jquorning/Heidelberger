@@ -703,6 +703,7 @@ is
    is
       use Php.HTML;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Sites;
@@ -711,9 +712,9 @@ is
       use Inc_Load;
       use Inc_Ms_Blogs;
 
-      Args : Array_Type := To_Array (List => (1 =>
+      Args : Array_Type := To_Array_Type ([
         Build ("action", "lostpassword")
-      ));
+      ]);
 
       Wp_Login_Path : UString;
    begin
@@ -1228,6 +1229,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Terms;
@@ -1238,9 +1240,9 @@ is
       Page  : Natural renames Globals.Global_Page;
       Paged : Natural renames Globals.Global_Paged;
 
-      Title : Array_Type := To_Array ((1 =>
+      Title : Array_Type := To_Array_Type ([
          Build ("title", "")
-      ));
+      ]);
    begin
       --
       -- Filters the document title before it is generated.
@@ -3258,6 +3260,7 @@ is
       use Php.Echoing;
       use Php.Strings;
       use Wp_Common;
+      use Array_Lists;
       use UStrings;
       use Inc_Feeds;
       use Inc_Formatting;
@@ -3271,14 +3274,14 @@ is
       end if;
 
       declare
-         Defaults : constant Array_Type := To_Array (List => (
+         Defaults : constant Array_Type := To_Array_Type ([
            -- translators: Separator between blog name and feed type in feed links.
            Build ("separator", X_X ("&raquo;", "feed link")),
            -- translators: 1: Blog title, 2: Separator (raquo).
            Build ("feedtitle", abs "%1s %2s Feed"),
            -- translators: 1: Blog title, 2: Separator (raquo).
            Build ("comstitle", abs "%1s %2s Comments Feed")
-         ));
+         ]);
 
          Args_2 : constant Array_Type := Wp_Parse_Args (Args, Defaults);
       begin
@@ -3351,6 +3354,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Posts;
@@ -3370,7 +3374,7 @@ is
       use Inc_Taxonomys;
 
       Defaults : constant Array_Type :=
-        To_Array (List => (
+        To_Array_Type ([
           -- translators: Separator between blog name and feed type in feed links.
           Build ("separator",     X_X ("&raquo;", "feed link")),
           -- translators: 1: Blog name, 2: Separator (raquo), 3: Post title.
@@ -3387,7 +3391,7 @@ is
           Build ("searchtitle",   abs "%1s %2s Search Results for &#8220;%3s&#8221; Feed"),
           -- translators: 1: Blog name, 2: Separator (raquo), 3: Post type name.
           Build ("posttypetitle", abs "%1s %2s %3s Feed")
-        ));
+        ]);
 
       Args_2 : constant Array_Type := Wp_Parse_Args (Args, Defaults);
 
@@ -3434,8 +3438,9 @@ is
                     [
                       1 => Get_Bloginfo ("name"),
                       2 => Get_As_String (Args_2, "separator"),
-                      3 => The_Title_Attribute (To_Array (List => (1 =>
-                             Build ("echo", False))))
+                      3 => The_Title_Attribute (To_Array_Type ([
+                             Build ("echo", False)
+                           ]))
                     ]
                   );
                declare
@@ -3776,18 +3781,19 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_HTTP;
 
       Hints : constant Array_Type :=
-        To_Array (List => (
+        To_Array_Type ([
           Build ("dns-prefetch", Wp_Dependencies_Unique_Hosts),
           Build ("preconnect",   Empty_List),
           Build ("prefetch",     Empty_List),
           Build ("prerender",    Empty_List)
-        ));
+        ]);
    begin
       for A in Hints.Iterate loop
          declare
@@ -4867,6 +4873,7 @@ is
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -4913,7 +4920,7 @@ is
                            ((-Global_Wp_Rewrite.Pagination_Base) & "/%#%", "paged")
                     else "?paged=%#%");
 
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
         Build ("base",              Pagenum_Link),
         -- http://example.com/all_posts.php%_% : %_% is replaced by format (below).
         Build ("format",            Format),
@@ -4932,7 +4939,7 @@ is
         Build ("add_fragment",       ""),
         Build ("before_page_number", ""),
         Build ("after_page_number",  "")
-      ));
+      ]);
 
       Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
    begin

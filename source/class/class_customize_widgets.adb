@@ -364,7 +364,6 @@ is
    procedure Customize_Controls_Init (This : in out Wp_Customize_Widgets)
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/includes/ajax-actions.php
       Do_Action ("load-widgets.php");
@@ -403,6 +402,7 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Plugins;
@@ -419,8 +419,8 @@ is
 
       Sidebars_Widgets :=
         Array_Merge (
-          Arry_1 => To_Array (List => (1 =>
-                      Build ("wp_inactive_widgets", Empty_Array))),
+          Arry_1 => To_Array_Type ([
+                      Build ("wp_inactive_widgets", Empty_Array)]),
           Arry_2 => Array_Fill_Keys (
                       Array_Keys (Global_Wp_Registered_Sidebars),
                       From_Array (Empty_Array)),
@@ -456,10 +456,10 @@ is
             Setting_Args : constant Array_Type :=
               This.Get_Setting_Args (
                 Setting_Id,
-                To_Array (List => (
+                To_Array_Type ([
                   Build ("type",  "global_variable"),
                   Build ("dirty", True)
-                ))
+                ])
               );
          begin
             This.Manager.Add_Setting (Setting_Id, Setting_Args);
@@ -468,7 +468,7 @@ is
 
       This.Manager.Add_Panel (
         "widgets",
-        To_Array (List => (
+        To_Array_Type ([
           Build ("type",                     "widgets"),
           Build ("title",                    abs "Widgets"),
           Build ("description",              abs "Widgets are independent sections of content that can be placed into widgetized areas provided by your theme (commonly called sidebars)."),
@@ -476,7 +476,7 @@ is
           Build ("active_callback",          To_Array (This, Is_Panel_Active'Access)),
           Build ("auto_expand_sole_section", True),
           Build ("theme_supports",           "widgets")
-        ))
+        ])
       );
 
       for A in Sidebars_Widgets.Iterate loop
@@ -528,7 +528,7 @@ is
 
                         if Is_Active_Sidebar then
                            declare
-                              Section_Args : Array_Type := To_Array (List => (
+                              Section_Args : Array_Type := To_Array_Type ([
                                 Build ("title",
                                        As_String (Get (Ref_2 (Global_Wp_Registered_Sidebars,
                                                               Key_1 => Sidebar_Id,
@@ -539,7 +539,7 @@ is
                                           List_Type'(Array_Keys (Global_Wp_Registered_Sidebars)), True)),
                                 Build ("panel",      "widgets"),
                                 Build ("sidebar_id", Sidebar_Id)
-                              ));
+                              ]);
                            begin
                               if Use_Widgets_Block_Editor then
                                  Set (Section_Args, "description", From_String (""));
@@ -588,12 +588,12 @@ is
                                       X_Construct (
                                         This.Manager,
                                         Setting_Id,
-                                        To_Array (List => (
+                                        To_Array_Type ([
                                           Build ("section",     -Section_Id),
                                           Build ("sidebar_id",  Sidebar_Id),
                                           Build ("label",       Get_As_String (Section_Args, "title")),
                                           Build ("description", Get_As_String (Section_Args, "description"))
-                                        ))
+                                        ])
                                       );
                                  begin
                                     This.Manager.Add_Control
@@ -608,12 +608,12 @@ is
                                       X_Construct (
                                         This.Manager,
                                         Setting_Id,
-                                        To_Array (List => (
+                                        To_Array_Type ([
                                           Build ("section",    -Section_Id),
                                           Build ("sidebar_id", Sidebar_Id),
                                           Build ("priority",   Sidebar_Widget_Ids.Length)
                                           -- place "Add Widget" and "Reorder" buttons at end.
-                                        ))
+                                        ])
                                       );
                                  begin
                                     This.Manager.Add_Control
@@ -675,7 +675,7 @@ is
                              X_Construct (
                                This.Manager,
                                Setting_Id,
-                               To_Array (List => (
+                               To_Array_Type ([
                                  Build ("label",          Get_As_String (Registered_Widget, "name")),
                                  Build ("section",        -Section_Id),
                                  Build ("sidebar_id",     Sidebar_Id),
@@ -685,7 +685,7 @@ is
                                  Build ("width",          Width),
                                  Build ("height",         Height),
                                  Build ("is_wide",        This.Is_Wide_Widget (Widget_Id))
-                               ))
+                               ])
                              );
                         begin
                            This.Manager.Add_Control
@@ -789,11 +789,12 @@ is
                              return Array_Type
    is
       use Php.Preg;
+      use Array_Lists;
 
-      Parsed : Array_Type := To_Array (List => (
+      Parsed : Array_Type := To_Array_Type ([
         Build ("number",  Null_Value),
         Build ("id_base", Null_Value)
-      ));
+      ]);
       Matches : List_Type;
    begin
       if Preg_Match ("/^(.+)-(\d+)/", Widget_Id, Matches) /= 0 then
@@ -813,7 +814,6 @@ is
    procedure Print_Styles (This : in out Wp_Customize_Widgets)
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/admin-header.php
       Do_Action ("admin_print_styles-widgets.php");
@@ -830,7 +830,6 @@ is
    procedure Print_Scripts (This : in out Wp_Customize_Widgets)
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/admin-header.php
       Do_Action ("admin_print_scripts-widgets.php");
@@ -849,12 +848,12 @@ is
       use Php.Arrays;
       use Php.HTML;
       use Php.Strings;
+      use Array_Lists;
       use Wp_Common;
       use Inc_Functions_Wp_Scripts;
       use Inc_Functions_Wp_Styles;
       use Inc_Functions;
       use Inc_General_Templates;
-      use Inc_Plugins;
       use Inc_L10n;
       use Inc_Widgets;
 
@@ -977,13 +976,13 @@ is
          end if;
 
          declare
-            Settings : constant Array_Type := To_Array (List => (
+            Settings : constant Array_Type := To_Array_Type ([
               Build ("registeredSidebars",
                      Array_Type'(Array_Values (Global_Wp_Registered_Sidebars))),
               Build ("registeredWidgets",   Global_Wp_Registered_Widgets),
               Build ("availableWidgets",    Available_Widgets),
               -- @todo Merge this with registered_widgets.
-              Build ("l10n",                        To_Array (List => (
+              Build ("l10n",                        To_Array_Type ([
                 Build ("saveBtnLabel",     abs "Apply"),
                 Build ("saveBtnTooltip",
                        abs "Save and preview changes before publishing them."),
@@ -1003,14 +1002,14 @@ is
                 -- translators: %d: The number of widgets found.
                 Build ("widgetsFound",     abs "Number of widgets found: %d"),
                 Build ("noWidgetsFound",   abs "No widgets found.")
-              ))),
-              Build ("tpl",                         To_Array (List => (
+              ])),
+              Build ("tpl",                         To_Array_Type ([
                 Build ("widgetReorderNav", Widget_Reorder_Nav_TPL),
                 Build ("moveWidgetArea",   Move_Widget_Area_TPL)
-              ))),
+              ])),
               Build ("selectiveRefreshableWidgets",
                      This.Get_Selective_Refreshable_Widgets)
-            ));
+            ]);
 
             Registered : constant Array_Type :=
               As_Array (Get (Settings, "registeredWidgets"));
@@ -1042,9 +1041,9 @@ is
 
                Block_Editor_Context : constant Wp_Block_Editor_Context :=
                  X_Construct (
-                   To_Array (List => (1 =>
+                   To_Array_Type ([
                      Build ("name", "core/customize-widgets")
-                   ))
+                   ])
                  );
 
                Editor_Settings : constant Array_Type := Get_Block_Editor_Settings (
@@ -1167,7 +1166,6 @@ is
    procedure Print_Footer_Scripts (This : in out Wp_Customize_Widgets)
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       -- This action is documented in wp-admin/admin-footer.php
       Do_Action ("admin_print_footer_scripts-widgets.php");
@@ -1192,14 +1190,15 @@ is
    is
       use Php.Arrays;
       use Php.Preg;
+      use Array_Lists;
       use Wp_Common;
       use Inc_Themes;
 
-      Args : Array_Type := To_Array (List => (
+      Args : Array_Type := To_Array_Type ([
         Build ("type",       "option"),
         Build ("capability", "edit_theme_options"),
         Build ("default",    Empty_Array)
-      ));
+      ]);
 
       Pattern_Widgets : constant String :=
         Get_As_String (This.Setting_Id_Patterns, "sidebar_widgets");
@@ -1290,6 +1289,7 @@ is
    is
       use Php.Arrays;
       use Php.Sorting;
+      use Array_Lists;
       use Adi_Widgets;
       use Inc_Widgets;
 
@@ -1337,11 +1337,11 @@ is
                      Delete (Ref (Available_Widget, "callback"));
                      -- Not serializable to JSON.
                      declare
-                        Args : Array_Type := To_Array (List => (
+                        Args : Array_Type := To_Array_Type ([
                           Build ("widget_id",   Get_As_String (Widget, "id")),
                           Build ("widget_name", Get_As_String (Widget, "name")),
                           Build ("_display",    "template")
-                        ));
+                        ]);
 
                         Is_Disabled : Boolean := False;
 
@@ -1381,11 +1381,11 @@ is
                         declare
                            List_Widget_Controls_Args : constant Array_Type :=
                               Wp_List_Widget_Controls_Dynamic_Sidebar (
-                                To_Array (List => (
+                                To_Array_Type ([
                                   Build ("0", Args), -- "" added
                                   Build ("1",
                                          As_String (Get (Ref_2 (Widget, "params", "[0]"))))
-                                ))
+                                ])
                               );
 
                            Control_TPL : constant String :=
@@ -1406,7 +1406,7 @@ is
                            Available_Widget :=
                              Array_Merge (
                                Available_Widget,
-                               To_Array (List => (
+                               To_Array_Type ([
 
                                  Build ("temp_id",
                                         (if Isset (Args, "_temp_id")
@@ -1429,7 +1429,7 @@ is
                                  Build ("width",        Width),
                                  Build ("height",       Height),
                                  Build ("is_wide",      This.Is_Wide_Widget (Id))
-                               ))
+                               ])
                              );
 
                            Static_Available_Widgets.Append (
@@ -1588,15 +1588,16 @@ is
    is
       use Php.Arrays;
       use Php.Echoing;
+      use Array_Lists;
       use Inc_Functions;
       use Inc_L10n;
 
       Switched_Locale : constant Boolean :=
         Switch_To_Locale (Get_User_Locale);
 
-      L10n : constant Array_Type := To_Array (List => (1 =>
+      L10n : constant Array_Type := To_Array_Type ([
         Build ("widgetTooltip", abs "Shift-click to edit this widget.")
-      ));
+      ]);
    begin
       if Switched_Locale then
          Restore_Previous_Locale;
@@ -1610,7 +1611,7 @@ is
            Array_Filter (This.Rendered_Widgets);
 
          -- Prepare Customizer settings to pass to JavaScript.
-         Settings : constant Array_Type := To_Array (List => (
+         Settings : constant Array_Type := To_Array_Type ([
            Build ("renderedSidebars",
                   Array_Fill_Keys (Array_Keys (Rendered_Sidebars),
                                    From_Boolean (True))),
@@ -1626,7 +1627,7 @@ is
            Build ("l10n",                L10n),
            Build ("selectiveRefreshableWidgets",
                   This.Get_Selective_Refreshable_Widgets)
-         ));
+         ]);
       begin
          for
            A in
@@ -1751,6 +1752,7 @@ is
    is
       use Php.Arrays;
       use Php.Preg;
+      use Array_Lists;
       use Inc_Themes;
 
       Matches : List_Type;
@@ -1768,7 +1770,7 @@ is
          Partial_Args_2 :=
            Array_Merge (
              Partial_Args,
-             To_Array (List => (
+             To_Array_Type ([
                Build ("type",                "widget"),
                Build ("render_callback",
                       To_Array (This, Render_Widget_Partial'Access)),
@@ -1777,7 +1779,7 @@ is
                       This.Get_Setting_Id ("XXX-016")),
                       -- Matches ("widget_id"))), -- []
                Build ("capability",          "edit_theme_options")
-             ))
+             ])
            );
       end if;
 
@@ -1825,6 +1827,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Widgets;
@@ -1832,10 +1835,10 @@ is
       Params_2 : Array_Type := Params;
 
       Sidebar_Args : Array_Type := Array_Merge (
-        To_Array (List => (
+        To_Array_Type ([
           Build ("before_widget", ""),
           Build ("after_widget",  "")
-        )),
+        ]),
         As_Array (Get (Params_2, "[0]"))
       );
 
@@ -1863,9 +1866,9 @@ is
 
       declare
          Context : Array_Type :=
-           To_Array (List => (1 =>
+           To_Array_Type ([
              Build ("sidebar_id", Get_As_String (Sidebar_Args, "id"))
-           ));
+           ]);
 
 --         Attributes : Unbounded_String;
       begin

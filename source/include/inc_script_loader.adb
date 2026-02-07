@@ -150,6 +150,7 @@ is
    procedure Wp_Default_Packages_Vendor
      (Scripts : in out Class_Scripts.Wp_Scripts)
    is
+      use Array_Lists;
       use UStrings;
       use Inc_L10n;
       use Inc_Functions;
@@ -159,9 +160,9 @@ is
 
       Suffix : constant String := Wp_Scripts_Get_Suffix;
 
-      Vendor_Scripts : constant Array_Type := To_Array ((
-        Build ("react",       To_Array ((1 => Build ("wp-polyfill", "")))),
-        Build ("react-dom",   To_Array ((1 => Build ("react", "")))),
+      Vendor_Scripts : constant Array_Type := To_Array_Type ([
+        Build ("react",       To_Array_Type ([Build ("wp-polyfill", "")])),
+        Build ("react-dom",   To_Array_Type ([Build ("react", "")])),
         Build ("regenerator-runtime", ""),
         Build ("moment", ""),
         Build ("lodash", ""),
@@ -172,10 +173,10 @@ is
         Build ("wp-polyfill-dom-rect", ""),
         Build ("wp-polyfill-element-closest", ""),
         Build ("wp-polyfill-object-fit", ""),
-        Build ("wp-polyfill", To_Array ((1 => Build ("regenerator-runtime", ""))))
-      ));
+        Build ("wp-polyfill", To_Array_Type ([Build ("regenerator-runtime", "")]))
+      ]);
 
-      Vendor_Scripts_Versions : constant Array_Type := To_Array ((
+      Vendor_Scripts_Versions : constant Array_Type := To_Array_Type ([
         Build ("react",                       "17.0.1"),
         Build ("react-dom",                   "17.0.1"),
         Build ("regenerator-runtime",         "0.13.9"),
@@ -189,7 +190,7 @@ is
         Build ("wp-polyfill-element-closest", "2.0.2"),
         Build ("wp-polyfill-object-fit",      "2.3.5"),
         Build ("wp-polyfill",                 "3.15.0")
-      ));
+      ]);
    begin
       for A in Vendor_Scripts.Iterate loop
          declare
@@ -225,7 +226,7 @@ is
               [
                 1 => Get_User_Locale,
                 2 => Wp_JSON_Encode (From_Array (
-                  To_Array ((
+                  To_Array_Type ([
                   Build ("months",
                          List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Month))),
                   Build ("monthsShort",
@@ -234,18 +235,18 @@ is
                          List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Weekday))),
                   Build ("weekdaysShort",
                          List_Type'(Php.Arrays.Array_Values (Globals.Wp_Locale.Weekday_Abbrev))),
-                  Build ("week",           To_Array ((1 =>
+                  Build ("week",           To_Array_Type ([
                     Build ("dow", String'(Get_Option ("start_of_week", "0"))) -- (int), 0
-                  ))),
-                  Build ("longDateFormat", To_Array ((
+                  ])),
+                  Build ("longDateFormat", To_Array_Type ([
                     Build ("LT",   String'(Get_Option ("time_format", abs "g:i a"))),
 --                                              "LTS"  => null,
 --                                              "L"    => null,
                     Build ("LL",   String'(Get_Option ("date_format", abs "F j, Y"))),
                     Build ("LLL",  abs "F j, Y g:i a")
 --                                             "LLLL" => null,
-                  )))
-                ))
+                  ]))
+                ])
               ))
             ]),
             "after"
@@ -453,6 +454,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Dependency.Dependency_Maps;
       use Class_Users;
@@ -561,23 +563,23 @@ is
            Sprintf (
              "wp.date.setSettings( %s );",
              [1 => Wp_JSON_Encode (From_Array (
-               To_Array ((
-                 Build ("l10n",     To_Array ((
+               To_Array_Type ([
+                 Build ("l10n",     To_Array_Type ([
                    Build ("locale",        Get_User_Locale),
                    Build ("months",        List_Type'(Array_Values (Wp_Locale.Month))),
                    Build ("monthsShort",   List_Type'(Array_Values (Wp_Locale.Month_Abbrev))),
                    Build ("weekdays",      List_Type'(Array_Values (Wp_Locale.Weekday))),
                    Build ("weekdaysShort", List_Type'(Array_Values (Wp_Locale.Weekday_Abbrev))),
                    Build ("meridiem",      Wp_Locale.Meridiem), -- (object)
-                   Build ("relative",      To_Array ((
+                   Build ("relative",      To_Array_Type ([
                       -- translators: %s: Duration.
                       Build ("future", abs "%s from now"),
                       -- translators: %s: Duration.
                       Build ("past",   abs "%s ago")
-                   ))),
+                   ])),
                    Build ("startOfWeek",   Integer'(Get_Option ("start_of_week", 0)))
-                 ))),
-                 Build ("formats",  To_Array ((
+                 ])),
+                 Build ("formats",  To_Array_Type ([
                    -- translators: Time format, see
                    -- https://www.php.net/manual/datetime.format.php
                    Build ("time",  String'(Get_Option ("time_format", abs "g:i a"))),
@@ -590,13 +592,13 @@ is
                    -- translators: Abbreviated date/time format, see
                    -- https://www.php.net/manual/datetime.format.php
                    Build ("datetimeAbbreviated", abs "M j, Y g:i a")
-                 ))),
-                 Build ("timezone", To_Array ((
+                 ])),
+                 Build ("timezone", To_Array_Type ([
                    Build ("offset", Get_Option ("gmt_offset", 0)), -- (float)
                    Build ("string", Timezone_String),
                    Build ("abbr",   Timezone_Abbr)
-                 )))
-               ))
+                 ]))
+               ])
              ))]
            ),
            "after"
@@ -802,6 +804,7 @@ is
    function Wp_Scripts_Get_Suffix (Typ : String := "")
                                    return String
    is
+      use Array_Lists;
       use Constants;
       use Inc_Versions;
 --         static suffixes;
@@ -823,10 +826,10 @@ is
                Suffix     : constant String := (if SCRIPT_DEBUG then "" else ".min");
                Dev_Suffix : constant String := (if Develop_Src  then "" else ".min");
             begin
-               Static_Suffixes := Arrays.To_Array ((
+               Static_Suffixes := To_Array_Type ([
                   Build ("suffix",     Suffix),
                   Build ("dev_suffix", Dev_Suffix)
-               ));
+               ]);
             end;
          end;
       end if;
@@ -844,6 +847,7 @@ is
 
    procedure Wp_Default_Scripts (Scripts : in out Class_Scripts.Wp_Scripts)
    is
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -876,12 +880,12 @@ is
          Scripts.Localize (
            "utils",
            "userSettings",
-           To_Array ((
+           To_Array_Type ([
              Build ("url",    -Constants.SITECOOKIEPATH), -- (string)
              Build ("uid",    Integer (Inc_Users.Get_Current_User_Id)), -- (string)
 --           Build ("time",   (string) time(),
              Build ("secure", Boolean'Image ("https" = Php.HTML.Parse_URL (Site_URL, Php.HTML.PHP_URL_SCHEME)))
-           ))
+           ])
          );
       end if;
 
@@ -902,7 +906,7 @@ is
          Scripts.Localize (
            "quicktags",
            "quicktagsL10n",
-           To_Array ((
+           To_Array_Type ([
              Build ("closeAllOpenTags",      abs "Close all open tags"),
              Build ("closeTags",             abs "close tags"),
              Build ("enterURL",              abs "Enter the URL"),
@@ -932,7 +936,7 @@ is
              Build ("code",                  abs "Code"),
              Build ("codeClose",             abs "Close code tag"),
              Build ("more",                  abs "Insert Read More tag")
-           ))
+           ])
          );
       end if;
 
@@ -952,10 +956,10 @@ is
          Scripts.Localize (
            "wp-ajax-response",
            "wpAjax",
-           To_Array ((
+           To_Array_Type ([
              Build ("noPerm", abs "Sorry, you are not allowed to do that."),
              Build ("broken", abs "Something went wrong.")
-           ))
+           ])
          );
       end if;
 
@@ -967,12 +971,12 @@ is
          Scripts.Localize (
            "wp-api-request",
            "wpApiSettings",
-           To_Array ((
+           To_Array_Type ([
              Build ("root",     Sanitize_URL (Inc_REST_API.Get_REST_URL)),
              Build ("nonce",    (if Globals.WP_INSTALLING then ""
                                  else Inc_Pluggables.Wp_Create_Nonce ("wp_rest"))),
              Build ("versionString", "wp/v2/")
-           ))
+           ])
          );
       end if;
 
@@ -1136,14 +1140,14 @@ is
          Scripts.Localize (
            "jquery-ui-autocomplete",
            "uiAutocompleteL10n",
-           To_Array ((
+           To_Array_Type ([
              Build ("noResults",    abs "No results found."),
              -- translators: Number of results found when using jQuery UI Autocomplete.
              Build ("oneResult",    abs "1 result found. Use up and down arrow keys to navigate."),
              -- translators: %d: Number of results found when using jQuery UI Autocomplete.
              Build ("manyResults",  abs "%d results found. Use up and down arrow keys to navigate."),
              Build ("itemSelected", abs "Item selected.")
-           ))
+           ])
          );
       end if;
 
@@ -1174,7 +1178,7 @@ is
          Scripts.Localize (
            "thickbox",
            "thickboxL10n",
-           To_Array ((
+           To_Array_Type ([
              Build ("next",             abs "Next &gt;"),
              Build ("prev",             abs "&lt; Prev"),
              Build ("image",            abs "Image"),
@@ -1182,7 +1186,7 @@ is
              Build ("close",            abs "Close"),
              Build ("noiframes",        abs "This feature requires inline frames. You have iframes disabled or your browser does not support them."),
              Build ("loadingAnimation", Includes_URL ("js/thickbox/loadingAnimation.gif"))
-           ))
+           ])
          );
       end if;
 
@@ -1193,7 +1197,7 @@ is
 
       -- Error messages for Plupload.
       declare
-         Uploader_L10n : constant Array_Type := To_Array ((
+         Uploader_L10n : constant Array_Type := To_Array_Type ([
            Build ("queue_limit_exceeded",      abs "You have attempted to queue too many files."),
            -- translators: %s: File name.
            Build ("file_exceeds_size_limit",   abs "%s exceeds the maximum upload size for this site."),
@@ -1224,7 +1228,7 @@ is
            Build ("unsupported_image",         abs "This image cannot be displayed in a web browser. For best results convert it to JPEG before uploading."),
            Build ("noneditable_image",         abs "This image cannot be processed by the web server. Convert it to JPEG or PNG before uploading."),
            Build ("file_url_copied",           abs "The file URL has been copied to your clipboard")
-         ));
+         ]);
       begin
          Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", Empty_List, "1.3.5");
          Scripts.Add ("plupload", "/wp-includes/js/plupload/pluploadsuffix.js", ["moxiejs"], "2.1.9");
@@ -1296,11 +1300,11 @@ is
          Scripts.Localize (
            "wp-util",
            "_wpUtilSettings",
-           To_Array ((1 =>
-             Build ("ajax", To_Array ((1 =>
+           To_Array_Type ([
+             Build ("ajax", To_Array_Type ([
                Build ("url", Admin_URL ("admin-ajax.php", "relative"))
-           )))
-          ))
+           ]))
+          ])
          );
       end if;
 
@@ -1338,10 +1342,10 @@ is
            Php.Strings.Sprintf (
              "var mejsL10n = %s;",
              [Wp_JSON_Encode (From_Array (
-               To_Array ((
+               To_Array_Type ([
                  Build ("language",
                         Php.Strings.Strtolower (Php.Strings.Strtok (Determine_Locale, "_-"))),
-                 Build ("strings",  To_Array ((
+                 Build ("strings",  To_Array_Type ([
                  Build ("mejs.download-file",       abs "Download File"),
                  Build ("mejs.install-flash",       abs "You are using a browser that does not have Flash player enabled or installed. Please turn on your Flash player plugin or download the latest version from https://get.adobe.com/flashplayer/"),
                  Build ("mejs.fullscreen",          abs "Fullscreen"),
@@ -1414,8 +1418,8 @@ is
                  Build ("mejs.vietnamese",          abs "Vietnamese"),
                  Build ("mejs.welsh",               abs "Welsh"),
                  Build ("mejs.yiddish",             abs "Yiddish")
-               )))
-             )))
+               ]))
+             ]))
            )]
            ),
            "before"
@@ -1430,11 +1434,11 @@ is
                    ["mediaelement"], False, 1);
 
       declare
-         Mejs_Settings : constant Array_Type := To_Array ((
+         Mejs_Settings : constant Array_Type := To_Array_Type ([
            Build ("pluginPath",  Includes_URL ("js/mediaelement/", "relative")),
            Build ("classPrefix", "mejs-"),
            Build ("stretching",  "responsive")
-         ));
+         ]);
       begin
          if Did_Action ("init") then
             Scripts.Localize (
@@ -1481,11 +1485,11 @@ is
          Scripts.Localize (
            "zxcvbn-async",
            "_zxcvbnSettings",
-           To_Array ((1 =>
+           To_Array_Type ([1 =>
              Build ("src", (if not Guessed_URL
                             then Includes_URL ("/js/zxcvbn.min.js")
                             else -Scripts.Base_URL & "/wp-includes/js/zxcvbn.min.js"))
-           ))
+           ])
          );
       end if;
 
@@ -1498,14 +1502,14 @@ is
          Scripts.Localize (
            "password-strength-meter",
            "pwsL10n",
-           To_Array ((
+           To_Array_Type ([
              Build ("unknown",  X_X ("Password strength unknown", "password strength")),
              Build ("short",    X_X ("Very weak", "password strength")),
              Build ("bad",      X_X ("Weak", "password strength")),
              Build ("good",     X_X ("Medium", "password strength")),
              Build ("strong",   X_X ("Strong", "password strength")),
              Build ("mismatch", X_X ("Mismatch", "password mismatch"))
-           ))
+           ])
          );
       end if;
 
@@ -1539,12 +1543,12 @@ is
             Scripts.Localize (
               "user-profile",
               "userProfileL10n",
-              To_Array ((
+              To_Array_Type ([
                 Build ("user_id", User_Id),
                 Build ("nonce",
                   (if Wp_Installing then ""
                    else Inc_Pluggables.Wp_Create_Nonce ("reset-password-for-" & Helpers.Image (User_Id))))
-              ))
+              ])
             );
          end if;
       end;
@@ -1561,7 +1565,7 @@ is
          Scripts.Localize (
            "wplink",
            "wpLinkL10n",
-           To_Array ((
+           To_Array_Type ([
              Build ("title",          abs "Insert/edit link"),
              Build ("update",         abs "Update"),
              Build ("save",           abs "Add Link"),
@@ -1571,7 +1575,7 @@ is
              Build ("linkInserted",   abs "Link inserted."),
              -- translators: Minimum input length in characters to start searching posts in the "Insert/edit link" modal.
              Build ("minInputLength", "XXX-930") -- XXX -- Integer'Value (X_X ("3", "minimum input length for searching post links")))
-           ))
+           ])
          );
       end if;
 
@@ -1604,7 +1608,7 @@ is
          Scripts.Localize (
            "customize-controls",
            "_wpCustomizeControlsL10n",
-           To_Array ((
+           To_Array_Type ([
              Build ("activate",                abs "Activate &amp; Publish"),
              Build ("save",                    abs "Save &amp; Publish"),
              -- @todo Remove as not required.
@@ -1644,23 +1648,23 @@ is
              Build ("videoHeaderNotice",       abs "This theme does not support video headers on this page. Navigate to the front page or another page that supports video headers."),
              -- Used for overriding the file types allowed in Plupload.
              Build ("allowedFiles",            abs "Allowed Files"),
-             Build ("customCssError",          To_Array ((
+             Build ("customCssError",          To_Array_Type ([
                -- translators: %d: Error count.
                Build ("singular", X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 1)),
                -- translators: %d: Error count.
                Build ("plural",   X_N ("There is %d error which must be fixed before you can save.", "There are %d errors which must be fixed before you can save.", 2))
                -- @todo This is lacking, as some languages have a dedicated dual
                -- form. For proper handling of plurals in JS, see #20491.
-             ))),
+             ])),
              Build ("pageOnFrontError",        abs "Homepage and posts page must be different."),
-             Build ("saveBlockedError",        To_Array ((
+             Build ("saveBlockedError",        To_Array_Type ([
                 -- translators: %s: Number of invalid settings.
                 Build ("singular", X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 1)),
                 -- translators: %s: Number of invalid settings.
                 Build ("plural",   X_N ("Unable to save due to %s invalid setting.", "Unable to save due to %s invalid settings.", 2))
                 -- @todo This is lacking, as some languages have a dedicated dual
                 -- form. For proper handling of plurals in JS, see #20491.
-              ))),
+              ])),
               Build ("scheduleDescription",     abs "Schedule your customization changes to publish ('go live') at a future date."),
               Build ("themePreviewUnavailable", abs "Sorry, you cannot preview new themes when you have changes scheduled or saved as a draft. Please publish your changes, or wait until they publish to preview new themes."),
               Build ("themeInstallUnavailable", Php.Strings.Sprintf (
@@ -1686,7 +1690,7 @@ is
                     )
                   ]
                 ))
-                ))
+                ])
          );
       end if;
 
@@ -1726,12 +1730,12 @@ is
          Scripts.Localize (
            "media-models",
            "_wpMediaModelsL10n",
-           To_Array ((1 =>
-             Build ("settings", To_Array ((
+           To_Array_Type ([1 =>
+             Build ("settings", To_Array_Type ([
                Build ("ajaxurl", Admin_URL ("admin-ajax.php", "relative")),
-               Build ("post",    To_Array ((1 => Build ("id", 0))))
-             )))
-           ))
+               Build ("post",    To_Array_Type ([Build ("id", 0)]))
+             ]))
+           ])
          );
       end if;
       Scripts.Add ("wp-embed", "/wp-includes/js/wp-embedsuffix.js", Empty_List, False, 1);
@@ -1768,10 +1772,10 @@ is
             Scripts.Localize (
               "admin-comments",
               "adminCommentsSettings",
-              To_Array ((
+              To_Array_Type ([
                 Build ("hotkeys_highlight_first", Isset (XX_GET, "hotkeys_highlight_first")),
                 Build ("hotkeys_highlight_last",  Isset (XX_GET, "hotkeys_highlight_last"))
-              ))
+              ])
             );
          end if;
 
@@ -1838,9 +1842,9 @@ is
             Scripts.Localize (
               "updates",
               "_wpUpdatesSettings",
-              To_Array ((1 =>
+              To_Array_Type ([1 =>
                 Build ("ajax_nonce", (if Wp_Installing then "" else Inc_Pluggables.Wp_Create_Nonce ("updates")))
-              ))
+              ])
             );
          end if;
 
@@ -1902,6 +1906,7 @@ is
 
    procedure Wp_Default_Styles (Styles : in out Class_Styles.Wp_Styles)
    is
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
       use Inc_General_Templates;
@@ -2159,7 +2164,7 @@ is
          end;
 
          declare
-            Package_Styles : constant Array_Type := To_Array ((
+            Package_Styles : constant Array_Type := To_Array_Type ([
                 Build ("block-editor",         ["wp-components")),
                 Build ("block-library",        Empty_List),
                 Build ("block-directory",      Empty_List),
@@ -2202,7 +2207,7 @@ is
                         "wp-block-editor",
                         "wp-edit-blocks"
                 ])
-         ));
+         ]);
 
          begin
 
@@ -3533,12 +3538,12 @@ is
               "" /= Globals.Global_Wp_Styles.Get_Data (Handle, "path") and then
               File_Exists (Path)
             then
-               Styles_2.Append (To_Array (List => (
+               Styles_2.Append (To_Array_Type ([
                  Build ("handle", Handle),
                  Build ("src",    -Registered.Src),
                  Build ("path",   Path),
                  Build ("size",   Filesize (Path))
-               )));
+               ]));
             end if;
          end;
       end loop;

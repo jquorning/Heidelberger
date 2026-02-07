@@ -442,9 +442,9 @@ is
 --    Add_Action ("init", X_Register_Core_Block_Patterns_And_Categories'Access);
 --    Add_Action ("init", Check_Theme_Switched'Access, 99);
 
---    Add_Action ("init", To_Array (("WP_Block_Supports", "init")), 22);
---    Add_Action ("switch_theme", To_Array (("WP_Theme_JSON_Resolver", "clean_cached_data")));
---    Add_Action ("start_previewing_theme", To_Array (("WP_Theme_JSON_Resolver", "clean_cached_data")));
+--    Add_Action ("init", To_Array_Type (("WP_Block_Supports", "init")), 22);
+--    Add_Action ("switch_theme", To_Array_Type (("WP_Theme_JSON_Resolver", "clean_cached_data")));
+--    Add_Action ("start_previewing_theme", To_Array_Type (("WP_Theme_JSON_Resolver", "clean_cached_data")));
 
 --    Add_Action ("after_switch_theme", X_Wp_Menus_Changed'Access);
 --    Add_Action ("after_switch_theme", X_Wp_Sidebars_Changed'Access);
@@ -776,7 +776,7 @@ is
       -- Widgets.
 --    Add_Action ("after_setup_theme", Wp_Setup_Widgets_Block_Editor'Access, 1);
 --    Add_Action ("init", Wp_Widgets_Init'Access, 1);
---    Add_Action ("change_locale", To_Array (("WP_Widget_Media", "reset_default_labels")));
+--    Add_Action ("change_locale", To_Array_Type (("WP_Widget_Media", "reset_default_labels")));
 
       -- Admin Bar.
       -- Don"t remove. Wrong way to disable.

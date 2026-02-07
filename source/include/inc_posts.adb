@@ -15,6 +15,7 @@ with Php.Misc;
 with Php.Numerics;
 with Php.Strings;
 
+with Array_Lists;
 with Globals;
 with Helpers_3;
 with Wp_Common;
@@ -64,6 +65,7 @@ is
    --
    procedure Create_Initial_Post_Types
    is
+      use Array_Lists;
       use UStrings;
       use Inc_L10n;
    begin
@@ -73,9 +75,9 @@ is
                 "post",
                 Args_Type'(
                         Labels                =>
-                           Arrays.To_Array ((
-                              1 => Build ("name_admin_bar",
-                                          X_X ("Post", "add new from admin bar")))),
+                           To_Array_Type ([
+                             Build ("name_admin_bar",
+                                    X_X ("Post", "add new from admin bar"))]),
                         Public                => True,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.
                         X_Edit_Link           => +"post.php?post=%d", -- internal use only. don"t use this when registering your own post type.
@@ -125,9 +127,9 @@ is
                 "page",
                 Args_Type'(
                         Labels                =>
-                           Arrays.To_Array ((
-                             1 => Build ("name_admin_bar",
-                                         X_X ("Page", "add new from admin bar")))),
+                           To_Array_Type ([
+                             Build ("name_admin_bar",
+                                    X_X ("Page", "add new from admin bar"))]),
                         Public                => True,
                         Publicly_Queryable    => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
@@ -177,14 +179,14 @@ is
       Register_Post_Type (
                 "attachment",
                 Args_Type'(
-                        Labels                => Arrays.To_Array ((
+                        Labels                => To_Array_Type ([
                                 Build ("name",           X_X ("Media", "post type general name")),
                                 Build ("name_admin_bar", X_X ("Media", "add new from admin bar")),
                                 Build ("add_new",        X_X ("Add New", "file")),
                                 Build ("edit_item",      abs "Edit Media"),
                                 Build ("view_item",      abs "View Attachment Page"),
                                 Build ("attributes",     abs "Attachment Attributes")
-                        )),
+                        ]),
                         Public                => True,
                         Show_UI               => True,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.
@@ -192,8 +194,8 @@ is
                         Capability_Type_String => +"post",
                         Capability_Type_Array  => Empty_Array,
                         Capabilities          =>
-                           Arrays.To_Array ((
-                              1 => Build ("create_posts", "upload_files"))),
+                          To_Array_Type ([
+                            Build ("create_posts", "upload_files")]),
                         Map_Meta_Cap          => True,
                         Menu_Icon             => +"dashicons-admin-media",
                         Hierarchical          => False,
@@ -239,10 +241,10 @@ is
       Register_Post_Type (
                 "revision",
                 Args_Type'(
-                        Labels           => Arrays.To_Array ((
+                        Labels           => To_Array_Type ([
                                 Build ("name",          abs "Revisions"),
                                 Build ("singular_name", abs "Revision")
-                        )),
+                        ]),
                         Public           => False,
                         X_Builtin         => True, -- internal use only. don"t use this when registering your own post type.--
                         X_Edit_Link       => +"revision.php?revision=%d", -- internal use only. don"t use this when registering your own post type.--
@@ -290,10 +292,10 @@ is
       Register_Post_Type (
                 "nav_menu_item",
                 Args_Type'(
-                        Labels                => Arrays.To_Array ((
+                        Labels                => To_Array_Type ([
                                 Build ("name",          abs "Navigation Menu Items"),
                                 Build ("singular_name", abs "Navigation Menu Item")
-                        )),
+                        ]),
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
                         Hierarchical          => False,
@@ -303,9 +305,9 @@ is
                         Map_Meta_Cap          => True,
                         Capability_Type_String => Null_UString,
                         Capability_Type_Array  =>
-                           Arrays.To_Array ((1 => Build ("edit_theme_options",
-                                                         "edit_theme_options"))),
-                        Capabilities          => Arrays.To_Array ((
+                           To_Array_Type ([Build ("edit_theme_options",
+                                                  "edit_theme_options")]),
+                        Capabilities          => To_Array_Type ([
                                 -- Meta Capabilities.
                                 Build ("edit_post",              "edit_post"),
                                 Build ("read_post",              "read_post"),
@@ -322,7 +324,7 @@ is
                                 Build ("delete_others_posts",    "edit_theme_options"),
                                 Build ("edit_private_posts",     "edit_theme_options"),
                                 Build ("edit_published_posts",   "edit_theme_options")
-                        )),
+                        ]),
                         Show_In_REST          => True,
                         REST_Base             => +"menu-items",
                         REST_Controller_Class => +"WP_REST_Menu_Items_Controller",
@@ -363,10 +365,10 @@ is
       Register_Post_Type (
                 "custom_css",
                 Args_Type'(
-                        Labels           => Arrays.To_Array ((
+                        Labels           => To_Array_Type ([
                                 Build ("name",          abs "Custom CSS"),
                                 Build ("singular_name", abs "Custom CSS")
-                        )),
+                        ]),
                         Public           => False,
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
@@ -375,7 +377,7 @@ is
                         Can_Export       => True,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
                         Supports         => ["title", "revisions"],
-                        Capabilities     => Arrays.To_Array ((
+                        Capabilities     => To_Array_Type ([
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_post",            "edit_theme_options"),
                                 Build ("delete_published_posts", "edit_theme_options"),
@@ -388,7 +390,7 @@ is
                                 Build ("read_post",              "read"),
                                 Build ("read_private_posts",     "read"),
                                 Build ("publish_posts",          "edit_theme_options")
-                        )),
+                        ]),
 
                         -- Added
                         Map_Meta_Cap           => False,
@@ -429,7 +431,7 @@ is
       Register_Post_Type (
                 "customize_changeset",
                 Args_Type'(
-                        Labels           => Arrays.To_Array ((
+                        Labels           => To_Array_Type ([
                                 Build ("name",               X_X ("Changesets", "post type general name")),
                                 Build ("singular_name",      X_X ("Changeset", "post type singular name")),
                                 Build ("add_new",            X_X ("Add New", "Customize Changeset")),
@@ -441,7 +443,7 @@ is
                                 Build ("search_items",       abs "Search Changesets"),
                                 Build ("not_found",          abs "No changesets found."),
                                 Build ("not_found_in_trash", abs "No changesets found in Trash.")
-                        )),
+                        ]),
                         Public           => False,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
                         Map_Meta_Cap     => True,
@@ -453,7 +455,7 @@ is
                         Supports         => ["title", "author"],
                         Capability_Type_String => +"customize_changeset",
                         Capability_Type_Array  => Empty_Array,
-                        Capabilities     => Arrays.To_Array ((
+                        Capabilities     => To_Array_Type ([
                                 Build ("create_posts",           "customize"),
                                 Build ("delete_others_posts",    "customize"),
                                 Build ("delete_post",            "customize"),
@@ -469,7 +471,7 @@ is
                                 Build ("read",                   "read"),
                                 Build ("read_post",              "customize"),
                                 Build ("read_private_posts",     "customize")
-                        )),
+                        ]),
 
                         -- Added
 --                        Map_Meta_Cap           => False,
@@ -510,10 +512,10 @@ is
       Register_Post_Type (
                 "oembed_cache",
                 Args_Type'(
-                        Labels           => Arrays.To_Array ((
+                        Labels           => To_Array_Type ([
                                 Build ("name",          abs "oEmbed Responses"),
                                 Build ("singular_name", abs "oEmbed Response")
-                        )),
+                        ]),
                         Public           => False,
                         Hierarchical     => False,
                         Rewrite          => Empty_Rewrite,
@@ -563,10 +565,10 @@ is
       Register_Post_Type (
                 "user_request",
                 Args_Type'(
-                        Labels           => Arrays.To_Array ((
+                        Labels           => To_Array_Type ([
                                 Build ("name",          abs "User Requests"),
                                 Build ("singular_name", abs "User Request")
-                        )),
+                        ]),
                         Public           => False,
                         X_Builtin        => True, -- internal use only. don"t use this when registering your own post type.--
                         Hierarchical     => False,
@@ -616,7 +618,7 @@ is
       Register_Post_Type (
                 "wp_block",
                 Args_Type'(
-                        Labels                => Arrays.To_Array ((
+                        Labels                => To_Array_Type ([
                                 Build ("name",                     X_X ("Reusable blocks", "post type general name")),
                                 Build ("singular_name",            X_X ("Reusable block", "post type singular name")),
                                 Build ("add_new",                  X_X ("Add New", "Reusable block")),
@@ -636,7 +638,7 @@ is
                                 Build ("item_reverted_to_draft",   abs "Reusable block reverted to draft."),
                                 Build ("item_scheduled",           abs "Reusable block scheduled."),
                                 Build ("item_updated",             abs "Reusable block updated.")
-                        )),
+                        ]),
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
                         Show_UI               => True,
@@ -646,7 +648,7 @@ is
                         REST_Base              => +"blocks",
                         REST_Controller_Class  => +"WP_REST_Blocks_Controller",
                         Capability_Type_String => +"block",
-                        Capabilities           => Arrays.To_Array ((
+                        Capabilities           => To_Array_Type ([
                                 -- You need to be able to edit posts, in order to read blocks in their raw form.
                                 Build ("read",                   "edit_posts"),
                                 -- You need to be able to publish posts, in order to create blocks.
@@ -656,7 +658,7 @@ is
                                 Build ("delete_published_posts", "delete_published_posts"),
                                 Build ("edit_others_posts",      "edit_others_posts"),
                                 Build ("delete_others_posts",    "delete_others_posts")
-                        )),
+                        ]),
                         Map_Meta_Cap          => True,
                         Supports              => ["title", "editor", "revisions"],
 
@@ -703,7 +705,7 @@ is
       Register_Post_Type (
                 "wp_template",
                 Args_Type'(
-                        Labels                => Arrays.To_Array ((
+                        Labels                => To_Array_Type ([
                                 Build ("name",                  X_X ("Templates", "post type general name")),
                                 Build ("singular_name",         X_X ("Template", "post type singular name")),
                                 Build ("add_new",               X_X ("Add New", "Template")),
@@ -722,7 +724,7 @@ is
                                 Build ("filter_items_list",     abs "Filter templates list"),
                                 Build ("items_list_navigation", abs "Templates list navigation"),
                                 Build ("items_list",            abs "Templates list")
-                        )),
+                        ]),
                         Description           => +abs "Templates to include in your theme.",
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
@@ -734,8 +736,9 @@ is
                         REST_Base             => +"templates",
                         REST_Controller_Class => +"WP_REST_Templates_Controller",
                         Capability_Type_String => Null_UString,
-                        Capability_Type_Array  => Arrays.To_Array ((1 =>  Build ("template", "templates"))),
-                        Capabilities          => Arrays.To_Array ((
+                        Capability_Type_Array  => To_Array_Type ([
+                          Build ("template", "templates")]),
+                        Capabilities          => To_Array_Type ([
                                 Build ("create_posts",           "edit_theme_options"),
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_others_posts",    "edit_theme_options"),
@@ -748,7 +751,7 @@ is
                                 Build ("publish_posts",          "edit_theme_options"),
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("read_private_posts",     "edit_theme_options")
-                        )),
+                        ]),
                         Map_Meta_Cap          => True,
                         Supports              => ["title", "slug", "excerpt",
                                                   "editor", "revisions", "author"],
@@ -796,7 +799,7 @@ is
       Register_Post_Type (
                 "wp_template_part",
                 Args_Type'(
-                        Labels                => Arrays.To_Array ((
+                        Labels                => To_Array_Type ([
                                 Build ("name",                  X_X ("Template Parts", "post type general name")),
                                 Build ("singular_name",         X_X ("Template Part", "post type singular name")),
                                 Build ("add_new",               X_X ("Add New", "Template Part")),
@@ -815,7 +818,7 @@ is
                                 Build ("filter_items_list",     abs "Filter template parts list"),
                                 Build ("items_list_navigation", abs "Template parts list navigation"),
                                 Build ("items_list",            abs "Template parts list")
-                        )),
+                        ]),
                         Description           => +abs "Template parts to include in your templates.",
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don"t use this when registering your own post type.--
@@ -827,7 +830,7 @@ is
                         REST_Base             => +"template-parts",
                         REST_Controller_Class => +"WP_REST_Templates_Controller",
                         Map_Meta_Cap          => True,
-                        Capabilities          => Arrays.To_Array ((
+                        Capabilities          => To_Array_Type ([
                                 Build ("create_posts",           "edit_theme_options"),
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("delete_others_posts",    "edit_theme_options"),
@@ -840,7 +843,7 @@ is
                                 Build ("publish_posts",          "edit_theme_options"),
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("read_private_posts",     "edit_theme_options")
-                        )),
+                        ]),
                         Supports              => ["title", "slug", "excerpt",
                                                   "editor", "revisions", "author"],
 
@@ -894,7 +897,7 @@ is
                         Show_UI      => False,
                         Show_In_REST => False,
                         Rewrite      => Empty_Rewrite,
-                        Capabilities => Arrays.To_Array ((
+                        Capabilities => To_Array_Type ([
                                 Build ("read",                   "edit_theme_options"),
                                 Build ("create_posts",           "edit_theme_options"),
                                 Build ("edit_posts",             "edit_theme_options"),
@@ -902,7 +905,7 @@ is
                                 Build ("delete_published_posts", "edit_theme_options"),
                                 Build ("edit_others_posts",      "edit_theme_options"),
                                 Build ("delete_others_posts",    "edit_theme_options")
-                        )),
+                        ]),
                         Map_Meta_Cap => True,
                         Supports     => ["title", "editor", "revisions"],
 
@@ -950,7 +953,7 @@ is
       Register_Post_Type (
                 "wp_navigation",
                 Args_Type'(
-                        Labels                => Arrays.To_Array ((
+                        Labels                => To_Array_Type ([
                                 Build ("name",                  X_X ("Navigation Menus", "post type general name")),
                                 Build ("singular_name",         X_X ("Navigation Menu", "post type singular name")),
                                 Build ("add_new",               X_X ("Add New", "Navigation Menu")),
@@ -969,7 +972,7 @@ is
                                 Build ("filter_items_list",     abs "Filter Navigation Menu list"),
                                 Build ("items_list_navigation", abs "Navigation Menus list navigation"),
                                 Build ("items_list",            abs "Navigation Menus list")
-                        )),
+                        ]),
                         Description           => +abs "Navigation menus that can be inserted into your site.",
                         Public                => False,
                         X_Builtin             => True, -- internal use only. don't use this when registering your own post type.
@@ -980,7 +983,7 @@ is
                         Show_In_REST          => True,
                         Rewrite               => Empty_Rewrite,
                         Map_Meta_Cap          => True,
-                        Capabilities          => Arrays.To_Array ((
+                        Capabilities          => To_Array_Type ([
                                 Build ("edit_others_posts",      "edit_theme_options"),
                                 Build ("delete_posts",           "edit_theme_options"),
                                 Build ("publish_posts",          "edit_theme_options"),
@@ -992,7 +995,7 @@ is
                                 Build ("edit_private_posts",     "edit_theme_options"),
                                 Build ("edit_published_posts",   "edit_theme_options"),
                                 Build ("edit_posts",             "edit_theme_options")
-                        )),
+                        ]),
                         REST_Base             => +"navigation",
                         REST_Controller_Class => +"WP_REST_Posts_Controller",
                         Supports              => ["title", "editor", "revisions"],
@@ -1965,13 +1968,14 @@ is
                                   Args        : Status_Type)
                                   return Status_Type -- Array_Type
    is
+      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_L10n;
 
 --         global wp_post_statuses;
       -- Args prefixed with an underscore are reserved for internal use.
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
         Build ("label",                     False),
         Build ("label_count",               False),
         Build ("exclude_from_search",       null),
@@ -1984,7 +1988,7 @@ is
         Build ("show_in_admin_status_list", null),
         Build ("show_in_admin_all_list",    null),
         Build ("date_floating",             null)
-      ));
+      ]);
 
       Args_2 : Status_Type := Wp_Parse_Args_2 (Args, Defaults);
 --    Args     := (object) args;
@@ -2860,13 +2864,14 @@ is
 
    procedure X_Add_Post_Type_Submenus
    is
+      use Array_Lists;
       use UStrings;
       use Adi_Plugins;
       use Class_Post_Type;
 
       Post_Types : constant List_Type :=
-        Get_Post_Types (To_Array (List => (1 =>
-          Build ("show_ui", True))));
+        Get_Post_Types (To_Array_Type ([
+          Build ("show_ui", True)]));
    begin
       for PType of Post_Types loop
          declare
@@ -3182,10 +3187,11 @@ is
    function Get_Posts (Args : Array_Type := Empty_Array) -- null
                        return Class_Posts.Post_Array
    is
+      use Array_Lists;
       use Class_Querys;
       use Inc_Functions;
 
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
         Build ("numberposts",      5),
         Build ("category",         0),
         Build ("orderby",          "date"),
@@ -3196,7 +3202,7 @@ is
         Build ("meta_value",       ""),
         Build ("post_type",        "post"),
         Build ("suppress_filters", True)
-      ));
+      ]);
 
       Parsed_Args : Array_Type := Wp_Parse_Args (Args, Defaults);
    begin

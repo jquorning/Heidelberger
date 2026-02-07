@@ -11,6 +11,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Php.Arrays;
 with Php.Lists;
 
+with Array_Lists;
 with Globals;
 with Wp_Common;
 
@@ -55,6 +56,7 @@ is
    is
       use Php.Arrays;
       use Php.Lists;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -99,7 +101,7 @@ is
       Args_2 := Apply_Filters ("register_" & (-Globals.Taxonomy) & "_taxonomy_args",
                                Args_2, -This.Name, Object_Type); -- (array)
       declare
-         Defaults : constant Array_Type := To_Array (List => (
+         Defaults : constant Array_Type := To_Array_Type ([
            Build ("labels",                Empty_Array),
            Build ("description",           ""),
            Build ("public",                True),
@@ -125,7 +127,7 @@ is
            Build ("sort",                  Null_Value),
            Build ("args",                  Null_Value),
            Build ("_builtin",              False)
-         ));
+         ]);
       begin
          Args_2 := Array_Merge (Defaults, Args_2);
 --       Put_Line (Defaults.Length'Image);
@@ -164,11 +166,11 @@ is
               From_Array (
                 Wp_Parse_Args (
                   As_Boolean (Get (Args_2, "rewrite")),
-                  To_Array (List => (
+                  To_Array_Type ([
                     Build ("with_front",   True),
                     Build ("hierarchical", False) -- ,
 --                  Build ("ep_mask",      Ep_None)
-                  ))
+                  ])
               )));
 
          -- if Empty (Args_2 ("rewrite") ("slug")) then
@@ -226,12 +228,12 @@ is
       end if;
 
       declare
-         Default_Caps : constant Array_Type := To_Array (List => (
+         Default_Caps : constant Array_Type := To_Array_Type ([
            Build ("manage_terms", "manage_categories"),
            Build ("edit_terms",   "manage_categories"),
            Build ("delete_terms", "manage_categories"),
            Build ("assign_terms", "edit_posts")
-         ));
+         ]);
       begin
 --       Put_Line (Args_2'Image);
          Set (Args_2,
@@ -289,18 +291,18 @@ is
       if not Empty (Args_2, "default_term") then
          -- if not Is_Array (Args_2, "default_term") then
          --    Set (Args_2, "default_term",
-         --         To_Array (List => (1 =>
-         --           Build ("name", Get (Args_2, "default_term")))));
+         --         To_Array_Type ([
+         --           Build ("name", Get (Args_2, "default_term"))]));
          -- end if;
          Set (Args_2, "default_term",
               From_Array (
                 Wp_Parse_Args (
                   False, -- Get_Array (Args_2, "default_term"),
-                  To_Array (List => (
+                  To_Array_Type ([
                     Build ("name",        ""),
                     Build ("slug",        ""),
                     Build ("description", "")
-                  ))
+                  ])
               )));
       end if;
 
@@ -472,6 +474,7 @@ is
    function Get_Default_Labels
             return Array_Type
    is
+      use Array_Lists;
       use Inc_L10n;
 
       -- if ( ! empty( self::default_labels ) ) then
@@ -490,43 +493,43 @@ is
       Desc_Field_Description : constant String :=
         abs "The description is not prominent by default; however, some themes may show it.";
 
-      Self_Default_Labels : constant Array_Type := To_Array (List => (
-         Build ("name",                       To_Array ((1 => Build (X_X ("Tags", "taxonomy general name"), X_X ("Categories", "taxonomy general name"))))),
-         Build ("singular_name",              To_Array ((1 => Build (X_X ("Tag", "taxonomy singular name"), X_X ("Category", "taxonomy singular name"))))),
-         Build ("search_items",               To_Array ((1 => Build (abs "Search Tags", abs "Search Categories")))),
-         Build ("popular_items",              To_Array ((1 => Build (abs "Popular Tags", "null")))),
-         Build ("all_items",                  To_Array ((1 => Build (abs "All Tags", abs "All Categories")))),
-         Build ("parent_item",                To_Array ((1 => Build ("null", abs "Parent Category")))),
-         Build ("parent_item_colon",          To_Array ((1 => Build ("null", abs "Parent Category:")))),
-         Build ("name_field_description",     To_Array ((1 => Build (Name_Field_Description, Name_Field_Description)))),
-         Build ("slug_field_description",     To_Array ((1 => Build (Slug_Field_Description, Slug_Field_Description)))),
-         Build ("parent_field_description",   To_Array ((1 => Build ("null", Parent_Field_Description)))),
-         Build ("desc_field_description",     To_Array ((1 => Build (Desc_Field_Description, Desc_Field_Description)))),
-         Build ("edit_item",                  To_Array ((1 => Build (abs "Edit Tag", abs "Edit Category")))),
-         Build ("view_item",                  To_Array ((1 => Build (abs "View Tag", abs "View Category")))),
-         Build ("update_item",                To_Array ((1 => Build (abs "Update Tag", abs "Update Category")))),
-         Build ("add_new_item",               To_Array ((1 => Build (abs "Add New Tag", abs "Add New Category")))),
-         Build ("new_item_name",              To_Array ((1 => Build (abs "New Tag Name", abs "New Category Name")))),
-         Build ("separate_items_with_commas", To_Array ((1 => Build (abs "Separate tags with commas", "null")))),
-         Build ("add_or_remove_items",        To_Array ((1 => Build (abs "Add or remove tags", "null")))),
-         Build ("choose_from_most_used",      To_Array ((1 => Build (abs "Choose from the most used tags", "null")))),
-         Build ("not_found",                  To_Array ((1 => Build (abs "No tags found.", abs "No categories found.")))),
-         Build ("no_terms",                   To_Array ((1 => Build (abs "No tags", abs "No categories")))),
-         Build ("filter_by_item",             To_Array ((1 => Build ("null", abs "Filter by category")))),
-         Build ("items_list_navigation",      To_Array ((1 => Build (abs "Tags list navigation", abs "Categories list navigation")))),
-         Build ("items_list",                 To_Array ((1 => Build (abs "Tags list", abs "Categories list")))),
+      Self_Default_Labels : constant Array_Type := To_Array_Type ([
+         Build ("name",                       To_Array_Type ([Build (X_X ("Tags", "taxonomy general name"), X_X ("Categories", "taxonomy general name"))])),
+         Build ("singular_name",              To_Array_Type ([Build (X_X ("Tag", "taxonomy singular name"), X_X ("Category", "taxonomy singular name"))])),
+         Build ("search_items",               To_Array_Type ([Build (abs "Search Tags", abs "Search Categories")])),
+         Build ("popular_items",              To_Array_Type ([Build (abs "Popular Tags", "null")])),
+         Build ("all_items",                  To_Array_Type ([Build (abs "All Tags", abs "All Categories")])),
+         Build ("parent_item",                To_Array_Type ([Build ("null", abs "Parent Category")])),
+         Build ("parent_item_colon",          To_Array_Type ([Build ("null", abs "Parent Category:")])),
+         Build ("name_field_description",     To_Array_Type ([Build (Name_Field_Description, Name_Field_Description)])),
+         Build ("slug_field_description",     To_Array_Type ([Build (Slug_Field_Description, Slug_Field_Description)])),
+         Build ("parent_field_description",   To_Array_Type ([Build ("null", Parent_Field_Description)])),
+         Build ("desc_field_description",     To_Array_Type ([Build (Desc_Field_Description, Desc_Field_Description)])),
+         Build ("edit_item",                  To_Array_Type ([Build (abs "Edit Tag", abs "Edit Category")])),
+         Build ("view_item",                  To_Array_Type ([Build (abs "View Tag", abs "View Category")])),
+         Build ("update_item",                To_Array_Type ([Build (abs "Update Tag", abs "Update Category")])),
+         Build ("add_new_item",               To_Array_Type ([Build (abs "Add New Tag", abs "Add New Category")])),
+         Build ("new_item_name",              To_Array_Type ([Build (abs "New Tag Name", abs "New Category Name")])),
+         Build ("separate_items_with_commas", To_Array_Type ([Build (abs "Separate tags with commas", "null")])),
+         Build ("add_or_remove_items",        To_Array_Type ([Build (abs "Add or remove tags", "null")])),
+         Build ("choose_from_most_used",      To_Array_Type ([Build (abs "Choose from the most used tags", "null")])),
+         Build ("not_found",                  To_Array_Type ([Build (abs "No tags found.", abs "No categories found.")])),
+         Build ("no_terms",                   To_Array_Type ([Build (abs "No tags", abs "No categories")])),
+         Build ("filter_by_item",             To_Array_Type ([Build ("null", abs "Filter by category")])),
+         Build ("items_list_navigation",      To_Array_Type ([Build (abs "Tags list navigation", abs "Categories list navigation")])),
+         Build ("items_list",                 To_Array_Type ([Build (abs "Tags list", abs "Categories list")])),
          -- translators: Tab heading when selecting from the most used terms.
-         Build ("most_used",                  To_Array ((1 => Build (X_X ("Most Used", "tags"), X_X ("Most Used", "categories"))))),
-         Build ("back_to_items",              To_Array ((1 => Build (abs "&larr; Go to Tags", abs "&larr; Go to Categories")))),
-         Build ("item_link",                  To_Array (List => (1 =>
+         Build ("most_used",                  To_Array_Type ([Build (X_X ("Most Used", "tags"), X_X ("Most Used", "categories"))])),
+         Build ("back_to_items",              To_Array_Type ([Build (abs "&larr; Go to Tags", abs "&larr; Go to Categories")])),
+         Build ("item_link",                  To_Array_Type ([
                  Build (X_X ("Tag Link", "navigation link block title"),
-                        X_X ("Category Link", "navigation link block title"))))
+                        X_X ("Category Link", "navigation link block title"))])
          ),
-         Build ("item_link_description",      To_Array (List => (1 =>
+         Build ("item_link_description",      To_Array_Type ([
                  Build (X_X ("A link to a tag.", "navigation link block description"),
-                        X_X ("A link to a category.", "navigation link block description"))))
+                        X_X ("A link to a category.", "navigation link block description"))])
          )
-      ));
+      ]);
    begin
       return Self_Default_Labels;
    end Get_Default_Labels;

@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+with Array_Lists;
 with Lists;
 
 package Class_Theme_JSON
@@ -138,31 +139,31 @@ is
    --
    PRESETS_METADATA : constant array (Positive range <>) of Array_Type :=
      (
-       To_Array (List => (
+       Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["color", "palette"]),
          Build ("prevent_override",  List_Type'["color", "defaultPalette"]),
          Build ("use_default_names", False),
          Build ("value_key",         "color"),
          Build ("css_vars",          "--wp--preset--color--$slug"),
-         Build ("classes",           To_Array (List => (
+         Build ("classes",           Array_Lists.To_Array_Type ([
            Build (".has-$slug-color",            "color"),
            Build (".has-$slug-background-color", "background-color"),
            Build (".has-$slug-border-color",     "border-color")
-         ))),
+         ])),
          Build ("properties",
                 List_Type'["color", "background-color", "border-color"])
-       )),
-       To_Array (List => (
+       ]),
+       Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["color", "gradients"]),
          Build ("prevent_override",  List_Type'["color", "defaultGradients"]),
          Build ("use_default_names", False),
          Build ("value_key",         "gradient"),
          Build ("css_vars",          "--wp--preset--gradient--$slug"),
-         Build ("classes",           To_Array (List => (1 =>
-           Build (".has-$slug-gradient-background", "background")))),
+         Build ("classes",           Array_Lists.To_Array_Type ([
+           Build (".has-$slug-gradient-background", "background")])),
          Build ("properties",        List_Type'["background"])
-       )),
-       To_Array (List => (
+       ]),
+       Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["color", "duotone"]),
          Build ("prevent_override",  List_Type'["color", "defaultDuotone"]),
          Build ("use_default_names", False),
@@ -170,28 +171,28 @@ is
          Build ("css_vars",          "--wp--preset--duotone--$slug"),
          Build ("classes",           Empty_Array),
          Build ("properties",        List_Type'["filter"])
-       )),
-       To_Array (List => (
+       ]),
+       Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["typography", "fontSizes"]),
          Build ("prevent_override",  False),
          Build ("use_default_names", True),
          Build ("value_func",        "wp_get_typography_font_size_value"),
          Build ("css_vars",          "--wp--preset--font-size--$slug"),
-         Build ("classes",           To_Array (List => (1 =>
-           Build (".has-$slug-font-size", "font-size")))),
+         Build ("classes",           Array_Lists.To_Array_Type ([
+           Build (".has-$slug-font-size", "font-size")])),
          Build ("properties",        List_Type'["font-size"])
-       )),
-       To_Array (List => (
+       ]),
+       Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["typography", "fontFamilies"]),
          Build ("prevent_override",  False),
          Build ("use_default_names", False),
          Build ("value_key",         "fontFamily"),
          Build ("css_vars",          "--wp--preset--font-family--$slug"),
-         Build ("classes",           To_Array (List => (1 =>
-           Build (".has-$slug-font-family", "font-family")))),
+         Build ("classes",           Array_Lists.To_Array_Type ([
+           Build (".has-$slug-font-family", "font-family")])),
          Build ("properties",        List_Type'["font-family"])
-       )),
-       To_Array (List => (
+       ]),
+       Array_Lists.To_Array_Type ([
          Build ("path",              List_Type'["spacing", "spacingSizes"]),
          Build ("prevent_override",  False),
          Build ("use_default_names", True),
@@ -199,7 +200,7 @@ is
          Build ("css_vars",          "--wp--preset--spacing--$slug"),
          Build ("classes",           Empty_Array),
          Build ("properties",        List_Type'["padding", "margin"])
-       ))
+       ])
    );
 
    --
@@ -218,7 +219,7 @@ is
    --              removed the `--wp--style--block-gap` property.
    -- @var array
    --
-   PROPERTIES_METADATA : constant Array_Type := To_Array (List => (
+   PROPERTIES_METADATA : constant Array_Type := Array_Lists.To_Array_Type ([
      Build ("background",                        List_Type'["color", "gradient"]),
      Build ("background-color",                  List_Type'["color", "background"]),
      Build ("border-radius",                     List_Type'["border", "radius"]),
@@ -267,7 +268,7 @@ is
      Build ("text-transform",                    List_Type'["typography", "textTransform"]),
      Build ("filter",                            List_Type'["filter", "duotone"]),
      Build ("box-shadow",                        List_Type'["shadow"])
-  ));
+  ]);
 
    --
    -- Protected style properties.
@@ -280,9 +281,9 @@ is
    --
    -- @since 5.9.0
    --
-   PROTECTED_PROPERTIES : constant Array_Type := To_Array (List => (1 =>
+   PROTECTED_PROPERTIES : constant Array_Type := Array_Lists.To_Array_Type ([
      Build ("spacing.blockGap", List_Type'["spacing", "blockGap"])
-   ));
+   ]);
 
    --
    -- The top-level keys a theme.json can have.
@@ -313,16 +314,16 @@ is
    -- @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
    -- @var array
    --
-   VALID_SETTINGS : constant Array_Type := To_Array (List => ((
+   VALID_SETTINGS : constant Array_Type := Array_Lists.To_Array_Type ([
                 Build ("appearanceTools",               Null_Value),
                 Build ("useRootPaddingAwareAlignments", Null_Value),
-                Build ("border",                        To_Array (List => (
+                Build ("border",                        Array_Lists.To_Array_Type ([
                         Build ("color",  Null_Value),
                         Build ("radius", Null_Value),
                         Build ("style",  Null_Value),
                         Build ("width",  Null_Value)
-                ))),
-                Build ("color",                         To_Array (List => (
+                ])),
+                Build ("color",                         Array_Lists.To_Array_Type ([
                         Build ("background",       Null_Value),
                         Build ("custom",           Null_Value),
                         Build ("customDuotone",    Null_Value),
@@ -335,14 +336,14 @@ is
                         Build ("link",             Null_Value),
                         Build ("palette",          Null_Value),
                         Build ("text",             Null_Value)
-                ))),
+                ])),
                 Build ("custom",                        Null_Value),
-                Build ("layout",                        To_Array (List => (
+                Build ("layout",                        Array_Lists.To_Array_Type ([
                         Build ("contentSize", Null_Value),
                         Build ("definitions", Null_Value),
                         Build ("wideSize",    Null_Value)
-                ))),
-                Build ("spacing",                       To_Array (List => (
+                ])),
+                Build ("spacing",                       Array_Lists.To_Array_Type ([
                         Build ("customSpacingSize", Null_Value),
                         Build ("spacingSizes",      Null_Value),
                         Build ("spacingScale",      Null_Value),
@@ -350,8 +351,8 @@ is
                         Build ("margin",            Null_Value),
                         Build ("padding",           Null_Value),
                         Build ("units",             Null_Value)
-                ))),
-                Build ("typography",                    To_Array (List => (
+                ])),
+                Build ("typography",                    Array_Lists.To_Array_Type ([
                         Build ("fluid",          Null_Value),
                         Build ("customFontSize", Null_Value),
                         Build ("dropCap",        Null_Value),
@@ -363,8 +364,8 @@ is
                         Build ("lineHeight",     Null_Value),
                         Build ("textDecoration", Null_Value),
                         Build ("textTransform",  Null_Value)
-                )))
-        )));
+                ]))
+        ]);
 
    --
    -- The valid properties under the styles key.
@@ -378,8 +379,8 @@ is
    --              updated `blockGap` to be allowed at any level.
    -- @var array
    --
-   VALID_STYLES : constant Array_Type := To_Array (List => (
-                Build ("border",     To_Array (List => (
+   VALID_STYLES : constant Array_Type := Array_Lists.To_Array_Type ([
+                Build ("border",     Array_Lists.To_Array_Type ([
                         Build ("color",  Null_Value),
                         Build ("radius", Null_Value),
                         Build ("style",  Null_Value),
@@ -388,22 +389,22 @@ is
                         Build ("right",  Null_Value),
                         Build ("bottom", Null_Value),
                         Build ("left",   Null_Value)
-                ))),
-                Build ("color",      To_Array (List => (
+                ])),
+                Build ("color",      Array_Lists.To_Array_Type ([
                         Build ("background", Null_Value),
                         Build ("gradient",   Null_Value),
                         Build ("text",       Null_Value)
-                ))),
-                Build ("filter",     To_Array (List => (1 =>
+                ])),
+                Build ("filter",     Array_Lists.To_Array_Type ([
                         Build ("duotone", Null_Value)
-                ))),
+                ])),
                 Build ("shadow",     Null_Value),
-                Build ("spacing",    To_Array (List => (
+                Build ("spacing",    Array_Lists.To_Array_Type ([
                         Build ("margin",   Null_Value),
                         Build ("padding",  Null_Value),
                         Build ("blockGap", Null_Value)
-                ))),
-                Build ("typography", To_Array (List => (
+                ])),
+                Build ("typography", Array_Lists.To_Array_Type ([
                         Build ("fontFamily",     Null_Value),
                         Build ("fontSize",       Null_Value),
                         Build ("fontStyle",      Null_Value),
@@ -412,8 +413,8 @@ is
                         Build ("lineHeight",     Null_Value),
                         Build ("textDecoration", Null_Value),
                         Build ("textTransform",  Null_Value)
-                )))
-        ));
+                ]))
+        ]);
 
    --
    -- Defines which pseudo selectors are enabled for which elements.
@@ -428,10 +429,11 @@ is
    -- @since 6.1.0
    --
 -- VALID_ELEMENT_PSEUDO_SELECTORS : constant array (Positive range <>) of Array_Type := (
-   VALID_ELEMENT_PSEUDO_SELECTORS : constant Array_Type := To_Array (List => (
-     Build ("link",   List_Type'[":visited", ":hover", ":focus", ":active"]),
-     Build ("button", List_Type'[":visited", ":hover", ":focus", ":active"])
-   ));
+   VALID_ELEMENT_PSEUDO_SELECTORS : constant Array_Type :=
+     Array_Lists.To_Array_Type ([
+       Build ("link",   List_Type'[":visited", ":hover", ":focus", ":active"]),
+       Build ("button", List_Type'[":visited", ":hover", ":focus", ":active"])
+     ]);
 
    --
    -- The valid elements that can be found under styles.
@@ -440,7 +442,7 @@ is
    -- @since 6.1.0 Added `heading`, `button`. and `caption` elements.
    -- @var string[]
    --
-   ELEMENTS : constant Array_Type := To_Array (List => (
+   ELEMENTS : constant Array_Type := Array_Lists.To_Array_Type ([
      Build ("link",    "a:where(:not(.wp-element-button))"),
      -- The `where` is needed to lower the specificity.
      Build ("heading", "h1, h2, h3, h4, h5, h6"),
@@ -457,7 +459,7 @@ is
      -- new class names.
      Build ("caption", ".wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption"),
      Build ("cite",    "cite")
-   ));
+   ]);
 
 --         const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
 --                 "button"  => "wp-element-button",
@@ -471,12 +473,13 @@ is
    -- @since 6.1.0
    -- @var string[]
    --
-   BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS : constant Array_Type := To_Array (List => (
-     Build ("__experimentalBorder", "border"),
-     Build ("color",                "color"),
-     Build ("spacing",              "spacing"),
-     Build ("typography",           "typography")
-   ));
+   BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS : constant Array_Type :=
+     Array_Lists.To_Array_Type ([
+       Build ("__experimentalBorder", "border"),
+       Build ("color",                "color"),
+       Build ("spacing",              "spacing"),
+       Build ("typography",           "typography")
+     ]);
 
 --         --
 --         -- Returns a class name by an element name.

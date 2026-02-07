@@ -6,8 +6,6 @@
 -- @since 3.1.0
 --
 
-with Ada.Containers;
-
 with Php.Arrays;
 with Php.Echoing;
 with Php.Errors;
@@ -15,6 +13,7 @@ with Php.Lists;
 with Php.Misc;
 with Php.Strings;
 
+with Array_Lists;
 with Binder;
 with Helpers;
 with Wp_Common;
@@ -28,7 +27,6 @@ with Inc_Formatting;
 with Inc_L10n;
 with Inc_Link_Templates;
 with Inc_Options;
-with Inc_Plugins;
 
 package body Adi_Class_Wp_List_Tables
 is
@@ -41,6 +39,7 @@ is
                          return Wp_List_Table
    is
       use Php.Arrays;
+      use Array_Lists;
       use UStrings;
       use Adi_Templates;
       use Inc_Formatting;
@@ -54,12 +53,12 @@ is
       Args_2 : Array_Type :=
         Wp_Parse_Args (
           Args,
-          To_Array ((
+          To_Array_Type ([
             Build ("plural",   ""),
             Build ("singular", ""),
             Build ("ajax",     False),
             Build ("screen",   "null")
-          ))
+          ])
         );
    begin
       This.Screen := Convert_To_Screen (Get_As_String (Args, "screen"));
@@ -85,10 +84,10 @@ is
       end if;
 
       if Empty (This.Modes) then
-         This.Modes := To_Array ((
+         This.Modes := To_Array_Type ([
            Build ("list",    abs "Compact view"),
            Build ("excerpt", abs "Extended view")
-         ));
+         ]);
       end if;
 
       return This;
@@ -272,6 +271,7 @@ is
                          Input_Id : String)
    is
       use Php.Echoing;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Adi_Templates;
@@ -313,7 +313,7 @@ is
       Echo ("  ");
       Submit_Button
          (Text, "", "", False,
-          To_Array ((1 => Build ("id", "search-submit"))));
+          To_Array_Type ([Build ("id", "search-submit")]));
       Echo ("</p>" & NL);
 
    end Search_Box;
@@ -412,7 +412,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Views : Array_Type := This.Get_Views;
    begin
@@ -469,11 +468,11 @@ is
    is
       use Php.Arrays;
       use Php.Echoing;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Two : UString;
    begin
@@ -551,7 +550,7 @@ is
       Echo ("</select>" & NL & NL);
 
       Adi_Templates.Submit_Button (abs "Apply", "action", "", False,
-                                   To_Array ((1 => Build ("id", "doactiontwo"))));
+                                   To_Array_Type ([Build ("id", "doactiontwo")]));
       Echo (NL & NL);
    end Bulk_Actions;
 
@@ -1194,7 +1193,6 @@ is
       use Php.Strings;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Columns   : constant Array_Type := Adi_Screens.Get_Column_Headers (This.Screen);
       Default_2 : constant String     := This.Get_Default_Primary_Column_Name;
@@ -1235,7 +1233,6 @@ is
    is
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
    begin
       -- _column_headers is already set / cached.
 --       if
@@ -1255,7 +1252,7 @@ is
 
 --          declare
 --             Column_Headers : Columns_Type :=
--- --            Arrays.To_Array ((List =>
+-- --            Arrays.To_Array_Type ([
 --                                  (Empty_Array,
 --                                   Empty_Array,
 --                                   Empty_Array,
@@ -1338,7 +1335,6 @@ is
    is
       use Php.Arrays;
       use Php.Lists;
-      use type Ada.Containers.Count_Type;
 
       Column_Info : constant Columns_Type := This.Get_Column_Info;
 --    Columns  : constant List_Type  := Column_Info.Columns;
@@ -1648,11 +1644,12 @@ is
 
    procedure Display_Rows (This : in out Wp_List_Table)
    is
+      use Array_Lists;
    begin
       for Item in This.Items.Iterate loop
-         This.Single_Row (To_Array ((1 =>
+         This.Single_Row (To_Array_Type ([
                           Build (Key (Item), Get_As_String (This.Items, Key (Item))) -- Element (Item))
-                          )));
+                          ]));
       end loop;
    end Display_Rows;
 

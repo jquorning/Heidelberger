@@ -13,6 +13,7 @@ with Php.Lists;
 with Php.Misc;
 with Php.Preg;
 
+with Array_Lists;
 with Constants;
 with Globals;
 with UStrings;
@@ -44,46 +45,47 @@ is
    function Get_Default_Block_Categories
             return Array_Type
    is
+      use Array_Lists;
       use Inc_L10n;
    begin
       return
-        To_Array (List => (
-          To_Array (List => (
+        To_Array_Type ([
+          To_Array_Type ([
             Build ("slug",  "text"),
             Build ("title", X_X ("Text", "block category")),
             Build ("icon",  null)
-          )),
-          To_Array (List => (
+          ]),
+          To_Array_Type ([
             Build ("slug",  "media"),
             Build ("title", X_X ("Media", "block category")),
             Build ("icon",  null)
-          )),
-          To_Array (List => (
+          ]),
+          To_Array_Type ([
             Build ("slug",  "design"),
             Build ("title", X_X ("Design", "block category")),
             Build ("icon",  null)
-          )),
-          To_Array (List => (
+          ]),
+          To_Array_Type ([
             Build ("slug",  "widgets"),
             Build ("title", X_X ("Widgets", "block category")),
             Build ("icon",  null)
-          )),
-          To_Array (List => (
+          ]),
+          To_Array_Type ([
             Build ("slug",  "theme"),
             Build ("title", X_X ("Theme", "block category")),
             Build ("icon",  null)
-          )),
-          To_Array (List => (
+          ]),
+          To_Array_Type ([
             Build ("slug",  "embed"),
             Build ("title", X_X ("Embeds", "block category")),
             Build ("icon",  null)
-          )),
-          To_Array (List => (
+          ]),
+          To_Array_Type ([
             Build ("slug",  "reusable"),
             Build ("title", X_X ("Reusable Blocks", "block category")),
             Build ("icon",  null)
-          ))
-        ));
+          ])
+        ]);
    end Get_Default_Block_Categories;
 
    --------------------------
@@ -95,18 +97,18 @@ is
                  Class_Block_Editor_Contexts.Wp_Block_Editor_Context)
                return Array_Type
    is
+      use Array_Lists;
       use Wp_Common;
       use Class_Block_Editor_Contexts;
       use Class_Posts;
---    use Inc_Plugins;
 
       Block_Categories     : Array_Type := Get_Default_Block_Categories;
       Block_Editor_Context : constant Wp_Block_Editor_Context :=
         (if False -- Post_Or_Block_Editor_Context in Wp_Post -- instanceof
          then X_Construct ( -- new WP_Block_Editor_Context(
-                To_Array (List => (1 =>
+                To_Array_Type ([
                   Build ("post", "XXX-019") -- Post_Or_Block_Editor_Context)
-                )))
+                ]))
          else Post_Or_Block_Editor_Context);
 
       --
@@ -221,6 +223,7 @@ is
       use Php.Files;
       use Php.Lists;
       use Php.Misc;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Functions;
@@ -246,9 +249,10 @@ is
                Image_Size_Slug : constant String := Key (A);
                Image_Size_Name : constant String := As_String (Element (A));
 
-               Value : constant Array_Type := To_Array (List => (
+               Value : constant Array_Type := To_Array_Type ([
                  Build ("slug", Image_Size_Slug),
-                 Build ("name", Image_Size_Name)));
+                 Build ("name", Image_Size_Name)
+               ]);
             begin
                Append (Result, Key => "XXX-891", Value => From_Array (Value));
             end;
@@ -270,12 +274,12 @@ is
       -- This filter is documented in wp-admin/includes/media.php--
       Image_Size_Names : constant Array_Type := Apply_Filters (
         "image_size_names_choose",
-        To_Array (List => (
+        To_Array_Type ([
           Build ("thumbnail", abs "Thumbnail"),
           Build ("medium",    abs "Medium"),
           Build ("large",     abs "Large"),
           Build ("full",      abs "Full Size")
-        ))
+        ])
       );
 
       Available_Image_Sizes : constant Array_Type :=
@@ -310,14 +314,15 @@ is
       end if;
 
       if Static_Default_Editor_Styles_File_Contents_Bool then
-         Default_Editor_Styles := To_Array (List => (1 =>
-           To_Array (List => (1 =>
-             Build ("css", -Static_Default_Editor_Styles_File_Contents))
-           )));
+         Default_Editor_Styles := To_Array_Type ([
+           To_Array_Type ([
+             Build ("css", -Static_Default_Editor_Styles_File_Contents)
+           ])
+         ]);
       end if;
 
       declare
-         Editor_Settings : Array_Type := To_Array (List => (
+         Editor_Settings : Array_Type := To_Array_Type ([
            Build ("alignWide",             Boolean'(Get_Theme_Support ("align-wide"))),
            Build ("allowedBlockTypes",     True),
            Build ("allowedMimeTypes",      Get_Allowed_MIME_Types),
@@ -347,7 +352,7 @@ is
            -- The following flag is required to enable the new Gallery block
            -- format on the mobile apps in 5.9.
            Build ("__unstableGalleryWithImageBlocks", True)
-         ));
+         ]);
 
          -- Theme settings.
          Color_Palette : constant String :=
@@ -432,6 +437,7 @@ is
    is
       use Php.Echoing;
       use Php.Lists;
+      use Array_Lists;
       use UStrings;
       use Class_Block_Type_Registry;
       use Inc_Themes;
@@ -511,10 +517,10 @@ is
       Scripts_2 := +OB_Get_Clean;
 
       return
-        To_Array (List => (
+        To_Array_Type ([
           Build ("styles",  From_String (-Styles_2)),
           Build ("scripts", From_String (-Scripts_2))
-        ));
+        ]);
    end X_Wp_Get_Iframed_Editor_Assets;
 
    -------------------------------
@@ -528,6 +534,7 @@ is
                return Array_Type
    is
       use Php.Arrays;
+      use Array_Lists;
       use Wp_Common;
       use Class_Posts;
       use Inc_Global_Styles_And_Settings;
@@ -537,27 +544,27 @@ is
 
       Editor_Settings : Array_Type := Array_Merge (
         Get_Default_Block_Editor_Settings,
-        To_Array (List => (
+        To_Array_Type ([
           Build ("allowedBlockTypes", Get_Allowed_Block_Types (Block_Editor_Context)),
           Build ("blockCategories",   Get_Block_Categories (Block_Editor_Context))
-        )),
+        ]),
         Custom_Settings
       );
 
       Global_Styles : Array_Type;
 
-      Presets : Array_List_2 := ( -- To_Array (List =>
-        1 => To_Array (List => (
-               Build ("css",            "variables"),
-               Build ("__unstableType", "presets"),
-               Build ("isGlobalStyles", True)
-             )),
-        2 => To_Array (List => (
-               Build ("css",            "presets"),
-               Build ("__unstableType", "presets"),
-               Build ("isGlobalStyles", True)
-             ))
-        );
+      Presets : Array_List := [
+        To_Array_Type ([
+          Build ("css",            "variables"),
+          Build ("__unstableType", "presets"),
+          Build ("isGlobalStyles", True)
+        ]),
+        To_Array_Type ([
+          Build ("css",            "presets"),
+          Build ("__unstableType", "presets"),
+          Build ("isGlobalStyles", True)
+        ])
+      ];
    begin
       for Preset_Style of Presets loop
          declare
@@ -574,11 +581,11 @@ is
 
       if Class_Theme_JSON_Resolver.Theme_Has_Support then
          declare
-            Block_Classes : Array_Type := To_Array (List => (
+            Block_Classes : Array_Type := To_Array_Type ([
               Build ("css",            "styles"),
               Build ("__unstableType", "theme"),
               Build ("isGlobalStyles", True)
-            ));
+            ]);
             Actual_CSS : constant String :=
               Wp_Get_Global_Stylesheet (As_List (Get (Block_Classes, "css")));
          begin
@@ -592,11 +599,11 @@ is
          -- If there is no `theme.json` file, ensure base layout styles are still
          -- available.
          declare
-            Block_Classes : Array_Type := To_Array (List => (
+            Block_Classes : Array_Type := To_Array_Type ([
               Build ("css",            "base-layout-styles"),
               Build ("__unstableType", "base-layout"),
               Build ("isGlobalStyles", True)
-            ));
+            ]);
             Actual_CSS : constant String :=
               Wp_Get_Global_Stylesheet (As_List (Get (Block_Classes, "css")));
          begin
@@ -775,7 +782,7 @@ is
            Current_Theme_Supports ("disable-layout-styles")));
 
       Set (Editor_Settings, "__experimentalDiscussionSettings", From_Array (
-           To_Array (List => (
+           To_Array_Type ([
              Build ("commentOrder",        String'(Get_Option ("comment_order"))),
              Build ("commentsPerPage",     String'(Get_Option ("comments_per_page"))),
              Build ("defaultCommentsPage",
@@ -789,13 +796,13 @@ is
              Build ("avatarURL",
                Get_Avatar_URL (
                  "",
-                 To_Array (List => (
+                 To_Array_Type ([
                    Build ("size",          96),
                    Build ("force_default", True),
                    Build ("default",       String'(Get_Option ("avatar_default")))
-                 ))
+                 ])
                ))
-           ))
+           ])
           ));
 
       --
@@ -849,6 +856,7 @@ is
    is
       use Php.Files;
       use Php.Preg;
+      use Array_Lists;
       use Inc_HTTP;
       use Inc_Themes;
       use Inc_Load;
@@ -868,11 +876,11 @@ is
                begin
                   if not Is_Wp_Error (Response) then
                      Styles.Append (Key   => "XXX-890",
-                                    Value => From_Array (To_Array (List => (
+                                    Value => From_Array (To_Array_Type ([
                        Build ("css",            Wp_Remote_Retrieve_Body (Response)),
                        Build ("__unstableType", "theme"),
                        Build ("isGlobalStyles", False)
-                     ))));
+                     ])));
                   end if;
                end;
             else
@@ -881,12 +889,12 @@ is
                begin
                   if Is_File (File) then
                      Styles.Append (Key   => "XXX-889",
-                                    Value => From_Array (To_Array (List => (
+                                    Value => From_Array (To_Array_Type ([
                        Build ("css",            File_Get_Contents (File)),
                        Build ("baseURL",        Get_Theme_File_URI (Style)),
                        Build ("__unstableType", "theme"),
                        Build ("isGlobalStyles", False)
-                     ))));
+                     ])));
                   end if;
                end;
             end if;

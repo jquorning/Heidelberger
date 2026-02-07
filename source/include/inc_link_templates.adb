@@ -18,6 +18,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Constants;
 with Globals;
 with Helpers;
@@ -230,6 +231,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Posts;
@@ -283,8 +285,8 @@ is
          return Get_Attachment_Link (Post, Leavename);
       elsif
         In_List (-Post.Post_Type,
-                 Get_Post_Types (To_Array (List => (1 =>
-                    Build ("_builtin", False)))), True)
+                 Get_Post_Types (To_Array_Type ([
+                    Build ("_builtin", False)])), True)
       then
          return Get_Post_Permalink (Post, Leavename, Sample);
       end if;
@@ -319,9 +321,9 @@ is
 --                     Cats :=
 --                       Wp_List_Sort (
 --                         Cats,
---                         To_Array (List => (1 =>
+--                         To_Array_Type ([
 --                           Build ("term_id", "ASC")
---                         ))
+--                         ])
 --                       );
 
                      --
@@ -460,13 +462,13 @@ is
                                 return String
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Posts;
       use Class_Post_Type;
       use Inc_Functions;
       use Inc_Posts;
---    use Inc_Plugins;
 
       Post : constant Wp_Post := Get_Post (Id);
    begin
@@ -505,10 +507,10 @@ is
             else
                Post_Link :=
                  +Add_Query_Arg (
-                   To_Array (List => (
+                   To_Array_Type ([
                      Build ("post_type", -Post.Post_Type),
                      Build ("p",         Helpers.Image (Integer (Post.Id)))
-                   )),
+                   ]),
                    ""
                  );
             end if;
@@ -924,6 +926,7 @@ is
                                          return String
    is
       use Php.Strings;
+      use Array_Lists;
       use Wp_Common;
       use UStrings;
       use Class_Posts;
@@ -983,28 +986,28 @@ is
             if Unattached then
                URL :=
                  +Add_Query_Arg (
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("feed",          Feed),
                       Build ("attachment_id", Integer (Post_Id))
-                    )),
+                    ]),
                     Home_URL ("/")
                   );
             elsif "page" = Post.Post_Type then
                URL :=
                  +Add_Query_Arg (
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("feed",    Feed),
                       Build ("page_id", Integer (Post_Id))
-                    )),
+                    ]),
                     Home_URL ("/")
                   );
             else
                URL :=
                  +Add_Query_Arg (
-                    To_Array (List => (
+                    To_Array_Type ([
                       Build ("feed", Feed),
                       Build ("p",    Integer (Post_Id))
-                    )),
+                    ]),
                     Home_URL ("/")
                   );
             end if;
@@ -1294,6 +1297,7 @@ is
                                 Object_Type : String := "")
                                 return String
    is
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Capabilities;
@@ -1326,10 +1330,10 @@ is
          end if;
 
          declare
-            Args : Array_Type := To_Array (List => (
+            Args : Array_Type := To_Array_Type ([
               Build ("taxonomy", Taxonomy),
               Build ("tag_ID",   Term_Id)
-            ));
+            ]);
 
             Location : UString;
          begin
@@ -4671,6 +4675,7 @@ is
       use Php.Numerics;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -4681,7 +4686,7 @@ is
       Args_2 : Array_Type :=
         Wp_Parse_Args (
           Args,
-          To_Array (List => (
+          To_Array_Type ([
             Build ("size",           96),
             Build ("height",         Null_Value),
             Build ("width",          Null_Value),
@@ -4693,7 +4698,7 @@ is
             Build ("scheme",         Null_Value),
             Build ("processed_args", Null_Value), -- If used, should be a reference.
             Build ("extra_attr",     "")
-          ))
+          ])
         );
    begin
 
@@ -4836,13 +4841,13 @@ is
          end if;
 
          declare
-            URL_Args : constant Array_Type := To_Array (List => (
+            URL_Args : constant Array_Type := To_Array_Type ([
                 Build ("s", As_Integer (Get (Args_2, "size"))),
                 Build ("d", Get_As_String (Args_2, "default")),
                 Build ("f", (if As_Boolean (Get (Args_2, "force_default"))
                              then "y" else "False")),
                 Build ("r", Get_As_String (Args_2, "rating"))
-            ));
+            ]);
 
             URL_2 : constant String :=
               (if Is_SSL

@@ -11,6 +11,7 @@ with Ada.Containers;
 with Php.Echoing;
 with Php.Strings;
 
+with Array_Lists;
 with Helpers;
 with Integer_Vectors;
 with Lists;
@@ -70,17 +71,18 @@ is
                                   -- , $deprecated = array() ) then
                                   return String -- List_Type -- String;
    is
+      use Array_Lists;
 --        if ( ! empty( $deprecated ) ) then
 --                _deprecated_argument( __FUNCTION__, '4.8.0' );
 --        end;
 
       Format : String := (if Nicename then "slug" else "name");
 
-      Args : constant Array_Type := To_Array (List => (
+      Args : constant Array_Type := To_Array_Type ([
         Build ("separator", Separator),
         Build ("link",      Link),
         Build ("format",    Format)
-      ));
+      ]);
    begin
       return Get_Term_Parents_List (Category_Id, "category", Args);
    end Get_Category_Parents;
@@ -331,13 +333,14 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_L10n;
 
-      Defaults : Array_Type := To_Array ((
+      Defaults : Array_Type := To_Array_Type ([
          Build ("show_option_all",   ""),
          Build ("show_option_none",  ""),
          Build ("orderby",           "id"),
@@ -360,7 +363,7 @@ is
          Build ("value_field",       "term_id"),
          Build ("required",          False),
          Build ("aria_describedby",  "")
-      ));
+     ]);
 
       Parsed_Args       : Array_Type;
       Get_Terms_Args    : Array_Type;
@@ -1376,10 +1379,11 @@ is
                            -- Inc_Class_Posts.Wp_Post
    is
       use Ada.Containers;
+      use Array_Lists;
       use Wp_Common;
-      use Adi_Caches;
       use Class_Terms;
       use Class_Posts;
+      use Adi_Caches;
       use Inc_Taxonomys;
       use Inc_Load;
       use Inc_Functions;
@@ -1399,8 +1403,8 @@ is
       begin
          if Length (Terms) = 0 then  -- false =
             Terms := Wp_Get_Object_Terms (Empty_Integer_Array & Integer (Post_2.Id),
-                                          Arrays.To_Array ((1 =>
-                                            Build (Taxonomy, ""))));
+                                          To_Array_Type ([
+                                            Build (Taxonomy, "")]));
             if not Is_Wp_Error ("Terms") then
                declare
                   Term_Ids : constant Array_Type := Wp_List_Pluck (Terms, "term_id");
@@ -1509,6 +1513,7 @@ is
                                    Args     : Array_Type := Empty_Array)
                                    return String -- List_Type
    is
+      use Array_Lists;
       use UStrings;
       use Class_Taxonomy;
       use Class_Terms;
@@ -1532,12 +1537,12 @@ is
       declare
          Term_Id_2 : constant Integer := Term.Term_Id;
 
-         Defaults : constant Array_Type := To_Array (List => (
+         Defaults : constant Array_Type := To_Array_Type ([
                 Build ("format",    "name"),
                 Build ("separator", "/"),
                 Build ("link",      True),
                 Build ("inclusive", True)
-         ));
+         ]);
 
          Args_2 : Array_Type := Wp_Parse_Args (Args, Defaults);
       begin

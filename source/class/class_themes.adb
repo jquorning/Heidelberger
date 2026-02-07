@@ -12,6 +12,7 @@ with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Lists;
 with Wp_Common;
 
@@ -22,7 +23,6 @@ with Inc_Formatting;
 with Inc_KSES;
 with Inc_L10n;
 with Inc_Load;
-with Inc_Plugins;
 with Inc_Themes;
 
 package body Class_Themes
@@ -45,6 +45,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Caches;
@@ -54,7 +55,6 @@ is
       use Inc_Formatting;
       use Inc_L10n;
       use Inc_Load;
-      use Inc_Plugins;
       use Inc_Themes;
 
       This  : Wp_Theme;
@@ -136,12 +136,12 @@ is
          This.Template := This.Stylesheet;
          This.Cache_Add (
            "theme",
-           To_Array (List => (
+           To_Array_Type ([
              Build ("headers",    This.Headers),
 --           Build ("errors",     This.Errors),
              Build ("stylesheet", -This.Stylesheet),
              Build ("template",   -This.Template)
-           ))
+           ])
          );
 
          if not File_Exists (-This.Theme_Root) then
@@ -162,12 +162,12 @@ is
          This.Template         := This.Stylesheet;
          This.Cache_Add (
            "theme",
-           To_Array (List => (
+           To_Array_Type ([
              Build ("headers",    This.Headers),
 --           Build ("errors",     -This.Errors),
              Build ("stylesheet", -This.Stylesheet),
              Build ("template",   -This.Template)
-           ))
+           ])
          );
          return Null_Theme;
 
@@ -210,11 +210,11 @@ is
            ));
          This.Cache_Add (
            "theme",
-           To_Array (List => (
+           To_Array_Type ([
              Build ("headers",    This.Headers),
 --           Build ("errors",     -This.Errors),
              Build ("stylesheet", -This.Stylesheet)
-           ))
+           ])
          );
          return Null_Theme;
 
@@ -254,12 +254,12 @@ is
                end;
                This.Cache_Add (
                  "theme",
-                 To_Array (List => (
+                 To_Array_Type ([
                    Build ("headers",    This.Headers),
 --                 Build ("errors",     -This.Errors),
                    Build ("stylesheet", -This.Stylesheet),
                    Build ("template",   -This.Template)
-                 ))
+                 ])
                );
                return Null_Theme;
             end if;
@@ -307,12 +307,12 @@ is
                ));
                This.Cache_Add (
                  "theme",
-                 To_Array (List => (
+                 To_Array_Type ([
                    Build ("headers",    This.Headers),
 --                 Build ("errors",     -This.Errors),
                    Build ("stylesheet", -This.Stylesheet),
                    Build ("template",   -This.Template)
-                 ))
+                 ])
                );
                This.M_Parent :=
                  new Wp_Theme'(X_Construct (-This.Template, -This.Theme_Root, This));
@@ -340,12 +340,12 @@ is
             ));
             X_Child.Cache_Add (
               "theme",
-              To_Array (List => (
+              To_Array_Type ([
                 Build ("headers",    X_Child.Headers),
 --              Build ("errors",     X_Child.Errors),
                 Build ("stylesheet", -X_Child.Stylesheet),
                 Build ("template",   -X_Child.Template)
-              ))
+              ])
             );
             -- The two themes actually reference each other with the Template header.
             if X_Child.Stylesheet = This.Template then
@@ -359,12 +359,12 @@ is
                ));
                This.Cache_Add (
                  "theme",
-                 To_Array (List => (
+                 To_Array_Type ([
                    Build ("headers",    This.Headers),
 --                 Build ("errors",     -This.Errors),
                    Build ("stylesheet", -This.Stylesheet),
                    Build ("template",   -This.Template)
-                 ))
+                 ])
                );
             end if;
             return Null_Theme;
@@ -393,12 +393,12 @@ is
 
       -- We're good. If we didn't retrieve from cache, set it.
       if not Is_Array (Cache) then
-         Cache := To_Array (List => (
+         Cache := To_Array_Type ([
            Build ("headers",    This.Headers),
 --         Build ("errors",     -This.Errors),
            Build ("stylesheet", -This.Stylesheet),
            Build ("template",   -This.Template)
-         ));
+         ]);
          -- If the parent theme is in another root, we'll want to cache this. Avoids
          -- an entire branch of filesystem calls above.
          if Theme_Root_Template /= "" then
@@ -553,6 +553,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_KSES;
@@ -570,13 +571,13 @@ is
 
          declare
             -- static
-            Header_Tags : constant Array_Type := To_Array (List => (
-              Build ("abbr",    To_Array (List => (1 => Build ("title", True)))),
-              Build ("acronym", To_Array (List => (1 => Build ("title", True)))),
+            Header_Tags : constant Array_Type := To_Array_Type ([
+              Build ("abbr",    To_Array_Type ([Build ("title", True)])),
+              Build ("acronym", To_Array_Type ([Build ("title", True)])),
               Build ("code",    True),
               Build ("em",      True),
               Build ("strong",  True)
-            ));
+            ]);
          begin
             Value_2 := +Wp_KSES (Value, Header_Tags);
          end;
@@ -587,17 +588,17 @@ is
          -- challenging.
          declare
             -- static
-            Header_Tags_With_A : constant Array_Type := To_Array (List => (
-              Build ("a",       To_Array (List => (
+            Header_Tags_With_A : constant Array_Type := To_Array_Type ([
+              Build ("a",       To_Array_Type ([
                 Build ("href",  True),
                 Build ("title", True)
-              ))),
-              Build ("abbr",    To_Array (List => (1 => Build ("title", True)))),
-              Build ("acronym", To_Array (List => (1 => Build ("title", True)))),
+              ])),
+              Build ("abbr",    To_Array_Type ([Build ("title", True)])),
+              Build ("acronym", To_Array_Type ([Build ("title", True)])),
               Build ("code",    True),
               Build ("em",      True),
               Build ("strong",  True)
-            ));
+            ]);
          begin
             Value_2 := +Wp_KSES (Value, Header_Tags_With_A);
          end;

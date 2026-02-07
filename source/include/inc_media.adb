@@ -11,6 +11,7 @@ with Php.Ini;
 with Php.Lists;
 with Php.Strings;
 
+with Array_Lists;
 with Constants;
 with Globals;
 with Wp_Common;
@@ -18,7 +19,6 @@ with Wp_Common;
 with Inc_Formatting;
 with Inc_Load;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Posts;
 with Inc_Querys;
 
@@ -855,7 +855,6 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Wp_Common;
-      use Inc_Plugins;
 
       Default_Sizes_2 : constant List_Type :=
         ["thumbnail", "medium", "medium_large", "large"];
@@ -887,6 +886,7 @@ is
    function Wp_Get_Registered_Image_Subsizes
             return Array_Type
    is
+      use Array_Lists;
       use Inc_Options;
 
       Additional_Sizes : constant Array_Type :=
@@ -898,11 +898,11 @@ is
          declare
             Size_Name : constant String := Size_Name_2;
 
-            Size_Data : Array_Type := To_Array (List => (
+            Size_Data : Array_Type := To_Array_Type ([
               Build ("width",  0),
               Build ("height", 0),
               Build ("crop",   False)
-            ));
+            ]);
          begin
             if Isset_2 (Additional_Sizes, Size_Name, "width") then
                -- For sizes added by plugins and themes.
@@ -968,7 +968,6 @@ is
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
-      use Inc_Plugins;
       use Inc_Posts;
 
       -- Get a thumbnail or intermediate image if there is one.
@@ -5548,7 +5547,6 @@ is
                                             return Integer
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       -- This function may be called multiple times. Run the filter only once per
       -- page load.

@@ -16,6 +16,7 @@ with Php.Preg;
 with Php.Types;
 with Php.Strings;
 
+with Array_Lists;
 with Globals;
 with UStrings;
 with Wp_Common;
@@ -44,6 +45,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use Wp_Common;
       use Inc_L10n;
 
@@ -184,17 +186,17 @@ is
 
          -- Pattern-based replacements of characters.
          -- Sort the remaining patterns into several arrays for performance tuning.
-         Dynamic_Characters := To_Array (List => (
+         Dynamic_Characters := To_Array_Type ([
            Build ("apos",  Empty_Array),
            Build ("quote", Empty_Array),
            Build ("dash",  Empty_Array)
-         ));
+         ]);
 
-         Dynamic_Replacements := To_Array (List => (
+         Dynamic_Replacements := To_Array_Type ([
            Build ("apos",  Empty_Array),
            Build ("quote", Empty_Array),
            Build ("dash",  Empty_Array)
-         ));
+         ]);
 
          Dynamic := Empty_Array;
 --       Spaces  := Wp_Spaces_Regexp;

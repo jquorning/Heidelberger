@@ -6,6 +6,8 @@
 -- @since 4.6.0
 --
 
+with Array_Lists;
+
 with Inc_Functions;
 
 package body Adi_Class_Wp_Upgrader_Skins
@@ -18,16 +20,17 @@ is
    function X_Construct (Args : Array_Type := Empty_Array)
                          return Wp_Upgrader_Skin
    is
+      use Array_Lists;
       use Inc_Functions;
 
       This : Wp_Upgrader_Skin;
 
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
         Build ("url",     ""),
         Build ("nonce",   ""),
         Build ("title",   ""),
         Build ("context", False)
-      ));
+      ]);
    begin
       This.Options := Wp_Parse_Args (Args, Defaults);
       return This;

@@ -140,7 +140,7 @@ is
                      Menus : Array_Type :=
                        (if Isset (X_REQUEST, "menu")
                         then Empty_Array
-                        -- Arrays.To_Array ((1 => Build (X_REQUEST, "menu")))
+                        -- To_Array_Type ([Build (X_REQUEST, "menu")])
                         else Inc_Taxonomys.Wp_Get_Object_Terms (Menu_Item_Id,
                                                                 "nav_menu",
                                 ["fields", "ids"]));

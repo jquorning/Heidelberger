@@ -8,6 +8,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Array_Lists;
 with Arrays;
 with Globals;
 with UStrings;
@@ -42,6 +43,7 @@ is
                         Locale  : String := "")
                         return JSON_Value
    is
+      use Array_Lists;
       use UStrings;
       use Inc_L10n;
       use Inc_Options;
@@ -75,8 +77,8 @@ is
                (-Version_2) & "&locale=" & (-Locale_2) & """";
 
             Options : constant Array_Type :=
-               Arrays.To_Array ((1 => Build ("user-agent", "WordPress/" &
-                          (-Version_2) & "; " & Inc_Link_Templates.Home_URL ("/"))));
+               To_Array_Type ([Build ("user-agent", "WordPress/" &
+                          (-Version_2) & "; " & Inc_Link_Templates.Home_URL ("/"))]);
 
             Response : Array_Type;
             JSON     : JSON_Value;
@@ -212,6 +214,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_L10n;
@@ -285,13 +288,13 @@ is
                   Size   : constant Integer := (if Compact then 80 else 160);
                   Data   : constant Array_Type :=
                      Get_Avatar_Data (Get (Person_Data, 2).Get & "@md5.gravatar.com",
-                                      Arrays.To_Array ((1 =>
-                                         Build ("size", Size))));     -- (1)
+                                      To_Array_Type ([
+                                         Build ("size", Size)]));     -- (1)
 
                   Data2x : constant Array_Type :=
                      Get_Avatar_Data (Get (Person_Data, 2).Get & "@md5.gravatar.com",
-                                      Arrays.To_Array ((1 =>
-                                         Build ("size", Size * 2)))); -- (1)
+                                      To_Array_Type ([
+                                         Build ("size", Size * 2)])); -- (1)
                begin
                   Echo ("<span class=""wp-person-avatar""><img src=""" &
                         ESC_URL (Get_As_String (Data,   "url")) & """ srcset=""" &
@@ -321,8 +324,8 @@ is
 --                   use Inc_Link_Templates;
 
 --                   Size   : constant Integer := (if Compact then 80 else 160);
---                   Data   : Array_Type; -- := Get_Avatar_Data (Person_Data (1) & "@md5.gravatar.com", To_Array ((1 => Build ("size", Size))));
---                   Data2x : Array_Type; -- := Get_Avatar_Data (Person_Data (1) & "@md5.gravatar.com", To_Array ((1 => Build ("size", Size * 2))));
+--                   Data   : Array_Type; -- := Get_Avatar_Data (Person_Data (1) & "@md5.gravatar.com", To_Array_Type ([Build ("size", Size)]));
+--                   Data2x : Array_Type; -- := Get_Avatar_Data (Person_Data (1) & "@md5.gravatar.com", To_Array_Type ([Build ("size", Size * 2)]));
 --                begin
 --                   Echo ("<span class=""wp-person-avatar""><img src=""" &
 --                         ESC_URL (Get (Data,   "url")) & """ srcset=""" &

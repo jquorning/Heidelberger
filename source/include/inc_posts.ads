@@ -7,7 +7,6 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 
-with Arrayable_Arrays;
 with Arrayable_Interfaces;
 with Arrays;
 with Helpers_2;

@@ -14,6 +14,7 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
+with Array_Lists;
 with Binder;
 with Constants;
 with Helpers;
@@ -167,6 +168,7 @@ is
    procedure Wp_Admin_Bar_Wp_Menu
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Inc_Capabilities;
@@ -187,11 +189,11 @@ is
 
       declare
          Wp_Logo_Menu_Args : Node_Args; --  := X_Construct;
-       -- Wp_Logo_Menu_Args : Array_Type := Arrays.To_Array ((
+       -- Wp_Logo_Menu_Args : Array_Type := To_Array_Type ([
        --          Build ("id",    "wp-logo"),
        --          Build ("title", "<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "About WordPress" & "</span>"),
        --          Build ("href",  -About_Url)
-       -- ));
+       -- ]);
       begin
          Wp_Logo_Menu_Args.Id    := +"wp-logo";
          Wp_Logo_Menu_Args.Title := +"<span class=""ab-icon"" aria-hidden=""true""></span><span class=""screen-reader-text"">" & abs "About WordPress" & "</span>";
@@ -199,8 +201,8 @@ is
 
          -- Set tabindex="0" to make sub menus accessible when no URL is available.
          if About_URL /= "" then
-            Wp_Logo_Menu_Args.Meta := Arrays.To_Array ((1 =>
-                                         Build ("tabindex", 0)));
+            Wp_Logo_Menu_Args.Meta := To_Array_Type ([
+                                         Build ("tabindex", 0)]);
          end if;
 
          Admin_Bar.Add_Node (Wp_Logo_Menu_Args);
@@ -301,6 +303,7 @@ is
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Class_Users;
@@ -345,7 +348,7 @@ is
          Node.Parent := +"top-secondary";
          Node.Title  := +Howdy & Avatar;
          Node.Href   := Profile_Url;
-         Node.Meta   := Arrays.To_Array ((1 => Build ("class", Class)));
+         Node.Meta   := To_Array_Type ([Build ("class", Class)]);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -358,6 +361,7 @@ is
    procedure Wp_Admin_Bar_My_Account_Menu
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Class_Users;
@@ -411,7 +415,7 @@ is
          Node.Id     := +"user-info";
          Node.Title  := User_Info;
          Node.Href   := Profile_Url;
-         Node.Meta   := Arrays.To_Array ((1 => Build ("tabindex", -1)));
+         Node.Meta   := To_Array_Type ([Build ("tabindex", -1)]);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -599,6 +603,7 @@ is
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.HTML;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Class_Admin_Bar;
@@ -654,8 +659,8 @@ is
                                        Wp_Customize_URL);
       if Is_Customize_Preview then
          Customize_URL :=
-            +Add_Query_Arg (Arrays.To_Array ((1 =>
-               Build ("changeset_uuid", -Wp_Customize.X_Changeset_UUID))),
+            +Add_Query_Arg (To_Array_Type ([
+               Build ("changeset_uuid", -Wp_Customize.X_Changeset_UUID)]),
                            -Customize_URL);
       end if;
 
@@ -665,8 +670,8 @@ is
          Node.Id    := +"customize";
          Node.Title := +abs "Customize";
          Node.Href  := Customize_URL;
-         Node.Meta  := Arrays.To_Array ((1 =>
-                          Build ("class", "hide-if-no-customize")));
+         Node.Meta  := To_Array_Type ([
+                          Build ("class", "hide-if-no-customize")]);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -685,6 +690,7 @@ is
       use Ada.Containers;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Admin_Bar;
@@ -835,9 +841,9 @@ is
          Node.Parent := +"my-sites";
          Node.Id     := +"my-sites-list";
          Node.Meta   :=
-            Arrays.To_Array ((1 => Build ("class",
-                                          (if Current_User_Can ("manage_network")
-                                           then "ab-sub-secondary" else ""))));
+            To_Array_Type ([Build ("class",
+                           (if Current_User_Can ("manage_network")
+                            then "ab-sub-secondary" else ""))]);
          Admin_Bar.Add_Group (Node);
       end;
 
@@ -994,6 +1000,7 @@ is
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Inc_Formatting;
@@ -1017,7 +1024,7 @@ is
          Node.Id    := +Id;
          Node.Title := +abs "Shortlink";
          Node.Href  := +Short;
-         Node.Meta  := Arrays.To_Array ((1 => Build ("html", -Html)));
+         Node.Meta  := To_Array_Type ([Build ("html", -Html)]);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1031,6 +1038,7 @@ is
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Adi_Class_Wp_Screens;
@@ -1085,9 +1093,9 @@ is
                      Node.Title := +Get_As_String (Post_Type_Object.Labels, "view_item");
                      Node.Href  := +ESC_URL (Preview_Link);
                      Node.Meta  :=
-                        Arrays.To_Array ((1 =>
+                        To_Array_Type ([
                            Build ("target",
-                                  "wp-preview-" & "XXX-451"))); --"Image (Post_Id) (Post.Id))));
+                                  "wp-preview-" & "XXX-451")]); --"Image (Post_Id) (Post.Id))));
 
                      Admin_Bar.Add_Node (Node);
                   end;
@@ -1263,6 +1271,7 @@ is
    procedure Wp_Admin_Bar_New_Content_Menu
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Inc_Capabilities;
@@ -1295,7 +1304,7 @@ is
 
       Actions : Action_Maps.Map; -- Array_Type;
       Cpts    : Wp_Post_Type_Array :=
-         Get_Post_Types (Arrays.To_Array ((1 => Build ("show_in_admin_bar", "true"))),
+         Get_Post_Types (To_Array_Type ([Build ("show_in_admin_bar", "true")]),
                          "objects"); -- (array)
    begin
       if
@@ -1304,8 +1313,8 @@ is
         Current_User_Can (Get_As_String (Cpts ("post").Cap, "create_posts"))
       then
          Actions ("post-new.php") :=
-            Arrays.To_Array ((1 =>
-               Build (Get_As_String (Cpts ("post").Labels, "name_admin_bar"), "new-post")));
+            To_Array_Type ([
+               Build (Get_As_String (Cpts ("post").Labels, "name_admin_bar"), "new-post")]);
       end if;
 
       if
@@ -1313,15 +1322,15 @@ is
         Current_User_Can ("upload_files")
       then
          Actions ("media-new.php") :=
-            Arrays.To_Array ((1 =>
+            To_Array_Type ([
                Build (Get_As_String (Cpts ("attachment").Labels, "name_admin_bar"),
-                      "new-media")));
+                      "new-media")]);
       end if;
 
       if Current_User_Can ("manage_links") then
          Actions ("link-add.php") :=
-            Arrays.To_Array ((1 =>
-               Build (X_X ("Link", "add new from admin bar"), "new-link")));
+            To_Array_Type ([
+               Build (X_X ("Link", "add new from admin bar"), "new-link")]);
       end if;
 
       if
@@ -1329,9 +1338,9 @@ is
         Current_User_Can (Get_As_String (Cpts ("page").Cap, "create_posts"))
       then
          Actions ("post-new.php?post_type=page") :=
-            Arrays.To_Array ((1 =>
+            To_Array_Type ([
                Build (Get_As_String (Cpts ("page").Labels, "name_admin_bar"),
-                      "new-page")));
+                      "new-page")]);
       end if;
 
       Cpts.Delete ("post");
@@ -1351,8 +1360,9 @@ is
             Key : constant String := "post-new.php?post_type=" & (-Cpt.Name);
          begin
             Actions (Key) :=
-               Arrays.To_Array ((1 =>
-                  Build (Get_As_String (Cpt.Labels, "name_admin_bar"), "new-" & (-Cpt.Name))));
+               To_Array_Type ([
+                  Build (Get_As_String (Cpt.Labels, "name_admin_bar"),
+                         "new-" & (-Cpt.Name))]);
          end;
          << Continue >>
       end loop;
@@ -1368,8 +1378,8 @@ is
         Current_User_Can ("promote_users")
       then
          Actions ("user-new.php") :=
-            Arrays.To_Array ((1 => Build (X_X ("User", "add new from admin bar"),
-                                          "new-user")));
+            To_Array_Type ([Build (X_X ("User", "add new from admin bar"),
+                                   "new-user")]);
       end if;
 
       if Actions.Is_Empty then
@@ -1471,6 +1481,7 @@ is
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
       use UStrings;
+      use Array_Lists;
       use Class_Admin_Bar;
       use Inc_Capabilities;
       use Inc_Link_Templates;
@@ -1541,7 +1552,7 @@ is
             Node.Title  := +abs "Background";
             Node.Href   := +Admin_URL ("themes.php?page=custom-background");
             Node.Meta   :=
-               Arrays.To_Array ((1 => Build ("class", "hide-if-customize")));
+               To_Array_Type ([Build ("class", "hide-if-customize")]);
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -1556,7 +1567,7 @@ is
             Node.Title  := +abs "Header";
             Node.Href   := +Admin_URL ("themes.php?page=custom-header");
             Node.Meta   :=
-               Arrays.To_Array ((1 => Build ("class", "hide-if-customize")));
+               To_Array_Type ([Build ("class", "hide-if-customize")]);
 
             Admin_Bar.Add_Node (Node);
          end;
@@ -1620,6 +1631,7 @@ is
    procedure Wp_Admin_Bar_Search_Menu
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
       use Inc_Formatting;
@@ -1645,9 +1657,9 @@ is
          Node.Parent := +"top-secondary";
          Node.Id     := +"search";
          Node.Title  := Form;
-         Node.Meta   := Arrays.To_Array ((
+         Node.Meta   := To_Array_Type ([
                            Build ("class",    "admin-bar-search"),
-                           Build ("tabindex", -1)));
+                           Build ("tabindex", -1)]);
 
          Admin_Bar.Add_Node (Node);
       end;
@@ -1695,6 +1707,7 @@ is
    procedure Wp_Admin_Bar_Add_Secondary_Groups
                (Admin_Bar : in out Class_Admin_Bar.Wp_Admin_Bar)
    is
+      use Array_Lists;
       use UStrings;
       use Class_Admin_Bar;
    begin
@@ -1702,7 +1715,7 @@ is
          Node : Node_Args;
       begin
          Node.Id   := +"top-secondary";
-         Node.Meta := Arrays.To_Array ((1 => Build ("class", "ab-top-secondary")));
+         Node.Meta := To_Array_Type ([Build ("class", "ab-top-secondary")]);
 
          Admin_Bar.Add_Group (Node);
       end;
@@ -1712,7 +1725,7 @@ is
       begin
          Node.Parent := +"wp-logo";
          Node.Id     := +"wp-logo-external";
-         Node.Meta   := Arrays.To_Array ((1 => Build ("class", "ab-sub-secondary")));
+         Node.Meta   := To_Array_Type ([Build ("class", "ab-sub-secondary")]);
 
          Admin_Bar.Add_Group (Node);
       end;

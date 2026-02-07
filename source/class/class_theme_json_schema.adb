@@ -22,12 +22,14 @@ is
    function Migrate (Theme_JSON : Array_Type)
                      return Array_Type
    is
+      use Array_Lists;
+
       Theme_JSON_2 : Array_Type := Theme_JSON;
    begin
       if not Isset (Theme_JSON, "version") then
-         Theme_JSON_2 := To_Array (List => (1 =>
+         Theme_JSON_2 := To_Array_Type ([
            Build ("version", Class_Theme_JSON.LATEST_SCHEMA)
-         ));
+         ]);
       end if;
 
       if 1 = As_Integer (Get (Theme_JSON, "version")) then

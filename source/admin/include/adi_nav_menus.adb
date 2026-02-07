@@ -87,13 +87,13 @@ is
 --                                              To_array (Get_Post (Object_Id))), 0, Args)); -- (object)
                   elsif "json" = Response_Format then
                      Echo (Inc_Functions.Wp_JSON_Encode (
-                        Arrays.To_Array ((
+                        To_Array_Type ([
                            Build ("ID",         Object_Id),
                            Build ("post_title",
                                   Inc_Post_Templates.Get_The_Title (Object_Id)),
                            Build ("post_type",
                                   Inc_Posts.Get_Post_Type (Post_Id (Object_Id)))
-                           ))
+                           ])
                         ));
                         Echo ("\n");
                   end if;
@@ -118,11 +118,11 @@ is
                           Get_Term (Object_Id, Object_Type);
                      begin
                         Echo (Inc_Functions.Wp_JSON_Encode (
-                           Arrays.To_Array ((
+                           To_Array_Type ([
                               Build ("ID",         Object_Id),
                               Build ("post_title", -Post_Obj.Name),
                               Build ("post_type",  Object_Type)
-                           ))
+                           ])
                         ));
                         Echo ("\n");
                      end;
@@ -147,14 +147,14 @@ is
 
                   Args_2 : constant Array_Type := Array_Merge (
                      Args,
-                     Arrays.To_Array ((
+                     To_Array_Type ([
                         Build ("no_found_rows",          "true"),
                         Build ("update_post_meta_cache", "false"),
                         Build ("update_post_term_cache", "false"),
                         Build ("posts_per_page",         "10"),
                         Build ("post_type",              -Matches (2)),
                         Build ("s",                      Query)
-                     ))
+                     ])
                   );
             begin
                -- if Isset (Post_Type_Obj.X_Default_Query) then
@@ -191,13 +191,13 @@ is
                            end;
                         elsif "json" = Response_Format then
                            Echo (Inc_Functions.Wp_JSON_Encode (
-                              Arrays.To_Array ((
+                              To_Array_Type ([
                                  Build ("ID",         Integer (Post.Id)),
                                  Build ("post_title",
                                         Inc_Post_Templates.Get_The_Title
                                            (Integer (Post.Id))),
                                  Build ("post_type",  -Matches (2))
-                              ))
+                              ])
                            ));
                            Echo ("\n");
                         end if;
@@ -212,12 +212,12 @@ is
 
                Terms : constant Wp_Term_Array :=
                   Inc_Taxonomys.Get_Terms (
-                     Arrays.To_Array ((
+                     To_Array_Type ([
                         Build ("taxonomy",   -Matches (2)),
                         Build ("name__like", Query),
                         Build ("number",     "10"),
                         Build ("hide_empty", "false")
-                     )));
+                     ]));
             begin
                if
                  False
@@ -231,15 +231,15 @@ is
                   if "markup" = Response_Format then
                      null;
 --                   Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item",
---                         Arrays.To_Array ((1 => Build (Term, "")))), 0, Args)); -- (object)
+--                         To_Array_Type ([1 => Build (Term, "")])), 0, Args)); -- (object)
 
                   elsif "json" = Response_Format then
                      Echo (Inc_Functions.Wp_JSON_Encode (
-                        Arrays.To_Array ((
+                        To_Array_Type ([
                            Build ("ID",         Term.Term_Id),
                            Build ("post_title", -Term.Name),
                            Build ("post_type",  -Matches (2))
-                        ))
+                        ])
                      ));
                      Echo ("\n");
                   end if;
@@ -280,13 +280,13 @@ is
             Update_User_Meta (
                         User.Id,
                         "managenav-menuscolumnshidden",
-                        Arrays.To_Array ((
+                        To_Array_Type ([
                            Build ("0", "link-target"),  -- "0" was 0
                            Build ("1", "css-classes"),
                            Build ("2", "xfn"),
                            Build ("3", "description"),
                            Build ("4", "title-attribute")
-                        )));
+                        ]));
          end;
       end if;
    end Wp_Nav_Menu_Setup;
@@ -355,7 +355,7 @@ is
       use Wp_Common;
 
       Post_Types : constant Wp_Post_Type_Array :=
-         Get_Post_Types (Arrays.To_Array ((1 => Build ("show_in_nav_menus", "true"))),
+         Get_Post_Types (To_Array_Type ([1 => Build ("show_in_nav_menus", "true")]),
                          "object");
    begin
       if Post_Types.Is_Empty then -- not Post_Types then
@@ -411,7 +411,7 @@ is
       use Taxonomy_Vectors;
 
       Taxonomies : constant Taxonomy_Array :=
-         Get_Taxonomies (Arrays.To_Array ((1 => Build ("show_in_nav_menus", "true"))),
+         Get_Taxonomies (To_Array_Type ([1 => Build ("show_in_nav_menus", "true")]),
                          "object");
    begin
       if Length (Taxonomies) = 0 then -- not Taxonomies then
@@ -521,7 +521,7 @@ is
       Offset : constant Natural := (if 0 < Pagenum
                                     then Per_Page * (Pagenum - 1) else 0);
 
-      Args : Array_Type := Arrays.To_Array ((
+      Args : Array_Type := To_Array_Type ([
               Build ("offset",                 Offset),
               Build ("order",                  "ASC"),
               Build ("orderby",                "title"),
@@ -530,7 +530,7 @@ is
               Build ("suppress_filters",       "true"),
               Build ("update_post_term_cache", "false"),
               Build ("update_post_meta_cache", "false")
-      ));
+      ]);
 
       --
       -- If we"re dealing with pages, let's prioritize the Front Page,
@@ -566,7 +566,7 @@ is
          else
             X_Nav_Menu_Placeholder :=  (if 0 > X_Nav_Menu_Placeholder
                                         then X_Nav_Menu_Placeholder - 1 else -1); -- (int)
-            -- Front_Page_Obj := Arrays.To_Array ((  -- (object)
+            -- Front_Page_Obj := To_Array_Type ([  -- (object)
             --    Build ("front_or_home", "true"),
             --    Build ("ID",            "0"),
             --    Build ("object_id",     X_Nav_Menu_Placeholder),
@@ -664,12 +664,12 @@ is
             Num_Pages : constant Natural := Get_Posts.Max_Num_Pages;
 
             Page_Links : String := Paginate_Links (
-               Arrays.To_Array ((
-               -- Build ("base", Add_Query_Arg (To_Array ((
+               To_Array_Type ([
+               -- Build ("base", Add_Query_Arg (To_Array_Type ([
                --                Build (Tab_Name,     "all"),
                --                Build ("paged",       "%#%"),
                --                Build ("item-type",   "post_type"),
-               --                Build ("item-object", Post_Type_Name))))),
+               --                Build ("item-object", Post_Type_Name)]))),
                Build ("format",             ""),
 
                Build ("prev_text",          "<span aria-label=""" &
@@ -682,7 +682,7 @@ is
                   abs "Page" & "</span> "),
 
                Build ("total",              Num_Pages),
-               Build ("current",            Pagenum))));
+               Build ("current",            Pagenum)]));
          begin
             null;
          end;
@@ -692,9 +692,9 @@ is
          DB_Fields : Array_Type; -- Boolean := False;
       begin
          if Is_Post_Type_Hierarchical (Post_Type_Name) then
-            DB_Fields := Arrays.To_Array ((
+            DB_Fields := To_Array_Type ([
                Build ("parent", "post_parent"),
-               Build ("id",     "ID")));
+               Build ("id",     "ID")]);
          end if;
 
 --      Walker := new Walker_Nav_Menu_Checklist (Db_Fields);
@@ -779,11 +779,11 @@ is
             declare
                Recent_Args : Array_Type := Array_Merge (
                   Args,
-                  Arrays.To_Array ((
+                  To_Array_Type ([
                      Build ("orderby",        "post_date"),
                      Build ("order",          "DESC"),
                      Build ("posts_per_page", "15")
-                  )));
+                  ]));
 
                Most_Recent : Array_Type;
             begin
@@ -842,12 +842,12 @@ is
                   Searched := +ESC_Attr (Get_As_String ((X_REQUEST, "quick-search-posttype-" &
                                          Post_Type_Name)));
 --            Search_Results := Get_Posts (
---               To_Array ((
+--               To_Array_Type ([
 --                  Build ("s",         Searched),
 --                  Build ("post_type", Post_Type_Name),
 --                  Build ("fields",    "all"),
 --                  Build ("order",     "DESC")
---               )));
+--               ]));
                else
                   Searched       := Null_UString;
                   Search_Results := Empty_Array;
@@ -916,7 +916,7 @@ is
                                        then X_Nav_Menu_Placeholder - 1 else -1);
             -- Array_Unshift (
             --    Posts,
-            --    To_Array (( -- (object)
+            --    To_Array_Type ([ -- (object)
             --       Build ("ID",           "0"),
             --       Build ("object_id",    X_Nav_Menu_Placeholder),
             --       Build ("object",       Post_Type_Name),
@@ -926,7 +926,7 @@ is
             --       Build ("post_type",    "nav_menu_item"),
             --       Build ("type",         "post_type_archive"),
             --       Build ("url",          Get_Post_Type_Archive_Link (Post_Type_Name))
-            --    )));
+            --    ]));
          end if;
 
          --
@@ -1030,7 +1030,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
       Offset   : constant Natural :=
         (if 0 < Pagenum then Per_Page * (Pagenum - 1) else 0);
 
-      Args : constant Array_Type := Arrays.To_Array ((
+      Args : constant Array_Type := To_Array_Type ([
                 Build ("taxonomy",     Taxonomy_Name),
                 Build ("child_of",     "0"),
                 Build ("exclude",      ""),
@@ -1042,7 +1042,7 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
                 Build ("order",        "ASC"),
                 Build ("orderby",      "name"),
                 Build ("pad_counts",   "false")
-      ));
+      ]);
 
       Terms       : Wp_Term; --  := Get_Terms (Args);
       Num_Pages   : Natural;
@@ -1058,23 +1058,23 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
                 Float (Wp_Count_Terms (
                    Array_Merge (
                       Args,
-                      Arrays.To_Array ((
+                      To_Array_Type ([
                          Build ("number", ""),
                          Build ("offset", "")
-                      ))
+                      ])
                    )
                )) / Float (Per_Page)));
 
       Page_Links :=
          +Paginate_Links (
-            Arrays.To_Array ((
+            To_Array_Type ([
                -- Build ("base",               Add_Query_Arg (
-               --    To_Array ((
+               --    To_Array_Type ([
                --       Build (Tab_Name,      "all"),
                --       Build ("paged",       "%#%"),
                --       Build ("item-type",   "taxonomy"),
                --       Build ("item-object", Taxonomy_Name)
-               -- )))),
+               -- ]))),
             Build ("format",             ""),
             Build ("prev_text",
                    "<span aria-label=""" & Esc_Attr_X ("Previous page") & """>" &
@@ -1086,14 +1086,14 @@ Echo ("</div><!-- /.posttypediv -->" & NL);
                    "<span class=""screen-reader-text"">" & abs "Page" & "</span> "),
             Build ("total",              Num_Pages),
             Build ("current",            Pagenum)
-         )));
+         ]));
 
       -- DB_Fields := False;
       -- if Is_Taxonomy_Hierarchical (Taxonomy_Name) then
-      --    Db_Fields := To_Array ((
+      --    Db_Fields := To_Array_Type ([
       --                   Build ("parent", "parent"),
       --                   Build ("id",     "term_id")
-      --    ));
+      --    ]);
       -- end if;
 
       -- Walker := new Walker_Nav_Menu_Checklist (db_fields);
@@ -1184,13 +1184,13 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       end;
 
       -- Popular_Terms := Get_Terms (
-      --                    To_Array ((
+      --                    To_Array_Type ([
       --                       Build ("taxonomy",     Taxonomy_Name),
       --                       Build ("orderby",      "count"),
       --                       Build ("order",        "DESC"),
       --                       Build ("number",       "10"),
       --                       Build ("hierarchical", "false")
-      --                    ))
+      --                    ])
       --                 );
       -- Args ("walker") := Walker;
       -- Echo (Walk_Nav_Menu_Tree (Array_Map ("wp_setup_nav_menu_item", Popular_Terms),
@@ -1225,14 +1225,14 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       --    Searched := Esc_Attr (X_REQUEST ("quick-search-taxonomy-" & Taxonomy_Name));
 
       --    Search_Results := Get_Terms (
-      --                         To_Array ((
+      --                         To_Array_Type ([
       --                            Build ("taxonomy",     Taxonomy_Name),
       --                            Build ("name__like",   Searched),
       --                            Build ("fields",       "all"),
       --                            Build ("orderby",      "count"),
       --                            Build ("order",        "DESC"),
       --                            Build ("hierarchical", "false")
-      --                         ))
+      --                         ])
       --                      );
       -- else
       --    Searched       := "";
@@ -1330,7 +1330,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
                --    X_Actual_Db_Id := X_Item_Object_Data ("menu-item-db-id"); -- (int)
                -- end if;
 
-               -- Args := Arrays.To_Array ((
+               -- Args := To_Array_Type ([
                --    Build ("menu-item-db-id",
                --           (if isset (X_Item_Object_Data ("menu-item-db-id"))
                --            then X_Item_Object_Data ("menu-item-db-id") else "")),
@@ -1394,27 +1394,27 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       -- if Isset (Data_Object.Name) then
 
       --    if "page" = Data_Object.Name then
-      --       Data_Object.X_Default_Query := To_Array ((
+      --       Data_Object.X_Default_Query := To_Array_Type ((
       --          Build ("orderby",     "menu_order title"),
       --          Build ("post_status", "publish")
       --       ));
 
       --       -- Posts should show only published items.
       --    elsif "post" = Data_Object.Name then
-      --       Data_Object.X_Default_Query := To_Array ((
+      --       Data_Object.X_Default_Query := To_Array_Type ((
       --          Build ("post_status", "publish")
       --       ));
 
       --    -- Categories should be in reverse chronological order.
       --    elsif "category" = Data_Object.Name then
-      --       Data_Object.X_Default_Query := To_Array ((
+      --       Data_Object.X_Default_Query := To_Array_Type ((
       --          Build ("orderby", "id"),
       --          Build ("order",   "DESC")
       --       ));
 
       --    -- Custom post types should show only published items.
       --    else
-      --       Data_Object.X_Default_Query := To_Array ((
+      --       Data_Object.X_Default_Query := To_Array_Type ((
       --          Build ("post_status", "publish")
       --       ));
       --    end if;
@@ -1442,8 +1442,8 @@ Echo ("                <ul id=""" & Taxonomy_Name &
          declare
             Menu_Items : constant Menu_Item_Array :=
                Wp_Get_Nav_Menu_Items ("XXX-623", -- Menu.Term_Id,
-                                      Arrays.To_Array ((1 =>
-                                         Build ("post_status", "any"))));
+                                      To_Array_Type ([
+                                         Build ("post_status", "any")]));
          begin
             Result := +"<div id=""menu-instructions"" class=""post-body-plain""";
 
@@ -1537,7 +1537,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
             return Array_Type
    is
    begin
-      return Arrays.To_Array ((
+      return To_Array_Type ([
          Build ("_title",          abs "Show advanced menu properties"),
          Build ("cb",              "<input type=""checkbox"" />"),
          Build ("link-target",     abs "Link Target"),
@@ -1545,7 +1545,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
          Build ("css-classes",     abs "CSS Classes"),
          Build ("xfn",             abs "Link Relationship (XFN)"),
          Build ("description",     abs "Description")
-      ));
+      ]);
    end Wp_Nav_Menu_Manage_Columns;
 
    -------------------------------------------
@@ -1596,12 +1596,12 @@ Echo ("                <ul id=""" & Taxonomy_Name &
       Unsorted_Menu_Items : constant Menu_Item_Array := -- Array_Type :=
          Inc_Nav_Menus.Wp_Get_Nav_Menu_Items (
             Nav_Menu_Selected_Id,
-            Arrays.To_Array ((
+            To_Array_Type ([
                Build ("orderby",     "ID"),
                Build ("output",      "ARRAY_A"),  -- "" added
                Build ("output_key",  "ID"),
                Build ("post_status", "draft,publish")
-            )));
+            ]));
 
       Messages   : UString; -- Array_Type := Empty_Array;
       Menu_Items : Array_Type;       -- := Empty_Array;
@@ -1690,8 +1690,10 @@ Echo ("                <ul id=""" & Taxonomy_Name &
 
       -- Store "auto-add" pages.
       declare
-         Auto_Add        : constant Boolean := "" /= Get_As_String ((X_POST, "auto-add-pages"));
-         Nav_Menu_Option : Array_Type       := Get_Option ("nav_menu_options");
+         Auto_Add : constant Boolean :=
+           "" /= Get_As_String ((X_POST, "auto-add-pages"));
+
+         Nav_Menu_Option : Array_Type := Get_Option ("nav_menu_options");
          -- (array)
       begin
 
@@ -1742,7 +1744,7 @@ Echo ("                <ul id=""" & Taxonomy_Name &
 --    Unset (Menu_Items);
 --    Unset (Unsorted_Menu_Items);
 
-      return Arrays.To_Array ((1 => Build (-Messages, "")));
+      return To_Array_Type ([1 => Build (-Messages, "")]);
    end Wp_Nav_Menu_Update_Menu_Items;
 
    ------------------------------------

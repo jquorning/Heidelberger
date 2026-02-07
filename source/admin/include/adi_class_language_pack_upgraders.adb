@@ -8,6 +8,8 @@
 
 with Php.Types;
 
+with Array_Lists;
+
 package body Adi_Class_Language_Pack_Upgraders
 is
 
@@ -33,10 +35,12 @@ is
                      return Array_Type
    is
       use Php.Types;
+      use Array_Lists;
+
       Update_2 : Array_Type;
    begin
       if Update /= "" then
-         Update_2 := To_Array (List => (1 => Build (Update, "")));
+         Update_2 := To_Array_Type ([Build (Update, "")]);
       end if;
 
       declare

@@ -6,11 +6,11 @@
 -- @since 3.9.0
 --
 
-with Arrayable_Arrays;
 with Arrayable_Interfaces;
 with Arrays;
-with UStrings;
+with Array_Lists;
 with Lists;
+with UStrings;
 
 with Cust_Class_Wp_Customize_Partials;
 
@@ -116,12 +116,12 @@ is
          -- @var array
          --
          -- protected
-         Setting_Id_Patterns : Array_Type := To_Array (List => (
+         Setting_Id_Patterns : Array_Type := Array_Lists.To_Array_Type ([
                Build ("widget_instance",
                       "/^widget_(?P<id_base>.+?)(?:\[(?P<widget_number>\d+)\])?/"),
                Build ("sidebar_widgets",
                       "/^sidebars_widgets\[(?P<sidebar_id>.+?)\]/")
-        ));
+        ]);
 
    --
    -- These were originally member of the file and not the object (jq)

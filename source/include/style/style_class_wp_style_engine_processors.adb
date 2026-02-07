@@ -14,6 +14,7 @@ with Php.Arrays;
 with Php.Sorting;
 with Php.Strings;
 
+with Array_Lists;
 with Constants;
 with Lists;
 with UStrings;
@@ -78,15 +79,16 @@ is
                      Options : Array_Type := Empty_Array)
                      return String
    is
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
       use Style_Class_Wp_Style_Engine_CSS_Rules_Stores;
 
-      Defaults : constant Array_Type := To_Array (List => (
+      Defaults : constant Array_Type := To_Array_Type ([
         Build ("optimize", True),
         Build ("prettify", Constants.SCRIPT_DEBUG)
         -- defined( "SCRIPT_DEBUG" ) &&
-      ));
+      ]);
       Options_2 : constant Array_Type := Wp_Parse_Args (Options, Defaults);
    begin
       -- If we have stores, get the rules from them.

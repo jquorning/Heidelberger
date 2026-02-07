@@ -1119,26 +1119,6 @@ is
       return Map;
    end Build;
 
-   --------------
-   -- To_Array --
-   --------------
-
-   function To_Array (List : Array_List_2)
-            return Array_Type
-   is
-      use Array_Maps;
-
-      Result : Array_Type;
-   begin
-      for A of List loop
-         for B in A.Iterate loop
-            Result.Include (Key   => Key     (B),
-                            Value => Element (B));
-         end loop;
-      end loop;
-      return Result;
-   end To_Array;
-
    -----------
    -- First --
    -----------

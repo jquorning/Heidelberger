@@ -12,6 +12,7 @@ with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -600,6 +601,7 @@ is
 
    procedure Wp_Set_Wpdb_Vars
    is
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
       use Inc_L10n;
@@ -611,7 +613,7 @@ is
       --    Dead_DB; -- ()
       -- end if;
 
-      Globals.WpDB.Field_Types := Arrays.To_Array ((
+      Globals.WpDB.Field_Types := To_Array_Type ([
                 Build ("post_author",      "%d"),
                 Build ("post_parent",      "%d"),
                 Build ("menu_order",       "%d"),
@@ -647,7 +649,7 @@ is
                 Build ("public",           "%d"),
                 Build ("site_id",          "%d"),
                 Build ("spam",             "%d")
-        ));
+        ]);
 
       Prefix := +Globals.WpDB.Set_Prefix (Wp_Config.Table_Prefix);
 

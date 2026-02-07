@@ -13,6 +13,7 @@ with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Constants;
 with Globals;
 with Lists;
@@ -398,6 +399,7 @@ is
       use Php.Misc;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use Constants;
       use Globals;
       use UStrings;
@@ -479,7 +481,7 @@ is
             end if;
 
             declare
-               Defaults : Array_Type := To_Array (List => (
+               Defaults : Array_Type := To_Array_Type ([
                 Build ("siteurl",                         Guess_URL),
                 Build ("home",                            Guess_URL),
                 Build ("blogname",                        abs "My Site"),
@@ -627,7 +629,7 @@ is
 
                 -- 5.8.0
                 Build ("wp_force_deactivated_plugins",    Empty_Array)
-               ));
+               ]);
             begin
                -- 3.3.0
                if not Is_Multisite then

@@ -45,6 +45,7 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Caches;
@@ -84,10 +85,10 @@ is
       -- redirect requests to deprecated keys to the new, correct ones.
       --
       declare
-         Deprecated_Keys : constant Array_Type := To_Array (List => (
+         Deprecated_Keys : constant Array_Type := To_Array_Type ([
            Build ("blacklist_keys",    "disallowed_keys"),
            Build ("comment_whitelist", "comment_previously_approved")
-         ));
+         ]);
       begin
          if
            Isset (Deprecated_Keys, Option) and then
@@ -558,6 +559,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Caches;
@@ -579,10 +581,10 @@ is
       -- redirect requests to deprecated keys to the new, correct ones.
       --
       declare
-         Deprecated_Keys : constant Array_Type := To_Array (List => (
+         Deprecated_Keys : constant Array_Type := To_Array_Type ([
            Build ("blacklist_keys",    "disallowed_keys"),
            Build ("comment_whitelist", "comment_previously_approved")
-         ));
+         ]);
       begin
          if Isset (Deprecated_Keys, Option) and then not Wp_Installing then
             X_Deprecated_Argument (
@@ -689,9 +691,9 @@ is
          declare
             use Class_WpDB;
 
-            Update_Args : Array_Type := To_Array (List => (1 =>
+            Update_Args : Array_Type := To_Array_Type ([
               Build ("option_value", As_String (Serialized_Value))
-            ));
+            ]);
             Result : Rows_Result_Type;
          begin
             if not Autoload then -- ( null !== autoload ) then
@@ -702,9 +704,9 @@ is
             Result :=
               Globals.WpDB.Update (-Globals.WpDB.Options,
                                    Update_Args,
-                                   To_Array (List => (1 =>
+                                   To_Array_Type ([
                                      Build ("option_name", Option)
-                                  )));
+                                  ]));
             if Result.Status = Error then
                return False;
             end if;
@@ -785,6 +787,7 @@ is
    is
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use Wp_Common;
       use Class_WpDB;
       use Inc_Caches;
@@ -812,10 +815,10 @@ is
       -- redirect requests to deprecated keys to the new, correct ones.
       --
       declare
-         Deprecated_Keys : constant Array_Type := To_Array (List => (
+         Deprecated_Keys : constant Array_Type := To_Array_Type ([
            Build ("blacklist_keys",    "disallowed_keys"),
            Build ("comment_whitelist", "comment_previously_approved")
-         ));
+         ]);
       begin
          if Isset (Deprecated_Keys, Option) and then not Wp_Installing then
             X_Deprecated_Argument (
@@ -971,6 +974,7 @@ is
                            return Boolean
    is
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_WpDB;
@@ -1019,8 +1023,8 @@ is
          Result :=
            Globals.WpDB.Delete (
              -Globals.WpDB.Options,
-             To_Array (List => (1 =>
-               Build ("option_name", Option)))
+             To_Array_Type ([
+               Build ("option_name", Option)])
            );
 
          if not Wp_Installing then
@@ -2003,6 +2007,7 @@ is
                                 return Boolean
    is
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Caches;
@@ -2083,11 +2088,11 @@ is
                Result_2 :=
                  Globals.WpDB.Insert (
                    -Globals.WpDB.Sitemeta,
-                   To_Array (List => (
+                   To_Array_Type ([
                      Build ("site_id",    Network_Id_2),
                      Build ("meta_key",   Option),
                      Build ("meta_value", As_String (Serialized_Value))
-                   ))
+                   ])
                  );
             end;
 
@@ -2156,6 +2161,7 @@ is
                                    return Boolean
    is
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_WpDB;
@@ -2226,10 +2232,10 @@ is
             Result :=
               Globals.WpDB.Delete (
                 -Globals.WpDB.Sitemeta,
-                To_Array (List => (
+                To_Array_Type ([
                   Build ("meta_key", Option),
                   Build ("site_id",  Network_Id_2)
-                ))
+                ])
               );
          end;
       end if;
@@ -2276,6 +2282,7 @@ is
                                    return Boolean
    is
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Caches;
@@ -2372,12 +2379,12 @@ is
                   Result :=
                     Globals.WpDB.Update (
                       -Globals.WpDB.Sitemeta,
-                      To_Array (List => (1 => Build ("meta_value",
-                                                     As_String (Serialized_Value)))),
-                      To_Array (List => (
+                      To_Array_Type ([Build ("meta_value",
+                                                     As_String (Serialized_Value))]),
+                      To_Array_Type ([
                         Build ("site_id",  Network_Id_2),
                         Build ("meta_key", Option)
-                      ))
+                      ])
                     );
                end;
 

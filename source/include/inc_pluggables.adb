@@ -18,6 +18,7 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
+with Array_Lists;
 with Binder;
 with Constants;
 with UStrings;
@@ -1044,6 +1045,7 @@ is
                                   Scheme : String := "")
                                   return Array_Type
    is
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Inc_Load;
@@ -1095,13 +1097,13 @@ is
             Token      : constant String := Cookie_Elements (3);
             Hmac       : constant String := Cookie_Elements (4);
          begin
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("username",   Username),
               Build ("expiration", Expiration),
               Build ("token",      Token),
               Build ("hmac",       Hmac),
               Build ("scheme",     -Scheme_2)
-            ));
+            ]);
 --          return Php.Compact ("username", "expiration", "token", "hmac", "scheme");
          end;
       end;
@@ -2732,6 +2734,7 @@ is
                      return String
    is
       use Php.Lists;
+      use Array_Lists;
       use Wp_Common;
       use Inc_L10n;
       use Inc_Options;
@@ -2750,7 +2753,7 @@ is
       end if;
 
       if Static_Duplicated_Keys = Empty_Array then
-         Static_Duplicated_Keys := To_Array (List => (
+         Static_Duplicated_Keys := To_Array_Type ([
            Build ("put your unique phrase here", True),
            --
            -- translators: This string should only be translated if
@@ -2760,7 +2763,7 @@ is
            -- /dist/wp-config-sample.php
            --
            Build (abs "put your unique phrase here", True)
-         ));
+         ]);
          for
            First of List_Type'["AUTH", "SECURE_AUTH", "LOGGED_IN",
                                "NONCE", "SECRET"]
@@ -2782,10 +2785,10 @@ is
       end if;
 
       declare
-         Values : Array_Type := To_Array (List => (
+         Values : Array_Type := To_Array_Type ([
            Build ("key",  ""),
            Build ("salt", "")
-         ));
+         ]);
       begin
          if
 --         Defined ('SECRET_KEY') and then
@@ -3173,6 +3176,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Inc_Formatting;
@@ -3182,7 +3186,7 @@ is
       use Inc_Media;
       use Inc_Options;
 
-      Defaults : Array_Type := To_Array (List => (
+      Defaults : Array_Type := To_Array_Type ([
         -- get_avatar_data() args.
         Build ("size",          96),
         Build ("height",        Null_Value),
@@ -3197,7 +3201,7 @@ is
         Build ("loading",       Null_Value),
         Build ("extra_attr",    ""),
         Build ("decoding",      "async")
-      ));
+      ]);
 
       Args_2 : Array_Type := Args;
    begin
@@ -3273,9 +3277,9 @@ is
          declare
             URL_2x : constant String :=
               Get_Avatar_URL (Id_Or_Email,
-                              Array_Merge (Args_2, To_Array (List => (1 =>
+                              Array_Merge (Args_2, To_Array_Type ([
                                 Build ("size",
-                                       As_Integer (Get (Args_2, "size")) * 2)))));
+                                       As_Integer (Get (Args_2, "size")) * 2)])));
 
             Args_3 : constant Array_Type := Get_Avatar_Data (Id_Or_Email, Args_2);
 

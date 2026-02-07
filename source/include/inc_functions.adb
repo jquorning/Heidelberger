@@ -22,11 +22,12 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
-with UStrings;
 with Helpers;
+with UStrings;
 with Wp_Common;
 
 with Inc_Caches;
@@ -1479,7 +1480,6 @@ is
          Desc : UString;
       end record;
 
---    Array_Type := To_Array (List => (
       Wp_Header_To_Desc : constant array (Positive range <>) of List_Entry :=
         (
           (100, +"Continue"),
@@ -1617,12 +1617,13 @@ is
    function Wp_Get_Nocache_Headers
             return Array_Type
    is
+      use Array_Lists;
       use Wp_Common;
 
-      Headers : constant Array_Type := To_Array (List => (
+      Headers : constant Array_Type := To_Array_Type ([
         Build ("Expires",       "Wed, 11 Jan 1984 05:00:00 GMT"),
         Build ("Cache-Control", "no-cache, must-revalidate, max-age=0")
-      ));
+      ]);
 
 --    if ( function_exists( "apply_filters" ) ) then
                 --
@@ -2597,7 +2598,7 @@ is
                              return Array_Type
    is
       use Php.Strings;
---    use Globals;
+      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_Load;
@@ -2718,14 +2719,14 @@ is
          Append (Dir, Sub_Dir);
          Append (URL, Sub_Dir);
 
-         return To_Array (List => (
+         return To_Array_Type ([
            Build ("path",    -Dir),
            Build ("url",     -URL),
            Build ("subdir",  -Sub_Dir),
            Build ("basedir", Base_Dir),
            Build ("baseurl", Base_URL),
            Build ("error",   False)
-          ));
+          ]);
       end;
    end X_Wp_Upload_Dir;
 
@@ -3547,6 +3548,7 @@ is
    function Wp_Get_MIME_Types
             return Array_Type
    is
+      use Array_Lists;
       use Wp_Common;
    begin
       --
@@ -3563,7 +3565,7 @@ is
       return
         Apply_Filters (
           "mime_types",
-          To_Array (List => (
+          To_Array_Type ([
             -- Image formats.
             Build ("jpg|jpeg|jpe",                 "image/jpeg"),
             Build ("gif",                          "image/gif"),
@@ -3669,7 +3671,7 @@ is
             Build ("key",                          "application/vnd.apple.keynote"),
             Build ("numbers",                      "application/vnd.apple.numbers"),
             Build ("pages",                        "application/vnd.apple.pages")
-          ))
+          ])
        );
    end Wp_Get_MIME_Types;
 
@@ -4804,6 +4806,7 @@ is
       use Php.Files;
       use Php.JSON;
       use Php.Strings;
+      use Array_Lists;
       use Inc_L10n;
 
       Result     : Array_Type;
@@ -4822,8 +4825,8 @@ is
 
       declare
          Options_2    : constant Array_Type :=
-           Wp_Parse_Args (Options, To_Array (List => (1 =>
-                          Build ("associative", False))));
+           Wp_Parse_Args (Options, To_Array_Type ([
+                          Build ("associative", False)]));
 
          Decoded_File : constant Array_Type :=
            JSON_Decode (File_Get_Contents (Filename_2),
@@ -6521,6 +6524,7 @@ is
    function Get_Main_Network_Id
             return Integer
    is
+      use Array_Lists;
       use Wp_Common;
       use Class_Networks;
       use Inc_Ms_Networks;
@@ -6549,10 +6553,10 @@ is
             declare
                X_Networks : constant Network_List :=
                  Get_Networks (
-                   To_Array (List => (
+                   To_Array_Type ([
                      Build ("fields", "ids"),
                      Build ("number", 1)
-                   ))
+                   ])
                  );
             begin
                Main_Network_Id := X_Networks.First_Element.Id;

@@ -14,6 +14,7 @@ with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
+with Array_Lists;
 with Lists;
 
 package body Class_Requests
@@ -33,6 +34,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
+      use Array_Lists;
 
       URL_2     : String     := URL;
       Headers_2 : Array_Type := Headers;
@@ -65,8 +67,8 @@ is
          declare
             Need_SSL : constant Boolean := Stripos (URL_2, "https://") = 0;
 
-            Capabilities : Array_Type := To_Array (List => (1 =>
-              Build ("ssl", Need_SSL)));
+            Capabilities : Array_Type := To_Array_Type ([
+              Build ("ssl", Need_SSL)]);
 
          begin
             null;
@@ -93,7 +95,9 @@ is
    function Get_Default_Options (Multirequest : Boolean := False)
                                  return Array_Type
    is
-      Defaults : Array_Type := To_Array (List => (
+      use Array_Lists;
+
+      Defaults : Array_Type := To_Array_Type ([
         Build ("timeout",          10),
         Build ("connect_timeout",  10),
         Build ("useragent",        "php-requests/" & VERSION), -- self::, change case
@@ -113,7 +117,7 @@ is
         Build ("transport",        Null_Value),
         Build ("verify",           Get_Certificate_Path), -- self::
         Build ("verifyname",       True)
-      ));
+      ]);
    begin
       if Multirequest then
          Set (Defaults, "complete", From_Null);
@@ -289,7 +293,7 @@ is
 
          for Header of Headers_4 loop
             declare
-               List : List_Type := Explode (":", Header, 2);
+               List : constant List_Type := Explode (":", Header, 2);
 
                Key   : constant String := List (1);
                Value : constant String := Trim (List (2));

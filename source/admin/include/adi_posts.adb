@@ -5,6 +5,8 @@
 -- @subpackage Administration
 --
 
+with Array_Lists;
+
 with Class_Block_Type_Registry;
 with Class_Block_Type;
 
@@ -2169,11 +2171,12 @@ is
    function Get_Block_Editor_Server_Block_Settings
             return Array_Type
    is
+      use Array_Lists;
       use Class_Block_Type_Registry;
 
       Block_Registry : constant Wp_Block_Type_Registry := Get_Instance;
 
-      Fields_To_Pick : constant Array_Type := To_Array (List => (
+      Fields_To_Pick : constant Array_Type := To_Array_Type ([
         Build ("api_version",      "apiVersion"),
         Build ("title",            "title"),
         Build ("description",      "description"),
@@ -2190,7 +2193,7 @@ is
         Build ("keywords",         "keywords"),
         Build ("example",          "example"),
         Build ("variations",       "variations")
-      ));
+      ]);
 
       Blocks : Array_Type;
    begin

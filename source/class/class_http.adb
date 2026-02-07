@@ -13,9 +13,10 @@ with Php.Lists;
 with Php.Preg;
 with Php.Strings;
 
+with Array_Lists;
 with Constants;
-with UStrings;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Class_Requests;
@@ -44,6 +45,7 @@ is
    is
       use Php.Files;
       use Php.HTML;
+      use Array_Lists;
       use Wp_Common;
       use Class_Errors;
       use Inc_Functions;
@@ -51,7 +53,7 @@ is
       use Inc_Load;
       use Inc_L10n;
 
-      Defaults : Array_Type := To_Array (List => (
+      Defaults : Array_Type := To_Array_Type ([
         Build ("method",              "GET"),
         --
         -- Filters the timeout value for an HTTP request.
@@ -125,7 +127,7 @@ is
         Build ("stream",              False),
         Build ("filename",            Null_Value),
         Build ("limit_response_size", Null_Value)
-      ));
+      ]);
 
       -- Pre-parse for the HEAD checks.
       Args_2 : constant Array_Type := Wp_Parse_Args (Args);
@@ -276,12 +278,12 @@ is
             Headers : constant Array_Type := As_Array (Get (Parsed_Args, "headers"));
             Data    : constant Array_Type := As_Array (Get (Parsed_Args, "body"));
             Typ     : constant String := Get_As_String (Parsed_Args, "method");
-            Options : Array_Type := To_Array (List => (
+            Options : Array_Type := To_Array_Type ([
                         Build ("timeout",   Get_As_String (Parsed_Args, "timeout")),
                         Build ("useragent", Get_As_String (Parsed_Args, "user-agent")),
                         Build ("blocking",  Get_As_String (Parsed_Args, "blocking"))
 --           Build ("hooks",     new Wp_Http_Requests_Hooks (URL, Parsed_Args))
-            ));
+            ]);
          begin
             -- Ensure redirects follow browser behaviour.
 --          options["hooks"].Register ("requests.before_redirect", array (get_class(), "browser_redirect_compatibility"));
@@ -418,16 +420,16 @@ is
                return (Success => True,
                        Error   => Null_Wp_Error,
                        Arry    =>
-               To_Array (List => (
+               To_Array_Type ([
                  Build ("headers",       Empty_Array),
                  Build ("body",          ""),
-                 Build ("response",      To_Array (List => (
+                 Build ("response",      To_Array_Type ([
                    Build ("code",    False),
                    Build ("message", False)
-                 ))),
+                 ])),
                  Build ("cookies",       Empty_Array),
                  Build ("http_response", Null_Value)
-               )));
+               ]));
             end if;
 
             --
@@ -492,7 +494,7 @@ is
             -- transport statically.
             if
               False
---            not Call_User_Func (To_Array (List => (1 => Build (Class, "test"))),
+--            not Call_User_Func (To_Array_Type ([Build (Class, "test")]),
 --                                Args, URL)
             then
                goto Continue;
@@ -515,11 +517,13 @@ is
                   Args : Array_Type := Empty_Array)
                   return Array_Type
    is
+      use Array_Lists;
       use Inc_Functions;
 
       Defaults : constant Array_Type :=
-        To_Array (List => (1 =>
-          Build ("method", "POST")));
+        To_Array_Type ([
+          Build ("method", "POST")
+        ]);
 
       Parsed_Args : constant Array_Type :=
         Wp_Parse_Args (Args, Defaults);
@@ -537,6 +541,7 @@ is
    is
       use Php.Arrays;
       use Php.Strings;
+      use Array_Lists;
 
       -- -- Split headers, one per array element.
       -- if ( is_string( headers ) ) then
@@ -552,10 +557,10 @@ is
       --    headers = explode( "\n", headers );
       -- end if;
 
-      Response : Array_Type := To_Array (List => (
+      Response : Array_Type := To_Array_Type ([
         Build ("code",    0),
         Build ("message", "")
-      ));
+      ]);
 
       Headers_2 : Array_Type := Headers;
    begin
@@ -628,11 +633,11 @@ is
          Set (Response, "code",
               From_Integer (As_Integer (Get (Response, "code"))));
 
-         return To_Array (List => (
+         return To_Array_Type ([
                         Build ("response", Response),
                         Build ("headers",  New_Headers),
                         Build ("cookies",  Cookies)
-                ));
+                ]);
       end;
    end Process_Headers;
 

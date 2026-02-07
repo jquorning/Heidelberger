@@ -6,6 +6,8 @@
 -- @subpackage translations
 --
 
+with Array_Lists;
+
 package body POMO_Translations
 is
 
@@ -111,14 +113,15 @@ is
                        Context  : String := "")
                        return String
    is
+      use Array_Lists;
       use POMO_Entries;
 
       Entri : constant Translation_Entry :=
         X_Construct (
-          To_Array (List => (
+          To_Array_Type ([
             Build ("singular", Singular),
             Build ("context",  Context)
-          ))
+          ])
         );
       Translated : constant Translation_Entry := This.Translate_Entry (Entri);
    begin

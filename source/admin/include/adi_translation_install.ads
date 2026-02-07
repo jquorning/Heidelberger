@@ -5,7 +5,6 @@
 -- @subpackage Administration
 --
 
-with Array_Lists;
 with Arrays;
 
 with Class_Errors;

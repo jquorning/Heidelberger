@@ -10,6 +10,7 @@ with Php.Echoing;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Helpers;
 with Lists;
 with Wp_Common;
@@ -168,6 +169,7 @@ is
                        Args : Node_Args) -- Array_Type)
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_Functions;
@@ -175,7 +177,7 @@ is
 
       Args_2 : Node_Args := Args;
 
-      Defaults : Node_Args := -- Array_Type := To_Array ((
+      Defaults : Node_Args := -- Array_Type := To_Array_Type ([
         (Id       => Null_UString,   --              Build ("id",     "false"),
          Title    => Null_UString,   --              Build ("title",  "false"),
          Parent   => Null_UString,   --              Build ("parent", "false"),
@@ -234,12 +236,12 @@ is
 --    Args_2 := Wp_Parse_Args (Args_2, Defaults);
 
       declare
-         Back_Compat_Parents : constant Array_Type := Arrays.To_Array ((
+         Back_Compat_Parents : constant Array_Type := To_Array_Type ([
             Build ("my-account-with-avatar",
-                   Arrays.To_Array ((1 => Build ("my-account", "3.3")))),
+                   To_Array_Type ([Build ("my-account", "3.3")])),
             Build ("my-blogs",
-                   Arrays.To_Array ((1 => Build ("my-sites",   "3.3"))))
-         ));
+                   To_Array_Type ([Build ("my-sites",   "3.3")]))
+         ]);
          New_Parent : UString;
          Version    : UString;
       begin
@@ -417,6 +419,7 @@ is
    function X_Bind (This : in out Wp_Admin_Bar)
             return Node_Args
    is
+      use Array_Lists;
       use UStrings;
 
       Parent : Node_Args;
@@ -437,10 +440,10 @@ is
          This.Add_Node (N);
       end;
       -- This.Add_Node (
-      --    To_Array ((
+      --    To_Array_Type ([
       --       Build ("id",    "root"),
       --       Build ("group", "false")
-      --    ))
+      --    ])
       -- );
 
       -- Normalize nodes: define internal "children" and "type" properties.
@@ -499,24 +502,24 @@ is
                            Parent   =>  Parent.Id,
                            Typ      =>  Typ_Group,
                            Children =>  null,
-                           Meta     =>  Arrays.To_Array ((
-                                 1 => Build ("class", Group_Class)
-                              )),
+                           Meta     =>  To_Array_Type ([
+                                 Build ("class", Group_Class)
+                              ]),
                            Title    => Null_UString,
                            Href     => Null_UString,
                            Group    => False
                         ));
-                        -- To_Array ((
+                        -- To_Array_TYpe ([
                         --    Build ("id",       Default_Id),
                         --    Build ("parent",   parent.Id),
                         --    Build ("type",     "group"),
                         --    Build ("children", Empty_Array),
-                        --    Build ("meta",     To_Array ((
-                        --          1 => Build ("class", Group_Class))
-                        --       )),
+                        --    Build ("meta",     To_Array_Type (([
+                        --          Build ("class", Group_Class))
+                        --       ]),
                         --    Build ("title",    "false"),
                         --    Build ("href",     "false")
-                        -- ))
+                        -- ])
 
                      Default := This.X_Get_Node (Default_Id);
                      Parent.Children.Include (Key      => "XXX-989",

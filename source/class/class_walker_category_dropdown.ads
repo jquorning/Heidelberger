@@ -39,10 +39,10 @@ is
          --
          -- @see Walker::$db_fields
          --
---       DB_Fields : Array_Type := To_Array ((
+--       DB_Fields : Array_Type := To_Array_Type ([
 --           Build ("parent", "parent"),
 --           Build ("id",     "term_id")
---       ));
+--       ]);
          null;
       end record;
 

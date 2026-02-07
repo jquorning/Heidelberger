@@ -15,6 +15,7 @@ with Php.HTML;
 with Php.Strings;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -59,6 +60,7 @@ is
       use Php.Files;
       use Php.HTML;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use Constants;
       use Globals;
@@ -180,10 +182,10 @@ is
                   begin
                      Response := Inc_HTTP.Wp_Remote_Get (
                         Admin_URL ("upgrade.php?step=1"),
-                           Arrays.To_Array ((
+                           To_Array_Type ([
                               Build ("timeout",     120),
                               Build ("httpversion", "1.1")
-                           ))
+                           ])
                         );
                      -- This action is documented in wp-admin/network/upgrade.php
                      Do_Action ("after_mu_upgrade", Response);

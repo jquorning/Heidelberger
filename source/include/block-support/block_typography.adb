@@ -11,8 +11,9 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
-with UStrings;
+with Array_Lists;
 with Lists;
+with UStrings;
 
 with Inc_Functions;
 with Inc_Global_Styles_And_Settings;
@@ -35,6 +36,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
       use Inc_L10n;
@@ -61,11 +63,11 @@ is
       end if;
 
       declare
-         Defaults : constant Array_Type := To_Array (List => (
+         Defaults : constant Array_Type := To_Array_Type ([
            Build ("coerce_to",        ""),
            Build ("root_size_value",  16),
            Build ("acceptable_units", List_Type'["rem", "px", "em"])
-         ));
+         ]);
 
          Options_2 : constant Array_Type := Wp_Parse_Args (Options, Defaults);
 
@@ -129,10 +131,10 @@ is
                Unit := +Coerce_To;
             end if;
 
-            return To_Array (List => (
+            return To_Array_Type ([
               Build ("value", Round (Value, 3)'Image),
               Build ("unit",  -Unit)
-            ));
+            ]);
          end;
       end;
    end Wp_Get_Typography_Value_And_Unit;
@@ -147,6 +149,7 @@ is
    is
       use Php.Numerics;
       use Php.Strings;
+      use Array_Lists;
 
       Maximum_Viewport_Width_Raw : constant Multi_Type :=
         (if Isset (Args, "maximum_viewport_width")
@@ -184,9 +187,9 @@ is
       Maximum_Font_Size : constant Array_Type :=
         Wp_Get_Typography_Value_And_Unit (
           Maximum_Font_Size_Raw,
-          To_Array (List => (1 =>
+          To_Array_Type ([
             Build ("coerce_to", Font_Size_Unit)
-          ))
+          ])
         );
    begin
       -- Checks for mandatory min and max sizes, and protects against unsupported
@@ -204,26 +207,26 @@ is
          Minimum_Font_Size_Rem : constant Array_Type :=
            Wp_Get_Typography_Value_And_Unit (
              Minimum_Font_Size_Raw,
-             To_Array (List => (1 =>
+             To_Array_Type ([
                Build ("coerce_to", "rem")
-             ))
+             ])
            );
 
          -- Viewport widths defined for fluid typography. Normalize units.
          Maximum_Viewport_Width : constant Array_Type :=
            Wp_Get_Typography_Value_And_Unit (
              Maximum_Viewport_Width_Raw,
-             To_Array (List => (1 =>
+             To_Array_Type ([
                Build ("coerce_to", Font_Size_Unit)
-             ))
+             ])
            );
 
          Minimum_Viewport_Width : constant Array_Type :=
            Wp_Get_Typography_Value_And_Unit (
              Minimum_Viewport_Width_Raw,
-             To_Array (List => (1 =>
+             To_Array_Type ([
                Build ("coerce_to", Font_Size_Unit)
-             ))
+             ])
            );
 
          --
@@ -280,6 +283,7 @@ is
       use Php.Arrays;
       use Php.Numerics;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Inc_Global_Styles_And_Settings;
    begin
@@ -350,9 +354,9 @@ is
             Minimum_Font_Size_Limit : constant Array_Type :=
               Wp_Get_Typography_Value_And_Unit (
                 From_String (Default_Minimum_Font_Size_Limit),
-                To_Array (List => (1 =>
+                To_Array_Type ([
                   Build ("coerce_to", Get_As_String (Preferred_Size, "unit"))
-                ))
+                ])
               );
 
             Maximum_Font_Size_Raw_String : UString;
@@ -423,13 +427,13 @@ is
 
             declare
                Fluid_Font_Size_Value : constant String :=
-                 Wp_Get_Computed_Fluid_Typography_Value (To_Array (List => (
+                 Wp_Get_Computed_Fluid_Typography_Value (To_Array_Type ([
                    Build ("minimum_viewport_width", Default_Minimum_Viewport_Width),
                    Build ("maximum_viewport_width", Default_Maximum_Viewport_Width),
                    Build ("minimum_font_size",      Minimum_Font_Size_Raw),
                    Build ("maximum_font_size",      Maximum_Font_Size_Raw),
                    Build ("scale_factor",           Default_Scale_Factor)
-                 ))
+                 ])
                );
             begin
                if not Empty (Fluid_Font_Size_Value) then

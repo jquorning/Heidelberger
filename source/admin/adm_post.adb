@@ -13,6 +13,7 @@ with Php.Lists;
 with Php.Strings;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -54,6 +55,7 @@ is
    procedure Render
    is
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use Constants;
       use Globals;
@@ -262,7 +264,7 @@ is
                   if
                     not Php.Lists.In_List (-Globals.Typenow,
                                   Inc_Posts.Get_Post_Types
-                                    (To_Array (List => (1 => Build ("show_ui", "true")))),
+                                    (To_Array_Type ([Build ("show_ui", "true")])),
                                   True)
                   then
                      Wp_Die
@@ -437,10 +439,10 @@ is
 
                      Wp_Redirect (
                         Add_Query_Arg (
-                          To_Array (List => (
+                          To_Array_Type ([
                             Build ("trashed", "1"),
                             Build ("ids",     Image (Id))
-                          )),
+                          ]),
                           -Sendback));
                   end;
                   goto Bailout;
@@ -467,10 +469,10 @@ is
                   end if;
 
                   Sendback := +Add_Query_Arg (
-                           To_Array (List => (
+                           To_Array_Type ([
                               Build ("untrashed", "1"),
                               Build ("ids",       Image (Id))
-                           )),
+                           ]),
                            -Sendback);
                   Wp_Redirect (-Sendback);
                   goto Bailout;

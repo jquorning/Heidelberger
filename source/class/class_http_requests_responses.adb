@@ -6,6 +6,8 @@
 -- @since 4.6.0
 --
 
+with Array_Lists;
+
 with Inc_Functions;
 
 package body Class_HTTP_Requests_Responses
@@ -104,20 +106,21 @@ is
    function To_Array (This : Wp_HTTP_Requests_Response)
                       return Array_Type
    is
+      use Array_Lists;
       use UStrings;
       use Inc_Functions;
    begin
       return
-        To_Array (List => (
+        To_Array_Type ([
           Build ("headers",  This.Get_Headers),
           Build ("body",     This.Get_Data),
-          Build ("response", To_Array (List => (
+          Build ("response", To_Array_Type ([
             Build ("code",    This.Get_Status),
             Build ("message", Get_Status_Header_Desc (This.Get_Status))
-          ))),
+          ])),
           Build ("cookies",  This.Get_Cookies),
           Build ("filename", -This.Filename)
-        ));
+        ]);
    end To_Array;
 
 end Class_HTTP_Requests_Responses;

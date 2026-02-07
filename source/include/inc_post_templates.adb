@@ -10,6 +10,8 @@
 with Php.Echoing;
 with Php.Strings;
 
+with Array_Lists;
+
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Posts;
@@ -76,17 +78,18 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use Inc_Formatting;
       use Inc_Functions;
       use Inc_Posts;
 
       Defaults : constant Array_Type :=
-        To_Array (List => (
+        To_Array_Type ([
           Build ("before", ""),
           Build ("after",  ""),
           Build ("echo",   True),
           Build ("post",   Get_Post)
-        ));
+        ]);
 
       Parsed_Args : constant Array_Type := Wp_Parse_Args (Args, Defaults);
 

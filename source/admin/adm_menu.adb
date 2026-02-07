@@ -10,10 +10,10 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Binder;
 with Helpers;
 with Helpers_3;
-with Wp_Common;
 with Lists;
 
 with Adi_Plugins;
@@ -35,7 +35,6 @@ with Class_Post_Type;
 
 package body Adm_Menu
 is
-   use Arrays;
    use Lists;
 
    function To_Menu (Menu_Title : String;
@@ -66,10 +65,10 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use Binder;
       use Helpers_3;
       use UStrings;
-      use Wp_Common;
       use Inc_Capabilities;
       use Inc_Functions;
       use Inc_Formatting;
@@ -223,20 +222,21 @@ is
          -- The index of the last top-level menu in the object menu group.
 
          Types  : constant List_Type := Get_Post_Types (  -- (array)
-            Arrays.To_Array ((
+            To_Array_Type ([
                 Build ("show_ui",      "true"),
                 Build ("_builtin",     "false"),
-                Build ("show_in_menu", "true"))));
+                Build ("show_in_menu", "true")]));
 
 --         Builtin : constant String_Array := String_Array'(1 => "post", 2 => "page");
---            Arrays.To_Array ((
+--            To_Array_List ([
 --               Build ("post", ""),
---               Build ("page", "")));
+--               Build ("page", "")]);
       begin
          for Ptype of Types loop -- String_Array'(Builtin & Types) loop -- Array_Merge (Builtin, Types) loop
             declare
                Ptype_Obj : constant Class_Post_Type.Wp_Post_Type :=
                   Inc_Posts.Get_Post_Type_Object (Ptype);
+
                Ptype_Menu_Position : Menu_Index;
                Ptype_For_Id        : UString;
                Menu_Icon           : UString;
@@ -445,10 +445,12 @@ is
               Current_User_Can ("customize")
             then
                declare
-                  Array_1 : constant Array_Type := Arrays.To_Array ((1 =>
-                                                   Build ("control", "header_image")));
-                  Array_2 : constant Array_Type := Arrays.To_Array ((1 =>
-                                                   Build ("autofocus", Array_1)));
+                  Array_1 : constant Array_Type :=
+                    To_Array_Type ([Build ("control", "header_image")]);
+
+                  Array_2 : constant Array_Type :=
+                    To_Array_Type ([Build ("autofocus", Array_1)]);
+
                   Customize_Header_Url : constant String :=
                      Add_Query_Arg (Array_2, Customize_Url);
                begin
@@ -463,13 +465,13 @@ is
             then
                declare
                   Array_1 : constant Array_Type :=
-                     Arrays.To_Array ((1 => Build ("control", "background_image")));
+                    To_Array_Type ([Build ("control", "background_image")]);
 
                   Array_2 : constant Array_Type :=
-                     Arrays.To_Array ((1 => Build ("autofocus", Array_1)));
+                    To_Array_Type ([Build ("autofocus", Array_1)]);
 
                   Customize_Background_Url : constant String :=
-                     Add_Query_Arg (Array_2, Customize_Url);
+                    Add_Query_Arg (Array_2, Customize_Url);
                begin
                   Set (Submenu, "themes.php", 20, abs "Background", Appearance_Cap,
                        ESC_URL (Customize_Background_Url), "", "hide-if-no-customize");
@@ -582,11 +584,10 @@ is
                Current_User_Can ("view_site_health_checks")
             then
                declare
---                use Array_Maps;
-
-                  Get_Issues   : String :=
+                  Get_Issues : String :=
                      As_String (
                        Inc_Options.Get_Transient ("health-check-site-status-result"));
+
                   Issue_Counts : Array_Type := Empty_Array;
                begin
                   -- if False /= Get_Issues then
@@ -597,14 +598,16 @@ is
                     not Is_Array (Issue_Counts) or else
                     Issue_Counts = Empty_Array
                   then
-                     Issue_Counts := Arrays.To_Array ((
-                        Build ("good",        "0"),
-                     Build ("recommended", "0"),
-                     Build ("critical",    "0")));
+                     Issue_Counts := To_Array_Type ([
+                       Build ("good",        "0"),
+                       Build ("recommended", "0"),
+                       Build ("critical",    "0")
+                     ]);
                   end if;
 
                   declare
-                     Health : constant String := Get_As_String (Issue_Counts, "critical");
+                     Health : constant String :=
+                       Get_As_String (Issue_Counts, "critical");
                   begin
                      Site_Health_Count := +Sprintf (
                         "<span class=""menu-counter site-health-counter count-%s""><span class=""count"">%s</span></span>",
@@ -682,7 +685,7 @@ is
       -- X_wp_Real_Parent_File ("ms-admin.php")   := "tools.php";
 
       -- -- Ensure backward compatibility.
-      -- Compat := To_Array ((
+      -- Compat := To_Array_List ([
       --    Build ("index",           "dashboard"),
       --    Build ("edit",            "posts"),
       --    Build ("post",            "posts"),
@@ -693,7 +696,7 @@ is
       --    Build ("edit-comments",   "comments"),
       --    Build ("options-general", "settings"),
       --    Build ("themes",          "appearance")
-      -- ));
+      -- ]);
    end Run;
 
    ---------------------

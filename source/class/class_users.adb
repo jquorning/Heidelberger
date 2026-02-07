@@ -12,6 +12,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Globals;
 with Helpers;
 with Wp_Common;
@@ -24,7 +25,6 @@ with Class_WpDB;
 with Inc_Formatting;
 with Inc_Load;
 with Inc_Ms_Blogs;
--- with Inc_Plugins;
 with Inc_Users;
 
 package body Class_Users
@@ -40,6 +40,7 @@ is
                          return Wp_User
    is
       use Php.Arrays;
+      use Array_Lists;
       use UStrings;
 
       This : Wp_User;
@@ -49,14 +50,14 @@ is
             Prefix : constant String := -Globals.WpDB.Prefix;
             -- Globals.GLOBALS['wpdb'].prefix;
          begin
-            Back_Compat_Keys := To_Array (List => ( -- self::
+            Back_Compat_Keys := To_Array_Type ([
               Build ("user_firstname",             "first_name"),
               Build ("user_lastname",              "last_name"),
               Build ("user_description",           "description"),
               Build ("user_level",                 Prefix & "user_level"),
               Build (Prefix & "usersettings",      Prefix & "user-settings"),
               Build (Prefix & "usersettingstime",  Prefix & "user-settings-time")
-            ));
+            ]);
          end;
       end if;
 
@@ -691,7 +692,7 @@ is
          if not Empty (Role) then
             Set (This.Caps, Role, From_Boolean (True));
             This.Roles := [Role];
---          This.Roles := To_Array (List => (1 => Build (Role, True)));
+--          This.Roles := To_Array_Type ([Build (Role, True)]);
          else
             This.Roles := Empty_List;
          end if;

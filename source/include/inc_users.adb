@@ -8,6 +8,7 @@
 
 with Php.Strings;
 
+with Array_Lists;
 with Binder;
 with Globals;
 with Helpers;
@@ -2741,17 +2742,18 @@ is
                             Email    : String := "")
                             return Class_Users.User_Id_Type
    is
+      use Array_Lists;
       use Inc_Formatting;
 
       User_Login : constant String := Wp_Slash (Username);
       User_Email : constant String := Wp_Slash (Email);
       User_Pass  : constant String := Password;
 
-      Userdata : constant Array_Type := To_Array (List => (
+      Userdata : constant Array_Type := To_Array_Type ([
         Build ("user_login", User_Login),
         Build ("user_email", User_Email),
         Build ("user_pass",  User_Pass)
-      ));
+      ]);
 --    Userdata   : Array_Type := Compact ("user_login", "user_email", "user_pass");
    begin
       return Wp_Insert_User (Userdata);

@@ -7,6 +7,7 @@
 --
 
 with Arrays;
+with Array_Lists;
 with Lists;
 
 package Class_Theme_JSON_Schema
@@ -35,12 +36,12 @@ is
    -- Maps old properties to their new location within the schema"s settings.
    -- This will be applied at both the defaults and individual block levels.
    --
-   V1_TO_V2_RENAMED_PATHS : constant Array_Type := To_Array (List => (
+   V1_TO_V2_RENAMED_PATHS : constant Array_Type := Array_Lists.To_Array_Type ([
      Build ("border.customRadius",         "border.radius"),
      Build ("spacing.customMargin",        "spacing.margin"),
      Build ("spacing.customPadding",       "spacing.padding"),
      Build ("typography.customLineHeight", "typography.lineHeight")
-   ));
+   ]);
 
    --
    -- Function that migrates a given theme.json structure to the last version.

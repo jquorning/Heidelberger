@@ -6,6 +6,7 @@
 -- @since 3.4.0
 
 with Arrays;
+with Array_Lists;
 with UStrings;
 
 with Class_Errors;
@@ -156,7 +157,7 @@ is
    -- @var string[]
    --
    -- private static
-   Static_File_Headers : Array_Type := To_Array (List => (
+   Static_File_Headers : Array_Type := Array_Lists.To_Array_Type ([
      Build ("Name",        "Theme Name"),
      Build ("ThemeURI",    "Theme URI"),
      Build ("Description", "Description"),
@@ -171,7 +172,7 @@ is
      Build ("RequiresWP",  "Requires at least"),
      Build ("RequiresPHP", "Requires PHP"),
      Build ("UpdateURI",   "Update URI")
-   ));
+   ]);
 
    --
    -- Default themes.
@@ -190,7 +191,7 @@ is
    -- @var string[]
    --
    -- private static
-   Static_Default_Themes : Array_Type := To_Array (List => (
+   Static_Default_Themes : Array_Type := Array_Lists.To_Array_Type ([
      Build ("classic",           "WordPress Classic"),
      Build ("default",           "WordPress Default"),
      Build ("twentyten",         "Twenty Ten"),
@@ -206,7 +207,7 @@ is
      Build ("twentytwentyone",   "Twenty Twenty-One"),
      Build ("twentytwentytwo",   "Twenty Twenty-Two"),
      Build ("twentytwentythree", "Twenty Twenty-Three")
-   ));
+   ]);
 
    --
    -- Flag for whether the themes cache bucket should be persistently cached.

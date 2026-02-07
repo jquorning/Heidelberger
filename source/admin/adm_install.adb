@@ -33,6 +33,7 @@ with Php.Strings;
 with Php.Types;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Constants;
 with Globals;
@@ -132,6 +133,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -331,9 +333,12 @@ is
          Echo ("        <p class=""step"">");
          Submit_Button (abs "Install WordPress", "large", "Submit", False,
 --                      Array_Type'[Build ("id", "submit")]);
-                        To_Array (List => (1 => Build ("id", "submit"))));
+                        To_Array_Type ([Build ("id", "submit")]));
          Echo ("</p>" & NL);
-         Echo ("        <input type=""hidden"" name=""language"" value=""" & (if Isset (X_REQUEST, "language") then ESC_Attr (Get_As_String (X_REQUEST, "language")) else "") & " />" & NL);
+         Echo ("        <input type=""hidden"" name=""language"" value=""" &
+               (if Isset (X_REQUEST, "language")
+                then ESC_Attr (Get_As_String (X_REQUEST, "language"))
+                else "") & " />" & NL);
          Echo ("</form>" & NL);
       end;
    end Display_Setup_Form;

@@ -18,6 +18,7 @@ with Php.Types;
 with Templates_Parser;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Globals;
 with Helpers;
@@ -75,6 +76,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Wp_Common;
@@ -279,11 +281,11 @@ is
                               end loop;
 
                               Sendback := +Add_Query_Arg (
-                                To_Array (List => (
+                                To_Array_Type ([
                                         Build ("trashed", Helpers.Image (Trashed)),
 --                                        Build ("ids",     Implode (",", Post_Ids)),
                                         Build ("locked",  Helpers.Image (Locked))
-                                )),
+                                ]),
                                 -Sendback);
                            end;
 
@@ -458,15 +460,15 @@ is
 
                if "post" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab ( -- ()
-                        Arrays.To_Array (List => (
+                        To_Array_Type ([
                         Build ("id",    "overview"),
                         Build ("title", abs "Overview"),
                         Build ("content",
                                "<p>" & abs "This screen provides access to all of your posts. You can customize the display of this screen to suit your workflow." & "</p>") -- ,?
-                        )));
+                        ]));
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array (List => (
+                        To_Array_Type ([
                         Build ("id",    "screen-content"),
                         Build ("title", abs "Screen Content"),
                         Build ("content",
@@ -477,10 +479,10 @@ is
                                "<li>" & abs "You can view posts in a simple title list or with an excerpt using the Screen Options tab." & "</li>" &
                                "<li>" & abs "You can refine the list to show only posts in a specific category or from a specific month by using the dropdown menus above the posts list. Click the Filter button after making your selection. You also can refine the list by clicking on the post author, category or tag in the posts list." & "</li>" &
                                 "</ul>")
-                        )));
+                        ]));
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array (List => (
+                        To_Array_Type ([
                          Build ("id",    "action-links"),
                          Build ("title", abs "Available Actions"),
                         Build ("content",
@@ -491,16 +493,16 @@ is
                                "<li>" & abs "<strong>Trash</strong> removes your post from this list and places it in the Trash, from which you can permanently delete it." & "</li>" &
                                "<li>" & abs "<strong>Preview</strong> will show you what your draft post will look like if you publish it. View will take you to your live site to view the post. Which link is available depends on your post&#8217;s status." & "</li>" &
                                "</ul>")
-                        )));
+                        ]));
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array (List => (
+                        To_Array_Type ([
                         Build ("id",    "bulk-actions"),
                         Build ("title", abs "Bulk actions"),
                         Build ("conten",
                                "<p>" & abs "You can also edit or move multiple posts to the Trash at once. Select the posts you want to act on using the checkboxes, then select the action you want to take from the Bulk actions menu and click Apply." & "</p>" &
                                "<p>" & abs "When using Bulk Edit, you can change the metadata (categories, author, etc.) for all selected posts at once. To remove a post from the grouping, just click the x next to its name in the Bulk Edit area that appears." & "</p>")
-                        )));
+                        ]));
 
                   Get_Current_Screen.Set_Help_Sidebar (
                 "<p><strong>" & abs "For more information:" & "</strong></p>" &
@@ -510,21 +512,21 @@ is
 
                elsif "page" = Post_Type then
                   Get_Current_Screen.Add_Help_Tab (
-                     To_Array (List => (
+                     To_Array_Type ([
                         Build ("id",    "overview"),
                         Build ("title", abs "Overview"),
                         Build ("content",
                                "<p>" & abs "Pages are similar to posts in that they have a title, body text, and associated metadata, but they are different in that they are not part of the chronological blog stream, kind of like permanent posts. Pages are not categorized or tagged, but can have a hierarchy. You can nest pages under other pages by making one the &#8220;Parent&#8221; of the other, creating a group of pages." & "</p>")
-                  )));
+                  ]));
 
                   Get_Current_Screen.Add_Help_Tab (
-                     To_Array (List => (
+                     To_Array_Type ([
                         Build ("id",    "managing-pages"),
                         Build ("title", abs "Managing Pages"),
                         Build ("content",
                                "<p>" & abs "Managing pages is very similar to managing posts, and the screens can be customized in the same way." & "</p>" &
                                "<p>" & abs "You can also perform the same types of actions, including narrowing the list by using the filters, acting on a page using the action links that appear when you hover over a row, or using the Bulk actions menu to edit the metadata for multiple pages at once." & "</p>")
-                  )));
+                  ]));
 
                   Get_Current_Screen.Set_Help_Sidebar (
                 "<p><strong>" & abs "For more information:" & "</strong></p>" &
@@ -534,26 +536,26 @@ is
                end if;
 
                Get_Current_Screen.Set_Screen_Reader_Content (
-                  To_Array (List => (
+                  To_Array_Type ([
                    Build ("heading_views",
                           Helpers_3.Get (Post_Type_Object, "labels.filter_items_list")),
                    Build ("heading_pagination",
                           Helpers_3.Get (Post_Type_Object, "labels.items_list_navigation")),
                    Build ("heading_list",
                           Helpers_3.Get (Post_Type_Object, "labels.items_list"))
-               )));
+               ]));
 
                Add_Screen_Option (
                   "per_page",
-                  To_Array (List => (
+                  To_Array_Type ([
                      Build ("default", "20"),
                      Build ("option",  "edit_" & (-Post_Type) & "_per_page")
-               )));
+               ]));
             end;
 
             declare
                Bulk_Counts : Array_Type
-                  := To_Array (List => (
+                  := To_Array_Type ([
         Build ("updated",   (if Isset (X_REQUEST, "updated")
                              then abs As_Integer (Get (X_REQUEST, "updated")) else 0)),
         Build ("locked",    (if Isset (X_REQUEST, "locked")
@@ -564,10 +566,10 @@ is
                              then abs As_Integer (Get (X_REQUEST, "trashed")) else 0)),
         Build ("untrashed", (if Isset (X_REQUEST, "untrashed")
                              then abs As_Integer (Get (X_REQUEST, "untrashed")) else 0))
-               ));
+               ]);
                Bulk_Messages    : Array_Type := Empty_Array; --          := To_Array; --  ();begin
             begin
-               Set (Bulk_Messages, "post", From_Array (To_Array (List => (    --  abs added
+               Set (Bulk_Messages, "post", From_Array (To_Array_Type ([  --  abs added
         -- translators: %s: Number of posts.
         Build ("updated", X_N ("%s post updated.",
                                "%s posts updated.",
@@ -590,9 +592,9 @@ is
         Build ("untrashed", X_N ("%s post restored from the Trash.",
                                  "%s posts restored from the Trash.",
                                  As_Integer (Get (Bulk_Counts, "untrashed"))))
-               ))));
+               ])));
 
-               Set (Bulk_Messages, "page", From_Array (To_Array (List => (
+               Set (Bulk_Messages, "page", From_Array (To_Array_Type ([
         -- translators: %s: Number of pages.
         Build ("updated", X_N ("%s page updated.",
                                "%s pages updated.",
@@ -615,9 +617,9 @@ is
         Build ("untrashed", X_N ("%s page restored from the Trash.",
                                  "%s pages restored from the Trash.",
                                  As_Integer (Get (Bulk_Counts, "untrashed"))))
-               ))));
+               ])));
 
-               Set (Bulk_Messages, "wp_block", From_Array (To_Array (List => (
+               Set (Bulk_Messages, "wp_block", From_Array (To_Array_Type ([
         -- translators: %s: Number of blocks.
         Build ("updated", X_N ("%s block updated.",
                                "%s blocks updated.",
@@ -640,7 +642,7 @@ is
         Build ("untrashed", X_N ("%s block restored from the Trash.",
                                  "%s blocks restored from the Trash.",
                                  As_Integer (Get (Bulk_Counts, "untrashed"))))
-               ))));
+               ])));
 
                --
                -- Filters the bulk action updated messages.

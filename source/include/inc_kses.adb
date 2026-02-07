@@ -39,6 +39,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Helpers;
 with UStrings;
 with Wp_Common;
@@ -718,6 +719,7 @@ is
                      Allowed_Protocols : List_Type := Empty_List)
                      return String
    is
+      use Array_Lists;
       use Inc_Functions;
 
       Allowed_Protocols_2 : constant List_Type :=
@@ -726,8 +728,8 @@ is
          else Allowed_Protocols);
 
       String_3 : constant String :=
-        Wp_KSES_No_Null (Item, To_Array (List => (1 =>
-                                 Build ("slash_zero", "keep"))));
+        Wp_KSES_No_Null (Item, To_Array_Type ([
+                                 Build ("slash_zero", "keep")]));
 
       String_2 : constant String :=
         Wp_KSES_Normalize_Entities (String_3);
@@ -1343,6 +1345,7 @@ is
       use Php.Lists;
       use Php.Preg;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
 
       Attr_2   : UString := +Attr;
@@ -1381,12 +1384,12 @@ is
                Working := True;
                Mode    := 0;
                if False = Array_Key_Exists (-Attrname, Attrarr) then
-                  Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                  Set (Attrarr, -Attrname, From_Array (To_Array_Type ([
                        Build ("name",  -Attrname),
                        Build ("value", ""),
                        Build ("whole", -Attrname),
                        Build ("vless", "y")
-                  ))));
+                  ])));
                end if;
                Attr_2 := +Preg_Replace ("/^\s+/", "", -Attr_2);
             end if;
@@ -1404,12 +1407,12 @@ is
                   end if;
 
                   if False = Array_Key_Exists (-Attrname, Attrarr) then
-                     Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                     Set (Attrarr, -Attrname, From_Array (To_Array_Type ([
                        Build ("name",  -Attrname),
                        Build ("value", -Thisval),
                        Build ("whole", -("""" & Attrname & "=\""" & Thisval & "\""")),
                        Build ("vless", "n")
-                     ))));
+                     ])));
                   end if;
                   Working := True;
                   Mode    := 0;
@@ -1423,12 +1426,12 @@ is
                   end if;
 
                   if False = Array_Key_Exists (-Attrname, Attrarr) then
-                     Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                     Set (Attrarr, -Attrname, From_Array (To_Array_Type ([
                        Build ("name",  -Attrname),
                        Build ("value", -Thisval),
                        Build ("whole", -("""" & Attrname & "=""" & Thisval & """")),
                        Build ("vless", "n")
-                     ))));
+                     ])));
                   end if;
                   Working := True;
                   Mode    := 0;
@@ -1442,12 +1445,12 @@ is
                   end if;
 
                   if False = Array_Key_Exists (-Attrname, Attrarr) then
-                     Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+                     Set (Attrarr, -Attrname, From_Array (To_Array_Type ([
                        Build ("name",  -Attrname),
                        Build ("value", -Thisval),
                        Build ("whole", -("""" & Attrname & "=\""" & Thisval & "\""")),
                        Build ("vless", "n")
-                     ))));
+                     ])));
                   end if;
                   -- We add quotes to conform to W3C's HTML spec.
                   Working := True;
@@ -1467,12 +1470,12 @@ is
       if 1 = Mode and then False = Array_Key_Exists (-Attrname, Attrarr) then
          -- Special case, for when the attribute list ends with a valueless
          -- attribute like "selected".
-         Set (Attrarr, -Attrname, From_Array (To_Array (List => (
+         Set (Attrarr, -Attrname, From_Array (To_Array_Type ([
            Build ("name",  -Attrname),
            Build ("value", ""),
            Build ("whole", -Attrname),
            Build ("vless", "y")
-         ))));
+         ])));
       end if;
 
       return Attrarr;
@@ -1718,10 +1721,11 @@ is
                              return String
    is
       use Php.Preg;
+      use Array_Lists;
 
       Options_2 : constant Array_Type :=
         (if not Isset (Options, "slash_zero")
-         then To_Array (List => (1 => Build ("slash_zero", "remove")))
+         then To_Array_Type ([Build ("slash_zero", "remove")])
          else Options);
 
       String_2 : constant String :=

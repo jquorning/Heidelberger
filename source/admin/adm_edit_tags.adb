@@ -12,12 +12,13 @@ with Php.Strings;
 with Templates_Parser;
 
 with Arrays;
+with Array_Lists;
 with Binder;
 with Globals;
 with Helpers;
 with Helpers_3;
-with UStrings;
 with Lists;
+with UStrings;
 with Wp_Common;
 
 with Adm_Admin;
@@ -84,6 +85,7 @@ is
    procedure Action_Add_Tag (Referer  : String;
                              Location : in out UStrings.UString)
    is
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Inc_Capabilities;
@@ -111,10 +113,10 @@ is
             Location := +Add_Query_Arg ("message", "1", Referer);
          else
             Location := +Add_Query_Arg (
-              To_Array (List => (
+              To_Array_Type ([
                 Build ("error", "true"),
                 Build ("message", "4")
-              )),
+              ]),
               Referer
             );
          end if;
@@ -253,6 +255,7 @@ is
 
    procedure Action_Edittag (Referer : String; Location : in out UStrings.UString)
    is
+      use Array_Lists;
       use Binder;
       use UStrings;
       use Class_Terms;
@@ -291,10 +294,10 @@ is
                Location := +Add_Query_Arg ("message", "3", Referer);
             else
                Location := +Add_Query_Arg (
-                  To_Array (List => (
+                  To_Array_Type ([
                     Build ("error", "true"),
                     Build ("message", "5")
-                  )),
+                  ]),
                   Referer
                 );
             end if;
@@ -343,6 +346,7 @@ is
    is
       use Php.Echoing;
       use Php.Strings;
+      use Array_Lists;
       use Binder;
       use Globals;
       use Helpers_3;
@@ -381,8 +385,8 @@ is
 
       if
          not In_Array (-Tax.Name, Get_Taxonomies
-                                   (To_Array (List => (1 =>
-                                      Build ("show_ui", "true")))), True)
+                                   (To_Array_Type ([
+                                      Build ("show_ui", "true")])), True)
       then
          Wp_Die
            (abs "Sorry, you are not allowed to edit terms in this taxonomy.");
@@ -434,18 +438,19 @@ is
 --         null;
 --      end;
          Add_Screen_Option ("per_page",
-                            To_Array (List => (
+                            To_Array_Type ([
                               Build ("default", "20"),
                               Build ("option",  "edit_" & (-Tax.Name) &
-                                                "_per_page"))));
+                                                "_per_page")
+                            ]));
 
          Get_Current_Screen.Set_Screen_Reader_Content (
-            Arrays.To_Array ((
+            To_Array_Type ([
                Build ("heading_pagination", "XXX-904"),
 --                    String'(Get (Tax.Labels, "items_list_navigation"))),
                Build ("heading_list",       "XXX-905")
 --                    String'(Get (Tax.Labels, "items_list")))
-            )));
+            ]));
 
 --               Location := False;
          declare
@@ -570,11 +575,11 @@ is
                end if;
 
                Get_Current_Screen.Add_Help_Tab (
-                To_Array (List => (
-                        Build ("id", "overview"),
-                        Build ("title", abs ("Overview")),
-                        Build ("content", -Help)
-               )));
+                To_Array_Type ([
+                  Build ("id", "overview"),
+                  Build ("title", abs ("Overview")),
+                  Build ("content", -Help)
+               ]));
 
                if "category" = Taxonomy or else "post_tag" = Taxonomy then
                   if "category" = Taxonomy then
@@ -597,13 +602,13 @@ is
                 "<p>" & abs "You can change the display of this screen using the Screen Options tab to set how many items are displayed per screen and to display/hide columns in the table." & "</p>";
 
                   Get_Current_Screen.Add_Help_Tab (
-                        To_Array (List => (
-                                Build ("id", "adding-terms"),
-                                Build ("title", (if "category" = Taxonomy
-                                                 then abs "Adding Categories"
-                                                 else abs "Adding Tags")),
-                                Build ("content", -Help)
-                       )));
+                    To_Array_Type ([
+                      Build ("id", "adding-terms"),
+                      Build ("title", (if "category" = Taxonomy
+                                       then abs "Adding Categories"
+                                       else abs "Adding Tags")),
+                      Build ("content", -Help)
+                    ]));
                end if;  -- ???
 
                Set_UString (Help, "<p><strong>" & abs "For more information:" & "</strong></p>");
@@ -940,15 +945,15 @@ is
                      declare
                         use Inc_Category_Templates;
 
-                        Dropdown_Args : Array_Type := To_Array (List => (
-                                      Build ("hide_empty",       0),
-                                      Build ("hide_if_empty",    False),
-                                      Build ("taxonomy",         -Taxonomy),
-                                      Build ("name",             "parent"),
-                                      Build ("orderby",          "name"),
-                                      Build ("hierarchical",     True),
-                                      Build ("show_option_none", abs "None")
-                                      ));
+                        Dropdown_Args : Array_Type := To_Array_Type ([
+                          Build ("hide_empty",       0),
+                          Build ("hide_if_empty",    False),
+                          Build ("taxonomy",         -Taxonomy),
+                          Build ("name",             "parent"),
+                          Build ("orderby",          "name"),
+                          Build ("hierarchical",     True),
+                          Build ("show_option_none", abs "None")
+                        ]);
 
                         --
                         -- Filters the taxonomy parent drop-down on the Edit Term page.

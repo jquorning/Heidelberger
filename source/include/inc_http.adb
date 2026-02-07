@@ -777,7 +777,7 @@ is
    function X_Wp_Translate_PHP_URL_Constant_To_Key (Component : Integer)
                                                     return String
    is
-      -- Translation : constant Array_Type := To_Array (List => (
+      -- Translation : constant Array_Type := To_Array_Type ([
       --           PHP_URL_SCHEME   => "scheme",
       --           PHP_URL_HOST     => "host",
       --           PHP_URL_PORT     => "port",
@@ -786,7 +786,7 @@ is
       --           PHP_URL_PATH     => "path",
       --           PHP_URL_QUERY    => "query",
       --           PHP_URL_FRAGMENT => "fragment",
-      --   );
+      --   ]);
    begin
       --   if ( isset( translation[ constant ] ) ) then
       --           return translation[ constant ];

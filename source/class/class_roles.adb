@@ -9,6 +9,7 @@
 with Php.Arrays;
 with Php.Strings;
 
+with Array_Lists;
 with Globals;
 with Lists;
 with Wp_Common;
@@ -16,7 +17,6 @@ with Wp_Common;
 with Inc_Load;
 with Inc_Ms_Blogs;
 with Inc_Options;
-with Inc_Plugins;
 
 package body Class_Roles
 is
@@ -48,6 +48,7 @@ is
                       return Class_Role.Wp_Role
    is
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Role;
       use Inc_Options;
@@ -57,10 +58,10 @@ is
       end if;
 
       Set (This.Roles, Role, From_Array (
-           To_Array (List => (
+           To_Array_Type ([
              Build ("name",         Display_Name),
              Build ("capabilities", Capabilities)
-           ))));
+           ])));
 
       if This.Use_DB then
          Update_Option (-This.Role_Key, From_Array (This.Roles));
@@ -152,7 +153,6 @@ is
       use Wp_Common;
       use Lists;
       use Class_Role;
-      use Inc_Plugins;
    begin
       if This.Roles.Is_Empty then
          return;

@@ -14,6 +14,7 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Binder;
 with Globals;
 with Helpers;
@@ -473,6 +474,7 @@ is
    is
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Class_Posts;
       use Inc_Functions;
@@ -487,7 +489,7 @@ is
                declare
                   Unpublished_Changeset_Posts : constant Post_Array :=
                     This.Get_Changeset_Posts (
-                      To_Array (List => (
+                      To_Array_Type ([
                         Build ("post_status",
                                List_Diff (Get_Post_Stati, List_Type'[
                                  "auto-draft", "publish", "trash",
@@ -497,7 +499,7 @@ is
                         Build ("posts_per_page",            1),
                         Build ("order",                     "DESC"),
                         Build ("orderby",                   "date")
-                      ))
+                      ])
                     );
                begin
                   if Unpublished_Changeset_Posts.Length not in 0 then
@@ -866,6 +868,7 @@ is
                                     UUID : String)
                                     return Class_Posts.Post_Id_Type
    is
+      use Array_Lists;
       use Inc_Caches;
       use Class_Posts;
       use Class_Querys;
@@ -885,7 +888,7 @@ is
 
       declare
          Changeset_Post_Query : constant Wp_Query := X_Construct (
-           To_Array (List => (
+           To_Array_Type ([
              Build ("post_type",              "customize_changeset"),
              Build ("post_status",            Get_Post_Stati),
              Build ("name",                   UUID),
@@ -895,7 +898,7 @@ is
              Build ("update_post_meta_cache", False),
              Build ("update_post_term_cache", False),
              Build ("lazy_load_term_meta",    False)
-           ))
+           ])
          );
       begin
          if Changeset_Post_Query.Posts not in Empty_Post_Array then
@@ -919,10 +922,11 @@ is
                                  return Class_Posts.Post_Array
    is
       use Php.Arrays;
+      use Array_Lists;
       use Inc_Posts;
       use Inc_Users;
 
-      Default_Args : Array_Type := To_Array (List => (
+      Default_Args : Array_Type := To_Array_Type ([
         Build ("exclude_restore_dismissed", True),
         Build ("posts_per_page",            -1),
         Build ("post_type",                 "customize_changeset"),
@@ -934,7 +938,7 @@ is
         Build ("update_post_meta_cache",    False),
         Build ("update_post_term_cache",    False),
         Build ("lazy_load_term_meta",       False)
-      ));
+      ]);
 
       Args_2 : Array_Type;
    begin
@@ -946,12 +950,12 @@ is
 
       if not Empty (Args_2, "exclude_restore_dismissed") then
          Delete (Ref (Args_2, "exclude_restore_dismissed"));
-         Set (Args_2, "meta_query", From_Array (To_Array (List => (1 =>
-              To_Array (List => (
+         Set (Args_2, "meta_query", From_Array (To_Array_Type ([
+              To_Array_Type ([
                 Build ("key",     "_customize_restore_dismissed"),
                 Build ("compare", "NOT EXISTS")
-              ))
-             ))));
+              ])
+             ])));
       end if;
 
       return Get_Posts (Args_2);
@@ -1641,6 +1645,7 @@ is
       use Php.JSON;
       use Php.Preg;
       use Php.Types;
+      use Array_Lists;
       use Binder;
       use Inc_Capabilities;
       use Inc_Formatting;
@@ -1648,10 +1653,10 @@ is
       use Inc_Options;
 
       Args_2 : constant Array_Type := Array_Merge (
-        To_Array (List => (
+        To_Array_Type ([
           Build ("exclude_changeset", False),
           Build ("exclude_post_data", not Current_User_Can ("customize"))
-        )),
+        ]),
         Args
       );
 

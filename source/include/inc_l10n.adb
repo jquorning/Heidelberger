@@ -1682,22 +1682,22 @@ package body Inc_L10n is
                   Translation : constant Array_Type :=
                     As_Array (Get (Translations, Locale));
                begin
-                  Languages.Append (To_Array (List => (
+                  Languages.Append (To_Array_Type ([
                     Build ("language",    Get_As_String (Translation, "language")),
                     Build ("native_name", Get_As_String (Translation, "native_name")),
                     Build ("lang",        Get_As_String (Translation, "iso"))
                     -- current ???
-                  )));
+                  ]));
 
                   -- Remove installed language from available translations.
                   Delete (Ref (Translations, Locale));
                end;
             else
-               Languages.Append (To_Array (List => (
+               Languages.Append (To_Array_Type ([
                  Build ("language",    Locale),
                  Build ("native_name", Locale),
                  Build ("lang",        "")
-               )));
+               ]));
             end if;
          end loop;
 

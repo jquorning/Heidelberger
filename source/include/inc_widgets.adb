@@ -26,6 +26,7 @@ with Php.Sorting;
 with Php.Strings;
 with Php.Types;
 
+with Array_Lists;
 with Arrayable_Arrays;
 with UStrings;
 with Wp_Common;
@@ -63,6 +64,7 @@ is
       use Php.Echoing;
       use Php.Misc;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Wp_Common;
       use Class_Customize_Widgets;
@@ -153,13 +155,13 @@ is
 --                    To_Array (
                         Array_Merge (
                           Sidebar,
-                          To_Array (List => (
+                          To_Array_Type ([
                             Build ("widget_id",   Id),
                             Build ("widget_name",
                                    As_String (Get (Ref_2 (
                                      Global_Wp_Registered_Widgets,
                                      Key_1 => Id, Key_2 => "name"))))
-                          ))
+                          ])
 --                       )
                         ),
                         As_Array (Get (Ref_2 (
@@ -603,13 +605,14 @@ is
       use Php.Lists;
       use Php.Strings;
       use Php.Types;
+      use Array_Lists;
       use Class_Customize_Widgets;
       use Inc_Themes;
 --        global wp_registered_sidebars;
 
-      New_Sidebars_Widgets : Array_Type := To_Array (List => (1 =>
+      New_Sidebars_Widgets : Array_Type := To_Array_Type ([
         Build ("wp_inactive_widgets", Empty_Array)
-      ));
+      ]);
    begin
       -- Short-circuit if there are no sidebars to map.
       if
@@ -679,7 +682,7 @@ is
          --
          declare
             Common_Slug_Groups : constant array (Positive range <>) of List_Type :=
-            -- Array_Type := To_Array (List => (
+            -- Array_Type := To_Array_Type ([
               (
               1 => ["sidebar", "primary", "main", "right"],
               2 => ["second", "left"],

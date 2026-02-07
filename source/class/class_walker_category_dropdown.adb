@@ -7,6 +7,8 @@
 --
 
 with Arrays;
+with Array_Lists;
+
 with UStrings;
 
 package body Class_Walker_Category_Dropdown
@@ -20,15 +22,16 @@ is
             return Walker_CategoryDropdown
    is
       use Arrays;
+      use Array_Lists;
       use UStrings;
 
       This : Walker_CategoryDropdown;
    begin
       This.Tree_Type := To_UString ("category");
-      This.DB_Fields := To_Array ((
+      This.DB_Fields := To_Array_Type ([
                 Build ("parent", "parent"),
                 Build ("id",     "term_id")
-         ));
+         ]);
       return This;
    end X_Construct;
 

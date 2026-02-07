@@ -10,6 +10,7 @@ with Php.Lists;
 with Php.Numerics;
 with Php.Strings;
 
+with Array_Lists;
 with Binder;
 with Globals;
 with UStrings;
@@ -37,6 +38,7 @@ is
       use Php.Lists;
       use Php.Numerics;
       use Php.Strings;
+      use Array_Lists;
       use UStrings;
       use Binder;
       use Class_Post_Type;
@@ -47,12 +49,12 @@ is
 
       List_Table : Wp_Posts_List_Table := (
         Adi_Class_Wp_List_Tables.X_Construct (
-          To_Array ((
+          To_Array_Type ([
             Build ("plural", "posts"),
             Build ("screen", (if Isset (Args, "screen")
                               then Get_As_String (Args, "screen")
                               else "null"))
-          ))
+          ])
         )
         with
           Hierarchical_Display => False,
@@ -61,9 +63,9 @@ is
       );
 
       Exclude_States : constant List_Type := Get_Post_Stati (
-        To_Array ((1 =>
+        To_Array_Type ([
           Build ("show_in_admin_all_list", "false")
-        ))
+        ])
       );
 
       Posts : constant Statement_Type := Statement_Type (-Globals.WpDB.Posts);
