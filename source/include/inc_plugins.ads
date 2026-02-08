@@ -362,7 +362,6 @@ is
    --                                        Default 10.
    -- @return bool Whether the function existed before it was removed.
    --
-   -- function remove_filter( hook_name, callback, priority = 10 ) then
    procedure Remove_Filter (Hook_Name : String;
                             Callback  : String;
                             Priority  : Integer := 10)

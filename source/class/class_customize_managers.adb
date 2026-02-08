@@ -2197,16 +2197,16 @@ is
 --                 return callback;
 --         end;
 
---         --
---         -- Determines whether it is a theme preview or not.
---         --
---         -- @since 3.4.0
---         --
---         -- @return bool True if it"s a preview, false if not.
---         --
---         public function is_preview() then
---                 return (bool) this->previewing;
---         end;
+   ----------------
+   -- Is_Preview --
+   ----------------
+
+   function Is_Preview (This : Wp_Customize_Manager)
+                        return Boolean
+   is
+   begin
+      return This.Previewing; -- (bool)
+   end Is_Preview;
 
 --         --
 --         -- Retrieves the template name of the previewed theme.

@@ -82,7 +82,8 @@ is
          -- @since 3.4.0
          -- @var bool
          --
---        protected previewing = false;
+         -- protected
+         Previewing : Boolean := False;
 
          --
          -- Methods and properties dealing with managing widgets in the Customizer.
@@ -517,6 +518,16 @@ is
    procedure Set_Post_Value (This       : in out Wp_Customize_Manager;
                              Setting_Id : String;
                              Value      : Array_Type); -- Multi_Type);
+
+   --
+   -- Determines whether it is a theme preview or not.
+   --
+   -- @since 3.4.0
+   --
+   -- @return bool True if it's a preview, false if not.
+   --
+   function Is_Preview (This : Wp_Customize_Manager)
+                        return Boolean;
 
    --
    -- Retrieves the stylesheet name of the previewed theme.

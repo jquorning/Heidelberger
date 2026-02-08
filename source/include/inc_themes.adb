@@ -22,8 +22,9 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
--- with Class_Customize_Managers;
+with Class_Customize_Managers;
 with Class_Querys;
+with Inc_Admin_Bar;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Link_Templates;
@@ -143,9 +144,10 @@ is
       use Php.Strings;
       use UStrings;
 
-      Stylesheet_2 : String := (if Empty (Stylesheet)
-                                then Get_Stylesheet
-                                else Stylesheet);
+      Stylesheet_2 : constant String :=
+        (if Empty (Stylesheet)
+         then Get_Stylesheet
+         else Stylesheet);
    begin
       if Empty (Theme_Root) then
          declare
@@ -1263,53 +1265,62 @@ is
 --         return "blank" !== text_color;
 -- end;
 
--- --
--- -- Checks whether a header image is set or not.
--- --
--- -- @since 4.2.0
--- --
--- -- @see get_header_image()
--- --
--- -- @return bool Whether a header image is set or not.
--- --
--- function has_header_image() then
---         return (bool) get_header_image();
--- end;
+   ----------------------
+   -- Has_Header_Image --
+   ----------------------
 
--- --
--- -- Retrieves header image for custom header.
--- --
--- -- @since 2.1.0
--- --
--- -- @return string|false
--- --
--- function get_header_image() then
---         url = get_theme_mod( "header_image", get_theme_support( "custom-header", "default-image" ) );
+   function Has_Header_Image
+            return Boolean
+   is
+   begin
+      return Get_Header_Image /= ""; -- (bool)
+   end Has_Header_Image;
 
---         if ( "remove-header" === url ) then
---                 return false;
---         end;
+   ----------------------
+   -- Get_Header_Image --
+   ----------------------
 
---         if ( is_random_header_image() ) then
---                 url = get_random_header_image();
---         end;
+   function Get_Header_Image
+            return String
+   is
+      use Php.Strings;
+      use Wp_Common;
+      use Inc_Formatting;
+      use Inc_Link_Templates;
 
---         --
---         -- Filters the header image URL.
---         --
---         -- @since 6.1.0
---         --
---         -- @param string url Header image URL.
---         --
---         url = apply_filters( "get_header_image", url );
+      URL_2 : constant String :=
+        Get_Theme_Mod ("header_image",
+                       Get_Theme_Support ("custom-header", "default-image"));
+   begin
+      if "remove-header" = URL_2 then
+         return ""; -- false;
+      end if;
 
---         if ( ! is_string( url ) ) then
---                 return false;
---         end;
+      declare
+         URL_3 : constant String :=
+           (if Is_Random_Header_Image then Get_Random_Header_Image else URL_2);
 
---         url = trim( url );
---         return sanitize_url( set_url_scheme( url ) );
--- end;
+         --
+         -- Filters the header image URL.
+         --
+         -- @since 6.1.0
+         --
+         -- @param string url Header image URL.
+         --
+         URL_4 : constant String := Apply_Filters ("get_header_image", URL_3);
+      begin
+         if URL_4 = "" then
+--       if ( ! is_string( Url_4 ) ) then
+            return ""; -- false;
+         end if;
+
+         declare
+            URL : constant String := Trim (URL_4);
+         begin
+            return Sanitize_URL (Set_URL_Scheme (URL));
+         end;
+      end;
+   end Get_Header_Image;
 
 -- --
 -- -- Creates image tag markup for a custom header image.
@@ -1414,18 +1425,17 @@ is
 --         echo get_header_image_tag( attr );
 -- end;
 
--- --
--- -- Gets random header image data from registered images in theme.
--- --
--- -- @since 3.4.0
--- --
--- -- @access private
--- --
--- -- @global array _wp_default_headers
--- --
--- -- @return object
--- --
--- function _get_random_header_data() then
+   ------------------------------
+   -- X_Get_Random_Header_Data --
+   ------------------------------
+
+   function X_Get_Random_Header_Data
+            return Duration
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return 0.0;
+   end X_Get_Random_Header_Data;
 --         global _wp_default_headers;
 --         static _wp_random_header = null;
 
@@ -1467,22 +1477,23 @@ is
 --         return _wp_random_header;
 -- end;
 
--- --
--- -- Gets random header image URL from registered images in theme.
--- --
--- -- @since 3.2.0
--- --
--- -- @return string Path to header image.
--- --
--- function get_random_header_image() then
---         random_image = _get_random_header_data();
+   -----------------------------
+   -- Get_Random_Header_Image --
+   -----------------------------
 
---         if ( empty( random_image.url ) ) then
---                 return "";
---         end;
+   function Get_Random_Header_Image
+            return String
+   is
+      Random_Image : constant Duration := X_Get_Random_Header_Data;
+   begin
+      raise Program_Error with "not implemented";
+      return "";
+      -- if Empty (Random_Image.URL)  then
+      --    return "";
+      -- end if;
 
---         return random_image.url;
--- end;
+      -- return Random_Image.URL;
+   end Get_Random_Header_Image;
 
 -- --
 -- -- Checks if random header image is in use.
@@ -1866,16 +1877,18 @@ is
 --         end;
 -- end;
 
--- --
--- -- Retrieves background image for custom background.
--- --
--- -- @since 3.0.0
--- --
--- -- @return string
--- --
--- function get_background_image() then
---         return get_theme_mod( "background_image", get_theme_support( "custom-background", "default-image" ) );
--- end;
+   --------------------------
+   -- Get_Background_Image --
+   --------------------------
+
+   function Get_Background_Image
+            return String
+   is
+   begin
+      return Get_Theme_Mod ("background_image",
+                            Get_Theme_Support ("custom-background",
+                                               "default-image"));
+   end Get_Background_Image;
 
 -- --
 -- -- Displays background image path.
@@ -3064,49 +3077,62 @@ is
       end if;
    end X_Custom_Logo_Header_Styles;
 
--- --
--- -- Gets the theme support arguments passed when registering that support.
--- --
--- -- Example usage:
--- --
--- --     get_theme_support( "custom-logo" );
--- --     get_theme_support( "custom-header", "width" );
--- --
--- -- @since 3.1.0
--- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
--- --              by adding it to the function signature.
--- --
--- -- @global array _wp_theme_features
--- --
--- -- @param string feature The feature to check. See add_theme_support() for the list
--- --                        of possible values.
--- -- @param mixed  ...args Optional extra arguments to be checked against certain features.
--- -- @return mixed The array of extra arguments or the value for the registered feature.
--- --
--- function get_theme_support( feature, ...args ) then
---         global _wp_theme_features;
+   -----------------------
+   -- Get_Theme_Support --
+   -----------------------
 
---         if ( ! isset( _wp_theme_features[ feature ] ) ) then
---                 return false;
---         end;
+   function Get_Theme_Support (Feature : String;
+                               T       : String := "")
+                               return List_Type
+   is
+--    global _wp_theme_features;
+   begin
+      if not Isset (Global_Wp_Theme_Features, Feature) then
+         return Empty_List; -- False;
+      end if;
 
---         if ( ! args ) then
---                 return _wp_theme_features[ feature ];
---         end;
+      if T = "" then
+--    if not Args then
+         return As_List (Get (Global_Wp_Theme_Features, Feature));
+      end if;
 
---         switch ( feature ) then
---                 elsif Feature = "custom-logo":
---                 elsif Feature = "custom-header":
---                 elsif Feature = "custom-background":
---                         if ( isset( _wp_theme_features[ feature ][0][ args[0] ] ) ) then
---                                 return _wp_theme_features[ feature ][0][ args[0] ];
---                         end;
---                         return false;
+      if Feature in "custom-logo" | "custom-header" | "custom-background" then
+         raise Program_Error with "not implemented";
+         -- if ( isset( _wp_theme_features[ feature ][0][ args[0] ] ) ) then
+         --    return _wp_theme_features[ feature ][0][ args[0] ];
+         -- end if;
+         -- return false;
 
---                 default:
---                         return _wp_theme_features[ feature ];
---         end;
--- end;
+      else
+         return As_List (Get (Global_Wp_Theme_Features, Feature));
+      end if;
+   end Get_Theme_Support;
+
+   -----------------------
+   -- Get_Theme_Support --
+   -----------------------
+
+   function Get_Theme_Support (Feature : String;
+                               T       : String := "")
+                               return Boolean
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return False;
+   end Get_Theme_Support;
+
+   -----------------------
+   -- Get_Theme_Support --
+   -----------------------
+
+   function Get_Theme_Support (Feature : String;
+                               T       : String := "")
+                               return String
+   is
+   begin
+      raise Program_Error with "not implemented";
+      return "";
+   end Get_Theme_Support;
 
 -- --
 -- -- Allows a theme to de-register its support of a certain feature
@@ -3194,87 +3220,99 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Checks a theme"s support for a given feature.
--- --
--- -- Example usage:
--- --
--- --     current_theme_supports( "custom-logo" );
--- --     current_theme_supports( "html5", "comment-form" );
--- --
--- -- @since 2.9.0
--- -- @since 5.3.0 Formalized the existing and already documented `...args` parameter
--- --              by adding it to the function signature.
--- --
--- -- @global array _wp_theme_features
--- --
--- -- @param string feature The feature being checked. See add_theme_support() for the list
--- --                        of possible values.
--- -- @param mixed  ...args Optional extra arguments to be checked against certain features.
--- -- @return bool True if the active theme supports the feature, false otherwise.
--- --
--- function current_theme_supports( feature, ...args ) then
---         global _wp_theme_features;
+   ----------------------------
+   -- Current_Theme_Supports --
+   ----------------------------
 
---         if ( "custom-header-uploads" === feature ) then
---                 return current_theme_supports( "custom-header", "uploads" );
---         end;
+   function Current_Theme_Supports (Feature : String;
+                                    Arg_2   : String := "")
+                                    return Boolean
+   is
+      use Php.Arrays;
+      use Wp_Common;
 
---         if ( ! isset( _wp_theme_features[ feature ] ) ) then
---                 return false;
---         end;
+--    global _wp_theme_features;
+   begin
+      if "custom-header-uploads" = Feature then
+         return Current_Theme_Supports ("custom-header", "uploads");
+      end if;
 
---         // If no args passed then no extra checks need to be performed.
---         if ( ! args ) then
---                 -- This filter is documented in wp-includes/theme.php--
---                 return apply_filters( "current_theme_supports-thenfeatureend;", true, args, _wp_theme_features[ feature ] ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
---         end;
+      if not Isset (Global_Wp_Theme_Features, Feature) then
+         return False;
+      end if;
 
---         switch ( feature ) then
---                 elsif Feature = "post-thumbnails":
---                         /*
---                         -- post-thumbnails can be registered for only certain content/post types
---                         -- by passing an array of types to add_theme_support().
---                         -- If no array was passed, then any type is accepted.
---                         --
---                         if ( true === _wp_theme_features[ feature ] ) then  // Registered for all types.
---                                 return true;
---                         end;
---                         content_type = args[0];
---                         return in_array( content_type, _wp_theme_features[ feature ][0], true );
+      -- If no args passed then no extra checks need to be performed.
+      if Arg_2 = "" then
+--    if not Args then
+         -- This filter is documented in wp-includes/theme.php
+         return
+           Apply_Filters ("current_theme_supports-" & Feature, True,
+                          Arg_2, Get_As_String (Global_Wp_Theme_Features, Feature));
+      end if;
 
---                 elsif Feature = "html5":
---                 elsif Feature = "post-formats":
---                         /*
---                         -- Specific post formats can be registered by passing an array of types
---                         -- to add_theme_support().
---                         --
---                         -- Specific areas of HTML5 support--must* be passed via an array to add_theme_support().
---                         --
---                         type = args[0];
---                         return in_array( type, _wp_theme_features[ feature ][0], true );
+      if Feature in "post-thumbnails" then
+         --
+         -- post-thumbnails can be registered for only certain content/post types
+         -- by passing an array of types to add_theme_support().
+         -- If no array was passed, then any type is accepted.
+         --
+         if True = As_Boolean (Get (Global_Wp_Theme_Features, Feature)) then
+            -- Registered for all types.
+            return True;
+         end if;
 
---                 elsif Feature = "custom-logo":
---                 elsif Feature = "custom-header":
---                 elsif Feature = "custom-background":
---                         // Specific capabilities can be registered by passing an array to add_theme_support().
---                         return ( isset( _wp_theme_features[ feature ][0][ args[0] ] ) && _wp_theme_features[ feature ][0][ args[0] ] );
---         end;
+         declare
+            Content_Type : constant String := Arg_2; -- args[0];
+         begin
+            return
+              In_Array (Content_Type,
+                        As_Array (Get (Global_Wp_Theme_Features, Feature)), -- [0]
+                        True);
+         end;
 
---         --
---         -- Filters whether the active theme supports a specific feature.
---         --
---         -- The dynamic portion of the hook name, `feature`, refers to the specific
---         -- theme feature. See add_theme_support() for the list of possible values.
---         --
---         -- @since 3.4.0
---         --
---         -- @param bool   supports Whether the active theme supports the given feature. Default true.
---         -- @param array  args     Array of arguments for the feature.
---         -- @param string feature  The theme feature.
---         --
---         return apply_filters( "current_theme_supports-thenfeatureend;", true, args, _wp_theme_features[ feature ] ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
--- end;
+      elsif Feature in "html5" | "post-formats" then
+         --
+         -- Specific post formats can be registered by passing an array of types
+         -- to add_theme_support().
+         --
+         -- Specific areas of HTML5 support--must* be passed via an array to
+         -- add_theme_support().
+         --
+         declare
+            Typ : constant String := Arg_2; -- args[0];
+         begin
+            return
+              In_Array (Typ,
+                        As_Array (Get (Global_Wp_Theme_Features, Feature)), -- [0]
+                        True);
+         end;
+
+      elsif Feature in "custom-logo" | "custom-header" | "custom-background" then
+         -- Specific capabilities can be registered by passing an array to
+         -- add_theme_support().
+         return
+           Isset (Global_Wp_Theme_Features, Feature) -- [0][ args[0] ] )
+           and then As_Boolean (Get (Global_Wp_Theme_Features, Feature));
+           -- [0][ args[0] ] );
+      end if;
+
+      --
+      -- Filters whether the active theme supports a specific feature.
+      --
+      -- The dynamic portion of the hook name, `feature`, refers to the specific
+      -- theme feature. See add_theme_support() for the list of possible values.
+      --
+      -- @since 3.4.0
+      --
+      -- @param bool   supports Whether the active theme supports the given feature.
+      --                        Default true.
+      -- @param array  args     Array of arguments for the feature.
+      -- @param string feature  The theme feature.
+      --
+      return Apply_Filters ("current_theme_supports-" & Feature,
+                            True, Arg_2,
+                            Get_As_String (Global_Wp_Theme_Features, Feature));
+   end Current_Theme_Supports;
 
 -- --
 -- -- Checks a theme"s support for a given feature before loading the functions which implement it.
@@ -3852,78 +3890,81 @@ is
 --         wp_scripts.add_data( "customize-loader", "data", script );
 -- end;
 
--- --
--- -- Returns a URL to load the Customizer.
--- --
--- -- @since 3.4.0
--- --
--- -- @param string stylesheet Optional. Theme to customize. Defaults to active theme.
--- --                           The theme"s stylesheet will be urlencoded if necessary.
--- -- @return string
--- --
--- function wp_customize_url( stylesheet = "" ) then
---         url = admin_url( "customize.php" );
---         if ( stylesheet ) then
---                 url .= "?theme=" . urlencode( stylesheet );
---         end;
---         return esc_url( url );
--- end;
+   ----------------------
+   -- Wp_Customize_URL --
+   ----------------------
 
--- --
--- -- Prints a script to check whether or not the Customizer is supported,
--- -- and apply either the no-customize-support or customize-support class
--- -- to the body.
--- --
--- -- This function MUST be called inside the body tag.
--- --
--- -- Ideally, call this function immediately after the body tag is opened.
--- -- This prevents a flash of unstyled content.
--- --
--- -- It is also recommended that you add the "no-customize-support" class
--- -- to the body tag by default.
--- --
--- -- @since 3.4.0
--- -- @since 4.7.0 Support for IE8 and below is explicitly removed via conditional comments.
--- -- @since 5.5.0 IE8 and older are no longer supported.
--- --
--- function wp_customize_support_script() then
---         admin_origin = parse_url( admin_url() );
---         home_origin  = parse_url( home_url() );
---         cross_domain = ( strtolower( admin_origin["host"] ) != strtolower( home_origin["host"] ) );
---         type_attr    = current_theme_supports( "html5", "script" ) ? "" : " type="text/javascript"";
---         ?>
---         <script<?php echo type_attr; ?>>
---                 (function() then
---                         var request, b = document.body, c = "className", cs = "customize-support", rcs = new RegExp("(^|\\s+)(no-)?"+cs+"(\\s+|)");
+   function Wp_Customize_URL (Stylesheet : String := "")
+                              return String
+   is
+      use Php.HTML;
+      use Inc_Formatting;
+      use Inc_Link_Templates;
 
---         <?php   if ( cross_domain ) : ?>
---                         request = (function()then var xhr = new XMLHttpRequest(); return ("withCredentials" in xhr); end;)();
---         <?php   else : ?>
---                         request = true;
---         <?php   endif; ?>
+      URL_2 : constant String := Admin_URL ("customize.php");
 
---                         b[c] = b[c].replace( rcs, " " );
---                         // The customizer requires postMessage and CORS (if the site is cross domain).
---                         b[c] += ( window.postMessage && request ? " " : " no-" ) + cs;
---                 end;());
---         </script>
---         <?php
--- end;
+      URL : constant String :=
+        (if Stylesheet /= ""
+         then URL_2 & "?theme=" & URL_Encode (Stylesheet) else URL_2);
 
--- --
--- -- Whether the site is being previewed in the Customizer.
--- --
--- -- @since 4.0.0
--- --
--- -- @global WP_Customize_Manager wp_customize Customizer instance.
--- --
--- -- @return bool True if the site is being previewed in the Customizer, false otherwise.
--- --
--- function is_customize_preview() then
+   begin
+      return ESC_URL (URL);
+   end Wp_Customize_URL;
+
+   ---------------------------------
+   -- Wp_Customize_Support_Script --
+   ---------------------------------
+
+   procedure Wp_Customize_Support_Script
+   is
+      use Php.Echoing;
+      use Php.HTML;
+      use Php.Strings;
+      use Inc_Link_Templates;
+
+      Admin_Origin : constant Array_Type := Parse_URL (Admin_URL);
+      Home_Origin  : constant Array_Type := Parse_URL (Home_URL);
+
+      Cross_Domain : constant Boolean :=
+        Strtolower (Get_As_String (Admin_Origin, "host")) /=
+        Strtolower (Get_As_String (Home_Origin,  "host"));
+
+      Type_Attr : constant String :=
+        (if Current_Theme_Supports ("html5", "script")
+         then "" else " type=""text/javascript""");
+   begin
+      Echo ("<script" & Type_Attr & ">");
+      Echo ("    (function() {");
+      Echo ("        var request, b = document.body, c = 'className', cs = 'customize-support', rcs = new RegExp('(^|\\s+)(no-)?'+cs+'(\\s+|$)');");
+
+      if Cross_Domain then
+         Echo ("       request = (function(){ var xhr = new XMLHttpRequest(); return ('withCredentials' in xhr); })();");
+      else
+         Echo ("       request = true;");
+      end if;
+
+      Echo ("          b[c] = b[c].replace( rcs, ' ' );");
+      Echo ("          // The customizer requires postMessage and CORS (if the site is cross domain).");
+      Echo ("          b[c] += ( window.postMessage && request ? ' ' : ' no-' ) + cs;");
+      Echo ("      }());");
+      Echo ("</script>");
+   end Wp_Customize_Support_Script;
+
+   --------------------------
+   -- Is_Customize_Preview --
+   --------------------------
+
+   function Is_Customize_Preview
+            return Boolean
+   is
+      use Class_Customize_Managers;
+      use Inc_Admin_Bar;
 --         global wp_customize;
-
---         return ( wp_customize instanceof WP_Customize_Manager ) && wp_customize.is_preview();
--- end;
+   begin
+      return
+        Wp_Customize in Wp_Customize_Manager and then   -- instanceof
+        Wp_Customize.Is_Preview;
+   end Is_Customize_Preview;
 
 -- --
 -- -- Makes sure that auto-draft posts get their post_date bumped or status changed
@@ -4385,16 +4426,16 @@ is
         );
    end Create_Initial_Theme_Features;
 
--- --
--- -- Returns whether the active theme is a block-based theme or not.
--- --
--- -- @since 5.9.0
--- --
--- -- @return boolean Whether the active theme is a block-based theme or not.
--- --
--- function wp_is_block_theme() then
---         return wp_get_theme().is_block_theme();
--- end;
+   -----------------------
+   -- Wp_Is_Block_Theme --
+   -----------------------
+
+   function Wp_Is_Block_Theme
+            return Boolean
+   is
+   begin
+      return Wp_Get_Theme.Is_Block_Theme;
+   end Wp_Is_Block_Theme;
 
 -- --
 -- -- Given an element name, returns a class name.

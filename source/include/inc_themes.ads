@@ -52,7 +52,8 @@ is
    -- @return array
    --
    function Get_Uploaded_Header_Images
-      return Array_Type is (Empty_Array);
+      return Array_Type
+      is (Empty_Array);
 
    --
    -- Checks if random header image is in use.
@@ -284,7 +285,7 @@ is
             is (False);
 
    --
-   -- Checks a theme"s support for a given feature.
+   -- Checks a theme's support for a given feature.
    --
    -- Example usage:
    --
@@ -303,12 +304,9 @@ is
    --                       features.
    -- @return bool True if the active theme supports the feature, false otherwise.
    --
-   -- function current_theme_supports( feature, ...args ) then
    function Current_Theme_Supports (Feature : String;
                                     Arg_2   : String := "")
---                                   , ...args )
-                                    return Boolean
-                                    is (False);
+                                    return Boolean;
 
    --
    -- Retrieves all theme modifications.
@@ -319,7 +317,8 @@ is
    -- @return array Theme modifications.
    --
    function Get_Theme_Mods
-            return Array_Type is (Empty_Array);
+            return Array_Type
+            is (Empty_Array);
 
    --
    -- Renders the Custom CSS style element.
@@ -371,7 +370,8 @@ is
    --
    function Get_Theme_Mod (Name    : String;
                            Default : Boolean := False)
-                           return Integer is (1);
+                           return Integer
+                           is (1);
 
    function Get_Theme_Mod (Name    : String;
                            Default : Boolean := False)
@@ -412,8 +412,7 @@ is
    -- @return bool Whether a header image is set or not.
    --
    function Has_Header_Image
-            return Boolean
-            is (True);
+            return Boolean;
 
    --
    -- Retrieves header image for custom header.
@@ -423,8 +422,31 @@ is
    -- @return string|false
    --
    function Get_Header_Image
-            return String
-            is ("XXX-211");
+            return String;
+
+   --
+   -- Gets random header image data from registered images in theme.
+   --
+   -- @since 3.4.0
+   --
+   -- @access private
+   --
+   -- @global array _wp_default_headers
+   --
+   -- @return object
+   --
+   function X_Get_Random_Header_Data
+            return Duration;
+
+   --
+   -- Gets random header image URL from registered images in theme.
+   --
+   -- @since 3.2.0
+   --
+   -- @return string Path to header image.
+   --
+   function Get_Random_Header_Image
+            return String;
 
    --
    -- Retrieves background image for custom background.
@@ -434,8 +456,7 @@ is
    -- @return string
    --
    function Get_Background_Image
-            return String
-            is ("XXX-210");
+            return String;
 
    --
    -- Gets the theme support arguments passed when registering that support.
@@ -461,13 +482,15 @@ is
    -- function get_theme_support( feature, ...args ) then
    function Get_Theme_Support (Feature : String;
                                T       : String := "")
-                               return List_Type -- String_Array
-                               is (Empty_List);
+                               return List_Type;
 
    function Get_Theme_Support (Feature : String;
                                T       : String := "")
-                               return Boolean
-                               is (True);
+                               return Boolean;
+
+   function Get_Theme_Support (Feature : String;
+                               T       : String := "")
+                               return String;
 
    --
    -- Whether the site is being previewed in the Customizer.
@@ -480,8 +503,7 @@ is
    --              otherwise.
    --
    function Is_Customize_Preview
-            return Boolean
-            is (True);
+            return Boolean;
 
    --
    -- Returns a URL to load the Customizer.
@@ -493,8 +515,7 @@ is
    -- @return string
    --
    function Wp_Customize_URL (Stylesheet : String := "")
-                              return String
-                              is ("XXX-353");
+                              return String;
 
    --
    -- Prints a script to check whether or not the Customizer is supported,
@@ -514,8 +535,7 @@ is
    --              comments.
    -- @since 5.5.0 IE8 and older are no longer supported.
    --
-   procedure Wp_Customize_Support_Script
-             is null;
+   procedure Wp_Customize_Support_Script;
 
    function Wp_Customize_Support_Script
      is new Helpers_2.Generic_Call_Procedure (Wp_Customize_Support_Script);
@@ -528,8 +548,7 @@ is
    -- @return boolean Whether the active theme is a block-based theme or not.
    --
    function Wp_Is_Block_Theme
-            return Boolean
-            is (True);
+            return Boolean;
 
    --
    -- Registers a theme feature for use in add_theme_support().

@@ -842,7 +842,8 @@ is
 --         end;
 
    --
-   -- Returns the directory name of the theme's "stylesheet" files, inside the theme root.
+   -- Returns the directory name of the theme's "stylesheet" files, inside the
+   -- theme root.
    --
    -- In the case of a child theme, this is directory name of the child theme.
    -- Otherwise, get_stylesheet() is the same as get_template().
@@ -868,43 +869,31 @@ is
    function Get_Template (This : Wp_Theme)
                           return String;
 
---         --
---         -- Returns the absolute path to the directory of a theme's "stylesheet" files.
---         --
---         -- In the case of a child theme, this is the absolute path to the directory
---         -- of the child theme's files.
---         --
---         -- @since 3.4.0
---         --
---         -- @return string Absolute path of the stylesheet directory.
---         --
---         public function get_stylesheet_directory() then
---                 if ( this->errors() && in_array( 'theme_root_missing', this->errors()->get_error_codes(), true ) ) then
---                         return '';
---                 end;
+   --
+   -- Returns the absolute path to the directory of a theme's "stylesheet" files.
+   --
+   -- In the case of a child theme, this is the absolute path to the directory
+   -- of the child theme's files.
+   --
+   -- @since 3.4.0
+   --
+   -- @return string Absolute path of the stylesheet directory.
+   --
+   function Get_Stylesheet_Directory (This : Wp_Theme)
+                                      return String;
 
---                 return this->theme_root . '/' . this->stylesheet;
---         end;
-
---         --
---         -- Returns the absolute path to the directory of a theme's "template" files.
---         --
---         -- In the case of a child theme, this is the absolute path to the directory
---         -- of the parent theme's files.
---         --
---         -- @since 3.4.0
---         --
---         -- @return string Absolute path of the template directory.
---         --
---         public function get_template_directory() then
---                 if ( this->parent() ) then
---                         theme_root = this->parent()->theme_root;
---                 end; else then
---                         theme_root = this->theme_root;
---                 end;
-
---                 return theme_root . '/' . this->template;
---         end;
+   --
+   -- Returns the absolute path to the directory of a theme's "template" files.
+   --
+   -- In the case of a child theme, this is the absolute path to the directory
+   -- of the parent theme's files.
+   --
+   -- @since 3.4.0
+   --
+   -- @return string Absolute path of the template directory.
+   --
+   function Get_Template_Directory (This : Wp_Theme)
+                                    return String;
 
 --         --
 --         -- Returns the URL to the directory of a theme's "stylesheet" files.
@@ -1293,56 +1282,30 @@ is
 --                 return false;
 --         end;
 
---         --
---         -- Returns whether this theme is a block-based theme or not.
---         --
---         -- @since 5.9.0
---         --
---         -- @return bool
---         --
---         public function is_block_theme() then
---                 paths_to_index_block_template = array(
---                         this->get_file_path( '/block-templates/index.html' ),
---                         this->get_file_path( '/templates/index.html' ),
---                 );
+   --
+   -- Returns whether this theme is a block-based theme or not.
+   --
+   -- @since 5.9.0
+   --
+   -- @return bool
+   --
+   function Is_Block_Theme (This : Wp_Theme)
+                            return Boolean;
 
---                 foreach ( paths_to_index_block_template as path_to_index_block_template ) then
---                         if ( is_file( path_to_index_block_template ) && is_readable( path_to_index_block_template ) ) then
---                                 return true;
---                         end;
---                 end;
-
---                 return false;
---         end;
-
---         --
---         -- Retrieves the path of a file in the theme.
---         --
---         -- Searches in the stylesheet directory before the template directory so themes
---         -- which inherit from a parent theme can just override one file.
---         --
---         -- @since 5.9.0
---         --
---         -- @param string file Optional. File to search for in the stylesheet directory.
---         -- @return string The path of the file.
---         --
---         public function get_file_path( file = '' ) then
---                 file = ltrim( file, '/' );
-
---                 stylesheet_directory = this->get_stylesheet_directory();
---                 template_directory   = this->get_template_directory();
-
---                 if ( empty( file ) ) then
---                         path = stylesheet_directory;
---                 end; elseif ( file_exists( stylesheet_directory . '/' . file ) ) then
---                         path = stylesheet_directory . '/' . file;
---                 end; else then
---                         path = template_directory . '/' . file;
---                 end;
-
---                 -- This filter is documented in wp-includes/link-template.php--
---                 return apply_filters( 'theme_file_path', path, file );
---         end;
+   --
+   -- Retrieves the path of a file in the theme.
+   --
+   -- Searches in the stylesheet directory before the template directory so themes
+   -- which inherit from a parent theme can just override one file.
+   --
+   -- @since 5.9.0
+   --
+   -- @param string file Optional. File to search for in the stylesheet directory.
+   -- @return string The path of the file.
+   --
+   function Get_File_Path (This : Wp_Theme;
+                           File : String := "")
+                           return String;
 
    --
    -- Determines the latest WordPress default theme that is installed.

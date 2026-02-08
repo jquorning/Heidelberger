@@ -12,7 +12,6 @@ with Php.Misc;
 with Php.Strings;
 with Php.Types;
 
-with Array_Lists;
 with Lists;
 with Wp_Common;
 
@@ -584,7 +583,7 @@ is
          << Break >>
 
       elsif Header in "Author" | "Description" then
-         -- There shouldn"t be anchor tags in Author, but some themes like to be
+         -- There shouldn't be anchor tags in Author, but some themes like to be
          -- challenging.
          declare
             -- static
@@ -641,6 +640,103 @@ is
    begin
       return -This.Template;
    end Get_Template;
+
+   ------------------------------
+   -- Get_Stylesheet_Directory --
+   ------------------------------
+
+   function Get_Stylesheet_Directory (This : Wp_Theme)
+            return String
+   is
+      use Php.Lists;
+      use UStrings;
+      use Class_Errors;
+   begin
+      if
+        This.Errors /= Null_Wp_Error and then
+        In_List ("theme_root_missing", This.Errors.Get_Error_Codes, True)
+      then
+         return "";
+      end if;
+
+      return -(This.Theme_Root & "/" & This.Stylesheet);
+   end Get_Stylesheet_Directory;
+
+   ----------------------------
+   -- Get_Template_Directory --
+   ----------------------------
+
+   function Get_Template_Directory (This : Wp_Theme)
+                                    return String
+   is
+      use UStrings;
+
+      Theme_Root : constant String :=
+        (if This.Parent /= Null_Theme
+         then -This.Parent.Theme_Root
+         else -This.Theme_Root);
+   begin
+      return -(Theme_Root & "/" & This.Template);
+   end Get_Template_Directory;
+
+   --------------------
+   -- Is_Block_Theme --
+   --------------------
+
+   function Is_Block_Theme (This : Wp_Theme)
+                            return Boolean
+   is
+      use Php.Files;
+
+      Paths_To_Index_Block_Template : List_Type :=
+        [
+          This.Get_File_Path ("/block-templates/index.html"),
+          This.Get_File_Path ("/templates/index.html")
+        ];
+   begin
+      for Path_To_Index_Block_Template of Paths_To_Index_Block_Template loop
+         if
+           Is_File (Path_To_Index_Block_Template) and then
+           Is_Readable (Path_To_Index_Block_Template)
+         then
+            return True;
+         end if;
+      end loop;
+
+      return False;
+   end Is_Block_Theme;
+
+   -------------------
+   -- Get_File_Path --
+   -------------------
+
+   function Get_File_Path (This : Wp_Theme;
+                           File : String := "")
+                           return String
+   is
+      use Php.Files;
+      use Php.Strings;
+      use UStrings;
+      use Wp_Common;
+
+      File_2 : constant String := Ltrim (File, "/");
+
+      Stylesheet_Directory : constant String := This.Get_Stylesheet_Directory;
+      Template_Directory   : constant String := This.Get_Template_Directory;
+
+      Path : UString;
+   begin
+      if Empty (File_2) then
+         Path := +Stylesheet_Directory;
+      elsif File_Exists (Stylesheet_Directory & "/" & File_2) then
+         Path := +Stylesheet_Directory & "/" & File_2;
+      else
+         Path := +Template_Directory & "/" & File_2;
+      end if;
+
+      -- This filter is documented in wp-includes/link-template.php
+      return Apply_Filters ("theme_file_path", -Path, File_2);
+   end Get_File_Path;
 
    ----------------------------
    -- Get_Core_Default_Theme --

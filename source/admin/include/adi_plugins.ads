@@ -143,8 +143,11 @@ is
    --
    -- @return string The title of the current admin page.
    --
+-- function Get_Admin_Page_Title
+--          return String;
+
    procedure Get_Admin_Page_Title
-             is null;
+   is null;
 
    --
    -- Gets the hook attached to the administrative page of a plugin.
