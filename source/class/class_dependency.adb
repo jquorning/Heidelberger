@@ -7,6 +7,8 @@
 -- @subpackage Dependencies
 --
 
+with Logging;
+
 package body Class_Dependency
 is
 
@@ -25,7 +27,7 @@ is
 
       This : X_Wp_Dependency;
    begin
-      -- list ()
+      Logging.Log ("class_dependency.x_construct", Src);
       This.Handle := +Handle;
       This.Src    := +Src;
       This.Deps   := Deps;

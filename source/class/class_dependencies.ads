@@ -220,15 +220,14 @@ is
    --                                 source is set to false,
    --                                 item is an alias of other items it depends on.
    -- @param string[]         $deps   Optional. An array of registered item handles
-   --                                 this item depends on.
-   --                                 Default empty array.
+   --                                 this item depends on. Default empty array.
    -- @param string|bool|null $ver    Optional. String specifying item version
    --                                 number, if it has one, which is added to the
    --                                 URL as a query string for cache busting purposes.
    --                                 If version is set to false, a version number is
-   --                                 automatically added
-   --                                 equal to current installed WordPress version.
-   --                                 If set to null, no version is added.
+   --                                 automatically added equal to current installed
+   --                                 WordPress version. If set to null, no version
+   --                                 is added.
    -- @param mixed            $args   Optional. Custom property of the item. NOT the
    --                                 class property $args.
    --                                 Examples: $media, $in_footer.
@@ -239,10 +238,9 @@ is
                  Handle : String;
                  Src    : String;
                  Deps   : List_Type := Empty_List;
-                 Ver    : String    := ""; -- Boolean      := False;
-                 Args   : String    := "") -- = null
-                 return Boolean
-                 with Side_Effects;
+                 Ver    : String    := "";
+                 Args   : String    := "")
+                 return Boolean;
 
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
@@ -256,24 +254,14 @@ is
                   Src    : String;
                   Deps   : List_Type := Empty_List;
                   Ver    : String    := "";
-                  Args   : Integer)
-                  is null;
-
-   procedure Add (This   : in out Wp_Dependencies;
-                  Handle : String;
-                  Src    : String;
-                  Deps   : List_Type := Empty_List;
-                  Ver    : Boolean;
-                  Args   : Integer)
-                  is null;
+                  Args   : Integer);
 
    procedure Add (This   : in out Wp_Dependencies;
                   Handle : String;
                   Src    : Boolean;
                   Deps   : List_Type := Empty_List;
                   Ver    : String    := "";
-                  Args   : Integer   := 0)
-                  is null;
+                  Args   : Integer   := 0);
 
    --
    -- Add extra item data.

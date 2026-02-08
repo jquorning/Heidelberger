@@ -61,23 +61,25 @@ is
                           return Boolean
                           is (False);
 
-   PHP_URL_SCHEME : constant Integer := 1; -- XXX guess
-   PHP_URL_PATH   : constant Integer := 2;
-   PHP_URL_QUERY  : constant Integer := 3;
+   type Component_Type is
+     (
+       PHP_URL_SCHEME, -- : constant Integer := 1; -- XXX guess
+       PHP_URL_PATH,   -- : constant Integer := 2;
+       PHP_URL_QUERY,  -- : constant Integer := 3;
+       PHP_URL_ALL
+     );
 
    procedure Parse_Str (Item   : String;
                         Result : in out Arrays.Array_Type)
                         is null;
 
    function Parse_URL (URL       : String;
-                       Component : Integer := -1)
-                       return String
-                       is ("XXX-781");
+                       Component : Component_Type := PHP_URL_ALL)
+                       return Arrays.Array_Type;
 
    function Parse_URL (URL       : String;
-                       Component : Integer := -1)
-                       return Arrays.Array_Type
-                       is (Arrays.Empty_Array);
+                       Component : Component_Type)
+                       return String;
 
    function Raw_URL_Encode (Item : String)
                             return String;

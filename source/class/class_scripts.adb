@@ -313,12 +313,12 @@ is
                then
                   Append (This.Print_Code,
                           This.Print_Extra_Script (Handle, False));
-                  Append (This.Concat,         "handle,");
-                  Append (This.Concat_Version, "handlever");
+                  Append (This.Concat,         Handle & ",");
+                  Append (This.Concat_Version, Handle & Ver);
                   return True;
                else
-                  Append (This.Ext_Handles, "handle,");
-                  Append (This.Ext_Version, "handlever");
+                  Append (This.Ext_Handles, Handle & ",");
+                  Append (This.Ext_Version, Handle & Ver);
                end if;
             end;
          end if;
@@ -632,7 +632,7 @@ is
          Grp := Group;
       end if;
 
-      return Set_Group (Wp_Dependencies (This), Handle, Recursion, Grp);
+      return Set_Group (Wp_Dependencies'Class (This), Handle, Recursion, Grp);
    end Set_Group;
 
    ----------------------
@@ -759,6 +759,7 @@ is
 
       Result : constant Boolean :=
         All_Deps (Wp_Dependencies (This), Handles, Recursion, Group);
+      -- Parent
    begin
       if not Recursion then
          --

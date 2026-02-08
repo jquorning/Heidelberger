@@ -51,11 +51,12 @@ is
 
       Map : Index_Maps.Map;
    begin
-      Map.Include (Key => Index, New_Item => Item);
+      Map.Insert (Key => Index, New_Item => Item);
       This.Callbacks.Include (Key => Priority, New_Item => Map);
 
       -- If we're adding a new priority to the list, put them back in sorted order.
       if not Priority_Existed and then This.Callbacks.Length > 1 then
+         Logging.Log ("add_filer", "ksort missing");
          null; -- Ksort (This.Callbacks, SORT_NUMERIC);
       end if;
 
@@ -283,7 +284,7 @@ is
       --    This.Iterations (Nesting_Level) := Get_Priorities (This.Callbacks);
       --    Current_Nesting := Nesting_Level;
       -- end if;
-      This.Iterations.Include (Nesting_Level, Get_Priorities (This.Callbacks));
+      This.Iterations.Insert (Nesting_Level, Get_Priorities (This.Callbacks));
       Current_Nesting := This.Iterations.Find (Nesting_Level);
 
       Num_Args := 1; -- Args.Length;

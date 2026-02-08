@@ -19,6 +19,7 @@ with Array_Lists;
 with Binder;
 with Globals;
 with Helpers;
+with Logging;
 with UStrings;
 with Wp_Common;
 
@@ -4136,43 +4137,40 @@ is
       procedure Generic_Do_Dep (Dependencies : Dep_Type)
       is
       begin
---         for Dependencies of Dep loop
---       for ( array( wp_scripts, wp_styles ) as dependencies ) then
-            if
---            Dependencies in Wp_Dependencies and then  -- instanceof
-              not Dependencies.Queue.Is_Empty
-            then
-               for Handle of Dependencies.Queue loop
+         if
+           not Dependencies.Queue.Is_Empty
+         then
+            for Handle of Dependencies.Queue loop
+               Logging.Log ("generic_do_dep", "handle: " & Handle);
+               if
+                 not Dependency_Maps.Has_Element
+                   (Dependencies.Registered.Find (Handle))
+               then
+                  goto Continue;
+               end if;
+
+               declare
+                  -- @var _WP_Dependency dependency
+                  Dependency : constant X_Wp_Dependency :=
+                    Dependencies.Registered (Handle);
+
+                  Parsed : constant Array_Type :=
+                    Wp_Parse_URL (-Dependency.Src);
+               begin
+                  Logging.Log ("generic_do_dep", -Dependency.Src);
                   if
-                    not Dependency_Maps.Has_Element
-                      (Dependencies.Registered.Find (Handle))
+                    not Empty (Parsed, "host") and then
+                    not In_List (Get_As_String (Parsed, "host"),
+                                 Unique_Hosts, True) and then
+                    Get_As_String (Parsed, "host") /=
+                    Get_As_String (X_SERVER, "SERVER_NAME")
                   then
---                if not Isset (Dependencies.Registered, Handle) then
-                     goto Continue;
+                     Append (Unique_Hosts, Get_As_String (Parsed, "host"));
                   end if;
-
-                  declare
-                     -- @var _WP_Dependency dependency
-                     Dependency : constant X_Wp_Dependency :=
-                       Dependencies.Registered (Handle);
-
-                     Parsed : constant Array_Type :=
-                       Wp_Parse_URL (-Dependency.Src);
-                  begin
-                     if
-                       not Empty (Parsed, "host") and then
-                       not In_List (Get_As_String (Parsed, "host"),
-                                    Unique_Hosts, True) and then
-                       Get_As_String (Parsed, "host") /=
-                       Get_As_String (X_SERVER, "SERVER_NAME")
-                     then
-                        Append (Unique_Hosts, Get_As_String (Parsed, "host"));
-                     end if;
-                  end;
-                  << Continue >>
-               end loop;
-            end if;
---         end loop;
+               end;
+               << Continue >>
+            end loop;
+         end if;
       end Generic_Do_Dep;
 
       procedure Do_Scripts is new

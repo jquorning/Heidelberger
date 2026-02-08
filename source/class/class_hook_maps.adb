@@ -29,8 +29,8 @@ is
 --            Callback_Groups in Wp_Hook
 --            Callback_Groups instanceof WP_Hook
             then
-               Normalized.Include (Key      => Hook_Name,
-                                   New_Item => Callback_Groups);
+               Normalized.Insert (Key      => Hook_Name,
+                                  New_Item => Callback_Groups);
                goto Continue;
             end if;
 

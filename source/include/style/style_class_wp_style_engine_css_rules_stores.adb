@@ -31,7 +31,7 @@ is
          begin
             -- Set the store name.
             Store.Set_Name (Store_Name);
-            Static_Stores.Include (Key => Store_Name, New_Item => Store);
+            Static_Stores.Insert (Key => Store_Name, New_Item => Store);
          end;
       end if;
       return Static_Stores (Store_Name);

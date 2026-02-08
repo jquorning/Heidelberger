@@ -42,7 +42,7 @@ is
    begin
       if not Hook_Maps.Has_Element (Global_Wp_Filter.Find (Hook_Name)) then
 --    if not Isset (Wp_Filter (Hook_Name)) then
-         Global_Wp_Filter.Include (Hook_Name, Hook); -- Tampering with cursor
+         Global_Wp_Filter.Insert (Hook_Name, Hook); -- Tampering with cursor
 --       Wp_Filter (Hook_Name) := new WP_Hook();
       end if;
 
@@ -103,7 +103,7 @@ is
       Logging.Log ("inc_plugins.apply_filters", Hook_Name);
 
       if not Has_Element (Global_Wp_Filters.Find (Hook_Name)) then
-         Global_Wp_Filters.Include (Hook_Name, 1);
+         Global_Wp_Filters.Insert (Hook_Name, 1);
       else
          Global_Wp_Filters (Hook_Name) :=
            Global_Wp_Filters (Hook_Name) + 1;
@@ -366,7 +366,7 @@ is
 
       if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
 --    if not Isset (Wp_Actions, Hook_Name) then
-         Global_Wp_Actions.Include (Hook_Name, 1);
+         Global_Wp_Actions.Insert (Hook_Name, 1);
       else
          Global_Wp_Actions.Include (Hook_Name,
                                     Global_Wp_Actions (Hook_Name) + 1);
@@ -431,7 +431,7 @@ is
       Logging.Log ("do_action_ref_array", Hook_Name);
 
       if not Has_Element (Global_Wp_Actions.Find (Hook_Name)) then
-         Global_Wp_Actions.Include (Hook_Name, 1);
+         Global_Wp_Actions.Insert (Hook_Name, 1);
       else
          Global_Wp_Actions.Include (Hook_Name,
                                     Global_Wp_Actions (Hook_Name) + 1);

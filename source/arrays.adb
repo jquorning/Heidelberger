@@ -56,7 +56,7 @@ is
                      Value : Multi_Type)
    is
    begin
-      Array_Maps.Include (Array_Maps.Map (Arry), Key, Value);
+      Array_Maps.Insert (Array_Maps.Map (Arry), Key, Value);
    end Append;
 
    --------------
@@ -411,8 +411,11 @@ is
       M : Multi_Type;
    begin
       M.Kind := Kind_Array;
-      if not Value.Is_Empty then
-         M.Arry.Holder := Value.First_Element.Arry.Holder;
+      if Value.Is_Empty then
+         M.Arry.Holder := new Array_Type'(Empty_Array);
+      else
+         M.Arry.Holder := new Array_Type'(Value); -- .First_Element.Arry.Holder;
+--       M.Arry.Holder := Value.First_Element.Arry.Holder;
       end if;
       return M;
    end From_Array;
@@ -1248,12 +1251,12 @@ is
    function Empty_Array
             return Array_Type
    is
-      Item : Multi_Type;
+--    Item : Multi_Type;
       Arry : Array_Type;
    begin
-      Item.Kind := Kind_Array;
-      Item.Arry.Holder := new Array_Type'(Null_Array_Type);
-      Arry.Append (Key => "XXX-929", Value => Item);
+--    Item.Kind := Kind_Array;
+--    Item.Arry.Holder := new Array_Type'(Null_Array_Type);
+--    Arry.Append (Key => "XXX-929", Value => Item);
       return Arry;
    end Empty_Array;
 

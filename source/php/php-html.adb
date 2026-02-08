@@ -4,10 +4,13 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with AWS.URL;
+
 with UStrings;
 
 package body Php.HTML
 is
+   use Arrays;
 
    Static_Header : UStrings.UString;
 
@@ -37,6 +40,46 @@ is
    begin
       Static_Header := +Header;
    end Header;
+
+   ---------------
+   -- Parse_URL --
+   ---------------
+
+   function Parse_URL (URL       : String;
+                       Component : Component_Type := PHP_URL_ALL)
+                       return Arrays.Array_Type
+   is
+      use AWS.URL;
+
+      Obj : constant Object := Parse (URL);
+
+      Result : Array_Type;
+   begin
+      Result.Append ("schema", From_String (Protocol_Name (Obj)));
+      Result.Append ("host",   From_String (Host          (Obj)));
+      Result.Append ("path",   From_String (Abs_Path      (Obj)));
+      Result.Append ("query",  From_String (Query         (Obj)));
+      return Result;
+   end Parse_URL;
+
+   ---------------
+   -- Parse_URL --
+   ---------------
+
+   function Parse_URL (URL       : String;
+                       Component : Component_Type)
+                       return String
+   is
+      Result : constant Array_Type :=
+        Parse_URL (URL, PHP_URL_ALL);
+   begin
+      case Component is
+      when PHP_URL_SCHEME => return Get_As_String (Result, "scheme");
+      when PHP_URL_PATH   => return Get_As_String (Result, "path");
+      when PHP_URL_QUERY  => return Get_As_String (Result, "query");
+      when PHP_URL_ALL    => raise Program_Error with "not implemented";
+      end case;
+   end Parse_URL;
 
    --------------------
    -- Raw_URL_Encode --

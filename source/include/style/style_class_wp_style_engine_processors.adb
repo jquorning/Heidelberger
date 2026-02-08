@@ -179,7 +179,7 @@ is
             declare
                Duplicate_Selectors : constant String := Implode (",", Duplicates);
             begin
-               This.CSS_Rules.Include
+               This.CSS_Rules.Insert
                  (Key      => Duplicate_Selectors,
                   New_Item => Style_Class_Wp_Style_Engine_CSS_Rules.X_Construct
                                 (Duplicate_Selectors, Declarations.Get_Declarations));

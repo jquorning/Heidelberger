@@ -15,6 +15,7 @@ with Php.Lists;
 with Php.Strings;
 with Php.Types;
 
+with Lists;
 with UStrings;
 
 with Class_HTTP;
@@ -23,6 +24,7 @@ with Inc_Load;
 
 package body Inc_HTTP
 is
+   use Lists;
 
    subtype Wp_Http is Class_HTTP.Wp_Http;
 
@@ -694,24 +696,25 @@ is
    -- Wp_Parse_URL --
    ------------------
 
-   function Wp_Parse_URL (URL       : String;
-                          Component : Integer := -1)
-                          return Array_Type
+   function Wp_Parse_URL
+              (URL       : String;
+               Component : Php.HTML.Component_Type := Php.HTML.PHP_URL_ALL)
+               return Array_Type
    is
       use Php.HTML;
       use Php.Strings;
       use UStrings;
 
-      To_Unset : Array_Type;
+      To_Unset : List_Type;
       URL_2 : UString := +URL;
    begin
       if "//" = Substr (-URL_2, 0, 2) then
-         To_Unset.Append (Key => "XXX-921", Value => From_String ("scheme"));
+         To_Unset.Append ("scheme");
          URL_2 := "placeholder:" & URL_2;
 
       elsif "/" = Substr (URL, 0, 1) then
-         To_Unset.Append (Key => "XXX-920", Value => From_String ("scheme"));
-         To_Unset.Append (Key => "XXX-919", Value => From_String ("host"));
+         To_Unset.Append ("scheme");
+         To_Unset.Append ("host");
          URL_2 := "placeholder://placeholder" & URL_2;
       end if;
 
@@ -724,8 +727,8 @@ is
          end if;
 
          -- Remove the placeholder values.
-         for Key in To_Unset.Iterate loop
-            Delete (Ref (Parts, Arrays.Key (Key)));
+         for Key of To_Unset loop
+            Delete (Ref (Parts, Key));
          end loop;
 
          return X_Get_Component_From_Parsed_URL_Array (Parts, Component);
@@ -737,20 +740,22 @@ is
    ------------------
 
    function Wp_Parse_URL (URL       : String;
-                          Component : Integer := -1)
+                          Component : Php.HTML.Component_Type)
                           return String
-                          is ("XXX-952");
+   is (raise Program_Error with "not implemented");
 
    -------------------------------------------
    -- X_Get_Component_From_Parsed_URL_Array --
    -------------------------------------------
 
-   function X_Get_Component_From_Parsed_URL_Array (URL_Parts : Array_Type;
-                                                   Component : Integer := -1)
-                                                   return Array_Type
+   function X_Get_Component_From_Parsed_URL_Array
+              (URL_Parts : Array_Type;
+               Component : Php.HTML.Component_Type)
+               return Array_Type
    is
+      use Php.HTML;
    begin
-      if -1 = Component then
+      if Component in PHP_URL_ALL then
          return URL_Parts;
       end if;
 
@@ -774,9 +779,12 @@ is
    -- X_Wp_Translate_PHP_URL_Constant_To_Key --
    --------------------------------------------
 
-   function X_Wp_Translate_PHP_URL_Constant_To_Key (Component : Integer)
-                                                    return String
+   function X_Wp_Translate_PHP_URL_Constant_To_Key
+             (Component : Php.HTML.Component_Type)
+              return String
    is
+      use Php.HTML;
+
       -- Translation : constant Array_Type := To_Array_Type ([
       --           PHP_URL_SCHEME   => "scheme",
       --           PHP_URL_HOST     => "host",
@@ -788,12 +796,17 @@ is
       --           PHP_URL_FRAGMENT => "fragment",
       --   ]);
    begin
+      case Component is
+      when PHP_URL_SCHEME => return "scheme";
+      when PHP_URL_PATH   => return "path";
+      when PHP_URL_QUERY  => return "query";
+      when PHP_URL_ALL    => raise Program_Error with "not implemented";
+      end case;
       --   if ( isset( translation[ constant ] ) ) then
       --           return translation[ constant ];
       --   else
       --           return false;
       --   end if;
-      return "";
    end X_Wp_Translate_PHP_URL_Constant_To_Key;
 
 end Inc_HTTP;

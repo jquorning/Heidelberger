@@ -228,11 +228,11 @@ is
                   begin
                      RTL_Href :=
                        +Str_Replace (Suffix & ".css", "-rtl" & Suffix & ".css",
-                                     This.X_CSS_Href (Src, Ver, "handle-rtl"));
+                                     This.X_CSS_Href (Src, Ver, Handle & "-rtl"));
                   end;
                else
                   RTL_Href := +This.X_CSS_Href (Get_As_String (Obj.Extra, "rtl"),
-                                                Ver, "handle-rtl");
+                                                Ver, Handle & "-rtl");
                end if;
 
                declare
@@ -330,7 +330,7 @@ is
       end if;
 
       declare
-         Output : constant String := Implode ("\n", Output_2);
+         Output : constant String := Implode (NL, Output_2);
       begin
          if not Display then
             return Output;
@@ -344,7 +344,7 @@ is
              3 => Output
            ]);
       end;
-      return "True";
+      return "(true)";
    end Print_Inline_Style;
 
    ------------------------

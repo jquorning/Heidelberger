@@ -1,20 +1,21 @@
 --
 -- Core HTTP Request API
 --
--- Standardizes the HTTP requests for WordPress. Handles cookies, gzip encoding and decoding, chunk
--- decoding, if HTTP 1.1 and various other difficult HTTP protocol implementations.
+-- Standardizes the HTTP requests for WordPress. Handles cookies, gzip encoding and
+-- decoding, chunk decoding, if HTTP 1.1 and various other difficult HTTP protocol
+-- implementations.
 --
 -- @package WordPress
 -- @subpackage HTTP
 --
 
+with Php.HTML;
+
 with Arrays;
--- with Lists;
 
 package Inc_HTTP
 is
    use Arrays;
--- use Lists;
 
    --
    -- Returns the initialized WP_Http Object
@@ -105,12 +106,13 @@ is
    --               PHP_URL_PORT - integer when it does. See parse_url()'s return
    --               values.
    --
-   function Wp_Parse_URL (URL       : String;
-                          Component : Integer := -1)
-                          return Array_Type;
+   function Wp_Parse_URL
+              (URL       : String;
+               Component : Php.HTML.Component_Type := Php.HTML.PHP_URL_ALL)
+               return Array_Type;
 
    function Wp_Parse_URL (URL       : String;
-                          Component : Integer := -1)
+                          Component : Php.HTML.Component_Type)
                           return String;
 
    --
@@ -134,9 +136,10 @@ is
    --               PHP_URL_PORT - integer when it does. See parse_url()'s return
    --               values.
    --
-   function X_Get_Component_From_Parsed_URL_Array (URL_Parts : Array_Type;
-                                                   Component : Integer := -1)
-                                                   return Array_Type;
+   function X_Get_Component_From_Parsed_URL_Array
+              (URL_Parts : Array_Type;
+               Component : Php.HTML.Component_Type) --  := Php.HTML.PHP_URL_ALL)
+               return Array_Type;
 
    --
    -- Translate a PHP_URL_* constant to the named array keys PHP uses.
@@ -151,8 +154,9 @@ is
    -- @param int constant PHP_URL_* constant.
    -- @return string|false The named key or false.
    --
-   function X_Wp_Translate_PHP_URL_Constant_To_Key (Component : Integer)
-                                                    return String;
+   function X_Wp_Translate_PHP_URL_Constant_To_Key
+              (Component : Php.HTML.Component_Type)
+               return String;
 
    --
    -- Retrieve only the body from the raw response.

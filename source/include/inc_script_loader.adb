@@ -416,7 +416,8 @@ is
 
             end if;
 
-            Scripts.Add (Handle, Path, Dependencies, Get_As_String (Package_Data, "version"), 1);
+            Scripts.Add (Handle, Path, Dependencies,
+                         Get_As_String (Package_Data, "version"), 1);
 
             if In_List ("wp-i18n", Dependencies, True) then
                Scripts.Set_Translations (Handle);
@@ -889,18 +890,18 @@ is
          );
       end if;
 
-      Scripts.Add ("common", "/wp-admin/js/commonsuffix.js",
-                   ["jquery", "hoverIntent", "utils"], False, 1);
+      Scripts.Add ("common", "/wp-admin/js/common" & Suffix & ".js",
+                   ["jquery", "hoverIntent", "utils"], "(false)", 1);
       Scripts.Set_Translations ("common");
 
-      Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitizesuffix.js",
-                   Empty_List, False, 1);
+      Scripts.Add ("wp-sanitize", "/wp-includes/js/wp-sanitize" & Suffix & ".js",
+                   Empty_List, "(false)", 1);
 
-      Scripts.Add ("sack", "/wp-includes/js/tw-sacksuffix.js",
+      Scripts.Add ("sack", "/wp-includes/js/tw-sack" & Suffix & ".js",
                    Empty_List, "1.6.1", 1);
 
-      Scripts.Add ("quicktags", "/wp-includes/js/quicktagssuffix.js",
-                   Empty_List, False, 1);
+      Scripts.Add ("quicktags", "/wp-includes/js/quicktags" & Suffix & ".js",
+                   Empty_List, "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -940,17 +941,17 @@ is
          );
       end if;
 
-      Scripts.Add ("colorpicker", "/wp-includes/js/colorpickersuffix.js",
+      Scripts.Add ("colorpicker", "/wp-includes/js/colorpicker" & Suffix & ".js",
                    ["prototype"], "3517m");
 
-      Scripts.Add ("editor", "/wp-admin/js/editorsuffix.js",
-                   ["utils", "jquery"], False, 1);
+      Scripts.Add ("editor", "/wp-admin/js/editor" & Suffix & ".js",
+                   ["utils", "jquery"], "(false)", 1);
 
-      Scripts.Add ("clipboard", "/wp-includes/js/clipboardsuffix.js",
+      Scripts.Add ("clipboard", "/wp-includes/js/clipboard" & Suffix & ".js",
                    Empty_List, "2.0.11", 1);
 
-      Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-responsesuffix.js",
-                   ["jquery", "wp-a11y"], False, 1);
+      Scripts.Add ("wp-ajax-response", "/wp-includes/js/wp-ajax-response" & Suffix & ".js",
+                   ["jquery", "wp-a11y"], "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -963,8 +964,8 @@ is
          );
       end if;
 
-      Scripts.Add ("wp-api-request", "/wp-includes/js/api-requestsuffix.js",
-                   ["jquery"], False, 1);
+      Scripts.Add ("wp-api-request", "/wp-includes/js/api-request" & Suffix & ".js",
+                   ["jquery"], "(false)", 1);
 
       -- `wpApiSettings` is also used by `wp-api`, which depends on this script.
       if Did_Action ("init") then
@@ -980,16 +981,16 @@ is
          );
       end if;
 
-      Scripts.Add ("wp-pointer", "/wp-includes/js/wp-pointersuffix.js",
-                   ["jquery-ui-core"], False, 1);
+      Scripts.Add ("wp-pointer", "/wp-includes/js/wp-pointer" & Suffix & ".js",
+                   ["jquery-ui-core"], "(false)", 1);
 
       Scripts.Set_Translations ("wp-pointer");
 
-      Scripts.Add ("autosave", "/wp-includes/js/autosavesuffix.js",
-                   ["heartbeat"], False, 1);
+      Scripts.Add ("autosave", "/wp-includes/js/autosave" & Suffix & ".js",
+                   ["heartbeat"], "(false)", 1);
 
-      Scripts.Add ("heartbeat", "/wp-includes/js/heartbeatsuffix.js",
-                   ["jquery", "wp-hooks"], False, 1);
+      Scripts.Add ("heartbeat", "/wp-includes/js/heartbeat" & Suffix & ".js",
+                   ["jquery", "wp-hooks"], "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1006,13 +1007,13 @@ is
          );
       end if;
 
-      Scripts.Add ("wp-auth-check", "/wp-includes/js/wp-auth-checksuffix.js",
-                   ["heartbeat"], False, 1);
+      Scripts.Add ("wp-auth-check", "/wp-includes/js/wp-auth-check" & Suffix & ".js",
+                   ["heartbeat"], "(false)", 1);
 
       Scripts.Set_Translations ("wp-auth-check");
 
-      Scripts.Add ("wp-lists", "/wp-includes/js/wp-listssuffix.js",
-                   ["wp-ajax-response", "jquery-color"], False, 1);
+      Scripts.Add ("wp-lists", "/wp-includes/js/wp-lists" & Suffix & ".js",
+                   ["wp-ajax-response", "jquery-color"], "(false)", 1);
 
       -- WordPress no longer uses or bundles Prototype or script.aculo.us. These
       -- are now pulled from an external source.
@@ -1065,10 +1066,10 @@ is
         ["jquery-core", "jquery-migrate"], "3.6.1");
       Scripts.Add (
         "jquery-core",
-        "/wp-includes/js/jquery/jquerysuffix.js", Empty_List, "3.6.1");
+        "/wp-includes/js/jquery/jquery" & Suffix & ".js", Empty_List, "3.6.1");
       Scripts.Add (
         "jquery-migrate",
-        "/wp-includes/js/jquery/jquery-migratesuffix.js", Empty_List, "3.3.2");
+        "/wp-includes/js/jquery/jquery-migrate" & Suffix & ".js", Empty_List, "3.3.2");
 
       -- Full jQuery UI.
       -- The build process in 1.12.1 has changed significantly.
@@ -1079,61 +1080,61 @@ is
       -- and "jquery-ui-widget".
       Scripts.Add (
         "jquery-ui-core",
-        "/wp-includes/js/jquery/ui/coresuffix.js",
+        "/wp-includes/js/jquery/ui/core" & Suffix & ".js",
         ["jquery"], "1.13.2", 1);
       Scripts.Add (
         "jquery-effects-core",
-        "/wp-includes/js/jquery/ui/effectsuffix.js",
+        "/wp-includes/js/jquery/ui/effect" & Suffix & ".js",
         ["jquery"], "1.13.2", 1);
 
-      Scripts.Add ("jquery-effects-blind", "/wp-includes/js/jquery/ui/effect-blindsuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-bounce", "/wp-includes/js/jquery/ui/effect-bouncesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-clip", "/wp-includes/js/jquery/ui/effect-clipsuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-drop", "/wp-includes/js/jquery/ui/effect-dropsuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-explode", "/wp-includes/js/jquery/ui/effect-explodesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-fade", "/wp-includes/js/jquery/ui/effect-fadesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-fold", "/wp-includes/js/jquery/ui/effect-foldsuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-highlight", "/wp-includes/js/jquery/ui/effect-highlightsuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-puff", "/wp-includes/js/jquery/ui/effect-puffsuffix.js", ["jquery-effects-core", "jquery-effects-scale"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-pulsate", "/wp-includes/js/jquery/ui/effect-pulsatesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-scale", "/wp-includes/js/jquery/ui/effect-scalesuffix.js", ["jquery-effects-core", "jquery-effects-size"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-shake", "/wp-includes/js/jquery/ui/effect-shakesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-size", "/wp-includes/js/jquery/ui/effect-sizesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-slide", "/wp-includes/js/jquery/ui/effect-slidesuffix.js", ["jquery-effects-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-effects-transfer", "/wp-includes/js/jquery/ui/effect-transfersuffix.js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-blind", "/wp-includes/js/jquery/ui/effect-blind" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-bounce", "/wp-includes/js/jquery/ui/effect-bounce" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-clip", "/wp-includes/js/jquery/ui/effect-clip" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-drop", "/wp-includes/js/jquery/ui/effect-drop" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-explode", "/wp-includes/js/jquery/ui/effect-explode" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-fade", "/wp-includes/js/jquery/ui/effect-fade" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-fold", "/wp-includes/js/jquery/ui/effect-fold" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-highlight", "/wp-includes/js/jquery/ui/effect-highlight" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-puff", "/wp-includes/js/jquery/ui/effect-puff" & Suffix & ".js", ["jquery-effects-core", "jquery-effects-scale"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-pulsate", "/wp-includes/js/jquery/ui/effect-pulsate" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-scale", "/wp-includes/js/jquery/ui/effect-scale" & Suffix & ".js", ["jquery-effects-core", "jquery-effects-size"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-shake", "/wp-includes/js/jquery/ui/effect-shake" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-size", "/wp-includes/js/jquery/ui/effect-size" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-slide", "/wp-includes/js/jquery/ui/effect-slide" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-effects-transfer", "/wp-includes/js/jquery/ui/effect-transfer" & Suffix & ".js", ["jquery-effects-core"], "1.13.2", 1);
 
       -- Widgets
-      Scripts.Add ("jquery-ui-accordion", "/wp-includes/js/jquery/ui/accordionsuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-autocomplete", "/wp-includes/js/jquery/ui/autocompletesuffix.js", ["jquery-ui-menu", "wp-a11y"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-button", "/wp-includes/js/jquery/ui/buttonsuffix.js",
+      Scripts.Add ("jquery-ui-accordion", "/wp-includes/js/jquery/ui/accordion" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-autocomplete", "/wp-includes/js/jquery/ui/autocomplete" & Suffix & ".js", ["jquery-ui-menu", "wp-a11y"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-button", "/wp-includes/js/jquery/ui/button" & Suffix & ".js",
                    ["jquery-ui-core", "jquery-ui-controlgroup", "jquery-ui-checkboxradio"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-datepicker", "/wp-includes/js/jquery/ui/datepickersuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-dialog", "/wp-includes/js/jquery/ui/dialogsuffix.js",
+      Scripts.Add ("jquery-ui-datepicker", "/wp-includes/js/jquery/ui/datepicker" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-dialog", "/wp-includes/js/jquery/ui/dialog" & Suffix & ".js",
                    ["jquery-ui-resizable", "jquery-ui-draggable", "jquery-ui-button"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-menu", "/wp-includes/js/jquery/ui/menusuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-mouse", "/wp-includes/js/jquery/ui/mousesuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-progressbar", "/wp-includes/js/jquery/ui/progressbarsuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-selectmenu", "/wp-includes/js/jquery/ui/selectmenusuffix.js", ["jquery-ui-menu"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-slider", "/wp-includes/js/jquery/ui/slidersuffix.js", ["jquery-ui-mouse"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-spinner", "/wp-includes/js/jquery/ui/spinnersuffix.js", ["jquery-ui-button"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-tabs", "/wp-includes/js/jquery/ui/tabssuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-tooltip", "/wp-includes/js/jquery/ui/tooltipsuffix.js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-menu", "/wp-includes/js/jquery/ui/menu" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-mouse", "/wp-includes/js/jquery/ui/mouse" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-progressbar", "/wp-includes/js/jquery/ui/progressbar" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-selectmenu", "/wp-includes/js/jquery/ui/selectmenu" & Suffix & ".js", ["jquery-ui-menu"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-slider", "/wp-includes/js/jquery/ui/slider" & Suffix & ".js", ["jquery-ui-mouse"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-spinner", "/wp-includes/js/jquery/ui/spinner" & Suffix & ".js", ["jquery-ui-button"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-tabs", "/wp-includes/js/jquery/ui/tabs" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-tooltip", "/wp-includes/js/jquery/ui/tooltip" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
 
       -- New in 1.12.1
-      Scripts.Add ("jquery-ui-checkboxradio", "/wp-includes/js/jquery/ui/checkboxradiosuffix.js", ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-controlgroup", "/wp-includes/js/jquery/ui/controlgroupsuffix.js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-checkboxradio", "/wp-includes/js/jquery/ui/checkboxradio" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-controlgroup", "/wp-includes/js/jquery/ui/controlgroup" & Suffix & ".js", ["jquery-ui-core"], "1.13.2", 1);
 
       -- Interactions
-      Scripts.Add ("jquery-ui-draggable", "/wp-includes/js/jquery/ui/draggablesuffix.js", ["jquery-ui-mouse"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-droppable", "/wp-includes/js/jquery/ui/droppablesuffix.js", ["jquery-ui-draggable"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-resizable", "/wp-includes/js/jquery/ui/resizablesuffix.js", ["jquery-ui-mouse"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-selectable", "/wp-includes/js/jquery/ui/selectablesuffix.js", ["jquery-ui-mouse"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-sortable", "/wp-includes/js/jquery/ui/sortablesuffix.js", ["jquery-ui-mouse"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-draggable", "/wp-includes/js/jquery/ui/draggable" & Suffix & ".js", ["jquery-ui-mouse"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-droppable", "/wp-includes/js/jquery/ui/droppable" & Suffix & ".js", ["jquery-ui-draggable"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-resizable", "/wp-includes/js/jquery/ui/resizable" & Suffix & ".js", ["jquery-ui-mouse"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-selectable", "/wp-includes/js/jquery/ui/selectable" & Suffix & ".js", ["jquery-ui-mouse"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-sortable", "/wp-includes/js/jquery/ui/sortable" & Suffix & ".js", ["jquery-ui-mouse"], "1.13.2", 1);
 
       -- As of 1.12.1 `jquery-ui-position` and `jquery-ui-widget` are part of `jquery-ui-core`.
       -- Listed here for back-compat.
-      Scripts.Add ("jquery-ui-position", False, ["jquery-ui-core"], "1.13.2", 1);
-      Scripts.Add ("jquery-ui-widget", False, ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-position", "(false)", ["jquery-ui-core"], "1.13.2", 1);
+      Scripts.Add ("jquery-ui-widget", "(false)", ["jquery-ui-core"], "1.13.2", 1);
 
       -- Strings for "jquery-ui-autocomplete" live region messages.
       if Did_Action ("init") then
@@ -1152,19 +1153,19 @@ is
       end if;
 
       -- Deprecated, not used in core, most functionality is included in jQuery 1.3.
-      Scripts.Add ("jquery-form", "/wp-includes/js/jquery/jquery.formsuffix.js", ["jquery"], "4.3.0", 1);
+      Scripts.Add ("jquery-form", "/wp-includes/js/jquery/jquery.form" & Suffix & ".js", ["jquery"], "4.3.0", 1);
 
       -- jQuery plugins.
       Scripts.Add ("jquery-color", "/wp-includes/js/jquery/jquery.color.min.js", ["jquery"], "2.2.0", 1);
       Scripts.Add ("schedule", "/wp-includes/js/jquery/jquery.schedule.js", ["jquery"], "20m", 1);
       Scripts.Add ("jquery-query", "/wp-includes/js/jquery/jquery.query.js", ["jquery"], "2.2.3", 1);
       Scripts.Add ("jquery-serialize-object", "/wp-includes/js/jquery/jquery.serialize-object.js", ["jquery"], "0.2-wp", 1);
-      Scripts.Add ("jquery-hotkeys", "/wp-includes/js/jquery/jquery.hotkeyssuffix.js", ["jquery"], "0.0.2m", 1);
-      Scripts.Add ("jquery-table-hotkeys", "/wp-includes/js/jquery/jquery.table-hotkeyssuffix.js", ["jquery", "jquery-hotkeys"], False, 1);
+      Scripts.Add ("jquery-hotkeys", "/wp-includes/js/jquery/jquery.hotkeys" & Suffix & ".js", ["jquery"], "0.0.2m", 1);
+      Scripts.Add ("jquery-table-hotkeys", "/wp-includes/js/jquery/jquery.table-hotkeys" & Suffix & ".js", ["jquery", "jquery-hotkeys"], "(false)", 1);
       Scripts.Add ("jquery-touch-punch", "/wp-includes/js/jquery/jquery.ui.touch-punch.js", ["jquery-ui-core", "jquery-ui-mouse"], "0.2.2", 1);
 
       -- Not used any more, registered for backward compatibility.
-      Scripts.Add ("suggest", "/wp-includes/js/jquery/suggestsuffix.js", ["jquery"], "1.1-20110113", 1);
+      Scripts.Add ("suggest", "/wp-includes/js/jquery/suggest" & Suffix & ".js", ["jquery"], "1.1-20110113", 1);
 
       -- Masonry v2 depended on jQuery. v3 does not. The older jquery-masonry handle is a shiv.
       -- It sets jQuery as a dependency, as the theme may have been implicitly loading it this way.
@@ -1230,17 +1231,17 @@ is
            Build ("file_url_copied",           abs "The file URL has been copied to your clipboard")
          ]);
       begin
-         Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxiesuffix.js", Empty_List, "1.3.5");
-         Scripts.Add ("plupload", "/wp-includes/js/plupload/pluploadsuffix.js", ["moxiejs"], "2.1.9");
+         Scripts.Add ("moxiejs", "/wp-includes/js/plupload/moxie" & Suffix & ".js", Empty_List, "1.3.5");
+         Scripts.Add ("plupload", "/wp-includes/js/plupload/plupload" & Suffix & ".js", ["moxiejs"], "2.1.9");
 
          -- Back compat handles:
          for Handle of List_Type'["all", "html5", "flash", "silverlight", "html4"] loop
-            Scripts.Add ("plupload-" & Handle, False, ["plupload"], "2.1.1");
+            Scripts.Add ("plupload-" & Handle, "(false)", ["plupload"], "2.1.1");
          end loop;
 
          Scripts.Add (
            "plupload-handlers",
-           "/wp-includes/js/plupload/handlerssuffix.js",
+           "/wp-includes/js/plupload/handlers" & Suffix & ".js",
            ["clipboard", "jquery", "plupload", "underscore",
             "wp-a11y", "wp-i18n"]);
 
@@ -1250,8 +1251,8 @@ is
 
          Scripts.Add (
            "wp-plupload",
-           "/wp-includes/js/plupload/wp-pluploadsuffix.js",
-           ["plupload", "jquery", "json2", "media-models"], False, 1);
+           "/wp-includes/js/plupload/wp-plupload" & Suffix & ".js",
+           ["plupload", "jquery", "json2", "media-models"], "(false)", 1);
 
          if Did_Action ("init") then
             Scripts.Localize ("wp-plupload", "pluploadL10n", Uploader_L10n);
@@ -1262,10 +1263,10 @@ is
            "swfupload",
            "/wp-includes/js/swfupload/swfupload.js",
            Empty_List, "2201-20110113");
-         Scripts.Add ("swfupload-all", False, ["swfupload"], "2201");
+         Scripts.Add ("swfupload-all", "(false)", ["swfupload"], "2201");
          Scripts.Add (
            "swfupload-handlers",
-           "/wp-includes/js/swfupload/handlerssuffix.js",
+           "/wp-includes/js/swfupload/handlers" & Suffix & ".js",
            ["swfupload-all", "jquery"], "2201-20110524");
 
          if Did_Action ("init") then
@@ -1274,11 +1275,11 @@ is
       end;
       Scripts.Add (
         "comment-reply",
-        "/wp-includes/js/comment-replysuffix.js", Empty_List, False, 1);
+        "/wp-includes/js/comment-reply" & Suffix & ".js", Empty_List, "(false)", 1);
 
       Scripts.Add (
         "json2",
-        "/wp-includes/js/json2suffix.js", Empty_List, "2015-05-03");
+        "/wp-includes/js/json2" & Suffix & ".js", Empty_List, "2015-05-03");
 
       if Did_Action ("init") then
          Scripts.Add_Data ("json2", "conditional", "lt IE 8");
@@ -1294,7 +1295,7 @@ is
 
       Scripts.Add ("wp-util",
                    "/wp-includes/js/wp-util" & Suffix & ".js",
-                   ["underscore", "jquery"], False, 1);
+                   ["underscore", "jquery"], "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1310,17 +1311,17 @@ is
 
       Scripts.Add ("wp-backbone",
                    "/wp-includes/js/wp-backbone" & Suffix & ".js",
-                   ["backbone", "wp-util"], False, 1);
+                   ["backbone", "wp-util"], "(false)", 1);
 
       Scripts.Add ("revisions",
                    "/wp-admin/js/revisions" & Suffix & ".js",
                    ["wp-backbone", "jquery-ui-slider",
-                    "hoverIntent"], False, 1);
+                    "hoverIntent"], "(false)", 1);
 
       Scripts.Add ("imgareaselect",
                    "/wp-includes/js/imgareaselect/jquery.imgareaselect" &
                    Suffix & ".js",
-                   ["jquery"], False, 1);
+                   ["jquery"], "(false)", 1);
 
       Scripts.Add ("mediaelement", False,
                    ["jquery", "mediaelement-core",
@@ -1334,7 +1335,7 @@ is
 
       Scripts.Add ("mediaelement-migrate",
                    "/wp-includes/js/mediaelement/mediaelement-migrate" &
-                   Suffix & ".js", Empty_List, False, 1);
+                   Suffix & ".js", Empty_List, "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Add_Inline_Script (
@@ -1430,8 +1431,8 @@ is
                    "/wp-includes/js/mediaelement/renderers/vimeo.min.js",
                    ["mediaelement"], "4.2.17", 1);
       Scripts.Add ("wp-mediaelement",
-                   "/wp-includes/js/mediaelement/wp-mediaelementsuffix.js",
-                   ["mediaelement"], False, 1);
+                   "/wp-includes/js/mediaelement/wp-mediaelement" & Suffix & ".js",
+                   ["mediaelement"], "(false)", 1);
 
       declare
          Mejs_Settings : constant Array_Type := To_Array_Type ([
@@ -1463,23 +1464,23 @@ is
       Scripts.Add ("jsonlint", "/wp-includes/js/codemirror/jsonlint.js", Empty_List, "1.6.2");
       Scripts.Add ("htmlhint", "/wp-includes/js/codemirror/htmlhint.js", Empty_List, "0.9.14-xwp");
       Scripts.Add ("htmlhint-kses", "/wp-includes/js/codemirror/htmlhint-kses.js", ["htmlhint"]);
-      Scripts.Add ("code-editor", "/wp-admin/js/code-editorsuffix.js",
+      Scripts.Add ("code-editor", "/wp-admin/js/code-editor" & Suffix & ".js",
                    ["jquery", "wp-codemirror", "underscore"]);
       Scripts.Add (
         "wp-theme-plugin-editor",
-        "/wp-admin/js/theme-plugin-editorsuffix.js",
+        "/wp-admin/js/theme-plugin-editor" & Suffix & ".js",
         ["common", "wp-util", "wp-sanitize", "jquery", "jquery-ui-core",
          "wp-a11y", "underscore"]);
       Scripts.Set_Translations ("wp-theme-plugin-editor");
 
       Scripts.Add (
         "wp-playlist",
-        "/wp-includes/js/mediaelement/wp-playlistsuffix.js",
-        ["wp-util", "backbone", "mediaelement"], False, 1);
+        "/wp-includes/js/mediaelement/wp-playlist" & Suffix & ".js",
+        ["wp-util", "backbone", "mediaelement"], "(false)", 1);
 
       Scripts.Add (
         "zxcvbn-async",
-        "/wp-includes/js/zxcvbn-asyncsuffix.js", Empty_List, "1.0");
+        "/wp-includes/js/zxcvbn-async" & Suffix & ".js", Empty_List, "1.0");
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1495,8 +1496,8 @@ is
 
       Scripts.Add (
         "password-strength-meter",
-        "/wp-admin/js/password-strength-metersuffix.js",
-        ["jquery", "zxcvbn-async"], False, 1);
+        "/wp-admin/js/password-strength-meter" & Suffix & ".js",
+        ["jquery", "zxcvbn-async"], "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1517,21 +1518,21 @@ is
 
       Scripts.Add (
         "application-passwords",
-        "/wp-admin/js/application-passwordssuffix.js",
+        "/wp-admin/js/application-passwords" & Suffix & ".js",
         ["jquery", "wp-util", "wp-api-request", "wp-date",
-         "wp-i18n", "wp-hooks"], False, 1);
+         "wp-i18n", "wp-hooks"], "(false)", 1);
       Scripts.Set_Translations ("application-passwords");
 
       Scripts.Add (
         "auth-app",
-        "/wp-admin/js/auth-appsuffix.js",
-        ["jquery", "wp-api-request", "wp-i18n", "wp-hooks"], False, 1);
+        "/wp-admin/js/auth-app" & Suffix & ".js",
+        ["jquery", "wp-api-request", "wp-i18n", "wp-hooks"], "(false)", 1);
       Scripts.Set_Translations ("auth-app");
 
       Scripts.Add (
         "user-profile",
-        "/wp-admin/js/user-profilesuffix.js",
-        ["jquery", "password-strength-meter", "wp-util"], False, 1);
+        "/wp-admin/js/user-profile" & Suffix & ".js",
+        ["jquery", "password-strength-meter", "wp-util"], "(false)", 1);
       Scripts.Set_Translations ("user-profile");
 
       declare
@@ -1553,13 +1554,13 @@ is
          end if;
       end;
 
-      Scripts.Add ("language-chooser", "/wp-admin/js/language-choosersuffix.js", ["jquery"], False, 1);
+      Scripts.Add ("language-chooser", "/wp-admin/js/language-chooser" & Suffix & ".js", ["jquery"], "(false)", 1);
 
-      Scripts.Add ("user-suggest", "/wp-admin/js/user-suggestsuffix.js", ["jquery-ui-autocomplete"], False, 1);
+      Scripts.Add ("user-suggest", "/wp-admin/js/user-suggest" & Suffix & ".js", ["jquery-ui-autocomplete"], "(false)", 1);
 
-      Scripts.Add ("admin-bar", "/wp-includes/js/admin-barsuffix.js", ["hoverintent-js"], False, 1);
+      Scripts.Add ("admin-bar", "/wp-includes/js/admin-bar" & Suffix & ".js", ["hoverintent-js"], "(false)", 1);
 
-      Scripts.Add ("wplink", "/wp-includes/js/wplinksuffix.js", ["jquery", "wp-a11y"], False, 1);
+      Scripts.Add ("wplink", "/wp-includes/js/wplink" & Suffix & ".js", ["jquery", "wp-a11y"], "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1579,30 +1580,34 @@ is
          );
       end if;
 
-      Scripts.Add ("wpdialogs", "/wp-includes/js/wpdialogsuffix.js", ["jquery-ui-dialog"], False, 1);
+      Scripts.Add ("wpdialogs", "/wp-includes/js/wpdialog" & Suffix & ".js", ["jquery-ui-dialog"], "(false)", 1);
 
-      Scripts.Add ("word-count", "/wp-admin/js/word-countsuffix.js", Empty_List, False, 1);
+      Scripts.Add ("word-count", "/wp-admin/js/word-count" & Suffix & ".js", Empty_List, "(false)", 1);
 
-      Scripts.Add ("media-upload", "/wp-admin/js/media-uploadsuffix.js", ["thickbox", "shortcode"], False, 1);
+      Scripts.Add ("media-upload", "/wp-admin/js/media-upload" & Suffix & ".js", ["thickbox", "shortcode"], "(false)", 1);
 
-      Scripts.Add ("hoverIntent", "/wp-includes/js/hoverIntentsuffix.js", ["jquery"], "1.10.2", 1);
+      Scripts.Add ("hoverIntent", "/wp-includes/js/hoverIntent" & Suffix & ".js", ["jquery"], "1.10.2", 1);
 
       -- JS-only version of hoverintent (no dependencies).
       Scripts.Add ("hoverintent-js", "/wp-includes/js/hoverintent-js.min.js", Empty_List, "2.2.1", 1);
 
-      Scripts.Add ("customize-base", "/wp-includes/js/customize-basesuffix.js",
-                   ["jquery", "json2", "underscore"], False, 1);
-      Scripts.Add ("customize-loader", "/wp-includes/js/customize-loadersuffix.js", ["customize-base"], False, 1);
-      Scripts.Add ("customize-preview", "/wp-includes/js/customize-previewsuffix.js",
-                   ["wp-a11y", "customize-base"], False, 1);
+      Scripts.Add ("customize-base", "/wp-includes/js/customize-base" & Suffix & ".js",
+                   ["jquery", "json2", "underscore"], "(false)", 1);
+      Scripts.Add ("customize-loader",
+                   "/wp-includes/js/customize-loader" & Suffix & ".js",
+                   ["customize-base"], "(false)", 1);
+      Scripts.Add ("customize-preview",
+                   "/wp-includes/js/customize-preview" & Suffix & ".js",
+                   ["wp-a11y", "customize-base"], "(false)", 1);
       Scripts.Add ("customize-models", "/wp-includes/js/customize-models.js",
-                   ["underscore", "backbone"], False, 1);
+                   ["underscore", "backbone"], "(false)", 1);
       Scripts.Add ("customize-views", "/wp-includes/js/customize-views.js",
                    ["jquery", "underscore", "imgareaselect", "customize-models",
-                    "media-editor", "media-views"], False, 1);
-      Scripts.Add ("customize-controls", "/wp-admin/js/customize-controlssuffix.js",
+                    "media-editor", "media-views"], "(false)", 1);
+      Scripts.Add ("customize-controls",
+                   "/wp-admin/js/customize-controls" & Suffix & ".js",
                    ["customize-base", "wp-a11y", "wp-util", "jquery-ui-core"],
-                   False, 1);
+                   "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1696,35 +1701,44 @@ is
 
       Scripts.Add (
         "customize-selective-refresh",
-        "/wp-includes/js/customize-selective-refreshsuffix.js",
-        ["jquery", "wp-util", "customize-preview"], False, 1);
+        "/wp-includes/js/customize-selective-refresh" & Suffix & ".js",
+        ["jquery", "wp-util", "customize-preview"], "(false)", 1);
 
       Scripts.Add (
         "customize-widgets",
-        "/wp-admin/js/customize-widgetssuffix.js",
+        "/wp-admin/js/customize-widgets" & Suffix & ".js",
         ["jquery", "jquery-ui-sortable", "jquery-ui-droppable",
-         "wp-backbone", "customize-controls"], False, 1);
+         "wp-backbone", "customize-controls"], "(false)", 1);
       Scripts.Add (
         "customize-preview-widgets",
-        "/wp-includes/js/customize-preview-widgetssuffix.js",
+        "/wp-includes/js/customize-preview-widgets" & Suffix & ".js",
         ["jquery", "wp-util", "customize-preview",
-         "customize-selective-refresh"], False, 1);
+         "customize-selective-refresh"], "(false)", 1);
 
-      Scripts.Add ("customize-nav-menus", "/wp-admin/js/customize-nav-menussuffix.js",
+      Scripts.Add ("customize-nav-menus",
+                   "/wp-admin/js/customize-nav-menus" & Suffix & ".js",
                    ["jquery", "wp-backbone", "customize-controls",
-                    "accordion", "nav-menu", "wp-sanitize"], False, 1);
+                    "accordion", "nav-menu", "wp-sanitize"], "(false)", 1);
       Scripts.Add (
         "customize-preview-nav-menus",
-        "/wp-includes/js/customize-preview-nav-menussuffix.js",
+        "/wp-includes/js/customize-preview-nav-menus" & Suffix & ".js",
         ["jquery", "wp-util", "customize-preview",
-         "customize-selective-refresh"], False, 1);
+         "customize-selective-refresh"], "(false)", 1);
 
-      Scripts.Add ("wp-custom-header", "/wp-includes/js/wp-custom-headersuffix.js", ["wp-a11y"], False, 1);
+      Scripts.Add ("wp-custom-header",
+                   "/wp-includes/js/wp-custom-header" & Suffix & ".js",
+                   ["wp-a11y"], "(false)", 1);
 
-      Scripts.Add ("accordion", "/wp-admin/js/accordionsuffix.js", ["jquery"], False, 1);
+      Scripts.Add ("accordion",
+                   "/wp-admin/js/accordion" & Suffix & ".js",
+                   ["jquery"], "(false)", 1);
 
-      Scripts.Add ("shortcode", "/wp-includes/js/shortcodesuffix.js", ["underscore"], False, 1);
-      Scripts.Add ("media-models", "/wp-includes/js/media-modelssuffix.js", ["wp-backbone"], False, 1);
+      Scripts.Add ("shortcode",
+                   "/wp-includes/js/shortcode" & Suffix & ".js",
+                   ["underscore"], "(false)", 1);
+      Scripts.Add ("media-models",
+                   "/wp-includes/js/media-models" & Suffix & ".js",
+                   ["wp-backbone"], "(false)", 1);
 
       if Did_Action ("init") then
          Scripts.Localize (
@@ -1738,35 +1752,39 @@ is
            ])
          );
       end if;
-      Scripts.Add ("wp-embed", "/wp-includes/js/wp-embedsuffix.js", Empty_List, False, 1);
+      Scripts.Add ("wp-embed",
+                   "/wp-includes/js/wp-embed" & Suffix & ".js",
+                   Empty_List, "(false)", 1);
 
       -- To enqueue media-views or media-editor, call wp_enqueue_media().
       -- Both rely on numerous settings, styles, and templates to operate correctly.
-      Scripts.Add ("media-views", "/wp-includes/js/media-viewssuffix.js",
+      Scripts.Add ("media-views", "/wp-includes/js/media-views" & Suffix & ".js",
                    ["utils", "media-models", "wp-plupload", "jquery-ui-sortable",
                     "wp-mediaelement", "wp-api-request", "wp-a11y", "clipboard"],
-                    False, 1);
+                    "(false)", 1);
       Scripts.Set_Translations ("media-views");
 
-      Scripts.Add ("media-editor", "/wp-includes/js/media-editorsuffix.js",
-                   ["shortcode", "media-views"], False, 1);
+      Scripts.Add ("media-editor", "/wp-includes/js/media-editor" & Suffix & ".js",
+                   ["shortcode", "media-views"], "(false)", 1);
       Scripts.Set_Translations ("media-editor");
-      Scripts.Add ("media-audiovideo", "/wp-includes/js/media-audiovideosuffix.js", ["media-editor"], False, 1);
+      Scripts.Add ("media-audiovideo",
+                   "/wp-includes/js/media-audiovideo" & Suffix & ".js",
+                   ["media-editor"], "(false)", 1);
       Scripts.Add (
-        "mce-view", "/wp-includes/js/mce-viewsuffix.js",
-        ["shortcode", "jquery", "media-views", "media-audiovideo"], False, 1);
+        "mce-view", "/wp-includes/js/mce-view" & Suffix & ".js",
+        ["shortcode", "jquery", "media-views", "media-audiovideo"], "(false)", 1);
 
       Scripts.Add (
-        "wp-api", "/wp-includes/js/wp-apisuffix.js",
-        ["jquery", "backbone", "underscore", "wp-api-request"], False, 1);
+        "wp-api", "/wp-includes/js/wp-api" & Suffix & ".js",
+        ["jquery", "backbone", "underscore", "wp-api-request"], "(false)", 1);
 
       if Is_Admin then
-         Scripts.Add ("admin-tags", "/wp-admin/js/tagssuffix.js",
-                      ["jquery", "wp-ajax-response"], False, 1);
+         Scripts.Add ("admin-tags", "/wp-admin/js/tags" & Suffix & ".js",
+                      ["jquery", "wp-ajax-response"], "(false)", 1);
          Scripts.Set_Translations ("admin-tags");
 
-         Scripts.Add ("admin-comments", "/wp-admin/js/edit-commentssuffix.js",
-                      ["wp-lists", "quicktags", "jquery-query"], False, 1);
+         Scripts.Add ("admin-comments", "/wp-admin/js/edit-comments" & Suffix & ".js",
+                      ["wp-lists", "quicktags", "jquery-query"], "(false)", 1);
          Scripts.Set_Translations ("admin-comments");
          if Did_Action ("init") then
             Scripts.Localize (
@@ -1779,63 +1797,63 @@ is
             );
          end if;
 
-         Scripts.Add ("xfn", "/wp-admin/js/xfnsuffix.js", ["jquery"], False, 1);
+         Scripts.Add ("xfn", "/wp-admin/js/xfn" & Suffix & ".js", ["jquery"], "(false)", 1);
 
-         Scripts.Add ("postbox", "/wp-admin/js/postboxsuffix.js", ["jquery-ui-sortable", "wp-a11y"], False, 1);
+         Scripts.Add ("postbox", "/wp-admin/js/postbox" & Suffix & ".js", ["jquery-ui-sortable", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("postbox");
 
-         Scripts.Add ("tags-box", "/wp-admin/js/tags-boxsuffix.js", ["jquery", "tags-suggest"], False, 1);
+         Scripts.Add ("tags-box", "/wp-admin/js/tags-box" & Suffix & ".js", ["jquery", "tags-suggest"], "(false)", 1);
          Scripts.Set_Translations ("tags-box");
 
-         Scripts.Add ("tags-suggest", "/wp-admin/js/tags-suggestsuffix.js", ["jquery-ui-autocomplete", "wp-a11y"], False, 1);
+         Scripts.Add ("tags-suggest", "/wp-admin/js/tags-suggest" & Suffix & ".js", ["jquery-ui-autocomplete", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("tags-suggest");
 
          Scripts.Add (
-           "post", "/wp-admin/js/postsuffix.js",
+           "post", "/wp-admin/js/post" & Suffix & ".js",
            ["suggest", "wp-lists", "postbox", "tags-box", "underscore",
-            "word-count", "wp-a11y", "wp-sanitize", "clipboard"], False, 1);
+            "word-count", "wp-a11y", "wp-sanitize", "clipboard"], "(false)", 1);
          Scripts.Set_Translations ("post");
 
-         Scripts.Add ("editor-expand", "/wp-admin/js/editor-expandsuffix.js", ["jquery", "underscore"], False, 1);
+         Scripts.Add ("editor-expand", "/wp-admin/js/editor-expand" & Suffix & ".js", ["jquery", "underscore"], "(false)", 1);
 
-         Scripts.Add ("link", "/wp-admin/js/linksuffix.js", ["wp-lists", "postbox"], False, 1);
+         Scripts.Add ("link", "/wp-admin/js/link" & Suffix & ".js", ["wp-lists", "postbox"], "(false)", 1);
 
-         Scripts.Add ("comment", "/wp-admin/js/commentsuffix.js", ["jquery", "postbox"], False, 1);
+         Scripts.Add ("comment", "/wp-admin/js/comment" & Suffix & ".js", ["jquery", "postbox"], "(false)", 1);
          Scripts.Set_Translations ("comment");
 
-         Scripts.Add ("admin-gallery", "/wp-admin/js/gallerysuffix.js", ["jquery-ui-sortable"]);
+         Scripts.Add ("admin-gallery", "/wp-admin/js/gallery" & Suffix & ".js", ["jquery-ui-sortable"]);
 
-         Scripts.Add ("admin-widgets", "/wp-admin/js/widgetssuffix.js", ["jquery-ui-sortable", "jquery-ui-draggable", "jquery-ui-droppable", "wp-a11y"], False, 1);
+         Scripts.Add ("admin-widgets", "/wp-admin/js/widgets" & Suffix & ".js", ["jquery-ui-sortable", "jquery-ui-draggable", "jquery-ui-droppable", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("admin-widgets");
 
-         Scripts.Add ("media-widgets", "/wp-admin/js/widgets/media-widgetssuffix.js", ["jquery", "media-models", "media-views", "wp-api-request"]);
+         Scripts.Add ("media-widgets", "/wp-admin/js/widgets/media-widgets" & Suffix & ".js", ["jquery", "media-models", "media-views", "wp-api-request"]);
          Scripts.Add_Inline_Script ("media-widgets", "wp.mediaWidgets.init();", "after");
 
-         Scripts.Add ("media-audio-widget", "/wp-admin/js/widgets/media-audio-widgetsuffix.js", ["media-widgets", "media-audiovideo"]);
-         Scripts.Add ("media-image-widget", "/wp-admin/js/widgets/media-image-widgetsuffix.js", ["media-widgets"]);
-         Scripts.Add ("media-gallery-widget", "/wp-admin/js/widgets/media-gallery-widgetsuffix.js", ["media-widgets"]);
-         Scripts.Add ("media-video-widget", "/wp-admin/js/widgets/media-video-widgetsuffix.js", ["media-widgets", "media-audiovideo", "wp-api-request"]);
-         Scripts.Add ("text-widgets", "/wp-admin/js/widgets/text-widgetssuffix.js", ["jquery", "backbone", "editor", "wp-util", "wp-a11y"]);
-         Scripts.Add ("custom-html-widgets", "/wp-admin/js/widgets/custom-html-widgetssuffix.js", ["jquery", "backbone", "wp-util", "jquery-ui-core", "wp-a11y"]);
+         Scripts.Add ("media-audio-widget", "/wp-admin/js/widgets/media-audio-widget" & Suffix & ".js", ["media-widgets", "media-audiovideo"]);
+         Scripts.Add ("media-image-widget", "/wp-admin/js/widgets/media-image-widget" & Suffix & ".js", ["media-widgets"]);
+         Scripts.Add ("media-gallery-widget", "/wp-admin/js/widgets/media-gallery-widget" & Suffix & ".js", ["media-widgets"]);
+         Scripts.Add ("media-video-widget", "/wp-admin/js/widgets/media-video-widget" & Suffix & ".js", ["media-widgets", "media-audiovideo", "wp-api-request"]);
+         Scripts.Add ("text-widgets", "/wp-admin/js/widgets/text-widgets" & Suffix & ".js", ["jquery", "backbone", "editor", "wp-util", "wp-a11y"]);
+         Scripts.Add ("custom-html-widgets", "/wp-admin/js/widgets/custom-html-widgets" & Suffix & ".js", ["jquery", "backbone", "wp-util", "jquery-ui-core", "wp-a11y"]);
 
-         Scripts.Add ("theme", "/wp-admin/js/themesuffix.js", ["wp-backbone", "wp-a11y", "customize-base"], False, 1);
+         Scripts.Add ("theme", "/wp-admin/js/theme" & Suffix & ".js", ["wp-backbone", "wp-a11y", "customize-base"], "(false)", 1);
 
-         Scripts.Add ("inline-edit-post", "/wp-admin/js/inline-edit-postsuffix.js", ["jquery", "tags-suggest", "wp-a11y"], False, 1);
+         Scripts.Add ("inline-edit-post", "/wp-admin/js/inline-edit-post" & Suffix & ".js", ["jquery", "tags-suggest", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("inline-edit-post");
 
-         Scripts.Add ("inline-edit-tax", "/wp-admin/js/inline-edit-taxsuffix.js", ["jquery", "wp-a11y"], False, 1);
+         Scripts.Add ("inline-edit-tax", "/wp-admin/js/inline-edit-tax" & Suffix & ".js", ["jquery", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("inline-edit-tax");
 
-         Scripts.Add ("plugin-install", "/wp-admin/js/plugin-installsuffix.js", ["jquery", "jquery-ui-core", "thickbox"], False, 1);
+         Scripts.Add ("plugin-install", "/wp-admin/js/plugin-install" & Suffix & ".js", ["jquery", "jquery-ui-core", "thickbox"], "(false)", 1);
          Scripts.Set_Translations ("plugin-install");
 
-         Scripts.Add ("site-health", "/wp-admin/js/site-healthsuffix.js", ["clipboard", "jquery", "wp-util", "wp-a11y", "wp-api-request", "wp-url", "wp-i18n", "wp-hooks"], False, 1);
+         Scripts.Add ("site-health", "/wp-admin/js/site-health" & Suffix & ".js", ["clipboard", "jquery", "wp-util", "wp-a11y", "wp-api-request", "wp-url", "wp-i18n", "wp-hooks"], "(false)", 1);
          Scripts.Set_Translations ("site-health");
 
-         Scripts.Add ("privacy-tools", "/wp-admin/js/privacy-toolssuffix.js", ["jquery", "wp-a11y"], False, 1);
+         Scripts.Add ("privacy-tools", "/wp-admin/js/privacy-tools" & Suffix & ".js", ["jquery", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("privacy-tools");
 
-         Scripts.Add ("updates", "/wp-admin/js/updatessuffix.js", ["common", "jquery", "wp-util", "wp-a11y", "wp-sanitize", "wp-i18n"], False, 1);
+         Scripts.Add ("updates", "/wp-admin/js/updates" & Suffix & ".js", ["common", "jquery", "wp-util", "wp-a11y", "wp-sanitize", "wp-i18n"], "(false)", 1);
          Scripts.Set_Translations ("updates");
 
          if Did_Action ("init") then
@@ -1851,36 +1869,36 @@ is
          Scripts.Add ("farbtastic", "/wp-admin/js/farbtastic.js", ["jquery"], "1.2");
 
          Scripts.Add ("iris", "/wp-admin/js/iris.min.js", ["jquery-ui-draggable", "jquery-ui-slider", "jquery-touch-punch"], "1.1.1", 1);
-         Scripts.Add ("wp-color-picker", "/wp-admin/js/color-pickersuffix.js", ["iris"], False, 1);
+         Scripts.Add ("wp-color-picker", "/wp-admin/js/color-picker" & Suffix & ".js", ["iris"], "(false)", 1);
          Scripts.Set_Translations ("wp-color-picker");
 
-         Scripts.Add ("dashboard", "/wp-admin/js/dashboardsuffix.js", ["jquery", "admin-comments", "postbox", "wp-util", "wp-a11y", "wp-date"], False, 1);
+         Scripts.Add ("dashboard", "/wp-admin/js/dashboard" & Suffix & ".js", ["jquery", "admin-comments", "postbox", "wp-util", "wp-a11y", "wp-date"], "(false)", 1);
          Scripts.Set_Translations ("dashboard");
 
-         Scripts.Add ("list-revisions", "/wp-includes/js/wp-list-revisionssuffix.js");
+         Scripts.Add ("list-revisions", "/wp-includes/js/wp-list-revisions" & Suffix & ".js");
 
-         Scripts.Add ("media-grid", "/wp-includes/js/media-gridsuffix.js", ["media-editor"], False, 1);
-         Scripts.Add ("media", "/wp-admin/js/mediasuffix.js", ["jquery", "clipboard", "wp-i18n", "wp-a11y"], False, 1);
+         Scripts.Add ("media-grid", "/wp-includes/js/media-grid" & Suffix & ".js", ["media-editor"], "(false)", 1);
+         Scripts.Add ("media", "/wp-admin/js/media" & Suffix & ".js", ["jquery", "clipboard", "wp-i18n", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("media");
 
-         Scripts.Add ("image-edit", "/wp-admin/js/image-editsuffix.js", ["jquery", "jquery-ui-core", "json2", "imgareaselect", "wp-a11y"], False, 1);
+         Scripts.Add ("image-edit", "/wp-admin/js/image-edit" & Suffix & ".js", ["jquery", "jquery-ui-core", "json2", "imgareaselect", "wp-a11y"], "(false)", 1);
          Scripts.Set_Translations ("image-edit");
 
-         Scripts.Add ("set-post-thumbnail", "/wp-admin/js/set-post-thumbnailsuffix.js", ["jquery"], False, 1);
+         Scripts.Add ("set-post-thumbnail", "/wp-admin/js/set-post-thumbnail" & Suffix & ".js", ["jquery"], "(false)", 1);
          Scripts.Set_Translations ("set-post-thumbnail");
 
          --
          -- Navigation Menus: Adding underscore as a dependency to utilize _.debounce
          -- see https://core.trac.wordpress.org/ticket/42321
          --
-         Scripts.Add ("nav-menu", "/wp-admin/js/nav-menusuffix.js", ["jquery-ui-sortable", "jquery-ui-draggable", "jquery-ui-droppable", "wp-lists", "postbox", "json2", "underscore"]);
+         Scripts.Add ("nav-menu", "/wp-admin/js/nav-menu" & Suffix & ".js", ["jquery-ui-sortable", "jquery-ui-draggable", "jquery-ui-droppable", "wp-lists", "postbox", "json2", "underscore"]);
          Scripts.Set_Translations ("nav-menu");
 
-         Scripts.Add ("custom-header", "/wp-admin/js/custom-header.js", ["jquery-masonry"], False, 1);
-         Scripts.Add ("custom-background", "/wp-admin/js/custom-backgroundsuffix.js", ["wp-color-picker", "media-views"], False, 1);
-         Scripts.Add ("media-gallery", "/wp-admin/js/media-gallerysuffix.js", ["jquery"], False, 1);
+         Scripts.Add ("custom-header", "/wp-admin/js/custom-header.js", ["jquery-masonry"], "(false)", 1);
+         Scripts.Add ("custom-background", "/wp-admin/js/custom-background" & Suffix & ".js", ["wp-color-picker", "media-views"], "(false)", 1);
+         Scripts.Add ("media-gallery", "/wp-admin/js/media-gallery" & Suffix & ".js", ["jquery"], "(false)", 1);
 
-         Scripts.Add ("svg-painter", "/wp-admin/js/svg-painter.js", ["jquery"], False, 1);
+         Scripts.Add ("svg-painter", "/wp-admin/js/svg-painter.js", ["jquery"], "(false)", 1);
       end if;
    end Wp_Default_Scripts;
 
@@ -1934,7 +1952,7 @@ is
       Styles.Text_Direction  := +(if Is_RTL then "rtl" else "ltr");
 --    Styles.Text_Direction  := function_exists( "is_rtl" ) && (if is_rtl then "rtl" else "ltr");
       Styles.Default_Dirs :=
-        ["/wp-admin/", "/wp-includes/css/"];
+        ["/wp-admin/", "/ wp-includes/css/"];
 
       -- Open Sans is no longer used by core, but may be relied upon by themes
       -- and plugins.
@@ -2845,10 +2863,11 @@ is
       Zip : constant String :=
         (if Compress_CSS and then Constants.ENFORCE_GZIP then "gzip" else "");
 
-      Concat : constant String := Php.Strings.Trim (-Styles.Concat, ", ");
+      Concat : constant String := Trim (-Styles.Concat, ", ");
 
-      Type_Attr : String := (if Current_Theme_Supports ("html5", "style")
-                              then "" else " type=""text/css""");
+      Type_Attr : constant String :=
+        (if Current_Theme_Supports ("html5", "style")
+         then "" else " type=""text/css""");
    begin
 
       if Concat /= "" then
@@ -2856,7 +2875,9 @@ is
             Dir : constant String := -Styles.Text_Direction;
             Ver : constant String := -Styles.Default_Version;
 
-            Concat_2     : constant Array_Type := Str_Split (Concat, 128);
+            Concat_2 : constant Array_Type :=
+              Str_Split (Concat, Length => 128);
+
             Concatenated : UString;
          begin
             for A in Concat_2.Iterate loop
@@ -2880,7 +2901,7 @@ is
             if not Empty (Styles.Print_Code) then
                Echo ("<style" & Type_Attr & ">" & NL);
                Echo (-Styles.Print_Code);
-               Echo (NL & "</style>\n");
+               Echo (NL & "</style>" & NL);
             end if;
          end;
       end if;

@@ -67,7 +67,7 @@ is
          Update_Option (-This.Role_Key, From_Array (This.Roles));
       end if;
 
-      This.Role_Objects.Include (
+      This.Role_Objects.Insert (
         Key      => Role,
         New_Item => Class_Role.X_Construct (Role, Capabilities));
 

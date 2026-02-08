@@ -12,7 +12,9 @@ with Ada.Text_IO;
 with Php.Lists;
 with Php.Strings;
 
+with Helpers;
 with Helpers_3;
+with Logging;
 
 package body Class_Dependencies
 is
@@ -270,6 +272,40 @@ is
       null;
    end Add;
 
+   ---------
+   -- Add --
+   ---------
+
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : String;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : String    := "";
+                  Args   : Integer)
+   is
+      Unused : constant Boolean :=
+        Add (This, Handle, Src, Deps, Ver, Helpers.Image (Args));
+   begin
+      null;
+   end Add;
+
+   ---------
+   -- Add --
+   ---------
+
+   procedure Add (This   : in out Wp_Dependencies;
+                  Handle : String;
+                  Src    : Boolean;
+                  Deps   : List_Type := Empty_List;
+                  Ver    : String    := "";
+                  Args   : Integer   := 0)
+   is
+      Unused : constant Boolean :=
+        Add (This, Handle, Boolean'Image (Src), Deps, Ver, Helpers.Image (Args));
+   begin
+      null;
+   end Add;
+
    --------------
    -- Add_Data --
    --------------
@@ -373,6 +409,7 @@ is
       use Class_Dependency.Dependency_Maps;
    begin
       for Handle of Handles loop
+         Logging.Log ("enqueue", Handle);
          declare
             List  : constant List_Type := Explode ("?", Handle);
             First : constant String    := List (1);
@@ -576,8 +613,8 @@ is
       end if;
 
       Ada.Text_IO.Put_Line (This'Image);
-      This.Groups.Include (Key      => Handle,
-                           New_Item => Group);
+      This.Groups.Insert (Key      => Handle,
+                          New_Item => Group);
 
       return True;
    end Set_Group;
