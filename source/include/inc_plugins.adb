@@ -8,7 +8,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Arrays;
 with Php.Lists;
-with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
@@ -91,9 +90,7 @@ is
                Args      : Arrayable_Interfaces.Arrayable_Interface'Class)
                return Array_Type
    is
-      use Php.Arrays;
       use Php.Lists;
-      use Php.Misc;
       use Arrayable_Interfaces;
       use Globals;
       use Globals.Natural_Maps;
@@ -356,7 +353,6 @@ is
                 -- Arg_3     : String := "")
    is
       use Php.Lists;
-      use Php.Misc;
       use Arrayable_Interfaces;
       use Globals;
       use Globals.Count_Maps;
@@ -378,7 +374,7 @@ is
 --    if Isset (Wp_Filter, "all") then
          Global_Wp_Current_Filter.Append (Hook_Name);
          declare
-            All_Args : Arrayable_Interface'Class := Args; -- Func_Get_Args;
+            All_Args : constant Arrayable_Interface'Class := Args; -- Func_Get_Args;
          begin
             X_Wp_Call_All_Hook (All_Args);
          end;
@@ -399,7 +395,7 @@ is
       end if;
 
       declare
-         Arg_2 : Arrayable_Interface'Class := Args; -- Func_Get_Args;
+         Arg_2 : constant Arrayable_Interface'Class := Args; -- Func_Get_Args;
       begin
 --       Arg.Include (Arg_2, "");
 --       Arg.Include (Arg_3, "");
@@ -442,7 +438,7 @@ is
       if Has_Element (Global_Wp_Filter.Find ("all")) then
          Global_Wp_Current_Filter.Append (Hook_Name);
          declare
-            All_Args : Arrayable_Interface'Class := Args; -- Func_Get_Args;
+            All_Args : constant Arrayable_Interface'Class := Args; -- Func_Get_Args;
          begin
             X_Wp_Call_All_Hook (All_Args);
          end;
