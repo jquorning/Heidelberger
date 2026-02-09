@@ -27,6 +27,7 @@ with Binder;
 with Constants;
 with Globals;
 with Helpers;
+with Logging;
 with UStrings;
 with Wp_Common;
 
@@ -5645,26 +5646,17 @@ is
 --         return abs( (int) maybeint );
 -- end;
 
---
--- Marks a function as deprecated and inform when it has been used.
---
--- There is a hook {@see "deprecated_function_run"} that will be called that can be used
--- to get the backtrace up to what file and function called the deprecated
--- function.
---
--- The current behavior is to trigger a user error if `WP_DEBUG` is true.
---
--- This function is to be used in every function that is deprecated.
---
--- @since 2.5.0
--- @since 5.4.0 This function is no longer marked as "private".
--- @since 5.4.0 The error type is now classified as E_USER_DEPRECATED (used to default to E_USER_NOTICE).
---
--- @param string function    The function that was called.
--- @param string version     The version of WordPress that deprecated the function.
--- @param string replacement Optional. The function that should have been called. Default empty.
---
--- function _deprecated_function( function, version, replacement = "" ) then
+   ---------------------------
+   -- X_Deprecated_Function --
+   ---------------------------
+
+   procedure X_Deprecated_Function (Funct       : String;
+                                    Version     : String;
+                                    Replacement : String := "")
+   is
+   begin
+      Logging.Log ("deprecated_function", Funct);
+   end X_Deprecated_Function;
 
 --         --
 --         -- Fires when a deprecated function is called.
@@ -5923,33 +5915,17 @@ is
 --         end;
 -- end;
 
---
--- Marks a function argument as deprecated and inform when it has been used.
---
--- This function is to be used whenever a deprecated function argument is used.
--- Before this function is called, the argument must be checked for whether it was
--- used by comparing it to its default value or evaluating whether it is empty.
--- For example:
---
---     if ( ! empty( deprecated ) ) then
---         _deprecated_argument( __FUNCTION__, "3.0.0" );
---     end;
---
--- There is a hook deprecated_argument_run that will be called that can be used
--- to get the backtrace up to what file and function used the deprecated
--- argument.
---
--- The current behavior is to trigger a user error if WP_DEBUG is true.
---
--- @since 3.0.0
--- @since 5.4.0 This function is no longer marked as "private".
--- @since 5.4.0 The error type is now classified as E_USER_DEPRECATED (used to default to E_USER_NOTICE).
---
--- @param string function The function that was called.
--- @param string version  The version of WordPress that deprecated the argument used.
--- @param string message  Optional. A message regarding the change. Default empty.
---
--- function _deprecated_argument( function, version, message = "" ) then
+   ---------------------------
+   -- X_Deprecated_Argument --
+   ---------------------------
+
+   procedure X_Deprecated_Argument (Funct   : String;
+                                    Version : String;
+                                    Message : String := "")
+   is
+   begin
+      Logging.Log ("deprecated_argument", Funct);
+   end X_Deprecated_Argument;
 
 --         --
 --         -- Fires when a deprecated argument is called.
@@ -6018,27 +5994,19 @@ is
 --         end;
 -- end;
 
---
--- Marks a deprecated action or filter hook as deprecated and throws a notice.
---
--- Use the {@see "deprecated_hook_run"} action to get the backtrace describing where
--- the deprecated hook was called.
---
--- Default behavior is to trigger a user error if `WP_DEBUG` is true.
---
--- This function is called by the do_action_deprecated() and apply_filters_deprecated()
--- functions, and so generally does not need to be called directly.
---
--- @since 4.6.0
--- @since 5.4.0 The error type is now classified as E_USER_DEPRECATED (used to default to E_USER_NOTICE).
--- @access private
---
--- @param string hook        The hook that was used.
--- @param string version     The version of WordPress that deprecated the hook.
--- @param string replacement Optional. The hook that should have been used. Default empty.
--- @param string message     Optional. A message regarding the change. Default empty.
---
--- function _deprecated_hook( hook, version, replacement = "", message = "" ) then
+   -----------------------
+   -- X_Deprecated_Hook --
+   -----------------------
+
+   procedure X_Deprecated_Hook (Hook        : String;
+                                Version     : String;
+                                Replacement : String := "";
+                                Message     : String := "")
+   is
+   begin
+      Logging.Log ("deprecated_hook", Hook);
+   end X_Deprecated_Hook;
+
 --         --
 --         -- Fires when a deprecated hook is called.
 --         --

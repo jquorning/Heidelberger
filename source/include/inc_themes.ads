@@ -83,8 +83,7 @@ is
    -- @return array|false Valid themes found on success, false on failure.
    --
    function Search_Theme_Directories (Force : Boolean := False)
-                                      return Array_Type
-                                      is (Empty_Array);
+                                      return Array_Type;
 
    --
    -- Retrieves theme roots.

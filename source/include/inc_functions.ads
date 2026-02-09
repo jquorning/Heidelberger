@@ -427,8 +427,7 @@ is
    --
    procedure X_Deprecated_Function (Funct       : String;
                                     Version     : String;
-                                    Replacement : String := "")
-                                    is null;
+                                    Replacement : String := "");
 
    --
    -- Sets the headers to prevent caching for the different browsers.
@@ -542,8 +541,7 @@ is
    --
    procedure X_Deprecated_Argument (Funct   : String;
                                     Version : String;
-                                    Message : String := "")
-                                    is null;
+                                    Message : String := "");
 
    --
    -- Retrieves referer from '_wp_http_referer' or HTTP referer.
@@ -804,8 +802,7 @@ is
    procedure X_Deprecated_Hook (Hook        : String;
                                 Version     : String;
                                 Replacement : String := "";
-                                Message     : String := "")
-                                is null;
+                                Message     : String := "");
 
    --
    -- Marks something as being incorrectly called.

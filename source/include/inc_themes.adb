@@ -502,17 +502,14 @@ is
       return True;
    end Register_Theme_Directory;
 
--- --
--- -- Searches all registered theme directories for complete and valid themes.
--- --
--- -- @since 2.9.0
--- --
--- -- @global array wp_theme_directories
--- --
--- -- @param bool force Optional. Whether to force a new directory scan. Default false.
--- -- @return array|false Valid themes found on success, false on failure.
--- --
--- function search_theme_directories( force = false ) then
+   ------------------------------
+   -- Search_Theme_Directories --
+   ------------------------------
+
+   function Search_Theme_Directories (Force : Boolean := False)
+                                      return Array_Type
+   is (raise Program_Error with "not implemented");
+
 --         global wp_theme_directories;
 --         static found_themes = null;
 
