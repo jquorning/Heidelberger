@@ -12,6 +12,7 @@ with Php.Misc;
 with Php.Preg;
 with Php.Strings;
 
+with Arrayable_Arrays;
 with Constants;
 with Globals;
 with Helpers;
@@ -627,6 +628,8 @@ is
    is
       use Inc_Functions;
    begin
+      Logging.Log ("apply_filters_deprecated", Hook_Name);
+
       if not Has_Filter (Hook_Name) then
          return Args (1); -- [0]
       end if;
@@ -636,32 +639,31 @@ is
       return Apply_Filters_Ref_Array (Hook_Name, Args);
    end Apply_Filters_Deprecated;
 
--- --
--- -- Fires functions attached to a deprecated action hook.
--- --
--- -- When an action hook is deprecated, the do_action() call is replaced with
--- -- do_action_deprecated(), which triggers a deprecation notice and then fires
--- -- the original hook.
--- --
--- -- @since 4.6.0
--- --
--- -- @see _deprecated_hook()
--- --
--- -- @param string hook_name   The name of the action hook.
--- -- @param array  args        Array of additional function arguments to be passed to do_action().
--- -- @param string version     The version of WordPress that deprecated the hook.
--- -- @param string replacement Optional. The hook that should have been used. Default empty.
--- -- @param string message     Optional. A message regarding the change. Default empty.
--- --
--- function do_action_deprecated( hook_name, args, version, replacement = '', message = '' ) then
---         if ( ! has_action( hook_name ) ) then
---                 return;
---         end;
+   --------------------------
+   -- Do_Action_Deprecated --
+   --------------------------
 
---         _deprecated_hook( hook_name, version, replacement, message );
+   procedure Do_Action_Deprecated (Hook_Name   : String;
+                                   Args        : List_Type;
+                                   Version     : String;
+                                   Replacement : String := "";
+                                   Message     : String := "")
+   is
+      use Arrayable_Arrays;
+      use Inc_Functions;
 
---         do_action_ref_array( hook_name, args );
--- end;
+      Arry : Arrayable_Array;
+   begin
+      Logging.Log ("do_action_deprecated", Hook_Name);
+
+      if not Has_Action (Hook_Name) then
+         return;
+      end if;
+
+      X_Deprecated_Hook (Hook_Name, Version, Replacement, Message);
+
+      Do_Action_Ref_Array (Hook_Name, Arry); -- Args);
+   end Do_Action_Deprecated;
 
    -----------------------------------------
    ---- Functions for handling plugins. ----

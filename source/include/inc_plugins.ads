@@ -553,8 +553,7 @@ is
                                    Args        : List_Type;
                                    Version     : String;
                                    Replacement : String := "";
-                                   Message     : String := "")
-                                   is null;
+                                   Message     : String := "");
 
    --
    -- Adds a callback function to an action hook.
