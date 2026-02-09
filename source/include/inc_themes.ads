@@ -281,8 +281,19 @@ is
    -- @return bool Whether a header video is set or not.
    --
    function Has_Header_Video
-            return Boolean
-            is (False);
+            return Boolean;
+
+   --
+   -- Retrieves header video URL for custom header.
+   --
+   -- Uses a local video if present, or falls back to an external video.
+   --
+   -- @since 4.7.0
+   --
+   -- @return string|false Header video URL or false if there is no video.
+   --
+   function Get_Header_Video_URL
+            return String;
 
    --
    -- Checks a theme's support for a given feature.

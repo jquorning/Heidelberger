@@ -1684,53 +1684,53 @@ is
 --         end;
 -- end;
 
--- --
--- -- Checks whether a header video is set or not.
--- --
--- -- @since 4.7.0
--- --
--- -- @see get_header_video_url()
--- --
--- -- @return bool Whether a header video is set or not.
--- --
--- function has_header_video() then
---         return (bool) get_header_video_url();
--- end;
+   ----------------------
+   -- Has_Header_Video --
+   ----------------------
 
--- --
--- -- Retrieves header video URL for custom header.
--- --
--- -- Uses a local video if present, or falls back to an external video.
--- --
--- -- @since 4.7.0
--- --
--- -- @return string|false Header video URL or false if there is no video.
--- --
--- function get_header_video_url() then
---         id = absint( get_theme_mod( "header_video" ) );
+   function Has_Header_Video
+            return Boolean
+   is
+   begin
+      return Get_Header_Video_URL /= "";
+   end Has_Header_Video;
 
---         if ( id ) then
---                 // Get the file URL from the attachment ID.
---                 url = wp_get_attachment_url( id );
---         end; else then
---                 url = get_theme_mod( "external_header_video" );
---         end;
+   --------------------------
+   -- Get_Header_Video_URL --
+   --------------------------
 
---         --
---         -- Filters the header video URL.
---         --
---         -- @since 4.7.3
---         --
---         -- @param string url Header video URL, if available.
---         --
---         url = apply_filters( "get_header_video_url", url );
+   function Get_Header_Video_URL
+            return String
+   is
+      use Wp_Common;
+      use Class_Posts;
+      use Inc_Formatting;
+      use Inc_Link_Templates;
+      use Inc_Posts;
 
---         if ( ! id && ! url ) then
---                 return false;
---         end;
+      Id : constant Post_Id_Type :=
+        Post_Id_Type (Integer'(Get_Theme_Mod ("header_video")));
 
---         return sanitize_url( set_url_scheme( url ) );
--- end;
+      URL_2 : constant String :=
+        (if Id /= 0
+         then Wp_Get_Attachment_URL (Id) -- Get the file URL from the attachment ID.
+         else Get_Theme_Mod ("external_header_video"));
+
+      --
+      -- Filters the header video URL.
+      --
+      -- @since 4.7.3
+      --
+      -- @param string url Header video URL, if available.
+      --
+      URL : constant String := Apply_Filters ("get_header_video_url", URL_2);
+   begin
+      if Id = 0 and then URL = "" then
+         return ""; -- false;
+      end if;
+
+      return Sanitize_URL (Set_URL_Scheme (URL));
+   end Get_Header_Video_URL;
 
 -- --
 -- -- Displays header video URL.
