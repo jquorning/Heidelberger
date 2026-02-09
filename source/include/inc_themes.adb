@@ -12,6 +12,7 @@ with Php.Echoing;
 with Php.Files;
 with Php.HTML;
 with Php.Lists;
+with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
@@ -1073,82 +1074,99 @@ is
 --         return true;
 -- end;
 
--- --
--- -- Retrieves all theme modifications.
--- --
--- -- @since 3.1.0
--- -- @since 5.9.0 The return value is always an array.
--- --
--- -- @return array Theme modifications.
--- --
--- function get_theme_mods() then
---         theme_slug = get_option( "stylesheet" );
---         mods       = get_option( "theme_mods_theme_slug" );
+   --------------------
+   -- Get_Theme_Mods --
+   --------------------
 
---         if ( false === mods ) then
---                 theme_name = get_option( "current_theme" );
---                 if ( false === theme_name ) then
---                         theme_name = wp_get_theme().get( "Name" );
---                 end;
+   function Get_Theme_Mods
+            return Array_Type
+   is
+      use Class_Themes;
+      use Inc_Load;
+      use Inc_Options;
 
---                 mods = get_option( "mods_theme_name" ); // Deprecated location.
---                 if ( is_admin() && false !== mods ) then
---                         update_option( "theme_mods_theme_slug", mods );
---                         delete_option( "mods_theme_name" );
---                 end;
---         end;
+      Theme_Slug : constant String :=
+        Get_Option ("stylesheet");
 
---         if ( ! is_array( mods ) ) then
---                 mods = array();
---         end;
+      Mods : constant Array_Type :=
+        Get_Option ("theme_mods_" & Theme_Slug);
+   begin
+      if Empty_Array = Mods then -- false
+         declare
+            Theme_Name_2 : constant String := Get_Option ("current_theme");
 
---         return mods;
--- end;
+            Theme : Wp_Theme := Wp_Get_Theme;
 
--- --
--- -- Retrieves theme modification value for the active theme.
--- --
--- -- If the modification name does not exist and `default` is a string, then the
--- -- default will be passed through the {@link https://www.php.net/sprintf sprintf()}
--- -- PHP function with the template directory URI as the first value and the
--- -- stylesheet directory URI as the second value.
--- --
--- -- @since 2.1.0
--- --
--- -- @param string name    Theme modification name.
--- -- @param mixed  default Optional. Theme modification default value. Default false.
--- -- @return mixed Theme modification value.
--- --
--- function get_theme_mod( name, default = false ) then
---         mods = get_theme_mods();
+            Theme_Name : String :=
+              (if "" = Theme_Name_2 -- false
+               then Theme.Get ("Name")
+               else Theme_Name_2);
 
---         if ( isset( mods[ name ] ) ) then
---                 --
---                 -- Filters the theme modification, or "theme_mod", value.
---                 --
---                 -- The dynamic portion of the hook name, `name`, refers to the key name
---                 -- of the modification array. For example, "header_textcolor", "header_image",
---                 -- and so on depending on the theme options.
---                 --
---                 -- @since 2.2.0
---                 --
---                 -- @param mixed current_mod The value of the active theme modification.
---                 --
---                 return apply_filters( "theme_mod_thennameend;", mods[ name ] );
---         end;
+            Mods_2 : constant String :=
+              Get_Option ("mods_theme_name"); -- Deprecated location.
+         begin
+            if Is_Admin and "" /= Mods_2 then -- false
+               Update_Option ("theme_mods_" & Theme_Slug, From_String (Mods_2));
+               Delete_Option ("mods_" & Theme_Name);
+            end if;
+         end;
+      end if;
 
---         if ( is_string( default ) ) then
---                 // Only run the replacement if an sprintf() string format pattern was found.
---                 if ( preg_match( "#(?<!%)%(?:\d+\?)?s#", default ) ) then
---                         // Remove a single trailing percent sign.
---                         default = preg_replace( "#(?<!%)%#", "", default );
---                         default = sprintf( default, get_template_directory_uri(), get_stylesheet_directory_uri() );
---                 end;
---         end;
+      -- if ( ! is_array( mods ) ) then
+      --    mods = array();
+      -- end if;
 
---         -- This filter is documented in wp-includes/theme.php--
---         return apply_filters( "theme_mod_thennameend;", default );
--- end;
+      return Mods;
+   end Get_Theme_Mods;
+
+   -------------------
+   -- Get_Theme_Mod --
+   -------------------
+
+   function Get_Theme_Mod (Name    : String;
+                           Default : String := "")
+                           return String
+   is
+      use Php.Preg;
+      use Php.Strings;
+      use Php.Types;
+      use UStrings;
+      use Wp_Common;
+
+      Mods      : constant Array_Type := Get_Theme_Mods;
+      Default_2 : UString             := +Default;
+   begin
+      if Isset (Mods, Name) then
+         --
+         -- Filters the theme modification, or "theme_mod", value.
+         --
+         -- The dynamic portion of the hook name, `name`, refers to the key name
+         -- of the modification array. For example, "header_textcolor", "header_image",
+         -- and so on depending on the theme options.
+         --
+         -- @since 2.2.0
+         --
+         -- @param mixed current_mod The value of the active theme modification.
+         --
+         return Apply_Filters ("theme_mod_" & Name, Get_As_String (Mods, Name));
+      end if;
+
+      if Is_String (Default) then
+         -- Only run the replacement if an sprintf() string format pattern was found.
+         if Preg_Match ("#(?<!%)%(?:\d+\?)?s#", Default) then
+            -- Remove a single trailing percent sign.
+            Default_2 := +Preg_Replace ("#(?<!%)%#", "", Default);
+            Default_2 := +Sprintf (-Default_2,
+                                   [
+                                     1 => Get_Template_Directory_URI,
+                                     2 => Get_Stylesheet_Directory_URI
+                                   ]);
+         end if;
+      end if;
+
+      -- This filter is documented in wp-includes/theme.php
+      return Apply_Filters ("theme_mod_" & Name, -Default_2);
+   end Get_Theme_Mod;
 
 -- --
 -- -- Updates theme modification value for the active theme.

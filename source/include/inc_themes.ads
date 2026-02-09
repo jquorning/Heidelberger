@@ -328,8 +328,7 @@ is
    -- @return array Theme modifications.
    --
    function Get_Theme_Mods
-            return Array_Type
-            is (Empty_Array);
+            return Array_Type;
 
    --
    -- Renders the Custom CSS style element.
@@ -391,8 +390,7 @@ is
 
    function Get_Theme_Mod (Name    : String;
                            Default : String := "")
-                           return String
-                           is ("XXX-023");
+                           return String;
 
    --
    -- Updates theme modification value for the active theme.
