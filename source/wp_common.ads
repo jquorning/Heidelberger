@@ -611,6 +611,12 @@ is
                Value     : Array_Lists.Array_List)
                return Array_Lists.Array_List;
 
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Multi_Type;
+               Old       : Multi_Type)
+               return Multi_Type;
+
    function Apply_Filters_Deprecated
               (Hook_Name : String;
                Value     : Array_Type;

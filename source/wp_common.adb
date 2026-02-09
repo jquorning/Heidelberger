@@ -1460,6 +1460,21 @@ is
       return Value;
    end Apply_Filters;
 
+   function Apply_Filters
+              (Hook_Name : String;
+               Value     : Multi_Type;
+               Old       : Multi_Type)
+               return Multi_Type
+   is
+      use Arrayable_Arrays;
+
+      Unused : Array_Type;
+   begin
+      Logging.Log ("apply_filters", Hook_Name);
+      Unused := Inc_Plugins.Apply_Filters (Hook_Name, Empty_Array, Empty_Arrayable);
+      return Value;
+   end Apply_Filters;
+
    procedure Do_Action (Hook_Name : String;
                         Arg_2     : String := "";
                         Arg_3     : String := "")

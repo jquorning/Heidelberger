@@ -403,13 +403,11 @@ is
    -- @return bool True if the value was updated, false otherwise.
    --
    function Set_Theme_Mod (Name  : String;
-                           Value : Array_Type)
-                           return Boolean
-                           is (False);
+                           Value : Multi_Type) -- Array_Type)
+                           return Boolean;
 
    procedure Set_Theme_Mod (Name  : String;
-                            Value : Integer)
-                            is null;
+                            Value : Integer);
 
    --
    -- Checks whether a header image is set or not.

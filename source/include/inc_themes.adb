@@ -1168,38 +1168,54 @@ is
       return Apply_Filters ("theme_mod_" & Name, -Default_2);
    end Get_Theme_Mod;
 
--- --
--- -- Updates theme modification value for the active theme.
--- --
--- -- @since 2.1.0
--- -- @since 5.6.0 A return value was added.
--- --
--- -- @param string name  Theme modification name.
--- -- @param mixed  value Theme modification value.
--- -- @return bool True if the value was updated, false otherwise.
--- --
--- function set_theme_mod( name, value ) then
---         mods      = get_theme_mods();
---         old_value = isset( mods[ name ] ) ? mods[ name ] : false;
+   -------------------
+   -- Set_Theme_Mod --
+   -------------------
 
---         --
---         -- Filters the theme modification, or "theme_mod", value on save.
---         --
---         -- The dynamic portion of the hook name, `name`, refers to the key name
---         -- of the modification array. For example, "header_textcolor", "header_image",
---         -- and so on depending on the theme options.
---         --
---         -- @since 3.9.0
---         --
---         -- @param mixed value     The new value of the theme modification.
---         -- @param mixed old_value The current value of the theme modification.
---         --
---         mods[ name ] = apply_filters( "pre_set_theme_mod_thennameend;", value, old_value );
+   function Set_Theme_Mod (Name  : String;
+                           Value : Multi_Type) -- Array_Type)
+                           return Boolean
+   is
+      use Inc_Options;
+      use Wp_Common;
 
---         theme = get_option( "stylesheet" );
+      Mods : Array_Type := Get_Theme_Mods;
 
---         return update_option( "theme_mods_theme", mods );
--- end;
+      Old_Value : constant Multi_Type :=
+        (if Isset (Mods, Name) then Get (Mods, Name) else From_Null); -- false
+   begin
+      --
+      -- Filters the theme modification, or "theme_mod", value on save.
+      --
+      -- The dynamic portion of the hook name, `name`, refers to the key name
+      -- of the modification array. For example, "header_textcolor", "header_image",
+      -- and so on depending on the theme options.
+      --
+      -- @since 3.9.0
+      --
+      -- @param mixed value     The new value of the theme modification.
+      -- @param mixed old_value The current value of the theme modification.
+      --
+      Set (Mods, Name,
+           Apply_Filters ("pre_set_theme_mod_" & Name, Value, Old_Value));
+      declare
+         Theme : constant String := Get_Option ("stylesheet");
+      begin
+         return Update_Option ("theme_mods_" & Theme, From_Array (Mods));
+      end;
+   end Set_Theme_Mod;
+
+   -------------------
+   -- Set_Theme_Mod --
+   -------------------
+
+   procedure Set_Theme_Mod (Name  : String;
+                            Value : Integer)
+   is
+      Unused : constant Boolean := Set_Theme_Mod (Name, From_Integer (Value));
+   begin
+      null;
+   end Set_Theme_Mod;
 
 -- --
 -- -- Removes theme modification name from active theme list.
