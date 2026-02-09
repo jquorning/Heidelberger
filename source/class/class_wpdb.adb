@@ -798,15 +798,15 @@ is
             Wp_Load_Translations_Early;
             declare
                Message : constant String :=
-                 "<h1>" & abs "Cannot select database" & "</h1>\n" &
+                 "<h1>" & abs "Cannot select database" & "</h1>" & NL &
                  "<p>" & Sprintf (
                    -- translators: %s: Database name.
                    abs "The database server could be connected to (which means your username and password is okay) but the %s database could not be selected.",
                    [1 => "<code>" & HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"]
-                 ) & "</p>\n" &
+                 ) & "</p>" & NL &
 
-                 "<ul>\n" &
-                 "<li>" & abs "Are you sure it exists?" & "</li>\n" &
+                 "<ul>" & NL &
+                 "<li>" & abs "Are you sure it exists?" & "</li>" & NL &
 
                  "<li>" & Sprintf (
                    -- translators: 1: Database user, 2: Database name.
@@ -818,21 +818,21 @@ is
                      2 => "<code>" &
                           HTML_Special_Chars (DB, ENT_QUOTES) & "</code>"
                    ]
-                 ) & "</li>\n" &
+                 ) & "</li>" & NL &
 
                  "<li>" & Sprintf (
                    -- translators: %s: Database name.
                    abs "On some systems the name of your database is prefixed with your username, so it would be like <code>username_%1s</code>. Could that be the problem?",
                    [1 => HTML_Special_Chars (DB, ENT_QUOTES)]
-                 ) & "</li>\n" &
+                 ) & "</li>" & NL &
 
-                 "</ul>\n" &
+                 "</ul>" & NL &
 
                  "<p>" & Sprintf (
                    -- translators: %s: Support forums URL.
                    abs "If you do not know how to set up a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href=""%s"">WordPress Support Forums</a>.",
                    [1 => abs "https://wordpress.org/support/forums/"]
-                 ) & "</p>\n";
+                 ) & "</p>" & NL;
             begin
                This.Bail (Message, "db_select_fail");
             end;
@@ -1514,7 +1514,7 @@ is
 
          declare
             Message : constant String :=
-              "<h1>" & abs "Error establishing a database connection" & "</h1>\n" &
+              "<h1>" & abs "Error establishing a database connection" & "</h1>" & NL &
 
               "<p>" & Sprintf (
                 -- translators: 1: wp-config.php, 2: Database host.
@@ -1524,19 +1524,19 @@ is
                   2 => "<code>" &
                        HTML_Special_Chars (-This.Dbhost, ENT_QUOTES) & "</code>"
                 ]
-              ) & "</p>\n" &
+              ) & "</p>" & NL &
 
-              "<ul>\n" &
-              "<li>" & abs "Are you sure you have the correct username and password?" & "</li>\n" &
-              "<li>" & abs "Are you sure you have typed the correct hostname?" & "</li>\n" &
-              "<li>" & abs "Are you sure the database server is running?" & "</li>\n" &
-              "</ul>\n" &
+              "<ul>" & NL &
+              "<li>" & abs "Are you sure you have the correct username and password?" & "</li>" & NL &
+              "<li>" & abs "Are you sure you have typed the correct hostname?" & "</li>" & NL &
+              "<li>" & abs "Are you sure the database server is running?" & "</li>" & NL &
+              "</ul>" & NL &
 
               "<p>" & Sprintf (
                  -- translators: %s: Support forums URL.
                  abs "If you are unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href=""%s"">WordPress Support Forums</a>.",
                  [1 => abs "https://wordpress.org/support/forums/"]
-               ) & "</p>\n";
+               ) & "</p>" & NL;
          begin
             This.Bail (Message, "db_connect_fail");
          end;

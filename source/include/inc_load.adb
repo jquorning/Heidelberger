@@ -601,6 +601,7 @@ is
 
    procedure Wp_Set_Wpdb_Vars
    is
+      use Php.Strings;
       use Array_Lists;
       use UStrings;
       use Inc_Functions;
@@ -609,9 +610,9 @@ is
 --    global (Table_Prefix);
       Prefix : UString;
    begin
-      -- if not Empty (Wpdb.error) then
-      --    Dead_DB; -- ()
-      -- end if;
+      if not Empty (-Globals.WpDB.Error) then
+         Dead_DB;
+      end if;
 
       Globals.WpDB.Field_Types := To_Array_Type ([
                 Build ("post_author",      "%d"),

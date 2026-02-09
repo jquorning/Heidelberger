@@ -86,7 +86,7 @@ is
 
    WP_DEBUG         : Boolean := True;
    WP_DEBUG_DISPLAY : Boolean;
-   SCRIPT_DEBUG     : Boolean := False;
+   SCRIPT_DEBUG     : Boolean := True;
    REST_REQUEST     : Boolean := False;
 
    WP_HTTP_BLOCK_EXTERNAL : Boolean := False;

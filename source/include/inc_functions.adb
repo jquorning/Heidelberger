@@ -5613,26 +5613,33 @@ is
    -- Dead_DB --
    -------------
 
-   procedure Dead_Db
-   is null;
---         global wpdb;
+   procedure Dead_DB
+   is
+      use Php.Errors;
+      use Php.Files;
+      use UStrings;
+      use Inc_Load;
+      use Inc_L10n;
+--    global wpdb;
+   begin
+      Wp_Load_Translations_Early;
 
---         wp_load_translations_early();
+      -- Load custom DB error template, if present.
+      if File_Exists (-(Globals.WP_CONTENT_DIR) & "/db-error.php") then
+         Logging.Log ("dead_db", "insert db-error.php here");
+--       require_once WP_CONTENT_DIR . "/db-error.php";
+         Die;
+      end if;
 
---         // Load custom DB error template, if present.
---         if ( file_exists( WP_CONTENT_DIR . "/db-error.php" ) ) then
---                 require_once WP_CONTENT_DIR . "/db-error.php";
---                 die();
---         end;
+      -- If installing or in the admin, provide the verbose message.
+      if Wp_Installing or else Constants.WP_ADMIN then
+         Wp_Die (-Globals.WpDB.Error);
+      end if;
 
---         // If installing or in the admin, provide the verbose message.
---         if ( wp_installing() || defined( "WP_ADMIN" ) ) then
---                 wp_die( wpdb->error );
---         end;
-
---         // Otherwise, be terse.
---         wp_die( "<h1>" . __( "Error establishing a database connection" ) . "</h1>", __( "Database Error" ) );
--- end;
+      -- Otherwise, be terse.
+      Wp_Die ("<h1>" & abs "Error establishing a database connection" & "</h1>",
+              abs "Database Error");
+   end Dead_DB;
 
 --
 -- Converts a value to non-negative integer.
