@@ -9,8 +9,6 @@
 -- @since 0.71
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Php.Arrays;
 with Php.Errors;
 with Php.Files;
@@ -23,14 +21,15 @@ with Php.Preg;
 with Php.Strings;
 with Php.Types;
 
+with Bind_ADO;
 with MySQL_Bind;
-with MySQLi_Bind;
 
 with Array_Lists;
 with Arrays.IO;
 with Constants;
 with Globals;
 with Helpers;
+with Logging;
 with Wp_Common;
 
 with Inc_Functions;
@@ -318,7 +317,7 @@ is
       use UStrings;
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
 
       Charset_2 : constant String :=
         (if not Isset (Charset)
@@ -336,7 +335,7 @@ is
          begin
             case This.Engine is -- if This.Use_Mysqli then
 
-            when Engine_MySQLi =>
+            when Engine_ADO =>
                if
 --               Function_Exists ("mysqli_set_charset") and then
                  This.Has_Cap ("set_charset")
@@ -354,11 +353,11 @@ is
                                 String (This.Prepare (" COLLATE %s",
                                                       [1 => Collate_2])));
                      end if;
-                     Mysqli_Query (Dbh, -Query);
+                     Bind_ADO.Query (Dbh, -Query);
                   end;
                end if;
-            when Engine_MySQL =>   --                     else
 
+            when Engine_MySQL =>
                if
 --               Function_Exists ("mysql_set_charset") and then
                  This.Has_Cap ("set_charset")
@@ -398,28 +397,30 @@ is
       use Php.Arrays;
       use Php.Lists;
       use Php.Strings;
+      use Array_Lists;
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Res       : Array_Type;
+      Res_2     : Array_List;
       Modes_Str : UString;
       Modes_2   : Array_Type := Modes;
    begin
       if Modes_2.Is_Empty then
          case This.Engine is
 
-         when Engine_MySQLi =>
-            Res := Mysqli_Query (This.Dbh, "SELECT @@SESSION.sql_mode");
+         when Engine_ADO =>
+            Res_2 := Bind_ADO.Query (This.Dbh, "SELECT @@SESSION.sql_mode");
+            Res := Res_2.First_Element; -- Empty_Array;
+            Arrays.IO.Dump (Res);
 
          when Engine_MySQL =>
             Res := Mysql_Query ("SELECT @@SESSION.sql_mode", This.Dbh);
 
          when Engine_SQLite =>
-            Put_Line ("set_sql_mode: no query session");
+            Logging.Log ("set_sql_mode", "no query session");
             Res := Empty_Array;
 --          pragma Assert (False);
          end case;
@@ -430,22 +431,22 @@ is
 
          case This.Engine is
 
-         when Engine_MySQLi =>
+         when Engine_ADO =>
             declare
-               Modes_Array : constant List_Type :=
-                 Mysqli_Fetch_Array (Res);
+               Modes_Array : constant Array_Type :=
+                 Bind_ADO.Fetch_Array (Res_2);
             begin
-               if Empty (Modes_Array (1)) then -- [0]
+               if Empty (As_String (Modes_Array.First_Element)) then -- [0]
                   return;
                end if;
-               Modes_Str := +Modes_Array (1); -- [0]
+               Modes_Str := +As_String (Modes_Array.First_Element); -- [0]
             end;
 
          when Engine_MySQL =>
             Modes_Str := +Mysql_Result (Res, 0);
 
          when Engine_SQLite =>
-            Put_Line ("set_sql_mode: modes_str");
+            Logging.Log ("set_sql_mode", -Modes_Str);
             Modes_Str := Null_UString;
 --          pragma Assert (False);
          end case;
@@ -487,12 +488,15 @@ is
          Mode : constant String := Implode (",", Modes_2);
       begin
          case This.Engine is
-         when Engine_MySQLi =>
-            Mysqli_Query (This.Dbh, "SET SESSION sql_mode='" & Mode & "'");
+
+         when Engine_ADO =>
+            Bind_ADO.Query (This.Dbh, "SET SESSION sql_mode='" & Mode & "'");
+
          when Engine_MySQL =>
             Mysql_Query ("SET SESSION sql_mode='" & Mode & "'", This.Dbh);
+
          when Engine_SQLite =>
-            Put_Line ("set_sql_mode: no set session");
+            Logging.Log ("set_sql_mode", "no set session");
 --          pragma Assert (False);
          end case;
       end;
@@ -515,6 +519,7 @@ is
       Unused_Match : List_Type;
    begin
       if 0 = Preg_Match ("|[^a-z0-9_]|i", Prefix, Unused_Match) then
+         Logging.Log ("set_prefix", "Invalid database prefix");
          return "";
 --       return new Wp_Error ("invalid_db_prefix", "Invalid database prefix");
       end if;
@@ -544,7 +549,7 @@ is
             return -Old_Prefix;
          end if;
 
-         This.Prefix := +This.Get_Blog_Prefix; -- ()
+         This.Prefix := +This.Get_Blog_Prefix;
 
          -- for A of This.Tables ("blog") loop
          --    declare
@@ -769,7 +774,6 @@ is
       use Php.Strings;
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
       use UStrings;
       use Inc_Load;
       use Inc_L10n;
@@ -782,12 +786,12 @@ is
       -- end if;
 
       case This.Engine is
-      when Engine_MySQLi =>
-         Success := Mysqli_Select_DB (Dbh, DB);
+      when Engine_ADO =>
+         Success := Bind_ADO.Select_DB (Dbh, DB);
       when Engine_MySQL =>
          Success := Mysql_Select_DB (DB, Dbh);
       when Engine_SQLite =>
-         Put_Line ("selectt: no select_db");
+         Logging.Log ("selectt", "no select_db");
          Success := False;
 --       pragma Assert (False);
       end case;
@@ -871,7 +875,7 @@ is
       use Php.Strings;
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
       use UStrings;
       use Inc_Functions;
       use Inc_Load;
@@ -885,7 +889,7 @@ is
 
       if This.Dbh /= 0 then
          case This.Engine is
-         when Engine_MySQLi =>
+         when Engine_ADO =>
             Escaped := +MySQLi_Real_Escape_String (This.Dbh, Item);
          when Engine_MySQL =>
             Escaped := +MySQL_Real_Escape_String (Item, This.Dbh);
@@ -1005,7 +1009,7 @@ is
       end Func;
 
    begin
-      Put_Line ("inc_class_wpdb.prepare: " & String (Query));
+      Logging.Log ("class_wpdb.prepare", String (Query));
 
       if Query = "" then
          return "";  -- "" added jq
@@ -1167,8 +1171,7 @@ is
                Query_9 : constant Statement_Type :=
                  Db.Add_Placeholder_Escape (Query_8);
             begin
-               Ada.Text_IO.Put_Line (
-                 "inc_class_wpdb.prepare: " & String (Query_9));
+               Logging.Log ("class_wpdb.prepare", String (Query_9));
 
                return Query_9;
             end;
@@ -1327,7 +1330,7 @@ is
    is
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
       use UStrings;
    begin
       This.Last_Result   := String_Vectors.Empty_Vector;
@@ -1343,7 +1346,7 @@ is
 --      then
       case This.Engine is
 
-      when Engine_MySQLi =>
+      when Engine_ADO =>
          Mysqli_Free_Result (This.Result);
          This.Result := Databases.None; -- null;
 
@@ -1357,8 +1360,8 @@ is
          end if;
 
          -- Clear out any results from a multi-query.
-         while Mysqli_More_Results (This.Dbh) loop
-            Mysqli_Next_Result (This.Dbh);
+         while Bind_ADO.More_Results (This.Dbh) loop
+            Bind_ADO.Next_Result (This.Dbh);
          end loop;
 
       when Engine_MySQL =>
@@ -1386,12 +1389,14 @@ is
       use Php.Strings;
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
       use UStrings;
       use Inc_Load;
       use Inc_L10n;
    begin
-      This.Engine := Databases.Engine_SQLite; -- Engine_MySQL;
+      Logging.Log ("db_connect", "Allow_Bail: " & Boolean'Image (Allow_Bail));
+
+      This.Engine := Databases.Engine_ADO; -- Engine_MySQL;
 --    This.Is_MySQL := True;
 
       --
@@ -1404,10 +1409,10 @@ is
          Client_Flags : constant Integer := 0;
          -- defined("MYSQL_CLIENT_FLAGS") ? MYSQL_CLIENT_FLAGS : 0;
       begin
---       if This.Use_Mysqli then
+
          case This.Engine is
 
-         when Engine_MySQLi =>
+         when Engine_ADO =>
             --
             -- Set the MySQLi error reporting off because WordPress handles its own.
             -- This is due to the default value change from `MYSQLI_REPORT_OFF`
@@ -1415,12 +1420,12 @@ is
             --
             Mysqli_Report (MYSQLI_REPORT_OFF);
 
-            This.Dbh := Mysqli_Init; -- ();
+            This.Dbh := Bind_ADO.Initialize;
 
             declare
                Host    : UString := This.Dbhost;
-               Port    : constant Natural  := 0;   -- Duration := null;
-               Socket  : constant String   := ""; -- Duration := null;
+               Port    : constant Natural  := 0;
+               Socket  : constant String   := "";
                Is_IPv6 : constant Boolean  := False;
                Host_Data : constant Array_Type := This.Parse_DB_Host (-This.Dbhost);
             begin
@@ -1431,8 +1436,8 @@ is
 
                --
                -- If using the `mysqlnd` library, the IPv6 address needs to be enclosed
-               -- in square brackets, whereas it doesn't while using the `libmysqlclient`
-               -- library.
+               -- in square brackets, whereas it doesn't while using the
+               -- `libmysqlclient` library.
                -- @see https://bugs.php.net/bug.php?id=67563
                --
                if Is_IPv6 then -- and then Extension_Loaded ("mysqlnd") then
@@ -1440,14 +1445,14 @@ is
                end if;
 
                if Constants.WP_DEBUG then
-                  Mysqli_Real_Connect
+                  Bind_ADO.Real_Connect
                     (This.Dbh, -Host, -This.Dbuser, -This.Dbpassword,
                      "", -- null,
                      Port, Socket, Client_Flags);
                else
                   -- phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                   -- @
-                  Mysqli_Real_Connect
+                  Bind_ADO.Real_Connect
                     (This.Dbh, -Host, -This.Dbuser, -This.Dbpassword,
                      "", -- null,
                      Port, Socket, Client_Flags);
@@ -1469,7 +1474,8 @@ is
                   if This.Has_Connected then
                      Attempt_Fallback := False;
 
-                  elsif False then -- Defined ("WP_USE_EXT_MYSQL") and then not WP_USE_EXT_MYSQL then
+                  elsif False then
+                  -- Defined ("WP_USE_EXT_MYSQL") and then not WP_USE_EXT_MYSQL then
                      Attempt_Fallback := False;
 
                   elsif True then -- not Function_Exists ("mysql_connect") then
@@ -1478,13 +1484,12 @@ is
 
                   if Attempt_Fallback then
 --                   This.Use_Mysqli := False;
-                     return This.DB_Connect (Allow_Bail);
+                     return This.DB_Connect (Allow_Bail => Allow_Bail);
                   end if;
                end;
             end if;
 
          when Engine_MySQL =>
---       else
             if Constants.WP_DEBUG then
                This.Dbh :=
                  Mysql_Connect (-This.Dbhost, -This.Dbuser, -This.Dbpassword,
@@ -1509,7 +1514,7 @@ is
          -- Load custom DB error template, if present.
          if File_Exists ((-Globals.WP_CONTENT_DIR) & "/db-error.php") then
 --          require_once WP_CONTENT_DIR & "/db-error.php";
-            Die; -- ();
+            Die;
          end if;
 
          declare
@@ -1571,7 +1576,6 @@ is
                            return Array_Type
    is
    begin
-      raise Program_Error with "not implemented";
       return Empty_Array;
    end Parse_DB_Host;
         --         socket  = null;
@@ -1613,88 +1617,110 @@ is
    -- Check_Connection --
    ----------------------
 
-   function Check_Connection (This       : Wpdb_Class;
+   function Check_Connection (This       : in out Wpdb_Class;
                               Allow_Bail : Boolean := True)
                               return Boolean
    is
+      use Php.Errors;
+      use Php.HTML;
+      use Php.Strings;
+      use Databases;
+      use UStrings;
+      use Inc_Functions;
+      use Inc_Load;
+      use Inc_L10n;
+      use Inc_Plugins;
    begin
-      raise Program_Error with "not implemented";
+      case This.Engine is
+
+      when Engine_ADO =>
+         if This.Dbh /= 0 and then Bind_ADO.Ping (This.Dbh) then
+            return True;
+         end if;
+
+      when Engine_MySQL =>
+         if This.Dbh /= 0 and then MySQL_Bind.Mysql_Ping (This.Dbh) then
+            return True;
+         end if;
+
+      when Engine_SQLite =>
+         pragma Assert (False);
+      end case;
+
+      declare
+         Reporting : Error_Level_Type := (others => False);
+      begin
+         -- Disable warnings, as we don't want to see a multitude of "unable to
+         -- connect" messages.
+         if Constants.WP_DEBUG then
+            Reporting := Error_Reporting;
+            Error_Reporting ((Warning => Reporting.Warning,
+                              others  => False));
+         end if;
+
+         for Tries in 1 .. This.Reconnect_Retries loop
+            -- On the last try, re-enable warnings. We want to see a single instance
+            -- of the "unable to connect" message on the bail() screen, if it appears.
+            if This.Reconnect_Retries = Tries and then Constants.WP_DEBUG then
+               Error_Reporting (Reporting);
+            end if;
+
+            if This.DB_Connect (Allow_Bail => False) then
+               if Reporting /= (others => False) then
+                  Error_Reporting (Reporting);
+               end if;
+
+               return True;
+            end if;
+
+            delay 1.000;
+         end loop;
+      end;
+
+      -- If template_redirect has already happened, it's too late for
+      -- wp_die()/dead_db(). Let's just return and hope for the best.
+      if Did_Action ("template_redirect") then
+         return False;
+      end if;
+
+      if not Allow_Bail then
+         return False;
+      end if;
+
+      Wp_Load_Translations_Early;
+
+      declare
+         Message : constant String :=
+           "<h1>" & abs "Error reconnecting to the database" & "</h1>" & NL &
+
+           "<p>" & Sprintf (
+                     -- translators: %s: Database host.
+                     abs "This means that the contact with the database server at %s was lost. This could mean your host&#8217;s database server is down.",
+                        [1 => "<code>" &
+                              HTML_Special_Chars (-This.Dbhost, ENT_QUOTES) &
+                              "</code>"]
+                   ) & "</p>" & NL &
+
+           "<ul>" & NL &
+           "<li>" & abs "Are you sure the database server is running?" & "</li>" & NL &
+           "<li>" & abs "Are you sure the database server is not under particularly heavy load?" & "</li>" & NL &
+           "</ul>" & NL &
+
+           "<p>" & Sprintf (
+                     -- translators: %s: Support forums URL.
+                     abs "If you are unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href=""%s"">WordPress Support Forums</a>.",
+                     [1 => abs "https://wordpress.org/support/forums/"]
+                   ) & "</p>" & NL;
+      begin
+         -- We weren't able to reconnect, so we better bail.
+         This.Bail (Message, "db_connect_fail");
+      end;
+
+      -- Call dead_db() if bail didn't die, because this database is no more.
+      -- It has ceased to be (at least temporarily).
+      Dead_DB;
       return False;
    end Check_Connection;
-        --         if (this.use_mysqli) then
-        --                 if (! empty(this.dbh) && mysqli_ping(this.dbh)) then
-        --                         return true;
-        --                 end;
-        --         end; else then
-        --                 if (! empty(this.dbh) && mysql_ping(this.dbh)) then
-        --                         return true;
-        --                 end;
-        --         end;
-
-        --         error_reporting = false;
-
-        --         // Disable warnings, as we don"t want to see a multitude of "unable to connect" messages.
-        --         if (WP_DEBUG) then
-        --                 error_reporting = error_reporting();
-        --                 error_reporting(error_reporting & ~E_WARNING);
-        --         end;
-
-        --         for (tries = 1; tries <= this.reconnect_retries; tries++) then
-        --                 // On the last try, re-enable warnings. We want to see a single instance
-        --                 // of the "unable to connect" message on the bail() screen, if it appears.
-        --                 if (this.reconnect_retries === tries && WP_DEBUG) then
-        --                         error_reporting(error_reporting);
-        --                 end;
-
-        --                 if (this.db_connect(false)) then
-        --                         if (error_reporting) then
-        --                                 error_reporting(error_reporting);
-        --                         end;
-
-        --                         return true;
-        --                 end;
-
-        --                 sleep(1);
-        --         end;
-
-        --         // If template_redirect has already happened, it"s too late for wp_die()/dead_db().
-        --         // Let"s just return and hope for the best.
-        --         if (did_action("template_redirect")) then
-        --                 return false;
-        --         end;
-
-        --         if (! allow_bail) then
-        --                 return false;
-        --         end;
-
-        --         wp_load_translations_early();
-
-        --         message = "<h1>" . __("Error reconnecting to the database") . "</h1>\n";
-
-        --         message .= "<p>" . sprintf(
-        --                 /* translators: %s: Database host.--
-        --                 __("This means that the contact with the database server at %s was lost. This could mean your host&#8217;s database server is down."),
-        --                 "<code>" . htmlspecialchars(this.dbhost, ENT_QUOTES) . "</code>"
-        --        ) . "</p>\n";
-
-        --         message .= "<ul>\n";
-        --         message .= "<li>" . __("Are you sure the database server is running?") . "</li>\n";
-        --         message .= "<li>" . __("Are you sure the database server is not under particularly heavy load?") . "</li>\n";
-        --         message .= "</ul>\n";
-
-        --         message .= "<p>" . sprintf(
-        --                 /* translators: %s: Support forums URL.--
-        --                 __("If you are unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href="%s">WordPress Support Forums</a>."),
-        --                 __("https://wordpress.org/support/forums/")
-        --        ) . "</p>\n";
-
-        --         // We weren"t able to reconnect, so we better bail.
-        --         this.bail(message, "db_connect_fail");
-
-        --         // Call dead_db() if bail didn"t die, because this database is no more.
-        --         // It has ceased to be (at least temporarily).
-        --         dead_db();
-        -- end;
 
    -----------
    -- Query --
@@ -1705,15 +1731,13 @@ is
                    return Rows_Result_Type
    is
       use Php.Preg;
---    use Php.Types;
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
       use UStrings;
       use Wp_Common;
       use Inc_Load;
       use Inc_L10n;
-      use Inc_Plugins;
    begin
       if not This.Ready then
          This.Check_Current_Query := True;
@@ -1787,7 +1811,7 @@ is
 --             if This.Use_Mysqli then
                case This.Engine is
 
-               when Engine_MySQLi =>
+               when Engine_ADO =>
 --                  if This.Dbh in Mysqli then -- instanceof
                      Mysql_Errno := Mysqli_Errno (This.Dbh);
 --                  else
@@ -1809,7 +1833,7 @@ is
                end case;
             end if;
 
-            if This.Dbh /= 0 or else 2006 = Mysql_Errno then
+            if This.Dbh = 0 or else 2006 = Mysql_Errno then
 --          if Empty (This.Dbh) or else 2006 = Mysql_Errno then
                if This.Check_Connection then -- ()
                   This.X_Do_Query (Query_2);
@@ -1824,7 +1848,7 @@ is
 --          if This.Use_Mysqli then
             case This.Engine is
 
-            when Engine_MySQLi =>
+            when Engine_ADO =>
 --               if This.Dbh in mysqli then -- instanceof
                   This.Last_Error := +Mysqli_Error (This.Dbh);
 --               else
@@ -1865,7 +1889,7 @@ is
 
             elsif Preg_Match ("/^\s*(insert|delete|update|replace)\s/i", Query_2) then
                case This.Engine is
-               when Engine_MySQLi =>
+               when Engine_ADO =>
                   This.Rows_Affected := Mysqli_Affected_Rows (This.Dbh);
                when Engine_MySQL =>
                   This.Rows_Affected := Mysql_Affected_Rows (This.Dbh);
@@ -1876,7 +1900,7 @@ is
                -- Take note of the insert_id.
                if Preg_Match ("/^\s*(insert|replace)\s/i", Query_2) then
                   case This.Engine is
-                  when Engine_MySQLi =>
+                  when Engine_ADO =>
                      This.Insert_Id := Mysqli_Insert_Id (This.Dbh);
                   when Engine_MySQL =>
                      This.Insert_Id := Mysql_Insert_Id (This.Dbh);
@@ -1893,15 +1917,13 @@ is
                begin
                   case This.Engine is
 
-                  when Engine_MySQLi =>
---                  if
---                    This.Use_Mysqli and then
---                    This.Result in Mysqli_Result    -- instanceof
---                  then
+                  when Engine_ADO =>
                      declare
                         Row : Natural;
                      begin
-                        while Row = Mysqli_Fetch_Object (This.Result) loop
+                        loop
+                           Row := Bind_ADO.Fetch_Object (This.Result);
+                           exit when Row = 0;
 --                         This.Last_Result (Num_Rows) := Row;
                            Num_Rows := Num_Rows + 1;
                         end loop;
@@ -1954,19 +1976,19 @@ is
    is
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
    begin
-      Put_Line ("x_do_query:");
-      Put_Line ("  query: " & Query);
+      Logging.Log ("x_do_query", Query);
       -- if (defined("SAVEQUERIES") && SAVEQUERIES) then
       --    this.timer_start();
       -- end if;
 
       if This.Dbh /= 0 then
          case This.Engine is
-         when Engine_MySQLi =>
+
+         when Engine_ADO =>
 --    if not Empty (This.Dbh) and then This.Use_Mysqli then
-            This.Result := Mysqli_Query (This.Dbh, Query);
+            This.Result := Bind_ADO.Query (This.Dbh, Query);
+
          when Engine_MySQL => --  This.Dbh /= 0 then
 --    elsif not Empty (This.Dbh) then
             This.Result := Mysql_Query (This.Dbh, Query);
@@ -2327,10 +2349,8 @@ is
               "UPDATE `" & Statement_Type (Table) &
               "` SET " & Fields_2 & " WHERE " & Conditions_2;
          begin
-            Put_Line ("update:");
-            Put_Line ("  sql: " & String (SQL));
-            Put_Line ("  values: ");
-            Put_Line (Values'Image);
+            Logging.Log ("update", "");
+            Logging.Log ("update", "sql: " & String (SQL));
 
             This.Check_Current_Query := False;
             return This.Query (This.Prepare (SQL, Values));
@@ -2434,7 +2454,7 @@ is
 
       Data_2 : Array_Type := Data;
    begin
-      Ada.Text_IO.Put_Line ("process_fields:");
+      Logging.Log ("process_fields", "");
 
       Data_2 := This.Process_Field_Formats (Data_2, Format);
       if Empty_Array = Data_2 then -- false
@@ -2590,7 +2610,7 @@ is
 
       Data_2 : Array_Type := Data;
    begin
-      Ada.Text_IO.Put_Line ("process_field_lengths: data:");
+      Logging.Log ("process_field_lengths", "data:");
       Arrays.IO.Dump (Data);
 
       for A in Data_2.Iterate loop
@@ -2637,8 +2657,8 @@ is
         +("\db.get_var(\" & String (Query) & "\" &
           Helpers.Image (X) & "," &
           Helpers.Image (Y) & "");
-      Put_Line ("\db.get_var(\" & String (Query) & "\" &
-                Helpers.Image (X) & "," & Helpers.Image (Y) & "");
+--    Put_Line ("\db.get_var(\" & String (Query) & "\" &
+--              Helpers.Image (X) & "," & Helpers.Image (Y) & "");
 
       if Query /= "" then
          if
@@ -2845,8 +2865,8 @@ is
                          return Array_Type
    is
    begin
-      Put_Line ("get_results: ");
-      Put_Line ("  output: " & Output);
+      Logging.Log ("get_results", "output: " & Output);
+
       Get_Results (This, Query);
       pragma Assert (Output = "OBJECT");
                 -- new_array = array();
@@ -2903,13 +2923,11 @@ is
                                Table : String)
                                return String_Error_Type
    is
-      use Ada.Containers;
       use Php.Strings;
       use UStrings;
       use Wp_Common;
       use Class_Errors;
       use Inc_L10n;
-      use Inc_Plugins;
 
       Tablekey : constant String := Strtolower (Table);
 
@@ -2929,9 +2947,7 @@ is
         +Apply_Filters ("pre_get_table_charset", "", -- null,
                         Table);
    begin
-      Put_Line ("get_table_charset:");
-      Put_Line ("  table: " & Tablekey);
-      Put_Line ("  charset: " & (-Charset));
+      Logging.Log ("get_table_charset", "");
 
       if "" /= Charset then -- null
          return (Success => True,
@@ -2949,10 +2965,12 @@ is
          Charsets : Array_Type;
          Columns  : Array_Type;
 
-         Table_Parts : constant List_Type  := Explode (".", Table);
-         Table       : constant String     := "`" & Implode ("`.`", Table_Parts) & "`";
+         Table_Parts : constant List_Type := Explode (".", Table);
 
-         Results     : constant Array_Type :=
+         Table : constant String :=
+           "`" & Implode ("`.`", Table_Parts) & "`";
+
+         Results : constant Array_Type :=
            This.Get_Results (Statement_Type ("SHOW FULL COLUMNS FROM " & Table));
       begin
          if Results = Empty_Array then -- not
@@ -3065,7 +3083,6 @@ is
       use Databases;
       use UStrings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Tablekey  : constant String := Strtolower (Table);
       Columnkey : constant String := Strtolower (Column);
@@ -3313,9 +3330,9 @@ is
          end;
 
          Table := Strtolower (Table);
-         Put_Line ("check_safe_collation :");
-         Put_Line ("  " & Table);
-         Put_Line (This.Col_Meta'Image);
+         Logging.Log ("check_safe_collation", "");
+         Logging.Log ("check_safe_collation", Table);
+--       Put_Line (This.Col_Meta'Image);
 
          if "" = Get_As_String (This.Col_Meta, Table) then
             return False;
@@ -3518,7 +3535,7 @@ is
                            Connection_Charset := This.Charset;
                         else
                            case This.Engine is
-                           when Engine_MySQLi =>
+                           when Engine_ADO =>
                               Connection_Charset := +"XXX-998";
 --                              Mysqli_Character_Set_Name (This.Dbh);
                            when Engine_MySQL =>
@@ -3749,8 +3766,7 @@ is
 
       Maybe : List_Type;
    begin
-      Put_Line ("get_table_from_query: ");
-      Put_Line ("  query: " & String (Query));
+      Logging.Log ("get_table_from_query", "query: " & String (Query));
 
       -- Quickly match most common queries.
       if
@@ -3905,7 +3921,7 @@ is
    is
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
       use UStrings;
       use Inc_Functions;
    begin
@@ -3915,7 +3931,7 @@ is
          begin
             case This.Engine is
 
-            when Engine_MySQLi =>
+            when Engine_ADO =>
                if True then
 --             if This.Dbh in Mysqli then
                   Error := +Mysqli_Error (This.Dbh);
@@ -4063,7 +4079,7 @@ is
       use Php.Preg;
       use Php.Strings;
       use MySQL_Bind;
-      use MySQLi_Bind;
+      use Bind_ADO;
       use Databases;
 
       DB_Server_Info_2 : constant String := This.DB_Server_Info;
@@ -4107,7 +4123,7 @@ is
          declare
             Client_Version : constant String :=
               (case This.Engine is
-               when Engine_MySQLi => Mysqli_Get_Client_Info,
+               when Engine_ADO => Mysqli_Get_Client_Info,
                when Engine_MySQL  => Mysql_Get_Client_Info,
                when Engine_SQLite => "10.11.14");
          begin
@@ -4166,11 +4182,10 @@ is
    is
       use Databases;
       use MySQL_Bind;
-      use MySQLi_Bind;
    begin
       return
         (case This.Engine is
-         when Engine_MySQLi => MySQLi_Get_Server_Info (This.Dbh),
+         when Engine_ADO    => Bind_ADO.Get_Server_Info,
          when Engine_MySQL  => MySQL_Get_Server_Info (This.Dbh),
          when Engine_SQLite => "10.11.14");
    end DB_Server_Info;
@@ -4189,7 +4204,7 @@ is
          This.Options := +Value;
       end if;
 
-      Put_Line ("set_table: " & Table);
+      Logging.Log ("set_table", Table);
       pragma Assert (False);
    end Set_Table;
 

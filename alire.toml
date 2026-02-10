@@ -17,3 +17,6 @@ runner = "alire"
 [[depends-on]]
 aws = "^25.2.0"
 simple_components = "^4.68.0"
+
+[[depends-on]]
+ado_mysql = "^2.5.0"

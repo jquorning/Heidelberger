@@ -4,7 +4,6 @@
 
 with Php.Echoing;
 
-with Helpers;
 with Logging;
 
 package body Php.Errors
@@ -26,21 +25,29 @@ is
    -- Error_Reporting --
    ---------------------
 
-   procedure Error_Reporting (Error_Level : Integer := 0)
+   procedure Error_Reporting (Error_Level : Error_Level_Type := ERROR_NONE)
    is
    begin
-      Logging.Log ("error_reporting", Helpers.Image (Error_Level));
+      Logging.Log ("error_reporting", Error_Level'Image);
    end Error_Reporting;
+
+   ---------------------
+   -- Error_Reporting --
+   ---------------------
+
+   function Error_Reporting return Error_Level_Type
+   is (others => True);
 
    -------------------
    -- Trigger_Error --
    -------------------
 
-   procedure Trigger_Error (Message     : String;
-                            Error_Level : Integer := E_USER_NOTICE)
+   procedure Trigger_Error
+               (Message     : String;
+                Error_Level : Error_Level_Type := E_USER_NOTICE)
    is
    begin
-      Logging.Log ("trigger_error", Helpers.Image (Error_Level));
+      Logging.Log ("trigger_error", Error_Level'Image);
       Logging.Log ("trigger_error", Message);
    end Trigger_Error;
 

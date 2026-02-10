@@ -8,19 +8,19 @@
 --
 
 with Globals;
+with UStrings;
 with Wp_Common;
 
 with Inc_Default_Filters;
 with Inc_Default_Constants;
 with Inc_L10n;
 with Inc_Load;
-with Inc_Plugins;
--- with Inc_Pluggables;
 with Inc_Posts;
 with Inc_Taxonomys;
 with Inc_Themes;
 with Inc_Vars;
--- with Inc_Versions;
+
+with Wp_Config;
 
 package body Wp_Settings
 is
@@ -32,7 +32,6 @@ is
    procedure Run
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       --
       -- Stores the location of the WordPress directory of functions, classes,
@@ -167,7 +166,7 @@ is
 
       -- Set the database table prefix and the format specifiers for database
       -- table columns.
---    $GLOBALS['table_prefix'] = $table_prefix;
+      Globals.Table_Prefix := UStrings.To_UString (Wp_Config.Table_Prefix);
       Inc_Load.Wp_Set_Wpdb_Vars;
 
       -- Start the WordPress object cache, or an external object cache if the

@@ -31,7 +31,6 @@ with Inc_Comments;
 with Inc_Formatting;
 with Inc_Functions;
 with Inc_Pluggables;
-with Inc_Plugins;
 with Inc_Posts;
 with Inc_Taxonomys;
 
@@ -848,8 +847,6 @@ is
 --        end if;
 
       declare
-         use Inc_Plugins;
-
          -- This filter is documented in wp-includes/meta.php
          Check : constant Integer
            := Apply_Filters (Hook_Name => "get_" & Meta_Type & "_metadata",
@@ -1399,7 +1396,6 @@ is
       use Php.Preg;
       use Php.Strings;
       use Wp_Common;
-      use Inc_Plugins;
 
       Sanitized_Key : constant String :=
         Preg_Replace ("/[^\x20-\x7E\p{L}]/", "", Meta_Key);
@@ -1867,7 +1863,6 @@ is
       use Wp_Common;
       use Class_Posts;
       use Inc_Posts;
-      use Inc_Plugins;
 
       Object_Subtype : UString;
    begin

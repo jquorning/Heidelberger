@@ -354,7 +354,6 @@ is
       use Wp_Common;
       use Inc_Load;
       use Inc_Options;
-      use Inc_Plugins;
 
       Id_2 : constant Integer :=
         (if Id = 0

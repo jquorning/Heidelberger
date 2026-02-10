@@ -96,7 +96,6 @@ is
 --    global wp_scripts;
       use Wp_Common;
       use Class_Scripts;
-      use Inc_Plugins;
    begin
       --
       -- Fires before scripts in the handles queue are printed.

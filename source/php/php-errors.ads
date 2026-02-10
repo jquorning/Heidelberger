@@ -16,12 +16,24 @@ is
 
    procedure Die (Reason : String := "");
 
-   E_USER_NOTICE  : constant Integer := 47;  -- Arbitraty
-   E_USER_WARNING : constant Integer := 48;
+   type Error_Level_Type is
+     record
+        User_Notice  : Boolean;
+        User_Warning : Boolean;
+        Warning      : Boolean;
+     end record;
 
-   procedure Error_Reporting (Error_Level : Integer := 0);
+   ERROR_NONE     : constant Error_Level_Type := (others => False);
+   E_USER_NOTICE  : constant Error_Level_Type := (User_Notice => True,
+                                                  others      => False);
+   E_USER_WARNING : constant Error_Level_Type := (User_Warning => True,
+                                                  others       => False);
 
-   procedure Trigger_Error (Message     : String;
-                            Error_Level : Integer := E_USER_NOTICE);
+   procedure Error_Reporting (Error_Level : Error_Level_Type := ERROR_NONE);
+   function Error_Reporting return Error_Level_Type;
+
+   procedure Trigger_Error
+               (Message     : String;
+                Error_Level : Error_Level_Type := E_USER_NOTICE);
 
 end Php.Errors;

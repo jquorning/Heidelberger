@@ -14,12 +14,10 @@ with Globals;
 with UStrings;
 with Wp_Common;
 
-with Class_Dependencies;
 with Class_Styles;
 with Inc_Functions;
 with Inc_Functions_Wp_Scripts;
 with Inc_L10n;
-with Inc_Plugins;
 
 package body Inc_Functions_Wp_Styles
 is
@@ -44,7 +42,6 @@ is
                              return List_Type
    is
       use Inc_Functions_Wp_Scripts;
-      use Inc_Plugins;
       use Wp_Common;
 --    global wp_styles;
    begin
@@ -202,7 +199,6 @@ is
    is
       use Php.Strings;
       use Class_Styles;
-      use Class_Dependencies;
       use Inc_Functions_Wp_Scripts;
    begin
       X_Wp_Scripts_Maybe_Doing_It_Wrong ("__FUNCTION__", Handle);

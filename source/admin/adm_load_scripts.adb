@@ -59,7 +59,7 @@ is
       Wp_Scripts : Class_Scripts.Wp_Scripts := Class_Scripts.X_Construct;
       Expires_Offset : Natural;
    begin
-      Error_Reporting (0);
+      Error_Reporting (ERROR_NONE);
 
 -- Set ABSPATH for execution.
 -- if ( ! defined( 'ABSPATH' ) ) then

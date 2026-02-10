@@ -97,4 +97,8 @@ is
                                    is ("10.11.14");
 -- is (raise Program_Error with "not implemented");
 
+   function Mysql_Ping (Dbh : Integer)
+                        return Boolean
+                        is (False);
+
 end MySQL_Bind;

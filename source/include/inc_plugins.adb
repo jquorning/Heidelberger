@@ -131,7 +131,8 @@ is
       end if;
 
       -- Pass the value to WP_Hook.
-      Array_Unshift (Args_2, Value);
+      Args_2.Array_Unshift (Value);
+--    Array_Unshift (Arrayable_Interface'Class (Args_2), Value);
 
       declare
          Filtered : constant Array_Type :=

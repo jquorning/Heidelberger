@@ -6,8 +6,6 @@
 -- @since 4.7.0
 --
 
-with Ada.Text_IO; use Ada.Text_IO;
-
 with Php.Arrays;
 with Php.Lists;
 

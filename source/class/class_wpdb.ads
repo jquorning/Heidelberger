@@ -237,7 +237,8 @@ is
          -- @see wpdb::check_connection()
          -- @var int
          --
---        protected $reconnect_retries = 5;
+         --
+         Reconnect_Retries : Natural := 5;
 
          --
          -- WordPress table prefix.
@@ -419,7 +420,7 @@ is
          -- @var string
          --
          Options : UStrings.UString :=
-           UStrings.To_UString ("options"); -- added
+           UStrings.To_UString ("wp_options"); -- added
 
          --
          -- WordPress Post Metadata table.
@@ -948,7 +949,7 @@ is
    -- @param bool allow_bail Optional. Allows the function to bail. Default true.
    -- @return bool|void True if the connection is up.
    --
-   function Check_Connection (This       : Wpdb_Class;
+   function Check_Connection (This       : in out Wpdb_Class;
                               Allow_Bail : Boolean := True)
                               return Boolean;
 

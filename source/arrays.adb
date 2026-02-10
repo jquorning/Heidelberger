@@ -56,7 +56,7 @@ is
                      Value : Multi_Type)
    is
    begin
-      Array_Maps.Insert (Array_Maps.Map (Arry), Key, Value);
+      Array_Maps.Include (Array_Maps.Map (Arry), Key, Value);
    end Append;
 
    --------------
@@ -1235,7 +1235,7 @@ is
       end loop;
 
       declare
-         Arry : Array_Access := Holder.Holder;
+         Arry : constant Array_Access := Holder.Holder;
       begin
          if Arry /= null then
 --          Free (Arry);

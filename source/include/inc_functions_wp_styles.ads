@@ -7,7 +7,6 @@
 -- @subpackage Dependencies
 --
 
-with Arrayable_Arrays;
 with Arrayable_Interfaces;
 with Arrays;
 with Lists;

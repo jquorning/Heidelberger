@@ -30,7 +30,6 @@ with Inc_Functions;
 with Inc_Load;
 with Inc_L10n;
 with Inc_Options;
-with Inc_Plugins;
 with Inc_Themes;
 with Inc_Versions;
 
@@ -412,7 +411,6 @@ is
       use Inc_Load;
       use Inc_L10n;
       use Inc_Options;
-      use Inc_Plugins;
       use Inc_Themes;
       use Inc_Versions;
 --    global wpdb, wp_db_version, wp_current_db_version;

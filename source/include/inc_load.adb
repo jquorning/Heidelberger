@@ -17,6 +17,7 @@ with Binder;
 with Constants;
 with Globals;
 with Lists;
+with Logging;
 with UStrings;
 with Wp_Common;
 
@@ -31,7 +32,6 @@ with Inc_Error_Protection;
 with Inc_Functions;
 with Inc_L10n;
 with Inc_Ms_Networks;
-with Inc_Plugins;
 with Inc_Pluggables;
 
 package body Inc_Load
@@ -611,6 +611,7 @@ is
       Prefix : UString;
    begin
       if not Empty (-Globals.WpDB.Error) then
+         Logging.Log ("wp_set_wpdb_vars", -Globals.WpDB.Error);
          Dead_DB;
       end if;
 
@@ -652,7 +653,7 @@ is
                 Build ("spam",             "%d")
         ]);
 
-      Prefix := +Globals.WpDB.Set_Prefix (Wp_Config.Table_Prefix);
+      Prefix := +Globals.WpDB.Set_Prefix (-Globals.Table_Prefix);
 
       if Is_Wp_Error (-Prefix) then
          Wp_Load_Translations_Early;
@@ -1295,13 +1296,11 @@ is
    -- Get_Current_Blog_Id --
    -------------------------
 
-   Global_Blog_Id : Integer := 0;
-
    function Get_Current_Blog_Id
             return Integer
    is
    begin
-      return abs Global_Blog_Id;
+      return abs Globals.Global_Blog_Id;
    end Get_Current_Blog_Id;
 
    ----------------------------
@@ -1589,7 +1588,6 @@ is
    is
       use Constants;
       use Wp_Common;
-      use Inc_Plugins;
    begin
       --
       -- Filters whether the current request is a WordPress Ajax request.
@@ -1676,7 +1674,6 @@ is
                                     return Boolean
    is
       use Wp_Common;
-      use Inc_Plugins;
    begin
       --
       -- Filters whether file modifications are allowed.

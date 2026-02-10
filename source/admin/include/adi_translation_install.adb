@@ -254,7 +254,6 @@ is
       use Php.Arrays;
       use Php.Echoing;
       use Php.Strings;
-      use Array_Lists;
       use UStrings;
       use Inc_Formatting;
       use Inc_L10n;

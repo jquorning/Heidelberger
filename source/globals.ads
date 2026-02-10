@@ -25,6 +25,9 @@ is
    use Lists;
 
    GLOBALS : Array_Type := Empty_Array;
+   Table_Prefix : UStrings.UString;
+
+   Global_Blog_Id : Integer := Integer'First;
 
    WpDB : Class_WpDB.Wpdb_Class;
 

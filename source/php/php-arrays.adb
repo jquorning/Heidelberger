@@ -3,7 +3,6 @@
 --
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
 
 with Php.Strings;
 
@@ -236,6 +235,29 @@ is
       end loop;
       return Result;
    end Array_Unique;
+
+   -------------------
+   -- Array_Unshift --
+   -------------------
+
+   procedure Array_Unshift (Arry : in out Array_Type;
+                            S    : String)
+   is
+   begin
+      raise Program_Error with "not implemented";
+   end Array_Unshift;
+
+   -------------------
+   -- Array_Unshift --
+   -------------------
+
+   procedure Array_Unshift (Arry : in out Array_Type;
+                            S    : Array_Type)
+   is
+   begin
+      Arry := Array_Merge (S, Arry);
+--    raise Program_Error with "not implemented";
+   end Array_Unshift;
 
    -----------
    -- Isset --

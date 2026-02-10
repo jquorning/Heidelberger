@@ -81,7 +81,7 @@ is
 --         end;
 
 --         if ( ! isset( $blog_id ) ) then
---                 $blog_id = 1;
+      Globals.Global_Blog_Id := 1;
 --         end;
 
 --         if ( ! defined( "WP_CONTENT_DIR" ) ) then

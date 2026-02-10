@@ -117,7 +117,7 @@ is
    --
    function Get_Metadata (Meta_Type : String;
                           Object_Id : Integer;
-                          meta_key  : String  := "";
+                          Meta_Key  : String  := "";
                           Single    : Boolean := False)
                           return Array_Type is (Empty_Array);
 

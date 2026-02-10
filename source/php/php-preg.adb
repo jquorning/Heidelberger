@@ -4,6 +4,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Logging;
 with UStrings;
 
 with GNAT.Regpat;
@@ -62,16 +63,13 @@ is
             Flags := Flags and Case_Insensitive;
 
          when 's' =>
-            Put_Line ("DOTALL ignored in:");
-            Put_Line ("  " & Pattern);
+            Logging.Log ("find_marks", "DOTALL ignored in: " & Pattern);
 
          when 'x' =>
-            Put_Line ("EXTENDED ignored in:");
-            Put_Line ("  " & Pattern);
+            Logging.Log ("find_marks", "EXTENDED ignored in: " & Pattern);
 
          when others =>
-            Put_Line ("find_marks: " & Flag & " not implemented");
-            Put_Line (" in: " & Pattern);
+            Logging.Log ("find_marks", Flag & " not implemented in: " & Pattern);
             raise Program_Error with "not implemented";
          end case;
       end loop;
@@ -143,10 +141,10 @@ is
    is
       use GNAT.Regpat;
    begin
-      Put_Line ("preg_replace:");
-      Put_Line ("  pattern    : " & Pattern);
-      Put_Line ("  replacement: " & Replacement);
-      Put_Line ("  subject    : " & Subject);
+      Logging.Log ("preg_replace", "");
+      Logging.Log ("preg_replace", "  pattern    : " & Pattern);
+      Logging.Log ("preg_replace", "  replacement: " & Replacement);
+      Logging.Log ("preg_replace", "  subject    : " & Subject);
 
       declare
          Marks : constant Marks_Type :=
@@ -169,8 +167,7 @@ is
 
    exception
       when Expression_Error =>
-         Put_Line ("preg_replace:");
-         Put_Line ("  EXCEPTION: Expression_Error");
+         Logging.Log ("preg_replace", "  EXCEPTION in: " & Pattern);
          return Subject;
    end Preg_Replace;
 
@@ -196,9 +193,7 @@ is
 
       Result : Match_Array (0 .. Paren_Count (Re));
    begin
-      Put_Line ("preg_match:");
---    Put_Line ("  marks:");
---    Put_Line (Marks'Image);
+      Logging.Log ("preg_match", "");
 
       Match (Re, Subject, Result);
       if Result (0) = No_Match then
